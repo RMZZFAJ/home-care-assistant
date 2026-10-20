@@ -104,6 +104,12 @@ supabase db reset
    - Site URL: `https://SEU_DOMINIO.vercel.app`
    - Redirect URLs: `https://SEU_DOMINIO.vercel.app/**`
 
+7. Para habilitar login com Google, em Supabase abra `Authentication > Providers > Google`, habilite o provedor e informe o Client ID e o Client Secret criados no Google Cloud. Adicione como callback autorizado do Google:
+
+   `https://SEU_PROJECT_REF.supabase.co/auth/v1/callback`
+
+   O botão Google já está disponível na tela de login e usa `/auth/callback` para concluir a sessão. O usuário OAuth ainda precisa ter um perfil ativo em `public.profiles`; para contas novas, crie o perfil após o primeiro login.
+
 6. Atualize `NEXT_PUBLIC_APP_URL` com o domínio final e redeploy:
 
    ```powershell

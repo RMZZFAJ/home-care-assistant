@@ -18,6 +18,7 @@ Atualizado em 20/10/2026.
 ## O que foi implementado
 
 - Fluxo de login, logout e proteção server-side com Supabase Auth.
+- Botão de login Google e callback OAuth implementados; o provedor ainda depende de configuração no painel Supabase/Google Cloud.
 - Autorização por perfil ativo (`admin`, `supervisor`, `professional` e `reader`).
 - RLS nas tabelas de negócio.
 - Validação de requisições, limites, JSON inválido, duplicidades e idempotência.
@@ -79,7 +80,9 @@ Senhas nunca devem ser armazenadas no repositório, em documentação ou em comm
 
 Foi solicitado um master remoto com o e-mail `renatomazzarino10@gmail.com` e a senha fornecida pelo proprietário do projeto. Também foi preparado um usuário de teste comum `usuario.teste@home-care.test`, com perfil `professional`.
 
-**Atenção:** esses dois registros foram inseridos diretamente no schema interno `auth` durante a preparação, mas o login via GoTrue retornou erro. Eles precisam ser removidos e recriados pelo painel Supabase Auth ou pela API Admin oficial. Não considerar as contas prontas até o login ser validado.
+**Atenção:** os registros de teste antigos criados diretamente no schema interno `auth` continuam documentados como inválidos. Não reutilize esses registros sem recriá-los pelo fluxo oficial do Supabase Auth.
+
+O usuário `renatomazzarinocorp@gmail.com` foi criado pelo painel Supabase, confirmado por e-mail e recebeu perfil `admin` ativo em `public.profiles`.
 
 Perfis planejados:
 
@@ -89,13 +92,14 @@ Perfis planejados:
 ## O que falta concluir
 
 1. Remover os dois registros Auth inválidos de teste, após confirmação explícita.
-2. Recriar master e usuário comum pelo mecanismo oficial do Supabase Auth.
-3. Confirmar login de ambos pela tela `/login`.
-4. Configurar `NEXT_PUBLIC_APP_URL` na Vercel.
-5. Fazer o primeiro deploy com `vercel deploy --prod`.
-6. Configurar Site URL e Redirect URLs no Supabase Auth.
-7. Testar criação de uma requisição no ambiente remoto.
-8. Antes de produção, criar outro projeto Supabase sem dados fictícios e separar Preview/Production.
+2. Confirmar login do novo admin pela tela `/login`.
+3. Configurar o provedor Google no Supabase e Google Cloud.
+4. Criar perfil ativo para novos usuários OAuth.
+5. Configurar `NEXT_PUBLIC_APP_URL` na Vercel.
+6. Fazer o primeiro deploy com `vercel deploy --prod`.
+7. Configurar Site URL e Redirect URLs no Supabase Auth.
+8. Testar criação de uma requisição no ambiente remoto.
+9. Antes de produção, criar outro projeto Supabase sem dados fictícios e separar Preview/Production.
 
 ## Decisões e itens descartados
 
@@ -129,4 +133,3 @@ vercel deploy --prod
 - `git diff --check`
 - Migrações locais e remotas conferidas.
 - Projeto remoto confirmado como `ACTIVE_HEALTHY`.
-
