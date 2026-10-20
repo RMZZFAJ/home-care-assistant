@@ -1,11 +1,11 @@
 # Estado completo do projeto
 
-Atualizado em 20/10/2026.
+Atualizado em 20/10/2026, após a sincronização final do Supabase e limpeza das branches.
 
 ## Identificação
 
 - Repositório: `RMZZFAJ/home-care-assistant`
-- Branch de trabalho publicada: `hardening/home-care-assistant`
+- Branch de trabalho publicada: `master`
 - Projeto Supabase de testes: `home-care-assistant`
 - Supabase project-ref: `qwfrqychokvhdzakibid`
 - Organização Supabase: `wfaicgnnirwsxzupchwo`
@@ -36,13 +36,15 @@ Atualizado em 20/10/2026.
 
 ## Banco remoto de testes
 
-As cinco migrações versionadas foram aplicadas com `supabase db push`:
+As sete migrações versionadas foram aplicadas com `supabase db push` e estão sincronizadas:
 
 1. `20261019000100_initial_schema.sql`
 2. `20261019000200_catalog_and_submission_hardening.sql`
 3. `20261020000300_update_product_units.sql`
 4. `20261020000400_add_product_aliases.sql`
 5. `20261020000500_set_fosfomicina_canonical_name.sql`
+6. `20261020000600_grant_authenticated_permissions.sql`
+7. `20261020000700_restrict_public_data_api_access.sql`
 
 O seed fictício foi aplicado no remoto com autorização explícita para este ambiente de testes.
 
@@ -54,6 +56,7 @@ Estado atual:
 - Extensão `unaccent` instalada.
 - Função `find_product_by_alias(text)` existente.
 - O seed não deve ser usado em produção sem revisão dos dados.
+- As branches legadas foram removidas; `master` é a única branch de trabalho.
 
 ## Vercel
 

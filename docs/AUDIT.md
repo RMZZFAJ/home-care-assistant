@@ -1,6 +1,6 @@
 # Auditoria técnica
 
-Data: 20/10/2026
+Data: 20/10/2026 (atualizado após sincronização remota)
 
 ## Escopo revisado
 
@@ -32,24 +32,24 @@ Passaram localmente:
 
 O deploy Production da Vercel foi validado anteriormente como `Ready`.
 
-## Pendência bloqueada
+## Estado do banco remoto
 
-A aplicação da migração `20261020000700` no Supabase remoto não foi concluída nesta auditoria porque `supabase db push` retornou HTTP 403 ao inicializar o login role. A conta do CLI precisa recuperar permissão de gerenciamento do projeto. Depois disso, execute:
+A conta correta foi autenticada no Supabase CLI, o projeto foi vinculado e a migração
+`20261020000700` foi aplicada com sucesso. A lista local/remota está sincronizada
+com as sete migrações:
 
 ```powershell
-supabase link --project-ref qwfrqychokvhdzakibid
-supabase db push
+supabase migration list
 ```
 
-Confirme com `supabase migration list` que a migração `20261020000700` aparece em local e remoto.
+O projeto remoto continua sendo um ambiente de testes com seed fictício.
 
 ## Branches após a auditoria
 
-O estado auditado foi consolidado em `master` por fast-forward no commit
-`d43bfff`. A branch `hardening/home-care-assistant` aponta para o mesmo commit
-e pode ser mantida como histórico ou removida posteriormente. A branch remota
-`fix/mvp-hardening-2026-10-19` permanece no commit anterior `ec6bc18` e não
-contém as correções finais; ela não participa do deploy principal.
+O estado auditado foi consolidado em `master` e publicado em `origin/master`.
+As branches legadas `hardening/home-care-assistant` e
+`fix/mvp-hardening-2026-10-19` foram removidas local e remotamente. A partir de
+agora, alterações devem ser feitas somente em `master`.
 
 ## Riscos ainda existentes antes de produção
 
