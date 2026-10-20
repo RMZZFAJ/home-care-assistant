@@ -23,7 +23,13 @@ export async function GET(request: Request) {
   if (protocol) query = query.ilike("protocol", `%${protocol}%`);
   if (status) query = query.eq("status", status);
   if (from) query = query.gte("created_at", `${from}T00:00:00.000Z`);
-  if (to) query = query.lt("created_at", `${to}T00:00:00.000Z`);
+  if (to) {
+    const end = new Date(`${to}T00:00:00.000Z`);
+    if (!Number.isNaN(end.getTime())) {
+      end.setUTCDate(end.getUTCDate() + 1);
+      query = query.lt("created_at", end.toISOString());
+    }
+  }
   const { data, error, count } = await query;
   if (error) {
     console.error("Failed to load requisition history.", error);

@@ -9,7 +9,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   const { id } = await context.params;
   const { data, error } = await supabase
     .from("requisitions")
-    .select("id, protocol, status, created_at, updated_at, profiles!requisitions_created_by_fkey(full_name), care_recipients(display_name), requisition_items(product_id, custom_name, current_stock, urgent, products(name, category, unit)), requisition_observations(body, created_at), requisition_notifications(recipient_group, recipient_label, channel, state, attempts, attempted_at, last_error)")
+    .select("id, protocol, status, created_at, updated_at, profiles!requisitions_created_by_fkey(full_name), care_recipients(display_name), requisition_items(product_id, custom_name, current_stock, urgent, products(name, category, unit)), requisition_observations(body, created_at), requisition_status_history(from_status, to_status, changed_by, changed_at, reason), requisition_notifications(recipient_group, recipient_label, channel, state, attempts, attempted_at, last_error)")
     .eq("id", id)
     .maybeSingle();
   if (error) {

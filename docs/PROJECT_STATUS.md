@@ -36,7 +36,8 @@ Atualizado em 20/10/2026, após a sincronização final do Supabase e limpeza da
 
 ## Banco remoto de testes
 
-As sete migrações versionadas foram aplicadas com `supabase db push` e estão sincronizadas:
+As migrações versionadas até `20261020001700` foram aplicadas no banco local durante a validação. Não houve
+`supabase db push` nem sincronização de banco remoto nesta rodada:
 
 1. `20261019000100_initial_schema.sql`
 2. `20261019000200_catalog_and_submission_hardening.sql`

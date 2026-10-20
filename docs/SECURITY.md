@@ -13,6 +13,12 @@
 - O histórico é consultado pelo vínculo autorizado ao paciente, não por protocolo ou por `created_by`; leitores têm somente leitura.
 - Estoque é um catálogo único com saldos separados por paciente e custódia. Movimentos são transacionais, idempotentes e auditados; a API não aceita edição direta de saldo.
 - Falha de notificação não desfaz uma requisição persistida. Estados individuais ficam preparados para processamento assíncrono e retry.
+- Cada requisição cria um item interno pendente após a persistência; nenhum envio externo é declarado como concluído sem confirmação do provedor.
+- Alterações de status passam pela função SQL `transition_requisition_status`, que valida perfil ativo, escopo, matriz de transições e justificativa de cancelamento.
+- Saídas de estoque são verificadas contra o saldo derivado sob lock transacional; apenas administrador global pode autorizar saldo negativo, sempre com justificativa e auditoria.
+- Administração de perfis, pacientes, catálogo, memberships e importação histórica exige administrador global verificado por `auth.uid()`; nenhuma dessas operações aceita função, escopo ou status confiados ao navegador.
+- A importação histórica usa hash de lote, limites, validação de produtos/paciente e protocolo separado da sequence nova; a repetição da mesma carga retorna o relatório original.
+- Aprovação de inventário é exclusiva de administrador global e transforma apenas divergências em movimentos de ajuste auditáveis.
 - A chave de idempotência é criada uma vez por submissão no navegador e a unicidade por usuário é reforçada no banco.
 - Documentos futuros deverão usar bucket privado e URLs assinadas curtas.
 

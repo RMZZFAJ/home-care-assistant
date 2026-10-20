@@ -39,6 +39,32 @@ O repositório usa migrações versionadas; não copie o banco manualmente e nã
 
    Se `supabase link --project-ref` informar que a conta não tem privilégios, confirme no painel do Supabase que o projeto pertence à organização da conta autenticada no CLI ou aceite um convite de membro/administrador. Não use uma chave de outro projeto e não tente aplicar migrações até o vínculo funcionar.
 
+### Resultado da tentativa de aplicação em 20/10/2026
+
+Nesta rodada o projeto local está vinculado ao ref `qwfrqychokvhdzakibid`, mas a
+conta autenticada no Supabase CLI não possui privilégio para inicializar a role de
+login do banco. Os comandos abaixo foram executados e falharam antes de executar
+qualquer migração:
+
+```powershell
+supabase migration list
+supabase db push --yes
+```
+
+Erro retornado:
+
+```text
+DbConfigLoginRoleStatusError: unexpected login role status 403
+Your account does not have the necessary privileges to access this endpoint.
+```
+
+Por segurança, não foi usada chave de outro projeto, `SUPABASE_SERVICE_ROLE_KEY`,
+conexão direta desconhecida ou qualquer atalho para contornar o controle de acesso.
+Um membro/administrador da organização `wfaicgnnirwsxzupchwo` precisa conceder
+acesso ao usuário autenticado. Depois disso, execute `supabase db push --yes` e
+confirme que as migrações `20261020001300` até `20261020001800` foram aplicadas
+antes de publicar a versão correspondente na Vercel.
+
 4. Crie a pessoa assistida e o perfil administrativo no remoto por procedimento controlado. Não execute `supabase/seed.sql` em produção, pois ele contém dados fictícios.
 
 5. Crie o usuário no Auth pelo painel Supabase ou pelo fluxo administrativo. Depois insira o perfil correspondente:
@@ -57,6 +83,20 @@ supabase db reset
 ```
 
 ## Conectar e publicar na Vercel
+
+O projeto Vercel `home-care-assistant` está vinculado ao escopo `rmzzfajs-projects`,
+com URL atual `https://home-care-assistant.vercel.app`. As variáveis
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+`NEXT_PUBLIC_APP_URL` e `CARE_RECIPIENT_ID` existem em Production e Preview.
+Os valores não são reproduzidos nesta documentação.
+
+Não publique uma versão que exija migrações ainda não aplicadas. A ordem segura é:
+
+1. corrigir o acesso do Supabase;
+2. executar `supabase db push --yes`;
+3. validar Auth, perfil ativo e `CARE_RECIPIENT_ID`;
+4. executar as validações locais;
+5. executar `vercel deploy --prod`.
 
 1. Faça login. Se o comando `vercel` não for reconhecido no PowerShell, use o caminho completo abaixo:
 
