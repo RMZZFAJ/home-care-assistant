@@ -90,13 +90,19 @@ com URL atual `https://home-care-assistant.vercel.app`. As variáveis
 `NEXT_PUBLIC_APP_URL` e `CARE_RECIPIENT_ID` existem em Production e Preview.
 Os valores não são reproduzidos nesta documentação.
 
-Não publique uma versão que exija migrações ainda não aplicadas. A ordem segura é:
+Não publique uma versão que exija migrações ainda não aplicadas. Nesta rodada o push
+para `master` acionou automaticamente um deploy de produção, que terminou `Ready`
+e respondeu HTTP 200, apesar do bloqueio do banco remoto. Isso deixa a página pública,
+mas não significa que as operações dependentes do schema novo estejam prontas. A
+ordem segura para a próxima atualização é:
 
 1. corrigir o acesso do Supabase;
 2. executar `supabase db push --yes`;
 3. validar Auth, perfil ativo e `CARE_RECIPIENT_ID`;
 4. executar as validações locais;
-5. executar `vercel deploy --prod`.
+5. executar `vercel deploy --prod` ou deixar o push acionar o deploy automático;
+6. verificar o alias `https://home-care-assistant.vercel.app` e testar login,
+   histórico e uma operação administrativa autorizada.
 
 1. Faça login. Se o comando `vercel` não for reconhecido no PowerShell, use o caminho completo abaixo:
 

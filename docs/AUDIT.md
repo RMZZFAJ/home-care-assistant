@@ -54,8 +54,11 @@ rodada. A validação descrita aqui é exclusivamente local.
 ## Branches após a auditoria
 
 O estado auditado nesta rodada está apenas no working tree local de `master`.
-O commit e o push desta rodada devem ser feitos após a revisão final; deploy não deve
-ocorrer enquanto o banco remoto não aceitar `supabase db push`.
+O commit `4256ae6` foi enviado para `origin/master`. O push acionou o deploy
+automático da Vercel, que terminou `Ready` em 20/10/2026 e assumiu o alias de
+produção `https://home-care-assistant.vercel.app`. O banco remoto, porém, não
+aceitou `supabase db push`; portanto a publicação existe, mas as funcionalidades
+que dependem das migrações novas ainda aguardam aplicação no banco remoto.
 
 ## Limitações e pendências verificadas
 
@@ -83,6 +86,6 @@ ocorrer enquanto o banco remoto não aceitar `supabase db push`.
   global, com justificativa e auditoria; demais perfis são bloqueados.
 - A tentativa de aplicar o banco remoto em 20/10/2026 foi bloqueada por HTTP 403 do
   Supabase CLI (`DbConfigLoginRoleStatusError`). Nenhuma migração remota foi executada.
-- A Vercel possui as quatro variáveis esperadas em Production e Preview, mas a versão
-  correspondente não deve ser publicada até as migrações `20261020001300`–`20261020001800`
-  estarem aplicadas no banco remoto.
+- A Vercel possui as quatro variáveis esperadas em Production e Preview. A página de
+  produção respondeu HTTP 200 e o deployment ficou `Ready`, mas as migrações
+  `20261020001300`–`20261020001800` continuam pendentes no banco remoto.
