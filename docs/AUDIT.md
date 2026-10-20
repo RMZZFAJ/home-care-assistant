@@ -89,8 +89,8 @@ Vercel, que terminou `Ready` em 20/10/2026 e assumiu o alias de produção
   a RPC mantém as validações de autorização e atomicidade sem conceder `UPDATE`
   direto de `requisitions` ao papel `authenticated`.
 - O erro remoto `42501` de submissão foi reproduzido por inspeção da função
-  `SECURITY INVOKER`; a correção está pronta localmente, mas a aplicação remota
-  desta migração depende de uma sessão Supabase CLI autorizada.
+  `SECURITY INVOKER`; a migração `20261020001900` foi aplicada remotamente após
+  a renovação da sessão Supabase CLI.
 - Existe uma UI administrativa protegida em `/admin` para consulta e atualização de perfis, consulta de pacientes e consulta de catálogo. O botão `Configurações` aparece na tela principal somente para administrador global; operações de importação, memberships e inventário continuam disponíveis por APIs server-side protegidas.
 - Não foi executado teste E2E autenticado nem uma suíte RLS com múltiplos usuários reais nesta rodada; o reset/lint local validou a aplicação das migrações, não substitui esses testes.
 - A importação foi validada quanto a schema, funções e contrato da API, mas ainda não foi executada com usuários autenticados reais no ambiente local.

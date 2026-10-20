@@ -54,13 +54,10 @@ Resultado esperado após renovar a sessão:
 Remote database is up to date.
 ```
 
-Na correção do erro `42501` de submissão, a tentativa de executar o novo
-`20261020001900_submit_requisition_security_definer.sql` voltou a receber
-`DbConfigLoginRoleStatusError`/HTTP 403 antes da execução. Renove a sessão com
-`supabase logout` e `supabase login`, confirme `supabase projects list` e então
-execute novamente `supabase db push --yes`. A migração transforma a RPC de
-submissão em `SECURITY DEFINER`, sem conceder `UPDATE` direto de
-`public.requisitions` ao papel `authenticated`.
+Na correção do erro `42501` de submissão, a migração
+`20261020001900_submit_requisition_security_definer.sql` foi aplicada com
+sucesso. Ela transforma a RPC de submissão em `SECURITY DEFINER`, sem conceder
+`UPDATE` direto de `public.requisitions` ao papel `authenticated`.
 
 `supabase migration list` deve confirmar que as migrações `20261020001300` até
 `20261020001900` estão presentes no remoto. Não foi usada chave de outro projeto,
