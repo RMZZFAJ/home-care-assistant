@@ -48,14 +48,22 @@ da sessão do Supabase CLI, os comandos abaixo foram executados com sucesso:
 supabase db push --yes
 ```
 
-Resultado:
+Resultado esperado após renovar a sessão:
 
 ```text
 Remote database is up to date.
 ```
 
-`supabase migration list` confirmou que as migrações `20261020001300` até
-`20261020001800` estão presentes no remoto. Não foi usada chave de outro projeto,
+Na correção do erro `42501` de submissão, a tentativa de executar o novo
+`20261020001900_submit_requisition_security_definer.sql` voltou a receber
+`DbConfigLoginRoleStatusError`/HTTP 403 antes da execução. Renove a sessão com
+`supabase logout` e `supabase login`, confirme `supabase projects list` e então
+execute novamente `supabase db push --yes`. A migração transforma a RPC de
+submissão em `SECURITY DEFINER`, sem conceder `UPDATE` direto de
+`public.requisitions` ao papel `authenticated`.
+
+`supabase migration list` deve confirmar que as migrações `20261020001300` até
+`20261020001900` estão presentes no remoto. Não foi usada chave de outro projeto,
 `SUPABASE_SERVICE_ROLE_KEY` ou conexão desconhecida.
 
 4. Crie a pessoa assistida e o perfil administrativo no remoto por procedimento controlado. Não execute `supabase/seed.sql` em produção, pois ele contém dados fictícios.
