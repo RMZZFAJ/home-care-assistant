@@ -104,6 +104,10 @@ Perfis planejados:
 8. Remover ou bloquear os registros Auth antigos inválidos, após confirmação.
 9. Antes de produção, criar outro projeto Supabase sem dados fictícios e separar Preview/Production.
 
+Se a aplicação exibir acesso não autorizado para `renatomazzarinocorp@gmail.com`, use o botão `Sair`, abra uma janela anônima e entre novamente com esse e-mail. O perfil remoto está ativo; uma sessão antiga ou outro e-mail não recebe autorização.
+
+O erro da extensão Vercel mostra um `teamId` diferente do projeto (`team_nK1ZiKkOiazduF3bVY9q3b22` versus o time correto `team_X3JshR4ahuzIk95k6JMAYhq2`). Isso é estado de autenticação/cache da extensão, não erro do deploy. Saia da extensão, entre com `rmzzfaj`, recarregue o VS Code e selecione `rmzzfajs-projects`.
+
 ## Decisões e itens descartados
 
 - Não foi usado `supabase db reset` no remoto.

@@ -1,4 +1,5 @@
 import { RequisitionWizard } from "@/components/requisitions/requisition-wizard";
+import { LogoutButton } from "@/components/auth/logout-button";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
@@ -28,5 +29,5 @@ function SetupRequired() {
 }
 
 function AccessDenied() {
-  return <main className="mx-auto max-w-2xl p-8"><h1 className="text-2xl font-semibold">Acesso não autorizado</h1><p className="mt-3 text-[var(--muted)]">Sua conta não possui um perfil ativo autorizado para registrar requisições.</p></main>;
+  return <main className="mx-auto max-w-2xl p-8"><div className="flex items-center justify-between gap-4"><div><h1 className="text-2xl font-semibold">Acesso não autorizado</h1><p className="mt-3 text-[var(--muted)]">Sua conta não possui um perfil ativo autorizado para registrar requisições.</p></div><LogoutButton /></div></main>;
 }
