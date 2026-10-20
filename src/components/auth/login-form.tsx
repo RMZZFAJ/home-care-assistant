@@ -78,17 +78,17 @@ export function LoginForm() {
   return (
     <form onSubmit={submit} className="space-y-4">
       <label className="block text-sm font-semibold">E-mail
-        <input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1 w-full rounded-lg border border-[var(--line)] p-3" />
+        <input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1 w-full rounded-lg border border-(--line) p-3" />
       </label>
       <label className="block text-sm font-semibold">Senha
-        <input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-1 w-full rounded-lg border border-[var(--line)] p-3" />
+        <input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-1 w-full rounded-lg border border-(--line) p-3" />
       </label>
       {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}
       {notice && <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">{notice}</p>}
-      <button type="submit" disabled={loading} className="w-full rounded-lg bg-[var(--brand)] px-4 py-3 font-bold text-white disabled:opacity-50">{loading ? "Entrando..." : "Entrar"}</button>
-      <button type="button" onClick={recoverPassword} disabled={loading} className="w-full text-left text-sm font-semibold text-[var(--brand)] underline disabled:opacity-50">Esqueci minha senha</button>
-      <div className="flex items-center gap-3 text-xs text-[var(--muted)]"><span className="h-px flex-1 bg-[var(--line)]" />ou<span className="h-px flex-1 bg-[var(--line)]" /></div>
-      <button type="button" onClick={signInWithGoogle} disabled={loading} className="w-full rounded-lg border border-[var(--line)] px-4 py-3 font-bold text-[var(--ink)] disabled:opacity-50">Continuar com Google</button>
+      <button type="submit" disabled={loading} className="w-full rounded-lg bg-(--brand) px-4 py-3 font-bold text-white disabled:opacity-50">{loading ? "Entrando..." : "Entrar"}</button>
+      <button type="button" onClick={recoverPassword} disabled={loading} className="w-full text-left text-sm font-semibold text-(--brand) underline disabled:opacity-50">Esqueci minha senha</button>
+      <div className="flex items-center gap-3 text-xs text-(--muted)"><span className="h-px flex-1 bg-(--line)" />ou<span className="h-px flex-1 bg-(--line)" /></div>
+      <button type="button" onClick={signInWithGoogle} disabled={loading} className="w-full rounded-lg border border-(--line) px-4 py-3 font-bold text-(--ink) disabled:opacity-50">Continuar com Google</button>
     </form>
   );
 }

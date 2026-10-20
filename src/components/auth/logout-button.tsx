@@ -22,5 +22,5 @@ export function LogoutButton() {
     router.replace("/login");
     router.refresh();
   }
-  return <span className="inline-flex items-center gap-2">{error && <span role="alert" className="text-xs text-red-700">{error}</span>}<button type="button" onClick={logout} className="rounded-lg border border-[var(--line)] px-3 py-2 text-sm font-semibold">Sair</button></span>;
+  return <span className="inline-flex items-center gap-2">{error && <span role="alert" className="text-xs text-red-700">{error}</span>}<button type="button" onClick={logout} className="rounded-lg border border-(--line) px-3 py-2 text-sm font-semibold">Sair</button></span>;
 }
