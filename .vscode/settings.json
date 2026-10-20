@@ -1,3 +1,19 @@
 {
-    "markdown.validate.enabled": true
+    "markdown.validate.enabled": true,
+    "powershell.enableProfileLoading": false,
+    "powershell.powerShellAdditionalExePaths": {
+        "PowerShell 7": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
+    },
+    "powershell.powerShellDefaultVersion": "PowerShell 7",
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+            "args": [
+                "-NoLogo",
+                "-NoProfile"
+            ],
+            "icon": "terminal-powershell"
+        }
+    }
 }

@@ -118,6 +118,19 @@ vercel link --yes --scope rmzzfajs-projects --project prj_GwdwNVay81iZ7ltM4Tg5II
 vercel deploy --prod --scope rmzzfajs-projects
 ```
 
+## PowerShell no VS Code
+
+O PowerShell 7.6.7 está instalado e inicia corretamente com `-NoProfile`. O log de 20/10/2026 não indica falha de inicialização: o processo iniciou e foi encerrado depois, quando o terminal da extensão foi fechado ou terminado externamente.
+
+O workspace fixa o executável `C:\Program Files\PowerShell\7\pwsh.exe`, desativa carregamento de perfil para a sessão da extensão e usa `-NoLogo -NoProfile` no terminal integrado. Para aplicar a configuração:
+
+1. Execute `Developer: Reload Window`.
+2. Feche terminais antigos pelo ícone de lixeira.
+3. Execute `PowerShell: Restart Session`.
+4. Abra um novo terminal integrado com `Terminal: Create New Terminal`.
+
+Se o aviso reaparecer, não encerre o terminal chamado `PowerShell Extension Terminal`; ele é usado pelo IntelliSense. Feche somente terminais integrados comuns quando necessário.
+
 ## Decisões e itens descartados
 
 - Não foi usado `supabase db reset` no remoto.
