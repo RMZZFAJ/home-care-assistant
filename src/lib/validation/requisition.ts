@@ -1,14 +1,11 @@
 import { z } from "zod";
 
 const quantity = z.number().finite().int("Use unidades inteiras.").min(0, "Informe uma quantidade igual ou maior que zero.").max(100000, "Quantidade acima do limite permitido.");
-const requested = z.number().finite().int("Use unidades inteiras.").min(1, "Informe ao menos uma unidade.").max(100000, "Quantidade acima do limite permitido.");
-
 export const requisitionLineSchema = z.object({
   productId: z.string().trim().min(1).max(120),
   productName: z.string().trim().min(1).max(200),
   category: z.enum(["medicamentos", "higiene", "dieta"]),
   currentStock: quantity,
-  requestedQuantity: requested,
   urgent: z.boolean(),
 }).strict();
 
@@ -16,7 +13,6 @@ export const extraItemSchema = z.object({
   id: z.string().trim().min(1).max(120),
   name: z.string().trim().min(1, "Informe o nome do item.").max(200),
   currentStock: quantity,
-  requestedQuantity: requested,
   urgent: z.boolean(),
 }).strict();
 

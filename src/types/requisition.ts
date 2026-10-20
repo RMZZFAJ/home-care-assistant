@@ -14,7 +14,6 @@ export type RequisitionLine = {
   productName: string;
   category: ProductCategory;
   currentStock: number;
-  requestedQuantity: number;
   urgent: boolean;
 };
 
@@ -22,7 +21,6 @@ export type ExtraItem = {
   id: string;
   name: string;
   currentStock: number;
-  requestedQuantity: number;
   urgent: boolean;
 };
 

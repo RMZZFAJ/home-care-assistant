@@ -9,6 +9,6 @@ export function formatBrazilDate(value: string) {
 }
 
 export function buildWhatsAppSummary(receipt: RequisitionReceipt) {
-  const items = [...receipt.lines.map((item) => `${item.productName}: ${item.requestedQuantity}`), ...receipt.extraItems.map((item) => `${item.name}: ${item.requestedQuantity}`)];
+  const items = [...receipt.lines.map((item) => `${item.productName} (estoque informado: ${item.currentStock})`), ...receipt.extraItems.map((item) => `${item.name} (estoque informado: ${item.currentStock})`)];
   return `Requisição ${receipt.protocol} para ${receipt.recipientName}. Itens: ${items.join("; ")}.`;
 }
