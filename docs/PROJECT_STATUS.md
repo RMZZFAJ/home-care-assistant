@@ -106,7 +106,17 @@ Perfis planejados:
 
 Se a aplicação exibir acesso não autorizado para `renatomazzarinocorp@gmail.com`, use o botão `Sair`, abra uma janela anônima e entre novamente com esse e-mail. O perfil remoto está ativo; uma sessão antiga ou outro e-mail não recebe autorização.
 
+Correção importante publicada no commit `f58b383`: o `proxy.ts` também precisava aceitar `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Sem isso, o login podia ser aceito pelo Supabase, mas a sessão não era renovada corretamente no deploy e a página mostrava acesso não autorizado.
+
 O erro da extensão Vercel mostra um `teamId` diferente do projeto (`team_nK1ZiKkOiazduF3bVY9q3b22` versus o time correto `team_X3JshR4ahuzIk95k6JMAYhq2`). Isso é estado de autenticação/cache da extensão, não erro do deploy. Saia da extensão, entre com `rmzzfaj`, recarregue o VS Code e selecione `rmzzfajs-projects`.
+
+A CLI Vercel foi deslogada deliberadamente para permitir uma nova autenticação limpa. Para publicar a correção:
+
+```powershell
+vercel login
+vercel link --yes --scope rmzzfajs-projects --project prj_GwdwNVay81iZ7ltM4Tg5IIXFLGPv
+vercel deploy --prod --scope rmzzfajs-projects
+```
 
 ## Decisões e itens descartados
 
