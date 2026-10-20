@@ -42,7 +42,7 @@ describe("integridade do catálogo", () => {
   it("usa as unidades operacionais revisadas", () => {
     const item = (id: string) => CATALOG.find((catalogItem) => catalogItem.id === id);
     expect(item("phosfoenema")?.unit).toBe("bisnaga");
-    expect(item("monuril")).toMatchObject({ name: "Fsofomicna (Monuril) 3g", unit: "envelope" });
+    expect(item("monuril")).toMatchObject({ name: "Fosfomicina", unit: "envelope" });
     expect(item("quetiapina-100")?.unit).toBe("comprimido");
     expect(item("fralda")?.unit).toBe("unidade");
     expect(item("sabonete-intimo")?.unit).toBe("frasco");

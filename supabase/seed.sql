@@ -12,7 +12,7 @@ insert into public.products (id, name, category, unit, is_active) values
   ('memantina-10', 'Memantina 10 mg', 'medicamentos', 'comprimido', true),
   ('lorazepam-2', 'Lorazepam 2 mg', 'medicamentos', 'comprimido', true),
   ('risperidona-1', 'Risperidona 1 mg', 'medicamentos', 'comprimido', true),
-  ('monuril', 'Fsofomicna (Monuril) 3g', 'medicamentos', 'envelope', true),
+  ('monuril', 'Fosfomicina', 'medicamentos', 'envelope', true),
   ('probiotico', 'Probiótico', 'medicamentos', 'comprimido', true),
   ('clister', 'Clister', 'medicamentos', 'unidade', true),
   ('fralda', 'Fralda', 'higiene', 'unidade', true),
@@ -45,7 +45,7 @@ update public.products set aliases = case id
   when 'memantina-10' then array['Memantina', 'Memantina 10mg', 'Memantina comprimido']
   when 'lorazepam-2' then array['Lorazepam', 'Lorazepam 2mg', 'Lorazepam comprimido']
   when 'risperidona-1' then array['Risperidona', 'Risperidona 1mg', 'Risperidona comprimido']
-  when 'monuril' then array['Fosfomicina', 'Fosfomicina (Monuril) 3g', 'Monuril', 'Monuril 3g', 'Fsofomicna']
+  when 'monuril' then array['Fosfomicina (Monuril) 3g', 'Monuril', 'Monuril 3g']
   when 'probiotico' then array['Probiotico', 'Probiótico comprimido']
   when 'clister' then array['Clister', 'Enema']
   when 'fralda' then array['Fraldas']

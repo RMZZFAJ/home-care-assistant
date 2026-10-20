@@ -56,11 +56,19 @@ supabase db reset
 
 ## Conectar e publicar na Vercel
 
-1. Faça login:
+1. Faça login. Se o comando `vercel` não for reconhecido no PowerShell, use o caminho completo abaixo:
 
    ```powershell
-   vercel login
+   & "$env:APPDATA\npm\vercel.cmd" login
    ```
+
+   Para tornar `vercel` disponível nas próximas janelas do PowerShell, adicione o diretório global do npm ao PATH do usuário e abra um novo terminal:
+
+   ```powershell
+   [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";$env:APPDATA\npm", "User")
+   ```
+
+   Cole somente os comandos dentro dos blocos; não cole as linhas ```powershell ou ```.
 
 2. Na raiz do projeto, associe a pasta a um projeto Vercel existente ou crie um novo:
 

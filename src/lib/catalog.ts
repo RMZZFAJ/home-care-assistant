@@ -10,7 +10,7 @@ const definitions: CatalogDefinition[] = [
   ["memantina-10", "Memantina 10 mg", ["Memantina", "Memantina 10mg", "Memantina comprimido"], "medicamentos", "comprimido"],
   ["lorazepam-2", "Lorazepam 2 mg", ["Lorazepam", "Lorazepam 2mg", "Lorazepam comprimido"], "medicamentos", "comprimido"],
   ["risperidona-1", "Risperidona 1 mg", ["Risperidona", "Risperidona 1mg", "Risperidona comprimido"], "medicamentos", "comprimido"],
-  ["monuril", "Fsofomicna (Monuril) 3g", ["Fosfomicina", "Fosfomicina (Monuril) 3g", "Monuril", "Monuril 3g", "Fsofomicna"], "medicamentos", "envelope"],
+  ["monuril", "Fosfomicina", ["Fosfomicina", "Fosfomicina (Monuril) 3g", "Monuril", "Monuril 3g"], "medicamentos", "envelope"],
   ["probiotico", "Probiótico", ["Probiotico", "Probiótico comprimido"], "medicamentos", "comprimido"],
   ["clister", "Clister", ["Clister", "Enema"], "medicamentos", "unidade"],
   ["fralda", "Fralda", ["Fraldas"], "higiene", "unidade"],
