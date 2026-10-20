@@ -30,7 +30,7 @@ npm test
 npm run build
 ```
 
-Configure no `.env.local` `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL` e `CARE_RECIPIENT_ID`. O último deve ser o UUID de uma pessoa assistida ativa autorizada no ambiente; não use nome de paciente. `SUPABASE_SERVICE_ROLE_KEY` não é necessária no MVP e nunca deve ser exposta no cliente.
+Configure no `.env.local` `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (ou a chave legada `NEXT_PUBLIC_SUPABASE_ANON_KEY`), `NEXT_PUBLIC_APP_URL` e `CARE_RECIPIENT_ID`. O último deve ser o UUID de uma pessoa assistida ativa autorizada no ambiente; não use nome de paciente. `SUPABASE_SERVICE_ROLE_KEY` não é necessária no MVP e nunca deve ser exposta no cliente.
 
 ## Supabase
 

@@ -37,6 +37,8 @@ O repositório usa migrações versionadas; não copie o banco manualmente e nã
 
    O comando aplica somente migrações ainda ausentes na tabela de histórico remoto, em ordem. A migração `20261020000400_add_product_aliases.sql` cria aliases e a função de resolução por nome.
 
+   Se `supabase link --project-ref` informar que a conta não tem privilégios, confirme no painel do Supabase que o projeto pertence à organização da conta autenticada no CLI ou aceite um convite de membro/administrador. Não use uma chave de outro projeto e não tente aplicar migrações até o vínculo funcionar.
+
 4. Crie a pessoa assistida e o perfil administrativo no remoto por procedimento controlado. Não execute `supabase/seed.sql` em produção, pois ele contém dados fictícios.
 
 5. Crie o usuário no Auth pelo painel Supabase ou pelo fluxo administrativo. Depois insira o perfil correspondente:
@@ -80,7 +82,7 @@ supabase db reset
 
    ```powershell
    vercel env add NEXT_PUBLIC_SUPABASE_URL production
-   vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
+   vercel env add NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY production
    vercel env add NEXT_PUBLIC_APP_URL production
    vercel env add CARE_RECIPIENT_ID production
    ```
