@@ -43,6 +43,14 @@ supabase db push
 
 Confirme com `supabase migration list` que a migração `20261020000700` aparece em local e remoto.
 
+## Branches após a auditoria
+
+O estado auditado foi consolidado em `master` por fast-forward no commit
+`d43bfff`. A branch `hardening/home-care-assistant` aponta para o mesmo commit
+e pode ser mantida como histórico ou removida posteriormente. A branch remota
+`fix/mvp-hardening-2026-10-19` permanece no commit anterior `ec6bc18` e não
+contém as correções finais; ela não participa do deploy principal.
+
 ## Riscos ainda existentes antes de produção
 
 - O projeto remoto atual contém seed fictício e deve ser separado de produção.
