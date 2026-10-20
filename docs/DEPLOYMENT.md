@@ -35,7 +35,7 @@ O repositório usa migrações versionadas; não copie o banco manualmente e nã
    supabase db push
    ```
 
-   O comando aplica somente migrações ainda ausentes na tabela de histórico remoto, em ordem. A migração `20261020000400_add_product_aliases.sql` cria aliases e a função de resolução por nome.
+   O comando aplica somente migrações ainda ausentes na tabela de histórico remoto, em ordem. Revise especialmente as migrações `20261020000800` a `20261020001000`: elas alteram o contrato de itens, adicionam escopo multipaciente e criam funções transacionais de estoque. Faça primeiro em um projeto local/staging e verifique dependências antes de promover.
 
    Se `supabase link --project-ref` informar que a conta não tem privilégios, confirme no painel do Supabase que o projeto pertence à organização da conta autenticada no CLI ou aceite um convite de membro/administrador. Não use uma chave de outro projeto e não tente aplicar migrações até o vínculo funcionar.
 

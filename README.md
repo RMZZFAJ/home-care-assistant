@@ -4,9 +4,10 @@ Fundação de MVP para requisições de insumos em assistência domiciliar. A ap
 
 ## Implementado
 
-- Fluxo navegável e responsivo de requisição com catálogo fictício, estoque atual, itens extras, observações, revisão e comprovante.
+- Fluxo navegável e responsivo de requisição com catálogo fictício, estoque informado, urgência, itens extras, observações, revisão e comprovante.
 - Validação de quantidades no cliente e no servidor com Zod.
-- Rota server-side preparada para Supabase Auth, RLS, persistência, protocolo único, idempotência e auditoria.
+- Rota server-side preparada para Supabase Auth, RLS, persistência, protocolo sequencial a partir de 12, idempotência por hash canônico e auditoria.
+- Histórico autorizado por paciente, detalhe persistido, reimpressão, estoque segregado por custódia, inventário e rastreamento de notificações.
 - Migração PostgreSQL com RLS restritiva e seed explicitamente fictício.
 - Resumo para WhatsApp por conversa pré-preenchida e impressão/Salvar como PDF pelo navegador.
 - Testes Vitest e configuração Playwright.

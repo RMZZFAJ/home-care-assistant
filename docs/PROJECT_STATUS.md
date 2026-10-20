@@ -28,7 +28,7 @@ Atualizado em 20/10/2026, após a sincronização final do Supabase e limpeza da
 - Nome canônico atual: `Fosfomicina`.
 - Aliases de Fosfomicina: `Fosfomicina (Monuril) 3g`, `Monuril` e `Monuril 3g`.
 - Interface responsiva para celular.
-- Campo de quantidade solicitada oculto no formulário, preservado internamente para compatibilidade.
+- O formulário registra itens, estoque informado e urgência; não existe quantidade de reposição na requisição.
 - Etapa chamada `Itens extras`, iniciando sem campos vazios pré-abertos.
 - Cartões de produtos inteiramente clicáveis.
 - CLI Supabase atualizada e CLI Vercel instalada.
