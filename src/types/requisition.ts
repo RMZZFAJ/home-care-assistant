@@ -4,8 +4,9 @@ export type RequisitionStatus = "draft" | "submitted" | "under_review" | "approv
 export type CatalogItem = {
   id: string;
   name: string;
+  aliases: string[];
   category: ProductCategory;
-  unit: "unidade" | "caixa" | "frasco" | "pacote";
+  unit: "unidade" | "caixa" | "frasco" | "pacote" | "bisnaga" | "envelope" | "comprimido";
 };
 
 export type RequisitionLine = {

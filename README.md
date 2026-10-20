@@ -4,7 +4,7 @@ Fundação de MVP para requisições de insumos em assistência domiciliar. A ap
 
 ## Implementado
 
-- Fluxo navegável de requisição com catálogo fictício, itens extras, observações, revisão e comprovante.
+- Fluxo navegável e responsivo de requisição com catálogo fictício, estoque atual, itens extras, observações, revisão e comprovante.
 - Validação de quantidades no cliente e no servidor com Zod.
 - Rota server-side preparada para Supabase Auth, RLS, persistência, protocolo único, idempotência e auditoria.
 - Migração PostgreSQL com RLS restritiva e seed explicitamente fictício.
@@ -30,11 +30,13 @@ npm test
 npm run build
 ```
 
-Configure no `.env.local` apenas `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` e, para deploy, `NEXT_PUBLIC_APP_URL`. `SUPABASE_SERVICE_ROLE_KEY` não é necessária no MVP e nunca deve ser exposta no cliente.
+Configure no `.env.local` `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL` e `CARE_RECIPIENT_ID`. O último deve ser o UUID de uma pessoa assistida ativa autorizada no ambiente; não use nome de paciente. `SUPABASE_SERVICE_ROLE_KEY` não é necessária no MVP e nunca deve ser exposta no cliente.
 
 ## Supabase
 
-Com a Supabase CLI instalada, vincule o projeto manualmente e aplique `supabase/migrations`. O seed contém somente uma pessoa assistida fictícia. Crie usuários via Supabase Auth e depois perfis por procedimento administrativo seguro; não habilite cadastro público irrestrito.
+Com a Supabase CLI instalada, vincule o projeto manualmente e aplique `supabase/migrations`, depois execute `supabase db seed`. O seed idempotente contém 29 produtos e uma pessoa assistida fictícia. Defina `CARE_RECIPIENT_ID` com o UUID do registro usado localmente. Crie usuários via Supabase Auth e depois perfis por procedimento administrativo seguro; não habilite cadastro público irrestrito.
+
+O acesso à aplicação exige login Supabase e um registro `profiles` com status `active` e função `admin`, `supervisor` ou `professional`. A chave anon é pública por desenho, mas toda autorização depende de RLS e de verificações server-side; nunca configure uma service role em `NEXT_PUBLIC_*`.
 
 Leia [docs/SECURITY.md](docs/SECURITY.md), [docs/DATABASE.md](docs/DATABASE.md) e [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) antes de qualquer ambiente compartilhado.
 
@@ -59,4 +61,3 @@ flowchart TD
   F --> G[Persistência + protocolo + auditoria]
   G --> H[Comprovante oficial]
 ```
-
