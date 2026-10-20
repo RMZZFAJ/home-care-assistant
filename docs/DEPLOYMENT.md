@@ -120,3 +120,4 @@ supabase db reset
 - RLS validada com usuários de funções diferentes.
 - Backups e retenção configurados no Supabase.
 - Variáveis configuradas na Vercel sem segredos no cliente.
+- Consulte [PROJECT_STATUS.md](./PROJECT_STATUS.md) para o estado atual, pendências, decisões e limitações conhecidas.
