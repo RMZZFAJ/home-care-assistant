@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import Link from "next/link";
 
 export default function Home() {
   return <Suspense fallback={<main className="p-8">Carregando...</main>}><AuthenticatedHome /></Suspense>;
@@ -24,9 +25,10 @@ async function AuthenticatedHome() {
   if (profileError) {
     return <AuthProblem />;
   }
-  if (!profile || profile.status !== "active" || !["admin", "supervisor", "professional"].includes(profile.role)) {
+  if (!profile || profile.status !== "active" || !["admin", "supervisor", "professional", "reader"].includes(profile.role)) {
     return <AccessDenied />;
   }
+  if (profile.role === "reader") return <ReadOnlyHome />;
   return <RequisitionWizard />;
 }
 
@@ -40,4 +42,8 @@ function AuthProblem() {
 
 function AccessDenied() {
   return <main className="mx-auto max-w-2xl p-8"><div className="flex items-center justify-between gap-4"><div><h1 className="text-2xl font-semibold">Acesso não autorizado</h1><p className="mt-3 text-[var(--muted)]">Sua conta não possui um perfil ativo autorizado para registrar requisições.</p></div><LogoutButton /></div></main>;
+}
+
+function ReadOnlyHome() {
+  return <main className="mx-auto max-w-2xl p-8"><div className="flex items-start justify-between gap-4"><div><h1 className="text-2xl font-semibold">Acesso somente leitura</h1><p className="mt-3 text-[var(--muted)]">Seu perfil pode consultar requisições autorizadas, mas não registrar ou alterar operações.</p><Link href="/historico" className="mt-5 inline-block rounded-lg bg-[var(--brand)] px-4 py-3 text-sm font-bold text-white">Consultar histórico</Link></div><LogoutButton /></div></main>;
 }

@@ -41,8 +41,13 @@ export function normalizeCatalogText(value: string) {
 }
 
 export function findCatalogItemByName(value: string) {
+  const matches = findCatalogItemsByName(value);
+  return matches.length === 1 ? matches[0] : undefined;
+}
+
+export function findCatalogItemsByName(value: string) {
   const normalized = normalizeCatalogText(value);
-  return CATALOG.find((item) => [item.name, ...item.aliases].some((name) => normalizeCatalogText(name) === normalized));
+  return CATALOG.filter((item) => [item.name, ...item.aliases].some((name) => normalizeCatalogText(name) === normalized));
 }
 
 export const CATEGORY_LABELS: Record<CatalogItem["category"], string> = {
