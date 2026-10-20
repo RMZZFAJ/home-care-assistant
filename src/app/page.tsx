@@ -21,7 +21,7 @@ async function AuthenticatedHome() {
     return <AuthProblem />;
   }
   if (!user) redirect("/login");
-  const { data: profile, error: profileError } = await supabase.from("profiles").select("status, role").eq("id", user.id).maybeSingle();
+  const { data: profile, error: profileError } = await supabase.from("profiles").select("status, role, global_scope").eq("id", user.id).maybeSingle();
   if (profileError) {
     return <AuthProblem />;
   }
@@ -29,7 +29,7 @@ async function AuthenticatedHome() {
     return <AccessDenied />;
   }
   if (profile.role === "reader") return <ReadOnlyHome />;
-  return <RequisitionWizard />;
+  return <RequisitionWizard canAccessAdmin={profile.role === "admin" && profile.global_scope === true} />;
 }
 
 function SetupRequired() {

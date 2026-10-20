@@ -10,7 +10,7 @@ import Link from "next/link";
 const steps = ["Identificação", "Medicamentos", "Higiene", "Dieta", "Itens extras", "Observações", "Revisão"];
 const emptyExtra = (): ExtraItem => ({ id: `extra-${crypto.randomUUID()}`, name: "", currentStock: 0, urgent: false });
 
-export function RequisitionWizard() {
+export function RequisitionWizard({ canAccessAdmin = false }: { canAccessAdmin?: boolean }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<RequisitionFormData>({ lines: [], extraItems: [], observations: [] });
   const [receipt, setReceipt] = useState<RequisitionReceipt | null>(null);
@@ -73,7 +73,7 @@ export function RequisitionWizard() {
         <div className="mx-auto max-w-5xl px-3 pb-2 pt-3 sm:px-5 sm:pt-5">
           <div className="flex items-center justify-between gap-3">
             <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--brand)] sm:text-xs">Home Care Assistant</p><h1 className="mt-1 text-lg font-semibold sm:text-xl">Requisição de insumos</h1></div>
-            <div className="flex shrink-0 items-center gap-2"><Link href="/historico" className="rounded-lg border border-[var(--line)] px-3 py-2 text-xs font-semibold">Histórico</Link><span className="hidden rounded-full bg-[#e8f3f4] px-3 py-1 text-xs font-semibold text-[var(--brand-dark)] sm:inline">Ambiente configurado</span><LogoutButton /></div>
+            <div className="flex shrink-0 items-center gap-2"><Link href="/historico" className="rounded-lg border border-[var(--line)] px-3 py-2 text-xs font-semibold">Histórico</Link>{canAccessAdmin && <Link href="/admin" className="rounded-lg border border-[var(--line)] px-3 py-2 text-xs font-semibold">Configurações</Link>}<span className="hidden rounded-full bg-[#e8f3f4] px-3 py-1 text-xs font-semibold text-[var(--brand-dark)] sm:inline">Ambiente configurado</span><LogoutButton /></div>
           </div>
           <div className="mt-3 flex items-center justify-between text-xs text-[var(--muted)]"><span>Etapa {step + 1} de {steps.length}</span><span>{steps[step]}</span></div>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#dfe8e4]"><span className="block h-full rounded-full bg-[var(--brand)] transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%` }} /></div>

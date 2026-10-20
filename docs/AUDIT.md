@@ -85,7 +85,7 @@ Vercel, que terminou `Ready` em 20/10/2026 e assumiu o alias de produção
   autorizada e exige justificativa para cancelamento.
 - A migração `20261020001500` bloqueia saídas acima do saldo para usuários não
   administradores e serializa a verificação por paciente/produto/custódia.
-- Existe uma UI administrativa protegida em `/admin` para consulta e atualização de perfis, consulta de pacientes e consulta de catálogo; operações de importação, memberships e inventário continuam disponíveis por APIs server-side protegidas.
+- Existe uma UI administrativa protegida em `/admin` para consulta e atualização de perfis, consulta de pacientes e consulta de catálogo. O botão `Configurações` aparece na tela principal somente para administrador global; operações de importação, memberships e inventário continuam disponíveis por APIs server-side protegidas.
 - Não foi executado teste E2E autenticado nem uma suíte RLS com múltiplos usuários reais nesta rodada; o reset/lint local validou a aplicação das migrações, não substitui esses testes.
 - A importação foi validada quanto a schema, funções e contrato da API, mas ainda não foi executada com usuários autenticados reais no ambiente local.
 - A regra confirmada de negócio permite saldo negativo somente para administrador

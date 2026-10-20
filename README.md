@@ -8,6 +8,7 @@ Fundação de MVP para requisições de insumos em assistência domiciliar. A ap
 - Validação de quantidades no cliente e no servidor com Zod.
 - Rota server-side preparada para Supabase Auth, RLS, persistência, protocolo sequencial a partir de 12, idempotência por hash canônico e auditoria.
 - Histórico autorizado por paciente, detalhe persistido, reimpressão, estoque segregado por custódia, inventário e rastreamento de notificações.
+- Área `Configurações` acessível pelo botão da tela principal para administradores globais, com administração protegida de perfis, pacientes e catálogo.
 - Migração PostgreSQL com RLS restritiva e seed explicitamente fictício.
 - Resumo para WhatsApp por conversa pré-preenchida e impressão/Salvar como PDF pelo navegador.
 - Testes Vitest e configuração Playwright.
