@@ -14,31 +14,55 @@ export async function POST(request: Request) {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return NextResponse.json({ error: "Supabase não está configurado. Configure as variáveis do servidor para registrar uma requisição oficial." }, { status: 503 });
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    console.error("Failed to resolve authenticated user.", userError);
+    return NextResponse.json({ error: "Não foi possível validar sua sessão. Entre novamente." }, { status: 401 });
+  }
   if (!user) return NextResponse.json({ error: "Sua sessão expirou. Entre novamente para continuar." }, { status: 401 });
 
-  const { data: profile } = await supabase.from("profiles").select("full_name, role").eq("id", user.id).eq("status", "active").maybeSingle();
+  const { data: profile, error: profileError } = await supabase.from("profiles").select("full_name, role").eq("id", user.id).eq("status", "active").maybeSingle();
+  if (profileError) {
+    console.error("Failed to load authenticated profile.", profileError);
+    return NextResponse.json({ error: "Não foi possível validar seu perfil. Tente novamente." }, { status: 503 });
+  }
   if (!profile || !["admin", "supervisor", "professional"].includes(profile.role)) {
     return NextResponse.json({ error: "Seu perfil não tem autorização para registrar requisições." }, { status: 403 });
   }
   const recipientId = process.env.CARE_RECIPIENT_ID;
   if (!recipientId) return NextResponse.json({ error: "A pessoa assistida não está configurada no ambiente." }, { status: 503 });
-  const { data: recipient } = await supabase.from("care_recipients").select("id, display_name").eq("id", recipientId).eq("is_active", true).maybeSingle();
+  const { data: recipient, error: recipientError } = await supabase.from("care_recipients").select("id, display_name").eq("id", recipientId).eq("is_active", true).maybeSingle();
+  if (recipientError) {
+    console.error("Failed to load configured care recipient.", recipientError);
+    return NextResponse.json({ error: "Não foi possível validar a pessoa assistida. Tente novamente." }, { status: 503 });
+  }
   if (!profile || !recipient) return NextResponse.json({ error: "Seu perfil ou pessoa assistida não está autorizado para este ambiente." }, { status: 403 });
 
-  const { data: existing } = await supabase.from("requisitions").select("id, protocol, created_at").eq("created_by", user.id).eq("idempotency_key", parsed.data.idempotencyKey).maybeSingle();
+  const { data: existing, error: existingError } = await supabase.from("requisitions").select("id, protocol, created_at").eq("created_by", user.id).eq("idempotency_key", parsed.data.idempotencyKey).maybeSingle();
+  if (existingError) {
+    console.error("Failed to check requisition idempotency.", existingError);
+    return NextResponse.json({ error: "Não foi possível verificar o envio anterior. Tente novamente." }, { status: 503 });
+  }
   if (existing) return NextResponse.json({ receipt: { ...parsed.data, protocol: existing.protocol, requesterName: profile.full_name, recipientName: recipient.display_name, createdAt: existing.created_at } });
 
   const productIds = parsed.data.lines.map((line) => line.productId);
-  const { data: products } = productIds.length
+  const { data: products, error: productsError } = productIds.length
     ? await supabase.from("products").select("id, name, category, unit").in("id", productIds).eq("is_active", true)
-    : { data: [] };
+    : { data: [], error: null };
+  if (productsError) {
+    console.error("Failed to load active product catalog.", productsError);
+    return NextResponse.json({ error: "Não foi possível validar o catálogo. Tente novamente." }, { status: 503 });
+  }
   if (!products || products.length !== new Set(productIds).size) {
     return NextResponse.json({ error: "Um ou mais produtos não existem ou estão inativos." }, { status: 400 });
   }
   const extraIds = parsed.data.extraItems.map((item) => item.id);
   if (extraIds.length) {
-    const { data: catalogIds } = await supabase.from("products").select("id").in("id", extraIds);
+    const { data: catalogIds, error: catalogError } = await supabase.from("products").select("id").in("id", extraIds);
+    if (catalogError) {
+      console.error("Failed to validate extra item identifiers.", catalogError);
+      return NextResponse.json({ error: "Não foi possível validar os itens extras. Tente novamente." }, { status: 503 });
+    }
     if (catalogIds?.length) return NextResponse.json({ error: "Itens do catálogo não podem ser enviados como itens extras." }, { status: 400 });
   }
   const productMap = new Map(products.map((product) => [product.id, product]));

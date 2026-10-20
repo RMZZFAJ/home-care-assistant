@@ -15,9 +15,15 @@ async function AuthenticatedHome() {
   if (!supabase) {
     return <SetupRequired />;
   }
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    return <AuthProblem />;
+  }
   if (!user) redirect("/login");
-  const { data: profile } = await supabase.from("profiles").select("status, role").eq("id", user.id).maybeSingle();
+  const { data: profile, error: profileError } = await supabase.from("profiles").select("status, role").eq("id", user.id).maybeSingle();
+  if (profileError) {
+    return <AuthProblem />;
+  }
   if (!profile || profile.status !== "active" || !["admin", "supervisor", "professional"].includes(profile.role)) {
     return <AccessDenied />;
   }
@@ -26,6 +32,10 @@ async function AuthenticatedHome() {
 
 function SetupRequired() {
   return <main className="mx-auto max-w-2xl p-8"><h1 className="text-2xl font-semibold">Configuração necessária</h1><p className="mt-3 text-[var(--muted)]">Configure as variáveis do Supabase em `.env.local` antes de iniciar uma sessão autenticada.</p></main>;
+}
+
+function AuthProblem() {
+  return <main className="mx-auto max-w-2xl p-8"><h1 className="text-2xl font-semibold">Não foi possível validar o acesso</h1><p className="mt-3 text-[var(--muted)]">O serviço de autenticação ou o perfil não respondeu corretamente. Saia e entre novamente; se o problema persistir, verifique a configuração do Supabase.</p><div className="mt-5"><LogoutButton /></div></main>;
 }
 
 function AccessDenied() {
