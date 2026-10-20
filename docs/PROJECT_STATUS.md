@@ -14,6 +14,7 @@ Atualizado em 20/10/2026.
 - Vercel project ID: `prj_GwdwNVay81iZ7ltM4Tg5IIXFLGPv`
 - Proprietário Vercel: `rmzzfaj's projects`
 - URL Vercel conhecida: `https://home-care-assistant.vercel.app`
+- Último deploy Production validado: `dpl_2p9FXG8uoVz2WdTn9j8UXremB82w`
 
 ## O que foi implementado
 
@@ -84,6 +85,8 @@ Foi solicitado um master remoto com o e-mail `renatomazzarino10@gmail.com` e a s
 
 O usuário `renatomazzarinocorp@gmail.com` foi criado pelo painel Supabase, confirmado por e-mail e recebeu perfil `admin` ativo em `public.profiles`.
 
+O usuário deve acessar a aplicação com a senha definida no painel Auth. A senha não é registrada neste repositório nem nesta documentação.
+
 Perfis planejados:
 
 - Master: `admin`, acesso ao formulário e administração.
@@ -95,10 +98,10 @@ Perfis planejados:
 2. Confirmar login do novo admin pela tela `/login`.
 3. Configurar o provedor Google no Supabase e Google Cloud.
 4. Criar perfil ativo para novos usuários OAuth.
-5. Configurar `NEXT_PUBLIC_APP_URL` na Vercel.
-6. Fazer o primeiro deploy com `vercel deploy --prod`.
-7. Configurar Site URL e Redirect URLs no Supabase Auth.
-8. Testar criação de uma requisição no ambiente remoto.
+5. Configurar Site URL e Redirect URLs no Supabase Auth.
+6. Cadastrar Client ID/Secret do Google e testar o login OAuth.
+7. Testar criação de uma requisição no ambiente remoto.
+8. Remover ou bloquear os registros Auth antigos inválidos, após confirmação.
 9. Antes de produção, criar outro projeto Supabase sem dados fictícios e separar Preview/Production.
 
 ## Decisões e itens descartados
