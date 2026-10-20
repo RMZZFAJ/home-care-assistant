@@ -38,6 +38,8 @@ Com a Supabase CLI instalada, vincule o projeto manualmente e aplique `supabase/
 
 O acesso à aplicação exige login Supabase e um registro `profiles` com status `active` e função `admin`, `supervisor` ou `professional`. A chave anon é pública por desenho, mas toda autorização depende de RLS e de verificações server-side; nunca configure uma service role em `NEXT_PUBLIC_*`.
 
+Cada produto possui um ID estável, um nome canônico e aliases. A busca futura pode aceitar qualquer alias (por exemplo, `Fosfomicina`, `Monuril` ou `Fosfomicina (Monuril) 3g`) sem criar um segundo produto. O banco expõe a função autenticada `find_product_by_alias(text)` para integrações futuras.
+
 Leia [docs/SECURITY.md](docs/SECURITY.md), [docs/DATABASE.md](docs/DATABASE.md) e [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) antes de qualquer ambiente compartilhado.
 
 ## Arquitetura

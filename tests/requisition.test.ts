@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { requisitionInputSchema } from "@/lib/validation/requisition";
 import { buildWhatsAppSummary } from "@/lib/receipt";
-import { CATALOG } from "@/lib/catalog";
+import { CATALOG, findCatalogItemByName } from "@/lib/catalog";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -42,10 +42,15 @@ describe("integridade do catálogo", () => {
   it("usa as unidades operacionais revisadas", () => {
     const item = (id: string) => CATALOG.find((catalogItem) => catalogItem.id === id);
     expect(item("phosfoenema")?.unit).toBe("bisnaga");
-    expect(item("monuril")).toMatchObject({ name: "Fosfomicina", unit: "envelope" });
+    expect(item("monuril")).toMatchObject({ name: "Fsofomicna (Monuril) 3g", unit: "envelope" });
     expect(item("quetiapina-100")?.unit).toBe("comprimido");
     expect(item("fralda")?.unit).toBe("unidade");
     expect(item("sabonete-intimo")?.unit).toBe("frasco");
     expect(item("pomada-assadura")?.unit).toBe("bisnaga");
+  });
+  it("resolve aliases sem duplicar o produto", () => {
+    expect(findCatalogItemByName("Fosfomicina")?.id).toBe("monuril");
+    expect(findCatalogItemByName("Monuril")?.id).toBe("monuril");
+    expect(findCatalogItemByName("fosfomicina (monuril) 3g")?.id).toBe("monuril");
   });
 });
