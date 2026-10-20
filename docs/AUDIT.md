@@ -48,17 +48,23 @@ O deploy Production da Vercel foi validado anteriormente como `Ready`.
 
 ## Estado do banco remoto
 
-Não foi feita aplicação de migrações, push, deploy ou alteração em banco remoto nesta
-rodada. A validação descrita aqui é exclusivamente local.
+O projeto remoto `qwfrqychokvhdzakibid` está vinculado e saudável. Em
+20/10/2026, `supabase db push --yes` confirmou:
+
+```text
+Remote database is up to date.
+```
+
+As migrações locais e remotas estão alinhadas até `20261020001800`. Foram
+verificadas remotamente as funções de transição de status, importação histórica,
+aprovação de inventário e processamento de notificações, além das tabelas e
+constraints críticas.
 
 ## Branches após a auditoria
 
-O estado auditado nesta rodada está apenas no working tree local de `master`.
-O commit `4256ae6` foi enviado para `origin/master`. O push acionou o deploy
-automático da Vercel, que terminou `Ready` em 20/10/2026 e assumiu o alias de
-produção `https://home-care-assistant.vercel.app`. O banco remoto, porém, não
-aceitou `supabase db push`; portanto a publicação existe, mas as funcionalidades
-que dependem das migrações novas ainda aguardam aplicação no banco remoto.
+O commit `6ffd984` está em `origin/master`. O push acionou o deploy automático da
+Vercel, que terminou `Ready` em 20/10/2026 e assumiu o alias de produção
+`https://home-care-assistant.vercel.app`. A página de produção respondeu HTTP 200.
 
 ## Limitações e pendências verificadas
 
@@ -79,13 +85,11 @@ que dependem das migrações novas ainda aguardam aplicação no banco remoto.
   autorizada e exige justificativa para cancelamento.
 - A migração `20261020001500` bloqueia saídas acima do saldo para usuários não
   administradores e serializa a verificação por paciente/produto/custódia.
-- Ainda não há UI administrativa completa para usuários, pacientes e catálogo; as tabelas/RLS e contratos incrementais estão preparados.
+- Existe uma UI administrativa protegida em `/admin` para consulta e atualização de perfis, consulta de pacientes e consulta de catálogo; operações de importação, memberships e inventário continuam disponíveis por APIs server-side protegidas.
 - Não foi executado teste E2E autenticado nem uma suíte RLS com múltiplos usuários reais nesta rodada; o reset/lint local validou a aplicação das migrações, não substitui esses testes.
 - A importação foi validada quanto a schema, funções e contrato da API, mas ainda não foi executada com usuários autenticados reais no ambiente local.
 - A regra confirmada de negócio permite saldo negativo somente para administrador
   global, com justificativa e auditoria; demais perfis são bloqueados.
-- A tentativa de aplicar o banco remoto em 20/10/2026 foi bloqueada por HTTP 403 do
-  Supabase CLI (`DbConfigLoginRoleStatusError`). Nenhuma migração remota foi executada.
-- A Vercel possui as quatro variáveis esperadas em Production e Preview. A página de
-  produção respondeu HTTP 200 e o deployment ficou `Ready`, mas as migrações
-  `20261020001300`–`20261020001800` continuam pendentes no banco remoto.
+- A Vercel possui as quatro variáveis esperadas em Production e Preview. O deployment
+  final ficou `Ready` e as migrações `20261020001300`–`20261020001800` estão aplicadas
+  no banco remoto.

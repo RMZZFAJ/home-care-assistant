@@ -39,31 +39,24 @@ O repositório usa migrações versionadas; não copie o banco manualmente e nã
 
    Se `supabase link --project-ref` informar que a conta não tem privilégios, confirme no painel do Supabase que o projeto pertence à organização da conta autenticada no CLI ou aceite um convite de membro/administrador. Não use uma chave de outro projeto e não tente aplicar migrações até o vínculo funcionar.
 
-### Resultado da tentativa de aplicação em 20/10/2026
+### Resultado da aplicação em 20/10/2026
 
-Nesta rodada o projeto local está vinculado ao ref `qwfrqychokvhdzakibid`, mas a
-conta autenticada no Supabase CLI não possui privilégio para inicializar a role de
-login do banco. Os comandos abaixo foram executados e falharam antes de executar
-qualquer migração:
+O projeto local está vinculado ao ref `qwfrqychokvhdzakibid`. Depois da renovação
+da sessão do Supabase CLI, os comandos abaixo foram executados com sucesso:
 
 ```powershell
-supabase migration list
 supabase db push --yes
 ```
 
-Erro retornado:
+Resultado:
 
 ```text
-DbConfigLoginRoleStatusError: unexpected login role status 403
-Your account does not have the necessary privileges to access this endpoint.
+Remote database is up to date.
 ```
 
-Por segurança, não foi usada chave de outro projeto, `SUPABASE_SERVICE_ROLE_KEY`,
-conexão direta desconhecida ou qualquer atalho para contornar o controle de acesso.
-Um membro/administrador da organização `wfaicgnnirwsxzupchwo` precisa conceder
-acesso ao usuário autenticado. Depois disso, execute `supabase db push --yes` e
-confirme que as migrações `20261020001300` até `20261020001800` foram aplicadas
-antes de publicar a versão correspondente na Vercel.
+`supabase migration list` confirmou que as migrações `20261020001300` até
+`20261020001800` estão presentes no remoto. Não foi usada chave de outro projeto,
+`SUPABASE_SERVICE_ROLE_KEY` ou conexão desconhecida.
 
 4. Crie a pessoa assistida e o perfil administrativo no remoto por procedimento controlado. Não execute `supabase/seed.sql` em produção, pois ele contém dados fictícios.
 
@@ -90,11 +83,8 @@ com URL atual `https://home-care-assistant.vercel.app`. As variáveis
 `NEXT_PUBLIC_APP_URL` e `CARE_RECIPIENT_ID` existem em Production e Preview.
 Os valores não são reproduzidos nesta documentação.
 
-Não publique uma versão que exija migrações ainda não aplicadas. Nesta rodada o push
-para `master` acionou automaticamente um deploy de produção, que terminou `Ready`
-e respondeu HTTP 200, apesar do bloqueio do banco remoto. Isso deixa a página pública,
-mas não significa que as operações dependentes do schema novo estejam prontas. A
-ordem segura para a próxima atualização é:
+Não publique uma versão que exija migrações ainda não aplicadas. A ordem segura
+validada nesta rodada foi:
 
 1. corrigir o acesso do Supabase;
 2. executar `supabase db push --yes`;
