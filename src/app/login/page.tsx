@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/login-form";
+import { Suspense } from "react";
 
 export default function LoginPage() {
   return (
@@ -7,7 +8,7 @@ export default function LoginPage() {
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-(--brand)">Home Care Assistant</p>
         <h1 className="mt-2 text-3xl font-semibold">Entrar</h1>
         <p className="mt-3 text-sm text-(--muted)">Use uma conta previamente criada e autorizada no Supabase.</p>
-        <div className="mt-8"><LoginForm /></div>
+        <div className="mt-8"><Suspense fallback={<p role="status">Carregando formulário...</p>}><LoginForm /></Suspense></div>
       </section>
     </main>
   );
