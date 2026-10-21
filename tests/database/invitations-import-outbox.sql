@@ -1,0 +1,136 @@
+-- Verified local development stack only. All data mutations roll back; no external calls.
+begin;
+create temporary table fixture_users as select replace(full_name,'Teste ','') name,id from public.profiles where full_name like 'Teste %';
+grant select on fixture_users to authenticated,service_role;
+create or replace function pg_temp.assert_ok(p_ok boolean,p_message text) returns void language plpgsql as $$begin if not coalesce(p_ok,false) then raise exception 'ASSERTION FAILED: %',p_message;end if;end;$$;
+create or replace function pg_temp.must_fail(p_sql text,p_message text) returns void language plpgsql as $$declare caught boolean:=false;begin begin execute p_sql;exception when others then caught:=true;end;perform pg_temp.assert_ok(caught,p_message);end;$$;
+create or replace function pg_temp.login(p_name text) returns void language plpgsql as $$declare v uuid;begin
+  select id into v from fixture_users where name=p_name;perform pg_temp.assert_ok(v is not null,'fixture exists');
+  perform set_config('request.jwt.claim.sub',v::text,true);perform set_config('request.jwt.claim.role','authenticated',true);
+end;$$;
+create temporary table operation_ids(key text primary key,id uuid);
+create temporary table protocol_before_import as select last_value,is_called from public.requisition_protocol_number_seq;
+grant select,insert,update on operation_ids to authenticated,service_role;
+set local role authenticated;
+select pg_temp.login('adminA');
+select pg_temp.must_fail($q$select public.admin_upsert_membership('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='adminB'),'admin',true,true)$q$,'local admin cannot attach arbitrary known other-patient identity');
+insert into operation_ids select 'invite',id from public.admin_create_invitation('20000000-0000-4000-8000-000000000001','hca-unlinked@example.invalid','professional',false,true,repeat('a',64),now()+interval '1 day');
+select pg_temp.login('reader');
+select pg_temp.must_fail($q$select public.accept_invitation(repeat('a',64))$q$,'invitation email must match confirmed identity');
+select pg_temp.login('unlinked');
+select public.accept_invitation(repeat('a',64));
+select public.accept_invitation(repeat('a',64));
+select pg_temp.assert_ok(public.recipient_role('20000000-0000-4000-8000-000000000001')='professional','invitation grants local role');
+select pg_temp.assert_ok(not public.is_global_administrator(),'invitation cannot grant global power');
+select pg_temp.login('adminA');
+select public.admin_create_invitation('20000000-0000-4000-8000-000000000001','hca-unlinked@example.invalid','admin',true,true,repeat('b',64),now()+interval '1 day');
+select public.admin_set_membership_status('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='unlinked'),'revoked');
+select pg_temp.login('unlinked');
+select pg_temp.must_fail($q$select public.accept_invitation(repeat('a',64))$q$,'accepted token cannot restore revoked membership');
+select pg_temp.must_fail($q$select public.accept_invitation(repeat('b',64))$q$,'old pending invitation invalidated on revoke');
+select pg_temp.login('adminA');
+select public.admin_create_invitation('20000000-0000-4000-8000-000000000001','hca-unlinked@example.invalid','professional',false,false,repeat('c',64),now()+interval '1 day');
+select pg_temp.login('global');
+select public.admin_set_membership_status('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='adminA'),'revoked');
+select pg_temp.login('unlinked');
+select pg_temp.must_fail($q$select public.accept_invitation(repeat('c',64))$q$,'revoked inviter cannot continue granting access');
+select pg_temp.login('global');
+select public.admin_set_membership_status('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='adminA'),'active');
+select pg_temp.login('adminA');
+select public.admin_resend_invitation((select id from public.care_recipient_invitations where token_hash=repeat('c',64)),repeat('d',64),now()+interval '1 day');
+select pg_temp.login('unlinked');
+select pg_temp.must_fail($q$select public.accept_invitation(repeat('c',64))$q$,'rotated token no longer valid');
+select public.accept_invitation(repeat('d',64));
+select pg_temp.login('adminA');
+select pg_temp.must_fail($q$select public.admin_create_invitation('20000000-0000-4000-8000-000000000002','hca-unlinked@example.invalid','admin',true,true,repeat('e',64),now()+interval '1 day')$q$,'A cannot invite to B');
+
+do $$declare v_before bigint;v_called boolean;r jsonb;r2 jsonb;v_id uuid;begin
+  -- Sequence value is readable only through a privileged snapshot below.
+  r:=public.import_historical_requisitions(repeat('f',64),'[{"physicalProtocol":1,"careRecipientId":"20000000-0000-4000-8000-000000000001","lines":[{"productId":"fralda","currentStock":2,"urgent":false}]}]');
+  perform pg_temp.assert_ok((r->>'imported')::integer=1,'known patient historical import');
+  r2:=public.import_historical_requisitions('untrusted different caller hash','[{"physicalProtocol":1,"careRecipientId":"20000000-0000-4000-8000-000000000001","lines":[{"productId":"fralda","currentStock":2,"urgent":false}]}]');
+  perform pg_temp.assert_ok(r->>'batchId'=r2->>'batchId' and (r2->>'replayed')::boolean,'import computes canonical hash in database');
+  select id into v_id from public.requisitions where protocol='HC-000001';
+  perform pg_temp.assert_ok((select created_by is null and status is null and created_at is null and requester_name_snapshot is null from public.requisitions where id=v_id),'historical unknown facts remain unknown');
+  perform pg_temp.assert_ok(not exists(select 1 from public.requisition_notifications where requisition_id=v_id),'historical import no retroactive messages');
+  r:=public.import_historical_requisitions('x','[{"physicalProtocol":2,"careRecipientId":"20000000-0000-4000-8000-000000000001","lines":[{"productId":"fralda","currentStock":2},{"productId":"fralda","currentStock":3}]}]');
+  perform pg_temp.assert_ok((r->>'rejected')::integer=1 and not exists(select 1 from public.requisitions where protocol='HC-000002'),'duplicate import lines rejected atomically');
+  r:=public.import_historical_requisitions('x','[{"physicalProtocol":3,"careRecipientId":"20000000-0000-4000-8000-000000000001","lines":[{"productId":"fralda","currentStock":-2}]}]');
+  perform pg_temp.assert_ok((r->>'rejected')::integer=1,'invalid stock rejected with report');
+  perform pg_temp.must_fail($q$select public.import_historical_requisitions('x','[{"physicalProtocol":4,"careRecipientId":"20000000-0000-4000-8000-000000000002","lines":[{"productId":"fralda","currentStock":2}]}]')$q$,'local historical import cannot cross patient');
+end;$$;
+
+do $$declare r jsonb;r2 jsonb;v_id uuid;v_rows jsonb;begin
+  v_rows:='[{"physicalProtocol":5,"careRecipientId":"20000000-0000-4000-8000-000000000001","lines":[{"productId":"fralda","currentStock":null},{"productId":"gaze"}]}]';
+  r:=public.import_historical_requisitions('caller hash is not authority',v_rows);
+  perform pg_temp.assert_ok((r->>'imported')::integer=1,'historical omitted and null counts accepted');
+  select id into v_id from public.requisitions where protocol='HC-000005';
+  perform pg_temp.assert_ok((select count(*)=2 and bool_and(current_stock is null) from public.requisition_items where requisition_id=v_id),'unknown historical stock stays NULL rather than zero');
+  perform pg_temp.assert_ok(not exists(select 1 from public.requisition_notifications where requisition_id=v_id),'unknown stock import does not enqueue retroactive notifications');
+  r2:=public.import_historical_requisitions('different caller hash',v_rows);
+  perform pg_temp.assert_ok(r->>'batchId'=r2->>'batchId' and (r2->>'replayed')::boolean,'unknown count import replay does not duplicate');
+  v_rows:='[{"physicalProtocol":6,"careRecipientId":"20000000-0000-4000-8000-000000000001","extraItems":[{"customName":"Fralda","currentStock":null},{"customName":"Material avulso comprovado","currentStock":4,"urgent":true}]}]';
+  r:=public.import_historical_requisitions('x',v_rows);
+  perform pg_temp.assert_ok((r->>'imported')::integer=1,'historical extra-only form accepted');
+  select id into v_id from public.requisitions where protocol='HC-000006';
+  perform pg_temp.assert_ok((select count(*)=2 and bool_and(product_id is null) from public.requisition_items where requisition_id=v_id),'historical custom names never autoassociate even when catalogue name matches');
+  perform pg_temp.assert_ok(exists(select 1 from public.requisition_items where requisition_id=v_id and custom_name='Fralda' and product_name_snapshot='Fralda' and current_stock is null),'extra source name and unknown count preserved');
+  perform pg_temp.assert_ok(exists(select 1 from public.requisition_items where requisition_id=v_id and custom_name='Material avulso comprovado' and current_stock=4 and urgent),'known extra count and urgency preserved');
+  r:=public.import_historical_requisitions('x','[{"physicalProtocol":7,"careRecipientId":"20000000-0000-4000-8000-000000000001","extraItems":[{"customName":"   "}]}]');
+  perform pg_temp.assert_ok((r->>'rejected')::integer=1 and not exists(select 1 from public.requisitions where protocol='HC-000007'),'blank historical extra rejected');
+  r:=public.import_historical_requisitions('x','[{"physicalProtocol":8,"careRecipientId":"20000000-0000-4000-8000-000000000001","lines":[{"productId":"fralda","currentStock":null}],"extraItems":[{"customName":"Fonte inválida","currentStock":-1}]}]');
+  perform pg_temp.assert_ok((r->>'rejected')::integer=1 and not exists(select 1 from public.requisitions where protocol='HC-000008'),'invalid extra rolls back complete historical row');
+  r:=public.import_historical_requisitions('x','[{"physicalProtocol":9,"careRecipientId":"20000000-0000-4000-8000-000000000001","lines":[{"productId":"unproven-product","currentStock":null}]}]');
+  perform pg_temp.assert_ok((r->>'rejected')::integer=1,'unknown stock never permits an unproven product association');
+  r:=public.import_historical_requisitions('x','[{"physicalProtocol":10,"careRecipientId":"20000000-0000-4000-8000-000000000001","extraItems":[{"customName":"Fonte","currentStock":"0"}]}]');
+  perform pg_temp.assert_ok((r->>'rejected')::integer=1,'historical counts reject coercion from text');
+  r:=public.import_historical_requisitions('x','[{"physicalProtocol":11,"careRecipientId":"20000000-0000-4000-8000-000000000001","extraItems":[{"customName":"Fonte","productId":"fralda"}]}]');
+  perform pg_temp.assert_ok((r->>'rejected')::integer=1,'historical extras cannot smuggle canonical product identities');
+  perform pg_temp.must_fail($q$select public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[{"productId":"fralda","currentStock":null,"urgent":false}]','[]','[]')$q$,'operational canonical lines still require known stock');
+  perform pg_temp.must_fail($q$select public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[]','[{"customName":"Fonte operacional","currentStock":null,"urgent":false}]','[]')$q$,'operational extra lines still require known stock');
+end;$$;
+
+reset role;
+select pg_temp.must_fail($q$update public.requisition_items set current_stock=null where requisition_id='30000000-0000-4000-8000-000000000001'$q$,'database guard independently rejects unknown count on operational records');
+select pg_temp.must_fail($q$update public.requisitions set is_historical=false where protocol='HC-000005'$q$,'historical origin cannot be changed to evade stock contract');
+select pg_temp.assert_ok((select a.last_value=b.last_value and a.is_called=b.is_called from public.requisition_protocol_number_seq a cross join protocol_before_import b),'historical import leaves protocol sequence unchanged');
+set local role authenticated;
+select pg_temp.login('adminA');
+
+select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','internal',null,true);
+select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','whatsapp','+5511999999999',true);
+select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','email','receiver@example.invalid',true);
+insert into operation_ids select 'request',requisition_id from public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[{"productId":"fralda","currentStock":0,"urgent":false}]','[]','[]');
+select pg_temp.assert_ok((select count(*)=3 from public.requisition_notifications where requisition_id=(select id from operation_ids where key='request')),'one message per individual and configured channel');
+select pg_temp.login('reader');
+select pg_temp.assert_ok(not exists(select 1 from public.requisition_notifications where requisition_id=(select id from operation_ids where key='request')),'unrelated reader cannot see personal notification destinations');
+select pg_temp.login('global');
+do $$declare v_worker uuid:=gen_random_uuid();v_worker2 uuid:=gen_random_uuid();n public.requisition_notifications;v_count integer:=0;begin
+  for n in select * from public.claim_notification_jobs(100,v_worker,false) loop
+    perform pg_temp.assert_ok(n.channel='internal','disabled external channels never claimed');
+    perform public.complete_notification_job(n.id,v_worker,'delivered','internal');v_count:=v_count+1;
+  end loop;
+  perform pg_temp.assert_ok(v_count=1,'exactly one internal configured recipient claimed');
+  for n in select * from public.claim_notification_jobs(100,v_worker2,true) loop
+    perform pg_temp.assert_ok(n.channel='whatsapp','unsupported email remains pending');
+    insert into operation_ids values('external',n.id);
+  end loop;
+  perform pg_temp.assert_ok(exists(select 1 from operation_ids where key='external'),'WhatsApp claim when provider enabled');
+end;$$;
+reset role;
+update public.requisition_notifications set lease_expires_at=now()-interval '1 minute' where id=(select id from operation_ids where key='external');
+set local role authenticated;
+select pg_temp.login('global');
+select public.claim_notification_jobs(100,gen_random_uuid(),true);
+select pg_temp.assert_ok((select state='uncertain' from public.requisition_notifications where id=(select id from operation_ids where key='external')),'expired external lease is uncertain and not resent');
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role','service_role',true);
+select public.notification_webhook('provider-fictitious-opaque-id','delivered',(select id from operation_ids where key='external'));
+select public.notification_webhook('provider-fictitious-opaque-id','accepted',(select id from operation_ids where key='external'));
+select public.notification_webhook('provider-fictitious-opaque-id','read',(select id from operation_ids where key='external'));
+select public.notification_webhook('provider-fictitious-opaque-id','delivered',(select id from operation_ids where key='external'));
+reset role;
+select pg_temp.assert_ok((select state='read' and provider_reference='provider-fictitious-opaque-id' and delivered_at is not null and read_at is not null from public.requisition_notifications where id=(select id from operation_ids where key='external')),'signed reconciliation binds missing reference and statuses never regress');
+select 'invitation import and outbox assertions passed' result;
+rollback;

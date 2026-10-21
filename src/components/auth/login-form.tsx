@@ -1,11 +1,13 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { safeReturnPath } from "@/lib/safe-return-path";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,14 +26,17 @@ export function LoginForm() {
       return;
     }
 
+    try {
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (signInError) {
       setError("E-mail ou senha inválidos.");
       setLoading(false);
       return;
     }
-    router.replace("/");
+    router.replace(safeReturnPath(searchParams.get("next"), window.location.origin));
     router.refresh();
+    } catch { setError("Não foi possível conectar. Tente novamente."); }
+    finally { setLoading(false); }
   }
 
   async function recoverPassword() {
@@ -47,13 +52,15 @@ export function LoginForm() {
       return;
     }
     setLoading(true);
-    const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/login` });
-    setLoading(false);
+    try {
+    const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/recuperar-senha` });
     if (recoveryError) {
       setError("Não foi possível iniciar a recuperação. Verifique o e-mail ou procure um administrador.");
       return;
     }
     setNotice("Se o e-mail estiver autorizado, você receberá instruções de recuperação.");
+    } catch { setError("Não foi possível conectar. Tente novamente."); }
+    finally { setLoading(false); }
   }
 
   async function signInWithGoogle() {
@@ -65,18 +72,22 @@ export function LoginForm() {
       setLoading(false);
       return;
     }
+    try {
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeReturnPath(searchParams.get("next"), window.location.origin))}` },
     });
     if (oauthError) {
       setError("Não foi possível iniciar o login com Google. Verifique se o provedor está habilitado.");
       setLoading(false);
     }
+    } catch { setError("Não foi possível conectar ao provedor. Tente novamente."); }
+    finally { setLoading(false); }
   }
 
   return (
     <form onSubmit={submit} className="space-y-4">
+      {searchParams.get("error") && <p role="alert" className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</p>}
       <label className="block text-sm font-semibold">E-mail
         <input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1 w-full rounded-lg border border-(--line) p-3" />
       </label>

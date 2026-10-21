@@ -1,0 +1,3638 @@
+[
+  {
+    "id": "MISSION-1",
+    "source": "MISSION",
+    "line": 1,
+    "section": "MISSÃO MESTRE — AUDITORIA FORENSE, REFATORAÇÃO ARQUITETURAL, CORREÇÃO INTEGRAL E CONSOLIDAÇÃO DO HOME CARE ASSISTANT",
+    "criteria": []
+  },
+  {
+    "id": "MISSION-2",
+    "source": "MISSION",
+    "line": 3,
+    "section": "1. PAPEL, MISSÃO E RESULTADO ESPERADO",
+    "criteria": [
+      "Você atuará como **Principal Software Engineer, Software Architect, Database Engineer, Security Engineer e QA Lead**, assumindo a responsabilidade técnica de examinar, corrigir, refatorar, consolidar e evoluir o repositório existente `RMZZFAJ/home-care-assistant`.",
+      "Esta não é uma solicitação de revisão superficial, geração de recomendações genéricas ou elaboração isolada de um plano de desenvolvimento.",
+      "**Sua missão é executar uma auditoria técnica, arquitetural, funcional, operacional e de segurança de todo o projeto, identificar integralmente os problemas e as funcionalidades incompletas, aplicar as correções necessárias e validar o resultado com evidências reproduzíveis.**",
+      "Quero que você trabalhe com o rigor de uma equipe sênior realizando uma auditoria de código, revisão arquitetural, saneamento de dívida técnica, hardening de segurança, engenharia de confiabilidade e preparação de um sistema para evolução contínua.",
+      "O objetivo é transformar o repositório em uma base de engenharia sólida, coesa, organizada, extensível, bem documentada e efetivamente funcional, pronta para continuar o desenvolvimento do Home Care Assistant sem acumular inconsistências, implementações fictícias ou dependências ocultas.",
+      "Você possui autonomia para:",
+      "- Investigar integralmente o repositório.",
+      "- Examinar todos os arquivos pertinentes, inclusive linha por linha quando necessário.",
+      "- Criar, modificar e excluir código.",
+      "- Refatorar componentes, serviços, APIs, funções e estruturas.",
+      "- Reorganizar diretórios e arquivos.",
+      "- Criar, consolidar, renomear, atualizar ou eliminar documentos obsoletos.",
+      "- Criar testes unitários, de integração, segurança, banco de dados e E2E.",
+      "- Corrigir falhas de arquitetura, tipagem, integridade, concorrência, autorização e persistência.",
+      "- Criar novas migrations incrementais.",
+      "- Executar validações em ambiente local seguro.",
+      "- Consultar e comparar o estado do banco remoto.",
+      "- Melhorar a experiência do usuário, a interface administrativa e os fluxos operacionais.",
+      "- Eliminar duplicações, abstrações desnecessárias, código morto e dependências sem utilidade demonstrável.",
+      "Essa autonomia está sujeita às salvaguardas de integridade, preservação de dados, segurança e autorização descritas adiante.",
+      "**Não interprete a autorização para refatoração como autorização para apagar dados existentes, reescrever o histórico de migrations, modificar infraestrutura remota ou destruir trabalho preexistente.**",
+      "Não recrie a aplicação do zero. Preserve os comportamentos corretos, a identidade funcional e o histórico do sistema, substituindo apenas aquilo que apresentar justificativa técnica verificável."
+    ]
+  },
+  {
+    "id": "MISSION-3",
+    "source": "MISSION",
+    "line": 39,
+    "section": "2. OS DOIS DOCUMENTOS ANEXADOS SÃO PARTE ESSENCIAL DA MISSÃO",
+    "criteria": [
+      "Estou anexando a esta mensagem dois prompts extensos anteriormente encaminhados ao GitHub Copilot no VS Code.",
+      "Esses documentos descrevem requisitos, decisões de negócio, funcionalidades, critérios de aceite, restrições e resultados que deveriam ter sido implementados no Home Care Assistant.",
+      "Há indícios de que determinadas etapas foram executadas apenas parcialmente, de maneira simplificada ou exclusivamente estrutural, sem que todos os requisitos tenham sido efetivamente concluídos.",
+      "**Leia os dois anexos integralmente antes de iniciar as alterações.**",
+      "Não se limite a resumos, títulos ou trechos selecionados.",
+      "Considere-os conjuntamente como uma especificação histórica e funcional do projeto, mas não presuma que todos os diagnósticos técnicos e referências de estado neles contidos continuam atuais.",
+      "Em particular:",
+      "1. Extraia todos os requisitos funcionais e não funcionais de ambos os documentos.",
+      "2. Identifique requisitos repetidos, complementares ou contraditórios.",
+      "3. Compare as exigências com o código atualmente existente.",
+      "4. Verifique quais requisitos foram integralmente implementados.",
+      "5. Identifique implementações parciais, incorretas, apenas documentadas ou ausentes.",
+      "6. Identifique funcionalidades novas que tenham surgido depois da elaboração dos anexos.",
+      "7. Preserve decisões de negócio válidas.",
+      "8. Identifique decisões técnicas ultrapassadas ou que hoje possam ser melhor resolvidas.",
+      "9. Não reimplemente funcionalidades já concluídas apenas porque aparecem nos anexos.",
+      "10. Não considere um requisito atendido somente porque existe uma tabela, interface, função, endpoint, comentário, teste isolado ou afirmação documental.",
+      "Construa uma **matriz de rastreabilidade dos requisitos**, relacionando cada exigência extraída dos anexos com:",
+      "- Identificador do requisito.",
+      "- Fonte e seção de origem.",
+      "- Descrição funcional.",
+      "- Componentes e arquivos envolvidos.",
+      "- Estado atual.",
+      "- Evidência identificada.",
+      "- Lacunas ou inconsistências.",
+      "- Impacto e prioridade.",
+      "- Alteração necessária.",
+      "- Testes e critérios de aceite.",
+      "- Resultado final após a intervenção.",
+      "Use a seguinte classificação:",
+      "- IMPLEMENTADO E VALIDADO.",
+      "- IMPLEMENTADO, MAS NÃO VALIDADO INTEGRALMENTE.",
+      "- PARCIALMENTE IMPLEMENTADO.",
+      "- APENAS ESTRUTURADO.",
+      "- NÃO IMPLEMENTADO.",
+      "- IMPLEMENTADO INCORRETAMENTE.",
+      "- OBSOLETO OU SUBSTITUÍDO JUSTIFICADAMENTE.",
+      "- DEPENDENTE DE CONFIGURAÇÃO EXTERNA.",
+      "- BLOQUEADO, COM JUSTIFICATIVA DOCUMENTADA.",
+      "Não descarte requisitos silenciosamente. Toda decisão de não implementar, substituir ou adiar algum requisito deverá ser fundamentada."
+    ]
+  },
+  {
+    "id": "MISSION-4",
+    "source": "MISSION",
+    "line": 96,
+    "section": "3. LEVANTAMENTO INICIAL OBRIGATÓRIO",
+    "criteria": [
+      "Antes de modificar o projeto, estabeleça seu estado real.",
+      "Inspecione:",
+      "- Repositório GitHub e diretório local.",
+      "- Branch atual e branch padrão.",
+      "- HEAD e histórico recente de commits.",
+      "- Estado do working tree.",
+      "- Alterações locais não commitadas.",
+      "- Arquivos não rastreados.",
+      "- Diferenças entre o estado local e os commits publicados.",
+      "- Estrutura integral de diretórios.",
+      "- Arquivos de configuração.",
+      "- Dependências diretas e transitivas relevantes.",
+      "- Scripts do `package.json`.",
+      "- Variáveis de ambiente utilizadas.",
+      "- Configuração do Next.js.",
+      "- Configuração do TypeScript.",
+      "- Configuração do ESLint.",
+      "- Configuração de testes.",
+      "- Configuração do Supabase.",
+      "- Workflows do GitHub Actions.",
+      "- Configurações de integração e implantação que estejam disponíveis.",
+      "- Documentos e instruções de agentes existentes.",
+      "Leia todos os arquivos pertinentes ao funcionamento do projeto, incluindo `AGENTS.md`, arquivos de instrução equivalentes, `README.md`, documentos em `docs`, código em `src`, migrations em `supabase/migrations`, seeds, testes, workflows e configurações.",
+      "**Não assuma que a estrutura existente corresponde àquela mencionada nos anexos. Descubra primeiro a estrutura atual.**",
+      "Documente a arquitetura encontrada e identifique os fluxos reais entre interface, API, autenticação, autorização, banco, funções SQL e serviços externos.",
+      "A revisão deve ser suficientemente granular para identificar:",
+      "- Erros de lógica.",
+      "- Erros silenciosos.",
+      "- Comportamentos inesperados.",
+      "- Código redundante.",
+      "- Código morto.",
+      "- Duplicação de responsabilidades.",
+      "- Abstrações artificiais.",
+      "- Acoplamento excessivo.",
+      "- Dependências circulares.",
+      "- Problemas de coesão.",
+      "- Contratos de API inconsistentes.",
+      "- Validação insuficiente.",
+      "- Tipagem frágil.",
+      "- Tratamento inadequado de exceções.",
+      "- Falhas de concorrência.",
+      "- Problemas de integridade transacional.",
+      "- Riscos de autenticação e autorização.",
+      "- Exposição indevida de dados.",
+      "- Problemas de desempenho.",
+      "- Consultas ineficientes.",
+      "- Falta de índices.",
+      "- Problemas de acessibilidade.",
+      "- Interfaces incompletas.",
+      "- Estados de carregamento inadequados.",
+      "- Documentação desatualizada.",
+      "- Testes insuficientes.",
+      "- Fragilidades de manutenção.",
+      "- Falhas de observabilidade.",
+      "- Problemas de configuração, integração e implantação.",
+      "Não produza afirmações genéricas como \"o código pode ser melhor organizado\". Identifique precisamente o problema, a localização, a causa, o impacto e a solução apropriada."
+    ]
+  },
+  {
+    "id": "MISSION-5",
+    "source": "MISSION",
+    "line": 165,
+    "section": "4. REGRAS DE SEGURANÇA E PRESERVAÇÃO",
+    "criteria": []
+  },
+  {
+    "id": "MISSION-6",
+    "source": "MISSION",
+    "line": 167,
+    "section": "4.1. Git e arquivos existentes",
+    "criteria": [
+      "Antes de editar, registre a situação inicial do repositório.",
+      "Não utilize operações Git destrutivas, como resets forçados, limpeza indiscriminada, rebase destrutivo ou descarte de alterações locais.",
+      "Não sobrescreva trabalho preexistente sem identificar sua origem e relevância.",
+      "Utilize uma branch própria para esta intervenção caso seja seguro fazê-lo e isso não comprometa as alterações atuais.",
+      "Você está autorizado a reorganizar, renomear e excluir arquivos obsoletos ou redundantes, desde que:",
+      "- Haja justificativa técnica.",
+      "- Seus consumidores tenham sido identificados.",
+      "- As referências tenham sido corrigidas.",
+      "- O comportamento necessário seja preservado.",
+      "- Os testes pertinentes tenham sido executados.",
+      "- A alteração seja rastreável no diff.",
+      "Não faça commit, push, merge, rebase remoto, abertura de PR, publicação ou deploy sem autorização expressa."
+    ]
+  },
+  {
+    "id": "MISSION-7",
+    "source": "MISSION",
+    "line": 188,
+    "section": "4.2. Dados e infraestrutura",
+    "criteria": [
+      "Não execute operações destrutivas em bancos remotos.",
+      "Não execute `supabase db reset` no remoto.",
+      "Não execute `supabase db push`, migrations remotas, backfills remotos ou comandos equivalentes sem minha autorização posterior.",
+      "Não altere dados remotos, configurações de autenticação, usuários, permissões, políticas RLS, segredos ou infraestrutura externa nesta execução.",
+      "Você pode consultar o ambiente remoto para diagnosticar seu estado, desde que tenha acesso autorizado e utilize operações efetivamente somente de leitura.",
+      "Evite consultas que produzam efeitos colaterais, executem funções mutáveis ou exponham dados pessoais desnecessários.",
+      "Não extraia dumps contendo dados pessoais reais para testes locais.",
+      "Nunca registre credenciais, tokens ou segredos em arquivos versionados, logs, relatórios ou respostas.",
+      "Não exponha chaves privilegiadas do Supabase no navegador.",
+      "Não desabilite RLS para contornar testes.",
+      "Não faça envios reais de WhatsApp, e-mail ou notificações externas durante testes automatizados.",
+      "Use exclusivamente dados fictícios e ambientes isolados para testes que envolvam alteração de dados."
+    ]
+  },
+  {
+    "id": "MISSION-8",
+    "source": "MISSION",
+    "line": 214,
+    "section": "4.3. Ambiente local",
+    "criteria": [
+      "Você está autorizado a executar comandos, instalar dependências necessárias ao projeto, criar fixtures, iniciar serviços locais e executar testes em ambiente controlado.",
+      "O uso de comandos como `supabase db reset --local` exige confirmação prévia de que o destino é exclusivamente o banco local de testes e de que não há dados locais relevantes a preservar.",
+      "Não presuma que a palavra `local` garante, por si só, que um comando está apontando para o ambiente desejado. Verifique os vínculos e parâmetros antes de executar operações potencialmente destrutivas.",
+      "Se um recurso externo estiver indisponível, não invente resultados. Registre o impedimento e continue as frentes independentes."
+    ]
+  },
+  {
+    "id": "MISSION-9",
+    "source": "MISSION",
+    "line": 226,
+    "section": "5. AUDITORIA INTEGRAL DO BANCO DE DADOS",
+    "criteria": [
+      "Esta é uma das etapas mais importantes da missão.",
+      "Quero uma auditoria estrutural e funcional do PostgreSQL/Supabase, confrontando três realidades distintas:",
+      "**A. Schema esperado pelas migrations versionadas.**",
+      "**B. Schema efetivamente existente no banco local.**",
+      "**C. Schema efetivamente existente no banco remoto autorizado.**",
+      "Sempre que possível, compare também o estado declarado pela aplicação e pela documentação."
+    ]
+  },
+  {
+    "id": "MISSION-10",
+    "source": "MISSION",
+    "line": 240,
+    "section": "5.1. Inspeção estrutural",
+    "criteria": [
+      "Examine:",
+      "- Schemas.",
+      "- Tabelas.",
+      "- Colunas.",
+      "- Tipos.",
+      "- Enums.",
+      "- Valores padrão.",
+      "- Constraints.",
+      "- Chaves primárias e estrangeiras.",
+      "- Relacionamentos.",
+      "- Índices.",
+      "- Índices únicos e parciais.",
+      "- Sequences.",
+      "- Views.",
+      "- Materialized views, se houver.",
+      "- Triggers.",
+      "- Funções SQL e PL/pgSQL.",
+      "- Procedures.",
+      "- Permissões e grants.",
+      "- Políticas RLS.",
+      "- Regras de integridade.",
+      "- Dependências.",
+      "- Extensões.",
+      "- Histórico de migrations.",
+      "- Objetos legados.",
+      "- Objetos órfãos.",
+      "- Objetos redundantes.",
+      "Identifique especialmente:",
+      "- Colunas que não deveriam existir.",
+      "- Colunas esperadas que estejam ausentes.",
+      "- Estruturas equivalentes duplicadas.",
+      "- Constraints contraditórias.",
+      "- Funções antigas ainda acessíveis.",
+      "- Objetos criados diretamente no banco sem migration.",
+      "- Diferenças entre migrations e schema efetivo.",
+      "- Permissões excessivas.",
+      "- Índices ausentes ou desnecessários.",
+      "- Dependências que possam impedir migrations futuras.",
+      "- Dados inconsistentes, sem expor seu conteúdo pessoal.",
+      "- Registros sem relacionamento esperado.",
+      "- Registros duplicados.",
+      "- Relações com cardinalidade incorreta.",
+      "- Referências históricas quebradas.",
+      "- Problemas de integridade derivados de mudanças anteriores.",
+      "Diferencie claramente **drift de schema**, inconsistência de dados, diferença intencional de ambiente e migração ainda não aplicada.",
+      "Não classifique automaticamente uma coluna como desnecessária apenas porque ela não é utilizada pelo frontend atual. Investigue os consumidores, contratos históricos, integrações e regras de negócio."
+    ]
+  },
+  {
+    "id": "MISSION-11",
+    "source": "MISSION",
+    "line": 294,
+    "section": "5.2. Auditoria das migrations",
+    "criteria": [
+      "Leia as migrations em ordem e reproduza mentalmente e, sempre que possível, em ambiente local, seus efeitos cumulativos.",
+      "Não analise cada migration isoladamente sem considerar as migrations posteriores.",
+      "Verifique se o resultado final corresponde ao contrato utilizado pelo código atual.",
+      "Migrations históricas já aplicadas devem permanecer imutáveis. Toda correção deve ser implementada em novas migrations incrementais, acompanhadas de testes e estratégia de compatibilidade.",
+      "Teste dois cenários:",
+      "1. Criação do banco a partir de uma instalação limpa.",
+      "2. Evolução de um banco com schema e registros equivalentes ao estado legado.",
+      "Identifique incompatibilidades entre os dois caminhos."
+    ]
+  },
+  {
+    "id": "MISSION-12",
+    "source": "MISSION",
+    "line": 311,
+    "section": "5.3. Banco remoto",
+    "criteria": [
+      "Se houver acesso ao Supabase remoto, execute uma auditoria exclusivamente de leitura.",
+      "Compare metadados e definições estruturais com o ambiente local.",
+      "Verifique, quando autorizado:",
+      "- Histórico de migrations aplicadas.",
+      "- Divergências de schema.",
+      "- Objetos ausentes.",
+      "- Objetos adicionais.",
+      "- Constraints e índices efetivos.",
+      "- RLS habilitada.",
+      "- Políticas vigentes.",
+      "- Permissões de execução de funções.",
+      "- Definições de funções privilegiadas.",
+      "- Referências órfãs e duplicidades mediante consultas agregadas seguras.",
+      "- Coerência dos dados essenciais sem exposição desnecessária de informações pessoais.",
+      "**Não modifique o banco remoto para corrigir divergências encontradas.**",
+      "Prepare migrations e instruções de aplicação para revisão posterior.",
+      "Ao final, apresente um relatório de diferenças entre os ambientes, distinguindo:",
+      "- Igual.",
+      "- Divergente.",
+      "- Não verificado.",
+      "- Requer migration.",
+      "- Requer reconciliação de dados.",
+      "- Requer decisão ou autorização minha."
+    ]
+  },
+  {
+    "id": "MISSION-13",
+    "source": "MISSION",
+    "line": 346,
+    "section": "6. AUDITORIA DE SEGURANÇA E AUTORIZAÇÃO",
+    "criteria": [
+      "Não considere o uso de Supabase Auth ou a presença de políticas RLS como prova suficiente de segurança.",
+      "Audite o fluxo completo de autenticação, autorização e acesso a dados.",
+      "Examine:",
+      "- Login.",
+      "- Logout.",
+      "- Recuperação de acesso.",
+      "- OAuth e callbacks.",
+      "- Sessões.",
+      "- Cookies.",
+      "- Proxy/middleware.",
+      "- Rotas protegidas.",
+      "- APIs.",
+      "- RPCs.",
+      "- Funções `SECURITY DEFINER`.",
+      "- `search_path`.",
+      "- Grants e revokes.",
+      "- Policies RLS.",
+      "- Views e comportamento de segurança.",
+      "- Permissões por perfil.",
+      "- Permissões por paciente.",
+      "- Revogação de acesso.",
+      "- Operações administrativas.",
+      "- Logs de auditoria.",
+      "- Gerenciamento de segredos.",
+      "Verifique riscos de escalonamento vertical e horizontal de privilégios.",
+      "O sistema deverá preservar a separação entre administrador global, administrador limitado, supervisor, profissional, familiar e leitor, conforme os requisitos dos anexos e a arquitetura efetivamente adotada.",
+      "A autorização deverá considerar o usuário autenticado, seu estado, seu papel, o paciente, seu vínculo específico e as permissões para a operação solicitada.",
+      "O vínculo com um paciente não pode conceder automaticamente privilégios administrativos.",
+      "A função de um usuário não pode permitir acesso indiscriminado a todos os pacientes sem uma autorização global explícita.",
+      "A desativação de usuários ou revogação de vínculos deve bloquear novas operações protegidas.",
+      "Teste acesso não autorizado por manipulação de IDs, payloads, parâmetros, URLs e chamadas diretas à API ou ao banco.",
+      "**Crie testes de integração reais com múltiplos usuários e pelo menos dois pacientes fictícios.**",
+      "Mocks podem complementar os testes, mas não substituem a verificação efetiva das políticas RLS e funções SQL.",
+      "Audite também a possibilidade de inserção, edição ou falsificação de eventos de auditoria por usuários comuns."
+    ]
+  },
+  {
+    "id": "MISSION-14",
+    "source": "MISSION",
+    "line": 398,
+    "section": "7. AUDITORIA E CONCLUSÃO FUNCIONAL DO SISTEMA",
+    "criteria": [
+      "Utilize os requisitos dos dois anexos como referência detalhada. Para cada módulo, avalie o banco, o backend, a interface, as permissões, os testes e a documentação."
+    ]
+  },
+  {
+    "id": "MISSION-15",
+    "source": "MISSION",
+    "line": 402,
+    "section": "7.1. Gestão multipaciente",
+    "criteria": [
+      "Valide e conclua:",
+      "- Cadastro e inativação de pacientes.",
+      "- Associações de usuários.",
+      "- Permissões específicas.",
+      "- Seleção de paciente ativo.",
+      "- Isolamento de dados.",
+      "- Histórico por paciente.",
+      "- Contexto de paciente nas operações.",
+      "- Preservação de registros históricos.",
+      "- Preparação para ampliação futura do sistema.",
+      "Verifique especialmente a dependência de `CARE_RECIPIENT_ID` como contexto único e substitua essa limitação quando necessário, sem comprometer o funcionamento atual."
+    ]
+  },
+  {
+    "id": "MISSION-16",
+    "source": "MISSION",
+    "line": 418,
+    "section": "7.2. Gestão administrativa",
+    "criteria": [
+      "A administração deve ser funcional, não apenas uma coleção de RPCs.",
+      "Verifique e conclua:",
+      "- Cadastro e convite de usuários.",
+      "- Gestão de perfis.",
+      "- Papéis e permissões.",
+      "- Ativação e revogação.",
+      "- Associações com pacientes.",
+      "- Gestão de pacientes.",
+      "- Gestão de produtos.",
+      "- Configurações operacionais.",
+      "- Auditoria administrativa.",
+      "- Mensagens claras de erro e sucesso.",
+      "O Supabase Auth deve continuar sendo a autoridade para autenticação e credenciais.",
+      "Qualquer operação administrativa privilegiada deve ocorrer exclusivamente no servidor autorizado."
+    ]
+  },
+  {
+    "id": "MISSION-17",
+    "source": "MISSION",
+    "line": 439,
+    "section": "7.3. Catálogo de produtos",
+    "criteria": [
+      "Audite:",
+      "- Consistência entre catálogo estático e banco.",
+      "- IDs canônicos.",
+      "- Nomes.",
+      "- Categorias.",
+      "- Unidades.",
+      "- Aliases.",
+      "- Produtos inativos.",
+      "- Duplicidades.",
+      "- Ordenação.",
+      "- Referências históricas.",
+      "- Gestão administrativa.",
+      "A inativação ou alteração de produto não pode destruir o histórico das requisições.",
+      "Analise se os registros históricos precisam de snapshots imutáveis de nome e unidade, para que mudanças futuras do catálogo não alterem indevidamente o significado dos comprovantes antigos."
+    ]
+  },
+  {
+    "id": "MISSION-18",
+    "source": "MISSION",
+    "line": 459,
+    "section": "7.4. Requisições",
+    "criteria": [
+      "Valide integralmente:",
+      "- Formulário.",
+      "- Identificação do solicitante.",
+      "- Seleção de paciente.",
+      "- Catálogo.",
+      "- Itens extras.",
+      "- Estoque informado.",
+      "- Urgência.",
+      "- Observações.",
+      "- Revisão.",
+      "- Validação.",
+      "- Persistência.",
+      "- Protocolo.",
+      "- Idempotência.",
+      "- Comprovante.",
+      "- Tratamento de falhas.",
+      "- Histórico.",
+      "- Reimpressão.",
+      "O conceito de **quantidade solicitada para reposição não deve reaparecer** no contrato funcional da requisição.",
+      "Não confunda essa restrição com quantidades utilizadas em entradas, saídas, transferências, contagens e ajustes de estoque.",
+      "O protocolo sequencial deve permanecer globalmente único, iniciando a partir de 12, preservando os registros históricos de 1 a 11.",
+      "Investigue o estado atual da migration de compatibilidade, sem presumir que o problema anteriormente identificado continua presente."
+    ]
+  },
+  {
+    "id": "MISSION-19",
+    "source": "MISSION",
+    "line": 489,
+    "section": "7.5. Importação histórica",
+    "criteria": [
+      "Audite e conclua o mecanismo de importação dos formulários físicos anteriores.",
+      "Verifique:",
+      "- Preservação dos protocolos.",
+      "- Validação de pacientes.",
+      "- Validação de produtos.",
+      "- Preservação de datas.",
+      "- Idempotência.",
+      "- Tratamento de registros inválidos.",
+      "- Rollback de operações incompletas.",
+      "- Ausência de notificações retroativas.",
+      "- Relatórios de importação.",
+      "- Auditoria.",
+      "Não confunda a existência de um procedimento SQL com um fluxo administrativo completo."
+    ]
+  },
+  {
+    "id": "MISSION-20",
+    "source": "MISSION",
+    "line": 508,
+    "section": "7.6. Gestão de estoque",
+    "criteria": [
+      "O estoque deve utilizar catálogo único, com saldos separados por paciente e custódia:",
+      "- `FAMILY`.",
+      "- `CARE_TEAM`.",
+      "Audite:",
+      "- Entradas.",
+      "- Saídas.",
+      "- Transferências.",
+      "- Ajustes.",
+      "- Saldo calculado.",
+      "- Histórico.",
+      "- Justificativas.",
+      "- Idempotência.",
+      "- Concorrência.",
+      "- Auditoria.",
+      "- Bloqueio de saldo insuficiente.",
+      "- Permissões de escrita.",
+      "O estoque oficial somente poderá ser alterado por administradores expressamente autorizados.",
+      "Os demais usuários poderão consultar ou realizar contagens conforme suas permissões, sem alterar diretamente o saldo oficial.",
+      "Avalie criticamente a exceção existente para administradores globais produzirem saldo negativo. Não permita que essa exceção contorne indiscriminadamente todas as regras de saída e transferência."
+    ]
+  },
+  {
+    "id": "MISSION-21",
+    "source": "MISSION",
+    "line": 536,
+    "section": "7.7. Inventário",
+    "criteria": [
+      "Valide o fluxo completo:",
+      "- Abertura.",
+      "- Contagem.",
+      "- Saldo de referência.",
+      "- Divergência.",
+      "- Justificativa.",
+      "- Submissão.",
+      "- Revisão.",
+      "- Aprovação ou rejeição.",
+      "- Ajuste compensatório.",
+      "- Auditoria.",
+      "Teste aprovação duplicada, concorrência e movimentações ocorridas durante a contagem."
+    ]
+  },
+  {
+    "id": "MISSION-22",
+    "source": "MISSION",
+    "line": 553,
+    "section": "7.8. Alertas e notificações",
+    "criteria": [
+      "Diferencie o registro interno de notificações do envio efetivo por um provedor externo.",
+      "Verifique:",
+      "- Destinatários.",
+      "- Grupos.",
+      "- Canais.",
+      "- Estados.",
+      "- Persistência.",
+      "- Retentativas.",
+      "- Backoff.",
+      "- Idempotência.",
+      "- Recuperação de processamento interrompido.",
+      "- Falhas.",
+      "- Reprocessamento autorizado.",
+      "- Alertas por custódia.",
+      "- Configurações por paciente e produto.",
+      "O saldo da família não pode ocultar uma falta de estoque na posse da equipe.",
+      "Não apresente uma notificação marcada internamente como processada como se uma mensagem externa tivesse sido entregue.",
+      "Sem credenciais de provedor, mantenha o adaptador de integração e os testes, mas registre a integração real como pendente."
+    ]
+  },
+  {
+    "id": "MISSION-23",
+    "source": "MISSION",
+    "line": 579,
+    "section": "7.9. Histórico, status e comprovantes",
+    "criteria": [
+      "Audite filtros, paginação, ordenação, dados persistidos, escopo de autorização, transições de status, justificativas, notificações e reimpressão.",
+      "O histórico de um paciente deve incluir todas as requisições acessíveis ao usuário autorizado, não somente aquelas criadas por ele.",
+      "O comprovante deve preservar as informações válidas no momento da operação."
+    ]
+  },
+  {
+    "id": "MISSION-24",
+    "source": "MISSION",
+    "line": 587,
+    "section": "7.10. Interface e experiência de uso",
+    "criteria": [
+      "Analise todas as telas, inclusive nos contextos de celular e desktop.",
+      "Melhore:",
+      "- Navegação.",
+      "- Hierarquia visual.",
+      "- Organização das informações.",
+      "- Consistência dos componentes.",
+      "- Formulários.",
+      "- Validação.",
+      "- Feedback.",
+      "- Estados de carregamento.",
+      "- Estados vazios.",
+      "- Mensagens de erro.",
+      "- Recuperação de conexão.",
+      "- Acessibilidade.",
+      "- Responsividade.",
+      "Nenhuma tela deve permanecer aparentemente congelada sem indicar o estado da operação.",
+      "Não execute refatorações estéticas extensas que não agreguem clareza, acessibilidade, consistência ou manutenção."
+    ]
+  },
+  {
+    "id": "MISSION-25",
+    "source": "MISSION",
+    "line": 613,
+    "section": "8. AUDITORIA ARQUITETURAL E REFATORAÇÃO DO CÓDIGO",
+    "criteria": [
+      "Avalie o projeto como um sistema completo, e não como uma sequência de arquivos independentes.",
+      "Examine a separação entre:",
+      "- Interface.",
+      "- Componentes de apresentação.",
+      "- Estado da aplicação.",
+      "- Validação.",
+      "- Contratos e tipos.",
+      "- Casos de uso.",
+      "- Regras de negócio.",
+      "- Persistência.",
+      "- Autorização.",
+      "- Serviços externos.",
+      "- Configuração.",
+      "- Observabilidade.",
+      "- Testes.",
+      "Avalie se as responsabilidades estão adequadamente distribuídas.",
+      "Identifique oportunidades reais de:",
+      "- Reutilização.",
+      "- Simplificação.",
+      "- Encapsulamento.",
+      "- Centralização de validações.",
+      "- Centralização de contratos.",
+      "- Redução de acoplamento.",
+      "- Extração de lógica de componentes grandes.",
+      "- Eliminação de duplicação.",
+      "- Organização de módulos.",
+      "- Padronização de erros.",
+      "- Melhorias de desempenho.",
+      "- Redução de dependências.",
+      "- Melhoria da legibilidade.",
+      "- Melhoria da testabilidade.",
+      "Você pode reorganizar a estrutura de pastas quando houver benefício técnico demonstrável.",
+      "**Não introduza abstrações, frameworks, camadas ou padrões apenas por parecerem sofisticados.**",
+      "Prefira soluções simples, explícitas, testáveis, coesas e compatíveis com a escala atual do projeto.",
+      "O sistema deve estar preparado para expansão, mas sem engenharia excessiva ou custos operacionais desnecessários."
+    ]
+  },
+  {
+    "id": "MISSION-26",
+    "source": "MISSION",
+    "line": 662,
+    "section": "9. AUDITORIA E REESTRUTURAÇÃO DA DOCUMENTAÇÃO",
+    "criteria": [
+      "Quero que você trate os documentos do repositório como parte fundamental da arquitetura e da manutenção.",
+      "Leia e revise integralmente:",
+      "- `AGENTS.md` e eventuais instruções adicionais de agentes.",
+      "- `README.md`.",
+      "- `docs/AUDIT.md`.",
+      "- `docs/PROJECT_STATUS.md`.",
+      "- `docs/DATABASE.md`.",
+      "- `docs/SECURITY.md`.",
+      "- `docs/DEPLOYMENT.md`.",
+      "- `docs/ROADMAP.md`.",
+      "- `docs/WHATSAPP_AI.md`.",
+      "- Outros documentos existentes.",
+      "Não se limite a acrescentar texto ao final de arquivos antigos.",
+      "Avalie criticamente a necessidade, utilidade e estrutura de cada documento.",
+      "Você pode:",
+      "- Reescrever documentos.",
+      "- Corrigir instruções incorretas.",
+      "- Eliminar informações ultrapassadas.",
+      "- Fundir arquivos redundantes.",
+      "- Dividir documentos excessivamente extensos.",
+      "- Criar documentos especializados.",
+      "- Renomear arquivos.",
+      "- Criar uma arquitetura documental.",
+      "- Excluir documentos sem utilidade, após preservar o conteúdo válido.",
+      "- Organizar os documentos em diretórios.",
+      "- Criar índices de navegação.",
+      "- Atualizar referências internas."
+    ]
+  },
+  {
+    "id": "MISSION-27",
+    "source": "MISSION",
+    "line": 698,
+    "section": "9.1. Revisão especial do AGENTS.md",
+    "criteria": [
+      "Este arquivo deve funcionar como um guia operacional claro, preciso e realmente utilizável por agentes de programação.",
+      "Audite se contém:",
+      "- Descrição correta do projeto.",
+      "- Arquitetura real.",
+      "- Convenções de código.",
+      "- Organização de pastas.",
+      "- Padrões de componentes.",
+      "- Convenções de banco.",
+      "- Regras de migrations.",
+      "- Segurança e RLS.",
+      "- Regras de autorização.",
+      "- Requisitos de testes.",
+      "- Comandos de validação.",
+      "- Fluxos de desenvolvimento.",
+      "- Critérios para considerar uma tarefa concluída.",
+      "- Restrições de infraestrutura.",
+      "- Cuidados com dados pessoais.",
+      "- Padrões de documentação.",
+      "- Orientações para novas funcionalidades.",
+      "- Procedimentos de revisão.",
+      "Remova:",
+      "- Instruções contraditórias.",
+      "- Informações obsoletas.",
+      "- Repetições desnecessárias.",
+      "- Comandos inexistentes.",
+      "- Orientações que induzam a alterar dados de produção.",
+      "- Referências incorretas.",
+      "- Regras vagas e impossíveis de verificar.",
+      "Se houver instruções de agente em subdiretórios, verifique sua hierarquia e compatibilidade.",
+      "Preserve as instruções aplicáveis e não trate sua autorização para editar documentos como permissão para ignorar restrições hierarquicamente superiores.",
+      "O resultado deve ser um conjunto de instruções que permita a outro agente compreender o sistema rapidamente, trabalhar sem recriar funcionalidades existentes e seguir as convenções corretas."
+    ]
+  },
+  {
+    "id": "MISSION-28",
+    "source": "MISSION",
+    "line": 739,
+    "section": "9.2. Documentação técnica",
+    "criteria": [
+      "A documentação final deverá explicar, com precisão:",
+      "- Visão geral e arquitetura.",
+      "- Estrutura do repositório.",
+      "- Fluxos principais.",
+      "- Modelo de dados.",
+      "- Matriz de permissões.",
+      "- Escopo multipaciente.",
+      "- Autenticação.",
+      "- Administração.",
+      "- Requisições.",
+      "- Protocolos.",
+      "- Importação histórica.",
+      "- Catálogo.",
+      "- Estoque.",
+      "- Inventário.",
+      "- Alertas.",
+      "- Notificações.",
+      "- APIs.",
+      "- Variáveis de ambiente.",
+      "- Desenvolvimento local.",
+      "- Testes.",
+      "- CI.",
+      "- Migrations.",
+      "- Homologação.",
+      "- Deploy.",
+      "- Segurança.",
+      "- LGPD.",
+      "- Limitações.",
+      "- Próximas etapas.",
+      "Não duplique a mesma explicação extensamente em diversos documentos.",
+      "Crie referências cruzadas quando necessário.",
+      "Separe instruções permanentes de desenvolvimento dos registros históricos de auditoria, incidentes e estados temporários do projeto.",
+      "O `README.md` deve servir como porta de entrada. O `AGENTS.md` deve orientar o trabalho dos agentes. Os demais documentos devem aprofundar assuntos específicos.",
+      "**Documentação não pode afirmar que algo está concluído quando o código ou os testes não comprovam essa afirmação.**"
+    ]
+  },
+  {
+    "id": "MISSION-29",
+    "source": "MISSION",
+    "line": 784,
+    "section": "10. TESTES E VALIDAÇÃO OBRIGATÓRIA",
+    "criteria": [
+      "A conclusão não depende apenas de compilação bem-sucedida.",
+      "Quero validação em diferentes níveis."
+    ]
+  },
+  {
+    "id": "MISSION-30",
+    "source": "MISSION",
+    "line": 790,
+    "section": "10.1. Análise estática",
+    "criteria": [
+      "Execute os comandos disponíveis e corrija os problemas encontrados:",
+      "- Instalação determinística das dependências.",
+      "- Lint.",
+      "- Typecheck.",
+      "- Build.",
+      "- Verificações de segurança de dependências, quando viáveis.",
+      "- Verificação de formatação, caso exista padrão adotado.",
+      "- Verificação de imports, módulos e código não utilizado.",
+      "- Verificação de integridade do diff."
+    ]
+  },
+  {
+    "id": "MISSION-31",
+    "source": "MISSION",
+    "line": 803,
+    "section": "10.2. Testes unitários",
+    "criteria": [
+      "Teste regras de negócio, validação, contratos, processamento de erros, normalização, cálculo de saldo, inventário, protocolo e estados operacionais."
+    ]
+  },
+  {
+    "id": "MISSION-32",
+    "source": "MISSION",
+    "line": 807,
+    "section": "10.3. Testes de integração",
+    "criteria": [
+      "Teste com banco PostgreSQL/Supabase local real:",
+      "- Migrations.",
+      "- Constraints.",
+      "- RPCs.",
+      "- Persistência.",
+      "- Protocolo.",
+      "- Idempotência.",
+      "- Concorrência.",
+      "- Rollback.",
+      "- Autorização.",
+      "- RLS.",
+      "- Revogação.",
+      "- Estoque.",
+      "- Transferências.",
+      "- Inventário.",
+      "- Importação histórica.",
+      "- Processamento de notificações."
+    ]
+  },
+  {
+    "id": "MISSION-33",
+    "source": "MISSION",
+    "line": 828,
+    "section": "10.4. Testes E2E",
+    "criteria": [
+      "Teste os fluxos operacionais da aplicação utilizando dados e usuários fictícios:",
+      "- Login.",
+      "- Requisição.",
+      "- Comprovante.",
+      "- Histórico.",
+      "- Administração.",
+      "- Seleção de paciente.",
+      "- Catálogo.",
+      "- Estoque.",
+      "- Inventário.",
+      "- Estados de erro.",
+      "- Estados de carregamento.",
+      "- Falha de rede.",
+      "- Recuperação de operação."
+    ]
+  },
+  {
+    "id": "MISSION-34",
+    "source": "MISSION",
+    "line": 846,
+    "section": "10.5. GitHub Actions",
+    "criteria": [
+      "Examine o histórico recente dos workflows e investigue falhas reais, em vez de assumir que a configuração do CI é suficiente.",
+      "Existe registro anterior de falhas no workflow de CI após commits recentes; confirme o estado atual e identifique a causa exata.",
+      "Não atribua a falha a uma causa presumida sem verificar os logs.",
+      "Corrija o código ou a configuração pertinente e, quando viável, execute localmente os mesmos comandos usados no CI.",
+      "Amplie o pipeline para validar migrations e testes de integração determinísticos.",
+      "Não utilize credenciais de produção nem altere o banco remoto a partir do CI."
+    ]
+  },
+  {
+    "id": "MISSION-35",
+    "source": "MISSION",
+    "line": 860,
+    "section": "10.6. Evidência de execução",
+    "criteria": [
+      "Para cada verificação, informe:",
+      "- Comando ou procedimento.",
+      "- Ambiente.",
+      "- Resultado.",
+      "- Falha encontrada.",
+      "- Correção aplicada.",
+      "- Resultado após a correção.",
+      "- Limitações de cobertura.",
+      "Não marque testes como aprovados por inferência.",
+      "Não esconda testes falhos, não exclua testes para tornar o resultado verde e não desative regras de qualidade sem justificativa técnica concreta."
+    ]
+  },
+  {
+    "id": "MISSION-36",
+    "source": "MISSION",
+    "line": 878,
+    "section": "11. MÉTODO DE EXECUÇÃO",
+    "criteria": [
+      "A execução deverá ser organizada, progressiva e rastreável."
+    ]
+  },
+  {
+    "id": "MISSION-37",
+    "source": "MISSION",
+    "line": 882,
+    "section": "FASE I — INVENTÁRIO E DIAGNÓSTICO",
+    "criteria": [
+      "1. Ler integralmente os dois anexos.",
+      "2. Examinar o repositório atual.",
+      "3. Examinar a documentação.",
+      "4. Examinar migrations e estrutura de banco.",
+      "5. Investigar resultados recentes de CI.",
+      "6. Consultar os ambientes disponíveis.",
+      "7. Mapear requisitos e implementações.",
+      "8. Identificar dependências e riscos.",
+      "9. Classificar as falhas e lacunas."
+    ]
+  },
+  {
+    "id": "MISSION-38",
+    "source": "MISSION",
+    "line": 894,
+    "section": "FASE II — CORREÇÃO DOS BLOQUEADORES",
+    "criteria": [
+      "Priorize:",
+      "1. Falhas que impedem compilação, testes ou execução.",
+      "2. Problemas de persistência e integridade.",
+      "3. Falhas críticas de autenticação e autorização.",
+      "4. Inconsistências de schema.",
+      "5. Vulnerabilidades em RLS ou funções privilegiadas.",
+      "6. Falhas transacionais.",
+      "7. Problemas de concorrência.",
+      "8. Falhas que possam provocar perda, corrupção ou exposição de dados."
+    ]
+  },
+  {
+    "id": "MISSION-39",
+    "source": "MISSION",
+    "line": 907,
+    "section": "FASE III — CONSOLIDAÇÃO DA ARQUITETURA",
+    "criteria": [
+      "Refatore a organização do código, contratos, módulos, responsabilidades, erros e testes, sempre que necessário.",
+      "Não faça alterações arquiteturais de grande alcance sem demonstrar a necessidade e preservar os comportamentos existentes."
+    ]
+  },
+  {
+    "id": "MISSION-40",
+    "source": "MISSION",
+    "line": 913,
+    "section": "FASE IV — CONCLUSÃO DOS REQUISITOS",
+    "criteria": [
+      "Use a matriz dos dois anexos para implementar o que ainda estiver ausente ou incompleto.",
+      "Priorize o núcleo funcional e as interfaces que tornem os recursos realmente operacionais."
+    ]
+  },
+  {
+    "id": "MISSION-41",
+    "source": "MISSION",
+    "line": 919,
+    "section": "FASE V — BANCO, AUTORIZAÇÃO E TESTES",
+    "criteria": [
+      "Conclua as migrations incrementais, reproduza o schema local, execute os testes de integração e segurança e corrija os problemas encontrados."
+    ]
+  },
+  {
+    "id": "MISSION-42",
+    "source": "MISSION",
+    "line": 923,
+    "section": "FASE VI — DOCUMENTAÇÃO E LIMPEZA",
+    "criteria": [
+      "Reorganize as instruções, a documentação, o `AGENTS.md` e os demais materiais.",
+      "Elimine referências obsoletas, duplicações e estruturas sem utilidade."
+    ]
+  },
+  {
+    "id": "MISSION-43",
+    "source": "MISSION",
+    "line": 929,
+    "section": "FASE VII — VALIDAÇÃO FINAL",
+    "criteria": [
+      "Execute todas as verificações disponíveis, revise o diff e confronte novamente o sistema com os requisitos dos anexos.",
+      "Não encerre após a primeira rodada de testes. Corrija os problemas e repita as verificações afetadas."
+    ]
+  },
+  {
+    "id": "MISSION-44",
+    "source": "MISSION",
+    "line": 937,
+    "section": "12. NÃO INTERROMPER PREMATURAMENTE O TRABALHO",
+    "criteria": [
+      "Esta é uma missão extensa e poderá exigir múltiplas etapas de implementação.",
+      "**Não encerre a execução após elaborar um plano, identificar alguns problemas ou corrigir o primeiro erro.**",
+      "Também não interprete a descoberta de um bloqueio externo como motivo para abandonar todas as outras frentes.",
+      "Se encontrar um problema:",
+      "1. Determine a causa.",
+      "2. Avalie as dependências.",
+      "3. Corrija-o, se estiver dentro da autorização e for seguro.",
+      "4. Valide a correção.",
+      "5. Registre o resultado.",
+      "6. Continue com os próximos problemas.",
+      "Quando uma funcionalidade depender de acesso ou autorização indisponível, registre essa dependência e continue as tarefas independentes.",
+      "Mantenha uma lista persistente de tarefas e atualize seu progresso durante a execução.",
+      "Se houver limite de contexto ou necessidade de retomar a sessão, deixe um checkpoint contendo o estado real dos arquivos, o último resultado de testes, as alterações realizadas e as próximas ações.",
+      "Não reinicie o trabalho do zero em uma continuação.",
+      "Não substitua execução por explicações excessivas.",
+      "Faça perguntas somente quando uma decisão de negócio essencial não puder ser deduzida com segurança, quando houver opções incompatíveis de impacto relevante ou quando a operação exigir minha autorização.",
+      "Na ausência de um bloqueio dessa natureza, tome decisões técnicas fundamentadas e continue."
+    ]
+  },
+  {
+    "id": "MISSION-45",
+    "source": "MISSION",
+    "line": 970,
+    "section": "13. CRITÉRIOS DE QUALIDADE",
+    "criteria": [
+      "Quero que o resultado obedeça aos seguintes princípios:",
+      "**Correção:** as funcionalidades executam o comportamento esperado.",
+      "**Segurança:** acesso, permissões e dados são protegidos efetivamente.",
+      "**Integridade:** operações críticas não produzem inconsistência ou duplicidade.",
+      "**Confiabilidade:** falhas de rede, banco e serviços externos são tratadas.",
+      "**Manutenibilidade:** o código é compreensível, modular e testável.",
+      "**Coesão:** os componentes possuem responsabilidades claras.",
+      "**Simplicidade:** complexidade adicional só é introduzida quando necessária.",
+      "**Consistência:** backend, frontend, banco, testes e documentação seguem os mesmos contratos.",
+      "**Auditabilidade:** operações sensíveis possuem rastreabilidade.",
+      "**Extensibilidade:** novas funcionalidades podem ser incluídas sem refazer todo o núcleo.",
+      "**Observabilidade:** erros e comportamentos relevantes podem ser diagnosticados sem exposição indevida de dados.",
+      "**Usabilidade:** a aplicação informa corretamente o estado de cada operação.",
+      "**Evolução segura:** migrations e refatorações preservam o histórico e os dados existentes.",
+      "Não busque métricas artificiais, como criar o maior número possível de arquivos, testes ou abstrações.",
+      "Prefira qualidade verificável, soluções proporcionais e arquitetura sustentável."
+    ]
+  },
+  {
+    "id": "MISSION-46",
+    "source": "MISSION",
+    "line": 1006,
+    "section": "14. ENTREGÁVEIS OBRIGATÓRIOS",
+    "criteria": [
+      "Ao final, quero que estejam disponíveis no próprio repositório, conforme a organização documental que você considerar adequada:"
+    ]
+  },
+  {
+    "id": "MISSION-47",
+    "source": "MISSION",
+    "line": 1010,
+    "section": "A. Auditoria técnica",
+    "criteria": [
+      "Relatório com os problemas encontrados, causa raiz, gravidade, evidência, impacto, solução e resultado da validação."
+    ]
+  },
+  {
+    "id": "MISSION-48",
+    "source": "MISSION",
+    "line": 1014,
+    "section": "B. Matriz de rastreabilidade",
+    "criteria": [
+      "Comparação integral dos dois prompts anexados com o estado inicial e final de cada requisito."
+    ]
+  },
+  {
+    "id": "MISSION-49",
+    "source": "MISSION",
+    "line": 1018,
+    "section": "C. Auditoria do banco",
+    "criteria": [
+      "Relatório comparativo entre migrations, banco local e banco remoto, com divergências, objetos obsoletos, inconsistências e migrations necessárias."
+    ]
+  },
+  {
+    "id": "MISSION-50",
+    "source": "MISSION",
+    "line": 1022,
+    "section": "D. Auditoria de segurança",
+    "criteria": [
+      "Matriz de autorização, cobertura RLS, permissões de funções, problemas encontrados, correções e testes negativos."
+    ]
+  },
+  {
+    "id": "MISSION-51",
+    "source": "MISSION",
+    "line": 1026,
+    "section": "E. Arquitetura consolidada",
+    "criteria": [
+      "Documentação atualizada da estrutura, módulos, decisões arquiteturais e padrões utilizados."
+    ]
+  },
+  {
+    "id": "MISSION-52",
+    "source": "MISSION",
+    "line": 1030,
+    "section": "F. Documentação operacional e AGENTS.md",
+    "criteria": [
+      "Instruções coerentes, completas e realmente utilizáveis para o desenvolvimento posterior."
+    ]
+  },
+  {
+    "id": "MISSION-53",
+    "source": "MISSION",
+    "line": 1034,
+    "section": "G. Código refatorado e funcionalidades concluídas",
+    "criteria": [
+      "Alterações efetivamente implementadas, integradas e verificadas dentro do escopo autorizado."
+    ]
+  },
+  {
+    "id": "MISSION-54",
+    "source": "MISSION",
+    "line": 1038,
+    "section": "H. Testes",
+    "criteria": [
+      "Suíte de testes atualizada, incluindo validação real do banco e das permissões sempre que viável."
+    ]
+  },
+  {
+    "id": "MISSION-55",
+    "source": "MISSION",
+    "line": 1042,
+    "section": "I. Relatório de execução",
+    "criteria": [
+      "Resumo verificável das mudanças realizadas, testes executados, problemas resolvidos e limitações remanescentes."
+    ]
+  },
+  {
+    "id": "MISSION-56",
+    "source": "MISSION",
+    "line": 1046,
+    "section": "J. Pendências e plano de continuidade",
+    "criteria": [
+      "Itens que dependam de configuração externa, decisões minhas, credenciais, permissões ou implementação futura."
+    ]
+  },
+  {
+    "id": "MISSION-57",
+    "source": "MISSION",
+    "line": 1052,
+    "section": "15. FORMATO DO RELATÓRIO FINAL",
+    "criteria": [
+      "Apresente:",
+      "1. Estado inicial do repositório: branch, HEAD, working tree e divergências.",
+      "2. Resumo executivo da auditoria.",
+      "3. Inventário das áreas examinadas.",
+      "4. Requisitos dos anexos efetivamente concluídos, parcialmente concluídos e não concluídos.",
+      "5. Problemas críticos identificados.",
+      "6. Correções realizadas.",
+      "7. Refatorações e decisões arquiteturais.",
+      "8. Arquivos criados, modificados, movidos e removidos.",
+      "9. Migrations criadas e testes de compatibilidade.",
+      "10. Resultado da comparação com o banco remoto.",
+      "11. Resultado dos testes de segurança e RLS.",
+      "12. Resultado dos testes unitários, de integração e E2E.",
+      "13. Resultado de lint, typecheck, build e verificações equivalentes.",
+      "14. Melhorias realizadas na documentação e no `AGENTS.md`.",
+      "15. Funcionalidades ainda dependentes de serviços externos.",
+      "16. Problemas e riscos residuais.",
+      "17. Próximos passos recomendados, em ordem de prioridade.",
+      "Para cada problema relevante, informe a localização exata no código e como a correção pode ser verificada.",
+      "Diferencie sempre:",
+      "- Confirmado por inspeção.",
+      "- Confirmado por teste.",
+      "- Corrigido e validado.",
+      "- Corrigido, mas ainda não validado em integração.",
+      "- Pendente.",
+      "- Bloqueado.",
+      "- Dependente de autorização ou configuração externa.",
+      "Não declare que o projeto está perfeito, completamente seguro ou pronto para produção sem evidências suficientes."
+    ]
+  },
+  {
+    "id": "MISSION-58",
+    "source": "MISSION",
+    "line": 1090,
+    "section": "16. DIRETRIZ FINAL",
+    "criteria": [
+      "**Quero uma intervenção profunda e efetiva, não mais uma execução parcial dos prompts anteriores.**",
+      "Os dois anexos representam o conjunto de requisitos que o projeto deveria ter atendido. Sua responsabilidade é confrontá-los com a realidade atual, recuperar todas as pendências relevantes, corrigir os erros encontrados e entregar a base mais sólida possível para a continuidade do desenvolvimento.",
+      "Trabalhe com autonomia técnica e visão sistêmica, preservando o histórico e os dados, evitando alterações desnecessárias e validando os resultados de maneira rigorosa.",
+      "Não se satisfaça com um sistema que apenas compila.",
+      "Quero um sistema cujas regras sejam coerentes, cuja arquitetura seja compreensível, cujo banco seja íntegro, cujas permissões sejam testáveis, cujas interfaces sejam realmente operacionais e cuja documentação corresponda ao que está implementado.",
+      "**COMECE AGORA: leia integralmente os dois anexos, examine o estado atual do repositório, construa a matriz de rastreabilidade, investigue a integridade do banco e os resultados do CI, priorize os problemas encontrados e inicie as correções.**",
+      "Não faça commit, push, merge, abertura de PR, deploy ou qualquer alteração no banco remoto sem minha autorização expressa."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-1",
+    "source": "SUPERPROMPT",
+    "line": 1,
+    "section": "SUPERPROMPT MESTRE — HOME CARE ASSISTANT",
+    "criteria": []
+  },
+  {
+    "id": "SUPERPROMPT-2",
+    "source": "SUPERPROMPT",
+    "line": 2,
+    "section": "Evolução estrutural, gestão de pacientes, requisições, estoque por custódia, administração, auditoria e notificações",
+    "criteria": [
+      "Você é o engenheiro de software sênior responsável por evoluir o projeto existente `RMZZFAJ/home-care-assistant`, implementando uma versão funcional, segura, extensível e auditável do sistema de gestão de Home Care.",
+      "**Repositório:** `RMZZFAJ/home-care-assistant`  ",
+      "**Branch de referência:** `master`  ",
+      "**Ambiente de trabalho:** VS Code, GitHub Copilot em modo Agent.",
+      "Sua missão não é produzir um plano, uma análise isolada ou exemplos ilustrativos. Você deverá inspecionar o código existente, implementar as mudanças necessárias, criar migrações incrementais, desenvolver as interfaces, executar testes, corrigir falhas e documentar o resultado.",
+      "O projeto já possui uma base em Next.js, TypeScript, Supabase, PostgreSQL, autenticação, catálogo de produtos, formulário de requisições e migrações. **Preserve o que estiver correto e evolua a arquitetura existente. Não recrie o projeto do zero.**"
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-3",
+    "source": "SUPERPROMPT",
+    "line": 16,
+    "section": "1. REGRAS INEGOCIÁVEIS DE EXECUÇÃO",
+    "criteria": [
+      "Antes de qualquer alteração:",
+      "1. Leia `AGENTS.md`, `README.md`, `package.json`, os documentos de arquitetura e segurança, as migrações existentes e a árvore atual do projeto.",
+      "2. Verifique a branch atual, o estado do Git, alterações locais, commits recentes e arquivos não rastreados.",
+      "3. Preserve integralmente as alterações locais do usuário.",
+      "4. Não faça reset, rebase destrutivo, limpeza indiscriminada, descarte de alterações ou sobrescrita de trabalho não relacionado.",
+      "5. Trabalhe em uma branch de implementação própria, criada a partir da `master` atualizada, se isso puder ser feito sem comprometer o estado local. Caso contrário, preserve o estado existente e explique a situação.",
+      "6. Não faça commit, push, merge, abertura de PR ou deploy sem autorização expressa.",
+      "7. Não altere diretamente migrações que possam já ter sido aplicadas. Crie novas migrações incrementais e compatíveis.",
+      "8. Não execute migrações destrutivas nem comandos que possam apagar dados de bancos remotos.",
+      "9. Não use dados reais da paciente em seeds, testes, fixtures, logs ou documentação.",
+      "10. Não invente credenciais, configurações externas, resultados de testes ou funcionalidades que não foram implementadas.",
+      "11. Nunca exponha `SUPABASE_SERVICE_ROLE_KEY` no cliente, em variáveis `NEXT_PUBLIC_*`, no Git ou em logs.",
+      "12. Não desabilite RLS para contornar erros.",
+      "13. Não use mocks como prova de que políticas RLS reais funcionam.",
+      "14. Não esconda erros com `any`, supressões genéricas, desativação de regras do ESLint ou exclusão de testes.",
+      "15. Se uma funcionalidade depender de credenciais externas, implemente toda a estrutura local possível e documente a configuração pendente.",
+      "16. Execute as verificações disponíveis e registre seus resultados reais.",
+      "17. Se encontrar uma falha, corrija-a antes de seguir, sempre que isso puder ser feito com segurança.",
+      "18. Não considere uma tarefa concluída apenas porque os arquivos foram criados. Verifique sua integração com o restante da aplicação.",
+      "Organize o trabalho em etapas pequenas e coerentes, mantendo a aplicação compilável sempre que possível."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-4",
+    "source": "SUPERPROMPT",
+    "line": 41,
+    "section": "2. OBJETIVO GERAL DO SISTEMA",
+    "criteria": [
+      "Evoluir o Home Care Assistant para uma plataforma de gestão operacional de Home Care, inicialmente utilizada por uma família e uma equipe de profissionais, mas com arquitetura preparada para atender vários pacientes e diferentes operações no futuro.",
+      "O sistema deverá contemplar:",
+      "- Cadastro e gestão de pacientes.",
+      "- Associação de familiares, profissionais, supervisores e administradores aos pacientes.",
+      "- Formulário de requisições de insumos.",
+      "- Histórico completo de requisições.",
+      "- Geração de protocolos sequenciais.",
+      "- Catálogo de produtos configurável.",
+      "- Estoque separado por custódia e localização.",
+      "- Inventário semanal da equipe.",
+      "- Administração de usuários e permissões.",
+      "- Auditoria e rastreabilidade.",
+      "- Catálogo inicial de erros operacionais e técnicos.",
+      "- Estados de carregamento e feedback de todas as operações.",
+      "- Preparação para notificações por WhatsApp e outros canais.",
+      "- Estrutura para um futuro agente de IA que consulte dados autorizados e auxilie na operação.",
+      "O sistema é operacional e administrativo. Não deve emitir diagnósticos, prescrever medicamentos, recomendar doses ou tomar decisões clínicas."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-5",
+    "source": "SUPERPROMPT",
+    "line": 64,
+    "section": "3. REMOVER COMPLETAMENTE O CONCEITO DE QUANTIDADE SOLICITADA",
+    "criteria": [
+      "Esta é uma alteração obrigatória e prioritária.",
+      "O conceito de campo, propriedade ou regra de negócio denominado `requestedQuantity`, `requested_quantity`, “quantidade solicitada” ou equivalente deverá ser eliminado de toda a aplicação.",
+      "Não basta esconder o campo no formulário."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-6",
+    "source": "SUPERPROMPT",
+    "line": 72,
+    "section": "3.1. Inspecionar e remover",
+    "criteria": [
+      "Procure em todo o repositório:",
+      "- `requestedQuantity`",
+      "- `requested_quantity`",
+      "- `requested_quantity`",
+      "- Campos equivalentes em português.",
+      "- Propriedades de tipos TypeScript.",
+      "- Schemas Zod.",
+      "- Valores padrão e cálculos derivados.",
+      "- Componentes e formulários.",
+      "- Payloads de API.",
+      "- Rotas e serviços.",
+      "- Funções SQL.",
+      "- Colunas do banco.",
+      "- Seeds e fixtures.",
+      "- Testes.",
+      "- Tipos gerados do Supabase.",
+      "- Comprovantes.",
+      "- Documentação.",
+      "- Relatórios e integrações.",
+      "- Qualquer referência a esse conceito como parte da requisição.",
+      "Use busca global no projeto e confira também ocorrências com nomes diferentes que tenham a mesma finalidade."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-7",
+    "source": "SUPERPROMPT",
+    "line": 98,
+    "section": "3.2. Não confundir conceitos distintos",
+    "criteria": [
+      "A remoção se aplica à quantidade que o usuário solicitava como parte do formulário de requisição.",
+      "**Não remova as quantidades necessárias para registrar movimentações reais de estoque.**",
+      "O sistema continuará precisando de quantidades para:",
+      "- Entrada de produtos.",
+      "- Transferência de custódia.",
+      "- Entrega de itens da família à equipe.",
+      "- Devolução de itens.",
+      "- Consumo ou saída operacional, se esse evento for autorizado e implementado.",
+      "- Ajuste de inventário.",
+      "- Contagem física.",
+      "- Diferenças entre saldo esperado e saldo contado.",
+      "Essas quantidades pertencem ao domínio de estoque e movimentações, não ao formulário de requisição."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-8",
+    "source": "SUPERPROMPT",
+    "line": 117,
+    "section": "3.3. Alterações no banco",
+    "criteria": [
+      "Se a coluna correspondente existir em uma migração anterior ou no banco:",
+      "1. Crie uma migração incremental que remova o campo ou a coluna, depois de verificar todas as dependências.",
+      "2. Remova referências em funções SQL, índices, views, triggers e constraints, quando aplicável.",
+      "3. Atualize tipos e contratos de API.",
+      "4. Não apague registros históricos inteiros para eliminar o campo.",
+      "5. Preserve todos os outros dados e relacionamentos.",
+      "6. Se a coluna já tiver sido utilizada, documente como será tratada sua remoção.",
+      "7. Não edite o histórico de migrações já aplicado.",
+      "A migração deverá falhar de forma explícita se existir uma dependência não prevista, em vez de executar uma alteração destrutiva indiscriminada."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-9",
+    "source": "SUPERPROMPT",
+    "line": 131,
+    "section": "3.4. Formulário e comprovante",
+    "criteria": [
+      "O formulário não poderá solicitar nem exibir quantidade de reposição.",
+      "O comprovante deverá registrar os itens pertinentes à requisição, o estoque informado quando aplicável, a urgência, as observações e os demais dados operacionais definidos pelo sistema, sem incluir o conceito removido.",
+      "A tela de revisão deverá refletir exatamente o que será persistido."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-10",
+    "source": "SUPERPROMPT",
+    "line": 139,
+    "section": "3.5. Critério de aceitação",
+    "criteria": [
+      "Não poderá haver nenhuma referência funcional ao conceito removido no código atual, nas APIs, nos tipos, nas funções SQL ou no schema final do banco.",
+      "Referências históricas necessárias para explicar a migração poderão permanecer na documentação técnica, desde que não representem funcionalidade ativa."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-11",
+    "source": "SUPERPROMPT",
+    "line": 145,
+    "section": "4. ARQUITETURA MULTIPACIENTE",
+    "criteria": [
+      "O sistema deverá ser preparado para atender mais de um paciente, mesmo que inicialmente exista apenas um cadastro ativo.",
+      "Crie ou normalize a entidade central `care_recipients`, ou outra entidade equivalente já existente, preservando a nomenclatura e os relacionamentos atuais sempre que forem adequados.",
+      "O paciente será o centro do contexto operacional."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-12",
+    "source": "SUPERPROMPT",
+    "line": 153,
+    "section": "4.1. Entidade paciente",
+    "criteria": [
+      "Cada paciente deverá ter, conforme o modelo existente e as necessidades identificadas:",
+      "- ID UUID.",
+      "- Nome de exibição.",
+      "- Identificador interno opcional.",
+      "- Status ativo/inativo.",
+      "- Data de criação.",
+      "- Data de atualização.",
+      "- Usuário responsável pelo cadastro.",
+      "- Observações administrativas, se necessárias.",
+      "- Configurações operacionais específicas.",
+      "- Auditoria de alterações.",
+      "Não torne dados clínicos sensíveis obrigatórios para o cadastro básico.",
+      "Não use o nome do paciente como chave primária, identificador público ou mecanismo de autorização."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-13",
+    "source": "SUPERPROMPT",
+    "line": 172,
+    "section": "4.2. Relacionamentos",
+    "criteria": [
+      "Avalie e implemente os relacionamentos necessários entre:",
+      "- Pacientes.",
+      "- Usuários.",
+      "- Perfis e funções.",
+      "- Familiares e responsáveis.",
+      "- Profissionais.",
+      "- Supervisores.",
+      "- Requisições.",
+      "- Produtos e configurações do catálogo.",
+      "- Saldos e movimentações de estoque.",
+      "- Inventários.",
+      "- Notificações.",
+      "- Eventos de auditoria.",
+      "Use tabelas associativas quando um usuário puder estar relacionado a mais de um paciente ou exercer funções diferentes conforme o paciente.",
+      "Não crie uma coluna de paciente redundante em todas as tabelas se o relacionamento puder ser resolvido de maneira segura e consistente. Porém, não dependa exclusivamente de joins indiretos complexos quando um vínculo explícito for necessário para garantir autorização e auditoria."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-14",
+    "source": "SUPERPROMPT",
+    "line": 193,
+    "section": "4.3. Isolamento por paciente",
+    "criteria": [
+      "Cada operação deve verificar o contexto do paciente no servidor.",
+      "Regras:",
+      "- Usuários comuns só podem atuar nos pacientes aos quais estão vinculados.",
+      "- O administrador global poderá administrar vários pacientes de acordo com uma permissão explícita.",
+      "- Um administrador limitado a determinado paciente não poderá acessar outros pacientes automaticamente.",
+      "- A associação a um paciente não concede acesso administrativo irrestrito.",
+      "- A desativação de um paciente deverá impedir novas operações incompatíveis com seu status.",
+      "- O histórico existente deverá continuar acessível a usuários autorizados, mesmo que o paciente seja inativado.",
+      "- Não use o UUID enviado pelo cliente como prova de autorização.",
+      "Implemente as verificações na API e no banco, usando RLS e funções seguras quando aplicável."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-15",
+    "source": "SUPERPROMPT",
+    "line": 209,
+    "section": "5. AUTENTICAÇÃO, USUÁRIOS E ADMINISTRAÇÃO",
+    "criteria": [
+      "Implemente uma área administrativa para gerenciar usuários.",
+      "Essa área deverá ser acessível somente a administradores autorizados."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-16",
+    "source": "SUPERPROMPT",
+    "line": 215,
+    "section": "5.1. Cadastro e configuração de usuários",
+    "criteria": [
+      "Permitir ao administrador:",
+      "- Criar usuários.",
+      "- Informar nome e e-mail.",
+      "- Definir ou solicitar a definição inicial de senha pelo fluxo seguro de autenticação.",
+      "- Enviar convite ou link de ativação, quando configurado.",
+      "- Atribuir função.",
+      "- Associar o usuário a um ou mais pacientes.",
+      "- Definir o escopo da autorização.",
+      "- Ativar e desativar usuários.",
+      "- Revogar acesso.",
+      "- Consultar informações administrativas do perfil.",
+      "- Consultar eventos de auditoria relacionados ao usuário.",
+      "- Alterar associações e funções com registro de auditoria.",
+      "Não exiba senhas existentes nem armazene senhas em texto puro.",
+      "Não permita que o navegador atribua a própria função, se torne administrador ou crie perfis privilegiados diretamente.",
+      "A criação de usuários no Supabase Auth deverá ocorrer por um endpoint server-side autorizado ou mecanismo equivalente, utilizando a credencial administrativa somente no servidor."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-17",
+    "source": "SUPERPROMPT",
+    "line": 238,
+    "section": "5.2. Funções iniciais",
+    "criteria": [
+      "Implemente ou adapte as funções existentes para representar, no mínimo:"
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-18",
+    "source": "SUPERPROMPT",
+    "line": 242,
+    "section": "Administrador",
+    "criteria": [
+      "- Gerenciar usuários e permissões.",
+      "- Gerenciar pacientes dentro de seu escopo.",
+      "- Gerenciar catálogo.",
+      "- Criar e alterar produtos.",
+      "- Administrar o estoque.",
+      "- Registrar e corrigir movimentações conforme as regras.",
+      "- Consultar todo o histórico autorizado.",
+      "- Gerenciar configurações operacionais.",
+      "- Consultar auditoria.",
+      "- Gerenciar configurações de notificações."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-19",
+    "source": "SUPERPROMPT",
+    "line": 255,
+    "section": "Supervisor",
+    "criteria": [
+      "- Consultar o histórico completo dos pacientes aos quais tem acesso.",
+      "- Consultar estoque.",
+      "- Acompanhar requisições e inventários.",
+      "- Consultar estados de notificações.",
+      "- Executar ações operacionais explicitamente autorizadas.",
+      "- Não gerenciar funções de administrador.",
+      "- Não alterar catálogo ou estoque se não receber uma permissão específica."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-20",
+    "source": "SUPERPROMPT",
+    "line": 265,
+    "section": "Profissional",
+    "criteria": [
+      "- Registrar requisições.",
+      "- Consultar o histórico completo de requisições dos pacientes aos quais está vinculado.",
+      "- Consultar o estoque sob posse da equipe.",
+      "- Consultar o estoque da família, quando autorizado para o paciente.",
+      "- Registrar contagem física da equipe, caso essa permissão seja concedida.",
+      "- Não alterar o catálogo.",
+      "- Não realizar ajustes administrativos de estoque.",
+      "- Não administrar usuários."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-21",
+    "source": "SUPERPROMPT",
+    "line": 276,
+    "section": "Familiar/responsável",
+    "criteria": [
+      "- Consultar as requisições dos pacientes aos quais está vinculado.",
+      "- Consultar o histórico autorizado.",
+      "- Consultar os estoques pertinentes.",
+      "- Receber notificações.",
+      "- Não modificar o catálogo.",
+      "- Não realizar movimentações administrativas sem autorização específica."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-22",
+    "source": "SUPERPROMPT",
+    "line": 285,
+    "section": "Leitor",
+    "criteria": [
+      "- Acesso somente de leitura aos recursos expressamente autorizados.",
+      "- Nenhuma criação, edição ou exclusão de dados operacionais.",
+      "- Nenhuma submissão de requisições.",
+      "- Nenhuma movimentação de estoque.",
+      "Não codifique permissões apenas com condicionais na interface. A autorização precisa existir no servidor e no banco.",
+      "Implemente permissões por escopo de paciente. Se a estrutura atual exigir uma matriz de permissões, prefira regras explícitas e testáveis em vez de espalhar verificações de nomes de função pelo projeto."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-23",
+    "source": "SUPERPROMPT",
+    "line": 296,
+    "section": "5.3. Auditoria administrativa",
+    "criteria": [
+      "Toda ação administrativa relevante deverá registrar:",
+      "- Usuário executor.",
+      "- Paciente/contexto, quando aplicável.",
+      "- Tipo de ação.",
+      "- Entidade e identificador afetados.",
+      "- Data e hora.",
+      "- Resultado da operação.",
+      "- Motivo ou justificativa, quando exigido.",
+      "- Metadados não sensíveis necessários para investigação.",
+      "Não registre senhas, tokens ou dados sensíveis desnecessários.",
+      "Os registros de auditoria não devem ser editáveis ou removíveis por usuários comuns ou administradores operacionais. Utilize privilégios restritos e controles adequados."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-24",
+    "source": "SUPERPROMPT",
+    "line": 313,
+    "section": "6. GESTÃO DO CATÁLOGO DE PRODUTOS",
+    "criteria": [
+      "Implemente uma área administrativa para gerir os produtos usados no formulário.",
+      "O catálogo deverá continuar centralizado no banco, com uma representação TypeScript consistente e validação server-side."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-25",
+    "source": "SUPERPROMPT",
+    "line": 319,
+    "section": "6.1. Funcionalidades",
+    "criteria": [
+      "O administrador poderá:",
+      "- Incluir produtos.",
+      "- Editar produtos.",
+      "- Alterar nome.",
+      "- Alterar descrição.",
+      "- Alterar categoria.",
+      "- Alterar unidade de medida.",
+      "- Configurar aliases de busca.",
+      "- Ativar e inativar produtos.",
+      "- Consultar o histórico de alterações.",
+      "- Reordenar ou organizar produtos no formulário.",
+      "- Configurar informações operacionais que sejam realmente necessárias.",
+      "- Corrigir erros de digitação.",
+      "- Consultar alertas de produtos com dados incompletos ou inconsistentes.",
+      "O sistema deve permitir unidades apropriadas, como unidade, pacote, frasco, caixa, envelope, bisnaga e outras necessárias ao catálogo.",
+      "Não presuma que todas as unidades existentes são adequadas a todos os produtos."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-26",
+    "source": "SUPERPROMPT",
+    "line": 341,
+    "section": "6.2. Integridade do catálogo",
+    "criteria": [
+      "Cada produto deverá possuir identificador estável, preferencialmente UUID no banco.",
+      "O catálogo deverá manter consistência entre:",
+      "- Banco.",
+      "- Formulário.",
+      "- Validação Zod.",
+      "- Tipos TypeScript.",
+      "- Comprovantes.",
+      "- Estoque.",
+      "- Movimentações.",
+      "- Busca por aliases.",
+      "- Notificações.",
+      "- Relatórios.",
+      "Não permita que a interface envie nome, categoria ou unidade arbitrários para substituir os valores canônicos do banco.",
+      "Quando o produto estiver inativo, ele não poderá ser escolhido para novas operações incompatíveis, mas deverá continuar aparecendo corretamente no histórico antigo."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-27",
+    "source": "SUPERPROMPT",
+    "line": 362,
+    "section": "6.3. Exclusão de produtos",
+    "criteria": [
+      "Evite exclusão física quando o produto já possuir histórico de requisições ou movimentações.",
+      "Nesse caso, use inativação ou arquivamento.",
+      "A exclusão física só poderá ocorrer quando for comprovadamente segura, não houver dependências e a operação for autorizada.",
+      "Todas as alterações deverão ser auditadas."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-28",
+    "source": "SUPERPROMPT",
+    "line": 372,
+    "section": "6.4. Aliases e busca",
+    "criteria": [
+      "Implemente um catálogo inicial de aliases e erros comuns de digitação.",
+      "A busca poderá normalizar espaços, acentos e caixa, mas deverá distinguir:",
+      "- Correspondência exata.",
+      "- Alias conhecido.",
+      "- Correspondência aproximada.",
+      "- Termo ambíguo.",
+      "- Produto inexistente.",
+      "Não escolha silenciosamente um produto quando o termo corresponder a vários produtos.",
+      "Exiba sugestões claras e peça confirmação quando necessário.",
+      "Aliases não poderão alterar o nome canônico do produto nem criar produtos duplicados."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-29",
+    "source": "SUPERPROMPT",
+    "line": 390,
+    "section": "7. HISTÓRICO COMPLETO DE REQUISIÇÕES",
+    "criteria": [
+      "A aplicação deverá permitir que usuários autorizados solicitem e consultem **todo o histórico de requisições do paciente ao qual têm acesso**, e não apenas aquelas criadas por eles.",
+      "Essa é uma regra funcional explícita.",
+      "Não aplique o filtro `created_by = usuário atual` como restrição geral de leitura do histórico.",
+      "O escopo de leitura deve ser determinado pela associação autorizada do usuário ao paciente e pelas permissões atribuídas."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-30",
+    "source": "SUPERPROMPT",
+    "line": 400,
+    "section": "7.1. Histórico",
+    "criteria": [
+      "Implemente uma página de histórico com:",
+      "- Listagem de requisições.",
+      "- Protocolo.",
+      "- Data e hora.",
+      "- Paciente.",
+      "- Solicitante.",
+      "- Estado da requisição.",
+      "- Estado das notificações.",
+      "- Filtros por período.",
+      "- Filtros por status.",
+      "- Busca por protocolo.",
+      "- Paginação server-side.",
+      "- Ordenação previsível.",
+      "- Estados de carregamento, erro e lista vazia."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-31",
+    "source": "SUPERPROMPT",
+    "line": 418,
+    "section": "7.2. Detalhe da requisição",
+    "criteria": [
+      "Implemente uma página de detalhe baseada exclusivamente nos dados persistidos.",
+      "Ela deverá exibir os dados operacionais efetivamente salvos, incluindo:",
+      "- Protocolo.",
+      "- Paciente.",
+      "- Solicitante.",
+      "- Data e hora.",
+      "- Itens da requisição.",
+      "- Estoque informado no momento da requisição, quando aplicável.",
+      "- Urgência.",
+      "- Observações.",
+      "- Status atual.",
+      "- Histórico de mudanças de status.",
+      "- Estado de cada notificação.",
+      "- Destinatários e tentativas de envio, conforme a permissão.",
+      "- Informações de auditoria acessíveis ao usuário.",
+      "Permita imprimir ou gerar novamente o comprovante com base nos dados persistidos.",
+      "Não dependa do estado React, `localStorage` ou da existência do formulário original."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-32",
+    "source": "SUPERPROMPT",
+    "line": 442,
+    "section": "7.3. Autorização",
+    "criteria": [
+      "- Profissionais podem consultar o histórico completo do paciente ao qual estão vinculados, conforme a regra definida.",
+      "- Familiares podem consultar o histórico autorizado do paciente associado.",
+      "- Supervisores podem consultar os pacientes sob sua supervisão.",
+      "- Administradores podem consultar os pacientes dentro de seu escopo.",
+      "- Usuários sem vínculo autorizado não podem consultar o histórico.",
+      "- O papel `reader` continua estritamente sem permissão de escrita.",
+      "- O protocolo não pode ser utilizado como mecanismo de autorização.",
+      "Teste leitura autorizada e negada com usuários distintos."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-33",
+    "source": "SUPERPROMPT",
+    "line": 454,
+    "section": "8. PROTOCOLO SEQUENCIAL DE REQUISIÇÃO",
+    "criteria": [
+      "Implemente um gerador de protocolos de requisição."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-34",
+    "source": "SUPERPROMPT",
+    "line": 458,
+    "section": "8.1. Sequência inicial",
+    "criteria": [
+      "O primeiro protocolo disponível para novas requisições será o número **12**, pois os números de 1 a 11 correspondem a fichas físicas já preenchidas.",
+      "O protocolo deverá ser gerado pelo servidor ou banco, nunca confiando em um número enviado pelo cliente.",
+      "Exemplo ilustrativo:",
+      "- HC-000012",
+      "- HC-000013",
+      "- HC-000014",
+      "A apresentação visual poderá ser ajustada, mas o valor persistido deverá ser único e ter um formato estável."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-35",
+    "source": "SUPERPROMPT",
+    "line": 472,
+    "section": "8.2. Requisitos técnicos",
+    "criteria": [
+      "- Unicidade garantida pelo banco.",
+      "- Segurança sob requisições simultâneas.",
+      "- Geração atômica.",
+      "- Ausência de dependência do relógio do navegador.",
+      "- Protocolo imutável após a criação.",
+      "- Retorno do protocolo persistido em retries idempotentes.",
+      "- Ausência de duplicidade sob falhas de rede.",
+      "- Associação do protocolo ao paciente e à requisição.",
+      "Use sequence do PostgreSQL ou mecanismo transacional equivalente. Não gere números usando `MAX(protocol_number) + 1` sem proteção contra concorrência.",
+      "Não use o número sequencial como chave de autorização."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-36",
+    "source": "SUPERPROMPT",
+    "line": 487,
+    "section": "8.3. Fichas físicas anteriores",
+    "criteria": [
+      "Prepare o sistema para importação posterior das fichas físicas de números 1 a 11.",
+      "A importação deverá:",
+      "- Permitir registrar o protocolo histórico original.",
+      "- Preservar a data original, quando conhecida.",
+      "- Identificar que se trata de registro importado.",
+      "- Identificar quem realizou a importação.",
+      "- Evitar conflito com a sequência de novos protocolos.",
+      "- Registrar dados desconhecidos como ausentes, sem inventá-los.",
+      "- Não gerar notificações retroativas automaticamente.",
+      "- Permitir auditoria da importação.",
+      "O processo de importação deverá ser idempotente e detectar duplicidade. Não implemente uma importação destrutiva."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-37",
+    "source": "SUPERPROMPT",
+    "line": 504,
+    "section": "9. ESTOQUE POR CUSTÓDIA E LOCALIZAÇÃO",
+    "criteria": [
+      "Esta é uma das principais regras arquiteturais do projeto.",
+      "**Não implemente dois catálogos independentes de estoque. Implemente um catálogo de produtos com saldos segregados por localização/custódia.**",
+      "O sistema precisa distinguir:",
+      "1. Estoque sob posse da família.",
+      "2. Estoque sob posse da equipe de Home Care.",
+      "Os itens em posse da família podem estar disponíveis para futura entrega à equipe, mas não podem ser considerados automaticamente disponíveis para o consumo operacional da equipe."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-38",
+    "source": "SUPERPROMPT",
+    "line": 517,
+    "section": "9.1. Modelo de estoque",
+    "criteria": [
+      "Analise a estrutura atual de `stock_movements` e os demais objetos existentes.",
+      "Implemente um modelo consistente para:",
+      "- Produtos.",
+      "- Localizações ou categorias de custódia.",
+      "- Saldos por produto e localização.",
+      "- Movimentações.",
+      "- Inventários físicos.",
+      "- Ajustes.",
+      "- Transferências entre localizações.",
+      "- Auditoria.",
+      "As localizações iniciais deverão incluir:",
+      "- `FAMILY` — estoque sob custódia da família.",
+      "- `CARE_TEAM` — estoque sob custódia da equipe.",
+      "A arquitetura deverá permitir novas localizações no futuro sem duplicar o catálogo de produtos.",
+      "Se houver necessidade de representar itens em trânsito, implemente essa possibilidade de forma explícita ou documente o tratamento operacional. Não conte os mesmos itens simultaneamente nos dois estoques."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-39",
+    "source": "SUPERPROMPT",
+    "line": 541,
+    "section": "9.2. Regras de movimentação",
+    "criteria": [
+      "Implemente movimentações auditáveis para:",
+      "- Entrada de itens no estoque da família.",
+      "- Entrada de itens no estoque da equipe.",
+      "- Transferência de itens da família para a equipe.",
+      "- Devolução da equipe para a família.",
+      "- Ajuste positivo ou negativo com justificativa.",
+      "- Contagem física e conciliação.",
+      "- Outros movimentos operacionais que sejam aprovados e necessários.",
+      "Cada movimentação deverá conter, conforme aplicável:",
+      "- ID.",
+      "- Paciente.",
+      "- Produto.",
+      "- Localização de origem.",
+      "- Localização de destino.",
+      "- Quantidade movimentada.",
+      "- Tipo de movimento.",
+      "- Usuário responsável.",
+      "- Data e hora.",
+      "- Justificativa.",
+      "- Referência de documento ou operação.",
+      "- Chave idempotente, quando necessária.",
+      "- Evento de auditoria correspondente.",
+      "As movimentações deverão ser atômicas.",
+      "Uma transferência deverá diminuir o saldo de origem e aumentar o saldo de destino na mesma transação. Nunca permita que uma falha deixe apenas metade da transferência registrada.",
+      "Implemente proteção contra concorrência e saldo negativo, de acordo com a regra de negócio aprovada.",
+      "Não permita movimentação com quantidade zero ou negativa."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-40",
+    "source": "SUPERPROMPT",
+    "line": 577,
+    "section": "9.3. Permissões de estoque",
+    "criteria": [
+      "**Somente administradores autorizados poderão criar, alterar, excluir ou corrigir dados oficiais de estoque.**",
+      "Usuários não administradores poderão consultar os estoques autorizados, mas não poderão modificar os saldos oficiais nem registrar ajustes administrativos.",
+      "Não permita edição direta do saldo por meio de um formulário genérico.",
+      "Os saldos deverão ser consequência de movimentações válidas ou de um mecanismo transacional consistente, documentado e testado.",
+      "O administrador deverá conseguir:",
+      "- Registrar entrada.",
+      "- Transferir entre família e equipe.",
+      "- Ajustar saldo com justificativa.",
+      "- Consultar movimentações.",
+      "- Corrigir erros mediante movimento compensatório auditado, sem apagar o histórico original.",
+      "- Consultar divergências.",
+      "- Consultar inventários físicos.",
+      "Se houver permissão futura para profissionais informarem contagens físicas, essa função deverá registrar uma **contagem ou proposta de ajuste**, sem modificar diretamente o saldo oficial. A aprovação e aplicação do ajuste seguirão as regras administrativas."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-41",
+    "source": "SUPERPROMPT",
+    "line": 599,
+    "section": "9.4. Formulário de requisição e estoque",
+    "criteria": [
+      "O formulário deverá consultar e exibir os estoques de forma inequívoca.",
+      "Para cada produto, distinguir visualmente:",
+      "- Saldo em posse da equipe.",
+      "- Saldo em posse da família, quando autorizado.",
+      "- Data da última atualização, se disponível.",
+      "A equipe deverá basear sua avaliação operacional principalmente no estoque que está efetivamente sob sua posse.",
+      "O estoque da família deverá ser apresentado separadamente, sem ser somado silenciosamente ao estoque da equipe.",
+      "**Não haverá campo de quantidade solicitada no formulário.**",
+      "A requisição registra a necessidade, os itens selecionados e os dados operacionais definidos, sem determinar uma quantidade de reposição por meio do conceito removido.",
+      "A quantidade de uma futura transferência ou entrada de estoque continuará sendo registrada no respectivo módulo de movimentação."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-42",
+    "source": "SUPERPROMPT",
+    "line": 619,
+    "section": "9.5. Contagem semanal da equipe",
+    "criteria": [
+      "Prepare a estrutura para contagem semanal do estoque em posse da equipe.",
+      "Implemente, se viável nesta rodada:",
+      "- Criação de sessão de inventário.",
+      "- Identificação do paciente e da localização.",
+      "- Data e responsável pela contagem.",
+      "- Itens esperados.",
+      "- Quantidades físicas contadas.",
+      "- Divergências.",
+      "- Justificativa para diferenças.",
+      "- Status do inventário: rascunho, submetido, em análise, aprovado ou cancelado.",
+      "- Auditoria das alterações.",
+      "- Aplicação de ajustes somente por usuário autorizado.",
+      "Não altere o saldo oficial apenas porque uma contagem foi preenchida. O saldo será ajustado somente após aprovação e criação das movimentações correspondentes."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-43",
+    "source": "SUPERPROMPT",
+    "line": 638,
+    "section": "9.6. Preparação para alertas de estoque",
+    "criteria": [
+      "Prepare os dados para que futuramente as notificações possam distinguir:",
+      "- Estoque crítico da família.",
+      "- Estoque baixo da família.",
+      "- Estoque crítico da equipe.",
+      "- Estoque baixo da equipe.",
+      "As regras de limite devem ser configuráveis por produto e paciente, quando aplicável.",
+      "Não implemente limites clínicos ou valores arbitrários como se fossem prescrições. Permita configuração administrativa e documente os valores de exemplo como fictícios.",
+      "A estrutura de eventos deverá permitir direcionar avisos conforme a custódia:",
+      "- Problema no estoque da família: aviso prioritariamente para os responsáveis familiares.",
+      "- Problema no estoque da equipe: aviso para equipe, supervisão e família, conforme configuração.",
+      "Nesta rodada, priorize a estrutura dos dados e dos eventos. A política definitiva de avisos poderá ser configurada posteriormente."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-44",
+    "source": "SUPERPROMPT",
+    "line": 658,
+    "section": "10. TELA DE SUCESSO E ACOMPANHAMENTO DE NOTIFICAÇÕES",
+    "criteria": [
+      "O fim do formulário deverá ter uma tela de conclusão explícita.",
+      "A tela não poderá confundir persistência da requisição com envio de mensagens."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-45",
+    "source": "SUPERPROMPT",
+    "line": 664,
+    "section": "10.1. Estados principais",
+    "criteria": [
+      "Implemente estados visuais distintos:",
+      "- Enviando requisição.",
+      "- Requisição salva com sucesso.",
+      "- Falha ao salvar a requisição.",
+      "- Requisição salva e notificações em processamento.",
+      "- Algumas notificações enviadas e outras pendentes.",
+      "- Todas as notificações concluídas.",
+      "- Falha parcial de notificações.",
+      "- Falha total de notificações, mantendo a requisição salva.",
+      "O protocolo só poderá ser exibido como confirmado depois de o servidor retornar a confirmação da persistência."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-46",
+    "source": "SUPERPROMPT",
+    "line": 679,
+    "section": "10.2. Persistência independente",
+    "criteria": [
+      "A gravação da requisição deverá ser concluída independentemente do WhatsApp.",
+      "Se a requisição foi salva, uma falha posterior no WhatsApp não poderá:",
+      "- Apagar a requisição.",
+      "- Criar uma segunda requisição.",
+      "- Alterar o protocolo.",
+      "- Invalidar o comprovante.",
+      "- Fazer a tela informar que o formulário não foi salvo.",
+      "A tela deverá informar claramente que o pedido foi salvo e que há notificações pendentes ou com falha."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-47",
+    "source": "SUPERPROMPT",
+    "line": 693,
+    "section": "10.3. Lista de notificações",
+    "criteria": [
+      "Prepare uma lista individual de notificações, com grupos lógicos como:",
+      "- Família.",
+      "- Supervisão.",
+      "- Equipe.",
+      "- Outros destinatários configurados.",
+      "Cada destinatário deverá ter seu próprio registro de notificação ou uma representação equivalente que permita rastreabilidade individual.",
+      "A interface deverá mostrar:",
+      "- Grupo.",
+      "- Nome de exibição ou identificação apropriada do destinatário.",
+      "- Canal.",
+      "- Estado.",
+      "- Horário da tentativa.",
+      "- Número de tentativas.",
+      "- Erro resumido, se houver.",
+      "- Possibilidade de consultar detalhes para usuários autorizados.",
+      "Estados mínimos:",
+      "- Pendente.",
+      "- Enfileirada.",
+      "- Enviando.",
+      "- Enviada.",
+      "- Entregue, quando o provedor confirmar.",
+      "- Lida, somente quando o canal oferecer esse evento.",
+      "- Falha temporária.",
+      "- Falha definitiva.",
+      "- Cancelada.",
+      "Não use “entregue” quando só houver confirmação de aceitação da mensagem pelo provedor."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-48",
+    "source": "SUPERPROMPT",
+    "line": 729,
+    "section": "10.4. Interface durante o processamento",
+    "criteria": [
+      "Após a persistência, a tela deverá permanecer aberta e apresentar:",
+      "- Confirmação de que a requisição foi salva.",
+      "- Protocolo.",
+      "- Resumo da requisição.",
+      "- Indicador de processamento das notificações.",
+      "- Lista por grupo e destinatário.",
+      "- Atualização dos estados sem travar a interface.",
+      "- Opção para consultar a requisição completa.",
+      "- Opção para voltar ao formulário e iniciar outra requisição somente quando adequado.",
+      "Se o processamento continuar em segundo plano, o usuário poderá sair da tela. Ao retornar, o estado deverá ser recuperado do banco.",
+      "Não mantenha uma requisição HTTP longa aguardando todas as mensagens serem enviadas."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-49",
+    "source": "SUPERPROMPT",
+    "line": 746,
+    "section": "10.5. Preparação técnica para WhatsApp",
+    "criteria": [
+      "Implemente uma arquitetura de notificações independente do provedor, com interfaces e serviços próprios.",
+      "Prepare:",
+      "- Tabela ou modelo de notificações.",
+      "- Registro de destinatários.",
+      "- Configuração de grupos.",
+      "- Fila de envio ou mecanismo equivalente.",
+      "- Tentativas e backoff.",
+      "- Idempotência por evento e destinatário.",
+      "- Registro de erros.",
+      "- Estado de processamento.",
+      "- Webhook de confirmação, quando suportado.",
+      "- Auditoria.",
+      "- Política de reprocessamento.",
+      "- Restrições contra envio duplicado.",
+      "Não envie mensagens reais durante os testes.",
+      "Se as credenciais da WhatsApp Business Platform não estiverem configuradas, implemente o modelo, o serviço de abstração, os testes e a documentação. Não simule que mensagens foram realmente enviadas."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-50",
+    "source": "SUPERPROMPT",
+    "line": 769,
+    "section": "10.6. Destinatários e privacidade",
+    "criteria": [
+      "O destinatário deverá ser resolvido a partir de relações autorizadas do paciente e das configurações administrativas.",
+      "Não confie em números de telefone enviados pelo formulário.",
+      "Evite enviar conteúdo clínico ou dados sensíveis em mensagens. Use mensagens mínimas com protocolo e instruções para acessar o sistema autenticado, quando adequado.",
+      "O sistema deverá permitir configurar quais eventos são enviados para cada grupo."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-51",
+    "source": "SUPERPROMPT",
+    "line": 779,
+    "section": "11. ESTADOS DE CARREGAMENTO E EXPERIÊNCIA DO USUÁRIO",
+    "criteria": [
+      "Nenhuma operação que dependa de rede ou banco deverá deixar a interface aparentemente congelada.",
+      "Implemente estados explícitos em todas as áreas relevantes:",
+      "- Login.",
+      "- Logout.",
+      "- Recuperação de senha.",
+      "- Carregamento inicial da aplicação.",
+      "- Seleção de paciente.",
+      "- Carregamento do catálogo.",
+      "- Formulário de requisição.",
+      "- Envio da requisição.",
+      "- Tela de sucesso.",
+      "- Histórico.",
+      "- Detalhe da requisição.",
+      "- Administração de usuários.",
+      "- Administração de produtos.",
+      "- Consulta de estoque.",
+      "- Movimentações.",
+      "- Inventário.",
+      "- Notificações."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-52",
+    "source": "SUPERPROMPT",
+    "line": 803,
+    "section": "11.1. Requisitos de interface",
+    "criteria": [
+      "Utilize:",
+      "- Skeletons ou placeholders para carregamento de conteúdo.",
+      "- Indicadores de progresso em operações longas.",
+      "- Mensagens de erro claras.",
+      "- Botões desabilitados durante operações que não podem ser repetidas.",
+      "- Prevenção de cliques duplos.",
+      "- Estados vazios explicativos.",
+      "- Botões de tentar novamente quando apropriado.",
+      "- Mensagens de sucesso apenas após confirmação real.",
+      "- Indicadores acessíveis para leitores de tela.",
+      "- Feedback visual que funcione em celular.",
+      "Não use uma tela branca ou spinner infinito como único estado de carregamento."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-53",
+    "source": "SUPERPROMPT",
+    "line": 820,
+    "section": "11.2. Recuperação de falhas",
+    "criteria": [
+      "Se uma consulta falhar, mostre o erro e ofereça uma ação adequada.",
+      "Se a sessão expirar, oriente o usuário a autenticar-se novamente e preserve dados não sensíveis quando isso puder ser feito com segurança.",
+      "Se o envio da requisição tiver resultado incerto por falha de rede, preserve a chave idempotente da operação e permita repetir a tentativa com segurança.",
+      "Não gere uma nova chave idempotente para a mesma operação inconclusiva.",
+      "Se a notificação falhar, mostre que a requisição já foi salva e que a notificação precisa ser reprocessada ou investigada."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-54",
+    "source": "SUPERPROMPT",
+    "line": 832,
+    "section": "12. CATÁLOGO INICIAL DE ERROS",
+    "criteria": [
+      "Implemente um catálogo centralizado de erros técnicos e operacionais.",
+      "A estrutura deve separar:",
+      "1. Código interno estável.",
+      "2. Categoria.",
+      "3. Mensagem segura para o usuário.",
+      "4. Detalhe técnico restrito a logs.",
+      "5. Indicação de possibilidade de repetição.",
+      "6. Ação recomendada.",
+      "7. Identificador de correlação.",
+      "8. Status HTTP ou código equivalente, quando aplicável.",
+      "Não mostre stack traces, SQL, credenciais ou informações sensíveis ao usuário."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-55",
+    "source": "SUPERPROMPT",
+    "line": 849,
+    "section": "12.1. Códigos iniciais sugeridos",
+    "criteria": [
+      "Implemente códigos equivalentes aos seguintes, respeitando os padrões atuais do projeto:",
+      "- `AUTH_REQUIRED` — autenticação necessária.",
+      "- `SESSION_EXPIRED` — sessão expirada.",
+      "- `ACCESS_DENIED` — operação não autorizada.",
+      "- `PROFILE_INACTIVE` — perfil inativo ou revogado.",
+      "- `PATIENT_NOT_FOUND` — paciente inexistente ou inacessível.",
+      "- `PATIENT_INACTIVE` — paciente inativo para a operação.",
+      "- `PRODUCT_NOT_FOUND` — produto inexistente.",
+      "- `PRODUCT_INACTIVE` — produto inativo.",
+      "- `PRODUCT_ALIAS_AMBIGUOUS` — termo corresponde a mais de um produto.",
+      "- `INVALID_INPUT` — dados inválidos.",
+      "- `INVALID_QUANTITY` — quantidade inválida em operação de estoque.",
+      "- `IDEMPOTENCY_CONFLICT` — mesma chave usada com conteúdo diferente.",
+      "- `REQUEST_SAVE_FAILED` — falha ao persistir a requisição.",
+      "- `REQUEST_NOT_FOUND` — requisição inexistente ou inacessível.",
+      "- `STOCK_INSUFFICIENT` — saldo insuficiente para uma movimentação.",
+      "- `STOCK_CONFLICT` — conflito de concorrência ou de inventário.",
+      "- `INVENTORY_NOT_FOUND` — inventário inexistente ou inacessível.",
+      "- `NOTIFICATION_PENDING` — notificação ainda pendente.",
+      "- `NOTIFICATION_FAILED` — notificação com falha.",
+      "- `NOTIFICATION_PROVIDER_UNAVAILABLE` — provedor indisponível.",
+      "- `RATE_LIMITED` — limite de requisições excedido.",
+      "- `INTERNAL_ERROR` — erro inesperado.",
+      "Não crie uma mensagem diferente para cada exceção técnica sem necessidade. Mantenha códigos estáveis e centralizados."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-56",
+    "source": "SUPERPROMPT",
+    "line": 878,
+    "section": "12.2. Registro de erros",
+    "criteria": [
+      "Implemente logs estruturados com:",
+      "- Código do erro.",
+      "- Identificador de correlação.",
+      "- Data e hora.",
+      "- Contexto técnico não sensível.",
+      "- Usuário e paciente identificados por IDs internos, quando necessário.",
+      "- Operação afetada.",
+      "- Resultado.",
+      "Não grave senhas, tokens, conteúdo integral de mensagens privadas ou dados clínicos desnecessários."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-57",
+    "source": "SUPERPROMPT",
+    "line": 892,
+    "section": "13. SEGURANÇA DO BANCO, RLS E INTEGRIDADE",
+    "criteria": [
+      "Audite e corrija todas as tabelas existentes e novas, incluindo, conforme aplicável:",
+      "- `profiles`",
+      "- `care_recipients`",
+      "- Tabelas de associação entre usuários e pacientes.",
+      "- `products`",
+      "- Tabelas de aliases.",
+      "- `requisitions`",
+      "- `requisition_items`",
+      "- `requisition_observations`",
+      "- `stock_movements`",
+      "- Saldos ou projeções de estoque.",
+      "- Inventários.",
+      "- Notificações.",
+      "- Destinatários.",
+      "- Fila de processamento.",
+      "- `audit_events`.",
+      "Verifique:",
+      "- RLS habilitada em todas as tabelas que precisam de isolamento.",
+      "- Políticas de leitura baseadas no paciente e na função.",
+      "- Restrições de escrita para estoque.",
+      "- Proibição de alteração de funções pelo próprio usuário.",
+      "- Proteção contra acesso horizontal indevido.",
+      "- Impossibilidade de criar itens em requisições de terceiros.",
+      "- Impossibilidade de forjar notificações ou alterar seu status pelo cliente.",
+      "- Segurança das funções SQL.",
+      "- Privilégios mínimos.",
+      "- Uso seguro de `SECURITY DEFINER`.",
+      "- `search_path` fixo quando necessário.",
+      "- Privilégios de execução das funções.",
+      "- Consistência das transações.",
+      "- Constraints de integridade.",
+      "- Índices para as consultas frequentes.",
+      "- Proteção contra concorrência.",
+      "Não use `service_role` para contornar o modelo de autorização. Quando uma operação administrativa exigir privilégios elevados, valide a identidade, a função e o escopo do usuário antes da operação, exclusivamente no servidor."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-58",
+    "source": "SUPERPROMPT",
+    "line": 933,
+    "section": "14. AUDITORIA E RASTREABILIDADE",
+    "criteria": [
+      "A aplicação deverá possuir trilha de auditoria consistente.",
+      "Registre, no mínimo, os seguintes eventos:",
+      "- Criação e alteração de paciente.",
+      "- Associação ou remoção de usuário a paciente.",
+      "- Criação, alteração, ativação ou inativação de usuário.",
+      "- Mudança de função.",
+      "- Criação, alteração e inativação de produto.",
+      "- Criação de requisição.",
+      "- Importação de requisição histórica.",
+      "- Mudança de status.",
+      "- Criação de movimentação de estoque.",
+      "- Transferência entre família e equipe.",
+      "- Ajuste de estoque.",
+      "- Abertura, submissão e aprovação de inventário.",
+      "- Criação e reprocessamento de notificação.",
+      "- Falhas relevantes de operação.",
+      "- Alterações de configurações administrativas.",
+      "A auditoria deverá ser vinculada ao usuário executor e ao paciente quando pertinente.",
+      "Não permita que o usuário altere o criador de uma requisição ou de uma movimentação para outro usuário.",
+      "Preserve a história dos registros. Quando uma correção for necessária, prefira eventos compensatórios ou novas versões auditáveis em vez de apagar o registro original."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-59",
+    "source": "SUPERPROMPT",
+    "line": 961,
+    "section": "15. MODELO DE DADOS E MIGRAÇÕES",
+    "criteria": [
+      "Antes de criar novas tabelas, inspecione o schema existente para evitar duplicação de entidades.",
+      "Desenhe a solução de forma que o modelo possa suportar, no mínimo:",
+      "- Vários pacientes.",
+      "- Vários usuários por paciente.",
+      "- Um usuário associado a vários pacientes.",
+      "- Um usuário com diferentes permissões por paciente.",
+      "- Um catálogo de produtos compartilhado ou configurável conforme a decisão documentada.",
+      "- Saldos por produto e localização.",
+      "- Histórico de movimentações.",
+      "- Inventários por paciente e localização.",
+      "- Requisições com protocolo estável.",
+      "- Histórico completo por paciente.",
+      "- Notificações individualizadas.",
+      "- Auditoria centralizada.",
+      "Toda migração deverá:",
+      "- Ser incremental.",
+      "- Ser revisada antes da execução.",
+      "- Preservar dados existentes.",
+      "- Incluir constraints e índices adequados.",
+      "- Ser compatível com os dados de teste já existentes.",
+      "- Ter instruções de execução e verificação.",
+      "- Ser acompanhada de testes quando houver lógica SQL.",
+      "- Não depender de alteração manual invisível para funcionar.",
+      "Se precisar migrar registros atuais para a nova estrutura, implemente uma estratégia de backfill idempotente e documentada.",
+      "Não use dados reais para completar associações desconhecidas. Quando uma associação não puder ser determinada, registre a pendência e interrompa a promoção para produção até que seja resolvida."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-60",
+    "source": "SUPERPROMPT",
+    "line": 995,
+    "section": "16. TESTES OBRIGATÓRIOS",
+    "criteria": [
+      "Amplie os testes existentes e crie testes adicionais."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-61",
+    "source": "SUPERPROMPT",
+    "line": 999,
+    "section": "16.1. Remoção da quantidade solicitada",
+    "criteria": [
+      "- O formulário não exibe esse campo.",
+      "- O schema de validação não o aceita como conceito funcional.",
+      "- A API não o utiliza.",
+      "- O tipo TypeScript não o exige.",
+      "- O comprovante não o apresenta.",
+      "- A estrutura final do banco não depende dele.",
+      "- As movimentações de estoque continuam registrando quantidades reais.",
+      "- A migração preserva os demais dados."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-62",
+    "source": "SUPERPROMPT",
+    "line": 1010,
+    "section": "16.2. Pacientes e permissões",
+    "criteria": [
+      "- Usuário associado ao paciente consegue acessar o histórico autorizado.",
+      "- Usuário consegue consultar requisições de outros solicitantes do mesmo paciente.",
+      "- Usuário sem vínculo não consegue consultar o paciente.",
+      "- Usuário não consegue mudar o escopo enviando outro UUID.",
+      "- Administrador global pode atuar dentro das permissões previstas.",
+      "- Administrador limitado não acessa outros pacientes.",
+      "- Usuário inativo ou revogado não realiza operações.",
+      "- Papel `reader` não escreve."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-63",
+    "source": "SUPERPROMPT",
+    "line": 1021,
+    "section": "16.3. Protocolo",
+    "criteria": [
+      "- Primeiro protocolo novo é 12.",
+      "- Protocolo é único.",
+      "- Duas submissões simultâneas não geram o mesmo protocolo.",
+      "- Repetição idempotente retorna o protocolo original.",
+      "- Falha de rede não gera duplicidade.",
+      "- Importação de protocolos históricos 1 a 11 não altera registros existentes.",
+      "- A importação não faz novas notificações automaticamente."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-64",
+    "source": "SUPERPROMPT",
+    "line": 1031,
+    "section": "16.4. Estoque",
+    "criteria": [
+      "- Saldo da família não é confundido com saldo da equipe.",
+      "- Transferência reduz a origem e aumenta o destino atomicamente.",
+      "- Falha de transferência não deixa saldo parcial.",
+      "- Usuário não administrador não altera o estoque oficial.",
+      "- Produto inativo não recebe novas movimentações incompatíveis.",
+      "- Quantidade zero ou negativa é rejeitada.",
+      "- Saldo negativo é bloqueado conforme a regra definida.",
+      "- Ajustes exigem justificativa.",
+      "- Inventário não altera o saldo oficial antes da aprovação.",
+      "- Eventos de auditoria são registrados."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-65",
+    "source": "SUPERPROMPT",
+    "line": 1044,
+    "section": "16.5. Catálogo",
+    "criteria": [
+      "- Administrador cria e altera produtos.",
+      "- Usuário sem permissão não altera produtos.",
+      "- Produto inativo permanece legível no histórico.",
+      "- Alias conhecido é resolvido corretamente.",
+      "- Alias ambíguo exige confirmação.",
+      "- Não há produtos duplicados por diferenças de acentuação ou caixa.",
+      "- Unidade do produto é consistente no formulário e no banco."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-66",
+    "source": "SUPERPROMPT",
+    "line": 1054,
+    "section": "16.6. Notificações",
+    "criteria": [
+      "- Requisição é salva mesmo se o provedor estiver indisponível.",
+      "- A tela diferencia persistência e envio de mensagens.",
+      "- Destinatários recebem registros individuais.",
+      "- Retry não duplica mensagens já aceitas pelo provedor.",
+      "- Falha de uma notificação não bloqueia as demais.",
+      "- Estados são recuperados após recarregar a página.",
+      "- A interface não afirma que uma mensagem foi entregue sem confirmação do provedor.",
+      "- Falha no WhatsApp não cria uma segunda requisição."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-67",
+    "source": "SUPERPROMPT",
+    "line": 1065,
+    "section": "16.7. Carregamento e recuperação",
+    "criteria": [
+      "- Tela inicial apresenta estado de carregamento.",
+      "- Erro de rede apresenta mensagem e ação de recuperação.",
+      "- Duplo clique não gera duas operações.",
+      "- Sessão expirada é tratada.",
+      "- Lista vazia tem estado apropriado.",
+      "- Erro inesperado não exibe detalhes internos.",
+      "- Operação em segundo plano não bloqueia indefinidamente a interface.",
+      "Use testes de integração com Supabase local para validar RLS, funções SQL e transações reais, sempre que possível.",
+      "Não apresente mocks como prova de segurança real do banco."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-68",
+    "source": "SUPERPROMPT",
+    "line": 1079,
+    "section": "17. CI, DOCUMENTAÇÃO E CONFIGURAÇÃO",
+    "criteria": [
+      "Implemente ou atualize `.github/workflows/ci.yml` para executar em pull requests e pushes relevantes:",
+      "1. `npm ci`",
+      "2. Lint.",
+      "3. Typecheck.",
+      "4. Testes unitários.",
+      "5. Build de produção.",
+      "Use os nomes de scripts que realmente existem no `package.json`. Se necessário, adicione scripts consistentes.",
+      "Não exija credenciais reais para executar testes unitários ou compilar o projeto quando isso puder ser evitado.",
+      "Atualize:",
+      "- `README.md`",
+      "- `docs/SECURITY.md`",
+      "- `docs/DATABASE.md`",
+      "- `docs/DEPLOYMENT.md`",
+      "- `docs/ROADMAP.md`",
+      "- `docs/AUDIT.md`",
+      "- `docs/WHATSAPP_AI.md`",
+      "Crie ou atualize também documentação específica para:",
+      "- Gestão de pacientes.",
+      "- Administração de usuários.",
+      "- Catálogo de produtos.",
+      "- Estoque por custódia.",
+      "- Inventário semanal.",
+      "- Protocolos e importação histórica.",
+      "- Notificações.",
+      "- Catálogo de erros.",
+      "A documentação deverá distinguir claramente:",
+      "- Implementado e testado.",
+      "- Implementado, mas ainda não testado em infraestrutura real.",
+      "- Preparado para integração futura.",
+      "- Dependente de configuração externa.",
+      "- Ainda não implementado."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-69",
+    "source": "SUPERPROMPT",
+    "line": 1122,
+    "section": "18. ORDEM DE IMPLEMENTAÇÃO",
+    "criteria": [
+      "Execute o trabalho nesta sequência, ajustando-a apenas se houver dependências técnicas demonstráveis."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-70",
+    "source": "SUPERPROMPT",
+    "line": 1126,
+    "section": "Fase A — Auditoria e planejamento técnico",
+    "criteria": [
+      "- Inspecionar o estado atual.",
+      "- Mapear as tabelas e dependências.",
+      "- Localizar integralmente o conceito de quantidade solicitada.",
+      "- Desenhar as migrações.",
+      "- Definir relações de pacientes e permissões.",
+      "- Identificar os riscos de compatibilidade."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-71",
+    "source": "SUPERPROMPT",
+    "line": 1135,
+    "section": "Fase B — Integridade do núcleo",
+    "criteria": [
+      "- Remover o conceito de quantidade solicitada de ponta a ponta.",
+      "- Implementar protocolo sequencial a partir de 12.",
+      "- Revisar idempotência.",
+      "- Garantir persistência atômica.",
+      "- Implementar catálogo inicial de erros.",
+      "- Implementar estados de carregamento e tratamento de falhas."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-72",
+    "source": "SUPERPROMPT",
+    "line": 1144,
+    "section": "Fase C — Pacientes e administração",
+    "criteria": [
+      "- Implementar cadastro de pacientes.",
+      "- Implementar associações entre pacientes e usuários.",
+      "- Implementar gestão de usuários.",
+      "- Implementar atribuição de funções e escopos.",
+      "- Implementar administração do catálogo.",
+      "- Implementar auditoria dessas operações."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-73",
+    "source": "SUPERPROMPT",
+    "line": 1153,
+    "section": "Fase D — Histórico",
+    "criteria": [
+      "- Implementar listagem.",
+      "- Implementar filtros e paginação.",
+      "- Implementar detalhe persistido.",
+      "- Implementar reimpressão de comprovantes.",
+      "- Garantir consulta do histórico completo por paciente autorizado."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-74",
+    "source": "SUPERPROMPT",
+    "line": 1161,
+    "section": "Fase E — Estoque",
+    "criteria": [
+      "- Implementar custódia da família e da equipe.",
+      "- Implementar movimentações atômicas.",
+      "- Implementar controle administrativo de escrita.",
+      "- Implementar consultas de saldo.",
+      "- Implementar inventário semanal.",
+      "- Preparar eventos de estoque baixo."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-75",
+    "source": "SUPERPROMPT",
+    "line": 1170,
+    "section": "Fase F — Sucesso e notificações",
+    "criteria": [
+      "- Implementar tela de conclusão.",
+      "- Persistir a requisição antes das notificações.",
+      "- Implementar registros individuais de destinatários.",
+      "- Implementar estados e tentativas.",
+      "- Implementar processamento assíncrono.",
+      "- Preparar integração com WhatsApp.",
+      "- Garantir recuperação de estado após recarga."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-76",
+    "source": "SUPERPROMPT",
+    "line": 1180,
+    "section": "Fase G — Testes e validação",
+    "criteria": [
+      "- Executar testes unitários.",
+      "- Executar testes de integração.",
+      "- Validar RLS real quando possível.",
+      "- Executar Playwright.",
+      "- Executar build.",
+      "- Corrigir erros.",
+      "- Atualizar a documentação.",
+      "Não tente implementar todas as interfaces em um único componente gigante. Reutilize componentes e separe responsabilidades por domínio."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-77",
+    "source": "SUPERPROMPT",
+    "line": 1192,
+    "section": "19. CRITÉRIOS DE ACEITAÇÃO FINAL",
+    "criteria": [
+      "A missão somente poderá ser considerada concluída quando:",
+      "- O conceito de quantidade solicitada estiver removido do código ativo, API e schema final.",
+      "- As quantidades de movimentações de estoque continuarem funcionando.",
+      "- O sistema possuir cadastro e isolamento de pacientes.",
+      "- Usuários autorizados puderem consultar o histórico completo do paciente, independentemente de quem criou cada requisição.",
+      "- A gestão de usuários for funcional e restrita a administradores autorizados.",
+      "- O catálogo puder ser administrado sem editar código.",
+      "- O protocolo sequencial iniciar em 12 e funcionar sob concorrência.",
+      "- O estoque da família e o da equipe estiverem separados por custódia.",
+      "- Somente administradores autorizados puderem modificar o estoque oficial.",
+      "- O sistema permitir a estrutura de contagem semanal.",
+      "- A tela final distinguir requisição salva de notificação enviada.",
+      "- As notificações tiverem estado e rastreabilidade individual por destinatário.",
+      "- O catálogo inicial de erros estiver implementado.",
+      "- As operações de rede apresentarem estados de carregamento, sucesso e erro.",
+      "- RLS e autorização forem testadas de forma real sempre que a infraestrutura permitir.",
+      "- Migrações forem incrementais e preservarem dados.",
+      "- CI, testes e build tiverem resultados documentados.",
+      "- A documentação refletir a implementação real."
+    ]
+  },
+  {
+    "id": "SUPERPROMPT-78",
+    "source": "SUPERPROMPT",
+    "line": 1215,
+    "section": "20. RELATÓRIO FINAL OBRIGATÓRIO",
+    "criteria": [
+      "Ao terminar, apresente um relatório objetivo com:",
+      "1. Resumo das mudanças implementadas.",
+      "2. Arquivos criados.",
+      "3. Arquivos alterados.",
+      "4. Migrações SQL criadas e seus objetivos.",
+      "5. Como o conceito de quantidade solicitada foi removido.",
+      "6. Como funciona o protocolo sequencial.",
+      "7. Como funciona o vínculo de usuários a pacientes.",
+      "8. Como são aplicadas as permissões de histórico.",
+      "9. Como funciona a separação do estoque por custódia.",
+      "10. Como são registradas e auditadas as movimentações.",
+      "11. Como funciona a tela de sucesso e o processamento de notificações.",
+      "12. Comandos executados.",
+      "13. Resultados reais de lint, typecheck, testes, Playwright e build.",
+      "14. Limitações que permaneceram.",
+      "15. Credenciais ou configurações externas que ainda dependem de ação humana.",
+      "16. Instruções para executar localmente.",
+      "17. Procedimento seguro para aplicar as migrações em ambiente de teste.",
+      "18. Pendências que ainda impedem o uso em produção.",
+      "Não afirme que o sistema está pronto para produção sem evidências suficientes.",
+      "**Comece agora inspecionando o estado real do repositório e execute as alterações. Não entregue somente um plano de trabalho. Preserve os dados e o código existentes, implemente de forma incremental e valide cada etapa.**"
+    ]
+  },
+  {
+    "id": "AUDITORIA-1",
+    "source": "AUDITORIA",
+    "line": 1,
+    "section": "PROMPT MESTRE — AUDITORIA, CORREÇÃO E CONCLUSÃO DO HOME CARE ASSISTANT",
+    "criteria": []
+  },
+  {
+    "id": "AUDITORIA-2",
+    "source": "AUDITORIA",
+    "line": 3,
+    "section": "1. Missão e contexto",
+    "criteria": [
+      "Trabalhe diretamente no repositório GitHub:",
+      "**Repositório:** `RMZZFAJ/home-care-assistant`  ",
+      "**Branch de trabalho atual:** `master`  ",
+      "**Stack:** Next.js 16, React 19, TypeScript, Supabase Auth, PostgreSQL, RLS, Zod, Vitest e Playwright.",
+      "Esta é a continuação de uma implementação já existente. Não crie um projeto novo, não recomece do zero e não substitua indiscriminadamente o código existente.",
+      "O objetivo é **auditar, corrigir, implementar e testar o que falta para entregar um sistema funcional, coerente, seguro e utilizável de gestão de requisições de insumos para Home Care**, com arquitetura multipaciente e possibilidade de evolução para SaaS.",
+      "Considere como ponto de partida os commits já publicados:",
+      "- `36fdfd8` — integridade da submissão e protocolos.",
+      "- `38486e7` — estoque por custódia e escopo multipaciente.",
+      "- `5b37a72` — histórico autorizado de requisições.",
+      "- `c603dec` — recuperação de acesso e correspondência de catálogo.",
+      "- `95a2d48` — documentação de auditoria e CI.",
+      "Não presuma que o relatório anterior está integralmente correto. Ele é uma fonte de contexto, não substitui a inspeção do código."
+    ]
+  },
+  {
+    "id": "AUDITORIA-3",
+    "source": "AUDITORIA",
+    "line": 25,
+    "section": "Resultado esperado",
+    "criteria": [
+      "Ao concluir, quero:",
+      "1. Corrigir todas as falhas críticas de integridade, segurança e banco.",
+      "2. Finalizar os módulos operacionais prioritários, não apenas criar suas tabelas.",
+      "3. Implementar a administração necessária para operar o sistema.",
+      "4. Garantir isolamento entre pacientes e permissões verificadas no servidor e no banco.",
+      "5. Tornar o fluxo de requisição confiável, inclusive em falhas de rede e de notificação.",
+      "6. Criar testes que comprovem os comportamentos importantes.",
+      "7. Atualizar a documentação para que reflita o código real.",
+      "8. Entregar um relatório objetivo do que está concluído, do que permanece pendente e de como validar e implantar.",
+      "Não declare uma funcionalidade concluída apenas porque existem tabelas, tipos, endpoints ou documentação."
+    ]
+  },
+  {
+    "id": "AUDITORIA-4",
+    "source": "AUDITORIA",
+    "line": 42,
+    "section": "2. Regras obrigatórias de execução",
+    "criteria": [
+      "Antes de alterar qualquer arquivo:",
+      "1. Leia `AGENTS.md`, `README.md`, `package.json`, `docs/AUDIT.md`, `docs/PROJECT_STATUS.md`, `docs/DATABASE.md`, `docs/SECURITY.md`, `docs/DEPLOYMENT.md`, `docs/ROADMAP.md` e `docs/WHATSAPP_AI.md`, caso existam.",
+      "2. Inspecione toda a árvore de `src`, `supabase/migrations`, `supabase/seed.sql`, `.github/workflows` e `tests`.",
+      "3. Verifique a branch, o HEAD, os commits recentes, o estado do working tree e os arquivos efetivamente publicados.",
+      "4. Compare as migrações históricas com as incrementais e identifique constraints, triggers, funções, grants, políticas RLS e dependências.",
+      "5. Verifique se o código local e o código remoto divergem. Não presuma que os dois ambientes possuem exatamente os mesmos arquivos.",
+      "6. Identifique as funcionalidades existentes e reutilize-as sempre que possível.",
+      "7. Crie uma lista de tarefas verificável e execute-a até onde o ambiente permitir."
+    ]
+  },
+  {
+    "id": "AUDITORIA-5",
+    "source": "AUDITORIA",
+    "line": 54,
+    "section": "Proteção do trabalho existente",
+    "criteria": [
+      "- Não apague, descarte, sobrescreva ou reverta alterações preexistentes sem autorização.",
+      "- Não use comandos Git destrutivos.",
+      "- Não altere migrações que possam já ter sido aplicadas.",
+      "- Não execute `supabase db reset` em banco remoto.",
+      "- Não aplique migrações remotas, não implante, não publique, não faça merge, não abra PR e não faça commit ou push sem autorização explícita.",
+      "- Não altere segredos, credenciais ou configurações externas de forma irreversível.",
+      "- Não use dados clínicos ou pessoais reais em testes, seeds, logs ou documentação.",
+      "- Não exponha `SUPABASE_SERVICE_ROLE_KEY` no navegador, em respostas HTTP ou em variáveis `NEXT_PUBLIC_*`.",
+      "- Não simule sucesso de uma integração que não está conectada.",
+      "- Não desabilite RLS para fazer os testes passarem.",
+      "Se precisar de credenciais, acesso a um provedor ou configuração externa que não esteja disponível, implemente o que puder com segurança, crie testes com mocks e registre objetivamente o impedimento."
+    ]
+  },
+  {
+    "id": "AUDITORIA-6",
+    "source": "AUDITORIA",
+    "line": 71,
+    "section": "3. P0 — Corrigir primeiro o protocolo e a integridade da submissão",
+    "criteria": [
+      "Esta é a primeira prioridade. Não avance considerando o fluxo de requisição concluído até verificar o problema de compatibilidade do protocolo."
+    ]
+  },
+  {
+    "id": "AUDITORIA-7",
+    "source": "AUDITORIA",
+    "line": 75,
+    "section": "3.1. Constraint do protocolo",
+    "criteria": [
+      "Foi identificado que:",
+      "- A migração inicial `20261019000100_initial_schema.sql` define uma constraint para o formato antigo `HC-YYYYMMDD-XXXXXXXX`.",
+      "- A implementação posterior pretende gerar protocolos sequenciais, começando em `HC-000012`.",
+      "- A documentação menciona uma migração `20261020001200` de compatibilidade.",
+      "- Esse arquivo não foi localizado na listagem publicada de migrações de `master`.",
+      "Investigue o estado real do repositório e determine se a correção está ausente, tem outro nome ou foi implementada de outra forma.",
+      "**Corrija a incompatibilidade por meio de uma nova migração incremental**, com nome e sequência coerentes com as migrações existentes. Nunca edite a migração inicial apenas para corrigir o problema.",
+      "A migração deve:",
+      "1. Preservar os protocolos históricos já gravados.",
+      "2. Aceitar o formato histórico e o formato sequencial novo.",
+      "3. Preservar a unicidade dos protocolos.",
+      "4. Garantir que novas requisições gerem o protocolo sequencial esperado.",
+      "5. Preservar a associação entre número, protocolo e requisição.",
+      "6. Tratar corretamente a inicialização da sequência a partir de 12.",
+      "7. Não reutilizar números já atribuídos.",
+      "8. Ser segura para execução incremental e possuir verificações adequadas para os objetos que altera.",
+      "9. Funcionar tanto em banco recém-criado quanto em um banco que já recebeu as migrações anteriores.",
+      "Valide a cadeia completa em banco Supabase local limpo e, quando possível, teste também a transição a partir de um estado equivalente ao banco já migrado.",
+      "Não considere `build`, `typecheck` ou `lint` suficientes para comprovar a correção do banco."
+    ]
+  },
+  {
+    "id": "AUDITORIA-8",
+    "source": "AUDITORIA",
+    "line": 104,
+    "section": "3.2. Numeração sequencial",
+    "criteria": [
+      "O protocolo deve ser gerado no banco, de maneira concorrente e transacionalmente segura.",
+      "Formato esperado:",
+      "- `HC-000012`",
+      "- `HC-000013`",
+      "- `HC-000014`",
+      "A sequência deve começar em 12, pois os protocolos físicos de 1 a 11 serão importados posteriormente.",
+      "O número global deve ser único em todo o sistema, não apenas por paciente ou usuário.",
+      "A geração precisa continuar correta quando dois usuários submetem requisições simultaneamente. Lacunas decorrentes de sequências PostgreSQL podem ser aceitáveis; reutilização ou duplicidade de números não é."
+    ]
+  },
+  {
+    "id": "AUDITORIA-9",
+    "source": "AUDITORIA",
+    "line": 120,
+    "section": "3.3. Importação histórica",
+    "criteria": [
+      "Implemente ou prepare de forma efetiva um mecanismo administrativo de importação dos registros históricos, respeitando os protocolos originais.",
+      "Requisitos:",
+      "- Preservar o protocolo original informado no documento físico.",
+      "- Validar duplicidade de protocolo e de registro importado.",
+      "- Não gerar notificações retroativas.",
+      "- Não enviar mensagens reais durante importações.",
+      "- Impedir que a mesma importação crie registros duplicados quando repetida.",
+      "- Registrar quem importou, quando importou e o resultado.",
+      "- Validar paciente, produtos, datas e dados obrigatórios.",
+      "- Produzir relatório de registros importados, rejeitados e pendentes de correção.",
+      "- Não misturar o protocolo físico histórico com a sequência automática de novos protocolos.",
+      "- Não alterar ou consumir a sequência automática ao importar os números históricos.",
+      "Se a importação por planilha não puder ser finalizada com segurança nesta etapa, entregue pelo menos o modelo de dados, a API autorizada, a validação, os testes e a documentação do formato de entrada. Não simule uma importação concluída."
+    ]
+  },
+  {
+    "id": "AUDITORIA-10",
+    "source": "AUDITORIA",
+    "line": 139,
+    "section": "3.4. Integridade e idempotência",
+    "criteria": [
+      "Audite a função SQL `submit_requisition`, a API `src/app/api/requisitions/route.ts` e o wizard de submissão.",
+      "Comprove que:",
+      "- O cliente não define o protocolo oficial.",
+      "- O banco é a fonte de autoridade para protocolo, identidade e dados canônicos do catálogo.",
+      "- O payload é validado no servidor e novamente nas operações SQL críticas.",
+      "- A chave idempotente é preservada durante tentativas de reenvio da mesma submissão.",
+      "- Repetir uma submissão não cria outra requisição.",
+      "- Reutilizar a mesma chave com conteúdo diferente é rejeitado.",
+      "- A resposta de repetição recupera o registro e o recibo persistidos originalmente.",
+      "- Duas submissões concorrentes com a mesma chave não geram duplicidade.",
+      "- Uma falha intermediária provoca rollback dos registros que precisem ser atômicos.",
+      "- O recibo não depende dos dados atuais do formulário após a confirmação.",
+      "- Erros de infraestrutura, autenticação, validação e conflito são diferenciados.",
+      "- Os logs não registram conteúdo pessoal desnecessário.",
+      "Crie testes de integração no PostgreSQL/Supabase local para os casos de concorrência, idempotência, conflito de payload e rollback. Não se limite a testes unitários de funções TypeScript."
+    ]
+  },
+  {
+    "id": "AUDITORIA-11",
+    "source": "AUDITORIA",
+    "line": 162,
+    "section": "4. P0 — Garantir o isolamento multipaciente e as permissões",
+    "criteria": [
+      "A pessoa assistida deve ser a unidade central de autorização.",
+      "O sistema deve suportar vários pacientes, cada um com usuários, familiares, profissionais, supervisores, estoque, requisições, notificações, inventários e configurações devidamente associados."
+    ]
+  },
+  {
+    "id": "AUDITORIA-12",
+    "source": "AUDITORIA",
+    "line": 168,
+    "section": "4.1. Escopo de autorização",
+    "criteria": [
+      "Audite `profiles`, `care_recipients`, `care_recipient_memberships`, `can_access_recipient`, as funções SQL e todas as políticas RLS.",
+      "Não confie somente na interface, em IDs enviados pelo navegador ou em verificações feitas apenas na rota HTTP.",
+      "Cada consulta, alteração e operação de banco precisa validar o escopo de paciente.",
+      "Implemente ou complete:",
+      "- Associação explícita de usuário a paciente.",
+      "- Estado ativo ou revogado do usuário.",
+      "- Estado ativo ou inativo do paciente.",
+      "- Permissões por associação, sem conceder acesso implícito a todos os pacientes.",
+      "- Separação entre administrador global e administrador limitado.",
+      "- Escopo de supervisores conforme os pacientes ou equipes autorizados.",
+      "- Restrições de escrita de acordo com o papel e as permissões explícitas.",
+      "- Revogação imediata de acesso após desativação do perfil ou remoção do vínculo.",
+      "- Verificação de acesso a detalhes, histórico, estoque, movimentações, inventários, notificações e auditoria.",
+      "Uma pessoa autorizada a visualizar o histórico de um paciente deve conseguir consultar todas as requisições desse paciente, mesmo que tenham sido criadas por outros usuários. Não deve conseguir consultar outro paciente sem autorização."
+    ]
+  },
+  {
+    "id": "AUDITORIA-13",
+    "source": "AUDITORIA",
+    "line": 190,
+    "section": "4.2. Testes de segurança obrigatórios",
+    "criteria": [
+      "Crie pelo menos dois pacientes fictícios, A e B, e usuários com permissões diferentes.",
+      "Comprove os seguintes cenários:",
+      "1. Usuário vinculado a A consulta requisições de A.",
+      "2. Usuário vinculado a A não consulta requisições de B.",
+      "3. Usuário sem vínculo não acessa dados de nenhum paciente.",
+      "4. Usuário revogado perde acesso.",
+      "5. Profissional não adquire privilégios administrativos ao manipular o payload.",
+      "6. Leitor consulta dados autorizados, mas não cria requisições nem movimenta estoque.",
+      "7. Administrador limitado não atua fora de seu escopo.",
+      "8. Administrador global acessa somente as operações explicitamente permitidas ao papel.",
+      "9. IDs de requisição, paciente, produto ou movimentação alterados no navegador não permitem acesso horizontal.",
+      "10. As mesmas restrições são aplicadas diretamente pelo PostgreSQL/RLS.",
+      "Execute os testes com identidades autenticadas distintas no Supabase local. Se algum teste não puder ser executado, identifique exatamente o que faltou e não declare isolamento comprovado."
+    ]
+  },
+  {
+    "id": "AUDITORIA-14",
+    "source": "AUDITORIA",
+    "line": 209,
+    "section": "4.3. Matriz de permissões",
+    "criteria": [
+      "Documente e implemente uma matriz explícita para:",
+      "- Administrador global.",
+      "- Administrador limitado.",
+      "- Supervisor.",
+      "- Profissional da equipe de cuidado.",
+      "- Familiar.",
+      "- Leitor.",
+      "Considere permissões distintas para:",
+      "- Consultar pacientes.",
+      "- Gerenciar associações de usuários.",
+      "- Criar e consultar requisições.",
+      "- Consultar histórico.",
+      "- Gerenciar catálogo.",
+      "- Consultar saldos.",
+      "- Registrar movimentações.",
+      "- Contar estoque.",
+      "- Aprovar inventários.",
+      "- Consultar e reprocessar notificações.",
+      "- Consultar auditoria.",
+      "Não use apenas o nome do papel como substituto de todas as permissões. Preserve os vínculos e as permissões por paciente."
+    ]
+  },
+  {
+    "id": "AUDITORIA-15",
+    "source": "AUDITORIA",
+    "line": 238,
+    "section": "5. P1 — Concluir a administração de usuários e pacientes",
+    "criteria": [
+      "O relatório anterior confirmou que boa parte dessa administração ainda não existe na interface. Não basta documentar que o administrador deve usar o painel Supabase.",
+      "Crie uma área administrativa protegida, integrada ao modelo real do banco."
+    ]
+  },
+  {
+    "id": "AUDITORIA-16",
+    "source": "AUDITORIA",
+    "line": 244,
+    "section": "5.1. Gestão de usuários",
+    "criteria": [
+      "Permitir, de acordo com a autorização:",
+      "- Consultar usuários.",
+      "- Criar ou convidar usuários.",
+      "- Informar nome e e-mail.",
+      "- Definir papel.",
+      "- Associar um ou mais pacientes.",
+      "- Configurar permissões específicas por paciente.",
+      "- Ativar, desativar ou revogar acesso.",
+      "- Consultar o histórico administrativo.",
+      "- Atualizar associações e permissões.",
+      "- Visualizar erros de criação ou convite.",
+      "- Reenviar convite ou recuperação de acesso quando aplicável.",
+      "Requisitos de segurança:",
+      "- Não armazenar senhas em texto puro.",
+      "- Não permitir que o usuário escolha ou eleve o próprio papel.",
+      "- Não expor a chave de serviço no cliente.",
+      "- Operações administrativas do Supabase Auth devem ocorrer exclusivamente em ambiente servidor autorizado.",
+      "- Validar novamente a autorização no servidor para cada operação.",
+      "- Registrar alterações de papel, escopo, estado e associação.",
+      "- Impedir que a desativação de um usuário deixe vínculos privilegiados utilizáveis.",
+      "Se houver uma operação administrativa que dependa de `auth.admin`, use uma função server-side protegida, com validação de sessão e autorização explícita. Nunca exponha o cliente privilegiado ao navegador."
+    ]
+  },
+  {
+    "id": "AUDITORIA-17",
+    "source": "AUDITORIA",
+    "line": 272,
+    "section": "5.2. Gestão de pacientes",
+    "criteria": [
+      "Criar uma interface para:",
+      "- Cadastrar paciente.",
+      "- Editar informações administrativas.",
+      "- Ativar e inativar paciente.",
+      "- Associar usuários.",
+      "- Consultar profissionais e familiares vinculados.",
+      "- Visualizar resumo operacional do paciente.",
+      "- Consultar requisições, estoque e alertas do paciente.",
+      "- Consultar eventos administrativos relevantes.",
+      "Não permita exclusão física de um paciente com histórico operacional, movimentações ou registros relacionados. Utilize inativação e preserve os dados históricos.",
+      "Não adicione dados clínicos desnecessários ao cadastro. A finalidade principal deste sistema é a gestão operacional de Home Care."
+    ]
+  },
+  {
+    "id": "AUDITORIA-18",
+    "source": "AUDITORIA",
+    "line": 289,
+    "section": "5.3. Seleção do paciente ativo",
+    "criteria": [
+      "Substitua a dependência rígida de `CARE_RECIPIENT_ID` como único contexto operacional.",
+      "A aplicação deve permitir selecionar um paciente entre aqueles autorizados para o usuário.",
+      "O paciente selecionado deve ser validado no servidor a cada operação. A seleção feita no navegador não é autorização.",
+      "Mantenha uma forma segura de configurar um paciente padrão, se necessária, sem impedir o crescimento para múltiplos pacientes."
+    ]
+  },
+  {
+    "id": "AUDITORIA-19",
+    "source": "AUDITORIA",
+    "line": 301,
+    "section": "6. P1 — Finalizar o catálogo de produtos",
+    "criteria": [
+      "Existe um catálogo com IDs estáveis e resolução de aliases, mas falta administração funcional.",
+      "Crie uma área de gestão de catálogo que permita:",
+      "- Listar e pesquisar produtos.",
+      "- Criar produtos.",
+      "- Editar nome, categoria, unidade e aliases.",
+      "- Ativar e inativar produtos.",
+      "- Ordenar os produtos exibidos.",
+      "- Consultar aliases existentes.",
+      "- Detectar aliases duplicados ou ambíguos.",
+      "- Consultar o histórico de alterações.",
+      "- Exibir inconsistências de cadastro."
+    ]
+  },
+  {
+    "id": "AUDITORIA-20",
+    "source": "AUDITORIA",
+    "line": 317,
+    "section": "Regras de integridade",
+    "criteria": [
+      "1. Não altere IDs históricos de forma indiscriminada.",
+      "2. Preserve referências de requisições e movimentações já registradas.",
+      "3. Não exclua fisicamente produtos com histórico associado.",
+      "4. Produtos inativos não podem ser utilizados em novas requisições nem em novas movimentações que exijam produto ativo.",
+      "5. O histórico deve continuar exibindo os dados canônicos registrados à época da operação.",
+      "6. A normalização deve tratar acentos, maiúsculas, espaços e aliases.",
+      "7. Correspondências ambíguas devem ser apresentadas para resolução, nunca escolhidas silenciosamente.",
+      "8. As regras de unidade e categoria devem ser validadas no servidor e no banco.",
+      "9. Alterações administrativas devem gerar eventos de auditoria.",
+      "Confira o catálogo esperado do projeto e compare-o com os produtos efetivamente existentes no banco e na interface. Não invente produtos nem use dados fictícios como se fossem registros de produção.",
+      "Crie um relatório de divergências entre catálogo esperado, catálogo cadastrado, aliases e produtos inativos."
+    ]
+  },
+  {
+    "id": "AUDITORIA-21",
+    "source": "AUDITORIA",
+    "line": 335,
+    "section": "7. P1 — Finalizar o estoque por custódia",
+    "criteria": [
+      "O sistema precisa ter um catálogo único de produtos e saldos segregados por paciente e local de custódia.",
+      "As duas custódias operacionais são:",
+      "- `FAMILY`: estoque sob responsabilidade da família.",
+      "- `CARE_TEAM`: estoque em posse da equipe de cuidado.",
+      "Não crie catálogos diferentes para família e equipe. O produto é o mesmo; o que muda é a localização/custódia e o saldo correspondente."
+    ]
+  },
+  {
+    "id": "AUDITORIA-22",
+    "source": "AUDITORIA",
+    "line": 346,
+    "section": "7.1. Interface de estoque",
+    "criteria": [
+      "Criar telas para:",
+      "- Consultar estoque da família.",
+      "- Consultar estoque da equipe.",
+      "- Consultar saldo total por produto, sem perder a distinção entre custódias.",
+      "- Registrar entradas.",
+      "- Registrar saídas.",
+      "- Transferir itens entre família e equipe.",
+      "- Registrar ajustes justificados.",
+      "- Consultar histórico de movimentações.",
+      "- Pesquisar por produto e período.",
+      "- Visualizar saldo anterior, quantidade movimentada e saldo resultante.",
+      "- Consultar divergências e itens críticos.",
+      "O estoque operacional da equipe deve ser destacado, pois representa o que os profissionais efetivamente têm disponível para utilizar."
+    ]
+  },
+  {
+    "id": "AUDITORIA-23",
+    "source": "AUDITORIA",
+    "line": 364,
+    "section": "7.2. Permissões de estoque",
+    "criteria": [
+      "Somente administradores autorizados podem gravar ou alterar o estoque oficial.",
+      "Os demais usuários devem ter acesso de leitura conforme seus vínculos e permissões.",
+      "A contagem por profissionais pode ser permitida sem dar a eles poder para alterar diretamente o saldo oficial. O inventário deve ser submetido para revisão e aprovação.",
+      "Toda operação de escrita deve ser autorizada novamente no servidor e no banco."
+    ]
+  },
+  {
+    "id": "AUDITORIA-24",
+    "source": "AUDITORIA",
+    "line": 374,
+    "section": "7.3. Movimentações transacionais",
+    "criteria": [
+      "Audite `record_stock_movement` e `src/app/api/stock/movements/route.ts`.",
+      "Garanta:",
+      "- Quantidade positiva e válida.",
+      "- Origem e destino compatíveis com o tipo de movimentação.",
+      "- Paciente e produto válidos.",
+      "- Justificativa obrigatória quando aplicável.",
+      "- Idempotência.",
+      "- Auditoria.",
+      "- Integridade transacional.",
+      "- Prevenção de concorrência inconsistente.",
+      "- Ausência de edição direta do saldo calculado.",
+      "- Proteção contra transferências que produzam saldos inconsistentes.",
+      "Transferências devem ser atômicas: a saída de uma custódia e a entrada na outra precisam ocorrer juntas ou não ocorrer.",
+      "A correção de uma movimentação histórica deve ser feita por movimento compensatório, não por edição silenciosa do registro original."
+    ]
+  },
+  {
+    "id": "AUDITORIA-25",
+    "source": "AUDITORIA",
+    "line": 395,
+    "section": "7.4. Saldo negativo",
+    "criteria": [
+      "Não mantenha decisões contraditórias entre documentação, regras de negócio e código.",
+      "O comportamento padrão deve impedir saldo negativo. Caso o responsável pelo produto confirme uma exceção administrativa, ela deve ser explícita, restrita, justificada e auditada.",
+      "Não permita saldo negativo silenciosamente nem por erro de concorrência."
+    ]
+  },
+  {
+    "id": "AUDITORIA-26",
+    "source": "AUDITORIA",
+    "line": 405,
+    "section": "8. P1 — Inventário semanal com aprovação",
+    "criteria": [
+      "As tabelas de inventário não bastam. Implemente o fluxo operacional completo.",
+      "Etapas mínimas:",
+      "1. Criar sessão de inventário para um paciente e uma custódia.",
+      "2. Registrar responsável e horário.",
+      "3. Capturar ou calcular o saldo esperado no início da contagem.",
+      "4. Registrar quantidade contada por produto.",
+      "5. Calcular divergência.",
+      "6. Solicitar justificativa quando houver divergência.",
+      "7. Submeter para revisão.",
+      "8. Aprovar ou rejeitar.",
+      "9. Aplicar ajustes somente após aprovação autorizada.",
+      "10. Registrar movimentos compensatórios para as diferenças aprovadas.",
+      "11. Preservar o inventário original e sua trilha de auditoria.",
+      "A aplicação dos ajustes deve ser idempotente. Aprovar duas vezes não pode gerar duas movimentações.",
+      "O saldo esperado deve ter uma referência temporal consistente. Movimentações ocorridas durante a contagem não podem produzir correções silenciosamente incorretas.",
+      "Inclua estados de carregamento, erro, vazio, sucesso e conflito de concorrência.",
+      "Crie testes para inventário sem divergência, divergência aprovada, divergência rejeitada, tentativa de aprovação não autorizada, dupla aprovação e falha parcial."
+    ]
+  },
+  {
+    "id": "AUDITORIA-27",
+    "source": "AUDITORIA",
+    "line": 433,
+    "section": "9. P1 — Alertas de estoque e notificações",
+    "criteria": [
+      "A estrutura `requisition_notifications` representa apenas uma parte do mecanismo. Não trate a existência dessa tabela como implementação de envio."
+    ]
+  },
+  {
+    "id": "AUDITORIA-28",
+    "source": "AUDITORIA",
+    "line": 437,
+    "section": "9.1. Regras de alerta por custódia",
+    "criteria": [
+      "O modelo deve permitir regras configuráveis de estoque baixo e crítico.",
+      "A política inicial precisa distinguir:",
+      "- **Estoque da família:** alertas direcionados à família ou aos responsáveis administrativos autorizados.",
+      "- **Estoque da equipe:** alertas destinados à equipe e à supervisão, podendo incluir a família conforme a regra configurada.",
+      "- **Alertas críticos:** prioridade superior e deduplicação apropriada.",
+      "- **Reabastecimento:** atualização do alerta quando houver entrada ou transferência suficiente para resolver a condição.",
+      "O saldo da família não deve mascarar a falta de itens na custódia da equipe.",
+      "Não codifique os limites como números espalhados pelo frontend. Crie uma configuração clara por produto, paciente e custódia, com valores padrão documentados."
+    ]
+  },
+  {
+    "id": "AUDITORIA-29",
+    "source": "AUDITORIA",
+    "line": 452,
+    "section": "9.2. Persistência e processamento assíncrono",
+    "criteria": [
+      "Uma requisição precisa ser salva independentemente do resultado das notificações.",
+      "Implemente ou complete:",
+      "- Registro individual por destinatário e canal.",
+      "- Estado `pending`, `processing`, `sent`, `failed` ou equivalente consistente.",
+      "- Número de tentativas.",
+      "- Referência do provedor.",
+      "- Erro técnico resumido e seguro.",
+      "- Horários de tentativa e confirmação.",
+      "- Idempotência da mensagem.",
+      "- Estratégia de retry com limite e backoff.",
+      "- Prevenção de processamento duplicado.",
+      "- Recuperação de tarefas interrompidas.",
+      "- Consulta do estado atual.",
+      "- Reprocessamento administrativo autorizado.",
+      "- Auditoria de alterações de estado.",
+      "Se for adotada uma tabela outbox, worker ou mecanismo de fila, documente a arquitetura e garanta que a criação dos registros de notificação esteja coordenada com a persistência da requisição."
+    ]
+  },
+  {
+    "id": "AUDITORIA-30",
+    "source": "AUDITORIA",
+    "line": 474,
+    "section": "9.3. WhatsApp",
+    "criteria": [
+      "Não afirme que existe integração real com WhatsApp se ainda não houver provedor conectado.",
+      "Quando a configuração externa não estiver disponível:",
+      "- Implemente a abstração do provedor.",
+      "- Crie mocks determinísticos.",
+      "- Teste sucesso, falha, timeout, retry e duplicidade.",
+      "- Mantenha a interface honesta sobre o estado da entrega.",
+      "- Documente as credenciais e configurações exigidas.",
+      "A integração real deve usar a API oficial apropriada, validar webhooks e tratar confirmação de entrega. Não envie mensagens reais durante testes automatizados."
+    ]
+  },
+  {
+    "id": "AUDITORIA-31",
+    "source": "AUDITORIA",
+    "line": 490,
+    "section": "10. P1 — Tela de sucesso da requisição e estados de notificação",
+    "criteria": [
+      "A tela de sucesso deve separar claramente dois fatos:",
+      "1. A requisição foi persistida no banco.",
+      "2. As notificações estão sendo processadas e podem ter resultados diferentes.",
+      "Nunca faça o usuário interpretar uma falha de WhatsApp como se a requisição não tivesse sido salva.",
+      "Após salvar com sucesso, mostre:",
+      "- Protocolo oficial.",
+      "- Paciente.",
+      "- Solicitante.",
+      "- Data e hora.",
+      "- Resumo dos itens e estoque informado.",
+      "- Estado de persistência.",
+      "- Estado individual das notificações.",
+      "- Grupo destinatário: família, supervisão, equipe ou outro.",
+      "- Destinatário efetivo, quando for seguro exibi-lo.",
+      "- Canal.",
+      "- Número de tentativas.",
+      "- Última atualização.",
+      "- Falha ou pendência, quando houver.",
+      "- Ação para consultar novamente o estado.",
+      "Estados de interface esperados:",
+      "- Salvando requisição.",
+      "- Requisição salva; notificações pendentes.",
+      "- Notificações em processamento.",
+      "- Todas as notificações concluídas.",
+      "- Conclusão parcial.",
+      "- Falha de notificação com requisição preservada.",
+      "- Erro ao salvar a requisição.",
+      "- Estado desconhecido por falha temporária de conexão.",
+      "O frontend deve consultar o estado persistido no servidor. Não simule a conclusão com um temporizador.",
+      "Se o usuário fechar a tela, a requisição e o processamento devem continuar recuperáveis ao retornar ao histórico.",
+      "O botão de reenvio da requisição não deve criar outra requisição. O reprocessamento de notificações deve ser uma operação separada e autorizada."
+    ]
+  },
+  {
+    "id": "AUDITORIA-32",
+    "source": "AUDITORIA",
+    "line": 535,
+    "section": "11. P1 — Histórico de requisições",
+    "criteria": [
+      "Audite as telas e rotas existentes:",
+      "- `src/app/historico/page.tsx`",
+      "- `src/app/historico/[id]/page.tsx`",
+      "- `src/components/requisitions/requisition-history.tsx`",
+      "- `src/app/api/requisitions/route.ts`",
+      "- `src/app/api/requisitions/[id]/route.ts`",
+      "Complete o histórico com:",
+      "- Seleção de paciente autorizado.",
+      "- Busca por protocolo.",
+      "- Filtro por status.",
+      "- Filtro por período com limites inclusivos e exclusivos bem definidos.",
+      "- Paginação server-side.",
+      "- Ordenação consistente.",
+      "- Estados de carregamento, erro e vazio.",
+      "- Detalhes persistidos do registro.",
+      "- Solicitante e data.",
+      "- Histórico de transições de status.",
+      "- Situação individual das notificações.",
+      "- Reimpressão do recibo.",
+      "- Acesso autorizado à trilha de auditoria.",
+      "- Tratamento de registro inexistente ou fora do escopo.",
+      "Não dependa de `created_by` para restringir o histórico ao usuário que criou a requisição. A regra principal é a autorização de acesso ao paciente.",
+      "A consulta precisa continuar segura mesmo quando o usuário alterar manualmente o ID da requisição na URL.",
+      "A impressão pelo navegador pode ser mantida como recurso, mas deixe claro que se trata de impressão/Salvar como PDF, não de um PDF oficial gerado pelo servidor."
+    ]
+  },
+  {
+    "id": "AUDITORIA-33",
+    "source": "AUDITORIA",
+    "line": 570,
+    "section": "12. P1 — Estados de carregamento, erros e experiência de uso",
+    "criteria": [
+      "Audite todas as páginas e operações principais.",
+      "A aplicação não pode parecer congelada nem deixar o usuário sem saber se uma operação foi concluída.",
+      "Implemente:",
+      "- Indicadores de carregamento.",
+      "- Desabilitação de ações durante operações incompatíveis.",
+      "- Mensagens de erro claras.",
+      "- Possibilidade de tentar novamente quando seguro.",
+      "- Estados vazios com orientação útil.",
+      "- Feedback de sucesso.",
+      "- Tratamento de sessão expirada.",
+      "- Tratamento de ausência de permissão.",
+      "- Tratamento de indisponibilidade do banco.",
+      "- Prevenção de cliques duplicados.",
+      "- Recuperação de estado após falha de rede.",
+      "- Cancelamento ou descarte seguro de requisições obsoletas quando aplicável.",
+      "Padronize os códigos de erro da API, preservando mensagens amigáveis ao usuário.",
+      "Considere códigos como:",
+      "- `AUTH_REQUIRED`",
+      "- `SESSION_EXPIRED`",
+      "- `ACCESS_DENIED`",
+      "- `PROFILE_INACTIVE`",
+      "- `PATIENT_NOT_FOUND`",
+      "- `PRODUCT_NOT_FOUND`",
+      "- `PRODUCT_ALIAS_AMBIGUOUS`",
+      "- `INVALID_INPUT`",
+      "- `INVALID_QUANTITY`",
+      "- `IDEMPOTENCY_CONFLICT`",
+      "- `REQUEST_SAVE_FAILED`",
+      "- `STOCK_INSUFFICIENT`",
+      "- `NOTIFICATION_FAILED`",
+      "A lista final deve corresponder aos erros realmente implementados. Não crie códigos decorativos sem tratamento correspondente.",
+      "Não exponha stack traces, detalhes internos do PostgreSQL, tokens ou segredos nas respostas."
+    ]
+  },
+  {
+    "id": "AUDITORIA-34",
+    "source": "AUDITORIA",
+    "line": 615,
+    "section": "13. P1 — Auditoria administrativa",
+    "criteria": [
+      "Implemente uma trilha de auditoria útil e protegida para as operações sensíveis.",
+      "Registrar, conforme a necessidade:",
+      "- Criação e inativação de pacientes.",
+      "- Criação e revogação de usuários.",
+      "- Alteração de papéis e permissões.",
+      "- Associação e remoção de vínculos.",
+      "- Alteração de produtos e aliases.",
+      "- Movimentações de estoque.",
+      "- Aprovação e rejeição de inventários.",
+      "- Importações históricas.",
+      "- Alterações de configuração de alertas.",
+      "- Reprocessamento de notificações.",
+      "- Mudanças de status de requisições.",
+      "Cada evento deve conter ator, ação, entidade, identificador, data e metadados mínimos necessários.",
+      "Não registre senhas, tokens, dados clínicos desnecessários ou payloads completos com informações pessoais.",
+      "Os registros de auditoria não devem ser editáveis por usuários comuns. As telas de auditoria devem respeitar escopo de paciente e permissões administrativas."
+    ]
+  },
+  {
+    "id": "AUDITORIA-35",
+    "source": "AUDITORIA",
+    "line": 641,
+    "section": "14. P2 — Recuperação de acesso e autenticação",
+    "criteria": [
+      "Revise o fluxo existente de login, logout, callback OAuth e recuperação de senha.",
+      "Garanta:",
+      "- Mensagens seguras que não revelem se uma conta existe.",
+      "- Validação de redirecionamentos, rejeitando destinos externos não autorizados.",
+      "- Tratamento de erros da troca de código OAuth.",
+      "- Tratamento de sessão expirada.",
+      "- Logout com feedback explícito em caso de falha.",
+      "- Revogação de perfis inativos.",
+      "- Proteção de rotas e APIs.",
+      "- Provisionamento administrativo controlado de perfis para novos usuários.",
+      "- Nenhum privilégio derivado de campos arbitrários enviados pelo navegador.",
+      "Documente as configurações externas necessárias para Google OAuth e Supabase Auth.",
+      "Não considere a autenticação completa apenas porque a tela de login funciona."
+    ]
+  },
+  {
+    "id": "AUDITORIA-36",
+    "source": "AUDITORIA",
+    "line": 663,
+    "section": "15. P2 — Contrato de dados e migrações",
+    "criteria": [
+      "Audite todas as migrações em ordem cronológica.",
+      "Confira especialmente:",
+      "- Constraints históricas.",
+      "- Unicidade do protocolo.",
+      "- Chaves estrangeiras.",
+      "- Índices de consulta.",
+      "- Sequências.",
+      "- Idempotência.",
+      "- Grants.",
+      "- RLS.",
+      "- Funções `SECURITY DEFINER`.",
+      "- `search_path` das funções privilegiadas.",
+      "- Permissões de execução.",
+      "- Dependências entre funções e tabelas.",
+      "- Compatibilidade de tipos e enums.",
+      "- Views e suas permissões.",
+      "- Dados legados.",
+      "- Comportamento com registros inativos.",
+      "Toda mudança de schema deve ser feita por migração incremental nova.",
+      "Antes de concluir uma migração, teste:",
+      "1. Aplicação em banco limpo.",
+      "2. Aplicação sequencial de todas as migrações.",
+      "3. Compatibilidade com os dados legados relevantes.",
+      "4. Integridade das constraints após a mudança.",
+      "5. Consultas e mutações sob diferentes usuários.",
+      "6. Reexecução ou comportamento idempotente, quando aplicável.",
+      "Não altere migrações anteriores apenas para fazer o reset passar.",
+      "Atualize a documentação somente depois de confirmar o comportamento real. Não registre como existente uma migração que não esteja presente no repositório."
+    ]
+  },
+  {
+    "id": "AUDITORIA-37",
+    "source": "AUDITORIA",
+    "line": 703,
+    "section": "16. P2 — Testes automatizados e CI",
+    "criteria": [
+      "O relatório anterior registra 10 testes Vitest e validações locais, mas isso não comprova todos os fluxos críticos.",
+      "Expanda a suíte de testes."
+    ]
+  },
+  {
+    "id": "AUDITORIA-38",
+    "source": "AUDITORIA",
+    "line": 709,
+    "section": "Testes unitários",
+    "criteria": [
+      "Cobrir:",
+      "- Validação de requisição.",
+      "- Ausência de quantidade solicitada.",
+      "- Catálogo e aliases.",
+      "- Correspondência ambígua.",
+      "- Formatação de protocolo.",
+      "- Tratamento de erros.",
+      "- Idempotência.",
+      "- Estados de notificação.",
+      "- Cálculo de saldo.",
+      "- Cálculo de divergência de inventário.",
+      "- Regras de alertas."
+    ]
+  },
+  {
+    "id": "AUDITORIA-39",
+    "source": "AUDITORIA",
+    "line": 725,
+    "section": "Testes de integração",
+    "criteria": [
+      "Cobrir:",
+      "- Persistência de requisição.",
+      "- Geração de protocolo.",
+      "- Reenvio idempotente.",
+      "- Conflito de chave.",
+      "- Concorrência.",
+      "- Rollback.",
+      "- Movimentações transacionais.",
+      "- Transferências entre custódias.",
+      "- Aprovação de inventário.",
+      "- Reprocessamento de notificações.",
+      "- Revogação de usuário.",
+      "- Associação a paciente.",
+      "- RLS com usuários diferentes."
+    ]
+  },
+  {
+    "id": "AUDITORIA-40",
+    "source": "AUDITORIA",
+    "line": 743,
+    "section": "Testes de interface e E2E",
+    "criteria": [
+      "Criar fluxos com dados fictícios para:",
+      "- Login.",
+      "- Recuperação de senha, quando testável.",
+      "- Submissão de requisição.",
+      "- Visualização do recibo.",
+      "- Consulta ao histórico.",
+      "- Detalhe e impressão.",
+      "- Seleção de paciente.",
+      "- Administração de usuários.",
+      "- Administração de produtos.",
+      "- Consulta de estoque.",
+      "- Movimentação autorizada.",
+      "- Contagem e aprovação de inventário.",
+      "- Exibição de notificações.",
+      "- Tratamento de falha de rede.",
+      "Não dependa de uma sessão administrativa permanente ou de credenciais reais no CI."
+    ]
+  },
+  {
+    "id": "AUDITORIA-41",
+    "source": "AUDITORIA",
+    "line": 764,
+    "section": "CI",
+    "criteria": [
+      "Revise `.github/workflows/ci.yml`.",
+      "Mantenha os passos de instalação, lint, typecheck, testes e build. Acrescente os testes de integração e verificações de migrações que forem viáveis e determinísticos.",
+      "O CI não pode enviar mensagens reais, alterar bancos remotos ou utilizar segredos de produção.",
+      "Inclua uma verificação automatizada que impeça a reintrodução do conceito funcional `requestedQuantity` ou `requested_quantity` em código ativo e em novas migrações, sem modificar migrações históricas apenas para apagar referências antigas.",
+      "A regra deve diferenciar referências legadas preservadas de novas referências funcionais."
+    ]
+  },
+  {
+    "id": "AUDITORIA-42",
+    "source": "AUDITORIA",
+    "line": 778,
+    "section": "17. P2 — Documentação e configuração",
+    "criteria": [
+      "Ao final, atualize:",
+      "- `README.md`",
+      "- `docs/AUDIT.md`",
+      "- `docs/PROJECT_STATUS.md`",
+      "- `docs/DATABASE.md`",
+      "- `docs/SECURITY.md`",
+      "- `docs/DEPLOYMENT.md`",
+      "- `docs/ROADMAP.md`",
+      "- `docs/WHATSAPP_AI.md`",
+      "Documente:",
+      "- Arquitetura atual.",
+      "- Papéis e matriz de permissões.",
+      "- Fluxo de autenticação.",
+      "- Modelo multipaciente.",
+      "- Estrutura do estoque por custódia.",
+      "- Regras de movimentação.",
+      "- Inventário e aprovação.",
+      "- Geração e importação de protocolos.",
+      "- Idempotência.",
+      "- Notificações e retries.",
+      "- Variáveis de ambiente.",
+      "- Configuração local.",
+      "- Execução dos testes.",
+      "- Aplicação de migrações.",
+      "- Limitações conhecidas.",
+      "- Procedimento seguro de deploy.",
+      "Crie ou atualize `.env.example` com nomes e descrições das variáveis necessárias, sem valores secretos.",
+      "Não documente valores fictícios como credenciais válidas."
+    ]
+  },
+  {
+    "id": "AUDITORIA-43",
+    "source": "AUDITORIA",
+    "line": 816,
+    "section": "18. Critérios de aceite",
+    "criteria": [
+      "A tarefa não está concluída enquanto os critérios críticos abaixo não forem comprovados."
+    ]
+  },
+  {
+    "id": "AUDITORIA-44",
+    "source": "AUDITORIA",
+    "line": 820,
+    "section": "A. Requisição",
+    "criteria": [
+      "- [ ] Não existe quantidade solicitada no contrato funcional da requisição.",
+      "- [ ] Quantidades de estoque continuam disponíveis para movimentações e inventários.",
+      "- [ ] O protocolo sequencial inicia em 12.",
+      "- [ ] Protocolos históricos continuam válidos.",
+      "- [ ] A constraint aceita os formatos necessários.",
+      "- [ ] Não há protocolo duplicado sob concorrência.",
+      "- [ ] Reenvio idempotente não cria duplicidade.",
+      "- [ ] Payload diferente com a mesma chave é rejeitado.",
+      "- [ ] O recibo é reconstruído a partir dos dados persistidos.",
+      "- [ ] Falha de notificação não invalida a requisição salva."
+    ]
+  },
+  {
+    "id": "AUDITORIA-45",
+    "source": "AUDITORIA",
+    "line": 833,
+    "section": "B. Segurança",
+    "criteria": [
+      "- [ ] Cada operação verifica o escopo de paciente.",
+      "- [ ] RLS foi testada com usuários distintos.",
+      "- [ ] O acesso horizontal entre pacientes foi testado negativamente.",
+      "- [ ] Usuários revogados perdem acesso.",
+      "- [ ] Papéis não podem ser manipulados pelo navegador.",
+      "- [ ] Operações administrativas são verificadas no servidor.",
+      "- [ ] A chave de serviço nunca chega ao cliente.",
+      "- [ ] Movimentações e alterações sensíveis são auditadas."
+    ]
+  },
+  {
+    "id": "AUDITORIA-46",
+    "source": "AUDITORIA",
+    "line": 844,
+    "section": "C. Administração",
+    "criteria": [
+      "- [ ] Gestão de usuários funcional.",
+      "- [ ] Associação de usuários a pacientes funcional.",
+      "- [ ] Gestão de pacientes funcional.",
+      "- [ ] Gestão de catálogo funcional.",
+      "- [ ] Produtos históricos preservados.",
+      "- [ ] Permissões administrativas verificadas."
+    ]
+  },
+  {
+    "id": "AUDITORIA-47",
+    "source": "AUDITORIA",
+    "line": 853,
+    "section": "D. Estoque e inventário",
+    "criteria": [
+      "- [ ] Saldo da família separado do saldo da equipe.",
+      "- [ ] Transferências atômicas.",
+      "- [ ] Ajustes justificados e auditados.",
+      "- [ ] Estoque oficial protegido contra escrita não autorizada.",
+      "- [ ] Inventário com contagem, divergência, revisão e aprovação.",
+      "- [ ] Aprovação idempotente.",
+      "- [ ] Alertas distinguem custódias."
+    ]
+  },
+  {
+    "id": "AUDITORIA-48",
+    "source": "AUDITORIA",
+    "line": 863,
+    "section": "E. Notificações",
+    "criteria": [
+      "- [ ] Estado de cada destinatário é persistido.",
+      "- [ ] Falhas e retries são rastreáveis.",
+      "- [ ] Duplicidades são prevenidas.",
+      "- [ ] Tela de sucesso distingue persistência e envio.",
+      "- [ ] A ausência de provedor não é apresentada como envio concluído.",
+      "- [ ] Testes não disparam mensagens reais."
+    ]
+  },
+  {
+    "id": "AUDITORIA-49",
+    "source": "AUDITORIA",
+    "line": 872,
+    "section": "F. Qualidade",
+    "criteria": [
+      "- [ ] `npm run lint`",
+      "- [ ] `npm run typecheck`",
+      "- [ ] `npm test`",
+      "- [ ] `npm run build`",
+      "- [ ] Testes E2E relevantes.",
+      "- [ ] Testes RLS multiusuário.",
+      "- [ ] `supabase db reset --local`, quando disponível e seguro.",
+      "- [ ] `supabase db lint --local`, quando disponível.",
+      "- [ ] `git diff --check`",
+      "- [ ] Documentação sincronizada com o código.",
+      "Se algum critério não puder ser concluído, registre-o como pendente, com causa, risco e próximo passo. Não marque como aprovado por inferência."
+    ]
+  },
+  {
+    "id": "AUDITORIA-50",
+    "source": "AUDITORIA",
+    "line": 889,
+    "section": "19. Ordem de execução",
+    "criteria": [
+      "Execute na seguinte ordem:",
+      "**Fase 1 — Auditoria e integridade**",
+      "1. Confirmar HEAD e arquivos reais.",
+      "2. Corrigir a divergência da migração do protocolo.",
+      "3. Validar constraints, sequência, idempotência e concorrência.",
+      "4. Corrigir riscos de autorização críticos.",
+      "5. Rodar testes de banco e submissão.",
+      "**Fase 2 — Segurança multipaciente**",
+      "6. Completar matriz de permissões.",
+      "7. Revisar RLS e funções SQL.",
+      "8. Criar testes com pacientes A e B.",
+      "9. Corrigir todas as falhas de isolamento.",
+      "**Fase 3 — Administração**",
+      "10. Implementar gestão de pacientes.",
+      "11. Implementar gestão de usuários e associações.",
+      "12. Implementar gestão de catálogo e aliases.",
+      "13. Implementar auditoria administrativa.",
+      "**Fase 4 — Operação**",
+      "14. Implementar interface de estoque por custódia.",
+      "15. Implementar movimentações e transferências.",
+      "16. Implementar inventário e aprovação.",
+      "17. Implementar alertas configuráveis.",
+      "**Fase 5 — Requisições e notificações**",
+      "18. Finalizar histórico e filtros.",
+      "19. Finalizar tela de sucesso.",
+      "20. Implementar fila ou outbox e processamento assíncrono.",
+      "21. Integrar o provedor real somente quando houver configuração autorizada.",
+      "**Fase 6 — Validação final**",
+      "22. Expandir testes unitários, integração e E2E.",
+      "23. Revisar CI.",
+      "24. Atualizar documentação.",
+      "25. Executar as validações disponíveis.",
+      "26. Emitir relatório final de aceite e pendências.",
+      "Se uma fase encontrar um bloqueio de arquitetura, corrija-o antes de empilhar novas funcionalidades sobre uma base inconsistente.",
+      "Não pare após produzir um plano ou apenas listar arquivos. Implemente as etapas possíveis, valide cada uma e continue até concluir o escopo autorizado."
+    ]
+  },
+  {
+    "id": "AUDITORIA-51",
+    "source": "AUDITORIA",
+    "line": 937,
+    "section": "20. Relatório final obrigatório",
+    "criteria": [
+      "Ao terminar, apresente um relatório conciso, mas tecnicamente verificável, contendo:",
+      "1. **Estado inicial:** branch, HEAD e divergências encontradas.",
+      "2. **Falhas críticas identificadas:** causa, consequência e correção aplicada.",
+      "3. **Implementações concluídas:** funcionalidades realmente operacionais.",
+      "4. **Arquivos alterados:** agrupados por módulo.",
+      "5. **Migrações criadas:** nome, finalidade, dependências e validações.",
+      "6. **Segurança:** matriz de permissões e resultados dos testes RLS.",
+      "7. **Testes:** comandos executados e resultado real de cada um.",
+      "8. **Limitações:** funcionalidades que ainda dependem de configuração externa ou trabalho adicional.",
+      "9. **Riscos residuais:** gravidade e mitigação.",
+      "10. **Próximos passos:** ações necessárias para homologação e produção.",
+      "Diferencie explicitamente:",
+      "- Implementado e testado.",
+      "- Implementado, mas não testado de ponta a ponta.",
+      "- Estruturado, mas ainda sem interface ou processamento.",
+      "- Dependente de configuração externa.",
+      "- Não implementado.",
+      "Não afirme que o sistema está pronto para produção apenas porque lint, typecheck, testes unitários e build passaram.",
+      "**Autorização desta execução:** auditar e implementar no ambiente de trabalho autorizado, preservando o estado existente. Não fazer commit, push, merge, PR, migração remota ou deploy sem autorização expressa.",
+      "Comece pela auditoria do HEAD atual e pela incompatibilidade do protocolo. Corrija primeiro o que pode impedir a persistência de uma requisição válida. Em seguida, avance pelas fases, preservando o trabalho já publicado e validando cada mudança antes de continuar."
+    ]
+  }
+]

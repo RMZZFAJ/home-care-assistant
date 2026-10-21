@@ -1,21 +1,18 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { api, ApiError, authenticate, databaseError, patientContext, rpc, uuid } from "@/lib/server/api";
+import { loadReceipt } from "@/lib/server/receipts";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) return NextResponse.json({ error: "Supabase não está configurado." }, { status: 503 });
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) return NextResponse.json({ error: "Sua sessão expirou. Entre novamente." }, { status: 401 });
-  const { id } = await context.params;
-  const { data, error } = await supabase
-    .from("requisitions")
-    .select("id, protocol, status, created_at, updated_at, profiles!requisitions_created_by_fkey(full_name), care_recipients(display_name), requisition_items(product_id, custom_name, current_stock, urgent, products(name, category, unit)), requisition_observations(body, created_at), requisition_status_history(from_status, to_status, changed_by, changed_at, reason), requisition_notifications(recipient_group, recipient_label, channel, state, attempts, attempted_at, last_error)")
-    .eq("id", id)
-    .maybeSingle();
-  if (error) {
-    console.error("Failed to load requisition detail.", error);
-    return NextResponse.json({ error: "Não foi possível carregar a requisição." }, { status: 503 });
-  }
-  if (!data) return NextResponse.json({ error: "Requisição não encontrada." }, { status: 404 });
-  return NextResponse.json({ data });
+  return api("requisitions.detail", async () => {
+    const auth = await authenticate();
+    const { id } = await context.params;
+    if (!uuid.safeParse(id).success) throw new ApiError("VALIDATION_ERROR", "Identificador inválido.");
+    const { data, error } = await auth.client.from("requisitions").select("id,protocol,care_recipient_id,status,created_at,updated_at,is_historical,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body,created_at),requisition_status_history(id,from_status,to_status,changed_by,changed_at,reason),requisition_notifications(id,recipient_group,recipient_label,channel,state,attempts,attempted_at)").eq("id", id).maybeSingle();
+    if (error) databaseError(error);
+    if (!data) throw new ApiError("NOT_FOUND", "Requisição não encontrada.", 404);
+    await patientContext(auth, data.care_recipient_id);
+    const receipt = await loadReceipt(auth.client, id);
+    const notifications = await rpc(auth.client,"requisition_delivery_status",{p_requisition_ids:[id]});
+    return NextResponse.json({ data: {...data,requisition_notifications:notifications ?? []}, receipt });
+  });
 }

@@ -1,0 +1,99 @@
+# Testes e reprodução
+
+## Qualidade sem banco remoto
+
+Use a versão de Node de .nvmrc e npm de packageManager. npm ci deve funcionar
+com o lockfile, sem force ou legacy-peer-deps. O CI testa Windows e Linux.
+
+```sh
+npm run check:contracts
+npm run lint
+npm run lint:markdown
+npm run typecheck
+npm test
+npm run build
+```
+
+O guard verifica migrations históricas e o contrato removido no código ativo.
+Testes unitários cobrem validação, redirects, limites, erros, snapshots e
+worker/provedor com transporte falso. Não utilizam credenciais reais.
+
+## Banco local de desenvolvimento
+
+Requisitos: Docker e Supabase CLI 2.121.0. O harness usa o projeto
+home-care-assistant neste repositório: API 54321, banco 54322 e Mailpit 54324.
+Esse é o mesmo banco utilizado no desenvolvimento. Não cria outro projeto.
+O preparo verifica os destinos locais antes de aplicar migrations.
+
+```sh
+npm run test:db:prepare
+```
+
+test:db:prepare inicia o ambiente e aplica a cadeia incremental local.
+test:migrations **recria os dados desse banco local**: primeiro com a cadeia
+completa e depois na versão 019 com fixtures legadas antes do upgrade.
+Guarde backup antes de autorizar a substituição de dados a preservar.
+Os helpers recusam hosts remotos e selecionam explicitamente o destino local.
+O vínculo administrativo do CLI com um projeto remoto não muda o destino
+da suíte. Nunca executar reset, fixtures ou E2E no remoto.
+
+Para consentir com o replay, informe explicitamente a operação e um backup
+local já gerado, armazenado fora do repositório:
+
+```sh
+npm run db:backup:local
+npm run test:migrations -- --replay-local --backup CAMINHO_DO_BACKUP
+npm run test:integration
+```
+
+O primeiro comando gera um arquivo pg_dump em formato custom e seu manifesto
+em LOCALAPPDATA/home-care-assistant/backups no Windows, ou no diretório local
+de dados do usuário em outros sistemas. Use o caminho impresso como
+CAMINHO_DO_BACKUP. A verificação pg_restore --list comprova a leitura do
+arquivo; não equivale a um ensaio completo de restauração.
+
+`test:db:clean` usa os mesmos argumentos de proteção. O backup deve ser não
+vazio e possuir um arquivo adjacente `<backup>.json` com projectId, container,
+sha256 e createdAt. O harness verifica projeto home-care-assistant, container
+supabase_db_home-care-assistant, hash real e data válida antes de recriar dados.
+Não renomeie um arquivo qualquer como backup para contornar essas verificações.
+
+São criadas contas Auth reais fictícias: administradores globais e A/B,
+supervisor, profissional, familiar, leitor, revogado, compartilhado e sem vínculo.
+SQL testa políticas e transações. HTTP/RPC testa caminhos diretos e concorrência,
+incluindo a proteção simultânea do último administrador global.
+
+Ao mudar configurações de Auth, use `npm run test:db:prepare -- --restart`.
+O comando reinicia somente o projeto local verificado e mantém seus dados.
+Confirmação de e-mail e Mailpit permitem testar jornadas sem entrega externa.
+As configurações e limites de Auth locais não são aplicados ao remoto pelo
+comando de migrations; a configuração remota deve ser verificada separadamente.
+
+## Navegador
+
+```sh
+npx playwright install chromium
+npm run e2e
+```
+
+O runner injeta credenciais exclusivamente da stack local verificada, desabilita
+envio externo e gera build separado em .next-e2e. Inicia servidor em 3100,
+sem reaproveitar processo desconhecido. Os projetos desktop e celular usam
+dados fictícios. Relatórios e traces não são versionados.
+Os IDs das fixtures ficam em supabase/.temp/hca-fixtures.json, ignorado pelo Git.
+
+E2E e análise axe verificam jornadas completas e acessibilidade. Falha de rede
+após persistência deve recuperar o mesmo registro. Resultado de provedor real,
+OAuth externo e novo run publicado do CI dependem de homologação separada.
+
+Antes da suíte completa, autorize o replay local e execute test:migrations e
+test:integration. A importação E2E usa protocolos físicos 9 e 10 em dados
+fictícios; o replay prepara novamente essa fixture para uma nova execução.
+Mailpit valida cadastro, confirmação e recuperação sem entrega externa.
+
+## Linux local
+
+scripts/verify-linux.sh roda dentro de container Node 24.22.0 com o repositório
+montado somente para leitura em /workspace. Copia código para área temporária,
+exclui .env, Git e caches e executa instalação limpa, lint, tipos, testes e build.
+Não utiliza banco nem credenciais remotas.

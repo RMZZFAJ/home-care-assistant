@@ -1,0 +1,104 @@
+{
+  "generatedAt": "2026-10-21T22:20:59.930Z",
+  "method": "Canonical object keys; ordered SQL inventories; no row data.",
+  "components": {
+    "tables": {
+      "localCount": 21,
+      "remoteCount": 21,
+      "equal": true,
+      "differences": []
+    },
+    "policies": {
+      "localCount": 22,
+      "remoteCount": 22,
+      "equal": true,
+      "differences": []
+    },
+    "functions": {
+      "localCount": 59,
+      "remoteCount": 59,
+      "equal": true,
+      "differences": []
+    },
+    "constraints": {
+      "localCount": 119,
+      "remoteCount": 119,
+      "equal": true,
+      "differences": []
+    },
+    "indexes": {
+      "localCount": 48,
+      "remoteCount": 48,
+      "equal": true,
+      "differences": []
+    },
+    "client_grants": {
+      "localCount": 19,
+      "remoteCount": 19,
+      "equal": true,
+      "differences": []
+    },
+    "defaults": {
+      "localCount": 3,
+      "remoteCount": 3,
+      "equal": false,
+      "differences": [
+        {
+          "local": {
+            "acl": "{postgres=rwU/postgres,service_role=rwU/postgres}",
+            "type": "S",
+            "schema": "public",
+            "creator": "postgres"
+          },
+          "remote": {
+            "acl": "{postgres=rwU/postgres}",
+            "creator": "postgres",
+            "schema": "public",
+            "type": "S"
+          }
+        },
+        {
+          "local": {
+            "acl": "{postgres=X/postgres,service_role=X/postgres}",
+            "type": "f",
+            "schema": "public",
+            "creator": "postgres"
+          },
+          "remote": {
+            "acl": "{postgres=X/postgres}",
+            "creator": "postgres",
+            "schema": "public",
+            "type": "f"
+          }
+        },
+        {
+          "local": {
+            "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+            "type": "r",
+            "schema": "public",
+            "creator": "postgres"
+          },
+          "remote": {
+            "acl": "{postgres=arwdDxtm/postgres,service_role=Dxtm/postgres}",
+            "creator": "postgres",
+            "schema": "public",
+            "type": "r"
+          }
+        }
+      ]
+    }
+  },
+  "security": {
+    "anonymous_select": 0,
+    "balance_view_options": [
+      "security_invoker=true"
+    ],
+    "client_dml": 0,
+    "cross_parent_items": 0,
+    "global_admin_count_consistent": true,
+    "temporary_hash_bridge": 0,
+    "unmatched_items": 0,
+    "unsafe_definer_search_path": 0,
+    "unvalidated": 0
+  }
+}

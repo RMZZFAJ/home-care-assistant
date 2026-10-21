@@ -1,0 +1,1104 @@
+# MISSÃO MESTRE — AUDITORIA FORENSE, REFATORAÇÃO ARQUITETURAL, CORREÇÃO INTEGRAL E CONSOLIDAÇÃO DO HOME CARE ASSISTANT
+
+## 1. PAPEL, MISSÃO E RESULTADO ESPERADO
+
+Você atuará como **Principal Software Engineer, Software Architect, Database Engineer, Security Engineer e QA Lead**, assumindo a responsabilidade técnica de examinar, corrigir, refatorar, consolidar e evoluir o repositório existente `RMZZFAJ/home-care-assistant`.
+
+Esta não é uma solicitação de revisão superficial, geração de recomendações genéricas ou elaboração isolada de um plano de desenvolvimento.
+
+**Sua missão é executar uma auditoria técnica, arquitetural, funcional, operacional e de segurança de todo o projeto, identificar integralmente os problemas e as funcionalidades incompletas, aplicar as correções necessárias e validar o resultado com evidências reproduzíveis.**
+
+Quero que você trabalhe com o rigor de uma equipe sênior realizando uma auditoria de código, revisão arquitetural, saneamento de dívida técnica, hardening de segurança, engenharia de confiabilidade e preparação de um sistema para evolução contínua.
+
+O objetivo é transformar o repositório em uma base de engenharia sólida, coesa, organizada, extensível, bem documentada e efetivamente funcional, pronta para continuar o desenvolvimento do Home Care Assistant sem acumular inconsistências, implementações fictícias ou dependências ocultas.
+
+Você possui autonomia para:
+
+- Investigar integralmente o repositório.
+- Examinar todos os arquivos pertinentes, inclusive linha por linha quando necessário.
+- Criar, modificar e excluir código.
+- Refatorar componentes, serviços, APIs, funções e estruturas.
+- Reorganizar diretórios e arquivos.
+- Criar, consolidar, renomear, atualizar ou eliminar documentos obsoletos.
+- Criar testes unitários, de integração, segurança, banco de dados e E2E.
+- Corrigir falhas de arquitetura, tipagem, integridade, concorrência, autorização e persistência.
+- Criar novas migrations incrementais.
+- Executar validações em ambiente local seguro.
+- Consultar e comparar o estado do banco remoto.
+- Melhorar a experiência do usuário, a interface administrativa e os fluxos operacionais.
+- Eliminar duplicações, abstrações desnecessárias, código morto e dependências sem utilidade demonstrável.
+
+Essa autonomia está sujeita às salvaguardas de integridade, preservação de dados, segurança e autorização descritas adiante.
+
+**Não interprete a autorização para refatoração como autorização para apagar dados existentes, reescrever o histórico de migrations, modificar infraestrutura remota ou destruir trabalho preexistente.**
+
+Não recrie a aplicação do zero. Preserve os comportamentos corretos, a identidade funcional e o histórico do sistema, substituindo apenas aquilo que apresentar justificativa técnica verificável.
+
+---
+
+## 2. OS DOIS DOCUMENTOS ANEXADOS SÃO PARTE ESSENCIAL DA MISSÃO
+
+Estou anexando a esta mensagem dois prompts extensos anteriormente encaminhados ao GitHub Copilot no VS Code.
+
+Esses documentos descrevem requisitos, decisões de negócio, funcionalidades, critérios de aceite, restrições e resultados que deveriam ter sido implementados no Home Care Assistant.
+
+Há indícios de que determinadas etapas foram executadas apenas parcialmente, de maneira simplificada ou exclusivamente estrutural, sem que todos os requisitos tenham sido efetivamente concluídos.
+
+**Leia os dois anexos integralmente antes de iniciar as alterações.**
+
+Não se limite a resumos, títulos ou trechos selecionados.
+
+Considere-os conjuntamente como uma especificação histórica e funcional do projeto, mas não presuma que todos os diagnósticos técnicos e referências de estado neles contidos continuam atuais.
+
+Em particular:
+
+1. Extraia todos os requisitos funcionais e não funcionais de ambos os documentos.
+2. Identifique requisitos repetidos, complementares ou contraditórios.
+3. Compare as exigências com o código atualmente existente.
+4. Verifique quais requisitos foram integralmente implementados.
+5. Identifique implementações parciais, incorretas, apenas documentadas ou ausentes.
+6. Identifique funcionalidades novas que tenham surgido depois da elaboração dos anexos.
+7. Preserve decisões de negócio válidas.
+8. Identifique decisões técnicas ultrapassadas ou que hoje possam ser melhor resolvidas.
+9. Não reimplemente funcionalidades já concluídas apenas porque aparecem nos anexos.
+10. Não considere um requisito atendido somente porque existe uma tabela, interface, função, endpoint, comentário, teste isolado ou afirmação documental.
+
+Construa uma **matriz de rastreabilidade dos requisitos**, relacionando cada exigência extraída dos anexos com:
+
+- Identificador do requisito.
+- Fonte e seção de origem.
+- Descrição funcional.
+- Componentes e arquivos envolvidos.
+- Estado atual.
+- Evidência identificada.
+- Lacunas ou inconsistências.
+- Impacto e prioridade.
+- Alteração necessária.
+- Testes e critérios de aceite.
+- Resultado final após a intervenção.
+
+Use a seguinte classificação:
+
+- IMPLEMENTADO E VALIDADO.
+- IMPLEMENTADO, MAS NÃO VALIDADO INTEGRALMENTE.
+- PARCIALMENTE IMPLEMENTADO.
+- APENAS ESTRUTURADO.
+- NÃO IMPLEMENTADO.
+- IMPLEMENTADO INCORRETAMENTE.
+- OBSOLETO OU SUBSTITUÍDO JUSTIFICADAMENTE.
+- DEPENDENTE DE CONFIGURAÇÃO EXTERNA.
+- BLOQUEADO, COM JUSTIFICATIVA DOCUMENTADA.
+
+Não descarte requisitos silenciosamente. Toda decisão de não implementar, substituir ou adiar algum requisito deverá ser fundamentada.
+
+---
+
+## 3. LEVANTAMENTO INICIAL OBRIGATÓRIO
+
+Antes de modificar o projeto, estabeleça seu estado real.
+
+Inspecione:
+
+- Repositório GitHub e diretório local.
+- Branch atual e branch padrão.
+- HEAD e histórico recente de commits.
+- Estado do working tree.
+- Alterações locais não commitadas.
+- Arquivos não rastreados.
+- Diferenças entre o estado local e os commits publicados.
+- Estrutura integral de diretórios.
+- Arquivos de configuração.
+- Dependências diretas e transitivas relevantes.
+- Scripts do `package.json`.
+- Variáveis de ambiente utilizadas.
+- Configuração do Next.js.
+- Configuração do TypeScript.
+- Configuração do ESLint.
+- Configuração de testes.
+- Configuração do Supabase.
+- Workflows do GitHub Actions.
+- Configurações de integração e implantação que estejam disponíveis.
+- Documentos e instruções de agentes existentes.
+
+Leia todos os arquivos pertinentes ao funcionamento do projeto, incluindo `AGENTS.md`, arquivos de instrução equivalentes, `README.md`, documentos em `docs`, código em `src`, migrations em `supabase/migrations`, seeds, testes, workflows e configurações.
+
+**Não assuma que a estrutura existente corresponde àquela mencionada nos anexos. Descubra primeiro a estrutura atual.**
+
+Documente a arquitetura encontrada e identifique os fluxos reais entre interface, API, autenticação, autorização, banco, funções SQL e serviços externos.
+
+A revisão deve ser suficientemente granular para identificar:
+
+- Erros de lógica.
+- Erros silenciosos.
+- Comportamentos inesperados.
+- Código redundante.
+- Código morto.
+- Duplicação de responsabilidades.
+- Abstrações artificiais.
+- Acoplamento excessivo.
+- Dependências circulares.
+- Problemas de coesão.
+- Contratos de API inconsistentes.
+- Validação insuficiente.
+- Tipagem frágil.
+- Tratamento inadequado de exceções.
+- Falhas de concorrência.
+- Problemas de integridade transacional.
+- Riscos de autenticação e autorização.
+- Exposição indevida de dados.
+- Problemas de desempenho.
+- Consultas ineficientes.
+- Falta de índices.
+- Problemas de acessibilidade.
+- Interfaces incompletas.
+- Estados de carregamento inadequados.
+- Documentação desatualizada.
+- Testes insuficientes.
+- Fragilidades de manutenção.
+- Falhas de observabilidade.
+- Problemas de configuração, integração e implantação.
+
+Não produza afirmações genéricas como "o código pode ser melhor organizado". Identifique precisamente o problema, a localização, a causa, o impacto e a solução apropriada.
+
+---
+
+## 4. REGRAS DE SEGURANÇA E PRESERVAÇÃO
+
+### 4.1. Git e arquivos existentes
+
+Antes de editar, registre a situação inicial do repositório.
+
+Não utilize operações Git destrutivas, como resets forçados, limpeza indiscriminada, rebase destrutivo ou descarte de alterações locais.
+
+Não sobrescreva trabalho preexistente sem identificar sua origem e relevância.
+
+Utilize uma branch própria para esta intervenção caso seja seguro fazê-lo e isso não comprometa as alterações atuais.
+
+Você está autorizado a reorganizar, renomear e excluir arquivos obsoletos ou redundantes, desde que:
+
+- Haja justificativa técnica.
+- Seus consumidores tenham sido identificados.
+- As referências tenham sido corrigidas.
+- O comportamento necessário seja preservado.
+- Os testes pertinentes tenham sido executados.
+- A alteração seja rastreável no diff.
+
+Não faça commit, push, merge, rebase remoto, abertura de PR, publicação ou deploy sem autorização expressa.
+
+### 4.2. Dados e infraestrutura
+
+Não execute operações destrutivas em bancos remotos.
+
+Não execute `supabase db reset` no remoto.
+
+Não execute `supabase db push`, migrations remotas, backfills remotos ou comandos equivalentes sem minha autorização posterior.
+
+Não altere dados remotos, configurações de autenticação, usuários, permissões, políticas RLS, segredos ou infraestrutura externa nesta execução.
+
+Você pode consultar o ambiente remoto para diagnosticar seu estado, desde que tenha acesso autorizado e utilize operações efetivamente somente de leitura.
+
+Evite consultas que produzam efeitos colaterais, executem funções mutáveis ou exponham dados pessoais desnecessários.
+
+Não extraia dumps contendo dados pessoais reais para testes locais.
+
+Nunca registre credenciais, tokens ou segredos em arquivos versionados, logs, relatórios ou respostas.
+
+Não exponha chaves privilegiadas do Supabase no navegador.
+
+Não desabilite RLS para contornar testes.
+
+Não faça envios reais de WhatsApp, e-mail ou notificações externas durante testes automatizados.
+
+Use exclusivamente dados fictícios e ambientes isolados para testes que envolvam alteração de dados.
+
+### 4.3. Ambiente local
+
+Você está autorizado a executar comandos, instalar dependências necessárias ao projeto, criar fixtures, iniciar serviços locais e executar testes em ambiente controlado.
+
+O uso de comandos como `supabase db reset --local` exige confirmação prévia de que o destino é exclusivamente o banco local de testes e de que não há dados locais relevantes a preservar.
+
+Não presuma que a palavra `local` garante, por si só, que um comando está apontando para o ambiente desejado. Verifique os vínculos e parâmetros antes de executar operações potencialmente destrutivas.
+
+Se um recurso externo estiver indisponível, não invente resultados. Registre o impedimento e continue as frentes independentes.
+
+---
+
+## 5. AUDITORIA INTEGRAL DO BANCO DE DADOS
+
+Esta é uma das etapas mais importantes da missão.
+
+Quero uma auditoria estrutural e funcional do PostgreSQL/Supabase, confrontando três realidades distintas:
+
+**A. Schema esperado pelas migrations versionadas.**
+
+**B. Schema efetivamente existente no banco local.**
+
+**C. Schema efetivamente existente no banco remoto autorizado.**
+
+Sempre que possível, compare também o estado declarado pela aplicação e pela documentação.
+
+### 5.1. Inspeção estrutural
+
+Examine:
+
+- Schemas.
+- Tabelas.
+- Colunas.
+- Tipos.
+- Enums.
+- Valores padrão.
+- Constraints.
+- Chaves primárias e estrangeiras.
+- Relacionamentos.
+- Índices.
+- Índices únicos e parciais.
+- Sequences.
+- Views.
+- Materialized views, se houver.
+- Triggers.
+- Funções SQL e PL/pgSQL.
+- Procedures.
+- Permissões e grants.
+- Políticas RLS.
+- Regras de integridade.
+- Dependências.
+- Extensões.
+- Histórico de migrations.
+- Objetos legados.
+- Objetos órfãos.
+- Objetos redundantes.
+
+Identifique especialmente:
+
+- Colunas que não deveriam existir.
+- Colunas esperadas que estejam ausentes.
+- Estruturas equivalentes duplicadas.
+- Constraints contraditórias.
+- Funções antigas ainda acessíveis.
+- Objetos criados diretamente no banco sem migration.
+- Diferenças entre migrations e schema efetivo.
+- Permissões excessivas.
+- Índices ausentes ou desnecessários.
+- Dependências que possam impedir migrations futuras.
+- Dados inconsistentes, sem expor seu conteúdo pessoal.
+- Registros sem relacionamento esperado.
+- Registros duplicados.
+- Relações com cardinalidade incorreta.
+- Referências históricas quebradas.
+- Problemas de integridade derivados de mudanças anteriores.
+
+Diferencie claramente **drift de schema**, inconsistência de dados, diferença intencional de ambiente e migração ainda não aplicada.
+
+Não classifique automaticamente uma coluna como desnecessária apenas porque ela não é utilizada pelo frontend atual. Investigue os consumidores, contratos históricos, integrações e regras de negócio.
+
+### 5.2. Auditoria das migrations
+
+Leia as migrations em ordem e reproduza mentalmente e, sempre que possível, em ambiente local, seus efeitos cumulativos.
+
+Não analise cada migration isoladamente sem considerar as migrations posteriores.
+
+Verifique se o resultado final corresponde ao contrato utilizado pelo código atual.
+
+Migrations históricas já aplicadas devem permanecer imutáveis. Toda correção deve ser implementada em novas migrations incrementais, acompanhadas de testes e estratégia de compatibilidade.
+
+Teste dois cenários:
+
+1. Criação do banco a partir de uma instalação limpa.
+2. Evolução de um banco com schema e registros equivalentes ao estado legado.
+
+Identifique incompatibilidades entre os dois caminhos.
+
+### 5.3. Banco remoto
+
+Se houver acesso ao Supabase remoto, execute uma auditoria exclusivamente de leitura.
+
+Compare metadados e definições estruturais com o ambiente local.
+
+Verifique, quando autorizado:
+
+- Histórico de migrations aplicadas.
+- Divergências de schema.
+- Objetos ausentes.
+- Objetos adicionais.
+- Constraints e índices efetivos.
+- RLS habilitada.
+- Políticas vigentes.
+- Permissões de execução de funções.
+- Definições de funções privilegiadas.
+- Referências órfãs e duplicidades mediante consultas agregadas seguras.
+- Coerência dos dados essenciais sem exposição desnecessária de informações pessoais.
+
+**Não modifique o banco remoto para corrigir divergências encontradas.**
+
+Prepare migrations e instruções de aplicação para revisão posterior.
+
+Ao final, apresente um relatório de diferenças entre os ambientes, distinguindo:
+
+- Igual.
+- Divergente.
+- Não verificado.
+- Requer migration.
+- Requer reconciliação de dados.
+- Requer decisão ou autorização minha.
+
+---
+
+## 6. AUDITORIA DE SEGURANÇA E AUTORIZAÇÃO
+
+Não considere o uso de Supabase Auth ou a presença de políticas RLS como prova suficiente de segurança.
+
+Audite o fluxo completo de autenticação, autorização e acesso a dados.
+
+Examine:
+
+- Login.
+- Logout.
+- Recuperação de acesso.
+- OAuth e callbacks.
+- Sessões.
+- Cookies.
+- Proxy/middleware.
+- Rotas protegidas.
+- APIs.
+- RPCs.
+- Funções `SECURITY DEFINER`.
+- `search_path`.
+- Grants e revokes.
+- Policies RLS.
+- Views e comportamento de segurança.
+- Permissões por perfil.
+- Permissões por paciente.
+- Revogação de acesso.
+- Operações administrativas.
+- Logs de auditoria.
+- Gerenciamento de segredos.
+
+Verifique riscos de escalonamento vertical e horizontal de privilégios.
+
+O sistema deverá preservar a separação entre administrador global, administrador limitado, supervisor, profissional, familiar e leitor, conforme os requisitos dos anexos e a arquitetura efetivamente adotada.
+
+A autorização deverá considerar o usuário autenticado, seu estado, seu papel, o paciente, seu vínculo específico e as permissões para a operação solicitada.
+
+O vínculo com um paciente não pode conceder automaticamente privilégios administrativos.
+
+A função de um usuário não pode permitir acesso indiscriminado a todos os pacientes sem uma autorização global explícita.
+
+A desativação de usuários ou revogação de vínculos deve bloquear novas operações protegidas.
+
+Teste acesso não autorizado por manipulação de IDs, payloads, parâmetros, URLs e chamadas diretas à API ou ao banco.
+
+**Crie testes de integração reais com múltiplos usuários e pelo menos dois pacientes fictícios.**
+
+Mocks podem complementar os testes, mas não substituem a verificação efetiva das políticas RLS e funções SQL.
+
+Audite também a possibilidade de inserção, edição ou falsificação de eventos de auditoria por usuários comuns.
+
+---
+
+## 7. AUDITORIA E CONCLUSÃO FUNCIONAL DO SISTEMA
+
+Utilize os requisitos dos dois anexos como referência detalhada. Para cada módulo, avalie o banco, o backend, a interface, as permissões, os testes e a documentação.
+
+### 7.1. Gestão multipaciente
+
+Valide e conclua:
+
+- Cadastro e inativação de pacientes.
+- Associações de usuários.
+- Permissões específicas.
+- Seleção de paciente ativo.
+- Isolamento de dados.
+- Histórico por paciente.
+- Contexto de paciente nas operações.
+- Preservação de registros históricos.
+- Preparação para ampliação futura do sistema.
+
+Verifique especialmente a dependência de `CARE_RECIPIENT_ID` como contexto único e substitua essa limitação quando necessário, sem comprometer o funcionamento atual.
+
+### 7.2. Gestão administrativa
+
+A administração deve ser funcional, não apenas uma coleção de RPCs.
+
+Verifique e conclua:
+
+- Cadastro e convite de usuários.
+- Gestão de perfis.
+- Papéis e permissões.
+- Ativação e revogação.
+- Associações com pacientes.
+- Gestão de pacientes.
+- Gestão de produtos.
+- Configurações operacionais.
+- Auditoria administrativa.
+- Mensagens claras de erro e sucesso.
+
+O Supabase Auth deve continuar sendo a autoridade para autenticação e credenciais.
+
+Qualquer operação administrativa privilegiada deve ocorrer exclusivamente no servidor autorizado.
+
+### 7.3. Catálogo de produtos
+
+Audite:
+
+- Consistência entre catálogo estático e banco.
+- IDs canônicos.
+- Nomes.
+- Categorias.
+- Unidades.
+- Aliases.
+- Produtos inativos.
+- Duplicidades.
+- Ordenação.
+- Referências históricas.
+- Gestão administrativa.
+
+A inativação ou alteração de produto não pode destruir o histórico das requisições.
+
+Analise se os registros históricos precisam de snapshots imutáveis de nome e unidade, para que mudanças futuras do catálogo não alterem indevidamente o significado dos comprovantes antigos.
+
+### 7.4. Requisições
+
+Valide integralmente:
+
+- Formulário.
+- Identificação do solicitante.
+- Seleção de paciente.
+- Catálogo.
+- Itens extras.
+- Estoque informado.
+- Urgência.
+- Observações.
+- Revisão.
+- Validação.
+- Persistência.
+- Protocolo.
+- Idempotência.
+- Comprovante.
+- Tratamento de falhas.
+- Histórico.
+- Reimpressão.
+
+O conceito de **quantidade solicitada para reposição não deve reaparecer** no contrato funcional da requisição.
+
+Não confunda essa restrição com quantidades utilizadas em entradas, saídas, transferências, contagens e ajustes de estoque.
+
+O protocolo sequencial deve permanecer globalmente único, iniciando a partir de 12, preservando os registros históricos de 1 a 11.
+
+Investigue o estado atual da migration de compatibilidade, sem presumir que o problema anteriormente identificado continua presente.
+
+### 7.5. Importação histórica
+
+Audite e conclua o mecanismo de importação dos formulários físicos anteriores.
+
+Verifique:
+
+- Preservação dos protocolos.
+- Validação de pacientes.
+- Validação de produtos.
+- Preservação de datas.
+- Idempotência.
+- Tratamento de registros inválidos.
+- Rollback de operações incompletas.
+- Ausência de notificações retroativas.
+- Relatórios de importação.
+- Auditoria.
+
+Não confunda a existência de um procedimento SQL com um fluxo administrativo completo.
+
+### 7.6. Gestão de estoque
+
+O estoque deve utilizar catálogo único, com saldos separados por paciente e custódia:
+
+- `FAMILY`.
+- `CARE_TEAM`.
+
+Audite:
+
+- Entradas.
+- Saídas.
+- Transferências.
+- Ajustes.
+- Saldo calculado.
+- Histórico.
+- Justificativas.
+- Idempotência.
+- Concorrência.
+- Auditoria.
+- Bloqueio de saldo insuficiente.
+- Permissões de escrita.
+
+O estoque oficial somente poderá ser alterado por administradores expressamente autorizados.
+
+Os demais usuários poderão consultar ou realizar contagens conforme suas permissões, sem alterar diretamente o saldo oficial.
+
+Avalie criticamente a exceção existente para administradores globais produzirem saldo negativo. Não permita que essa exceção contorne indiscriminadamente todas as regras de saída e transferência.
+
+### 7.7. Inventário
+
+Valide o fluxo completo:
+
+- Abertura.
+- Contagem.
+- Saldo de referência.
+- Divergência.
+- Justificativa.
+- Submissão.
+- Revisão.
+- Aprovação ou rejeição.
+- Ajuste compensatório.
+- Auditoria.
+
+Teste aprovação duplicada, concorrência e movimentações ocorridas durante a contagem.
+
+### 7.8. Alertas e notificações
+
+Diferencie o registro interno de notificações do envio efetivo por um provedor externo.
+
+Verifique:
+
+- Destinatários.
+- Grupos.
+- Canais.
+- Estados.
+- Persistência.
+- Retentativas.
+- Backoff.
+- Idempotência.
+- Recuperação de processamento interrompido.
+- Falhas.
+- Reprocessamento autorizado.
+- Alertas por custódia.
+- Configurações por paciente e produto.
+
+O saldo da família não pode ocultar uma falta de estoque na posse da equipe.
+
+Não apresente uma notificação marcada internamente como processada como se uma mensagem externa tivesse sido entregue.
+
+Sem credenciais de provedor, mantenha o adaptador de integração e os testes, mas registre a integração real como pendente.
+
+### 7.9. Histórico, status e comprovantes
+
+Audite filtros, paginação, ordenação, dados persistidos, escopo de autorização, transições de status, justificativas, notificações e reimpressão.
+
+O histórico de um paciente deve incluir todas as requisições acessíveis ao usuário autorizado, não somente aquelas criadas por ele.
+
+O comprovante deve preservar as informações válidas no momento da operação.
+
+### 7.10. Interface e experiência de uso
+
+Analise todas as telas, inclusive nos contextos de celular e desktop.
+
+Melhore:
+
+- Navegação.
+- Hierarquia visual.
+- Organização das informações.
+- Consistência dos componentes.
+- Formulários.
+- Validação.
+- Feedback.
+- Estados de carregamento.
+- Estados vazios.
+- Mensagens de erro.
+- Recuperação de conexão.
+- Acessibilidade.
+- Responsividade.
+
+Nenhuma tela deve permanecer aparentemente congelada sem indicar o estado da operação.
+
+Não execute refatorações estéticas extensas que não agreguem clareza, acessibilidade, consistência ou manutenção.
+
+---
+
+## 8. AUDITORIA ARQUITETURAL E REFATORAÇÃO DO CÓDIGO
+
+Avalie o projeto como um sistema completo, e não como uma sequência de arquivos independentes.
+
+Examine a separação entre:
+
+- Interface.
+- Componentes de apresentação.
+- Estado da aplicação.
+- Validação.
+- Contratos e tipos.
+- Casos de uso.
+- Regras de negócio.
+- Persistência.
+- Autorização.
+- Serviços externos.
+- Configuração.
+- Observabilidade.
+- Testes.
+
+Avalie se as responsabilidades estão adequadamente distribuídas.
+
+Identifique oportunidades reais de:
+
+- Reutilização.
+- Simplificação.
+- Encapsulamento.
+- Centralização de validações.
+- Centralização de contratos.
+- Redução de acoplamento.
+- Extração de lógica de componentes grandes.
+- Eliminação de duplicação.
+- Organização de módulos.
+- Padronização de erros.
+- Melhorias de desempenho.
+- Redução de dependências.
+- Melhoria da legibilidade.
+- Melhoria da testabilidade.
+
+Você pode reorganizar a estrutura de pastas quando houver benefício técnico demonstrável.
+
+**Não introduza abstrações, frameworks, camadas ou padrões apenas por parecerem sofisticados.**
+
+Prefira soluções simples, explícitas, testáveis, coesas e compatíveis com a escala atual do projeto.
+
+O sistema deve estar preparado para expansão, mas sem engenharia excessiva ou custos operacionais desnecessários.
+
+---
+
+## 9. AUDITORIA E REESTRUTURAÇÃO DA DOCUMENTAÇÃO
+
+Quero que você trate os documentos do repositório como parte fundamental da arquitetura e da manutenção.
+
+Leia e revise integralmente:
+
+- `AGENTS.md` e eventuais instruções adicionais de agentes.
+- `README.md`.
+- `docs/AUDIT.md`.
+- `docs/PROJECT_STATUS.md`.
+- `docs/DATABASE.md`.
+- `docs/SECURITY.md`.
+- `docs/DEPLOYMENT.md`.
+- `docs/ROADMAP.md`.
+- `docs/WHATSAPP_AI.md`.
+- Outros documentos existentes.
+
+Não se limite a acrescentar texto ao final de arquivos antigos.
+
+Avalie criticamente a necessidade, utilidade e estrutura de cada documento.
+
+Você pode:
+
+- Reescrever documentos.
+- Corrigir instruções incorretas.
+- Eliminar informações ultrapassadas.
+- Fundir arquivos redundantes.
+- Dividir documentos excessivamente extensos.
+- Criar documentos especializados.
+- Renomear arquivos.
+- Criar uma arquitetura documental.
+- Excluir documentos sem utilidade, após preservar o conteúdo válido.
+- Organizar os documentos em diretórios.
+- Criar índices de navegação.
+- Atualizar referências internas.
+
+### 9.1. Revisão especial do AGENTS.md
+
+Este arquivo deve funcionar como um guia operacional claro, preciso e realmente utilizável por agentes de programação.
+
+Audite se contém:
+
+- Descrição correta do projeto.
+- Arquitetura real.
+- Convenções de código.
+- Organização de pastas.
+- Padrões de componentes.
+- Convenções de banco.
+- Regras de migrations.
+- Segurança e RLS.
+- Regras de autorização.
+- Requisitos de testes.
+- Comandos de validação.
+- Fluxos de desenvolvimento.
+- Critérios para considerar uma tarefa concluída.
+- Restrições de infraestrutura.
+- Cuidados com dados pessoais.
+- Padrões de documentação.
+- Orientações para novas funcionalidades.
+- Procedimentos de revisão.
+
+Remova:
+
+- Instruções contraditórias.
+- Informações obsoletas.
+- Repetições desnecessárias.
+- Comandos inexistentes.
+- Orientações que induzam a alterar dados de produção.
+- Referências incorretas.
+- Regras vagas e impossíveis de verificar.
+
+Se houver instruções de agente em subdiretórios, verifique sua hierarquia e compatibilidade.
+
+Preserve as instruções aplicáveis e não trate sua autorização para editar documentos como permissão para ignorar restrições hierarquicamente superiores.
+
+O resultado deve ser um conjunto de instruções que permita a outro agente compreender o sistema rapidamente, trabalhar sem recriar funcionalidades existentes e seguir as convenções corretas.
+
+### 9.2. Documentação técnica
+
+A documentação final deverá explicar, com precisão:
+
+- Visão geral e arquitetura.
+- Estrutura do repositório.
+- Fluxos principais.
+- Modelo de dados.
+- Matriz de permissões.
+- Escopo multipaciente.
+- Autenticação.
+- Administração.
+- Requisições.
+- Protocolos.
+- Importação histórica.
+- Catálogo.
+- Estoque.
+- Inventário.
+- Alertas.
+- Notificações.
+- APIs.
+- Variáveis de ambiente.
+- Desenvolvimento local.
+- Testes.
+- CI.
+- Migrations.
+- Homologação.
+- Deploy.
+- Segurança.
+- LGPD.
+- Limitações.
+- Próximas etapas.
+
+Não duplique a mesma explicação extensamente em diversos documentos.
+
+Crie referências cruzadas quando necessário.
+
+Separe instruções permanentes de desenvolvimento dos registros históricos de auditoria, incidentes e estados temporários do projeto.
+
+O `README.md` deve servir como porta de entrada. O `AGENTS.md` deve orientar o trabalho dos agentes. Os demais documentos devem aprofundar assuntos específicos.
+
+**Documentação não pode afirmar que algo está concluído quando o código ou os testes não comprovam essa afirmação.**
+
+---
+
+## 10. TESTES E VALIDAÇÃO OBRIGATÓRIA
+
+A conclusão não depende apenas de compilação bem-sucedida.
+
+Quero validação em diferentes níveis.
+
+### 10.1. Análise estática
+
+Execute os comandos disponíveis e corrija os problemas encontrados:
+
+- Instalação determinística das dependências.
+- Lint.
+- Typecheck.
+- Build.
+- Verificações de segurança de dependências, quando viáveis.
+- Verificação de formatação, caso exista padrão adotado.
+- Verificação de imports, módulos e código não utilizado.
+- Verificação de integridade do diff.
+
+### 10.2. Testes unitários
+
+Teste regras de negócio, validação, contratos, processamento de erros, normalização, cálculo de saldo, inventário, protocolo e estados operacionais.
+
+### 10.3. Testes de integração
+
+Teste com banco PostgreSQL/Supabase local real:
+
+- Migrations.
+- Constraints.
+- RPCs.
+- Persistência.
+- Protocolo.
+- Idempotência.
+- Concorrência.
+- Rollback.
+- Autorização.
+- RLS.
+- Revogação.
+- Estoque.
+- Transferências.
+- Inventário.
+- Importação histórica.
+- Processamento de notificações.
+
+### 10.4. Testes E2E
+
+Teste os fluxos operacionais da aplicação utilizando dados e usuários fictícios:
+
+- Login.
+- Requisição.
+- Comprovante.
+- Histórico.
+- Administração.
+- Seleção de paciente.
+- Catálogo.
+- Estoque.
+- Inventário.
+- Estados de erro.
+- Estados de carregamento.
+- Falha de rede.
+- Recuperação de operação.
+
+### 10.5. GitHub Actions
+
+Examine o histórico recente dos workflows e investigue falhas reais, em vez de assumir que a configuração do CI é suficiente.
+
+Existe registro anterior de falhas no workflow de CI após commits recentes; confirme o estado atual e identifique a causa exata.
+
+Não atribua a falha a uma causa presumida sem verificar os logs.
+
+Corrija o código ou a configuração pertinente e, quando viável, execute localmente os mesmos comandos usados no CI.
+
+Amplie o pipeline para validar migrations e testes de integração determinísticos.
+
+Não utilize credenciais de produção nem altere o banco remoto a partir do CI.
+
+### 10.6. Evidência de execução
+
+Para cada verificação, informe:
+
+- Comando ou procedimento.
+- Ambiente.
+- Resultado.
+- Falha encontrada.
+- Correção aplicada.
+- Resultado após a correção.
+- Limitações de cobertura.
+
+Não marque testes como aprovados por inferência.
+
+Não esconda testes falhos, não exclua testes para tornar o resultado verde e não desative regras de qualidade sem justificativa técnica concreta.
+
+---
+
+## 11. MÉTODO DE EXECUÇÃO
+
+A execução deverá ser organizada, progressiva e rastreável.
+
+### FASE I — INVENTÁRIO E DIAGNÓSTICO
+
+1. Ler integralmente os dois anexos.
+2. Examinar o repositório atual.
+3. Examinar a documentação.
+4. Examinar migrations e estrutura de banco.
+5. Investigar resultados recentes de CI.
+6. Consultar os ambientes disponíveis.
+7. Mapear requisitos e implementações.
+8. Identificar dependências e riscos.
+9. Classificar as falhas e lacunas.
+
+### FASE II — CORREÇÃO DOS BLOQUEADORES
+
+Priorize:
+
+1. Falhas que impedem compilação, testes ou execução.
+2. Problemas de persistência e integridade.
+3. Falhas críticas de autenticação e autorização.
+4. Inconsistências de schema.
+5. Vulnerabilidades em RLS ou funções privilegiadas.
+6. Falhas transacionais.
+7. Problemas de concorrência.
+8. Falhas que possam provocar perda, corrupção ou exposição de dados.
+
+### FASE III — CONSOLIDAÇÃO DA ARQUITETURA
+
+Refatore a organização do código, contratos, módulos, responsabilidades, erros e testes, sempre que necessário.
+
+Não faça alterações arquiteturais de grande alcance sem demonstrar a necessidade e preservar os comportamentos existentes.
+
+### FASE IV — CONCLUSÃO DOS REQUISITOS
+
+Use a matriz dos dois anexos para implementar o que ainda estiver ausente ou incompleto.
+
+Priorize o núcleo funcional e as interfaces que tornem os recursos realmente operacionais.
+
+### FASE V — BANCO, AUTORIZAÇÃO E TESTES
+
+Conclua as migrations incrementais, reproduza o schema local, execute os testes de integração e segurança e corrija os problemas encontrados.
+
+### FASE VI — DOCUMENTAÇÃO E LIMPEZA
+
+Reorganize as instruções, a documentação, o `AGENTS.md` e os demais materiais.
+
+Elimine referências obsoletas, duplicações e estruturas sem utilidade.
+
+### FASE VII — VALIDAÇÃO FINAL
+
+Execute todas as verificações disponíveis, revise o diff e confronte novamente o sistema com os requisitos dos anexos.
+
+Não encerre após a primeira rodada de testes. Corrija os problemas e repita as verificações afetadas.
+
+---
+
+## 12. NÃO INTERROMPER PREMATURAMENTE O TRABALHO
+
+Esta é uma missão extensa e poderá exigir múltiplas etapas de implementação.
+
+**Não encerre a execução após elaborar um plano, identificar alguns problemas ou corrigir o primeiro erro.**
+
+Também não interprete a descoberta de um bloqueio externo como motivo para abandonar todas as outras frentes.
+
+Se encontrar um problema:
+
+1. Determine a causa.
+2. Avalie as dependências.
+3. Corrija-o, se estiver dentro da autorização e for seguro.
+4. Valide a correção.
+5. Registre o resultado.
+6. Continue com os próximos problemas.
+
+Quando uma funcionalidade depender de acesso ou autorização indisponível, registre essa dependência e continue as tarefas independentes.
+
+Mantenha uma lista persistente de tarefas e atualize seu progresso durante a execução.
+
+Se houver limite de contexto ou necessidade de retomar a sessão, deixe um checkpoint contendo o estado real dos arquivos, o último resultado de testes, as alterações realizadas e as próximas ações.
+
+Não reinicie o trabalho do zero em uma continuação.
+
+Não substitua execução por explicações excessivas.
+
+Faça perguntas somente quando uma decisão de negócio essencial não puder ser deduzida com segurança, quando houver opções incompatíveis de impacto relevante ou quando a operação exigir minha autorização.
+
+Na ausência de um bloqueio dessa natureza, tome decisões técnicas fundamentadas e continue.
+
+---
+
+## 13. CRITÉRIOS DE QUALIDADE
+
+Quero que o resultado obedeça aos seguintes princípios:
+
+**Correção:** as funcionalidades executam o comportamento esperado.
+
+**Segurança:** acesso, permissões e dados são protegidos efetivamente.
+
+**Integridade:** operações críticas não produzem inconsistência ou duplicidade.
+
+**Confiabilidade:** falhas de rede, banco e serviços externos são tratadas.
+
+**Manutenibilidade:** o código é compreensível, modular e testável.
+
+**Coesão:** os componentes possuem responsabilidades claras.
+
+**Simplicidade:** complexidade adicional só é introduzida quando necessária.
+
+**Consistência:** backend, frontend, banco, testes e documentação seguem os mesmos contratos.
+
+**Auditabilidade:** operações sensíveis possuem rastreabilidade.
+
+**Extensibilidade:** novas funcionalidades podem ser incluídas sem refazer todo o núcleo.
+
+**Observabilidade:** erros e comportamentos relevantes podem ser diagnosticados sem exposição indevida de dados.
+
+**Usabilidade:** a aplicação informa corretamente o estado de cada operação.
+
+**Evolução segura:** migrations e refatorações preservam o histórico e os dados existentes.
+
+Não busque métricas artificiais, como criar o maior número possível de arquivos, testes ou abstrações.
+
+Prefira qualidade verificável, soluções proporcionais e arquitetura sustentável.
+
+---
+
+## 14. ENTREGÁVEIS OBRIGATÓRIOS
+
+Ao final, quero que estejam disponíveis no próprio repositório, conforme a organização documental que você considerar adequada:
+
+### A. Auditoria técnica
+
+Relatório com os problemas encontrados, causa raiz, gravidade, evidência, impacto, solução e resultado da validação.
+
+### B. Matriz de rastreabilidade
+
+Comparação integral dos dois prompts anexados com o estado inicial e final de cada requisito.
+
+### C. Auditoria do banco
+
+Relatório comparativo entre migrations, banco local e banco remoto, com divergências, objetos obsoletos, inconsistências e migrations necessárias.
+
+### D. Auditoria de segurança
+
+Matriz de autorização, cobertura RLS, permissões de funções, problemas encontrados, correções e testes negativos.
+
+### E. Arquitetura consolidada
+
+Documentação atualizada da estrutura, módulos, decisões arquiteturais e padrões utilizados.
+
+### F. Documentação operacional e AGENTS.md
+
+Instruções coerentes, completas e realmente utilizáveis para o desenvolvimento posterior.
+
+### G. Código refatorado e funcionalidades concluídas
+
+Alterações efetivamente implementadas, integradas e verificadas dentro do escopo autorizado.
+
+### H. Testes
+
+Suíte de testes atualizada, incluindo validação real do banco e das permissões sempre que viável.
+
+### I. Relatório de execução
+
+Resumo verificável das mudanças realizadas, testes executados, problemas resolvidos e limitações remanescentes.
+
+### J. Pendências e plano de continuidade
+
+Itens que dependam de configuração externa, decisões minhas, credenciais, permissões ou implementação futura.
+
+---
+
+## 15. FORMATO DO RELATÓRIO FINAL
+
+Apresente:
+
+1. Estado inicial do repositório: branch, HEAD, working tree e divergências.
+2. Resumo executivo da auditoria.
+3. Inventário das áreas examinadas.
+4. Requisitos dos anexos efetivamente concluídos, parcialmente concluídos e não concluídos.
+5. Problemas críticos identificados.
+6. Correções realizadas.
+7. Refatorações e decisões arquiteturais.
+8. Arquivos criados, modificados, movidos e removidos.
+9. Migrations criadas e testes de compatibilidade.
+10. Resultado da comparação com o banco remoto.
+11. Resultado dos testes de segurança e RLS.
+12. Resultado dos testes unitários, de integração e E2E.
+13. Resultado de lint, typecheck, build e verificações equivalentes.
+14. Melhorias realizadas na documentação e no `AGENTS.md`.
+15. Funcionalidades ainda dependentes de serviços externos.
+16. Problemas e riscos residuais.
+17. Próximos passos recomendados, em ordem de prioridade.
+
+Para cada problema relevante, informe a localização exata no código e como a correção pode ser verificada.
+
+Diferencie sempre:
+
+- Confirmado por inspeção.
+- Confirmado por teste.
+- Corrigido e validado.
+- Corrigido, mas ainda não validado em integração.
+- Pendente.
+- Bloqueado.
+- Dependente de autorização ou configuração externa.
+
+Não declare que o projeto está perfeito, completamente seguro ou pronto para produção sem evidências suficientes.
+
+---
+
+## 16. DIRETRIZ FINAL
+
+**Quero uma intervenção profunda e efetiva, não mais uma execução parcial dos prompts anteriores.**
+
+Os dois anexos representam o conjunto de requisitos que o projeto deveria ter atendido. Sua responsabilidade é confrontá-los com a realidade atual, recuperar todas as pendências relevantes, corrigir os erros encontrados e entregar a base mais sólida possível para a continuidade do desenvolvimento.
+
+Trabalhe com autonomia técnica e visão sistêmica, preservando o histórico e os dados, evitando alterações desnecessárias e validando os resultados de maneira rigorosa.
+
+Não se satisfaça com um sistema que apenas compila.
+
+Quero um sistema cujas regras sejam coerentes, cuja arquitetura seja compreensível, cujo banco seja íntegro, cujas permissões sejam testáveis, cujas interfaces sejam realmente operacionais e cuja documentação corresponda ao que está implementado.
+
+**COMECE AGORA: leia integralmente os dois anexos, examine o estado atual do repositório, construa a matriz de rastreabilidade, investigue a integridade do banco e os resultados do CI, priorize os problemas encontrados e inicie as correções.**
+
+Não faça commit, push, merge, abertura de PR, deploy ou qualquer alteração no banco remoto sem minha autorização expressa.

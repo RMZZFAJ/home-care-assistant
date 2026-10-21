@@ -1,0 +1,1952 @@
+{
+  "tables": [
+    {
+      "rls": true,
+      "name": "audit_events",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "care_recipient_invitations",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "care_recipient_memberships",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "care_recipient_products",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "care_recipients",
+      "force": false
+    },
+    {
+      "rls": false,
+      "name": "global_admin_guard",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "historical_requisition_imports",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "products",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "profiles",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "recipient_notification_settings",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "requisition_import_batches",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "requisition_items",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "requisition_notifications",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "requisition_observations",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "requisition_status_history",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "requisitions",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "stock_alert_events",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "stock_alert_rules",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "stock_inventories",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "stock_inventory_items",
+      "force": false
+    },
+    {
+      "rls": true,
+      "name": "stock_movements",
+      "force": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "audit_events_entity_idx",
+      "table": "audit_events",
+      "definition": "CREATE INDEX audit_events_entity_idx ON public.audit_events USING btree (entity_type, entity_id)"
+    },
+    {
+      "name": "audit_events_pkey",
+      "table": "audit_events",
+      "definition": "CREATE UNIQUE INDEX audit_events_pkey ON public.audit_events USING btree (id)"
+    },
+    {
+      "name": "care_recipient_invitations_pkey",
+      "table": "care_recipient_invitations",
+      "definition": "CREATE UNIQUE INDEX care_recipient_invitations_pkey ON public.care_recipient_invitations USING btree (id)"
+    },
+    {
+      "name": "care_recipient_invitations_token_hash_key",
+      "table": "care_recipient_invitations",
+      "definition": "CREATE UNIQUE INDEX care_recipient_invitations_token_hash_key ON public.care_recipient_invitations USING btree (token_hash)"
+    },
+    {
+      "name": "care_recipient_memberships_care_recipient_id_user_id_key",
+      "table": "care_recipient_memberships",
+      "definition": "CREATE UNIQUE INDEX care_recipient_memberships_care_recipient_id_user_id_key ON public.care_recipient_memberships USING btree (care_recipient_id, user_id)"
+    },
+    {
+      "name": "care_recipient_memberships_pkey",
+      "table": "care_recipient_memberships",
+      "definition": "CREATE UNIQUE INDEX care_recipient_memberships_pkey ON public.care_recipient_memberships USING btree (id)"
+    },
+    {
+      "name": "care_recipient_memberships_user_idx",
+      "table": "care_recipient_memberships",
+      "definition": "CREATE INDEX care_recipient_memberships_user_idx ON public.care_recipient_memberships USING btree (user_id, care_recipient_id)"
+    },
+    {
+      "name": "care_recipient_products_pkey",
+      "table": "care_recipient_products",
+      "definition": "CREATE UNIQUE INDEX care_recipient_products_pkey ON public.care_recipient_products USING btree (care_recipient_id, product_id)"
+    },
+    {
+      "name": "care_recipients_pkey",
+      "table": "care_recipients",
+      "definition": "CREATE UNIQUE INDEX care_recipients_pkey ON public.care_recipients USING btree (id)"
+    },
+    {
+      "name": "global_admin_guard_pkey",
+      "table": "global_admin_guard",
+      "definition": "CREATE UNIQUE INDEX global_admin_guard_pkey ON public.global_admin_guard USING btree (singleton)"
+    },
+    {
+      "name": "historical_requisition_imports_pkey",
+      "table": "historical_requisition_imports",
+      "definition": "CREATE UNIQUE INDEX historical_requisition_imports_pkey ON public.historical_requisition_imports USING btree (id)"
+    },
+    {
+      "name": "historical_requisition_imports_requisition_id_key",
+      "table": "historical_requisition_imports",
+      "definition": "CREATE UNIQUE INDEX historical_requisition_imports_requisition_id_key ON public.historical_requisition_imports USING btree (requisition_id)"
+    },
+    {
+      "name": "historical_requisition_imports_row_hash_key",
+      "table": "historical_requisition_imports",
+      "definition": "CREATE UNIQUE INDEX historical_requisition_imports_row_hash_key ON public.historical_requisition_imports USING btree (row_hash)"
+    },
+    {
+      "name": "products_pkey",
+      "table": "products",
+      "definition": "CREATE UNIQUE INDEX products_pkey ON public.products USING btree (id)"
+    },
+    {
+      "name": "profiles_pkey",
+      "table": "profiles",
+      "definition": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+    },
+    {
+      "name": "recipient_notification_settin_care_recipient_id_recipient_u_key",
+      "table": "recipient_notification_settings",
+      "definition": "CREATE UNIQUE INDEX recipient_notification_settin_care_recipient_id_recipient_u_key ON public.recipient_notification_settings USING btree (care_recipient_id, recipient_user_id, channel)"
+    },
+    {
+      "name": "recipient_notification_settings_pkey",
+      "table": "recipient_notification_settings",
+      "definition": "CREATE UNIQUE INDEX recipient_notification_settings_pkey ON public.recipient_notification_settings USING btree (id)"
+    },
+    {
+      "name": "requisition_import_batches_pkey",
+      "table": "requisition_import_batches",
+      "definition": "CREATE UNIQUE INDEX requisition_import_batches_pkey ON public.requisition_import_batches USING btree (id)"
+    },
+    {
+      "name": "requisition_import_batches_source_hash_key",
+      "table": "requisition_import_batches",
+      "definition": "CREATE UNIQUE INDEX requisition_import_batches_source_hash_key ON public.requisition_import_batches USING btree (source_hash)"
+    },
+    {
+      "name": "requisition_items_pkey",
+      "table": "requisition_items",
+      "definition": "CREATE UNIQUE INDEX requisition_items_pkey ON public.requisition_items USING btree (id)"
+    },
+    {
+      "name": "requisition_items_requisition_idx",
+      "table": "requisition_items",
+      "definition": "CREATE INDEX requisition_items_requisition_idx ON public.requisition_items USING btree (requisition_id)"
+    },
+    {
+      "name": "notification_due",
+      "table": "requisition_notifications",
+      "definition": "CREATE INDEX notification_due ON public.requisition_notifications USING btree (next_attempt_at) WHERE (state = 'pending'::text)"
+    },
+    {
+      "name": "notification_individual_alert",
+      "table": "requisition_notifications",
+      "definition": "CREATE UNIQUE INDEX notification_individual_alert ON public.requisition_notifications USING btree (alert_event_id, recipient_user_id, channel) WHERE (alert_event_id IS NOT NULL)"
+    },
+    {
+      "name": "notification_individual_requisition",
+      "table": "requisition_notifications",
+      "definition": "CREATE UNIQUE INDEX notification_individual_requisition ON public.requisition_notifications USING btree (requisition_id, recipient_user_id, channel) WHERE ((requisition_id IS NOT NULL) AND (recipient_user_id IS NOT NULL))"
+    },
+    {
+      "name": "notification_provider_reference_unique",
+      "table": "requisition_notifications",
+      "definition": "CREATE UNIQUE INDEX notification_provider_reference_unique ON public.requisition_notifications USING btree (provider_reference) WHERE ((provider_reference IS NOT NULL) AND (provider_reference <> 'internal'::text))"
+    },
+    {
+      "name": "requisition_notifications_pkey",
+      "table": "requisition_notifications",
+      "definition": "CREATE UNIQUE INDEX requisition_notifications_pkey ON public.requisition_notifications USING btree (id)"
+    },
+    {
+      "name": "requisition_notifications_requisition_id_recipient_group_re_key",
+      "table": "requisition_notifications",
+      "definition": "CREATE UNIQUE INDEX requisition_notifications_requisition_id_recipient_group_re_key ON public.requisition_notifications USING btree (requisition_id, recipient_group, recipient_label, channel)"
+    },
+    {
+      "name": "requisition_observations_pkey",
+      "table": "requisition_observations",
+      "definition": "CREATE UNIQUE INDEX requisition_observations_pkey ON public.requisition_observations USING btree (id)"
+    },
+    {
+      "name": "requisition_status_history_pkey",
+      "table": "requisition_status_history",
+      "definition": "CREATE UNIQUE INDEX requisition_status_history_pkey ON public.requisition_status_history USING btree (id)"
+    },
+    {
+      "name": "requisition_status_history_requisition_idx",
+      "table": "requisition_status_history",
+      "definition": "CREATE INDEX requisition_status_history_requisition_idx ON public.requisition_status_history USING btree (requisition_id, changed_at DESC)"
+    },
+    {
+      "name": "requisitions_created_by_idempotency_key_key",
+      "table": "requisitions",
+      "definition": "CREATE UNIQUE INDEX requisitions_created_by_idempotency_key_key ON public.requisitions USING btree (created_by, idempotency_key)"
+    },
+    {
+      "name": "requisitions_created_by_idx",
+      "table": "requisitions",
+      "definition": "CREATE INDEX requisitions_created_by_idx ON public.requisitions USING btree (created_by, created_at DESC)"
+    },
+    {
+      "name": "requisitions_historical_protocol_unique",
+      "table": "requisitions",
+      "definition": "CREATE UNIQUE INDEX requisitions_historical_protocol_unique ON public.requisitions USING btree (protocol) WHERE is_historical"
+    },
+    {
+      "name": "requisitions_patient_created_idx",
+      "table": "requisitions",
+      "definition": "CREATE INDEX requisitions_patient_created_idx ON public.requisitions USING btree (care_recipient_id, created_at DESC)"
+    },
+    {
+      "name": "requisitions_pkey",
+      "table": "requisitions",
+      "definition": "CREATE UNIQUE INDEX requisitions_pkey ON public.requisitions USING btree (id)"
+    },
+    {
+      "name": "requisitions_protocol_key",
+      "table": "requisitions",
+      "definition": "CREATE UNIQUE INDEX requisitions_protocol_key ON public.requisitions USING btree (protocol)"
+    },
+    {
+      "name": "requisitions_protocol_number_unique",
+      "table": "requisitions",
+      "definition": "CREATE UNIQUE INDEX requisitions_protocol_number_unique ON public.requisitions USING btree (protocol_number) WHERE (protocol_number IS NOT NULL)"
+    },
+    {
+      "name": "stock_alert_events_pkey",
+      "table": "stock_alert_events",
+      "definition": "CREATE UNIQUE INDEX stock_alert_events_pkey ON public.stock_alert_events USING btree (id)"
+    },
+    {
+      "name": "stock_alert_one_open",
+      "table": "stock_alert_events",
+      "definition": "CREATE UNIQUE INDEX stock_alert_one_open ON public.stock_alert_events USING btree (care_recipient_id, product_id, location) WHERE (state = 'open'::text)"
+    },
+    {
+      "name": "stock_alert_rules_care_recipient_id_product_id_location_key",
+      "table": "stock_alert_rules",
+      "definition": "CREATE UNIQUE INDEX stock_alert_rules_care_recipient_id_product_id_location_key ON public.stock_alert_rules USING btree (care_recipient_id, product_id, location)"
+    },
+    {
+      "name": "stock_alert_rules_pkey",
+      "table": "stock_alert_rules",
+      "definition": "CREATE UNIQUE INDEX stock_alert_rules_pkey ON public.stock_alert_rules USING btree (id)"
+    },
+    {
+      "name": "stock_inventories_pkey",
+      "table": "stock_inventories",
+      "definition": "CREATE UNIQUE INDEX stock_inventories_pkey ON public.stock_inventories USING btree (id)"
+    },
+    {
+      "name": "stock_inventory_items_pkey",
+      "table": "stock_inventory_items",
+      "definition": "CREATE UNIQUE INDEX stock_inventory_items_pkey ON public.stock_inventory_items USING btree (id)"
+    },
+    {
+      "name": "stock_inventory_items_unique_product",
+      "table": "stock_inventory_items",
+      "definition": "CREATE UNIQUE INDEX stock_inventory_items_unique_product ON public.stock_inventory_items USING btree (inventory_id, product_id)"
+    },
+    {
+      "name": "inventory_adjustment_once",
+      "table": "stock_movements",
+      "definition": "CREATE UNIQUE INDEX inventory_adjustment_once ON public.stock_movements USING btree (reference_id, product_id) WHERE (reference_type = 'inventory'::text)"
+    },
+    {
+      "name": "stock_movements_idempotency_unique",
+      "table": "stock_movements",
+      "definition": "CREATE UNIQUE INDEX stock_movements_idempotency_unique ON public.stock_movements USING btree (performed_by, idempotency_key) WHERE (idempotency_key IS NOT NULL)"
+    },
+    {
+      "name": "stock_movements_patient_product_idx",
+      "table": "stock_movements",
+      "definition": "CREATE INDEX stock_movements_patient_product_idx ON public.stock_movements USING btree (care_recipient_id, product_id, created_at DESC)"
+    },
+    {
+      "name": "stock_movements_pkey",
+      "table": "stock_movements",
+      "definition": "CREATE UNIQUE INDEX stock_movements_pkey ON public.stock_movements USING btree (id)"
+    }
+  ],
+  "defaults": [
+    {
+      "acl": "{postgres=rwU/postgres,service_role=rwU/postgres}",
+      "type": "S",
+      "schema": "public",
+      "creator": "postgres"
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "type": "f",
+      "schema": "public",
+      "creator": "postgres"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "type": "r",
+      "schema": "public",
+      "creator": "postgres"
+    }
+  ],
+  "policies": [
+    {
+      "name": "authenticated users insert audit events",
+      "check": "(actor_id = auth.uid())",
+      "roles": [
+        "public"
+      ],
+      "table": "audit_events",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "scoped audit read",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "audit_events",
+      "using": "(is_global_administrator() OR (EXISTS ( SELECT 1\n   FROM care_recipients r\n  WHERE (((r.id)::text = (audit_events.metadata ->> 'care_recipient_id'::text)) AND can_manage_recipient(r.id)))))",
+      "command": "SELECT"
+    },
+    {
+      "name": "patient administrators read invitations",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "care_recipient_invitations",
+      "using": "can_manage_recipient(care_recipient_id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "scoped membership read",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "care_recipient_memberships",
+      "using": "(can_manage_recipient(care_recipient_id) OR ((user_id = auth.uid()) AND (current_profile_role() IS NOT NULL)))",
+      "command": "SELECT"
+    },
+    {
+      "name": "scoped catalogue read",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "care_recipient_products",
+      "using": "can_access_recipient(care_recipient_id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "scoped recipients including history",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "care_recipients",
+      "using": "can_access_recipient(id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "authorized template or own product read",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "products",
+      "using": "((current_profile_role() IS NOT NULL) AND ((owner_care_recipient_id IS NULL) OR can_access_recipient(owner_care_recipient_id)))",
+      "command": "SELECT"
+    },
+    {
+      "name": "users read own profile",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "profiles",
+      "using": "(id = auth.uid())",
+      "command": "SELECT"
+    },
+    {
+      "name": "admin read notification settings",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "recipient_notification_settings",
+      "using": "can_manage_recipient(care_recipient_id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "users insert requisition items",
+      "check": "(EXISTS ( SELECT 1\n   FROM requisitions r\n  WHERE ((r.id = requisition_items.requisition_id) AND (r.created_by = auth.uid()))))",
+      "roles": [
+        "public"
+      ],
+      "table": "requisition_items",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "users read scoped requisition items",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "requisition_items",
+      "using": "(EXISTS ( SELECT 1\n   FROM requisitions r\n  WHERE ((r.id = requisition_items.requisition_id) AND can_access_recipient(r.care_recipient_id))))",
+      "command": "SELECT"
+    },
+    {
+      "name": "individual or admin notification read",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "requisition_notifications",
+      "using": "(can_manage_recipient(care_recipient_id) OR ((recipient_user_id = auth.uid()) AND can_access_recipient(care_recipient_id)))",
+      "command": "SELECT"
+    },
+    {
+      "name": "users insert own observations",
+      "check": "(created_by = auth.uid())",
+      "roles": [
+        "public"
+      ],
+      "table": "requisition_observations",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "users read scoped requisition observations",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "requisition_observations",
+      "using": "(EXISTS ( SELECT 1\n   FROM requisitions r\n  WHERE ((r.id = requisition_observations.requisition_id) AND can_access_recipient(r.care_recipient_id))))",
+      "command": "SELECT"
+    },
+    {
+      "name": "users read scoped requisition status history",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "requisition_status_history",
+      "using": "(EXISTS ( SELECT 1\n   FROM requisitions r\n  WHERE ((r.id = requisition_status_history.requisition_id) AND can_access_recipient(r.care_recipient_id))))",
+      "command": "SELECT"
+    },
+    {
+      "name": "authorized users create own requisitions",
+      "check": "((created_by = auth.uid()) AND (current_profile_role() = ANY (ARRAY['admin'::profile_role, 'supervisor'::profile_role, 'professional'::profile_role])) AND (EXISTS ( SELECT 1\n   FROM care_recipients c\n  WHERE ((c.id = requisitions.care_recipient_id) AND c.is_active))))",
+      "roles": [
+        "public"
+      ],
+      "table": "requisitions",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "users read scoped requisitions",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "requisitions",
+      "using": "can_access_recipient(care_recipient_id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "patient read alert events",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "stock_alert_events",
+      "using": "can_access_recipient(care_recipient_id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "patient read alert rules",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "stock_alert_rules",
+      "using": "can_access_recipient(care_recipient_id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "users read scoped inventories",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "stock_inventories",
+      "using": "can_access_recipient(care_recipient_id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "users read scoped inventory items",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "stock_inventory_items",
+      "using": "(EXISTS ( SELECT 1\n   FROM stock_inventories i\n  WHERE ((i.id = stock_inventory_items.inventory_id) AND can_access_recipient(i.care_recipient_id))))",
+      "command": "SELECT"
+    },
+    {
+      "name": "authorized users read scoped stock movements",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "stock_movements",
+      "using": "((care_recipient_id IS NOT NULL) AND can_access_recipient(care_recipient_id))",
+      "command": "SELECT"
+    }
+  ],
+  "security": {
+    "client_dml": 0,
+    "unvalidated": 0,
+    "unmatched_items": 0,
+    "anonymous_select": 0,
+    "cross_parent_items": 0,
+    "balance_view_options": [
+      "security_invoker=true"
+    ],
+    "temporary_hash_bridge": 0,
+    "unsafe_definer_search_path": 0,
+    "global_admin_count_consistent": true
+  },
+  "functions": [
+    {
+      "hash": "9399cc98457527ac8df1172b58f24202",
+      "name": "accept_invitation",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_token_hash text"
+    },
+    {
+      "hash": "8e3a14ed1cf3f3673a744cd57d04a740",
+      "name": "add_stock_inventory_item",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_inventory_id uuid, p_product_id text, p_counted_quantity bigint, p_justification text"
+    },
+    {
+      "hash": "c9deee4e466b2bf13bb1496e8454d146",
+      "name": "admin_adopt_product",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_product_id text"
+    },
+    {
+      "hash": "f373d6cfc2f0e3473ce37b334a158c49",
+      "name": "admin_create_invitation",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_email text, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean, p_token_hash text, p_expires_at timestamp with time zone"
+    },
+    {
+      "hash": "e0a17c90d97d3d2db2a95ba4748d986f",
+      "name": "admin_list_memberships",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_care_recipient_id uuid"
+    },
+    {
+      "hash": "f15f222d776172f4877c04fd59258d1e",
+      "name": "admin_list_products",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "1938aec4e2679d09ac2c3a36262bd57a",
+      "name": "admin_list_profiles",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "d703527c27fdb1f0a0525ce55b9e1ca4",
+      "name": "admin_list_recipients",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "bdb994c68fe33e712fbea23cc11f006b",
+      "name": "admin_resend_invitation",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_invitation_id uuid, p_token_hash text, p_expires_at timestamp with time zone"
+    },
+    {
+      "hash": "c25a468ba6ddd689877eea2c97495f8f",
+      "name": "admin_set_membership_status",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_user_id uuid, p_status text"
+    },
+    {
+      "hash": "f056ea534394aaad03bc6605fd08668c",
+      "name": "admin_set_profile",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_user_id uuid, p_full_name text, p_role profile_role, p_status text, p_global_scope boolean"
+    },
+    {
+      "hash": "cb765dbe1c08b9271953c00e75a25d79",
+      "name": "admin_upsert_membership",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_user_id uuid, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean"
+    },
+    {
+      "hash": "297c5170cb015b9b3521ddb0202e0c6f",
+      "name": "admin_upsert_product",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_id text, p_name text, p_category product_category, p_unit text, p_aliases text[], p_is_active boolean"
+    },
+    {
+      "hash": "cb6d4d45347bc8ed04cd98c45bbba31b",
+      "name": "admin_upsert_recipient",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_id uuid, p_display_name text, p_is_active boolean, p_is_development boolean"
+    },
+    {
+      "hash": "5635acca226c7c27d65b7c65b6e84aad",
+      "name": "admin_upsert_recipient_product",
+      "definer": true,
+      "settings": [
+        "search_path=public, extensions"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_product_id text, p_name text, p_category product_category, p_unit text, p_aliases text[], p_is_active boolean, p_description text, p_sort_order integer"
+    },
+    {
+      "hash": "09de3ea4f6518b82dc2229824a91f791",
+      "name": "after_stock_alert",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "6ba1c1e9cb3469ddbcc73777a8304604",
+      "name": "approve_stock_inventory",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_inventory_id uuid"
+    },
+    {
+      "hash": "67e164460a78de03bbb4eeb2d9a3cbc2",
+      "name": "can_access_recipient",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_recipient_id uuid"
+    },
+    {
+      "hash": "37a67ca7c1b0d9f7bba648679496c593",
+      "name": "can_manage_recipient",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_recipient_id uuid"
+    },
+    {
+      "hash": "bb1201c5c96edb628c2e04ff855428d9",
+      "name": "claim_notification_jobs",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_limit integer, p_worker_id uuid, p_external_enabled boolean"
+    },
+    {
+      "hash": "f2be3fcf7072b7a72cc8c9294625ceaa",
+      "name": "complete_notification_job",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_id uuid, p_worker_id uuid, p_state text, p_provider_reference text, p_error text"
+    },
+    {
+      "hash": "946ed623d6cd88fda0c0727bee431946",
+      "name": "configure_recipient_notification",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_recipient_user_id uuid, p_recipient_group text, p_channel text, p_destination text, p_enabled boolean, p_include_team_alerts boolean"
+    },
+    {
+      "hash": "b2282609407cc234b5449a9f4cb40bb7",
+      "name": "configure_stock_alert",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_product_id text, p_location text, p_low_threshold bigint, p_critical_threshold bigint, p_is_enabled boolean"
+    },
+    {
+      "hash": "6ce7424c65589a41e6ae990e64d1b45d",
+      "name": "create_stock_inventory",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_location text"
+    },
+    {
+      "hash": "4e7c7e70ae44fc32afc3fab359061798",
+      "name": "current_profile_role",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "45703747283a62ed9ac5acbf4df23977",
+      "name": "derive_item_patient",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "170ec54da910021b1a71a27baf506764",
+      "name": "enqueue_patient_event",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_patient uuid, p_requisition uuid, p_alert uuid"
+    },
+    {
+      "hash": "c1025194e8cb16e949fd6766ca413583",
+      "name": "enqueue_requisition_notifications",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "54be64041a808d58343174a6f14539e4",
+      "name": "evaluate_stock_alert",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_patient uuid, p_product text, p_location text"
+    },
+    {
+      "hash": "b8b79571b65ad89942791499fbd1b411",
+      "name": "extraordinary_stock_adjustment",
+      "definer": true,
+      "settings": [
+        "search_path=public, extensions"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_product_id text, p_quantity integer, p_location text, p_justification text, p_confirmation boolean, p_idempotency_key uuid"
+    },
+    {
+      "hash": "c4e57deeb0b9b3d281838784fc93330d",
+      "name": "find_patient_product_by_alias",
+      "definer": true,
+      "settings": [
+        "search_path=public, extensions"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_query text"
+    },
+    {
+      "hash": "91b79b81f4b49d73ba06df37c202d37b",
+      "name": "find_product_by_alias",
+      "definer": false,
+      "settings": [
+        "search_path=public, extensions"
+      ],
+      "arguments": "p_query text"
+    },
+    {
+      "hash": "f5787a649efc65a5c6dc682f00c148c7",
+      "name": "guard_patient_product_owner",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "f5fc1e046b43a37006d80644854852ab",
+      "name": "guard_requisition_item_stock",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "403e4f8ce5609c864cdbc568a646fb3b",
+      "name": "guard_stock_movement_balance",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "710308215c7cefe599ea666a101e9955",
+      "name": "import_historical_requisitions",
+      "definer": true,
+      "settings": [
+        "search_path=public, extensions"
+      ],
+      "arguments": "p_source_hash text, p_rows jsonb"
+    },
+    {
+      "hash": "e8090ab7a3e977adddca37d2b404aea6",
+      "name": "invalidate_revoked_membership_invitations",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "065d06e907c3bc3985b9301b280b169a",
+      "name": "invalidate_revoked_profile_notifications",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "90dbeb4d7acddba5b27b81c21d1a5762",
+      "name": "invitation_registration_allowed",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_token_hash text, p_email text"
+    },
+    {
+      "hash": "4d93c1aa40b470eddd25ea094084136a",
+      "name": "is_global_administrator",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "774a30fc8a8d3f1847b04361a1bf65f7",
+      "name": "normalize_local_capabilities",
+      "definer": false,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "1036035a3f9edf8765e8baacdd9fef63",
+      "name": "notification_webhook",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_provider_reference text, p_state text, p_notification_id uuid"
+    },
+    {
+      "hash": "c2bfae30f2f8fd5bd81591bcf5e22d96",
+      "name": "process_internal_notifications",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_limit integer"
+    },
+    {
+      "hash": "2c32d5d8ee852688cb6681e8b2cd08c5",
+      "name": "protect_last_global_admin",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "13b9d42bf5d8c475e07d4dcba92e8497",
+      "name": "protect_requisition_historical_origin",
+      "definer": false,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "3dd00b597480ee8294714822c46f15cd",
+      "name": "protect_requisition_identity",
+      "definer": false,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "a7d9c92fb55060b1a9687bfd73c9d40b",
+      "name": "recipient_can",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_recipient_id uuid, p_operation text"
+    },
+    {
+      "hash": "7193593947445c55b325755ba022cccd",
+      "name": "recipient_role",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_recipient_id uuid"
+    },
+    {
+      "hash": "ab054e94930d4deb0391dae89de6242a",
+      "name": "record_requisition_status_transition",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": ""
+    },
+    {
+      "hash": "5fb4c8605342334fcea0c45a01764dbd",
+      "name": "record_stock_movement",
+      "definer": true,
+      "settings": [
+        "search_path=public, extensions"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_product_id text, p_quantity integer, p_movement_type stock_movement_type, p_source_location text, p_destination_location text, p_justification text, p_idempotency_key uuid, p_reference_type text, p_reference_id uuid"
+    },
+    {
+      "hash": "354dfabd3d1e566fe5e7b146661610e7",
+      "name": "recount_stock_inventory",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_inventory_id uuid"
+    },
+    {
+      "hash": "d883835fe706339be9e0fb6c4dcb5731",
+      "name": "requisition_delivery_status",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_requisition_ids uuid[]"
+    },
+    {
+      "hash": "7d03ce57e13465bb2cbf8195cf0d8d21",
+      "name": "retry_notification_job",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_id uuid, p_confirm_uncertain boolean"
+    },
+    {
+      "hash": "419ebbf703075ac57f01bdb05fe3d862",
+      "name": "review_stock_inventory",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_inventory_id uuid, p_action text, p_reason text"
+    },
+    {
+      "hash": "7224952576984d424c70879fb3a2e417",
+      "name": "revoke_invitation",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_invitation_id uuid"
+    },
+    {
+      "hash": "f86f497a4376e2ba43a41b9c874af090",
+      "name": "submit_requisition",
+      "definer": true,
+      "settings": [
+        "search_path=public, extensions"
+      ],
+      "arguments": "p_care_recipient_id uuid, p_idempotency_key uuid, p_payload_hash text, p_lines jsonb, p_extra_items jsonb, p_observations jsonb"
+    },
+    {
+      "hash": "cf98725f8c7f1aff7b9e7967ca37c953",
+      "name": "submit_stock_inventory",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_inventory_id uuid"
+    },
+    {
+      "hash": "793e1f8cbe2f35a1a1c6b1c635a35ea7",
+      "name": "transition_requisition_status",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_requisition_id uuid, p_to_status requisition_status, p_reason text"
+    },
+    {
+      "hash": "cd7cd47fec63d188d69ec590db9e7163",
+      "name": "validate_notification_job",
+      "definer": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "arguments": "p_id uuid, p_worker_id uuid"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "audit_events_actor_id_fkey",
+      "table": "audit_events",
+      "validated": true,
+      "definition": "FOREIGN KEY (actor_id) REFERENCES profiles(id)"
+    },
+    {
+      "name": "audit_events_pkey",
+      "table": "audit_events",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "care_recipient_invitations_accepted_by_fkey",
+      "table": "care_recipient_invitations",
+      "validated": true,
+      "definition": "FOREIGN KEY (accepted_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "care_recipient_invitations_care_recipient_id_fkey",
+      "table": "care_recipient_invitations",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id) REFERENCES care_recipients(id)"
+    },
+    {
+      "name": "care_recipient_invitations_invited_by_fkey",
+      "table": "care_recipient_invitations",
+      "validated": true,
+      "definition": "FOREIGN KEY (invited_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "care_recipient_invitations_pkey",
+      "table": "care_recipient_invitations",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "care_recipient_invitations_status_check",
+      "table": "care_recipient_invitations",
+      "validated": true,
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'accepted'::text, 'revoked'::text])))"
+    },
+    {
+      "name": "care_recipient_invitations_token_hash_check",
+      "table": "care_recipient_invitations",
+      "validated": true,
+      "definition": "CHECK ((token_hash ~ '^[a-f0-9]{64}$'::text))"
+    },
+    {
+      "name": "care_recipient_invitations_token_hash_key",
+      "table": "care_recipient_invitations",
+      "validated": true,
+      "definition": "UNIQUE (token_hash)"
+    },
+    {
+      "name": "care_recipient_memberships_care_recipient_id_fkey",
+      "table": "care_recipient_memberships",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id) REFERENCES care_recipients(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "care_recipient_memberships_care_recipient_id_user_id_key",
+      "table": "care_recipient_memberships",
+      "validated": true,
+      "definition": "UNIQUE (care_recipient_id, user_id)"
+    },
+    {
+      "name": "care_recipient_memberships_pkey",
+      "table": "care_recipient_memberships",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "care_recipient_memberships_status_check",
+      "table": "care_recipient_memberships",
+      "validated": true,
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'revoked'::text])))"
+    },
+    {
+      "name": "care_recipient_memberships_user_id_fkey",
+      "table": "care_recipient_memberships",
+      "validated": true,
+      "definition": "FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "care_recipient_products_care_recipient_id_fkey",
+      "table": "care_recipient_products",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id) REFERENCES care_recipients(id)"
+    },
+    {
+      "name": "care_recipient_products_description_check",
+      "table": "care_recipient_products",
+      "validated": true,
+      "definition": "CHECK (((description IS NULL) OR (length(description) <= 2000)))"
+    },
+    {
+      "name": "care_recipient_products_name_check",
+      "table": "care_recipient_products",
+      "validated": true,
+      "definition": "CHECK (((length(TRIM(BOTH FROM name)) >= 2) AND (length(TRIM(BOTH FROM name)) <= 160)))"
+    },
+    {
+      "name": "care_recipient_products_pkey",
+      "table": "care_recipient_products",
+      "validated": true,
+      "definition": "PRIMARY KEY (care_recipient_id, product_id)"
+    },
+    {
+      "name": "care_recipient_products_product_id_fkey",
+      "table": "care_recipient_products",
+      "validated": true,
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id)"
+    },
+    {
+      "name": "care_recipient_products_unit_check",
+      "table": "care_recipient_products",
+      "validated": true,
+      "definition": "CHECK ((unit = ANY (ARRAY['unidade'::text, 'caixa'::text, 'frasco'::text, 'pacote'::text, 'bisnaga'::text, 'envelope'::text, 'comprimido'::text])))"
+    },
+    {
+      "name": "care_recipients_display_name_check",
+      "table": "care_recipients",
+      "validated": true,
+      "definition": "CHECK (((length(TRIM(BOTH FROM display_name)) >= 2) AND (length(TRIM(BOTH FROM display_name)) <= 160)))"
+    },
+    {
+      "name": "care_recipients_pkey",
+      "table": "care_recipients",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "global_admin_guard_active_count_check",
+      "table": "global_admin_guard",
+      "validated": true,
+      "definition": "CHECK ((active_count >= 0))"
+    },
+    {
+      "name": "global_admin_guard_pkey",
+      "table": "global_admin_guard",
+      "validated": true,
+      "definition": "PRIMARY KEY (singleton)"
+    },
+    {
+      "name": "global_admin_guard_singleton_check",
+      "table": "global_admin_guard",
+      "validated": true,
+      "definition": "CHECK (singleton)"
+    },
+    {
+      "name": "historical_requisition_imports_batch_id_fkey",
+      "table": "historical_requisition_imports",
+      "validated": true,
+      "definition": "FOREIGN KEY (batch_id) REFERENCES requisition_import_batches(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "historical_requisition_imports_physical_protocol_check",
+      "table": "historical_requisition_imports",
+      "validated": true,
+      "definition": "CHECK (((physical_protocol >= 1) AND (physical_protocol <= 11)))"
+    },
+    {
+      "name": "historical_requisition_imports_pkey",
+      "table": "historical_requisition_imports",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "historical_requisition_imports_requisition_id_fkey",
+      "table": "historical_requisition_imports",
+      "validated": true,
+      "definition": "FOREIGN KEY (requisition_id) REFERENCES requisitions(id)"
+    },
+    {
+      "name": "historical_requisition_imports_requisition_id_key",
+      "table": "historical_requisition_imports",
+      "validated": true,
+      "definition": "UNIQUE (requisition_id)"
+    },
+    {
+      "name": "historical_requisition_imports_row_hash_check",
+      "table": "historical_requisition_imports",
+      "validated": true,
+      "definition": "CHECK ((row_hash ~ '^[a-f0-9]{64}$'::text))"
+    },
+    {
+      "name": "historical_requisition_imports_row_hash_key",
+      "table": "historical_requisition_imports",
+      "validated": true,
+      "definition": "UNIQUE (row_hash)"
+    },
+    {
+      "name": "products_owner_care_recipient_id_fkey",
+      "table": "products",
+      "validated": true,
+      "definition": "FOREIGN KEY (owner_care_recipient_id) REFERENCES care_recipients(id)"
+    },
+    {
+      "name": "products_pkey",
+      "table": "products",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "products_unit_check",
+      "table": "products",
+      "validated": true,
+      "definition": "CHECK ((unit = ANY (ARRAY['unidade'::text, 'caixa'::text, 'frasco'::text, 'pacote'::text, 'bisnaga'::text, 'envelope'::text, 'comprimido'::text])))"
+    },
+    {
+      "name": "profiles_full_name_check",
+      "table": "profiles",
+      "validated": true,
+      "definition": "CHECK (((length(TRIM(BOTH FROM full_name)) >= 2) AND (length(TRIM(BOTH FROM full_name)) <= 160)))"
+    },
+    {
+      "name": "profiles_id_fkey",
+      "table": "profiles",
+      "validated": true,
+      "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "profiles_pkey",
+      "table": "profiles",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "profiles_status_check",
+      "table": "profiles",
+      "validated": true,
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'revoked'::text])))"
+    },
+    {
+      "name": "recipient_notification_settin_care_recipient_id_recipient_u_key",
+      "table": "recipient_notification_settings",
+      "validated": true,
+      "definition": "UNIQUE (care_recipient_id, recipient_user_id, channel)"
+    },
+    {
+      "name": "recipient_notification_settings_care_recipient_id_fkey",
+      "table": "recipient_notification_settings",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id) REFERENCES care_recipients(id)"
+    },
+    {
+      "name": "recipient_notification_settings_channel_check",
+      "table": "recipient_notification_settings",
+      "validated": true,
+      "definition": "CHECK ((channel = ANY (ARRAY['internal'::text, 'email'::text, 'whatsapp'::text])))"
+    },
+    {
+      "name": "recipient_notification_settings_pkey",
+      "table": "recipient_notification_settings",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "recipient_notification_settings_recipient_group_check",
+      "table": "recipient_notification_settings",
+      "validated": true,
+      "definition": "CHECK ((recipient_group = ANY (ARRAY['family'::text, 'supervision'::text, 'care_team'::text, 'other'::text])))"
+    },
+    {
+      "name": "recipient_notification_settings_recipient_user_id_fkey",
+      "table": "recipient_notification_settings",
+      "validated": true,
+      "definition": "FOREIGN KEY (recipient_user_id) REFERENCES profiles(id)"
+    },
+    {
+      "name": "requisition_import_batches_imported_by_fkey",
+      "table": "requisition_import_batches",
+      "validated": true,
+      "definition": "FOREIGN KEY (imported_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "requisition_import_batches_imported_rows_check",
+      "table": "requisition_import_batches",
+      "validated": true,
+      "definition": "CHECK ((imported_rows >= 0))"
+    },
+    {
+      "name": "requisition_import_batches_pkey",
+      "table": "requisition_import_batches",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "requisition_import_batches_rejected_rows_check",
+      "table": "requisition_import_batches",
+      "validated": true,
+      "definition": "CHECK ((rejected_rows >= 0))"
+    },
+    {
+      "name": "requisition_import_batches_source_hash_check",
+      "table": "requisition_import_batches",
+      "validated": true,
+      "definition": "CHECK ((source_hash ~ '^[a-f0-9]{64}$'::text))"
+    },
+    {
+      "name": "requisition_import_batches_source_hash_key",
+      "table": "requisition_import_batches",
+      "validated": true,
+      "definition": "UNIQUE (source_hash)"
+    },
+    {
+      "name": "requisition_import_batches_total_rows_check",
+      "table": "requisition_import_batches",
+      "validated": true,
+      "definition": "CHECK ((total_rows >= 0))"
+    },
+    {
+      "name": "requisition_items_check",
+      "table": "requisition_items",
+      "validated": true,
+      "definition": "CHECK ((((product_id IS NOT NULL) AND (custom_name IS NULL)) OR ((product_id IS NULL) AND (length(TRIM(BOTH FROM custom_name)) > 0))))"
+    },
+    {
+      "name": "requisition_items_current_stock_check",
+      "table": "requisition_items",
+      "validated": true,
+      "definition": "CHECK ((current_stock >= 0))"
+    },
+    {
+      "name": "requisition_items_patient_product_fk",
+      "table": "requisition_items",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id, product_id) REFERENCES care_recipient_products(care_recipient_id, product_id)"
+    },
+    {
+      "name": "requisition_items_pkey",
+      "table": "requisition_items",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "requisition_items_product_id_fkey",
+      "table": "requisition_items",
+      "validated": true,
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id)"
+    },
+    {
+      "name": "requisition_items_requisition_id_fkey",
+      "table": "requisition_items",
+      "validated": true,
+      "definition": "FOREIGN KEY (requisition_id) REFERENCES requisitions(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "requisition_items_snapshot_source_check",
+      "table": "requisition_items",
+      "validated": true,
+      "definition": "CHECK ((snapshot_source = ANY (ARRAY['persisted'::text, 'legacy_reconstructed'::text])))"
+    },
+    {
+      "name": "notification_event_kind",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "CHECK (((requisition_id IS NULL) <> (alert_event_id IS NULL)))"
+    },
+    {
+      "name": "requisition_notifications_alert_event_id_fkey",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "FOREIGN KEY (alert_event_id) REFERENCES stock_alert_events(id)"
+    },
+    {
+      "name": "requisition_notifications_attempts_check",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "CHECK ((attempts >= 0))"
+    },
+    {
+      "name": "requisition_notifications_care_recipient_id_fkey",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id) REFERENCES care_recipients(id)"
+    },
+    {
+      "name": "requisition_notifications_channel_check",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "CHECK ((channel = ANY (ARRAY['whatsapp'::text, 'email'::text, 'internal'::text])))"
+    },
+    {
+      "name": "requisition_notifications_pkey",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "requisition_notifications_recipient_group_check",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "CHECK ((recipient_group = ANY (ARRAY['family'::text, 'supervision'::text, 'care_team'::text, 'other'::text])))"
+    },
+    {
+      "name": "requisition_notifications_recipient_label_check",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "CHECK (((length(TRIM(BOTH FROM recipient_label)) >= 1) AND (length(TRIM(BOTH FROM recipient_label)) <= 160)))"
+    },
+    {
+      "name": "requisition_notifications_recipient_user_id_fkey",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "FOREIGN KEY (recipient_user_id) REFERENCES profiles(id)"
+    },
+    {
+      "name": "requisition_notifications_requisition_id_fkey",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "FOREIGN KEY (requisition_id) REFERENCES requisitions(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "requisition_notifications_requisition_id_recipient_group_re_key",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "UNIQUE (requisition_id, recipient_group, recipient_label, channel)"
+    },
+    {
+      "name": "requisition_notifications_state_check",
+      "table": "requisition_notifications",
+      "validated": true,
+      "definition": "CHECK ((state = ANY (ARRAY['pending'::text, 'processing'::text, 'accepted'::text, 'delivered'::text, 'read'::text, 'sent'::text, 'failed'::text, 'cancelled'::text, 'uncertain'::text])))"
+    },
+    {
+      "name": "requisition_observations_body_check",
+      "table": "requisition_observations",
+      "validated": true,
+      "definition": "CHECK (((length(TRIM(BOTH FROM body)) >= 1) AND (length(TRIM(BOTH FROM body)) <= 1000)))"
+    },
+    {
+      "name": "requisition_observations_created_by_fkey",
+      "table": "requisition_observations",
+      "validated": true,
+      "definition": "FOREIGN KEY (created_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "requisition_observations_pkey",
+      "table": "requisition_observations",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "requisition_observations_requisition_id_fkey",
+      "table": "requisition_observations",
+      "validated": true,
+      "definition": "FOREIGN KEY (requisition_id) REFERENCES requisitions(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "requisition_status_history_changed_by_fkey",
+      "table": "requisition_status_history",
+      "validated": true,
+      "definition": "FOREIGN KEY (changed_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "requisition_status_history_pkey",
+      "table": "requisition_status_history",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "requisition_status_history_reason_check",
+      "table": "requisition_status_history",
+      "validated": true,
+      "definition": "CHECK (((reason IS NULL) OR ((length(TRIM(BOTH FROM reason)) >= 1) AND (length(TRIM(BOTH FROM reason)) <= 1000))))"
+    },
+    {
+      "name": "requisition_status_history_requisition_id_fkey",
+      "table": "requisition_status_history",
+      "validated": true,
+      "definition": "FOREIGN KEY (requisition_id) REFERENCES requisitions(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "requisitions_care_recipient_id_fkey",
+      "table": "requisitions",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id) REFERENCES care_recipients(id)"
+    },
+    {
+      "name": "requisitions_created_by_fkey",
+      "table": "requisitions",
+      "validated": true,
+      "definition": "FOREIGN KEY (created_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "requisitions_created_by_idempotency_key_key",
+      "table": "requisitions",
+      "validated": true,
+      "definition": "UNIQUE (created_by, idempotency_key)"
+    },
+    {
+      "name": "requisitions_pkey",
+      "table": "requisitions",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "requisitions_protocol_format_check",
+      "table": "requisitions",
+      "validated": true,
+      "definition": "CHECK (((protocol ~ '^HC-[0-9]{8}-[A-Z0-9]{8}$'::text) OR (protocol ~ '^HC-[0-9]{6,}$'::text)))"
+    },
+    {
+      "name": "requisitions_protocol_key",
+      "table": "requisitions",
+      "validated": true,
+      "definition": "UNIQUE (protocol)"
+    },
+    {
+      "name": "requisitions_recipient_active_check",
+      "table": "requisitions",
+      "validated": true,
+      "definition": "CHECK ((care_recipient_id IS NOT NULL))"
+    },
+    {
+      "name": "stock_alert_events_care_recipient_id_product_id_fkey",
+      "table": "stock_alert_events",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id, product_id) REFERENCES care_recipient_products(care_recipient_id, product_id)"
+    },
+    {
+      "name": "stock_alert_events_location_check",
+      "table": "stock_alert_events",
+      "validated": true,
+      "definition": "CHECK ((location = ANY (ARRAY['FAMILY'::text, 'CARE_TEAM'::text])))"
+    },
+    {
+      "name": "stock_alert_events_pkey",
+      "table": "stock_alert_events",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "stock_alert_events_severity_check",
+      "table": "stock_alert_events",
+      "validated": true,
+      "definition": "CHECK ((severity = ANY (ARRAY['low'::text, 'critical'::text])))"
+    },
+    {
+      "name": "stock_alert_events_state_check",
+      "table": "stock_alert_events",
+      "validated": true,
+      "definition": "CHECK ((state = ANY (ARRAY['open'::text, 'resolved'::text])))"
+    },
+    {
+      "name": "stock_alert_rules_care_recipient_id_product_id_fkey",
+      "table": "stock_alert_rules",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id, product_id) REFERENCES care_recipient_products(care_recipient_id, product_id)"
+    },
+    {
+      "name": "stock_alert_rules_care_recipient_id_product_id_location_key",
+      "table": "stock_alert_rules",
+      "validated": true,
+      "definition": "UNIQUE (care_recipient_id, product_id, location)"
+    },
+    {
+      "name": "stock_alert_rules_check",
+      "table": "stock_alert_rules",
+      "validated": true,
+      "definition": "CHECK (((critical_threshold >= 0) AND (critical_threshold <= low_threshold)))"
+    },
+    {
+      "name": "stock_alert_rules_location_check",
+      "table": "stock_alert_rules",
+      "validated": true,
+      "definition": "CHECK ((location = ANY (ARRAY['FAMILY'::text, 'CARE_TEAM'::text])))"
+    },
+    {
+      "name": "stock_alert_rules_low_threshold_check",
+      "table": "stock_alert_rules",
+      "validated": true,
+      "definition": "CHECK ((low_threshold >= 0))"
+    },
+    {
+      "name": "stock_alert_rules_pkey",
+      "table": "stock_alert_rules",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "stock_inventories_approved_by_fkey",
+      "table": "stock_inventories",
+      "validated": true,
+      "definition": "FOREIGN KEY (approved_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "stock_inventories_care_recipient_id_fkey",
+      "table": "stock_inventories",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id) REFERENCES care_recipients(id)"
+    },
+    {
+      "name": "stock_inventories_counted_by_fkey",
+      "table": "stock_inventories",
+      "validated": true,
+      "definition": "FOREIGN KEY (counted_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "stock_inventories_location_check",
+      "table": "stock_inventories",
+      "validated": true,
+      "definition": "CHECK ((location = ANY (ARRAY['FAMILY'::text, 'CARE_TEAM'::text])))"
+    },
+    {
+      "name": "stock_inventories_pkey",
+      "table": "stock_inventories",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "stock_inventories_status_check",
+      "table": "stock_inventories",
+      "validated": true,
+      "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'submitted'::text, 'under_review'::text, 'approved'::text, 'rejected'::text, 'cancelled'::text])))"
+    },
+    {
+      "name": "inventory_items_patient_product_fk",
+      "table": "stock_inventory_items",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id, product_id) REFERENCES care_recipient_products(care_recipient_id, product_id)"
+    },
+    {
+      "name": "stock_inventory_items_counted_quantity_check",
+      "table": "stock_inventory_items",
+      "validated": true,
+      "definition": "CHECK ((counted_quantity >= 0))"
+    },
+    {
+      "name": "stock_inventory_items_inventory_id_fkey",
+      "table": "stock_inventory_items",
+      "validated": true,
+      "definition": "FOREIGN KEY (inventory_id) REFERENCES stock_inventories(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "stock_inventory_items_justification_check",
+      "table": "stock_inventory_items",
+      "validated": true,
+      "definition": "CHECK (((justification IS NULL) OR ((length(TRIM(BOTH FROM justification)) >= 1) AND (length(TRIM(BOTH FROM justification)) <= 1000))))"
+    },
+    {
+      "name": "stock_inventory_items_pkey",
+      "table": "stock_inventory_items",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "stock_inventory_items_product_id_fkey",
+      "table": "stock_inventory_items",
+      "validated": true,
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id)"
+    },
+    {
+      "name": "stock_inventory_items_reference_movement_id_fkey",
+      "table": "stock_inventory_items",
+      "validated": true,
+      "definition": "FOREIGN KEY (reference_movement_id) REFERENCES stock_movements(id)"
+    },
+    {
+      "name": "stock_inventory_items_unique_product",
+      "table": "stock_inventory_items",
+      "validated": true,
+      "definition": "UNIQUE (inventory_id, product_id)"
+    },
+    {
+      "name": "stock_movement_locations_check",
+      "table": "stock_movements",
+      "validated": true,
+      "definition": "CHECK ((((source_location IS NULL) OR (source_location = ANY (ARRAY['FAMILY'::text, 'CARE_TEAM'::text]))) AND ((destination_location IS NULL) OR (destination_location = ANY (ARRAY['FAMILY'::text, 'CARE_TEAM'::text])))))"
+    },
+    {
+      "name": "stock_movements_care_recipient_id_fkey",
+      "table": "stock_movements",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id) REFERENCES care_recipients(id)"
+    },
+    {
+      "name": "stock_movements_justification_check",
+      "table": "stock_movements",
+      "validated": true,
+      "definition": "CHECK (((length(TRIM(BOTH FROM justification)) >= 1) AND (length(TRIM(BOTH FROM justification)) <= 1000)))"
+    },
+    {
+      "name": "stock_movements_patient_product_fk",
+      "table": "stock_movements",
+      "validated": true,
+      "definition": "FOREIGN KEY (care_recipient_id, product_id) REFERENCES care_recipient_products(care_recipient_id, product_id)"
+    },
+    {
+      "name": "stock_movements_performed_by_fkey",
+      "table": "stock_movements",
+      "validated": true,
+      "definition": "FOREIGN KEY (performed_by) REFERENCES profiles(id)"
+    },
+    {
+      "name": "stock_movements_pkey",
+      "table": "stock_movements",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "stock_movements_product_id_fkey",
+      "table": "stock_movements",
+      "validated": true,
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id)"
+    },
+    {
+      "name": "stock_movements_quantity_check",
+      "table": "stock_movements",
+      "validated": true,
+      "definition": "CHECK ((quantity > 0))"
+    }
+  ],
+  "client_grants": [
+    {
+      "table": "audit_events",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "care_recipient_invitations",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "care_recipient_memberships",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "care_recipient_products",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "care_recipients",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "current_stock_balances",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "products",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "profiles",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "recipient_notification_settings",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "requisition_items",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "requisition_notifications",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "requisition_observations",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "requisition_status_history",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "requisitions",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "stock_alert_events",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "stock_alert_rules",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "stock_inventories",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "stock_inventory_items",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "stock_movements",
+      "grantee": "authenticated",
+      "privilege": "SELECT"
+    }
+  ]
+}

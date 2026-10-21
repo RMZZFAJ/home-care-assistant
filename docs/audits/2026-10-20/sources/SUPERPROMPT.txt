@@ -1,0 +1,1240 @@
+# SUPERPROMPT MESTRE — HOME CARE ASSISTANT
+## Evolução estrutural, gestão de pacientes, requisições, estoque por custódia, administração, auditoria e notificações
+
+Você é o engenheiro de software sênior responsável por evoluir o projeto existente `RMZZFAJ/home-care-assistant`, implementando uma versão funcional, segura, extensível e auditável do sistema de gestão de Home Care.
+
+**Repositório:** `RMZZFAJ/home-care-assistant`  
+**Branch de referência:** `master`  
+**Ambiente de trabalho:** VS Code, GitHub Copilot em modo Agent.
+
+Sua missão não é produzir um plano, uma análise isolada ou exemplos ilustrativos. Você deverá inspecionar o código existente, implementar as mudanças necessárias, criar migrações incrementais, desenvolver as interfaces, executar testes, corrigir falhas e documentar o resultado.
+
+O projeto já possui uma base em Next.js, TypeScript, Supabase, PostgreSQL, autenticação, catálogo de produtos, formulário de requisições e migrações. **Preserve o que estiver correto e evolua a arquitetura existente. Não recrie o projeto do zero.**
+
+---
+
+# 1. REGRAS INEGOCIÁVEIS DE EXECUÇÃO
+
+Antes de qualquer alteração:
+
+1. Leia `AGENTS.md`, `README.md`, `package.json`, os documentos de arquitetura e segurança, as migrações existentes e a árvore atual do projeto.
+2. Verifique a branch atual, o estado do Git, alterações locais, commits recentes e arquivos não rastreados.
+3. Preserve integralmente as alterações locais do usuário.
+4. Não faça reset, rebase destrutivo, limpeza indiscriminada, descarte de alterações ou sobrescrita de trabalho não relacionado.
+5. Trabalhe em uma branch de implementação própria, criada a partir da `master` atualizada, se isso puder ser feito sem comprometer o estado local. Caso contrário, preserve o estado existente e explique a situação.
+6. Não faça commit, push, merge, abertura de PR ou deploy sem autorização expressa.
+7. Não altere diretamente migrações que possam já ter sido aplicadas. Crie novas migrações incrementais e compatíveis.
+8. Não execute migrações destrutivas nem comandos que possam apagar dados de bancos remotos.
+9. Não use dados reais da paciente em seeds, testes, fixtures, logs ou documentação.
+10. Não invente credenciais, configurações externas, resultados de testes ou funcionalidades que não foram implementadas.
+11. Nunca exponha `SUPABASE_SERVICE_ROLE_KEY` no cliente, em variáveis `NEXT_PUBLIC_*`, no Git ou em logs.
+12. Não desabilite RLS para contornar erros.
+13. Não use mocks como prova de que políticas RLS reais funcionam.
+14. Não esconda erros com `any`, supressões genéricas, desativação de regras do ESLint ou exclusão de testes.
+15. Se uma funcionalidade depender de credenciais externas, implemente toda a estrutura local possível e documente a configuração pendente.
+16. Execute as verificações disponíveis e registre seus resultados reais.
+17. Se encontrar uma falha, corrija-a antes de seguir, sempre que isso puder ser feito com segurança.
+18. Não considere uma tarefa concluída apenas porque os arquivos foram criados. Verifique sua integração com o restante da aplicação.
+
+Organize o trabalho em etapas pequenas e coerentes, mantendo a aplicação compilável sempre que possível.
+
+# 2. OBJETIVO GERAL DO SISTEMA
+
+Evoluir o Home Care Assistant para uma plataforma de gestão operacional de Home Care, inicialmente utilizada por uma família e uma equipe de profissionais, mas com arquitetura preparada para atender vários pacientes e diferentes operações no futuro.
+
+O sistema deverá contemplar:
+
+- Cadastro e gestão de pacientes.
+- Associação de familiares, profissionais, supervisores e administradores aos pacientes.
+- Formulário de requisições de insumos.
+- Histórico completo de requisições.
+- Geração de protocolos sequenciais.
+- Catálogo de produtos configurável.
+- Estoque separado por custódia e localização.
+- Inventário semanal da equipe.
+- Administração de usuários e permissões.
+- Auditoria e rastreabilidade.
+- Catálogo inicial de erros operacionais e técnicos.
+- Estados de carregamento e feedback de todas as operações.
+- Preparação para notificações por WhatsApp e outros canais.
+- Estrutura para um futuro agente de IA que consulte dados autorizados e auxilie na operação.
+
+O sistema é operacional e administrativo. Não deve emitir diagnósticos, prescrever medicamentos, recomendar doses ou tomar decisões clínicas.
+
+# 3. REMOVER COMPLETAMENTE O CONCEITO DE QUANTIDADE SOLICITADA
+
+Esta é uma alteração obrigatória e prioritária.
+
+O conceito de campo, propriedade ou regra de negócio denominado `requestedQuantity`, `requested_quantity`, “quantidade solicitada” ou equivalente deverá ser eliminado de toda a aplicação.
+
+Não basta esconder o campo no formulário.
+
+## 3.1. Inspecionar e remover
+
+Procure em todo o repositório:
+
+- `requestedQuantity`
+- `requested_quantity`
+- `requested_quantity`
+- Campos equivalentes em português.
+- Propriedades de tipos TypeScript.
+- Schemas Zod.
+- Valores padrão e cálculos derivados.
+- Componentes e formulários.
+- Payloads de API.
+- Rotas e serviços.
+- Funções SQL.
+- Colunas do banco.
+- Seeds e fixtures.
+- Testes.
+- Tipos gerados do Supabase.
+- Comprovantes.
+- Documentação.
+- Relatórios e integrações.
+- Qualquer referência a esse conceito como parte da requisição.
+
+Use busca global no projeto e confira também ocorrências com nomes diferentes que tenham a mesma finalidade.
+
+## 3.2. Não confundir conceitos distintos
+
+A remoção se aplica à quantidade que o usuário solicitava como parte do formulário de requisição.
+
+**Não remova as quantidades necessárias para registrar movimentações reais de estoque.**
+
+O sistema continuará precisando de quantidades para:
+
+- Entrada de produtos.
+- Transferência de custódia.
+- Entrega de itens da família à equipe.
+- Devolução de itens.
+- Consumo ou saída operacional, se esse evento for autorizado e implementado.
+- Ajuste de inventário.
+- Contagem física.
+- Diferenças entre saldo esperado e saldo contado.
+
+Essas quantidades pertencem ao domínio de estoque e movimentações, não ao formulário de requisição.
+
+## 3.3. Alterações no banco
+
+Se a coluna correspondente existir em uma migração anterior ou no banco:
+
+1. Crie uma migração incremental que remova o campo ou a coluna, depois de verificar todas as dependências.
+2. Remova referências em funções SQL, índices, views, triggers e constraints, quando aplicável.
+3. Atualize tipos e contratos de API.
+4. Não apague registros históricos inteiros para eliminar o campo.
+5. Preserve todos os outros dados e relacionamentos.
+6. Se a coluna já tiver sido utilizada, documente como será tratada sua remoção.
+7. Não edite o histórico de migrações já aplicado.
+
+A migração deverá falhar de forma explícita se existir uma dependência não prevista, em vez de executar uma alteração destrutiva indiscriminada.
+
+## 3.4. Formulário e comprovante
+
+O formulário não poderá solicitar nem exibir quantidade de reposição.
+
+O comprovante deverá registrar os itens pertinentes à requisição, o estoque informado quando aplicável, a urgência, as observações e os demais dados operacionais definidos pelo sistema, sem incluir o conceito removido.
+
+A tela de revisão deverá refletir exatamente o que será persistido.
+
+## 3.5. Critério de aceitação
+
+Não poderá haver nenhuma referência funcional ao conceito removido no código atual, nas APIs, nos tipos, nas funções SQL ou no schema final do banco.
+
+Referências históricas necessárias para explicar a migração poderão permanecer na documentação técnica, desde que não representem funcionalidade ativa.
+
+# 4. ARQUITETURA MULTIPACIENTE
+
+O sistema deverá ser preparado para atender mais de um paciente, mesmo que inicialmente exista apenas um cadastro ativo.
+
+Crie ou normalize a entidade central `care_recipients`, ou outra entidade equivalente já existente, preservando a nomenclatura e os relacionamentos atuais sempre que forem adequados.
+
+O paciente será o centro do contexto operacional.
+
+## 4.1. Entidade paciente
+
+Cada paciente deverá ter, conforme o modelo existente e as necessidades identificadas:
+
+- ID UUID.
+- Nome de exibição.
+- Identificador interno opcional.
+- Status ativo/inativo.
+- Data de criação.
+- Data de atualização.
+- Usuário responsável pelo cadastro.
+- Observações administrativas, se necessárias.
+- Configurações operacionais específicas.
+- Auditoria de alterações.
+
+Não torne dados clínicos sensíveis obrigatórios para o cadastro básico.
+
+Não use o nome do paciente como chave primária, identificador público ou mecanismo de autorização.
+
+## 4.2. Relacionamentos
+
+Avalie e implemente os relacionamentos necessários entre:
+
+- Pacientes.
+- Usuários.
+- Perfis e funções.
+- Familiares e responsáveis.
+- Profissionais.
+- Supervisores.
+- Requisições.
+- Produtos e configurações do catálogo.
+- Saldos e movimentações de estoque.
+- Inventários.
+- Notificações.
+- Eventos de auditoria.
+
+Use tabelas associativas quando um usuário puder estar relacionado a mais de um paciente ou exercer funções diferentes conforme o paciente.
+
+Não crie uma coluna de paciente redundante em todas as tabelas se o relacionamento puder ser resolvido de maneira segura e consistente. Porém, não dependa exclusivamente de joins indiretos complexos quando um vínculo explícito for necessário para garantir autorização e auditoria.
+
+## 4.3. Isolamento por paciente
+
+Cada operação deve verificar o contexto do paciente no servidor.
+
+Regras:
+
+- Usuários comuns só podem atuar nos pacientes aos quais estão vinculados.
+- O administrador global poderá administrar vários pacientes de acordo com uma permissão explícita.
+- Um administrador limitado a determinado paciente não poderá acessar outros pacientes automaticamente.
+- A associação a um paciente não concede acesso administrativo irrestrito.
+- A desativação de um paciente deverá impedir novas operações incompatíveis com seu status.
+- O histórico existente deverá continuar acessível a usuários autorizados, mesmo que o paciente seja inativado.
+- Não use o UUID enviado pelo cliente como prova de autorização.
+
+Implemente as verificações na API e no banco, usando RLS e funções seguras quando aplicável.
+
+# 5. AUTENTICAÇÃO, USUÁRIOS E ADMINISTRAÇÃO
+
+Implemente uma área administrativa para gerenciar usuários.
+
+Essa área deverá ser acessível somente a administradores autorizados.
+
+## 5.1. Cadastro e configuração de usuários
+
+Permitir ao administrador:
+
+- Criar usuários.
+- Informar nome e e-mail.
+- Definir ou solicitar a definição inicial de senha pelo fluxo seguro de autenticação.
+- Enviar convite ou link de ativação, quando configurado.
+- Atribuir função.
+- Associar o usuário a um ou mais pacientes.
+- Definir o escopo da autorização.
+- Ativar e desativar usuários.
+- Revogar acesso.
+- Consultar informações administrativas do perfil.
+- Consultar eventos de auditoria relacionados ao usuário.
+- Alterar associações e funções com registro de auditoria.
+
+Não exiba senhas existentes nem armazene senhas em texto puro.
+
+Não permita que o navegador atribua a própria função, se torne administrador ou crie perfis privilegiados diretamente.
+
+A criação de usuários no Supabase Auth deverá ocorrer por um endpoint server-side autorizado ou mecanismo equivalente, utilizando a credencial administrativa somente no servidor.
+
+## 5.2. Funções iniciais
+
+Implemente ou adapte as funções existentes para representar, no mínimo:
+
+### Administrador
+
+- Gerenciar usuários e permissões.
+- Gerenciar pacientes dentro de seu escopo.
+- Gerenciar catálogo.
+- Criar e alterar produtos.
+- Administrar o estoque.
+- Registrar e corrigir movimentações conforme as regras.
+- Consultar todo o histórico autorizado.
+- Gerenciar configurações operacionais.
+- Consultar auditoria.
+- Gerenciar configurações de notificações.
+
+### Supervisor
+
+- Consultar o histórico completo dos pacientes aos quais tem acesso.
+- Consultar estoque.
+- Acompanhar requisições e inventários.
+- Consultar estados de notificações.
+- Executar ações operacionais explicitamente autorizadas.
+- Não gerenciar funções de administrador.
+- Não alterar catálogo ou estoque se não receber uma permissão específica.
+
+### Profissional
+
+- Registrar requisições.
+- Consultar o histórico completo de requisições dos pacientes aos quais está vinculado.
+- Consultar o estoque sob posse da equipe.
+- Consultar o estoque da família, quando autorizado para o paciente.
+- Registrar contagem física da equipe, caso essa permissão seja concedida.
+- Não alterar o catálogo.
+- Não realizar ajustes administrativos de estoque.
+- Não administrar usuários.
+
+### Familiar/responsável
+
+- Consultar as requisições dos pacientes aos quais está vinculado.
+- Consultar o histórico autorizado.
+- Consultar os estoques pertinentes.
+- Receber notificações.
+- Não modificar o catálogo.
+- Não realizar movimentações administrativas sem autorização específica.
+
+### Leitor
+
+- Acesso somente de leitura aos recursos expressamente autorizados.
+- Nenhuma criação, edição ou exclusão de dados operacionais.
+- Nenhuma submissão de requisições.
+- Nenhuma movimentação de estoque.
+
+Não codifique permissões apenas com condicionais na interface. A autorização precisa existir no servidor e no banco.
+
+Implemente permissões por escopo de paciente. Se a estrutura atual exigir uma matriz de permissões, prefira regras explícitas e testáveis em vez de espalhar verificações de nomes de função pelo projeto.
+
+## 5.3. Auditoria administrativa
+
+Toda ação administrativa relevante deverá registrar:
+
+- Usuário executor.
+- Paciente/contexto, quando aplicável.
+- Tipo de ação.
+- Entidade e identificador afetados.
+- Data e hora.
+- Resultado da operação.
+- Motivo ou justificativa, quando exigido.
+- Metadados não sensíveis necessários para investigação.
+
+Não registre senhas, tokens ou dados sensíveis desnecessários.
+
+Os registros de auditoria não devem ser editáveis ou removíveis por usuários comuns ou administradores operacionais. Utilize privilégios restritos e controles adequados.
+
+# 6. GESTÃO DO CATÁLOGO DE PRODUTOS
+
+Implemente uma área administrativa para gerir os produtos usados no formulário.
+
+O catálogo deverá continuar centralizado no banco, com uma representação TypeScript consistente e validação server-side.
+
+## 6.1. Funcionalidades
+
+O administrador poderá:
+
+- Incluir produtos.
+- Editar produtos.
+- Alterar nome.
+- Alterar descrição.
+- Alterar categoria.
+- Alterar unidade de medida.
+- Configurar aliases de busca.
+- Ativar e inativar produtos.
+- Consultar o histórico de alterações.
+- Reordenar ou organizar produtos no formulário.
+- Configurar informações operacionais que sejam realmente necessárias.
+- Corrigir erros de digitação.
+- Consultar alertas de produtos com dados incompletos ou inconsistentes.
+
+O sistema deve permitir unidades apropriadas, como unidade, pacote, frasco, caixa, envelope, bisnaga e outras necessárias ao catálogo.
+
+Não presuma que todas as unidades existentes são adequadas a todos os produtos.
+
+## 6.2. Integridade do catálogo
+
+Cada produto deverá possuir identificador estável, preferencialmente UUID no banco.
+
+O catálogo deverá manter consistência entre:
+
+- Banco.
+- Formulário.
+- Validação Zod.
+- Tipos TypeScript.
+- Comprovantes.
+- Estoque.
+- Movimentações.
+- Busca por aliases.
+- Notificações.
+- Relatórios.
+
+Não permita que a interface envie nome, categoria ou unidade arbitrários para substituir os valores canônicos do banco.
+
+Quando o produto estiver inativo, ele não poderá ser escolhido para novas operações incompatíveis, mas deverá continuar aparecendo corretamente no histórico antigo.
+
+## 6.3. Exclusão de produtos
+
+Evite exclusão física quando o produto já possuir histórico de requisições ou movimentações.
+
+Nesse caso, use inativação ou arquivamento.
+
+A exclusão física só poderá ocorrer quando for comprovadamente segura, não houver dependências e a operação for autorizada.
+
+Todas as alterações deverão ser auditadas.
+
+## 6.4. Aliases e busca
+
+Implemente um catálogo inicial de aliases e erros comuns de digitação.
+
+A busca poderá normalizar espaços, acentos e caixa, mas deverá distinguir:
+
+- Correspondência exata.
+- Alias conhecido.
+- Correspondência aproximada.
+- Termo ambíguo.
+- Produto inexistente.
+
+Não escolha silenciosamente um produto quando o termo corresponder a vários produtos.
+
+Exiba sugestões claras e peça confirmação quando necessário.
+
+Aliases não poderão alterar o nome canônico do produto nem criar produtos duplicados.
+
+# 7. HISTÓRICO COMPLETO DE REQUISIÇÕES
+
+A aplicação deverá permitir que usuários autorizados solicitem e consultem **todo o histórico de requisições do paciente ao qual têm acesso**, e não apenas aquelas criadas por eles.
+
+Essa é uma regra funcional explícita.
+
+Não aplique o filtro `created_by = usuário atual` como restrição geral de leitura do histórico.
+
+O escopo de leitura deve ser determinado pela associação autorizada do usuário ao paciente e pelas permissões atribuídas.
+
+## 7.1. Histórico
+
+Implemente uma página de histórico com:
+
+- Listagem de requisições.
+- Protocolo.
+- Data e hora.
+- Paciente.
+- Solicitante.
+- Estado da requisição.
+- Estado das notificações.
+- Filtros por período.
+- Filtros por status.
+- Busca por protocolo.
+- Paginação server-side.
+- Ordenação previsível.
+- Estados de carregamento, erro e lista vazia.
+
+## 7.2. Detalhe da requisição
+
+Implemente uma página de detalhe baseada exclusivamente nos dados persistidos.
+
+Ela deverá exibir os dados operacionais efetivamente salvos, incluindo:
+
+- Protocolo.
+- Paciente.
+- Solicitante.
+- Data e hora.
+- Itens da requisição.
+- Estoque informado no momento da requisição, quando aplicável.
+- Urgência.
+- Observações.
+- Status atual.
+- Histórico de mudanças de status.
+- Estado de cada notificação.
+- Destinatários e tentativas de envio, conforme a permissão.
+- Informações de auditoria acessíveis ao usuário.
+
+Permita imprimir ou gerar novamente o comprovante com base nos dados persistidos.
+
+Não dependa do estado React, `localStorage` ou da existência do formulário original.
+
+## 7.3. Autorização
+
+- Profissionais podem consultar o histórico completo do paciente ao qual estão vinculados, conforme a regra definida.
+- Familiares podem consultar o histórico autorizado do paciente associado.
+- Supervisores podem consultar os pacientes sob sua supervisão.
+- Administradores podem consultar os pacientes dentro de seu escopo.
+- Usuários sem vínculo autorizado não podem consultar o histórico.
+- O papel `reader` continua estritamente sem permissão de escrita.
+- O protocolo não pode ser utilizado como mecanismo de autorização.
+
+Teste leitura autorizada e negada com usuários distintos.
+
+# 8. PROTOCOLO SEQUENCIAL DE REQUISIÇÃO
+
+Implemente um gerador de protocolos de requisição.
+
+## 8.1. Sequência inicial
+
+O primeiro protocolo disponível para novas requisições será o número **12**, pois os números de 1 a 11 correspondem a fichas físicas já preenchidas.
+
+O protocolo deverá ser gerado pelo servidor ou banco, nunca confiando em um número enviado pelo cliente.
+
+Exemplo ilustrativo:
+
+- HC-000012
+- HC-000013
+- HC-000014
+
+A apresentação visual poderá ser ajustada, mas o valor persistido deverá ser único e ter um formato estável.
+
+## 8.2. Requisitos técnicos
+
+- Unicidade garantida pelo banco.
+- Segurança sob requisições simultâneas.
+- Geração atômica.
+- Ausência de dependência do relógio do navegador.
+- Protocolo imutável após a criação.
+- Retorno do protocolo persistido em retries idempotentes.
+- Ausência de duplicidade sob falhas de rede.
+- Associação do protocolo ao paciente e à requisição.
+
+Use sequence do PostgreSQL ou mecanismo transacional equivalente. Não gere números usando `MAX(protocol_number) + 1` sem proteção contra concorrência.
+
+Não use o número sequencial como chave de autorização.
+
+## 8.3. Fichas físicas anteriores
+
+Prepare o sistema para importação posterior das fichas físicas de números 1 a 11.
+
+A importação deverá:
+
+- Permitir registrar o protocolo histórico original.
+- Preservar a data original, quando conhecida.
+- Identificar que se trata de registro importado.
+- Identificar quem realizou a importação.
+- Evitar conflito com a sequência de novos protocolos.
+- Registrar dados desconhecidos como ausentes, sem inventá-los.
+- Não gerar notificações retroativas automaticamente.
+- Permitir auditoria da importação.
+
+O processo de importação deverá ser idempotente e detectar duplicidade. Não implemente uma importação destrutiva.
+
+# 9. ESTOQUE POR CUSTÓDIA E LOCALIZAÇÃO
+
+Esta é uma das principais regras arquiteturais do projeto.
+
+**Não implemente dois catálogos independentes de estoque. Implemente um catálogo de produtos com saldos segregados por localização/custódia.**
+
+O sistema precisa distinguir:
+
+1. Estoque sob posse da família.
+2. Estoque sob posse da equipe de Home Care.
+
+Os itens em posse da família podem estar disponíveis para futura entrega à equipe, mas não podem ser considerados automaticamente disponíveis para o consumo operacional da equipe.
+
+## 9.1. Modelo de estoque
+
+Analise a estrutura atual de `stock_movements` e os demais objetos existentes.
+
+Implemente um modelo consistente para:
+
+- Produtos.
+- Localizações ou categorias de custódia.
+- Saldos por produto e localização.
+- Movimentações.
+- Inventários físicos.
+- Ajustes.
+- Transferências entre localizações.
+- Auditoria.
+
+As localizações iniciais deverão incluir:
+
+- `FAMILY` — estoque sob custódia da família.
+- `CARE_TEAM` — estoque sob custódia da equipe.
+
+A arquitetura deverá permitir novas localizações no futuro sem duplicar o catálogo de produtos.
+
+Se houver necessidade de representar itens em trânsito, implemente essa possibilidade de forma explícita ou documente o tratamento operacional. Não conte os mesmos itens simultaneamente nos dois estoques.
+
+## 9.2. Regras de movimentação
+
+Implemente movimentações auditáveis para:
+
+- Entrada de itens no estoque da família.
+- Entrada de itens no estoque da equipe.
+- Transferência de itens da família para a equipe.
+- Devolução da equipe para a família.
+- Ajuste positivo ou negativo com justificativa.
+- Contagem física e conciliação.
+- Outros movimentos operacionais que sejam aprovados e necessários.
+
+Cada movimentação deverá conter, conforme aplicável:
+
+- ID.
+- Paciente.
+- Produto.
+- Localização de origem.
+- Localização de destino.
+- Quantidade movimentada.
+- Tipo de movimento.
+- Usuário responsável.
+- Data e hora.
+- Justificativa.
+- Referência de documento ou operação.
+- Chave idempotente, quando necessária.
+- Evento de auditoria correspondente.
+
+As movimentações deverão ser atômicas.
+
+Uma transferência deverá diminuir o saldo de origem e aumentar o saldo de destino na mesma transação. Nunca permita que uma falha deixe apenas metade da transferência registrada.
+
+Implemente proteção contra concorrência e saldo negativo, de acordo com a regra de negócio aprovada.
+
+Não permita movimentação com quantidade zero ou negativa.
+
+## 9.3. Permissões de estoque
+
+**Somente administradores autorizados poderão criar, alterar, excluir ou corrigir dados oficiais de estoque.**
+
+Usuários não administradores poderão consultar os estoques autorizados, mas não poderão modificar os saldos oficiais nem registrar ajustes administrativos.
+
+Não permita edição direta do saldo por meio de um formulário genérico.
+
+Os saldos deverão ser consequência de movimentações válidas ou de um mecanismo transacional consistente, documentado e testado.
+
+O administrador deverá conseguir:
+
+- Registrar entrada.
+- Transferir entre família e equipe.
+- Ajustar saldo com justificativa.
+- Consultar movimentações.
+- Corrigir erros mediante movimento compensatório auditado, sem apagar o histórico original.
+- Consultar divergências.
+- Consultar inventários físicos.
+
+Se houver permissão futura para profissionais informarem contagens físicas, essa função deverá registrar uma **contagem ou proposta de ajuste**, sem modificar diretamente o saldo oficial. A aprovação e aplicação do ajuste seguirão as regras administrativas.
+
+## 9.4. Formulário de requisição e estoque
+
+O formulário deverá consultar e exibir os estoques de forma inequívoca.
+
+Para cada produto, distinguir visualmente:
+
+- Saldo em posse da equipe.
+- Saldo em posse da família, quando autorizado.
+- Data da última atualização, se disponível.
+
+A equipe deverá basear sua avaliação operacional principalmente no estoque que está efetivamente sob sua posse.
+
+O estoque da família deverá ser apresentado separadamente, sem ser somado silenciosamente ao estoque da equipe.
+
+**Não haverá campo de quantidade solicitada no formulário.**
+
+A requisição registra a necessidade, os itens selecionados e os dados operacionais definidos, sem determinar uma quantidade de reposição por meio do conceito removido.
+
+A quantidade de uma futura transferência ou entrada de estoque continuará sendo registrada no respectivo módulo de movimentação.
+
+## 9.5. Contagem semanal da equipe
+
+Prepare a estrutura para contagem semanal do estoque em posse da equipe.
+
+Implemente, se viável nesta rodada:
+
+- Criação de sessão de inventário.
+- Identificação do paciente e da localização.
+- Data e responsável pela contagem.
+- Itens esperados.
+- Quantidades físicas contadas.
+- Divergências.
+- Justificativa para diferenças.
+- Status do inventário: rascunho, submetido, em análise, aprovado ou cancelado.
+- Auditoria das alterações.
+- Aplicação de ajustes somente por usuário autorizado.
+
+Não altere o saldo oficial apenas porque uma contagem foi preenchida. O saldo será ajustado somente após aprovação e criação das movimentações correspondentes.
+
+## 9.6. Preparação para alertas de estoque
+
+Prepare os dados para que futuramente as notificações possam distinguir:
+
+- Estoque crítico da família.
+- Estoque baixo da família.
+- Estoque crítico da equipe.
+- Estoque baixo da equipe.
+
+As regras de limite devem ser configuráveis por produto e paciente, quando aplicável.
+
+Não implemente limites clínicos ou valores arbitrários como se fossem prescrições. Permita configuração administrativa e documente os valores de exemplo como fictícios.
+
+A estrutura de eventos deverá permitir direcionar avisos conforme a custódia:
+
+- Problema no estoque da família: aviso prioritariamente para os responsáveis familiares.
+- Problema no estoque da equipe: aviso para equipe, supervisão e família, conforme configuração.
+
+Nesta rodada, priorize a estrutura dos dados e dos eventos. A política definitiva de avisos poderá ser configurada posteriormente.
+
+# 10. TELA DE SUCESSO E ACOMPANHAMENTO DE NOTIFICAÇÕES
+
+O fim do formulário deverá ter uma tela de conclusão explícita.
+
+A tela não poderá confundir persistência da requisição com envio de mensagens.
+
+## 10.1. Estados principais
+
+Implemente estados visuais distintos:
+
+- Enviando requisição.
+- Requisição salva com sucesso.
+- Falha ao salvar a requisição.
+- Requisição salva e notificações em processamento.
+- Algumas notificações enviadas e outras pendentes.
+- Todas as notificações concluídas.
+- Falha parcial de notificações.
+- Falha total de notificações, mantendo a requisição salva.
+
+O protocolo só poderá ser exibido como confirmado depois de o servidor retornar a confirmação da persistência.
+
+## 10.2. Persistência independente
+
+A gravação da requisição deverá ser concluída independentemente do WhatsApp.
+
+Se a requisição foi salva, uma falha posterior no WhatsApp não poderá:
+
+- Apagar a requisição.
+- Criar uma segunda requisição.
+- Alterar o protocolo.
+- Invalidar o comprovante.
+- Fazer a tela informar que o formulário não foi salvo.
+
+A tela deverá informar claramente que o pedido foi salvo e que há notificações pendentes ou com falha.
+
+## 10.3. Lista de notificações
+
+Prepare uma lista individual de notificações, com grupos lógicos como:
+
+- Família.
+- Supervisão.
+- Equipe.
+- Outros destinatários configurados.
+
+Cada destinatário deverá ter seu próprio registro de notificação ou uma representação equivalente que permita rastreabilidade individual.
+
+A interface deverá mostrar:
+
+- Grupo.
+- Nome de exibição ou identificação apropriada do destinatário.
+- Canal.
+- Estado.
+- Horário da tentativa.
+- Número de tentativas.
+- Erro resumido, se houver.
+- Possibilidade de consultar detalhes para usuários autorizados.
+
+Estados mínimos:
+
+- Pendente.
+- Enfileirada.
+- Enviando.
+- Enviada.
+- Entregue, quando o provedor confirmar.
+- Lida, somente quando o canal oferecer esse evento.
+- Falha temporária.
+- Falha definitiva.
+- Cancelada.
+
+Não use “entregue” quando só houver confirmação de aceitação da mensagem pelo provedor.
+
+## 10.4. Interface durante o processamento
+
+Após a persistência, a tela deverá permanecer aberta e apresentar:
+
+- Confirmação de que a requisição foi salva.
+- Protocolo.
+- Resumo da requisição.
+- Indicador de processamento das notificações.
+- Lista por grupo e destinatário.
+- Atualização dos estados sem travar a interface.
+- Opção para consultar a requisição completa.
+- Opção para voltar ao formulário e iniciar outra requisição somente quando adequado.
+
+Se o processamento continuar em segundo plano, o usuário poderá sair da tela. Ao retornar, o estado deverá ser recuperado do banco.
+
+Não mantenha uma requisição HTTP longa aguardando todas as mensagens serem enviadas.
+
+## 10.5. Preparação técnica para WhatsApp
+
+Implemente uma arquitetura de notificações independente do provedor, com interfaces e serviços próprios.
+
+Prepare:
+
+- Tabela ou modelo de notificações.
+- Registro de destinatários.
+- Configuração de grupos.
+- Fila de envio ou mecanismo equivalente.
+- Tentativas e backoff.
+- Idempotência por evento e destinatário.
+- Registro de erros.
+- Estado de processamento.
+- Webhook de confirmação, quando suportado.
+- Auditoria.
+- Política de reprocessamento.
+- Restrições contra envio duplicado.
+
+Não envie mensagens reais durante os testes.
+
+Se as credenciais da WhatsApp Business Platform não estiverem configuradas, implemente o modelo, o serviço de abstração, os testes e a documentação. Não simule que mensagens foram realmente enviadas.
+
+## 10.6. Destinatários e privacidade
+
+O destinatário deverá ser resolvido a partir de relações autorizadas do paciente e das configurações administrativas.
+
+Não confie em números de telefone enviados pelo formulário.
+
+Evite enviar conteúdo clínico ou dados sensíveis em mensagens. Use mensagens mínimas com protocolo e instruções para acessar o sistema autenticado, quando adequado.
+
+O sistema deverá permitir configurar quais eventos são enviados para cada grupo.
+
+# 11. ESTADOS DE CARREGAMENTO E EXPERIÊNCIA DO USUÁRIO
+
+Nenhuma operação que dependa de rede ou banco deverá deixar a interface aparentemente congelada.
+
+Implemente estados explícitos em todas as áreas relevantes:
+
+- Login.
+- Logout.
+- Recuperação de senha.
+- Carregamento inicial da aplicação.
+- Seleção de paciente.
+- Carregamento do catálogo.
+- Formulário de requisição.
+- Envio da requisição.
+- Tela de sucesso.
+- Histórico.
+- Detalhe da requisição.
+- Administração de usuários.
+- Administração de produtos.
+- Consulta de estoque.
+- Movimentações.
+- Inventário.
+- Notificações.
+
+## 11.1. Requisitos de interface
+
+Utilize:
+
+- Skeletons ou placeholders para carregamento de conteúdo.
+- Indicadores de progresso em operações longas.
+- Mensagens de erro claras.
+- Botões desabilitados durante operações que não podem ser repetidas.
+- Prevenção de cliques duplos.
+- Estados vazios explicativos.
+- Botões de tentar novamente quando apropriado.
+- Mensagens de sucesso apenas após confirmação real.
+- Indicadores acessíveis para leitores de tela.
+- Feedback visual que funcione em celular.
+
+Não use uma tela branca ou spinner infinito como único estado de carregamento.
+
+## 11.2. Recuperação de falhas
+
+Se uma consulta falhar, mostre o erro e ofereça uma ação adequada.
+
+Se a sessão expirar, oriente o usuário a autenticar-se novamente e preserve dados não sensíveis quando isso puder ser feito com segurança.
+
+Se o envio da requisição tiver resultado incerto por falha de rede, preserve a chave idempotente da operação e permita repetir a tentativa com segurança.
+
+Não gere uma nova chave idempotente para a mesma operação inconclusiva.
+
+Se a notificação falhar, mostre que a requisição já foi salva e que a notificação precisa ser reprocessada ou investigada.
+
+# 12. CATÁLOGO INICIAL DE ERROS
+
+Implemente um catálogo centralizado de erros técnicos e operacionais.
+
+A estrutura deve separar:
+
+1. Código interno estável.
+2. Categoria.
+3. Mensagem segura para o usuário.
+4. Detalhe técnico restrito a logs.
+5. Indicação de possibilidade de repetição.
+6. Ação recomendada.
+7. Identificador de correlação.
+8. Status HTTP ou código equivalente, quando aplicável.
+
+Não mostre stack traces, SQL, credenciais ou informações sensíveis ao usuário.
+
+## 12.1. Códigos iniciais sugeridos
+
+Implemente códigos equivalentes aos seguintes, respeitando os padrões atuais do projeto:
+
+- `AUTH_REQUIRED` — autenticação necessária.
+- `SESSION_EXPIRED` — sessão expirada.
+- `ACCESS_DENIED` — operação não autorizada.
+- `PROFILE_INACTIVE` — perfil inativo ou revogado.
+- `PATIENT_NOT_FOUND` — paciente inexistente ou inacessível.
+- `PATIENT_INACTIVE` — paciente inativo para a operação.
+- `PRODUCT_NOT_FOUND` — produto inexistente.
+- `PRODUCT_INACTIVE` — produto inativo.
+- `PRODUCT_ALIAS_AMBIGUOUS` — termo corresponde a mais de um produto.
+- `INVALID_INPUT` — dados inválidos.
+- `INVALID_QUANTITY` — quantidade inválida em operação de estoque.
+- `IDEMPOTENCY_CONFLICT` — mesma chave usada com conteúdo diferente.
+- `REQUEST_SAVE_FAILED` — falha ao persistir a requisição.
+- `REQUEST_NOT_FOUND` — requisição inexistente ou inacessível.
+- `STOCK_INSUFFICIENT` — saldo insuficiente para uma movimentação.
+- `STOCK_CONFLICT` — conflito de concorrência ou de inventário.
+- `INVENTORY_NOT_FOUND` — inventário inexistente ou inacessível.
+- `NOTIFICATION_PENDING` — notificação ainda pendente.
+- `NOTIFICATION_FAILED` — notificação com falha.
+- `NOTIFICATION_PROVIDER_UNAVAILABLE` — provedor indisponível.
+- `RATE_LIMITED` — limite de requisições excedido.
+- `INTERNAL_ERROR` — erro inesperado.
+
+Não crie uma mensagem diferente para cada exceção técnica sem necessidade. Mantenha códigos estáveis e centralizados.
+
+## 12.2. Registro de erros
+
+Implemente logs estruturados com:
+
+- Código do erro.
+- Identificador de correlação.
+- Data e hora.
+- Contexto técnico não sensível.
+- Usuário e paciente identificados por IDs internos, quando necessário.
+- Operação afetada.
+- Resultado.
+
+Não grave senhas, tokens, conteúdo integral de mensagens privadas ou dados clínicos desnecessários.
+
+# 13. SEGURANÇA DO BANCO, RLS E INTEGRIDADE
+
+Audite e corrija todas as tabelas existentes e novas, incluindo, conforme aplicável:
+
+- `profiles`
+- `care_recipients`
+- Tabelas de associação entre usuários e pacientes.
+- `products`
+- Tabelas de aliases.
+- `requisitions`
+- `requisition_items`
+- `requisition_observations`
+- `stock_movements`
+- Saldos ou projeções de estoque.
+- Inventários.
+- Notificações.
+- Destinatários.
+- Fila de processamento.
+- `audit_events`.
+
+Verifique:
+
+- RLS habilitada em todas as tabelas que precisam de isolamento.
+- Políticas de leitura baseadas no paciente e na função.
+- Restrições de escrita para estoque.
+- Proibição de alteração de funções pelo próprio usuário.
+- Proteção contra acesso horizontal indevido.
+- Impossibilidade de criar itens em requisições de terceiros.
+- Impossibilidade de forjar notificações ou alterar seu status pelo cliente.
+- Segurança das funções SQL.
+- Privilégios mínimos.
+- Uso seguro de `SECURITY DEFINER`.
+- `search_path` fixo quando necessário.
+- Privilégios de execução das funções.
+- Consistência das transações.
+- Constraints de integridade.
+- Índices para as consultas frequentes.
+- Proteção contra concorrência.
+
+Não use `service_role` para contornar o modelo de autorização. Quando uma operação administrativa exigir privilégios elevados, valide a identidade, a função e o escopo do usuário antes da operação, exclusivamente no servidor.
+
+# 14. AUDITORIA E RASTREABILIDADE
+
+A aplicação deverá possuir trilha de auditoria consistente.
+
+Registre, no mínimo, os seguintes eventos:
+
+- Criação e alteração de paciente.
+- Associação ou remoção de usuário a paciente.
+- Criação, alteração, ativação ou inativação de usuário.
+- Mudança de função.
+- Criação, alteração e inativação de produto.
+- Criação de requisição.
+- Importação de requisição histórica.
+- Mudança de status.
+- Criação de movimentação de estoque.
+- Transferência entre família e equipe.
+- Ajuste de estoque.
+- Abertura, submissão e aprovação de inventário.
+- Criação e reprocessamento de notificação.
+- Falhas relevantes de operação.
+- Alterações de configurações administrativas.
+
+A auditoria deverá ser vinculada ao usuário executor e ao paciente quando pertinente.
+
+Não permita que o usuário altere o criador de uma requisição ou de uma movimentação para outro usuário.
+
+Preserve a história dos registros. Quando uma correção for necessária, prefira eventos compensatórios ou novas versões auditáveis em vez de apagar o registro original.
+
+# 15. MODELO DE DADOS E MIGRAÇÕES
+
+Antes de criar novas tabelas, inspecione o schema existente para evitar duplicação de entidades.
+
+Desenhe a solução de forma que o modelo possa suportar, no mínimo:
+
+- Vários pacientes.
+- Vários usuários por paciente.
+- Um usuário associado a vários pacientes.
+- Um usuário com diferentes permissões por paciente.
+- Um catálogo de produtos compartilhado ou configurável conforme a decisão documentada.
+- Saldos por produto e localização.
+- Histórico de movimentações.
+- Inventários por paciente e localização.
+- Requisições com protocolo estável.
+- Histórico completo por paciente.
+- Notificações individualizadas.
+- Auditoria centralizada.
+
+Toda migração deverá:
+
+- Ser incremental.
+- Ser revisada antes da execução.
+- Preservar dados existentes.
+- Incluir constraints e índices adequados.
+- Ser compatível com os dados de teste já existentes.
+- Ter instruções de execução e verificação.
+- Ser acompanhada de testes quando houver lógica SQL.
+- Não depender de alteração manual invisível para funcionar.
+
+Se precisar migrar registros atuais para a nova estrutura, implemente uma estratégia de backfill idempotente e documentada.
+
+Não use dados reais para completar associações desconhecidas. Quando uma associação não puder ser determinada, registre a pendência e interrompa a promoção para produção até que seja resolvida.
+
+# 16. TESTES OBRIGATÓRIOS
+
+Amplie os testes existentes e crie testes adicionais.
+
+## 16.1. Remoção da quantidade solicitada
+
+- O formulário não exibe esse campo.
+- O schema de validação não o aceita como conceito funcional.
+- A API não o utiliza.
+- O tipo TypeScript não o exige.
+- O comprovante não o apresenta.
+- A estrutura final do banco não depende dele.
+- As movimentações de estoque continuam registrando quantidades reais.
+- A migração preserva os demais dados.
+
+## 16.2. Pacientes e permissões
+
+- Usuário associado ao paciente consegue acessar o histórico autorizado.
+- Usuário consegue consultar requisições de outros solicitantes do mesmo paciente.
+- Usuário sem vínculo não consegue consultar o paciente.
+- Usuário não consegue mudar o escopo enviando outro UUID.
+- Administrador global pode atuar dentro das permissões previstas.
+- Administrador limitado não acessa outros pacientes.
+- Usuário inativo ou revogado não realiza operações.
+- Papel `reader` não escreve.
+
+## 16.3. Protocolo
+
+- Primeiro protocolo novo é 12.
+- Protocolo é único.
+- Duas submissões simultâneas não geram o mesmo protocolo.
+- Repetição idempotente retorna o protocolo original.
+- Falha de rede não gera duplicidade.
+- Importação de protocolos históricos 1 a 11 não altera registros existentes.
+- A importação não faz novas notificações automaticamente.
+
+## 16.4. Estoque
+
+- Saldo da família não é confundido com saldo da equipe.
+- Transferência reduz a origem e aumenta o destino atomicamente.
+- Falha de transferência não deixa saldo parcial.
+- Usuário não administrador não altera o estoque oficial.
+- Produto inativo não recebe novas movimentações incompatíveis.
+- Quantidade zero ou negativa é rejeitada.
+- Saldo negativo é bloqueado conforme a regra definida.
+- Ajustes exigem justificativa.
+- Inventário não altera o saldo oficial antes da aprovação.
+- Eventos de auditoria são registrados.
+
+## 16.5. Catálogo
+
+- Administrador cria e altera produtos.
+- Usuário sem permissão não altera produtos.
+- Produto inativo permanece legível no histórico.
+- Alias conhecido é resolvido corretamente.
+- Alias ambíguo exige confirmação.
+- Não há produtos duplicados por diferenças de acentuação ou caixa.
+- Unidade do produto é consistente no formulário e no banco.
+
+## 16.6. Notificações
+
+- Requisição é salva mesmo se o provedor estiver indisponível.
+- A tela diferencia persistência e envio de mensagens.
+- Destinatários recebem registros individuais.
+- Retry não duplica mensagens já aceitas pelo provedor.
+- Falha de uma notificação não bloqueia as demais.
+- Estados são recuperados após recarregar a página.
+- A interface não afirma que uma mensagem foi entregue sem confirmação do provedor.
+- Falha no WhatsApp não cria uma segunda requisição.
+
+## 16.7. Carregamento e recuperação
+
+- Tela inicial apresenta estado de carregamento.
+- Erro de rede apresenta mensagem e ação de recuperação.
+- Duplo clique não gera duas operações.
+- Sessão expirada é tratada.
+- Lista vazia tem estado apropriado.
+- Erro inesperado não exibe detalhes internos.
+- Operação em segundo plano não bloqueia indefinidamente a interface.
+
+Use testes de integração com Supabase local para validar RLS, funções SQL e transações reais, sempre que possível.
+
+Não apresente mocks como prova de segurança real do banco.
+
+# 17. CI, DOCUMENTAÇÃO E CONFIGURAÇÃO
+
+Implemente ou atualize `.github/workflows/ci.yml` para executar em pull requests e pushes relevantes:
+
+1. `npm ci`
+2. Lint.
+3. Typecheck.
+4. Testes unitários.
+5. Build de produção.
+
+Use os nomes de scripts que realmente existem no `package.json`. Se necessário, adicione scripts consistentes.
+
+Não exija credenciais reais para executar testes unitários ou compilar o projeto quando isso puder ser evitado.
+
+Atualize:
+
+- `README.md`
+- `docs/SECURITY.md`
+- `docs/DATABASE.md`
+- `docs/DEPLOYMENT.md`
+- `docs/ROADMAP.md`
+- `docs/AUDIT.md`
+- `docs/WHATSAPP_AI.md`
+
+Crie ou atualize também documentação específica para:
+
+- Gestão de pacientes.
+- Administração de usuários.
+- Catálogo de produtos.
+- Estoque por custódia.
+- Inventário semanal.
+- Protocolos e importação histórica.
+- Notificações.
+- Catálogo de erros.
+
+A documentação deverá distinguir claramente:
+
+- Implementado e testado.
+- Implementado, mas ainda não testado em infraestrutura real.
+- Preparado para integração futura.
+- Dependente de configuração externa.
+- Ainda não implementado.
+
+# 18. ORDEM DE IMPLEMENTAÇÃO
+
+Execute o trabalho nesta sequência, ajustando-a apenas se houver dependências técnicas demonstráveis.
+
+### Fase A — Auditoria e planejamento técnico
+
+- Inspecionar o estado atual.
+- Mapear as tabelas e dependências.
+- Localizar integralmente o conceito de quantidade solicitada.
+- Desenhar as migrações.
+- Definir relações de pacientes e permissões.
+- Identificar os riscos de compatibilidade.
+
+### Fase B — Integridade do núcleo
+
+- Remover o conceito de quantidade solicitada de ponta a ponta.
+- Implementar protocolo sequencial a partir de 12.
+- Revisar idempotência.
+- Garantir persistência atômica.
+- Implementar catálogo inicial de erros.
+- Implementar estados de carregamento e tratamento de falhas.
+
+### Fase C — Pacientes e administração
+
+- Implementar cadastro de pacientes.
+- Implementar associações entre pacientes e usuários.
+- Implementar gestão de usuários.
+- Implementar atribuição de funções e escopos.
+- Implementar administração do catálogo.
+- Implementar auditoria dessas operações.
+
+### Fase D — Histórico
+
+- Implementar listagem.
+- Implementar filtros e paginação.
+- Implementar detalhe persistido.
+- Implementar reimpressão de comprovantes.
+- Garantir consulta do histórico completo por paciente autorizado.
+
+### Fase E — Estoque
+
+- Implementar custódia da família e da equipe.
+- Implementar movimentações atômicas.
+- Implementar controle administrativo de escrita.
+- Implementar consultas de saldo.
+- Implementar inventário semanal.
+- Preparar eventos de estoque baixo.
+
+### Fase F — Sucesso e notificações
+
+- Implementar tela de conclusão.
+- Persistir a requisição antes das notificações.
+- Implementar registros individuais de destinatários.
+- Implementar estados e tentativas.
+- Implementar processamento assíncrono.
+- Preparar integração com WhatsApp.
+- Garantir recuperação de estado após recarga.
+
+### Fase G — Testes e validação
+
+- Executar testes unitários.
+- Executar testes de integração.
+- Validar RLS real quando possível.
+- Executar Playwright.
+- Executar build.
+- Corrigir erros.
+- Atualizar a documentação.
+
+Não tente implementar todas as interfaces em um único componente gigante. Reutilize componentes e separe responsabilidades por domínio.
+
+# 19. CRITÉRIOS DE ACEITAÇÃO FINAL
+
+A missão somente poderá ser considerada concluída quando:
+
+- O conceito de quantidade solicitada estiver removido do código ativo, API e schema final.
+- As quantidades de movimentações de estoque continuarem funcionando.
+- O sistema possuir cadastro e isolamento de pacientes.
+- Usuários autorizados puderem consultar o histórico completo do paciente, independentemente de quem criou cada requisição.
+- A gestão de usuários for funcional e restrita a administradores autorizados.
+- O catálogo puder ser administrado sem editar código.
+- O protocolo sequencial iniciar em 12 e funcionar sob concorrência.
+- O estoque da família e o da equipe estiverem separados por custódia.
+- Somente administradores autorizados puderem modificar o estoque oficial.
+- O sistema permitir a estrutura de contagem semanal.
+- A tela final distinguir requisição salva de notificação enviada.
+- As notificações tiverem estado e rastreabilidade individual por destinatário.
+- O catálogo inicial de erros estiver implementado.
+- As operações de rede apresentarem estados de carregamento, sucesso e erro.
+- RLS e autorização forem testadas de forma real sempre que a infraestrutura permitir.
+- Migrações forem incrementais e preservarem dados.
+- CI, testes e build tiverem resultados documentados.
+- A documentação refletir a implementação real.
+
+# 20. RELATÓRIO FINAL OBRIGATÓRIO
+
+Ao terminar, apresente um relatório objetivo com:
+
+1. Resumo das mudanças implementadas.
+2. Arquivos criados.
+3. Arquivos alterados.
+4. Migrações SQL criadas e seus objetivos.
+5. Como o conceito de quantidade solicitada foi removido.
+6. Como funciona o protocolo sequencial.
+7. Como funciona o vínculo de usuários a pacientes.
+8. Como são aplicadas as permissões de histórico.
+9. Como funciona a separação do estoque por custódia.
+10. Como são registradas e auditadas as movimentações.
+11. Como funciona a tela de sucesso e o processamento de notificações.
+12. Comandos executados.
+13. Resultados reais de lint, typecheck, testes, Playwright e build.
+14. Limitações que permaneceram.
+15. Credenciais ou configurações externas que ainda dependem de ação humana.
+16. Instruções para executar localmente.
+17. Procedimento seguro para aplicar as migrações em ambiente de teste.
+18. Pendências que ainda impedem o uso em produção.
+
+Não afirme que o sistema está pronto para produção sem evidências suficientes.
+
+**Comece agora inspecionando o estado real do repositório e execute as alterações. Não entregue somente um plano de trabalho. Preserve os dados e o código existentes, implemente de forma incremental e valide cada etapa.**

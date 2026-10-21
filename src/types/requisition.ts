@@ -5,6 +5,10 @@ export type CatalogItem = {
   id: string;
   name: string;
   aliases: string[];
+  description?: string | null;
+  active?: boolean;
+  is_active?: boolean;
+  sort_order?: number;
   category: ProductCategory;
   unit: "unidade" | "caixa" | "frasco" | "pacote" | "bisnaga" | "envelope" | "comprimido";
 };
@@ -13,6 +17,7 @@ export type RequisitionLine = {
   productId: string;
   productName: string;
   category: ProductCategory;
+  unit?: string;
   currentStock: number;
   urgent: boolean;
 };
@@ -30,9 +35,17 @@ export type RequisitionFormData = {
   observations: string[];
 };
 
-export type RequisitionReceipt = RequisitionFormData & {
+export type ReceiptLine = Omit<RequisitionLine, "currentStock"> & { currentStock: number | null };
+export type ReceiptExtraItem = Omit<ExtraItem, "currentStock"> & { currentStock: number | null };
+
+export type RequisitionReceipt = {
+  lines: ReceiptLine[];
+  extraItems: ReceiptExtraItem[];
+  observations: string[];
+  requisitionId?: string;
   protocol: string;
   requesterName: string;
   recipientName: string;
-  createdAt: string;
+  createdAt: string | null;
+  legacyReconstructed?: boolean;
 };

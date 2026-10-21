@@ -1,0 +1,15 @@
+{
+  "preservation": true,
+  "unit": true,
+  "database": true,
+  "integration": true,
+  "e2e": false,
+  "onboarding": false,
+  "linux": false,
+  "linuxInstall": true,
+  "windowsInstall": true,
+  "documentation": false,
+  "remote": "not-verified-403",
+  "unitTests": 45,
+  "integrationTests": 5
+}
