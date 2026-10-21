@@ -1,37 +1,19 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { api, ApiError, authenticate, databaseError, patientContext, readJson, rpc, uuid } from "@/lib/server/api";
 
-const statusSchema = z.object({
-  status: z.enum(["under_review", "approved", "separated", "delivered", "cancelled"]),
-  reason: z.string().trim().max(1000).nullable().optional(),
-});
-
+const schema = z.object({ status: z.enum(["under_review", "approved", "separated", "delivered", "cancelled"]), reason: z.string().trim().min(1).max(1000).nullable().optional() }).strict();
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) return NextResponse.json({ error: "Supabase não está configurado." }, { status: 503 });
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) return NextResponse.json({ error: "Sua sessão expirou. Entre novamente." }, { status: 401 });
-  let body: unknown;
-  try { body = await request.json(); } catch { return NextResponse.json({ error: "Dados inválidos." }, { status: 400 }); }
-  const parsed = statusSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Status inválido." }, { status: 400 });
-  const { id } = await context.params;
-  const { data, error } = await supabase.rpc("transition_requisition_status", {
-    p_requisition_id: id,
-    p_to_status: parsed.data.status,
-    p_reason: parsed.data.reason ?? null,
-  }).maybeSingle();
-  if (error || !data) {
-    console.error("Failed to transition requisition status.", error);
-    const message = error?.message.includes("not authorized")
-      ? "Você não tem autorização para alterar este status."
-      : error?.message.includes("invalid status")
-        ? "Esta transição de status não é permitida."
-        : error?.message.includes("reason required")
-          ? "Informe uma justificativa para cancelar."
-          : "Não foi possível alterar o status.";
-    return NextResponse.json({ error: message }, { status: error?.message.includes("not authorized") ? 403 : 400 });
-  }
-  return NextResponse.json({ data });
+  return api("requisitions.transition", async () => {
+    const input = await readJson(request, schema);
+    const auth = await authenticate();
+    const { id } = await context.params;
+    if (!uuid.safeParse(id).success) throw new ApiError("VALIDATION_ERROR", "Identificador inválido.");
+    const { data: row, error } = await auth.client.from("requisitions").select("care_recipient_id").eq("id", id).maybeSingle();
+    if (error) databaseError(error);
+    if (!row) throw new ApiError("NOT_FOUND", "Requisição não encontrada.", 404);
+    await patientContext(auth, row.care_recipient_id, "request", true);
+    const data = await rpc(auth.client, "transition_requisition_status", { p_requisition_id: id, p_to_status: input.status, p_reason: input.reason ?? null });
+    return NextResponse.json({ data });
+  });
 }
