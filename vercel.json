@@ -1,0 +1,4 @@
+{
+  "installCommand": "npm install --global npm@11.21.1 && npm ci",
+  "buildCommand": "npm run build"
+}
