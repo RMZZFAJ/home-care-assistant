@@ -21,7 +21,7 @@ async function actor(name) {
 }
 const requestArgs = (idempotencyKey, patient = patientA, stock = 2) => ({
   p_care_recipient_id: patient, p_idempotency_key: idempotencyKey, p_payload_hash: "caller-cannot-choose-database-hash",
-  p_lines: [{ productId: "fralda", productName: "untrusted display label", currentStock: stock, urgent: false }],
+  p_lines: [{ productId: "fralda", productName: "untrusted display label", currentStock: stock, urgent: false, repeatReason: "Reiteração explícita para integração concorrente" }],
   p_extra_items: [], p_observations: ["Teste de integração HTTP fictício"],
 });
 
@@ -64,24 +64,22 @@ test("concurrent HTTP submissions persist one canonical request and immutable re
   }
 });
 
-test("concurrent withdrawals cannot overspend and transfers preserve both custodies", async () => {
-  const local = await actor("adminA"); const global = await actor("global");
-  let productId;
-  try {
-    const product = await local.rpc("admin_upsert_recipient_product", { p_care_recipient_id: patientA, p_product_id: null, p_name: `Teste concorrente ${randomUUID()}`, p_category: "higiene", p_unit: "unidade", p_aliases: [], p_is_active: true });
-    assert.ifError(product.error); productId = row(product.data).product_id;
-    const args = { p_care_recipient_id: patientA, p_product_id: productId, p_quantity: 2, p_movement_type: "inbound", p_source_location: null, p_destination_location: "FAMILY", p_justification: "Carga de teste", p_idempotency_key: randomUUID() };
-    assert.ifError((await local.rpc("record_stock_movement", args)).error);
-    const results = await Promise.all(Array.from({ length: 6 }, () => local.rpc("record_stock_movement", { ...args, p_movement_type: "outbound", p_source_location: "FAMILY", p_destination_location: "CARE_TEAM", p_idempotency_key: randomUUID() })));
-    assert.equal(results.filter((result) => !result.error).length, 1);
-    assert.equal(results.filter((result) => result.error).length, 5);
-    const balances = await local.from("current_stock_balances").select("location,balance").eq("care_recipient_id", patientA).eq("product_id", productId);
-    assert.ifError(balances.error);
-    assert.deepEqual(Object.fromEntries(balances.data.map((entry) => [entry.location, Number(entry.balance)])), { FAMILY: 0, CARE_TEAM: 2 });
-    assert.ok((await global.rpc("record_stock_movement", { ...args, p_movement_type: "outbound", p_source_location: "FAMILY", p_destination_location: null, p_idempotency_key: randomUUID() })).error);
-  } finally {
-    if (productId) sql(`delete from public.stock_movements where product_id=${sqlLiteral(productId)}; delete from public.care_recipient_products where product_id=${sqlLiteral(productId)}; delete from public.products where id=${sqlLiteral(productId)};`);
-  }
+test("concurrent family withdrawals cannot overspend and ENT acceptance preserves both custodies", async () => {
+  const global=await actor("global");const team=await actor("professional");
+  const created=await global.rpc("admin_upsert_recipient_product",{p_care_recipient_id:patientA,p_product_id:null,p_name:"Concorrência "+randomUUID(),p_category:"higiene",p_unit:"unidade",p_aliases:[],p_is_active:true});
+  assert.ifError(created.error);const productId=created.data.product_id;
+  const base={p_patient:patientA,p_product:productId,p_quantity:"5",p_action:"inbound",p_reason:"Entrada familiar concorrente",p_key:randomUUID()};
+  assert.ifError((await global.rpc("family_stock_movement",base)).error);
+  const results=await Promise.all(Array.from({length:5},()=>global.rpc("family_stock_movement",{...base,p_quantity:"2",p_action:"outbound",p_key:randomUUID()})));
+  assert.equal(results.filter(r=>!r.error).length,2);assert.equal(results.filter(r=>r.error).length,3);
+  const issued=await global.rpc("create_supply_document",{p_patient:patientA,p_type:"ENT",p_payload:{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,lines:[{productId,quantity:"1"}]},p_key:randomUUID(),p_draft:false});
+  assert.ifError(issued.error);const d=issued.data;
+  const key=randomUUID();const accepted=await Promise.all(Array.from({length:5},()=>team.rpc("supply_document_command",{p_id:d.id,p_action:"receive",p_body:{divergences:[]},p_key:key,p_version:d.version})));
+  for(const result of accepted)assert.ifError(result.error);
+  const balances=await global.from("current_stock_balances").select("location,balance").eq("care_recipient_id",patientA).eq("product_id",productId);assert.ifError(balances.error);
+  assert.deepEqual(Object.fromEntries(balances.data.map(entry=>[entry.location,Number(entry.balance)])),{FAMILY:0,TRANSIT:0,CARE_TEAM:1});
+  assert.ok((await global.rpc("record_stock_movement",{p_care_recipient_id:patientA,p_product_id:productId,p_quantity:1,p_movement_type:"inbound",p_source_location:null,p_destination_location:"CARE_TEAM",p_justification:"Bypass de ENT negado",p_idempotency_key:randomUUID()})).error);
+  // Confirmed synthetic events remain immutable until the authorized local reset.
 });
 
 test("concurrent global administrator demotions retain one active administrator", async () => {
@@ -105,11 +103,12 @@ test("competing outbox workers claim each notification once under real HTTP conc
     assert.ifError((await global.rpc("configure_recipient_notification", { p_care_recipient_id: patientA, p_recipient_user_id: fixtures.professional.id, p_recipient_group: "care_team", p_channel: "internal", p_destination: null, p_enabled: true })).error);
     const created = await global.rpc("submit_requisition", requestArgs(randomUUID())); assert.ifError(created.error);
     requisitionId = row(created.data).requisition_id;
+    sql(`update public.requisition_notifications set next_attempt_at=now()-interval '100 years' where document_id=${sqlLiteral(requisitionId)};`);
     const workers = Array.from({ length: 6 }, () => randomUUID());
-    const results = await Promise.all(workers.map((worker) => global.rpc("claim_notification_jobs", { p_limit: 1, p_worker_id: worker, p_external_enabled: false })));
+    const results = await Promise.all(workers.map((worker) => global.rpc("claim_notification_jobs", { p_limit: 50, p_worker_id: worker, p_external_enabled: false })));
     for (const result of results) assert.ifError(result.error);
-    const claims = results.flatMap((result, index) => result.data.map((notification) => ({ notification, worker: workers[index] }))).filter((entry) => entry.notification.requisition_id === requisitionId);
-    assert.equal(claims.length, 1);
+    const claims = results.flatMap((result, index) => result.data.map((notification) => ({ notification, worker: workers[index] }))).filter((entry) => (entry.notification.document_id ?? entry.notification.requisition_id) === requisitionId);
+    assert.ok(claims.length > 0); assert.equal(new Set(claims.map((entry)=>entry.notification.id)).size,claims.length);
     const { notification, worker } = claims[0];
     const validated = await global.rpc("validate_notification_job", { p_id: notification.id, p_worker_id: worker }); assert.ifError(validated.error); assert.equal(validated.data, true);
     assert.ok((await global.rpc("complete_notification_job", { p_id: notification.id, p_worker_id: randomUUID(), p_state: "delivered" })).error);
@@ -133,11 +132,11 @@ test("service-role HTTP worker operates through RPCs without private table grant
     const created = await global.rpc("submit_requisition", requestArgs(randomUUID()));
     assert.ifError(created.error); requisitionId = row(created.data).requisition_id;
     // Place this synthetic job first without depending on the age of other fixtures.
-    sql(`update public.requisition_notifications set next_attempt_at=now()-interval '100 years' where requisition_id=${sqlLiteral(requisitionId)} and channel='internal';`);
+    sql(`update public.requisition_notifications set next_attempt_at=now()-interval '100 years' where coalesce(document_id,requisition_id)=${sqlLiteral(requisitionId)} and recipient_user_id=${sqlLiteral(fixtures.professional.id)} and channel='internal';`);
     const worker = randomUUID();
     const claimed = await service.rpc("claim_notification_jobs", { p_limit: 1, p_worker_id: worker, p_external_enabled: false });
-    assert.ifError(claimed.error); assert.equal(claimed.data.length, 1);
-    const job = claimed.data[0]; assert.equal(job.requisition_id, requisitionId);
+    assert.ifError(claimed.error); assert.ok(claimed.data.length >= 1);
+    const job = claimed.data.find((entry)=>(entry.document_id??entry.requisition_id)===requisitionId&&entry.recipient_user_id===fixtures.professional.id); assert.ok(job); assert.equal(job.document_id ?? job.requisition_id, requisitionId);
     const validated = await service.rpc("validate_notification_job", { p_id: job.id, p_worker_id: worker });
     assert.ifError(validated.error); assert.equal(validated.data, true);
     const reference = `hca-service-fixture-${randomUUID()}`;

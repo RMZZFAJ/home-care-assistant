@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { getTestEnvironment, sql, sqlLiteral, testDataRoot, fixtureFile } from "./test-environment.mjs";
+import { getTestEnvironment, waitForLocalDataApi, sql, sqlLiteral, testDataRoot, fixtureFile } from "./test-environment.mjs";
 
 import { fixturePassword, patientA, patientB, legacyRequisition } from "./test-constants.mjs";
 export { fixturePassword, patientA, patientB, legacyRequisition };
@@ -47,6 +47,7 @@ export async function seedFixtures({ legacy = false } = {}) {
       on conflict(id) do nothing;`);
   }
   writeFileSync(fixtureFile, JSON.stringify(fixtures));
+  await waitForLocalDataApi();
   return fixtures;
 }
 

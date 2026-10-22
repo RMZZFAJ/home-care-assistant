@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { api, ApiError, boundedText, rpc } from "@/lib/server/api";
 import { createWorkerClient } from "@/lib/server/service-client";
-import { metaStatuses, secretMatches, verifyMetaSignature } from "@/lib/notifications/webhook";
+import { metaInbound, metaStatuses, secretMatches, verifyMetaSignature } from "@/lib/notifications/webhook";
+import { tokenHash } from "@/lib/notifications/flows";
+import { parseConsumptionMessage } from "@/lib/notifications/consumption-parser";
 
 export async function GET(request: Request) {
   return api("notification.webhook.verify", async () => {
@@ -21,7 +23,17 @@ export async function POST(request: Request) {
     const statuses = metaStatuses(payload);
     if (!statuses) throw new ApiError("VALIDATION_ERROR", "Evento inválido.");
     const client = createWorkerClient();
-    for (const status of statuses) await rpc(client, "notification_webhook", { p_provider_reference: status.providerReference, p_state: status.state, p_notification_id: status.notificationId ?? null });
-    return NextResponse.json({ received: true, processed: statuses.length });
+    for (const status of statuses) {await rpc(client, "notification_webhook", { p_provider_reference: status.providerReference, p_state: status.state, p_notification_id: status.notificationId ?? null });if(status.errorCode)await rpc(client,"notification_safe_failure",{p_reference:status.providerReference,p_code:status.errorCode});}
+    const messages=metaInbound(payload)??[];
+    for(const message of messages){
+      const button=message.button?.payload??message.interactive?.button_reply.id;
+      if(button?.startsWith("HCA_ACCEPT:")){await rpc(client,"accept_whatsapp_receipt",{p_provider_id:message.id,p_phone:message.from,p_hash:tokenHash(button.slice(11))});continue;}
+      if(message.type==="text"&&message.text?.body){
+        const context=await rpc(client,"inbound_report_context",{p_phone:message.from}) as {catalog:Parameters<typeof parseConsumptionMessage>[1]}|null;
+        if(!context)continue;const parsed=parseConsumptionMessage(message.text.body,context.catalog);
+        await rpc(client,"ingest_whatsapp_report",{p_provider_id:message.id,p_phone:message.from,p_text:message.text.body,p_lines:parsed.needsReview?[]:parsed.lines,p_kind:parsed.kind});
+      }
+    }
+    return NextResponse.json({ received: true, processed: statuses.length+messages.length });
   });
 }

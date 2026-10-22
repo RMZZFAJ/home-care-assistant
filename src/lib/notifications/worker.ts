@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ApiError, databaseError } from "@/lib/server/api";
 import { metaConfiguration, MetaWhatsAppProvider, type NotificationJob, type NotificationProvider } from "@/lib/notifications/provider";
+import { prepareDocumentNotification } from "@/lib/notifications/document-notification";
 
 export async function processNotifications(client: SupabaseClient, limit = 25, provider?: NotificationProvider) {
   const config = metaConfiguration();
@@ -16,7 +17,9 @@ export async function processNotifications(client: SupabaseClient, limit = 25, p
     const { data: valid, error: validationError } = await client.rpc("validate_notification_job", { p_id: job.id, p_worker_id: workerId });
     if (validationError) { unconfirmed++; return; }
     if (!valid) { counts.skipped++; return; }
-    const result = job.channel === "internal" ? { state: "delivered" as const } : job.channel === "whatsapp" && external ? await external.send(job) : { state: "pending" as const, error: "CHANNEL_NOT_CONFIGURED" };
+    let result;
+    try {result = job.channel === "internal" ? { state: "delivered" as const } : job.channel === "whatsapp" && external ? await external.send(await prepareDocumentNotification(client,job,workerId)) : { state: "pending" as const, error: "CHANNEL_NOT_CONFIGURED" };}
+    catch {result={state:"pending" as const,error:"DOCUMENT_PREPARATION_FAILED"};}
     const { error: completionError } = await client.rpc("complete_notification_job", { p_id: job.id, p_worker_id: workerId, p_state: result.state, p_provider_reference: "providerReference" in result ? result.providerReference ?? null : null, p_error: "error" in result ? result.error ?? null : null });
     if (completionError) {
       // A signed webhook or revocation may finish a job while its HTTP send is

@@ -2,8 +2,8 @@
 create temporary table supply_test_state(k text primary key,v uuid);
 insert into supply_test_state values
  ('global',(select id from public.profiles where global_scope and status='active' order by id limit 1)),
- ('family',(select user_id from public.care_recipient_memberships where role='family' and status='active' order by user_id limit 1)),
- ('professional',(select user_id from public.care_recipient_memberships where role='professional' and status='active' order by user_id limit 1));
+ ('family',(select m.user_id from public.care_recipient_memberships m join public.profiles p on p.id=m.user_id where m.role='family' and m.status='active' and p.status='active' order by m.user_id limit 1)),
+ ('professional',(select m.user_id from public.care_recipient_memberships m join public.profiles p on p.id=m.user_id where m.role='professional' and m.status='active' and p.status='active' order by m.user_id limit 1));
 insert into public.care_recipients(id,display_name,is_development) values('aa000000-0000-4000-8000-000000000001','Paciente fictício — fornecimento',true);
 insert into public.care_recipient_products(care_recipient_id,product_id,name,category,unit,aliases,sort_order)
 select 'aa000000-0000-4000-8000-000000000001',id,name,category,unit,aliases,0 from public.products where id='fralda';

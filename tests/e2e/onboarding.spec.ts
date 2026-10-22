@@ -27,12 +27,13 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Requisição de insumos" }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Visão geral" }).first()).toBeVisible();
   const email = `new-${randomUUID()}@example.invalid`;
   const invitation = await page.request.post("/api/admin", { data: { action: "invitation", careRecipientId: patientA, email, role: "professional", canManageStock: false, canCountStock: true } });
   expect(invitation.ok()).toBeTruthy();
   const { invitationUrl } = await invitation.json();
   expect(new URL(invitationUrl).origin).toBe(process.env.NEXT_PUBLIC_APP_URL);
+  await page.getByLabel("Menu do usuário",{exact:true}).click();
   await page.getByRole("button", { name: "Sair", exact: true }).click();
   await page.goto(invitationUrl);
   await page.getByText("Ainda não tenho conta", { exact: true }).click();
@@ -56,6 +57,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   expect(context.data.isGlobalAdmin).toBe(false);
   expect(context.data.patients.map((patient: { id: string }) => patient.id)).toEqual([patientA]);
   expect(context.data.fullName).toBe("Pessoa convidada E2E");
+  await page.getByLabel("Menu do usuário",{exact:true}).click();
   await page.getByRole("button", { name: "Sair", exact: true }).click();
   await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByRole("button", { name: "Esqueci minha senha", exact: true }).click();
@@ -68,6 +70,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await page.getByRole("button", { name: "Salvar nova senha", exact: true }).click();
   await expect(page.getByText("Senha atualizada.", { exact: false })).toBeVisible();
   await page.getByRole("link", { name: "Acessar o sistema", exact: true }).click();
+  await page.getByLabel("Menu do usuário",{exact:true}).click();
   await page.getByRole("button", { name: "Sair", exact: true }).click();
   await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(newPassword);

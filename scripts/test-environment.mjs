@@ -41,6 +41,15 @@ export function getTestEnvironment() {
   return { url: "http://127.0.0.1:54321", anonKey: status.ANON_KEY, serviceKey: status.SERVICE_ROLE_KEY };
 }
 
+export async function waitForLocalDataApi() {
+  const env=getTestEnvironment();
+  for(let attempt=0;attempt<45;attempt++) {
+    try {const response=await fetch(env.url+"/rest/v1/",{headers:{apikey:env.anonKey,authorization:"Bearer "+env.serviceKey},signal:AbortSignal.timeout(2000)});if(response.ok)return;}catch{ /* Reset restarts the local REST schema cache. */ }
+    await new Promise((resolve)=>setTimeout(resolve,1000));
+  }
+  throw new Error("The local Data API schema cache did not become healthy after reset.");
+}
+
 export function assertLocalReplay() {
   getTestEnvironment();
   const backupIndex = process.argv.indexOf("--backup");

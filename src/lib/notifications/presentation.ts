@@ -12,6 +12,10 @@ export const recipientGroupLabels: Record<string,string> = {
   family:"Família",supervision:"Supervisão",care_team:"Equipe de cuidado",other:"Responsável",
 };
 export const deliveryErrorLabels: Record<string,string> = {
+  META_COUNTRY_RESTRICTED_130497:"A Meta restringiu envios para o país deste destinatário (130497). Solicite revisão da elegibilidade da conta antes de tentar novamente.",
+  DOCUMENT_TEMPLATE_NOT_CONFIGURED:"Template de documento aguardando aprovação e configuração na Meta.",
+  MEDIA_UPLOAD_FAILED:"Não foi possível enviar o PDF ao provedor.",
+  DOCUMENT_PREPARATION_FAILED:"Comprovante aguardando preparação; o registro operacional foi preservado.",
   INVALID_DESTINATION:"Destino inválido; revise a configuração.",
   PROVIDER_RATE_LIMIT:"Provedor limitou os envios; aguarde a próxima tentativa.",
   PROVIDER_RESULT_UNCERTAIN:"Confirme o resultado no provedor antes de reenviar.",

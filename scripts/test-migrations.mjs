@@ -27,23 +27,24 @@ const first = await client.rpc("submit_requisition", {
   p_lines: [{ productId: "fralda", currentStock: 0, urgent: false }], p_extra_items: [], p_observations: [],
 });
 assert.ifError(first.error);
-assert.equal(first.data[0].protocol, "HC-000012");
-console.log("PASS clean installation: complete migrations, real Auth and first protocol HC-000012.");
+assert.equal((await client.rpc("operational_document",{p_id:first.data[0].requisition_id})).data.code,"REQ-0001");
+console.log("PASS clean installation: complete migrations, real Auth and independent first code REQ-0001.");
 
 reset("20261020001900");
-await seedFixtures({ legacy: true });
+const legacyFixtures=await seedFixtures({ legacy: true });
 try { execFileSync("supabase", ["migration", "up", "--local", "--workdir", testRoot], { stdio: ["ignore", "pipe", "pipe"] }); }
 catch (error) { throw new Error(`Upgrade failed: ${error.stderr?.toString() ?? "see Supabase migration logs"}`, { cause: error }); }
 assert.equal(sql(`select protocol from public.requisitions where id='${legacyRequisition}';`), "HC-20260101-A1B2C3D4");
-assert.equal(sql(`select current_stock from public.requisition_items where requisition_id='${legacyRequisition}';`), "2");
-assert.equal(sql(`select balance from public.current_stock_balances where care_recipient_id='${patientA}' and product_id='fralda' and location='FAMILY';`), "10");
-assert.equal(sql(`select balance from public.current_stock_balances where care_recipient_id='${patientB}' and product_id='fralda' and location='CARE_TEAM';`), "7");
+assert.equal(Number(sql(`select current_stock from public.requisition_items where requisition_id='${legacyRequisition}';`)), 2);
+assert.equal(Number(sql(`begin; set local request.jwt.claim.sub=\'${legacyFixtures.global.id}\'; select balance from public.current_stock_balances where care_recipient_id='${patientA}' and product_id='fralda' and location='FAMILY'; rollback;`)), 10);
+assert.equal(Number(sql(`begin; set local request.jwt.claim.sub='${legacyFixtures.global.id}'; select balance from public.current_stock_balances where care_recipient_id='${patientB}' and product_id='fralda' and location='CARE_TEAM'; rollback;`)), 7);
 assert.equal(sql("select count(*) from public.stock_movements where care_recipient_id is null and product_id='gaze' and quantity=3;"), "1");
 assert.equal(sql("select count(*) from public.requisition_items i left join public.care_recipient_products p on p.care_recipient_id=i.care_recipient_id and p.product_id=i.product_id where i.product_id is not null and p.product_id is null;"), "0");
 console.log("PASS legacy upgrade: protocols, quantities, both patient balances, FKs and unassigned stock preserved.");
 
-for (const file of ["transactions.sql", "invitations-import-outbox.sql", "alerts-routing.sql", "notification-read-model.sql", "protocol-and-stock-boundaries.sql", "service-role.sql"]) {
-  const output = sql(readFileSync(`tests/database/${file}`, "utf8"));
+for (const file of ["transactions.sql", "invitations-import-outbox.sql", "alerts-routing.sql", "notification-read-model.sql", "protocol-and-stock-boundaries.sql", "service-role.sql", "supply-workflows.sql", "document-invariants.sql"]) {
+  const content=readFileSync(`tests/database/${file}`, "utf8");
+  const output = sql(file==="supply-workflows.sql"?"begin;"+content+"rollback;":content);
   assert.match(output, /passed/);
   console.log(`PASS PostgreSQL regression: ${file}`);
 }

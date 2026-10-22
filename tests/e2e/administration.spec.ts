@@ -21,7 +21,7 @@ test.describe("administração integrada no ambiente local", () => {
     await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[name].email);
     await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Requisição de insumos" }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Visão geral" }).first()).toBeVisible();
     await expect(page.getByRole("combobox", { name: "Pessoa assistida", exact: true })).toBeVisible();
   }
 
@@ -35,7 +35,7 @@ test.describe("administração integrada no ambiente local", () => {
 
   async function section(page: Page, patientId: string, name: string) {
     await page.goto(`/admin?careRecipientId=${patientId}`);
-    await page.getByRole("button", { name, exact: true }).click();
+    await page.getByRole("combobox", {name:"Seção administrativa",exact:true}).selectOption({label:name});
     await expect(page.getByText("Carregando", { exact: false })).toHaveCount(0);
   }
 
@@ -90,7 +90,8 @@ test.describe("administração integrada no ambiente local", () => {
     }
     const localAdmin = await page.request.post("/api/admin", { data: { action: "membership", careRecipientId: firstPatient, userId: fixtures().adminA.id, role: "admin", canManageStock: true, canCountStock: true } });
     expect(localAdmin.ok()).toBeTruthy();
-    await page.getByRole("button", { name: "Sair", exact: true }).click();
+    await page.getByLabel("Menu do usuário",{exact:true}).click();
+  await page.getByRole("button", { name: "Sair", exact: true }).click();
     await login(page, "adminA");
     await section(page, firstPatient, "Vínculos");
     await expect(page.getByRole("button", { name: "Contas globais", exact: true })).toHaveCount(0);
@@ -102,7 +103,8 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(page.getByRole("listitem").filter({ has: page.getByText("Teste shared", { exact: true }) }).getByText("Profissional · Revogado", { exact: true })).toBeVisible();
     const forbidden = await page.request.get(`/api/admin?section=memberships&careRecipientId=${secondPatient}`);
     expect(forbidden.status()).toBe(404);
-    await page.getByRole("button", { name: "Sair", exact: true }).click();
+    await page.getByLabel("Menu do usuário",{exact:true}).click();
+  await page.getByRole("button", { name: "Sair", exact: true }).click();
     await login(page, "shared");
     const context = await (await page.request.get("/api/context")).json();
     expect(context.data.isGlobalAdmin).toBe(false);
@@ -162,7 +164,7 @@ test.describe("administração integrada no ambiente local", () => {
     const settings = await (await page.request.get(`/api/admin?section=notificationRecipients&careRecipientId=${patientId}`)).json();
     expect(settings.data).toHaveLength(1);
     expect(settings.data[0]).toMatchObject({ recipient_user_id: userId, recipient_group: "family", channel: "internal", is_enabled: true, include_team_alerts: true });
-    await page.getByRole("button", { name: "Alertas", exact: true }).click();
+    await page.getByRole("combobox",{name:"Seção administrativa",exact:true}).selectOption({label:"Alertas"});
     await page.getByRole("combobox", { name: "Item do catálogo", exact: true }).selectOption({ label: "Fralda" });
     await page.getByRole("combobox", { name: "Custódia", exact: true }).selectOption("CARE_TEAM");
     await page.getByLabel("Limite baixo", { exact: true }).fill("5");
@@ -227,8 +229,8 @@ test.describe("administração integrada no ambiente local", () => {
       if (name === "Gaze") productId = saved.data.product_id;
     }
     expect(productId).toBeTruthy();
-    await page.goto(`/?careRecipientId=${patientId}`);
-    for (let step = 0; step < 4; step++) await page.getByRole("button", { name: "Continuar", exact: true }).click();
+    await page.goto(`/fichas/req?careRecipientId=${patientId}`);
+    for (let step = 0; step < 4; step++) await page.getByRole("button", { name: "Avançar", exact: true }).click();
     await page.getByRole("button", { name: "+ Incluir novo item", exact: true }).click();
     await page.getByLabel("Nome", { exact: true }).fill("compressa alternativa");
     await expect(page.getByText("Nome alternativo reconhecido no catálogo.", { exact: true })).toBeVisible();
@@ -245,7 +247,7 @@ test.describe("administração integrada no ambiente local", () => {
     for (let step = 0; step < 2; step++) await page.getByRole("button", { name: "Continuar", exact: true }).click();
     await expect(page.getByText("Gaze — estoque atual: 3 (urgente)", { exact: true })).toBeVisible();
     const pending = page.waitForResponse((response) => new URL(response.url()).pathname === "/api/requisitions" && response.request().method() === "POST");
-    await page.getByRole("button", { name: "Confirmar e registrar", exact: true }).click();
+    await page.getByRole("button", { name: "Concluir requisição", exact: true }).click();
     const response = await pending;
     expect(response.ok()).toBeTruthy();
     const persisted = await response.json();

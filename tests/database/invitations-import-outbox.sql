@@ -1,5 +1,7 @@
 -- Verified local development stack only. All data mutations roll back; no external calls.
 begin;
+update public.requisitions set status='cancelled' where id='30000000-0000-4000-8000-000000000001';
+update public.requisition_notifications set state='cancelled' where state in ('pending','processing');
 create temporary table fixture_users as select replace(full_name,'Teste ','') name,id from public.profiles where full_name like 'Teste %';
 grant select on fixture_users to authenticated,service_role;
 create or replace function pg_temp.assert_ok(p_ok boolean,p_message text) returns void language plpgsql as $$begin if not coalesce(p_ok,false) then raise exception 'ASSERTION FAILED: %',p_message;end if;end;$$;
@@ -102,16 +104,16 @@ select public.configure_recipient_notification('20000000-0000-4000-8000-00000000
 select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','whatsapp','+5511999999999',true);
 select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','email','receiver@example.invalid',true);
 insert into operation_ids select 'request',requisition_id from public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[{"productId":"fralda","currentStock":0,"urgent":false}]','[]','[]');
-select pg_temp.assert_ok((select count(*)=3 from public.requisition_notifications where requisition_id=(select id from operation_ids where key='request')),'one message per individual and configured channel');
+select pg_temp.assert_ok((select count(*)=3 from public.requisition_notifications where recipient_user_id=(select id from fixture_users where name='professional') and coalesce(document_id,requisition_id)=(select id from operation_ids where key='request')),'one message per individual and configured channel');
 select pg_temp.login('reader');
-select pg_temp.assert_ok(not exists(select 1 from public.requisition_notifications where requisition_id=(select id from operation_ids where key='request')),'unrelated reader cannot see personal notification destinations');
+select pg_temp.assert_ok(not exists(select 1 from public.requisition_notifications where recipient_user_id<>(select id from fixture_users where name='reader') and coalesce(document_id,requisition_id)=(select id from operation_ids where key='request')),'unrelated reader cannot see personal notification destinations');
 select pg_temp.login('global');
 do $$declare v_worker uuid:=gen_random_uuid();v_worker2 uuid:=gen_random_uuid();n public.requisition_notifications;v_count integer:=0;begin
   for n in select * from public.claim_notification_jobs(100,v_worker,false) loop
     perform pg_temp.assert_ok(n.channel='internal','disabled external channels never claimed');
     perform public.complete_notification_job(n.id,v_worker,'delivered','internal');v_count:=v_count+1;
   end loop;
-  perform pg_temp.assert_ok(v_count=1,'exactly one internal configured recipient claimed');
+  perform pg_temp.assert_ok(v_count=(select count(*) from public.requisition_notifications where document_id=(select id from operation_ids where key='request') and channel='internal'),'one internal event per authorized recipient claimed');
   for n in select * from public.claim_notification_jobs(100,v_worker2,true) loop
     perform pg_temp.assert_ok(n.channel='whatsapp','unsupported email remains pending');
     insert into operation_ids values('external',n.id);

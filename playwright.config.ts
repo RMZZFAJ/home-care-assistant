@@ -10,7 +10,7 @@ export default defineConfig({
   testDir: "./tests/e2e", fullyParallel: false, workers: 1,
   forbidOnly: Boolean(process.env.CI), retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
-  use: { baseURL, trace: "retain-on-failure", screenshot: "only-on-failure" },
+  use: { baseURL, actionTimeout: 15_000, navigationTimeout: 30_000, trace: "retain-on-failure", screenshot: "only-on-failure" },
   webServer: {
     command: `node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port ${port}`,
     url: `${baseURL}/login`, reuseExistingServer: false, timeout: 60_000,

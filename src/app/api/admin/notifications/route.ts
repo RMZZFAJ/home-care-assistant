@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { api, ApiError, authenticate, databaseError, pageParameters, patientContext, readJson, requireGlobal, rpc, uuid } from "@/lib/server/api";
 import { deliveryErrorLabels } from "@/lib/notifications/presentation";
+import { createWorkerClient } from "@/lib/server/service-client";
 import { processNotifications } from "@/lib/notifications/worker";
 
 export const maxDuration = 120;
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     const auth = await authenticate();
     if (input.action === "process") {
       requireGlobal(auth);
-      return NextResponse.json({ data: await processNotifications(auth.client, input.limit) });
+      return NextResponse.json({ data: await processNotifications(createWorkerClient(), input.limit) });
     }
     await patientContext(auth, input.careRecipientId, "manage");
     const { data, error } = await auth.client.from("requisition_notifications").select("id,state").eq("id", input.notificationId).eq("care_recipient_id", input.careRecipientId).maybeSingle();

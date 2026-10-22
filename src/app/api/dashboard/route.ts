@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { api, authenticate, databaseError, patientContext } from "@/lib/server/api";
+import { api, authenticate, databaseError, patientContext, rpc } from "@/lib/server/api";
 
 export async function GET(request: Request) { return api("dashboard.read", async () => {
   const auth = await authenticate(); const patient = await patientContext(auth, new URL(request.url).searchParams.get("careRecipientId"));
@@ -11,5 +11,6 @@ export async function GET(request: Request) { return api("dashboard.read", async
     auth.client.from("patient_settings").select("settings").eq("care_recipient_id", patient.id).maybeSingle(),
   ]);
   for (const result of results) if (result.error) databaseError(result.error);
-  return NextResponse.json({ data: { requests: results[0].count ?? 0, receipts: results[1].count ?? 0, purchases: results[2].count ?? 0, disputes: results[3].count ?? 0, balances: results[4].count ?? 0, recent: results[5].data ?? [], balDay: (results[6].data as { settings?: { balDay?: number } } | null)?.settings?.balDay ?? null } });
+  const tasks=await rpc(auth.client,"operational_tasks",{p_patient:patient.id}) as {requests:number;balOverdue:boolean;balDue:string;drafts:number;consumptionPending:number};
+  return NextResponse.json({ data: {...tasks, requests: tasks.requests, receipts: results[1].count ?? 0, purchases: results[2].count ?? 0, disputes: results[3].count ?? 0, balances: results[4].count ?? 0, recent: results[5].data ?? [], balDay: (results[6].data as { settings?: { balDay?: number } } | null)?.settings?.balDay ?? null } });
 }); }

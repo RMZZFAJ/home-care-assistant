@@ -20,7 +20,8 @@ export async function GET(request: Request) {
     if (params.get("to")) query = query.lt("created_at", saoPauloDateBoundary(params.get("to")!, true));
     const { data, error, count } = await query;
     if (error) databaseError(error);
-    return NextResponse.json({ data: data ?? [], page, pageSize, total: count ?? 0 });
+    const enriched=await Promise.all((data??[]).map(async(row)=>({...row,...(row.type==="REQ"?{fulfillment:await rpc(auth.client,"requisition_fulfillment",{p_requisition:row.id})}:{})})));
+    return NextResponse.json({ data: enriched, page, pageSize, total: count ?? 0 });
   });
 }
 export async function POST(request: Request) {
