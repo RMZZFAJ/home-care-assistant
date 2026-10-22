@@ -1,77 +1,91 @@
 # Segurança e autorização
 
-## Matriz efetiva
+## Identidade e capacidades
 
-| Papel | Leitura | Requisição | Estoque | Contagem | Administração |
-| --- | --- | --- | --- | --- | --- |
-| Admin global | Todos | Sim | Sim | Sim | Sistema |
-| Admin local | Paciente | Sim | Sim | Sim | Paciente |
-| Supervisor | Vínculo | Sim | Não | Permitida | Status |
-| Profissional | Vínculo | Sim | Não | Permitida | Não |
-| Familiar | Vínculo | Não | Não | Não | Não |
-| Leitor | Vínculo | Não | Não | Não | Não |
+Auth valida credenciais. Perfil ativo, escopo global e vínculo local são
+conceitos distintos. Privilégio global exige administração global ativa no
+banco. Administrador local só administra recursos e vínculos de seu paciente;
+não altera senha, e-mail, perfil-base ou escopo global de outra pessoa.
 
-O papel efetivo vem do vínculo; o papel legado no perfil não amplia seu
-escopo. Privilégio global exige perfil ativo, papel administrativo e flag
-global explícita. Administrador local não altera perfil-base, senha, e-mail
-de login, estado global ou vínculos de outros pacientes.
+Funções padrão incluem administrador do paciente, familiar, supervisor,
+profissional e leitor. capability_definitions e overrides locais determinam
+as capacidades efetivas. COM permanece no âmbito familiar/administrativo.
+A equipe não lê o saldo geral familiar; a consulta mínima por produto da REQ
+tem capacidade própria. APIs e banco aplicam essas regras sem confiar no
+menu, metadata, nomes, UUIDs ou flags do navegador.
 
-O último administrador global ativo não pode ser removido, revogado ou
-rebaixado. Um contador transacional protege também alterações concorrentes
-e exclusões que atinjam o perfil por cascata.
+Concessões críticas e mudanças da política de revisão exigem proposta e
+aprovação por identidades administradoras distintas do paciente. A versão
+da política impede aplicar decisão antiga sobre configuração nova.
+Bootstrap global é delimitado aos primeiros administradores locais.
+A administração de acesso de administrador ativo não pode ser removida por
+override; revogar seu vínculo é a operação própria.
 
-## Fronteiras
+O último administrador global ativo é protegido inclusive sob concorrência.
+Revogação local não remove acesso da mesma conta a outro paciente. Paciente
+inativo conserva histórico autorizado e recusa novas operações.
 
-Toda operação valida sessão, perfil ativo, vínculo ativo, paciente, papel e
-capacidade. RLS protege consultas e RPCs repetem as condições. IDs, nomes,
-protocolo e flags enviados pelo navegador não são autorização. Histórico
-permanece legível para usuários autorizados após inativação do paciente.
+## Banco, APIs e objetos privados
 
-Grants explícitos e defaults foram revisados. A view de saldos usa
-`security_invoker`. Funções privilegiadas têm search_path controlado;
-helpers internos não são executáveis livremente. O lookup público de convite
-exige hash de token aleatório e e-mail correspondentes e retorna só booleano.
+RLS, grants explícitos/defaults e SECURITY DEFINER são revisados em conjunto.
+Helpers internos não são executáveis livremente. Funções privilegiadas têm
+search_path controlado. Serviço não possui DML público geral: usa a allowlist
+de RPCs de worker, evidências e webhook. Toda nova função exige grant próprio.
 
-O serviço de notificações não possui acesso direto às tabelas ou sequências
-públicas. Usa cinco RPCs explícitas de reserva, validação, conclusão, webhook
-e leitura mínima do estado. Novas funções criadas por postgres não herdam
-EXECUTE global de PUBLIC; um REVOKE somente por schema não substitui essa
-restrição global. Novos owners precisam de revisão própria dos defaults.
+Ledger e eventos confirmados são imutáveis para clientes. Saldo vem de
+movimentos transacionais não negativos. SHA-256 compara conteúdo canônico;
+não é assinatura assimétrica nem proteção contra administradores do banco.
 
-Mutações HTTP exigem JSON e rejeitam origem externa. Redirects são resolvidos
-e limitados à origem e aos caminhos internos permitidos. Respostas sensíveis
-usam no-store. Erros externos contêm código seguro e correlação, sem SQL,
-stack, tokens ou payloads privados nos logs.
+Uploads têm limites, reserva idempotente, validação de formato e sanitização.
+Imagens perdem metadados; PDFs ativos ou excessivos são recusados e páginas
+passivas são copiadas para novo arquivo. Objetos e PDFs ficam privados, com
+links temporários e acesso revalidado pela capacidade documental ou custódia.
+Anexos não ampliam a autorização do seu autor após revogação.
 
-## Identidade e convites
+Mutações rejeitam origem externa e validam contratos. Respostas sensíveis usam
+no-store e correlação. Logs omitem payload privado, SQL, credenciais e tokens.
+O navegador conserva tentativas incertas por até 24 horas para recuperação
+idempotente; conclusão e saída removem os rascunhos. Não é histórico oficial.
 
-Convites concedem somente vínculo local após aceite por conta com e-mail
-verificado. A autoridade atual do emissor é revalidada. Tokens são armazenados
-como hash, expiram e são invalidados por revogação/reemissão. O administrador
-nunca recebe credencial de login de uma conta existente. O destinatário novo
-se cadastra pessoalmente pelo Auth, sem escolher papel ou privilégios globais.
+## Autenticação pessoal
 
-Confirmação de e-mail deve estar habilitada em produção. A configuração
-remota de Auth e OAuth precisa ser verificada antes da homologação; não foi
-alterada nesta execução. Testes usam somente identidades e e-mails fictícios.
+Convite concede vínculo local somente após aceite pela identidade de e-mail
+correspondente confirmado. Autoridade do emissor, prazo e revogação são
+revalidados. Token fica em hash no banco e é removido da URL pela interface.
+Administradores nunca recebem senha de outra conta.
 
-## Privacidade e LGPD
+Alterações de contato, vínculo de provedor e encerramento de outras sessões
+exigem autenticação recente. Telefone usado em aceite WhatsApp deriva do
+telefone confirmado no Auth. Dados de perfil ou do navegador não comprovam
+posse de telefone. Tokens já emitidos expiram conforme a política do Auth.
 
-Coletar somente dados operacionais necessários. Observações podem conter
-dados sensíveis; evitar conteúdo clínico desnecessário. Não usar dados reais
-em fixtures, dumps de teste, screenshots, traces ou documentação.
+A política de novas senhas respeita o limite do bcrypt configurado no Auth,
+inclusive tamanho em bytes; o aplicativo não calcula hashes de credenciais.
+A referência é o [código oficial do Auth](https://github.com/supabase/auth/blob/master/internal/api/password.go).
+OAuth, confirmação de e-mail e SMS reais exigem configuração e teste próprios.
 
-O resumo de compartilhamento contém somente protocolo e orientação para
-acesso autenticado. Destinatários externos vêm de configuração autorizada,
-nunca do formulário. Bases legais, retenção, atendimento aos titulares,
-operadores externos e políticas de backup precisam ser definidos pelo
-controlador antes da operação real.
+## WhatsApp e Flows
 
-Uma tentativa de requisição cujo resultado é incerto fica em sessionStorage
-do navegador por até 24 horas para recuperação idempotente. O conteúdo pode
-incluir observações operacionais. É removido ao concluir, ao sair da conta
-ou quando uma tentativa expirada é carregada. Usar sessão individual em
-dispositivos compartilhados; esse armazenamento não é um histórico oficial.
+Webhooks verificam HMAC antes do processamento. Aceite simples exige opt-in
+do paciente, destinatário, telefone confirmado, desafio único, versão e prazo
+válidos. Mudança de destinatário ou versão invalida o desafio. Eventos
+registram o nível de verificação usado; esse canal não permite divergência,
+cancelamento ou reatribuição.
 
-Nenhuma auditoria garante ausência absoluta de vulnerabilidades. Consulte
-os testes negativos e os limites demonstrados na auditoria datada.
+Flows exige sessão curta e envelope cifrado. A sugestão é revista pelo autor
+no aplicativo e segue como relato pendente. Texto ambíguo não movimenta
+estoque. Chaves privadas e credenciais ficam exclusivamente no servidor.
+Canais desligados ou indisponíveis retornam estado controlado, sem simular
+envio, aceite ou publicação no provedor.
+
+## Testes e privacidade
+
+A suíte usa identidades Auth oficiais fictícias, com credenciais aleatórias
+em estado local ignorado e envio externo desabilitado. Não inserir hashes de
+senha manualmente nem carregar fixtures no remoto. Traces ficam desabilitados.
+Backups e dados privados não pertencem ao Git nem ao upload Vercel.
+
+Observações podem conter dados sensíveis: registre apenas informações
+operacionais necessárias. Retenção, base legal e operadores devem ser
+definidos pelo controlador. Resultados reais e limites da revisão ficam na
+[matriz](evolution/EXECUTION.md); não presumir homologação externa.

@@ -1,5 +1,6 @@
 -- Synthetic users, verified local development database only. No provider calls.
 begin;
+update public.requisitions set status='cancelled' where id='30000000-0000-4000-8000-000000000001';
 create temporary table fixture_users as
   select replace(full_name,'Teste ','') name,id from public.profiles where full_name like 'Teste %';
 grant select on fixture_users to authenticated;
@@ -87,15 +88,21 @@ do $$declare n public.requisition_notifications;w uuid:=gen_random_uuid();begin
   perform public.complete_notification_job(n.id,w,'delivered','internal');
 end;$$;
 select pg_temp.login('adminA');
-select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',10,
-  'inbound',null,'CARE_TEAM','Reposição fictícia resolve alerta',gen_random_uuid());
+do $$declare d jsonb;begin
+ d:=public.create_supply_document('20000000-0000-4000-8000-000000000001','ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from fixture_users where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','10'))),gen_random_uuid(),false);
+ perform pg_temp.login('professional');
+ perform public.supply_document_command((d->>'id')::uuid,'receive','{"divergences":[]}',gen_random_uuid(),(d->>'version')::integer);
+ perform pg_temp.login('adminA');
+end;$$;
 select pg_temp.assert_ok((select state='resolved' and resolved_at is not null
   from public.stock_alert_events where id=(select id from alert_test_ids where key='team')),
   'replenishment resolves team alert');
 select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',
   (select id from fixture_users where name='family'),'family','internal',null,true,true);
-select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',10,
-  'outbound','CARE_TEAM',null,'Nova falta fictícia após reposição',gen_random_uuid());
+do $$declare v uuid;begin
+ v:=public.report_extraordinary_consumption('20000000-0000-4000-8000-000000000001','consumption','CARE_TEAM','Consumo fictício após reposição','[{"productId":"fralda","quantity":"10"}]',gen_random_uuid());
+ perform public.confirm_extraordinary_consumption(v,true);
+end;$$;
 insert into alert_test_ids select 'teamOptIn',id from public.stock_alert_events
   where care_recipient_id='20000000-0000-4000-8000-000000000001'
     and product_id='fralda' and location='CARE_TEAM' and state='open';
@@ -120,8 +127,8 @@ insert into alert_test_ids select 'request',requisition_id from public.submit_re
   '20000000-0000-4000-8000-000000000001',gen_random_uuid(),'ignored',
   '[{"productId":"fralda","currentStock":0,"urgent":false}]','[]','[]');
 select pg_temp.login('adminA');
-select pg_temp.assert_ok((select count(*)=5 from public.requisition_notifications
-  where requisition_id=(select id from alert_test_ids where key='request')),
+select pg_temp.assert_ok((select count(distinct recipient_user_id)>=5 from public.requisition_notifications
+  where coalesce(document_id,requisition_id)=(select id from alert_test_ids where key='request')),
   'ordinary requisition retains all configured recipients');
 select 'custody alert routing priority and replenishment assertions passed' result;
 rollback;

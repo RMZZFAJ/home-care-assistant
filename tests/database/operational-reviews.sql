@@ -1,0 +1,86 @@
+-- Local Auth sessions are created officially by the harness before this rollback suite.
+begin;
+create temporary table review_actors as select replace(full_name,'Teste ','') name,id from public.profiles where full_name in ('Teste adminA','Teste adminB','Teste professional','Teste family','Teste reader');
+create temporary table review_state(key text primary key,value text);
+grant all on review_state to authenticated,service_role;
+grant select on review_actors to authenticated,service_role;
+create function pg_temp.review_assert(ok boolean,message text) returns void language plpgsql as $$begin if not coalesce(ok,false) then raise exception 'ASSERTION: %',message;end if;end;$$;
+create function pg_temp.review_login(who text) returns void language plpgsql security definer set search_path='' as $$
+declare u uuid;s uuid;begin
+ select id into strict u from pg_temp.review_actors where name=who;
+ select id into s from auth.sessions where user_id=u order by created_at desc limit 1;
+ perform set_config('request.jwt.claim.sub',u::text,true);
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated','session_id',s)::text,true);
+end;$$;
+grant execute on function pg_temp.review_assert(boolean,text),pg_temp.review_login(text) to authenticated,service_role;
+insert into public.care_recipients(id,display_name,is_development) values('ac000000-0000-4000-8000-000000000001','Revisões operacionais fictícias',true);
+insert into public.care_recipient_products(care_recipient_id,product_id,name,category,unit,aliases,sort_order) select 'ac000000-0000-4000-8000-000000000001',id,name,category,unit,aliases,0 from public.products where id='fralda';
+insert into public.care_recipient_memberships(care_recipient_id,user_id,role) select 'ac000000-0000-4000-8000-000000000001',id,case when name like 'admin%' then 'admin'::public.profile_role else name::public.profile_role end from review_actors;
+set local role authenticated;
+do $$declare p uuid:='ac000000-0000-4000-8000-000000000001';req record;i uuid;r jsonb;d jsonb;k uuid:=gen_random_uuid();h text;report_id uuid;before_qty numeric;caught boolean;pol jsonb;setting_version integer;
+begin
+ perform pg_temp.review_login('professional');
+ select * into req from public.submit_requisition(p,gen_random_uuid(),'ignored','[]','[{"customName":"Item extra a identificar","currentStock":0,"urgent":false}]','[]');
+ select id into i from public.requisition_items where requisition_id=req.requisition_id;
+ select content_hash into h from public.document_events where document_id=req.requisition_id and version=1;
+ caught:=false;begin perform public.resolve_requisition_item(i,'fralda','Identificação proibida',gen_random_uuid());exception when insufficient_privilege then caught:=true;end;
+ perform pg_temp.review_assert(caught,'team cannot resolve catalogue identity');
+ perform pg_temp.review_login('adminA');
+ r:=public.resolve_requisition_item(i,'fralda','Produto identificado após conferência',k);
+ perform pg_temp.review_assert(public.resolve_requisition_item(i,'fralda','Produto identificado após conferência',k)=r,'resolution retry is idempotent');
+ perform pg_temp.review_assert((select product_id is null and custom_name='Item extra a identificar' from public.requisition_items where id=i),'original request item is preserved');
+ perform pg_temp.review_assert((select content_hash=h from public.document_events where document_id=req.requisition_id and version=1),'original canonical version hash is preserved');
+ perform pg_temp.review_assert((select jsonb_array_length(canonical_snapshot->'itemResolutions')=1 from public.operational_documents where id=req.requisition_id),'new canonical version includes explicit resolution');
+ perform pg_temp.review_assert((public.requisition_item_context(p,array['fralda'])->0->'pending'->0->>'lineId')::uuid=i,'resolved extra is selectable for explicit linking');
+ caught:=false;begin update public.requisition_item_resolutions set reason='silently changed' where requisition_item_id=i;exception when insufficient_privilege then caught:=true;end;
+ perform pg_temp.review_assert(caught,'client cannot edit a confirmed resolution');
+ select version into setting_version from public.patient_settings where care_recipient_id=p;
+ foreach pol in array array['{"balReview":null}'::jsonb,'{"balDay":2.5}'::jsonb,'{"balApprovers":["family","family"]}'::jsonb,'{"balRequirement":null}'::jsonb] loop
+ caught:=false;begin perform public.configure_patient_access(p,'settings',pol,gen_random_uuid(),setting_version);exception when raise_exception then caught:=true;end;
+ perform pg_temp.review_assert(caught,'malformed settings rejected at direct RPC boundary');end loop;
+ caught:=false;begin perform public.configure_patient_access(p,'capability','{"capability":"access.manage","subjectRole":"admin","enabled":false}',gen_random_uuid(),setting_version);exception when check_violation then caught:=true;end;
+ perform pg_temp.review_assert(caught,'administrator governance cannot be disabled by override');
+ perform pg_temp.review_login('professional');
+ perform pg_temp.review_assert(not exists(select 1 from jsonb_array_elements(public.my_workspace()->'patients') x where x->>'id'='20000000-0000-4000-8000-000000000002'),'workspace does not expose another patient');
+ perform pg_temp.review_login('adminA');
+ perform public.family_stock_movement(p,'fralda',20,'inbound','Entrada para revisão operacional',gen_random_uuid());
+ d:=public.create_supply_document(p,'ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from review_actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','10','requisitionItemIds',jsonb_build_array(i)))),gen_random_uuid(),false);
+ perform pg_temp.review_assert((public.stock_transit(p)->0->'lines'->0->>'pending')::numeric=10,'transit is not confirmed stock');
+ perform pg_temp.review_login('professional');
+ d:=public.supply_document_command((d->>'id')::uuid,'receive',jsonb_build_object('divergences',jsonb_build_array(jsonb_build_object('lineId',d->'lines'->0->>'id','acceptedQuantity','6','problem','shortage')),'securityLevel','forged','providerId','forged'),gen_random_uuid(),(d->>'version')::integer);
+ perform pg_temp.review_assert((select body->'event'->>'securityLevel'='authenticated_session' and not(body->'event'?'providerId') from public.document_events where document_id=(d->>'id')::uuid order by version desc limit 1),'client JSON cannot forge receipt provenance');
+ perform pg_temp.review_assert(public.requisition_fulfillment(req.requisition_id)->>'fulfilled'='1','positive receipt fulfills the explicitly resolved extra');
+ perform pg_temp.review_assert((public.stock_transit(p)->0->'lines'->0->>'pending')::numeric=4,'partial receipt leaves exact unresolved transit');
+ report_id:=public.report_extraordinary_consumption(p,'consumption','CARE_TEAM','Consumo extraordinário conferido','[{"productId":"fralda","quantity":"2"}]',gen_random_uuid());
+ perform pg_temp.review_assert((select balance=6 from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='CARE_TEAM'),'report alone does not debit stock');
+ perform pg_temp.review_login('adminA');perform public.confirm_extraordinary_consumption(report_id,true);perform public.confirm_extraordinary_consumption(report_id,true);
+ perform pg_temp.review_assert((public.stock_consumption_metrics(p,now()-interval '30 days',now()+interval '1 second')->0->>'quantity')::numeric=2,'consumption metric uses confirmed ledger once');
+ perform pg_temp.review_login('professional');
+ perform pg_temp.review_assert(public.recent_session(),'Flow requires real recent Auth session');
+ perform public.create_flow_session(p,repeat('a',64));
+ insert into review_state values('patient',p::text),('before',(select balance::text from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='CARE_TEAM'));
+end;$$;
+reset role;
+set local role service_role;
+set local request.jwt.claims='{"role":"service_role"}';
+set local request.jwt.claim.sub='';
+do $$declare result jsonb;begin
+ result:=public.flow_exchange(repeat('a',64),'{"kind":"consumption","text":"Relato de Flow para confirmar","products":["fralda"]}');
+ insert into review_state values('flow',result->>'submissionId');
+ perform pg_temp.review_assert((result->>'pendingConfirmation')::boolean,'Flow stages data instead of touching stock');
+end;$$;
+reset role;
+set local role authenticated;
+do $$declare f uuid:=(select value::uuid from review_state where key='flow');p uuid:=(select value::uuid from review_state where key='patient');r jsonb;caught boolean;
+begin
+ perform pg_temp.review_login('family');caught:=false;begin perform public.review_flow_submission(f,true,'consumption','Tentativa de outro usuário','[{"productId":"fralda","quantity":"1"}]');exception when insufficient_privilege then caught:=true;end;
+ perform pg_temp.review_assert(caught,'another user cannot adopt a Flow suggestion');
+ perform pg_temp.review_login('professional');
+ r:=public.review_flow_submission(f,true,'consumption','Relato de Flow conferido no aplicativo','[{"productId":"fralda","quantity":"1"}]');
+ perform pg_temp.review_assert(public.review_flow_submission(f,true,'consumption','Relato de Flow conferido no aplicativo','[{"productId":"fralda","quantity":"1"}]')=r,'authenticated review is idempotent');
+ perform pg_temp.review_assert((select balance::text=(select value from review_state where key='before') from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='CARE_TEAM'),'Flow review still requires authorized stock confirmation');
+ perform pg_temp.review_assert((select status='reported' from public.consumption_reports where id=(r->>'reportId')::uuid),'review creates pending report');
+end;$$;
+reset role;
+select 'operational reviews passed';
+rollback;

@@ -1,6 +1,7 @@
 -- Run ONLY against scripts/test-environment.mjs's verified local development PostgreSQL.
 -- Requires the synthetic Auth fixtures and all migrations. Every mutation rolls back.
 begin;
+update public.requisitions set status='cancelled' where id='30000000-0000-4000-8000-000000000001';
 create temporary table fixture_users as select replace(full_name,'Teste ','') name,id from public.profiles where full_name like 'Teste %';
 grant select on fixture_users to authenticated;
 create or replace function pg_temp.assert_ok(p_ok boolean,p_message text) returns void language plpgsql as $$begin
@@ -18,6 +19,21 @@ create or replace function pg_temp.login(p_name text) returns void language plpg
 end;$$;
 
 grant execute on function pg_temp.assert_ok(boolean,text),pg_temp.must_fail(text,text),pg_temp.login(text) to authenticated;
+
+-- Ignored inserts and no-op upserts must not inflate the administrator guard.
+select pg_temp.assert_ok((select active_count from public.global_admin_guard where singleton)=
+  (select count(*) from public.profiles where status='active' and role='admin' and global_scope),
+  'global administrator guard starts consistent');
+insert into public.profiles(id,full_name,role,status,global_scope)
+select id,full_name,role,status,global_scope from public.profiles
+where status='active' and role='admin' and global_scope on conflict(id) do nothing;
+insert into public.profiles(id,full_name,role,status,global_scope)
+select id,full_name,role,status,global_scope from public.profiles
+where status='active' and role='admin' and global_scope
+on conflict(id) do update set full_name=excluded.full_name;
+select pg_temp.assert_ok((select active_count from public.global_admin_guard where singleton)=
+  (select count(*) from public.profiles where status='active' and role='admin' and global_scope),
+  'ignored inserts and no-op upserts preserve the exact guard count');
 
 select pg_temp.assert_ok(not has_table_privilege('anon','public.current_stock_balances','SELECT'),'anon cannot read balances');
 select pg_temp.assert_ok(not has_table_privilege('authenticated','public.requisitions','INSERT'),'direct requisition insert denied');
@@ -76,30 +92,25 @@ select pg_temp.login('global');
 select pg_temp.must_fail($q$select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',9999,'outbound','FAMILY',null,'Saída global negada',gen_random_uuid())$q$,'global normal outbound cannot become negative');
 select pg_temp.must_fail($q$select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',9999,'outbound','FAMILY','CARE_TEAM','Transferência global negada',gen_random_uuid())$q$,'global transfer cannot become negative');
 select pg_temp.must_fail($q$select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',1,'inbound','FAMILY','CARE_TEAM','Formato inválido',gen_random_uuid())$q$,'ambiguous direction invalid');
-select public.extraordinary_stock_adjustment('20000000-0000-4000-8000-000000000001','fralda',-20,'FAMILY','Correção extraordinária confirmada',true,'50000000-0000-4000-8000-000000000002');
-select pg_temp.assert_ok((select balance=-10 from public.current_stock_balances where care_recipient_id='20000000-0000-4000-8000-000000000001' and product_id='fralda' and location='FAMILY'),'only extraordinary adjustment permits negative');
+select pg_temp.must_fail($q$select public.family_stock_movement('20000000-0000-4000-8000-000000000001','fralda',20,'outbound','Saldo insuficiente',gen_random_uuid())$q$,'even global family movement cannot create negative stock');
+select pg_temp.assert_ok((select balance=10 from public.current_stock_balances where care_recipient_id='20000000-0000-4000-8000-000000000001' and product_id='fralda' and location='FAMILY'),'failed movement preserves original stock');
 select pg_temp.must_fail($q$select public.extraordinary_stock_adjustment('20000000-0000-4000-8000-000000000001','fralda',-1,'FAMILY','Sem confirmação',false,gen_random_uuid())$q$,'extraordinary explicit confirmation required');
-select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',30,'inbound',null,'FAMILY','Reposição', '50000000-0000-4000-8000-000000000003');
-select pg_temp.must_fail($q$select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',31,'inbound',null,'FAMILY','Reposição','50000000-0000-4000-8000-000000000003')$q$,'stock idempotency content conflict');
+select public.family_stock_movement('20000000-0000-4000-8000-000000000001','fralda',30,'inbound','Reposição', '50000000-0000-4000-8000-000000000003');
+select pg_temp.must_fail($q$select public.family_stock_movement('20000000-0000-4000-8000-000000000001','fralda',31,'inbound','Reposição','50000000-0000-4000-8000-000000000003')$q$,'stock idempotency content conflict');
 select pg_temp.login('adminA');
 select pg_temp.must_fail($q$select public.extraordinary_stock_adjustment('20000000-0000-4000-8000-000000000001','fralda',-100,'FAMILY','Local proibido',true,gen_random_uuid())$q$,'local admin no extraordinary bypass');
 
-do $$declare i public.stock_inventories;x record;v_count bigint;begin
-  i:=public.create_stock_inventory('20000000-0000-4000-8000-000000000001','FAMILY');
-  for x in select * from public.stock_inventory_items where inventory_id=i.id loop
-    perform public.add_stock_inventory_item(i.id,x.product_id,x.expected_quantity,'Contagem conferida');
-  end loop;
-  perform public.submit_stock_inventory(i.id);
-  perform public.record_stock_movement(i.care_recipient_id,'fralda',1,'inbound',null,'FAMILY','Movimento após referência',gen_random_uuid());
-  perform pg_temp.must_fail(format('select public.approve_stock_inventory(%L)',i.id),'movement after reference requires recount');
-  i:=public.recount_stock_inventory(i.id);
-  for x in select * from public.stock_inventory_items where inventory_id=i.id loop
-    perform public.add_stock_inventory_item(i.id,x.product_id,x.expected_quantity+case when x.product_id='fralda' then 1 else 0 end,'Divergência conferida');
-  end loop;
-  perform public.submit_stock_inventory(i.id);perform public.approve_stock_inventory(i.id);
-  select count(*) into v_count from public.stock_movements where reference_type='inventory' and reference_id=i.id;
-  perform public.approve_stock_inventory(i.id);
-  perform pg_temp.assert_ok(v_count=1 and v_count=(select count(*) from public.stock_movements where reference_type='inventory' and reference_id=i.id),'inventory approval idempotent single adjustment');
+do $$declare b jsonb;c jsonb;payload jsonb;k uuid:=gen_random_uuid();v_count bigint;begin
+ select jsonb_build_object('lines',jsonb_agg(jsonb_build_object('productId',product_id,'quantity','0'))) into payload from public.care_recipient_products where care_recipient_id='20000000-0000-4000-8000-000000000001' and is_active;
+ b:=public.create_supply_document('20000000-0000-4000-8000-000000000001','BAL',payload,gen_random_uuid(),true);
+ c:=public.create_supply_document('20000000-0000-4000-8000-000000000001','ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from fixture_users where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','1'))),gen_random_uuid(),false);
+ perform pg_temp.must_fail(format('select public.supply_document_command(%L,''submit'',''{}'',gen_random_uuid(),%s)',b->>'id',b->>'version'),'movement after reference requires recount');
+ select jsonb_build_object('lines',jsonb_agg(jsonb_build_object('productId',product_id,'quantity',case when product_id='fralda' then '1' else '0' end))) into payload from public.care_recipient_products where care_recipient_id='20000000-0000-4000-8000-000000000001' and is_active;
+ b:=public.revise_supply_document((b->>'id')::uuid,payload,gen_random_uuid(),(b->>'version')::integer,true);
+ b:=public.supply_document_command((b->>'id')::uuid,'submit','{}',k,(b->>'version')::integer);
+ select count(*) into v_count from public.stock_movements where reference_type='bal' and reference_id=(b->>'id')::uuid;
+ perform public.supply_document_command((b->>'id')::uuid,'submit','{}',k,1);
+ perform pg_temp.assert_ok(v_count=1 and v_count=(select count(*) from public.stock_movements where reference_type='bal' and reference_id=(b->>'id')::uuid),'BAL application is idempotent single adjustment');
 end;$$;
 
 select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','internal',null,true);

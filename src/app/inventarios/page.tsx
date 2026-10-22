@@ -1,3 +1,4 @@
-import { AuthenticatedPage } from "@/components/authenticated-page";
-import { InventoryConsole } from "@/components/stock/inventory-console";
-export default function InventoriesPage() { return <AuthenticatedPage><InventoryConsole /></AuthenticatedPage>; }
+import { redirect } from "next/navigation";
+export default function InventoriesPage() {
+  redirect("/historico?type=BAL");
+}

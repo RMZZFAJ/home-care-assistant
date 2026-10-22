@@ -1,5 +1,12 @@
 export type ProductCategory = "medicamentos" | "higiene" | "dieta";
-export type RequisitionStatus = "draft" | "submitted" | "under_review" | "approved" | "separated" | "delivered" | "cancelled";
+export type RequisitionStatus =
+  | "draft"
+  | "submitted"
+  | "under_review"
+  | "approved"
+  | "separated"
+  | "delivered"
+  | "cancelled";
 
 export type CatalogItem = {
   id: string;
@@ -10,7 +17,8 @@ export type CatalogItem = {
   is_active?: boolean;
   sort_order?: number;
   category: ProductCategory;
-  unit: "unidade" | "caixa" | "frasco" | "pacote" | "bisnaga" | "envelope" | "comprimido";
+  unit: string;
+  quantity_decimals?: number;
 };
 
 export type RequisitionLine = {
@@ -20,6 +28,7 @@ export type RequisitionLine = {
   unit?: string;
   currentStock: number;
   urgent: boolean;
+  repeatReason?: string;
 };
 
 export type ExtraItem = {
@@ -35,8 +44,12 @@ export type RequisitionFormData = {
   observations: string[];
 };
 
-export type ReceiptLine = Omit<RequisitionLine, "currentStock"> & { currentStock: number | null };
-export type ReceiptExtraItem = Omit<ExtraItem, "currentStock"> & { currentStock: number | null };
+export type ReceiptLine = Omit<RequisitionLine, "currentStock"> & {
+  currentStock: number | null;
+};
+export type ReceiptExtraItem = Omit<ExtraItem, "currentStock"> & {
+  currentStock: number | null;
+};
 
 export type RequisitionReceipt = {
   lines: ReceiptLine[];
@@ -44,6 +57,7 @@ export type RequisitionReceipt = {
   observations: string[];
   requisitionId?: string;
   protocol: string;
+  code?: string;
   requesterName: string;
   recipientName: string;
   createdAt: string | null;

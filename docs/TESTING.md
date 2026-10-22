@@ -72,22 +72,29 @@ comando de migrations; a configuração remota deve ser verificada separadamente
 ## Navegador
 
 ```sh
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run e2e
 ```
 
 O runner injeta credenciais exclusivamente da stack local verificada, desabilita
 envio externo e gera build separado em .next-e2e. Inicia servidor em 3100,
-sem reaproveitar processo desconhecido. Os projetos desktop e celular usam
-dados fictícios. Relatórios e traces não são versionados.
-Os IDs das fixtures ficam em supabase/.temp/hca-fixtures.json, ignorado pelo Git.
+sem reaproveitar processo desconhecido. Os projetos Chromium desktop, Pixel 7
+e WebKit/iPhone 13 usam dados fictícios. Relatórios não são versionados;
+traces ficam desabilitados para evitar registrar credenciais de Auth.
+
+Os IDs ficam em supabase/.temp/hca-fixtures.json. A senha aleatória de cada
+workspace fica em supabase/.temp/hca-test-credentials.json. Ambos são ignorados
+pelo Git e excluídos do upload Vercel. O provisionamento usa Auth Admin oficial;
+não inserir hashes de senha manualmente. A conta profissional local recebe
+telefone fictício confirmado via Auth Admin para testar autorização de desafio;
+isso não constitui homologação de SMS real.
 
 E2E e análise axe verificam jornadas completas e acessibilidade. Falha de rede
 após persistência deve recuperar o mesmo registro. Resultado de provedor real,
 OAuth externo e novo run publicado do CI dependem de homologação separada.
 
 Antes da suíte completa, autorize o replay local e execute test:migrations e
-test:integration. A importação E2E usa protocolos físicos 9 e 10 em dados
+test:integration. A importação E2E usa protocolos físicos 9, 10 e 11 em dados
 fictícios; o replay prepara novamente essa fixture para uma nova execução.
 Mailpit valida cadastro, confirmação e recuperação sem entrega externa.
 

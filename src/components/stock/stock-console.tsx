@@ -1,88 +1,650 @@
 "use client";
-
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  api,
+  ApiError,
+  buttonClass,
+  can,
+  inputClass,
+  Notice,
+  primaryClass,
+  Workspace,
+  type WorkspaceContext,
+} from "@/components/workspace";
+import { Attachments } from "@/components/documents/attachments";
+import { Dialog, EmptyState, Icon } from "@/components/ui/primitives";
+import { TransitStock, type TransitDocument } from "./transit-stock";
+import { quantity, formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
-import { api, buttonClass, inputClass, may, Notice, panelClass, primaryClass, Workspace, type WorkspaceContext } from "@/components/workspace";
 
-type Product = { id: string; name: string; unit: string; is_active?: boolean; active?: boolean };
-type Balance = { product_id: string; location: string; balance: number };
-type Movement = { id: string; product_id: string; quantity: number; movement_type: string; source_location: string | null; destination_location: string | null; justification: string; created_at: string; reference_type?: string | null; source_balance_before?: number; source_balance_after?: number; destination_balance_before?: number; destination_balance_after?: number };
-type Alert = { id: string; product_id: string; location: string; severity?: string; state?: string };
-type StockResponse = { data: Movement[]; balances: Balance[]; alerts?: Alert[]; page: number; pageSize: number; total: number };
-const custody = { CARE_TEAM: "Equipe de cuidado", FAMILY: "Família" };
-const movementLabels: Record<string,string> = { inbound: "Entrada", outbound: "Saída", transfer: "Transferência", adjustment: "Ajuste compensatório", exceptionalAdjustment: "Ajuste extraordinário" };
-const emptyHistoryFilter = { productId: "", location: "", from: "", to: "" };
-
-export function StockConsole() { return <Workspace title="Estoque por custódia">{(context) => context.patient ? <PatientStock context={context} /> : <Notice>Cadastre ou selecione um paciente para consultar o estoque.</Notice>}</Workspace>; }
-function PatientStock({ context }: { context: WorkspaceContext }) {
-  const [products,setProducts] = useState<Product[]>([]);
-  const [balances,setBalances] = useState<Balance[]>([]);
-  const [movements,setMovements] = useState<Movement[]>([]);
-  const [alerts,setAlerts] = useState<Alert[]>([]);
-  const [loading,setLoading] = useState(true);
-  const [busy,setBusy] = useState(false);
-  const [error,setError] = useState("");
-  const [message,setMessage] = useState("");
-  const [attempt,setAttempt] = useState(0);
-  const [movementType,setMovementType] = useState("inbound");
-  const [filter,setFilter] = useState({productId:"",location:""});
-  const [historyDraft,setHistoryDraft] = useState(emptyHistoryFilter);
-  const [historyFilter,setHistoryFilter] = useState(emptyHistoryFilter);
-  const [page,setPage] = useState(1);
-  const [pagination,setPagination] = useState({ page: 1, pageSize: 20, total: 0 });
-  const [uncertain,setUncertain] = useState(false);
-  const pendingRef = useRef<Record<string,unknown> | null>(null);
-  const patientId = context.patient!.id;
+type StockCustody = {
+  confirmed: string;
+  incoming: string;
+  minimum: string | null;
+  purchasePending?: string;
+};
+type ProductStock = {
+  productId: string;
+  name: string;
+  unit: string;
+  decimals: number;
+  active: boolean;
+  family: StockCustody | null;
+  team: StockCustody | null;
+  disputed: string;
+};
+type Movement = {
+  id: string;
+  product_id: string;
+  quantity: string;
+  source_location: string | null;
+  destination_location: string | null;
+  justification: string;
+  created_at: string;
+  reference_type: string | null;
+  reference_id: string | null;
+};
+const locationLabels: Record<string, string> = {
+  FAMILY: "Família",
+  CARE_TEAM: "Equipe",
+  TRANSIT: "Em trânsito",
+};
+export function StockConsole() {
+  const params = useSearchParams();
+  return (
+    <Workspace title="Gestão dos estoques">
+      {(context) =>
+        context.patient ? (
+          <PatientStock
+            key={context.patient.id + params.toString()}
+            context={context}
+            initialCustody={params.get("custody") ?? ""}
+          />
+        ) : (
+          <Notice>Selecione um paciente para consultar o estoque.</Notice>
+        )
+      }
+    </Workspace>
+  );
+}
+function PatientStock({
+  context,
+  initialCustody,
+}: {
+  context: WorkspaceContext;
+  initialCustody: string;
+}) {
+  const [transit, setTransit] = useState<TransitDocument[]>([]);
+  const [metrics, setMetrics] = useState<
+    {
+      productId: string;
+      location: string;
+      quantity: string;
+      averagePerDay: string;
+    }[]
+  >([]);
+  const [products, setProducts] = useState<ProductStock[]>([]);
+  const [movements, setMovements] = useState<Movement[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [custody, setCustody] = useState(initialCustody);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({ productId: "", from: "", to: "" });
+  const [operation, setOperation] = useState("inbound");
+  const [review, setReview] = useState<Record<string, unknown> | null>(null);
+  const [uncertain, setUncertain] = useState(false);
+  const [savedMovement, setSavedMovement] = useState<string | null>(null);
+  const hasStock =
+    can(context, "stock.family.read") || can(context, "stock.team.read");
+  const frozenRef = useRef<Record<string, unknown> | null>(null);
   useEffect(() => {
     const controller = new AbortController();
-    const params = new URLSearchParams({ careRecipientId: patientId, page: String(page), pageSize: "20" });
-    for (const [key,value] of Object.entries(historyFilter)) if (value) params.set(key,value);
-    Promise.all([api<{data:Product[]}>(`/api/catalog?careRecipientId=${patientId}&includeInactive=true`,undefined,controller.signal),api<StockResponse>(`/api/stock/movements?${params}`,undefined,controller.signal)]).then(([catalog,stock]) => {
-      if (controller.signal.aborted) return;
-      setProducts(catalog.data); setBalances(stock.balances ?? []); setMovements(stock.data); setAlerts(stock.alerts ?? []); setPagination({ page: stock.page, pageSize: stock.pageSize, total: stock.total }); setError("");
-    }).catch((reason) => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Não foi possível carregar o estoque."); }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    const patient = context.patient!.id;
+    Promise.all([
+      api<{
+        overview: ProductStock[];
+        transit: TransitDocument[];
+        metrics: typeof metrics;
+      }>(
+        "/api/stock/balances?careRecipientId=" +
+          patient +
+          "&custody=" +
+          custody,
+        undefined,
+        controller.signal,
+      ),
+      hasStock
+        ? api<{ data: Movement[]; total: number }>(
+            "/api/stock/movements?" +
+              new URLSearchParams({
+                careRecipientId: patient,
+                page: String(page),
+                location: custody,
+                ...filters,
+              }),
+            undefined,
+            controller.signal,
+          )
+        : Promise.resolve({ data: [], total: 0 }),
+    ])
+      .then(([stock, history]) => {
+        if (!controller.signal.aborted) {
+          setProducts(stock.overview);
+          setTransit(stock.transit);
+          setMetrics(stock.metrics);
+          setMovements(history.data);
+          setTotal(history.total);
+          setError("");
+        }
+      })
+      .catch((reason) => {
+        if (!controller.signal.aborted)
+          setError(
+            reason instanceof Error
+              ? reason.message
+              : "Não foi possível consultar o estoque.",
+          );
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
     return () => controller.abort();
-  },[patientId,attempt,page,historyFilter]);
-  function searchHistory(event: FormEvent<HTMLFormElement>) {
+  }, [context.patient, page, custody, filters, attempt, hasStock]);
+  function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (historyDraft.from && historyDraft.to && historyDraft.from > historyDraft.to) { setError("A data inicial precisa ser anterior ou igual à final."); return; }
-    setError(""); setLoading(true); setPage(1); setHistoryFilter({...historyDraft});
+    const form = new FormData(event.currentTarget);
+    setReview({
+      careRecipientId: context.patient!.id,
+      productId: form.get("productId"),
+      quantity: form.get("quantity"),
+      action: operation,
+      reason: form.get("reason"),
+      idempotencyKey: crypto.randomUUID(),
+      ...(form.get("referenceId")
+        ? { referenceId: form.get("referenceId") }
+        : {}),
+    });
   }
-  async function save(event?: FormEvent<HTMLFormElement>) {
-    event?.preventDefault(); setError(""); setMessage("");
-    const formElement = event?.currentTarget;
-    if (!pendingRef.current && event) {
-      const form = new FormData(event.currentTarget); const location = String(form.get("location")); const quantity = Number(form.get("quantity"));
-      if (!Number.isSafeInteger(quantity) || quantity === 0 || (movementType !== "exceptionalAdjustment" && quantity < 0)) { setError("Informe uma quantidade inteira válida."); return; }
-      const base = { careRecipientId:context.patient!.id,productId:form.get("productId"),quantity,justification:form.get("justification"),idempotencyKey:crypto.randomUUID() };
-      pendingRef.current = movementType === "exceptionalAdjustment" ? { ...base,action:"exceptionalAdjustment",location,confirmation:form.has("confirmation") } : { ...base,movementType:movementType === "adjustmentIn" || movementType === "adjustmentOut" ? "adjustment" : movementType,sourceLocation:movementType === "outbound" || movementType === "adjustmentOut" || movementType === "transfer" ? location : null,destinationLocation:movementType === "inbound" || movementType === "adjustmentIn" ? location : movementType === "transfer" ? form.get("destinationLocation") : null,referenceType:null,referenceId:null };
-    }
-    if (!pendingRef.current) return;
+  async function save() {
+    if (!frozenRef.current) frozenRef.current = review;
+    if (!frozenRef.current) return;
     setBusy(true);
-    try { await api("/api/stock/movements",pendingRef.current); pendingRef.current = null; setUncertain(false); setMessage("Movimentação registrada. Saldos atualizados."); formElement?.reset(); setLoading(true); setPage(1); setAttempt((value) => value + 1); }
-    catch(reason) { setUncertain(true); setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a movimentação."); }
-    finally { setBusy(false); }
+    setError("");
+    try {
+      const result = await api<{ id: string }>(
+        "/api/stock/movements",
+        frozenRef.current,
+      );
+      frozenRef.current = null;
+      setUncertain(false);
+      setReview(null);
+      setSavedMovement(result.id);
+      setMessage(
+        "Movimentação familiar confirmada. O histórico original foi preservado.",
+      );
+      setAttempt((value) => value + 1);
+    } catch (reason) {
+      const rejected =
+        reason instanceof ApiError &&
+        [400, 403, 404, 409, 422].includes(reason.status);
+      if (rejected) {
+        frozenRef.current = null;
+        setReview(null);
+      }
+      setUncertain(!rejected);
+      setError(
+        reason instanceof Error ? reason.message : "Resultado não confirmado.",
+      );
+    } finally {
+      setBusy(false);
+    }
   }
-  const productName = (id:string) => products.find((item) => item.id === id) ? `${products.find((item) => item.id === id)!.name}${products.find((item) => item.id === id)!.is_active === false ? " (inativo)" : ""}` : id;
-  const visibleProducts = products.filter((item) => !filter.productId || item.id === filter.productId);
-  return <div className="space-y-5">
-    {loading && <Notice>Carregando catálogo, saldos e movimentações…</Notice>}
-    {error && <Notice error>{error}<button className={`${buttonClass} ml-3`} onClick={() => { setLoading(true); setAttempt((value) => value + 1); }}>Atualizar consulta</button></Notice>}{message && <Notice>{message}</Notice>}
-    <section className={panelClass}><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-lg font-bold">Saldos atuais</h2><button className={buttonClass} disabled={loading} onClick={() => { setLoading(true); setAttempt((value) => value + 1); }}>Atualizar saldos</button></div><div className="mt-4 grid gap-3 sm:grid-cols-2"><label className="text-sm font-semibold">Produto<select className={inputClass} value={filter.productId} onChange={(event) => setFilter({...filter,productId:event.target.value})}><option value="">Todos</option>{products.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label className="text-sm font-semibold">Custódia<select className={inputClass} value={filter.location} onChange={(event) => setFilter({...filter,location:event.target.value})}><option value="">Todas</option>{Object.entries(custody).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label></div><div role="region" aria-label="Saldos por produto e custódia" tabIndex={0} className="mt-5 overflow-x-auto focus-visible:outline-2 focus-visible:outline-(--brand)"><table className="min-w-full text-left text-sm"><caption className="sr-only">Saldos separados da equipe e da família</caption><thead><tr><th className="p-3">Item</th>{Object.entries(custody).filter(([key]) => !filter.location || key === filter.location).map(([key,label]) => <th className={`p-3 ${key === "CARE_TEAM" ? "bg-teal-50" : ""}`} key={key}>{label}</th>)}<th className="p-3">Total (ambas custódias)</th></tr></thead><tbody>{visibleProducts.map((item) => <tr key={item.id} className="border-t border-(--line)"><th className="p-3 font-semibold">{item.name}{item.is_active === false && " (inativo)"}<span className="block text-xs font-normal text-(--muted)">{item.unit}</span></th>{Object.keys(custody).filter((key) => !filter.location || key === filter.location).map((key) => <td key={key} className={`p-3 font-bold ${key === "CARE_TEAM" ? "bg-teal-50" : ""}`}>{balances.find((balance) => balance.product_id === item.id && balance.location === key)?.balance ?? 0}</td>)}<td className="p-3 font-semibold">{balances.filter((balance) => balance.product_id === item.id).reduce((sum,balance) => sum+balance.balance,0)}</td></tr>)}</tbody></table></div>{!loading && products.length === 0 && <p className="mt-3 text-sm">O catálogo deste paciente está vazio.</p>}</section>
-    {alerts.length > 0 && <section className={panelClass}><h2 className="font-bold">Alertas de estoque</h2><ul className="mt-3 space-y-2 text-sm">{alerts.map((item) => <li key={item.id}>{productName(item.product_id)} · {custody[item.location as keyof typeof custody] ?? item.location} · {item.severity ?? item.state}</li>)}</ul></section>}
-    {may(context,"manageStock") && <section className={panelClass}><h2 className="mb-4 text-lg font-bold">Registrar movimentação</h2><form onSubmit={save} className="space-y-4"><fieldset disabled={busy || uncertain || loading} className="grid min-w-0 gap-4 sm:grid-cols-2"><label className="text-sm font-semibold">Operação<select className={inputClass} value={movementType} onChange={(event) => setMovementType(event.target.value)}><option value="inbound">Entrada</option><option value="outbound">Saída</option><option value="transfer">Transferência</option><option value="adjustmentIn">Ajuste compensatório de entrada</option><option value="adjustmentOut">Ajuste compensatório de saída</option>{context.isGlobalAdmin && <option value="exceptionalAdjustment">Ajuste extraordinário global</option>}</select></label><label className="text-sm font-semibold">Item<select name="productId" required className={inputClass}><option value="">Selecione</option>{products.filter((item) => item.is_active !== false && item.active !== false).map((item) => <option key={item.id} value={item.id}>{item.name} · {item.unit}</option>)}</select></label><label className="text-sm font-semibold">{movementType === "transfer" ? "Custódia de origem" : "Custódia"}<select name="location" className={inputClass}>{Object.entries(custody).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>{movementType === "transfer" && <label className="text-sm font-semibold">Custódia de destino<select name="destinationLocation" className={inputClass}><option value="FAMILY">Família</option><option value="CARE_TEAM">Equipe de cuidado</option></select></label>}<label className="text-sm font-semibold">{movementType === "exceptionalAdjustment" ? "Variação do saldo (+ entrada / − saída)" : "Quantidade"}<input name="quantity" type="number" required step="1" min={movementType === "exceptionalAdjustment" ? undefined : 1} max="1000000" className={inputClass} /></label><label className="text-sm font-semibold sm:col-span-2">Justificativa<textarea name="justification" required minLength={3} maxLength={1000} className={inputClass} rows={3} /></label>{movementType === "exceptionalAdjustment" && <label className="flex items-start gap-3 rounded border border-amber-300 bg-amber-50 p-3 text-sm sm:col-span-2"><input type="checkbox" name="confirmation" required className="mt-1 h-5 w-5 shrink-0" />Confirmo o ajuste extraordinário e autorizo saldo negativo se necessário. A operação será auditada com esta justificativa.</label>}</fieldset><button disabled={busy || uncertain || loading} type="submit" className={primaryClass}>{busy ? "Registrando…" : "Confirmar movimentação"}</button></form>{uncertain && <div className="mt-4"><Notice>Esta tentativa ainda precisa de confirmação. Os dados e a chave foram preservados. Atualizar a consulta não inicia outra movimentação.</Notice><button className={`${primaryClass} mt-3`} disabled={busy} onClick={() => void save()}>{busy ? "Recuperando…" : "Recuperar esta movimentação"}</button></div>}</section>}
-    <section className={panelClass} aria-busy={loading}>
-      <h2 className="font-bold">Histórico de movimentações</h2>
-      <form onSubmit={searchHistory} className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <label className="text-sm font-semibold">Produto do histórico<select className={inputClass} value={historyDraft.productId} onChange={(event) => setHistoryDraft({...historyDraft,productId:event.target.value})}><option value="">Todos</option>{products.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-        <label className="text-sm font-semibold">Custódia do histórico<select className={inputClass} value={historyDraft.location} onChange={(event) => setHistoryDraft({...historyDraft,location:event.target.value})}><option value="">Todas</option>{Object.entries(custody).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>
-        <label className="text-sm font-semibold">De<input type="date" className={inputClass} value={historyDraft.from} max={historyDraft.to || undefined} onChange={(event) => setHistoryDraft({...historyDraft,from:event.target.value})} /></label>
-        <label className="text-sm font-semibold">Até<input type="date" className={inputClass} value={historyDraft.to} min={historyDraft.from || undefined} onChange={(event) => setHistoryDraft({...historyDraft,to:event.target.value})} /></label>
-        <button type="submit" disabled={loading} className={`${primaryClass} self-end`}>Buscar movimentações</button>
-        <p className="text-xs text-(--muted) sm:col-span-2 lg:col-span-5">O período considera dias completos no fuso de São Paulo. Os filtros do histórico não alteram os saldos atuais.</p>
-      </form>
-      {!loading && !error && <><p className="mt-5 text-sm text-(--muted)">{pagination.total} movimentação(ões) encontrada(s).</p><ul className="mt-4 space-y-3">{movements.map((item) => <li key={item.id} className="rounded border border-(--line) p-3 text-sm"><p className="font-semibold">{productName(item.product_id)} · {item.reference_type === "extraordinary_adjustment" ? movementLabels.exceptionalAdjustment : item.source_location && item.destination_location ? movementLabels.transfer : movementLabels[item.movement_type] ?? item.movement_type} · {item.quantity}</p><p className="mt-1">{item.source_location ? custody[item.source_location as keyof typeof custody] : "Origem externa"} → {item.destination_location ? custody[item.destination_location as keyof typeof custody] : "Saída externa"}</p>{item.source_balance_before != null && <p>Saldo de origem: {item.source_balance_before} → {item.source_balance_after}</p>}{item.destination_balance_before != null && <p>Saldo de destino: {item.destination_balance_before} → {item.destination_balance_after}</p>}<p className="mt-1">{item.justification}</p><p className="mt-2 text-xs text-(--muted)">{formatBrazilDate(item.created_at)}</p></li>)}</ul>{movements.length === 0 && <p className="mt-3 text-sm">Nenhuma movimentação encontrada para os filtros selecionados.</p>}</>}
-      {pagination.total > pagination.pageSize && <nav aria-label="Páginas das movimentações" className="mt-5 flex flex-wrap items-center justify-between gap-3"><button type="button" disabled={page <= 1 || loading} className={buttonClass} onClick={() => { setLoading(true); setPage((value) => value - 1); }}>Anterior</button><span className="text-sm">Página {pagination.page} de {Math.ceil(pagination.total / pagination.pageSize)}</span><button type="button" disabled={page * pagination.pageSize >= pagination.total || loading} className={buttonClass} onClick={() => { setLoading(true); setPage((value) => value + 1); }}>Próxima</button></nav>}
-    </section>
-  </div>;
+  const name = (id: string) =>
+    products.find((product) => product.productId === id)?.name ?? "Produto";
+  const hasFamily = can(context, "stock.family.read");
+  const hasTeam = can(context, "stock.team.read");
+  const visible = products.filter((product) =>
+    product.name
+      .toLocaleLowerCase("pt-BR")
+      .includes(search.toLocaleLowerCase("pt-BR")),
+  );
+  return (
+    <div className="space-y-5">
+      {error ? <Notice error>{error}</Notice> : null}
+      {message ? <Notice>{message}</Notice> : null}
+      {loading ? <Notice>Consultando saldos e movimentações…</Notice> : null}
+      <section className="ui-card">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold">Saldos e previsões</h2>
+          <button
+            className={buttonClass}
+            disabled={loading}
+            onClick={() => {
+              setLoading(true);
+              setAttempt((value) => value + 1);
+            }}
+          >
+            Atualizar
+          </button>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm font-semibold">
+            Buscar produto
+            <input
+              className={inputClass}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </label>
+          <label className="text-sm font-semibold">
+            Custódia
+            <select
+              className={inputClass}
+              aria-label="Custódia"
+              value={custody}
+              onChange={(event) => setCustody(event.target.value)}
+            >
+              <option value="">Todas autorizadas</option>
+              {hasFamily ? <option value="FAMILY">Família</option> : null}
+              {hasTeam ? <option value="CARE_TEAM">Equipe</option> : null}
+              {can(context, "ent.read") ? (
+                <option value="TRANSIT">Materiais em trânsito</option>
+              ) : null}
+            </select>
+          </label>
+        </div>
+        <p className="mt-4 text-xs leading-5 text-(--muted)">
+          Saldo confirmado está disponível na custódia. Trânsito e compras
+          pendentes são previsões e dependem de recebimento válido. Somente a
+          ENT aceita atende as linhas REQ.
+        </p>
+        {custody === "TRANSIT" ? (
+          <TransitStock documents={transit} search={search} loading={loading} />
+        ) : null}
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {(custody === "TRANSIT" ? [] : visible).map((product) => (
+            <article
+              key={product.productId}
+              className="rounded-xl border border-(--line) p-4"
+            >
+              <h3 className="font-semibold">
+                {product.name}
+                {!product.active ? " (inativo)" : ""}
+              </h3>
+              <p className="mt-1 text-xs text-(--muted)">
+                Unidade base: {product.unit}
+              </p>
+              {(
+                [
+                  ["FAMILY", product.family],
+                  ["CARE_TEAM", product.team],
+                ] as const
+              )
+                .filter(([key]) => !custody || custody === key)
+                .map(([key, stock]) =>
+                  stock ? (
+                    <div
+                      key={key}
+                      className="mt-4 border-t border-(--line) pt-3"
+                    >
+                      <p className="text-sm font-semibold">
+                        {locationLabels[key]}
+                      </p>
+                      <div className="mt-2 grid grid-cols-2 gap-3">
+                        <div className="rounded-lg bg-(--brand-soft) p-3">
+                          <p className="text-xs">Confirmado</p>
+                          <p className="mt-1 text-xl font-semibold">
+                            {formatQuantity(stock.confirmed)}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border border-dashed border-slate-300 p-3">
+                          <p className="text-xs text-(--muted)">
+                            Entrada em trânsito
+                          </p>
+                          <p className="mt-1 text-lg">
+                            {formatQuantity(stock.incoming)}
+                          </p>
+                        </div>
+                      </div>
+                      <dl className="mt-3 space-y-1 text-xs text-(--muted)">
+                        {stock.purchasePending !== undefined ? (
+                          <div className="flex justify-between gap-2">
+                            <dt>COM aprovada ainda não recebida</dt>
+                            <dd>{formatQuantity(stock.purchasePending)}</dd>
+                          </div>
+                        ) : null}
+                        <div className="flex justify-between gap-2">
+                          <dt>Projeção após entradas previstas</dt>
+                          <dd>
+                            {formatQuantity(
+                              quantity(stock.confirmed)
+                                .plus(stock.incoming)
+                                .plus(stock.purchasePending ?? 0)
+                                .toFixed(),
+                            )}
+                          </dd>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <dt>Mínimo configurado</dt>
+                          <dd>
+                            {stock.minimum === null
+                              ? "Não definido"
+                              : formatQuantity(String(stock.minimum))}
+                          </dd>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <dt>Consumo extraordinário confirmado · 30 dias</dt>
+                          <dd>
+                            {formatQuantity(
+                              metrics.find(
+                                (item) =>
+                                  item.productId === product.productId &&
+                                  item.location === key,
+                              )?.quantity ?? "0",
+                            )}
+                          </dd>
+                        </div>
+                      </dl>
+                      {stock.minimum !== null &&
+                      quantity(stock.confirmed).lte(stock.minimum) ? (
+                        <p className="mt-2 text-sm font-semibold text-amber-800">
+                          Saldo confirmado no mínimo ou abaixo
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null,
+                )}
+              {quantity(product.disputed).gt(0) ? (
+                <p className="mt-3 text-sm font-semibold text-red-800">
+                  Divergência pendente:{" "}
+                  {formatQuantity(product.disputed, product.unit)}
+                </p>
+              ) : null}
+            </article>
+          ))}
+        </div>
+        {custody !== "TRANSIT" && !loading && !visible.length ? (
+          <EmptyState title="Nenhum produto encontrado">
+            Consulte o catálogo ou ajuste a busca.
+          </EmptyState>
+        ) : null}
+      </section>
+      {custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
+        <section className="ui-card">
+          <h2 className="font-semibold">Movimentar estoque familiar</h2>
+          <form className="mt-4 space-y-4" onSubmit={prepare}>
+            <fieldset
+              disabled={busy || uncertain}
+              className="grid min-w-0 gap-4 sm:grid-cols-2"
+            >
+              <label className="text-sm font-semibold">
+                Operação
+                <select
+                  aria-label="Operação"
+                  className={inputClass}
+                  value={operation}
+                  onChange={(event) => setOperation(event.target.value)}
+                >
+                  <option value="inbound">Entrada avulsa</option>
+                  <option value="outbound">Retirada</option>
+                  <option value="correction_in">
+                    Correção compensatória de entrada
+                  </option>
+                  <option value="correction_out">
+                    Correção compensatória de saída
+                  </option>
+                </select>
+              </label>
+              <label className="text-sm font-semibold">
+                Produto
+                <select
+                  aria-label="Produto"
+                  className={inputClass}
+                  name="productId"
+                  required
+                >
+                  <option value="">Selecione</option>
+                  {products
+                    .filter((product) => product.active)
+                    .map((product) => (
+                      <option key={product.productId} value={product.productId}>
+                        {product.name} · {product.unit}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label className="text-sm font-semibold">
+                Quantidade
+                <input
+                  className={inputClass}
+                  name="quantity"
+                  type="number"
+                  inputMode="decimal"
+                  min="0.000001"
+                  step="any"
+                  max="1000000000"
+                  required
+                />
+              </label>
+              {operation.startsWith("correction") ? (
+                <label className="text-sm font-semibold">
+                  Movimento original a compensar
+                  <input
+                    className={inputClass}
+                    name="referenceId"
+                    placeholder="UUID da movimentação original"
+                    required
+                  />
+                </label>
+              ) : null}
+              <label className="text-sm font-semibold sm:col-span-2">
+                Motivo
+                <textarea
+                  className={inputClass}
+                  name="reason"
+                  minLength={3}
+                  maxLength={1000}
+                  rows={3}
+                  required
+                />
+              </label>
+            </fieldset>
+            <button className={primaryClass} disabled={busy || uncertain}>
+              Revisar movimentação
+            </button>
+          </form>
+          {savedMovement ? (
+            <p className="mt-4 break-all text-xs text-(--muted)">
+              Movimentação registrada: {savedMovement}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+      {savedMovement ? (
+        <Attachments
+          patientId={context.patient!.id}
+          movementId={savedMovement}
+          writable
+        />
+      ) : null}
+      <section className="ui-card">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold">Histórico auditável</h2>
+          <button
+            className={buttonClass}
+            aria-expanded={showFilters}
+            onClick={() => setShowFilters((value) => !value)}
+          >
+            <Icon name="search" />
+            Filtrar
+          </button>
+        </div>
+        {showFilters ? (
+          <form
+            className="mt-4 grid gap-3 sm:grid-cols-3"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const form = new FormData(event.currentTarget);
+              setFilters({
+                productId: String(form.get("productId")),
+                from: String(form.get("from")),
+                to: String(form.get("to")),
+              });
+              setPage(1);
+              setLoading(true);
+            }}
+          >
+            <label className="text-sm">
+              Produto
+              <select
+                className={inputClass}
+                name="productId"
+                defaultValue={filters.productId}
+              >
+                <option value="">Todos</option>
+                {products.map((product) => (
+                  <option key={product.productId} value={product.productId}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm">
+              De
+              <input
+                className={inputClass}
+                type="date"
+                name="from"
+                defaultValue={filters.from}
+              />
+            </label>
+            <label className="text-sm">
+              Até
+              <input
+                className={inputClass}
+                type="date"
+                name="to"
+                defaultValue={filters.to}
+              />
+            </label>
+            <button className={primaryClass}>Aplicar filtros</button>
+          </form>
+        ) : null}
+        <ul className="mt-4 space-y-3">
+          {movements.map((movement) => (
+            <li
+              key={movement.id}
+              className="rounded-lg border border-(--line) p-3 text-sm"
+            >
+              <p className="font-semibold">
+                {name(movement.product_id)} ·{" "}
+                {formatQuantity(movement.quantity)}
+              </p>
+              <p className="mt-1">
+                {movement.source_location
+                  ? locationLabels[movement.source_location]
+                  : "Entrada"}{" "}
+                →{" "}
+                {movement.destination_location
+                  ? locationLabels[movement.destination_location]
+                  : "Retirada / consumo"}
+              </p>
+              <p className="mt-1">{movement.justification}</p>
+              <p className="mt-2 text-xs text-(--muted)">
+                {formatBrazilDate(movement.created_at)}
+              </p>
+              {movement.reference_type === "document" &&
+              movement.reference_id ? (
+                <Link
+                  className="mt-2 inline-block underline"
+                  href={"/fichas/" + movement.reference_id}
+                >
+                  Abrir ficha
+                </Link>
+              ) : null}
+              <details className="mt-2">
+                <summary className="cursor-pointer text-xs">
+                  Referência da movimentação
+                </summary>
+                <p className="break-all text-xs">{movement.id}</p>
+              </details>
+            </li>
+          ))}
+        </ul>
+        {!loading && !movements.length ? (
+          <EmptyState title="Sem movimentações neste filtro" />
+        ) : null}
+        {total > 20 ? (
+          <nav
+            className="mt-4 flex items-center justify-between gap-3"
+            aria-label="Páginas das movimentações"
+          >
+            <button
+              className={buttonClass}
+              disabled={page === 1 || loading}
+              onClick={() => setPage((value) => value - 1)}
+            >
+              Anterior
+            </button>
+            <span className="text-sm">
+              {page} / {Math.ceil(total / 20)}
+            </span>
+            <button
+              className={buttonClass}
+              disabled={page * 20 >= total || loading}
+              onClick={() => setPage((value) => value + 1)}
+            >
+              Próxima
+            </button>
+          </nav>
+        ) : null}
+      </section>
+      <Dialog
+        open={Boolean(review)}
+        title="Confirmar movimentação familiar"
+        onClose={() => {
+          if (!busy && !uncertain) setReview(null);
+        }}
+      >
+        <p className="text-sm">Produto: {name(String(review?.productId))}</p>
+        <p className="mt-2 text-sm">
+          Quantidade: {String(review?.quantity ?? "")}
+        </p>
+        <p className="mt-2 text-sm">Motivo: {String(review?.reason ?? "")}</p>
+        <p className="mt-3 text-xs text-(--muted)">
+          O saldo familiar será atualizado imediatamente. A operação original
+          permanecerá no histórico.
+        </p>
+        {error ? <Notice error>{error}</Notice> : null}
+        <div className="ui-form-actions">
+          <button
+            className={buttonClass}
+            disabled={busy || uncertain}
+            onClick={() => setReview(null)}
+          >
+            Voltar
+          </button>
+          <button
+            className={primaryClass}
+            disabled={busy}
+            onClick={() => void save()}
+          >
+            {busy
+              ? "Confirmando…"
+              : uncertain
+                ? "Recuperar tentativa"
+                : "Confirmar"}
+          </button>
+        </div>
+      </Dialog>
+    </div>
+  );
 }

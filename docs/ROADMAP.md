@@ -1,25 +1,31 @@
 # Continuidade
 
-As pendências reais e seus estados ficam na matriz e no relatório de execução,
-em [Auditoria](AUDIT.md). Não duplicar checklists de aceite neste documento.
+O estado da entrega e as dependências ainda não verificadas ficam na
+[matriz de execução](evolution/EXECUTION.md).
 
-## Dependências externas
+## Homologações externas
 
-- Publicar os blocos lógicos e concluir PR/merge quando os checks estiverem aptos.
-- Confirmar e-mail, redirects, OAuth, identidade global inicial e recuperação.
-- Configurar provedor oficial, templates, destinatários, webhook e
-  agendamento do worker.
-- Definir política de retenção, backup, base legal e operadores de dados.
+WhatsApp exige conta elegível, credencial válida, templates aprovados,
+webhook configurado e teste real do destinatário. A restrição Meta 130497
+é tratada como falha permanente segura, sem repetição automática.
+Flows depende da chave do endpoint, configuração e publicação no provedor.
+SMS, OAuth e e-mail real exigem seus provedores e redirects autorizados.
+Transcrição possui contrato de adaptador; um provedor não foi homologado.
 
-A autorização de execução está registrada na continuação de 21/10. Ações
-concluídas e impedimentos ficam na auditoria. A identidade Supabase foi
-corrigida e a cadeia de 35 migrations foi aplicada ao remoto; publicação,
-checks e homologações externas recebem evidências próprias.
+Câmera física, teclado virtual e permissões nos aparelhos reais complementam
+a emulação Android e iPhone. Não declarar testes reais de aparelho a partir
+de viewport ou browser emulado.
 
-## Evolução posterior
+## Possibilidades futuras
 
-Organizações, faturamento SaaS, estoque institucional e agente de IA completo
-não fazem parte desta intervenção. Somente introduzir essas entidades com
-requisitos próprios; um administrador já pode gerir vários pacientes por
-vínculos independentes. Novas unidades de medida e conversões exigem regra
-explícita de integridade, sem reinterpretar saldos históricos.
+- Assinatura digital Ed25519, gestão de chaves e verificador externo, mediante
+  requisitos próprios. Não são necessários para a integridade transacional
+  desta etapa e não estão implementados.
+- Provedor de transcrição e ferramentas de IA para sugerir relatos,
+  sempre com confirmação humana e sem autonomia clínica.
+- Adaptador de e-mail operacional e agendamento do worker conforme o ambiente.
+- Política de retenção e recuperação de objetos privados e seus metadados.
+
+Estoque institucional, fornecimento direto por operadora/home care, módulo
+financeiro, fornecedores e uma quinta ficha permanecem fora do escopo.
+Somente ampliar essas fronteiras com requisitos e autorização próprios.

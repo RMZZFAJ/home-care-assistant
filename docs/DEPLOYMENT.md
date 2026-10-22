@@ -2,8 +2,8 @@
 
 ## Runtime
 
-Desenvolvimento e CI usam Node 24.22.0 e npm 11.21.1. Vercel foi consultada
-em modo de leitura e utiliza a linha 24.x; o patch do runtime é controlado
+Desenvolvimento e CI usam Node 24.22.0 e npm 11.21.1. Vercel utiliza
+a linha 24.x; o patch do runtime é controlado
 pela plataforma. O comando de instalação versionado seleciona npm 11.21.1.
 
 Node 26 estava disponível, mas não constava no suporte Vercel verificado.
@@ -15,7 +15,9 @@ compatíveis, sem forçar peers ou desativar regras.
 
 O template `.env.example` é a referência sem segredos. URL e chave pública
 Supabase são necessárias. A chave de serviço é exclusivamente server-side,
-para worker/webhook autorizados; não é necessária para contornar RLS.
+para worker/webhook autorizados e validação de anexos/PDFs. Cada uso exige
+sessão ou autenticação do canal e autorização prévia; não contorna a política
+de negócio. Configure-a como Secret, sem prefixo NEXT_PUBLIC_.
 CARE_RECIPIENT_ID não define mais o contexto operacional.
 
 Auth exige Site URL e redirects aprovados, confirmação de e-mail, provedor
@@ -36,7 +38,17 @@ ausência de credenciais não pode produzir estado de entrega externo.
 9. Verificar Auth, OAuth, convites, usuário global inicial e configurações externas.
 10. Validar checks do PR, fazer merge quando apto e verificar o deploy resultante.
 
-A continuação de 21/10/2026 autoriza atualizar o banco local e remoto, fazer
+O deploy não alcança 127.0.0.1 da máquina de desenvolvimento. O preview
+aprovado reutiliza o Supabase remoto existente. .vercelignore exclui dados e
+credenciais locais, caches e artefatos de teste. Não desative a proteção Vercel
+para testar: use a autenticação existente da CLI ou OIDC temporário da equipe.
+
+Mantenha NOTIFICATIONS_EXTERNAL_ENABLED e META_FLOWS_ENABLED desligados até
+homologar os provedores. Os resultados atuais e os links publicados ficam em
+[EXECUTION.md](evolution/EXECUTION.md).
+
+A autorização de 22/10/2026 para a evolução integral permite atualizar os bancos,
+publicar preview parcial antecipadamente, fazer
 commits e push em blocos lógicos e abrir PR e fazer merge se as verificações
 confirmarem prontidão. Essa autorização substitui o limite anterior de somente
 consulta. Não dispensa a confirmação do destino e da identidade administrativa.

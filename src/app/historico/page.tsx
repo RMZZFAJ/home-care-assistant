@@ -1,6 +1,10 @@
 import { AuthenticatedPage } from "@/components/authenticated-page";
-import { RequisitionHistory } from "@/components/requisitions/requisition-history";
+import { DocumentHistory } from "@/components/documents/document-history";
 
 export default function HistoryPage() {
-  return <AuthenticatedPage><RequisitionHistory /></AuthenticatedPage>;
+  return (
+    <AuthenticatedPage>
+      <DocumentHistory />
+    </AuthenticatedPage>
+  );
 }

@@ -1,0 +1,83 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import {
+  api,
+  authenticate,
+  databaseError,
+  patientContext,
+  readJson,
+  rpc,
+  uuid,
+} from "@/lib/server/api";
+import { exactQuantity } from "@/lib/validation/documents";
+const schema = z.discriminatedUnion("action", [
+  z
+    .object({
+      action: z.literal("report"),
+      careRecipientId: uuid,
+      kind: z.enum(["consumption", "shortage"]),
+      location: z.enum(["FAMILY", "CARE_TEAM"]),
+      text: z.string().trim().min(3).max(2000),
+      lines: z
+        .array(
+          z
+            .object({
+              productId: z.string().min(1).max(120),
+              quantity: exactQuantity,
+            })
+            .strict(),
+        )
+        .max(100),
+      idempotencyKey: uuid,
+    })
+    .strict(),
+  z
+    .object({ action: z.literal("confirm"), id: uuid, accept: z.boolean() })
+    .strict(),
+]);
+export async function GET(request: Request) {
+  return api("consumption.read", async () => {
+    const auth = await authenticate();
+    const patient = await patientContext(
+      auth,
+      new URL(request.url).searchParams.get("careRecipientId"),
+    );
+    const { data, error } = await auth.client
+      .from("consumption_reports")
+      .select("*")
+      .eq("care_recipient_id", patient.id)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) databaseError(error);
+    return NextResponse.json({ data });
+  });
+}
+export async function POST(request: Request) {
+  return api("consumption.write", async () => {
+    const input = await readJson(request, schema);
+    const auth = await authenticate();
+    if (input.action === "confirm")
+      return NextResponse.json({
+        data: await rpc(auth.client, "confirm_extraordinary_consumption", {
+          p_id: input.id,
+          p_accept: input.accept,
+        }),
+      });
+    await patientContext(
+      auth,
+      input.careRecipientId,
+      "consumption.report",
+      true,
+    );
+    return NextResponse.json({
+      id: await rpc(auth.client, "report_extraordinary_consumption", {
+        p_patient: input.careRecipientId,
+        p_kind: input.kind,
+        p_location: input.location,
+        p_text: input.text,
+        p_lines: input.lines,
+        p_key: input.idempotencyKey,
+      }),
+    });
+  });
+}
