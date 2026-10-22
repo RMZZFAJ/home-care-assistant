@@ -20,6 +20,21 @@ end;$$;
 
 grant execute on function pg_temp.assert_ok(boolean,text),pg_temp.must_fail(text,text),pg_temp.login(text) to authenticated;
 
+-- Ignored inserts and no-op upserts must not inflate the administrator guard.
+select pg_temp.assert_ok((select active_count from public.global_admin_guard where singleton)=
+  (select count(*) from public.profiles where status='active' and role='admin' and global_scope),
+  'global administrator guard starts consistent');
+insert into public.profiles(id,full_name,role,status,global_scope)
+select id,full_name,role,status,global_scope from public.profiles
+where status='active' and role='admin' and global_scope on conflict(id) do nothing;
+insert into public.profiles(id,full_name,role,status,global_scope)
+select id,full_name,role,status,global_scope from public.profiles
+where status='active' and role='admin' and global_scope
+on conflict(id) do update set full_name=excluded.full_name;
+select pg_temp.assert_ok((select active_count from public.global_admin_guard where singleton)=
+  (select count(*) from public.profiles where status='active' and role='admin' and global_scope),
+  'ignored inserts and no-op upserts preserve the exact guard count');
+
 select pg_temp.assert_ok(not has_table_privilege('anon','public.current_stock_balances','SELECT'),'anon cannot read balances');
 select pg_temp.assert_ok(not has_table_privilege('authenticated','public.requisitions','INSERT'),'direct requisition insert denied');
 select pg_temp.assert_ok(not has_table_privilege('authenticated','public.audit_events','INSERT'),'audit spoof denied');

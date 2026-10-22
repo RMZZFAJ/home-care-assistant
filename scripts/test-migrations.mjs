@@ -53,16 +53,27 @@ assert.ifError(
     })
   ).error,
 );
+const cleanPatient = crypto.randomUUID();
+assert.ifError(
+  (
+    await client.rpc("admin_upsert_recipient", {
+      p_id: cleanPatient,
+      p_display_name: "Paciente fictício de instalação limpa",
+      p_is_active: true,
+      p_is_development: true,
+    })
+  ).error,
+);
 assert.ifError(
   (
     await client.rpc("admin_adopt_product", {
-      p_care_recipient_id: patientA,
+      p_care_recipient_id: cleanPatient,
       p_product_id: "fralda",
     })
   ).error,
 );
 const first = await client.rpc("submit_requisition", {
-  p_care_recipient_id: patientA,
+  p_care_recipient_id: cleanPatient,
   p_idempotency_key: "60000000-0000-4000-8000-000000000001",
   p_payload_hash: "not-authority",
   p_lines: [{ productId: "fralda", currentStock: 0, urgent: false }],

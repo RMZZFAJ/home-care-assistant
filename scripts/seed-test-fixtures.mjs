@@ -101,6 +101,24 @@ export async function seedFixtures({ legacy = false } = {}) {
   sql(
     `insert into public.care_recipient_memberships(care_recipient_id,user_id,role,can_count_stock) values('${patientB}',${sqlLiteral(fixtures.shared.id)},'reader',false) on conflict(care_recipient_id,user_id) do nothing; update public.profiles set status='revoked' where id=${sqlLiteral(fixtures.revoked.id)};`,
   );
+  // These patients are created after the migrations on a clean reset. Catalogue
+  // adoption must therefore be explicit, rather than an upgrade side effect.
+  if (!legacy) {
+    sql(`insert into public.care_recipient_products(
+      care_recipient_id, product_id, name, category, unit, aliases, is_active, sort_order)
+    select patient.id, p.id, p.name, p.category, p.unit, p.aliases, p.is_active,
+      row_number() over (partition by patient.id order by p.id)::integer
+    from (values ('${patientA}'::uuid), ('${patientB}'::uuid)) patient(id)
+    cross join public.products p
+    where p.owner_care_recipient_id is null
+    on conflict(care_recipient_id, product_id) do nothing;`);
+    if (
+      sql(`select count(*) from public.care_recipient_products
+      where care_recipient_id in ('${patientA}', '${patientB}')
+        and product_id='fralda' and is_active;`) !== "2"
+    )
+      throw new Error("Controlled local patient catalogues were not prepared.");
+  }
   if (legacy) {
     sql(`insert into public.requisitions(id,protocol,created_by,care_recipient_id,status,idempotency_key,created_at) values('${legacyRequisition}','HC-20260101-A1B2C3D4',${sqlLiteral(fixtures.professional.id)},'${patientA}','submitted','30000000-0000-4000-8000-000000000099','2026-01-01T12:00:00Z') on conflict(id) do nothing;
       insert into public.requisition_items(id,requisition_id,product_id,current_stock,urgent) values('30000000-0000-4000-8000-000000000002','${legacyRequisition}','fralda',2,false) on conflict(id) do nothing;
