@@ -6,7 +6,7 @@ import { api, ApiError, authenticate, databaseError, patientContext, readJson, r
 
 const role = z.enum(["admin", "supervisor", "professional", "family", "reader"]);
 const category = z.enum(["medicamentos", "higiene", "dieta"]);
-const unit = z.enum(["unidade", "caixa", "frasco", "pacote", "bisnaga", "envelope", "comprimido"]);
+const unit = z.string().trim().min(1).max(30);
 const location = z.enum(["FAMILY", "CARE_TEAM"]);
 const historicalStock = z.number().int().min(0).max(100_000).nullable().default(null);
 const historicalRow = z.object({
@@ -117,7 +117,19 @@ export async function POST(request: Request) {
     switch (input.action) {
       case "product": data = await rpc(auth.client, "admin_upsert_recipient_product", { p_care_recipient_id: input.careRecipientId, p_product_id: input.id, p_name: input.name, p_category: input.category, p_unit: input.unit, p_aliases: input.aliases, p_is_active: input.isActive, p_description: input.description ?? null, p_sort_order: input.sortOrder }); break;
       case "adoptProduct": data = await rpc(auth.client, "admin_adopt_product", { p_care_recipient_id: input.careRecipientId, p_product_id: input.productId }); break;
-      case "membership": data = await rpc(auth.client, "admin_upsert_membership", { p_care_recipient_id: input.careRecipientId, p_user_id: input.userId, p_role: input.role, p_can_manage_stock: input.canManageStock, p_can_count_stock: input.canCountStock }); break;
+      case "membership": {
+        if (["admin","supervisor"].includes(input.role)) {
+          const settings = await auth.client.from("patient_settings").select("version,bootstrap_closed").eq("care_recipient_id",input.careRecipientId).maybeSingle();
+          if(settings.error) databaseError(settings.error);
+          const {count,error} = await auth.client.from("care_recipient_memberships").select("id",{count:"exact",head:true}).eq("care_recipient_id",input.careRecipientId).eq("role","admin").eq("status","active");
+          if(error) databaseError(error);
+          if (!(auth.isGlobalAdmin && input.role==="admin" && !settings.data?.bootstrap_closed && (count??0)<2)) {
+            data = await rpc(auth.client,"configure_patient_access",{p_patient:input.careRecipientId,p_kind:"membership",p_change:{userId:input.userId,role:input.role},p_key:crypto.randomUUID(),p_version:settings.data?.version??1});
+            return NextResponse.json({data,pendingApproval:true});
+          }
+        }
+        data = await rpc(auth.client, "admin_upsert_membership", { p_care_recipient_id: input.careRecipientId, p_user_id: input.userId, p_role: input.role, p_can_manage_stock: input.canManageStock, p_can_count_stock: input.canCountStock }); break;
+      }
       case "membershipStatus": data = await rpc(auth.client, "admin_set_membership_status", { p_care_recipient_id: input.careRecipientId, p_user_id: input.userId, p_status: input.status }); break;
       case "alertRule":
         if (input.criticalThreshold > input.lowThreshold) throw new ApiError("VALIDATION_ERROR", "O limite crítico deve ser menor ou igual ao limite baixo.");

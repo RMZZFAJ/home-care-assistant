@@ -19,7 +19,7 @@ const reason = z.string().trim().min(3).max(1000);
 export const supplyCommandSchema = z.object({
   action: z.enum(["submit", "approve", "purchase", "receive", "validate_receipt", "reject_receipt", "reassign", "resolve", "cancel", "consent_cancel"]),
   idempotencyKey: identifier, expectedVersion: z.number().int().positive(), body: z.unknown(),
-}).strict().superRefine((value, ctx) => {
+}).strict().transform((value, ctx) => {
   const schemas: Record<string, z.ZodType> = {
     submit: z.object({}).strict(), approve: z.union([z.object({ lines: commandLines, reason: reason.optional() }).strict(), z.object({ group: z.enum(["family", "supervisor"]) }).strict()]),
     purchase: z.object({ lines: commandLines, notes: z.string().max(1000).optional() }).strict(),
@@ -29,5 +29,6 @@ export const supplyCommandSchema = z.object({
     cancel: z.object({ reason }).strict(), consent_cancel: z.object({ reason, lines: z.array(z.object({ lineId: identifier, returnQuantity: exactQuantity, consumedQuantity: exactQuantity }).strict()).min(1).max(1000) }).strict(),
   };
   const parsed = schemas[value.action].safeParse(value.body);
-  if (!parsed.success) parsed.error.issues.forEach((issue) => ctx.addIssue({ code: "custom", path: ["body", ...issue.path], message: issue.message }));
+  if (!parsed.success) { parsed.error.issues.forEach((issue) => ctx.addIssue({ code: "custom", path: ["body", ...issue.path], message: issue.message })); return z.NEVER; }
+  return { ...value, body: parsed.data };
 });

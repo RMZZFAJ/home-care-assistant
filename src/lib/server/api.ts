@@ -45,7 +45,7 @@ export async function api(operation: string, action: () => Promise<Response>): P
   }
 }
 
-export function validateMutationRequest(request: Request) {
+export function validateMutationRequest(request: Request, requireJson = true) {
   const origin = request.headers.get("origin");
   const fetchSite = request.headers.get("sec-fetch-site");
   if (fetchSite === "cross-site") throw new ApiError("INVALID_ORIGIN", "Origem da operação não autorizada.", 403);
@@ -58,7 +58,7 @@ export function validateMutationRequest(request: Request) {
     } catch { /* rejected below */ }
     if (!sameOrigin) throw new ApiError("INVALID_ORIGIN", "Origem da operação não autorizada.", 403);
   }
-  if (request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() !== "application/json") throw new ApiError("JSON_REQUIRED", "Envie os dados em formato JSON.", 415);
+  if (requireJson && request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() !== "application/json") throw new ApiError("JSON_REQUIRED", "Envie os dados em formato JSON.", 415);
 }
 
 export async function boundedText(request: Request, maxBytes: number) {

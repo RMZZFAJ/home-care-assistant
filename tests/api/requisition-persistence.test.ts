@@ -12,6 +12,7 @@ function fixture(options: { absentProfile?: boolean; absentPatient?: boolean; re
   const receipt = { id: requisitionId, protocol: "HC-000012", created_at: "2026-10-20T12:00:00Z", requester_name_snapshot: "Original requester", recipient_name_snapshot: "Original patient", profiles: { full_name: "Changed requester" }, care_recipients: { display_name: "Changed patient" }, requisition_items: [{ id: "item", product_id: "product", current_stock: 4, urgent: false, product_name_snapshot: "Original product", category_snapshot: "higiene", unit_snapshot: "pacote", snapshot_source: "persisted", products: { name: "Changed product", category: "dieta", unit: "caixa" } }], requisition_observations: [] };
   const rpc = vi.fn(async (name: string, args?: Record<string, unknown>) => {
     void args;
+    if(name==="patient_capabilities")return {data:{"req.create":true,"bal.count":true},error:null};
     return name === "is_global_administrator" ? { data: false, error: null } : options.conflict ? { data: null, error: { code: "P0001", message: "idempotency conflict" } } : { data: [{ requisition_id: requisitionId, protocol: "HC-000012" }], error: null };
   });
   const from = vi.fn((table: string) => {

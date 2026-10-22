@@ -1,6 +1,6 @@
 import { AuthenticatedPage } from "@/components/authenticated-page";
-import { RequisitionWizard } from "@/components/requisitions/requisition-wizard";
+import { Dashboard } from "@/components/dashboard";
 
 export default function Home() {
-  return <AuthenticatedPage><RequisitionWizard /></AuthenticatedPage>;
+  return <AuthenticatedPage><Dashboard /></AuthenticatedPage>;
 }

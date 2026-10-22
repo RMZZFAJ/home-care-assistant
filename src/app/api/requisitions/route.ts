@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const input = await readJson(request, requisitionInputSchema);
     const auth = await authenticate();
     await patientContext(auth, input.careRecipientId, "request", true);
-    const lines = input.lines.map(({ productId, currentStock, urgent }) => ({ productId, currentStock, urgent }));
+    const lines = input.lines.map(({ productId, currentStock, urgent, repeatReason }) => ({ productId, currentStock, urgent, ...(repeatReason ? { repeatReason } : {}) }));
     const extras = input.extraItems.map(({ name, currentStock, urgent }) => ({ customName: name, currentStock, urgent }));
     const intent = { careRecipientId: input.careRecipientId, lines, extraItems: extras, observations: input.observations };
     const result = await rpc(auth.client, "submit_requisition", { p_care_recipient_id: input.careRecipientId, p_idempotency_key: input.idempotencyKey, p_payload_hash: createHash("sha256").update(JSON.stringify(intent)).digest("hex"), p_lines: lines, p_extra_items: extras, p_observations: input.observations });

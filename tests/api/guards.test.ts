@@ -75,7 +75,7 @@ describe("operational time and safe errors", () => {
 describe("patient capability checks", () => {
   function auth(role: string, manage = false, count = false): AuthContext {
     const fixture = [{ id: patientId, display_name: "Fictício", is_active: true }, { role, can_manage_stock: manage, can_count_stock: count }];
-    const client = { from: vi.fn(() => { const query = { select: vi.fn(() => query), eq: vi.fn(() => query), maybeSingle: vi.fn(async () => ({ data: fixture.shift(), error: null })) }; return query; }) } as unknown as SupabaseClient;
+    const client = { rpc: vi.fn(async () => ({data:{"access.manage":role==="admin","stock.family.manage":role==="admin","bal.count":["admin","supervisor","professional"].includes(role),"req.create":["admin","supervisor","professional"].includes(role)},error:null})), from: vi.fn(() => { const query = { select: vi.fn(() => query), eq: vi.fn(() => query), maybeSingle: vi.fn(async () => ({ data: fixture.shift(), error: null })) }; return query; }) } as unknown as SupabaseClient;
     return { client, userId: "20000000-0000-4000-8000-000000000001", fullName: "Teste", isGlobalAdmin: false };
   }
   it("never lets reader permission flags grant writes", async () => {

@@ -5,7 +5,7 @@ import { ApiError, databaseError } from "@/lib/server/api";
 // Only snapshots from the original transaction are authoritative. Legacy rows
 // retain their identity but are explicitly marked as reconstructed.
 export async function loadReceipt(client: SupabaseClient, id: string): Promise<RequisitionReceipt> {
-  const { data, error } = await client.from("requisitions").select("id,protocol,created_at,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body)").eq("id", id).maybeSingle();
+  const { data, error } = await client.from("requisitions").select("id,code,protocol,created_at,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body)").eq("id", id).maybeSingle();
   if (error) databaseError(error);
   if (!data) throw new ApiError("NOT_FOUND", "Comprovante não encontrado.", 404);
   const requester = Array.isArray(data.profiles) ? data.profiles[0] : data.profiles;
@@ -14,6 +14,7 @@ export async function loadReceipt(client: SupabaseClient, id: string): Promise<R
   return {
     requisitionId: data.id,
     protocol: data.protocol,
+    code: data.code ?? undefined,
     requesterName: data.requester_name_snapshot ?? requester?.full_name ?? "Solicitante desconhecido",
     recipientName: data.recipient_name_snapshot ?? patient?.display_name ?? "Paciente não identificado",
     createdAt: data.created_at,

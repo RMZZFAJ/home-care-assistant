@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const quantity = z.number().finite().int("Use unidades inteiras.").min(0, "Informe uma quantidade igual ou maior que zero.").max(100000, "Quantidade acima do limite permitido.");
+const quantity = z.number().finite().min(0, "Informe uma quantidade igual ou maior que zero.").max(100000, "Quantidade acima do limite permitido.").refine((value) => /^\d+(?:\.\d{1,6})?$/.test(String(value)), "Use até seis casas decimais.");
 export const requisitionLineSchema = z.object({
   productId: z.string().trim().min(1).max(120),
   productName: z.string().trim().min(1).max(200).optional(),
@@ -8,6 +8,7 @@ export const requisitionLineSchema = z.object({
   unit: z.string().trim().min(1).max(80).optional(),
   currentStock: quantity,
   urgent: z.boolean(),
+  repeatReason: z.string().trim().min(3).max(1000).optional(),
 }).strict();
 
 export const extraItemSchema = z.object({

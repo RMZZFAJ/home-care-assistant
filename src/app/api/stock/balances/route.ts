@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { api, authenticate, databaseError, patientContext } from "@/lib/server/api";
+import { api, authenticate, databaseError, patientContext, rpc } from "@/lib/server/api";
 
 export async function GET(request: Request) {
   return api("stock.balances", async () => {
@@ -11,6 +11,6 @@ export async function GET(request: Request) {
     ]);
     if (balances.error) databaseError(balances.error);
     if (latest.error) databaseError(latest.error);
-    return NextResponse.json({ data: balances.data ?? [], updatedAt: latest.data?.[0]?.created_at ?? null });
+    return NextResponse.json({ data: balances.data ?? [], overview: await rpc(auth.client, "stock_overview", {p_patient: patient.id}), updatedAt: latest.data?.[0]?.created_at ?? null });
   });
 }

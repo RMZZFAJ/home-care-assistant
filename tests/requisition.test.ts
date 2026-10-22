@@ -12,9 +12,9 @@ describe("validação de requisição", () => {
   it("não aceita campos removidos do contrato de requisição", () => {
     expect(requisitionInputSchema.safeParse({ ...base, lines: [{ ...base.lines[0], requestedQuantity: 2 }] }).success).toBe(false);
   });
-  it("bloqueia estoque negativo e solicitação decimal", () => {
+  it("bloqueia estoque negativo e aceita observação com precisão decimal", () => {
     expect(requisitionInputSchema.safeParse({ ...base, lines: [{ ...base.lines[0], currentStock: -1 }] }).success).toBe(false);
-    expect(requisitionInputSchema.safeParse({ ...base, lines: [{ ...base.lines[0], currentStock: 1.5 }] }).success).toBe(false);
+    expect(requisitionInputSchema.safeParse({ ...base, lines: [{ ...base.lines[0], currentStock: 1.5 }] }).success).toBe(true);
   });
   it("bloqueia item extra sem nome e observação vazia", () => {
     expect(requisitionInputSchema.safeParse({ ...base, extraItems: [{ id: "x", name: " ", currentStock: 0, urgent: false }] }).success).toBe(false);
@@ -23,8 +23,8 @@ describe("validação de requisição", () => {
   it("permite uma requisição composta apenas por item extra válido", () => {
     expect(requisitionInputSchema.safeParse({ ...base, lines: [], extraItems: [{ id: "x", name: "Material especial", currentStock: 0, urgent: false }] }).success).toBe(true);
   });
-  it("rejeita quantidade fracionária, limite de observações e produtos duplicados", () => {
-    expect(requisitionInputSchema.safeParse({ ...base, lines: [{ ...base.lines[0], currentStock: 1.5 }] }).success).toBe(false);
+  it("rejeita precisão excessiva, limite de observações e produtos duplicados", () => {
+    expect(requisitionInputSchema.safeParse({ ...base, lines: [{ ...base.lines[0], currentStock: 1.1234567 }] }).success).toBe(false);
     expect(requisitionInputSchema.safeParse({ ...base, observations: Array.from({ length: 51 }, () => "observação") }).success).toBe(false);
     expect(requisitionInputSchema.safeParse({ ...base, lines: [base.lines[0], base.lines[0]] }).success).toBe(false);
   });

@@ -12,7 +12,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     if (!data) throw new ApiError("NOT_FOUND", "Requisição não encontrada.", 404);
     await patientContext(auth, data.care_recipient_id);
     const receipt = await loadReceipt(auth.client, id);
-    const notifications = await rpc(auth.client,"requisition_delivery_status",{p_requisition_ids:[id]});
-    return NextResponse.json({ data: {...data,requisition_notifications:notifications ?? []}, receipt });
+    const [notifications, fulfillment] = await Promise.all([rpc(auth.client,"document_delivery_status",{p_document:id}), rpc(auth.client,"requisition_fulfillment",{p_requisition:id})]);
+    return NextResponse.json({ data: {...data,requisition_notifications:notifications ?? [],fulfillment}, receipt });
   });
 }

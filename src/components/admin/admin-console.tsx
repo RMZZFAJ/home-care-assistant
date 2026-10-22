@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api, buttonClass, inputClass, may, Notice, panelClass, primaryClass, Workspace, type WorkspaceContext } from "@/components/workspace";
 import { NotificationSettings, NotificationQueue } from "./notification-settings";
@@ -15,10 +17,12 @@ function Field({ name, label, value = "", type = "text", required = false }: { n
 function Check({ name, label, checked = false }: { name: string; label: string; checked?: boolean }) { return <label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" name={name} defaultChecked={checked} className="h-5 w-5 accent-(--brand)" />{label}</label>; }
 function RoleSelect({ value = "professional" }: { value?: string }) { return <label className="text-sm font-semibold">Função neste paciente<select name="role" defaultValue={value} className={inputClass}>{Object.entries(roles).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>; }
 
-export function AdminConsole() { return <Workspace title="Administração" administration>{(context) => <PatientAdmin context={context} />}</Workspace>; }
+export function AdminConsole() { const params=useSearchParams(); return <Workspace title="Administração" administration>{(context) => <PatientAdmin key={(context.patient?.id??"global")+params.toString()} context={context} />}</Workspace>; }
 
 function PatientAdmin({ context }: { context: WorkspaceContext }) {
-  const [section, setSection] = useState<Section>("patient");
+  const params = useSearchParams();
+  const requestedSection = params.get("section") as Section | null;
+  const [section, setSection] = useState<Section>(requestedSection && Object.hasOwn(labels,requestedSection) ? requestedSection : "patient");
   const [rows, setRows] = useState<Row[]>([]);
   const [templates, setTemplates] = useState<Row[]>([]);
   const [directory, setDirectory] = useState<Row[]>([]);
@@ -60,8 +64,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     try {
       const isNotification = ["retry","process"].includes(String(payload.action));
       const scoped = !["profile","recipient","historicalImport","process"].includes(String(payload.action));
-      const result = await api<{ data?: unknown; invitationUrl?: string }>(isNotification ? "/api/admin/notifications" : "/api/admin", { ...(scoped ? { careRecipientId: patientId } : {}), ...payload });
-      setMessage(success); setEditing(null);
+      const result = await api<{ data?: unknown; invitationUrl?: string; pendingApproval?: boolean }>(isNotification ? "/api/admin/notifications" : "/api/admin", { ...(scoped ? { careRecipientId: patientId } : {}), ...payload });
+      setMessage(result.pendingApproval ? "Proposta registrada. A segunda pessoa administradora deve aprovar em Funções, permissões e regras." : success); setEditing(null);
       if (result.invitationUrl) setInvitationUrl(result.invitationUrl);
       if (payload.action === "historicalImport") setReport(result.data);
       if (refreshContext) await context.refresh();
@@ -74,7 +78,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   if (!canManage) return <Notice error>Selecione um paciente que você administra.</Notice>;
   return <div className="space-y-5">
     <p className="text-sm text-(--muted)">{context.isGlobalAdmin ? "Administração global e por paciente." : "Todas as alterações desta área se limitam ao paciente selecionado."}</p>
-    <nav aria-label="Seções administrativas" className="flex flex-wrap gap-2">{(Object.keys(labels) as Section[]).filter((key) => key !== "profiles" || context.isGlobalAdmin).filter((key) => Boolean(patientId) || key === "patient" || key === "profiles").map((key) => <button key={key} className={section === key ? primaryClass : buttonClass} onClick={() => { if (key === section) return; setSection(key); setPage(1); setRows([]); setLoading(!["patient","import"].includes(key)); setEditing(null); setError(""); setMessage(""); }} aria-current={section === key ? "page" : undefined}>{labels[key]}</button>)}</nav>
+    <div className="ui-card"><label className="text-sm font-semibold">Seção administrativa<select className={inputClass} value={section} onChange={(event) => { const key = event.target.value as Section; setSection(key); setPage(1); setRows([]); setLoading(!["patient","import"].includes(key)); setEditing(null); setError(""); setMessage(""); }}>{(Object.keys(labels) as Section[]).filter((key) => key !== "profiles" || context.isGlobalAdmin).filter((key) => Boolean(patientId) || key === "patient" || key === "profiles").map((key) => <option key={key} value={key}>{labels[key]}</option>)}</select></label>{section === "catalog" ? <Link className={buttonClass+" mt-3"} href="/unidades">Unidades e apresentações / scanner</Link> : null}{section === "memberships" ? <Link className={buttonClass+" mt-3"} href="/configuracoes">Permissões e alterações com dupla aprovação</Link> : null}</div>
     {error && <Notice error>{error}<button className={`${buttonClass} ml-3`} onClick={() => void load()}>Recarregar</button></Notice>}
     {message && <Notice>{message}</Notice>}
     {invitationUrl && <section className={panelClass}><h2 className="font-bold">Link de convite</h2><p className="mt-2 text-sm">Copie e compartilhe este link com a pessoa convidada. Nenhum e-mail foi enviado automaticamente.</p><label className="mt-3 block text-sm">Link<input readOnly value={invitationUrl} className={inputClass} onFocus={(event) => event.target.select()} /></label></section>}
