@@ -192,7 +192,7 @@ begin
  if q<>l.quantity and length(trim(coalesce(p_body->>'reason','')))<3 then raise exception 'approval reason required';end if;
  update public.document_lines set approved_quantity=q where id=l.id;
  end loop;
- if (select count(distinct x->>'lineId') from jsonb_array_elements(p_body->'lines') x)<>jsonb_array_length(p_body->'lines') then raise exception 'duplicate lines';end if;
+ if (select count(distinct entry.value->>'lineId') from jsonb_array_elements(p_body->'lines') entry)<>jsonb_array_length(p_body->'lines') then raise exception 'duplicate lines';end if;
  update public.operational_documents set status=case when not exists(select 1 from public.document_lines where document_id=p_id and approved_quantity>0) then 'rejected' when exists(select 1 from public.document_lines where document_id=p_id and approved_quantity<quantity) then 'partially_approved' else 'approved' end where id=p_id;
  elsif d.type='COM' and p_action='purchase' then
  perform private.require_cap(d.care_recipient_id,'com.purchase');
@@ -207,7 +207,7 @@ begin
  elsif d.type='COM' and p_action='receive' then
  perform private.require_cap(d.care_recipient_id,'com.receive');
  if d.status not in ('purchased','purchasing','partially_received') or jsonb_array_length(p_body->'lines')<1 then raise exception 'purchase required';end if;
- if (select count(distinct x->>'lineId') from jsonb_array_elements(p_body->'lines') x)<>jsonb_array_length(p_body->'lines') then raise exception 'duplicate lines';end if;
+ if (select count(distinct entry.value->>'lineId') from jsonb_array_elements(p_body->'lines') entry)<>jsonb_array_length(p_body->'lines') then raise exception 'duplicate lines';end if;
  for x in select value from jsonb_array_elements(p_body->'lines') loop
  select * into strict l from public.document_lines where id=(x->>'lineId')::uuid and document_id=p_id;
  q:=(x->>'quantity')::numeric;

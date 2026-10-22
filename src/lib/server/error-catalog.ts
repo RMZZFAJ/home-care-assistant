@@ -27,6 +27,8 @@ export const errorCatalog = {
   INVITATION_INVALID: { ...conflict, recommendedAction: "Solicite um novo convite ao administrador do paciente." },
   AMBIGUOUS_PRODUCT: { ...conflict, recommendedAction: "Identifique explicitamente o produto correto." },
   DUPLICATE: conflict,
+  DUPLICATE_REVIEW_REQUIRED: { ...conflict, recommendedAction: "Confira os itens pendentes e justifique a nova requisição." },
+  VERSION_CONFLICT: { ...conflict, recommendedAction: "Atualize a tela e revise o estado e as aprovações atuais." },
   PATIENT_INACTIVE: { ...conflict, recommendedAction: "Consulte o histórico ou solicite a reativação do paciente." },
   RECONCILIATION_REQUIRED: { ...conflict, recommendedAction: "Confira o resultado no provedor antes de confirmar uma nova tentativa." },
   DATABASE_UNAVAILABLE: dependency,

@@ -13,6 +13,8 @@ export class ApiError extends Error {
 
 export function databaseError(error: { code?: string; message?: string } | null): never {
   const message = error?.message ?? "";
+  if (/duplicate review required/i.test(message)) throw new ApiError("DUPLICATE_REVIEW_REQUIRED", "Há uma requisição pendente deste produto. Confira a anterior e justifique a reiteração.", 409);
+  if (/stale document|stale policy|distinct patient administrator/i.test(message)) throw new ApiError("VERSION_CONFLICT", "O registro mudou ou precisa de outro administrador. Atualize o acompanhamento.", 409);
   if (/last global|last administrator/i.test(message)) throw new ApiError("LAST_GLOBAL_ADMIN", "Mantenha ao menos um administrador global ativo.", 409);
   if (/idempotency|different content|payload mismatch/i.test(message)) throw new ApiError("IDEMPOTENCY_CONFLICT", "A chave já foi utilizada com outro conteúdo. Inicie uma nova operação.", 409);
   if (/reference.*changed|stale|concurrent|recount|inventory conflict/i.test(message)) throw new ApiError("INVENTORY_CONFLICT", "O estoque mudou após a referência. Faça uma nova contagem antes de aprovar.", 409);
@@ -114,27 +116,25 @@ export function requireGlobal(auth: AuthContext) {
 }
 
 export const uuid = z.string().uuid("Informe um identificador válido.");
-export async function patientContext(auth: AuthContext, id: string | null | undefined, capability: "read" | "request" | "manage" | "manageStock" | "countStock" = "read", active = false) {
+export async function patientContext(auth: AuthContext, id: string | null | undefined, capability: string = "read", active = false) {
   if (!id || !uuid.safeParse(id).success) throw new ApiError("PATIENT_REQUIRED", "Selecione um paciente válido.");
   const { data: patient, error } = await auth.client.from("care_recipients").select("id,display_name,is_active,is_development").eq("id", id).maybeSingle();
   if (error) databaseError(error);
   if (!patient) throw new ApiError("NOT_FOUND", "Paciente não encontrado ou acesso não autorizado.", 404);
   let role = "admin";
-  let manageStock = auth.isGlobalAdmin;
-  let countStock = auth.isGlobalAdmin;
   if (!auth.isGlobalAdmin) {
     const { data: member, error: memberError } = await auth.client.from("care_recipient_memberships").select("role,status,can_manage_stock,can_count_stock").eq("care_recipient_id", id).eq("user_id", auth.userId).eq("status", "active").maybeSingle();
     if (memberError) databaseError(memberError);
     if (!member) throw new ApiError("FORBIDDEN", "Você não tem acesso ativo a este paciente.", 403);
     role = member.role;
-    manageStock = role === "admin";
-    countStock = role === "admin" || (["supervisor", "professional"].includes(role) && member.can_count_stock);
   }
-  const permissions = { canManage: role === "admin", canRequest: ["admin", "supervisor", "professional"].includes(role), canManageStock: manageStock, canCountStock: countStock };
-  const permitted = capability === "read" || (capability === "manage" ? permissions.canManage : capability === "request" ? permissions.canRequest : capability === "manageStock" ? permissions.canManageStock : permissions.canCountStock);
+  const capabilities = await rpc(auth.client, "patient_capabilities", { p_patient: id }) as Record<string, boolean>;
+  const permissions = { canManage: capabilities["access.manage"] === true, canRequest: capabilities["req.create"] === true, canManageStock: capabilities["stock.family.manage"] === true, canCountStock: capabilities["bal.count"] === true };
+  const aliases: Record<string, string> = { request: "req.create", manage: "access.manage", manageStock: "stock.family.manage", countStock: "bal.count" };
+  const permitted = capability === "read" || capabilities[aliases[capability] ?? capability] === true;
   if (!permitted) throw new ApiError("FORBIDDEN", "Você não tem autorização para esta operação.", 403);
   if (active && !patient.is_active) throw new ApiError("PATIENT_INACTIVE", "O paciente está inativo. O histórico permanece disponível.", 409);
-  return { ...patient, role, permissions };
+  return { ...patient, role, permissions, capabilities };
 }
 
 export async function rpc(client: SupabaseClient, name: string, args?: Record<string, unknown>) {
