@@ -358,7 +358,7 @@ function ProfileContent() {
                   <strong>
                     {session.current ? "Esta sessão" : "Outra sessão"}
                   </strong>
-                  <p className="mt-1 break-words text-xs text-(--muted)">
+                  <p className="mt-1 wrap-break-word text-xs text-(--muted)">
                     {session.userAgent || "Dispositivo não identificado"}
                   </p>
                   <p className="mt-1 text-xs">

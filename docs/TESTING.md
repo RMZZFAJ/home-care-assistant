@@ -82,6 +82,12 @@ sem reaproveitar processo desconhecido. Os projetos Chromium desktop, Pixel 7
 e WebKit/iPhone 13 usam dados fictícios. Relatórios não são versionados;
 traces ficam desabilitados para evitar registrar credenciais de Auth.
 
+A extensão Playwright do VS Code pode descobrir testes sem banco ou variáveis
+do runner. Ao executar, tanto o servidor quanto o globalSetup verificam a stack
+local e substituem qualquer configuração herdada por credenciais locais, com
+envio externo desligado. O servidor compila o build isolado antes de iniciá-lo.
+Descobrir testes não inicia servidor, autentica usuários ou modifica o banco.
+
 Os IDs ficam em supabase/.temp/hca-fixtures.json. A senha aleatória de cada
 workspace fica em supabase/.temp/hca-test-credentials.json. Ambos são ignorados
 pelo Git e excluídos do upload Vercel. O provisionamento usa Auth Admin oficial;

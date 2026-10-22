@@ -47,5 +47,6 @@ next-env.d.ts
 !.env.example
 
 # isolated verification artifacts
+/.private/
 /playwright-report/
 /output/playwright/
