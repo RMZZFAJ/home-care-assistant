@@ -42,7 +42,7 @@ begin
  perform set_config('request.jwt.claim.sub',f::text,true);
  d:=public.create_supply_document(p,'ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',t,'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','5','requisitionItemIds',jsonb_build_array(line_id)))),gen_random_uuid());
  if d->>'status'<>'pending_receipt' or (select balance from public.current_stock_balances where care_recipient_id=p and location='FAMILY')<>1 or (select balance from public.current_stock_balances where care_recipient_id=p and location='TRANSIT')<>5 then raise exception 'dispatch custody incorrect';end if;
- begin perform public.supply_document_command((d->>'id')::uuid,'receive','{}',gen_random_uuid(),(d->>'version')::integer);raise exception 'issuer accepted delivery';exception when insufficient_privilege then null;end;
+ begin perform public.supply_document_command((d->>'id')::uuid,'receive','{"divergences":[]}',gen_random_uuid(),(d->>'version')::integer);raise exception 'issuer accepted delivery';exception when insufficient_privilege then null;end;
  perform set_config('request.jwt.claim.sub',t::text,true);
  if exists(select 1 from public.operational_documents where type='COM' and care_recipient_id=p) then raise exception 'COM leaked to team';end if;
  if exists(select 1 from public.current_stock_balances where care_recipient_id=p and location='FAMILY') then raise exception 'family balance leaked';end if;
