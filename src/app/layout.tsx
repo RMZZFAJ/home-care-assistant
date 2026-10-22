@@ -4,10 +4,13 @@ import "./design-system.css";
 
 export const metadata: Metadata = {
   title: "Home Care Assistant",
-  description: "Gestão segura de requisições de insumos para assistência domiciliar.",
+  description:
+    "Gestão segura de requisições de insumos para assistência domiciliar.",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
       <body>{children}</body>

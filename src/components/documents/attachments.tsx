@@ -1,18 +1,203 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { api, buttonClass, errorMessage, inputClass, Notice, primaryClass } from "@/components/workspace";
-type Attachment = {id: string; filename: string; bytes: number; state: string; sha256: string; url: string | null};
-export function Attachments({patientId, documentId, movementId, writable = false, onChange}: {patientId: string; documentId?: string; movementId?: string; writable?: boolean; onChange?: () => void}) {
-  const [files, setFiles] = useState<Attachment[]>([]); const [error, setError] = useState(""); const [busy, setBusy] = useState(false); const [loading, setLoading] = useState(true); const [attempt, setAttempt] = useState(0); const fileInput = useRef<HTMLInputElement>(null); const pendingRef=useRef<FormData|null>(null);const [uncertain,setUncertain]=useState(false);
-  const query = new URLSearchParams({careRecipientId: patientId, ...(documentId ? {documentId} : {movementId: movementId!})}).toString();
-  useEffect(() => {const controller = new AbortController(); api<{data: Attachment[]}>("/api/attachments?" + query, undefined, controller.signal).then((result) => {setFiles(result.data); setError("");}).catch((reason) => {if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Não foi possível consultar anexos.");}).finally(() => {if (!controller.signal.aborted) setLoading(false);}); return () => controller.abort();}, [query, attempt]);
+import {
+  api,
+  buttonClass,
+  errorMessage,
+  inputClass,
+  Notice,
+  primaryClass,
+} from "@/components/workspace";
+type Attachment = {
+  id: string;
+  filename: string;
+  bytes: number;
+  state: string;
+  sha256: string;
+  url: string | null;
+};
+export function Attachments({
+  patientId,
+  documentId,
+  movementId,
+  writable = false,
+  onChange,
+}: {
+  patientId: string;
+  documentId?: string;
+  movementId?: string;
+  writable?: boolean;
+  onChange?: () => void;
+}) {
+  const [files, setFiles] = useState<Attachment[]>([]);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [attempt, setAttempt] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingRef = useRef<FormData | null>(null);
+  const [uncertain, setUncertain] = useState(false);
+  const query = new URLSearchParams({
+    careRecipientId: patientId,
+    ...(documentId ? { documentId } : { movementId: movementId! }),
+  }).toString();
+  useEffect(() => {
+    const controller = new AbortController();
+    api<{ data: Attachment[] }>(
+      "/api/attachments?" + query,
+      undefined,
+      controller.signal,
+    )
+      .then((result) => {
+        setFiles(result.data);
+        setError("");
+      })
+      .catch((reason) => {
+        if (!controller.signal.aborted)
+          setError(
+            reason instanceof Error
+              ? reason.message
+              : "Não foi possível consultar anexos.",
+          );
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [query, attempt]);
   async function upload(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); const file = fileInput.current?.files?.[0]; if (!file) return;
-    if (file.size > 10_485_760) {setError("Selecione um arquivo de até 10 MB."); return;}
-    const form = pendingRef.current??new FormData(); if(!pendingRef.current)form.set("idempotencyKey",crypto.randomUUID()); form.set("file", file); form.set("careRecipientId", patientId); if (documentId) form.set("documentId", documentId); if (movementId) form.set("movementId", movementId);
-    pendingRef.current=form;setBusy(true); setError("");
-    try {const response = await fetch("/api/attachments", {method: "POST", body: form}); const body = await response.json(); if (!response.ok) {if([400,403,404,409,413,422].includes(response.status)){pendingRef.current=null;setUncertain(false);}else setUncertain(true);throw new Error(errorMessage(body, "Não foi possível confirmar o anexo."));} pendingRef.current=null;setUncertain(false); if (fileInput.current) fileInput.current.value = ""; setAttempt((value) => value + 1); onChange?.();}
-    catch (reason) {setError(reason instanceof Error ? reason.message : "Não foi possível enviar o anexo.");} finally {setBusy(false);}
+    event.preventDefault();
+    const file = fileInputRef.current?.files?.[0];
+    if (!file) return;
+    if (file.size > 10_485_760) {
+      setError("Selecione um arquivo de até 10 MB.");
+      return;
+    }
+    const form = pendingRef.current ?? new FormData();
+    if (!pendingRef.current) form.set("idempotencyKey", crypto.randomUUID());
+    form.set("file", file);
+    form.set("careRecipientId", patientId);
+    if (documentId) form.set("documentId", documentId);
+    if (movementId) form.set("movementId", movementId);
+    pendingRef.current = form;
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/attachments", {
+        method: "POST",
+        body: form,
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        if ([400, 403, 404, 409, 413, 422].includes(response.status)) {
+          pendingRef.current = null;
+          setUncertain(false);
+        } else setUncertain(true);
+        throw new Error(
+          errorMessage(body, "Não foi possível confirmar o anexo."),
+        );
+      }
+      pendingRef.current = null;
+      setUncertain(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setAttempt((value) => value + 1);
+      onChange?.();
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "Não foi possível enviar o anexo.",
+      );
+    } finally {
+      setBusy(false);
+    }
   }
-  return <section className="ui-card"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-semibold">Anexos e ficha física</h2><button className={buttonClass} disabled={busy} onClick={() => setAttempt((value) => value + 1)}>Atualizar anexos</button></div><p className="mt-2 text-xs text-(--muted)">Fotos e PDFs ficam vinculados à operação. Até 10 arquivos de 10 MB. A foto da ficha física permanece disponível como alternativa ao formulário digital.</p>{error ? <Notice error>{error}</Notice> : null}{loading ? <p className="mt-3 text-sm" role="status">Consultando anexos…</p> : null}<ul className="mt-4 space-y-3">{files.map((file) => <li key={file.id} className="rounded border border-(--line) p-3 text-sm">{file.url ? <a href={file.url} target="_blank" rel="noopener" className="font-semibold underline">{file.filename}</a> : <strong>{file.filename}</strong>}<p className="mt-1 text-xs text-(--muted)">{Math.ceil(file.bytes / 1024)} KB · {file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : "Validação pendente"}</p>{file.sha256 ? <details className="mt-2"><summary className="cursor-pointer text-xs">SHA-256 do arquivo</summary><code className="block break-all text-xs">{file.sha256}</code></details> : null}</li>)}</ul>{!loading && !files.length ? <p className="mt-4 text-sm text-(--muted)">Nenhum anexo registrado.</p> : null}{writable ? <form className="mt-4 space-y-3" onSubmit={upload}><label className="block text-sm font-semibold">Adicionar foto ou PDF<input ref={fileInput} className={inputClass} type="file" name="file" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={busy||uncertain} required /></label><button className={primaryClass} disabled={busy}>{busy ? "Validando e enviando…" : uncertain ? "Recuperar envio do anexo" : "Enviar anexo"}</button></form> : null}</section>;
+  return (
+    <section className="ui-card">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-semibold">Anexos e ficha física</h2>
+        <button
+          className={buttonClass}
+          disabled={busy}
+          onClick={() => setAttempt((value) => value + 1)}
+        >
+          Atualizar anexos
+        </button>
+      </div>
+      <p className="mt-2 text-xs text-(--muted)">
+        Fotos e PDFs ficam vinculados à operação. Até 10 arquivos de 10 MB. A
+        foto da ficha física permanece disponível como alternativa ao formulário
+        digital.
+      </p>
+      {error ? <Notice error>{error}</Notice> : null}
+      {loading ? (
+        <p className="mt-3 text-sm" role="status">
+          Consultando anexos…
+        </p>
+      ) : null}
+      <ul className="mt-4 space-y-3">
+        {files.map((file) => (
+          <li
+            key={file.id}
+            className="rounded border border-(--line) p-3 text-sm"
+          >
+            {file.url ? (
+              <a
+                href={file.url}
+                target="_blank"
+                rel="noopener"
+                className="font-semibold underline"
+              >
+                {file.filename}
+              </a>
+            ) : (
+              <strong>{file.filename}</strong>
+            )}
+            <p className="mt-1 text-xs text-(--muted)">
+              {Math.ceil(file.bytes / 1024)} KB ·{" "}
+              {file.state === "ready"
+                ? "Validado"
+                : file.state === "rejected"
+                  ? "Rejeitado"
+                  : "Validação pendente"}
+            </p>
+            {file.sha256 ? (
+              <details className="mt-2">
+                <summary className="cursor-pointer text-xs">
+                  SHA-256 do arquivo
+                </summary>
+                <code className="block break-all text-xs">{file.sha256}</code>
+              </details>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+      {!loading && !files.length ? (
+        <p className="mt-4 text-sm text-(--muted)">Nenhum anexo registrado.</p>
+      ) : null}
+      {writable ? (
+        <form className="mt-4 space-y-3" onSubmit={upload}>
+          <label className="block text-sm font-semibold">
+            Adicionar foto ou PDF
+            <input
+              ref={fileInputRef}
+              className={inputClass}
+              type="file"
+              name="file"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
+              disabled={busy || uncertain}
+              required
+            />
+          </label>
+          <button className={primaryClass} disabled={busy}>
+            {busy
+              ? "Validando e enviando…"
+              : uncertain
+                ? "Recuperar envio do anexo"
+                : "Enviar anexo"}
+          </button>
+        </form>
+      ) : null}
+    </section>
+  );
 }
