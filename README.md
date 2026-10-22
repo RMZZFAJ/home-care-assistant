@@ -1,67 +1,90 @@
 # Home Care Assistant
 
-Fundação de MVP para requisições de insumos em assistência domiciliar. A aplicação é inteiramente em português brasileiro e foi desenhada para Vercel + Supabase, sem serviços pagos obrigatórios.
+Gestão operacional de Home Care com Next.js, React, TypeScript e Supabase.
+O paciente é a unidade de administração, catálogo e autorização. O sistema
+não prescreve, diagnostica ou toma decisões clínicas.
 
-## Implementado
+## Desenvolvimento
 
-- Fluxo navegável e responsivo de requisição com catálogo fictício, estoque informado, urgência, itens extras, observações, revisão e comprovante.
-- Validação de quantidades no cliente e no servidor com Zod.
-- Rota server-side preparada para Supabase Auth, RLS, persistência, protocolo sequencial a partir de 12, idempotência por hash canônico e auditoria.
-- Histórico autorizado por paciente, detalhe persistido, reimpressão, estoque segregado por custódia, inventário e rastreamento de notificações.
-- Área `Configurações` acessível pelo botão da tela principal para administradores globais, com administração protegida de perfis, pacientes e catálogo.
-- Migração PostgreSQL com RLS restritiva e seed explicitamente fictício.
-- Resumo para WhatsApp por conversa pré-preenchida e impressão/Salvar como PDF pelo navegador.
-- Testes Vitest e configuração Playwright.
+Use Node **24.22.0** e npm **11.21.1**, conforme os arquivos de versão.
+As dependências têm versões exatas e lockfile versionado. TypeScript 6 e
+ESLint 10 foram escolhidos pela compatibilidade do conjunto de ferramentas.
 
-O registro oficial fica bloqueado até que Supabase esteja configurado e o solicitante tenha sessão e perfil autorizado. Não há autenticação simulada, dados reais, integração de IA ou automação de WhatsApp Web.
+```sh
+npm ci
+```
 
-## Executar
+Copie `.env.example` para `.env.local` e configure a URL e chave pública do
+Supabase local: `http://127.0.0.1:54321`. Nunca use a chave de serviço como
+variável pública. O projeto local `home-care-assistant` é o ambiente de
+desenvolvimento e testes. Não é necessário criar uma segunda stack.
+O cadastro operacional exige migrations aplicadas e vínculos autorizados.
 
-```bash
-npm install
-copy .env.example .env.local
+```sh
+npm run test:db:prepare
+```
+
+Esse preparo inicia/verifica o projeto local e aplica migrations locais.
+Leia [Testes](docs/TESTING.md) antes de recriar dados ou carregar fixtures.
+
+```sh
 npm run dev
 ```
 
-Para validar:
+## Operação
 
-```bash
+Selecione um paciente autorizado e utilize Requisição, Histórico, Estoque,
+Inventários ou Administração. Um administrador de paciente gerencia somente
+aquele contexto. Administradores globais administram todos os pacientes.
+Convites permitem cadastro pessoal e aceite; revogar um vínculo não bloqueia
+a conta em outros pacientes. Novos pacientes iniciam com catálogo vazio e
+podem adotar modelos explicitamente.
+
+Saldos de família e equipe são separados. Contagem não altera estoque antes
+da aprovação. Quantidade solicitada não integra uma requisição. O protocolo
+é global, gerado pelo banco, e a primeira numeração nova é 12.
+
+## Validação
+
+```sh
+npm run check:contracts
 npm run lint
+npm run lint:markdown
 npm run typecheck
 npm test
 npm run build
+npm run test:db:prepare
+npm run db:backup:local
+npm run test:migrations -- --replay-local --backup CAMINHO_DO_BACKUP
+npm run test:integration
+npm run e2e
 ```
 
-Configure no `.env.local` `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (ou a chave legada `NEXT_PUBLIC_SUPABASE_ANON_KEY`), `NEXT_PUBLIC_APP_URL` e `CARE_RECIPIENT_ID`. O último deve ser o UUID de uma pessoa assistida ativa autorizada no ambiente; não use nome de paciente. `SUPABASE_SERVICE_ROLE_KEY` não é necessária no MVP e nunca deve ser exposta no cliente.
+As etapas de banco e navegador usam exclusivamente o projeto local verificado.
+O replay de migrations recria dados locais e exige a opção de consentimento
+documentada em [Testes](docs/TESTING.md). Substitua CAMINHO_DO_BACKUP pelo caminho
+real impresso pelo helper de backup. Nunca execute a suíte no remoto.
 
-## Supabase
+A auditoria atual validou a cadeia 35 limpa/legada, seis suítes SQL, seis testes
+HTTP/Auth e 69 unitários. O CI publicado aprovou Windows/Linux e os 32 casos E2E
+em rodada única. Consulte o [PR #1][consolidation-pr] para integração e checks.
+Consulte o [relatório](docs/audits/2026-10-21/FINAL_REPORT.md) para o escopo de
+Windows/Linux, preservação dos dados e homologações externas pendentes.
 
-Com a Supabase CLI instalada, vincule o projeto manualmente e aplique `supabase/migrations`, depois execute `supabase db seed`. O seed idempotente contém 29 produtos e uma pessoa assistida fictícia. Defina `CARE_RECIPIENT_ID` com o UUID do registro usado localmente. Crie usuários via Supabase Auth e depois perfis por procedimento administrativo seguro; não habilite cadastro público irrestrito.
+## Documentação
 
-O acesso à aplicação exige login Supabase e um registro `profiles` com status `active` e função `admin`, `supervisor` ou `professional`. A chave anon é pública por desenho, mas toda autorização depende de RLS e de verificações server-side; nunca configure uma service role em `NEXT_PUBLIC_*`.
+- [Arquitetura](docs/ARCHITECTURE.md): módulos e fluxos reais.
+- [Banco](docs/DATABASE.md): catálogo, migrations e integridade.
+- [Segurança](docs/SECURITY.md): matriz de autorização e LGPD.
+- [Operação](docs/OPERATIONS.md): jornadas administrativas e operacionais.
+- [APIs](docs/API.md): contratos e erros.
+- [Implantação](docs/DEPLOYMENT.md): configuração e aplicação revisada.
+- [Notificações e IA](docs/WHATSAPP_AI.md): integração e limites externos.
+- [Auditoria](docs/AUDIT.md): evidências, rastreabilidade e pendências.
 
-Cada produto possui um ID estável, um nome canônico e aliases. A busca futura pode aceitar qualquer alias (por exemplo, `Fosfomicina`, `Monuril` ou `Fosfomicina (Monuril) 3g`) sem criar um segundo produto. O banco expõe a função autenticada `find_product_by_alias(text)` para integrações futuras.
+A [continuação de 21/10](docs/audits/2026-10-21/README.md) registra a autorização
+para atualizar os bancos local/remoto e publicar o trabalho em blocos lógicos,
+com PR e merge condicionados às verificações. Consulte o
+[estado verificável](docs/PROJECT_STATUS.md) antes de assumir implantação.
 
-Leia [docs/SECURITY.md](docs/SECURITY.md), [docs/DATABASE.md](docs/DATABASE.md) e [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) antes de qualquer ambiente compartilhado.
-
-## Arquitetura
-
-```mermaid
-flowchart LR
-  Browser[Next.js React] --> Route[Route Handler server-side]
-  Route --> Auth[Supabase Auth]
-  Route --> DB[(PostgreSQL + RLS)]
-  Route --> Audit[Audit events]
-  DB --> Storage[Storage privado futuro]
-```
-
-```mermaid
-flowchart TD
-  A[Identificação] --> B[Catálogo]
-  B --> C[Itens extras]
-  C --> D[Observações]
-  D --> E[Revisão]
-  E --> F[Validação server-side]
-  F --> G[Persistência + protocolo + auditoria]
-  G --> H[Comprovante oficial]
-```
+[consolidation-pr]: https://github.com/RMZZFAJ/home-care-assistant/pull/1

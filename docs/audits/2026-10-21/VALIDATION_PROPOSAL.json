@@ -1,0 +1,587 @@
+{
+  "status": "HISTORICAL_PROPOSAL_SUPERSEDED_BY_VERIFICATION",
+  "appliedToVerification": false,
+  "baseline": "67 unit tests Windows; chain33 clean and legacy;5SQL plus forced search_path;5HTTP approved. Final target35,6SQL/6HTTP,E2E and Linux full checks pending.",
+  "note": "Preserva a proposta de revisão anterior. O aceite atual de70 IDs está somente em verification.json e na matriz regenerada; os remaining abaixo são históricos, não uma lista atual de pendências.",
+  "candidateIdsFromUnitSqlHttp": [
+    "PRES-01",
+    "PRES-02",
+    "DB-02",
+    "DB-03",
+    "DB-04",
+    "SEC-02",
+    "SEC-03",
+    "SEC-04",
+    "SEC-05",
+    "SEC-06",
+    "SEC-07",
+    "SEC-08",
+    "SEC-09",
+    "AUTH-02",
+    "PAT-03",
+    "ADM-03",
+    "CAT-01",
+    "CAT-02",
+    "CAT-06",
+    "REQ-01",
+    "REQ-02",
+    "REQ-03",
+    "IMP-01",
+    "IMP-03",
+    "STK-01",
+    "STK-02",
+    "STK-03",
+    "STK-05",
+    "INV-01",
+    "INV-03",
+    "INV-04",
+    "ALT-02",
+    "NOT-02",
+    "NOT-03",
+    "NOT-05",
+    "ERR-01",
+    "CI-01",
+    "REQ-05",
+    "STK-04"
+  ],
+  "candidateIdsAfterFinalBrowser": [
+    "AUTH-03",
+    "PAT-02",
+    "ADM-01",
+    "ADM-02",
+    "CAT-03",
+    "CAT-04",
+    "CAT-05",
+    "REQ-04",
+    "REQ-06",
+    "REQ-07",
+    "HIS-01",
+    "IMP-02",
+    "STK-06",
+    "INV-02",
+    "INV-05",
+    "ALT-01",
+    "NOT-01",
+    "NOT-04"
+  ],
+  "requirements": [
+    {
+      "id": "PRES-01",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "git log/status;check:contracts;scripts/historical-migrations.json",
+      "scope": "Preservação do histórico e hashes; publicação tem evidência separada.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "PRES-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "docs/audits/2026-10-21/AUTHORIZATION.md;scripts/test-environment.mjs;scripts/supabase-project.mjs",
+      "scope": "Autorizações mudaram em 21/10; envio externo permanece desabilitado nos testes.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "DB-01",
+      "proposal": "needs_individual_review",
+      "evidence": "docs/audits/2026-10-21/DATABASE_COMPARISON.json;REMOTE_BEFORE.json;REMOTE_AFTER.json",
+      "scope": "Cadeia33:21tables22policies59functions119constraints48indexes19clientgrants iguais; hashes operacionais preservados.",
+      "remaining": "Regerar comparação após033/034; defaults service_role e EXECUTE global PUBLIC exigem validação própria."
+    },
+    {
+      "id": "DB-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "scripts/check-contracts.mjs;scripts/test-migrations.mjs",
+      "scope": "19 hashes históricos; cadeia alvo inclui as compatibilizações 02050 e 032.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "DB-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "scripts/test-migrations.mjs:reset completo e reset019→cadeia atual",
+      "scope": "Banco local com Auth real e fixtures; nunca reset remoto.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "DB-04",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "scripts/test-migrations.mjs:stock_movements órfão;tests/database/transactions.sql",
+      "scope": "Movimento legado sem origem permanece sem paciente/custódia.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "SEC-01",
+      "proposal": "needs_individual_review",
+      "evidence": "tests/database/transactions.sql:has_table_privilege/has_function_privilege;tests/integration/database.test.mjs:Data API grants",
+      "scope": "Cobre privilégios testados e funções críticas; não presume auditoria de infraestrutura.",
+      "remaining": "Validar033/034 sobre serviço e EXECUTE global PUBLIC; repetir regressão35 e conferir metadados/grants efetivos nos dois ambientes."
+    },
+    {
+      "id": "SEC-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:anon e security_invoker;tests/integration/database.test.mjs:Data API grants",
+      "scope": "Visibilidade de saldos com identidades Auth reais e paciente A/B.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "SEC-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:A cannot access B;tests/integration/database.test.mjs:cross-patient isolation",
+      "scope": "SQL e HTTP provam isolamento; telas administrativas precisam de seus testes próprios.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "SEC-04",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:globally revoked e patient revocation;tests/integration/database.test.mjs:Data API grants",
+      "scope": "Sessão autenticada não contorna perfil/vínculo revogado.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "SEC-05",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/api/guards.test.ts:reader flags e family;tests/database/transactions.sql;tests/e2e/workflows.spec.ts:leitor",
+      "scope": "Requer SQL/API e interface; flags permissivas não concedem escrita.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "SEC-06",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:global identity write denied;tests/integration/database.test.mjs:local authority",
+      "scope": "Identidade global e autoridade local verificadas separadamente.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "SEC-07",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/integration/database.test.mjs:concurrent global administrator demotions;tests/database/transactions.sql:admin guard",
+      "scope": "Concorrência real preserva ao menos um administrador global ativo.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "SEC-08",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:audit spoof denied;tests/database/notification-read-model.sql:retry audited",
+      "scope": "DML direto negado e eventos transacionais testados.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "SEC-09",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/api/guards.test.ts:safe errors;tests/api/notifications.test.ts:payload;docs/SECURITY.md",
+      "scope": "Mocks provam minimização local; configuração de segredos externos exige revisão própria.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "AUTH-01",
+      "proposal": "needs_individual_review",
+      "evidence": "tests/e2e/workflows.spec.ts:login/logout;src/components/auth",
+      "scope": "Login e logout usuais exercitados; indisponibilidade de rede no login não é inferida de outro fluxo.",
+      "remaining": "Login/logout usuais serão percorridos no E2E; confirmar tratamento visual de falha de rede/credenciais e ausência de contexto residual."
+    },
+    {
+      "id": "AUTH-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/auth.test.ts;src/app/auth/callback/route.ts",
+      "scope": "Casos de redirects adversos e código inválido conforme testes individuais.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "AUTH-03",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/onboarding.spec.ts",
+      "scope": "Cadastro, e-mail local, aceite e recuperação completos via Mailpit; sem OAuth remoto.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "AUTH-04",
+      "proposal": "needs_individual_review",
+      "evidence": "docs/DEPLOYMENT.md;docs/audits/2026-10-21/EXECUTION.md",
+      "scope": "Depende de Auth/OAuth/e-mail e redirects do ambiente remoto.",
+      "remaining": "Homologar Google OAuth e configuração Auth remota; dependência externa."
+    },
+    {
+      "id": "PAT-01",
+      "proposal": "needs_individual_review",
+      "evidence": "tests/e2e/workflows.spec.ts:criação;src/components/admin/admin-console.tsx",
+      "scope": "Criar paciente não comprova sozinho edição/inativação na interface.",
+      "remaining": "Criação é exercitada. Falta evidência específica de edição e inativação de paciente preservando histórico e leitura autorizada."
+    },
+    {
+      "id": "PAT-02",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/workflows.spec.ts:seletor;src/app/api/context/route.ts",
+      "scope": "Paciente da sessão e URL é validado pelo servidor; não há contexto único por env.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "PAT-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/api/guards.test.ts:patient capabilities;tests/database/transactions.sql:same identity different powers",
+      "scope": "Papel efetivo por vínculo; perfil global não amplia escopo local.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "ADM-01",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/administration.spec.ts;tests/integration/database.test.mjs:local authority",
+      "scope": "Aprovar somente as operações administrativas efetivamente percorridas.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "ADM-02",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/database/invitations-import-outbox.sql:invites;tests/e2e/administration.spec.ts:convite;tests/e2e/onboarding.spec.ts",
+      "scope": "Prazo, reemissão, revogação e aceite precisam de SQL e UI pertinentes.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "ADM-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:patient revocation;tests/e2e/administration.spec.ts:acesso compartilhado",
+      "scope": "Revogação A mantém B; não equivale a revogação global da conta.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "CAT-01",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "scripts/test-migrations.mjs:FKs/quantidades/protocolo;tests/database/transactions.sql:catalogue relationships",
+      "scope": "Upgrade legado preserva identidades e associações comprovadas.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "CAT-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:exclusive identity hidden/B unchanged;tests/integration/database.test.mjs:cross-patient isolation",
+      "scope": "Produto exclusivo e atributos locais não atravessam pacientes.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "CAT-03",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/administration.spec.ts:catálogo;tests/e2e/workflows.spec.ts:cadastro/renomeação",
+      "scope": "Cada atributo e inativação precisam de evidência; existência do formulário não basta.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "CAT-04",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/administration.spec.ts:sugestões por alias e grafia ambígua",
+      "scope": "Sugestão não associa sem escolha explícita do usuário.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "CAT-05",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/workflows.spec.ts:catálogo→requisição;src/app/api/catalog/route.ts",
+      "scope": "Produto criado no banco aparece no wizard e gera snapshot canônico.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "CAT-06",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:unit guard",
+      "scope": "Mudança de unidade com histórico é recusada; substituição é explícita.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "REQ-01",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "scripts/test-migrations.mjs:requested_quantity ausente;tests/api/requisition-contract.test.ts;scripts/check-contracts.mjs;tests/e2e/workflows.spec.ts",
+      "scope": "Quantidade de estoque permanece; quantidade solicitada não pertence ao contrato.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "REQ-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/api/requisition-persistence.test.ts;tests/database/transactions.sql;tests/integration/database.test.mjs:canonical request",
+      "scope": "Valores do navegador não definem identidade ou atributos canônicos.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "REQ-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/integration/database.test.mjs:concurrent HTTP submissions;tests/database/transactions.sql:canonical retry",
+      "scope": "Oito submissões concorrentes, replay e conflito de conteúdo.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "REQ-04",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/workflows.spec.ts:resposta perdida",
+      "scope": "Persistência confirmada antes de abortar resposta; reload recupera um único registro.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "REQ-05",
+      "proposal": "candidate_after_executed_boundary_case",
+      "evidence": "scripts/test-migrations.mjs:HC-000012;tests/database/protocol-and-stock-boundaries.sql:HC-1000000;tests/integration/database.test.mjs",
+      "scope": "Primeira emissão, legado, concorrência e limite de largura foram exercitados; sequência restaurada após o caso local.",
+      "remaining": "Repetir as suítes afetadas na cadeia final35 sem inferir aprovação por área."
+    },
+    {
+      "id": "REQ-06",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/workflows.spec.ts:renomear após emissão;tests/database/transactions.sql:snapshot canonical",
+      "scope": "Comprovante persistido mantém nomes anteriores e identifica origem legada.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "REQ-07",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/workflows.spec.ts:wizard;tests/e2e/administration.spec.ts:extras;tests/requisition.test.ts",
+      "scope": "Cada campo e revisão dependem dos casos exercitados, sem aprovação por simples cadastro.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "HIS-01",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/integration/database.test.mjs:Data API grants;tests/e2e/workflows.spec.ts:histórico",
+      "scope": "Leitura do paciente independe do autor e permanece limitada ao vínculo.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "HIS-02",
+      "proposal": "needs_individual_review",
+      "evidence": "tests/api/guards.test.ts:IANA;src/app/api/requisitions/route.ts;src/components/history",
+      "scope": "Datas unitárias não provam por si paginação e todos os filtros na interface.",
+      "remaining": "Datas São Paulo têm testes unitários. Falta jornada específica da paginação e todos os filtros de histórico de requisições."
+    },
+    {
+      "id": "HIS-03",
+      "proposal": "needs_individual_review",
+      "evidence": "tests/e2e/workflows.spec.ts:transição e detalhe;tests/database/transactions.sql",
+      "scope": "Estado e auditoria persistidos; impressão requer inspeção específica do comprovante.",
+      "remaining": "Transição under_review e snapshot estão no E2E. Confirmar reimpressão e comportamento de trilha dos demais estados relevantes."
+    },
+    {
+      "id": "IMP-01",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/invitations-import-outbox.sql:unknown facts;tests/e2e/administration.spec.ts:importação",
+      "scope": "Campos desconhecidos continuam NULL; não há associação automática de extras.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "IMP-02",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/database/invitations-import-outbox.sql:canonical replay;tests/e2e/administration.spec.ts:preview/commit",
+      "scope": "Lote idempotente, revisão e relatório por registro exercitados conjuntamente.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "IMP-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/invitations-import-outbox.sql:invalid extra/duplicate/no retroactive notifications",
+      "scope": "Linha inválida reverte e importação não enfileira mensagens antigas.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "STK-01",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "scripts/test-migrations.mjs:patient balances;tests/database/transactions.sql;tests/integration/database.test.mjs:transfers",
+      "scope": "Saldos separados em pacientes e custódias, sem compensação implícita.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "STK-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/api/guards.test.ts:manageStock;tests/database/transactions.sql;tests/e2e/workflows.spec.ts:leitor",
+      "scope": "Interface e caminhos diretos recusam escrita oficial sem administração.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "STK-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/integration/database.test.mjs:concurrent withdrawals;tests/database/transactions.sql",
+      "scope": "Seis saídas simultâneas e transferência com ambos os lados atômicos.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "STK-04",
+      "proposal": "candidate_after_executed_boundary_case",
+      "evidence": "tests/database/transactions.sql:conflict;tests/database/protocol-and-stock-boundaries.sql:same content retry",
+      "scope": "Retry de mesmo conteúdo retorna o movimento original sem duplicar; conteúdo diferente gera conflito.",
+      "remaining": "Repetir suítes pertinentes na cadeia final35."
+    },
+    {
+      "id": "STK-05",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:extraordinary adjustment e outbound denied",
+      "scope": "Saldo negativo só pelo fluxo global confirmado e justificado.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "STK-06",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/workflows.spec.ts:histórico estoque;tests/database/transactions.sql",
+      "scope": "Movimentos preservados; UI deve mostrar contexto e não editar saldo diretamente.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "INV-01",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:inventory reference/revision",
+      "scope": "Referência e revisão capturadas no banco ao abrir contagem.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "INV-02",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/workflows.spec.ts:contagem divergente;tests/database/transactions.sql",
+      "scope": "Salvar contagem não altera saldo; justificativa antecede aprovação.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "INV-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:inventory approval idempotent;tests/e2e/workflows.spec.ts:aprovação",
+      "scope": "Compensação aplicada uma vez na mesma transação.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "INV-04",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/transactions.sql:revision conflict/recount",
+      "scope": "Movimento posterior à referência impede aprovação sem recontagem.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "INV-05",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/e2e/workflows.spec.ts:revisão/rejeição/recontagem/cancelamento;tests/database/transactions.sql",
+      "scope": "Contagens anteriores e trilha permanecem consultáveis.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "ALT-01",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/database/alerts-routing.sql;tests/e2e/administration.spec.ts:limites",
+      "scope": "Configuração por produto/custódia precisa de validação SQL e formulário.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "ALT-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/alerts-routing.sql:family/team/dedup/resolve;tests/database/transactions.sql:alert opened once",
+      "scope": "Deduplicação, reposição e roteamento respeitam custódia e configuração.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "NOT-01",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/database/invitations-import-outbox.sql:individual channels;tests/e2e/administration.spec.ts:destinatários",
+      "scope": "Destinatário ativo autorizado e canal configurado, sem endereço oriundo do wizard.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "NOT-02",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/api/requisition-persistence.test.ts;tests/database/invitations-import-outbox.sql",
+      "scope": "Falha de mensageria não desfaz registro da requisição.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "NOT-03",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/database/invitations-import-outbox.sql:lease/recovery;tests/integration/database.test.mjs:outbox workers;tests/api/worker.test.ts",
+      "scope": "Concorrência real, lease expirado e incerteza não provocam reenvio silencioso.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "NOT-04",
+      "proposal": "candidate_after_named_final_browser_case",
+      "evidence": "tests/database/notification-read-model.sql;tests/e2e/workflows.spec.ts:pending→delivered;tests/api/notifications.test.ts",
+      "scope": "Estados internos e externos distintos; entrega real do provedor depende de homologação externa.",
+      "remaining": "Aguardar resultado do cenário nominal de navegador e revisar seu escopo."
+    },
+    {
+      "id": "NOT-05",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "tests/api/notifications.test.ts;tests/api/worker.test.ts;tests/database/invitations-import-outbox.sql:webhook",
+      "scope": "Transporte falso e assinatura/callback; nenhum envio externo foi necessário para testes.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "NOT-06",
+      "proposal": "needs_individual_review",
+      "evidence": "docs/WHATSAPP_AI.md;docs/DEPLOYMENT.md",
+      "scope": "Credenciais, template, webhook e agendamento do provedor precisam de configuração externa.",
+      "remaining": "Configurar/homologar provedor, template, callback e agendamento; dependência externa."
+    },
+    {
+      "id": "UX-01",
+      "proposal": "needs_individual_review",
+      "evidence": "tests/e2e/workflows.spec.ts:resposta perdida;src/components",
+      "scope": "Um fluxo de rede não prova todos os estados de todas as telas.",
+      "remaining": "Estados exercitados por jornada são limitados; confirmar tela vazia, erro e recuperação das áreas administrativas mais importantes."
+    },
+    {
+      "id": "UX-02",
+      "proposal": "needs_individual_review",
+      "evidence": "tests/e2e/accessibility.spec.ts;playwright.config.ts",
+      "scope": "Axe cobre telas visitadas e viewport; não substitui teste completo de teclado de todas as telas.",
+      "remaining": "Axe e viewport cobrem login/formulário. Falta evidência de teclado e inspeção visual das outras telas principais."
+    },
+    {
+      "id": "ERR-01",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "src/lib/server/error-catalog.ts;src/lib/server/api.ts;tests/api/guards.test.ts",
+      "scope": "Catálogo tipado inclui categoria, ação, status e retry; respostas mantêm correlação e mensagens seguras.",
+      "remaining": "Aguardar resultado dos testes do novo catálogo e typecheck."
+    },
+    {
+      "id": "ARC-01",
+      "proposal": "candidate_documented_architecture_review",
+      "evidence": "docs/ARCHITECTURE.md:fronteiras e arquivos;src/lib/server/api.ts;src/components/workspace.tsx;src/lib/notifications",
+      "scope": "Revisão estática das fronteiras UI/API/banco/serviço e consumidores; não é auditoria de desempenho ou prova automática de inexistência de ciclos.",
+      "remaining": "Parent deve aceitar explicitamente a revisão arquitetural com esse escopo."
+    },
+    {
+      "id": "DOC-01",
+      "proposal": "needs_individual_review",
+      "evidence": "README.md;AGENTS.md;docs;lint:markdown",
+      "scope": "Documentação precisa refletir evidências finais e autorizações vigentes.",
+      "remaining": "Regenerar documentos com todos os resultados finais e repetir Markdown na árvore pronta para publicação."
+    },
+    {
+      "id": "QA-01",
+      "proposal": "needs_individual_review",
+      "evidence": "docs/audits/2026-10-21/EXECUTION.md;verification.json",
+      "scope": "Suítes unitária, SQL, HTTP e navegador são evidências distintas; nenhuma cobre tudo sozinha.",
+      "remaining": "Aguardar cadeia35+seisSQL+seisHTTP, navegador final e Linux completo; registrar contagens/escopos reais."
+    },
+    {
+      "id": "CI-01",
+      "proposal": "candidate_after_final_chain_regression",
+      "evidence": "docs/audits/2026-10-20/DEPENDENCY_REVIEW.md;docs/audits/2026-10-20/VERSIONS.md",
+      "scope": "Instalação Win/Linux e suporte Vercel; seis advisories dev residuais não equivalem a zero riscos.",
+      "remaining": "Repetir/confirmar evidência pertinente na cadeia33 quando ela afetar este requisito."
+    },
+    {
+      "id": "CI-02",
+      "proposal": "needs_individual_review",
+      "evidence": ".github/workflows/ci.yml;scripts/verify-linux.sh",
+      "scope": "Comandos locais equivalentes não substituem resultado publicado do workflow.",
+      "remaining": "Workflow foi adaptado ao replay com backup. Validar execução publicada, sem concluir apenas por comandos locais."
+    },
+    {
+      "id": "CI-03",
+      "proposal": "needs_individual_review",
+      "evidence": ".github/workflows/ci.yml;docs/audits/2026-10-21/EXECUTION.md",
+      "scope": "Push está autorizado; aguardar URL/run e checks reais do PR.",
+      "remaining": "Aguardar push autorizado e checks reais com URL de execução/PR."
+    },
+    {
+      "id": "AI-01",
+      "proposal": "candidate_preparatory_contract_scope",
+      "evidence": "docs/API.md;docs/WHATSAPP_AI.md:IA futura;docs/ARCHITECTURE.md",
+      "scope": "O requisito pede preparação de contratos e limites; atendido nesse escopo, sem agente autônomo/clínico implementado.",
+      "remaining": "Parent deve registrar aceite somente da preparação documental, sem declarar um agente completo."
+    },
+    {
+      "id": "AUD-01",
+      "proposal": "needs_individual_review",
+      "evidence": "REQUIREMENTS.csv;REQUIREMENTS.json;SOURCE_REQUIREMENTS.json;docs/audits/2026-10-21/EXECUTION.md",
+      "scope": "74 requisitos consolidados e inventário integral das fontes; cada estado exige evidência própria.",
+      "remaining": "Após resultados, registrar aceites por ID e concluir matriz/relatórios sem promoção automática por área."
+    }
+  ]
+}

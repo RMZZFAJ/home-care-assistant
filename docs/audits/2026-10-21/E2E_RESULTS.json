@@ -1,0 +1,220 @@
+{
+  "generatedAt": "2026-10-22T00:04:12.393Z",
+  "database": "verified local home-care-assistant API54321, PostgreSQL54322",
+  "migrationCount": 35,
+  "first": {
+    "passed": 29,
+    "failed": 3
+  },
+  "correctionRun": {
+    "passed": 6,
+    "failed": 0
+  },
+  "uniqueCasesPassed": 32,
+  "projects": [
+    "chromium",
+    "mobile"
+  ],
+  "method": "Local full32 plus affected regression cases, followed by published CI full32/32 in one clean execution.",
+  "cases": [
+    {
+      "id": "ddd864604af8a6a0198f-243e263e7e8b7ba11d42",
+      "project": "chromium",
+      "title": "login e formulário permitem navegação acessível em desktop e celular",
+      "status": "passed"
+    },
+    {
+      "id": "ddd864604af8a6a0198f-e74d7e080ad531a3898a",
+      "project": "mobile",
+      "title": "login e formulário permitem navegação acessível em desktop e celular",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-564fa3e70e6f559c8205",
+      "project": "chromium",
+      "title": "catálogo edita nomes alternativos e inativa preservando a identidade",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-5cdd1bc856c4a4c45ee6",
+      "project": "chromium",
+      "title": "administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-daffeaddf980360aad00",
+      "project": "chromium",
+      "title": "convite é criado, reemitido e revogado pela interface",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-7425e1fa73aff7fb0570",
+      "project": "chromium",
+      "title": "seletores administrativos salvam destinatário e limites por produto e custódia",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-7bad9d24a16daa355b76",
+      "project": "chromium",
+      "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-76f37bab9b26e020bb35",
+      "project": "chromium",
+      "title": "sugestões por alias e grafia ambígua só associam o produto após escolha explícita",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-6ac7a5fb53bb687d76f7",
+      "project": "mobile",
+      "title": "catálogo edita nomes alternativos e inativa preservando a identidade",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-bfa352a3cb9d0240c434",
+      "project": "mobile",
+      "title": "administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-5faa9c0cf7f8c56b0906",
+      "project": "mobile",
+      "title": "convite é criado, reemitido e revogado pela interface",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-67dbc605ba812a4f0f9a",
+      "project": "mobile",
+      "title": "seletores administrativos salvam destinatário e limites por produto e custódia",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-25941714f62beec70ced",
+      "project": "mobile",
+      "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+      "status": "passed"
+    },
+    {
+      "id": "621cf2e2025a12091a7a-d035e7089ce10f0b9baa",
+      "project": "mobile",
+      "title": "sugestões por alias e grafia ambígua só associam o produto após escolha explícita",
+      "status": "passed"
+    },
+    {
+      "id": "41d3fd2474a19feb00a1-50d80c3d8886b3453666",
+      "project": "chromium",
+      "title": "exibe a tela de login",
+      "status": "passed"
+    },
+    {
+      "id": "41d3fd2474a19feb00a1-3d1b3d453fca6db78bbe",
+      "project": "chromium",
+      "title": "login apresenta falha de credencial e de rede e permite recuperar a sessão",
+      "status": "passed"
+    },
+    {
+      "id": "41d3fd2474a19feb00a1-7e731c4db4c0b8ec4fa9",
+      "project": "mobile",
+      "title": "exibe a tela de login",
+      "status": "passed"
+    },
+    {
+      "id": "41d3fd2474a19feb00a1-60672302735bb3fe61db",
+      "project": "mobile",
+      "title": "login apresenta falha de credencial e de rede e permite recuperar a sessão",
+      "status": "passed"
+    },
+    {
+      "id": "fe534f0825407f213faa-fade425aa61b5398ba33",
+      "project": "chromium",
+      "title": "convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha",
+      "status": "passed"
+    },
+    {
+      "id": "fe534f0825407f213faa-857259768655c95d0a07",
+      "project": "mobile",
+      "title": "convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-1309a0cdbc86efdb2b9f",
+      "project": "chromium",
+      "title": "catálogo → requisição → comprovante imutável → estoque → inventário aprovado",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-fc4e278e8c24b9f7c422",
+      "project": "chromium",
+      "title": "leitor consulta dados e tem escrita negada também pela API",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-0a7d1c998fd0413de4c4",
+      "project": "chromium",
+      "title": "retry após resposta perdida recupera a mesma requisição sem duplicação",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-2241246831e6d09238f8",
+      "project": "chromium",
+      "title": "paciente renomeado e inativo preserva histórico paginado, filtros e impressão",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-78c0680d8f511080fbcd",
+      "project": "chromium",
+      "title": "histórico de estoque pagina, filtra período e preserva saldo de item inativo",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-7ca1dcabda4a1783cdd8",
+      "project": "chromium",
+      "title": "revisão de inventário rejeita, reconta e cancela preservando as contagens",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-cc66c3daef501cf63faa",
+      "project": "mobile",
+      "title": "catálogo → requisição → comprovante imutável → estoque → inventário aprovado",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-76b0e00ae48c0aa43437",
+      "project": "mobile",
+      "title": "leitor consulta dados e tem escrita negada também pela API",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-3218f139c105d8b417c5",
+      "project": "mobile",
+      "title": "retry após resposta perdida recupera a mesma requisição sem duplicação",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-48d9c69a5c3dda629f32",
+      "project": "mobile",
+      "title": "paciente renomeado e inativo preserva histórico paginado, filtros e impressão",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-5dbf4132fa1a862a9f84",
+      "project": "mobile",
+      "title": "histórico de estoque pagina, filtra período e preserva saldo de item inativo",
+      "status": "passed"
+    },
+    {
+      "id": "26aa48cee8983222f549-2a4064cce447af979f1a",
+      "project": "mobile",
+      "title": "revisão de inventário rejeita, reconta e cancela preservando as contagens",
+      "status": "passed"
+    }
+  ],
+  "publishedFullRun": {
+    "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144",
+    "headSha": "8fe30fe194d921af571ff8227f95cb554cc1eee4",
+    "passed": 32,
+    "failed": 0,
+    "singleExecution": true
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "backupSha256": "516d0b63956959a4a543d7691657ead26dfc0333fa4de782aff3cf0fd534602d",
+  "originalRecordHashesPreserved": true,
+  "original": {
+    "global_admins": 1,
+    "item_integrity": "b79eab9365de7701ca688bb8187bd013",
+    "items": 1,
+    "migrations": 35,
+    "movement_integrity": "d41d8cd98f00b204e9800998ecf8427e",
+    "movements": 0,
+    "patients": 1,
+    "products": 29,
+    "profiles": 2,
+    "request_integrity": "4d768c6297b4bac027a169a16138ae44",
+    "requests": 1
+  },
+  "newRequests": 2,
+  "newItems": 5
+}

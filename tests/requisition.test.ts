@@ -5,7 +5,7 @@ import { CATALOG, findCatalogItemByName, findCatalogItemsByName } from "@/lib/ca
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-const base = { lines: [{ productId: "fralda", productName: "Fralda", category: "higiene" as const, currentStock: 2, urgent: true }], extraItems: [], observations: [], idempotencyKey: "4c9b5c6a-7d8e-4f90-a123-456789abcdef" };
+const base = { careRecipientId: "20000000-0000-4000-8000-000000000001", lines: [{ productId: "fralda", productName: "Fralda", category: "higiene" as const, currentStock: 2, urgent: true }], extraItems: [], observations: [], idempotencyKey: "4c9b5c6a-7d8e-4f90-a123-456789abcdef" };
 
 describe("validação de requisição", () => {
   it("aceita itens válidos com quantidade inteira", () => expect(requisitionInputSchema.safeParse(base).success).toBe(true));
@@ -31,7 +31,8 @@ describe("validação de requisição", () => {
   it("produz resumo sem expor dados além do comprovante", () => {
     const summary = buildWhatsAppSummary({ ...base, protocol: "HC-000012", requesterName: "Profissional teste", recipientName: "Pessoa desenvolvimento", createdAt: "2026-10-19T12:00:00.000Z" });
     expect(summary).toContain("HC-000012");
-    expect(summary).toContain("Fralda (estoque informado: 2)");
+    expect(summary).not.toContain("Fralda");
+    expect(summary).not.toContain("Pessoa desenvolvimento");
   });
 });
 

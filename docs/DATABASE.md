@@ -1,18 +1,55 @@
 # Banco de dados
 
-`profiles` vincula o usuário do Auth a função e status. `care_recipients` é o centro do contexto multipaciente e `care_recipient_memberships` associa usuários a pacientes com permissões explícitas. `products` continua sendo um catálogo único. `requisitions`, `requisition_items` e `requisition_observations` registram a necessidade operacional sem quantidade de reposição. `stock_movements` deriva saldos por paciente e custódia (`FAMILY`/`CARE_TEAM`); `stock_inventories` registra contagens que só viram movimentos após aprovação; `requisition_notifications` acompanha destinatários e tentativas.
+## Fonte e preservação
 
-A migração em `supabase/migrations` cria enums, chaves estrangeiras, checks, índices, unicidade do protocolo e chave de idempotência. As migrações de hardening validam o catálogo, restringem as funções de submissão, tratam concorrência de idempotência e mantêm a persistência atômica. `products.aliases` guarda nomes alternativos sem duplicar produtos, e `find_product_by_alias(text)` resolve buscas autenticadas sem diferenciar acentos ou maiúsculas. RLS está habilitada em todas as tabelas expostas. A pessoa assistida do seed é fictícia.
+As 19 migrations iniciais são imutáveis, verificadas por hashes normalizados
+entre Windows e Linux. Correções são arquivos incrementais posteriores.
+Não executar migrations remotas nem reconciliações sem revisão e autorização.
 
-As migrações incrementais `20261020000800` a `20261020001900` removem a coluna de quantidade de reposição, adicionam hash canônico/idempotência e protocolos a partir de 12, preservam protocolos históricos e aceitam o novo formato sequencial, escopo multipaciente, custódia, inventário, notificações, histórico de status, transições autorizadas, administração server-side, importação dos protocolos físicos 1 a 11 e execução segura da RPC de submissão. A migração `20261020001500` bloqueia saldo insuficiente, exceto para administrador global; isso não transforma uma requisição em baixa automática.
+Os schemas esperado, local existente e remoto são realidades distintas.
+O relatório comparativo fica na [auditoria](audits/2026-10-20/README.md), com
+atualizações na [continuação de 21/10](audits/2026-10-21/README.md).
+Um acesso remoto recusado não comprova drift. A autorização de 21/10 permite
+atualizar o remoto correto após reconciliação, validação e backup verificável.
 
-Importações usam `requisition_import_batches` e `historical_requisition_imports`. O hash da carga impede repetição silenciosa; cada linha precisa de paciente ativo, protocolo físico entre 1 e 11, pelo menos um produto ativo e estoque inteiro não negativo. Linhas inválidas entram no relatório como rejeitadas e não produzem notificações.
+## Catálogo por paciente
 
-Aplicação local:
+`products` preserva identidades textuais históricas, inclusive IDs com acentos.
+Modelos globais têm proprietário nulo; novos itens exclusivos têm paciente
+proprietário. `care_recipient_products` contém nome, unidade, categoria,
+aliases, ordenação e estado locais, com chave paciente/produto.
 
-```bash
-supabase start
-supabase db reset
-```
+A conversão copia a disponibilidade global anterior para os pacientes já
+existentes. Não atribui paciente a movimentações legadas sem origem conhecida.
+Novos pacientes começam vazios; a adoção de modelos é explícita. Alterações
+locais não modificam outros pacientes ou o modelo global.
 
-O reset aplica as migrações e o seed; ele é destrutivo no banco local. Em ambientes compartilhados, use `supabase db push` e aplique o seed somente após revisar o destino. Não execute `db reset` ou migrações destrutivas em banco remoto.
+FKs compostas e triggers derivam o paciente do registro pai e impedem usar
+produto exclusivo em outro paciente. Alterar unidade com histórico exige
+substituição por novo item. Produtos com histórico são inativados.
+
+## Integridade operacional
+
+- Protocolo global e único; sequência começa em 12, sem reutilizar números.
+- Formatos anteriores permanecem válidos; largura mínima de seis dígitos.
+- Hash calculado no banco inclui paciente e intenção normalizada.
+- Mesmo conteúdo/chave recupera o original; conteúdo diferente gera conflito.
+- Requisição e seus snapshots são gravados atomicamente.
+- Importação 1–11 preserva campos originais conhecidos e não consome sequência.
+- Data, solicitante e status desconhecidos não são inventados na importação.
+- Ledger separa FAMILY e CARE_TEAM; transferência tem origem e destino juntos.
+- Saldo negativo exige ajuste extraordinário global explícito e auditado.
+- Inventário aprovado usa referência estável e revisão transacional de estoque.
+- Auditoria e escritas críticas não aceitam DML direto de usuários comuns.
+
+## Verificação
+
+`test:migrations` verifica instalação limpa e evolução a partir da migration
+019 com dados fictícios. Confere protocolo histórico, itens, saldos de dois
+pacientes, FKs e preservação de estoque sem paciente. As suítes SQL exercitam
+RLS, RPCs, catálogo, inventário, importação, convites e outbox. A integração
+HTTP utiliza identidades Auth reais e concorrência entre conexões distintas.
+
+O banco local home-care-assistant é o alvo desses testes. O replay exige
+backup e consentimento explícito, conforme [Testes](TESTING.md). O remoto
+nunca recebe reset, fixtures ou a execução da suíte mutável.

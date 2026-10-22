@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-10-22T00:15:45.104Z",
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144",
+  "headSha": "8fe30fe194d921af571ff8227f95cb554cc1eee4",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "name": "validate (windows-latest)",
+      "conclusion": "success",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144/job/119559550757"
+    },
+    {
+      "name": "validate (ubuntu-latest)",
+      "conclusion": "success",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144/job/119559551142"
+    },
+    {
+      "name": "database-and-browser",
+      "conclusion": "success",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144/job/119559551283"
+    }
+  ],
+  "unitTestsPerPlatform": 69,
+  "integrationTests": 6,
+  "sqlSuites": 6,
+  "migrationCount": 35,
+  "e2e": {
+    "passed": 32,
+    "failed": 0,
+    "retriesUsed": 0,
+    "scope": "Full desktop and mobile suite in one clean CI execution"
+  },
+  "remoteCredentialsUsed": false,
+  "preview": {
+    "url": "https://home-care-assistant-gw58mig7r-rmzzfajs-projects.vercel.app",
+    "ready": true,
+    "loginStatus": 200,
+    "unauthenticatedContextStatus": 401,
+    "code": "SESSION_EXPIRED",
+    "deploymentProtectionPreserved": true
+  },
+  "independentReview": "Directed read-only review of 033/034, worker state RPC and local CI guards found no new merge blocker; not a new repository-wide scan."
+}

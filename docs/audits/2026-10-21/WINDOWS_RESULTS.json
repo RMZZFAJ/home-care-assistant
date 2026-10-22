@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-10-22T00:06:02.635Z",
+  "node": "24.22.0",
+  "npm": "11.21.1",
+  "checks": {
+    "contracts": "passed",
+    "lint": "passed",
+    "markdown": "passed",
+    "typecheck": "passed",
+    "unit": "69/69 passed",
+    "build": "passed",
+    "e2eProductionBuild": "passed"
+  },
+  "scope": "Final application code including keyboard-accessible stock scrolling; CI checks exact published head independently."
+}

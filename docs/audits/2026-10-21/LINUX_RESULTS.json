@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-10-22T00:04:12.389Z",
+  "node": "24.22.0",
+  "npm": "11.21.1",
+  "image": "node:24.22.0-bookworm",
+  "install": "npm ci --no-audit --no-fund",
+  "packages": 323,
+  "checks": [
+    {
+      "name": "dependency-tree",
+      "result": "PASS"
+    },
+    {
+      "name": "contracts",
+      "result": "PASS"
+    },
+    {
+      "name": "lint",
+      "result": "PASS"
+    },
+    {
+      "name": "markdown",
+      "result": "PASS"
+    },
+    {
+      "name": "typecheck",
+      "result": "PASS"
+    },
+    {
+      "name": "unit",
+      "result": "PASS"
+    },
+    {
+      "name": "build",
+      "result": "PASS"
+    }
+  ],
+  "unitTests": 69,
+  "credentialsUsed": false,
+  "sourceMount": "read-only; copied without env/Git/caches",
+  "logSha256": "24f93a850ce8dd591975f87bc0baa109a2a6e1c92f5692c3ac8d554ae20dec5e",
+  "scope": "Before final stock scroll-region accessibility attribute; published CI validates final head.",
+  "finalPublishedVerification": {
+    "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144",
+    "headSha": "8fe30fe194d921af571ff8227f95cb554cc1eee4",
+    "allChecks": "passed including final accessibility change"
+  }
+}

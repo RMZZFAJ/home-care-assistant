@@ -1,0 +1,21 @@
+{
+  "supabase/migrations/20261019000100_initial_schema.sql": "7da1f5b2ee05ab65fa7135a125a1bc8f8c32b5b8f83a8456b4fd11d1588dd720",
+  "supabase/migrations/20261019000200_catalog_and_submission_hardening.sql": "bbc9040b3bf97c57ee04e0074a70586f328735ad7921691f306b76108d9faeea",
+  "supabase/migrations/20261020000300_update_product_units.sql": "27671f2bb9f9627fdc6c08a2436fae8f61753bdab1ea1fd2ad62526b0e8c7840",
+  "supabase/migrations/20261020000400_add_product_aliases.sql": "b13b60d095bf89b26e2fc74b2ae8db42c56afb2f6bc42eb43194bcdf0a463ab6",
+  "supabase/migrations/20261020000500_set_fosfomicina_canonical_name.sql": "ce2709e70124d96236cc2782546761f070d72a97856abce4b950b277d12ed4fc",
+  "supabase/migrations/20261020000600_grant_authenticated_permissions.sql": "014449ee3a3d54cbaff72d7d7d308163bdae648d368bdd0c38013eeafc6b8d51",
+  "supabase/migrations/20261020000700_restrict_public_data_api_access.sql": "cb50e8b01ad67631d2e4c7708b7f2e2763a9506e7cc58af274584d9290d1406f",
+  "supabase/migrations/20261020000800_requisition_integrity_and_remove_requested_quantity.sql": "e256f1a80df0f52ec71acda27decf47ce5efce803f84bdd641914e6ad2ae0861",
+  "supabase/migrations/20261020000900_patient_scope_custody_inventory_notifications.sql": "4154a94d05e25d1163786d575f3a70e74679636b9ce2229f433f6ec3154ccf74",
+  "supabase/migrations/20261020001000_stock_movement_transaction.sql": "30e3cdb41673e134850621f90d16a205e3c93090034c0ab800de582d4d2a1c9e",
+  "supabase/migrations/20261020001100_add_family_role.sql": "1dd46f1969dbe3a7e69d507222e9f988cfaeccc6879d9b5276e85d444c721854",
+  "supabase/migrations/20261020001200_protocol_format_compatibility.sql": "a9e0ec4907fa8973925c3883c2a0d5a214cfa92cc33fda6e5eb3d2d301f687b6",
+  "supabase/migrations/20261020001300_requisition_status_history.sql": "b4d1f68769a083ed72ae3f1e1f429c0551b6d7a097c02f8971efe2e3c133f8c8",
+  "supabase/migrations/20261020001400_authorized_status_transitions.sql": "dc50289cc54caf94b779228120b2c815d2ed37effdf7fa7d839fe5e4ff790063",
+  "supabase/migrations/20261020001500_stock_balance_guard.sql": "9021989b84044f14f06f48f75cca916c77a7a87a1e4a75d6fae17832f7695800",
+  "supabase/migrations/20261020001600_admin_import_and_operations.sql": "e8fff8bb262c27086f61b70e5ada3b9914c47771012dc0620c59694b0a8b8d9f",
+  "supabase/migrations/20261020001700_inventory_workflow.sql": "697231eedc5f4e4bec21f75c69f58b70b59c867bac971ac2c0f8211a1c6582f9",
+  "supabase/migrations/20261020001800_notification_processing.sql": "da5b5788f5adbd839f15baf32ef26e10a8b0a7510db0a5570684b9da0b1dfde5",
+  "supabase/migrations/20261020001900_submit_requisition_security_definer.sql": "8b85e344eef4c2c720d60c46c9419288f4d1627a70406e219adae0e257380872"
+}

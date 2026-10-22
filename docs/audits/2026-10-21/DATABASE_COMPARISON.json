@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-10-22T00:02:29.888Z",
+  "method": "Read-only SQL catalogs; canonical object keys; function hashes normalize CRLF to LF only; aggregate or verified original-record integrity hashes; no patient row data.",
+  "migrationCount": 35,
+  "remoteMigrationCount": 35,
+  "components": {
+    "tables": {
+      "localCount": 21,
+      "remoteCount": 21,
+      "equal": true
+    },
+    "indexes": {
+      "localCount": 48,
+      "remoteCount": 48,
+      "equal": true
+    },
+    "defaults": {
+      "localCount": 4,
+      "remoteCount": 4,
+      "equal": true
+    },
+    "policies": {
+      "localCount": 22,
+      "remoteCount": 22,
+      "equal": true
+    },
+    "security": {
+      "equal": true
+    },
+    "functions": {
+      "localCount": 60,
+      "remoteCount": 60,
+      "equal": true
+    },
+    "constraints": {
+      "localCount": 119,
+      "remoteCount": 119,
+      "equal": true
+    },
+    "client_grants": {
+      "localCount": 19,
+      "remoteCount": 19,
+      "equal": true
+    }
+  },
+  "dataPreserved": true,
+  "aggregateUnchanged": false,
+  "baselineVerification": {
+    "backupSha256": "516d0b63956959a4a543d7691657ead26dfc0333fa4de782aff3cf0fd534602d",
+    "originalRecordHashesPreserved": true,
+    "original": {
+      "global_admins": 1,
+      "item_integrity": "b79eab9365de7701ca688bb8187bd013",
+      "items": 1,
+      "migrations": 35,
+      "movement_integrity": "d41d8cd98f00b204e9800998ecf8427e",
+      "movements": 0,
+      "patients": 1,
+      "products": 29,
+      "profiles": 2,
+      "request_integrity": "4d768c6297b4bac027a169a16138ae44",
+      "requests": 1
+    },
+    "newRequests": 2,
+    "newItems": 5
+  },
+  "activeGlobalAdministrators": 1
+}

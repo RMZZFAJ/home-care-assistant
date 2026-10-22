@@ -16,6 +16,7 @@
 
 # next.js
 /.next/
+/.next-e2e/
 /out/
 
 # production
@@ -43,3 +44,8 @@ next-env.d.ts
 
 .vercel
 .env*
+!.env.example
+
+# isolated verification artifacts
+/playwright-report/
+/output/playwright/

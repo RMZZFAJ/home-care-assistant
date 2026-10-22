@@ -1,7 +1,42 @@
-# WhatsApp e agente de IA
+# Notificações, WhatsApp e preparação para IA
 
-Esta etapa apenas prepara o domínio. A integração futura deve usar a WhatsApp Business Platform oficial, validar assinatura de webhook, associar o remetente a profissional autorizado, tratar duplicidade e registrar falhas.
+## Processamento
 
-As requisições são persistidas antes de qualquer notificação. `requisition_notifications` mantém um registro por destinatário/canal, estado, tentativas e erro resumido; indisponibilidade do provedor não apaga, duplica ou altera o protocolo. A API administrativa processa apenas o canal interno atualmente; WhatsApp e outros canais externos permanecem pendentes e não são apresentados como enviados sem confirmação do provedor.
+Requisições são persistidas antes das mensagens. Configurações por paciente
+resolvem grupos e destinatários ativos. A outbox registra um evento por
+destinatário/canal, tentativas, lease, próxima execução e referência do provedor.
 
-O agente deverá chamar contratos tipados de negócio como consultar requisições, criar rascunho, submeter após confirmação, consultar estoque e buscar documentos permitidos. Cada função deve autenticar, autorizar, validar e auditar. O agente nunca recebe acesso direto ao banco, SQL arbitrário, prescrições ou autonomia clínica. Dados pessoais só podem ser enviados a provedor de IA após finalidade, base legal, minimização e controles de privacidade definidos.
+O worker usa reserva concorrente, revalidação de acesso e conclusão persistida.
+Falhas temporárias têm backoff; tarefas interrompidas são recuperadas. Timeout
+após possível aceitação é resultado incerto e exige conciliação. Reprocessar
+é uma ação administrativa separada de submeter uma requisição.
+
+Estados distinguem pendência, processamento, aceitação, entrega, leitura,
+falha, cancelamento e incerteza. Canal interno entregue significa registro
+interno disponível; não significa envio externo. Reposição resolve alertas
+por custódia sem somar silenciosamente saldos da família e equipe.
+
+## Provedor oficial
+
+O adaptador WhatsApp usa somente graph.facebook.com, template aprovado,
+versão suportada configurada e identificador do evento. Não inclui nome de
+paciente, medicamentos ou observações. Webhooks verificam assinatura HMAC,
+processam eventos idempotentes e não regridem confirmação já recebida.
+
+NOTIFICATIONS_EXTERNAL_ENABLED permanece false por padrão. O template de
+ambiente lista as variáveis Meta, segredo do worker e chave server-side.
+E-mail de notificação permanece pendente até existir adaptador específico.
+Não tratar uma configuração de destinatário como integração real concluída.
+
+Testes usam fetch falso ou Mailpit local, sem enviar mensagens reais.
+Homologação do provedor e configuração de agendamento dependem das credenciais,
+do template aprovado e da configuração do ambiente externo. A suíte local
+não realiza envios reais.
+
+## IA futura
+
+As futuras ferramentas devem chamar contratos de negócio autenticados,
+autorizados, validados e auditados. Nunca disponibilizar SQL arbitrário,
+chave privilegiada ou autonomia clínica ao agente. A finalidade, base legal,
+minimização, retenção e transferência a provedor de IA devem ser definidas
+antes de enviar dados pessoais. Um agente de IA completo não foi implementado.
