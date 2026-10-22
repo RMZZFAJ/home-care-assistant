@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-10-22T00:06:02.633Z",
+  "target": "local home-care-assistant only API54321/PostgreSQL54322",
+  "migrationFiles": 35,
+  "maxVersion": "20261020003400",
+  "cleanReplay": true,
+  "firstProtocol": "HC-000012",
+  "legacyFrom": "20261020001900",
+  "legacyUpgrade": true,
+  "historicalMigrationHashesUnchanged": 19,
+  "sqlPassed": [
+    "transactions.sql",
+    "invitations-import-outbox.sql",
+    "alerts-routing.sql",
+    "notification-read-model.sql",
+    "protocol-and-stock-boundaries.sql",
+    "service-role.sql"
+  ],
+  "additionalCompatibilityScenario": "restricted search_path / pgcrypto bridge lifecycle passed",
+  "integration": {
+    "passed": 6,
+    "failed": 0,
+    "realAuth": true,
+    "concurrency": [
+      "8 duplicate submissions ->1request",
+      "6 withdrawals ->1accepted",
+      "2 simultaneous global-admin demotions ->1retained",
+      "6 notification claims ->1lease"
+    ],
+    "serviceRole": "real JWT; worker and webhook RPCs allowed; private table read/write denied"
+  },
+  "backupBeforeReplay": {
+    "bytes": 698258,
+    "sha256": "1cddcfe5953e33cd84f6675813481e7c8da2423a4ee282747b9ec82d28e513c6",
+    "outsideGit": true,
+    "archiveListVerified": true
+  },
+  "remoteFixturesOrReset": false
+}

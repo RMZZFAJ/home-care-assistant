@@ -1,0 +1,964 @@
+# PROMPT MESTRE — AUDITORIA, CORREÇÃO E CONCLUSÃO DO HOME CARE ASSISTANT
+
+## 1. Missão e contexto
+
+Trabalhe diretamente no repositório GitHub:
+
+**Repositório:** `RMZZFAJ/home-care-assistant`  
+**Branch de trabalho atual:** `master`  
+**Stack:** Next.js 16, React 19, TypeScript, Supabase Auth, PostgreSQL, RLS, Zod, Vitest e Playwright.
+
+Esta é a continuação de uma implementação já existente. Não crie um projeto novo, não recomece do zero e não substitua indiscriminadamente o código existente.
+
+O objetivo é **auditar, corrigir, implementar e testar o que falta para entregar um sistema funcional, coerente, seguro e utilizável de gestão de requisições de insumos para Home Care**, com arquitetura multipaciente e possibilidade de evolução para SaaS.
+
+Considere como ponto de partida os commits já publicados:
+
+- `36fdfd8` — integridade da submissão e protocolos.
+- `38486e7` — estoque por custódia e escopo multipaciente.
+- `5b37a72` — histórico autorizado de requisições.
+- `c603dec` — recuperação de acesso e correspondência de catálogo.
+- `95a2d48` — documentação de auditoria e CI.
+
+Não presuma que o relatório anterior está integralmente correto. Ele é uma fonte de contexto, não substitui a inspeção do código.
+
+### Resultado esperado
+
+Ao concluir, quero:
+
+1. Corrigir todas as falhas críticas de integridade, segurança e banco.
+2. Finalizar os módulos operacionais prioritários, não apenas criar suas tabelas.
+3. Implementar a administração necessária para operar o sistema.
+4. Garantir isolamento entre pacientes e permissões verificadas no servidor e no banco.
+5. Tornar o fluxo de requisição confiável, inclusive em falhas de rede e de notificação.
+6. Criar testes que comprovem os comportamentos importantes.
+7. Atualizar a documentação para que reflita o código real.
+8. Entregar um relatório objetivo do que está concluído, do que permanece pendente e de como validar e implantar.
+
+Não declare uma funcionalidade concluída apenas porque existem tabelas, tipos, endpoints ou documentação.
+
+---
+
+## 2. Regras obrigatórias de execução
+
+Antes de alterar qualquer arquivo:
+
+1. Leia `AGENTS.md`, `README.md`, `package.json`, `docs/AUDIT.md`, `docs/PROJECT_STATUS.md`, `docs/DATABASE.md`, `docs/SECURITY.md`, `docs/DEPLOYMENT.md`, `docs/ROADMAP.md` e `docs/WHATSAPP_AI.md`, caso existam.
+2. Inspecione toda a árvore de `src`, `supabase/migrations`, `supabase/seed.sql`, `.github/workflows` e `tests`.
+3. Verifique a branch, o HEAD, os commits recentes, o estado do working tree e os arquivos efetivamente publicados.
+4. Compare as migrações históricas com as incrementais e identifique constraints, triggers, funções, grants, políticas RLS e dependências.
+5. Verifique se o código local e o código remoto divergem. Não presuma que os dois ambientes possuem exatamente os mesmos arquivos.
+6. Identifique as funcionalidades existentes e reutilize-as sempre que possível.
+7. Crie uma lista de tarefas verificável e execute-a até onde o ambiente permitir.
+
+### Proteção do trabalho existente
+
+- Não apague, descarte, sobrescreva ou reverta alterações preexistentes sem autorização.
+- Não use comandos Git destrutivos.
+- Não altere migrações que possam já ter sido aplicadas.
+- Não execute `supabase db reset` em banco remoto.
+- Não aplique migrações remotas, não implante, não publique, não faça merge, não abra PR e não faça commit ou push sem autorização explícita.
+- Não altere segredos, credenciais ou configurações externas de forma irreversível.
+- Não use dados clínicos ou pessoais reais em testes, seeds, logs ou documentação.
+- Não exponha `SUPABASE_SERVICE_ROLE_KEY` no navegador, em respostas HTTP ou em variáveis `NEXT_PUBLIC_*`.
+- Não simule sucesso de uma integração que não está conectada.
+- Não desabilite RLS para fazer os testes passarem.
+
+Se precisar de credenciais, acesso a um provedor ou configuração externa que não esteja disponível, implemente o que puder com segurança, crie testes com mocks e registre objetivamente o impedimento.
+
+---
+
+## 3. P0 — Corrigir primeiro o protocolo e a integridade da submissão
+
+Esta é a primeira prioridade. Não avance considerando o fluxo de requisição concluído até verificar o problema de compatibilidade do protocolo.
+
+### 3.1. Constraint do protocolo
+
+Foi identificado que:
+
+- A migração inicial `20261019000100_initial_schema.sql` define uma constraint para o formato antigo `HC-YYYYMMDD-XXXXXXXX`.
+- A implementação posterior pretende gerar protocolos sequenciais, começando em `HC-000012`.
+- A documentação menciona uma migração `20261020001200` de compatibilidade.
+- Esse arquivo não foi localizado na listagem publicada de migrações de `master`.
+
+Investigue o estado real do repositório e determine se a correção está ausente, tem outro nome ou foi implementada de outra forma.
+
+**Corrija a incompatibilidade por meio de uma nova migração incremental**, com nome e sequência coerentes com as migrações existentes. Nunca edite a migração inicial apenas para corrigir o problema.
+
+A migração deve:
+
+1. Preservar os protocolos históricos já gravados.
+2. Aceitar o formato histórico e o formato sequencial novo.
+3. Preservar a unicidade dos protocolos.
+4. Garantir que novas requisições gerem o protocolo sequencial esperado.
+5. Preservar a associação entre número, protocolo e requisição.
+6. Tratar corretamente a inicialização da sequência a partir de 12.
+7. Não reutilizar números já atribuídos.
+8. Ser segura para execução incremental e possuir verificações adequadas para os objetos que altera.
+9. Funcionar tanto em banco recém-criado quanto em um banco que já recebeu as migrações anteriores.
+
+Valide a cadeia completa em banco Supabase local limpo e, quando possível, teste também a transição a partir de um estado equivalente ao banco já migrado.
+
+Não considere `build`, `typecheck` ou `lint` suficientes para comprovar a correção do banco.
+
+### 3.2. Numeração sequencial
+
+O protocolo deve ser gerado no banco, de maneira concorrente e transacionalmente segura.
+
+Formato esperado:
+
+- `HC-000012`
+- `HC-000013`
+- `HC-000014`
+
+A sequência deve começar em 12, pois os protocolos físicos de 1 a 11 serão importados posteriormente.
+
+O número global deve ser único em todo o sistema, não apenas por paciente ou usuário.
+
+A geração precisa continuar correta quando dois usuários submetem requisições simultaneamente. Lacunas decorrentes de sequências PostgreSQL podem ser aceitáveis; reutilização ou duplicidade de números não é.
+
+### 3.3. Importação histórica
+
+Implemente ou prepare de forma efetiva um mecanismo administrativo de importação dos registros históricos, respeitando os protocolos originais.
+
+Requisitos:
+
+- Preservar o protocolo original informado no documento físico.
+- Validar duplicidade de protocolo e de registro importado.
+- Não gerar notificações retroativas.
+- Não enviar mensagens reais durante importações.
+- Impedir que a mesma importação crie registros duplicados quando repetida.
+- Registrar quem importou, quando importou e o resultado.
+- Validar paciente, produtos, datas e dados obrigatórios.
+- Produzir relatório de registros importados, rejeitados e pendentes de correção.
+- Não misturar o protocolo físico histórico com a sequência automática de novos protocolos.
+- Não alterar ou consumir a sequência automática ao importar os números históricos.
+
+Se a importação por planilha não puder ser finalizada com segurança nesta etapa, entregue pelo menos o modelo de dados, a API autorizada, a validação, os testes e a documentação do formato de entrada. Não simule uma importação concluída.
+
+### 3.4. Integridade e idempotência
+
+Audite a função SQL `submit_requisition`, a API `src/app/api/requisitions/route.ts` e o wizard de submissão.
+
+Comprove que:
+
+- O cliente não define o protocolo oficial.
+- O banco é a fonte de autoridade para protocolo, identidade e dados canônicos do catálogo.
+- O payload é validado no servidor e novamente nas operações SQL críticas.
+- A chave idempotente é preservada durante tentativas de reenvio da mesma submissão.
+- Repetir uma submissão não cria outra requisição.
+- Reutilizar a mesma chave com conteúdo diferente é rejeitado.
+- A resposta de repetição recupera o registro e o recibo persistidos originalmente.
+- Duas submissões concorrentes com a mesma chave não geram duplicidade.
+- Uma falha intermediária provoca rollback dos registros que precisem ser atômicos.
+- O recibo não depende dos dados atuais do formulário após a confirmação.
+- Erros de infraestrutura, autenticação, validação e conflito são diferenciados.
+- Os logs não registram conteúdo pessoal desnecessário.
+
+Crie testes de integração no PostgreSQL/Supabase local para os casos de concorrência, idempotência, conflito de payload e rollback. Não se limite a testes unitários de funções TypeScript.
+
+---
+
+## 4. P0 — Garantir o isolamento multipaciente e as permissões
+
+A pessoa assistida deve ser a unidade central de autorização.
+
+O sistema deve suportar vários pacientes, cada um com usuários, familiares, profissionais, supervisores, estoque, requisições, notificações, inventários e configurações devidamente associados.
+
+### 4.1. Escopo de autorização
+
+Audite `profiles`, `care_recipients`, `care_recipient_memberships`, `can_access_recipient`, as funções SQL e todas as políticas RLS.
+
+Não confie somente na interface, em IDs enviados pelo navegador ou em verificações feitas apenas na rota HTTP.
+
+Cada consulta, alteração e operação de banco precisa validar o escopo de paciente.
+
+Implemente ou complete:
+
+- Associação explícita de usuário a paciente.
+- Estado ativo ou revogado do usuário.
+- Estado ativo ou inativo do paciente.
+- Permissões por associação, sem conceder acesso implícito a todos os pacientes.
+- Separação entre administrador global e administrador limitado.
+- Escopo de supervisores conforme os pacientes ou equipes autorizados.
+- Restrições de escrita de acordo com o papel e as permissões explícitas.
+- Revogação imediata de acesso após desativação do perfil ou remoção do vínculo.
+- Verificação de acesso a detalhes, histórico, estoque, movimentações, inventários, notificações e auditoria.
+
+Uma pessoa autorizada a visualizar o histórico de um paciente deve conseguir consultar todas as requisições desse paciente, mesmo que tenham sido criadas por outros usuários. Não deve conseguir consultar outro paciente sem autorização.
+
+### 4.2. Testes de segurança obrigatórios
+
+Crie pelo menos dois pacientes fictícios, A e B, e usuários com permissões diferentes.
+
+Comprove os seguintes cenários:
+
+1. Usuário vinculado a A consulta requisições de A.
+2. Usuário vinculado a A não consulta requisições de B.
+3. Usuário sem vínculo não acessa dados de nenhum paciente.
+4. Usuário revogado perde acesso.
+5. Profissional não adquire privilégios administrativos ao manipular o payload.
+6. Leitor consulta dados autorizados, mas não cria requisições nem movimenta estoque.
+7. Administrador limitado não atua fora de seu escopo.
+8. Administrador global acessa somente as operações explicitamente permitidas ao papel.
+9. IDs de requisição, paciente, produto ou movimentação alterados no navegador não permitem acesso horizontal.
+10. As mesmas restrições são aplicadas diretamente pelo PostgreSQL/RLS.
+
+Execute os testes com identidades autenticadas distintas no Supabase local. Se algum teste não puder ser executado, identifique exatamente o que faltou e não declare isolamento comprovado.
+
+### 4.3. Matriz de permissões
+
+Documente e implemente uma matriz explícita para:
+
+- Administrador global.
+- Administrador limitado.
+- Supervisor.
+- Profissional da equipe de cuidado.
+- Familiar.
+- Leitor.
+
+Considere permissões distintas para:
+
+- Consultar pacientes.
+- Gerenciar associações de usuários.
+- Criar e consultar requisições.
+- Consultar histórico.
+- Gerenciar catálogo.
+- Consultar saldos.
+- Registrar movimentações.
+- Contar estoque.
+- Aprovar inventários.
+- Consultar e reprocessar notificações.
+- Consultar auditoria.
+
+Não use apenas o nome do papel como substituto de todas as permissões. Preserve os vínculos e as permissões por paciente.
+
+---
+
+## 5. P1 — Concluir a administração de usuários e pacientes
+
+O relatório anterior confirmou que boa parte dessa administração ainda não existe na interface. Não basta documentar que o administrador deve usar o painel Supabase.
+
+Crie uma área administrativa protegida, integrada ao modelo real do banco.
+
+### 5.1. Gestão de usuários
+
+Permitir, de acordo com a autorização:
+
+- Consultar usuários.
+- Criar ou convidar usuários.
+- Informar nome e e-mail.
+- Definir papel.
+- Associar um ou mais pacientes.
+- Configurar permissões específicas por paciente.
+- Ativar, desativar ou revogar acesso.
+- Consultar o histórico administrativo.
+- Atualizar associações e permissões.
+- Visualizar erros de criação ou convite.
+- Reenviar convite ou recuperação de acesso quando aplicável.
+
+Requisitos de segurança:
+
+- Não armazenar senhas em texto puro.
+- Não permitir que o usuário escolha ou eleve o próprio papel.
+- Não expor a chave de serviço no cliente.
+- Operações administrativas do Supabase Auth devem ocorrer exclusivamente em ambiente servidor autorizado.
+- Validar novamente a autorização no servidor para cada operação.
+- Registrar alterações de papel, escopo, estado e associação.
+- Impedir que a desativação de um usuário deixe vínculos privilegiados utilizáveis.
+
+Se houver uma operação administrativa que dependa de `auth.admin`, use uma função server-side protegida, com validação de sessão e autorização explícita. Nunca exponha o cliente privilegiado ao navegador.
+
+### 5.2. Gestão de pacientes
+
+Criar uma interface para:
+
+- Cadastrar paciente.
+- Editar informações administrativas.
+- Ativar e inativar paciente.
+- Associar usuários.
+- Consultar profissionais e familiares vinculados.
+- Visualizar resumo operacional do paciente.
+- Consultar requisições, estoque e alertas do paciente.
+- Consultar eventos administrativos relevantes.
+
+Não permita exclusão física de um paciente com histórico operacional, movimentações ou registros relacionados. Utilize inativação e preserve os dados históricos.
+
+Não adicione dados clínicos desnecessários ao cadastro. A finalidade principal deste sistema é a gestão operacional de Home Care.
+
+### 5.3. Seleção do paciente ativo
+
+Substitua a dependência rígida de `CARE_RECIPIENT_ID` como único contexto operacional.
+
+A aplicação deve permitir selecionar um paciente entre aqueles autorizados para o usuário.
+
+O paciente selecionado deve ser validado no servidor a cada operação. A seleção feita no navegador não é autorização.
+
+Mantenha uma forma segura de configurar um paciente padrão, se necessária, sem impedir o crescimento para múltiplos pacientes.
+
+---
+
+## 6. P1 — Finalizar o catálogo de produtos
+
+Existe um catálogo com IDs estáveis e resolução de aliases, mas falta administração funcional.
+
+Crie uma área de gestão de catálogo que permita:
+
+- Listar e pesquisar produtos.
+- Criar produtos.
+- Editar nome, categoria, unidade e aliases.
+- Ativar e inativar produtos.
+- Ordenar os produtos exibidos.
+- Consultar aliases existentes.
+- Detectar aliases duplicados ou ambíguos.
+- Consultar o histórico de alterações.
+- Exibir inconsistências de cadastro.
+
+### Regras de integridade
+
+1. Não altere IDs históricos de forma indiscriminada.
+2. Preserve referências de requisições e movimentações já registradas.
+3. Não exclua fisicamente produtos com histórico associado.
+4. Produtos inativos não podem ser utilizados em novas requisições nem em novas movimentações que exijam produto ativo.
+5. O histórico deve continuar exibindo os dados canônicos registrados à época da operação.
+6. A normalização deve tratar acentos, maiúsculas, espaços e aliases.
+7. Correspondências ambíguas devem ser apresentadas para resolução, nunca escolhidas silenciosamente.
+8. As regras de unidade e categoria devem ser validadas no servidor e no banco.
+9. Alterações administrativas devem gerar eventos de auditoria.
+
+Confira o catálogo esperado do projeto e compare-o com os produtos efetivamente existentes no banco e na interface. Não invente produtos nem use dados fictícios como se fossem registros de produção.
+
+Crie um relatório de divergências entre catálogo esperado, catálogo cadastrado, aliases e produtos inativos.
+
+---
+
+## 7. P1 — Finalizar o estoque por custódia
+
+O sistema precisa ter um catálogo único de produtos e saldos segregados por paciente e local de custódia.
+
+As duas custódias operacionais são:
+
+- `FAMILY`: estoque sob responsabilidade da família.
+- `CARE_TEAM`: estoque em posse da equipe de cuidado.
+
+Não crie catálogos diferentes para família e equipe. O produto é o mesmo; o que muda é a localização/custódia e o saldo correspondente.
+
+### 7.1. Interface de estoque
+
+Criar telas para:
+
+- Consultar estoque da família.
+- Consultar estoque da equipe.
+- Consultar saldo total por produto, sem perder a distinção entre custódias.
+- Registrar entradas.
+- Registrar saídas.
+- Transferir itens entre família e equipe.
+- Registrar ajustes justificados.
+- Consultar histórico de movimentações.
+- Pesquisar por produto e período.
+- Visualizar saldo anterior, quantidade movimentada e saldo resultante.
+- Consultar divergências e itens críticos.
+
+O estoque operacional da equipe deve ser destacado, pois representa o que os profissionais efetivamente têm disponível para utilizar.
+
+### 7.2. Permissões de estoque
+
+Somente administradores autorizados podem gravar ou alterar o estoque oficial.
+
+Os demais usuários devem ter acesso de leitura conforme seus vínculos e permissões.
+
+A contagem por profissionais pode ser permitida sem dar a eles poder para alterar diretamente o saldo oficial. O inventário deve ser submetido para revisão e aprovação.
+
+Toda operação de escrita deve ser autorizada novamente no servidor e no banco.
+
+### 7.3. Movimentações transacionais
+
+Audite `record_stock_movement` e `src/app/api/stock/movements/route.ts`.
+
+Garanta:
+
+- Quantidade positiva e válida.
+- Origem e destino compatíveis com o tipo de movimentação.
+- Paciente e produto válidos.
+- Justificativa obrigatória quando aplicável.
+- Idempotência.
+- Auditoria.
+- Integridade transacional.
+- Prevenção de concorrência inconsistente.
+- Ausência de edição direta do saldo calculado.
+- Proteção contra transferências que produzam saldos inconsistentes.
+
+Transferências devem ser atômicas: a saída de uma custódia e a entrada na outra precisam ocorrer juntas ou não ocorrer.
+
+A correção de uma movimentação histórica deve ser feita por movimento compensatório, não por edição silenciosa do registro original.
+
+### 7.4. Saldo negativo
+
+Não mantenha decisões contraditórias entre documentação, regras de negócio e código.
+
+O comportamento padrão deve impedir saldo negativo. Caso o responsável pelo produto confirme uma exceção administrativa, ela deve ser explícita, restrita, justificada e auditada.
+
+Não permita saldo negativo silenciosamente nem por erro de concorrência.
+
+---
+
+## 8. P1 — Inventário semanal com aprovação
+
+As tabelas de inventário não bastam. Implemente o fluxo operacional completo.
+
+Etapas mínimas:
+
+1. Criar sessão de inventário para um paciente e uma custódia.
+2. Registrar responsável e horário.
+3. Capturar ou calcular o saldo esperado no início da contagem.
+4. Registrar quantidade contada por produto.
+5. Calcular divergência.
+6. Solicitar justificativa quando houver divergência.
+7. Submeter para revisão.
+8. Aprovar ou rejeitar.
+9. Aplicar ajustes somente após aprovação autorizada.
+10. Registrar movimentos compensatórios para as diferenças aprovadas.
+11. Preservar o inventário original e sua trilha de auditoria.
+
+A aplicação dos ajustes deve ser idempotente. Aprovar duas vezes não pode gerar duas movimentações.
+
+O saldo esperado deve ter uma referência temporal consistente. Movimentações ocorridas durante a contagem não podem produzir correções silenciosamente incorretas.
+
+Inclua estados de carregamento, erro, vazio, sucesso e conflito de concorrência.
+
+Crie testes para inventário sem divergência, divergência aprovada, divergência rejeitada, tentativa de aprovação não autorizada, dupla aprovação e falha parcial.
+
+---
+
+## 9. P1 — Alertas de estoque e notificações
+
+A estrutura `requisition_notifications` representa apenas uma parte do mecanismo. Não trate a existência dessa tabela como implementação de envio.
+
+### 9.1. Regras de alerta por custódia
+
+O modelo deve permitir regras configuráveis de estoque baixo e crítico.
+
+A política inicial precisa distinguir:
+
+- **Estoque da família:** alertas direcionados à família ou aos responsáveis administrativos autorizados.
+- **Estoque da equipe:** alertas destinados à equipe e à supervisão, podendo incluir a família conforme a regra configurada.
+- **Alertas críticos:** prioridade superior e deduplicação apropriada.
+- **Reabastecimento:** atualização do alerta quando houver entrada ou transferência suficiente para resolver a condição.
+
+O saldo da família não deve mascarar a falta de itens na custódia da equipe.
+
+Não codifique os limites como números espalhados pelo frontend. Crie uma configuração clara por produto, paciente e custódia, com valores padrão documentados.
+
+### 9.2. Persistência e processamento assíncrono
+
+Uma requisição precisa ser salva independentemente do resultado das notificações.
+
+Implemente ou complete:
+
+- Registro individual por destinatário e canal.
+- Estado `pending`, `processing`, `sent`, `failed` ou equivalente consistente.
+- Número de tentativas.
+- Referência do provedor.
+- Erro técnico resumido e seguro.
+- Horários de tentativa e confirmação.
+- Idempotência da mensagem.
+- Estratégia de retry com limite e backoff.
+- Prevenção de processamento duplicado.
+- Recuperação de tarefas interrompidas.
+- Consulta do estado atual.
+- Reprocessamento administrativo autorizado.
+- Auditoria de alterações de estado.
+
+Se for adotada uma tabela outbox, worker ou mecanismo de fila, documente a arquitetura e garanta que a criação dos registros de notificação esteja coordenada com a persistência da requisição.
+
+### 9.3. WhatsApp
+
+Não afirme que existe integração real com WhatsApp se ainda não houver provedor conectado.
+
+Quando a configuração externa não estiver disponível:
+
+- Implemente a abstração do provedor.
+- Crie mocks determinísticos.
+- Teste sucesso, falha, timeout, retry e duplicidade.
+- Mantenha a interface honesta sobre o estado da entrega.
+- Documente as credenciais e configurações exigidas.
+
+A integração real deve usar a API oficial apropriada, validar webhooks e tratar confirmação de entrega. Não envie mensagens reais durante testes automatizados.
+
+---
+
+## 10. P1 — Tela de sucesso da requisição e estados de notificação
+
+A tela de sucesso deve separar claramente dois fatos:
+
+1. A requisição foi persistida no banco.
+2. As notificações estão sendo processadas e podem ter resultados diferentes.
+
+Nunca faça o usuário interpretar uma falha de WhatsApp como se a requisição não tivesse sido salva.
+
+Após salvar com sucesso, mostre:
+
+- Protocolo oficial.
+- Paciente.
+- Solicitante.
+- Data e hora.
+- Resumo dos itens e estoque informado.
+- Estado de persistência.
+- Estado individual das notificações.
+- Grupo destinatário: família, supervisão, equipe ou outro.
+- Destinatário efetivo, quando for seguro exibi-lo.
+- Canal.
+- Número de tentativas.
+- Última atualização.
+- Falha ou pendência, quando houver.
+- Ação para consultar novamente o estado.
+
+Estados de interface esperados:
+
+- Salvando requisição.
+- Requisição salva; notificações pendentes.
+- Notificações em processamento.
+- Todas as notificações concluídas.
+- Conclusão parcial.
+- Falha de notificação com requisição preservada.
+- Erro ao salvar a requisição.
+- Estado desconhecido por falha temporária de conexão.
+
+O frontend deve consultar o estado persistido no servidor. Não simule a conclusão com um temporizador.
+
+Se o usuário fechar a tela, a requisição e o processamento devem continuar recuperáveis ao retornar ao histórico.
+
+O botão de reenvio da requisição não deve criar outra requisição. O reprocessamento de notificações deve ser uma operação separada e autorizada.
+
+---
+
+## 11. P1 — Histórico de requisições
+
+Audite as telas e rotas existentes:
+
+- `src/app/historico/page.tsx`
+- `src/app/historico/[id]/page.tsx`
+- `src/components/requisitions/requisition-history.tsx`
+- `src/app/api/requisitions/route.ts`
+- `src/app/api/requisitions/[id]/route.ts`
+
+Complete o histórico com:
+
+- Seleção de paciente autorizado.
+- Busca por protocolo.
+- Filtro por status.
+- Filtro por período com limites inclusivos e exclusivos bem definidos.
+- Paginação server-side.
+- Ordenação consistente.
+- Estados de carregamento, erro e vazio.
+- Detalhes persistidos do registro.
+- Solicitante e data.
+- Histórico de transições de status.
+- Situação individual das notificações.
+- Reimpressão do recibo.
+- Acesso autorizado à trilha de auditoria.
+- Tratamento de registro inexistente ou fora do escopo.
+
+Não dependa de `created_by` para restringir o histórico ao usuário que criou a requisição. A regra principal é a autorização de acesso ao paciente.
+
+A consulta precisa continuar segura mesmo quando o usuário alterar manualmente o ID da requisição na URL.
+
+A impressão pelo navegador pode ser mantida como recurso, mas deixe claro que se trata de impressão/Salvar como PDF, não de um PDF oficial gerado pelo servidor.
+
+---
+
+## 12. P1 — Estados de carregamento, erros e experiência de uso
+
+Audite todas as páginas e operações principais.
+
+A aplicação não pode parecer congelada nem deixar o usuário sem saber se uma operação foi concluída.
+
+Implemente:
+
+- Indicadores de carregamento.
+- Desabilitação de ações durante operações incompatíveis.
+- Mensagens de erro claras.
+- Possibilidade de tentar novamente quando seguro.
+- Estados vazios com orientação útil.
+- Feedback de sucesso.
+- Tratamento de sessão expirada.
+- Tratamento de ausência de permissão.
+- Tratamento de indisponibilidade do banco.
+- Prevenção de cliques duplicados.
+- Recuperação de estado após falha de rede.
+- Cancelamento ou descarte seguro de requisições obsoletas quando aplicável.
+
+Padronize os códigos de erro da API, preservando mensagens amigáveis ao usuário.
+
+Considere códigos como:
+
+- `AUTH_REQUIRED`
+- `SESSION_EXPIRED`
+- `ACCESS_DENIED`
+- `PROFILE_INACTIVE`
+- `PATIENT_NOT_FOUND`
+- `PRODUCT_NOT_FOUND`
+- `PRODUCT_ALIAS_AMBIGUOUS`
+- `INVALID_INPUT`
+- `INVALID_QUANTITY`
+- `IDEMPOTENCY_CONFLICT`
+- `REQUEST_SAVE_FAILED`
+- `STOCK_INSUFFICIENT`
+- `NOTIFICATION_FAILED`
+
+A lista final deve corresponder aos erros realmente implementados. Não crie códigos decorativos sem tratamento correspondente.
+
+Não exponha stack traces, detalhes internos do PostgreSQL, tokens ou segredos nas respostas.
+
+---
+
+## 13. P1 — Auditoria administrativa
+
+Implemente uma trilha de auditoria útil e protegida para as operações sensíveis.
+
+Registrar, conforme a necessidade:
+
+- Criação e inativação de pacientes.
+- Criação e revogação de usuários.
+- Alteração de papéis e permissões.
+- Associação e remoção de vínculos.
+- Alteração de produtos e aliases.
+- Movimentações de estoque.
+- Aprovação e rejeição de inventários.
+- Importações históricas.
+- Alterações de configuração de alertas.
+- Reprocessamento de notificações.
+- Mudanças de status de requisições.
+
+Cada evento deve conter ator, ação, entidade, identificador, data e metadados mínimos necessários.
+
+Não registre senhas, tokens, dados clínicos desnecessários ou payloads completos com informações pessoais.
+
+Os registros de auditoria não devem ser editáveis por usuários comuns. As telas de auditoria devem respeitar escopo de paciente e permissões administrativas.
+
+---
+
+## 14. P2 — Recuperação de acesso e autenticação
+
+Revise o fluxo existente de login, logout, callback OAuth e recuperação de senha.
+
+Garanta:
+
+- Mensagens seguras que não revelem se uma conta existe.
+- Validação de redirecionamentos, rejeitando destinos externos não autorizados.
+- Tratamento de erros da troca de código OAuth.
+- Tratamento de sessão expirada.
+- Logout com feedback explícito em caso de falha.
+- Revogação de perfis inativos.
+- Proteção de rotas e APIs.
+- Provisionamento administrativo controlado de perfis para novos usuários.
+- Nenhum privilégio derivado de campos arbitrários enviados pelo navegador.
+
+Documente as configurações externas necessárias para Google OAuth e Supabase Auth.
+
+Não considere a autenticação completa apenas porque a tela de login funciona.
+
+---
+
+## 15. P2 — Contrato de dados e migrações
+
+Audite todas as migrações em ordem cronológica.
+
+Confira especialmente:
+
+- Constraints históricas.
+- Unicidade do protocolo.
+- Chaves estrangeiras.
+- Índices de consulta.
+- Sequências.
+- Idempotência.
+- Grants.
+- RLS.
+- Funções `SECURITY DEFINER`.
+- `search_path` das funções privilegiadas.
+- Permissões de execução.
+- Dependências entre funções e tabelas.
+- Compatibilidade de tipos e enums.
+- Views e suas permissões.
+- Dados legados.
+- Comportamento com registros inativos.
+
+Toda mudança de schema deve ser feita por migração incremental nova.
+
+Antes de concluir uma migração, teste:
+
+1. Aplicação em banco limpo.
+2. Aplicação sequencial de todas as migrações.
+3. Compatibilidade com os dados legados relevantes.
+4. Integridade das constraints após a mudança.
+5. Consultas e mutações sob diferentes usuários.
+6. Reexecução ou comportamento idempotente, quando aplicável.
+
+Não altere migrações anteriores apenas para fazer o reset passar.
+
+Atualize a documentação somente depois de confirmar o comportamento real. Não registre como existente uma migração que não esteja presente no repositório.
+
+---
+
+## 16. P2 — Testes automatizados e CI
+
+O relatório anterior registra 10 testes Vitest e validações locais, mas isso não comprova todos os fluxos críticos.
+
+Expanda a suíte de testes.
+
+### Testes unitários
+
+Cobrir:
+
+- Validação de requisição.
+- Ausência de quantidade solicitada.
+- Catálogo e aliases.
+- Correspondência ambígua.
+- Formatação de protocolo.
+- Tratamento de erros.
+- Idempotência.
+- Estados de notificação.
+- Cálculo de saldo.
+- Cálculo de divergência de inventário.
+- Regras de alertas.
+
+### Testes de integração
+
+Cobrir:
+
+- Persistência de requisição.
+- Geração de protocolo.
+- Reenvio idempotente.
+- Conflito de chave.
+- Concorrência.
+- Rollback.
+- Movimentações transacionais.
+- Transferências entre custódias.
+- Aprovação de inventário.
+- Reprocessamento de notificações.
+- Revogação de usuário.
+- Associação a paciente.
+- RLS com usuários diferentes.
+
+### Testes de interface e E2E
+
+Criar fluxos com dados fictícios para:
+
+- Login.
+- Recuperação de senha, quando testável.
+- Submissão de requisição.
+- Visualização do recibo.
+- Consulta ao histórico.
+- Detalhe e impressão.
+- Seleção de paciente.
+- Administração de usuários.
+- Administração de produtos.
+- Consulta de estoque.
+- Movimentação autorizada.
+- Contagem e aprovação de inventário.
+- Exibição de notificações.
+- Tratamento de falha de rede.
+
+Não dependa de uma sessão administrativa permanente ou de credenciais reais no CI.
+
+### CI
+
+Revise `.github/workflows/ci.yml`.
+
+Mantenha os passos de instalação, lint, typecheck, testes e build. Acrescente os testes de integração e verificações de migrações que forem viáveis e determinísticos.
+
+O CI não pode enviar mensagens reais, alterar bancos remotos ou utilizar segredos de produção.
+
+Inclua uma verificação automatizada que impeça a reintrodução do conceito funcional `requestedQuantity` ou `requested_quantity` em código ativo e em novas migrações, sem modificar migrações históricas apenas para apagar referências antigas.
+
+A regra deve diferenciar referências legadas preservadas de novas referências funcionais.
+
+---
+
+## 17. P2 — Documentação e configuração
+
+Ao final, atualize:
+
+- `README.md`
+- `docs/AUDIT.md`
+- `docs/PROJECT_STATUS.md`
+- `docs/DATABASE.md`
+- `docs/SECURITY.md`
+- `docs/DEPLOYMENT.md`
+- `docs/ROADMAP.md`
+- `docs/WHATSAPP_AI.md`
+
+Documente:
+
+- Arquitetura atual.
+- Papéis e matriz de permissões.
+- Fluxo de autenticação.
+- Modelo multipaciente.
+- Estrutura do estoque por custódia.
+- Regras de movimentação.
+- Inventário e aprovação.
+- Geração e importação de protocolos.
+- Idempotência.
+- Notificações e retries.
+- Variáveis de ambiente.
+- Configuração local.
+- Execução dos testes.
+- Aplicação de migrações.
+- Limitações conhecidas.
+- Procedimento seguro de deploy.
+
+Crie ou atualize `.env.example` com nomes e descrições das variáveis necessárias, sem valores secretos.
+
+Não documente valores fictícios como credenciais válidas.
+
+---
+
+## 18. Critérios de aceite
+
+A tarefa não está concluída enquanto os critérios críticos abaixo não forem comprovados.
+
+### A. Requisição
+
+- [ ] Não existe quantidade solicitada no contrato funcional da requisição.
+- [ ] Quantidades de estoque continuam disponíveis para movimentações e inventários.
+- [ ] O protocolo sequencial inicia em 12.
+- [ ] Protocolos históricos continuam válidos.
+- [ ] A constraint aceita os formatos necessários.
+- [ ] Não há protocolo duplicado sob concorrência.
+- [ ] Reenvio idempotente não cria duplicidade.
+- [ ] Payload diferente com a mesma chave é rejeitado.
+- [ ] O recibo é reconstruído a partir dos dados persistidos.
+- [ ] Falha de notificação não invalida a requisição salva.
+
+### B. Segurança
+
+- [ ] Cada operação verifica o escopo de paciente.
+- [ ] RLS foi testada com usuários distintos.
+- [ ] O acesso horizontal entre pacientes foi testado negativamente.
+- [ ] Usuários revogados perdem acesso.
+- [ ] Papéis não podem ser manipulados pelo navegador.
+- [ ] Operações administrativas são verificadas no servidor.
+- [ ] A chave de serviço nunca chega ao cliente.
+- [ ] Movimentações e alterações sensíveis são auditadas.
+
+### C. Administração
+
+- [ ] Gestão de usuários funcional.
+- [ ] Associação de usuários a pacientes funcional.
+- [ ] Gestão de pacientes funcional.
+- [ ] Gestão de catálogo funcional.
+- [ ] Produtos históricos preservados.
+- [ ] Permissões administrativas verificadas.
+
+### D. Estoque e inventário
+
+- [ ] Saldo da família separado do saldo da equipe.
+- [ ] Transferências atômicas.
+- [ ] Ajustes justificados e auditados.
+- [ ] Estoque oficial protegido contra escrita não autorizada.
+- [ ] Inventário com contagem, divergência, revisão e aprovação.
+- [ ] Aprovação idempotente.
+- [ ] Alertas distinguem custódias.
+
+### E. Notificações
+
+- [ ] Estado de cada destinatário é persistido.
+- [ ] Falhas e retries são rastreáveis.
+- [ ] Duplicidades são prevenidas.
+- [ ] Tela de sucesso distingue persistência e envio.
+- [ ] A ausência de provedor não é apresentada como envio concluído.
+- [ ] Testes não disparam mensagens reais.
+
+### F. Qualidade
+
+- [ ] `npm run lint`
+- [ ] `npm run typecheck`
+- [ ] `npm test`
+- [ ] `npm run build`
+- [ ] Testes E2E relevantes.
+- [ ] Testes RLS multiusuário.
+- [ ] `supabase db reset --local`, quando disponível e seguro.
+- [ ] `supabase db lint --local`, quando disponível.
+- [ ] `git diff --check`
+- [ ] Documentação sincronizada com o código.
+
+Se algum critério não puder ser concluído, registre-o como pendente, com causa, risco e próximo passo. Não marque como aprovado por inferência.
+
+---
+
+## 19. Ordem de execução
+
+Execute na seguinte ordem:
+
+**Fase 1 — Auditoria e integridade**
+1. Confirmar HEAD e arquivos reais.
+2. Corrigir a divergência da migração do protocolo.
+3. Validar constraints, sequência, idempotência e concorrência.
+4. Corrigir riscos de autorização críticos.
+5. Rodar testes de banco e submissão.
+
+**Fase 2 — Segurança multipaciente**
+6. Completar matriz de permissões.
+7. Revisar RLS e funções SQL.
+8. Criar testes com pacientes A e B.
+9. Corrigir todas as falhas de isolamento.
+
+**Fase 3 — Administração**
+10. Implementar gestão de pacientes.
+11. Implementar gestão de usuários e associações.
+12. Implementar gestão de catálogo e aliases.
+13. Implementar auditoria administrativa.
+
+**Fase 4 — Operação**
+14. Implementar interface de estoque por custódia.
+15. Implementar movimentações e transferências.
+16. Implementar inventário e aprovação.
+17. Implementar alertas configuráveis.
+
+**Fase 5 — Requisições e notificações**
+18. Finalizar histórico e filtros.
+19. Finalizar tela de sucesso.
+20. Implementar fila ou outbox e processamento assíncrono.
+21. Integrar o provedor real somente quando houver configuração autorizada.
+
+**Fase 6 — Validação final**
+22. Expandir testes unitários, integração e E2E.
+23. Revisar CI.
+24. Atualizar documentação.
+25. Executar as validações disponíveis.
+26. Emitir relatório final de aceite e pendências.
+
+Se uma fase encontrar um bloqueio de arquitetura, corrija-o antes de empilhar novas funcionalidades sobre uma base inconsistente.
+
+Não pare após produzir um plano ou apenas listar arquivos. Implemente as etapas possíveis, valide cada uma e continue até concluir o escopo autorizado.
+
+---
+
+## 20. Relatório final obrigatório
+
+Ao terminar, apresente um relatório conciso, mas tecnicamente verificável, contendo:
+
+1. **Estado inicial:** branch, HEAD e divergências encontradas.
+2. **Falhas críticas identificadas:** causa, consequência e correção aplicada.
+3. **Implementações concluídas:** funcionalidades realmente operacionais.
+4. **Arquivos alterados:** agrupados por módulo.
+5. **Migrações criadas:** nome, finalidade, dependências e validações.
+6. **Segurança:** matriz de permissões e resultados dos testes RLS.
+7. **Testes:** comandos executados e resultado real de cada um.
+8. **Limitações:** funcionalidades que ainda dependem de configuração externa ou trabalho adicional.
+9. **Riscos residuais:** gravidade e mitigação.
+10. **Próximos passos:** ações necessárias para homologação e produção.
+
+Diferencie explicitamente:
+
+- Implementado e testado.
+- Implementado, mas não testado de ponta a ponta.
+- Estruturado, mas ainda sem interface ou processamento.
+- Dependente de configuração externa.
+- Não implementado.
+
+Não afirme que o sistema está pronto para produção apenas porque lint, typecheck, testes unitários e build passaram.
+
+**Autorização desta execução:** auditar e implementar no ambiente de trabalho autorizado, preservando o estado existente. Não fazer commit, push, merge, PR, migração remota ou deploy sem autorização expressa.
+
+Comece pela auditoria do HEAD atual e pela incompatibilidade do protocolo. Corrija primeiro o que pode impedir a persistência de uma requisição válida. Em seguida, avance pelas fases, preservando o trabalho já publicado e validando cada mudança antes de continuar.

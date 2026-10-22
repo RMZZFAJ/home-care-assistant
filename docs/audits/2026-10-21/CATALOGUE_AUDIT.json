@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-10-21T23:45:40.874Z",
+  "method": "Local development database; BEGIN READ ONLY; no patient identities queried.",
+  "reference": {
+    "source": "src/lib/catalog.ts",
+    "sha256": "d6d8b1d5d8698cf19dbf9f87d9f39064c998209626e4f79ff369c6ebd08f2685",
+    "count": 29
+  },
+  "local": {
+    "lastMigration": "20261020003200",
+    "migrationCount": 33,
+    "hasPatientCatalogue": true,
+    "patientCount": 3,
+    "emptyCatalogueCount": 0,
+    "comparison": {
+      "expectedCount": 29,
+      "actualCount": 29,
+      "missingIds": [],
+      "unexpectedIds": [],
+      "attributeDifferences": [
+        {
+          "id": "monuril",
+          "field": "aliases",
+          "expected": [
+            "fosfomicina",
+            "fosfomicina (monuril) 3g",
+            "monuril",
+            "monuril 3g"
+          ],
+          "actual": [
+            "fosfomicina (monuril) 3g",
+            "monuril",
+            "monuril 3g"
+          ]
+        }
+      ]
+    },
+    "ambiguities": [],
+    "inactiveTemplateIds": []
+  },
+  "patientDefinitions": {
+    "count": 87,
+    "scopes": 3,
+    "exclusive": 0,
+    "inactive": 0,
+    "overrides": {
+      "name": 0,
+      "category": 0,
+      "unit": 0,
+      "aliases": 0,
+      "active": 0
+    },
+    "ambiguousTerms": 0
+  },
+  "limits": [
+    "Patient customizations are intentional capabilities, not automatic inconsistencies.",
+    "New patients start empty until explicit adoption.",
+    "Remote database reconciliation is recorded separately in EXECUTION.md."
+  ]
+}

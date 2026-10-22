@@ -1,202 +1,77 @@
-# Deploy
+# Ambiente e implantação
 
-## Pré-requisitos
+## Runtime
 
-- Conta Supabase com um projeto remoto criado.
-- Conta Vercel com acesso ao projeto.
-- Supabase CLI instalado (`supabase --version`).
-- Vercel CLI instalado (`vercel --version`).
+Desenvolvimento e CI usam Node 24.22.0 e npm 11.21.1. Vercel foi consultada
+em modo de leitura e utiliza a linha 24.x; o patch do runtime é controlado
+pela plataforma. O comando de instalação versionado seleciona npm 11.21.1.
 
-O Vercel CLI instalado para este ambiente é `64.7.0`. Se o comando não estiver
-no `PATH` do PowerShell, execute diretamente:
+Node 26 estava disponível, mas não constava no suporte Vercel verificado.
+npm 12 falhou na resolução limpa de dependência; TypeScript 7 não era
+aceito pelo parser do lint. O conjunto adota TS 6 e ESLint 10 com plugins
+compatíveis, sem forçar peers ou desativar regras.
 
-```powershell
-& "$env:APPDATA\npm\vercel.cmd" --version
+## Variáveis
+
+O template `.env.example` é a referência sem segredos. URL e chave pública
+Supabase são necessárias. A chave de serviço é exclusivamente server-side,
+para worker/webhook autorizados; não é necessária para contornar RLS.
+CARE_RECIPIENT_ID não define mais o contexto operacional.
+
+Auth exige Site URL e redirects aprovados, confirmação de e-mail, provedor
+OAuth quando utilizado e serviço de e-mail operacional. Localmente, Mailpit
+captura mensagens sem envio externo. WhatsApp exige configuração explícita;
+ausência de credenciais não pode produzir estado de entrega externo.
+
+## Atualização controlada
+
+1. Revisar diff, matriz, relatório de segurança e resultados locais.
+2. Confirmar a identidade do CLI, organização e ID do projeto remoto correto.
+3. Comparar migrations, metadados e relacionamentos nos bancos local e remoto.
+4. Resolver associações legadas desconhecidas sem inventar dados.
+5. Verificar backup recuperável do ambiente autorizado, sem publicar dados pessoais.
+6. Revisar migrations novas, ordem, locks, dados afetados e compatibilidade.
+7. Aplicar primeiro localmente e validar instalação limpa e evolução legada.
+8. Pré-validar a aplicação remota e aplicar somente a cadeia incremental pendente.
+9. Verificar Auth, OAuth, convites, usuário global inicial e configurações externas.
+10. Validar checks do PR, fazer merge quando apto e verificar o deploy resultante.
+
+A continuação de 21/10/2026 autoriza atualizar o banco local e remoto, fazer
+commits e push em blocos lógicos e abrir PR e fazer merge se as verificações
+confirmarem prontidão. Essa autorização substitui o limite anterior de somente
+consulta. Não dispensa a confirmação do destino e da identidade administrativa.
+Se a conta não tem acesso ao projeto, trocar silenciosamente o vínculo para
+outro projeto não resolve o impedimento.
+
+Use o perfil nomeado home-care-assistant, com identidade e projeto esperados
+registrados na configuração local da máquina. O diagnóstico de 21/10
+identificou uma conta padrão diferente da conta com acesso. Consulte
+[Identidade Supabase CLI](audits/2026-10-21/SUPABASE_CLI.md) antes de renovar
+o login; o acesso correto já foi confirmado por consulta de migrations.
+
+```sh
+npm run supabase:project -- doctor
+npm run supabase:project -- db push --dry-run
 ```
 
-## Deixar o banco remoto igual ao local
+Use o mesmo wrapper para a aplicação revisada. Ele recusa troca de identidade
+ou destino. O login explícito é `npm run supabase:project -- login`.
 
-O repositório usa migrações versionadas; não copie o banco manualmente e não use
-`db reset` no remoto.
+O banco local home-care-assistant é o ambiente de desenvolvimento e testes.
+Reset local requer a proteção descrita em [Testes](TESTING.md). Reset remoto,
+carga de fixtures remotas e alteração de migrations aplicadas não fazem parte
+da atualização. Falha de acesso remoto não invalida os testes locais, mas
+impede declarar a integração remota concluída.
 
-1. Faça login no Supabase CLI:
+Não aplicar o código novo contra schema antigo como se estivesse homologado.
+O provisionamento inicial de administrador global é uma operação privilegiada
+separada: o usuário deve existir em Auth e o perfil deve ter papel admin,
+status active e global_scope true. Não promover automaticamente metadata do
+navegador nem executar bootstrap remoto a partir do CI.
 
-   ```powershell
-   supabase login
-   ```
+Rollback de aplicação depende de compatibilidade do schema. Nunca apagar
+dados ou reescrever migrations para desfazer a intervenção. Corrigir por
+novas migrations e movimentos compensatórios quando pertinente.
 
-2. Entre na pasta do projeto e vincule o projeto remoto pelo `project-ref`
-   exibido no painel Supabase:
-
-   ```powershell
-   supabase link --project-ref SEU_PROJECT_REF
-   ```
-
-3. Confirme que as migrações locais estão completas e aplique-as no remoto:
-
-   ```powershell
-   supabase db push
-   ```
-
-O comando aplica somente migrações ainda ausentes na tabela de histórico remoto,
-em ordem. Revise especialmente as migrações `20261020000800` a `20261020001000`:
-elas alteram o contrato de itens, adicionam escopo multipaciente e criam funções
-transacionais de estoque. Faça primeiro em um projeto local/staging e verifique
-dependências antes de promover.
-
-Se `supabase link --project-ref` informar que a conta não tem privilégios,
-confirme no painel do Supabase que o projeto pertence à organização da conta
-autenticada no CLI ou aceite um convite de membro/administrador. Não use uma
-chave de outro projeto e não tente aplicar migrações até o vínculo funcionar.
-
-### Resultado da aplicação em 20/10/2026
-
-O projeto local está vinculado ao ref `qwfrqychokvhdzakibid`. Depois da
-renovação
-da sessão do Supabase CLI, os comandos abaixo foram executados com sucesso:
-
-```powershell
-supabase db push --yes
-```
-
-Resultado esperado após renovar a sessão:
-
-```text
-Remote database is up to date.
-```
-
-Na correção do erro `42501` de submissão, a migração
-`20261020001900_submit_requisition_security_definer.sql` foi aplicada com
-sucesso. Ela transforma a RPC de submissão em `SECURITY DEFINER`, sem conceder
-`UPDATE` direto de `public.requisitions` ao papel `authenticated`.
-
-`supabase migration list` deve confirmar que as migrações `20261020001300` até
-`20261020001900` estão presentes no remoto. Não foi usada chave de outro
-projeto,
-`SUPABASE_SERVICE_ROLE_KEY` ou conexão desconhecida.
-
-1. Crie a pessoa assistida e o perfil administrativo no remoto por procedimento
-   controlado. Não execute `supabase/seed.sql` em produção, pois ele contém
-   dados fictícios.
-
-2. Crie o usuário no Auth pelo painel Supabase ou pelo fluxo administrativo.
-   Depois insira o perfil correspondente:
-
-   ```sql
-   insert into public.profiles (id, full_name, role, status)
-   values ('UUID_DO_USUARIO_AUTH', 'Nome autorizado', 'admin', 'active');
-   ```
-
-3. Defina o UUID da pessoa assistida ativa em `CARE_RECIPIENT_ID`. Use o mesmo
-   valor nas variáveis da Vercel.
-
-Para reproduzir localmente, o comando destrutivo é permitido somente no banco
-local:
-
-```powershell
-supabase db reset
-```
-
-## Conectar e publicar na Vercel
-
-O projeto Vercel `home-care-assistant` está vinculado ao escopo
-`rmzzfajs-projects`,
-com URL atual `https://home-care-assistant.vercel.app`. As variáveis
-`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
-`NEXT_PUBLIC_APP_URL` e `CARE_RECIPIENT_ID` existem em Production e Preview.
-Os valores não são reproduzidos nesta documentação.
-
-Não publique uma versão que exija migrações ainda não aplicadas. A ordem segura
-validada nesta rodada foi:
-
-1. corrigir o acesso do Supabase;
-2. executar `supabase db push --yes`;
-3. validar Auth, perfil ativo e `CARE_RECIPIENT_ID`;
-4. executar as validações locais;
-5. executar `vercel deploy --prod` ou deixar o push acionar o deploy automático;
-6. verificar o alias `https://home-care-assistant.vercel.app` e testar login,
-   histórico e uma operação administrativa autorizada.
-
-### Configurar a Vercel pelo CLI
-
-1. Faça login. Se o comando `vercel` não for reconhecido no PowerShell, use o
-   caminho completo abaixo:
-
-   ```powershell
-   & "$env:APPDATA\npm\vercel.cmd" login
-   ```
-
-Para tornar `vercel` disponível nas próximas janelas do PowerShell, adicione o
-diretório global do npm ao PATH do usuário e abra um novo terminal:
-
-   ```powershell
-   $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
-   $userPath += ";$env:APPDATA\npm"
-   [Environment]::SetEnvironmentVariable("Path", $userPath, "User")
-   ```
-
-Cole somente os comandos dentro dos blocos; não cole os delimitadores de código.
-
-1. Na raiz do projeto, associe a pasta a um projeto Vercel existente ou crie um
-   novo:
-
-   ```powershell
-   vercel link
-   ```
-
-1. Cadastre as variáveis nos ambientes desejados. A chave anon é pública por
-   desenho; nunca cadastre uma service role como `NEXT_PUBLIC_*`:
-
-   ```powershell
-   vercel env add NEXT_PUBLIC_SUPABASE_URL production
-   vercel env add NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY production
-   vercel env add NEXT_PUBLIC_APP_URL production
-   vercel env add CARE_RECIPIENT_ID production
-   ```
-
-Repita para `preview` se quiser que previews usem um banco de staging. Prefira
-projetos Supabase separados para desenvolvimento, preview e produção.
-
-1. Valide e faça o primeiro deploy:
-
-   ```powershell
-   npm run lint
-   npm run typecheck
-   npm test
-   npm run build
-   vercel deploy --prod
-   ```
-
-1. No painel Supabase Auth, configure as URLs permitidas para o domínio Vercel:
-
-   - Site URL: `https://SEU_DOMINIO.vercel.app`
-   - Redirect URLs: `https://SEU_DOMINIO.vercel.app/**`
-
-1. Para habilitar login com Google, em Supabase abra `Authentication > Providers
-   > Google`, habilite o provedor e informe o Client ID e o Client Secret
-   criados no Google Cloud. Adicione como callback autorizado do Google:
-
-   `https://SEU_PROJECT_REF.supabase.co/auth/v1/callback`
-
-O botão Google já está disponível na tela de login e usa `/auth/callback` para
-concluir a sessão. O usuário OAuth ainda precisa ter um perfil ativo em
-`public.profiles`; para contas novas, crie o perfil após o primeiro login.
-
-1. Atualize `NEXT_PUBLIC_APP_URL` com o domínio final e redeploy:
-
-   ```powershell
-   vercel env add NEXT_PUBLIC_APP_URL production
-   vercel deploy --prod
-   ```
-
-## Checklist antes de produção
-
-- Migrações aplicadas com `supabase db push`.
-- Perfil ativo e pessoa assistida autorizada criados no remoto.
-- `CARE_RECIPIENT_ID` aponta para um registro ativo.
-- Login, logout e sessão expirada testados.
-- RLS validada com usuários de funções diferentes.
-- Backups e retenção configurados no Supabase.
-- Variáveis configuradas na Vercel sem segredos no cliente.
-- Consulte [PROJECT_STATUS.md](./PROJECT_STATUS.md) para o estado atual,
-  pendências, decisões e limitações conhecidas.
+O [estado verificável](PROJECT_STATUS.md) e a auditoria datada registram
+as ações efetivamente concluídas. Autorização não é evidência de execução.

@@ -1,0 +1,251 @@
+{
+  "role": {
+    "name": "service_role",
+    "inherit": true,
+    "bypassrls": true,
+    "superuser": false
+  },
+  "default_acl": [
+    {
+      "acl": "{postgres=X/postgres}",
+      "type": "f",
+      "schema": "all",
+      "creator": "postgres"
+    },
+    {
+      "acl": "{postgres=rwU/postgres}",
+      "type": "S",
+      "schema": "public",
+      "creator": "postgres"
+    },
+    {
+      "acl": "{postgres=X/postgres}",
+      "type": "f",
+      "schema": "public",
+      "creator": "postgres"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres}",
+      "type": "r",
+      "schema": "public",
+      "creator": "postgres"
+    }
+  ],
+  "schema_usage": true,
+  "table_privileges": [
+    {
+      "table": "audit_events",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "care_recipient_invitations",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "care_recipient_memberships",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "care_recipient_products",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "care_recipients",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "current_stock_balances",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "global_admin_guard",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "historical_requisition_imports",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "products",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "profiles",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "recipient_notification_settings",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "requisition_import_batches",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "requisition_items",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "requisition_notifications",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "requisition_observations",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "requisition_status_history",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "requisitions",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "stock_alert_events",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "stock_alert_rules",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "stock_inventories",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "stock_inventory_items",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    },
+    {
+      "table": "stock_movements",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "truncate": false
+    }
+  ],
+  "worker_functions": [
+    {
+      "owner": "postgres",
+      "definer": true,
+      "execute": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "signature": "claim_notification_jobs(integer,uuid,boolean)"
+    },
+    {
+      "owner": "postgres",
+      "definer": true,
+      "execute": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "signature": "complete_notification_job(uuid,uuid,text,text,text)"
+    },
+    {
+      "owner": "postgres",
+      "definer": true,
+      "execute": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "signature": "notification_webhook(text,text,uuid)"
+    },
+    {
+      "owner": "postgres",
+      "definer": true,
+      "execute": true,
+      "settings": [
+        "search_path=public"
+      ],
+      "signature": "validate_notification_job(uuid,uuid)"
+    }
+  ]
+}
