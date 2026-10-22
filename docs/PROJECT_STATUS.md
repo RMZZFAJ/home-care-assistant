@@ -16,10 +16,12 @@ Esta página aponta para a auditoria datada; não substitui seus resultados.
 - Serviço: sem privilégios diretos; cinco RPCs autorizadas explicitamente.
 - Windows: lint, typecheck, 69 testes unitários e build aprovados.
 - Linux: instalação e sete checks aprovados; ver escopo na auditoria.
-- E2E: 32 casos únicos aprovados em rodada completa e regressão direcionada;
-  a repetição integral no HEAD publicado depende do CI.
-- Publicação e merge: autorizados em 21/10, condicionados às verificações.
-- Produção: não considerar atualizada sem evidência de aplicação e smoke.
+- E2E publicado: 32/32 aprovados em rodada única no GitHub Actions.
+- CI Windows/Linux e banco/navegador: run 39697862144 aprovado no código 8fe30fe.
+- Publicação: [PR #1](https://github.com/RMZZFAJ/home-care-assistant/pull/1).
+  Seu estado registra a integração posterior e os checks do fechamento documental.
+- Prévia Vercel: READY; smoke HTTP login 200 e API sem sessão 401.
+- Produção: a implantação resultante é rastreada no PR e na Vercel.
 
 Leia o [checkpoint](audits/2026-10-20/CHECKPOINT.md), a
 [execução](audits/2026-10-20/EXECUTION.md), a matriz daquela auditoria e a

@@ -1055,14 +1055,14 @@
     "description": "Pipeline determinístico com migrations e E2E sem produção",
     "components": "package.json;package-lock.json;.github/workflows/ci.yml;vercel.json",
     "initial_state": "PARCIALMENTE IMPLEMENTADO",
-    "final_state": "IMPLEMENTADO, MAS NÃO VALIDADO INTEGRALMENTE",
+    "final_state": "IMPLEMENTADO E VALIDADO",
     "priority": "P1",
-    "evidence": ".github/workflows/ci.yml;scripts/verify-linux.sh",
-    "validation_scope": "Comandos locais equivalentes não substituem resultado publicado do workflow.",
-    "gaps": "Workflow local confirmado; aguarda run publicado completo.",
+    "evidence": ".github/workflows/ci.yml;docs/audits/2026-10-21/CI_RESULTS.json",
+    "validation_scope": "Workflow publicado passou em Windows, Linux e banco/navegador; 35 migrations, seis SQL, seis HTTP e 32 E2E, sem produção.",
+    "gaps": "Limites do escopo descrito; não equivale a homologação de ambientes não exercitados.",
     "change": "Pipeline determinístico com migrations e E2E sem produção",
     "acceptance": "workflow;comandos locais equivalentes",
-    "result": "Implementação e evidências relacionadas disponíveis; validação integral deste requisito ainda não atestada."
+    "result": "Aceite individual registrado em verification.json.validatedRequirementIds com as evidências indicadas."
   },
   {
     "id": "CI-03",
@@ -1070,14 +1070,14 @@
     "description": "Novo resultado publicado de GitHub Actions após autorização",
     "components": ".github/workflows/ci.yml;docs/audits/2026-10-21/EXECUTION.md",
     "initial_state": "BLOQUEADO, COM JUSTIFICATIVA DOCUMENTADA",
-    "final_state": "IMPLEMENTADO, MAS NÃO VALIDADO INTEGRALMENTE",
+    "final_state": "IMPLEMENTADO E VALIDADO",
     "priority": "P1",
-    "evidence": ".github/workflows/ci.yml;docs/audits/2026-10-21/EXECUTION.md",
-    "validation_scope": "Push está autorizado; aguardar URL/run e checks reais do PR.",
-    "gaps": "Commits logicos preparados; PR/checks em publicacao.",
+    "evidence": "docs/audits/2026-10-21/CI_RESULTS.json;https://github.com/RMZZFAJ/home-care-assistant/pull/1",
+    "validation_scope": "Run 39697862144 aprovado no código 8fe30fe; estado posterior de integração e implantação é rastreado no PR.",
+    "gaps": "Limites do escopo descrito; não equivale a homologação de ambientes não exercitados.",
     "change": "Novo resultado publicado de GitHub Actions após autorização",
     "acceptance": "push autorizado;checks do PR aguardam execução",
-    "result": "Implementação e evidências relacionadas disponíveis; validação integral deste requisito ainda não atestada."
+    "result": "Aceite individual registrado em verification.json.validatedRequirementIds com as evidências indicadas."
   },
   {
     "id": "AI-01",

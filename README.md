@@ -66,8 +66,8 @@ documentada em [Testes](docs/TESTING.md). Substitua CAMINHO_DO_BACKUP pelo camin
 real impresso pelo helper de backup. Nunca execute a suíte no remoto.
 
 A auditoria atual validou a cadeia 35 limpa/legada, seis suítes SQL, seis testes
-HTTP/Auth e 69 unitários. Os 32 casos E2E passaram no conjunto da rodada completa
-e da regressão corrigida; o CI publicado deverá repetir a suíte no HEAD final.
+HTTP/Auth e 69 unitários. O CI publicado aprovou Windows/Linux e os 32 casos E2E
+em rodada única. Consulte o [PR #1][consolidation-pr] para integração e checks.
 Consulte o [relatório](docs/audits/2026-10-21/FINAL_REPORT.md) para o escopo de
 Windows/Linux, preservação dos dados e homologações externas pendentes.
 
@@ -86,3 +86,5 @@ A [continuação de 21/10](docs/audits/2026-10-21/README.md) registra a autoriza
 para atualizar os bancos local/remoto e publicar o trabalho em blocos lógicos,
 com PR e merge condicionados às verificações. Consulte o
 [estado verificável](docs/PROJECT_STATUS.md) antes de assumir implantação.
+
+[consolidation-pr]: https://github.com/RMZZFAJ/home-care-assistant/pull/1

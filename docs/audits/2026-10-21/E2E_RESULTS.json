@@ -15,7 +15,7 @@
     "chromium",
     "mobile"
   ],
-  "method": "Full32 then6 affected regression cases after fixing ambiguous alert locator and keyboard access to stock region; final CI full32 pending.",
+  "method": "Local full32 plus affected regression cases, followed by published CI full32/32 in one clean execution.",
   "cases": [
     {
       "id": "ddd864604af8a6a0198f-243e263e7e8b7ba11d42",
@@ -209,5 +209,12 @@
       "title": "revisão de inventário rejeita, reconta e cancela preservando as contagens",
       "status": "passed"
     }
-  ]
+  ],
+  "publishedFullRun": {
+    "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144",
+    "headSha": "8fe30fe194d921af571ff8227f95cb554cc1eee4",
+    "passed": 32,
+    "failed": 0,
+    "singleExecution": true
+  }
 }

@@ -168,8 +168,8 @@ const individualEvidence = {
   "DOC-01": ["README.md;AGENTS.md;docs;lint:markdown", "Documentação precisa refletir evidências finais e autorizações vigentes."],
   "QA-01": ["docs/audits/2026-10-21/EXECUTION.md;verification.json", "Suítes unitária, SQL, HTTP e navegador são evidências distintas; nenhuma cobre tudo sozinha."],
   "CI-01": ["docs/audits/2026-10-20/DEPENDENCY_REVIEW.md;docs/audits/2026-10-20/VERSIONS.md", "Instalação Win/Linux e suporte Vercel; seis advisories dev residuais não equivalem a zero riscos."],
-  "CI-02": [".github/workflows/ci.yml;scripts/verify-linux.sh", "Comandos locais equivalentes não substituem resultado publicado do workflow."],
-  "CI-03": [".github/workflows/ci.yml;docs/audits/2026-10-21/EXECUTION.md", "Push está autorizado; aguardar URL/run e checks reais do PR."],
+  "CI-02": [".github/workflows/ci.yml;docs/audits/2026-10-21/CI_RESULTS.json", "Workflow publicado passou em Windows, Linux e banco/navegador; 35 migrations, seis SQL, seis HTTP e 32 E2E, sem produção."],
+  "CI-03": ["docs/audits/2026-10-21/CI_RESULTS.json;https://github.com/RMZZFAJ/home-care-assistant/pull/1", "Run 39697862144 aprovado no código 8fe30fe; estado posterior de integração e implantação é rastreado no PR."],
   "AI-01": ["docs/API.md;docs/WHATSAPP_AI.md", "Somente contratos e limites preparatórios; agente clínico não foi implementado."],
   "AUD-01": ["REQUIREMENTS.csv;REQUIREMENTS.json;SOURCE_REQUIREMENTS.json;docs/audits/2026-10-21/EXECUTION.md", "74 requisitos consolidados e inventário integral das fontes; cada estado exige evidência própria."],
 };

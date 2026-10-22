@@ -1,14 +1,16 @@
 # Relatório da consolidação
 
 Este relatório reúne as entregas e os limites comprovados da cadeia final de
-35 migrations. Publicação, checks do PR, merge e implantação ainda aguardam
-evidência própria. Os resultados por requisito ficam na
+35 migrations. O [PR #1][pr] publica os blocos lógicos, e o
+[CI completo][ci] aprovou o código 8fe30fe em Windows/Linux e banco/navegador.
+O estado posterior do merge e da implantação é rastreado no PR.
+Os resultados por requisito ficam na
 [matriz](../2026-10-20/REQUIREMENTS.csv), com critérios completos preservados em
 [SOURCE_REQUIREMENTS.json](../2026-10-20/SOURCE_REQUIREMENTS.json).
 
-Dos 74 requisitos consolidados, 70 têm aceite individual registrado. AUTH-04
-e NOT-06 dependem de homologação externa; CI-02 e CI-03 aguardam os checks
-publicados. A preparação de IA está aceita somente como contratos e limites,
+Dos 74 requisitos consolidados, 72 têm aceite individual registrado. AUTH-04
+e NOT-06 dependem de homologação externa. A preparação de IA está aceita
+somente como contratos e limites,
 sem declarar um agente completo implementado.
 
 ## Preservação e escopo
@@ -115,10 +117,11 @@ Os hashes de funções normalizam somente finais de linha CRLF para LF.
 | test:migrations | Cadeia 35 limpa e 019→034 aprovadas |
 | SQL | Seis suítes e caso de search_path aprovados |
 | test:integration | Seis testes HTTP/Auth reais aprovados |
-| E2E desktop/celular | 32 casos únicos aprovados em duas rodadas |
+| E2E desktop/celular | 32/32 aprovados em rodada única no CI publicado |
 | Linux | Instalação, sete checks, 69 unitários e build aprovados |
 | Documentação e matriz | Revisadas; aceites individuais e Markdown |
-| CI publicado, PR, merge e deploy | Aguardam evidência própria |
+| CI Windows/Linux e banco/navegador | Todos aprovados; run 39697862144 |
+| Prévia Vercel | READY; login 200 e contexto sem sessão 401 |
 
 A suíte SQL cobre RLS, grants, associação cruzada, idempotência, estoque,
 inventário, importação, convites, alertas e notificações. Os seis testes HTTP
@@ -129,13 +132,18 @@ A rodada E2E completa teve 29 aprovações e três falhas. Foram corrigidos o
 seletor de alerta ambíguo e o foco por teclado da região de estoque; os seis casos
 afetados/regressões passaram em seguida, cobrindo desktop e celular. O conjunto
 combinado cobre os 32 casos únicos, conforme [E2E_RESULTS.json](E2E_RESULTS.json).
-Não se apresenta isso como rodada única de 32/32; o CI executará novamente a
-suíte completa publicada.
+Posteriormente, o CI publicou a rodada única completa de 32/32 aprovações,
+sem retries, conforme [CI_RESULTS.json](CI_RESULTS.json).
 
 O Linux foi verificado antes do atributo final de acessibilidade da tabela de
 estoque, sem credenciais, conforme [LINUX_RESULTS.json](LINUX_RESULTS.json).
 O ajuste posterior passou nos checks Windows pertinentes e na regressão de
-navegador. O CI deve conferir o HEAD final em ambas as plataformas.
+navegador. O CI confirmou posteriormente o código final em ambas as plataformas.
+
+O smoke da prévia preservou a proteção da Vercel: a CLI autorizada recebeu
+login 200 e SESSION_EXPIRED/401 na API sem sessão da aplicação. Esse teste
+HTTP não equivale à homologação de OAuth, SMTP ou mensagens externas.
+O merge exige checks aprovados também após o fechamento documental.
 
 ## Riscos residuais e dependências externas
 
@@ -165,3 +173,6 @@ explica instalação, preparo, backup, replay e E2E. [Implantação](../../DEPLO
 registra a aplicação incremental e as configurações externas. O inventário
 [CHANGED_FILES.md](CHANGED_FILES.md) agrupa arquivos criados, alterados e removidos
 por motivo; os nomes completos das migrations ficam no próprio inventário.
+
+[pr]: https://github.com/RMZZFAJ/home-care-assistant/pull/1
+[ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144

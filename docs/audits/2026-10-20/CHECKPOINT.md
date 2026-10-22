@@ -46,10 +46,11 @@ Consulte [Autorizações](../2026-10-21/AUTHORIZATION.md),
 - Objetos públicos, grants de clientes e quatro default ACLs iguais local/remoto.
 - 033/034 aplicadas: serviço sem privilégios diretos, cinco RPCs explícitas
   e zero EXECUTE de PUBLIC nas funções da aplicação.
-- E2E: 32 casos únicos aprovados; rodada completa 29/32 e regressão 6/6.
+- E2E: 32/32 aprovados em rodada única no CI publicado, após correções locais.
 - Linux: npm ci, sete checks, 69 unitários e build aprovados antes do atributo
-  final de acessibilidade; o CI deve validar o HEAD publicado.
-- Publicação dos blocos, checks, merge e smoke recebem evidências próprias.
+  final de acessibilidade; o CI também aprovou o código final Windows/Linux.
+- Código 8fe30fe publicado no PR #1; run 39697862144 aprovado nos três jobs.
+- Prévia Vercel READY e smoke HTTP aprovados; evidência em CI_RESULTS.json.
 
 ## Ambientes e backups
 
@@ -63,7 +64,7 @@ ensaio completo de restauração. O backup remoto público não inclui Auth.
 
 ## Próximas ações
 
-Registrar aceites individuais na matriz, revisar o diff e publicar os blocos
-lógicos. Acompanhar os checks do PR, incluindo E2E completo no HEAD final, antes
-do merge e verificar a implantação resultante. Dependências externas de OAuth,
-e-mail, provedor/agendamento e política de dados permanecem explícitas.
+72 aceites individuais registrados; AUTH-04 e NOT-06 seguem como homologações
+externas. O [PR #1](https://github.com/RMZZFAJ/home-care-assistant/pull/1) rastreia
+o fechamento documental, seus checks e a integração/implantação resultantes.
+Preservar a tag de recuperação do snapshot e os dois commits originais.

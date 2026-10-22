@@ -27,8 +27,9 @@ seu sucesso não é inferido dos testes locais.
 | Defaults e segurança | Quatro ACLs e propriedades verificadas iguais |
 | service_role | Sem grants diretos; cinco RPCs autorizadas |
 | Linux | Instalação e sete checks aprovados; 69 testes unitários |
-| E2E desktop/celular | 32 casos únicos aprovados nas rodadas documentadas |
-| GitHub Actions e Vercel finais | Aguardam publicação e checks próprios |
+| E2E desktop/celular | 32/32 aprovados em rodada única no CI publicado |
+| GitHub Actions | Run 39697862144: três jobs aprovados no código 8fe30fe |
+| Prévia Vercel | READY; smoke login 200 e API sem sessão 401 |
 
 Os seis testes HTTP usam identidades Auth e service_role reais. Cobrem acesso
 horizontal, idempotência concorrente, estoque, último administrador global,
@@ -39,8 +40,8 @@ catálogo, inventário, importação, convites, alertas, outbox e limites.
 [LINUX_RESULTS.json](LINUX_RESULTS.json) registra npm ci com 323 pacotes,
 árvore de dependências, contratos, lint, Markdown, tipos, 69 unitários e build.
 Essa rodada antecedeu o atributo final de acessibilidade da região rolável de
-estoque. O CI publicado deve conferir o HEAD final; o ajuste foi verificado
-no navegador e nos checks Windows pertinentes.
+estoque. O CI publicado aprovou posteriormente o código final Windows/Linux,
+com os 69 testes em cada plataforma e a suíte completa de navegador.
 
 ## Método e correções do E2E
 
@@ -52,8 +53,9 @@ O seletor foi tornado específico e a região recebeu acesso por teclado e
 identificação acessível. A rodada seguinte passou seis casos em desktop e
 celular: os três afetados e três regressões relacionadas. A cobertura combinada
 registra os 32 casos únicos aprovados em [E2E_RESULTS.json](E2E_RESULTS.json).
-Isso não é apresentado como uma única rodada final de 32/32. O CI executará
-novamente a suíte completa sobre o commit publicado.
+Depois dessas correções, o run 39697862144 publicou 32/32 aprovações em uma
+única rodada, sem retries. [CI_RESULTS.json](CI_RESULTS.json) identifica o código,
+os três jobs aprovados e o smoke da prévia com proteção da Vercel preservada.
 
 As jornadas incluem falhas de login/rede, confirmação e recuperação por Mailpit,
 catálogo, administração local, revogação, convites, alias ambíguo, importação,

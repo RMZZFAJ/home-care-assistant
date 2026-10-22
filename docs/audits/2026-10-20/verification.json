@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-22T00:04:57.364Z",
+  "generatedAt": "2026-10-22T00:15:45.106Z",
   "preservation": true,
   "unit": true,
   "database": true,
@@ -16,8 +16,8 @@
   "sqlSuites": 6,
   "migrationCount": 35,
   "e2eUniqueCases": 32,
-  "e2eMethod": "29 passed in full32, then6 affected cases passed after corrections; full final CI pending",
-  "publication": false,
+  "e2eMethod": "Full32/32 passed in published Linux CI; local corrected case coverage also retained.",
+  "publication": true,
   "validatedRequirementIds": [
     "PRES-01",
     "PRES-02",
@@ -88,10 +88,12 @@
     "QA-01",
     "CI-01",
     "AI-01",
-    "AUD-01"
+    "AUD-01",
+    "CI-02",
+    "CI-03"
   ],
-  "requirementGaps": {
-    "CI-02": "Workflow local confirmado; aguarda run publicado completo.",
-    "CI-03": "Commits logicos preparados; PR/checks em publicacao."
-  }
+  "requirementGaps": {},
+  "publishedRun": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39697862144",
+  "verifiedCodeCommit": "8fe30fe194d921af571ff8227f95cb554cc1eee4",
+  "pullRequest": "https://github.com/RMZZFAJ/home-care-assistant/pull/1"
 }

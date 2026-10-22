@@ -1,7 +1,7 @@
 # Arquivos e motivos da intervenção
 
-Inventário em relação à base fc04de4, incluindo arquivos novos ainda não
-commitados. A = criado, M = alterado, D = removido. A remoção de
+Inventário em relação à base fc04de4, incluindo o fechamento documental
+publicado. A = criado, M = alterado, D = removido. A remoção de
 vitest.config.ts corresponde à substituição pela configuração ESM .mts.
 Os primeiros 19 arquivos de migration não foram alterados.
 
@@ -191,6 +191,7 @@ banco, evidências e limites.
 - A `docs/audits/2026-10-21/DATABASE_COMPARISON.json`
 - A `docs/audits/2026-10-21/DATABASE_TEST_RESULTS.json`
 - A `docs/audits/2026-10-21/DEPENDENCY_PRODUCTION.json`
+- A `docs/audits/2026-10-21/CI_RESULTS.json`
 - A `docs/audits/2026-10-21/E2E_RESULTS.json`
 - A `docs/audits/2026-10-21/EXECUTION.md`
 - A `docs/audits/2026-10-21/FINAL_REPORT.md`
