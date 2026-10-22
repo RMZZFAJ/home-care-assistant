@@ -656,9 +656,32 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
   await page
     .getByRole("button", { name: "Confirmar e concluir", exact: true })
     .click();
+  const heldRead = Promise.withResolvers<void>();
+  const observedRead = Promise.withResolvers<void>();
+  let interceptRead = true;
+  await page.route("**/api/documents/" + bal.id, async (route) => {
+    if (interceptRead && route.request().method() === "GET") {
+      interceptRead = false;
+      observedRead.resolve();
+      await heldRead.promise;
+    }
+    await route.continue();
+  });
   await page
     .getByRole("link", { name: "Acompanhar ficha", exact: false })
     .click();
+  await observedRead.promise;
+  try {
+    await expect(
+      page.getByRole("button", {
+        name: "Solicitar cancelamento",
+        exact: true,
+        disabled: false,
+      }),
+    ).toHaveCount(0);
+  } finally {
+    heldRead.resolve();
+  }
   await page
     .getByRole("button", { name: "Solicitar cancelamento", exact: true })
     .click();

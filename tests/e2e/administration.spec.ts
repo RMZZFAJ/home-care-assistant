@@ -178,6 +178,7 @@ test.describe("administração integrada no ambiente local", () => {
     expect(localAdmin.ok()).toBeTruthy();
     await page.getByLabel("Menu do usuário", { exact: true }).click();
     await page.getByRole("button", { name: "Sair", exact: true }).click();
+    await expect(page).toHaveURL(/\/login$/);
     await login(page, "adminA");
     await section(page, firstPatient, "Vínculos");
     await expect(
@@ -209,6 +210,7 @@ test.describe("administração integrada no ambiente local", () => {
     expect(forbidden.status()).toBe(404);
     await page.getByLabel("Menu do usuário", { exact: true }).click();
     await page.getByRole("button", { name: "Sair", exact: true }).click();
+    await expect(page).toHaveURL(/\/login$/);
     await login(page, "shared");
     const context = await (await page.request.get("/api/context")).json();
     expect(context.data.isGlobalAdmin).toBe(false);

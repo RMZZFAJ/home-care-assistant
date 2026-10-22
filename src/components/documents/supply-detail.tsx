@@ -54,8 +54,14 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
     expectedVersion: number;
     idempotencyKey: string;
   } | null>(null);
+  const patientId = context.patient?.id;
   useEffect(() => {
     const controller = new AbortController();
+    // Cache Components can resume this route with its previous state. Reconnect
+    // the loading state before exposing actions on a document being refreshed.
+    queueMicrotask(() => {
+      if (!controller.signal.aborted) setLoading(true);
+    });
     api<{ data: SupplyDocument }>(
       "/api/documents/" + id,
       undefined,
@@ -65,7 +71,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
         if (controller.signal.aborted) return;
         setData(result.data);
         setError("");
-        if (result.data.care_recipient_id === context.patient?.id) {
+        if (result.data.care_recipient_id === patientId) {
           const directory = await api<{ directory: PatientPerson[] }>(
             "/api/patient-settings?careRecipientId=" +
               result.data.care_recipient_id,
@@ -87,7 +93,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [id, context.patient, attempt]);
+  }, [id, patientId, attempt]);
   async function execute() {
     if (!data) return;
     if (!pendingRef.current && review)
