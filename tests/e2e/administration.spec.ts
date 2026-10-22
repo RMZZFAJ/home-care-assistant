@@ -10,10 +10,11 @@ import {
 type Fixture = { id: string; email: string };
 
 test.describe("administração integrada no ambiente local", () => {
-  test.skip(
-    process.env.HCA_E2E_LOCAL !== "1",
-    "Use o runner que verifica o banco local de desenvolvimento.",
-  );
+  test.beforeAll(() => {
+    if (process.env.HCA_E2E_LOCAL !== "1")
+      throw new Error("The verified local browser environment is required.");
+    assertLocalProject();
+  });
   test.setTimeout(120_000);
 
   function fixtures(): Record<string, Fixture> {

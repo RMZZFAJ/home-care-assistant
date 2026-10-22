@@ -6,8 +6,10 @@ de testes e os impedimentos externos ficam em
 
 A evolução parte da master 701521c, após o
 [PR de consolidação](https://github.com/RMZZFAJ/home-care-assistant/pull/1).
-A branch atual é codex/home-care-evolucao-integral. O commit temporário
-014580f publicado pelo usuário foi preservado como checkpoint.
+A evolução foi integrada pelo [PR 2](https://github.com/RMZZFAJ/home-care-assistant/pull/2)
+na master fec3926, com CI aprovada. O commit temporário 014580f publicado pelo
+usuário foi preservado no histórico. O fechamento e as evidências atuais estão
+na matriz de execução, inclusive contas remotas e impedimento Meta.
 
 A auditoria de 21/10 registra a base anterior e seus resultados históricos em
 [Auditoria](audits/2026-10-21/README.md). Não considerar suas contagens,

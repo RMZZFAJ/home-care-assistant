@@ -62,3 +62,31 @@ destinatário, criptografia e revisão antes do débito. Não provam envio Meta,
 SMS real, publicação de Flow ou transcrição. Templates, liberação da conta,
 chaves, webhook e agendamento precisam de validação no provedor antes de ativar
 os canais. O estado verificado consta em [EXECUTION.md](evolution/EXECUTION.md).
+
+## Preparação da conta de teste Meta
+
+O usuário já forneceu os IDs do aplicativo, WABA e telefone de teste, versão
+Graph, destinatário e um token temporário. Nenhum token é registrado aqui.
+O webhook apresentado pelo usuário retornou falha 130497 para o destinatário
+brasileiro: a conta está restrita para enviar a esse país. Esse resultado não
+representa entrega e exige resolução de elegibilidade junto à Meta.
+
+Para ligar este ambiente, ainda são necessários:
+
+- App Secret, entregue por configuração secreta do ambiente, para validar HMAC.
+- Token de acesso válido com permissões WhatsApp e acesso aos ativos informados.
+  Renovar/revogar o token compartilhado em conversa antes de uso continuado.
+- Destinatário verificado na lista de teste e conta liberada para seu país.
+- Templates aprovados de notificação, documento e aceite, com idioma e botões
+  compatíveis com as variáveis documentadas em .env.example.
+- Cadastro e verificação do webhook HTTPS
+  `/api/notifications/webhook`, com verify token aleatório gerado para o ambiente,
+  inscrição no campo messages e vínculo do aplicativo à WABA.
+- Para Flows: ID/JSON aprovado e publicado, chave pública registrada na Meta,
+  chave privada e eventual passphrase no servidor e endpoint HTTPS configurado.
+- Agendamento autenticado do worker no ambiente e teste real dos callbacks de
+  aceitação, entrega, leitura e falha antes de habilitar o envio externo.
+
+O verify token e o par de chaves de Flows podem ser gerados durante a
+configuração; não precisam ser enviados pelo usuário em texto de conversa.
+A senha das contas locais de homologação não dá acesso à Meta.

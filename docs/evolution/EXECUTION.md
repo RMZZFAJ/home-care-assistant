@@ -1,152 +1,134 @@
 # Evolução integral — execução
 
-## Contrato e autorização
+## Entrega e autorização
 
-Execução integral autorizada em 22/10/2026: implementação, commits, push,
-reset local controlado, PR, merge na master e verificação do deploy.
-O usuário autorizou antecipar o preview e migrações incrementais remotas,
-preservando catálogo e administrador global. Nunca executar reset, fixtures
-ou suíte mutável no remoto.
+Implementação integral autorizada em 22/10/2026, incluindo commits, publicação,
+reset local com backup, migrações incrementais remotas, contas de homologação,
+PR e merge. O usuário integrou o [PR 2][pr] na master fec3926.
+A [CI dessa master][ci] terminou com sucesso. O fechamento corrige a integração
+do editor Playwright e a classe Tailwind, e consolida os acessos e evidências.
 
 Somente insumos sob responsabilidade familiar. Quatro fichas: REQ, COM, ENT
-e BAL. COM admite doação sem pagamento obrigatório; ajustes familiares usam
-ledger próprio. BAL pertence à equipe. REQ não tem quantidade solicitada:
-atendimento por linha depende de ENT explicitamente vinculada e aceite
-positivo. Conferência ENT e atendimento REQ são indicadores separados.
+e BAL. COM admite doação sem pagamento obrigatório. Ajustes familiares geram
+ledger auditável; BAL é exclusivo da equipe. REQ não tem quantidade solicitada:
+atendimento por linha exige vínculo explícito e aceite positivo da ENT.
+Conferência ENT, atendimento REQ e quantidades físicas são independentes.
 
 UUID, sequência por paciente/tipo, protocolo, snapshots e SHA-256 ficam no
-banco. Assinatura assimétrica é futura. Hash não impede adulteração por
-administradores do banco que também alterem controles e histórico.
+banco. Assinatura assimétrica é futura. Hash não impede alteração por
+administradores do banco que também modifiquem controles e histórico.
 
-## Publicação e preservação
+## Banco, preservação e contas
 
-- Base Git: 701521c; branch codex/home-care-evolucao-integral publicada.
-- Snapshot do usuário: 014580f (Temp), preservado.
-- Cadeia local: 51 migrations, sendo 16 de evolução, todas aplicadas e congeladas.
-- Remoto reconciliado após aplicação das primeiras onze pelo usuário.
-  Os cinco incrementais restantes foram aplicados: 51 migrations, sem reset.
-  Pré-validação selecionou apenas esses cinco arquivos, sem seed ou roles.
-- Todos os campos originais dos 29 produtos e 29 vínculos remotos foram
-  comparados com a exportação anterior e preservados. Administrador global ativo.
-- Backup local completo externo com SHA-256 verificado. Ensaio de restauração
-  passou: 37 produtos, 107 vínculos, 13 Auth e 13 perfis. Replays posteriores
-  recriaram containers; repor/conferir o catálogo após a última suíte.
-- Backup remoto externo de schema/dados inclui Auth e metadados Storage.
-  A exportação inicial coincidiu com a migração do usuário. Antes dos cinco
-  incrementais finais foram feitos novos dumps (schema 465495 bytes; dados
-  463995 bytes), com CLI concluída e manifesto SHA-256 verificado.
-  Schema e dados foram exportados sequencialmente; não são snapshot atômico.
-- [Preview parcial][preview] READY, conectado ao Supabase remoto existente.
-  Segredos de servidor ausentes foram adicionados a preview e produção;
-  flags externas permanecem desligadas. Configuração pública preservada.
-- Verificação online: Auth oficial da conta global, API anônima bloqueada,
-  contexto, catálogo, estoque, fichas, dashboard e perfil responderam.
-  Doze verificações visuais desktop/Pixel 7 passaram sem overflow e com menu.
-  Proteção Vercel mantida. Isso não homologa OAuth humano ou canal externo.
+- Local e remoto: 52 migrations aplicadas, sendo 17 da evolução. As primeiras
+  19 históricas intactas; nenhuma migration aplicada foi reescrita.
+- Último incremento corrige o contador transacional de administradores:
+  somente eventos de linha efetivados alteram a contagem.
+- Atualizações remotas incrementais precedidas de reconciliação, pré-validação
+  e backups externos de schema/dados com manifesto SHA-256. Dumps sequenciais
+  não constituem snapshot atômico. Não houve reset ou replay da suíte no remoto.
+- Todos os campos originalmente exportados dos 29 produtos e 29 vínculos
+  remotos foram comparados após o provisionamento: zero diferenças.
+  Administrador global exigido permanece ativo, com senha preservada.
+- Backup local completo restaurado em banco temporário do mesmo container
+  para ensaio e extração. Catálogo original reposto: 37 produtos e 107 vínculos,
+  zero diferenças nos campos originais. Banco temporário removido após QA;
+  nunca utilizado como destino da suíte.
+- Cinco identidades remotas reais criadas pela API oficial Supabase Auth:
+  administrador do paciente, familiar, supervisor, profissional e leitor.
+  Todas autenticaram por senha e têm perfil/vínculo ativo no paciente
+  “Homologação Home Care Assistant”. Nenhuma recebeu administração global.
+- Administrador global também é o segundo administrador desse paciente.
+  Promoção do supervisor proposta/aprovada por administradores distintos.
+  Catálogo de 29 produtos adotado nesse paciente, preservando o original.
+- Login real na produção, menu por capacidades, APIs proibidas, isolamento
+  e saída passaram nas cinco contas. RPC/RLS também recusaram acesso ao
+  paciente original e operações proibidas.
+- Credenciais aleatórias em `.private/homologacao/ACESSOS.md` e `contas.json`,
+  ignoradas pelo Git e excluídas do upload Vercel. ACL restrita ao proprietário.
+  Nenhuma senha, token ou hash manual nos commits. Endereços example.invalid
+  são controlados para teste; recuperação por e-mail exige endereço humano.
+  Login por senha foi efetivamente verificado.
 
-## Matriz atual
+## Matriz da implementação
 
-| Bloco | Estado | Evidência |
+| Bloco | Estado | Evidência executada |
 | --- | --- | --- |
-| Banco e capacidades | Implementados | Local e remoto: 51 migrations |
-| REQ, COM, ENT, BAL | Integrados | Fluxos positivos e negativos em E2E |
-| UI/UX global | Refatorada | Menus, contexto, wizards e componentes |
+| REQ, COM, ENT, BAL | Integrados | Jornadas positivas e negativas |
+| UI/UX global | Refatorada | Menus, perfis, mobile, filtros e wizards |
 | Estoques e unidades | Integrados | Ledger, trânsito, mínimos e apresentações |
-| Scanner e anexos | Integrados | Leitura manual, arquivos privados e PDF |
-| Perfil e Auth | Integrados | Auth real, registro, foto e sessões |
-| Notificações | Integradas | Caixa paginada e estados independentes |
-| WhatsApp/Flows | Configuráveis | Testes locais; provedor não homologado |
-| Consumo e indicadores | Integrados | Conferência antes do débito |
-| Gates completos | Em execução | Resultados abaixo |
-| PR, merge e produção | PR em rascunho | [PR 2][pr]; merge após critérios de aceite |
+| Scanner e anexos | Integrados | Imagem, câmera recusada, Storage, PDF |
+| Auth e perfil | Integrados | Auth real, foto, sessões e cinco contas remotas |
+| Notificações | Integradas | Central, outbox, ciência e estados do provedor |
+| Consumo e indicadores | Integrados | Revisão autenticada antes do débito |
+| WhatsApp e Flows | Configuráveis | Contratos testados; Meta bloqueada |
+| Produção | Publicada | [Sistema online][production] e verificações abaixo |
 
-## Resultados efetivamente obtidos
+## Validações realizadas
 
-- check:contracts passou; primeiras 19 migrations históricas intactas.
-- Lint sem erros/avisos, Markdown, tipagem e unitários passaram na revisão final.
-  Componentes de etapas/comprovante foram extraídos para reduzir os wizards
-  e reutilizar o acompanhamento de notificações.
-- Typecheck e build atuais passaram, com 49 rotas.
-- Unitários: 81 testes em 13 arquivos passaram.
+- Contratos passaram: primeiras 19 migrations intactas e quantidade solicitada
+  ausente do contrato ativo de REQ.
+- Lint sem erros/avisos, Markdown, tipagem e build com 49 rotas.
+- 84 unitários em 14 arquivos, incluindo proteção E2E contra configuração
+  remota herdada e recusa de stack/porta não autorizadas.
 - Auditoria npm de produção: zero vulnerabilidades reportadas.
-- Replay das 51 migrations passou: instalação limpa, evolução legada,
-  dez suítes SQL e compatibilidade com search_path restrito do hosted.
-- Revisões SQL e aceite WhatsApp passaram isoladamente com Auth real:
-  telefone, desafio único, replay e invalidação por destinatário/versão.
-  Transporte e telefone de teste não representam homologação de SMS ou Meta.
-- Integração HTTP: 6/6 passaram novamente após a cadeia final de 51 migrations.
-- Chromium: rodada final 25/25 passou, incluindo perfil/foto/ciência e scanner
-  por imagem real, recusa de câmera e código desconhecido.
-- Android: rodada final 25/25 passou.
-- WebKit/iPhone: 24/25 passaram; falha intermitente na confirmação de e-mail.
-  A navegação do teste agora aguarda a saída concluir antes de abrir o convite;
-  callback ganhou códigos seguros e correlação. Três repetições WebKit do
-  fluxo completo convite/cadastro/confirmação/recuperação passaram.
-- Os fluxos operacionais completos passaram nos três projetos: COM/doação,
-  aceite parcial, REQ 5/10 e ENT 8/10, anexo/PDF, reconto BAL, scanner,
-  múltiplas REQ, cancelamento bilateral, trânsito e revisão autenticada de Flow.
-- Rodada unificada inicial: 74/75 passaram. O retorno Auth WebKit corrigido
-  passou três repetições. Nova rodada unificada após os ajustes de componentes
-  será executada em base local limpa. Nenhum teste foi excluído ou enfraquecido.
-- PDF gerado pelo aplicativo foi renderizado e inspecionado visualmente.
-  Câmera física continua dependente de aparelho.
+- Replay local das 52 migrations: instalação limpa, upgrade legado, dez suítes
+  SQL, search_path restrito e autorização com Auth real.
+- Integração HTTP/RPC: 6/6, incluindo concorrência, idempotência e isolamento.
+- E2E completo local: 75/75. CI do PR 2 e da master fec3926 passou novamente
+  com Chromium desktop, Pixel 7 e WebKit/iPhone 13.
+- Retomada de tela BAL considera Activity do Next: carregamento bloqueia ações
+  até a resposta atual. Doze repetições direcionadas passaram após a correção;
+  CI completa posterior também passou.
+- Após correção do editor: descoberta direta lista 75 testes sem exigir banco
+  ou autenticação. Execução direta sem variáveis do runner passou nos seis
+  testes de login dos três projetos com stack local verificada.
+- Servidor e globalSetup preparam credenciais locais antes da execução;
+  descoberta não inicia servidor nem toca o banco. Nenhum diagnóstico foi
+  suprimido, teste excluído ou proteção desativada.
+- Classe Tailwind `break-words` substituída pela canônica `wrap-break-word`.
+- Produção fec3926 READY: Auth oficial global, anônimo bloqueado, oito leituras
+  de API e 39 verificações visuais (13 rotas em desktop, Android e iPhone),
+  menus e sino, sem erros de navegador ou overflow horizontal.
+- PDF real baixado, renderizado e inspecionado no local e preview.
+  Homologação remota começa sem documentos operacionais; não foram criadas
+  movimentações fictícias remotas para simular esse resultado.
+- CI do fechamento executa novamente a cadeia completa e os 75 E2E; os checks
+  do PR registram o resultado associado ao SHA efetivamente integrado.
 
-## Apontamentos do Supabase Advisor
+## Limites externos verificados
 
-Consulta após a atualização remota: seis tabelas internas com RLS sem política
-direta são fechadas e acessadas somente pelos RPCs autorizados. O predicado
-anônimo de elegibilidade de convite exige hash do token e e-mail e retorna
-somente booleano. Os 67 RPCs SECURITY DEFINER autenticados são fronteiras
-intencionais, com autorização no banco, grants e search_path revisados e
-testados. A listagem automática não substitui os testes de isolamento.
+NOTIFICATIONS_EXTERNAL_ENABLED e META_FLOWS_ENABLED permanecem false.
+O webhook fornecido pelo usuário registrou falha Meta 130497: restrição de
+envio ao país do destinatário. Isso não representa mensagem entregue.
+App Secret, token válido, templates, webhook inscrito, chaves/publicação de
+Flow e elegibilidade precisam de configuração e validação no provedor.
+Dados faltantes em [WhatsApp e Flows](../WHATSAPP_AI.md).
+Nenhum token compartilhado em conversa foi versionado ou exposto em logs.
 
-Permanecem o aviso herdado de unaccent no schema public e a proteção de senhas
-vazadas desabilitada no Auth remoto. A mudança de schema da extensão não foi
-incluída neste corte para preservar dependências legadas. Proteção de senhas
-vazadas depende de configuração e plano Pro ou superior, conforme
-[documentação Supabase][password-security]. A política de novas senhas do
-aplicativo continua ativa. Não foi declarada ausência absoluta de riscos.
+Worker possui endpoint autenticado e processamento administrativo manual;
+agendamento automático externo precisa ser configurado. OAuth humano, SMTP,
+SMS real, câmera física e transcrição externa não foram homologados por esta
+suíte. Transcrição tem contrato extensível, sem provedor contratado.
 
-Referências dos avisos:
-[RLS sem política][advisor-rls],
-[SECURITY DEFINER][advisor-rpc] e
-[extensão no public][advisor-extension].
+Advisor: seis tabelas internas com RLS sem política direta são fechadas e
+acessadas por RPCs autorizados; 67 funções SECURITY DEFINER são fronteiras
+intencionais verificadas com grants/RLS. Predicado anônimo de convite valida
+hash/e-mail e retorna booleano. Permanecem aviso herdado de unaccent em public
+e proteção de senhas vazadas desativada no Auth remoto, dependente de
+configuração/plano conforme [Supabase][passwords].
+Não foi declarada ausência absoluta de risco ou homologação externa fictícia.
 
-## Trabalho restante
+## Reprodução e artefatos privados
 
-1. Fechar gates e E2E unificado; corrigir qualquer falha e repetir o afetado.
-2. Publicar evidências finais; incrementais remotos concluídos e conferidos.
-   CI e novo preview estão em execução sobre os commits publicados.
-3. Repor e verificar o catálogo local preservado e as identidades de teste.
-4. Consolidar documentação/evidências, abrir PR, conferir CI e fazer merge.
-5. Verificar master, deploy publicado, acesso administrativo e operações.
+Usar Node 24.22.0 e npm 11.21.1. Suíte mutável seleciona exclusivamente
+a stack local home-care-assistant em 127.0.0.1:54321/54322. Backups, manifestos,
+provas de preservação e resultados online ficam em
+LOCALAPPDATA/home-care-assistant, fora do Git. Credenciais locais da suíte
+continuam em supabase/.temp; contas remotas ficam em `.private`.
+Não rodar integração que revoga administradores junto com E2E autenticado.
 
-Usuários locais de teste existem no Auth oficial e têm vínculos reais:
-administrador do paciente, familiar, supervisor, profissional e leitor.
-Credenciais aleatórias ficam em estado local ignorado, sem hashes manuais.
-O remoto não recebeu fixtures. Homologação remota com pessoas distintas
-continua dependente de identidades humanas controladas.
-
-Meta/WhatsApp, publicação de Flow, OAuth humano, SMS, transcrição e câmera
-física dependem de configuração, credenciais ou liberação do provedor/aparelho.
-Permanecem controlados por configuração. Não declarar esses canais homologados
-sem evidência externa efetiva.
-
-## Retomada
-
-Usar Node 24.22.0 e npm 11.21.1 preparados fora do Git. A suíte mutável usa
-exclusivamente a stack local home-care-assistant em 127.0.0.1:54321/54322,
-com Storage habilitado e envio externo desligado. Não executar integração que
-revoga administradores em paralelo com E2E autenticado.
-
-Backups ficam em LOCALAPPDATA/home-care-assistant/backups. Verificar SHA-256
-e manifesto antes do replay. Após a última suíte, restaurar o backup em banco
-temporário do mesmo container para exportar/conferir o catálogo original.
-Nunca usar esse banco temporário como destino da suíte.
-
-[preview]: https://home-care-assistant-6alv20w16-rmzzfajs-projects.vercel.app
 [pr]: https://github.com/RMZZFAJ/home-care-assistant/pull/2
-[password-security]: https://supabase.com/docs/guides/auth/password-security
-[advisor-rls]: https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy
-[advisor-rpc]: https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable
-[advisor-extension]: https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public
+[ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39769658084
+[production]: https://home-care-assistant.vercel.app
+[passwords]: https://supabase.com/docs/guides/auth/password-security
