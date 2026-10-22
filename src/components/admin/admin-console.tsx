@@ -19,8 +19,17 @@ import {
   NotificationQueue,
 } from "./notification-settings";
 import { formatBrazilDate } from "@/lib/receipt";
+import {
+  Field,
+  Check,
+  RoleSelect,
+  roles,
+  text,
+  bool,
+  type Row,
+} from "./admin-fields";
+import { AlertSettings } from "./alert-settings";
 
-type Row = Record<string, unknown>;
 type Section =
   | "patient"
   | "catalog"
@@ -44,81 +53,6 @@ const labels: Record<Section, string> = {
   notificationRecipients: "Destinatários",
   notifications: "Notificações",
 };
-const roles = {
-  admin: "Administrador do paciente",
-  supervisor: "Supervisor",
-  professional: "Profissional",
-  family: "Familiar",
-  reader: "Leitor",
-};
-function text(row: Row, key: string) {
-  return row[key] == null ? "" : String(row[key]);
-}
-function bool(row: Row, key: string, fallback = false) {
-  return typeof row[key] === "boolean" ? (row[key] as boolean) : fallback;
-}
-function Field({
-  name,
-  label,
-  value = "",
-  type = "text",
-  required = false,
-}: {
-  name: string;
-  label: string;
-  value?: string | number;
-  type?: string;
-  required?: boolean;
-}) {
-  return (
-    <label className="block text-sm font-semibold">
-      {label}
-      <input
-        name={name}
-        defaultValue={value}
-        type={type}
-        required={required}
-        className={inputClass}
-      />
-    </label>
-  );
-}
-function Check({
-  name,
-  label,
-  checked = false,
-}: {
-  name: string;
-  label: string;
-  checked?: boolean;
-}) {
-  return (
-    <label className="flex min-h-11 items-center gap-2 text-sm">
-      <input
-        type="checkbox"
-        name={name}
-        defaultChecked={checked}
-        className="h-5 w-5 accent-(--brand)"
-      />
-      {label}
-    </label>
-  );
-}
-function RoleSelect({ value = "professional" }: { value?: string }) {
-  return (
-    <label className="text-sm font-semibold">
-      Função neste paciente
-      <select name="role" defaultValue={value} className={inputClass}>
-        {Object.entries(roles).map(([key, label]) => (
-          <option key={key} value={key}>
-            {label}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
 export function AdminConsole() {
   const params = useSearchParams();
   return (
@@ -1041,93 +975,5 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       </fieldset>
       {busy && <Notice>Salvando operação… Aguarde a confirmação.</Notice>}
     </div>
-  );
-}
-
-function AlertSettings({
-  rows,
-  products,
-  handle,
-}: {
-  rows: Row[];
-  products: Row[];
-  handle: (
-    event: FormEvent<HTMLFormElement>,
-    payload: (data: FormData) => Row,
-    success?: string,
-  ) => void;
-}) {
-  return (
-    <section className={panelClass}>
-      <h2 className="mb-4 font-bold">Limites de estoque por item e custódia</h2>
-      <form
-        className="grid gap-4 sm:grid-cols-2"
-        onSubmit={(event) =>
-          handle(event, (data) => ({
-            action: "alertRule",
-            productId: data.get("productId"),
-            location: data.get("location"),
-            lowThreshold: Number(data.get("lowThreshold")),
-            criticalThreshold: Number(data.get("criticalThreshold")),
-            isEnabled: data.has("isEnabled"),
-          }))
-        }
-      >
-        <label className="text-sm font-semibold">
-          Item do catálogo
-          <select name="productId" required className={inputClass}>
-            <option value="">Selecione</option>
-            {products
-              .filter((product) => product.is_active !== false)
-              .map((product) => (
-                <option key={text(product, "id")} value={text(product, "id")}>
-                  {text(product, "name")}
-                </option>
-              ))}
-          </select>
-        </label>
-        <label className="text-sm font-semibold">
-          Custódia
-          <select className={inputClass} name="location">
-            <option value="CARE_TEAM">Equipe de cuidado</option>
-            <option value="FAMILY">Família</option>
-          </select>
-        </label>
-        <Field
-          name="lowThreshold"
-          label="Limite baixo"
-          type="number"
-          value={0}
-          required
-        />
-        <Field
-          name="criticalThreshold"
-          label="Limite crítico"
-          type="number"
-          value={0}
-          required
-        />
-        <Check name="isEnabled" label="Regra habilitada" />
-        <button className={primaryClass} type="submit">
-          Salvar regra
-        </button>
-      </form>
-      <ul className="mt-5 space-y-2">
-        {rows.map((row) => (
-          <li
-            key={text(row, "id")}
-            className="rounded border border-(--line) p-3 text-sm"
-          >
-            {text(
-              products.find((product) => product.id === row.product_id) ?? row,
-              "name",
-            ) || text(row, "product_id")}{" "}
-            · {text(row, "location")} · baixo: {text(row, "low_threshold")} ·
-            crítico: {text(row, "critical_threshold")} ·{" "}
-            {bool(row, "is_enabled") ? "habilitada" : "desabilitada"}
-          </li>
-        ))}
-      </ul>
-    </section>
   );
 }

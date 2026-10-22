@@ -71,6 +71,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   expect(new URL(invitationUrl).origin).toBe(process.env.NEXT_PUBLIC_APP_URL);
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await page.getByRole("button", { name: "Sair", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
   await page.goto(invitationUrl);
   await page.getByText("Ainda não tenho conta", { exact: true }).click();
   await page.getByLabel("Nome", { exact: true }).fill("Pessoa convidada E2E");
@@ -101,6 +102,12 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
     },
   );
   expect(beforeConfirmation.status()).toBe(401);
+  expect(
+    (await page.context().cookies()).some(
+      (cookie) =>
+        cookie.name.endsWith("-code-verifier") && Boolean(cookie.value),
+    ),
+  ).toBe(true);
   await page.goto(await confirmationLink(page, email, "Confirm"));
   await expect(page).toHaveURL(/\/convites\/aceitar$/);
   await page
