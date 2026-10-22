@@ -33,16 +33,24 @@ npm run dev
 
 ## Operação
 
-Selecione um paciente autorizado e utilize Requisição, Histórico, Estoque,
-Inventários ou Administração. Um administrador de paciente gerencia somente
+Selecione o paciente no cabeçalho e use o menu recolhível: Visão geral,
+Fichas (REQ, COM, ENT, BAL), Histórico, Estoque e Administração.
+Um administrador de paciente gerencia somente
 aquele contexto. Administradores globais administram todos os pacientes.
 Convites permitem cadastro pessoal e aceite; revogar um vínculo não bloqueia
 a conta em outros pacientes. Novos pacientes iniciam com catálogo vazio e
 podem adotar modelos explicitamente.
 
-Saldos de família e equipe são separados. Contagem não altera estoque antes
-da aprovação. Quantidade solicitada não integra uma requisição. O protocolo
-é global, gerado pelo banco, e a primeira numeração nova é 12.
+O catálogo contém apenas insumos sob responsabilidade familiar. COM aceita
+compra ou doação; recebimento validado abastece a família. ENT transfere entre
+família e equipe, com trânsito e aceite do destinatário. REQ não tem quantidade
+solicitada: atendimento por linha depende de ENT vinculada e aceite positivo.
+BAL conta apenas o estoque da equipe, conforme a política de revisão.
+
+O administrador movimenta e corrige o estoque familiar diretamente, com
+ledger e anexos. Cada ficha tem UUID, sequência independente por paciente/tipo,
+protocolo, snapshots e SHA-256. Assinatura assimétrica é possibilidade futura.
+Leia [Operação](docs/OPERATIONS.md) e o [estado atual](docs/evolution/EXECUTION.md).
 
 ## Validação
 
