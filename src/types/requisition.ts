@@ -1,5 +1,12 @@
 export type ProductCategory = "medicamentos" | "higiene" | "dieta";
-export type RequisitionStatus = "draft" | "submitted" | "under_review" | "approved" | "separated" | "delivered" | "cancelled";
+export type RequisitionStatus =
+  | "draft"
+  | "submitted"
+  | "under_review"
+  | "approved"
+  | "separated"
+  | "delivered"
+  | "cancelled";
 
 export type CatalogItem = {
   id: string;
@@ -37,8 +44,12 @@ export type RequisitionFormData = {
   observations: string[];
 };
 
-export type ReceiptLine = Omit<RequisitionLine, "currentStock"> & { currentStock: number | null };
-export type ReceiptExtraItem = Omit<ExtraItem, "currentStock"> & { currentStock: number | null };
+export type ReceiptLine = Omit<RequisitionLine, "currentStock"> & {
+  currentStock: number | null;
+};
+export type ReceiptExtraItem = Omit<ExtraItem, "currentStock"> & {
+  currentStock: number | null;
+};
 
 export type RequisitionReceipt = {
   lines: ReceiptLine[];
