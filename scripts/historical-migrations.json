@@ -64,5 +64,6 @@
   "supabase/migrations/20261023073958_v4_verification_corrections.sql": "8cdba7ce09f1da1c2fa9ddd5a5f85c691d6ec8ee6c5abbd167f825bb3bfb0585",
   "supabase/migrations/20261023120000_v4_review_regressions.sql": "a89e83d4de7ed07ce4d114ee55d3bc4cfdd11b919331f4d3c2a73d7a96cc10c1",
   "supabase/migrations/20261023173000_v4_preserve_authorized_worker_contract.sql": "f09c8d77c89498a16d4d45a04a33514c055d0c53a2dcfec9f1d6186f08f3e950",
-  "supabase/migrations/20261023174500_v4_review_follow_up.sql": "f0d6e0e63a32eb880d5af210d11f7af32e14daa47165a322851b4f1b5c519813"
+  "supabase/migrations/20261023174500_v4_review_follow_up.sql": "f0d6e0e63a32eb880d5af210d11f7af32e14daa47165a322851b4f1b5c519813",
+  "supabase/migrations/20261023180000_v4_archive_authority_serialization.sql": "4c41dbc39d490940495c2b99f3f37f86f8fa17c130dbe2c9eaa9a2283834a2ac"
 }

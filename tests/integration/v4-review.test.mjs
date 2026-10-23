@@ -2,6 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID, randomBytes } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import { spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { setTimeout as delay } from "node:timers/promises";
 import {
   env,
   fixtures,
@@ -13,6 +16,119 @@ import {
 } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+
+test("V4 review: archive rechecks revoked capability after waiting for the patient transaction lock", async () => {
+  const { patient, admin, products } = await setup();
+  const req = await issue(patient, [products[0]]);
+  const ent = await delivery(patient, req, [products[0]]);
+  await rpc(await actor("professional", patient), "supply_document_command", {
+    p_id: ent.id,
+    p_action: "receive",
+    p_body: { divergences: [] },
+    p_key: randomUUID(),
+    p_version: ent.version,
+  });
+  const archiver = await actor("global", patient);
+  const version = (
+    await rpc(admin, "patient_governance", { p_patient: patient })
+  ).data.version;
+  const blocker = spawn(
+    "docker",
+    [
+      "exec",
+      "-i",
+      "supabase_db_home-care-assistant",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "postgres",
+      "-At",
+      "-v",
+      "ON_ERROR_STOP=1",
+    ],
+    { stdio: ["pipe", "pipe", "pipe"] },
+  );
+  let output = "",
+    errors = "",
+    archive;
+  blocker.stdout.on("data", (value) => {
+    output += value;
+  });
+  blocker.stderr.on("data", (value) => {
+    errors += value;
+  });
+  const exited = new Promise((resolve) => blocker.on("exit", resolve));
+  async function until(predicate) {
+    for (let attempt = 0; attempt < 60; attempt++) {
+      if (predicate()) return;
+      if (blocker.exitCode !== null)
+        throw Error("Local transaction ended: " + errors);
+      await delay(50);
+    }
+    throw Error("Local concurrency barrier timed out");
+  }
+  try {
+    blocker.stdin.write(
+      readFileSync("tests/database/assume-context.sql", "utf8") +
+        "\nbegin;select pg_advisory_xact_lock(hashtextextended('stock:'||" +
+        sqlLiteral(patient) +
+        ",0));select 'archive_lock_ready';\n",
+    );
+    await until(() => output.includes("archive_lock_ready"));
+    archive = archiver
+      .rpc("archive_requisition", {
+        p_id: req.id,
+        p_reason: "Tentativa concorrente após revogação",
+      })
+      .abortSignal(AbortSignal.timeout(10000))
+      .then((result) => result);
+    await until(
+      () =>
+        sql(
+          "select exists(select 1 from pg_stat_activity where datname='postgres' and state='active' and wait_event='advisory' and query like '%archive_requisition%')",
+        ) === "t",
+    );
+    // The SQL bridge uses an actual Auth session, then the same policy RPC as HTTP.
+    blocker.stdin.write(
+      "set local role authenticated;select pg_temp.assume_context('adminA'," +
+        sqlLiteral(patient) +
+        ");select public.configure_patient_access(" +
+        sqlLiteral(patient) +
+        ",'capability'," +
+        sqlLiteral(
+          JSON.stringify({
+            capability: "req.archive",
+            subjectUser: fixtures.global.id,
+            enabled: false,
+          }),
+        ) +
+        "::jsonb," +
+        sqlLiteral(randomUUID()) +
+        "," +
+        version +
+        ");commit;select 'archive_policy_committed';\n",
+    );
+    await until(() => output.includes("archive_policy_committed"));
+    assert.equal((await archive).error?.code, "42501");
+    assert.equal(
+      (await rpc(admin, "requisition_progress", { p_id: req.id })).archivedAt,
+      null,
+    );
+    assert.equal(
+      sql(
+        "select count(*) from public.document_events where document_id=" +
+          sqlLiteral(req.id) +
+          " and action='req.archived.manual'",
+      ),
+      "0",
+    );
+  } finally {
+    blocker.stdin.end("rollback;\n");
+    await exited;
+    if (archive) await archive;
+  }
+});
 const settingsVersion = async (c, p) =>
   (await rpc(c, "patient_governance", { p_patient: p })).data.version;
 const policy = async (c, p, change) =>
