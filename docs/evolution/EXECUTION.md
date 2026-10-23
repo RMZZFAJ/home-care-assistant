@@ -318,3 +318,22 @@ Contratos, lint, tipagem e build do runner passaram. A suíte completa fica na
 CI do novo SHA da [PR 4][pr-v4]; o fechamento registra o resultado e a produção.
 Envios externos Meta e Flows continuam desabilitados. Aprovação em fixture
 local não representa aprovação da Meta.
+
+A CI `39994658483` validou código em Linux/Windows e a instalação/upgrade do
+incremento 64, mas detectou regressão no contrato global do worker. O incremento
+65 restaura os grants anteriores; verificações de identidade global, contexto
+e lease continuam obrigatórias. Dois testes HTTP de concorrência/serviço
+passaram, junto com recusas para familiar e administrador em contexto local.
+
+A nova revisão identificou formulário de política desatualizado, capacidade de
+arquivamento ignorada e erro determinístico de configuração PDF com retries.
+O incremento 66 aplica a capacidade no RPC e nas tarefas; API e botão também
+exigem a permissão. PDF incompatível fica pausado e habilitar o PDF na matriz
+libera somente os trabalhos correspondentes. Formulários intocados acompanham
+a versão atual; rascunhos em edição preservam a versão original e recebem
+conflito explícito, com recarga e recuperação verificadas.
+Os incrementos 65/66 foram aplicados no remoto após novo backup completo dos
+mesmos schemas; todas as 66 migrations estão protegidas por hash.
+Regressões direcionadas: 16 unitários, três HTTP/Auth e dois contratos de worker;
+E2E verificou a nova recusa de arquivamento e as duas sessões de configuração.
+Correções adicionais nos commits `d949bfc` e `415ec5e`.
