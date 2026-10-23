@@ -32,7 +32,7 @@ jobs:
 
   database-and-browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     permissions:
       contents: read
     steps:
@@ -52,6 +52,20 @@ jobs:
           node --input-type=module -e "import {backupLocalDatabase} from './scripts/backup-local-database.mjs'; import {appendFileSync} from 'node:fs'; const {file}=await backupLocalDatabase(); appendFileSync(process.env.GITHUB_ENV,'HCA_LOCAL_BACKUP='+file+'\n');"
       - run: npm run test:migrations -- --replay-local --backup "$HCA_LOCAL_BACKUP"
       - run: npm run test:integration
+      - name: Use official Ubuntu archives for browser dependencies
+        run: |
+          # Avoid throttled Azure mirrors; keep APT signature verification intact.
+          if [ -f /etc/apt/apt-mirrors.txt ]; then
+            printf '%s\n' 'https://archive.ubuntu.com/ubuntu/' | sudo tee /etc/apt/apt-mirrors.txt >/dev/null
+          fi
+          for apt_source_file in /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources; do
+            if [ -f "$apt_source_file" ]; then
+              sudo sed -i -E \
+                -e 's#https?://azure\.archive\.ubuntu\.com/ubuntu/?#https://archive.ubuntu.com/ubuntu/#g' \
+                -e 's#http://security\.ubuntu\.com/ubuntu/?#https://security.ubuntu.com/ubuntu/#g' \
+                "$apt_source_file"
+            fi
+          done
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run e2e
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

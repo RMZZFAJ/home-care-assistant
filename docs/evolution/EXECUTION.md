@@ -356,3 +356,9 @@ controle de WhatsApp para arquivamento. Persistência e autorização continuam
 reais; nenhum teste ou filtro foi removido. Os três cenários direcionados
 passaram localmente. A lentidão de pacotes Ubuntu na primeira tentativa foi
 isolada no log e o job repetido no mesmo SHA, sem alterar as verificações.
+
+A lentidão do mirror Azure reapareceu na CI `40005863396`, antes dos testes
+visuais. O runner passa a usar o arquivo oficial Ubuntu por HTTPS, mantendo a
+[verificação de assinatura do APT](https://documentation.ubuntu.com/security/software-integrity/archive-verification/).
+O limite do job foi ampliado para 40 minutos para comportar a suíte completa;
+nenhum teste, navegador, condição de acesso ou verificação foi removido.
