@@ -1,3 +1,4 @@
+import { selectContext } from "./auth-context";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -55,6 +56,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await expect(
     page.getByRole("heading", { name: "Visão geral" }).first(),
   ).toBeVisible();
+  await selectContext(page, patientA);
   const email = `new-${randomUUID()}@example.invalid`;
   const invitation = await page.request.post("/api/admin", {
     data: {
@@ -125,6 +127,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await expect(
     page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
   ).toBeVisible();
+  await selectContext(page, patientA);
   const context = await (await page.request.get("/api/context")).json();
   expect(context.data.isGlobalAdmin).toBe(false);
   expect(
