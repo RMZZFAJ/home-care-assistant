@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   api,
+  ApiError,
   buttonClass,
   can,
   inputClass,
@@ -74,6 +75,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState("rules");
+  const savingRef = useRef(false);
+  const currentVersionRef = useRef<number | null>(null);
+  const [invitationUrl, setInvitationUrl] = useState("");
   const editingVersionRef = useRef<number | null>(null);
   useEffect(() => {
     const controller = new AbortController();
@@ -83,7 +87,13 @@ function Policies({ context }: { context: WorkspaceContext }) {
       controller.signal,
     )
       .then((result) => {
-        if (!controller.signal.aborted) setData(result);
+        if (
+          !controller.signal.aborted &&
+          result.data.version >= (currentVersionRef.current ?? 0)
+        ) {
+          currentVersionRef.current = result.data.version;
+          setData(result);
+        }
       })
       .catch((reason) => {
         if (!controller.signal.aborted) setError(reason.message);
@@ -96,39 +106,61 @@ function Policies({ context }: { context: WorkspaceContext }) {
     requestId?: string,
     decision?: string,
   ) {
-    if (!data) return false;
+    if (!data || savingRef.current) return false;
+    savingRef.current = true;
     setBusy(true);
     setError("");
     try {
-      const result = await api<{ data: { status: string } }>(
-        "/api/patient-settings",
-        {
-          careRecipientId: patientId,
-          kind,
-          change,
-          idempotencyKey: crypto.randomUUID(),
-          expectedVersion:
-            kind === "settings"
-              ? (editingVersionRef.current ?? data.data.version)
-              : data.data.version,
-          ...(requestId ? { requestId, decision } : {}),
-        },
-      );
+      const result = await api<{
+        data: { status: string };
+        invitationUrl?: string;
+      }>("/api/patient-settings", {
+        careRecipientId: patientId,
+        kind,
+        change,
+        idempotencyKey: crypto.randomUUID(),
+        expectedVersion:
+          kind === "settings"
+            ? (editingVersionRef.current ?? data.data.version)
+            : (currentVersionRef.current ?? data.data.version),
+        ...(requestId ? { requestId, decision } : {}),
+      });
+      setInvitationUrl(result.invitationUrl ?? "");
       setMessage(
-        result.data.status === "pending"
-          ? "Proposta global registrada. Um administrador local distinto deve aprovar."
-          : "Configuração aplicada no paciente.",
+        result.data.status === "awaiting_acceptance"
+          ? "Aprovação registrada. O vínculo será criado somente após o aceite do destinatário."
+          : result.data.status === "pending"
+            ? "Proposta global registrada. Um administrador local distinto deve aprovar."
+            : "Configuração aplicada no paciente.",
       );
-      setAttempt((value) => value + 1);
+      const authoritative = await api<PolicyData>(
+        "/api/patient-settings?careRecipientId=" + patientId,
+      );
+      currentVersionRef.current = authoritative.data.version;
+      setData(authoritative);
       editingVersionRef.current = null;
       await context.refresh();
       return result.data.status === "applied";
     } catch (reason) {
       setError(
-        reason instanceof Error ? reason.message : "Não foi possível salvar.",
+        reason instanceof ApiError && reason.status === 409
+          ? "A configuração mudou em outra sessão. Dados recarregados; revise e reaplique sua alteração."
+          : reason instanceof Error
+            ? reason.message
+            : "Não foi possível salvar.",
       );
+      try {
+        const authoritative = await api<PolicyData>(
+          "/api/patient-settings?careRecipientId=" + patientId,
+        );
+        currentVersionRef.current = authoritative.data.version;
+        setData(authoritative);
+      } catch {
+        setAttempt((value) => value + 1);
+      }
       return false;
     } finally {
+      savingRef.current = false;
       setBusy(false);
     }
   }
@@ -186,6 +218,18 @@ function Policies({ context }: { context: WorkspaceContext }) {
       </p>
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
+      {invitationUrl ? (
+        <Notice>
+          Entregue este convite apenas ao destinatário aprovado.
+          <input
+            aria-label="Convite aprovado"
+            className={inputClass}
+            readOnly
+            value={invitationUrl}
+            onFocus={(event) => event.currentTarget.select()}
+          />
+        </Notice>
+      ) : null}
       <label className="block max-w-md text-sm font-semibold">
         Configurar
         <select
@@ -448,7 +492,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
               Propostas globais aguardando aprovação local
             </h2>
             {data.changes
-              .filter((change) => change.status === "pending")
+              .filter((change) =>
+                ["pending", "awaiting_acceptance"].includes(change.status),
+              )
               .map((change) => (
                 <article
                   className="mt-3 rounded-lg border border-(--line) p-3"
@@ -458,9 +504,14 @@ function Policies({ context }: { context: WorkspaceContext }) {
                   <pre className="my-3 whitespace-pre-wrap break-all text-xs">
                     {JSON.stringify(change.proposed, null, 2)}
                   </pre>
-                  {change.proposed_by !== context.userId &&
-                  context.activeContext?.mode === "patient" &&
-                  context.patient?.role === "admin" ? (
+                  {change.status === "awaiting_acceptance" ? (
+                    <p className="text-sm">
+                      Aguardando aceite do destinatário. Ainda não concede
+                      vínculo.
+                    </p>
+                  ) : change.proposed_by !== context.userId &&
+                    context.activeContext?.mode === "patient" &&
+                    context.patient?.role === "admin" ? (
                     <div className="flex flex-wrap gap-3">
                       <button
                         className={primaryClass}

@@ -3,9 +3,46 @@ import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { PDFDocument } from "pdf-lib";
 import { demoDocuments } from "@/lib/demo-documents";
-import { renderDocumentPdf } from "@/lib/server/operational-pdf";
+import {
+  renderDocumentPdf,
+  requisitionNextStep,
+} from "@/lib/server/operational-pdf";
 
 describe("approved document presentation", () => {
+  it("directs completed and archived requests to their actual next operation", () => {
+    const req = Object.values(demoDocuments)[0];
+    expect(requisitionNextStep(req)).toContain("Providenciar ENT");
+    expect(
+      requisitionNextStep({
+        ...req,
+        sciencePolicy: { completed_at: "2026-10-23T00:00:00Z" },
+      }),
+    ).toContain("arquivamento");
+    expect(
+      requisitionNextStep({
+        ...req,
+        sciencePolicy: {
+          completed_at: "2026-10-23T00:00:00Z",
+          manual_archive_required: true,
+        },
+      }),
+    ).toContain("manual");
+    expect(
+      requisitionNextStep({
+        ...req,
+        sciencePolicy: { archived_at: "2026-10-23T00:00:00Z" },
+      }),
+    ).toBe("Documento arquivado");
+    expect(
+      requisitionNextStep({
+        ...req,
+        fulfillmentLines: [{ id: "line", attended: true }],
+      }),
+    ).toContain("conciliar");
+    expect(requisitionNextStep({ ...req, isHistorical: true })).toContain(
+      "histórico",
+    );
+  });
   it("renders all four types, pending science and confirmed receipts as distinct paginated artifacts", async () => {
     await mkdir(".private/v4/pdf", { recursive: true });
     const filenames = [

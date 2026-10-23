@@ -57,6 +57,23 @@ const white = rgb(1, 1, 1),
   pageHeight = 841.89,
   margin = 44,
   width = pageWidth - margin * 2;
+export function requisitionNextStep(snapshot: DocumentSnapshot) {
+  const policy = snapshot.sciencePolicy;
+  if (snapshot.isHistorical) return "Preservar o registro histórico";
+  if (snapshot.status === "cancelled") return "Documento cancelado";
+  if (policy?.archived_at) return "Documento arquivado";
+  if (policy?.completed_at) {
+    if (policy.manual_archive_required)
+      return "Revisão e arquivamento manual pelo administrador";
+    return "Aguardar arquivamento ou revisão administrativa";
+  }
+  if (
+    snapshot.fulfillmentLines?.length &&
+    snapshot.fulfillmentLines.every((line) => line.attended)
+  )
+    return "Conferir e conciliar a ENT vinculada";
+  return "Providenciar ENT e conferir recebimento";
+}
 function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   const result: string[] = [];
   const clean = Array.from(String(value ?? "Não informado"), (character) =>
@@ -468,12 +485,7 @@ export async function renderDocumentPdf(
           ? formatBrazilDate(snapshot.sciencePolicy.science_satisfied_at)
           : "Pendente nesta versão",
       ],
-      [
-        "Próximo passo",
-        snapshot.sciencePolicy?.archived_at
-          ? "Documento arquivado"
-          : "Providenciar ENT e conferir recebimento",
-      ],
+      ["Próximo passo", requisitionNextStep(snapshot)],
     ]);
   }
   nextPage();

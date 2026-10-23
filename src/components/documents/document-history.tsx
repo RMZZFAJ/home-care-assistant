@@ -46,6 +46,11 @@ type Filters = {
   to: string;
 };
 const empty: Filters = { search: "", type: "", status: "", from: "", to: "" };
+const historyFilters = {
+  ...documentStatuses,
+  archive_pending: "Conclusões para revisar e arquivar",
+  science_required: "Requisições para sua ciência",
+};
 export function DocumentRow({ row }: { row: DocumentSummary }) {
   return (
     <Link
@@ -236,7 +241,7 @@ function HistoryContent({
                 }
               >
                 <option value="">Todas</option>
-                {Object.entries(documentStatuses).map(([status, label]) => (
+                {Object.entries(historyFilters).map(([status, label]) => (
                   <option key={status} value={status}>
                     {label}
                   </option>

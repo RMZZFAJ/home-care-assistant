@@ -103,7 +103,7 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
           {
             label: "Requisições para sua ciência",
             count: data.sciencePending,
-            href: "/historico?type=REQ&status=science_pending",
+            href: "/historico?type=REQ&status=science_required",
           },
         ]
       : []),
@@ -112,7 +112,7 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
           {
             label: "Conclusões para revisar e arquivar",
             count: data.archivePending,
-            href: "/historico?type=REQ&status=completed_science_pending",
+            href: "/historico?type=REQ&status=archive_pending",
           },
         ]
       : []),

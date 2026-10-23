@@ -450,7 +450,12 @@ export function AppWorkspace({
             <span className="text-sm text-(--muted)">Home Care Assistant</span>
           )}
         </div>
-        {value ? <NotificationBell patientId={patient?.id} /> : null}
+        {value ? (
+          <NotificationBell
+            key={patient?.id ?? "all"}
+            patientId={patient?.id}
+          />
+        ) : null}
         <details className="profile-menu" ref={profileMenuRef}>
           <summary aria-label="Menu do usuário">
             <span className="avatar">
