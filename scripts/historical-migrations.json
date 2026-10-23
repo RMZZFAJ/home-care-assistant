@@ -62,5 +62,7 @@
   "supabase/migrations/20261023041917_v4_purpose_bound_whatsapp_flows.sql": "ba88409e214501167bdac3f51915f2544320aee8d6dc2582edc559616fcd25cb",
   "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql": "29c2cc370ca85c3ee7bd0ee9a74771c6696daf086d9244b0803516598dd3152d",
   "supabase/migrations/20261023073958_v4_verification_corrections.sql": "8cdba7ce09f1da1c2fa9ddd5a5f85c691d6ec8ee6c5abbd167f825bb3bfb0585",
-  "supabase/migrations/20261023120000_v4_review_regressions.sql": "a89e83d4de7ed07ce4d114ee55d3bc4cfdd11b919331f4d3c2a73d7a96cc10c1"
+  "supabase/migrations/20261023120000_v4_review_regressions.sql": "a89e83d4de7ed07ce4d114ee55d3bc4cfdd11b919331f4d3c2a73d7a96cc10c1",
+  "supabase/migrations/20261023173000_v4_preserve_authorized_worker_contract.sql": "f09c8d77c89498a16d4d45a04a33514c055d0c53a2dcfec9f1d6186f08f3e950",
+  "supabase/migrations/20261023174500_v4_review_follow_up.sql": "f0d6e0e63a32eb880d5af210d11f7af32e14daa47165a322851b4f1b5c519813"
 }

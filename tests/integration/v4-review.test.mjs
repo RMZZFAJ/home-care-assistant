@@ -139,6 +139,48 @@ test("V4 review: collective science and dashboard archive filters match authorit
     new Set(list.data.map((d) => d.status)),
     new Set(["completed", "completed_science_pending"]),
   );
+  async function archiveCapability(enabled) {
+    await rpc(admin, "configure_patient_access", {
+      p_patient: patient,
+      p_kind: "capability",
+      p_change: {
+        capability: "req.archive",
+        subjectUser: fixtures.adminA.id,
+        enabled,
+      },
+      p_key: randomUUID(),
+      p_version: await settingsVersion(admin, patient),
+    });
+  }
+  await archiveCapability(false);
+  assert.equal(
+    (await rpc(admin, "operational_tasks", { p_patient: patient }))
+      .archivePending,
+    0,
+  );
+  assert.equal(
+    (
+      await rpc(admin, "operational_document_list", {
+        p_patient: patient,
+        p_status: "archive_pending",
+      })
+    ).total,
+    0,
+  );
+  assert.equal(
+    (
+      await admin.rpc("archive_requisition", {
+        p_id: ids[0],
+        p_reason: "Operação negada mesmo ao administrador",
+      })
+    ).error?.code,
+    "42501",
+  );
+  assert.equal(
+    (await rpc(admin, "requisition_progress", { p_id: ids[0] })).archivedAt,
+    null,
+  );
+  await archiveCapability(null);
   await rpc(admin, "archive_requisition", {
     p_id: ids[0],
     p_reason: "Arquivamento manual de cenário fictício revisado",
@@ -344,11 +386,11 @@ test("V4 review: external queue rejects app-only events and holds unapproved tem
     p_enabled: true,
   });
   // Newer configuration always uses the authoritative policy version.
-  async function rule(event, channels) {
+  async function rule(event, channels, includePdf = true) {
     return rpc(admin, "configure_patient_access", {
       p_patient: patient,
       p_kind: "notification_rule",
-      p_change: { event, role: "family", channels, includePdf: true },
+      p_change: { event, role: "family", channels, includePdf },
       p_key: randomUUID(),
       p_version: await settingsVersion(admin, patient),
     });
@@ -451,6 +493,28 @@ test("V4 review: external queue rejects app-only events and holds unapproved tem
       (j) => j.document_id === req.id && j.channel === "whatsapp",
     );
   assert.ok(job);
+  for (const name of ["family", "global"]) {
+    const unauthorized = await actor(name, patient);
+    assert.equal(
+      (
+        await unauthorized.rpc("validate_notification_job", {
+          p_id: job.id,
+          p_worker_id: worker,
+        })
+      ).error?.code,
+      "42501",
+    );
+    assert.equal(
+      (
+        await unauthorized.rpc("complete_notification_job", {
+          p_id: job.id,
+          p_worker_id: worker,
+          p_state: "delivered",
+        })
+      ).error?.code,
+      "42501",
+    );
+  }
   assert.equal(
     (
       await rpc(service, "bind_notification_template", {
@@ -498,7 +562,49 @@ test("V4 review: external queue rejects app-only events and holds unapproved tem
     ),
     "t",
   );
-  const nextWorker = randomUUID();
+  let nextWorker = randomUUID();
+  assert.ok(
+    (
+      await rpc(service, "claim_notification_jobs", {
+        p_limit: 100,
+        p_worker_id: nextWorker,
+        p_external_enabled: true,
+      })
+    ).some((j) => j.id === job.id),
+  );
+  await rule("req.issued", ["internal", "whatsapp"], false);
+  const pdfHold = await rpc(service, "complete_notification_job", {
+    p_id: job.id,
+    p_worker_id: nextWorker,
+    p_state: "pending",
+    p_error: "PDF_TEMPLATE_VARIANT_REQUIRED",
+  });
+  assert.equal(pdfHold.next_attempt_at, "infinity");
+  assert.ok(
+    !(
+      await rpc(service, "claim_notification_jobs", {
+        p_limit: 100,
+        p_worker_id: randomUUID(),
+        p_external_enabled: true,
+      })
+    ).some((j) => j.id === job.id),
+  );
+  assert.equal(
+    sql(
+      "select attempts from public.requisition_notifications where id=" +
+        sqlLiteral(job.id),
+    ),
+    String(pdfHold.attempts),
+  );
+  await rule("req.issued", ["internal", "whatsapp"], true);
+  assert.equal(
+    sql(
+      "select include_pdf and next_attempt_at<=now() and last_error is null from public.requisition_notifications where id=" +
+        sqlLiteral(job.id),
+    ),
+    "t",
+  );
+  nextWorker = randomUUID();
   assert.ok(
     (
       await rpc(service, "claim_notification_jobs", {

@@ -8,8 +8,43 @@ import {
   whatsappEvents,
 } from "@/lib/notifications/template-registry";
 import { MetaWhatsAppProvider } from "@/lib/notifications/provider";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { prepareDocumentNotification } from "@/lib/notifications/document-notification";
 
 describe("immutable Meta event contracts", () => {
+  it("reports a PDF configuration hold before rendering or sending a document template", async () => {
+    const definition = templateForEvent("req.science_satisfied")!;
+    const client = {
+      rpc: async (name: string) => ({
+        error: null,
+        data:
+          name === "bind_notification_template"
+            ? { ...definition, approval: "APPROVED" }
+            : {
+                type: "REQ",
+                code: "REQ-0001",
+                version: 1,
+                hash: "test",
+                eventKey: "req.science_satisfied",
+                includePdf: false,
+                snapshot: { type: "REQ", lines: [], history: [] },
+              },
+      }),
+    } as unknown as SupabaseClient;
+    const result = await prepareDocumentNotification(
+      client,
+      {
+        id: "10000000-0000-4000-8000-000000000001",
+        document_id: "20000000-0000-4000-8000-000000000001",
+        requisition_id: null,
+        channel: "whatsapp",
+        destination: "+15555550102",
+      },
+      "30000000-0000-4000-8000-000000000001",
+    );
+    expect(result.preparationError).toBe("PDF_TEMPLATE_VARIANT_REQUIRED");
+    expect(result.attachment).toBeUndefined();
+  });
   it("keeps database routing and external templates in one tested contract", () => {
     const sql = readFileSync(
       "supabase/migrations/20261023120000_v4_review_regressions.sql",
