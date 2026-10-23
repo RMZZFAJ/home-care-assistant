@@ -1,90 +1,144 @@
 # Evolução integral — execução
 
-## Checkpoint V4 para acesso online — 23/10/2026
+## Entrega V4 — 23/10/2026
 
-A pedido do usuário, esta etapa prioriza publicar o estado funcional parcial.
-Não representa homologação integral nem autorização para afirmar testes ausentes.
-A branch é `codex/evolucao-integral-v4`, baseada na master `3f64dfd`.
-O merge final permanece condicionado à validação completa da V4.
+Esta revisão substitui o checkpoint parcial da V4. O [PR 4][pr-v4] reúne a
+implementação, os commits lógicos e os checks associados ao código integrado.
+O resultado do merge, da CI da master e da validação pós-merge é registrado no
+PR e no relatório final da entrega. Resultados V3 abaixo são históricos.
 
-### Implementação neste checkpoint
+### Escopo implementado
 
-- Contexto explícito por sessão Auth: administração global ou vínculo local.
-  Administrador local altera seu escopo imediatamente; propostas globais
-  exigem aprovação de outra pessoa com administração no paciente.
-- Ciência REQ independente de aceite ENT, com evidência da origem e preferências
-  pessoais. Aceite positivo atende a linha vinculada, sem quantidade solicitada.
-  Necessidade compartilhada exige justificativa, sem duplicar crédito físico.
-- Aceites parciais entram imediatamente no saldo confirmado. Conferência,
-  trânsito, divergência e conciliação continuam distintos.
-- Arquivamento manual justificado e automático agendado. Conclusão com ciência
-  obrigatória pendente mantém a exceção que bloqueia arquivamento automático.
-- Realtime privado com revisão durável e recuperação de conexão; retorno ao
-  documento após login; matrizes de permissões e canais; revisão de cancelamento.
-- PDFs com nova revisão do renderizador, fonte incorporada, QR de integridade
-  mínima e preservação das versões anteriores. Seis exemplos foram inspecionados.
-- Catálogo de 27 templates e contratos de Flows versionados; lembretes BAL e de
-  período com destinatários explícitos. Não há envio externo habilitado.
-- TOTP opcional no perfil e exigência AAL2 para administração após ativação.
-  A homologação completa do ciclo MFA ainda está pendente.
+- Contexto explícito por sessão Auth real: global ou vínculo local existente.
+  Identidade global não concede poderes operacionais. Administrador local
+  aplica alterações no próprio paciente; proposta global exige aprovação de
+  outra identidade administradora local. Trocar perfil não permite autoaprovar.
+- Cadastro de paciente com administrador inicial explicitamente informado e
+  e-mail confirmado. Convites exigem aceite da identidade destinatária e
+  revalidam o emissor. O último administrador ativo é preservado sob concorrência.
+- Ciência REQ independente de recebimento ENT, com preferências pessoais,
+  política do paciente, modalidades e evidência de origem. Na emissão o autor
+  recebe confirmação sem PDF; ciência satisfeita gera outro aviso com PDF novo.
+- REQ sem quantidade solicitada: aceite positivo de ENT vinculada atende a
+  linha. Necessidade compartilhada exige motivo e não duplica crédito físico.
+  Atualizações do atendimento geram nova versão canônica da requisição.
+- ENT sem aceite aguarda conferência. Aceite parcial credita imediatamente a
+  equipe; divergência, quantidade conciliada e conferência integral ficam
+  separadas. Compra ou doação COM entra na família somente após validação.
+- Ajustes familiares usam ledger, motivo, responsável e compensação auditável.
+  BAL é exclusivo da equipe. Estoque confirmado, trânsito, projeção e mínimos
+  possuem apresentação e contratos distintos.
+- Agendador de lembretes e arquivamento com intervalo configurável, trabalho
+  vencido e recuperação. Conclusão com ciência obrigatória pendente conserva
+  a exceção que exige arquivamento manual justificado, mesmo após ciência tardia.
+- Navegação por capacidades, perfil ativo, quatro wizards, histórico filtrável,
+  matrizes móveis, duplicidade contextual, timeline e notificações integradas.
+  Realtime privado transmite revisões; recuperação não descarta rascunhos.
+- PDF profissional com fonte incorporada, QR mínimo, SHA canônico, SHA dos bytes
+  e revisão do renderizador. Versões anteriores e documentos históricos ficam
+  preservados; dados desconhecidos não são inventados.
+- Arquivo PDF entregue ao compartilhamento nativo, com download alternativo.
+  Acompanhamento inicial dos avisos termina em até dez segundos.
+- TOTP oficial no perfil; fator confirmado exige AAL2 para administração.
+  Templates Meta versionados e Flows com propósito, revisão, telefone, versão e
+  token de uso único. Consumo extraordinário exige confirmação autorizada.
 
-### Evidência executada no candidato
+### Evidência executada nesta revisão
 
-| Verificação | Resultado |
+| Verificação | Resultado real |
 | --- | --- |
-| Contratos | 52 migrations históricas intactas |
-| Tipagem e build | Passaram |
-| Unitários | 91/91 em 16 arquivos |
-| Integração V4 com Auth real | 5/5 |
-| Realtime entre duas sessões | Passou; canal alheio recusado |
-| PDF e templates | Incluídos nos unitários |
-| Instalação limpa local | 62 migrations aplicadas; emissão REQ-0001 |
-| Evolução desde migration 19 | 62 aplicadas; suíte legada em adaptação |
-| SQL/RLS e E2E completos V4 | Pendentes; resultados V3 abaixo são históricos |
+| Contratos | 63 migrations aplicadas protegidas por hash |
+| Lint, Markdown, tipagem e build | Passaram |
+| Unitários | 92/92 em 16 arquivos |
+| Instalação limpa e upgrade desde 19 | 63; preservação validada |
+| SQL/RLS | Dez suítes; grants e search_path restrito passaram |
+| Integração HTTP/Auth | 16/16, sem testes ignorados |
+| Concorrência e isolamento | Idempotência, saldo, outbox e últimos admins |
+| Realtime | Duas sessões reais; canal de outro usuário recusado |
+| TOTP/AAL2 | Local e remoto; AAL1 impedido; fator temporário removido |
+| E2E local | 81/81 em 13,8 minutos; desktop, Pixel 7 e WebKit/iPhone 13 |
+| Matrizes e arquivo PDF | Persistência e aprovação local verificadas |
+| Prazo de acompanhamento | Parada em dez segundos verificada no navegador |
+| Preview | READY; APIs, menus, sino, três larguras e PDF real |
+| Jornada remota | REQ → COM → família → ENT parcial → conciliação → BAL |
+| Contas remotas | Cinco logins; capacidades e proibições RPC/RLS passaram |
 
-O replay legado encontrou uma asserção antiga que consultava saldo como global
-sem selecionar vínculo. Isso não prova perda: a V4 exige contexto local.
-A adaptação incompleta do harness foi preservada em
-`.private/v4/pending-harness/`; não foram removidos testes nem relaxadas regras
-para obter verde. O runner E2E existente continua restrito à stack local;
-precisa incorporar a seleção explícita de contexto antes da suíte final.
+Os testes preservam verificações negativas; erros seguros de acesso negado,
+sessão revogada, versão antiga e paciente inativo são resultados esperados.
+O contrato visual de múltiplos canais simula somente a lista de canais, pois
+provedores estão desabilitados; gravação, RPC, autorização e aprovação são reais.
+O contrato WhatsApp local não representa entrega ou aprovação real da Meta.
 
-### Preservação e aplicação remota
+O erro antigo da extensão Playwright vinha de uma exceção durante a descoberta
+no editor. A descoberta agora é livre de mutações; servidor e globalSetup
+verificam a stack local ao executar. Nenhum aviso foi desativado. A classe
+Tailwind usa a forma canônica wrap-break-word.
 
-Backup local custom verificado antes do replay: 1283270 bytes, manifesto SHA-256
-fora do Git. O catálogo original tem cópia anterior verificada e rotina de
-restauração; a restauração local final ainda precisa ser executada após a suíte.
+### Banco, preservação e acessos
 
-Remoto conciliado antes da atualização: 52 migrations, 29 produtos, 58 vínculos
-de catálogo, oito identidades Auth, um administrador global e quatro movimentos.
-Backup remoto de esquema e dados inclui public, private, Auth, metadados Storage
-e histórico de migrations. Arquivos de 485445 e 561273 bytes têm manifesto
-SHA-256 em LOCALAPPDATA/home-care-assistant/backups. Bytes dos anexos não foram
-copiados; nenhum reset remoto ou carga de fixtures remotas será executado.
+O proprietário aplicou as dez migrations V4 iniciais. Conferimos 62 migrations
+antes do complemento; nenhuma foi reescrita. O incremento 63 foi validado em
+instalação limpa e upgrade, protegido por transação e aplicado incrementalmente.
+O dry-run indicava somente esse arquivo, sem seeds ou alterações de roles.
 
-Aplicação das dez migrations V4 e publicação: em andamento neste checkpoint.
-As cinco contas de teste existentes serão preservadas e verificadas online.
-Acesso privado: `.private/homologacao/ACESSOS.md`, ignorado por Git e Vercel.
+Backup remoto prévio: esquema de 609148 bytes e dados de 840172 bytes, com
+manifesto SHA-256 fora do Git. Inclui public, private, Auth, metadados Storage e
+histórico de migrations. Dumps sequenciais não formam snapshot atômico; bytes
+de anexos não foram copiados e esse backup remoto não teve ensaio de restore.
+Não houve reset remoto nem carga da suíte/fixtures no remoto.
 
-### Limites externos efetivamente constatados
+Os 29 produtos, 58 vínculos originais do catálogo, oito identidades Auth e o
+administrador global foram preservados. Hashes do catálogo permaneceram iguais
+antes/depois da migração. A jornada remota criou paciente fictício separado,
+adotou um produto existente e usou convites oficiais para as cinco contas.
+Dados operacionais originais não foram apagados.
 
-Consulta Meta em 23/10: HTTP 401, OAuthException 190/463, token expirado.
+Na jornada isolada, COM recebeu 12 unidades sem comprovação financeira;
+ENT expediu dez e aceitou seis. As quatro ausentes foram conciliadas formalmente.
+Resultado: família 2, equipe 6, trânsito 0; REQ 1/1 atendida; ENT confirmada com
+0/1 linha integralmente conferida; BAL aplicado. O PDF da versão 1 permaneceu
+idêntico após o PDF da versão 5.
+
+Após a suíte, o banco local foi limpo com backup verificado e recebeu o catálogo
+original: 37 produtos e 107 vínculos, zero diferenças nos campos originais.
+O dump original foi restaurado para conferência em banco temporário dentro do
+mesmo container; esse banco foi removido e nunca foi destino da suíte.
+
+Credenciais das cinco contas: .private/homologacao/ACESSOS.md e contas.json,
+ignorados por Git, Vercel e empacotamento npm, com acesso local restrito.
+Endereços example.invalid permitem login por senha; recuperação por e-mail exige
+endereço humano. Senhas, tokens, QR TOTP e dumps não foram versionados.
+A conta `renatomazzarinocorp@gmail.com` mantém senha e administração global.
+
+### Publicação e integrações externas
+
+[Preview validado][preview-v4], [PR 4][pr-v4] e [CI da master][master-ci] são as
+referências públicas. A efetivação e verificação do deploy oficial constam no PR.
+O agendador usa pg_cron; URL oficial e segredo do worker são configurados no
+Vault pela RPC de serviço. Agendamento interno independe da liberação da Meta.
+
+Consulta real Meta em 23/10: HTTP 401, OAuthException 190/463, token expirado.
 Os cinco templates prioritários ficaram individualmente bloqueados antes da
-submissão. Existem 27 contratos preparados, nenhum aprovado por esta execução.
-Token válido, permissões Meta, App Secret, webhook e publicação dos Flows são
-pendências externas. O erro histórico 130497 é restrição de país, sem entrega.
+submissão. Há 27 contratos preparados; nenhum foi declarado aprovado.
+Faltam token válido/permissões, App Secret, webhook inscrito, elegibilidade do
+destinatário e chaves/publicação dos Flows. O erro 130497 é o relato histórico
+fornecido pelo proprietário, sem nova entrega confirmada nesta execução.
 NOTIFICATIONS_EXTERNAL_ENABLED e META_FLOWS_ENABLED permanecem false.
+OAuth humano, SMTP, SMS real, câmera física e transcrição não foram homologados.
 
-Auditoria npm de produção: zero vulnerabilidades. Auditoria com dependências de
-ferramentas reporta seis alertas altos transitivos de braces, sem versão corrigida
-publicada no advisory GHSA-vfj7-8cjw-p6xm consultado. Não houve downgrade nem
-supressão para mascarar o resultado. OAuth/SMTP, câmera física e mensagens reais
-não são declarados homologados.
+Auditoria npm de produção: zero vulnerabilidades. A cadeia de ferramentas tem
+seis alertas altos transitivos de braces, sem correção publicada no advisory
+GHSA-vfj7-8cjw-p6xm consultado. Não houve downgrade nem supressão para esconder
+esse resultado. Essa limitação externa não equivale a ausência absoluta de risco.
 
-Os cinco arquivos de referência estão em `docs/references/v3/`; JSON e PDFs
-originais intactos. Markdown foi reformatado, com original também em `.private`.
-A assinatura assimétrica permanece apenas no roadmap; SHA-256 não impede um
-administrador do banco de alterar também o histórico e os próprios controles.
+As referências aprovadas estão em docs/references/v3. PDFs e JSON originais
+permanecem intactos; Markdown foi reformatado, com original privado preservado.
+Ed25519 fica no roadmap. SHA-256 não impede que um administrador do banco
+altere o conteúdo junto com os próprios controles e histórico.
+
+[pr-v4]: https://github.com/RMZZFAJ/home-care-assistant/pull/4
+[preview-v4]: https://home-care-assistant-5o4ge7pt4-rmzzfajs-projects.vercel.app
+[master-ci]: https://github.com/RMZZFAJ/home-care-assistant/actions?query=branch%3Amaster
 
 ## Histórico da entrega anterior — 22/10/2026
 

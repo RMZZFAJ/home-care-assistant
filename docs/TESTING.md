@@ -63,6 +63,17 @@ supervisor, profissional, familiar, leitor, revogado, compartilhado e sem víncu
 SQL testa políticas e transações. HTTP/RPC testa caminhos diretos e concorrência,
 incluindo a proteção simultânea do último administrador global.
 
+O helper SQL seleciona sessões criadas pela API oficial Auth e seu contexto
+explícito. Não fabrica sessões nem deriva autorização do papel global. As suítes
+de banco, MFA e revogação alteram as mesmas identidades de fixture: execute-as
+sequencialmente antes do E2E. Não rode essas suítes em paralelo com navegadores.
+
+A integração V4 verifica ciência independente, necessidade compartilhada,
+recebimento parcial, versões canônicas, governança, concorrência do último
+administrador local, Realtime privado, agendador, TOTP/AAL2 e Flows de uso único.
+O contrato WhatsApp local testa leitura e confirmação correlacionadas; aprovar
+registro local de template nesse teste não representa aprovação pela Meta.
+
 Ao mudar configurações de Auth, use `npm run test:db:prepare -- --restart`.
 O comando reinicia somente o projeto local verificado e mantém seus dados.
 Confirmação de e-mail e Mailpit permitem testar jornadas sem entrega externa.
@@ -100,8 +111,8 @@ após persistência deve recuperar o mesmo registro. Resultado de provedor real,
 OAuth externo e novo run publicado do CI dependem de homologação separada.
 
 Antes da suíte completa, autorize o replay local e execute test:migrations e
-test:integration. A importação E2E usa protocolos físicos 9, 10 e 11 em dados
-fictícios; o replay prepara novamente essa fixture para uma nova execução.
+test:integration. A importação E2E aloca o próximo protocolo físico disponível
+em dados fictícios, preservando protocolos e eventos confirmados anteriores.
 Mailpit valida cadastro, confirmação e recuperação sem entrega externa.
 
 ## Linux local

@@ -60,5 +60,6 @@
   "supabase/migrations/20261023041150_v4_session_assurance_and_admin_directory.sql": "fcfe90544b44acb391759d0cf26c469e16883f6e6258244d75e280be27d07790",
   "supabase/migrations/20261023041624_v4_document_read_models_and_worker_cron.sql": "ebbcdb5ada9c73093ee670bda96ef4759a28016b341c24a0eed7f8017c879493",
   "supabase/migrations/20261023041917_v4_purpose_bound_whatsapp_flows.sql": "ba88409e214501167bdac3f51915f2544320aee8d6dc2582edc559616fcd25cb",
-  "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql": "29c2cc370ca85c3ee7bd0ee9a74771c6696daf086d9244b0803516598dd3152d"
+  "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql": "29c2cc370ca85c3ee7bd0ee9a74771c6696daf086d9244b0803516598dd3152d",
+  "supabase/migrations/20261023073958_v4_verification_corrections.sql": "8cdba7ce09f1da1c2fa9ddd5a5f85c691d6ec8ee6c5abbd167f825bb3bfb0585"
 }

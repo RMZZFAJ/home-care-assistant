@@ -3,7 +3,7 @@
 ## Preservação e migrations
 
 Migrations aplicadas são imutáveis. O guard verifica os hashes normalizados
-das primeiras 19 entre Windows e Linux; toda evolução usa novos arquivos.
+das primeiras 63 entre Windows e Linux; toda evolução usa novos arquivos.
 Instalação limpa e evolução legada são testadas na stack local, preservando
 protocolos, snapshots, FKs e estoques cuja origem não pode ser atribuída.
 
@@ -75,6 +75,18 @@ escopo global; care_recipient_memberships define função e estado locais.
 capability_definitions e capability_overrides determinam capacidades efetivas.
 access_change_requests versiona propostas críticas e segunda aprovação.
 
+private.authority_sessions associa contexto explícito à sessão Auth vigente.
+Autoridade global não substitui vínculo operacional. O administrador local
+aplica mudanças imediatamente; propostas globais conservam versão e exigem
+aprovação de outra identidade local. Locks e guards preservam o último
+administrador ativo sob revogações concorrentes. O selo privado transacional
+autoriza somente o vínculo inicial explícito ou aceite de convite válido.
+
+requisition_lifecycle conserva política, prazo, conclusão, exceção de ciência
+pendente e arquivamento. requisition_science_events registra ator, modalidade e
+evidência imutável. Atendimento aceito altera uma nova versão documental; hashes
+e PDFs anteriores permanecem intactos. Importações não inventam ciência ou data.
+
 my_workspace retorna pacientes e capacidades em uma chamada autorizada.
 Browser metadata, IDs e seleção local não concedem acesso. RLS, grants
 explícitos/defaults, schema private e SECURITY DEFINER são revisados juntos.
@@ -83,11 +95,19 @@ attachments e document_pdfs guardam referências, hashes e versões de objetos
 privados no Storage. Upload sanitizado tem reserva idempotente e confirmação
 de servidor. PDF é armazenado por versão imutável.
 
+document_pdfs distingue hash do conteúdo canônico, hash dos bytes e revisão do
+renderizador. O verificador público retorna somente integridade mínima, sem
+nome, material, observação ou outro dado do paciente.
+
 Outbox individual controla lease, tentativas e estados externos.
 seen_at é independente de leitura do provedor. verified_phones deriva de
 telefone confirmado no Auth. whatsapp_challenges associa identidade, telefone,
 versão, prazo e uso único. flow_submissions e consumption_reports preservam
 sugestões pendentes até revisão e confirmação autorizada.
+
+workspace_revisions e broadcasts privados invalidam leituras autorizadas, sem
+enviar snapshots clínicos. pg_cron agenda ciclo documental e worker; credencial
+e URL do worker ficam no Vault, configuradas pela RPC de serviço dedicada.
 
 ## Verificação
 
