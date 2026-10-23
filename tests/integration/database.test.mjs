@@ -29,6 +29,18 @@ async function actor(name) {
       password: fixturePassword,
     });
     assert.ifError(result.error);
+    if (!["revoked", "unlinked"].includes(name))
+      assert.ifError(
+        (
+          await client.rpc("select_active_context", {
+            p_patient: name.startsWith("global")
+              ? null
+              : name === "adminB"
+                ? patientB
+                : patientA,
+          })
+        ).error,
+      );
     clients.set(name, client);
   }
   return clients.get(name);
@@ -158,13 +170,12 @@ test("concurrent HTTP submissions persist one canonical request and immutable re
         .error,
     );
   } finally {
-    if (savedId)
-      sql(`delete from public.requisitions where id=${sqlLiteral(savedId)};`);
+    // Confirmed audit history stays until the explicitly backed-up local fixture reset.
   }
 });
 
 test("concurrent family withdrawals cannot overspend and ENT acceptance preserves both custodies", async () => {
-  const global = await actor("global");
+  const global = await actor("adminA");
   const team = await actor("professional");
   const created = await global.rpc("admin_upsert_recipient_product", {
     p_care_recipient_id: patientA,
@@ -303,7 +314,9 @@ test("competing outbox workers claim each notification once under real HTTP conc
   try {
     assert.ifError(
       (
-        await global.rpc("configure_recipient_notification", {
+        await (
+          await actor("adminA")
+        ).rpc("configure_recipient_notification", {
           p_care_recipient_id: patientA,
           p_recipient_user_id: fixtures.professional.id,
           p_recipient_group: "care_team",
@@ -313,10 +326,9 @@ test("competing outbox workers claim each notification once under real HTTP conc
         })
       ).error,
     );
-    const created = await global.rpc(
-      "submit_requisition",
-      requestArgs(randomUUID()),
-    );
+    const created = await (
+      await actor("adminA")
+    ).rpc("submit_requisition", requestArgs(randomUUID()));
     assert.ifError(created.error);
     requisitionId = row(created.data).requisition_id;
     sql(
@@ -376,7 +388,7 @@ test("competing outbox workers claim each notification once under real HTTP conc
         })
       ).error,
     );
-    const checked = await global
+    const checked = await (await actor("adminA"))
       .from("requisition_notifications")
       .select("state")
       .eq("id", notification.id)
@@ -384,10 +396,7 @@ test("competing outbox workers claim each notification once under real HTTP conc
     assert.ifError(checked.error);
     assert.equal(checked.data.state, "delivered");
   } finally {
-    if (requisitionId)
-      sql(
-        `delete from public.requisitions where id=${sqlLiteral(requisitionId)};`,
-      );
+    // Confirmed audit history stays until the explicitly backed-up local fixture reset.
     sql(
       `delete from public.recipient_notification_settings where care_recipient_id=${sqlLiteral(patientA)} and recipient_user_id=${sqlLiteral(fixtures.professional.id)} and channel='internal';`,
     );
@@ -407,7 +416,7 @@ test("service-role HTTP worker operates through RPCs without private table grant
   try {
     assert.ifError(
       (
-        await global.rpc("configure_recipient_notification", {
+        await local.rpc("configure_recipient_notification", {
           p_care_recipient_id: patientA,
           p_recipient_user_id: fixtures.professional.id,
           p_recipient_group: "care_team",
@@ -417,10 +426,9 @@ test("service-role HTTP worker operates through RPCs without private table grant
         })
       ).error,
     );
-    const created = await global.rpc(
-      "submit_requisition",
-      requestArgs(randomUUID()),
-    );
+    const created = await (
+      await actor("adminA")
+    ).rpc("submit_requisition", requestArgs(randomUUID()));
     assert.ifError(created.error);
     requisitionId = row(created.data).requisition_id;
     // Place this synthetic job first without depending on the age of other fixtures.
@@ -513,10 +521,7 @@ test("service-role HTTP worker operates through RPCs without private table grant
       0,
     );
   } finally {
-    if (requisitionId)
-      sql(
-        `delete from public.requisitions where id=${sqlLiteral(requisitionId)};`,
-      );
+    // Confirmed audit history stays until the explicitly backed-up local fixture reset.
     sql(
       `delete from public.recipient_notification_settings where care_recipient_id=${sqlLiteral(patientA)} and recipient_user_id=${sqlLiteral(fixtures.professional.id)} and channel='internal';`,
     );

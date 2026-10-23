@@ -30,10 +30,16 @@ function reset(version) {
     timeout: 600_000,
   });
   if (result.status !== 0)
-    throw new Error(result.error?.message ?? result.stderr);
+    throw new Error(
+      result.error?.message ?? result.stderr + "\n" + result.stdout,
+    );
   if (existsSync(fixtureFile)) unlinkSync(fixtureFile);
 }
-reset();
+if (process.argv.includes("--sql-only")) {
+  await runSqlRegressions(JSON.parse(readFileSync(fixtureFile, "utf8")));
+  process.exit(0);
+}
+if (!process.argv.includes("--resume-clean")) reset();
 assert.equal(
   sql(
     "select count(*) from information_schema.columns where table_schema='public' and column_name='requested_quantity';",
@@ -53,16 +59,24 @@ assert.ifError(
     })
   ).error,
 );
-const cleanPatient = crypto.randomUUID();
 assert.ifError(
-  (
-    await client.rpc("admin_upsert_recipient", {
-      p_id: cleanPatient,
-      p_display_name: "Paciente fictício de instalação limpa",
-      p_is_active: true,
-      p_is_development: true,
-    })
-  ).error,
+  (await client.rpc("select_active_context", { p_patient: null })).error,
+);
+const cleanCreated = await client.rpc("admin_upsert_recipient", {
+  p_id: null,
+  p_display_name: "Paciente fictício de instalação limpa",
+  p_is_active: true,
+  p_is_development: true,
+});
+assert.ifError(cleanCreated.error);
+const cleanPatient = cleanCreated.data.id;
+// Explicit controlled membership, independent of global identity.
+sql(
+  `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${cleanPatient}','${fixtures.global.id}','admin');`,
+);
+assert.ifError(
+  (await client.rpc("select_active_context", { p_patient: cleanPatient }))
+    .error,
 );
 assert.ifError(
   (
@@ -124,7 +138,7 @@ assert.equal(
 assert.equal(
   Number(
     sql(
-      `begin; set local request.jwt.claim.sub='${legacyFixtures.global.id}'; select balance from public.current_stock_balances where care_recipient_id='${patientA}' and product_id='fralda' and location='FAMILY'; rollback;`,
+      `begin; set local request.jwt.claim.sub='${legacyFixtures.global.id}'; select coalesce(sum(case when destination_location='FAMILY' then quantity when source_location='FAMILY' then -quantity else 0 end),0) from public.stock_movements where care_recipient_id='${patientA}' and product_id='fralda'; rollback;`,
     ),
   ),
   10,
@@ -132,7 +146,7 @@ assert.equal(
 assert.equal(
   Number(
     sql(
-      `begin; set local request.jwt.claim.sub='${legacyFixtures.global.id}'; select balance from public.current_stock_balances where care_recipient_id='${patientB}' and product_id='fralda' and location='CARE_TEAM'; rollback;`,
+      `begin; set local request.jwt.claim.sub='${legacyFixtures.global.id}'; select coalesce(sum(case when destination_location='CARE_TEAM' then quantity when source_location='CARE_TEAM' then -quantity else 0 end),0) from public.stock_movements where care_recipient_id='${patientB}' and product_id='fralda'; rollback;`,
     ),
   ),
   7,
@@ -153,41 +167,7 @@ console.log(
   "PASS legacy upgrade: protocols, quantities, both patient balances, FKs and unassigned stock preserved.",
 );
 
-// Recent-session SQL checks use sessions issued by Auth, never synthetic JWT/session rows.
-for (const role of ["professional", "family"]) {
-  const sessionClient = createClient(backend.url, backend.anonKey, {
-    auth: { persistSession: false },
-  });
-  assert.ifError(
-    (
-      await sessionClient.auth.signInWithPassword({
-        email: legacyFixtures[role].email,
-        password: fixturePassword,
-      })
-    ).error,
-  );
-}
-for (const file of [
-  "transactions.sql",
-  "invitations-import-outbox.sql",
-  "alerts-routing.sql",
-  "notification-read-model.sql",
-  "protocol-and-stock-boundaries.sql",
-  "service-role.sql",
-  "supply-workflows.sql",
-  "document-invariants.sql",
-  "operational-reviews.sql",
-  "whatsapp-receipts.sql",
-]) {
-  const content = readFileSync(`tests/database/${file}`, "utf8");
-  const output = sql(
-    file === "supply-workflows.sql"
-      ? "begin;" + content + "rollback;"
-      : content,
-  );
-  assert.match(output, /passed/);
-  console.log(`PASS PostgreSQL regression: ${file}`);
-}
+await runSqlRegressions(legacyFixtures);
 
 const compatibility = readFileSync(
   "supabase/migrations/20261020002050_extension_migration_compatibility.sql",
@@ -212,3 +192,49 @@ assert.match(
 console.log(
   "PASS hosted migration compatibility: restricted public search_path, canonical SHA-256, client privileges and bridge cleanup.",
 );
+
+async function runSqlRegressions(fixtureIdentities) {
+  const localBackend = getTestEnvironment();
+  // Recent-session SQL checks use sessions issued by Auth, never synthetic JWT/session rows.
+  for (const role of Object.keys(fixtureIdentities)) {
+    const sessionClient = createClient(localBackend.url, localBackend.anonKey, {
+      auth: { persistSession: false },
+    });
+    assert.ifError(
+      (
+        await sessionClient.auth.signInWithPassword({
+          email: fixtureIdentities[role].email,
+          password: fixturePassword,
+        })
+      ).error,
+    );
+  }
+  for (const file of [
+    "transactions.sql",
+    "invitations-import-outbox.sql",
+    "alerts-routing.sql",
+    "notification-read-model.sql",
+    "protocol-and-stock-boundaries.sql",
+    "service-role.sql",
+    "supply-workflows.sql",
+    "document-invariants.sql",
+    "operational-reviews.sql",
+    "whatsapp-receipts.sql",
+  ]) {
+    if (
+      process.argv.includes("--sql-file") &&
+      file !== process.argv[process.argv.indexOf("--sql-file") + 1]
+    )
+      continue;
+    const content =
+      readFileSync("tests/database/assume-context.sql", "utf8") +
+      readFileSync(`tests/database/${file}`, "utf8");
+    const output = sql(
+      file === "supply-workflows.sql"
+        ? "begin;" + content + "rollback;"
+        : content,
+    );
+    assert.match(output, /passed/);
+    console.log(`PASS PostgreSQL regression: ${file}`);
+  }
+}

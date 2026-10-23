@@ -13,13 +13,7 @@ language plpgsql as $$declare caught boolean:=false;begin
   begin execute p_sql;exception when others then caught:=true;end;
   perform pg_temp.assert_ok(caught,p_message);
 end;$$;
-create or replace function pg_temp.login(p_name text) returns void
-language plpgsql as $$declare v uuid;begin
-  select id into v from fixture_users where name=p_name;
-  perform pg_temp.assert_ok(v is not null,'fixture user exists');
-  perform set_config('request.jwt.claim.sub',v::text,true);
-  perform set_config('request.jwt.claim.role','authenticated',true);
-end;$$;
+create function pg_temp.login(who text) returns void language plpgsql as $$begin perform pg_temp.assume_context(who);end;$$;
 create temporary table alert_test_ids(key text primary key,id uuid);
 grant execute on function pg_temp.assert_ok(boolean,text),pg_temp.must_fail(text,text),pg_temp.login(text) to authenticated;
 grant select,insert on alert_test_ids to authenticated;
@@ -63,7 +57,7 @@ insert into alert_test_ids select 'team',id from public.stock_alert_events
     and product_id='fralda' and location='CARE_TEAM' and state='open';
 select pg_temp.assert_ok((select severity='critical' from public.stock_alert_events
   where id=(select id from alert_test_ids where key='team')),'family balance cannot mask team shortage');
-select pg_temp.assert_ok((select count(*)=3 from public.requisition_notifications
+select pg_temp.assert_ok((select count(*)=4 from public.requisition_notifications
   where alert_event_id=(select id from alert_test_ids where key='team')),'team alert reaches team supervision and administrator');
 select pg_temp.assert_ok(not exists(select 1 from public.requisition_notifications
   where alert_event_id=(select id from alert_test_ids where key='team')
@@ -73,7 +67,7 @@ select public.configure_stock_alert('20000000-0000-4000-8000-000000000001','fral
 select pg_temp.assert_ok((select count(*)=1 from public.stock_alert_events
   where care_recipient_id='20000000-0000-4000-8000-000000000001'
     and product_id='fralda' and location='CARE_TEAM' and state='open'),'unchanged condition does not duplicate event');
-select pg_temp.assert_ok((select count(*)=3 from public.requisition_notifications
+select pg_temp.assert_ok((select count(*)=4 from public.requisition_notifications
   where alert_event_id=(select id from alert_test_ids where key='team')),'unchanged condition does not duplicate recipients');
 
 reset role;
@@ -106,7 +100,7 @@ end;$$;
 insert into alert_test_ids select 'teamOptIn',id from public.stock_alert_events
   where care_recipient_id='20000000-0000-4000-8000-000000000001'
     and product_id='fralda' and location='CARE_TEAM' and state='open';
-select pg_temp.assert_ok((select count(*)=4 from public.requisition_notifications
+select pg_temp.assert_ok((select count(*)=5 from public.requisition_notifications
   where alert_event_id=(select id from alert_test_ids where key='teamOptIn')),
   'explicit family opt-in adds one recipient to next team event');
 select pg_temp.assert_ok(exists(select 1 from public.requisition_notifications
@@ -114,6 +108,7 @@ select pg_temp.assert_ok(exists(select 1 from public.requisition_notifications
     and recipient_user_id=(select id from fixture_users where name='family')),'family opt-in respected');
 select pg_temp.login('global');
 select public.claim_notification_jobs(1,gen_random_uuid(),false);
+select pg_temp.login('adminA');
 select pg_temp.assert_ok(not exists(select 1 from public.requisition_notifications
   where alert_event_id=(select id from alert_test_ids where key='team') and state='pending'),
   'unclaimed resolved warnings are cancelled before send');

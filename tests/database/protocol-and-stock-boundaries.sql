@@ -1,7 +1,7 @@
 -- Local regression only, with sequence restoration even if an assertion fails.
 begin;
 update public.requisitions set status='cancelled' where id='30000000-0000-4000-8000-000000000001';
-select set_config('request.jwt.claim.sub',(select id::text from public.profiles where full_name='Teste global'),true);
+select pg_temp.assume_context('adminA');
 select set_config('request.jwt.claim.role','authenticated',true);
 do $$
 declare v_last bigint;v_called boolean;v_protocol text;v_key uuid:=gen_random_uuid();a uuid;b uuid;
