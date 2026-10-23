@@ -26,6 +26,7 @@ export function UnitConsole() {
   );
 }
 function Units({ context }: { context: WorkspaceContext }) {
+  const globalMode = context.activeContext?.mode === "global";
   const [units, setUnits] = useState<Unit[]>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [selected, setSelected] = useState("");
@@ -37,7 +38,7 @@ function Units({ context }: { context: WorkspaceContext }) {
     const controller = new AbortController();
     Promise.all([
       api<{ data: Unit[] }>("/api/units", undefined, controller.signal),
-      context.patient
+      context.patient && !globalMode
         ? api<{ data: CatalogProduct[] }>(
             "/api/catalog?careRecipientId=" + context.patient.id,
             undefined,
@@ -53,7 +54,7 @@ function Units({ context }: { context: WorkspaceContext }) {
         if (!controller.signal.aborted) setError(reason.message);
       });
     return () => controller.abort();
-  }, [context.patient, attempt]);
+  }, [context.patient, attempt, globalMode]);
   async function save(url: string, payload: unknown) {
     setBusy(true);
     setError("");
@@ -93,7 +94,7 @@ function Units({ context }: { context: WorkspaceContext }) {
           ))}
         </ul>
       </section>
-      {context.isGlobalAdmin || can(context, "catalog.manage") ? (
+      {globalMode || can(context, "catalog.manage") ? (
         <section className="ui-card">
           <h2 className="font-semibold">Nova unidade</h2>
           <form
@@ -119,7 +120,7 @@ function Units({ context }: { context: WorkspaceContext }) {
                 {context.patient ? (
                   <option value="patient">Paciente selecionado</option>
                 ) : null}
-                {context.isGlobalAdmin ? (
+                {globalMode ? (
                   <option value="global">Global</option>
                 ) : null}
               </select>

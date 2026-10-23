@@ -1,7 +1,7 @@
 "use client";
 import type { FormEvent } from "react";
 import { inputClass, panelClass, primaryClass } from "@/components/workspace";
-import { Field, Check, text, bool, type Row } from "./admin-fields";
+import { Check, text, bool, type Row } from "./admin-fields";
 
 export function AlertSettings({
   rows,
@@ -26,8 +26,8 @@ export function AlertSettings({
             action: "alertRule",
             productId: data.get("productId"),
             location: data.get("location"),
-            lowThreshold: Number(data.get("lowThreshold")),
-            criticalThreshold: Number(data.get("criticalThreshold")),
+            lowThreshold: String(data.get("lowThreshold")),
+            criticalThreshold: String(data.get("criticalThreshold")),
             isEnabled: data.has("isEnabled"),
           }))
         }
@@ -52,20 +52,8 @@ export function AlertSettings({
             <option value="FAMILY">Família</option>
           </select>
         </label>
-        <Field
-          name="lowThreshold"
-          label="Limite baixo"
-          type="number"
-          value={0}
-          required
-        />
-        <Field
-          name="criticalThreshold"
-          label="Limite crítico"
-          type="number"
-          value={0}
-          required
-        />
+        <label className="text-sm font-semibold">Limite baixo<input className={inputClass} name="lowThreshold" inputMode="decimal" defaultValue="0" required pattern="[0-9]+([.,][0-9]{1,6})?" /></label>
+        <label className="text-sm font-semibold">Limite crítico<input className={inputClass} name="criticalThreshold" inputMode="decimal" defaultValue="0" required pattern="[0-9]+([.,][0-9]{1,6})?" /></label>
         <Check name="isEnabled" label="Regra habilitada" />
         <button className={primaryClass} type="submit">
           Salvar regra

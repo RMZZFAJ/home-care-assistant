@@ -68,6 +68,7 @@ export function AdminConsole() {
 }
 
 function PatientAdmin({ context }: { context: WorkspaceContext }) {
+  const globalMode = context.activeContext?.mode === "global";
   const params = useSearchParams();
   const requestedSection = params.get("section") as Section | null;
   const [section, setSection] = useState<Section>(
@@ -91,7 +92,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [importText, setImportText] = useState("");
   const [importReviewed, setImportReviewed] = useState(false);
   const patientId = context.patient?.id;
-  const canManage = context.isGlobalAdmin || may(context, "manage");
+  const canManage = context.activeContext?.mode === "global" || may(context, "manage");
   const load = useCallback(
     (signal?: AbortSignal) => {
       if (["patient", "import"].includes(section)) return Promise.resolve();
@@ -114,7 +115,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           : Promise.resolve({ data: [] as Row[] }),
         ["memberships", "notificationRecipients"].includes(section)
           ? api<{ data: Row[] }>(
-              section === "memberships" && context.isGlobalAdmin
+              section === "memberships" && globalMode
                 ? "/api/admin?section=profiles"
                 : `/api/admin?section=memberships&careRecipientId=${patientId}`,
               undefined,
@@ -150,7 +151,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         },
       );
     },
-    [section, patientId, context.isGlobalAdmin, page],
+    [section, patientId, globalMode, page],
   );
   useEffect(() => {
     const controller = new AbortController();
@@ -186,7 +187,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       });
       setMessage(
         result.pendingApproval
-          ? "Proposta registrada. A segunda pessoa administradora deve aprovar em Funções, permissões e regras."
+          ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras."
           : success,
       );
       setEditing(null);
@@ -222,7 +223,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   return (
     <div className="space-y-5">
       <p className="text-sm text-(--muted)">
-        {context.isGlobalAdmin
+        {globalMode
           ? "Administração global e por paciente."
           : "Todas as alterações desta área se limitam ao paciente selecionado."}
       </p>
@@ -244,7 +245,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             }}
           >
             {(Object.keys(labels) as Section[])
-              .filter((key) => key !== "profiles" || context.isGlobalAdmin)
+              .filter((key) => key !== "profiles" || globalMode)
               .filter(
                 (key) =>
                   Boolean(patientId) || key === "patient" || key === "profiles",
@@ -310,7 +311,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
                     id: editing ? null : (patientId ?? null),
                     displayName: data.get("displayName"),
                     isActive: data.has("isActive"),
-                    isDevelopment: context.isGlobalAdmin
+                    isDevelopment: globalMode
                       ? data.has("isDevelopment")
                       : context.patient?.is_development === true,
                   }),
@@ -333,7 +334,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
                     editing ? true : context.patient?.is_active !== false
                   }
                 />
-                {context.isGlobalAdmin && (
+                {globalMode && (
                   <Check
                     name="isDevelopment"
                     label="Cadastro de desenvolvimento"
@@ -348,7 +349,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
                 <button className={primaryClass} type="submit">
                   {editing || !patientId ? "Criar paciente" : "Salvar paciente"}
                 </button>
-                {context.isGlobalAdmin && patientId && (
+                {globalMode && patientId && (
                   <button
                     className={buttonClass}
                     type="button"
@@ -756,7 +757,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             <NotificationQueue
               rows={rows}
               execute={execute}
-              isGlobalAdmin={context.isGlobalAdmin}
+              isGlobalAdmin={globalMode}
             />
             {notificationTotal > 20 && (
               <nav
@@ -900,7 +901,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             )}
           </section>
         )}
-        {section === "profiles" && context.isGlobalAdmin && (
+        {section === "profiles" && globalMode && (
           <section className={panelClass}>
             <h2 className="font-bold">Identidades globais</h2>
             <p className="mt-2 text-sm">

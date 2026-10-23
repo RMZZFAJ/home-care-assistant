@@ -55,6 +55,7 @@ export const errorCatalog = {
     ...validation,
     recommendedAction: "Selecione um paciente autorizado.",
   },
+  CONTEXT_REQUIRED: { ...conflict, recommendedAction: "Escolha um vínculo válido em Mudar perfil." },
   JSON_REQUIRED: { ...validation, status: 415 },
   PAYLOAD_TOO_LARGE: {
     ...validation,

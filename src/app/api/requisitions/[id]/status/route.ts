@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { api, ApiError, authenticate, databaseError, patientContext, readJson, rpc, uuid } from "@/lib/server/api";
 
-const schema = z.object({ status: z.enum(["under_review", "approved", "separated", "delivered", "cancelled"]), reason: z.string().trim().min(1).max(1000).nullable().optional() }).strict();
+const schema = z.object({ status: z.literal("cancelled"), reason: z.string().trim().min(3).max(1000) }).strict();
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
   return api("requisitions.transition", async () => {
     const input = await readJson(request, schema);

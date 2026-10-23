@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { buttonClass } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
-import { buildWhatsAppSummary, formatBrazilDate } from "@/lib/receipt";
+import { formatBrazilDate } from "@/lib/receipt";
+import { DocumentActions } from "@/components/documents/document-actions";
 import type { RequisitionReceipt } from "@/types/requisition";
 import { Summary } from "./requisition-steps";
 
@@ -12,12 +13,6 @@ export type SavedReceipt = RequisitionReceipt & {
 };
 
 export function Receipt({ receipt }: { receipt: SavedReceipt }) {
-  const share = () =>
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(buildWhatsAppSummary(receipt))}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
   return (
     <div className="p-3 sm:p-5">
       <section className="mx-auto max-w-3xl rounded-2xl border border-(--line) bg-white p-5 shadow-sm sm:p-10">
@@ -67,13 +62,7 @@ export function Receipt({ receipt }: { receipt: SavedReceipt }) {
           >
             Imprimir / salvar como PDF
           </button>
-          <button
-            type="button"
-            onClick={share}
-            className="min-h-12 rounded-lg border border-(--brand) px-4 py-2 text-sm font-bold text-(--brand)"
-          >
-            Compartilhar resumo pelo WhatsApp
-          </button>
+          {receipt.id || receipt.requisitionId ? <DocumentActions id={(receipt.id ?? receipt.requisitionId)!} code={receipt.protocol} /> : null}
         </div>
         <div className="mt-5 flex flex-wrap gap-3 print:hidden">
           <Link
@@ -91,8 +80,7 @@ export function Receipt({ receipt }: { receipt: SavedReceipt }) {
           </Link>
         </div>
         <p className="mt-4 text-xs text-(--muted)">
-          O compartilhamento abre uma conversa com texto pré-preenchido; nenhum
-          PDF é anexado automaticamente.
+          Ciência familiar ainda depende dos registros próprios. O PDF de emissão identifica essa pendência.
         </p>
       </section>
     </div>

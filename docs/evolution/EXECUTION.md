@@ -1,5 +1,93 @@
 # Evolução integral — execução
 
+## Checkpoint V4 para acesso online — 23/10/2026
+
+A pedido do usuário, esta etapa prioriza publicar o estado funcional parcial.
+Não representa homologação integral nem autorização para afirmar testes ausentes.
+A branch é `codex/evolucao-integral-v4`, baseada na master `3f64dfd`.
+O merge final permanece condicionado à validação completa da V4.
+
+### Implementação neste checkpoint
+
+- Contexto explícito por sessão Auth: administração global ou vínculo local.
+  Administrador local altera seu escopo imediatamente; propostas globais
+  exigem aprovação de outra pessoa com administração no paciente.
+- Ciência REQ independente de aceite ENT, com evidência da origem e preferências
+  pessoais. Aceite positivo atende a linha vinculada, sem quantidade solicitada.
+  Necessidade compartilhada exige justificativa, sem duplicar crédito físico.
+- Aceites parciais entram imediatamente no saldo confirmado. Conferência,
+  trânsito, divergência e conciliação continuam distintos.
+- Arquivamento manual justificado e automático agendado. Conclusão com ciência
+  obrigatória pendente mantém a exceção que bloqueia arquivamento automático.
+- Realtime privado com revisão durável e recuperação de conexão; retorno ao
+  documento após login; matrizes de permissões e canais; revisão de cancelamento.
+- PDFs com nova revisão do renderizador, fonte incorporada, QR de integridade
+  mínima e preservação das versões anteriores. Seis exemplos foram inspecionados.
+- Catálogo de 27 templates e contratos de Flows versionados; lembretes BAL e de
+  período com destinatários explícitos. Não há envio externo habilitado.
+- TOTP opcional no perfil e exigência AAL2 para administração após ativação.
+  A homologação completa do ciclo MFA ainda está pendente.
+
+### Evidência executada no candidato
+
+| Verificação | Resultado |
+| --- | --- |
+| Contratos | 52 migrations históricas intactas |
+| Tipagem e build | Passaram |
+| Unitários | 91/91 em 16 arquivos |
+| Integração V4 com Auth real | 5/5 |
+| Realtime entre duas sessões | Passou; canal alheio recusado |
+| PDF e templates | Incluídos nos unitários |
+| Instalação limpa local | 62 migrations aplicadas; emissão REQ-0001 |
+| Evolução desde migration 19 | 62 aplicadas; suíte legada em adaptação |
+| SQL/RLS e E2E completos V4 | Pendentes; resultados V3 abaixo são históricos |
+
+O replay legado encontrou uma asserção antiga que consultava saldo como global
+sem selecionar vínculo. Isso não prova perda: a V4 exige contexto local.
+A adaptação incompleta do harness foi preservada em
+`.private/v4/pending-harness/`; não foram removidos testes nem relaxadas regras
+para obter verde. O runner E2E existente continua restrito à stack local;
+precisa incorporar a seleção explícita de contexto antes da suíte final.
+
+### Preservação e aplicação remota
+
+Backup local custom verificado antes do replay: 1283270 bytes, manifesto SHA-256
+fora do Git. O catálogo original tem cópia anterior verificada e rotina de
+restauração; a restauração local final ainda precisa ser executada após a suíte.
+
+Remoto conciliado antes da atualização: 52 migrations, 29 produtos, 58 vínculos
+de catálogo, oito identidades Auth, um administrador global e quatro movimentos.
+Backup remoto de esquema e dados inclui public, private, Auth, metadados Storage
+e histórico de migrations. Arquivos de 485445 e 561273 bytes têm manifesto
+SHA-256 em LOCALAPPDATA/home-care-assistant/backups. Bytes dos anexos não foram
+copiados; nenhum reset remoto ou carga de fixtures remotas será executado.
+
+Aplicação das dez migrations V4 e publicação: em andamento neste checkpoint.
+As cinco contas de teste existentes serão preservadas e verificadas online.
+Acesso privado: `.private/homologacao/ACESSOS.md`, ignorado por Git e Vercel.
+
+### Limites externos efetivamente constatados
+
+Consulta Meta em 23/10: HTTP 401, OAuthException 190/463, token expirado.
+Os cinco templates prioritários ficaram individualmente bloqueados antes da
+submissão. Existem 27 contratos preparados, nenhum aprovado por esta execução.
+Token válido, permissões Meta, App Secret, webhook e publicação dos Flows são
+pendências externas. O erro histórico 130497 é restrição de país, sem entrega.
+NOTIFICATIONS_EXTERNAL_ENABLED e META_FLOWS_ENABLED permanecem false.
+
+Auditoria npm de produção: zero vulnerabilidades. Auditoria com dependências de
+ferramentas reporta seis alertas altos transitivos de braces, sem versão corrigida
+publicada no advisory GHSA-vfj7-8cjw-p6xm consultado. Não houve downgrade nem
+supressão para mascarar o resultado. OAuth/SMTP, câmera física e mensagens reais
+não são declarados homologados.
+
+Os cinco arquivos de referência estão em `docs/references/v3/`; JSON e PDFs
+originais intactos. Markdown foi reformatado, com original também em `.private`.
+A assinatura assimétrica permanece apenas no roadmap; SHA-256 não impede um
+administrador do banco de alterar também o histórico e os próprios controles.
+
+## Histórico da entrega anterior — 22/10/2026
+
 ## Entrega e autorização
 
 Implementação integral autorizada em 22/10/2026, incluindo commits, publicação,
