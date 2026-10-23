@@ -347,3 +347,12 @@ da aplicação, além do backup completo anterior; 67 migrations estão congelad
 A CI `39997599812` passou por SQL e integração e foi cancelada durante E2E por
 ter sido substituída pelo commit com essa correção. A execução final usa o novo
 SHA e mantém toda a suíte, sem excluir testes ou afrouxar regras.
+
+A execução `39999220340` confirmou 95 unitários, 20 integrações e 87/90 E2E.
+As três falhas eram o mesmo contrato visual nos três dispositivos: o catálogo
+simulado incluía WhatsApp, mas omitia a disponibilidade por evento introduzida
+na API. O fixture agora declara somente o evento compatível e mantém ausente o
+controle de WhatsApp para arquivamento. Persistência e autorização continuam
+reais; nenhum teste ou filtro foi removido. Os três cenários direcionados
+passaram localmente. A lentidão de pacotes Ubuntu na primeira tentativa foi
+isolada no log e o job repetido no mesmo SHA, sem alterar as verificações.

@@ -262,7 +262,8 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
 }) => {
   const { patient } = await setup(page);
   await page.setViewportSize({ width: 360, height: 800 });
-  // Only the channel catalogue is simulated. Persistence, authorization and policy RPCs are real; no external send is enabled.
+  // Simulate provider availability for one supported event, including its channel
+  // contract. Persistence, authorization and policy RPCs remain real; no send is enabled.
   await page.route("**/api/notification-rules?**", async (route) => {
     const response = await route.fetch();
     const body = await response.json();
@@ -274,6 +275,10 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
           { code: "internal", label: "Aplicativo" },
           { code: "whatsapp", label: "WhatsApp (contrato visual)" },
         ],
+        eventChannels: {
+          ...body.eventChannels,
+          "req.issued": ["internal", "whatsapp"],
+        },
       },
     });
   });
@@ -287,6 +292,18 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   });
   await channel.check();
   await expect(channel).toBeChecked();
+  await expect(
+    page.getByRole("heading", {
+      name: "Arquivamento manual justificado",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("checkbox", {
+      name: "Arquivamento manual justificado · Familiar · WhatsApp (contrato visual)",
+      exact: true,
+    }),
+  ).toHaveCount(0);
   await expect(
     page.getByRole("checkbox", {
       name: "Requisição emitida · Familiar · Aplicativo",
