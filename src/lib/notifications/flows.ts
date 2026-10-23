@@ -58,11 +58,35 @@ export const flowRequest = z.object({
   screen: z.string().max(80).optional(),
   data: z
     .union([
-      z.object({ text: z.string().trim().min(3).max(2000), kind: z.enum(["consumption", "shortage"]), products: z.array(z.string().min(1).max(120)).max(100).optional() }).strict(),
+      z
+        .object({
+          text: z.string().trim().min(3).max(2000),
+          kind: z.enum(["consumption", "shortage"]),
+          products: z.array(z.string().min(1).max(120)).max(100).optional(),
+        })
+        .strict(),
       z.object({ kind: z.literal("no_issues") }).strict(),
-      z.object({ operation: z.literal("occurrence_mode"), kind: z.enum(["no_issues", "consumption", "shortage"]) }).strict(),
-      z.object({ operation: z.literal("mode"), mode: z.enum(["all", "divergence"]) }).strict(),
-      z.object({ operation: z.literal("line"), lineId: z.string().uuid(), acceptedQuantity: z.string().regex(/^\d+(?:[.]\d{1,6})?$/), notes: z.string().max(1000).optional(), next: z.enum(["another", "review"]) }).strict(),
+      z
+        .object({
+          operation: z.literal("occurrence_mode"),
+          kind: z.enum(["no_issues", "consumption", "shortage"]),
+        })
+        .strict(),
+      z
+        .object({
+          operation: z.literal("mode"),
+          mode: z.enum(["all", "divergence"]),
+        })
+        .strict(),
+      z
+        .object({
+          operation: z.literal("line"),
+          lineId: z.string().uuid(),
+          acceptedQuantity: z.string().regex(/^\d+(?:[.]\d{1,6})?$/),
+          notes: z.string().max(1000).optional(),
+          next: z.enum(["another", "review"]),
+        })
+        .strict(),
       z.object({ operation: z.literal("confirm") }).strict(),
     ])
     .optional(),

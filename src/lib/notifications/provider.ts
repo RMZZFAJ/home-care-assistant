@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { namedBody, templateButtons, type TemplateDefinition } from "./template-registry";
+import {
+  namedBody,
+  templateButtons,
+  type TemplateDefinition,
+} from "./template-registry";
 
 export type NotificationJob = {
   id: string;
@@ -48,7 +52,10 @@ export function metaConfiguration(
       accessToken: z.string().min(1),
       phoneNumberId: z.string().regex(/^\d+$/),
       graphVersion: z.string().regex(/^v\d+\.\d+$/),
-      template: z.string().regex(/^[a-z0-9_]+$/).optional(),
+      template: z
+        .string()
+        .regex(/^[a-z0-9_]+$/)
+        .optional(),
       language: z.string().regex(/^[a-z]{2}(?:_[A-Z]{2})?$/),
     })
     .safeParse({
@@ -77,24 +84,48 @@ export class MetaWhatsAppProvider implements NotificationProvider {
     private fetcher: typeof fetch = fetch,
   ) {}
   async send(job: NotificationJob): Promise<DeliveryResult> {
-    if (job.preparationError) return { state: "pending", error: job.preparationError };
-    if (job.template && job.template.approval !== "APPROVED") return { state: "pending", error: "TEMPLATE_NOT_APPROVED" };
-    if (!job.template && !this.config.template) return { state: "pending", error: "EVENT_TEMPLATE_NOT_CONFIGURED" };
+    if (job.preparationError)
+      return { state: "pending", error: job.preparationError };
+    if (job.template && job.template.approval !== "APPROVED")
+      return { state: "pending", error: "TEMPLATE_NOT_APPROVED" };
+    if (!job.template && !this.config.template)
+      return { state: "pending", error: "EVENT_TEMPLATE_NOT_CONFIGURED" };
     if (!job.destination || !/^\+?[1-9]\d{7,14}$/.test(job.destination))
       return { state: "failed", error: "INVALID_DESTINATION" };
     try {
       let namedParameters: ReturnType<typeof namedBody> | undefined;
       let registeredButtons: ReturnType<typeof templateButtons> | undefined;
       if (job.template) {
-        try { namedParameters = namedBody(job.template, job.templateValues ?? {}); registeredButtons = templateButtons(job.template, job.urlSuffix ?? job.document_id ?? "", job.acceptanceToken); }
-        catch (error) { return { state: "pending", error: error instanceof Error ? error.message : "INVALID_TEMPLATE_CONTRACT" }; }
-        if (job.template.components.some(part => part.type === "HEADER" && part.format === "DOCUMENT") && !job.attachment) return { state: "pending", error: "DOCUMENT_PREPARATION_FAILED" };
+        try {
+          namedParameters = namedBody(job.template, job.templateValues ?? {});
+          registeredButtons = templateButtons(
+            job.template,
+            job.urlSuffix ?? job.document_id ?? "",
+            job.acceptanceToken,
+          );
+        } catch (error) {
+          return {
+            state: "pending",
+            error:
+              error instanceof Error
+                ? error.message
+                : "INVALID_TEMPLATE_CONTRACT",
+          };
+        }
+        if (
+          job.template.components.some(
+            (part) => part.type === "HEADER" && part.format === "DOCUMENT",
+          ) &&
+          !job.attachment
+        )
+          return { state: "pending", error: "DOCUMENT_PREPARATION_FAILED" };
       }
       let mediaId: string | undefined;
       if (job.attachment) {
         if (
-          !job.template && (!this.config.documentTemplate ||
-          !/^[a-z0-9_]+$/.test(this.config.documentTemplate))
+          !job.template &&
+          (!this.config.documentTemplate ||
+            !/^[a-z0-9_]+$/.test(this.config.documentTemplate))
         )
           return {
             state: "pending",
@@ -152,12 +183,15 @@ export class MetaWhatsAppProvider implements NotificationProvider {
             biz_opaque_callback_data: job.id,
             template: {
               name:
-                job.template?.name ?? (job.acceptanceToken && this.config.acceptanceTemplate
+                job.template?.name ??
+                (job.acceptanceToken && this.config.acceptanceTemplate
                   ? this.config.acceptanceTemplate
                   : mediaId
                     ? this.config.documentTemplate
                     : this.config.template),
-              language: { code: job.template?.language ?? this.config.language },
+              language: {
+                code: job.template?.language ?? this.config.language,
+              },
               components: [
                 ...(mediaId
                   ? [
@@ -188,16 +222,17 @@ export class MetaWhatsAppProvider implements NotificationProvider {
                     },
                   ],
                 },
-                ...(registeredButtons ?? (job.document_id && this.config.urlButtonIndex
-                  ? [
-                      {
-                        type: "button",
-                        sub_type: "url",
-                        index: this.config.urlButtonIndex,
-                        parameters: [{ type: "text", text: job.document_id }],
-                      },
-                    ]
-                  : [])),
+                ...(registeredButtons ??
+                  (job.document_id && this.config.urlButtonIndex
+                    ? [
+                        {
+                          type: "button",
+                          sub_type: "url",
+                          index: this.config.urlButtonIndex,
+                          parameters: [{ type: "text", text: job.document_id }],
+                        },
+                      ]
+                    : [])),
                 ...(!registeredButtons && job.acceptanceToken
                   ? [
                       {

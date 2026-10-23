@@ -101,6 +101,7 @@ export const documentLabels: Record<DocumentType, string> = {
   BAL: "Balanço semanal",
 };
 export const documentStatuses: Record<string, string> = {
+  historical: "Registro histórico",
   science_pending: "Ciência familiar pendente",
   awaiting_fulfillment: "Aguardando atendimento",
   fulfillment_partial: "Atendimento parcial",

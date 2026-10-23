@@ -236,7 +236,12 @@ function PatientSupplyWizard({
             origin: existing.payload.origin ?? "purchase",
             source: existing.payload.source ?? "FAMILY",
             recipientId: existing.recipient_id ?? "",
-            sharedNeedReasons: Object.fromEntries(existing.lines.map(line => [line.product_id, String(line.metadata.sharedNeedReason ?? "")])),
+            sharedNeedReasons: Object.fromEntries(
+              existing.lines.map((line) => [
+                line.product_id,
+                String(line.metadata.sharedNeedReason ?? ""),
+              ]),
+            ),
           });
           if (restored && !documentId) setForm(restored);
           if (preserved) {
@@ -336,10 +341,15 @@ function PatientSupplyWizard({
           (type === "BAL" ? ", inclusive zero." : " acima de zero.");
     if (all && !Object.keys(form.quantities).length)
       errors.lines = "Selecione ao menos um produto.";
-    if (all || step === 0) for (const [productId, ids] of Object.entries(links)) {
-      if (ids.length > 1 && (form.sharedNeedReasons?.[productId]?.trim().length ?? 0) < 3)
-        errors[productId + ":shared"] = "Justifique por que essas requisições representam a mesma necessidade.";
-    }
+    if (all || step === 0)
+      for (const [productId, ids] of Object.entries(links)) {
+        if (
+          ids.length > 1 &&
+          (form.sharedNeedReasons?.[productId]?.trim().length ?? 0) < 3
+        )
+          errors[productId + ":shared"] =
+            "Justifique por que essas requisições representam a mesma necessidade.";
+      }
     setFieldErrors(errors);
     if (Object.keys(errors).length) {
       setError("Confira os campos destacados.");
@@ -415,7 +425,12 @@ function PatientSupplyWizard({
           productId: product.id,
           quantity: quantity(form.quantities[product.id]).toFixed(),
           ...(links[product.id]?.length
-            ? { requisitionItemIds: links[product.id], metadata: { sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "" } }
+            ? {
+                requisitionItemIds: links[product.id],
+                metadata: {
+                  sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "",
+                },
+              }
             : {}),
         }));
       const payload: SupplyPayload = {
@@ -575,7 +590,14 @@ function PatientSupplyWizard({
           abaixo.
         </p>
         {saved.status !== "draft" ? (
-          <><DocumentActions id={saved.id} code={saved.code ?? type} version={saved.version} /><DocumentDeliveryStatus id={saved.id} version={saved.version} /></>
+          <>
+            <DocumentActions
+              id={saved.id}
+              code={saved.code ?? type}
+              version={saved.version}
+            />
+            <DocumentDeliveryStatus id={saved.id} version={saved.version} />
+          </>
         ) : null}
       </section>
     );

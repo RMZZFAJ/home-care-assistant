@@ -26,7 +26,9 @@ export function UnitConsole() {
   );
 }
 function Units({ context }: { context: WorkspaceContext }) {
-  const globalMode = context.activeContext?.mode === "global";
+  const globalMode =
+    context.activeContext?.mode === "global" &&
+    context.globalAdministrationAllowed === true;
   const [units, setUnits] = useState<Unit[]>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [selected, setSelected] = useState("");
@@ -120,9 +122,7 @@ function Units({ context }: { context: WorkspaceContext }) {
                 {context.patient ? (
                   <option value="patient">Paciente selecionado</option>
                 ) : null}
-                {globalMode ? (
-                  <option value="global">Global</option>
-                ) : null}
+                {globalMode ? <option value="global">Global</option> : null}
               </select>
             </label>
             <label className="text-sm font-semibold">

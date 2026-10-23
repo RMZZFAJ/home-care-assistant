@@ -47,13 +47,19 @@ export async function POST(request: Request) {
           "Abra uma sessão autenticada para iniciar o Flow.",
           403,
         );
-      const result = await rpc(createWorkerClient(), "flow_exchange", {
+      const result = (await rpc(createWorkerClient(), "flow_exchange", {
         p_hash: tokenHash(input.data.flow_token),
         p_submit:
           input.data.action === "data_exchange"
             ? (input.data.data ?? {})
             : null,
-      }) as { purpose?: string; screen?: string; accepted?: boolean; noIssues?: boolean; pendingConfirmation?: boolean } & Record<string, unknown>;
+      })) as {
+        purpose?: string;
+        screen?: string;
+        accepted?: boolean;
+        noIssues?: boolean;
+        pendingConfirmation?: boolean;
+      } & Record<string, unknown>;
       response =
         input.data.action === "data_exchange" && !result.screen
           ? {
@@ -62,12 +68,27 @@ export async function POST(request: Request) {
                 extension_message_response: {
                   params: {
                     flow_token: input.data.flow_token,
-                    pending_confirmation: result.pendingConfirmation !== false && !result.accepted && !result.noIssues,
+                    pending_confirmation:
+                      result.pendingConfirmation !== false &&
+                      !result.accepted &&
+                      !result.noIssues,
                   },
                 },
               },
             }
-          : { screen: result.screen ?? "REPORT", data: Object.fromEntries(Object.entries(result).filter(([key]) => (result.screen === "REPORT_MODE" ? [] : result.purpose === "ent_receipt" ? ["documentCode", "reviewText", "lines"] : ["catalog", "kind"]).includes(key))) };
+          : {
+              screen: result.screen ?? "REPORT",
+              data: Object.fromEntries(
+                Object.entries(result).filter(([key]) =>
+                  (result.screen === "REPORT_MODE"
+                    ? []
+                    : result.purpose === "ent_receipt"
+                      ? ["documentCode", "reviewText", "lines"]
+                      : ["catalog", "kind"]
+                  ).includes(key),
+                ),
+              ),
+            };
     }
     return new Response(decrypted.encrypt(response), {
       headers: { "content-type": "text/plain", "cache-control": "no-store" },

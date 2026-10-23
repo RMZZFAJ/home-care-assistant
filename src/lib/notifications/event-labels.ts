@@ -8,6 +8,7 @@ const labels: Record<string, string> = {
   "req.science_recorded": "Ciência individual registrada",
   "req.science_satisfied": "Ciência familiar exigida satisfeita",
   "req.completed": "Requisição atendida operacionalmente",
+  "req.fulfillment_updated": "Atendimento atualizado pelas entregas vinculadas",
   "req.reopened": "Atendimento reaberto por pendência",
   "req.reminder": "Lembrete de requisição pendente",
   "req.archived.manual": "Arquivamento manual justificado",

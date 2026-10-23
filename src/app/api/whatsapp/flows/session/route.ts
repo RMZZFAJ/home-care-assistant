@@ -24,10 +24,16 @@ export async function POST(request: Request) {
         503,
       );
     const token = randomBytes(32).toString("base64url");
-    await rpc(auth.client, input.documentId ? "create_receipt_flow_session" : "create_flow_session", {
-      ...(input.documentId ? { p_document: input.documentId } : { p_patient: input.careRecipientId }),
-      p_hash: tokenHash(token),
-    });
+    await rpc(
+      auth.client,
+      input.documentId ? "create_receipt_flow_session" : "create_flow_session",
+      {
+        ...(input.documentId
+          ? { p_document: input.documentId }
+          : { p_patient: input.careRecipientId }),
+        p_hash: tokenHash(token),
+      },
+    );
     return NextResponse.json(
       {
         flowToken: token,

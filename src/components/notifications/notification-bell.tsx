@@ -112,42 +112,50 @@ export function NotificationBell({ patientId }: { patientId?: string }) {
             </p>
           ) : (
             <ul>
-              {rows.filter(row => !row.silent).slice(0, 8).map((row) => (
-                <li
-                  key={row.id}
-                  className={!row.seen_at ? "notification-unread" : ""}
-                >
-                  <Link
-                    href={notificationHref(row)}
-                    onClick={() => {
-                      setOpen(false);
-                      void api("/api/notifications", { id: row.id }).then(
-                        () =>
-                          setRows((current) =>
-                            current.map((item) =>
-                              item.id === row.id
-                                ? { ...item, seen_at: new Date().toISOString() }
-                                : item,
-                            ),
-                          ),
-                        () =>
-                          setError(
-                            "Não foi possível marcar a notificação como lida.",
-                          ),
-                      );
-                    }}
+              {rows
+                .filter((row) => !row.silent)
+                .slice(0, 8)
+                .map((row) => (
+                  <li
+                    key={row.id}
+                    className={!row.seen_at ? "notification-unread" : ""}
                   >
-                    <strong>
-                      {row.operational_documents?.code ??
-                        "Atualização do paciente"}
-                    </strong>
-                    <span>
-                      {documentEventLabel(row.document_events?.action ?? row.event_key)}
-                    </span>
-                    <time>{formatBrazilDate(row.created_at)}</time>
-                  </Link>
-                </li>
-              ))}
+                    <Link
+                      href={notificationHref(row)}
+                      onClick={() => {
+                        setOpen(false);
+                        void api("/api/notifications", { id: row.id }).then(
+                          () =>
+                            setRows((current) =>
+                              current.map((item) =>
+                                item.id === row.id
+                                  ? {
+                                      ...item,
+                                      seen_at: new Date().toISOString(),
+                                    }
+                                  : item,
+                              ),
+                            ),
+                          () =>
+                            setError(
+                              "Não foi possível marcar a notificação como lida.",
+                            ),
+                        );
+                      }}
+                    >
+                      <strong>
+                        {row.operational_documents?.code ??
+                          "Atualização do paciente"}
+                      </strong>
+                      <span>
+                        {documentEventLabel(
+                          row.document_events?.action ?? row.event_key,
+                        )}
+                      </span>
+                      <time>{formatBrazilDate(row.created_at)}</time>
+                    </Link>
+                  </li>
+                ))}
             </ul>
           )}
           <Link

@@ -14,7 +14,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}<LiveSession /></body>
+      <body>
+        {children}
+        <LiveSession />
+      </body>
     </html>
   );
 }

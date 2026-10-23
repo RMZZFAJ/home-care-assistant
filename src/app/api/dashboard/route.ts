@@ -27,7 +27,10 @@ export async function GET(request: Request) {
       base().eq("type", "COM").eq("status", "pending_approval"),
       base().eq("type", "ENT").eq("status", "disputed"),
       base().eq("type", "BAL").eq("status", "submitted"),
-      auth.client.rpc("operational_document_list", { p_patient: patient.id, p_size: 6 }),
+      auth.client.rpc("operational_document_list", {
+        p_patient: patient.id,
+        p_size: 6,
+      }),
       auth.client
         .from("patient_settings")
         .select("settings")

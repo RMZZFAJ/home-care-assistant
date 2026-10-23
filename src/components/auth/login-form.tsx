@@ -46,10 +46,20 @@ export function LoginForm() {
         setLoading(false);
         return;
       }
-      const { data: assurance } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (assurance?.nextLevel === "aal2" && assurance.currentLevel !== "aal2") {
-        router.replace("/perfil?mfa=required&next=" + encodeURIComponent(safeReturnPath(searchParams.get("next"), window.location.origin)));
-        router.refresh(); return;
+      const { data: assurance } =
+        await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (
+        assurance?.nextLevel === "aal2" &&
+        assurance.currentLevel !== "aal2"
+      ) {
+        router.replace(
+          "/perfil?mfa=required&next=" +
+            encodeURIComponent(
+              safeReturnPath(searchParams.get("next"), window.location.origin),
+            ),
+        );
+        router.refresh();
+        return;
       }
       router.replace(
         safeReturnPath(searchParams.get("next"), window.location.origin),

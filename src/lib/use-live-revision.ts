@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 export function useLiveRevision() {
   const [revision, setRevision] = useState(0);
   useEffect(() => {
-    const update = () => setRevision(value => value + 1);
+    const update = () => setRevision((value) => value + 1);
     window.addEventListener("hca:data-changed", update);
     return () => window.removeEventListener("hca:data-changed", update);
   }, []);

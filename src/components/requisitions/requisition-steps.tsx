@@ -82,11 +82,64 @@ export function CatalogStep({
   );
   return (
     <div className="space-y-4">
-      <Dialog open={Boolean(duplicate)} title="Este produto já está em uma requisição pendente" onClose={() => setDuplicate(null)}>
-        <p className="text-sm">Confira a necessidade anterior antes de reiterar {duplicate?.name}. A nova linha não substitui o pedido anterior.</p>
-        <ul className="my-3 space-y-3">{itemContext.find(info => info.productId === duplicate?.id)?.pending.map(pending => <li key={pending.lineId} className="rounded-lg border border-(--line) p-3 text-sm"><RelatedDocument id={pending.requisitionId} label={pending.code} /><p>{formatBrazilDate(pending.createdAt)} · Aguardando atendimento</p></li>)}</ul>
-        <label className="block text-sm font-semibold">Justificativa da nova requisição<textarea className={inputClass} minLength={3} maxLength={1000} value={repeatReason} onChange={event => setRepeatReason(event.target.value)} /></label>
-        <div className="ui-form-actions"><button type="button" className="ui-button ui-button-secondary" onClick={() => setDuplicate(null)}>Não incluir o item</button><button type="button" className="ui-button ui-button-primary" disabled={repeatReason.trim().length < 3} onClick={() => { if (duplicate) updateLine(duplicate, { repeatReason: repeatReason.trim() }); setDuplicate(null); }}>Manter nova requisição</button></div>
+      <Dialog
+        open={Boolean(duplicate)}
+        title="Este produto já está em uma requisição pendente"
+        onClose={() => setDuplicate(null)}
+      >
+        <p className="text-sm">
+          Confira a necessidade anterior antes de reiterar {duplicate?.name}. A
+          nova linha não substitui o pedido anterior.
+        </p>
+        <ul className="my-3 space-y-3">
+          {itemContext
+            .find((info) => info.productId === duplicate?.id)
+            ?.pending.map((pending) => (
+              <li
+                key={pending.lineId}
+                className="rounded-lg border border-(--line) p-3 text-sm"
+              >
+                <RelatedDocument
+                  id={pending.requisitionId}
+                  label={pending.code}
+                />
+                <p>
+                  {formatBrazilDate(pending.createdAt)} · Aguardando atendimento
+                </p>
+              </li>
+            ))}
+        </ul>
+        <label className="block text-sm font-semibold">
+          Justificativa da nova requisição
+          <textarea
+            className={inputClass}
+            minLength={3}
+            maxLength={1000}
+            value={repeatReason}
+            onChange={(event) => setRepeatReason(event.target.value)}
+          />
+        </label>
+        <div className="ui-form-actions">
+          <button
+            type="button"
+            className="ui-button ui-button-secondary"
+            onClick={() => setDuplicate(null)}
+          >
+            Não incluir o item
+          </button>
+          <button
+            type="button"
+            className="ui-button ui-button-primary"
+            disabled={repeatReason.trim().length < 3}
+            onClick={() => {
+              if (duplicate)
+                updateLine(duplicate, { repeatReason: repeatReason.trim() });
+              setDuplicate(null);
+            }}
+          >
+            Manter nova requisição
+          </button>
+        </div>
       </Dialog>
       <label className="block text-sm font-semibold">
         Buscar produto
@@ -114,8 +167,10 @@ export function CatalogStep({
                 checked={Boolean(line)}
                 onChange={() => {
                   if (line) removeLine(item.id);
-                  else if (info?.pending.length) { setDuplicate(item); setRepeatReason(""); }
-                  else updateLine(item, {});
+                  else if (info?.pending.length) {
+                    setDuplicate(item);
+                    setRepeatReason("");
+                  } else updateLine(item, {});
                 }}
               />
               {item.name}

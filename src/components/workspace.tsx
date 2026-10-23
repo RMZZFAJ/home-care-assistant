@@ -19,7 +19,12 @@ export type WorkspaceContext = {
   userId: string;
   fullName: string;
   isGlobalAdmin: boolean;
-  activeContext?: { mode: "global" | "patient"; care_recipient_id: string | null; revision: number } | null;
+  globalAdministrationAllowed?: boolean;
+  activeContext?: {
+    mode: "global" | "patient";
+    care_recipient_id: string | null;
+    revision: number;
+  } | null;
   patients: PatientContext[];
   patient?: PatientContext;
   refresh: () => Promise<void>;

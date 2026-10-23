@@ -3,10 +3,16 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-hca-return-path", request.nextUrl.pathname + request.nextUrl.search);
+  requestHeaders.set(
+    "x-hca-return-path",
+    request.nextUrl.pathname + request.nextUrl.search,
+  );
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return NextResponse.next({ request: { headers: requestHeaders } });
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key)
+    return NextResponse.next({ request: { headers: requestHeaders } });
 
   let response = NextResponse.next({ request: { headers: requestHeaders } });
   const supabase = createServerClient(url, key, {
@@ -26,4 +32,6 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|login).*)"] };
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|login).*)"],
+};

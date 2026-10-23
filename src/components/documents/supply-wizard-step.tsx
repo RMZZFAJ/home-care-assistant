@@ -211,10 +211,44 @@ export function SupplyWizardStep({
                             }}
                           />
                           {request.code}
-                          <RelatedDocument id={request.requisitionId} label="Conferir REQ" />
+                          <RelatedDocument
+                            id={request.requisitionId}
+                            label="Conferir REQ"
+                          />
                         </label>
                       ))}
-                      {(links[option.productId]?.length ?? 0) > 1 ? <label className="mt-3 block text-sm font-semibold">Justificativa da necessidade compartilhada<textarea className={inputClass} required minLength={3} maxLength={500} value={form.sharedNeedReasons?.[option.productId] ?? ""} onChange={event => setForm(current => ({ ...current, sharedNeedReasons: { ...current.sharedNeedReasons, [option.productId]: event.target.value } }))} /><span className="block text-xs font-normal text-(--muted)">As REQs representam a mesma necessidade. O estoque recebe a quantidade desta ENT uma única vez.</span>{fieldErrors[option.productId + ":shared"] ? <span className="ui-field-error">{fieldErrors[option.productId + ":shared"]}</span> : null}</label> : null}
+                      {(links[option.productId]?.length ?? 0) > 1 ? (
+                        <label className="mt-3 block text-sm font-semibold">
+                          Justificativa da necessidade compartilhada
+                          <textarea
+                            className={inputClass}
+                            required
+                            minLength={3}
+                            maxLength={500}
+                            value={
+                              form.sharedNeedReasons?.[option.productId] ?? ""
+                            }
+                            onChange={(event) =>
+                              setForm((current) => ({
+                                ...current,
+                                sharedNeedReasons: {
+                                  ...current.sharedNeedReasons,
+                                  [option.productId]: event.target.value,
+                                },
+                              }))
+                            }
+                          />
+                          <span className="block text-xs font-normal text-(--muted)">
+                            As REQs representam a mesma necessidade. O estoque
+                            recebe a quantidade desta ENT uma única vez.
+                          </span>
+                          {fieldErrors[option.productId + ":shared"] ? (
+                            <span className="ui-field-error">
+                              {fieldErrors[option.productId + ":shared"]}
+                            </span>
+                          ) : null}
+                        </label>
+                      ) : null}
                     </fieldset>
                   ))}
               </div>

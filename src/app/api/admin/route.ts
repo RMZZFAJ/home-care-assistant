@@ -103,6 +103,7 @@ const schema = z.discriminatedUnion("action", [
       displayName: z.string().trim().min(2).max(160),
       isActive: z.boolean(),
       isDevelopment: z.boolean(),
+      initialAdministratorEmail: z.string().trim().email().optional(),
     })
     .strict(),
   z
@@ -206,7 +207,9 @@ export async function GET(request: Request) {
     }
     if (section === "recipients") {
       if (auth.isGlobalAdmin) {
-        const workspace = await rpc(auth.client, "my_workspace") as { patients: unknown[] };
+        const workspace = (await rpc(auth.client, "my_workspace")) as {
+          patients: unknown[];
+        };
         return NextResponse.json({ data: workspace.patients });
       }
       const { data, error } = await auth.client
@@ -216,7 +219,13 @@ export async function GET(request: Request) {
       if (error) databaseError(error);
       return NextResponse.json({ data: data ?? [] });
     }
-    if (auth.isGlobalAdmin) return NextResponse.json({ data: await rpc(auth.client, "global_patient_administration", { p_patient: uuid.parse(params.get("careRecipientId")), p_section: section }) });
+    if (auth.isGlobalAdmin)
+      return NextResponse.json({
+        data: await rpc(auth.client, "global_patient_administration", {
+          p_patient: uuid.parse(params.get("careRecipientId")),
+          p_section: section,
+        }),
+      });
     const patient = await patientContext(
       auth,
       params.get("careRecipientId"),
@@ -311,11 +320,39 @@ export async function POST(request: Request) {
   return api("admin.write", async () => {
     const input = await readJson(request, schema, 2_000_000);
     const auth = await authenticate();
-    if (auth.isGlobalAdmin && ["membership", "product", "adoptProduct", "membershipStatus", "alertRule", "notificationRecipient", "recipient"].includes(input.action)) {
-      const target = "careRecipientId" in input ? input.careRecipientId : "id" in input ? input.id : null;
+    if (
+      auth.isGlobalAdmin &&
+      [
+        "membership",
+        "product",
+        "adoptProduct",
+        "membershipStatus",
+        "alertRule",
+        "notificationRecipient",
+        "recipient",
+      ].includes(input.action)
+    ) {
+      const target =
+        "careRecipientId" in input
+          ? input.careRecipientId
+          : "id" in input
+            ? input.id
+            : null;
       if (target) {
-        const governance = await rpc(auth.client, "patient_governance", { p_patient: target }) as { data: { version: number } };
-        const data = await rpc(auth.client, "configure_patient_access", { p_patient: target, p_kind: input.action === "membership" ? "membership" : "administration", p_change: input.action === "membership" ? { userId: input.userId, role: input.role } : { operation: input.action, args: input }, p_key: crypto.randomUUID(), p_version: governance.data.version });
+        const governance = (await rpc(auth.client, "patient_governance", {
+          p_patient: target,
+        })) as { data: { version: number } };
+        const data = await rpc(auth.client, "configure_patient_access", {
+          p_patient: target,
+          p_kind:
+            input.action === "membership" ? "membership" : "administration",
+          p_change:
+            input.action === "membership"
+              ? { userId: input.userId, role: input.role }
+              : { operation: input.action, args: input },
+          p_key: crypto.randomUUID(),
+          p_version: governance.data.version,
+        });
         return NextResponse.json({ data, pendingApproval: true });
       }
     }
@@ -334,6 +371,15 @@ export async function POST(request: Request) {
     if (input.action === "recipient") {
       if (input.id) await patientContext(auth, input.id, "manage");
       else requireGlobal(auth);
+      if (!input.id && input.initialAdministratorEmail) {
+        return NextResponse.json({
+          data: await rpc(auth.client, "create_patient_with_administrator", {
+            p_name: input.displayName,
+            p_development: input.isDevelopment,
+            p_administrator_email: input.initialAdministratorEmail,
+          }),
+        });
+      }
       return NextResponse.json({
         data: await rpc(auth.client, "admin_upsert_recipient", {
           p_id: input.id,

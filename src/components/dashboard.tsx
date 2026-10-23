@@ -98,8 +98,24 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
     );
   if (!data) return <Notice>Organizando suas próximas ações…</Notice>;
   const cards = [
-    ...(data.sciencePending ? [{ label: "Requisições para sua ciência", count: data.sciencePending, href: "/historico?type=REQ&status=science_pending" }] : []),
-    ...(data.archivePending ? [{ label: "Conclusões para revisar e arquivar", count: data.archivePending, href: "/historico?type=REQ&status=completed_science_pending" }] : []),
+    ...(data.sciencePending
+      ? [
+          {
+            label: "Requisições para sua ciência",
+            count: data.sciencePending,
+            href: "/historico?type=REQ&status=science_pending",
+          },
+        ]
+      : []),
+    ...(data.archivePending
+      ? [
+          {
+            label: "Conclusões para revisar e arquivar",
+            count: data.archivePending,
+            href: "/historico?type=REQ&status=completed_science_pending",
+          },
+        ]
+      : []),
     ...(data.drafts
       ? [
           {
@@ -118,16 +134,24 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
           },
         ]
       : []),
-    ...(can(context, "req.read") ? [{
-      label: "Requisições abertas",
-      count: data.requests,
-      href: "/historico?type=REQ",
-    }] : []),
-    ...(can(context, "ent.receive") ? [{
-      label: "Recebimentos para você",
-      count: data.receipts,
-      href: "/historico?type=ENT&status=pending_receipt",
-    }] : []),
+    ...(can(context, "req.read")
+      ? [
+          {
+            label: "Requisições abertas",
+            count: data.requests,
+            href: "/historico?type=REQ",
+          },
+        ]
+      : []),
+    ...(can(context, "ent.receive")
+      ? [
+          {
+            label: "Recebimentos para você",
+            count: data.receipts,
+            href: "/historico?type=ENT&status=pending_receipt",
+          },
+        ]
+      : []),
     ...(can(context, "com.approve")
       ? [
           {
@@ -137,16 +161,24 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
           },
         ]
       : []),
-    ...(can(context, "ent.read") ? [{
-      label: "Divergências em aberto",
-      count: data.disputes,
-      href: "/historico?type=ENT&status=disputed",
-    }] : []),
-    ...(can(context, "bal.approve") ? [{
-      label: "BAL aguardando revisão",
-      count: data.balances,
-      href: "/historico?type=BAL&status=submitted",
-    }] : []),
+    ...(can(context, "ent.read")
+      ? [
+          {
+            label: "Divergências em aberto",
+            count: data.disputes,
+            href: "/historico?type=ENT&status=disputed",
+          },
+        ]
+      : []),
+    ...(can(context, "bal.approve")
+      ? [
+          {
+            label: "BAL aguardando revisão",
+            count: data.balances,
+            href: "/historico?type=BAL&status=submitted",
+          },
+        ]
+      : []),
   ];
   return (
     <div className="space-y-6">

@@ -228,13 +228,52 @@ function ProfileContent() {
                     contato. Preferências não concedem permissões.
                   </p>
                   <fieldset className="mt-5 space-y-2">
-                    <legend className="font-semibold">Ciência das requisições</legend>
+                    <legend className="font-semibold">
+                      Ciência das requisições
+                    </legend>
                     {[
-                      ["scienceExpress", "Expressa no aplicativo", "Você confirma após consultar o documento; a ação fica atribuída à sua sessão."],
-                      ["scienceWhatsApp", "Simplificada pelo WhatsApp", "Permite confirmar com seu telefone verificado e desafio de uso único, quando a política do paciente permitir."],
-                      ["scienceAutomatic", "Automática por eventos autorizados", "Conteúdo efetivamente exibido ou leitura correlacionada no WhatsApp pode registrar ciência automática. Não equivale a confirmação expressa."],
-                    ].map(([key, label, description]) => <label key={key} className="block rounded-lg border border-(--line) p-3"><span className="flex min-h-11 items-center gap-3"><input name={key} type="checkbox" defaultChecked={profile.notification_preferences[key] ?? key === "scienceExpress"} />{label}</span><span className="block text-xs font-normal text-(--muted)">{description}</span></label>)}
-                    <p className="text-xs text-(--muted)">A política do paciente também deve autorizar o modo. Expedição só registra ciência quando você é entregador e responsável autorizado; a evidência identifica essa origem.</p>
+                      [
+                        "scienceExpress",
+                        "Expressa no aplicativo",
+                        "Você confirma após consultar o documento; a ação fica atribuída à sua sessão.",
+                      ],
+                      [
+                        "scienceWhatsApp",
+                        "Simplificada pelo WhatsApp",
+                        "Permite confirmar com seu telefone verificado e desafio de uso único, quando a política do paciente permitir.",
+                      ],
+                      [
+                        "scienceAutomatic",
+                        "Automática por eventos autorizados",
+                        "Conteúdo efetivamente exibido ou leitura correlacionada no WhatsApp pode registrar ciência automática. Não equivale a confirmação expressa.",
+                      ],
+                    ].map(([key, label, description]) => (
+                      <label
+                        key={key}
+                        className="block rounded-lg border border-(--line) p-3"
+                      >
+                        <span className="flex min-h-11 items-center gap-3">
+                          <input
+                            name={key}
+                            type="checkbox"
+                            defaultChecked={
+                              profile.notification_preferences[key] ??
+                              key === "scienceExpress"
+                            }
+                          />
+                          {label}
+                        </span>
+                        <span className="block text-xs font-normal text-(--muted)">
+                          {description}
+                        </span>
+                      </label>
+                    ))}
+                    <p className="text-xs text-(--muted)">
+                      A política do paciente também deve autorizar o modo.
+                      Expedição só registra ciência quando você é entregador e
+                      responsável autorizado; a evidência identifica essa
+                      origem.
+                    </p>
                   </fieldset>
                 </div>
               </fieldset>

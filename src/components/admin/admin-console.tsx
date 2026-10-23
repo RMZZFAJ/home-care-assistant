@@ -29,6 +29,7 @@ import {
   type Row,
 } from "./admin-fields";
 import { AlertSettings } from "./alert-settings";
+import { PatientRegistration } from "./patient-registration";
 
 type Section =
   | "patient"
@@ -68,7 +69,9 @@ export function AdminConsole() {
 }
 
 function PatientAdmin({ context }: { context: WorkspaceContext }) {
-  const globalMode = context.activeContext?.mode === "global";
+  const globalMode =
+    context.activeContext?.mode === "global" &&
+    context.globalAdministrationAllowed === true;
   const params = useSearchParams();
   const requestedSection = params.get("section") as Section | null;
   const [section, setSection] = useState<Section>(
@@ -92,7 +95,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [importText, setImportText] = useState("");
   const [importReviewed, setImportReviewed] = useState(false);
   const patientId = context.patient?.id;
-  const canManage = context.activeContext?.mode === "global" || may(context, "manage");
+  const canManage =
+    context.activeContext?.mode === "global" || may(context, "manage");
   const load = useCallback(
     (signal?: AbortSignal) => {
       if (["patient", "import"].includes(section)) return Promise.resolve();
@@ -298,69 +302,13 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       {loading && <Notice>Carregando {labels[section].toLowerCase()}…</Notice>}
       <fieldset disabled={busy} className="min-w-0 space-y-5">
         {section === "patient" && (
-          <section className={panelClass}>
-            <h2 className="mb-4 text-lg font-semibold">Cadastro do paciente</h2>
-            <form
-              key={editing ? "new" : (patientId ?? "none")}
-              className="grid gap-4 sm:grid-cols-2"
-              onSubmit={(event) =>
-                handle(
-                  event,
-                  (data) => ({
-                    action: "recipient",
-                    id: editing ? null : (patientId ?? null),
-                    displayName: data.get("displayName"),
-                    isActive: data.has("isActive"),
-                    isDevelopment: globalMode
-                      ? data.has("isDevelopment")
-                      : context.patient?.is_development === true,
-                  }),
-                  "Paciente salvo.",
-                  true,
-                )
-              }
-            >
-              <Field
-                name="displayName"
-                label="Nome de exibição"
-                value={editing ? "" : (context.patient?.display_name ?? "")}
-                required
-              />
-              <div>
-                <Check
-                  name="isActive"
-                  label="Paciente ativo"
-                  checked={
-                    editing ? true : context.patient?.is_active !== false
-                  }
-                />
-                {globalMode && (
-                  <Check
-                    name="isDevelopment"
-                    label="Cadastro de desenvolvimento"
-                    checked={bool(
-                      (context.patient as unknown as Row) ?? {},
-                      "is_development",
-                    )}
-                  />
-                )}
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <button className={primaryClass} type="submit">
-                  {editing || !patientId ? "Criar paciente" : "Salvar paciente"}
-                </button>
-                {globalMode && patientId && (
-                  <button
-                    className={buttonClass}
-                    type="button"
-                    onClick={() => setEditing(editing ? null : {})}
-                  >
-                    {editing ? "Editar atual" : "Novo paciente"}
-                  </button>
-                )}
-              </div>
-            </form>
-          </section>
+          <PatientRegistration
+            patient={context.patient}
+            globalMode={globalMode}
+            creating={Boolean(editing)}
+            onToggle={() => setEditing(editing ? null : {})}
+            handle={handle}
+          />
         )}
         {section === "catalog" && (
           <>

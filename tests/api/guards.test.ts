@@ -183,12 +183,19 @@ describe("patient capability checks", () => {
     ];
     const client = {
       rpc: vi.fn(async (name: string) => ({
-        data: name === "my_active_context" ? { mode: "patient", care_recipient_id: patientId } : {
-          "access.manage": role === "admin",
-          "stock.family.manage": role === "admin",
-          "bal.count": ["admin", "supervisor", "professional"].includes(role),
-          "req.create": ["admin", "supervisor", "professional"].includes(role),
-        },
+        data:
+          name === "my_active_context"
+            ? { mode: "patient", care_recipient_id: patientId }
+            : {
+                "access.manage": role === "admin",
+                "stock.family.manage": role === "admin",
+                "bal.count": ["admin", "supervisor", "professional"].includes(
+                  role,
+                ),
+                "req.create": ["admin", "supervisor", "professional"].includes(
+                  role,
+                ),
+              },
         error: null,
       })),
       from: vi.fn(() => {
@@ -256,8 +263,14 @@ describe("patient capability checks", () => {
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
   it("requires an explicit patient context even when the identity is globally privileged", async () => {
-    const identity = auth("admin"); identity.isGlobalAdmin = true;
-    vi.mocked(identity.client.rpc).mockResolvedValue({ data: { mode: "global", care_recipient_id: null }, error: null } as never);
-    await expect(patientContext(identity, patientId, "manage")).rejects.toMatchObject({ code: "CONTEXT_REQUIRED" });
+    const identity = auth("admin");
+    identity.isGlobalAdmin = true;
+    vi.mocked(identity.client.rpc).mockResolvedValue({
+      data: { mode: "global", care_recipient_id: null },
+      error: null,
+    } as never);
+    await expect(
+      patientContext(identity, patientId, "manage"),
+    ).rejects.toMatchObject({ code: "CONTEXT_REQUIRED" });
   });
 });

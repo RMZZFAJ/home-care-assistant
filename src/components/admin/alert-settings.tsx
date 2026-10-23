@@ -52,8 +52,28 @@ export function AlertSettings({
             <option value="FAMILY">Família</option>
           </select>
         </label>
-        <label className="text-sm font-semibold">Limite baixo<input className={inputClass} name="lowThreshold" inputMode="decimal" defaultValue="0" required pattern="[0-9]+([.,][0-9]{1,6})?" /></label>
-        <label className="text-sm font-semibold">Limite crítico<input className={inputClass} name="criticalThreshold" inputMode="decimal" defaultValue="0" required pattern="[0-9]+([.,][0-9]{1,6})?" /></label>
+        <label className="text-sm font-semibold">
+          Limite baixo
+          <input
+            className={inputClass}
+            name="lowThreshold"
+            inputMode="decimal"
+            defaultValue="0"
+            required
+            pattern="[0-9]+([.,][0-9]{1,6})?"
+          />
+        </label>
+        <label className="text-sm font-semibold">
+          Limite crítico
+          <input
+            className={inputClass}
+            name="criticalThreshold"
+            inputMode="decimal"
+            defaultValue="0"
+            required
+            pattern="[0-9]+([.,][0-9]{1,6})?"
+          />
+        </label>
         <Check name="isEnabled" label="Regra habilitada" />
         <button className={primaryClass} type="submit">
           Salvar regra

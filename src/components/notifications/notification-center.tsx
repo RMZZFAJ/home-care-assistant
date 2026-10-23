@@ -6,7 +6,10 @@ import { api, buttonClass, Notice, Workspace } from "../workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryLabels } from "@/lib/notifications/presentation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
-import { notificationHref, type NotificationTarget } from "@/lib/notifications/navigation";
+import {
+  notificationHref,
+  type NotificationTarget,
+} from "@/lib/notifications/navigation";
 type Notification = NotificationTarget & {
   id: string;
   seen_at: string | null;
@@ -126,11 +129,12 @@ function Center({ patientId }: { patientId?: string }) {
                   (deliveryLabels[row.state] ?? "Aguardando atualização")}
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
-              {row.document_id || row.requisition_id || row.reminder_id || row.consumption_report_id || row.alert_event_id ? (
-                <Link
-                  className={buttonClass}
-                  href={notificationHref(row)}
-                >
+              {row.document_id ||
+              row.requisition_id ||
+              row.reminder_id ||
+              row.consumption_report_id ||
+              row.alert_event_id ? (
+                <Link className={buttonClass} href={notificationHref(row)}>
                   Abrir documento
                 </Link>
               ) : null}

@@ -62,7 +62,12 @@ export function Receipt({ receipt }: { receipt: SavedReceipt }) {
           >
             Imprimir / salvar como PDF
           </button>
-          {receipt.id || receipt.requisitionId ? <DocumentActions id={(receipt.id ?? receipt.requisitionId)!} code={receipt.protocol} /> : null}
+          {receipt.id || receipt.requisitionId ? (
+            <DocumentActions
+              id={(receipt.id ?? receipt.requisitionId)!}
+              code={receipt.protocol}
+            />
+          ) : null}
         </div>
         <div className="mt-5 flex flex-wrap gap-3 print:hidden">
           <Link
@@ -80,7 +85,8 @@ export function Receipt({ receipt }: { receipt: SavedReceipt }) {
           </Link>
         </div>
         <p className="mt-4 text-xs text-(--muted)">
-          Ciência familiar ainda depende dos registros próprios. O PDF de emissão identifica essa pendência.
+          Ciência familiar ainda depende dos registros próprios. O PDF de
+          emissão identifica essa pendência.
         </p>
       </section>
     </div>

@@ -22,6 +22,36 @@ export function verifyMetaSignature(
     `sha256=${createHmac("sha256", appSecret).update(body).digest("hex")}`,
   );
 }
+export function metaAccountMatches(
+  payload: unknown,
+  accountId?: string,
+  phoneId?: string,
+) {
+  if (!accountId || !phoneId) return false;
+  const schema = z.object({
+    object: z.literal("whatsapp_business_account"),
+    entry: z
+      .array(
+        z.object({
+          id: z.literal(accountId),
+          changes: z
+            .array(
+              z.object({
+                field: z.literal("messages"),
+                value: z.object({
+                  metadata: z.object({ phone_number_id: z.literal(phoneId) }),
+                }),
+              }),
+            )
+            .min(1)
+            .max(100),
+        }),
+      )
+      .min(1)
+      .max(100),
+  });
+  return schema.safeParse(payload).success;
+}
 const payloadSchema = z.object({
   object: z.literal("whatsapp_business_account"),
   entry: z

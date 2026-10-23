@@ -159,7 +159,15 @@ function PatientStock({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [context.patient, page, custody, filters, attempt, hasStock, liveRevision]);
+  }, [
+    context.patient,
+    page,
+    custody,
+    filters,
+    attempt,
+    hasStock,
+    liveRevision,
+  ]);
   function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
