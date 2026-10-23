@@ -274,3 +274,47 @@ Não rodar integração que revoga administradores junto com E2E autenticado.
 [ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/39769658084
 [production]: https://home-care-assistant.vercel.app
 [passwords]: https://supabase.com/docs/guides/auth/password-security
+
+## Retomada e correções da revisão da PR 4 — 23/10/2026
+
+Commits de correção: `05e6bf4` (banco/API e regressões Auth) e `d92c342`
+(interface, acompanhamento e regressões visuais).
+
+O incremento 64, `20261023120000_v4_review_regressions.sql`, foi aplicado no
+remoto após backup de esquema/dados e dry-run exclusivo desse arquivo. As 63
+migrations anteriores continuam intactas. O manifesto agora protege as 64.
+Produtos, catálogo anterior, oito identidades Auth e administrador global foram
+reconferidos: contagens e hashes preservados; nenhum reset remoto ou fixture.
+Backups privados desta retomada: esquema 624771 bytes e dados 1026965 bytes,
+com manifesto SHA-256. São dumps sequenciais, sem bytes Storage ou ensaio remoto
+de restauração.
+
+Os cinco apontamentos foram tratados:
+
+- WhatsApp usa a mesma lista explícita no banco, matriz e registry. Eventos
+  internos não geram trabalhos externos; submissão COM tem template. Templates
+  preparados ficam pausados, sem consumir tentativas sucessivas; aprovação
+  libera os trabalhos compatíveis. Revalidação impede envio após desabilitação.
+- Aprovação local de proposta global para novo vínculo gera convite destinado
+  à identidade confirmada. Só o aceite cria acesso. Recusa ou revogação encerra
+  a proposta; autoaprovação e identidade indevida continuam bloqueadas.
+- Pendência de ciência considera satisfação coletiva, modos any/all, dispensa
+  e ausência de elegíveis, além da autorização atual.
+- Card de arquivamento e filtro usam o mesmo predicado, incluindo concluídas
+  com ciência satisfeita ou pendente e excluindo arquivadas.
+- Sino exclui silenciosas no servidor antes da paginação. Central preserva
+  esses registros; contador, troca de paciente e atualização foram verificados.
+
+Os ajustes adicionais mantêm o acompanhamento de envio conectado às revisões
+duráveis, com recuperação, e reconciliam horários/intervalos da matriz com o
+estado confirmado. Gravações são serializadas; conflitos recarregam a versão
+atual sem restaurar snapshot antigo. Conflito lógico de política agora retorna
+409, sem ficar repetindo a transação. PDF de REQ concluída indica arquivamento.
+
+Validação local direcionada: 15 testes unitários; três regressões HTTP/Auth,
+com reexecução dos casos alterados; três cenários E2E Chromium, incluindo
+conflito, rede, permissão, atualizações posteriores, sino e arquivamento.
+Contratos, lint, tipagem e build do runner passaram. A suíte completa fica na
+CI do novo SHA da [PR 4][pr-v4]; o fechamento registra o resultado e a produção.
+Envios externos Meta e Flows continuam desabilitados. Aprovação em fixture
+local não representa aprovação da Meta.
