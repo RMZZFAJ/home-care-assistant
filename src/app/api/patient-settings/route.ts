@@ -1,4 +1,6 @@
+import { createHash, randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
+import { appOrigin } from "@/lib/server/app-origin";
 import { z } from "zod";
 import {
   api,
@@ -89,16 +91,34 @@ export async function POST(request: Request) {
     const auth = await authenticate();
     if (!auth.isGlobalAdmin)
       await patientContext(auth, input.careRecipientId, "manage", true);
+    const invitationToken =
+      input.requestId && input.decision === "approve"
+        ? randomBytes(32).toString("base64url")
+        : null;
+    const invitationHash = invitationToken
+      ? createHash("sha256").update(invitationToken).digest("hex")
+      : null;
+    const data = (await rpc(auth.client, "configure_patient_access", {
+      p_patient: input.careRecipientId,
+      p_kind: input.kind,
+      p_change: invitationHash
+        ? { ...input.change, invitationTokenHash: invitationHash }
+        : input.change,
+      p_key: input.idempotencyKey,
+      p_version: input.expectedVersion,
+      p_request_id: input.requestId ?? null,
+      p_decision: input.decision ?? null,
+    })) as { status: string; resolution?: { invitationHash?: string } };
+    const invitationUrl =
+      data.status === "awaiting_acceptance" &&
+      data.resolution?.invitationHash === invitationHash &&
+      invitationToken
+        ? new URL("/convites/aceitar", appOrigin(request))
+        : null;
+    if (invitationUrl) invitationUrl.hash = "token=" + invitationToken;
     return NextResponse.json({
-      data: await rpc(auth.client, "configure_patient_access", {
-        p_patient: input.careRecipientId,
-        p_kind: input.kind,
-        p_change: input.change,
-        p_key: input.idempotencyKey,
-        p_version: input.expectedVersion,
-        p_request_id: input.requestId ?? null,
-        p_decision: input.decision ?? null,
-      }),
+      data,
+      ...(invitationUrl ? { invitationUrl: invitationUrl.toString() } : {}),
     });
   });
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { api, authenticate, parseUuid, rpc } from "@/lib/server/api";
+import { whatsappEvents } from "@/lib/notifications/template-registry";
 
 export const notificationEvents = [
   "req.issued",
@@ -46,6 +47,18 @@ export async function GET(request: Request) {
       rules: data,
       events: notificationEvents,
       channels,
+      eventChannels: Object.fromEntries(
+        notificationEvents.map((event) => [
+          event,
+          channels
+            .filter(
+              (channel) =>
+                channel.code !== "whatsapp" ||
+                (whatsappEvents as readonly string[]).includes(event),
+            )
+            .map((channel) => channel.code),
+        ]),
+      ),
     });
   });
 }

@@ -1,13 +1,42 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import {
   templates,
   templateForEvent,
   namedBody,
   templateButtons,
+  whatsappEvents,
 } from "@/lib/notifications/template-registry";
 import { MetaWhatsAppProvider } from "@/lib/notifications/provider";
 
 describe("immutable Meta event contracts", () => {
+  it("keeps database routing and external templates in one tested contract", () => {
+    const sql = readFileSync(
+      "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "utf8",
+    );
+    const allowed = [
+      ...sql.match(/p_event=any\(array\[([^\]]*)\]/)![1].matchAll(/'([^']+)'/g),
+    ].map((match) => match[1]);
+    expect(allowed.sort()).toEqual([...whatsappEvents].sort());
+    for (const event of whatsappEvents)
+      for (const status of [
+        "pending_receipt",
+        "confirmed",
+        "received",
+        "approved",
+      ])
+        expect(templateForEvent(event, status, true)).not.toBeNull();
+    for (const event of [
+      "req.science_recorded",
+      "req.reopened",
+      "req.archived.manual",
+      "req.archived.automatic",
+      "com.approve",
+    ])
+      expect(templateForEvent(event)).toBeNull();
+    expect(templateForEvent("com.submit")?.name).toBe("hca_com_aprovacao_v3");
+  });
   it("initial confirmation has no PDF and satisfied science uses a different named template", () => {
     const initial = templateForEvent("req.registered_author")!;
     const acknowledged = templateForEvent("req.science_satisfied")!;

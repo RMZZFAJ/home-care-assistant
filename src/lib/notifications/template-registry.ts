@@ -15,6 +15,34 @@ export type TemplateDefinition = {
   }[];
 };
 export const templates = catalogue as TemplateDefinition[];
+/** External event contract; the SQL regression checks keep the queue in sync. */
+export const whatsappEvents = [
+  "stock.alert",
+  "occurrence.received",
+  "bal.reminder",
+  "shift.reminder",
+  "req.issued",
+  "req.registered_author",
+  "req.fulfillment_updated",
+  "req.science_satisfied",
+  "req.completed",
+  "req.reminder",
+  "com.issued",
+  "com.submit",
+  "com.receive",
+  "com.validate_receipt",
+  "ent.issued",
+  "ent.submit",
+  "ent.receive",
+  "ent.resolve",
+  "ent.reminder",
+  "ent.cancel",
+  "bal.issued",
+  "bal.approve",
+  "com.revised",
+  "ent.revised",
+  "bal.recount",
+] as const;
 export function templateForEvent(
   event: string,
   status?: string,
@@ -32,6 +60,7 @@ export function templateForEvent(
     "req.completed": "hca_req_concluida_v3",
     "req.reminder": "hca_req_pendentes_lembrete_v3",
     "com.issued": "hca_com_aprovacao_v3",
+    "com.submit": "hca_com_aprovacao_v3",
     "com.receive":
       status === "received"
         ? "hca_com_validada_v3"

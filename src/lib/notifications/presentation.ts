@@ -29,6 +29,12 @@ export const recipientGroupLabels: Record<string, string> = {
   other: "Responsável",
 };
 export const deliveryErrorLabels: Record<string, string> = {
+  TEMPLATE_NOT_APPROVED:
+    "Template preparado, aguardando aprovação Meta. Envio pausado até regularização.",
+  EVENT_TEMPLATE_NOT_CONFIGURED:
+    "Evento sem template externo configurado; processamento pausado.",
+  EVENT_APP_ONLY: "Evento disponível somente no aplicativo.",
+  EVENT_DISABLED: "Envio cancelado pela configuração atual do paciente.",
   META_COUNTRY_RESTRICTED_130497:
     "A Meta restringiu envios para o país deste destinatário (130497). Solicite revisão da elegibilidade da conta antes de tentar novamente.",
   DOCUMENT_TEMPLATE_NOT_CONFIGURED:
