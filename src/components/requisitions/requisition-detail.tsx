@@ -412,11 +412,11 @@ function DetailContent({
         {p.manualArchiveRequired ? (
           <Notice>
             Concluída com ciência obrigatória pendente. O arquivamento
-            automático está bloqueado; um administrador do paciente poderá
-            arquivar com justificativa, sem inventar ciência.
+            automático está bloqueado; um responsável autorizado poderá arquivar
+            com justificativa, sem inventar ciência.
           </Notice>
         ) : null}
-        {p.completedAt && !p.archivedAt && context.patient?.role === "admin" ? (
+        {p.completedAt && !p.archivedAt && can(context, "req.archive") ? (
           <button
             className={buttonClass + " mt-4"}
             disabled={busy}

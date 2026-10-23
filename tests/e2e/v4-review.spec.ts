@@ -76,6 +76,68 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
   try {
     await login(other, "adminA", patient);
     await page.goto("/configuracoes?careRecipientId=" + patient);
+    const governance = async (editor: Page) =>
+      (
+        await (
+          await editor.request.get(
+            "/api/patient-settings?careRecipientId=" + patient,
+          )
+        ).json()
+      ).data;
+    const revisePolicy = async (change: Record<string, unknown>) =>
+      post(other, "/api/patient-settings", {
+        careRecipientId: patient,
+        kind: "settings",
+        change,
+        idempotencyKey: randomUUID(),
+        expectedVersion: (await governance(other)).version,
+      });
+    const archiveDays = page.getByLabel("Arquivar após conclusão (dias)", {
+      exact: true,
+    });
+    await expect(archiveDays).toHaveValue("7");
+    await revisePolicy({ archiveDays: 8 });
+    await expect(archiveDays).toHaveValue("8", { timeout: 45000 });
+    await page
+      .getByLabel("Primeiro lembrete (horas)", { exact: true })
+      .fill("3");
+    await page
+      .getByRole("button", { name: "Registrar política", exact: true })
+      .click();
+    await expect
+      .poll(async () => (await governance(page)).settings.reminderHours)
+      .toBe(3);
+    expect((await governance(page)).settings.archiveDays).toBe(8);
+    await expect(
+      page.getByRole("button", { name: "Registrar política", exact: true }),
+    ).toBeEnabled();
+    await archiveDays.fill("9");
+    await revisePolicy({ archiveDays: 10 });
+    await expect(
+      page.getByText("Política v" + (await governance(other)).version, {
+        exact: false,
+      }),
+    ).toBeVisible({ timeout: 45000 });
+    await expect(archiveDays).toHaveValue("9");
+    await page
+      .getByRole("button", { name: "Registrar política", exact: true })
+      .click();
+    await expect(
+      page
+        .getByRole("alert")
+        .filter({ hasText: "configuração mudou em outra sessão" }),
+    ).toBeVisible();
+    await expect(archiveDays).toHaveValue("10");
+    await archiveDays.fill("11");
+    await page
+      .getByRole("button", { name: "Registrar política", exact: true })
+      .click();
+    await expect
+      .poll(async () => (await governance(page)).settings.archiveDays)
+      .toBe(11);
+    await expect(
+      page.getByRole("button", { name: "Registrar política", exact: true }),
+    ).toBeEnabled();
     await page
       .getByRole("combobox", { name: "Configurar", exact: true })
       .selectOption("notifications");
@@ -293,7 +355,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       family
         .getByRole("region", { name: "Notificações recentes", exact: true })
         .getByRole("link")
-        .filter({ hasText: receipt.code }),
+        .and(family.locator('a[href*="' + receipt.requisitionId + '"]')),
     ).toHaveCount(0);
     await family.keyboard.press("Escape");
     await picker.selectOption(patient);
@@ -384,6 +446,48 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
       idempotencyKey: randomUUID(),
       expectedVersion: ent.version,
     });
+    const archivePermission = async (enabled: boolean | null) =>
+      post(page, "/api/patient-settings", {
+        careRecipientId: patient,
+        kind: "capability",
+        change: {
+          capability: "req.archive",
+          subjectUser: fixtures().global.id,
+          enabled,
+        },
+        idempotencyKey: randomUUID(),
+        expectedVersion: (
+          await (
+            await page.request.get(
+              "/api/patient-settings?careRecipientId=" + patient,
+            )
+          ).json()
+        ).data.version,
+      });
+    await archivePermission(false);
+    await page.goto("/fichas/" + req.requisitionId);
+    await expect(
+      page.getByRole("heading", { name: req.code, exact: false }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: "Revisar arquivamento manual",
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    const forbiddenArchive = await page.request.post(
+      "/api/requisitions/" + req.requisitionId + "/archive",
+      { data: { reason: "Tentativa proibida por capacidade explícita" } },
+    );
+    expect(forbiddenArchive.status()).toBe(403);
+    expect(
+      (
+        await (
+          await page.request.get("/api/dashboard?careRecipientId=" + patient)
+        ).json()
+      ).data.archivePending,
+    ).toBe(0);
+    await archivePermission(null);
     await page.goto("/?careRecipientId=" + patient);
     const card = page
       .getByRole("link")

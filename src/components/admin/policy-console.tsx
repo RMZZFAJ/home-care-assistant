@@ -78,7 +78,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const savingRef = useRef(false);
   const currentVersionRef = useRef<number | null>(null);
   const [invitationUrl, setInvitationUrl] = useState("");
-  const editingVersionRef = useRef<number | null>(null);
+  const [editingVersion, setEditingVersion] = useState<number | null>(null);
   useEffect(() => {
     const controller = new AbortController();
     void api<PolicyData>(
@@ -121,7 +121,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
         idempotencyKey: crypto.randomUUID(),
         expectedVersion:
           kind === "settings"
-            ? (editingVersionRef.current ?? data.data.version)
+            ? (editingVersion ?? data.data.version)
             : (currentVersionRef.current ?? data.data.version),
         ...(requestId ? { requestId, decision } : {}),
       });
@@ -136,12 +136,18 @@ function Policies({ context }: { context: WorkspaceContext }) {
       const authoritative = await api<PolicyData>(
         "/api/patient-settings?careRecipientId=" + patientId,
       );
-      currentVersionRef.current = authoritative.data.version;
-      setData(authoritative);
-      editingVersionRef.current = null;
+      if (authoritative.data.version >= (currentVersionRef.current ?? 0)) {
+        currentVersionRef.current = authoritative.data.version;
+        setData(authoritative);
+      }
+      setEditingVersion(null);
       await context.refresh();
       return result.data.status === "applied";
     } catch (reason) {
+      if (reason instanceof ApiError && reason.status === 409) {
+        setEditingVersion(null);
+        setAttempt((value) => value + 1);
+      }
       setError(
         reason instanceof ApiError && reason.status === 409
           ? "A configuração mudou em outra sessão. Dados recarregados; revise e reaplique sua alteração."
@@ -153,8 +159,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
         const authoritative = await api<PolicyData>(
           "/api/patient-settings?careRecipientId=" + patientId,
         );
-        currentVersionRef.current = authoritative.data.version;
-        setData(authoritative);
+        if (authoritative.data.version >= (currentVersionRef.current ?? 0)) {
+          currentVersionRef.current = authoritative.data.version;
+          setData(authoritative);
+        }
       } catch {
         setAttempt((value) => value + 1);
       }
@@ -251,10 +259,16 @@ function Policies({ context }: { context: WorkspaceContext }) {
             preservam a política de emissão.
           </p>
           <form
-            key={patientId + ":" + attempt}
+            key={
+              patientId +
+              ":" +
+              (editingVersion ?? data.data.version) +
+              ":" +
+              attempt
+            }
             onSubmit={saveSettings}
             onChange={() => {
-              editingVersionRef.current ??= data.data.version;
+              setEditingVersion((current) => current ?? data.data.version);
             }}
             className="space-y-4"
           >
