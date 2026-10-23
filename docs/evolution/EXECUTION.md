@@ -362,3 +362,25 @@ visuais. O runner passa a usar o arquivo oficial Ubuntu por HTTPS, mantendo a
 [verificação de assinatura do APT](https://documentation.ubuntu.com/security/software-integrity/archive-verification/).
 O limite do job foi ampliado para 40 minutos para comportar a suíte completa;
 nenhum teste, navegador, condição de acesso ou verificação foi removido.
+
+### Fechamento da integração
+
+A [CI final da PR](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40007688325)
+passou em Linux/Windows: 95 unitários, 20 integrações, dez suítes SQL/RLS,
+instalação limpa e upgrade. Foram concluídos 90 cenários E2E; um WebKit exigiu
+retry e passou também em três repetições direcionadas. Os nove comentários de
+revisão foram respondidos e resolvidos com regressões específicas.
+
+O [merge funcional 80c76eb](https://github.com/RMZZFAJ/home-care-assistant/commit/80c76ebbd05fbd283352b7cb96b9ff4729fa35a4)
+integrou a PR 4 em 23/10/2026. A branch de trabalho foi removida. O SHA final
+está no [commit atual da master](https://github.com/RMZZFAJ/home-care-assistant/commit/master),
+que inclui este registro. A CI pós-merge executa novamente a cadeia completa:
+
+[![CI da master](https://github.com/RMZZFAJ/home-care-assistant/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/RMZZFAJ/home-care-assistant/actions?query=branch%3Amaster)
+
+Estado do [deploy de produção](https://home-care-assistant.vercel.app), cinco
+logins, menus, APIs, PDF, preservação e agendamento efetivamente verificados
+constam no [relatório pós-merge](https://github.com/RMZZFAJ/home-care-assistant/pull/4#issuecomment-6373105656).
+As credenciais permanecem somente em `.private/homologacao/ACESSOS.md`.
+Meta/Flows seguem desabilitados; os limites externos documentados continuam
+distintos da validação operacional e não são apresentados como homologação.
