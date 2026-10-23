@@ -1,0 +1,149 @@
+{
+  "version": "7.3",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "REPORT_MODE": [
+      "REPORT",
+      "SUCCESS"
+    ],
+    "REPORT": [
+      "SUCCESS"
+    ],
+    "SUCCESS": []
+  },
+  "screens": [
+    {
+      "id": "REPORT_MODE",
+      "title": "Ocorrências de materiais",
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "mode_form",
+            "children": [
+              {
+                "type": "RadioButtonsGroup",
+                "name": "kind",
+                "label": "Como foi o período?",
+                "required": true,
+                "data-source": [
+                  {
+                    "id": "no_issues",
+                    "title": "Sem ocorrências"
+                  },
+                  {
+                    "id": "consumption",
+                    "title": "Consumo extraordinário"
+                  },
+                  {
+                    "id": "shortage",
+                    "title": "Falta de material"
+                  }
+                ]
+              },
+              {
+                "type": "Footer",
+                "label": "Continuar",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "operation": "occurrence_mode",
+                    "kind": "${form.kind}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "REPORT",
+      "title": "Relato para revisão",
+      "data": {
+        "catalog": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "__example__": [
+            {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "title": "Material fictício - expedido 10 unidades"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "__example__": "consumption"
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "O relato ficará pendente de revisão. Nenhum débito de estoque é automático."
+          },
+          {
+            "type": "Form",
+            "name": "report_form",
+            "children": [
+              {
+                "type": "TextArea",
+                "name": "text",
+                "label": "Relato para revisão",
+                "required": true,
+                "max-length": 2000
+              },
+              {
+                "type": "Footer",
+                "label": "Enviar para revisão",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "kind": "${data.kind}",
+                    "text": "${form.text}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SUCCESS",
+      "title": "Registro recebido",
+      "terminal": true,
+      "success": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Registro processado. Consulte os aceites e as divergências no Home Care Assistant."
+          },
+          {
+            "type": "Footer",
+            "label": "Concluir",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {}
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

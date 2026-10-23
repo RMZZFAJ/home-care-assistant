@@ -13,7 +13,7 @@ import {
 const schema = z
   .object({
     careRecipientId: uuid,
-    kind: z.enum(["capability", "settings", "membership"]),
+    kind: z.enum(["capability", "settings", "membership", "notification_rule", "administration"]),
     change: z.record(z.string(), z.unknown()),
     idempotencyKey: uuid,
     expectedVersion: z.number().int().positive(),
@@ -24,6 +24,9 @@ const schema = z
 export async function GET(request: Request) {
   return api("settings.read", async () => {
     const auth = await authenticate();
+    const requested = new URL(request.url).searchParams.get("careRecipientId");
+    if (auth.isGlobalAdmin && uuid.safeParse(requested).success)
+      return NextResponse.json(await rpc(auth.client, "patient_governance", { p_patient: requested }));
     const patient = await patientContext(
       auth,
       new URL(request.url).searchParams.get("careRecipientId"),
@@ -76,7 +79,7 @@ export async function POST(request: Request) {
   return api("settings.configure", async () => {
     const input = await readJson(request, schema);
     const auth = await authenticate();
-    await patientContext(auth, input.careRecipientId, "manage", true);
+    if (!auth.isGlobalAdmin) await patientContext(auth, input.careRecipientId, "manage", true);
     return NextResponse.json({
       data: await rpc(auth.client, "configure_patient_access", {
         p_patient: input.careRecipientId,

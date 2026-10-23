@@ -78,6 +78,9 @@ const schema = z.discriminatedUnion("action", [
           internal: z.boolean(),
           whatsapp: z.boolean(),
           email: z.boolean(),
+          scienceExpress: z.boolean().default(true),
+          scienceWhatsApp: z.boolean().default(false),
+          scienceAutomatic: z.boolean().default(false),
         })
         .strict(),
     })

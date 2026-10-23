@@ -24,6 +24,8 @@ import {
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { DocumentActions } from "./document-actions";
 
 export function SupplyDetail({ id }: { id: string }) {
   return (
@@ -33,6 +35,8 @@ export function SupplyDetail({ id }: { id: string }) {
   );
 }
 function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
+  const liveRevision = useLiveRevision();
+  const editingRef = useRef(false);
   const [data, setData] = useState<SupplyDocument | null>(null);
   const [people, setPeople] = useState<PatientPerson[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +52,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
     expectedVersion: number;
   } | null>(null);
   const [uncertain, setUncertain] = useState(false);
+  useEffect(() => { editingRef.current = Boolean(action || review || uncertain); }, [action, review, uncertain]);
   const pendingRef = useRef<{
     action: string;
     body: unknown;
@@ -69,7 +74,8 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
     )
       .then(async (result) => {
         if (controller.signal.aborted) return;
-        setData(result.data);
+        if (!editingRef.current) setData(result.data);
+        else setMessage("O acompanhamento foi atualizado. Sua operação permanece preservada e será validada contra a versão original ao confirmar.");
         setError("");
         if (result.data.care_recipient_id === patientId) {
           const directory = await api<{ directory: PatientPerson[] }>(
@@ -93,7 +99,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [id, patientId, attempt]);
+  }, [id, patientId, attempt, liveRevision]);
   async function execute() {
     if (!data) return;
     if (!pendingRef.current && review)
@@ -237,14 +243,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
           Atualizar
         </button>
         {data?.protocol ? (
-          <a
-            className={buttonClass}
-            href={"/api/documents/" + id + "/pdf"}
-            target="_blank"
-            rel="noopener"
-          >
-            Abrir PDF
-          </a>
+          <DocumentActions id={id} code={data.code ?? data.type} version={data.version} />
         ) : null}
       </div>
       {loading ? <Notice>Consultando documento persistido…</Notice> : null}
@@ -421,7 +420,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
                           </dd>
                         </div>
                         <div>
-                          <dt>Em divergência</dt>
+                          <dt>{line.metadata.issueOpen ? "Em divergência" : "Aguardando conferência"}</dt>
                           <dd>
                             {formatQuantity(
                               quantity(line.quantity)

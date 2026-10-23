@@ -1,11 +1,13 @@
 "use client";
+import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api, buttonClass, Notice, Workspace } from "../workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryLabels } from "@/lib/notifications/presentation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
-type Notification = {
+import { notificationHref, type NotificationTarget } from "@/lib/notifications/navigation";
+type Notification = NotificationTarget & {
   id: string;
   seen_at: string | null;
   state: string;
@@ -35,6 +37,7 @@ function Center({ patientId }: { patientId?: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const liveRevision = useLiveRevision();
   const [unread, setUnread] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
@@ -63,7 +66,7 @@ function Center({ patientId }: { patientId?: string }) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [patientId, page, unread, attempt]);
+  }, [patientId, page, unread, attempt, liveRevision]);
   return (
     <section className="ui-card">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -112,7 +115,7 @@ function Center({ patientId }: { patientId?: string }) {
               {row.operational_documents?.code ?? "Atualização operacional"}
             </p>
             <p className="mt-1 text-sm">
-              {documentEventLabel(row.document_events?.action)}
+              {documentEventLabel(row.event_key ?? row.document_events?.action)}
             </p>
             <p className="mt-1 text-xs text-(--muted)">
               {formatBrazilDate(row.created_at)} ·{" "}
@@ -123,15 +126,10 @@ function Center({ patientId }: { patientId?: string }) {
                   (deliveryLabels[row.state] ?? "Aguardando atualização")}
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
-              {row.document_id || row.requisition_id ? (
+              {row.document_id || row.requisition_id || row.reminder_id || row.consumption_report_id || row.alert_event_id ? (
                 <Link
                   className={buttonClass}
-                  href={
-                    (row.operational_documents?.type === "REQ" ||
-                    row.requisition_id
-                      ? "/historico/"
-                      : "/fichas/") + (row.document_id ?? row.requisition_id)
-                  }
+                  href={notificationHref(row)}
                 >
                   Abrir documento
                 </Link>

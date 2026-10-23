@@ -101,6 +101,12 @@ export const documentLabels: Record<DocumentType, string> = {
   BAL: "Balanço semanal",
 };
 export const documentStatuses: Record<string, string> = {
+  science_pending: "Ciência familiar pendente",
+  awaiting_fulfillment: "Aguardando atendimento",
+  fulfillment_partial: "Atendimento parcial",
+  completed: "Atendimento concluído",
+  completed_science_pending: "Concluída · ciência pendente",
+  archived: "Arquivada",
   draft: "Rascunho",
   submitted: "Aguardando revisão",
   pending_approval: "Aguardando aprovação",

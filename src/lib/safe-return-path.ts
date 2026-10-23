@@ -4,7 +4,7 @@ export function safeReturnPath(value: string | null, origin: string): string {
   try {
     const target = new URL(value, origin);
     if (target.origin !== new URL(origin).origin) return "/";
-    const allowed = ["/", "/historico", "/admin", "/estoque", "/inventarios", "/recuperar-senha", "/convites/aceitar"];
+    const allowed = ["/", "/historico", "/fichas", "/admin", "/estoque", "/inventarios", "/recuperar-senha", "/convites/aceitar", "/perfil", "/configuracoes", "/notificacoes", "/consumo", "/unidades"];
     if (!allowed.some((path) => target.pathname === path || (path !== "/" && target.pathname.startsWith(`${path}/`)))) return "/";
     return `${target.pathname}${target.search}`;
   } catch { return "/"; }
