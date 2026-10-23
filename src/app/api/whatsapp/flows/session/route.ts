@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const auth = await authenticate();
     const input = await readJson(
       request,
-      z.object({ careRecipientId: uuid }).strict(),
+      z.object({ careRecipientId: uuid, documentId: uuid.optional() }).strict(),
     );
     if (process.env.META_FLOWS_ENABLED !== "true")
       throw new ApiError(
@@ -24,15 +24,15 @@ export async function POST(request: Request) {
         503,
       );
     const token = randomBytes(32).toString("base64url");
-    await rpc(auth.client, "create_flow_session", {
-      p_patient: input.careRecipientId,
+    await rpc(auth.client, input.documentId ? "create_receipt_flow_session" : "create_flow_session", {
+      ...(input.documentId ? { p_document: input.documentId } : { p_patient: input.careRecipientId }),
       p_hash: tokenHash(token),
     });
     return NextResponse.json(
       {
         flowToken: token,
-        expiresInSeconds: 1200,
-        requiresAuthenticatedConfirmation: true,
+        expiresInSeconds: input.documentId ? 600 : 1200,
+        requiresAuthenticatedConfirmation: !input.documentId,
       },
       { headers: { "cache-control": "no-store" } },
     );

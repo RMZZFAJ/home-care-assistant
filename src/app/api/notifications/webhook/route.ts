@@ -73,6 +73,14 @@ export async function POST(request: Request) {
         });
         continue;
       }
+      if (button?.startsWith("HCA_SCIENCE:")) {
+        await rpc(client, "confirm_whatsapp_science", { p_provider_id: message.id, p_phone: message.from, p_hash: tokenHash(button.slice(12)) });
+        continue;
+      }
+      if (button?.startsWith("HCA_NO_ISSUES:")) {
+        await rpc(client, "acknowledge_no_issues", { p_provider_id: message.id, p_phone: message.from, p_hash: tokenHash(button.slice("HCA_NO_ISSUES:".length)) });
+        continue;
+      }
       if (message.type === "text" && message.text?.body) {
         const context = (await rpc(client, "inbound_report_context", {
           p_phone: message.from,

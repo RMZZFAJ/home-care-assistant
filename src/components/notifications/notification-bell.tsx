@@ -6,10 +6,18 @@ import { api } from "@/components/workspace";
 import { Icon } from "@/components/ui/primitives";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { notificationHref } from "@/lib/notifications/navigation";
 
 export type InboxNotification = {
   id: string;
   document_id?: string;
+  consumption_report_id?: string;
+  reminder_id?: string;
+  alert_event_id?: string;
+  care_recipient_id?: string;
+  event_key?: string;
+  silent?: boolean;
   requisition_id?: string;
   state: string;
   seen_at: string | null;
@@ -18,6 +26,7 @@ export type InboxNotification = {
   document_events?: { action: string } | null;
 };
 export function NotificationBell({ patientId }: { patientId?: string }) {
+  const liveRevision = useLiveRevision();
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<InboxNotification[]>([]);
   const [unread, setUnread] = useState(0);
@@ -50,7 +59,7 @@ export function NotificationBell({ patientId }: { patientId?: string }) {
       controller.abort();
       window.clearInterval(timer);
     };
-  }, [patientId]);
+  }, [patientId, liveRevision]);
   useEffect(() => {
     if (!open) return;
     const close = (event: PointerEvent) => {
@@ -103,19 +112,13 @@ export function NotificationBell({ patientId }: { patientId?: string }) {
             </p>
           ) : (
             <ul>
-              {rows.slice(0, 8).map((row) => (
+              {rows.filter(row => !row.silent).slice(0, 8).map((row) => (
                 <li
                   key={row.id}
                   className={!row.seen_at ? "notification-unread" : ""}
                 >
                   <Link
-                    href={
-                      row.document_id
-                        ? "/fichas/" + row.document_id
-                        : row.requisition_id
-                          ? "/historico/" + row.requisition_id
-                          : "/notificacoes"
-                    }
+                    href={notificationHref(row)}
                     onClick={() => {
                       setOpen(false);
                       void api("/api/notifications", { id: row.id }).then(
@@ -139,7 +142,7 @@ export function NotificationBell({ patientId }: { patientId?: string }) {
                         "Atualização do paciente"}
                     </strong>
                     <span>
-                      {documentEventLabel(row.document_events?.action)}
+                      {documentEventLabel(row.document_events?.action ?? row.event_key)}
                     </span>
                     <time>{formatBrazilDate(row.created_at)}</time>
                   </Link>

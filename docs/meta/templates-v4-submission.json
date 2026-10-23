@@ -1,0 +1,347 @@
+{
+  "domain": "https://home-care-assistant.vercel.app",
+  "requests": [
+    {
+      "name": "hca_ent_concluida_pdf_v3",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "parameter_format": "NAMED",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "DOCUMENT",
+          "example": {
+            "header_handle": [
+              "SUBSTITUIR_POR_HANDLE_DE_UPLOAD_META"
+            ]
+          }
+        },
+        {
+          "type": "BODY",
+          "text": "✅ *RECEBIMENTO CONFIRMADO*\n\nOlá, *{{nome_destinatario}}*!\n\nO recebimento da entrega *{{numero_entrega}}*, registrada em *{{data_hora}}* para *{{nome_paciente}}*, foi concluído.\n\n*Entregue por:* {{nome_entregador}}\n*Recebido por:* {{nome_recebedor}}\n*Itens conferidos:* {{itens_conferidos}}\n*Confirmação:* {{data_hora_conclusao}}\n\nO comprovante atualizado está anexado. As etapas de conferência e eventuais resoluções continuam disponíveis no histórico.",
+          "example": {
+            "body_text_named_params": [
+              {
+                "param_name": "nome_destinatario",
+                "example": "Adriana"
+              },
+              {
+                "param_name": "numero_entrega",
+                "example": "ENT-0012"
+              },
+              {
+                "param_name": "data_hora",
+                "example": "22/10/2026 às 07h42"
+              },
+              {
+                "param_name": "nome_paciente",
+                "example": "Paciente Exemplo"
+              },
+              {
+                "param_name": "nome_entregador",
+                "example": "Renato"
+              },
+              {
+                "param_name": "nome_recebedor",
+                "example": "Juliana"
+              },
+              {
+                "param_name": "itens_conferidos",
+                "example": "6 de 8"
+              },
+              {
+                "param_name": "data_hora_conclusao",
+                "example": "22/10/2026 às 09h18"
+              }
+            ]
+          }
+        },
+        {
+          "type": "FOOTER",
+          "text": "Home Care Assistant • Mensagem automática"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "text": "Ver comprovante",
+              "url": "https://home-care-assistant.vercel.app/fichas/{{1}}",
+              "example": [
+                "https://home-care-assistant.vercel.app/fichas/00000000-0000-4000-8000-00000000d003"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hca_ent_conferencia_autenticada_v3",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "parameter_format": "NAMED",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "DOCUMENT",
+          "example": {
+            "header_handle": [
+              "SUBSTITUIR_POR_HANDLE_DE_UPLOAD_META"
+            ]
+          }
+        },
+        {
+          "type": "BODY",
+          "text": "📦 *CONFIRA O RECEBIMENTO*\n\nOlá, *{{nome_destinatario}}*!\n\n*{{nome_entregador}}* registrou a entrega *{{numero_entrega}}* para *{{nome_paciente}}*. Você foi indicado para receber os materiais.\n\n*Data:* {{data_hora}}\n*Itens declarados:* {{quantidade_itens}}\n*Recebedor:* {{nome_recebedor}}\n\nConfira os produtos e as quantidades no PDF anexado. Para confirmar o que realmente recebeu ou informar qualquer diferença, abra o formulário seguro no sistema.\n\n*A entrega continua pendente até sua confirmação.*",
+          "example": {
+            "body_text_named_params": [
+              {
+                "param_name": "nome_destinatario",
+                "example": "Adriana"
+              },
+              {
+                "param_name": "nome_entregador",
+                "example": "Renato"
+              },
+              {
+                "param_name": "numero_entrega",
+                "example": "ENT-0012"
+              },
+              {
+                "param_name": "nome_paciente",
+                "example": "Paciente Exemplo"
+              },
+              {
+                "param_name": "data_hora",
+                "example": "22/10/2026 às 07h42"
+              },
+              {
+                "param_name": "quantidade_itens",
+                "example": "8"
+              },
+              {
+                "param_name": "nome_recebedor",
+                "example": "Juliana"
+              }
+            ]
+          }
+        },
+        {
+          "type": "FOOTER",
+          "text": "Home Care Assistant • Mensagem automática"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "text": "Conferir entrega",
+              "url": "https://home-care-assistant.vercel.app/fichas/{{1}}",
+              "example": [
+                "https://home-care-assistant.vercel.app/fichas/00000000-0000-4000-8000-00000000d003"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hca_req_registrada_autor_v4",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "parameter_format": "NAMED",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "TEXT",
+          "text": "REQUISIÇÃO REGISTRADA"
+        },
+        {
+          "type": "BODY",
+          "text": "Olá, {{nome_destinatario}}! Sua requisição {{numero_requisicao}} para {{nome_paciente}}, registrada em {{data_hora}}, foi encaminhada para ciência familiar. São {{quantidade_itens}} itens, dos quais {{itens_urgentes}} urgentes. Você receberá uma nova mensagem com o PDF atualizado quando a ciência exigida estiver registrada. Acompanhe pelo sistema; o PDF de emissão já está disponível, identificado com ciência pendente.",
+          "example": {
+            "body_text_named_params": [
+              {
+                "param_name": "nome_destinatario",
+                "example": "Juliana"
+              },
+              {
+                "param_name": "numero_requisicao",
+                "example": "REQ-0007"
+              },
+              {
+                "param_name": "nome_paciente",
+                "example": "Paciente Exemplo"
+              },
+              {
+                "param_name": "data_hora",
+                "example": "22/10/2026 às 07h42"
+              },
+              {
+                "param_name": "quantidade_itens",
+                "example": "6"
+              },
+              {
+                "param_name": "itens_urgentes",
+                "example": "2"
+              }
+            ]
+          }
+        },
+        {
+          "type": "FOOTER",
+          "text": "Home Care Assistant • Mensagem automática"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "text": "Consultar requisição",
+              "url": "https://home-care-assistant.vercel.app/historico/{{1}}",
+              "example": [
+                "https://home-care-assistant.vercel.app/historico/00000000-0000-4000-8000-00000000d001"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hca_req_ciencia_familia_v4",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "parameter_format": "NAMED",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "DOCUMENT",
+          "example": {
+            "header_handle": [
+              "SUBSTITUIR_POR_HANDLE_DE_UPLOAD_META"
+            ]
+          }
+        },
+        {
+          "type": "BODY",
+          "text": "Olá, {{nome_destinatario}}! {{nome_solicitante}} registrou a requisição {{numero_requisicao}} para {{nome_paciente}} em {{data_hora}}, com {{quantidade_itens}} itens. Consulte o PDF e registre sua ciência no aplicativo. A confirmação de ciência é independente do recebimento dos materiais; somente uma ENT recebida atende os itens.",
+          "example": {
+            "body_text_named_params": [
+              {
+                "param_name": "nome_destinatario",
+                "example": "Adriana"
+              },
+              {
+                "param_name": "nome_solicitante",
+                "example": "Juliana"
+              },
+              {
+                "param_name": "numero_requisicao",
+                "example": "REQ-0007"
+              },
+              {
+                "param_name": "nome_paciente",
+                "example": "Paciente Exemplo"
+              },
+              {
+                "param_name": "data_hora",
+                "example": "22/10/2026 às 07h42"
+              },
+              {
+                "param_name": "quantidade_itens",
+                "example": "6"
+              }
+            ]
+          }
+        },
+        {
+          "type": "FOOTER",
+          "text": "Home Care Assistant • Mensagem automática"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "text": "Consultar requisição",
+              "url": "https://home-care-assistant.vercel.app/historico/{{1}}",
+              "example": [
+                "https://home-care-assistant.vercel.app/historico/00000000-0000-4000-8000-00000000d001"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hca_req_ciencia_registrada_autor_v4",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "parameter_format": "NAMED",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "DOCUMENT",
+          "example": {
+            "header_handle": [
+              "SUBSTITUIR_POR_HANDLE_DE_UPLOAD_META"
+            ]
+          }
+        },
+        {
+          "type": "BODY",
+          "text": "Olá, {{nome_destinatario}}! A ciência familiar exigida da requisição {{numero_requisicao}} para {{nome_paciente}} foi registrada. Responsável: {{nome_responsavel}}. Origem da evidência: {{origem_ciencia}}. Data: {{data_hora_conclusao}}. O PDF atualizado, versão {{versao_documento}}, está anexado. O atendimento dos materiais continua dependendo dos recebimentos válidos das entregas vinculadas.",
+          "example": {
+            "body_text_named_params": [
+              {
+                "param_name": "nome_destinatario",
+                "example": "Juliana"
+              },
+              {
+                "param_name": "numero_requisicao",
+                "example": "REQ-0007"
+              },
+              {
+                "param_name": "nome_paciente",
+                "example": "Paciente Exemplo"
+              },
+              {
+                "param_name": "nome_responsavel",
+                "example": "Adriana"
+              },
+              {
+                "param_name": "origem_ciencia",
+                "example": "Confirmação expressa no aplicativo"
+              },
+              {
+                "param_name": "data_hora_conclusao",
+                "example": "22/10/2026 às 08h00"
+              },
+              {
+                "param_name": "versao_documento",
+                "example": "2"
+              }
+            ]
+          }
+        },
+        {
+          "type": "FOOTER",
+          "text": "Home Care Assistant • Mensagem automática"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "text": "Consultar requisição",
+              "url": "https://home-care-assistant.vercel.app/historico/{{1}}",
+              "example": [
+                "https://home-care-assistant.vercel.app/historico/00000000-0000-4000-8000-00000000d001"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

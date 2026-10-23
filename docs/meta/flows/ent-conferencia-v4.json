@@ -1,0 +1,279 @@
+{
+  "version": "7.3",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "RECEIPT_MODE": [
+      "RECEIPT_LINE",
+      "RECEIPT_REVIEW"
+    ],
+    "RECEIPT_LINE": [
+      "RECEIPT_REVIEW"
+    ],
+    "RECEIPT_REVIEW": [
+      "SUCCESS"
+    ],
+    "SUCCESS": []
+  },
+  "screens": [
+    {
+      "id": "RECEIPT_MODE",
+      "title": "Conferir entrega",
+      "data": {
+        "documentCode": {
+          "type": "string",
+          "__example__": "ENT-0001"
+        },
+        "reviewText": {
+          "type": "string",
+          "__example__": "Material fictício: expedido 10, aceito 6"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "__example__": [
+            {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "title": "Material fictício - expedido 10 unidades"
+            }
+          ]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "${data.documentCode}"
+          },
+          {
+            "type": "TextBody",
+            "text": "Confirme somente materiais efetivamente recebidos. As diferenças ficam pendentes de resolução."
+          },
+          {
+            "type": "Form",
+            "name": "mode_form",
+            "children": [
+              {
+                "type": "RadioButtonsGroup",
+                "name": "mode",
+                "label": "Como deseja conferir?",
+                "required": true,
+                "data-source": [
+                  {
+                    "id": "all",
+                    "title": "Confirmar tudo"
+                  },
+                  {
+                    "id": "divergence",
+                    "title": "Informar divergência"
+                  }
+                ]
+              },
+              {
+                "type": "Footer",
+                "label": "Continuar",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "operation": "mode",
+                    "mode": "${form.mode}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "RECEIPT_LINE",
+      "title": "Informar diferença",
+      "data": {
+        "documentCode": {
+          "type": "string",
+          "__example__": "ENT-0001"
+        },
+        "reviewText": {
+          "type": "string",
+          "__example__": "Material fictício: expedido 10, aceito 6"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "__example__": [
+            {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "title": "Material fictício - expedido 10 unidades"
+            }
+          ]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "line_form",
+            "children": [
+              {
+                "type": "Dropdown",
+                "name": "lineId",
+                "label": "Item divergente",
+                "required": true,
+                "data-source": "${data.lines}"
+              },
+              {
+                "type": "TextInput",
+                "name": "acceptedQuantity",
+                "label": "Quantidade recebida",
+                "input-type": "number",
+                "required": true
+              },
+              {
+                "type": "TextArea",
+                "name": "notes",
+                "label": "Diferença encontrada",
+                "required": false,
+                "max-length": 1000
+              },
+              {
+                "type": "RadioButtonsGroup",
+                "name": "next",
+                "label": "Próximo passo",
+                "required": true,
+                "data-source": [
+                  {
+                    "id": "another",
+                    "title": "Informar outra diferença"
+                  },
+                  {
+                    "id": "review",
+                    "title": "Revisar conferência"
+                  }
+                ]
+              },
+              {
+                "type": "Footer",
+                "label": "Salvar diferença",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "operation": "line",
+                    "lineId": "${form.lineId}",
+                    "acceptedQuantity": "${form.acceptedQuantity}",
+                    "notes": "${form.notes}",
+                    "next": "${form.next}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "RECEIPT_REVIEW",
+      "title": "Revisar recebimento",
+      "data": {
+        "documentCode": {
+          "type": "string",
+          "__example__": "ENT-0001"
+        },
+        "reviewText": {
+          "type": "string",
+          "__example__": "Material fictício: expedido 10, aceito 6"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "__example__": [
+            {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "title": "Material fictício - expedido 10 unidades"
+            }
+          ]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "${data.documentCode}"
+          },
+          {
+            "type": "TextBody",
+            "text": "Itens não selecionados como divergentes serão aceitos integralmente. Confira o resumo antes de confirmar."
+          },
+          {
+            "type": "TextBody",
+            "text": "${data.reviewText}"
+          },
+          {
+            "type": "Footer",
+            "label": "Confirmar recebimento",
+            "on-click-action": {
+              "name": "data_exchange",
+              "payload": {
+                "operation": "confirm"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SUCCESS",
+      "title": "Registro recebido",
+      "terminal": true,
+      "success": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Registro processado. Consulte os aceites e as divergências no Home Care Assistant."
+          },
+          {
+            "type": "Footer",
+            "label": "Concluir",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {}
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
