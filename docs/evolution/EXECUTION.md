@@ -337,3 +337,13 @@ mesmos schemas; todas as 66 migrations estão protegidas por hash.
 Regressões direcionadas: 16 unitários, três HTTP/Auth e dois contratos de worker;
 E2E verificou a nova recusa de arquivamento e as duas sessões de configuração.
 Correções adicionais nos commits `d949bfc` e `415ec5e`.
+
+A revisão seguinte encontrou uma disputa entre revogação e arquivamento. O
+incremento 67 repete a autorização após adquirir o bloqueio do paciente. Uma
+regressão concorrente com sessão Auth real e a RPC de política reproduziu o
+arquivamento indevido antes da correção e passou após ela, sem evento de arquivo
+nem alteração do documento. Backup da função/ACL foi comparado ao remoto antes
+da aplicação, além do backup completo anterior; 67 migrations estão congeladas.
+A CI `39997599812` passou por SQL e integração e foi cancelada durante E2E por
+ter sido substituída pelo commit com essa correção. A execução final usa o novo
+SHA e mantém toda a suíte, sem excluir testes ou afrouxar regras.
