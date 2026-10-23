@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
+import { Dialog } from "@/components/ui/primitives";
+import { RelatedDocument } from "@/components/documents/related-document";
+import { formatBrazilDate } from "@/lib/receipt";
 import { inputClass, Notice } from "@/components/workspace";
 import {
   matchCatalog,
@@ -71,6 +73,8 @@ export function CatalogStep({
   errors: Record<string, string>;
 }) {
   const [search, setSearch] = useState("");
+  const [duplicate, setDuplicate] = useState<Product | null>(null);
+  const [repeatReason, setRepeatReason] = useState("");
   const visible = items.filter((item) =>
     [item.name, ...(item.aliases ?? [])].some((name) =>
       normalize(name).includes(normalize(search)),
@@ -78,6 +82,65 @@ export function CatalogStep({
   );
   return (
     <div className="space-y-4">
+      <Dialog
+        open={Boolean(duplicate)}
+        title="Este produto já está em uma requisição pendente"
+        onClose={() => setDuplicate(null)}
+      >
+        <p className="text-sm">
+          Confira a necessidade anterior antes de reiterar {duplicate?.name}. A
+          nova linha não substitui o pedido anterior.
+        </p>
+        <ul className="my-3 space-y-3">
+          {itemContext
+            .find((info) => info.productId === duplicate?.id)
+            ?.pending.map((pending) => (
+              <li
+                key={pending.lineId}
+                className="rounded-lg border border-(--line) p-3 text-sm"
+              >
+                <RelatedDocument
+                  id={pending.requisitionId}
+                  label={pending.code}
+                />
+                <p>
+                  {formatBrazilDate(pending.createdAt)} · Aguardando atendimento
+                </p>
+              </li>
+            ))}
+        </ul>
+        <label className="block text-sm font-semibold">
+          Justificativa da nova requisição
+          <textarea
+            className={inputClass}
+            minLength={3}
+            maxLength={1000}
+            value={repeatReason}
+            onChange={(event) => setRepeatReason(event.target.value)}
+          />
+        </label>
+        <div className="ui-form-actions">
+          <button
+            type="button"
+            className="ui-button ui-button-secondary"
+            onClick={() => setDuplicate(null)}
+          >
+            Não incluir o item
+          </button>
+          <button
+            type="button"
+            className="ui-button ui-button-primary"
+            disabled={repeatReason.trim().length < 3}
+            onClick={() => {
+              if (duplicate)
+                updateLine(duplicate, { repeatReason: repeatReason.trim() });
+              setDuplicate(null);
+            }}
+          >
+            Manter nova requisição
+          </button>
+        </div>
+      </Dialog>
       <label className="block text-sm font-semibold">
         Buscar produto
         <input
@@ -102,9 +165,13 @@ export function CatalogStep({
               <input
                 type="checkbox"
                 checked={Boolean(line)}
-                onChange={() =>
-                  line ? removeLine(item.id) : updateLine(item, {})
-                }
+                onChange={() => {
+                  if (line) removeLine(item.id);
+                  else if (info?.pending.length) {
+                    setDuplicate(item);
+                    setRepeatReason("");
+                  } else updateLine(item, {});
+                }}
               />
               {item.name}
               <span className="ml-auto text-xs font-normal text-(--muted)">
@@ -168,13 +235,11 @@ export function CatalogStep({
                     <p>
                       Este produto ainda tem requisição pendente:{" "}
                       {info.pending.map((pending) => (
-                        <Link
+                        <RelatedDocument
                           key={pending.lineId}
-                          className="underline mr-2"
-                          href={"/historico/" + pending.requisitionId}
-                        >
-                          {pending.code}
-                        </Link>
+                          id={pending.requisitionId}
+                          label={pending.code}
+                        />
                       ))}
                     </p>
                     <label className="mt-3 block font-semibold">
@@ -436,7 +501,7 @@ export function Review({
         title="Itens do catálogo"
         rows={lines.map(
           (item) =>
-            `${item.productName} — estoque atual: ${item.currentStock ?? "desconhecido"}${item.urgent ? " (urgente)" : ""}`,
+            `${item.productName} — estoque atual: ${item.currentStock ?? "desconhecido"}${item.urgent ? " (urgente)" : ""}${item.repeatReason ? " · Reiteração: " + item.repeatReason : ""}`,
         )}
       />
       <Summary

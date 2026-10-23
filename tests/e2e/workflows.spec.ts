@@ -1,3 +1,4 @@
+import { selectContext } from "./auth-context";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -17,6 +18,7 @@ function fixtures() {
     { id: string; email: string }
   >;
 }
+const selectedPatients = new WeakMap<Page, string>();
 async function login(page: Page, role = "global") {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[role].email);
@@ -28,6 +30,11 @@ async function login(page: Page, role = "global") {
   await expect(
     page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
   ).toBeVisible();
+  await selectContext(
+    page,
+    selectedPatients.get(page) ??
+      (role === "global" ? null : "20000000-0000-4000-8000-000000000001"),
+  );
 }
 async function logout(page: Page) {
   await page.getByLabel("Menu do usuário", { exact: true }).click();
@@ -40,6 +47,7 @@ async function post(page: Page, path: string, data: unknown) {
   return response.json();
 }
 async function prepare(page: Page, count = 1) {
+  await selectContext(page, null);
   const patient = (
     await post(page, "/api/admin", {
       action: "recipient",
@@ -47,17 +55,16 @@ async function prepare(page: Page, count = 1) {
       displayName: "Homologação E2E " + randomUUID().slice(0, 8),
       isActive: true,
       isDevelopment: true,
+      initialAdministratorEmail: fixtures().global.email,
     })
   ).data.id as string;
   for (const role of ["adminA", "adminB", "family", "professional", "reader"])
-    await post(page, "/api/admin", {
-      action: "membership",
-      careRecipientId: patient,
-      userId: fixtures()[role].id,
-      role: role.startsWith("admin") ? "admin" : role,
-      canManageStock: false,
-      canCountStock: false,
-    });
+    sql(
+      `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patient}','${fixtures()[role].id}','${role.startsWith("admin") ? "admin" : role}') on conflict do nothing;`,
+    );
+  selectedPatients.set(page, patient);
+  await page.reload();
+  await selectContext(page, patient);
   const products: { id: string; name: string }[] = [];
   for (let index = 0; index < count; index++) {
     const product = (
@@ -268,7 +275,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
     "/historico/" + req.requisitionId + "?careRecipientId=" + patient,
   );
   await expect(
-    page.getByRole("heading", { name: /1\/1 itens atendidos/ }),
+    page.getByText("1/1 itens atendidos", { exact: true }),
   ).toBeVisible();
   const png = await sharp({
     create: { width: 4, height: 4, channels: 3, background: "#ffffff" },
@@ -402,9 +409,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     "/historico/" + req.requisitionId + "?careRecipientId=" + patient,
   );
   await expect(
-    page.getByRole("heading", {
-      name: /5\/10 itens atendidos — atendimento parcial/,
-    }),
+    page.getByText("5/10 itens atendidos", { exact: true }),
   ).toBeVisible();
   await page.goto("/fichas/" + second.data.id + "?careRecipientId=" + patient);
   await page
@@ -805,6 +810,13 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await page.getByRole("checkbox", { name: /REQ-0001/ }).check();
   await page.getByRole("checkbox", { name: /REQ-0002/ }).check();
   await next(page);
+  await expect(
+    page.locator(".ui-field-error").filter({ hasText: /Justifique/ }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Justificativa da necessidade compartilhada", { exact: false })
+    .fill("As duas requisições reiteram a mesma necessidade física.");
+  await next(page);
   await page
     .getByRole("button", { name: "Ler código de barras", exact: true })
     .click();
@@ -869,7 +881,17 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     page.getByLabel("Quantidade — " + product.name, { exact: true }),
   ).toHaveValue("4");
   await expect(page.getByText(/Código desconhecido/)).not.toBeVisible();
-  for (let step = 0; step < 3; step++) await next(page);
+  for (let step = 0; step < 3; step++) {
+    const shared = page.getByLabel(
+      "Justificativa da necessidade compartilhada",
+      { exact: false },
+    );
+    if (await shared.isVisible())
+      await shared.fill(
+        "As requisições reiteram a mesma necessidade, com um único crédito físico.",
+      );
+    await next(page);
+  }
   const issuing = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/documents" &&

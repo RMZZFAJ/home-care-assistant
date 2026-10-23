@@ -5,13 +5,7 @@ create temporary table review_state(key text primary key,value text);
 grant all on review_state to authenticated,service_role;
 grant select on review_actors to authenticated,service_role;
 create function pg_temp.review_assert(ok boolean,message text) returns void language plpgsql as $$begin if not coalesce(ok,false) then raise exception 'ASSERTION: %',message;end if;end;$$;
-create function pg_temp.review_login(who text) returns void language plpgsql security definer set search_path='' as $$
-declare u uuid;s uuid;begin
- select id into strict u from pg_temp.review_actors where name=who;
- select id into s from auth.sessions where user_id=u order by created_at desc limit 1;
- perform set_config('request.jwt.claim.sub',u::text,true);
- perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated','session_id',s)::text,true);
-end;$$;
+create function pg_temp.review_login(who text) returns void language plpgsql as $$begin perform pg_temp.assume_context(who,'ac000000-0000-4000-8000-000000000001');end;$$;
 grant execute on function pg_temp.review_assert(boolean,text),pg_temp.review_login(text) to authenticated,service_role;
 insert into public.care_recipients(id,display_name,is_development) values('ac000000-0000-4000-8000-000000000001','Revisões operacionais fictícias',true);
 insert into public.care_recipient_products(care_recipient_id,product_id,name,category,unit,aliases,sort_order) select 'ac000000-0000-4000-8000-000000000001',id,name,category,unit,aliases,0 from public.products where id='fralda';
@@ -61,7 +55,7 @@ begin
  insert into review_state values('patient',p::text),('before',(select balance::text from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='CARE_TEAM'));
 end;$$;
 reset role;
-set local role service_role;
+set local role service_role;set local request.jwt.claim.role='service_role';
 set local request.jwt.claims='{"role":"service_role"}';
 set local request.jwt.claim.sub='';
 do $$declare result jsonb;begin

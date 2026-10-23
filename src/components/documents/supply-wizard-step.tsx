@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { RelatedDocument } from "./related-document";
 import type { Dispatch, SetStateAction } from "react";
 import {
   inputClass,
@@ -20,6 +20,7 @@ export type WizardState = {
   origin: "purchase" | "donation";
   source: "FAMILY" | "CARE_TEAM";
   recipientId: string;
+  sharedNeedReasons?: Record<string, string>;
 };
 
 export function SupplyWizardStep({
@@ -210,16 +211,44 @@ export function SupplyWizardStep({
                             }}
                           />
                           {request.code}
-                          <Link
-                            href={"/historico/" + request.requisitionId}
-                            className="ml-auto underline"
-                            target="_blank"
-                            rel="noopener"
-                          >
-                            Conferir REQ
-                          </Link>
+                          <RelatedDocument
+                            id={request.requisitionId}
+                            label="Conferir REQ"
+                          />
                         </label>
                       ))}
+                      {(links[option.productId]?.length ?? 0) > 1 ? (
+                        <label className="mt-3 block text-sm font-semibold">
+                          Justificativa da necessidade compartilhada
+                          <textarea
+                            className={inputClass}
+                            required
+                            minLength={3}
+                            maxLength={500}
+                            value={
+                              form.sharedNeedReasons?.[option.productId] ?? ""
+                            }
+                            onChange={(event) =>
+                              setForm((current) => ({
+                                ...current,
+                                sharedNeedReasons: {
+                                  ...current.sharedNeedReasons,
+                                  [option.productId]: event.target.value,
+                                },
+                              }))
+                            }
+                          />
+                          <span className="block text-xs font-normal text-(--muted)">
+                            As REQs representam a mesma necessidade. O estoque
+                            recebe a quantidade desta ENT uma única vez.
+                          </span>
+                          {fieldErrors[option.productId + ":shared"] ? (
+                            <span className="ui-field-error">
+                              {fieldErrors[option.productId + ":shared"]}
+                            </span>
+                          ) : null}
+                        </label>
+                      ) : null}
                     </fieldset>
                   ))}
               </div>

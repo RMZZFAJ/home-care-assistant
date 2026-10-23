@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./design-system.css";
+import { LiveSession } from "@/components/live-session";
 
 export const metadata: Metadata = {
   title: "Home Care Assistant",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        {children}
+        <LiveSession />
+      </body>
     </html>
   );
 }

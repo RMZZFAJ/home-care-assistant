@@ -11,6 +11,14 @@ Identidade global e função local são independentes. O contexto vem da RPC
 my_workspace, com pacientes e capacidades efetivas em uma chamada. A seleção
 lembrada no navegador não concede acesso. API, RLS e RPCs revalidam a operação.
 
+Cada sessão Auth escolhe explicitamente administração global ou um vínculo
+local existente. O modo global administra a plataforma e propõe mudanças no
+paciente; não concede poderes operacionais. O administrador local altera seu
+paciente imediatamente. Uma proposta global exige aprovação de outra identidade
+administradora local, mesmo quando o proponente também possui esse vínculo.
+Novo paciente recebe administrador inicial por e-mail confirmado explicitamente
+informado. Convites revalidam a autoridade local do emissor no aceite.
+
 ## Domínios
 
 - Catálogo: products preserva identidade; care_recipient_products é canônico.
@@ -36,6 +44,13 @@ Aceite parcial positivo credita o destino e atende linhas REQ explicitamente
 vinculadas; a diferença permanece pendente. Conferência ENT e atendimento
 REQ são indicadores separados. Compra não atende REQ.
 
+Ciência familiar é independente de atendimento e recebimento. Política do
+paciente e preferências pessoais controlam ciência expressa, WhatsApp e
+automática. A exibição autorizada, leitura correlacionada ou expedição elegível
+registra sua origem; nenhuma dessas evidências vira confirmação expressa.
+Uma linha ENT pode atender várias REQs mediante justificativa, sem duplicar o
+crédito físico. Mudanças de atendimento geram nova versão canônica da REQ.
+
 Movimentos familiares avulsos e correções usam ledger e motivo. Cancelamento
 de ENT após aceite exige consentimento do destinatário e conciliação real.
 BAL conta apenas a equipe, captura revisão de estoque e segue política
@@ -49,6 +64,12 @@ intenção. O ledger não admite saldo negativo por exceção pública.
 Eventos confirmados incluem atores, conteúdo, evidências, vínculos e hash
 anterior. SHA-256 verifica conteúdo canônico, com versão documental imutável
 para clientes. Assinatura Ed25519 e gestão de chaves ficam para o roadmap.
+
+REQ concluída com ciência obrigatória pendente conserva a exceção que exige
+arquivamento manual justificado, inclusive após ciência tardia. O agendador
+seleciona apenas trabalho vencido e não processa importações históricas como
+pendências atuais. Realtime privado transmite somente revisões por usuário;
+reconexão e consulta periódica recuperam eventos perdidos, sem apagar rascunhos.
 
 ## Integrações
 

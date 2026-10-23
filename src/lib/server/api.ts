@@ -287,6 +287,12 @@ export async function authenticate(): Promise<AuthContext> {
       "Seu acesso foi revogado ou ainda não foi ativado.",
       403,
     );
+  if ((await rpc(client, "my_session_valid")) !== true)
+    throw new ApiError(
+      "SESSION_EXPIRED",
+      "Sua sessão foi encerrada. Entre novamente.",
+      401,
+    );
   const { data: global, error: globalError } = await client.rpc(
     "is_global_administrator",
   );
@@ -335,8 +341,8 @@ export async function patientContext(
       "Paciente não encontrado ou acesso não autorizado.",
       404,
     );
-  let role = "admin";
-  if (!auth.isGlobalAdmin) {
+  let role: string;
+  {
     const { data: member, error: memberError } = await auth.client
       .from("care_recipient_memberships")
       .select("role,status,can_manage_stock,can_count_stock")
@@ -353,6 +359,16 @@ export async function patientContext(
       );
     role = member.role;
   }
+  const selected = (await rpc(auth.client, "my_active_context")) as {
+    mode?: string;
+    care_recipient_id?: string;
+  } | null;
+  if (selected?.mode !== "patient" || selected.care_recipient_id !== id)
+    throw new ApiError(
+      "CONTEXT_REQUIRED",
+      "Selecione seu vínculo com este paciente em Mudar perfil.",
+      409,
+    );
   const capabilities = (await rpc(auth.client, "patient_capabilities", {
     p_patient: id,
   })) as Record<string, boolean>;

@@ -1,3 +1,4 @@
+import { selectContext } from "./auth-context";
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import sharp from "sharp";
@@ -17,6 +18,7 @@ test("perfil pessoal salva registro e foto privada e notificações distinguem c
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
+  await selectContext(page, patientA);
   const issued = await page.request.post("/api/requisitions", {
     data: {
       careRecipientId: patientA,

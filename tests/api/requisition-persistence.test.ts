@@ -66,6 +66,12 @@ function fixture(
   };
   const rpc = vi.fn(async (name: string, args?: Record<string, unknown>) => {
     void args;
+    if (name === "my_session_valid") return { data: true, error: null };
+    if (name === "my_active_context")
+      return {
+        data: { mode: "patient", care_recipient_id: patientId },
+        error: null,
+      };
     if (name === "patient_capabilities")
       return { data: { "req.create": true, "bal.count": true }, error: null };
     return name === "is_global_administrator"

@@ -11,12 +11,7 @@ create or replace function pg_temp.must_fail(p_sql text,p_message text) returns 
   begin execute p_sql;exception when others then caught:=true;end;
   perform pg_temp.assert_ok(caught,p_message);
 end;$$;
-create or replace function pg_temp.login(p_name text) returns void language plpgsql as $$declare v uuid;begin
-  select id into v from fixture_users where name=p_name;
-  perform pg_temp.assert_ok(v is not null,'fixture user '||p_name||' exists');
-  perform set_config('request.jwt.claim.sub',v::text,true);
-  perform set_config('request.jwt.claim.role','authenticated',true);
-end;$$;
+create function pg_temp.login(who text) returns void language plpgsql as $$begin perform pg_temp.assume_context(who);end;$$;
 
 grant execute on function pg_temp.assert_ok(boolean,text),pg_temp.must_fail(text,text),pg_temp.login(text) to authenticated;
 
@@ -85,7 +80,7 @@ select pg_temp.login('unlinked');
 select pg_temp.assert_ok(not exists(select 1 from public.current_stock_balances),'unlinked profile sees no balances');
 select pg_temp.login('adminA');
 select public.admin_set_membership_status('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='shared'),'revoked');
-select pg_temp.login('shared');
+select pg_temp.assume_context('shared','20000000-0000-4000-8000-000000000002');
 select pg_temp.assert_ok(not public.can_access_recipient('20000000-0000-4000-8000-000000000001') and public.can_access_recipient('20000000-0000-4000-8000-000000000002'),'patient revocation preserves other patient access');
 
 select pg_temp.login('global');
@@ -93,6 +88,8 @@ select pg_temp.must_fail($q$select public.record_stock_movement('20000000-0000-4
 select pg_temp.must_fail($q$select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',9999,'outbound','FAMILY','CARE_TEAM','Transferência global negada',gen_random_uuid())$q$,'global transfer cannot become negative');
 select pg_temp.must_fail($q$select public.record_stock_movement('20000000-0000-4000-8000-000000000001','fralda',1,'inbound','FAMILY','CARE_TEAM','Formato inválido',gen_random_uuid())$q$,'ambiguous direction invalid');
 select pg_temp.must_fail($q$select public.family_stock_movement('20000000-0000-4000-8000-000000000001','fralda',20,'outbound','Saldo insuficiente',gen_random_uuid())$q$,'even global family movement cannot create negative stock');
+select pg_temp.login('adminA');
+select pg_temp.must_fail($q$select public.family_stock_movement('20000000-0000-4000-8000-000000000001','fralda',20,'outbound','Saldo insuficiente local',gen_random_uuid())$q$,'local withdrawal cannot exceed confirmed family balance');
 select pg_temp.assert_ok((select balance=10 from public.current_stock_balances where care_recipient_id='20000000-0000-4000-8000-000000000001' and product_id='fralda' and location='FAMILY'),'failed movement preserves original stock');
 select pg_temp.must_fail($q$select public.extraordinary_stock_adjustment('20000000-0000-4000-8000-000000000001','fralda',-1,'FAMILY','Sem confirmação',false,gen_random_uuid())$q$,'extraordinary explicit confirmation required');
 select public.family_stock_movement('20000000-0000-4000-8000-000000000001','fralda',30,'inbound','Reposição', '50000000-0000-4000-8000-000000000003');
@@ -125,8 +122,10 @@ do $$declare n public.requisition_notifications;v_worker uuid:=gen_random_uuid()
     perform pg_temp.must_fail(format('select public.complete_notification_job(%L,%L,''delivered'')',n.id,gen_random_uuid()),'other worker cannot complete lease');
     perform public.complete_notification_job(n.id,v_worker,'delivered','internal');
   end loop;
+  perform pg_temp.login('adminA');
   perform pg_temp.assert_ok(exists(select 1 from public.requisition_notifications where alert_event_id is not null and state='delivered'),'internal alert delivered persisted');
 end;$$;
+select pg_temp.login('global');
 select public.admin_set_profile((select id from fixture_users where name='global2'),'Teste global2','professional','active',false);
 select pg_temp.must_fail($q$select public.admin_set_profile((select id from fixture_users where name='global'),'Teste global','professional','active',false)$q$,'last global admin demotion denied');
 select pg_temp.must_fail($q$select public.admin_set_profile((select id from fixture_users where name='global'),'Teste global','admin','revoked',true)$q$,'last global admin revoke denied');

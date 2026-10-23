@@ -3,6 +3,7 @@ import { api, ApiError, boundedText, rpc } from "@/lib/server/api";
 import { createWorkerClient } from "@/lib/server/service-client";
 import {
   metaInbound,
+  metaAccountMatches,
   metaStatuses,
   secretMatches,
   verifyMetaSignature,
@@ -46,6 +47,18 @@ export async function POST(request: Request) {
     } catch {
       throw new ApiError("INVALID_JSON", "Evento inválido.");
     }
+    if (
+      !metaAccountMatches(
+        payload,
+        process.env.META_WHATSAPP_BUSINESS_ACCOUNT_ID,
+        process.env.META_WHATSAPP_PHONE_NUMBER_ID,
+      )
+    )
+      throw new ApiError(
+        "FORBIDDEN",
+        "Conta de mensagens não autorizada.",
+        403,
+      );
     const statuses = metaStatuses(payload);
     if (!statuses) throw new ApiError("VALIDATION_ERROR", "Evento inválido.");
     const client = createWorkerClient();
@@ -70,6 +83,22 @@ export async function POST(request: Request) {
           p_provider_id: message.id,
           p_phone: message.from,
           p_hash: tokenHash(button.slice(11)),
+        });
+        continue;
+      }
+      if (button?.startsWith("HCA_SCIENCE:")) {
+        await rpc(client, "confirm_whatsapp_science", {
+          p_provider_id: message.id,
+          p_phone: message.from,
+          p_hash: tokenHash(button.slice(12)),
+        });
+        continue;
+      }
+      if (button?.startsWith("HCA_NO_ISSUES:")) {
+        await rpc(client, "acknowledge_no_issues", {
+          p_provider_id: message.id,
+          p_phone: message.from,
+          p_hash: tokenHash(button.slice("HCA_NO_ISSUES:".length)),
         });
         continue;
       }

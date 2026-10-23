@@ -9,6 +9,7 @@ import {
   type DeliveryStatus,
 } from "@/lib/notifications/presentation";
 import { formatBrazilDate } from "@/lib/receipt";
+import { useLiveRevision } from "@/lib/use-live-revision";
 
 export function DocumentDeliveryStatus({
   id,
@@ -20,15 +21,11 @@ export function DocumentDeliveryStatus({
   const [rows, setRows] = useState<DeliveryStatus[] | null>(null);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const revision = useLiveRevision();
   useEffect(() => {
     const controller = new AbortController();
-    let timer: ReturnType<typeof setTimeout>;
-    let polls = 0;
     const load = async () => {
-      if (document.hidden) {
-        timer = setTimeout(load, 5000);
-        return;
-      }
+      if (document.hidden || controller.signal.aborted) return;
       try {
         const result = await api<{ data: DeliveryStatus[] }>(
           "/api/documents/" + id + "/notifications",
@@ -38,13 +35,6 @@ export function DocumentDeliveryStatus({
         if (controller.signal.aborted) return;
         setRows(result.data);
         setError("");
-        if (
-          ++polls < 24 &&
-          result.data.some((row) =>
-            ["pending", "processing", "accepted"].includes(row.state),
-          )
-        )
-          timer = setTimeout(load, 5000);
       } catch (reason) {
         if (!controller.signal.aborted)
           setError(
@@ -55,13 +45,17 @@ export function DocumentDeliveryStatus({
       }
     };
     void load();
+    // WorkspaceSync recovers missed durable revisions every 30s and on reconnect.
+    window.addEventListener("focus", load);
+    document.addEventListener("visibilitychange", load);
     return () => {
       controller.abort();
-      clearTimeout(timer);
+      window.removeEventListener("focus", load);
+      document.removeEventListener("visibilitychange", load);
     };
-  }, [id, version, attempt]);
+  }, [id, version, attempt, revision]);
   return (
-    <section className="ui-card">
+    <section className="ui-card" aria-label="Notificações da ficha">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold">Notificações da ficha</h2>
         <button

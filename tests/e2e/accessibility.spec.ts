@@ -1,3 +1,4 @@
+import { selectContext } from "./auth-context";
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { readFileSync } from "node:fs";
@@ -6,7 +7,7 @@ import {
   patientA,
   patientB,
 } from "../../scripts/test-constants.mjs";
-import { fixtureFile } from "../../scripts/test-environment.mjs";
+import { fixtureFile, sql } from "../../scripts/test-environment.mjs";
 test.setTimeout(180_000);
 async function audit(page: import("@playwright/test").Page, label: string) {
   const result = await new AxeBuilder({ page })
@@ -23,6 +24,9 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   page,
 }) => {
   const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
+  sql(
+    `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patientA}','${fixture.global.id}','admin'),('${patientB}','${fixture.global.id}','admin') on conflict do nothing;`,
+  );
   await page.goto("/login");
   await audit(page, "login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixture.global.email);
@@ -37,6 +41,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
+  await selectContext(page, patientA);
   for (const [path, title] of [
     ["/", "Visão geral"],
     ["/fichas", "Central de fichas"],
@@ -47,7 +52,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     ["/historico", "Histórico de fichas"],
     ["/estoque", "Gestão dos estoques"],
     ["/admin", "Administração"],
-    ["/configuracoes", "Funções, permissões e regras"],
+    ["/configuracoes", "Permissões, comunicação e regras"],
     ["/perfil", "Meu perfil e segurança"],
     ["/notificacoes", "Central de notificações"],
     ["/consumo", "Faltas e consumo extraordinário"],
@@ -112,6 +117,7 @@ for (const role of [
     await expect(
       page.getByRole("heading", { name: "Visão geral", exact: true }),
     ).toBeVisible();
+    await selectContext(page, patientA);
     await page.goto("/fichas?careRecipientId=" + patientA);
     await expect(
       page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),

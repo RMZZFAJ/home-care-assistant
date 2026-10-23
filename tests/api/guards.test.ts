@@ -182,13 +182,20 @@ describe("patient capability checks", () => {
       { role, can_manage_stock: manage, can_count_stock: count },
     ];
     const client = {
-      rpc: vi.fn(async () => ({
-        data: {
-          "access.manage": role === "admin",
-          "stock.family.manage": role === "admin",
-          "bal.count": ["admin", "supervisor", "professional"].includes(role),
-          "req.create": ["admin", "supervisor", "professional"].includes(role),
-        },
+      rpc: vi.fn(async (name: string) => ({
+        data:
+          name === "my_active_context"
+            ? { mode: "patient", care_recipient_id: patientId }
+            : {
+                "access.manage": role === "admin",
+                "stock.family.manage": role === "admin",
+                "bal.count": ["admin", "supervisor", "professional"].includes(
+                  role,
+                ),
+                "req.create": ["admin", "supervisor", "professional"].includes(
+                  role,
+                ),
+              },
         error: null,
       })),
       from: vi.fn(() => {
@@ -254,5 +261,16 @@ describe("patient capability checks", () => {
     await expect(
       patientContext(auth("family", true, true), patientId, "countStock"),
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+  it("requires an explicit patient context even when the identity is globally privileged", async () => {
+    const identity = auth("admin");
+    identity.isGlobalAdmin = true;
+    vi.mocked(identity.client.rpc).mockResolvedValue({
+      data: { mode: "global", care_recipient_id: null },
+      error: null,
+    } as never);
+    await expect(
+      patientContext(identity, patientId, "manage"),
+    ).rejects.toMatchObject({ code: "CONTEXT_REQUIRED" });
   });
 });

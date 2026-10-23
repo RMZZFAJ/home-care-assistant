@@ -22,24 +22,28 @@ export async function GET(request: Request) {
     let query = auth.client
       .from("requisition_notifications")
       .select(
-        "id,care_recipient_id,document_id,requisition_id,channel,state,created_at,seen_at,recipient_label,document_event_id,operational_documents(type,code,status),document_events(action)",
+        "id,care_recipient_id,document_id,requisition_id,alert_event_id,consumption_report_id,reminder_id,silent,event_key,channel,state,created_at,seen_at,recipient_label,document_event_id,operational_documents(type,code,status),document_events(action)",
         { count: "exact" },
       )
       .eq("recipient_user_id", auth.userId)
       .order("created_at", { ascending: false })
-      .order("id")
-      .range(start, end);
+      .order("id");
+    if (params.get("surface") === "bell") query = query.eq("silent", false);
     let unseen = auth.client
       .from("requisition_notifications")
       .select("id", { count: "exact", head: true })
       .eq("recipient_user_id", auth.userId)
+      .eq("silent", false)
       .is("seen_at", null);
     if (patient) {
       query = query.eq("care_recipient_id", patient);
       unseen = unseen.eq("care_recipient_id", patient);
     }
     if (params.get("unread") === "true") query = query.is("seen_at", null);
-    const [result, unread] = await Promise.all([query, unseen]);
+    const [result, unread] = await Promise.all([
+      query.range(start, end),
+      unseen,
+    ]);
     if (result.error) databaseError(result.error);
     if (unread.error) databaseError(unread.error);
     return NextResponse.json({

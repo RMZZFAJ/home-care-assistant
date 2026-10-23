@@ -20,6 +20,7 @@ import {
   type DocumentType,
 } from "@/types/documents";
 import { formatBrazilDate } from "@/lib/receipt";
+import { useLiveRevision } from "@/lib/use-live-revision";
 
 export type DocumentSummary = {
   id: string;
@@ -45,6 +46,11 @@ type Filters = {
   to: string;
 };
 const empty: Filters = { search: "", type: "", status: "", from: "", to: "" };
+const historyFilters = {
+  ...documentStatuses,
+  archive_pending: "Conclusões para revisar e arquivar",
+  science_required: "Requisições para sua ciência",
+};
 export function DocumentRow({ row }: { row: DocumentSummary }) {
   return (
     <Link
@@ -117,6 +123,7 @@ function HistoryContent({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const liveRevision = useLiveRevision();
   useEffect(() => {
     const controller = new AbortController();
     const query = new URLSearchParams({
@@ -149,7 +156,7 @@ function HistoryContent({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [context.patient, filters, page, attempt]);
+  }, [context.patient, filters, page, attempt, liveRevision]);
   const active = Object.entries(filters).filter(([, value]) => value);
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -234,7 +241,7 @@ function HistoryContent({
                 }
               >
                 <option value="">Todas</option>
-                {Object.entries(documentStatuses).map(([status, label]) => (
+                {Object.entries(historyFilters).map(([status, label]) => (
                   <option key={status} value={status}>
                     {label}
                   </option>

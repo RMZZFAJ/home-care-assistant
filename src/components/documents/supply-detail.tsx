@@ -1,4 +1,5 @@
 "use client";
+import { SupplyLineSummary } from "./supply-line-summary";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -22,8 +23,10 @@ import {
   type SupplyDocument,
 } from "@/types/documents";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
-import { formatQuantity, quantity } from "@/lib/quantity";
+import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { DocumentActions } from "./document-actions";
 
 export function SupplyDetail({ id }: { id: string }) {
   return (
@@ -33,6 +36,8 @@ export function SupplyDetail({ id }: { id: string }) {
   );
 }
 function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
+  const liveRevision = useLiveRevision();
+  const editingRef = useRef(false);
   const [data, setData] = useState<SupplyDocument | null>(null);
   const [people, setPeople] = useState<PatientPerson[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +53,9 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
     expectedVersion: number;
   } | null>(null);
   const [uncertain, setUncertain] = useState(false);
+  useEffect(() => {
+    editingRef.current = Boolean(action || review || uncertain);
+  }, [action, review, uncertain]);
   const pendingRef = useRef<{
     action: string;
     body: unknown;
@@ -69,7 +77,11 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
     )
       .then(async (result) => {
         if (controller.signal.aborted) return;
-        setData(result.data);
+        if (!editingRef.current) setData(result.data);
+        else
+          setMessage(
+            "O acompanhamento foi atualizado. Sua operação permanece preservada e será validada contra a versão original ao confirmar.",
+          );
         setError("");
         if (result.data.care_recipient_id === patientId) {
           const directory = await api<{ directory: PatientPerson[] }>(
@@ -93,7 +105,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [id, patientId, attempt]);
+  }, [id, patientId, attempt, liveRevision]);
   async function execute() {
     if (!data) return;
     if (!pendingRef.current && review)
@@ -237,14 +249,11 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
           Atualizar
         </button>
         {data?.protocol ? (
-          <a
-            className={buttonClass}
-            href={"/api/documents/" + id + "/pdf"}
-            target="_blank"
-            rel="noopener"
-          >
-            Abrir PDF
-          </a>
+          <DocumentActions
+            id={id}
+            code={data.code ?? data.type}
+            version={data.version}
+          />
         ) : null}
       </div>
       {loading ? <Notice>Consultando documento persistido…</Notice> : null}
@@ -383,99 +392,13 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
             <h2 className="font-semibold">Produtos e quantidades</h2>
             <div className="mt-4 space-y-3">
               {data.lines.map((line) => (
-                <article
+                <SupplyLineSummary
                   key={line.id}
-                  className="rounded-xl border border-(--line) p-4"
-                >
-                  <h3 className="font-semibold">{line.name_snapshot}</h3>
-                  <dl className="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-                    <div>
-                      <dt className="text-(--muted)">
-                        {data.type === "BAL"
-                          ? "Contado"
-                          : data.type === "ENT"
-                            ? "Expedido"
-                            : "Proposto"}
-                      </dt>
-                      <dd className="mt-1 font-semibold">
-                        {formatQuantity(line.quantity, line.unit_snapshot)}
-                      </dd>
-                    </div>
-                    {data.type === "COM" ? (
-                      <>
-                        <div>
-                          <dt>Aprovado</dt>
-                          <dd>{formatQuantity(line.approved_quantity)}</dd>
-                        </div>
-                        <div>
-                          <dt>Adquirido</dt>
-                          <dd>{formatQuantity(line.purchased_quantity)}</dd>
-                        </div>
-                      </>
-                    ) : data.type === "ENT" ? (
-                      <>
-                        <div>
-                          <dt>Aceito</dt>
-                          <dd className="font-semibold text-(--brand)">
-                            {formatQuantity(line.accepted_quantity)}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt>Em divergência</dt>
-                          <dd>
-                            {formatQuantity(
-                              quantity(line.quantity)
-                                .minus(line.accepted_quantity)
-                                .minus(line.reconciled_quantity)
-                                .toFixed(),
-                            )}
-                          </dd>
-                        </div>
-                      </>
-                    ) : (
-                      <div>
-                        <dt>Saldo na referência</dt>
-                        <dd>
-                          {formatQuantity(
-                            String(line.metadata.expectedQuantity ?? "0"),
-                          )}
-                        </dd>
-                      </div>
-                    )}
-                    <div>
-                      <dt>
-                        {data.type === "ENT"
-                          ? "Conciliado"
-                          : "Recebido / validado"}
-                      </dt>
-                      <dd>
-                        {formatQuantity(
-                          data.type === "ENT"
-                            ? line.reconciled_quantity
-                            : line.accepted_quantity,
-                        )}
-                      </dd>
-                    </div>
-                  </dl>
-                  {data.type === "ENT" ? (
-                    <p className="mt-3 text-xs">
-                      {line.fully_checked
-                        ? "Linha integralmente conferida"
-                        : line.metadata.issueOpen
-                          ? "Divergência aberta"
-                          : data.status === "confirmed"
-                            ? "Linha conciliada com diferença"
-                            : "Aguardando conferência"}
-                    </p>
-                  ) : null}
-                  {line.requisitionItemIds.length ? (
-                    <p className="mt-2 text-xs text-(--muted)">
-                      {line.requisitionItemIds.length} linha(s) REQ
-                      explicitamente vinculada(s).
-                    </p>
-                  ) : null}
-                </article>
-              ))}
+                  line={line}
+                  type={data.type}
+                  status={data.status}
+                />
+              ))}{" "}
             </div>
             {data.payload.notes ? (
               <p className="mt-4 whitespace-pre-wrap text-sm">

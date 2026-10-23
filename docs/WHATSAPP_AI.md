@@ -13,6 +13,12 @@ vista não confirma recebimento de materiais nem entrega por WhatsApp.
 Falhas transitórias usam backoff; resultado incerto exige conciliação.
 Reprocessamento administrativo não emite outra ficha.
 
+A emissão REQ confirma o registro ao autor sem PDF e informa ciência pendente.
+Quando a política de ciência é satisfeita, outro evento entrega o PDF da nova
+versão com a evidência registrada. Baixar ou compartilhar o PDF de emissão é
+permitido; o documento identifica a pendência. Ciência familiar, leitura de
+notificação e aceite de quantidades ENT permanecem independentes.
+
 ## Adaptador oficial e aceite simplificado
 
 O adaptador usa graph.facebook.com, versão configurada e templates aprovados.
@@ -60,8 +66,27 @@ Testes unitários, SQL e E2E usam Auth real local e transporte simulado, sem
 mensagens externas. Verificam replay, desafio, telefone, expiração, versão,
 destinatário, criptografia e revisão antes do débito. Não provam envio Meta,
 SMS real, publicação de Flow ou transcrição. Templates, liberação da conta,
-chaves, webhook e agendamento precisam de validação no provedor antes de ativar
+chaves, webhook e callbacks precisam de validação no provedor antes de ativar
 os canais. O estado verificado consta em [EXECUTION.md](evolution/EXECUTION.md).
+
+O catálogo V4 contém 27 contratos versionados. O comando
+`node scripts/meta-templates.mjs` grava diagnóstico privado e, com token válido,
+consulta ou submete os cinco prioritários e registra cada resultado. O argumento
+opcional é o caminho do relatório dentro de `.private/`.
+Corpos usam variáveis nomeadas; botões URL dinâmicos terminam em `{{1}}` no
+domínio oficial. Os PDFs fictícios de demonstração têm UUIDs explicitamente
+permitidos: essa rota não expõe documentos reais ou objetos privados.
+
+pg_cron executa o ciclo operacional e chama o worker HTTPS usando URL oficial e
+segredo guardados no Vault pela RPC de serviço configure_worker_schedule.
+Sem segredo válido, a chamada não é enviada. Arquivamento e avisos internos não
+dependem da disponibilidade da Meta. Regras de ciência obrigatória, exceção
+manual e intervalo de lembretes são verificadas novamente em cada execução.
+
+Flows de conferência ENT exigem propósito, destinatário, telefone confirmado,
+versão, revisão e token de uso único. Quantidades parciais positivas são
+creditadas imediatamente; o restante segue a conciliação formal. O contrato
+de ocorrências oferece “sem intercorrências” sem produzir débito de estoque.
 
 ## Preparação da conta de teste Meta
 

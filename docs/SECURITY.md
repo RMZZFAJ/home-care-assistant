@@ -14,14 +14,17 @@ A equipe não lê o saldo geral familiar; a consulta mínima por produto da REQ
 tem capacidade própria. APIs e banco aplicam essas regras sem confiar no
 menu, metadata, nomes, UUIDs ou flags do navegador.
 
-Concessões críticas e mudanças da política de revisão exigem proposta e
-aprovação por identidades administradoras distintas do paciente. A versão
-da política impede aplicar decisão antiga sobre configuração nova.
-Bootstrap global é delimitado aos primeiros administradores locais.
+Sessão Auth vigente e contexto explicitamente selecionado são obrigatórios.
+Administrador local altera seu paciente imediatamente. Mudança proposta no
+modo global exige aprovação de outra identidade administradora local. Troca
+de perfil não permite autoaprovação. A versão da política impede aplicar decisão
+antiga sobre configuração nova. Cadastro inicial exige e-mail confirmado informado
+explicitamente; privilégio global não concede acesso operacional automático.
 A administração de acesso de administrador ativo não pode ser removida por
 override; revogar seu vínculo é a operação própria.
 
 O último administrador global ativo é protegido inclusive sob concorrência.
+O último administrador local ativo também é preservado por transação serializada.
 Revogação local não remove acesso da mesma conta a outro paciente. Paciente
 inativo conserva histórico autorizado e recusa novas operações.
 
@@ -64,9 +67,15 @@ inclusive tamanho em bytes; o aplicativo não calcula hashes de credenciais.
 A referência é o [código oficial do Auth](https://github.com/supabase/auth/blob/master/internal/api/password.go).
 OAuth, confirmação de e-mail e SMS reais exigem configuração e teste próprios.
 
+TOTP usa exclusivamente os contratos oficiais Supabase Auth. Após cadastrar e
+confirmar um fator, operações administrativas exigem AAL2. Token AAL1, fator
+apenas iniciado ou sessão revogada não satisfazem a exigência. O QR privado não
+entra em logs, documentação ou artefatos versionados.
+
 ## WhatsApp e Flows
 
-Webhooks verificam HMAC antes do processamento. Aceite simples exige opt-in
+Webhooks verificam HMAC, WABA e Phone Number ID antes do processamento.
+Aceite simples exige opt-in
 do paciente, destinatário, telefone confirmado, desafio único, versão e prazo
 válidos. Mudança de destinatário ou versão invalida o desafio. Eventos
 registram o nível de verificação usado; esse canal não permite divergência,

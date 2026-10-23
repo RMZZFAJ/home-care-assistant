@@ -17,12 +17,16 @@ documentais também exigem expectedVersion para detectar concorrência.
 | Rota | Contrato |
 | --- | --- |
 | /api/context | Contexto autorizado por my_workspace |
+| /api/context (POST) | Seleciona modo global ou vínculo local real da sessão |
+| /api/sync | Revisão privada e contexto vigente, sem payload documental |
 | /api/catalog | Catálogo do paciente |
 | /api/catalog/presentations | Unidades, apresentações e código de barras |
 | /api/units | Unidades de medida globais ou locais |
 | /api/requisitions | Submissão e consulta REQ |
 | /api/requisitions/:id | Snapshot, atendimento e vínculos |
 | /api/requisitions/:id/status | Etapa administrativa por PATCH |
+| /api/requisitions/:id/science | Ciência com modalidade e versão esperada |
+| /api/requisitions/:id/archive | Arquivamento local justificado e auditado |
 | /api/requisitions/:id/resolve | Identificação auditável de item extra |
 | /api/requisitions/item-context | Pendências e consulta mínima por produto |
 | /api/documents | Lista unificada e criação COM, ENT ou BAL |
@@ -80,14 +84,18 @@ Convites são criados, reemitidos e revogados por administração local;
 registro e aceite usam /api/invitations/register e /api/invitations/accept.
 O administrador nunca recebe a senha de outra identidade.
 
-Alterações críticas de acesso são propostas e aprovadas por administradores
-distintos do mesmo paciente. A proposta conserva a versão da política.
-O cadastro inicial dos dois administradores locais usa bootstrap delimitado.
+Administração local aplica alterações do próprio paciente imediatamente.
+Administração global propõe mudanças no paciente; a aprovação exige outra
+identidade com administração local. Trocar o perfil ativo não permite aprovar
+a própria proposta. A proposta conserva a versão da política. Cadastro de
+paciente usa initialAdministratorEmail confirmado e atribuição inicial explícita.
 Administração de acesso de um administrador ativo não é removida por override.
 
 Worker e webhook ficam em /api/notifications/worker e
 /api/notifications/webhook. O primeiro exige segredo de servidor; o segundo
 verifica assinatura Meta antes de processar estado ou mensagem.
+Também confere WABA e Phone Number ID configurados; assinatura válida de outro
+ativo não autoriza eventos neste ambiente.
 O serviço usa apenas RPCs explicitamente concedidas, sem DML público livre.
 
 Flows usa /api/whatsapp/flows para envelope cifrado e webhook autenticado,

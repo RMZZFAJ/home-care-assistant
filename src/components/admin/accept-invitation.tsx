@@ -16,6 +16,7 @@ export function AcceptInvitation() {
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
+  const [declined, setDeclined] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   useEffect(() => {
@@ -32,15 +33,16 @@ export function AcceptInvitation() {
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
-  async function accept() {
+  async function accept(decision: "accept" | "decline" = "accept") {
     if (busy) return;
     setBusy(true);
     setError("");
     try {
-      await api("/api/invitations/accept", { token });
+      await api("/api/invitations/accept", { token, decision });
       sessionStorage.removeItem("hca:invitation");
       setToken(null);
-      setAccepted(true);
+      if (decision === "decline") setDeclined(true);
+      else setAccepted(true);
     } catch (reason) {
       setError(
         reason instanceof Error
@@ -90,7 +92,9 @@ export function AcceptInvitation() {
         {!ready && <Notice>Validando link…</Notice>}
         {error && <Notice error>{error}</Notice>}
         {notice && <Notice>{notice}</Notice>}
-        {accepted ? (
+        {declined ? (
+          <Notice>Convite recusado. Nenhum vínculo foi concedido.</Notice>
+        ) : accepted ? (
           <>
             <Notice>
               Convite aceito. Seu vínculo com o paciente está disponível.
@@ -119,6 +123,14 @@ export function AcceptInvitation() {
                 onClick={() => void accept()}
               >
                 {busy ? "Confirmando…" : "Aceitar convite com minha conta"}
+              </button>
+              <button
+                type="button"
+                className={buttonClass}
+                disabled={busy}
+                onClick={() => void accept("decline")}
+              >
+                Recusar convite
               </button>
             </div>
             <details>

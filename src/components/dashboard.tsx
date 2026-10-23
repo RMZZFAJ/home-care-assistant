@@ -16,6 +16,7 @@ import {
   type DocumentSummary,
 } from "@/components/documents/document-history";
 import { EmptyState, Icon } from "@/components/ui/primitives";
+import { useLiveRevision } from "@/lib/use-live-revision";
 
 type DashboardData = {
   requests: number;
@@ -29,12 +30,14 @@ type DashboardData = {
   balDue: string;
   drafts: number;
   consumptionPending: number;
+  sciencePending: number;
+  archivePending: number;
 };
 export function Dashboard() {
   return (
     <Workspace title="Visão geral">
       {(context) =>
-        context.patient ? (
+        context.patient && context.activeContext?.mode === "patient" ? (
           <PatientDashboard context={context} />
         ) : (
           <EmptyState
@@ -55,6 +58,7 @@ export function Dashboard() {
   );
 }
 function PatientDashboard({ context }: { context: WorkspaceContext }) {
+  const liveRevision = useLiveRevision();
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -79,7 +83,7 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
       },
     );
     return () => controller.abort();
-  }, [context.patient, attempt]);
+  }, [context.patient, attempt, liveRevision]);
   if (error)
     return (
       <Notice error>
@@ -94,6 +98,24 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
     );
   if (!data) return <Notice>Organizando suas próximas ações…</Notice>;
   const cards = [
+    ...(data.sciencePending
+      ? [
+          {
+            label: "Requisições para sua ciência",
+            count: data.sciencePending,
+            href: "/historico?type=REQ&status=science_required",
+          },
+        ]
+      : []),
+    ...(data.archivePending
+      ? [
+          {
+            label: "Conclusões para revisar e arquivar",
+            count: data.archivePending,
+            href: "/historico?type=REQ&status=archive_pending",
+          },
+        ]
+      : []),
     ...(data.drafts
       ? [
           {
@@ -103,7 +125,7 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
           },
         ]
       : []),
-    ...(data.consumptionPending
+    ...(data.consumptionPending && can(context, "consumption.confirm")
       ? [
           {
             label: "Relatos para confirmar",
@@ -112,17 +134,25 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
           },
         ]
       : []),
-    {
-      label: "Requisições abertas",
-      count: data.requests,
-      href: "/historico?type=REQ",
-    },
-    {
-      label: "Recebimentos para você",
-      count: data.receipts,
-      href: "/historico?type=ENT&status=pending_receipt",
-    },
-    ...(can(context, "com.read")
+    ...(can(context, "req.read")
+      ? [
+          {
+            label: "Requisições abertas",
+            count: data.requests,
+            href: "/historico?type=REQ",
+          },
+        ]
+      : []),
+    ...(can(context, "ent.receive")
+      ? [
+          {
+            label: "Recebimentos para você",
+            count: data.receipts,
+            href: "/historico?type=ENT&status=pending_receipt",
+          },
+        ]
+      : []),
+    ...(can(context, "com.approve")
       ? [
           {
             label: "Compras a aprovar",
@@ -131,16 +161,24 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
           },
         ]
       : []),
-    {
-      label: "Divergências em aberto",
-      count: data.disputes,
-      href: "/historico?type=ENT&status=disputed",
-    },
-    {
-      label: "BAL aguardando revisão",
-      count: data.balances,
-      href: "/historico?type=BAL&status=submitted",
-    },
+    ...(can(context, "ent.read")
+      ? [
+          {
+            label: "Divergências em aberto",
+            count: data.disputes,
+            href: "/historico?type=ENT&status=disputed",
+          },
+        ]
+      : []),
+    ...(can(context, "bal.approve")
+      ? [
+          {
+            label: "BAL aguardando revisão",
+            count: data.balances,
+            href: "/historico?type=BAL&status=submitted",
+          },
+        ]
+      : []),
   ];
   return (
     <div className="space-y-6">

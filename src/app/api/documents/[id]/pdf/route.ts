@@ -16,6 +16,7 @@ export async function GET(
       auth.client,
       id,
       raw ? Number(raw) : undefined,
+      new URL(request.url).searchParams.get("renderer") === "legacy",
     );
     return new Response(new Uint8Array(result.bytes), {
       headers: {

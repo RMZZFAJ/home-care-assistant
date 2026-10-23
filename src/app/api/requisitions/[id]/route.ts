@@ -40,9 +40,10 @@ export async function GET(
         data.requisition_items.map((item) => item.id),
       );
     if (resolutionError) databaseError(resolutionError);
-    const [notifications, fulfillment] = await Promise.all([
+    const [notifications, fulfillment, progress] = await Promise.all([
       rpc(auth.client, "document_delivery_status", { p_document: id }),
       rpc(auth.client, "requisition_fulfillment", { p_requisition: id }),
+      rpc(auth.client, "requisition_progress", { p_id: id }),
     ]);
     return NextResponse.json({
       data: {
@@ -56,6 +57,7 @@ export async function GET(
         })),
         requisition_notifications: notifications ?? [],
         fulfillment,
+        progress,
       },
       receipt,
     });

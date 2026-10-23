@@ -6,14 +6,14 @@ create temporary table fixture_users as select replace(full_name,'Teste ','') na
 grant select on fixture_users to authenticated,service_role;
 create or replace function pg_temp.assert_ok(p_ok boolean,p_message text) returns void language plpgsql as $$begin if not coalesce(p_ok,false) then raise exception 'ASSERTION FAILED: %',p_message;end if;end;$$;
 create or replace function pg_temp.must_fail(p_sql text,p_message text) returns void language plpgsql as $$declare caught boolean:=false;begin begin execute p_sql;exception when others then caught:=true;end;perform pg_temp.assert_ok(caught,p_message);end;$$;
-create or replace function pg_temp.login(p_name text) returns void language plpgsql as $$declare v uuid;begin
-  select id into v from fixture_users where name=p_name;perform pg_temp.assert_ok(v is not null,'fixture exists');
-  perform set_config('request.jwt.claim.sub',v::text,true);perform set_config('request.jwt.claim.role','authenticated',true);
-end;$$;
+create function pg_temp.login(who text) returns void language plpgsql as $$begin perform pg_temp.assume_context(who);end;$$;
 create temporary table operation_ids(key text primary key,id uuid);
 create temporary table protocol_before_import as select last_value,is_called from public.requisition_protocol_number_seq;
 grant execute on function pg_temp.assert_ok(boolean,text),pg_temp.must_fail(text,text),pg_temp.login(text) to authenticated,service_role;
 grant select,insert,update on operation_ids to authenticated,service_role;
+insert into public.care_recipient_memberships(care_recipient_id,user_id,role) select '20000000-0000-4000-8000-000000000001',id,'admin' from fixture_users where name='global';
+insert into public.verified_phones(user_id,phone) select id,'+15555550101' from fixture_users where name='professional' on conflict(user_id) do update set phone=excluded.phone;
+update public.profiles set notification_preferences=notification_preferences||'{"whatsapp":true,"email":true}'::jsonb where id=(select id from fixture_users where name='professional');
 set local role authenticated;
 select pg_temp.login('adminA');
 select pg_temp.must_fail($q$select public.admin_upsert_membership('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='adminB'),'admin',true,true)$q$,'local admin cannot attach arbitrary known other-patient identity');
@@ -23,6 +23,7 @@ select pg_temp.must_fail($q$select public.accept_invitation(repeat('a',64))$q$,'
 select pg_temp.login('unlinked');
 select public.accept_invitation(repeat('a',64));
 select public.accept_invitation(repeat('a',64));
+select pg_temp.login('unlinked');
 select pg_temp.assert_ok(public.recipient_role('20000000-0000-4000-8000-000000000001')='professional','invitation grants local role');
 select pg_temp.assert_ok(not public.is_global_administrator(),'invitation cannot grant global power');
 select pg_temp.login('adminA');
@@ -33,11 +34,11 @@ select pg_temp.must_fail($q$select public.accept_invitation(repeat('a',64))$q$,'
 select pg_temp.must_fail($q$select public.accept_invitation(repeat('b',64))$q$,'old pending invitation invalidated on revoke');
 select pg_temp.login('adminA');
 select public.admin_create_invitation('20000000-0000-4000-8000-000000000001','hca-unlinked@example.invalid','professional',false,false,repeat('c',64),now()+interval '1 day');
-select pg_temp.login('global');
+select pg_temp.assume_context('global','20000000-0000-4000-8000-000000000001');
 select public.admin_set_membership_status('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='adminA'),'revoked');
 select pg_temp.login('unlinked');
 select pg_temp.must_fail($q$select public.accept_invitation(repeat('c',64))$q$,'revoked inviter cannot continue granting access');
-select pg_temp.login('global');
+select pg_temp.assume_context('global','20000000-0000-4000-8000-000000000001');
 select public.admin_set_membership_status('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='adminA'),'active');
 select pg_temp.login('adminA');
 select public.admin_resend_invitation((select id from public.care_recipient_invitations where token_hash=repeat('c',64)),repeat('d',64),now()+interval '1 day');
@@ -101,8 +102,8 @@ set local role authenticated;
 select pg_temp.login('adminA');
 
 select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','internal',null,true);
-select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','whatsapp','+5511999999999',true);
-select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','email','receiver@example.invalid',true);
+select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','whatsapp','+15555550101',true);
+select public.configure_recipient_notification('20000000-0000-4000-8000-000000000001',(select id from fixture_users where name='professional'),'care_team','email','hca-professional@example.invalid',true);
 insert into operation_ids select 'request',requisition_id from public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[{"productId":"fralda","currentStock":0,"urgent":false}]','[]','[]');
 select pg_temp.assert_ok((select count(*)=3 from public.requisition_notifications where recipient_user_id=(select id from fixture_users where name='professional') and coalesce(document_id,requisition_id)=(select id from operation_ids where key='request')),'one message per individual and configured channel');
 select pg_temp.login('reader');
@@ -113,7 +114,9 @@ do $$declare v_worker uuid:=gen_random_uuid();v_worker2 uuid:=gen_random_uuid();
     perform pg_temp.assert_ok(n.channel='internal','disabled external channels never claimed');
     perform public.complete_notification_job(n.id,v_worker,'delivered','internal');v_count:=v_count+1;
   end loop;
+  perform pg_temp.login('adminA');
   perform pg_temp.assert_ok(v_count=(select count(*) from public.requisition_notifications where document_id=(select id from operation_ids where key='request') and channel='internal'),'one internal event per authorized recipient claimed');
+  perform pg_temp.login('global');
   for n in select * from public.claim_notification_jobs(100,v_worker2,true) loop
     perform pg_temp.assert_ok(n.channel='whatsapp','unsupported email remains pending');
     insert into operation_ids values('external',n.id);
@@ -125,10 +128,13 @@ update public.requisition_notifications set lease_expires_at=now()-interval '1 m
 set local role authenticated;
 select pg_temp.login('global');
 select public.claim_notification_jobs(100,gen_random_uuid(),true);
+select pg_temp.login('adminA');
 select pg_temp.assert_ok((select state='uncertain' from public.requisition_notifications where id=(select id from operation_ids where key='external')),'expired external lease is uncertain and not resent');
 reset role;
 set local role service_role;
 select set_config('request.jwt.claim.role','service_role',true);
+select set_config('request.jwt.claims','{"role":"service_role"}',true);
+select set_config('request.jwt.claim.sub','',true);
 select public.notification_webhook('provider-fictitious-opaque-id','delivered',(select id from operation_ids where key='external'));
 select public.notification_webhook('provider-fictitious-opaque-id','accepted',(select id from operation_ids where key='external'));
 select public.notification_webhook('provider-fictitious-opaque-id','read',(select id from operation_ids where key='external'));

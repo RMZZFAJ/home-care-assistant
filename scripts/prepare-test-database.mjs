@@ -27,7 +27,7 @@ for (const args of [
     "--workdir",
     testRoot,
     "--exclude",
-    "edge-runtime,realtime,logflare,vector,supavisor",
+    "edge-runtime,logflare,vector,supavisor",
   ],
   ["migration", "up", "--local", "--include-all", "--workdir", testRoot],
 ]) {

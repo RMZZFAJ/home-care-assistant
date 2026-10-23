@@ -1,9 +1,11 @@
+import { selectContext } from "./auth-context";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import {
   assertLocalProject,
+  sql,
   fixtureFile,
 } from "../../scripts/test-environment.mjs";
 
@@ -39,9 +41,14 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
     ).toBeVisible();
+    await selectContext(
+      page,
+      name === "global" ? null : "20000000-0000-4000-8000-000000000001",
+    );
   }
 
   async function createPatient(page: Page) {
+    await selectContext(page, null);
     const response = await page.request.post("/api/admin", {
       data: {
         action: "recipient",
@@ -49,16 +56,25 @@ test.describe("administração integrada no ambiente local", () => {
         displayName: `Paciente administrativo ${randomUUID().slice(0, 8)}`,
         isActive: true,
         isDevelopment: true,
+        initialAdministratorEmail: fixtures().global.email,
       },
     });
     expect(response.ok()).toBeTruthy();
     const result = await response.json();
     expect(result.data.id).toBeTruthy();
-    return result.data.id as string;
+    const patient = result.data.id as string;
+    for (const role of ["adminA", "shared", "professional"])
+      sql(
+        `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patient}','${fixtures()[role].id}','${role === "adminA" ? "admin" : role === "shared" ? "reader" : "professional"}') on conflict do nothing;`,
+      );
+    await page.reload();
+    await selectContext(page, patient);
+    return patient;
   }
 
   async function section(page: Page, patientId: string, name: string) {
     await page.goto(`/admin?careRecipientId=${patientId}`);
+    await selectContext(page, patientId);
     await page
       .getByRole("combobox", { name: "Seção administrativa", exact: true })
       .selectOption({ label: name });
@@ -166,6 +182,8 @@ test.describe("administração integrada no ambiente local", () => {
           .filter({ has: page.getByText("Teste shared", { exact: true }) }),
       ).toBeVisible();
     }
+    await page.goto(`/admin?careRecipientId=${firstPatient}`);
+    await selectContext(page, firstPatient);
     const localAdmin = await page.request.post("/api/admin", {
       data: {
         action: "membership",
@@ -229,6 +247,8 @@ test.describe("administração integrada no ambiente local", () => {
       `/api/catalog?careRecipientId=${firstPatient}`,
     );
     expect(first.status()).toBe(404);
+    await page.goto(`/historico?careRecipientId=${secondPatient}`);
+    await selectContext(page, secondPatient);
     const second = await page.request.get(
       `/api/catalog?careRecipientId=${secondPatient}`,
     );
@@ -406,7 +426,7 @@ test.describe("administração integrada no ambiente local", () => {
 
   test("importação histórica revisada preserva itens extras e estoque desconhecido no comprovante", async ({
     page,
-  }, testInfo) => {
+  }) => {
     await login(page);
     const patientId = await createPatient(page);
     expect(
@@ -420,12 +440,11 @@ test.describe("administração integrada no ambiente local", () => {
         })
       ).ok(),
     ).toBeTruthy();
-    const physicalProtocol =
-      testInfo.project.name === "mobile"
-        ? 10
-        : testInfo.project.name === "ios"
-          ? 11
-          : 9;
+    const physicalProtocol = Number(
+      sql(
+        "select coalesce(max(physical_protocol),0)+1 from public.historical_requisition_imports",
+      ),
+    );
     const protocol = `HC-${String(physicalProtocol).padStart(6, "0")}`;
     const customName = `Nome físico comprovado ${randomUUID().slice(0, 8)}`;
     const rows = [
@@ -539,7 +558,7 @@ test.describe("administração integrada no ambiente local", () => {
       page.getByText("Estoque desconhecido", { exact: false }),
     ).toHaveCount(2);
     await expect(
-      page.getByText("Nenhuma notificação configurada.", { exact: true }),
+      page.getByText("Nenhum aviso disponível.", { exact: true }),
     ).toBeVisible();
     const retry = await page.request.post("/api/admin", {
       data: { action: "historicalImport", rows, preview: false },

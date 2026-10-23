@@ -9,6 +9,7 @@ export type PatientContext = {
   is_active?: boolean;
   is_development?: boolean;
   role: string;
+  hasMembership?: boolean;
   permissions?: Record<string, boolean>;
   capabilities?: Record<string, boolean>;
   can_manage_stock?: boolean;
@@ -18,6 +19,12 @@ export type WorkspaceContext = {
   userId: string;
   fullName: string;
   isGlobalAdmin: boolean;
+  globalAdministrationAllowed?: boolean;
+  activeContext?: {
+    mode: "global" | "patient";
+    care_recipient_id: string | null;
+    revision: number;
+  } | null;
   patients: PatientContext[];
   patient?: PatientContext;
   refresh: () => Promise<void>;
@@ -59,6 +66,7 @@ export async function api<T>(
   url: string,
   payload?: unknown,
   signal?: AbortSignal,
+  method = "POST",
 ): Promise<T> {
   const controller = new AbortController();
   const cancel = () => controller.abort();
@@ -72,7 +80,7 @@ export async function api<T>(
       ...(payload === undefined
         ? {}
         : {
-            method: "POST",
+            method,
             headers: { "content-type": "application/json" },
             body: JSON.stringify(payload),
           }),

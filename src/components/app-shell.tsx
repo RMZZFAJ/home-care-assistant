@@ -12,6 +12,7 @@ import {
 } from "react";
 import {
   api,
+  ApiError,
   buttonClass,
   can,
   may,
@@ -91,7 +92,6 @@ function WorkspaceNavigation({
         pathname={pathname}
         onNavigate={close}
         items={permitted([
-          { href: "/fichas", label: "Central de fichas" },
           {
             href: "/fichas/req",
             label: "REQ · Requisição",
@@ -175,7 +175,8 @@ function WorkspaceNavigation({
           ]}
         />
       ) : null}
-      {context?.isGlobalAdmin ? (
+      {context?.activeContext?.mode === "global" &&
+      context.globalAdministrationAllowed ? (
         <NavigationGroup
           label="Administração global"
           icon="settings"
@@ -192,10 +193,17 @@ function WorkspaceNavigation({
   );
 }
 type ContextData = {
+  documentContext?: {
+    patientId: string;
+    displayName: string;
+    type: string;
+  } | null;
   avatarUrl?: string | null;
   userId: string;
   fullName: string;
   isGlobalAdmin: boolean;
+  globalAdministrationAllowed?: boolean;
+  activeContext: WorkspaceContext["activeContext"];
   patients: PatientContext[];
 };
 export function AppWorkspace({
@@ -208,25 +216,49 @@ export function AppWorkspace({
   administration?: boolean;
 }) {
   const requestedPatientId = useSearchParams().get("careRecipientId");
+  const routePath = usePathname();
+  const documentId = /^\/(?:historico|fichas)\/([0-9a-f-]{36})$/.exec(
+    routePath,
+  )?.[1];
   const [context, setContext] = useState<ContextData | null>(null);
   const [patientId, setPatientId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [selecting, setSelecting] = useState(false);
   const drawerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const profileMenuRef = useRef<HTMLDetailsElement>(null);
   const load = useCallback(
     (signal?: AbortSignal) =>
-      api<{ data: ContextData }>("/api/context", undefined, signal).then(
+      api<{ data: ContextData }>(
+        "/api/context" + (documentId ? "?documentId=" + documentId : ""),
+        undefined,
+        signal,
+      ).then(
         (result) => {
           if (signal?.aborted) return;
-          setContext(result.data);
+          setContext((current) => ({
+            ...result.data,
+            patients: result.data.patients.map((patient) => {
+              const existing = current?.patients.find(
+                (row) => row.id === patient.id,
+              );
+              return existing &&
+                JSON.stringify(existing) === JSON.stringify(patient)
+                ? existing
+                : patient;
+            }),
+          }));
           setPatientId((current) => {
             const remembered =
-              requestedPatientId ||
-              current ||
-              sessionStorage.getItem("hca:patient") ||
-              "";
+              result.data.activeContext?.mode === "patient"
+                ? result.data.activeContext.care_recipient_id || ""
+                : requestedPatientId ||
+                  current ||
+                  sessionStorage.getItem("hca:patient") ||
+                  "";
             return result.data.patients.some(
               (patient) => patient.id === remembered,
             )
@@ -238,6 +270,11 @@ export function AppWorkspace({
         },
         (reason) => {
           if (!signal?.aborted) {
+            if (
+              reason instanceof ApiError &&
+              [401, 403].includes(reason.status)
+            )
+              setContext(null);
             setError(
               reason instanceof Error
                 ? reason.message
@@ -247,7 +284,7 @@ export function AppWorkspace({
           }
         },
       ),
-    [requestedPatientId],
+    [requestedPatientId, documentId],
   );
   useEffect(() => {
     const controller = new AbortController();
@@ -268,8 +305,11 @@ export function AppWorkspace({
       void load();
     };
     window.addEventListener("hca:profile-updated", refreshProfile);
-    return () =>
+    window.addEventListener("hca:data-changed", refreshProfile);
+    return () => {
       window.removeEventListener("hca:profile-updated", refreshProfile);
+      window.removeEventListener("hca:data-changed", refreshProfile);
+    };
   }, [load]);
   useEffect(() => {
     if (!menuOpen) return;
@@ -312,8 +352,36 @@ export function AppWorkspace({
     setError("");
     await load();
   };
+  const selectProfile = async (id: string | null) => {
+    setSelecting(true);
+    setError("");
+    try {
+      await api("/api/context", { careRecipientId: id });
+      if (id) setPatientId(id);
+      await load();
+      setProfileOpen(false);
+      profileMenuRef.current?.removeAttribute("open");
+      window.dispatchEvent(new Event("hca:context-changed"));
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "Não foi possível selecionar o perfil.",
+      );
+    } finally {
+      setSelecting(false);
+    }
+  };
   const value = context ? { ...context, patient, refresh } : null;
-  const canAdminister = value && (value.isGlobalAdmin || may(value, "manage"));
+  const linkedPatient =
+    context?.documentContext?.patientId ?? requestedPatientId;
+  const documentMismatch =
+    linkedPatient &&
+    (context?.activeContext?.mode !== "patient" ||
+      context.activeContext.care_recipient_id !== linkedPatient) &&
+    !administration;
+  const canAdminister =
+    value && (value.globalAdministrationAllowed || may(value, "manage"));
   const closeDrawer = () => {
     setMenuOpen(false);
     menuButtonRef.current?.focus();
@@ -353,7 +421,9 @@ export function AppWorkspace({
                 aria-label="Pessoa assistida"
                 value={patientId}
                 onChange={(event) => {
-                  setPatientId(event.target.value);
+                  if (context.activeContext?.mode === "patient")
+                    void selectProfile(event.target.value);
+                  else setPatientId(event.target.value);
                   const url = new URL(window.location.href);
                   url.searchParams.set("careRecipientId", event.target.value);
                   window.history.replaceState(null, "", url);
@@ -362,20 +432,31 @@ export function AppWorkspace({
                 <option value="" disabled>
                   Selecione um paciente
                 </option>
-                {context.patients.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.display_name}
-                    {item.is_active === false ? " (inativo)" : ""}
-                  </option>
-                ))}
+                {context.patients
+                  .filter(
+                    (item) =>
+                      context.activeContext?.mode !== "patient" ||
+                      item.hasMembership,
+                  )
+                  .map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.display_name}
+                      {item.is_active === false ? " (inativo)" : ""}
+                    </option>
+                  ))}
               </select>
             </label>
           ) : (
             <span className="text-sm text-(--muted)">Home Care Assistant</span>
           )}
         </div>
-        {value ? <NotificationBell patientId={patient?.id} /> : null}
-        <details className="profile-menu">
+        {value ? (
+          <NotificationBell
+            key={patient?.id ?? "all"}
+            patientId={patient?.id}
+          />
+        ) : null}
+        <details className="profile-menu" ref={profileMenuRef}>
           <summary aria-label="Menu do usuário">
             <span className="avatar">
               {context?.avatarUrl ? (
@@ -401,9 +482,21 @@ export function AppWorkspace({
           <div className="header-popover">
             <p className="font-semibold">{context?.fullName}</p>
             <p className="mb-3 text-xs text-(--muted)">
-              {value?.isGlobalAdmin ? "Administração global" : patient?.role}
+              {value?.activeContext?.mode === "global"
+                ? "Administração global"
+                : patient?.role}
             </p>
             <Link href="/perfil">Meu perfil e segurança</Link>
+            <button
+              type="button"
+              className="ui-button ui-button-secondary"
+              onClick={() => {
+                profileMenuRef.current?.removeAttribute("open");
+                setProfileOpen(true);
+              }}
+            >
+              Mudar perfil
+            </button>
             <Link href="/notificacoes">Preferências e notificações</Link>
             {canAdminister ? (
               <Link href="/configuracoes">Configurações do paciente</Link>
@@ -458,7 +551,7 @@ export function AppWorkspace({
           </div>
           {patient ? (
             <span className="context-tag">
-              {value?.isGlobalAdmin
+              {value?.activeContext?.mode === "global"
                 ? "Administrador global"
                 : {
                     admin: "Administrador",
@@ -490,7 +583,81 @@ export function AppWorkspace({
             </div>
           </Notice>
         ) : null}
-        {!error && value ? (
+        {value?.activeContext?.mode === "global" &&
+        !value.globalAdministrationAllowed ? (
+          <Notice>
+            Confirme seu autenticador para administrar.{" "}
+            <Link
+              className="font-semibold underline"
+              href="/perfil?mfa=required"
+            >
+              Verificar autenticação em duas etapas
+            </Link>
+          </Notice>
+        ) : null}
+        {value && (profileOpen || !value.activeContext || documentMismatch) ? (
+          <section className="ui-card mb-4" aria-label="Mudar perfil">
+            <h2 className="text-lg font-semibold">Escolha como deseja atuar</h2>
+            {context?.documentContext ? (
+              <p className="my-3 text-sm font-semibold">
+                Este documento pertence a {context.documentContext.displayName}.
+                Selecione seu vínculo para continuar no documento recebido.
+              </p>
+            ) : null}
+            {!context?.documentContext && requestedPatientId ? (
+              <p className="my-3 text-sm">
+                Selecione explicitamente o vínculo com o paciente indicado neste
+                aviso. O link preserva a tarefa e não concede permissões.
+              </p>
+            ) : null}
+            <p className="mb-4 text-sm text-(--muted)">
+              O perfil escolhido vale para esta sessão. A administração global
+              propõe alterações; fichas e estoque usam seu vínculo no paciente.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {value.isGlobalAdmin ? (
+                <button
+                  className={buttonClass}
+                  type="button"
+                  disabled={selecting}
+                  onClick={() => void selectProfile(null)}
+                >
+                  Administração global
+                </button>
+              ) : null}
+              {value.patients
+                .filter((item) => item.hasMembership)
+                .map((item) => (
+                  <button
+                    key={item.id}
+                    className={buttonClass}
+                    type="button"
+                    disabled={selecting}
+                    onClick={() => void selectProfile(item.id)}
+                  >
+                    {item.display_name} ·{" "}
+                    {{
+                      admin: "Administrador do paciente",
+                      family: "Familiar",
+                      supervisor: "Supervisor",
+                      professional: "Profissional",
+                      reader: "Leitor",
+                    }[item.role] ?? item.role}
+                  </button>
+                ))}
+              {profileOpen && value.activeContext ? (
+                <button
+                  type="button"
+                  className={buttonClass}
+                  onClick={() => setProfileOpen(false)}
+                >
+                  Voltar
+                </button>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
+        {!error && value?.activeContext && !documentMismatch ? (
           !patient && !value.isGlobalAdmin ? (
             <Notice>
               Nenhum paciente autorizado está vinculado à sua conta. Solicite
@@ -501,7 +668,9 @@ export function AppWorkspace({
               Seu vínculo não permite administrar este paciente.
             </Notice>
           ) : (
-            <div key={patient?.id ?? "global"}>
+            <div
+              key={(patient?.id ?? "global") + ":" + value.activeContext.mode}
+            >
               {patient?.is_active === false ? (
                 <Notice>
                   Paciente inativo. O histórico permanece disponível; novas

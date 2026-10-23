@@ -2,6 +2,8 @@ import { createHash, randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { appOrigin } from "@/lib/server/app-origin";
+import { exactQuantity } from "@/lib/validation/documents";
+import { quantity } from "@/lib/quantity";
 import {
   api,
   ApiError,
@@ -101,6 +103,7 @@ const schema = z.discriminatedUnion("action", [
       displayName: z.string().trim().min(2).max(160),
       isActive: z.boolean(),
       isDevelopment: z.boolean(),
+      initialAdministratorEmail: z.string().trim().email().optional(),
     })
     .strict(),
   z
@@ -165,8 +168,8 @@ const schema = z.discriminatedUnion("action", [
       careRecipientId: uuid,
       productId: z.string().min(1).max(120),
       location,
-      lowThreshold: z.number().int().min(0).max(1_000_000),
-      criticalThreshold: z.number().int().min(0).max(1_000_000),
+      lowThreshold: exactQuantity,
+      criticalThreshold: exactQuantity,
       isEnabled: z.boolean(),
     })
     .strict(),
@@ -203,6 +206,12 @@ export async function GET(request: Request) {
       });
     }
     if (section === "recipients") {
+      if (auth.isGlobalAdmin) {
+        const workspace = (await rpc(auth.client, "my_workspace")) as {
+          patients: unknown[];
+        };
+        return NextResponse.json({ data: workspace.patients });
+      }
       const { data, error } = await auth.client
         .from("care_recipients")
         .select("*")
@@ -210,6 +219,13 @@ export async function GET(request: Request) {
       if (error) databaseError(error);
       return NextResponse.json({ data: data ?? [] });
     }
+    if (auth.isGlobalAdmin)
+      return NextResponse.json({
+        data: await rpc(auth.client, "global_patient_administration", {
+          p_patient: uuid.parse(params.get("careRecipientId")),
+          p_section: section,
+        }),
+      });
     const patient = await patientContext(
       auth,
       params.get("careRecipientId"),
@@ -304,6 +320,42 @@ export async function POST(request: Request) {
   return api("admin.write", async () => {
     const input = await readJson(request, schema, 2_000_000);
     const auth = await authenticate();
+    if (
+      auth.isGlobalAdmin &&
+      [
+        "membership",
+        "product",
+        "adoptProduct",
+        "membershipStatus",
+        "alertRule",
+        "notificationRecipient",
+        "recipient",
+      ].includes(input.action)
+    ) {
+      const target =
+        "careRecipientId" in input
+          ? input.careRecipientId
+          : "id" in input
+            ? input.id
+            : null;
+      if (target) {
+        const governance = (await rpc(auth.client, "patient_governance", {
+          p_patient: target,
+        })) as { data: { version: number } };
+        const data = await rpc(auth.client, "configure_patient_access", {
+          p_patient: target,
+          p_kind:
+            input.action === "membership" ? "membership" : "administration",
+          p_change:
+            input.action === "membership"
+              ? { userId: input.userId, role: input.role }
+              : { operation: input.action, args: input },
+          p_key: crypto.randomUUID(),
+          p_version: governance.data.version,
+        });
+        return NextResponse.json({ data, pendingApproval: true });
+      }
+    }
     if (input.action === "profile") {
       requireGlobal(auth);
       return NextResponse.json({
@@ -319,6 +371,15 @@ export async function POST(request: Request) {
     if (input.action === "recipient") {
       if (input.id) await patientContext(auth, input.id, "manage");
       else requireGlobal(auth);
+      if (!input.id && input.initialAdministratorEmail) {
+        return NextResponse.json({
+          data: await rpc(auth.client, "create_patient_with_administrator", {
+            p_name: input.displayName,
+            p_development: input.isDevelopment,
+            p_administrator_email: input.initialAdministratorEmail,
+          }),
+        });
+      }
       return NextResponse.json({
         data: await rpc(auth.client, "admin_upsert_recipient", {
           p_id: input.id,
@@ -424,36 +485,6 @@ export async function POST(request: Request) {
         });
         break;
       case "membership": {
-        if (["admin", "supervisor"].includes(input.role)) {
-          const settings = await auth.client
-            .from("patient_settings")
-            .select("version,bootstrap_closed")
-            .eq("care_recipient_id", input.careRecipientId)
-            .maybeSingle();
-          if (settings.error) databaseError(settings.error);
-          const { count, error } = await auth.client
-            .from("care_recipient_memberships")
-            .select("id", { count: "exact", head: true })
-            .eq("care_recipient_id", input.careRecipientId)
-            .eq("role", "admin")
-            .eq("status", "active");
-          if (error) databaseError(error);
-          if (!(
-            auth.isGlobalAdmin &&
-            input.role === "admin" &&
-            !settings.data?.bootstrap_closed &&
-            (count ?? 0) < 2
-          )) {
-            data = await rpc(auth.client, "configure_patient_access", {
-              p_patient: input.careRecipientId,
-              p_kind: "membership",
-              p_change: { userId: input.userId, role: input.role },
-              p_key: crypto.randomUUID(),
-              p_version: settings.data?.version ?? 1,
-            });
-            return NextResponse.json({ data, pendingApproval: true });
-          }
-        }
         data = await rpc(auth.client, "admin_upsert_membership", {
           p_care_recipient_id: input.careRecipientId,
           p_user_id: input.userId,
@@ -471,7 +502,7 @@ export async function POST(request: Request) {
         });
         break;
       case "alertRule":
-        if (input.criticalThreshold > input.lowThreshold)
+        if (quantity(input.criticalThreshold).gt(input.lowThreshold))
           throw new ApiError(
             "VALIDATION_ERROR",
             "O limite crítico deve ser menor ou igual ao limite baixo.",

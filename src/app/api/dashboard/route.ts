@@ -20,7 +20,6 @@ export async function GET(request: Request) {
         .select("id", { head: true, count: "exact" })
         .eq("care_recipient_id", patient.id);
     const results = await Promise.all([
-      base().eq("type", "REQ").not("status", "in", "(cancelled,draft)"),
       base()
         .eq("type", "ENT")
         .eq("recipient_id", auth.userId)
@@ -28,12 +27,10 @@ export async function GET(request: Request) {
       base().eq("type", "COM").eq("status", "pending_approval"),
       base().eq("type", "ENT").eq("status", "disputed"),
       base().eq("type", "BAL").eq("status", "submitted"),
-      auth.client
-        .from("operational_documents")
-        .select("id,type,code,protocol,status,recipient_id,created_at")
-        .eq("care_recipient_id", patient.id)
-        .order("created_at", { ascending: false })
-        .limit(6),
+      auth.client.rpc("operational_document_list", {
+        p_patient: patient.id,
+        p_size: 6,
+      }),
       auth.client
         .from("patient_settings")
         .select("settings")
@@ -54,13 +51,13 @@ export async function GET(request: Request) {
       data: {
         ...tasks,
         requests: tasks.requests,
-        receipts: results[1].count ?? 0,
-        purchases: results[2].count ?? 0,
-        disputes: results[3].count ?? 0,
-        balances: results[4].count ?? 0,
-        recent: results[5].data ?? [],
+        receipts: results[0].count ?? 0,
+        purchases: results[1].count ?? 0,
+        disputes: results[2].count ?? 0,
+        balances: results[3].count ?? 0,
+        recent: results[4].data?.data ?? [],
         balDay:
-          (results[6].data as { settings?: { balDay?: number } } | null)
+          (results[5].data as { settings?: { balDay?: number } } | null)
             ?.settings?.balDay ?? null,
       },
     });

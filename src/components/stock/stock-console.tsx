@@ -1,4 +1,5 @@
 "use client";
+import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -93,6 +94,7 @@ function PatientStock({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const liveRevision = useLiveRevision();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [custody, setCustody] = useState(initialCustody);
@@ -157,7 +159,15 @@ function PatientStock({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [context.patient, page, custody, filters, attempt, hasStock]);
+  }, [
+    context.patient,
+    page,
+    custody,
+    filters,
+    attempt,
+    hasStock,
+    liveRevision,
+  ]);
   function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);

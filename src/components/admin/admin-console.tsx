@@ -29,6 +29,7 @@ import {
   type Row,
 } from "./admin-fields";
 import { AlertSettings } from "./alert-settings";
+import { PatientRegistration } from "./patient-registration";
 
 type Section =
   | "patient"
@@ -68,6 +69,9 @@ export function AdminConsole() {
 }
 
 function PatientAdmin({ context }: { context: WorkspaceContext }) {
+  const globalMode =
+    context.activeContext?.mode === "global" &&
+    context.globalAdministrationAllowed === true;
   const params = useSearchParams();
   const requestedSection = params.get("section") as Section | null;
   const [section, setSection] = useState<Section>(
@@ -91,7 +95,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [importText, setImportText] = useState("");
   const [importReviewed, setImportReviewed] = useState(false);
   const patientId = context.patient?.id;
-  const canManage = context.isGlobalAdmin || may(context, "manage");
+  const canManage =
+    context.activeContext?.mode === "global" || may(context, "manage");
   const load = useCallback(
     (signal?: AbortSignal) => {
       if (["patient", "import"].includes(section)) return Promise.resolve();
@@ -114,7 +119,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           : Promise.resolve({ data: [] as Row[] }),
         ["memberships", "notificationRecipients"].includes(section)
           ? api<{ data: Row[] }>(
-              section === "memberships" && context.isGlobalAdmin
+              section === "memberships" && globalMode
                 ? "/api/admin?section=profiles"
                 : `/api/admin?section=memberships&careRecipientId=${patientId}`,
               undefined,
@@ -150,7 +155,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         },
       );
     },
-    [section, patientId, context.isGlobalAdmin, page],
+    [section, patientId, globalMode, page],
   );
   useEffect(() => {
     const controller = new AbortController();
@@ -186,7 +191,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       });
       setMessage(
         result.pendingApproval
-          ? "Proposta registrada. A segunda pessoa administradora deve aprovar em Funções, permissões e regras."
+          ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras."
           : success,
       );
       setEditing(null);
@@ -222,7 +227,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   return (
     <div className="space-y-5">
       <p className="text-sm text-(--muted)">
-        {context.isGlobalAdmin
+        {globalMode
           ? "Administração global e por paciente."
           : "Todas as alterações desta área se limitam ao paciente selecionado."}
       </p>
@@ -244,7 +249,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             }}
           >
             {(Object.keys(labels) as Section[])
-              .filter((key) => key !== "profiles" || context.isGlobalAdmin)
+              .filter((key) => key !== "profiles" || globalMode)
               .filter(
                 (key) =>
                   Boolean(patientId) || key === "patient" || key === "profiles",
@@ -297,69 +302,13 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       {loading && <Notice>Carregando {labels[section].toLowerCase()}…</Notice>}
       <fieldset disabled={busy} className="min-w-0 space-y-5">
         {section === "patient" && (
-          <section className={panelClass}>
-            <h2 className="mb-4 text-lg font-semibold">Cadastro do paciente</h2>
-            <form
-              key={editing ? "new" : (patientId ?? "none")}
-              className="grid gap-4 sm:grid-cols-2"
-              onSubmit={(event) =>
-                handle(
-                  event,
-                  (data) => ({
-                    action: "recipient",
-                    id: editing ? null : (patientId ?? null),
-                    displayName: data.get("displayName"),
-                    isActive: data.has("isActive"),
-                    isDevelopment: context.isGlobalAdmin
-                      ? data.has("isDevelopment")
-                      : context.patient?.is_development === true,
-                  }),
-                  "Paciente salvo.",
-                  true,
-                )
-              }
-            >
-              <Field
-                name="displayName"
-                label="Nome de exibição"
-                value={editing ? "" : (context.patient?.display_name ?? "")}
-                required
-              />
-              <div>
-                <Check
-                  name="isActive"
-                  label="Paciente ativo"
-                  checked={
-                    editing ? true : context.patient?.is_active !== false
-                  }
-                />
-                {context.isGlobalAdmin && (
-                  <Check
-                    name="isDevelopment"
-                    label="Cadastro de desenvolvimento"
-                    checked={bool(
-                      (context.patient as unknown as Row) ?? {},
-                      "is_development",
-                    )}
-                  />
-                )}
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <button className={primaryClass} type="submit">
-                  {editing || !patientId ? "Criar paciente" : "Salvar paciente"}
-                </button>
-                {context.isGlobalAdmin && patientId && (
-                  <button
-                    className={buttonClass}
-                    type="button"
-                    onClick={() => setEditing(editing ? null : {})}
-                  >
-                    {editing ? "Editar atual" : "Novo paciente"}
-                  </button>
-                )}
-              </div>
-            </form>
-          </section>
+          <PatientRegistration
+            patient={context.patient}
+            globalMode={globalMode}
+            creating={Boolean(editing)}
+            onToggle={() => setEditing(editing ? null : {})}
+            handle={handle}
+          />
         )}
         {section === "catalog" && (
           <>
@@ -756,7 +705,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             <NotificationQueue
               rows={rows}
               execute={execute}
-              isGlobalAdmin={context.isGlobalAdmin}
+              isGlobalAdmin={globalMode}
             />
             {notificationTotal > 20 && (
               <nav
@@ -900,7 +849,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             )}
           </section>
         )}
-        {section === "profiles" && context.isGlobalAdmin && (
+        {section === "profiles" && globalMode && (
           <section className={panelClass}>
             <h2 className="font-bold">Identidades globais</h2>
             <p className="mt-2 text-sm">
