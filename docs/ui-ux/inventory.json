@@ -1,0 +1,1327 @@
+{
+  "base": "d467f92",
+  "records": [
+    {
+      "file": "src/app/admin/page.tsx",
+      "lines": 7,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/admin/admin-console"
+      ],
+      "exports": [
+        "AdminPage"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/configuracoes/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/admin/policy-console"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/consumo/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/stock/consumption-console"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/convites/aceitar/page.tsx",
+      "lines": 3,
+      "imports": [
+        "src/components/admin/accept-invitation"
+      ],
+      "exports": [
+        "AcceptInvitationPage"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/estoque/page.tsx",
+      "lines": 4,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/stock/stock-console"
+      ],
+      "exports": [
+        "StockPage"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/fichas/[id]/page.tsx",
+      "lines": 24,
+      "imports": [
+        "react",
+        "src/components/authenticated-page",
+        "src/components/documents/supply-detail",
+        "src/lib/demo-documents",
+        "src/components/documents/demo-document"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/fichas/bal/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/documents/supply-wizard"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/fichas/com/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/documents/supply-wizard"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/fichas/ent/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/documents/supply-wizard"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/fichas/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/documents/forms-hub"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/fichas/req/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/requisitions/requisition-wizard"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/historico/[id]/page.tsx",
+      "lines": 28,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/requisitions/requisition-detail",
+        "react",
+        "src/lib/demo-documents",
+        "src/components/documents/demo-document"
+      ],
+      "exports": [
+        "RequisitionDetailPage"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/historico/page.tsx",
+      "lines": 11,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/documents/document-history"
+      ],
+      "exports": [
+        "HistoryPage"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/inventarios/page.tsx",
+      "lines": 5,
+      "imports": [
+        "next/navigation"
+      ],
+      "exports": [
+        "InventoriesPage"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/layout.tsx",
+      "lines": 24,
+      "imports": [
+        "next",
+        "src/app/globals.css",
+        "src/app/design-system.css",
+        "src/components/live-session"
+      ],
+      "exports": [
+        "RootLayout"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "layout"
+    },
+    {
+      "file": "src/app/login/page.tsx",
+      "lines": 16,
+      "imports": [
+        "src/components/auth/login-form",
+        "react"
+      ],
+      "exports": [
+        "LoginPage"
+      ],
+      "headings": [
+        "Entrar"
+      ],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/notificacoes/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/notifications/notification-center"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/page.tsx",
+      "lines": 11,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/dashboard"
+      ],
+      "exports": [
+        "Home"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/perfil/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/profile-console"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/recuperar-senha/page.tsx",
+      "lines": 4,
+      "imports": [
+        "src/components/auth/password-recovery-form"
+      ],
+      "exports": [
+        "RecoverPasswordPage"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/unidades/page.tsx",
+      "lines": 10,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/catalog/unit-console"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/verificar/[id]/page.tsx",
+      "lines": 68,
+      "imports": [
+        "react",
+        "@supabase/supabase-js",
+        "zod"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [
+        "Verificação do comprovante"
+      ],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/components/admin/accept-invitation.tsx",
+      "lines": 192,
+      "imports": [
+        "next/link",
+        "react",
+        "src/components/workspace"
+      ],
+      "exports": [
+        "AcceptInvitation"
+      ],
+      "headings": [
+        "Convite de acesso ao paciente"
+      ],
+      "stateHooks": 7,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/admin-console.tsx",
+      "lines": 929,
+      "imports": [
+        "next/navigation",
+        "next/link",
+        "react",
+        "src/components/workspace",
+        "src/components/admin/notification-settings",
+        "src/lib/receipt",
+        "src/components/admin/admin-fields",
+        "src/components/admin/alert-settings",
+        "src/components/admin/patient-registration"
+      ],
+      "exports": [
+        "AdminConsole"
+      ],
+      "headings": [
+        "Link de convite",
+        " ",
+        "Catálogo do paciente ( )",
+        "Adotar modelo existente",
+        " ",
+        "Vínculos deste paciente",
+        "Convidar para este paciente",
+        "Convites",
+        "Eventos de auditoria deste contexto",
+        "Importar protocolos físicos 1–11",
+        "Identidades globais"
+      ],
+      "stateHooks": 16,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/admin-fields.tsx",
+      "lines": 79,
+      "imports": [
+        "src/components/workspace"
+      ],
+      "exports": [
+        "text",
+        "bool",
+        "Field",
+        "Check",
+        "RoleSelect"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/alert-settings.tsx",
+      "lines": 101,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/components/admin/admin-fields"
+      ],
+      "exports": [
+        "AlertSettings"
+      ],
+      "headings": [
+        "Limites de estoque por item e custódia"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/notification-matrix.tsx",
+      "lines": 300,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/lib/notifications/event-labels",
+        "src/components/admin/admin-fields"
+      ],
+      "exports": [
+        "NotificationMatrix"
+      ],
+      "headings": [
+        "Eventos × funções · múltiplos canais",
+        " "
+      ],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/notification-settings.tsx",
+      "lines": 17,
+      "imports": [
+        "src/lib/receipt",
+        "react",
+        "src/components/workspace"
+      ],
+      "exports": [
+        "NotificationSettings",
+        "NotificationQueue"
+      ],
+      "headings": [
+        "Destinatários de notificações",
+        "Acompanhamento de notificações"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/patient-registration.tsx",
+      "lines": 109,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/components/admin/admin-fields"
+      ],
+      "exports": [
+        "PatientRegistration"
+      ],
+      "headings": [
+        "Cadastro do paciente"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/permission-matrix.tsx",
+      "lines": 124,
+      "imports": [
+        "react",
+        "src/lib/capability-labels",
+        "src/components/workspace",
+        "src/components/admin/admin-fields"
+      ],
+      "exports": [
+        "PermissionMatrix"
+      ],
+      "headings": [
+        "Permissões por função e exceções pessoais",
+        " "
+      ],
+      "stateHooks": 1,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/policy-console.tsx",
+      "lines": 577,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/components/admin/permission-matrix",
+        "src/components/admin/notification-matrix",
+        "src/components/admin/reminder-settings",
+        "src/components/admin/admin-fields",
+        "src/lib/use-live-revision"
+      ],
+      "exports": [
+        "PolicyConsole"
+      ],
+      "headings": [
+        "Política do paciente",
+        "Função no paciente",
+        "Propostas globais aguardando aprovação local"
+      ],
+      "stateHooks": 8,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/reminder-settings.tsx",
+      "lines": 112,
+      "imports": [
+        "src/components/workspace"
+      ],
+      "exports": [
+        "ReminderSettings"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/app-shell.tsx",
+      "lines": 688,
+      "imports": [
+        "next/link",
+        "next/image",
+        "next/navigation",
+        "react",
+        "src/components/workspace",
+        "src/components/auth/logout-button",
+        "src/components/ui/primitives",
+        "src/components/notifications/notification-bell"
+      ],
+      "exports": [
+        "AppWorkspace"
+      ],
+      "headings": [
+        "Escolha como deseja atuar"
+      ],
+      "stateHooks": 7,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/auth/contact-settings.tsx",
+      "lines": 183,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/lib/supabase/client"
+      ],
+      "exports": [
+        "ContactSettings"
+      ],
+      "headings": [
+        "Contatos e métodos de login"
+      ],
+      "stateHooks": 4,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/auth/login-form.tsx",
+      "lines": 220,
+      "imports": [
+        "react",
+        "next/navigation",
+        "src/lib/use-client-ready",
+        "src/lib/supabase/client",
+        "src/lib/safe-return-path",
+        "@supabase/supabase-js"
+      ],
+      "exports": [
+        "LoginForm"
+      ],
+      "headings": [],
+      "stateHooks": 5,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/auth/logout-button.tsx",
+      "lines": 34,
+      "imports": [
+        "next/navigation",
+        "react",
+        "src/lib/supabase/client"
+      ],
+      "exports": [
+        "LogoutButton"
+      ],
+      "headings": [],
+      "stateHooks": 2,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/auth/mfa-settings.tsx",
+      "lines": 223,
+      "imports": [
+        "next/image",
+        "react",
+        "next/navigation",
+        "src/lib/supabase/client",
+        "src/lib/safe-return-path",
+        "src/components/workspace"
+      ],
+      "exports": [
+        "MfaSettings"
+      ],
+      "headings": [
+        "Autenticação em duas etapas"
+      ],
+      "stateHooks": 10,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/auth/password-recovery-form.tsx",
+      "lines": 121,
+      "imports": [
+        "react",
+        "next/link",
+        "src/lib/use-client-ready",
+        "src/lib/validation/password",
+        "src/lib/supabase/client"
+      ],
+      "exports": [
+        "PasswordRecoveryForm"
+      ],
+      "headings": [
+        "Definir nova senha"
+      ],
+      "stateHooks": 5,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/authenticated-page.tsx",
+      "lines": 71,
+      "imports": [
+        "next/server",
+        "next/navigation",
+        "react",
+        "next/headers",
+        "src/lib/safe-return-path",
+        "src/lib/supabase/server"
+      ],
+      "exports": [
+        "AuthenticatedPage"
+      ],
+      "headings": [
+        "Configuração necessária",
+        "Acesso indisponível"
+      ],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/components/catalog/barcode-scanner.tsx",
+      "lines": 228,
+      "imports": [
+        "react",
+        "src/components/ui/primitives",
+        "src/components/workspace"
+      ],
+      "exports": [
+        "BarcodeScanner"
+      ],
+      "headings": [],
+      "stateHooks": 4,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/catalog/unit-console.tsx",
+      "lines": 287,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/types/documents"
+      ],
+      "exports": [
+        "UnitConsole"
+      ],
+      "headings": [
+        "Unidades disponíveis",
+        "Nova unidade",
+        "Unidade base e código de embalagem"
+      ],
+      "stateHooks": 7,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/dashboard.tsx",
+      "lines": 293,
+      "imports": [
+        "next/link",
+        "react",
+        "src/components/workspace",
+        "src/components/documents/document-history",
+        "src/components/ui/primitives",
+        "src/lib/use-live-revision"
+      ],
+      "exports": [
+        "Dashboard"
+      ],
+      "headings": [
+        "O que precisa da sua atenção",
+        "Movimentação recente",
+        "Ações rápidas",
+        "Rotina semanal da equipe"
+      ],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/attachments.tsx",
+      "lines": 204,
+      "imports": [
+        "react",
+        "src/components/workspace"
+      ],
+      "exports": [
+        "Attachments"
+      ],
+      "headings": [
+        "Anexos e ficha física"
+      ],
+      "stateHooks": 6,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/demo-document.tsx",
+      "lines": 37,
+      "imports": [
+        "src/lib/demo-documents"
+      ],
+      "exports": [
+        "DemoDocument"
+      ],
+      "headings": [
+        " · Demonstração Home Care Assistant"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/document-actions.tsx",
+      "lines": 135,
+      "imports": [
+        "react",
+        "src/components/workspace"
+      ],
+      "exports": [
+        "DocumentActions"
+      ],
+      "headings": [],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/document-history.tsx",
+      "lines": 385,
+      "imports": [
+        "next/link",
+        "next/navigation",
+        "react",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/types/documents",
+        "src/lib/receipt",
+        "src/lib/use-live-revision"
+      ],
+      "exports": [
+        "DocumentRow",
+        "DocumentHistory"
+      ],
+      "headings": [
+        "Documentos e acompanhamento"
+      ],
+      "stateHooks": 9,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/document-timeline.tsx",
+      "lines": 43,
+      "imports": [
+        "src/lib/notifications/event-labels",
+        "src/lib/receipt"
+      ],
+      "exports": [
+        "DocumentTimeline"
+      ],
+      "headings": [
+        "Linha do tempo"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/forms-hub.tsx",
+      "lines": 73,
+      "imports": [
+        "next/link",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/types/documents"
+      ],
+      "exports": [
+        "FormsHub"
+      ],
+      "headings": [
+        " "
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/related-document.tsx",
+      "lines": 90,
+      "imports": [
+        "react",
+        "src/components/ui/primitives",
+        "src/components/workspace",
+        "src/lib/receipt"
+      ],
+      "exports": [
+        "RelatedDocument"
+      ],
+      "headings": [],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/supply-command-editor.tsx",
+      "lines": 435,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/lib/quantity",
+        "src/types/documents"
+      ],
+      "exports": [
+        "CommandEditor"
+      ],
+      "headings": [],
+      "stateHooks": 4,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/supply-detail.tsx",
+      "lines": 505,
+      "imports": [
+        "src/components/documents/supply-line-summary",
+        "next/link",
+        "react",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/components/notifications/document-delivery-status",
+        "src/components/documents/attachments",
+        "src/components/documents/supply-command-editor",
+        "src/types/documents",
+        "src/lib/notifications/event-labels",
+        "src/lib/quantity",
+        "src/lib/receipt",
+        "src/lib/use-live-revision",
+        "src/components/documents/document-actions"
+      ],
+      "exports": [
+        "SupplyDetail"
+      ],
+      "headings": [
+        " ",
+        "Próxima ação",
+        "Produtos e quantidades",
+        "Versões e integridade"
+      ],
+      "stateHooks": 10,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/supply-line-summary.tsx",
+      "lines": 107,
+      "imports": [
+        "src/types/documents",
+        "src/lib/quantity"
+      ],
+      "exports": [
+        "SupplyLineSummary"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/supply-wizard-step.tsx",
+      "lines": 409,
+      "imports": [
+        "src/components/documents/related-document",
+        "react",
+        "src/components/workspace",
+        "src/components/catalog/barcode-scanner",
+        "src/lib/quantity",
+        "src/types/documents"
+      ],
+      "exports": [
+        "SupplyWizardStep"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/supply-wizard.tsx",
+      "lines": 716,
+      "imports": [
+        "src/components/documents/document-actions",
+        "next/link",
+        "next/navigation",
+        "react",
+        "src/components/workspace",
+        "src/components/notifications/document-delivery-status",
+        "src/components/ui/primitives",
+        "src/components/documents/supply-wizard-step",
+        "src/lib/quantity",
+        "src/types/documents"
+      ],
+      "exports": [
+        "SupplyWizard"
+      ],
+      "headings": [
+        " "
+      ],
+      "stateHooks": 15,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/live-session.tsx",
+      "lines": 26,
+      "imports": [
+        "react",
+        "src/lib/supabase/client",
+        "src/components/workspace-sync"
+      ],
+      "exports": [
+        "LiveSession"
+      ],
+      "headings": [],
+      "stateHooks": 1,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/notifications/document-delivery-status.tsx",
+      "lines": 125,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/lib/notifications/presentation",
+        "src/lib/receipt",
+        "src/lib/use-live-revision"
+      ],
+      "exports": [
+        "DocumentDeliveryStatus"
+      ],
+      "headings": [
+        "Notificações da ficha"
+      ],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/notifications/notification-bell.tsx",
+      "lines": 170,
+      "imports": [
+        "next/link",
+        "react",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/lib/notifications/event-labels",
+        "src/lib/receipt",
+        "src/lib/use-live-revision",
+        "src/lib/notifications/navigation"
+      ],
+      "exports": [
+        "NotificationBell"
+      ],
+      "headings": [
+        "Notificações"
+      ],
+      "stateHooks": 4,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/notifications/notification-center.tsx",
+      "lines": 210,
+      "imports": [
+        "src/lib/use-live-revision",
+        "next/link",
+        "react",
+        "src/components/workspace",
+        "src/lib/receipt",
+        "src/lib/notifications/presentation",
+        "src/lib/notifications/event-labels",
+        "src/lib/notifications/navigation"
+      ],
+      "exports": [
+        "NotificationCenter"
+      ],
+      "headings": [
+        "Acompanhamento pessoal"
+      ],
+      "stateHooks": 7,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/profile-console.tsx",
+      "lines": 453,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/components/auth/contact-settings",
+        "src/components/auth/mfa-settings",
+        "next/image",
+        "src/lib/receipt"
+      ],
+      "exports": [
+        "ProfileConsole"
+      ],
+      "headings": [
+        "Identidade pessoal",
+        "Foto de perfil",
+        "Alterar senha",
+        "Seus vínculos com pacientes",
+        "Sessões autenticadas"
+      ],
+      "stateHooks": 7,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/requisitions/print-button.tsx",
+      "lines": 6,
+      "imports": [],
+      "exports": [
+        "PrintButton"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/requisitions/requisition-detail.tsx",
+      "lines": 559,
+      "imports": [
+        "next/link",
+        "react",
+        "src/components/workspace",
+        "src/lib/use-live-revision",
+        "src/lib/receipt",
+        "src/lib/quantity",
+        "src/lib/text-rows",
+        "src/components/documents/attachments",
+        "src/components/documents/document-actions",
+        "src/components/documents/document-timeline",
+        "src/components/documents/related-document",
+        "src/components/ui/primitives",
+        "src/components/requisitions/resolve-extra-item",
+        "src/lib/notifications/presentation"
+      ],
+      "exports": [
+        "RequisitionDetail"
+      ],
+      "headings": [
+        " ",
+        "Materiais requisitados",
+        "Ciência e responsáveis",
+        "Avisos e acompanhamento",
+        "Observações"
+      ],
+      "stateHooks": 7,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/requisitions/requisition-history.tsx",
+      "lines": 48,
+      "imports": [
+        "next/link",
+        "react",
+        "src/lib/notifications/presentation",
+        "src/lib/receipt",
+        "src/components/workspace"
+      ],
+      "exports": [
+        "RequisitionHistory"
+      ],
+      "headings": [],
+      "stateHooks": 7,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/requisitions/requisition-receipt.tsx",
+      "lines": 95,
+      "imports": [
+        "next/link",
+        "src/components/workspace",
+        "src/components/notifications/document-delivery-status",
+        "src/lib/receipt",
+        "src/components/documents/document-actions",
+        "src/types/requisition",
+        "src/components/requisitions/requisition-steps"
+      ],
+      "exports": [
+        "Receipt"
+      ],
+      "headings": [
+        "Comprovante oficial"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/requisitions/requisition-steps.tsx",
+      "lines": 537,
+      "imports": [
+        "react",
+        "src/components/ui/primitives",
+        "src/components/documents/related-document",
+        "src/lib/receipt",
+        "src/components/workspace",
+        "src/lib/catalog-match",
+        "src/lib/text-rows",
+        "src/lib/quantity",
+        "src/types/requisition",
+        "src/types/documents"
+      ],
+      "exports": [
+        "Identity",
+        "CatalogStep",
+        "Extras",
+        "Observations",
+        "Review",
+        "Summary"
+      ],
+      "headings": [],
+      "stateHooks": 4,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/requisitions/requisition-wizard.tsx",
+      "lines": 480,
+      "imports": [
+        "react",
+        "src/lib/quantity",
+        "src/types/requisition",
+        "src/types/documents",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/components/requisitions/requisition-steps",
+        "src/components/requisitions/requisition-receipt"
+      ],
+      "exports": [
+        "RequisitionWizard"
+      ],
+      "headings": [],
+      "stateHooks": 13,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/requisitions/resolve-extra-item.tsx",
+      "lines": 210,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/types/documents"
+      ],
+      "exports": [
+        "ResolveExtraItem"
+      ],
+      "headings": [
+        "Identificar itens extras no catálogo"
+      ],
+      "stateHooks": 6,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/stock/consumption-console.tsx",
+      "lines": 295,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/lib/receipt",
+        "src/components/stock/flow-reviews",
+        "src/types/documents"
+      ],
+      "exports": [
+        "ConsumptionConsole"
+      ],
+      "headings": [
+        "Registrar relato",
+        "Relatos registrados"
+      ],
+      "stateHooks": 8,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/stock/flow-reviews.tsx",
+      "lines": 275,
+      "imports": [
+        "react",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/types/documents",
+        "src/lib/receipt"
+      ],
+      "exports": [
+        "FlowReviews"
+      ],
+      "headings": [
+        "Relatos recebidos por Flow"
+      ],
+      "stateHooks": 8,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/stock/inventory-console.tsx",
+      "lines": 59,
+      "imports": [
+        "react",
+        "src/lib/receipt",
+        "src/components/workspace"
+      ],
+      "exports": [
+        "InventoryConsole"
+      ],
+      "headings": [
+        "Acompanhamento semanal",
+        "Abrir contagem",
+        "Inventários do paciente",
+        "·",
+        "Revisar contagem"
+      ],
+      "stateHooks": 11,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/stock/stock-console.tsx",
+      "lines": 661,
+      "imports": [
+        "src/lib/use-live-revision",
+        "next/link",
+        "next/navigation",
+        "react",
+        "src/components/workspace",
+        "src/components/documents/attachments",
+        "src/components/ui/primitives",
+        "src/components/stock/transit-stock",
+        "src/lib/quantity",
+        "src/lib/receipt"
+      ],
+      "exports": [
+        "StockConsole"
+      ],
+      "headings": [
+        "Saldos e previsões",
+        " ",
+        "Movimentar estoque familiar",
+        "Histórico auditável"
+      ],
+      "stateHooks": 19,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/stock/transit-stock.tsx",
+      "lines": 103,
+      "imports": [
+        "next/link",
+        "src/components/ui/primitives",
+        "src/lib/quantity",
+        "src/lib/receipt"
+      ],
+      "exports": [
+        "TransitStock"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/ui/primitives.tsx",
+      "lines": 248,
+      "imports": [
+        "react",
+        "src/types/documents"
+      ],
+      "exports": [
+        "Icon",
+        "StatusBadge",
+        "EmptyState",
+        "StepNavigator",
+        "Dialog"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/workspace-sync.tsx",
+      "lines": 118,
+      "imports": [
+        "react",
+        "src/lib/supabase/client"
+      ],
+      "exports": [
+        "WorkspaceSync"
+      ],
+      "headings": [],
+      "stateHooks": 1,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/workspace.tsx",
+      "lines": 174,
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "errorMessage",
+        "api",
+        "can",
+        "may",
+        "Notice"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    }
+  ]
+}

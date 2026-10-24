@@ -1,0 +1,33 @@
+HOME CARE ASSISTANT — PRÉVIA INTERATIVA DA NOVA INTERFACE
+Inspiração visual: Microsoft Dynamics 365 e Fluent 2.
+
+COMO ABRIR NO WINDOWS
+1. Extraia o ZIP, caso tenha baixado o pacote.
+2. Dê dois cliques no arquivo home-care-assistant-fluent-prototipo.html.
+3. O arquivo abre no Chrome, Edge ou outro navegador moderno, sem instalar aplicativos.
+4. Não requer internet, login, servidor, Docker, Node.js ou Supabase.
+
+O QUE EXPERIMENTAR
+- Menu superior direito (Rafael Martins) > Trocar perfil: troca de função sem abandonar a página.
+- Menu lateral > Gestão do paciente > Notificações: matriz compacta; clique em uma célula e marque vários canais.
+- Gestão do paciente > Permissões: grade com controles por perfil.
+- Pessoas e vínculos > Editar: painel lateral, sem abrir outra página.
+- Histórico de fichas > ENT-0012: visualizador único, timeline, abas, ação de conferência.
+- Histórico de fichas > REQ-0007: apresentação do atendimento e ciência.
+- Nova requisição > marcar Soro fisiológico 0,9%: abre modal de pedido repetido, com consulta contextual e justificativa.
+- Estoque > clicar em um produto: edição do estoque mínimo em painel lateral.
+- Abra com a janela estreita ou celular para ver o layout responsivo.
+
+AVISOS
+- Todos os pacientes, pessoas, saldos, documentos e eventos são fictícios.
+- Alterações são simulações temporárias, na memória do navegador. Ao recarregar, a demonstração reinicia.
+- O arquivo não acessa banco remoto, GitHub, Meta, Vercel ou quaisquer serviços externos.
+- Não implementa funções de negócio reais nem representa autenticação/permissões validadas.
+- O estilo é inspirado em Fluent 2; não utiliza o pacote oficial Fluent UI React v9 nesta demonstração standalone.
+- PDFs e envio de mensagens reais estão representados apenas como ideias de interface.
+- Nenhuma alteração foi realizada no Home Care Assistant de produção.
+
+OBJETIVO
+Avaliar a densidade visual, organização de páginas, menus, barras de ação,
+tabelas, formulários compactos, painéis laterais e componentes reutilizáveis
+antes de uma refatoração real do frontend.
