@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./design-system.css";
 import { LiveSession } from "@/components/live-session";
+import { ThemeProvider } from "@/theme/providers";
+import "@/theme/tokens.css";
 
 export const metadata: Metadata = {
   title: "Home Care Assistant",
@@ -15,8 +17,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        {children}
-        <LiveSession />
+        <ThemeProvider>
+          {children}
+          <LiveSession />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    optimizePackageImports: ["@fluentui/react-components", "@fluentui/react-icons"],
+  },
   turbopack: {
     rules: {
       "*.css": {

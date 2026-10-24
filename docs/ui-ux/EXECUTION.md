@@ -16,8 +16,8 @@ pré-condições. Nenhum reset de banco será realizado.
 
 | Bloco | Estado | Entrega |
 | --- | --- | --- |
-| A | Em execução | Referências, inventário, Fluent, tema e componentes |
-| B | Pendente | Shells, contexto, menus, login e perfil |
+| A | Fundação publicada | Referências, inventário, Fluent, tema e componentes |
+| B | Em execução | Shells, contexto, menus, login e perfil |
 | C | Pendente | Dashboards por contexto e tarefas |
 | D | Pendente | Administração, matrizes, catálogo e unidades |
 | E | Pendente | Documentos, wizards, estoque, histórico e notificações |
@@ -33,8 +33,12 @@ Telas novas não usarão simulações como resultado de operações reais.
 Reconhecimento: master local/remota sincronizadas; CI da base aprovada;
 check:contracts aprovado com 67 migrations intactas.
 
-As verificações desta implementação serão registradas aqui, com comando,
-resultado e limitações. Ainda não há homologação dos blocos novos.
+Fundação: versões exatas Fluent v9 e ícones oficiais, provider SSR/streaming,
+tokens, badges, diálogo e botões de etapas. Imports otimizados pelo Next.
+Tipos e build aprovados; 95 unitários aprovados; dois E2E Chromium de login
+aprovados pelo runner local. Lint apontou somente a convenção de nome de uma
+ref, corrigida antes do commit. Markdown aprovado. A instalação reportou zero
+vulnerabilidades conhecidas. Inspeção visual dos módulos permanece pendente.
 
 Gates finais: contratos, lint, Markdown, tipos, unitários, build, migrations
 limpas/legadas locais, SQL/RLS, integração Auth/HTTP, concorrência e E2E.

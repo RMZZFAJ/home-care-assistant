@@ -1,6 +1,16 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode, type SVGProps } from "react";
+import { useEffect, useRef, type ReactNode, type SVGProps } from "react";
+import {
+  Badge,
+  Button,
+  Dialog as FluentDialog,
+  DialogSurface,
+  DialogBody,
+  DialogTitle,
+  DialogContent,
+} from "@fluentui/react-components";
+import { Navigation20Regular, Dismiss20Regular, Home20Regular, DocumentBulletList20Regular, History20Regular, Box20Regular, Settings20Regular, Alert20Regular, Person20Regular, Search20Regular, ChevronDown20Regular, ArrowRight20Regular, Checkmark20Regular, Camera20Regular, ArrowUpload20Regular, Add20Regular, Calendar20Regular, People20Regular, VehicleTruck20Regular, MoreHorizontal20Regular } from "@fluentui/react-icons";
 import { documentStatuses } from "@/types/documents";
 
 export type IconName =
@@ -19,78 +29,23 @@ export type IconName =
   | "check"
   | "camera"
   | "upload"
-  | "plus";
-const paths: Record<IconName, ReactNode> = {
-  menu: <path d="M4 6h16M4 12h16M4 18h16" />,
-  close: <path d="m6 6 12 12M18 6 6 18" />,
-  home: (
-    <>
-      <path d="m3 10 9-7 9 7v10H3ZM9 21v-8h6v8" />
-    </>
-  ),
-  forms: (
-    <>
-      <rect x="5" y="3" width="14" height="18" rx="2" />
-      <path d="M9 8h6M9 12h6M9 16h4" />
-    </>
-  ),
-  history: (
-    <>
-      <path d="M3 11a9 9 0 1 1 2.4 7M3 4v7h7M12 7v5l3 2" />
-    </>
-  ),
-  stock: <path d="m3 7 9-4 9 4v10l-9 4-9-4ZM3 7l9 4 9-4M12 11v10M7.5 5l9 4" />,
-  settings: (
-    <>
-      <path d="m9 3-1 3-3 1-2 4 2 3 1 4 4 1 3 2 4-2 1-4 3-3-2-4-3-1-1-3Z" />
-      <circle cx="12" cy="12" r="3" />
-    </>
-  ),
-  bell: <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />,
-  user: (
-    <>
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
-    </>
-  ),
-  search: (
-    <>
-      <circle cx="10" cy="10" r="6" />
-      <path d="m15 15 6 6" />
-    </>
-  ),
-  chevron: <path d="m6 9 6 6 6-6" />,
-  arrow: <path d="M4 12h16m-6-6 6 6-6 6" />,
-  check: <path d="m5 12 4 4L19 6" />,
-  camera: (
-    <>
-      <path d="M3 7h4l2-3h6l2 3h4v13H3Z" />
-      <circle cx="12" cy="13" r="4" />
-    </>
-  ),
-  upload: <path d="M4 16v5h16v-5M12 16V3m-5 5 5-5 5 5" />,
-  plus: <path d="M12 4v16M4 12h16" />,
+  | "plus"
+  | "calendar"
+  | "team"
+  | "truck"
+  | "more";
+const icons = {
+  menu: Navigation20Regular, close: Dismiss20Regular, home: Home20Regular,
+  forms: DocumentBulletList20Regular, history: History20Regular, stock: Box20Regular,
+  settings: Settings20Regular, bell: Alert20Regular, user: Person20Regular,
+  search: Search20Regular, chevron: ChevronDown20Regular, arrow: ArrowRight20Regular,
+  check: Checkmark20Regular, camera: Camera20Regular, upload: ArrowUpload20Regular,
+  plus: Add20Regular, calendar: Calendar20Regular, team: People20Regular,
+  truck: VehicleTruck20Regular, more: MoreHorizontal20Regular,
 };
-export function Icon({
-  name,
-  ...props
-}: SVGProps<SVGSVGElement> & { name: IconName }) {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
-    >
-      {paths[name]}
-    </svg>
-  );
+export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName }) {
+  const Component = icons[name];
+  return <Component width={20} height={20} aria-hidden="true" {...props} />;
 }
 export function StatusBadge({ status }: { status: string }) {
   const tone = [
@@ -107,9 +62,9 @@ export function StatusBadge({ status }: { status: string }) {
         ? "neutral"
         : "pending";
   return (
-    <span className={"ui-badge ui-badge-" + tone}>
+    <Badge appearance="tint" color={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "informative"}>
       {documentStatuses[status] ?? status}
-    </span>
+    </Badge>
   );
 }
 export function EmptyState({
@@ -178,7 +133,7 @@ export function StepNavigator({
       >
         {steps.map((step, index) => (
           <li key={step}>
-            <button
+            <Button
               type="button"
               aria-current={index === active ? "step" : undefined}
               disabled={disabled || index > active}
@@ -192,7 +147,7 @@ export function StepNavigator({
                 )}
               </span>
               {step}
-            </button>
+            </Button>
           </li>
         ))}
       </ol>
@@ -210,38 +165,16 @@ export function Dialog({
   children: ReactNode;
   onClose: () => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const id = useId();
-  useEffect(() => {
-    const node = dialogRef.current;
-    if (open) node?.showModal();
-    else node?.close();
-    return () => node?.close();
-  }, [open]);
   return (
-    <dialog
-      ref={dialogRef}
-      aria-labelledby={id}
-      className="ui-dialog"
-      onCancel={onClose}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <div>
-        <div className="ui-dialog-heading">
-          <h2 id={id}>{title}</h2>
-          <button
-            type="button"
-            className="ui-icon-button"
-            aria-label="Fechar diálogo"
-            onClick={onClose}
-          >
-            <Icon name="close" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </dialog>
+    <FluentDialog open={open} onOpenChange={(_, data) => { if (!data.open) onClose(); }}>
+      <DialogSurface className="hca-dialog-surface">
+        <DialogBody>
+          <DialogTitle action={<Button appearance="subtle" aria-label="Fechar diálogo" icon={<Icon name="close" />} onClick={onClose} />}>
+            {title}
+          </DialogTitle>
+          <DialogContent className="hca-dialog-content">{children}</DialogContent>
+        </DialogBody>
+      </DialogSurface>
+    </FluentDialog>
   );
 }

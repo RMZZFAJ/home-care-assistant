@@ -1,0 +1,107 @@
+:root {
+  --background: #f5f6f8;
+  --foreground: #24282e;
+  --muted: #606b79;
+  --line: #e1e5eb;
+  --brand: #0f6cbd;
+  --brand-dark: #115ea3;
+  --brand-soft: #e8f3fc;
+  --surface: #fff;
+  --success: #0f6b49;
+  --warning: #895600;
+  --danger: #a4262c;
+  --app-header-height: 58px;
+  --hca-sidebar-width: 250px;
+  --hca-radius: 8px;
+  --hca-space-1: 4px;
+  --hca-space-2: 8px;
+  --hca-space-3: 12px;
+  --hca-space-4: 16px;
+  --hca-space-6: 24px;
+  --hca-space-8: 32px;
+  --hca-bottom-navigation: 68px;
+}
+
+.hca-theme {
+  min-height: 100dvh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+.hca-theme button:focus-visible,
+.hca-theme a:focus-visible,
+.hca-theme input:focus-visible,
+.hca-theme select:focus-visible,
+.hca-theme textarea:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+.hca-theme .ui-card {
+  padding: var(--hca-space-6);
+  border-radius: var(--hca-radius);
+  box-shadow: 0 1px 2px #14233405;
+}
+.hca-theme .ui-input {
+  min-height: 36px;
+  border-radius: 4px;
+  padding: 7px 10px;
+  border-color: #b8c0cc;
+  font-size: 14px;
+}
+.hca-theme .ui-button { min-height: 36px; border-radius: 4px; padding: 7px 14px; font-weight: 600; }
+.hca-theme .ui-notice { border-radius: 6px; }
+.hca-theme .welcome-panel { background: white; border-radius: 8px; padding: 24px; }
+.hca-theme .page-heading h1 { font-size: 24px; letter-spacing: -.35px; }
+.hca-theme .workspace-content { max-width: 1640px; padding: 24px 32px 48px; }
+.hca-theme .app-header { backdrop-filter: none; background: white; padding: 8px 20px; }
+.hca-theme .app-brand > span { background: var(--brand); border-radius: 7px; }
+.hca-theme .patient-picker select { min-height: 36px; border-radius: 5px; background: var(--surface); }
+.hca-theme .app-sidebar { width: var(--hca-sidebar-width); }
+.hca-theme .workspace-navigation a { border-radius: 5px; }
+.hca-theme .workspace-navigation a[aria-current=page] { background: var(--brand-soft); color: var(--brand-dark); }
+.hca-dialog-surface { max-width: min(640px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; }
+.hca-dialog-content { overflow-wrap: anywhere; }
+.hca-theme .wizard-navigation { margin-bottom: 20px; }
+.hca-theme .wizard-steps { padding-bottom: 6px; }
+.hca-theme .wizard-steps button { border-radius: 4px; }
+.hca-theme .document-row { min-height: 64px; border-radius: 0; }
+.hca-theme .document-type { width: 34px; height: 36px; border-radius: 5px; }
+.hca-theme .ui-empty { padding: 40px 20px; }
+.hca-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.hca-section-heading h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.hca-section-heading p { margin-top: 4px; color: var(--muted); font-size: 12px; }
+.hca-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 20px; }
+.hca-records { overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.hca-records > * + * { border-top: 1px solid var(--line); }
+.hca-record { display: flex; width: 100%; align-items: center; gap: 12px; padding: 14px 16px; text-align: left; color: inherit; text-decoration: none; background: white; border: 0; }
+.hca-record:hover { background: #f6f9fc; }
+.hca-record-main { flex: 1; min-width: 0; }
+.hca-record-main strong { display: block; font-size: 14px; font-weight: 600; }
+.hca-record-main small { display: block; margin-top: 4px; color: var(--muted); }
+.hca-record-actions { display: flex; align-items: center; gap: 8px; }
+.hca-compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
+.hca-table-container { overflow: auto; max-width: 100%; }
+.hca-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+.hca-table th { background: #f8f9fb; color: var(--muted); font-size: 12px; font-weight: 600; }
+.hca-table th, .hca-table td { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.hca-table tr:last-child td { border-bottom: none; }
+.hca-task-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 7px; background: var(--brand-soft); color: var(--brand); flex-shrink: 0; }
+
+@media (min-width: 1024px) {
+  .hca-theme .navigation-open .workspace-content { margin-left: var(--hca-sidebar-width); max-width: calc(100% - var(--hca-sidebar-width)); }
+}
+@media (max-width: 767px) {
+  :root { --app-header-height: 64px; }
+  .hca-theme .workspace-content { padding: 20px 14px 32px; }
+  .hca-theme .ui-input { font-size: 16px; min-height: 44px; }
+  .hca-theme .ui-button { min-height: 44px; }
+  .hca-theme .ui-card { padding: 18px; }
+  .hca-theme .page-heading h1 { font-size: 22px; }
+  .hca-theme .app-header { padding: 8px 12px; }
+  .hca-theme .patient-picker select { min-height: 44px; }
+  .hca-record { min-height: 64px; padding: 14px; }
+  .hca-dialog-surface { max-height: calc(100dvh - 16px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hca-theme *, .hca-theme *::before, .hca-theme *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
