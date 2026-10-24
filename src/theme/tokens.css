@@ -183,6 +183,46 @@
 .hca-admin-destination > svg { color: var(--brand); }
 .hca-admin-destination h2 { font-size: 16px; font-weight: 600; margin-top: 14px; }
 .hca-admin-destination p { font-size: 13px; color: var(--muted); margin-top: 8px; }
+.hca-admin-destination h3 { font-size: 15px; font-weight: 600; margin-top: 12px; }
+.hca-administration-center { display: grid; gap: 28px; }
+.hca-administration-toolbar { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.hca-administration-toolbar > button { margin-left: auto; }
+.hca-form { display: grid; gap: 18px; }
+.hca-form[hidden] { display: none; }
+.hca-configuration-tabs { flex-wrap: wrap; margin-bottom: 20px; }
+.hca-form > button { justify-self: start; }
+.hca-field-hint { font-size: 12px; line-height: 1.6; color: var(--muted); }
+.hca-result-count { font-size: 12px; color: var(--muted); margin-left: auto; }
+.hca-cell-secondary { display: block; margin-top: 4px; color: var(--muted); }
+.hca-pagination { display: flex; gap: 16px; align-items: center; justify-content: flex-end; margin-top: 16px; font-size: 12px; }
+.hca-record-drawer { max-width: 100vw; }
+.hca-record-drawer .fui-DrawerBody { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+.hca-record-drawer form { padding-top: 12px; }
+.hca-matrix-scroll { max-height: min(720px, 75dvh); overflow: auto; }
+.hca-matrix { min-width: 880px; }
+.hca-matrix th { position: sticky; top: 0; z-index: 2; }
+.hca-matrix .hca-matrix-name { min-width: 230px; max-width: 280px; position: sticky; left: 0; z-index: 1; background: white; }
+.hca-matrix-name h3, .hca-matrix-name strong { font-size: 12px; font-weight: 600; }
+.hca-permission-cell { font-size: 12px; padding: 5px; min-height: 36px; }
+.hca-channel-cell { display: flex; align-items: center; gap: 2px; }
+.hca-channel-checkbox { gap: 0; }
+.hca-channel-checkbox label { padding: 4px 2px; }
+.hca-change-summary { display: grid; grid-template-columns: auto 1fr; gap: 12px; margin: 20px 0; }
+.hca-change-summary dt { color: var(--muted); }
+@media (max-width: 600px) {
+  .hca-section-heading { flex-wrap: wrap; }
+  .hca-record-actions { flex-direction: column; align-items: stretch; }
+  .hca-record-actions button, .hca-record-drawer button { min-height: 44px; }
+  .hca-table th, .hca-table td { padding: 10px 8px; }
+  .hca-table { font-size: 12px; }
+  .hca-administration-toolbar { gap: 8px; }
+}
+@media (max-width: 767px) {
+  .hca-theme .fui-Button, .hca-record-drawer .fui-Button, .fui-MenuItem, .fui-MenuItemRadio { min-height: 44px; }
+  .hca-theme .fui-Input input, .hca-record-drawer .fui-Input input { min-height: 42px; font-size: 16px; }
+  .hca-theme .fui-Select select, .hca-record-drawer .fui-Select select { min-height: 44px; font-size: 16px; }
+  .hca-channel-checkbox label { min-width: 28px; min-height: 44px; }
+}
 @media (max-width: 767px) {
   .hca-dashboard-intro { align-items: flex-start; flex-direction: column; }
   .hca-dashboard-intro h2 { font-size: 23px; }

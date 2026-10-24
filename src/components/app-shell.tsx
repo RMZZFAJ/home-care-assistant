@@ -4,19 +4,19 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button, MessageBar, MessageBarBody, Spinner } from "@fluentui/react-components";
-import { may } from "@/lib/client/capabilities";
+import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
 import { roleLabels, useWorkspaceState } from "@/components/layout/workspace-context";
 
-export function AppWorkspace({ title, children, administration = false }: {
-  title: string; children: (context: WorkspaceContext) => ReactNode; administration?: boolean;
+export function AppWorkspace({ title, children, administration = false, administrationCapabilities = ["access.manage"] }: {
+  title: string; children: (context: WorkspaceContext) => ReactNode; administration?: boolean; administrationCapabilities?: string[];
 }) {
   const { value, data, error, loading, selecting, load, selectProfile } = useWorkspaceState();
   const routePatient = useSearchParams().get("careRecipientId");
   const linkedPatient = data?.documentContext?.patientId ?? routePatient;
   const mismatch = linkedPatient && (value?.activeContext?.mode !== "patient" || value.activeContext.care_recipient_id !== linkedPatient) && !administration;
   const choose = value && (!value.activeContext || mismatch);
-  const canAdminister = value && (value.globalAdministrationAllowed || may(value, "manage"));
+  const canAdminister = value && (value.globalAdministrationAllowed || administrationCapabilities.some((capability) => can(value, capability)));
   return <main id="workspace-content" className="workspace-content" tabIndex={-1}>
     <div className="page-heading"><div><p className="eyebrow">{value?.patient?.display_name ?? "Home Care Assistant"}</p><h1>{title}</h1></div>
       {value?.activeContext ? <span className="context-tag">{value.activeContext.mode === "global" ? "Administração global" : roleLabels[value.patient?.role ?? ""]}</span> : null}

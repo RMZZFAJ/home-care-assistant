@@ -18,6 +18,7 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
       {can(context, "req.read") ? <MetricCard label="Requisições abertas" value={data.requests} href="/historico?type=REQ" icon="forms" /> : null}
       {can(context, "ent.read") ? <MetricCard label="Entregas a conferir" value={data.teamReceipts} href="/entregas" icon="truck" /> : null}
       {data.sciencePending > 0 ? <MetricCard label="Ciências pendentes" value={data.sciencePending} href="/historico?type=REQ&status=science_required" icon="check" /> : null}
+      {data.archivePending > 0 ? <MetricCard label="Conclusões para revisar e arquivar" value={data.archivePending} href="/historico?type=REQ&status=archive_pending" icon="history" /> : null}
       {can(context, "com.approve") ? <MetricCard label="Compras a aprovar" value={data.purchases} href="/historico?type=COM&status=pending_approval" icon="stock" /> : null}
       {data.criticalStock.length ? <MetricCard label="Saldos abaixo do mínimo" value={data.criticalStock.length} href="/estoque" icon="stock" /> : null}
     </div>

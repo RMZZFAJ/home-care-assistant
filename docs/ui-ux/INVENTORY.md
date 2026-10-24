@@ -228,7 +228,7 @@ Dependências internas:
 
 ### src/components/admin/admin-console.tsx
 
-Linhas: 929. Estados locais: 16.
+Linhas: 528. Estados locais: 15.
 
 Dependências internas:
 
@@ -238,14 +238,24 @@ Dependências internas:
 - src/components/admin/admin-fields
 - src/components/admin/alert-settings
 - src/components/admin/patient-registration
+- src/components/admin/administration-navigation
+- src/components/admin/catalogue-management
+- src/components/admin/membership-management
+- src/components/admin/global-accounts
 
 ### src/components/admin/admin-fields.tsx
 
-Linhas: 79. Estados locais: 0.
+Linhas: 69. Estados locais: 0.
+
+### src/components/admin/administration-navigation.tsx
+
+Linhas: 30. Estados locais: 0.
 
 Dependências internas:
 
-- src/components/workspace
+- src/lib/client/capabilities
+- src/types/workspace
+- src/components/ui/primitives
 
 ### src/components/admin/alert-settings.tsx
 
@@ -256,15 +266,50 @@ Dependências internas:
 - src/components/workspace
 - src/components/admin/admin-fields
 
+### src/components/admin/catalogue-management.tsx
+
+Linhas: 39. Estados locais: 4.
+
+Dependências internas:
+
+- src/components/workspace
+- src/components/ui/primitives
+- src/components/forms/record-drawer
+- src/components/admin/admin-fields
+
+### src/components/admin/global-accounts.tsx
+
+Linhas: 20. Estados locais: 3.
+
+Dependências internas:
+
+- src/components/forms/record-drawer
+- src/components/ui/primitives
+- src/components/workspace
+- src/components/admin/admin-fields
+
+### src/components/admin/membership-management.tsx
+
+Linhas: 27. Estados locais: 3.
+
+Dependências internas:
+
+- src/components/forms/record-drawer
+- src/components/ui/primitives
+- src/components/workspace
+- src/components/admin/admin-fields
+
 ### src/components/admin/notification-matrix.tsx
 
-Linhas: 300. Estados locais: 3.
+Linhas: 252. Estados locais: 6.
 
 Dependências internas:
 
 - src/components/workspace
 - src/lib/notifications/event-labels
 - src/components/admin/admin-fields
+- src/components/ui/primitives
+- src/components/forms/record-drawer
 
 ### src/components/admin/notification-settings.tsx
 
@@ -286,26 +331,37 @@ Dependências internas:
 
 ### src/components/admin/permission-matrix.tsx
 
-Linhas: 124. Estados locais: 1.
+Linhas: 37. Estados locais: 4.
 
 Dependências internas:
 
 - src/lib/capability-labels
-- src/components/workspace
+- src/components/ui/primitives
 - src/components/admin/admin-fields
 
 ### src/components/admin/policy-console.tsx
 
-Linhas: 577. Estados locais: 8.
+Linhas: 379. Estados locais: 7.
 
 Dependências internas:
 
 - src/components/workspace
 - src/components/admin/permission-matrix
 - src/components/admin/notification-matrix
-- src/components/admin/reminder-settings
+- src/components/admin/policy-rules
 - src/components/admin/admin-fields
 - src/lib/use-live-revision
+
+### src/components/admin/policy-rules.tsx
+
+Linhas: 51. Estados locais: 1.
+
+Dependências internas:
+
+- src/components/forms/record-drawer
+- src/components/workspace
+- src/components/admin/reminder-settings
+- src/components/admin/admin-fields
 
 ### src/components/admin/reminder-settings.tsx
 
@@ -394,23 +450,93 @@ Dependências internas:
 
 ### src/components/catalog/unit-console.tsx
 
-Linhas: 287. Estados locais: 7.
+Linhas: 283. Estados locais: 10.
 
 Dependências internas:
 
 - src/components/workspace
+- src/components/forms/record-drawer
+- src/components/ui/primitives
 - src/types/documents
 
 ### src/components/dashboard.tsx
 
-Linhas: 293. Estados locais: 3.
+Linhas: 31. Estados locais: 3.
 
 Dependências internas:
 
 - src/components/workspace
-- src/components/documents/document-history
 - src/components/ui/primitives
 - src/lib/use-live-revision
+- src/types/dashboard
+- src/components/dashboard/management-dashboard
+- src/components/dashboard/operations-dashboard
+- src/components/dashboard/global-dashboard
+
+### src/components/dashboard/dashboard-summary.tsx
+
+Linhas: 32. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/ui/primitives
+- src/components/documents/document-history
+- src/types/dashboard
+- src/lib/quantity
+
+### src/components/dashboard/global-dashboard.tsx
+
+Linhas: 18. Estados locais: 0.
+
+Dependências internas:
+
+- src/types/workspace
+- src/components/ui/primitives
+
+### src/components/dashboard/management-dashboard.tsx
+
+Linhas: 29. Estados locais: 0.
+
+Dependências internas:
+
+- src/types/dashboard
+- src/types/workspace
+- src/lib/client/capabilities
+- src/components/ui/primitives
+- src/components/dashboard/metric-card
+- src/components/dashboard/task-list
+- src/components/dashboard/dashboard-summary
+
+### src/components/dashboard/metric-card.tsx
+
+Linhas: 7. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/ui/primitives
+
+### src/components/dashboard/operations-dashboard.tsx
+
+Linhas: 25. Estados locais: 0.
+
+Dependências internas:
+
+- src/types/dashboard
+- src/types/workspace
+- src/lib/client/capabilities
+- src/components/ui/primitives
+- src/components/dashboard/task-list
+- src/components/dashboard/metric-card
+- src/components/dashboard/dashboard-summary
+
+### src/components/dashboard/task-list.tsx
+
+Linhas: 17. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/ui/primitives
+- src/types/dashboard
 
 ### src/components/documents/attachments.tsx
 
@@ -449,7 +575,7 @@ Dependências internas:
 
 ### src/components/documents/document-history.tsx
 
-Linhas: 385. Estados locais: 9.
+Linhas: 370. Estados locais: 9.
 
 Dependências internas:
 
@@ -458,6 +584,7 @@ Dependências internas:
 - src/types/documents
 - src/lib/receipt
 - src/lib/use-live-revision
+- src/types/documents
 
 ### src/components/documents/document-timeline.tsx
 
@@ -551,6 +678,14 @@ Dependências internas:
 - src/components/documents/supply-wizard-step
 - src/lib/quantity
 - src/types/documents
+
+### src/components/forms/record-drawer.tsx
+
+Linhas: 24. Estados locais: 2.
+
+Dependências internas:
+
+- src/components/ui/primitives
 
 ### src/components/forms/settings-section.tsx
 

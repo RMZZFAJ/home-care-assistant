@@ -18,8 +18,8 @@ pré-condições. Nenhum reset de banco será realizado.
 | --- | --- | --- |
 | A | Fundação publicada | Referências, inventário, Fluent, tema e componentes |
 | B | Publicado | Shells, contexto, menus, login e perfil |
-| C | Publicação incremental | Dashboards por contexto e tarefas |
-| D | Em execução | Administração, matrizes, catálogo e unidades |
+| C | Publicado | Dashboards por contexto e tarefas |
+| D | Publicação incremental | Administração, matrizes, catálogo e unidades |
 | E | Pendente | Documentos, wizards, estoque, histórico e notificações |
 | F | Pendente | Escalas persistentes, permissões e interfaces |
 | G | Pendente | BAL por plantão, atrasos, adiamentos e regularização |
@@ -88,3 +88,35 @@ conteúdo recebeu um destino focalizável e os testes verificam seu foco real.
 Nenhum nó ou regra axe é excluído. A auditoria aguarda o fim das transições para
 medir cores finais, sem confundir a animação de abertura com contraste estático.
 O contraste do nome no cabeçalho foi corrigido.
+
+Bloco D: centro administrativo com áreas e URLs próprias, catálogo e pessoas
+com pesquisa e edição lateral, unidades em lista, matrizes compactas por função,
+confirmação de permissões críticas e política resumida com edição por grupo.
+O snapshot da edição preserva a versão original; conflito fecha a edição e
+obriga revisão da versão atual. Falhas de configuração aparecem dentro do
+painel ativo. As abas de configuração se reorganizam a 360 px.
+
+Rodada direcionada: dez cenários passaram inicialmente; os cinco cenários
+afetados foram corrigidos e reexecutados com sucesso. A última repetição cobriu
+o painel administrativo e a proposta global com aprovação local. Os testes
+continuam verificando persistência, proibições, isolamento e conflitos. Capturas
+de catálogo, permissões e notificações foram inspecionadas após as transições.
+Repetição completa por navegador e demais módulos permanece no bloco H.
+O percurso administrativo também passou nos projetos Pixel 7 e iPhone 13;
+capturas móveis de edição do catálogo e lista de unidades foram inspecionadas.
+
+Uma integração Auth real validou delegação de catálogo/auditoria, revogação,
+isolamento entre pacientes e impossibilidade de conceder administração local.
+A regressão SQL de grants do worker passou sem reset. A suíte SQL operacional
+completa requer fixtures iniciais; documentos existentes no banco local
+impedem supor esse estado. A CI fará o replay completo em sua stack efêmera.
+
+Migration 20261024205813 aplicada localmente sem reset e depois no remoto,
+precedida por dry-run e backup externo de esquema/dados com SHA-256. O backup
+inclui Auth, vínculos, catálogo, ledger e metadados Storage; não inclui os
+binários Storage e não foi restaurado em ensaio remoto. A migration altera
+somente autorização de catálogo/auditoria e não ativa BAL automático.
+Após a aplicação, permaneceram 8 identidades Auth, 6 perfis, 13 vínculos,
+29 produtos, 59 ligações de catálogo, 7 REQ, 11 documentos e 8 movimentos.
+O administrador global original segue ativo. Anônimo e worker não receberam
+execução da operação administrativa de adoção de catálogo.

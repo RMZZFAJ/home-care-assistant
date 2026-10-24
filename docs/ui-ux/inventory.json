@@ -370,7 +370,7 @@
     },
     {
       "file": "src/components/admin/admin-console.tsx",
-      "lines": 929,
+      "lines": 528,
       "imports": [
         "next/navigation",
         "next/link",
@@ -380,32 +380,31 @@
         "src/lib/receipt",
         "src/components/admin/admin-fields",
         "src/components/admin/alert-settings",
-        "src/components/admin/patient-registration"
+        "src/components/admin/patient-registration",
+        "src/components/admin/administration-navigation",
+        "src/components/admin/catalogue-management",
+        "src/components/admin/membership-management",
+        "src/components/admin/global-accounts"
       ],
       "exports": [
         "AdminConsole"
       ],
       "headings": [
         "Link de convite",
-        " ",
-        "Catálogo do paciente ( )",
-        "Adotar modelo existente",
-        " ",
-        "Vínculos deste paciente",
         "Convidar para este paciente",
         "Convites",
         "Eventos de auditoria deste contexto",
-        "Importar protocolos físicos 1–11",
-        "Identidades globais"
+        "Importar protocolos físicos 1–11"
       ],
-      "stateHooks": 16,
+      "stateHooks": 15,
       "kind": "component"
     },
     {
       "file": "src/components/admin/admin-fields.tsx",
-      "lines": 79,
+      "lines": 69,
       "imports": [
-        "src/components/workspace"
+        "react",
+        "@fluentui/react-components"
       ],
       "exports": [
         "text",
@@ -413,6 +412,24 @@
         "Field",
         "Check",
         "RoleSelect"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/administration-navigation.tsx",
+      "lines": 30,
+      "imports": [
+        "next/link",
+        "@fluentui/react-components",
+        "src/lib/client/capabilities",
+        "src/types/workspace",
+        "src/components/ui/primitives"
+      ],
+      "exports": [
+        "administrationAreas",
+        "AdministrationNavigation"
       ],
       "headings": [],
       "stateHooks": 0,
@@ -436,22 +453,84 @@
       "kind": "component"
     },
     {
+      "file": "src/components/admin/catalogue-management.tsx",
+      "lines": 39,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/components/forms/record-drawer",
+        "src/components/admin/admin-fields"
+      ],
+      "exports": [
+        "CatalogueManagement"
+      ],
+      "headings": [
+        "Catálogo do paciente"
+      ],
+      "stateHooks": 4,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/global-accounts.tsx",
+      "lines": 20,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/forms/record-drawer",
+        "src/components/ui/primitives",
+        "src/components/workspace",
+        "src/components/admin/admin-fields"
+      ],
+      "exports": [
+        "GlobalAccounts"
+      ],
+      "headings": [
+        "Identidades globais"
+      ],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/membership-management.tsx",
+      "lines": 27,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/forms/record-drawer",
+        "src/components/ui/primitives",
+        "src/components/workspace",
+        "src/components/admin/admin-fields"
+      ],
+      "exports": [
+        "MembershipManagement"
+      ],
+      "headings": [
+        "Pessoas e vínculos"
+      ],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
       "file": "src/components/admin/notification-matrix.tsx",
-      "lines": 300,
+      "lines": 252,
       "imports": [
         "react",
         "src/components/workspace",
         "src/lib/notifications/event-labels",
-        "src/components/admin/admin-fields"
+        "src/components/admin/admin-fields",
+        "@fluentui/react-components",
+        "src/components/ui/primitives",
+        "src/components/forms/record-drawer"
       ],
       "exports": [
         "NotificationMatrix"
       ],
       "headings": [
-        "Eventos × funções · múltiplos canais",
-        " "
+        "Eventos × funções · múltiplos canais"
       ],
-      "stateHooks": 3,
+      "stateHooks": 6,
       "kind": "component"
     },
     {
@@ -492,32 +571,34 @@
     },
     {
       "file": "src/components/admin/permission-matrix.tsx",
-      "lines": 124,
+      "lines": 37,
       "imports": [
         "react",
+        "@fluentui/react-components",
         "src/lib/capability-labels",
-        "src/components/workspace",
+        "src/components/ui/primitives",
         "src/components/admin/admin-fields"
       ],
       "exports": [
         "PermissionMatrix"
       ],
       "headings": [
-        "Permissões por função e exceções pessoais",
-        " "
+        "Permissões por função e exceções pessoais"
       ],
-      "stateHooks": 1,
+      "stateHooks": 4,
       "kind": "component"
     },
     {
       "file": "src/components/admin/policy-console.tsx",
-      "lines": 577,
+      "lines": 379,
       "imports": [
         "react",
         "src/components/workspace",
         "src/components/admin/permission-matrix",
         "src/components/admin/notification-matrix",
-        "src/components/admin/reminder-settings",
+        "src/components/admin/policy-rules",
+        "@fluentui/react-components",
+        "next/navigation",
         "src/components/admin/admin-fields",
         "src/lib/use-live-revision"
       ],
@@ -525,11 +606,30 @@
         "PolicyConsole"
       ],
       "headings": [
-        "Política do paciente",
         "Função no paciente",
         "Propostas globais aguardando aprovação local"
       ],
-      "stateHooks": 8,
+      "stateHooks": 7,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/admin/policy-rules.tsx",
+      "lines": 51,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/forms/record-drawer",
+        "src/components/workspace",
+        "src/components/admin/reminder-settings",
+        "src/components/admin/admin-fields"
+      ],
+      "exports": [
+        "PolicyRules"
+      ],
+      "headings": [
+        "Política do paciente"
+      ],
+      "stateHooks": 1,
       "kind": "component"
     },
     {
@@ -693,44 +793,163 @@
     },
     {
       "file": "src/components/catalog/unit-console.tsx",
-      "lines": 287,
+      "lines": 283,
       "imports": [
         "react",
         "src/components/workspace",
+        "@fluentui/react-components",
+        "src/components/forms/record-drawer",
+        "src/components/ui/primitives",
         "src/types/documents"
       ],
       "exports": [
         "UnitConsole"
       ],
       "headings": [
-        "Unidades disponíveis",
-        "Nova unidade",
-        "Unidade base e código de embalagem"
+        "Unidades disponíveis"
       ],
-      "stateHooks": 7,
+      "stateHooks": 10,
       "kind": "component"
     },
     {
       "file": "src/components/dashboard.tsx",
-      "lines": 293,
+      "lines": 31,
       "imports": [
-        "next/link",
         "react",
+        "@fluentui/react-components",
         "src/components/workspace",
-        "src/components/documents/document-history",
         "src/components/ui/primitives",
-        "src/lib/use-live-revision"
+        "src/lib/use-live-revision",
+        "src/types/dashboard",
+        "src/components/dashboard/management-dashboard",
+        "src/components/dashboard/operations-dashboard",
+        "src/components/dashboard/global-dashboard"
       ],
       "exports": [
         "Dashboard"
       ],
-      "headings": [
-        "O que precisa da sua atenção",
-        "Movimentação recente",
-        "Ações rápidas",
-        "Rotina semanal da equipe"
-      ],
+      "headings": [],
       "stateHooks": 3,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/dashboard/dashboard-summary.tsx",
+      "lines": 32,
+      "imports": [
+        "next/link",
+        "@fluentui/react-components",
+        "src/components/ui/primitives",
+        "src/components/documents/document-history",
+        "src/types/dashboard",
+        "src/lib/quantity"
+      ],
+      "exports": [
+        "RecentDocuments",
+        "RequestProgress",
+        "CriticalStockSummary"
+      ],
+      "headings": [
+        "Movimentações recentes",
+        "Atendimento da requisição",
+        "Estoque que precisa de atenção"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/dashboard/global-dashboard.tsx",
+      "lines": 18,
+      "imports": [
+        "next/link",
+        "src/types/workspace",
+        "src/components/ui/primitives"
+      ],
+      "exports": [
+        "GlobalDashboard"
+      ],
+      "headings": [
+        "Administração da plataforma",
+        "Pacientes",
+        "Identidades globais",
+        "Unidades globais",
+        "Pacientes autorizados"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/dashboard/management-dashboard.tsx",
+      "lines": 29,
+      "imports": [
+        "next/link",
+        "src/types/dashboard",
+        "src/types/workspace",
+        "src/lib/client/capabilities",
+        "src/components/ui/primitives",
+        "src/components/dashboard/metric-card",
+        "src/components/dashboard/task-list",
+        "src/components/dashboard/dashboard-summary"
+      ],
+      "exports": [
+        "ManagementDashboard"
+      ],
+      "headings": [
+        "O que precisa da sua atenção"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/dashboard/metric-card.tsx",
+      "lines": 7,
+      "imports": [
+        "next/link",
+        "src/components/ui/primitives"
+      ],
+      "exports": [
+        "MetricCard"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/dashboard/operations-dashboard.tsx",
+      "lines": 25,
+      "imports": [
+        "next/link",
+        "src/types/dashboard",
+        "src/types/workspace",
+        "src/lib/client/capabilities",
+        "src/components/ui/primitives",
+        "src/components/dashboard/task-list",
+        "src/components/dashboard/metric-card",
+        "src/components/dashboard/dashboard-summary"
+      ],
+      "exports": [
+        "OperationsDashboard"
+      ],
+      "headings": [
+        "Olá, .",
+        "Ações rápidas"
+      ],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/dashboard/task-list.tsx",
+      "lines": 17,
+      "imports": [
+        "next/link",
+        "@fluentui/react-components",
+        "src/components/ui/primitives",
+        "src/types/dashboard"
+      ],
+      "exports": [
+        "TaskList"
+      ],
+      "headings": [],
+      "stateHooks": 0,
       "kind": "component"
     },
     {
@@ -798,7 +1017,7 @@
     },
     {
       "file": "src/components/documents/document-history.tsx",
-      "lines": 385,
+      "lines": 370,
       "imports": [
         "next/link",
         "next/navigation",
@@ -807,7 +1026,8 @@
         "src/components/ui/primitives",
         "src/types/documents",
         "src/lib/receipt",
-        "src/lib/use-live-revision"
+        "src/lib/use-live-revision",
+        "src/types/documents"
       ],
       "exports": [
         "DocumentRow",
@@ -970,6 +1190,21 @@
         " "
       ],
       "stateHooks": 15,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/forms/record-drawer.tsx",
+      "lines": 24,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/ui/primitives"
+      ],
+      "exports": [
+        "RecordDrawer"
+      ],
+      "headings": [],
+      "stateHooks": 2,
       "kind": "component"
     },
     {

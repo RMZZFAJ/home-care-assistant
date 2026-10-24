@@ -9,6 +9,9 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "../workspace";
+import { Button, Input, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow } from "@fluentui/react-components";
+import { RecordDrawer } from "@/components/forms/record-drawer";
+import { Icon, EmptyState } from "@/components/ui/primitives";
 import type { CatalogProduct } from "@/types/documents";
 type Unit = {
   id: string;
@@ -29,6 +32,9 @@ function Units({ context }: { context: WorkspaceContext }) {
   const globalMode =
     context.activeContext?.mode === "global" &&
     context.globalAdministrationAllowed === true;
+  const [search, setSearch] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [editor, setEditor] = useState<{ mode: "unit" | "presentation"; opener: HTMLElement } | null>(null);
   const [units, setUnits] = useState<Unit[]>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [selected, setSelected] = useState("");
@@ -49,6 +55,8 @@ function Units({ context }: { context: WorkspaceContext }) {
         : Promise.resolve({ data: [] }),
     ])
       .then(([u, p]) => {
+        if (controller.signal.aborted) return;
+        setLoaded(true);
         setUnits(u.data);
         setProducts(p.data);
       })
@@ -63,6 +71,7 @@ function Units({ context }: { context: WorkspaceContext }) {
     try {
       await api(url, payload);
       setMessage("Configuração salva.");
+      setEditor(null);
       setAttempt((value) => value + 1);
     } catch (reason) {
       setError(
@@ -79,26 +88,13 @@ function Units({ context }: { context: WorkspaceContext }) {
     <div className="space-y-5">
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      <section className="ui-card">
-        <h2 className="font-semibold">Unidades disponíveis</h2>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {units.map((unit) => (
-            <li
-              key={unit.id}
-              className="rounded border border-(--line) p-3 text-sm"
-            >
-              <strong>{unit.name}</strong>
-              <p className="mt-1 text-xs text-(--muted)">
-                {unit.code} · até {unit.decimals} casa(s) ·{" "}
-                {unit.care_recipient_id ? "Paciente" : "Global"}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
-      {globalMode || can(context, "catalog.manage") ? (
-        <section className="ui-card">
-          <h2 className="font-semibold">Nova unidade</h2>
+      <section><div className="hca-section-heading"><div><h2>Unidades disponíveis</h2><p className="hca-field-hint">Unidades base e precisão dos produtos.</p></div><div className="hca-toolbar">{globalMode || can(context, "catalog.manage") ? <Button appearance="primary" icon={<Icon name="plus" />} onClick={(event) => setEditor({ mode: "unit", opener: event.currentTarget })}>Nova unidade</Button> : null}{context.patient && can(context, "catalog.manage") ? <Button onClick={(event) => setEditor({ mode: "presentation", opener: event.currentTarget })}>Configurar apresentação</Button> : null}</div></div>
+      <div className="hca-toolbar"><Input type="search" contentBefore={<Icon name="search" />} aria-label="Pesquisar unidades" value={search} onChange={(_, value) => setSearch(value.value)} placeholder="Nome ou código" /></div>
+      {!loaded && !error ? <Notice>Carregando unidades…</Notice> : null}
+      <div className="hca-records hca-table-container"><Table className="hca-table" aria-label="Unidades base"><TableHeader><TableRow><TableHeaderCell>Unidade</TableHeaderCell><TableHeaderCell>Precisão</TableHeaderCell><TableHeaderCell>Âmbito</TableHeaderCell></TableRow></TableHeader><TableBody>{units.filter((unit) => (unit.name + " " + unit.code).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((unit) => <TableRow key={unit.id}><TableCell><strong>{unit.name}</strong><small className="hca-cell-secondary">{unit.code}</small></TableCell><TableCell>{unit.decimals} casa(s)</TableCell><TableCell>{unit.care_recipient_id ? "Paciente" : "Global"}</TableCell></TableRow>)}</TableBody></Table>{loaded && !units.length ? <EmptyState title="Nenhuma unidade disponível" /> : null}</div></section>
+      {(globalMode || can(context, "catalog.manage")) && editor?.mode === "unit" ? (
+        <RecordDrawer title="Nova unidade" busy={busy} onClose={() => setEditor(null)} restoreFocusTo={editor.opener}>
+          {error ? <Notice error>{error}</Notice> : null}
           <form
             className="mt-4 grid gap-4 sm:grid-cols-2"
             onSubmit={(event) => {
@@ -119,7 +115,7 @@ function Units({ context }: { context: WorkspaceContext }) {
             <label className="text-sm font-semibold">
               Âmbito
               <select name="scope" className={inputClass}>
-                {context.patient ? (
+                {context.patient && !globalMode ? (
                   <option value="patient">Paciente selecionado</option>
                 ) : null}
                 {globalMode ? <option value="global">Global</option> : null}
@@ -169,11 +165,11 @@ function Units({ context }: { context: WorkspaceContext }) {
               Criar unidade
             </button>
           </form>
-        </section>
+        </RecordDrawer>
       ) : null}
-      {context.patient && can(context, "catalog.manage") ? (
-        <section className="ui-card">
-          <h2 className="font-semibold">Unidade base e código de embalagem</h2>
+      {context.patient && can(context, "catalog.manage") && editor?.mode === "presentation" ? (
+        <RecordDrawer title="Unidade base e código de embalagem" busy={busy} onClose={() => setEditor(null)} restoreFocusTo={editor.opener}>
+          {error ? <Notice error>{error}</Notice> : null}
           <p className="mt-2 text-sm text-(--muted)">
             Uma apresentação converte cada leitura para a unidade base. A
             unidade de um produto com movimentações fica preservada.
@@ -279,7 +275,7 @@ function Units({ context }: { context: WorkspaceContext }) {
               </button>
             </form>
           ) : null}
-        </section>
+        </RecordDrawer>
       ) : null}
     </div>
   );

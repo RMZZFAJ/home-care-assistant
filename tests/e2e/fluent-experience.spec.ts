@@ -18,6 +18,8 @@ async function noOverflow(page: Page) {
 }
 async function capture(page: Page, name: string, project: string) {
   mkdirSync("output/playwright/fluent", { recursive: true });
+  await page.waitForFunction(() => document.getAnimations().every((animation) => animation.playState !== "running" || animation.effect?.getComputedTiming().iterations === Infinity));
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await page.screenshot({ path: `output/playwright/fluent/${name}-${project}.png`, fullPage: await page.getByRole("dialog").count() === 0, animations: "disabled" });
 }
 
@@ -89,4 +91,52 @@ test("dashboards apresentam tarefas reais por perfil e preservam a custódia aut
       await expect(page).toHaveURL(/\/login/);
     });
   }
+});
+
+test("administração usa listas, painéis de edição e confirmação crítica sem perder o contexto", async ({ page }, info) => {
+  await login(page, "adminA");
+  await page.goto("/admin?careRecipientId=" + patientA);
+  const areas = page.getByRole("navigation", { name: "Áreas administrativas", exact: true });
+  await expect(areas).toBeVisible();
+  await areas.locator('a[href*="section=catalog"]').click();
+  await expect(page.getByRole("table", { name: "Produtos do catálogo", exact: true })).toBeVisible();
+  await capture(page, "catalogo-lista", info.project.name);
+  await page.getByRole("button", { name: "Novo item", exact: true }).click();
+  await page.getByLabel("Nome", { exact: true }).fill("Rascunho visual não gravado");
+  await page.getByRole("button", { name: "Fechar edição", exact: true }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Há alterações ainda não salvas" })).toBeVisible();
+  await page.getByRole("button", { name: "Continuar editando", exact: true }).click();
+  await expect(page.getByLabel("Nome", { exact: true })).toHaveValue("Rascunho visual não gravado");
+  await capture(page, "catalogo-edicao", info.project.name);
+  await page.getByRole("button", { name: "Fechar edição", exact: true }).click();
+  await page.getByRole("button", { name: "Descartar alterações", exact: true }).click();
+  await page.getByRole("button", { name: "Outras áreas", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Pessoas e vínculos", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Pessoas e vínculos", exact: true })).toBeVisible();
+  await capture(page, "pessoas-lista", info.project.name);
+  await page.getByRole("link", { name: "Permissões e alterações com dupla aprovação", exact: true }).click();
+  await page.getByRole("tab", { name: "Permissões", exact: true }).click();
+  const before = (await (await page.request.get("/api/patient-settings?careRecipientId=" + patientA)).json()).data.version;
+  await page.getByRole("searchbox", { name: "Pesquisar permissões", exact: true }).fill("Movimentar e corrigir estoque familiar");
+  await page.getByRole("button", { name: /Movimentar e corrigir estoque familiar · Profissional ·/ }).click();
+  await page.getByRole("menuitemradio", { name: "Permitir", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Confirmar alteração crítica", exact: true })).toBeVisible();
+  expect((await (await page.request.get("/api/patient-settings?careRecipientId=" + patientA)).json()).data.version).toBe(before);
+  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await capture(page, "permissoes-matriz", info.project.name);
+  await page.getByRole("tab", { name: "Notificações", exact: true }).click();
+  await expect(page.getByRole("table", { name: "Canais por evento e função", exact: true })).toBeVisible();
+  await capture(page, "notificacoes-matriz", info.project.name);
+  await page.getByRole("tab", { name: "Regras", exact: true }).click();
+  await capture(page, "politicas-resumo", info.project.name);
+  await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+  await expect(page.getByLabel("Arquivar após conclusão (dias)", { exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.goto("/unidades?careRecipientId=" + patientA);
+  await expect(page.getByRole("table", { name: "Unidades base", exact: true })).toBeVisible();
+  await capture(page, "unidades-lista", info.project.name);
+  await page.getByRole("button", { name: "Nova unidade", exact: true }).click();
+  await expect(page.getByLabel("Código", { exact: true })).toBeVisible();
+  await noOverflow(page);
+  await capture(page, "unidades-edicao", info.project.name);
 });

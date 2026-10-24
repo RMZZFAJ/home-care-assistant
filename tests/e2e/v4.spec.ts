@@ -285,8 +285,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   });
   await page.goto("/configuracoes?careRecipientId=" + patient);
   await page
-    .getByRole("combobox", { name: "Configurar", exact: true })
-    .selectOption("notifications");
+    .getByRole("tab", { name: "Notificações", exact: true }).click();
   const channel = page.getByRole("checkbox", {
     name: "Requisição emitida · Familiar · WhatsApp (contrato visual)",
     exact: true,
@@ -324,15 +323,11 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
     })
     .toBe(2);
   await page
-    .getByRole("combobox", { name: "Configurar", exact: true })
-    .selectOption("permissions");
+    .getByRole("tab", { name: "Permissões", exact: true }).click();
   await expect(
     page.getByRole("region", { name: "Matriz de permissões", exact: true }),
   ).toBeVisible();
-  const inherited = page
-    .getByRole("region", { name: "Matriz de permissões", exact: true })
-    .getByRole("combobox")
-    .filter({ has: page.locator('option[value="inherit"]') });
+  const inherited = page.getByRole("region", { name: "Matriz de permissões", exact: true }).getByRole("button", { name: / · Herdar · / });
   expect(await inherited.count()).toBeGreaterThan(5);
   expect(
     await page.evaluate(
@@ -344,16 +339,16 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
     const global = await other.newPage();
     await login(global, "global", null);
     await global.goto("/configuracoes?careRecipientId=" + patient);
+    await global.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
     await global.getByLabel("Arquivar após conclusão (dias)").fill("9");
     await global
       .getByRole("button", { name: "Registrar política", exact: true })
       .click();
     await expect(
-      global.getByText("Proposta global registrada.", { exact: false }),
+      global.getByRole("status").filter({ hasText: "Proposta global registrada." }),
     ).toBeVisible();
     await page
-      .getByRole("combobox", { name: "Configurar", exact: true })
-      .selectOption("people");
+      .getByRole("tab", { name: "Pessoas e propostas", exact: true }).click();
     await expect(
       page.getByRole("button", { name: "Aprovar proposta", exact: true }),
     ).toBeVisible({ timeout: 20000 });

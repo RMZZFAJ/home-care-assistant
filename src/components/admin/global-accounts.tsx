@@ -1,0 +1,19 @@
+"use client";
+import { useState } from "react";
+import { Badge, Button, Field as FluentField, Input, Select } from "@fluentui/react-components";
+import { RecordDrawer } from "@/components/forms/record-drawer";
+import { Dialog, Icon } from "@/components/ui/primitives";
+import { Notice } from "@/components/workspace";
+import { Field, Check, text, bool, type Row } from "./admin-fields";
+
+export function GlobalAccounts({ rows, save, busy, error }: {
+  rows: Row[]; save: (payload: Row, message: string, refresh?: boolean) => Promise<unknown>; busy: boolean; error: string;
+}) {
+  const [search, setSearch] = useState("");
+  const [editor, setEditor] = useState<{ row: Row; opener: HTMLElement } | null>(null);
+  const [review, setReview] = useState<Row | null>(null);
+  return <section><div className="hca-section-heading"><div><h2>Identidades globais</h2><p>Alterações atingem a conta inteira. Vínculos e competências locais são administrados separadamente.</p></div></div><div className="hca-toolbar"><Input type="search" aria-label="Pesquisar contas globais" value={search} onChange={(_, value) => setSearch(value.value)} contentBefore={<Icon name="search" />} placeholder="Nome da conta" /></div><div className="hca-records">{rows.filter((row) => text(row, "full_name").toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((row) => <article key={text(row, "id")} className="hca-record"><div className="hca-record-main"><h3>{text(row, "full_name")}</h3><small>{bool(row, "global_scope") ? "Privilégio global" : "Sem privilégio global"} · {text(row, "role")}</small></div><Badge appearance="tint" color={row.status === "active" ? "success" : "informative"}>{row.status === "active" ? "Ativa" : "Revogada"}</Badge><Button aria-label={"Editar conta " + text(row, "full_name")} onClick={(event) => setEditor({ row, opener: event.currentTarget })}>Editar</Button></article>)}</div>
+    {editor ? <RecordDrawer title="Editar conta global" onClose={() => setEditor(null)} busy={busy} restoreFocusTo={editor.opener}>{error ? <Notice error>{error}</Notice> : null}<form className="hca-form" onSubmit={(event) => { event.preventDefault(); const form = new FormData(event.currentTarget); setReview({ action: "profile", userId: editor.row.id, fullName: form.get("fullName"), role: form.get("role"), status: form.has("isActive") ? "active" : "revoked", globalScope: form.has("globalScope") }); }}><Field name="fullName" label="Nome da conta" value={text(editor.row, "full_name")} required /><FluentField label="Papel global"><Select name="role" defaultValue={text(editor.row, "role")}>{["admin", "supervisor", "professional", "reader"].map((role) => <option key={role} value={role}>{role}</option>)}</Select></FluentField><Check name="isActive" label="Conta ativa" checked={editor.row.status === "active"} /><Check name="globalScope" label="Privilégio global" checked={bool(editor.row, "global_scope")} /><p className="hca-field-hint">O último administrador global ativo permanece protegido pelo banco.</p><Button type="submit" appearance="primary">Revisar alteração</Button></form></RecordDrawer> : null}
+    <Dialog open={Boolean(review)} title="Revisar conta global" onClose={() => { if (!busy) setReview(null); }}>{review ? <><p><strong>{String(review.fullName)}</strong></p><dl className="hca-change-summary"><dt>Papel global</dt><dd>{String(review.role)}</dd><dt>Conta</dt><dd>{review.status === "active" ? "Ativa" : "Revogada"}</dd><dt>Privilégio global</dt><dd>{review.globalScope ? "Habilitado" : "Desabilitado"}</dd></dl>{error ? <Notice error>{error}</Notice> : null}<div className="hca-toolbar"><Button disabled={busy} onClick={() => setReview(null)}>Voltar</Button><Button appearance="primary" disabled={busy} onClick={async () => { if (await save(review, "Conta global atualizada.", true)) { setReview(null); setEditor(null); } }}>Confirmar conta global</Button></div></> : null}</Dialog>
+  </section>;
+}

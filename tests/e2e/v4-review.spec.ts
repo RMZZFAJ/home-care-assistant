@@ -92,63 +92,34 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         idempotencyKey: randomUUID(),
         expectedVersion: (await governance(other)).version,
       });
-    const archiveDays = page.getByLabel("Arquivar após conclusão (dias)", {
-      exact: true,
-    });
-    await expect(archiveDays).toHaveValue("7");
+    await expect(page.getByText("Arquivamento após 7 dias da conclusão", { exact: true })).toBeVisible();
     await revisePolicy({ archiveDays: 8 });
-    await expect(archiveDays).toHaveValue("8", { timeout: 45000 });
-    await page
-      .getByLabel("Primeiro lembrete (horas)", { exact: true })
-      .fill("3");
-    await page
-      .getByRole("button", { name: "Registrar política", exact: true })
-      .click();
-    await expect
-      .poll(async () => (await governance(page)).settings.reminderHours)
-      .toBe(3);
+    await expect(page.getByText("Arquivamento após 8 dias da conclusão", { exact: true })).toBeVisible({ timeout: 45000 });
+    await page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true }).click();
+    await page.getByLabel("Primeiro lembrete (horas)", { exact: true }).fill("3");
+    await page.getByRole("button", { name: "Registrar política", exact: true }).click();
+    await expect.poll(async () => (await governance(page)).settings.reminderHours).toBe(3);
     expect((await governance(page)).settings.archiveDays).toBe(8);
-    await expect(
-      page.getByRole("button", { name: "Registrar política", exact: true }),
-    ).toBeEnabled();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+    const archiveDays = page.getByLabel("Arquivar após conclusão (dias)", { exact: true });
+    await expect(archiveDays).toHaveValue("8");
     await archiveDays.fill("9");
     await revisePolicy({ archiveDays: 10 });
-    await expect(
-      page.getByText("Política v" + (await governance(other)).version, {
-        exact: false,
-      }),
-    ).toBeVisible({ timeout: 45000 });
+    await expect(page.getByText("Política v" + (await governance(other)).version, { exact: false })).toBeVisible({ timeout: 45000 });
     await expect(archiveDays).toHaveValue("9");
-    await page
-      .getByRole("button", { name: "Registrar política", exact: true })
-      .click();
-    await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: "configuração mudou em outra sessão" }),
-    ).toBeVisible();
+    await page.getByRole("button", { name: "Registrar política", exact: true }).click();
+    await expect(page.getByRole("alert").filter({ hasText: "configuração mudou em outra sessão" })).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
     await expect(archiveDays).toHaveValue("10");
     await archiveDays.fill("11");
-    await page
-      .getByRole("button", { name: "Registrar política", exact: true })
-      .click();
-    await expect
-      .poll(async () => (await governance(page)).settings.archiveDays)
-      .toBe(11);
-    await expect(
-      page.getByRole("button", { name: "Registrar política", exact: true }),
-    ).toBeEnabled();
-    await page
-      .getByRole("combobox", { name: "Configurar", exact: true })
-      .selectOption("notifications");
-    const cell = page
-      .getByRole("checkbox", {
-        name: "Requisição emitida · Familiar · Aplicativo",
-        exact: true,
-      })
-      .locator("..")
-      .locator("..");
-    await cell.getByText("Opções", { exact: true }).click();
+    await page.getByRole("button", { name: "Registrar política", exact: true }).click();
+    await expect.poll(async () => (await governance(page)).settings.archiveDays).toBe(11);
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.getByRole("tab", { name: "Notificações", exact: true }).click();
+    await page.getByRole("button", { name: "Opções de Requisição emitida · Familiar", exact: true }).click();
+    const cell = page.getByRole("dialog");
     const start = cell.getByLabel("Início", { exact: true }),
       end = cell.getByLabel("Fim", { exact: true }),
       cooldown = cell.getByLabel("Intervalo mínimo (min)", { exact: true });
