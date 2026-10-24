@@ -1,4 +1,5 @@
 import { selectContext } from "./auth-context";
+import { openNavigation } from "./navigation";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -38,7 +39,7 @@ async function login(page: Page, role = "global") {
 }
 async function logout(page: Page) {
   await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("button", { name: "Sair", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
 }
 async function post(page: Page, path: string, data: unknown) {
@@ -440,13 +441,11 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
       })
     ).status(),
   ).toBe(403);
-  await page
-    .getByRole("button", { name: "Abrir navegação", exact: true })
-    .click();
+  const navigation = await openNavigation(page);
   await expect(
-    page.getByRole("link", { name: "COM · Compra da família", exact: true }),
+    navigation.nav.locator('a[href="/fichas/com"]'),
   ).toHaveCount(0);
-  await page.getByRole("button", { name: "Fechar menu", exact: true }).click();
+  await navigation.close();
   await logout(page);
   await login(page, "reader");
   await page.goto("/fichas?careRecipientId=" + patient);

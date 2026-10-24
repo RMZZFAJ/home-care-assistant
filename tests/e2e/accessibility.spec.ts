@@ -1,4 +1,5 @@
 import { selectContext } from "./auth-context";
+import { openNavigation } from "./navigation";
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { readFileSync } from "node:fs";
@@ -72,17 +73,12 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await page.goto("/historico?careRecipientId=" + patientA);
   await page.getByRole("button", { name: /Pesquisar e filtrar/ }).click();
   await audit(page, "history expanded");
-  await page
-    .getByRole("button", { name: "Abrir navegação", exact: true })
-    .click();
+  const opened = await openNavigation(page);
   await expect(
     page.getByRole("navigation", { name: "Navegação principal", exact: true }),
   ).toBeVisible();
   await audit(page, "drawer");
-  await page.keyboard.press("Escape");
-  await expect(
-    page.getByRole("button", { name: "Abrir navegação", exact: true }),
-  ).toBeFocused();
+  await opened.close();
   await page.getByRole("button", { name: /^Notificações/ }).click();
   await expect(
     page.getByRole("region", { name: "Notificações recentes", exact: true }),
@@ -91,9 +87,10 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await page.keyboard.press("Escape");
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await expect(
-    page.getByRole("link", { name: "Meu perfil e segurança", exact: true }),
+    page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }),
   ).toBeVisible();
   await audit(page, "profile menu");
+  await page.keyboard.press("Escape");
   await page
     .getByRole("combobox", { name: "Pessoa assistida", exact: true })
     .selectOption(patientB);
@@ -122,31 +119,24 @@ for (const role of [
     await expect(
       page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
     ).toBeVisible();
-    await page
-      .getByRole("button", { name: "Abrir navegação", exact: true })
-      .click();
-    const nav = page.getByRole("navigation", {
-      name: "Navegação principal",
-      exact: true,
-    });
+    const opened = await openNavigation(page);
+    const nav = opened.nav;
     await expect(nav).toBeVisible();
     const ctx = (await (await page.request.get("/api/context")).json()).data;
     const patient = ctx.patients.find(
       (item: { id: string }) => item.id === patientA,
     );
-    for (const [cap, label] of [
-      ["req.create", "REQ · Requisição"],
-      ["com.create", "COM · Compra da família"],
-      ["ent.create", "ENT · Entrega / Entrada"],
-      ["bal.count", "BAL · Balanço semanal"],
+    for (const [cap, href] of [
+      ["req.create", "/fichas/req"],
+      ["com.create", "/fichas/com"],
+      ["ent.create", "/fichas/ent"],
+      ["bal.count", "/fichas/bal"],
     ])
       await expect(
-        nav.getByRole("link", { name: label, exact: true }),
+        nav.locator(`a[href="${href}"]`),
       ).toHaveCount(patient.capabilities[cap] ? 1 : 0);
     await audit(page, "menu " + role);
-    await page
-      .getByRole("button", { name: "Fechar menu", exact: true })
-      .click();
+    await opened.close();
     await page.goto("/estoque?careRecipientId=" + patientA);
     await expect(
       page.getByRole("heading", { name: "Saldos e previsões", exact: true }),

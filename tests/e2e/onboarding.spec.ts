@@ -72,7 +72,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   const { invitationUrl } = await invitation.json();
   expect(new URL(invitationUrl).origin).toBe(process.env.NEXT_PUBLIC_APP_URL);
   await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("button", { name: "Sair", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.goto(invitationUrl);
   await page.getByText("Ainda não tenho conta", { exact: true }).click();
@@ -135,7 +135,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   ).toEqual([patientA]);
   expect(context.data.fullName).toBe("Pessoa convidada E2E");
   await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("button", { name: "Sair", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page
     .getByRole("button", { name: "Esqueci minha senha", exact: true })
@@ -162,7 +162,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
     .getByRole("link", { name: "Acessar o sistema", exact: true })
     .click();
   await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("button", { name: "Sair", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(newPassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();

@@ -40,6 +40,15 @@ Dependências internas:
 
 - src/components/admin/accept-invitation
 
+### src/app/entregas/page.tsx
+
+Linhas: 4. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/authenticated-page
+- src/components/documents/delivery-inbox
+
 ### src/app/estoque/page.tsx
 
 Linhas: 4. Estados locais: 0.
@@ -131,13 +140,16 @@ Linhas: 5. Estados locais: 0.
 
 ### src/app/layout.tsx
 
-Linhas: 24. Estados locais: 0.
+Linhas: 32. Estados locais: 0.
 
 Dependências internas:
 
 - src/app/globals.css
 - src/app/design-system.css
 - src/components/live-session
+- src/theme/providers
+- src/theme/tokens.css
+- src/components/layout/workspace-context
 
 ### src/app/login/page.tsx
 
@@ -146,6 +158,15 @@ Linhas: 16. Estados locais: 0.
 Dependências internas:
 
 - src/components/auth/login-form
+
+### src/app/mais/page.tsx
+
+Linhas: 4. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/authenticated-page
+- src/components/navigation/more-actions
 
 ### src/app/notificacoes/page.tsx
 
@@ -296,27 +317,27 @@ Dependências internas:
 
 ### src/components/app-shell.tsx
 
-Linhas: 688. Estados locais: 7.
+Linhas: 42. Estados locais: 0.
 
 Dependências internas:
 
-- src/components/workspace
-- src/components/auth/logout-button
-- src/components/ui/primitives
-- src/components/notifications/notification-bell
+- src/lib/client/capabilities
+- src/types/workspace
+- src/components/layout/workspace-context
 
 ### src/components/auth/contact-settings.tsx
 
-Linhas: 183. Estados locais: 4.
+Linhas: 184. Estados locais: 4.
 
 Dependências internas:
 
+- src/components/forms/settings-section
 - src/components/workspace
 - src/lib/supabase/client
 
 ### src/components/auth/login-form.tsx
 
-Linhas: 220. Estados locais: 5.
+Linhas: 153. Estados locais: 5.
 
 Dependências internas:
 
@@ -326,7 +347,7 @@ Dependências internas:
 
 ### src/components/auth/logout-button.tsx
 
-Linhas: 34. Estados locais: 2.
+Linhas: 35. Estados locais: 2.
 
 Dependências internas:
 
@@ -334,10 +355,11 @@ Dependências internas:
 
 ### src/components/auth/mfa-settings.tsx
 
-Linhas: 223. Estados locais: 10.
+Linhas: 224. Estados locais: 10.
 
 Dependências internas:
 
+- src/components/forms/settings-section
 - src/lib/supabase/client
 - src/lib/safe-return-path
 - src/components/workspace
@@ -397,6 +419,17 @@ Linhas: 204. Estados locais: 6.
 Dependências internas:
 
 - src/components/workspace
+
+### src/components/documents/delivery-inbox.tsx
+
+Linhas: 39. Estados locais: 8.
+
+Dependências internas:
+
+- src/components/workspace
+- src/components/documents/document-history
+- src/components/ui/primitives
+- src/lib/use-live-revision
 
 ### src/components/documents/demo-document.tsx
 
@@ -519,6 +552,37 @@ Dependências internas:
 - src/lib/quantity
 - src/types/documents
 
+### src/components/forms/settings-section.tsx
+
+Linhas: 20. Estados locais: 1.
+
+Dependências internas:
+
+- src/components/ui/primitives
+
+### src/components/layout/workspace-context.tsx
+
+Linhas: 135. Estados locais: 5.
+
+Dependências internas:
+
+- src/lib/client/api
+- src/types/workspace
+- src/lib/demo-documents
+- src/components/layout/workspace-shell
+
+### src/components/layout/workspace-shell.tsx
+
+Linhas: 81. Estados locais: 3.
+
+Dependências internas:
+
+- src/components/ui/primitives
+- src/components/notifications/notification-bell
+- src/components/auth/logout-button
+- src/components/navigation/workspace-navigation
+- src/components/layout/workspace-context
+
 ### src/components/live-session.tsx
 
 Linhas: 26. Estados locais: 1.
@@ -527,6 +591,25 @@ Dependências internas:
 
 - src/lib/supabase/client
 - src/components/workspace-sync
+
+### src/components/navigation/more-actions.tsx
+
+Linhas: 23. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/workspace
+- src/components/ui/primitives
+
+### src/components/navigation/workspace-navigation.tsx
+
+Linhas: 77. Estados locais: 0.
+
+Dependências internas:
+
+- src/lib/client/capabilities
+- src/types/workspace
+- src/components/ui/primitives
 
 ### src/components/notifications/document-delivery-status.tsx
 
@@ -567,10 +650,11 @@ Dependências internas:
 
 ### src/components/profile-console.tsx
 
-Linhas: 453. Estados locais: 7.
+Linhas: 454. Estados locais: 7.
 
 Dependências internas:
 
+- src/components/forms/settings-section
 - src/components/workspace
 - src/components/auth/contact-settings
 - src/components/auth/mfa-settings
@@ -719,7 +803,7 @@ Dependências internas:
 
 ### src/components/ui/primitives.tsx
 
-Linhas: 248. Estados locais: 0.
+Linhas: 181. Estados locais: 0.
 
 Dependências internas:
 
@@ -735,7 +819,7 @@ Dependências internas:
 
 ### src/components/workspace.tsx
 
-Linhas: 174. Estados locais: 0.
+Linhas: 31. Estados locais: 0.
 
 ## Cobertura de estados
 

@@ -57,6 +57,20 @@
       "kind": "page"
     },
     {
+      "file": "src/app/entregas/page.tsx",
+      "lines": 4,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/documents/delivery-inbox"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
       "file": "src/app/estoque/page.tsx",
       "lines": 4,
       "imports": [
@@ -203,12 +217,16 @@
     },
     {
       "file": "src/app/layout.tsx",
-      "lines": 24,
+      "lines": 32,
       "imports": [
         "next",
+        "react",
         "src/app/globals.css",
         "src/app/design-system.css",
-        "src/components/live-session"
+        "src/components/live-session",
+        "src/theme/providers",
+        "src/theme/tokens.css",
+        "src/components/layout/workspace-context"
       ],
       "exports": [
         "RootLayout"
@@ -230,6 +248,20 @@
       "headings": [
         "Entrar"
       ],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
+      "file": "src/app/mais/page.tsx",
+      "lines": 4,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/navigation/more-actions"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
       "stateHooks": 0,
       "kind": "page"
     },
@@ -515,16 +547,15 @@
     },
     {
       "file": "src/components/app-shell.tsx",
-      "lines": 688,
+      "lines": 42,
       "imports": [
-        "next/link",
-        "next/image",
-        "next/navigation",
         "react",
-        "src/components/workspace",
-        "src/components/auth/logout-button",
-        "src/components/ui/primitives",
-        "src/components/notifications/notification-bell"
+        "next/link",
+        "next/navigation",
+        "@fluentui/react-components",
+        "src/lib/client/capabilities",
+        "src/types/workspace",
+        "src/components/layout/workspace-context"
       ],
       "exports": [
         "AppWorkspace"
@@ -532,13 +563,14 @@
       "headings": [
         "Escolha como deseja atuar"
       ],
-      "stateHooks": 7,
+      "stateHooks": 0,
       "kind": "component"
     },
     {
       "file": "src/components/auth/contact-settings.tsx",
-      "lines": 183,
+      "lines": 184,
       "imports": [
+        "src/components/forms/settings-section",
         "react",
         "src/components/workspace",
         "src/lib/supabase/client"
@@ -546,17 +578,16 @@
       "exports": [
         "ContactSettings"
       ],
-      "headings": [
-        "Contatos e métodos de login"
-      ],
+      "headings": [],
       "stateHooks": 4,
       "kind": "component"
     },
     {
       "file": "src/components/auth/login-form.tsx",
-      "lines": 220,
+      "lines": 153,
       "imports": [
         "react",
+        "@fluentui/react-components",
         "next/navigation",
         "src/lib/use-client-ready",
         "src/lib/supabase/client",
@@ -572,11 +603,12 @@
     },
     {
       "file": "src/components/auth/logout-button.tsx",
-      "lines": 34,
+      "lines": 35,
       "imports": [
         "next/navigation",
         "react",
-        "src/lib/supabase/client"
+        "src/lib/supabase/client",
+        "@fluentui/react-components"
       ],
       "exports": [
         "LogoutButton"
@@ -587,8 +619,9 @@
     },
     {
       "file": "src/components/auth/mfa-settings.tsx",
-      "lines": 223,
+      "lines": 224,
       "imports": [
+        "src/components/forms/settings-section",
         "next/image",
         "react",
         "next/navigation",
@@ -599,9 +632,7 @@
       "exports": [
         "MfaSettings"
       ],
-      "headings": [
-        "Autenticação em duas etapas"
-      ],
+      "headings": [],
       "stateHooks": 10,
       "kind": "component"
     },
@@ -716,6 +747,24 @@
         "Anexos e ficha física"
       ],
       "stateHooks": 6,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/delivery-inbox.tsx",
+      "lines": 39,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/workspace",
+        "src/components/documents/document-history",
+        "src/components/ui/primitives",
+        "src/lib/use-live-revision"
+      ],
+      "exports": [
+        "DeliveryInbox"
+      ],
+      "headings": [],
+      "stateHooks": 8,
       "kind": "component"
     },
     {
@@ -924,6 +973,61 @@
       "kind": "component"
     },
     {
+      "file": "src/components/forms/settings-section.tsx",
+      "lines": 20,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/ui/primitives"
+      ],
+      "exports": [
+        "SettingsSection"
+      ],
+      "headings": [],
+      "stateHooks": 1,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/layout/workspace-context.tsx",
+      "lines": 135,
+      "imports": [
+        "react",
+        "next/navigation",
+        "src/lib/client/api",
+        "src/types/workspace",
+        "src/lib/demo-documents",
+        "src/components/layout/workspace-shell"
+      ],
+      "exports": [
+        "useWorkspaceState",
+        "WorkspaceProvider"
+      ],
+      "headings": [],
+      "stateHooks": 5,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "lines": 81,
+      "imports": [
+        "react",
+        "next/link",
+        "next/navigation",
+        "@fluentui/react-components",
+        "src/components/ui/primitives",
+        "src/components/notifications/notification-bell",
+        "src/components/auth/logout-button",
+        "src/components/navigation/workspace-navigation",
+        "src/components/layout/workspace-context"
+      ],
+      "exports": [
+        "WorkspaceShell"
+      ],
+      "headings": [],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
       "file": "src/components/live-session.tsx",
       "lines": 26,
       "imports": [
@@ -936,6 +1040,39 @@
       ],
       "headings": [],
       "stateHooks": 1,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/navigation/more-actions.tsx",
+      "lines": 23,
+      "imports": [
+        "next/link",
+        "src/components/workspace",
+        "src/components/ui/primitives"
+      ],
+      "exports": [
+        "MoreActions"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/navigation/workspace-navigation.tsx",
+      "lines": 77,
+      "imports": [
+        "next/link",
+        "next/navigation",
+        "src/lib/client/capabilities",
+        "src/types/workspace",
+        "src/components/ui/primitives"
+      ],
+      "exports": [
+        "WorkspaceNavigation",
+        "BottomNavigation"
+      ],
+      "headings": [],
+      "stateHooks": 0,
       "kind": "component"
     },
     {
@@ -1003,8 +1140,9 @@
     },
     {
       "file": "src/components/profile-console.tsx",
-      "lines": 453,
+      "lines": 454,
       "imports": [
+        "src/components/forms/settings-section",
         "react",
         "src/components/workspace",
         "src/components/auth/contact-settings",
@@ -1015,13 +1153,7 @@
       "exports": [
         "ProfileConsole"
       ],
-      "headings": [
-        "Identidade pessoal",
-        "Foto de perfil",
-        "Alterar senha",
-        "Seus vínculos com pacientes",
-        "Sessões autenticadas"
-      ],
+      "headings": [],
       "stateHooks": 7,
       "kind": "component"
     },
@@ -1276,9 +1408,11 @@
     },
     {
       "file": "src/components/ui/primitives.tsx",
-      "lines": 248,
+      "lines": 181,
       "imports": [
         "react",
+        "@fluentui/react-components",
+        "@fluentui/react-icons",
         "src/types/documents"
       ],
       "exports": [
@@ -1308,15 +1442,11 @@
     },
     {
       "file": "src/components/workspace.tsx",
-      "lines": 174,
+      "lines": 31,
       "imports": [
         "react"
       ],
       "exports": [
-        "errorMessage",
-        "api",
-        "can",
-        "may",
         "Notice"
       ],
       "headings": [],

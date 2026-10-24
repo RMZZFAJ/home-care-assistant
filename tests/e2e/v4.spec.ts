@@ -48,7 +48,7 @@ async function setup(page: Page) {
         "')",
     );
   await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("button", { name: "Sair", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await login(page, "adminA", patient);
   const product = (
@@ -123,6 +123,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
     });
     await login(family, "family", patient);
     await family.goto("/perfil?careRecipientId=" + patient);
+    await family.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
     await family
       .getByRole("checkbox", { name: /Automática por eventos autorizados/ })
       .check();

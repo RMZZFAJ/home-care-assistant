@@ -17,8 +17,8 @@ pré-condições. Nenhum reset de banco será realizado.
 | Bloco | Estado | Entrega |
 | --- | --- | --- |
 | A | Fundação publicada | Referências, inventário, Fluent, tema e componentes |
-| B | Em execução | Shells, contexto, menus, login e perfil |
-| C | Pendente | Dashboards por contexto e tarefas |
+| B | Publicação incremental | Shells, contexto, menus, login e perfil |
+| C | Em execução | Dashboards por contexto e tarefas |
 | D | Pendente | Administração, matrizes, catálogo e unidades |
 | E | Pendente | Documentos, wizards, estoque, histórico e notificações |
 | F | Pendente | Escalas persistentes, permissões e interfaces |
@@ -39,6 +39,28 @@ Tipos e build aprovados; 95 unitários aprovados; dois E2E Chromium de login
 aprovados pelo runner local. Lint apontou somente a convenção de nome de uma
 ref, corrigida antes do commit. Markdown aprovado. A instalação reportou zero
 vulnerabilidades conhecidas. Inspeção visual dos módulos permanece pendente.
+
+Bloco B: shell/contexto compartilhado, menu de perfis integrado, navegação
+operacional em cinco destinos, caixa de entregas paginada, login Fluent e
+perfil com edição por seção. API de entregas revalida capacidade e paciente;
+regras de confirmação e RLS existentes foram preservadas. Não houve migration,
+reset ou modificação de dados remotos nesta etapa.
+
+A rodada direcionada de login/perfil/navegação executou 15 cenários: 14 passaram
+e um revelou retorno de foco no iPhone. Correção com restorer Fluent e foco
+explícito no botão, preservando Escape e a asserção de foco. Duas repetições
+WebKit da navegação real pelo submenu passaram depois da correção.
+
+No diagnóstico, navegação HTTP completa enquanto a página anterior iniciava
+leituras reproduziu o problema de classificação de cancelamento do WebKit,
+documentado no [Playwright](https://github.com/microsoft/playwright/issues/43120).
+O teste visual passou a navegar pelo menu real do produto e manteve a verificação
+de ausência de erros. Não foram removidas asserções nem alterados CORS/RLS.
+
+Capturas de perfil, menu móvel e entregas foram inspecionadas. A captura de
+overlays usa apenas o viewport e conclui animações para evitar registrar um
+quadro intermediário do movimento. Evidências ficam em output/playwright/fluent
+com dados fictícios, até a seleção do relatório visual final.
 
 Gates finais: contratos, lint, Markdown, tipos, unitários, build, migrations
 limpas/legadas locais, SQL/RLS, integração Auth/HTTP, concorrência e E2E.

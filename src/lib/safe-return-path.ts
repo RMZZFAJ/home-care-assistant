@@ -27,6 +27,11 @@ export function safeReturnPath(value: string | null, origin: string): string {
       "/notificacoes",
       "/consumo",
       "/unidades",
+      "/mais",
+      "/entregas",
+      "/documentos",
+      "/escalas",
+      "/balancos",
     ];
     if (
       !allowed.some(

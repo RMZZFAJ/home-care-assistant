@@ -28,7 +28,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <RendererProvider renderer={renderer}>
       <SSRProvider>
-        <FluentProvider theme={webLightTheme} className="hca-theme">
+        <FluentProvider theme={webLightTheme} className="hca-theme" style={{ backgroundColor: "var(--background)", color: "var(--foreground)" }}>
           {children}
         </FluentProvider>
       </SSRProvider>

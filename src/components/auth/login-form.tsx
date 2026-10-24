@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { Button, Field, Input, MessageBar, MessageBarBody, Spinner } from "@fluentui/react-components";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useClientReady } from "@/lib/use-client-ready";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -136,84 +137,16 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      {searchParams.get("error") && (
-        <p
-          role="alert"
-          className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm"
-        >
-          Não foi possível concluir a autenticação. O link pode ter expirado.
-          Entre novamente ou solicite outro link.
-        </p>
-      )}
-      <label className="block text-sm font-semibold">
-        E-mail
-        <input
-          required
-          disabled={!ready || loading}
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          className="mt-1 w-full rounded-lg border border-(--line) p-3"
-        />
-      </label>
-      <label className="block text-sm font-semibold">
-        Senha
-        <input
-          required
-          disabled={!ready || loading}
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          className="mt-1 w-full rounded-lg border border-(--line) p-3"
-        />
-      </label>
-      {error && (
-        <p
-          role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
-        >
-          {error}
-        </p>
-      )}
-      {notice && (
-        <p
-          role="status"
-          className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"
-        >
-          {notice}
-        </p>
-      )}
-      <button
-        type="submit"
-        disabled={loading || !ready}
-        className="w-full rounded-lg bg-(--brand) px-4 py-3 font-bold text-white disabled:opacity-50"
-      >
-        {loading ? "Entrando..." : "Entrar"}
-      </button>
-      <button
-        type="button"
-        onClick={recoverPassword}
-        disabled={loading || !ready}
-        className="w-full text-left text-sm font-semibold text-(--brand) underline disabled:opacity-50"
-      >
-        Esqueci minha senha
-      </button>
-      <div className="flex items-center gap-3 text-xs text-(--muted)">
-        <span className="h-px flex-1 bg-(--line)" />
-        ou
-        <span className="h-px flex-1 bg-(--line)" />
-      </div>
-      <button
-        type="button"
-        onClick={signInWithGoogle}
-        disabled={loading || !ready}
-        className="w-full rounded-lg border border-(--line) px-4 py-3 font-bold text-(--ink) disabled:opacity-50"
-      >
-        Continuar com Google
-      </button>
+    <form onSubmit={submit} className="hca-auth-form">
+      {searchParams.get("error") ? <MessageBar intent="warning" role="alert"><MessageBarBody>Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</MessageBarBody></MessageBar> : null}
+      <Field label={{ children: "E-mail", htmlFor: "login-email" }}><Input id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={(_, data) => setEmail(data.value)} size="large" /></Field>
+      <Field label={{ children: "Senha", htmlFor: "login-password" }}><Input id="login-password" name="password" required disabled={!ready || loading} type="password" autoComplete="current-password" value={password} onChange={(_, data) => setPassword(data.value)} size="large" /></Field>
+      {error ? <MessageBar intent="error" role="alert"><MessageBarBody>{error}</MessageBarBody></MessageBar> : null}
+      {notice ? <MessageBar intent="success" role="status"><MessageBarBody>{notice}</MessageBarBody></MessageBar> : null}
+      <Button type="submit" appearance="primary" size="large" disabled={loading || !ready} icon={loading ? <Spinner size="tiny" /> : undefined}>{loading ? "Entrando..." : "Entrar"}</Button>
+      <Button appearance="transparent" type="button" onClick={recoverPassword} disabled={loading || !ready}>Esqueci minha senha</Button>
+      <div className="hca-auth-divider"><span />ou<span /></div>
+      <Button type="button" size="large" onClick={signInWithGoogle} disabled={loading || !ready}>Continuar com Google</Button>
     </form>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import { SettingsSection } from "@/components/forms/settings-section";
 import Image from "next/image";
 import { useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
@@ -138,8 +139,8 @@ export function MfaSettings() {
     setBusy(false);
   }
   return (
-    <section className="ui-card">
-      <h2 className="font-semibold">Autenticação em duas etapas</h2>
+    <SettingsSection title="Autenticação em duas etapas" summary="Autenticador e verificação adicional de segurança" initiallyOpen={params.get("mfa") === "required"}>
+      
       <p className="my-3 text-sm">
         Após ativar o autenticador, a administração exige verificação AAL2.
         Guarde o acesso ao autenticador; não compartilhe o QR.
@@ -217,6 +218,6 @@ export function MfaSettings() {
           </button>
         </>
       )}
-    </section>
+    </SettingsSection>
   );
 }
