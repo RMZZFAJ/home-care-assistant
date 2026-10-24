@@ -19,6 +19,7 @@
     "test:integration": "node --test --test-concurrency=1 tests/integration/*.test.mjs",
     "check:contracts": "node scripts/check-contracts.mjs",
     "test:migrations": "node scripts/test-migrations.mjs",
+    "test:db:sql": "node scripts/test-migrations.mjs --sql-only",
     "test:db:clean": "node scripts/clean-test-database.mjs"
   },
   "dependencies": {

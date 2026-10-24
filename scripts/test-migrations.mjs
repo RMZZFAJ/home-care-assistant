@@ -17,7 +17,8 @@ import {
   legacyRequisition,
 } from "./seed-test-fixtures.mjs";
 
-assertLocalReplay();
+if (process.argv.includes("--sql-only")) getTestEnvironment();
+else assertLocalReplay();
 function reset(version) {
   assertLocalReplay();
   console.log(

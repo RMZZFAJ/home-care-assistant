@@ -25,6 +25,12 @@ home-care-assistant neste repositório: API 54321, banco 54322 e Mailpit 54324.
 Esse é o mesmo banco utilizado no desenvolvimento. Não cria outro projeto.
 O preparo verifica os destinos locais antes de aplicar migrations.
 
+`npm run test:db:sql -- --sql-file service-role.sql` executa uma regressão SQL
+com rollback e sem reset. As suítes transacionais operacionais precisam das
+fixtures controladas iniciais; não suponha que um banco de desenvolvimento com
+documentos já criados possui esse estado. A instalação limpa e o upgrade legado
+da CI usam somente a stack efêmera do job, sem substituir os dados locais.
+
 ```sh
 npm run test:db:prepare
 ```
