@@ -643,7 +643,7 @@
         "Acesso indisponível"
       ],
       "stateHooks": 0,
-      "kind": "page"
+      "kind": "component"
     },
     {
       "file": "src/components/catalog/barcode-scanner.tsx",

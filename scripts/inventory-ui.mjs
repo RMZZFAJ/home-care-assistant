@@ -38,18 +38,21 @@ const records = await Promise.all(files.map(async (file) => {
   }
   visit(tree);
   return { file: posix(file), lines: source.split(/\r?\n/).length, imports, exports, headings, stateHooks,
-    kind: file.endsWith("page.tsx") ? "page" : file.endsWith("layout.tsx") ? "layout" : "component" };
+    kind: path.basename(file) === "page.tsx" ? "page" : path.basename(file) === "layout.tsx" ? "layout" : "component" };
 }));
 const report = { base: "d467f92", records };
 await writeFile(path.join(root, "docs/ui-ux/inventory.json"), JSON.stringify(report, null, 2) + "\n");
-const clean = (value) => value.replaceAll("|", "\\|").replaceAll(/\r?\n/g, " ");
-const lines = ["# Inventário de interface", "", "Gerado por scripts/inventory-ui.mjs. O JSON adjacente registra dependências,", "exports e pontos de estado, incluindo componentes renderizados indiretamente.", "", "## Páginas e layouts", "", "| Arquivo | Elementos |", "| --- | --- |"];
-for (const row of records.filter((row) => row.kind !== "component")) {
-  lines.push(`| ${row.file} | ${clean(row.headings.join("; ") || row.imports.filter((value) => value.startsWith("src/components/")).join(", "))} |`);
-}
-lines.push("", "## Componentes", "", "| Arquivo | Linhas | Estados locais | Dependências internas |", "| --- | --- | --- | --- |");
-for (const row of records.filter((row) => row.file.startsWith("src/components/"))) {
-  lines.push(`| ${row.file} | ${row.lines} | ${row.stateHooks} | ${row.imports.filter((value) => value.startsWith("src/")).join(", ")} |`);
+const lines = ["# Inventário de interface", "", "Gerado por scripts/inventory-ui.mjs. O JSON adjacente registra dependências,", "exports e pontos de estado, incluindo componentes renderizados indiretamente."];
+for (const [title, selected] of [
+  ["Páginas e layouts", records.filter((row) => row.kind !== "component")],
+  ["Componentes", records.filter((row) => row.file.startsWith("src/components/"))],
+]) {
+  lines.push("", `## ${title}`);
+  for (const row of selected) {
+    lines.push("", `### ${row.file}`, "", `Linhas: ${row.lines}. Estados locais: ${row.stateHooks}.`);
+    const internal = row.imports.filter((value) => value.startsWith("src/"));
+    if (internal.length) lines.push("", "Dependências internas:", "", ...internal.map((value) => `- ${value}`));
+  }
 }
 lines.push("", "## Cobertura de estados", "", "Cada área deve ser verificada em carregamento, vazio, erro, bloqueio por", "capacidade, conflito, processamento e resultado real. A matriz de homologação", "registrará variações por contexto, paciente, documento e largura de tela.", "");
 await writeFile(path.join(root, "docs/ui-ux/INVENTORY.md"), lines.join("\n"));
