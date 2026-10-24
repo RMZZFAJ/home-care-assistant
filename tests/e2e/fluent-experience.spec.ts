@@ -63,3 +63,30 @@ test("operação móvel oferece cinco destinos e caixa de entregas autorizada", 
   for (const row of (await response.json()).data) expect(row.recipient_id).toBe(context.userId);
   await capture(page, "entregas-equipe-mobile", info.project.name);
 });
+
+test("dashboards apresentam tarefas reais por perfil e preservam a custódia autorizada", async ({ page }, info) => {
+  for (const role of ["adminA", "family", "supervisor", "professional", "reader"]) {
+    await test.step(role, async () => {
+      await page.setViewportSize({ width: 1366, height: 900 });
+      await login(page, role);
+      await expect(page.getByRole("heading", { name: role === "professional" ? "Precisa da sua atenção" : role === "supervisor" ? "Pendências da equipe" : "Ações que precisam de você", exact: true })).toBeVisible();
+      const response = await page.request.get("/api/dashboard?careRecipientId=" + patientA);
+      expect(response.ok()).toBeTruthy();
+      const data = (await response.json()).data;
+      expect(Array.isArray(data.pendingTasks)).toBe(true);
+      expect(Array.isArray(data.criticalStock)).toBe(true);
+      if (role === "professional") {
+        expect(data.criticalStock.every((item: { custody: string }) => item.custody === "CARE_TEAM")).toBe(true);
+        await expect(page.getByRole("link", { name: "Fazer balanço", exact: true })).toHaveCount(0);
+      }
+      await noOverflow(page);
+      await capture(page, "dashboard-" + role + "-desktop", info.project.name);
+      await page.setViewportSize({ width: 390, height: 844 });
+      await noOverflow(page);
+      await capture(page, "dashboard-" + role + "-mobile", info.project.name);
+      await page.getByLabel("Menu do usuário", { exact: true }).click();
+      await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
+      await expect(page).toHaveURL(/\/login/);
+    });
+  }
+});

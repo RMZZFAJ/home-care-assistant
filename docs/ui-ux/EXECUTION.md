@@ -17,9 +17,9 @@ pré-condições. Nenhum reset de banco será realizado.
 | Bloco | Estado | Entrega |
 | --- | --- | --- |
 | A | Fundação publicada | Referências, inventário, Fluent, tema e componentes |
-| B | Publicação incremental | Shells, contexto, menus, login e perfil |
-| C | Em execução | Dashboards por contexto e tarefas |
-| D | Pendente | Administração, matrizes, catálogo e unidades |
+| B | Publicado | Shells, contexto, menus, login e perfil |
+| C | Publicação incremental | Dashboards por contexto e tarefas |
+| D | Em execução | Administração, matrizes, catálogo e unidades |
 | E | Pendente | Documentos, wizards, estoque, histórico e notificações |
 | F | Pendente | Escalas persistentes, permissões e interfaces |
 | G | Pendente | BAL por plantão, atrasos, adiamentos e regularização |
@@ -69,3 +69,22 @@ Inspeção visual por módulo em desktop/mobile e larguras de 320 a 1920 px.
 Testes mutáveis usam exclusivamente a stack local verificada. Fixtures,
 credenciais, backups, traces privados e dados pessoais não entram no Git.
 Contas existentes de homologação serão preservadas.
+
+Bloco C: dashboards separados para gestão, profissional e supervisão, com
+contagens e pendências reais, destinatário explícito nas entregas e saldos
+críticos restritos às custódias autorizadas. Administração global apresenta
+pacientes e ações globais, sem assumir competências locais. O atalho de BAL
+depende de elegibilidade do servidor; o novo regime ainda será implementado.
+
+Três cenários funcionais Fluent passaram no Chromium, incluindo navegação
+operacional e cinco perfis de dashboard. Capturas desktop/mobile da gestão e
+equipe foram inspecionadas. Os seis cenários de acessibilidade e capacidades
+passaram, mantendo todas as regras axe e incluindo WCAG 2.2 AA.
+
+A entrada por teclado verifica o redirecionamento imediato dos sentinelas de
+foco do Tabster, documentado na
+[biblioteca](https://github.com/microsoft/tabster/issues/288). O atalho de
+conteúdo recebeu um destino focalizável e os testes verificam seu foco real.
+Nenhum nó ou regra axe é excluído. A auditoria aguarda o fim das transições para
+medir cores finais, sem confundir a animação de abertura com contraste estático.
+O contraste do nome no cabeçalho foi corrigido.

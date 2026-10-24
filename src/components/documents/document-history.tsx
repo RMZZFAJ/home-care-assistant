@@ -17,27 +17,12 @@ import { EmptyState, Icon, StatusBadge } from "@/components/ui/primitives";
 import {
   documentLabels,
   documentStatuses,
-  type DocumentType,
 } from "@/types/documents";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 
-export type DocumentSummary = {
-  id: string;
-  type: DocumentType;
-  fulfillment?: { fulfilled: number; total: number };
-  code: string | null;
-  protocol: string | null;
-  status: string;
-  created_at: string;
-  recipient_id: string | null;
-  document_lines?: {
-    id: string;
-    fully_checked: boolean;
-    accepted_quantity: string;
-    quantity: string;
-  }[];
-};
+export type { DocumentSummary } from "@/types/documents";
+import type { DocumentSummary } from "@/types/documents";
 type Filters = {
   search: string;
   type: string;

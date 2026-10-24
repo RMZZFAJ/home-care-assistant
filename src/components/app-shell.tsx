@@ -17,7 +17,7 @@ export function AppWorkspace({ title, children, administration = false }: {
   const mismatch = linkedPatient && (value?.activeContext?.mode !== "patient" || value.activeContext.care_recipient_id !== linkedPatient) && !administration;
   const choose = value && (!value.activeContext || mismatch);
   const canAdminister = value && (value.globalAdministrationAllowed || may(value, "manage"));
-  return <main id="workspace-content" className="workspace-content">
+  return <main id="workspace-content" className="workspace-content" tabIndex={-1}>
     <div className="page-heading"><div><p className="eyebrow">{value?.patient?.display_name ?? "Home Care Assistant"}</p><h1>{title}</h1></div>
       {value?.activeContext ? <span className="context-tag">{value.activeContext.mode === "global" ? "Administração global" : roleLabels[value.patient?.role ?? ""]}</span> : null}
     </div>

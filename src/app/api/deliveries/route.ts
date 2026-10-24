@@ -17,6 +17,6 @@ export async function GET(request: Request) {
     if (status) query = query.eq("status", status);
     const result = await query.order("created_at", { ascending: false }).order("id").range((page - 1) * pageSize, page * pageSize - 1);
     if (result.error) databaseError(result.error);
-    return NextResponse.json({ data: result.data ?? [], total: result.count ?? 0 });
+    return NextResponse.json({ data: (result.data ?? []).map((row) => ({ ...row, document_lines: row.document_lines.map((line) => ({ ...line, quantity: String(line.quantity), accepted_quantity: String(line.accepted_quantity) })) })), total: result.count ?? 0 });
   });
 }

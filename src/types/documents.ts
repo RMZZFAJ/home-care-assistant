@@ -126,3 +126,20 @@ export const documentStatuses: Record<string, string> = {
   under_review: "Em revisão",
   separated: "Separado",
 };
+
+export type DocumentSummary = {
+  id: string;
+  type: DocumentType;
+  fulfillment?: { fulfilled: number; total: number };
+  code: string | null;
+  protocol: string | null;
+  status: string;
+  created_at: string;
+  recipient_id: string | null;
+  document_lines?: {
+    id: string;
+    fully_checked: boolean;
+    accepted_quantity: string;
+    quantity: string;
+  }[];
+};

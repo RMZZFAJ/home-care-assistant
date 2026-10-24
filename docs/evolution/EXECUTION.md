@@ -1,5 +1,18 @@
 # Evolução integral — execução
 
+## Refatoração Fluent, escalas e BAL — 24/10/2026
+
+Execução integral autorizada na branch `codex/fluent-ui-escalas-bal`, publicada
+com [PR 5 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/5).
+O checkpoint e as evidências de cada bloco estão em
+[Execução da interface](../ui-ux/EXECUTION.md).
+
+Tema Fluent com SSR, shells por contexto, login/perfil e dashboards com tarefas
+reais foram publicados progressivamente. Administração, documentos, escalas e
+novo regime BAL continuam em execução. Não houve reset ou alteração remota
+nesta primeira etapa. O processamento novo será opt-in por paciente, iniciando
+na homologação. O merge depende da conclusão integral e dos checks finais.
+
 ## Entrega V4 — 23/10/2026
 
 Esta revisão substitui o checkpoint parcial da V4. O [PR 4][pr-v4] reúne a
