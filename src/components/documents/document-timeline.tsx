@@ -2,6 +2,8 @@
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
 
+import { SettingsSection } from "@/components/forms/settings-section";
+
 export type TimelineEvent = {
   id: string;
   action: string;
@@ -12,8 +14,7 @@ export type TimelineEvent = {
 };
 export function DocumentTimeline({ events }: { events: TimelineEvent[] }) {
   return (
-    <section className="ui-card">
-      <h2 className="font-semibold">Linha do tempo</h2>
+    <SettingsSection title="Linha do tempo" summary={events.length + " evento(s) registrados"}>
       {events.length ? (
         <ol className="mt-4 space-y-4 border-l-2 border-(--line) pl-4">
           {events.map((event) => (
@@ -37,6 +38,6 @@ export function DocumentTimeline({ events }: { events: TimelineEvent[] }) {
           Sem eventos documentais disponíveis.
         </p>
       )}
-    </section>
+    </SettingsSection>
   );
 }

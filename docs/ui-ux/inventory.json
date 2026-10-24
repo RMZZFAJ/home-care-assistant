@@ -57,6 +57,23 @@
       "kind": "page"
     },
     {
+      "file": "src/app/documentos/[id]/page.tsx",
+      "lines": 14,
+      "imports": [
+        "react",
+        "src/components/authenticated-page",
+        "src/components/documents/document-viewer",
+        "src/components/documents/demo-document",
+        "src/lib/demo-documents"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
       "file": "src/app/entregas/page.tsx",
       "lines": 4,
       "imports": [
@@ -90,7 +107,7 @@
       "imports": [
         "react",
         "src/components/authenticated-page",
-        "src/components/documents/supply-detail",
+        "src/components/documents/document-viewer",
         "src/lib/demo-documents",
         "src/components/documents/demo-document"
       ],
@@ -176,7 +193,7 @@
       "lines": 28,
       "imports": [
         "src/components/authenticated-page",
-        "src/components/requisitions/requisition-detail",
+        "src/components/documents/document-viewer",
         "react",
         "src/lib/demo-documents",
         "src/components/documents/demo-document"
@@ -370,7 +387,7 @@
     },
     {
       "file": "src/components/admin/admin-console.tsx",
-      "lines": 528,
+      "lines": 527,
       "imports": [
         "next/navigation",
         "next/link",
@@ -954,17 +971,16 @@
     },
     {
       "file": "src/components/documents/attachments.tsx",
-      "lines": 204,
+      "lines": 205,
       "imports": [
         "react",
-        "src/components/workspace"
+        "src/components/workspace",
+        "src/components/forms/settings-section"
       ],
       "exports": [
         "Attachments"
       ],
-      "headings": [
-        "Anexos e ficha física"
-      ],
+      "headings": [],
       "stateHooks": 6,
       "kind": "component"
     },
@@ -1016,8 +1032,25 @@
       "kind": "component"
     },
     {
+      "file": "src/components/documents/document-header.tsx",
+      "lines": 14,
+      "imports": [
+        "react",
+        "src/components/ui/primitives",
+        "src/components/documents/document-actions",
+        "src/lib/receipt",
+        "src/types/documents"
+      ],
+      "exports": [
+        "DocumentHeader"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
       "file": "src/components/documents/document-history.tsx",
-      "lines": 370,
+      "lines": 387,
       "imports": [
         "next/link",
         "next/navigation",
@@ -1036,22 +1069,37 @@
       "headings": [
         "Documentos e acompanhamento"
       ],
-      "stateHooks": 9,
+      "stateHooks": 7,
       "kind": "component"
     },
     {
       "file": "src/components/documents/document-timeline.tsx",
-      "lines": 43,
+      "lines": 44,
       "imports": [
         "src/lib/notifications/event-labels",
-        "src/lib/receipt"
+        "src/lib/receipt",
+        "src/components/forms/settings-section"
       ],
       "exports": [
         "DocumentTimeline"
       ],
-      "headings": [
-        "Linha do tempo"
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/documents/document-viewer.tsx",
+      "lines": 13,
+      "imports": [
+        "src/components/workspace",
+        "src/components/layout/workspace-context",
+        "src/components/requisitions/requisition-detail",
+        "src/components/documents/supply-detail"
       ],
+      "exports": [
+        "DocumentViewer"
+      ],
+      "headings": [],
       "stateHooks": 0,
       "kind": "component"
     },
@@ -1107,8 +1155,10 @@
     },
     {
       "file": "src/components/documents/supply-detail.tsx",
-      "lines": 505,
+      "lines": 476,
       "imports": [
+        "src/components/forms/settings-section",
+        "src/lib/documents/presentation",
         "src/components/documents/supply-line-summary",
         "next/link",
         "react",
@@ -1122,16 +1172,14 @@
         "src/lib/quantity",
         "src/lib/receipt",
         "src/lib/use-live-revision",
-        "src/components/documents/document-actions"
+        "src/components/documents/document-header"
       ],
       "exports": [
-        "SupplyDetail"
+        "SupplyDocumentContent"
       ],
       "headings": [
-        " ",
         "Próxima ação",
-        "Produtos e quantidades",
-        "Versões e integridade"
+        "Produtos e quantidades"
       ],
       "stateHooks": 10,
       "kind": "component"
@@ -1170,7 +1218,7 @@
     },
     {
       "file": "src/components/documents/supply-wizard.tsx",
-      "lines": 716,
+      "lines": 671,
       "imports": [
         "src/components/documents/document-actions",
         "next/link",
@@ -1178,6 +1226,7 @@
         "react",
         "src/components/workspace",
         "src/components/notifications/document-delivery-status",
+        "src/components/forms/wizard-actions",
         "src/components/ui/primitives",
         "src/components/documents/supply-wizard-step",
         "src/lib/quantity",
@@ -1220,6 +1269,20 @@
       ],
       "headings": [],
       "stateHooks": 1,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/forms/wizard-actions.tsx",
+      "lines": 11,
+      "imports": [
+        "@fluentui/react-components",
+        "src/components/ui/primitives"
+      ],
+      "exports": [
+        "WizardActions"
+      ],
+      "headings": [],
+      "stateHooks": 0,
       "kind": "component"
     },
     {
@@ -1294,7 +1357,7 @@
     },
     {
       "file": "src/components/navigation/workspace-navigation.tsx",
-      "lines": 77,
+      "lines": 79,
       "imports": [
         "next/link",
         "next/navigation",
@@ -1353,7 +1416,7 @@
     },
     {
       "file": "src/components/notifications/notification-center.tsx",
-      "lines": 210,
+      "lines": 209,
       "imports": [
         "src/lib/use-live-revision",
         "next/link",
@@ -1362,6 +1425,7 @@
         "src/lib/receipt",
         "src/lib/notifications/presentation",
         "src/lib/notifications/event-labels",
+        "@fluentui/react-components",
         "src/lib/notifications/navigation"
       ],
       "exports": [
@@ -1405,17 +1469,19 @@
     },
     {
       "file": "src/components/requisitions/requisition-detail.tsx",
-      "lines": 559,
+      "lines": 535,
       "imports": [
         "next/link",
+        "src/components/forms/settings-section",
         "react",
         "src/components/workspace",
         "src/lib/use-live-revision",
         "src/lib/receipt",
         "src/lib/quantity",
         "src/lib/text-rows",
+        "src/lib/documents/presentation",
         "src/components/documents/attachments",
-        "src/components/documents/document-actions",
+        "src/components/documents/document-header",
         "src/components/documents/document-timeline",
         "src/components/documents/related-document",
         "src/components/ui/primitives",
@@ -1423,13 +1489,11 @@
         "src/lib/notifications/presentation"
       ],
       "exports": [
-        "RequisitionDetail"
+        "RequisitionDocumentContent"
       ],
       "headings": [
-        " ",
         "Materiais requisitados",
         "Ciência e responsáveis",
-        "Avisos e acompanhamento",
         "Observações"
       ],
       "stateHooks": 7,
@@ -1502,13 +1566,14 @@
     },
     {
       "file": "src/components/requisitions/requisition-wizard.tsx",
-      "lines": 480,
+      "lines": 430,
       "imports": [
         "react",
         "src/lib/quantity",
         "src/types/requisition",
         "src/types/documents",
         "src/components/workspace",
+        "src/components/forms/wizard-actions",
         "src/components/ui/primitives",
         "src/components/requisitions/requisition-steps",
         "src/components/requisitions/requisition-receipt"
@@ -1540,22 +1605,24 @@
     },
     {
       "file": "src/components/stock/consumption-console.tsx",
-      "lines": 295,
+      "lines": 299,
       "imports": [
         "react",
         "src/components/workspace",
         "src/lib/receipt",
         "src/components/stock/flow-reviews",
+        "@fluentui/react-components",
+        "src/components/forms/record-drawer",
+        "src/components/ui/primitives",
         "src/types/documents"
       ],
       "exports": [
         "ConsumptionConsole"
       ],
       "headings": [
-        "Registrar relato",
         "Relatos registrados"
       ],
-      "stateHooks": 8,
+      "stateHooks": 10,
       "kind": "component"
     },
     {
@@ -1600,7 +1667,7 @@
     },
     {
       "file": "src/components/stock/stock-console.tsx",
-      "lines": 661,
+      "lines": 540,
       "imports": [
         "src/lib/use-live-revision",
         "next/link",
@@ -1611,18 +1678,37 @@
         "src/components/ui/primitives",
         "src/components/stock/transit-stock",
         "src/lib/quantity",
-        "src/lib/receipt"
+        "src/lib/receipt",
+        "src/types/stock",
+        "src/components/stock/stock-overview",
+        "src/components/forms/record-drawer",
+        "@fluentui/react-components"
       ],
       "exports": [
         "StockConsole"
       ],
       "headings": [
         "Saldos e previsões",
-        " ",
-        "Movimentar estoque familiar",
         "Histórico auditável"
       ],
-      "stateHooks": 19,
+      "stateHooks": 22,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/stock/stock-overview.tsx",
+      "lines": 26,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/forms/record-drawer",
+        "src/lib/quantity",
+        "src/types/stock"
+      ],
+      "exports": [
+        "StockOverview"
+      ],
+      "headings": [],
+      "stateHooks": 2,
       "kind": "component"
     },
     {
@@ -1643,7 +1729,7 @@
     },
     {
       "file": "src/components/ui/primitives.tsx",
-      "lines": 181,
+      "lines": 182,
       "imports": [
         "react",
         "@fluentui/react-components",

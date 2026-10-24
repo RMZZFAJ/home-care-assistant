@@ -54,6 +54,7 @@ export function StatusBadge({ status }: { status: string }) {
     "received",
     "delivered",
     "read",
+    "completed",
   ].includes(status)
     ? "success"
     : ["disputed", "rejected", "failed", "cancelled"].includes(status)

@@ -31,6 +31,9 @@ horizontalmente para alcançar filtros, abas ou ações.
 - Dashboard operacional: tarefas pessoais ou acompanhamento da equipe.
 - DeliveryInbox: destinatário e estado, consulta paginada autorizada pela API.
 - StepNavigator: etapas, retorno e rolagem da etapa ativa.
+- WizardActions: voltar, rascunho, revisão, conclusão e recuperação da tentativa.
+- DocumentViewer/DocumentHeader: consulta comum, metadados e adaptadores por tipo.
+- StockOverview: lista por custódia, cartões móveis e detalhes de real/estimado.
 - StatusBadge: estado com texto e cor semântica.
 - Dialog: confirmação acessível das operações definitivas.
 

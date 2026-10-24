@@ -8,6 +8,8 @@ import {
   Notice,
   primaryClass,
 } from "@/components/workspace";
+import { SettingsSection } from "@/components/forms/settings-section";
+
 type Attachment = {
   id: string;
   filename: string;
@@ -113,9 +115,8 @@ export function Attachments({
     }
   }
   return (
-    <section className="ui-card">
+    <SettingsSection title="Anexos e ficha física" summary={files.length + " arquivo(s) · foto e PDF vinculados à operação"}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold">Anexos e ficha física</h2>
         <button
           className={buttonClass}
           disabled={busy}
@@ -198,6 +199,6 @@ export function Attachments({
           </button>
         </form>
       ) : null}
-    </section>
+    </SettingsSection>
   );
 }

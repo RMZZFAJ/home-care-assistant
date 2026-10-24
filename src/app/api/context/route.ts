@@ -36,7 +36,7 @@ export async function GET(request: Request) {
     const { avatarPath, ...workspace } = result;
     const documentId = new URL(request.url).searchParams.get("documentId");
     const documentContext = uuid.safeParse(documentId).success
-      ? await rpc(client, "document_navigation_context", { p_id: documentId })
+      ? await rpc(client, "document_navigation_context", { p_id: documentId }) as { patientId: string; displayName: string; type: string } | null
       : null;
     const avatarUrl = avatarPath
       ? ((
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
         ).data?.signedUrl ?? null)
       : null;
     return NextResponse.json({
-      data: { ...workspace, avatarUrl, documentContext },
+      data: { ...workspace, avatarUrl, documentContext: documentContext ? { ...documentContext, id: documentId } : null },
     });
   });
 }

@@ -283,6 +283,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   })
     .png()
     .toBuffer();
+  await page.getByRole("button", { name: "Anexos e ficha física", exact: true }).click();
   await page.getByLabel("Adicionar foto ou PDF").setInputFiles({
     name: "ficha-fisica.png",
     mimeType: "image/png",
@@ -582,16 +583,17 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   await expect(page.getByText("2 / 2", { exact: true })).toBeVisible();
   const history = await (
     await page.request.get(
-      "/api/stock/movements?careRecipientId=" + patient + "&pageSize=1",
+      "/api/stock/movements?careRecipientId=" + patient + "&page=2",
     )
   ).json();
   const reference = history.data[0].id;
+  await page.getByRole("button", { name: "Movimentar estoque familiar", exact: true }).click();
   await page
     .getByLabel("Operação", { exact: true })
     .selectOption("correction_out");
   await page.getByLabel("Produto", { exact: true }).selectOption(product.id);
   await page.getByLabel("Quantidade", { exact: true }).fill("1");
-  await page.getByLabel("Movimento original a compensar").fill(reference);
+  await page.getByLabel("Movimento original a compensar").selectOption(reference);
   await page
     .getByLabel("Motivo", { exact: true })
     .fill("Correção auditável E2E");
@@ -622,8 +624,8 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   });
   await page.reload();
   await expect(
-    page.getByText(product.name + " (inativo)", { exact: true }),
-  ).toBeVisible();
+    page.getByRole("row", { name: product.name + " · Família", exact: true }).or(page.getByRole("article", { name: product.name + " · Família", exact: true })),
+  ).toContainText("Inativo");
 });
 
 test("BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento", async ({
@@ -1118,6 +1120,7 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   await page
     .getByRole("button", { name: "Confirmar relato e movimento", exact: true })
     .click();
+  await page.getByRole("dialog").getByRole("button", { name: "Confirmar consumo", exact: true }).click();
   await expect(
     page.getByText("Consumo · Equipe · Confirmado", { exact: true }),
   ).toBeVisible();

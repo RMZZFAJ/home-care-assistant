@@ -12,6 +12,9 @@ export async function openNavigation(page: Page) {
     }
   }
   await expect(nav).toBeVisible();
+  for (const group of await nav.locator("details").all()) {
+    if (await group.getAttribute("open") === null) await group.locator("summary").click();
+  }
   const close = async () => {
     const dialog = page.getByRole("dialog");
     if (await dialog.isVisible()) {

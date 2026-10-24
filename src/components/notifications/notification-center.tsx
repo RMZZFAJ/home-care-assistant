@@ -6,6 +6,7 @@ import { api, buttonClass, Notice, Workspace } from "../workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryLabels } from "@/lib/notifications/presentation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
+import { Badge, Checkbox } from "@fluentui/react-components";
 import {
   notificationHref,
   type NotificationTarget,
@@ -85,37 +86,35 @@ function Center({ patientId }: { patientId?: string }) {
           Atualizar
         </button>
       </div>
-      <label className="my-4 flex min-h-11 items-center gap-3 text-sm">
-        <input
-          type="checkbox"
+      <div className="hca-toolbar"><Checkbox
           checked={unread}
-          onChange={(event) => {
-            setUnread(event.target.checked);
+          label="Somente não vistas"
+          onChange={(_, value) => {
+            setUnread(value.checked === true);
             setPage(1);
             setLoading(true);
           }}
-        />
-        Somente não vistas
-      </label>
+        /></div>
       {error ? <Notice error>{error}</Notice> : null}
       {loading ? (
         <p className="my-3 text-sm" role="status">
           Consultando notificações…
         </p>
       ) : null}
-      <ul className="space-y-3">
+      <ul className="hca-notification-list">
         {rows.map((row) => (
           <li
             key={row.id}
             className={
-              "rounded-lg border p-4 " +
+              "hca-notification-row " +
               (row.seen_at
-                ? "border-(--line)"
-                : "border-teal-600 bg-teal-50/30")
+                ? ""
+                : "hca-notification-unread")
             }
           >
             <p className="text-sm font-semibold">
-              {row.operational_documents?.code ?? "Atualização operacional"}
+              <span>{row.operational_documents?.code ?? "Atualização operacional"}</span>
+              {!row.seen_at ? <Badge className="ml-3" appearance="tint" color="informative">Não vista</Badge> : null}
             </p>
             <p className="mt-1 text-sm">
               {documentEventLabel(row.event_key ?? row.document_events?.action)}

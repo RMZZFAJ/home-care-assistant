@@ -8,8 +8,8 @@ import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
 import { roleLabels, useWorkspaceState } from "@/components/layout/workspace-context";
 
-export function AppWorkspace({ title, children, administration = false, administrationCapabilities = ["access.manage"] }: {
-  title: string; children: (context: WorkspaceContext) => ReactNode; administration?: boolean; administrationCapabilities?: string[];
+export function AppWorkspace({ title, children, administration = false, administrationCapabilities = ["access.manage"], compact = false }: {
+  title: string; children: (context: WorkspaceContext) => ReactNode; administration?: boolean; administrationCapabilities?: string[]; compact?: boolean;
 }) {
   const { value, data, error, loading, selecting, load, selectProfile } = useWorkspaceState();
   const routePatient = useSearchParams().get("careRecipientId");
@@ -17,12 +17,12 @@ export function AppWorkspace({ title, children, administration = false, administ
   const mismatch = linkedPatient && (value?.activeContext?.mode !== "patient" || value.activeContext.care_recipient_id !== linkedPatient) && !administration;
   const choose = value && (!value.activeContext || mismatch);
   const canAdminister = value && (value.globalAdministrationAllowed || administrationCapabilities.some((capability) => can(value, capability)));
-  return <main id="workspace-content" className="workspace-content" tabIndex={-1}>
+  return <main id="workspace-content" className={"workspace-content" + (compact ? " hca-compact-workspace" : "")} tabIndex={-1}>
     <div className="page-heading"><div><p className="eyebrow">{value?.patient?.display_name ?? "Home Care Assistant"}</p><h1>{title}</h1></div>
       {value?.activeContext ? <span className="context-tag">{value.activeContext.mode === "global" ? "Administração global" : roleLabels[value.patient?.role ?? ""]}</span> : null}
     </div>
     {loading && !value ? <div className="hca-loading" role="status"><Spinner size="small" />Validando sessão e pacientes autorizados…</div> : null}
-    {error ? <MessageBar intent="error"><MessageBarBody><p>{error}</p><div className="hca-toolbar"><Button onClick={() => void load()}>Tentar novamente</Button><Link href="/login">Entrar novamente</Link></div></MessageBarBody></MessageBar> : null}
+    {error ? <MessageBar intent="error" role="alert"><MessageBarBody><p>{error}</p><div className="hca-toolbar"><Button onClick={() => void load()}>Tentar novamente</Button><Link href="/login">Entrar novamente</Link></div></MessageBarBody></MessageBar> : null}
     {value?.activeContext?.mode === "global" && !value.globalAdministrationAllowed ? <MessageBar intent="warning"><MessageBarBody>Confirme seu autenticador para administrar. <Link href="/perfil?mfa=required">Verificar autenticação em duas etapas</Link></MessageBarBody></MessageBar> : null}
     {choose ? <section className="ui-card hca-context-selection" aria-label="Mudar perfil">
       <h2 className="text-lg font-semibold">Escolha como deseja atuar</h2>

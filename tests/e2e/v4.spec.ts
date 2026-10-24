@@ -285,7 +285,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   });
   await page.goto("/configuracoes?careRecipientId=" + patient);
   await page
-    .getByRole("tab", { name: "Notificações", exact: true }).click();
+    .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
   const channel = page.getByRole("checkbox", {
     name: "Requisição emitida · Familiar · WhatsApp (contrato visual)",
     exact: true,
@@ -323,7 +323,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
     })
     .toBe(2);
   await page
-    .getByRole("tab", { name: "Permissões", exact: true }).click();
+    .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Permissões", exact: true }).click();
   await expect(
     page.getByRole("region", { name: "Matriz de permissões", exact: true }),
   ).toBeVisible();
@@ -348,7 +348,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
       global.getByRole("status").filter({ hasText: "Proposta global registrada." }),
     ).toBeVisible();
     await page
-      .getByRole("tab", { name: "Pessoas e propostas", exact: true }).click();
+      .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Pessoas e propostas", exact: true }).click();
     await expect(
       page.getByRole("button", { name: "Aprovar proposta", exact: true }),
     ).toBeVisible({ timeout: 20000 });

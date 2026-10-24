@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { SettingsSection } from "@/components/forms/settings-section";
 import { useEffect, useRef, useState } from "react";
 import {
   api,
@@ -9,15 +10,15 @@ import {
   inputClass,
   Notice,
   primaryClass,
-  Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import { textRows } from "@/lib/text-rows";
+import { requisitionDocumentState } from "@/lib/documents/presentation";
 import { Attachments } from "@/components/documents/attachments";
-import { DocumentActions } from "@/components/documents/document-actions";
+import { DocumentHeader } from "@/components/documents/document-header";
 import {
   DocumentTimeline,
   type TimelineEvent,
@@ -90,14 +91,7 @@ const modes: Record<string, string> = {
   dispatch: "Por expedição autorizada",
 };
 
-export function RequisitionDetail({ id }: { id: string }) {
-  return (
-    <Workspace title="Requisição e acompanhamento">
-      {(context) => <DetailContent key={id} id={id} context={context} />}
-    </Workspace>
-  );
-}
-function DetailContent({
+export function RequisitionDocumentContent({
   id,
   context,
 }: {
@@ -221,6 +215,7 @@ function DetailContent({
       </Notice>
     );
   const { fulfillment: f, progress: p } = data;
+  const documentState = requisitionDocumentState({ historical: data.is_historical, status: data.status, archivedAt: p.archivedAt, completedAt: p.completedAt, scienceSatisfied: p.scienceSatisfied, fulfilled: f.fulfilled });
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <Link className={buttonClass} href="/historico">
@@ -228,14 +223,7 @@ function DetailContent({
       </Link>
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      <section className="ui-card" ref={visibleRef}>
-        <p className="eyebrow">
-          REQ · Paciente:{" "}
-          {data.recipient_name_snapshot ?? context.patient?.display_name}
-        </p>
-        <h2 className="mt-2 text-2xl font-bold">
-          {data.code ?? data.protocol}
-        </h2>
+      <DocumentHeader id={id} type="REQ" code={data.code ?? data.protocol} protocol={data.protocol} status={documentState} version={p.version} createdAt={data.created_at} dateLabel={data.is_historical && !data.created_at ? "Data original desconhecida" : undefined} observedRef={visibleRef} patientName={data.recipient_name_snapshot ?? context.patient?.display_name}>
         <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
           <span>
             Solicitante:{" "}
@@ -243,12 +231,6 @@ function DetailContent({
               (data.is_historical
                 ? "Solicitante desconhecido"
                 : "Solicitante registrado")}
-          </span>
-          <span>
-            Data:{" "}
-            {data.is_historical && !data.created_at
-              ? "Data original desconhecida"
-              : formatBrazilDate(data.created_at)}
           </span>
         </p>
         <div className="my-4 grid gap-3 sm:grid-cols-3">
@@ -291,12 +273,7 @@ function DetailContent({
             </strong>
           </div>
         </div>
-        <DocumentActions
-          id={id}
-          code={data.code ?? "REQ"}
-          version={p.version}
-        />
-      </section>
+      </DocumentHeader>
       <section className="ui-card">
         <h2 className="font-semibold">Materiais requisitados</h2>
         <p className="mt-2 text-xs text-(--muted)">
@@ -496,8 +473,7 @@ function DetailContent({
           </button>
         </form>
       </Dialog>
-      <section className="ui-card">
-        <h2 className="font-semibold">Avisos e acompanhamento</h2>
+      <SettingsSection title="Avisos e acompanhamento" summary={data.requisition_notifications.length + " aviso(s) · estados do aplicativo e do provedor são independentes"}>
         <p className="mt-2 text-xs text-(--muted)">
           Enviado, entregue, lido e ciência são fatos independentes.
         </p>
@@ -515,7 +491,7 @@ function DetailContent({
         {!data.requisition_notifications.length ? (
           <p className="mt-3 text-sm">Nenhum aviso disponível.</p>
         ) : null}
-      </section>
+      </SettingsSection>
       <section className="ui-card">
         <h2 className="font-semibold">Observações</h2>
         {data.requisition_observations.length ? (

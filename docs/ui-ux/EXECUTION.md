@@ -19,8 +19,8 @@ pré-condições. Nenhum reset de banco será realizado.
 | A | Fundação publicada | Referências, inventário, Fluent, tema e componentes |
 | B | Publicado | Shells, contexto, menus, login e perfil |
 | C | Publicado | Dashboards por contexto e tarefas |
-| D | Publicação incremental | Administração, matrizes, catálogo e unidades |
-| E | Pendente | Documentos, wizards, estoque, histórico e notificações |
+| D | Base publicada | Administração, matrizes, catálogo e unidades |
+| E | Publicação incremental | Documentos, wizards, estoque e histórico |
 | F | Pendente | Escalas persistentes, permissões e interfaces |
 | G | Pendente | BAL por plantão, atrasos, adiamentos e regularização |
 | H | Pendente | Homologação, evidências, documentação e integração |
@@ -120,3 +120,31 @@ Após a aplicação, permaneceram 8 identidades Auth, 6 perfis, 13 vínculos,
 29 produtos, 59 ligações de catálogo, 7 REQ, 11 documentos e 8 movimentos.
 O administrador global original segue ativo. Anônimo e worker não receberam
 execução da operação administrativa de adoção de catálogo.
+
+Bloco E: DocumentViewer e cabeçalho comuns em `/documentos/[id]`, mantendo
+URLs legadas e allowlist de demonstração. Classificação vem do servidor e
+inclui o identificador, evitando metadados de outra navegação. Nome na emissão
+e versões são preservados. Eventos, hashes, avisos e anexos ficam sob demanda.
+
+Wizards usam ações compartilhadas e cabeçalho compacto. Atendimento REQ,
+ciência e conferência ENT continuam independentes. Histórico preserva filtros
+e página na URL. Estoque usa tabela no desktop, cartões móveis e detalhes por
+custódia; confirmado é separado de trânsito/projeção. Movimentação familiar
+abre painel e seleciona a compensação entre movimentos manuais do histórico.
+Documentos confirmados continuam corrigidos por seus próprios fluxos formais.
+
+Ocorrências usam edição contextual e revisão antes da confirmação que debita
+estoque. Notificações distinguem estado no aplicativo de resultado externo.
+Navegação tem grupos recolhíveis; configuração usa links de seção com URLs e
+teclado nativos, mantendo todas as regras axe.
+
+Passaram no Chromium o fluxo REQ/COM doação/recebimento/ENT parcial/BAL,
+anexos, scanner, cancelamento, troca de destinatário e compensação de estoque.
+Documentos dos quatro tipos, histórico e estoque passaram nos três projetos;
+o profissional aceitou um convite real antes de receber a ENT. A tentativa de
+vincular uma conta externa ao paciente sem convite foi recusada corretamente.
+
+Após as correções, passaram acessibilidade, consulta documental, ocorrências,
+notificações e confirmação de consumo. A repetição do fluxo com upload de
+anexo passou. Contratos, 95 unitários, tipos, lint e build do runner passaram.
+Homologação integral e CI final permanecem no bloco H, após escalas e novo BAL.

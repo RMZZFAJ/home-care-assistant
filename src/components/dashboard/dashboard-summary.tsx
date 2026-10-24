@@ -18,7 +18,7 @@ export function RequestProgress({ data }: { data: DashboardData }) {
     <strong>{request.code}</strong><p>{request.fulfillment.fulfilled} de {request.fulfillment.total} itens atendidos</p>
     <ProgressBar value={request.fulfillment.fulfilled} max={Math.max(1, request.fulfillment.total)} aria-label="Itens da requisição atendidos" />
     <p className="text-xs text-(--muted)">Ciência familiar e recebimento de materiais possuem registros próprios.</p>
-    <Link href={"/historico/" + request.id} className="ui-button ui-button-secondary" prefetch={false}>Abrir requisição</Link>
+    <Link href={"/documentos/" + request.id} className="ui-button ui-button-secondary" prefetch={false}>Abrir requisição</Link>
   </section>;
 }
 export function CriticalStockSummary({ data }: { data: DashboardData }) {

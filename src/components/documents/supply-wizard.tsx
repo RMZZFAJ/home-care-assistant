@@ -15,6 +15,7 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
+import { WizardActions } from "@/components/forms/wizard-actions";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { SupplyWizardStep, type WizardState } from "./supply-wizard-step";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
@@ -48,7 +49,7 @@ type SourceRequest = {
 export function SupplyWizard({ type }: { type: SupplyType }) {
   const params = useSearchParams();
   return (
-    <Workspace title={documentLabels[type]}>
+    <Workspace title={documentLabels[type]} compact>
       {(context) =>
         context.patient ? (
           <PatientSupplyWizard
@@ -661,53 +662,7 @@ function PatientSupplyWizard({
               tentativa antes de iniciar outra.
             </Notice>
           ) : null}
-          <div className="wizard-actions">
-            <button
-              className={buttonClass}
-              type="button"
-              disabled={step === 0 || busy || uncertain}
-              onClick={() => {
-                setStep((current) => current - 1);
-                setError("");
-              }}
-            >
-              Voltar
-            </button>
-            <div className="flex flex-wrap gap-2">
-              <button
-                className={buttonClass}
-                type="button"
-                disabled={busy || uncertain}
-                onClick={() => void persist(true)}
-              >
-                Salvar rascunho
-              </button>
-              {step < 5 ? (
-                <button
-                  className={primaryClass}
-                  type="button"
-                  disabled={busy || uncertain}
-                  onClick={next}
-                >
-                  {step === 4 ? "Revisar" : "Avançar"}{" "}
-                  <Icon name="arrow" width="16" />
-                </button>
-              ) : (
-                <button
-                  className={primaryClass}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void persist(false)}
-                >
-                  {busy
-                    ? "Registrando…"
-                    : uncertain
-                      ? "Recuperar esta tentativa"
-                      : "Confirmar e concluir"}
-                </button>
-              )}
-            </div>
-          </div>
+          <WizardActions step={step} total={6} saving={busy} uncertain={uncertain} onBack={() => { setStep((value) => value - 1); setError(""); }} onDraft={() => void persist(true)} onNext={next} onFinish={() => void persist(false)} />
         </section>
       )}
     </div>

@@ -159,7 +159,7 @@ for (const role of [
       page.getByRole("heading", { name: "Saldos e previsões", exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", {
+      page.getByRole("button", {
         name: "Movimentar estoque familiar",
         exact: true,
       }),

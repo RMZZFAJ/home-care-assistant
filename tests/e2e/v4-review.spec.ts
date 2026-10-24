@@ -117,7 +117,7 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
     await expect.poll(async () => (await governance(page)).settings.archiveDays).toBe(11);
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await page.getByRole("tab", { name: "Notificações", exact: true }).click();
+    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
     await page.getByRole("button", { name: "Opções de Requisição emitida · Familiar", exact: true }).click();
     const cell = page.getByRole("dialog");
     const start = cell.getByLabel("Início", { exact: true }),

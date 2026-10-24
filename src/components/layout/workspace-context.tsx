@@ -8,7 +8,7 @@ import { demoDocuments } from "@/lib/demo-documents";
 import { WorkspaceShell } from "./workspace-shell";
 
 export type ContextData = {
-  documentContext?: { patientId: string; displayName: string; type: string } | null;
+  documentContext?: { id: string; patientId: string; displayName: string; type: string } | null;
   avatarUrl?: string | null;
   userId: string;
   fullName: string;

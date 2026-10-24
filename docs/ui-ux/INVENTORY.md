@@ -40,6 +40,17 @@ Dependências internas:
 
 - src/components/admin/accept-invitation
 
+### src/app/documentos/[id]/page.tsx
+
+Linhas: 14. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/authenticated-page
+- src/components/documents/document-viewer
+- src/components/documents/demo-document
+- src/lib/demo-documents
+
 ### src/app/entregas/page.tsx
 
 Linhas: 4. Estados locais: 0.
@@ -65,7 +76,7 @@ Linhas: 24. Estados locais: 0.
 Dependências internas:
 
 - src/components/authenticated-page
-- src/components/documents/supply-detail
+- src/components/documents/document-viewer
 - src/lib/demo-documents
 - src/components/documents/demo-document
 
@@ -121,7 +132,7 @@ Linhas: 28. Estados locais: 0.
 Dependências internas:
 
 - src/components/authenticated-page
-- src/components/requisitions/requisition-detail
+- src/components/documents/document-viewer
 - src/lib/demo-documents
 - src/components/documents/demo-document
 
@@ -228,7 +239,7 @@ Dependências internas:
 
 ### src/components/admin/admin-console.tsx
 
-Linhas: 528. Estados locais: 15.
+Linhas: 527. Estados locais: 15.
 
 Dependências internas:
 
@@ -540,11 +551,12 @@ Dependências internas:
 
 ### src/components/documents/attachments.tsx
 
-Linhas: 204. Estados locais: 6.
+Linhas: 205. Estados locais: 6.
 
 Dependências internas:
 
 - src/components/workspace
+- src/components/forms/settings-section
 
 ### src/components/documents/delivery-inbox.tsx
 
@@ -573,9 +585,20 @@ Dependências internas:
 
 - src/components/workspace
 
+### src/components/documents/document-header.tsx
+
+Linhas: 14. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/ui/primitives
+- src/components/documents/document-actions
+- src/lib/receipt
+- src/types/documents
+
 ### src/components/documents/document-history.tsx
 
-Linhas: 370. Estados locais: 9.
+Linhas: 387. Estados locais: 7.
 
 Dependências internas:
 
@@ -588,12 +611,24 @@ Dependências internas:
 
 ### src/components/documents/document-timeline.tsx
 
-Linhas: 43. Estados locais: 0.
+Linhas: 44. Estados locais: 0.
 
 Dependências internas:
 
 - src/lib/notifications/event-labels
 - src/lib/receipt
+- src/components/forms/settings-section
+
+### src/components/documents/document-viewer.tsx
+
+Linhas: 13. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/workspace
+- src/components/layout/workspace-context
+- src/components/requisitions/requisition-detail
+- src/components/documents/supply-detail
 
 ### src/components/documents/forms-hub.tsx
 
@@ -627,10 +662,12 @@ Dependências internas:
 
 ### src/components/documents/supply-detail.tsx
 
-Linhas: 505. Estados locais: 10.
+Linhas: 476. Estados locais: 10.
 
 Dependências internas:
 
+- src/components/forms/settings-section
+- src/lib/documents/presentation
 - src/components/documents/supply-line-summary
 - src/components/workspace
 - src/components/ui/primitives
@@ -642,7 +679,7 @@ Dependências internas:
 - src/lib/quantity
 - src/lib/receipt
 - src/lib/use-live-revision
-- src/components/documents/document-actions
+- src/components/documents/document-header
 
 ### src/components/documents/supply-line-summary.tsx
 
@@ -667,13 +704,14 @@ Dependências internas:
 
 ### src/components/documents/supply-wizard.tsx
 
-Linhas: 716. Estados locais: 15.
+Linhas: 671. Estados locais: 15.
 
 Dependências internas:
 
 - src/components/documents/document-actions
 - src/components/workspace
 - src/components/notifications/document-delivery-status
+- src/components/forms/wizard-actions
 - src/components/ui/primitives
 - src/components/documents/supply-wizard-step
 - src/lib/quantity
@@ -690,6 +728,14 @@ Dependências internas:
 ### src/components/forms/settings-section.tsx
 
 Linhas: 20. Estados locais: 1.
+
+Dependências internas:
+
+- src/components/ui/primitives
+
+### src/components/forms/wizard-actions.tsx
+
+Linhas: 11. Estados locais: 0.
 
 Dependências internas:
 
@@ -738,7 +784,7 @@ Dependências internas:
 
 ### src/components/navigation/workspace-navigation.tsx
 
-Linhas: 77. Estados locais: 0.
+Linhas: 79. Estados locais: 0.
 
 Dependências internas:
 
@@ -772,7 +818,7 @@ Dependências internas:
 
 ### src/components/notifications/notification-center.tsx
 
-Linhas: 210. Estados locais: 7.
+Linhas: 209. Estados locais: 7.
 
 Dependências internas:
 
@@ -801,17 +847,19 @@ Linhas: 6. Estados locais: 0.
 
 ### src/components/requisitions/requisition-detail.tsx
 
-Linhas: 559. Estados locais: 7.
+Linhas: 535. Estados locais: 7.
 
 Dependências internas:
 
+- src/components/forms/settings-section
 - src/components/workspace
 - src/lib/use-live-revision
 - src/lib/receipt
 - src/lib/quantity
 - src/lib/text-rows
+- src/lib/documents/presentation
 - src/components/documents/attachments
-- src/components/documents/document-actions
+- src/components/documents/document-header
 - src/components/documents/document-timeline
 - src/components/documents/related-document
 - src/components/ui/primitives
@@ -859,7 +907,7 @@ Dependências internas:
 
 ### src/components/requisitions/requisition-wizard.tsx
 
-Linhas: 480. Estados locais: 13.
+Linhas: 430. Estados locais: 13.
 
 Dependências internas:
 
@@ -867,6 +915,7 @@ Dependências internas:
 - src/types/requisition
 - src/types/documents
 - src/components/workspace
+- src/components/forms/wizard-actions
 - src/components/ui/primitives
 - src/components/requisitions/requisition-steps
 - src/components/requisitions/requisition-receipt
@@ -883,13 +932,15 @@ Dependências internas:
 
 ### src/components/stock/consumption-console.tsx
 
-Linhas: 295. Estados locais: 8.
+Linhas: 299. Estados locais: 10.
 
 Dependências internas:
 
 - src/components/workspace
 - src/lib/receipt
 - src/components/stock/flow-reviews
+- src/components/forms/record-drawer
+- src/components/ui/primitives
 - src/types/documents
 
 ### src/components/stock/flow-reviews.tsx
@@ -914,7 +965,7 @@ Dependências internas:
 
 ### src/components/stock/stock-console.tsx
 
-Linhas: 661. Estados locais: 19.
+Linhas: 540. Estados locais: 22.
 
 Dependências internas:
 
@@ -925,6 +976,19 @@ Dependências internas:
 - src/components/stock/transit-stock
 - src/lib/quantity
 - src/lib/receipt
+- src/types/stock
+- src/components/stock/stock-overview
+- src/components/forms/record-drawer
+
+### src/components/stock/stock-overview.tsx
+
+Linhas: 26. Estados locais: 2.
+
+Dependências internas:
+
+- src/components/forms/record-drawer
+- src/lib/quantity
+- src/types/stock
 
 ### src/components/stock/transit-stock.tsx
 
@@ -938,7 +1002,7 @@ Dependências internas:
 
 ### src/components/ui/primitives.tsx
 
-Linhas: 181. Estados locais: 0.
+Linhas: 182. Estados locais: 0.
 
 Dependências internas:
 

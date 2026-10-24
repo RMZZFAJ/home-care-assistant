@@ -14,7 +14,7 @@ import {
 import { PermissionMatrix } from "./permission-matrix";
 import { NotificationMatrix } from "./notification-matrix";
 import { PolicyRules } from "./policy-rules";
-import { Tab, TabList } from "@fluentui/react-components";
+import { Button } from "@fluentui/react-components";
 import { useRouter, useSearchParams } from "next/navigation";
 import { roles } from "./admin-fields";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -241,7 +241,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
           />
         </Notice>
       ) : null}
-      <TabList aria-label="Áreas da configuração" selectedValue={tab} onTabSelect={(_, value) => setTab(String(value.value))} className="hca-configuration-tabs" style={{ flexWrap: "wrap" }}><Tab value="rules">Regras</Tab><Tab value="permissions">Permissões</Tab><Tab value="notifications">Notificações</Tab><Tab value="people">Pessoas e propostas</Tab></TabList>
+      <nav aria-label="Áreas da configuração" className="hca-configuration-tabs">{[["rules", "Regras"], ["permissions", "Permissões"], ["notifications", "Notificações"], ["people", "Pessoas e propostas"]].map(([area, label]) => { const query = new URLSearchParams(params.toString()); query.set("area", area); return <Button key={area} as="a" appearance="subtle" className="hca-configuration-tab" href={"/configuracoes?" + query} aria-current={tab === area ? "page" : undefined} onClick={(event) => { if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) { event.preventDefault(); setTab(area); } }}>{label}</Button>; })}</nav>
       <div hidden={tab !== "rules"}>
         <PolicyRules key={patientId + ":" + attempt} settings={settings} directory={data.directory} busy={busy} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
       </div>

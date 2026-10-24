@@ -13,6 +13,9 @@ import {
 } from "../workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { FlowReviews } from "./flow-reviews";
+import { Button } from "@fluentui/react-components";
+import { RecordDrawer } from "@/components/forms/record-drawer";
+import { Dialog, Icon } from "@/components/ui/primitives";
 import type { CatalogProduct } from "@/types/documents";
 type Report = {
   id: string;
@@ -37,6 +40,8 @@ export function ConsumptionConsole() {
   );
 }
 function Reports({ context }: { context: WorkspaceContext }) {
+  const [editor, setEditor] = useState<HTMLElement | null>(null);
+  const [review, setReview] = useState<{ row: Report; accept: boolean } | null>(null);
   const [rows, setRows] = useState<Report[]>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [lines, setLines] = useState<Record<string, string>>({});
@@ -77,10 +82,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
       await api("/api/consumption", pendingRef.current);
       pendingRef.current = null;
       setUncertain(false);
+      setEditor(null);
+      setLines({});
       setMessage(
         "Operação confirmada. Relatos só alteram o estoque após confirmação autorizada.",
       );
       setAttempt((value) => value + 1);
+      return true;
     } catch (reason) {
       if (
         reason instanceof ApiError &&
@@ -93,6 +101,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           ? reason.message
           : "Não foi possível confirmar.",
       );
+      return false;
     } finally {
       setBusy(false);
     }
@@ -101,9 +110,11 @@ function Reports({ context }: { context: WorkspaceContext }) {
     <div className="space-y-5">
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      {can(context, "consumption.report") ? (
-        <section className="ui-card">
-          <h2 className="font-semibold">Registrar relato</h2>
+      {can(context, "consumption.report") ? <div className="hca-toolbar"><Button appearance="primary" icon={<Icon name="plus" />} onClick={(event) => setEditor(event.currentTarget)}>Registrar ocorrência</Button></div> : null}
+      {can(context, "consumption.report") && editor ? (
+        <RecordDrawer title="Registrar relato" onClose={() => setEditor(null)} restoreFocusTo={editor} busy={busy} preventClose={uncertain}>
+          {error ? <Notice error>{error}</Notice> : null}
+          {uncertain ? <Notice>O envio está preservado. Recupere a mesma tentativa para confirmar o resultado.</Notice> : null}
           <p className="mt-2 text-sm text-(--muted)">
             Relate apenas produtos sob responsabilidade familiar. Quantidades
             serão conferidas antes de movimentar o estoque.
@@ -212,7 +223,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
               {uncertain ? "Recuperar relato" : "Registrar para conferência"}
             </button>
           </form>
-        </section>
+        </RecordDrawer>
       ) : null}
       {can(context, "consumption.report") ? (
         <FlowReviews
@@ -259,22 +270,14 @@ function Reports({ context }: { context: WorkspaceContext }) {
                   <button
                     className={primaryClass}
                     disabled={busy}
-                    onClick={() =>
-                      void send({ action: "confirm", id: row.id, accept: true })
-                    }
+                    onClick={() => setReview({ row, accept: true })}
                   >
                     Confirmar relato e movimento
                   </button>
                   <button
                     className={buttonClass}
                     disabled={busy}
-                    onClick={() =>
-                      void send({
-                        action: "confirm",
-                        id: row.id,
-                        accept: false,
-                      })
-                    }
+                    onClick={() => setReview({ row, accept: false })}
                   >
                     Rejeitar relato
                   </button>
@@ -289,6 +292,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           </p>
         ) : null}
       </section>
+      <Dialog open={Boolean(review)} title="Revisar confirmação do relato" onClose={() => { if (!busy && !uncertain) setReview(null); }}>{review ? <><p>{review.row.body}</p><ul className="my-4 space-y-2">{review.row.lines.map((line) => <li key={line.productId}>{products.find((product) => product.id === line.productId)?.name ?? "Produto"} · {line.quantity}</li>)}</ul><p className="hca-field-hint">{review.accept ? "A confirmação registra o consumo na custódia indicada. O relato e o movimento permanecem auditáveis." : "A rejeição preserva o relato sem movimentar o estoque."}</p>{error ? <Notice error>{error}</Notice> : null}<div className="hca-toolbar"><Button disabled={busy || uncertain} onClick={() => setReview(null)}>Voltar</Button><Button appearance="primary" disabled={busy} onClick={async () => { if (await send({ action: "confirm", id: review.row.id, accept: review.accept })) setReview(null); }}>{uncertain ? "Recuperar confirmação" : review.accept ? "Confirmar consumo" : "Confirmar rejeição"}</Button></div></> : null}</Dialog>
     </div>
   );
 }
