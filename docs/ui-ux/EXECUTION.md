@@ -20,8 +20,8 @@ pré-condições. Nenhum reset de banco será realizado.
 | B | Publicado | Shells, contexto, menus, login e perfil |
 | C | Publicado | Dashboards por contexto e tarefas |
 | D | Base publicada | Administração, matrizes, catálogo e unidades |
-| E | Publicação incremental | Documentos, wizards, estoque e histórico |
-| F | Pendente | Escalas persistentes, permissões e interfaces |
+| E | Base publicada | Documentos, wizards, estoque e histórico |
+| F | Publicação incremental | Escalas persistentes, permissões e interfaces |
 | G | Pendente | BAL por plantão, atrasos, adiamentos e regularização |
 | H | Pendente | Homologação, evidências, documentação e integração |
 
@@ -148,3 +148,26 @@ Após as correções, passaram acessibilidade, consulta documental, ocorrências
 notificações e confirmação de consumo. A repetição do fluxo com upload de
 anexo passou. Contratos, 95 unitários, tipos, lint e build do runner passaram.
 Homologação integral e CI final permanecem no bloco H, após escalas e novo BAL.
+
+Bloco F: agenda persistente com séries semanais, datas avulsas e ciclos
+12×36/24×48/24×24; exceções, propostas, substituições e encerramentos auditáveis.
+Exclusão transacional bloqueia sobreposições entre pacientes sem expor dados
+do conflito. Autoridade própria e da equipe são separadas. A API não permite
+escrita direta ou competência local derivada da administração global.
+
+A integração Auth real e o E2E Chromium passaram. A agenda e o formulário
+foram inspecionados em desktop/mobile; o cadastro e a recusa de conflito
+foram verificados na API. 97 unitários, tipos e lint passaram. A documentação
+de comportamento está em [Escalas](SCHEDULES.md). Três migrations incrementais
+foram pré-validadas localmente sem reset; o checkpoint remoto será registrado
+após a conferência das contagens. O novo BAL permanece em implementação.
+
+Escalas aplicadas no remoto após backup de esquema/dados e verificação SHA-256.
+As contagens permaneceram 8 Auth, 6 perfis, 13 vínculos, 59 produtos por
+paciente, 11 documentos e 8 movimentos. Nenhum plantão foi criado pela
+migration. A conta global original permanece ativa; anônimo e worker não
+receberam execução de comandos de escala.
+
+O helper de backup local foi corrigido para consumir o arquivo inteiro antes
+da leitura do catálogo: pg_restore encerrava a entrada cedo em arquivos maiores
+no Windows. Novo backup SHA-256 e leitura do catálogo foram verificados.

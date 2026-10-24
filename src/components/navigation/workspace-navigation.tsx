@@ -6,7 +6,7 @@ import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
 import { Icon, type IconName } from "@/components/ui/primitives";
 
-type Item = { label: string; href: string; icon?: IconName; capability?: string };
+type Item = { label: string; href: string; icon?: IconName; capability?: string; capabilities?: string[] };
 export const operationalDestinations: Item[] = [
   { label: "Início", href: "/", icon: "home" },
   { label: "Histórico", href: "/historico", icon: "history" },
@@ -19,6 +19,7 @@ const groups: { label: string; items: Item[] }[] = [
     { label: "Visão geral", href: "/", icon: "home" },
     { label: "Histórico de fichas", href: "/historico", icon: "history" },
     { label: "Notificações", href: "/notificacoes", icon: "bell" },
+    { label: "Escalas e plantões", href: "/escalas", icon: "calendar", capabilities: ["schedule.read.own", "schedule.read.team"] },
   ] },
   { label: "Fichas", items: [
     { label: "REQ · Requisição", href: "/fichas/req", icon: "forms", capability: "req.create" },
@@ -54,9 +55,9 @@ export function WorkspaceNavigation({ context, operational = false, onNavigate }
     const query = new URLSearchParams(search);
     return [...query].every(([key, value]) => (params.get(key) ?? (key === "custody" ? context?.patient?.capabilities?.["stock.family.read"] ? "FAMILY" : "CARE_TEAM" : "")) === value);
   };
-  const filtered = (items: Item[]) => items.filter((item) => !item.capability || context && can(context, item.capability));
+  const filtered = (items: Item[]) => items.filter((item) => (!item.capability || context && can(context, item.capability)) && (!item.capabilities || context && item.capabilities.some(capability => can(context, capability))));
   const sections = operational ? [{ label: "Seu plantão", items: filtered(operationalDestinations) },
-    { label: "Ações rápidas", items: filtered(groups.flatMap((group) => group.items).filter((item) => ["/fichas/req", "/fichas/bal", "/consumo"].includes(item.href))) },
+    { label: "Ações rápidas", items: filtered(groups.flatMap((group) => group.items).filter((item) => ["/fichas/req", "/fichas/bal", "/consumo", "/escalas"].includes(item.href))) },
     { label: "Gestão autorizada", items: filtered(groups.find((group) => group.label === "Gestão do paciente")!.items) }] : groups.map((group) => ({ ...group, items: filtered(group.items) }));
   if (context?.activeContext?.mode === "global" && context.globalAdministrationAllowed) sections.push({ label: "Administração global", items: [
     { label: "Pacientes", href: "/admin?section=patient", icon: "team" },

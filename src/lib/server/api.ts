@@ -22,6 +22,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/schedule overlap/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Este profissional já possui um plantão nesse período. Revise os horários.", 409);
   if (/duplicate review required/i.test(message))
     throw new ApiError(
       "DUPLICATE_REVIEW_REQUIRED",

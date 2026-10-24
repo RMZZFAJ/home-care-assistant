@@ -24,7 +24,7 @@ export function notificationHref(row: NotificationTarget) {
       : {}),
   });
   return (
-    (row.alert_event_id
+    (row.event_key?.startsWith("schedule.") ? "/escalas" : row.event_key?.startsWith("bal.cycle.") ? "/balancos" : row.alert_event_id
       ? "/estoque"
       : row.event_key === "bal.reminder"
         ? "/fichas/bal"
