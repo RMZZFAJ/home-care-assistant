@@ -29,6 +29,9 @@ informado. Convites revalidam a autoridade local do emissor no aceite.
 - Evidências: anexos privados, PDF por versão e snapshots canônicos.
 - Comunicação: outbox, estados externos e ciência no aplicativo independentes.
 - Relatos: sugestões de falta/consumo e revisão autenticada de Flow.
+- Escalas: programação persistente, propostas e intervalos sem sobreposição.
+- BAL por plantão: regime opt-in, obrigações semanais, atribuições, decisões
+  familiares e regularização com conservação dos atrasos históricos.
 
 A interface usa shell hierárquico recolhível, tokens visuais, controles comuns,
 wizards com barra de etapas acessível e histórico filtrável. Componentes de

@@ -1,4 +1,5 @@
 "use client";
+import { SettingsSection } from "@/components/forms/settings-section";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   api,
@@ -143,8 +144,8 @@ function ProfileContent() {
         <Notice>Carregando perfil…</Notice>
       ) : (
         <>
-          <section className="ui-card">
-            <h2 className="font-semibold">Identidade pessoal</h2>
+          <SettingsSection title="Identidade pessoal" summary="Nome, identificação profissional e preferências">
+            
             <p className="mt-2 text-sm text-(--muted)">{profile.email}</p>
             <form
               key={attempt}
@@ -281,9 +282,9 @@ function ProfileContent() {
                 Salvar perfil
               </button>
             </form>
-          </section>
-          <section className="ui-card">
-            <h2 className="font-semibold">Foto de perfil</h2>
+          </SettingsSection>
+          <SettingsSection title="Foto de perfil" summary="Imagem utilizada na identificação da sua conta">
+            
             {profile.avatar ? (
               <Image
                 className="mt-4 rounded-full object-cover"
@@ -312,10 +313,10 @@ function ProfileContent() {
                 Salvar foto
               </button>
             </form>
-          </section>
+          </SettingsSection>
           {profile.providers.includes("email") ? (
-            <section className="ui-card">
-              <h2 className="font-semibold">Alterar senha</h2>
+            <SettingsSection title="Alterar senha" summary="Proteja seu acesso com autenticação recente">
+              
               <form
                 className="mt-4 space-y-4"
                 onSubmit={(event) => void save(event, "password")}
@@ -349,7 +350,7 @@ function ProfileContent() {
                   Alterar senha
                 </button>
               </form>
-            </section>
+            </SettingsSection>
           ) : (
             <Notice>
               Sua autenticação é gerenciada pelo provedor da conta.
@@ -362,8 +363,8 @@ function ProfileContent() {
             providers={profile.providers}
             onChange={() => setAttempt((value) => value + 1)}
           />
-          <section className="ui-card">
-            <h2 className="font-semibold">Seus vínculos com pacientes</h2>
+          <SettingsSection title="Seus vínculos com pacientes" summary="Funções e situação dos seus acessos">
+            
             <ul className="mt-4 space-y-3">
               {memberships.map((membership) => (
                 <li
@@ -399,9 +400,9 @@ function ProfileContent() {
                 global possui escopo independente.
               </p>
             ) : null}
-          </section>
-          <section className="ui-card">
-            <h2 className="font-semibold">Sessões autenticadas</h2>
+          </SettingsSection>
+          <SettingsSection title="Sessões autenticadas" summary="Dispositivos e acessos vinculados à sua conta">
+            
             <ul className="mt-4 space-y-3">
               {sessions.map((session) => (
                 <li
@@ -444,7 +445,7 @@ function ProfileContent() {
             >
               Encerrar outras sessões
             </button>
-          </section>
+          </SettingsSection>
         </>
       )}
     </div>

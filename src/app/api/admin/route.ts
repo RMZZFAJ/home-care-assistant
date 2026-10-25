@@ -229,7 +229,7 @@ export async function GET(request: Request) {
     const patient = await patientContext(
       auth,
       params.get("careRecipientId"),
-      "manage",
+      ["catalog", "products"].includes(section) ? "catalog.manage" : section === "audit" ? "audit.read" : "manage",
     );
     if (section === "memberships") {
       const members = (await rpc(auth.client, "admin_list_memberships", {
@@ -462,7 +462,7 @@ export async function POST(request: Request) {
         }),
       });
     }
-    await patientContext(auth, input.careRecipientId, "manage", true);
+    await patientContext(auth, input.careRecipientId, ["product", "adoptProduct"].includes(input.action) ? "catalog.manage" : "manage", true);
     let data: unknown;
     switch (input.action) {
       case "product":

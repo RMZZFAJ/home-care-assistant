@@ -1,4 +1,6 @@
 "use client";
+import { SettingsSection } from "@/components/forms/settings-section";
+import { documentPatientName } from "@/lib/documents/presentation";
 import { SupplyLineSummary } from "./supply-line-summary";
 
 import Link from "next/link";
@@ -10,15 +12,13 @@ import {
   can,
   Notice,
   primaryClass,
-  Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
-import { Dialog, StatusBadge } from "@/components/ui/primitives";
+import { Dialog } from "@/components/ui/primitives";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { Attachments } from "./attachments";
 import { CommandEditor, type DocumentAction } from "./supply-command-editor";
 import {
-  documentLabels,
   type PatientPerson,
   type SupplyDocument,
 } from "@/types/documents";
@@ -26,16 +26,9 @@ import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
-import { DocumentActions } from "./document-actions";
+import { DocumentHeader } from "./document-header";
 
-export function SupplyDetail({ id }: { id: string }) {
-  return (
-    <Workspace title="Acompanhamento da ficha">
-      {(context) => <Detail key={id} id={id} context={context} />}
-    </Workspace>
-  );
-}
-function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
+export function SupplyDocumentContent({ id, context }: { id: string; context: WorkspaceContext }) {
   const liveRevision = useLiveRevision();
   const editingRef = useRef(false);
   const [data, setData] = useState<SupplyDocument | null>(null);
@@ -216,8 +209,9 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
       )
         actions.push("consent_cancel");
     } else if (data.type === "BAL" && data.status === "submitted") {
-      if (allowed("bal.approve.family")) actions.push("approve_family");
-      if (allowed("bal.approve.supervisor")) actions.push("approve_supervisor");
+      const ownCount=(data.payload.balanceContext?.professionalId??data.created_by)===context.userId;
+      if (!ownCount&&allowed("bal.approve.family") && ["admin","family"].includes(context.patient?.role??"")) actions.push("approve_family");
+      if (!ownCount&&allowed("bal.approve.supervisor")) actions.push("approve_supervisor");
     }
     if (
       data.status !== "cancellation_pending" &&
@@ -228,7 +222,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
         : data.type === "COM"
           ? allowed("com.approve") &&
             !data.lines.some((line) => quantity(line.purchased_quantity).gt(0))
-          : data.status !== "approved" && allowed("access.manage"))
+          : data.status !== "approved" && !data.payload.balanceContext && allowed("access.manage"))
     )
       actions.push("cancel");
   }
@@ -248,13 +242,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
         >
           Atualizar
         </button>
-        {data?.protocol ? (
-          <DocumentActions
-            id={id}
-            code={data.code ?? data.type}
-            version={data.version}
-          />
-        ) : null}
+
       </div>
       {loading ? <Notice>Consultando documento persistido…</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
@@ -273,22 +261,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
       ) : null}
       {data ? (
         <>
-          <section className="ui-card">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="eyebrow">{documentLabels[data.type]}</p>
-                <h2 className="mt-2 text-2xl font-semibold">
-                  {data.code ?? "Rascunho"}
-                </h2>
-              </div>
-              <StatusBadge status={data.status} />
-            </div>
-            <p className="mt-3 break-all text-xs text-(--muted)">
-              {data.protocol}
-            </p>
-            <p className="mt-3 text-sm">
-              {formatBrazilDate(data.created_at)} · Versão {data.version}
-            </p>
+          <DocumentHeader id={data.id} type={data.type} code={data.code ?? "Rascunho"} status={data.status} protocol={data.protocol} version={data.version} createdAt={data.created_at} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado no documento")}>
             {data.type === "ENT" ? (
               <div className="mt-4 space-y-2">
                 <p className="font-semibold">
@@ -320,7 +293,8 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
                 Abrir requisição
               </Link>
             ) : null}
-          </section>
+          </DocumentHeader>
+          {data.type==="BAL"&&data.payload.balanceContext?<section className="ui-card"><h2>Plantão e contagem física</h2><strong>{data.payload.balanceContext.professionalName} · {data.payload.balanceContext.shiftType}</strong><p>{formatBrazilDate(data.payload.balanceContext.startsAt)} → {formatBrazilDate(data.payload.balanceContext.endsAt)}</p><p>Contagem atual: {formatBrazilDate(data.payload.balanceContext.countedAt)}</p><p>Semanas vinculadas: {data.payload.balanceContext.weeks.map(week=>week.split("-").reverse().join("/")).join(", ")}</p><p className="hca-muted">Semanas anteriores são regularizadas pela contagem atual, preservando seus prazos e atrasos históricos.</p>{data.status==="draft"?<Notice>Rascunho: a obrigação ainda não foi concluída.</Notice>:null}</section>:null}
           {activeContext &&
           data.status === "draft" &&
           allowed(
@@ -340,7 +314,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
           {activeContext &&
           data.type === "BAL" &&
           data.status === "submitted" &&
-          allowed("bal.count") ? (
+          allowed("bal.count") && !data.payload.balanceContext ? (
             <Link
               className={buttonClass}
               href={"/fichas/bal?documentId=" + data.id + "&recount=true"}
@@ -348,6 +322,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
               Recontar com nova referência de estoque
             </Link>
           ) : null}
+          {data.type === "BAL" && data.payload.balanceContext ? <Link href="/balancos" className={buttonClass} prefetch={false}>Acompanhar plantão, revisão e reconto</Link> : null}
           {actions.length ? (
             <section className="ui-card">
               <h2 className="font-semibold">Próxima ação</h2>
@@ -418,8 +393,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
             onChange={() => setAttempt((value) => value + 1)}
           />
           <DocumentDeliveryStatus id={data.id} version={data.version} />
-          <section className="ui-card">
-            <h2 className="font-semibold">Versões e integridade</h2>
+          <SettingsSection title="Versões e integridade" summary={data.events.length + " versão(ões) · SHA-256 por evento"}>
             <p className="mt-2 text-xs text-(--muted)">
               O hash permite comparar o conteúdo canônico registrado. A
               rastreabilidade depende também dos controles de acesso e do
@@ -447,7 +421,7 @@ function Detail({ id, context }: { id: string; context: WorkspaceContext }) {
                 </li>
               ))}
             </ol>
-          </section>
+          </SettingsSection>
         </>
       ) : null}
       <Dialog

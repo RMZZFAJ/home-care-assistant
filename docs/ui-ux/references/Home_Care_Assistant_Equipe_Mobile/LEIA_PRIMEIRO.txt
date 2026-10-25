@@ -1,0 +1,9 @@
+HOME CARE ASSISTANT — PROTÓTIPO MOBILE DA EQUIPE
+
+Abra home-care-equipe-mobile.html no Chrome ou Edge.
+
+Em celular, ocupa a tela inteira. Em computador, apresenta moldura de telefone.
+Navegue por Início, Requisições, Entregas e Mais.
+Na seção Mais, alterne a demonstração entre Técnica e Supervisão.
+
+Dados fictícios e interações simuladas: nenhuma conexão ao Supabase.

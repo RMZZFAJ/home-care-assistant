@@ -1,5 +1,18 @@
 # Evolução integral — execução
 
+## Refatoração Fluent, escalas e BAL — 24/10/2026
+
+Execução integral autorizada na branch `codex/fluent-ui-escalas-bal`, publicada
+com [PR 5 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/5).
+O checkpoint e as evidências de cada bloco estão em
+[Execução da interface](../ui-ux/EXECUTION.md).
+
+Tema Fluent com SSR, shells por contexto, login/perfil e dashboards com tarefas
+reais foram publicados progressivamente. Administração, documentos, escalas e
+novo regime BAL continuam em execução. Não houve reset ou alteração remota
+nesta primeira etapa. O processamento novo será opt-in por paciente, iniciando
+na homologação. O merge depende da conclusão integral e dos checks finais.
+
 ## Entrega V4 — 23/10/2026
 
 Esta revisão substitui o checkpoint parcial da V4. O [PR 4][pr-v4] reúne a
@@ -384,3 +397,14 @@ constam no [relatório pós-merge](https://github.com/RMZZFAJ/home-care-assistan
 As credenciais permanecem somente em `.private/homologacao/ACESSOS.md`.
 Meta/Flows seguem desabilitados; os limites externos documentados continuam
 distintos da validação operacional e não são apresentados como homologação.
+
+## Evolução Fluent 2, escalas e BAL — 25/10/2026
+
+A execução posterior à V4 está registrada em
+[Execução da interface](../ui-ux/EXECUTION.md), na branch
+`codex/fluent-ui-escalas-bal` e na [PR 5](https://github.com/RMZZFAJ/home-care-assistant/pull/5).
+Os blocos A–F estão publicados; G integra o BAL por plantão e sua segregação
+de autoridade. O banco remoto recebeu os incrementos 68–81 após backups e
+validação local, preservando os dados. Nenhum reset foi feito; a ativação do
+novo BAL continua por paciente. Homologação integral e merge dependem dos
+checks e evidências finais registrados no checkpoint da interface e na PR 5.

@@ -15,6 +15,7 @@ import {
   issue,
   delivery,
   request,
+  claimExternalFixtureJob,
 } from "./v4-fixtures.mjs";
 
 test("V4: concurrent local administrator revocations preserve one active administrator", async () => {
@@ -558,13 +559,23 @@ test("V4: scheduled standalone reminders are idempotent, scoped and do not chang
   );
   await rpc(service, "run_operational_schedule");
   await rpc(service, "run_operational_schedule");
-  sql("select private.deliver_internal_notifications()");
-  const pro = await actor("professional", patient),
+  const pro = await actor("professional", patient);
+  const queueSize = Number(sql("select count(*) from public.requisition_notifications"));
+  let deliveredCount = Number(sql("select count(*) from public.requisition_notifications where channel='internal' and state='delivered'"));
+  let notices;
+  for (let batch = 0; batch <= queueSize; batch++) {
+    sql("select private.deliver_internal_notifications()");
     notices = await pro
       .from("requisition_notifications")
       .select("id,state,event_key,reminder_id")
       .eq("care_recipient_id", patient)
       .eq("event_key", "shift.reminder");
+    assert.ifError(notices.error);
+    if (notices.data[0]?.state === "delivered") break;
+    const nextCount = Number(sql("select count(*) from public.requisition_notifications where channel='internal' and state='delivered'"));
+    if (nextCount === deliveredCount) break;
+    deliveredCount = nextCount;
+  }
   assert.ifError(notices.error);
   assert.equal(notices.data.length, 1);
   assert.equal(notices.data[0].state, "delivered");
@@ -874,13 +885,8 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
       "update public.requisition_notifications set next_attempt_at=now()-interval '100 years' where document_id=" +
         sqlLiteral(req.id),
     );
-    const worker = randomUUID(),
-      jobs = await rpc(service, "claim_notification_jobs", {
-        p_limit: 100,
-        p_worker_id: worker,
-        p_external_enabled: true,
-      });
-    const job = jobs.find(
+    const worker = randomUUID();
+    const job = await claimExternalFixtureJob(service, worker,
       (n) =>
         n.document_id === req.id &&
         n.channel === "whatsapp" &&

@@ -1,4 +1,5 @@
 "use client";
+import { SettingsSection } from "@/components/forms/settings-section";
 import { useState, type FormEvent } from "react";
 import {
   api,
@@ -60,8 +61,8 @@ export function ContactSettings({
     }
   }
   return (
-    <section className="ui-card">
-      <h2 className="font-semibold">Contatos e métodos de login</h2>
+    <SettingsSection title="Contatos e métodos de login" summary="E-mail, telefone e provedores de autenticação">
+      
       <p className="mt-2 text-xs text-(--muted)">
         Alterações sensíveis exigem sessão recente. A confirmação de telefone
         usa o provedor de SMS do Supabase Auth. COREN não é fator de
@@ -177,6 +178,6 @@ export function ContactSettings({
           </button>
         ) : null}
       </div>
-    </section>
+    </SettingsSection>
   );
 }

@@ -11,12 +11,12 @@ import {
   api,
   ApiError,
   buttonClass,
-  primaryClass,
   Notice,
   may,
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
+import { WizardActions } from "@/components/forms/wizard-actions";
 import { StepNavigator } from "@/components/ui/primitives";
 
 import {
@@ -40,7 +40,7 @@ const steps = [
 ];
 export function RequisitionWizard() {
   return (
-    <Workspace title="Requisição de insumos">
+    <Workspace title="Requisição de insumos" compact>
       {(context) =>
         context.patient ? (
           <PatientRequisition context={context} />
@@ -421,57 +421,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
               Nenhum dado será reenviado com uma chave nova.
             </Notice>
           ) : null}
-          <div className="ui-form-actions">
-            <button
-              className={buttonClass}
-              disabled={step === 0 || saving || uncertain}
-              onClick={() => setStep((value) => value - 1)}
-            >
-              Voltar
-            </button>
-            <button
-              className={buttonClass}
-              disabled={saving || uncertain}
-              onClick={() => {
-                try {
-                  sessionStorage.setItem(
-                    storageKey,
-                    JSON.stringify({ savedAt: Date.now(), form }),
-                  );
-                  setMessage("Rascunho salvo neste dispositivo.");
-                } catch {
-                  setError(
-                    "O armazenamento deste dispositivo está indisponível.",
-                  );
-                }
-              }}
-            >
-              Salvar rascunho
-            </button>
-            {step < 6 ? (
-              <button
-                className={primaryClass}
-                disabled={Boolean(catalogError)}
-                onClick={() => {
-                  if (validate()) setStep((value) => value + 1);
-                }}
-              >
-                {step === 5 ? "Revisar" : "Avançar"}
-              </button>
-            ) : (
-              <button
-                className={primaryClass}
-                disabled={saving}
-                onClick={() => void submit()}
-              >
-                {saving
-                  ? "Registrando…"
-                  : uncertain
-                    ? "Recuperar esta tentativa"
-                    : "Concluir requisição"}
-              </button>
-            )}
-          </div>
+          <WizardActions step={step} total={7} saving={saving} uncertain={uncertain} blocked={Boolean(catalogError)} finishLabel="Concluir requisição" onBack={() => setStep((value) => value - 1)} onDraft={() => { try { sessionStorage.setItem(storageKey, JSON.stringify({ savedAt: Date.now(), form })); setMessage("Rascunho salvo neste dispositivo."); } catch { setError("O armazenamento deste dispositivo está indisponível."); } }} onNext={() => { if (validate()) setStep((value) => value + 1); }} onFinish={() => void submit()} />
         </section>
       )}
     </div>

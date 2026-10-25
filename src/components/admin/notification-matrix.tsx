@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { api, inputClass, Notice } from "@/components/workspace";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { roles } from "./admin-fields";
+import { Button, Checkbox, Input, Select, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow, Tooltip } from "@fluentui/react-components";
+import { Icon } from "@/components/ui/primitives";
+import { RecordDrawer } from "@/components/forms/record-drawer";
 type Rule = {
   event: string;
   subject_role: string;
@@ -24,6 +27,7 @@ export function NotificationMatrix({
   version,
   busy,
   configure,
+  configurationError = "",
 }: {
   patientId: string;
   version: number;
@@ -32,7 +36,11 @@ export function NotificationMatrix({
     kind: string,
     change: Record<string, unknown>,
   ) => Promise<boolean>;
+  configurationError?: string;
 }) {
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [editor, setEditor] = useState<{ event: string; role: string; opener: HTMLElement } | null>(null);
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState("");
   const savingRef = useRef(false);
@@ -133,66 +141,16 @@ export function NotificationMatrix({
       setPending(false);
     }
   };
-  return (
-    <section className="ui-card" aria-label="Matriz de notificações">
-      {error ? <Notice error>{error}</Notice> : null}
-      <h2 className="font-semibold">Eventos × funções · múltiplos canais</h2>
-      <p className="my-3 text-xs text-(--muted)">
-        Cada célula permite vários canais disponíveis. Destino verificado,
-        consentimento e autorização atual continuam obrigatórios. Canais sem
-        provedor habilitado não aparecem como disponíveis.
-      </p>
-      <div className="divide-y divide-(--line)">
-        {data.events.map((event) => (
-          <div key={event} className="py-4">
-            <h3 className="mb-3 text-sm font-semibold">
-              {documentEventLabel(event)}
-            </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
-              {Object.entries(roles).map(([role, label]) => {
-                const rule = data.rules.find(
-                  (row) => row.event === event && row.subject_role === role,
-                );
-                const selected = rule?.channels ?? ["internal"];
-                return (
-                  <div
-                    key={role}
-                    className="min-w-0 rounded-lg border border-(--line) p-2"
-                  >
-                    <p className="mb-2 text-xs font-semibold">{label}</p>
-                    {data.channels
-                      .filter(
-                        (channel) =>
-                          !data.eventChannels ||
-                          data.eventChannels[event]?.includes(channel.code),
-                      )
-                      .map((channel) => (
-                        <label
-                          key={channel.code}
-                          className="flex min-h-11 items-center gap-2 text-xs"
-                        >
-                          <input
-                            type="checkbox"
-                            aria-label={`${documentEventLabel(event)} · ${label} · ${channel.label}`}
-                            disabled={busy || pending}
-                            checked={selected.includes(channel.code)}
-                            onChange={(change) =>
-                              update(event, role, {
-                                channels: change.target.checked
-                                  ? [...selected, channel.code]
-                                  : selected.filter(
-                                      (code) => code !== channel.code,
-                                    ),
-                              })
-                            }
-                          />
-                          {channel.label}
-                        </label>
-                      ))}
-                    <details>
-                      <summary className="min-h-11 cursor-pointer pt-3 text-xs">
-                        Opções
-                      </summary>
+  const columns = Object.entries(roles).filter(([role]) => !roleFilter || role === roleFilter);
+  const available = (event: string) => data.channels.filter((channel) => !data.eventChannels || data.eventChannels[event]?.includes(channel.code));
+  return <section aria-label="Matriz de notificações">
+    {error ? <Notice error>{error}</Notice> : null}
+    <div className="hca-section-heading"><div><h2>Eventos × funções · múltiplos canais</h2><p>Canais disponíveis conforme o provedor; destino verificado, consentimento e autorização continuam obrigatórios.</p></div></div>
+    <div className="hca-toolbar"><Input type="search" aria-label="Pesquisar eventos de notificação" placeholder="Buscar evento" contentBefore={<Icon name="search" />} value={search} onChange={(_, value) => setSearch(value.value)} /><Select aria-label="Função nas notificações" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="">Todas as funções</option>{Object.entries(roles).map(([role, label]) => <option key={role} value={role}>{label}</option>)}</Select></div>
+    <div className="hca-records hca-matrix-scroll" tabIndex={0} role="region" aria-label="Tabela de notificações; rolagem horizontal por função"><Table className="hca-table hca-matrix" aria-label="Canais por evento e função"><TableHeader><TableRow><TableHeaderCell>Evento</TableHeaderCell>{columns.map(([role, label]) => <TableHeaderCell key={role}>{label}</TableHeaderCell>)}</TableRow></TableHeader><TableBody>{data.events.filter((event) => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((event) => <TableRow key={event}><TableCell className="hca-matrix-name"><h3>{documentEventLabel(event)}</h3></TableCell>{columns.map(([role, label]) => {
+      const rule = data.rules.find((row) => row.event === event && row.subject_role === role), selected = rule?.channels ?? ["internal"];
+      return <TableCell key={role}><div className="hca-channel-cell">{available(event).map((channel) => <Tooltip key={channel.code} content={channel.label} relationship="label"><Checkbox className="hca-channel-checkbox" label={<Icon name={channel.code === "internal" ? "bell" : channel.code === "email" ? "forms" : "team"} />} aria-label={documentEventLabel(event) + " · " + label + " · " + channel.label} disabled={busy || pending} checked={selected.includes(channel.code)} onChange={(_, value) => void update(event, role, { channels: value.checked ? [...selected, channel.code] : selected.filter((code) => code !== channel.code) })} /></Tooltip>)}<Button appearance="subtle" icon={<Icon name="more" />} aria-label={"Opções de " + documentEventLabel(event) + " · " + label} disabled={busy || pending} onClick={(value) => setEditor({ event, role, opener: value.currentTarget })} /></div>
+      {editor?.event === event && editor.role === role ? <RecordDrawer title={documentEventLabel(event) + " · " + label} onClose={() => setEditor(null)} busy={busy || pending} restoreFocusTo={editor.opener} trackChanges={false}>{error || configurationError ? <Notice error>{error || configurationError}</Notice> : null}<div className="hca-form"><p className="hca-field-hint">Cada alteração é salva e confirmada pelo servidor.</p>
                       <label className="block text-xs">
                         Comportamento
                         <select
@@ -286,14 +244,8 @@ export function NotificationMatrix({
                           </select>
                         </label>
                       ))}
-                    </details>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+
+      </div></RecordDrawer> : null}</TableCell>;
+    })}</TableRow>)}</TableBody></Table></div>
+  </section>;
 }

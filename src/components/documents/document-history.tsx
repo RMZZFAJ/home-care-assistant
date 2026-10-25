@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   api,
@@ -17,27 +17,12 @@ import { EmptyState, Icon, StatusBadge } from "@/components/ui/primitives";
 import {
   documentLabels,
   documentStatuses,
-  type DocumentType,
 } from "@/types/documents";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 
-export type DocumentSummary = {
-  id: string;
-  type: DocumentType;
-  fulfillment?: { fulfilled: number; total: number };
-  code: string | null;
-  protocol: string | null;
-  status: string;
-  created_at: string;
-  recipient_id: string | null;
-  document_lines?: {
-    id: string;
-    fully_checked: boolean;
-    accepted_quantity: string;
-    quantity: string;
-  }[];
-};
+export type { DocumentSummary } from "@/types/documents";
+import type { DocumentSummary } from "@/types/documents";
 type Filters = {
   search: string;
   type: string;
@@ -55,7 +40,8 @@ export function DocumentRow({ row }: { row: DocumentSummary }) {
   return (
     <Link
       className="document-row"
-      href={row.type === "REQ" ? "/historico/" + row.id : "/fichas/" + row.id}
+      href={"/documentos/" + row.id}
+      prefetch={false}
     >
       <span className="document-type">{row.type}</span>
       <span className="min-w-0">
@@ -96,7 +82,11 @@ export function DocumentHistory() {
               ...empty,
               type: params.get("type") ?? "",
               status: params.get("status") ?? "",
+              search: params.get("search") ?? "",
+              from: params.get("from") ?? "",
+              to: params.get("to") ?? "",
             }}
+            initialPage={Math.max(1, Number(params.get("page")) || 1)}
           />
         ) : (
           <Notice>Selecione um paciente para consultar o histórico.</Notice>
@@ -108,22 +98,37 @@ export function DocumentHistory() {
 function HistoryContent({
   context,
   initial,
+  initialPage,
 }: {
   context: WorkspaceContext;
   initial: Filters;
+  initialPage: number;
 }) {
-  const [filters, setFilters] = useState(initial);
+  const router = useRouter();
+  const filters = initial;
   const [draft, setDraft] = useState(initial);
   const [showFilters, setShowFilters] = useState(
     Object.values(initial).some(Boolean),
   );
   const [rows, setRows] = useState<DocumentSummary[]>([]);
-  const [page, setPage] = useState(1);
+  const page = initialPage;
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const liveRevision = useLiveRevision();
+  const navigate = (next: Filters, nextPage = 1) => {
+    if (JSON.stringify(next) === JSON.stringify(filters) && nextPage === page) {
+      setAttempt((value) => value + 1);
+      return;
+    }
+    const query = new URLSearchParams({ careRecipientId: context.patient!.id });
+    for (const [key, value] of Object.entries(next)) if (value) query.set(key, value);
+    if (nextPage > 1) query.set("page", String(nextPage));
+    router.push("/historico?" + query, { scroll: false });
+  };
+  const setPage = (value: number) => navigate(filters, value);
+  const setFilters = (value: Filters) => navigate(value);
   useEffect(() => {
     const controller = new AbortController();
     const query = new URLSearchParams({
@@ -160,7 +165,6 @@ function HistoryContent({
   const active = Object.entries(filters).filter(([, value]) => value);
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setPage(1);
     setLoading(true);
     setFilters({ ...draft });
   }
@@ -281,7 +285,6 @@ function HistoryContent({
                 onClick={() => {
                   setFilters(empty);
                   setDraft(empty);
-                  setPage(1);
                   setLoading(true);
                 }}
               >
@@ -302,7 +305,6 @@ function HistoryContent({
                 onClick={() => {
                   setFilters({ ...filters, [key]: "" });
                   setDraft({ ...draft, [key]: "" });
-                  setPage(1);
                   setLoading(true);
                 }}
                 aria-label={"Remover filtro " + key}
@@ -358,7 +360,7 @@ function HistoryContent({
             className={buttonClass}
             disabled={page <= 1 || loading}
             onClick={() => {
-              setPage((value) => value - 1);
+              setPage(page - 1);
               setLoading(true);
             }}
           >
@@ -371,7 +373,7 @@ function HistoryContent({
             className={buttonClass}
             disabled={page * 20 >= total || loading}
             onClick={() => {
-              setPage((value) => value + 1);
+              setPage(page + 1);
               setLoading(true);
             }}
           >

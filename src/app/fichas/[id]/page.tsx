@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { AuthenticatedPage } from "@/components/authenticated-page";
-import { SupplyDetail } from "@/components/documents/supply-detail";
+import { DocumentViewer } from "@/components/documents/document-viewer";
 import { demoDocuments } from "@/lib/demo-documents";
 import { DemoDocument } from "@/components/documents/demo-document";
 
@@ -17,7 +17,7 @@ async function Detail({ params }: { params: Promise<{ id: string }> }) {
     <DemoDocument id={id} />
   ) : (
     <AuthenticatedPage>
-      <SupplyDetail id={id} />
+      <DocumentViewer id={id} />
     </AuthenticatedPage>
   );
 }

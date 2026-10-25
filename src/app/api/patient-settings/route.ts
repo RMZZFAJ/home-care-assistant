@@ -52,7 +52,7 @@ export async function GET(request: Request) {
     });
     const [definitions, overrides, changes] = patient.permissions.canManage
       ? await Promise.all([
-          auth.client.from("capability_definitions").select("*"),
+          rpc(auth.client,"patient_capability_definitions",{p_patient:patient.id}).then(data=>({data,error:null})),
           auth.client
             .from("capability_overrides")
             .select("*")

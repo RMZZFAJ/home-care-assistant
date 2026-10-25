@@ -36,7 +36,8 @@ npm run dev
 Selecione o paciente no cabeçalho e use o menu recolhível: Visão geral,
 Fichas (REQ, COM, ENT, BAL), Histórico, Estoque e Administração.
 Um administrador de paciente gerencia somente
-aquele contexto. Administradores globais administram todos os pacientes.
+aquele contexto. Administração global gerencia a plataforma e propõe mudanças
+locais; competências operacionais exigem vínculo e contexto explícitos.
 Convites permitem cadastro pessoal e aceite; revogar um vínculo não bloqueia
 a conta em outros pacientes. Novos pacientes iniciam com catálogo vazio e
 podem adotar modelos explicitamente.
@@ -46,6 +47,10 @@ compra ou doação; recebimento validado abastece a família. ENT transfere entr
 família e equipe, com trânsito e aceite do destinatário. REQ não tem quantidade
 solicitada: atendimento por linha depende de ENT vinculada e aceite positivo.
 BAL conta apenas o estoque da equipe, conforme a política de revisão.
+O regime por plantão é habilitado por paciente: escalas reais determinam a
+janela e o responsável, e adiamento exige decisão familiar. A contagem atual
+pode regularizar semanas anteriores sem apagar atrasos nem simular contagens.
+Consulte [Escalas](docs/ui-ux/SCHEDULES.md) e [Balanços](docs/ui-ux/BALANCES.md).
 
 O administrador movimenta e corrige o estoque familiar diretamente, com
 ledger e anexos. Cada ficha tem UUID, sequência independente por paciente/tipo,

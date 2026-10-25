@@ -75,9 +75,8 @@ test.describe("administração integrada no ambiente local", () => {
   async function section(page: Page, patientId: string, name: string) {
     await page.goto(`/admin?careRecipientId=${patientId}`);
     await selectContext(page, patientId);
-    await page
-      .getByRole("combobox", { name: "Seção administrativa", exact: true })
-      .selectOption({ label: name });
+    const areas: Record<string, string> = { "Paciente": "patient", "Catálogo": "catalog", "Vínculos": "memberships", "Convites": "invitations", "Alertas": "alerts", "Destinatários": "notificationRecipients", "Importação histórica": "import", "Contas globais": "profiles" };
+    await page.getByRole("navigation", { name: "Áreas administrativas", exact: true }).locator('a[href*="section=' + areas[name] + '"]').click();
     await expect(page.getByText("Carregando", { exact: false })).toHaveCount(0);
   }
 
@@ -102,6 +101,7 @@ test.describe("administração integrada no ambiente local", () => {
     const originalName = `Material administrativo ${randomUUID().slice(0, 8)}`;
     const finalName = `${originalName} revisado`;
     await section(page, patientId, "Catálogo");
+    await page.getByRole("button", { name: "Novo item", exact: true }).click();
     await page.getByLabel("Nome", { exact: true }).fill(originalName);
     await page
       .getByRole("combobox", { name: "Categoria", exact: true })
@@ -114,7 +114,7 @@ test.describe("administração integrada no ambiente local", () => {
     const productId = created.data.product_id as string;
     expect(productId).toBeTruthy();
     await expect(
-      page.getByRole("heading", { name: originalName, exact: true }),
+      page.getByRole("cell", { name: originalName, exact: true }),
     ).toBeVisible();
     await page
       .getByRole("button", { name: `Editar ${originalName}`, exact: true })
@@ -132,12 +132,11 @@ test.describe("administração integrada no ambiente local", () => {
       .getByRole("checkbox", { name: "Item ativo", exact: true })
       .uncheck();
     await submit(page, "Salvar item", "product");
-    const article = page.getByRole("article").filter({
-      has: page.getByRole("heading", { name: finalName, exact: true }),
-    });
-    await expect(
-      article.getByText("higiene · pacote · Inativo", { exact: true }),
-    ).toBeVisible();
+    await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
+    const article = page.getByRole("row").filter({ has: page.getByRole("cell", { name: finalName, exact: true }) });
+    await expect(article.getByText("Inativo", { exact: true })).toBeVisible();
+    await expect(article).toContainText("higiene");
+    await expect(article.getByText("pacote", { exact: true })).toBeVisible();
     const all = await (
       await page.request.get(
         `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,
@@ -169,6 +168,7 @@ test.describe("administração integrada no ambiente local", () => {
       [secondPatient, "reader"],
     ]) {
       await section(page, patientId, "Vínculos");
+      await page.getByRole("button", { name: "Vincular conta", exact: true }).click();
       await page
         .getByRole("combobox", { name: "Conta vinculada", exact: true })
         .selectOption(shared.id);
@@ -178,7 +178,7 @@ test.describe("administração integrada no ambiente local", () => {
       await submit(page, "Salvar vínculo", "membership");
       await expect(
         page
-          .getByRole("listitem")
+          .getByRole("article")
           .filter({ has: page.getByText("Teste shared", { exact: true }) }),
       ).toBeVisible();
     }
@@ -196,7 +196,7 @@ test.describe("administração integrada no ambiente local", () => {
     });
     expect(localAdmin.ok()).toBeTruthy();
     await page.getByLabel("Menu do usuário", { exact: true }).click();
-    await page.getByRole("button", { name: "Sair", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
     await expect(page).toHaveURL(/\/login$/);
     await login(page, "adminA");
     await section(page, firstPatient, "Vínculos");
@@ -204,7 +204,7 @@ test.describe("administração integrada no ambiente local", () => {
       page.getByRole("button", { name: "Contas globais", exact: true }),
     ).toHaveCount(0);
     const member = page
-      .getByRole("listitem")
+      .getByRole("article")
       .filter({ has: page.getByText("Teste shared", { exact: true }) });
     const revoked = page.waitForResponse(
       (response) =>
@@ -213,22 +213,23 @@ test.describe("administração integrada no ambiente local", () => {
         response.request().postDataJSON().action === "membershipStatus",
     );
     await member.getByRole("button", { name: "Revogar", exact: true }).click();
+    await page.getByRole("button", { name: "Confirmar alteração", exact: true }).click();
     expect((await revoked).ok()).toBeTruthy();
     await expect(
       page.getByText("Estado do vínculo atualizado.", { exact: true }),
     ).toBeVisible();
     await expect(
       page
-        .getByRole("listitem")
+        .getByRole("article")
         .filter({ has: page.getByText("Teste shared", { exact: true }) })
-        .getByText("Profissional · Revogado", { exact: true }),
+        .getByText("Revogado", { exact: true }),
     ).toBeVisible();
     const forbidden = await page.request.get(
       `/api/admin?section=memberships&careRecipientId=${secondPatient}`,
     );
     expect(forbidden.status()).toBe(404);
     await page.getByLabel("Menu do usuário", { exact: true }).click();
-    await page.getByRole("button", { name: "Sair", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
     await expect(page).toHaveURL(/\/login$/);
     await login(page, "shared");
     const context = await (await page.request.get("/api/context")).json();
@@ -388,9 +389,8 @@ test.describe("administração integrada no ambiente local", () => {
       is_enabled: true,
       include_team_alerts: true,
     });
-    await page
-      .getByRole("combobox", { name: "Seção administrativa", exact: true })
-      .selectOption({ label: "Alertas" });
+    await page.getByRole("button", { name: "Outras áreas", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Alertas de estoque", exact: true }).click();
     await page
       .getByRole("combobox", { name: "Item do catálogo", exact: true })
       .selectOption({ label: "Fralda" });
@@ -544,8 +544,8 @@ test.describe("administração integrada no ambiente local", () => {
       page.getByRole("heading", { name: protocol, exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText("Data: Data original desconhecida", { exact: true }),
-    ).toBeVisible();
+      page.locator(".hca-document-date"),
+    ).toHaveText(/^Data original desconhecida · Versão \d+$/);
     await expect(
       page.getByText("Solicitante: Solicitante desconhecido", { exact: true }),
     ).toBeVisible();
@@ -557,9 +557,8 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByText("Estoque desconhecido", { exact: false }),
     ).toHaveCount(2);
-    await expect(
-      page.getByText("Nenhum aviso disponível.", { exact: true }),
-    ).toBeVisible();
+    await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
+    await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
     const retry = await page.request.post("/api/admin", {
       data: { action: "historicalImport", rows, preview: false },
     });

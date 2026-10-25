@@ -46,6 +46,36 @@ purchase_receipts separa recebimento informado e validação da entrada familiar
 bal_approvals identifica grupo, ator e versão de contagem. Reconto conserva
 aprovações antigas e captura nova referência; elas não aprovam o novo balanço.
 
+## Escalas e obrigações semanais
+
+shift_types, shift_series e scheduled_shifts preservam a programação real em
+intervalos UTC; exclusão GiST impede sobreposição do mesmo profissional entre
+pacientes. shift_change_requests e shift_events conservam propostas e decisões.
+Séries limitadas a 366 dias são materializadas e validadas integralmente.
+
+bal_regimes habilita processamento por paciente, sem ativação automática pela
+migration. bal_obligations preserva cada semana, prazo original, prazo efetivo,
+atraso e regularização real. bal_cycles acumula obrigações sem simular contagens
+anteriores. bal_assignments vincula profissional, janela e versão de plantão;
+bal_deferrals conserva proposta e decisão familiar. bal_cycle_events registra
+a cronologia. Comandos idempotentes privados e locks transacionais evitam
+atribuições/contagens concorrentes. O worker operacional existente processa
+apenas regimes habilitados, com limites e deduplicação.
+
+A recuperação idempotente de criar, revisar e enviar BAL adquire o lock do
+estoque antes de consultar o resultado anterior e antes de exigir elegibilidade
+para uma nova contagem. A autoridade é revalidada após a espera pelo lock.
+private.bal_scheduler_progress mantém o cursor de lotes de até 100 pacientes,
+com rotação ao fim dos UUIDs. Cursor e processamento confirmam juntos;
+uma falha desfaz ambos. A tabela possui RLS e nenhum acesso direto para anon,
+authenticated ou service_role, inclusive leitura.
+
+Essas tabelas possuem RLS e leitura por capacidade; cliente e service_role não
+possuem DML direto. Comandos públicos autorizados são a única entrada do usuário.
+Helpers, funções anteriores renomeadas e tabelas de controle ficam revogados.
+Contagem captura a revisão do ledger; uma alteração posterior exige nova
+conferência, preservando autor original e a identidade de quem contou.
+
 ## Estoque e transações
 
 stock_movements é o ledger oficial. FAMILY, CARE_TEAM e TRANSIT representam

@@ -1,5 +1,6 @@
 "use client";
-import { inputClass } from "@/components/workspace";
+import { useId } from "react";
+import { Checkbox, Field as FluentField, Input, Select, type InputProps } from "@fluentui/react-components";
 export type Row = Record<string, unknown>;
 
 export const roles = {
@@ -25,20 +26,20 @@ export function Field({
   name: string;
   label: string;
   value?: string | number;
-  type?: string;
+  type?: InputProps["type"];
   required?: boolean;
 }) {
+  const id = useId();
   return (
-    <label className="block text-sm font-semibold">
-      {label}
-      <input
+    <FluentField label={{ children: label, htmlFor: id }}>
+      <Input
+        id={id}
         name={name}
-        defaultValue={value}
+        defaultValue={String(value)}
         type={type}
         required={required}
-        className={inputClass}
       />
-    </label>
+    </FluentField>
   );
 }
 export function Check({
@@ -50,29 +51,18 @@ export function Check({
   label: string;
   checked?: boolean;
 }) {
-  return (
-    <label className="flex min-h-11 items-center gap-2 text-sm">
-      <input
-        type="checkbox"
-        name={name}
-        defaultChecked={checked}
-        className="h-5 w-5 accent-(--brand)"
-      />
-      {label}
-    </label>
-  );
+  return <Checkbox name={name} defaultChecked={checked} label={label} />;
 }
 export function RoleSelect({ value = "professional" }: { value?: string }) {
   return (
-    <label className="text-sm font-semibold">
-      Função neste paciente
-      <select name="role" defaultValue={value} className={inputClass}>
+    <FluentField label="Função neste paciente">
+      <Select name="role" defaultValue={value}>
         {Object.entries(roles).map(([key, label]) => (
           <option key={key} value={key}>
             {label}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </FluentField>
   );
 }

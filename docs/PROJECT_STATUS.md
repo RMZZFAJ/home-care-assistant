@@ -2,7 +2,9 @@
 
 O estado da evolução integral, a versão publicada, o preview, as evidências
 de testes e os impedimentos externos ficam em
-[EXECUTION.md](evolution/EXECUTION.md).
+[EXECUTION.md](evolution/EXECUTION.md). A refatoração Fluent 2, escalas e BAL
+por plantão está detalhada no [checkpoint da interface](ui-ux/EXECUTION.md) e na
+[matriz de homologação](ui-ux/ACCEPTANCE.md).
 
 A evolução parte da master 701521c, após o
 [PR de consolidação](https://github.com/RMZZFAJ/home-care-assistant/pull/1).

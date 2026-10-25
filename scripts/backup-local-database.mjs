@@ -24,7 +24,9 @@ export async function backupLocalDatabase() {
   const dump = spawn("docker", ["exec", testContainer, "pg_dump", "-U", "postgres", "-d", "postgres", "--format=custom"], { stdio: ["ignore", "pipe", "ignore"] });
   await Promise.all([completion(dump), pipeline(dump.stdout, createWriteStream(file, { flags: "wx", mode: 0o600 }))]);
   if (statSync(file).size === 0) throw new Error("Local backup is empty.");
-  const check = spawn("docker", ["exec", "-i", testContainer, "pg_restore", "--list"], { stdio: ["pipe", "ignore", "ignore"] });
+  // pg_restore --list stops reading after the archive TOC. Drain the full input
+  // first so larger archives cannot close Docker's stdin mid-pipeline on Windows.
+  const check = spawn("docker", ["exec", "-i", testContainer, "sh", "-c", 'archive=$(mktemp); cat > "$archive" && pg_restore --list "$archive"; result=$?; rm -f -- "$archive"; exit "$result"'], { stdio: ["pipe", "ignore", "ignore"] });
   await Promise.all([completion(check), pipeline(createReadStream(file), check.stdin)]);
   const hash = createHash("sha256");
   for await (const chunk of createReadStream(file)) hash.update(chunk);

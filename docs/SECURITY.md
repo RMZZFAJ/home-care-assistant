@@ -28,6 +28,19 @@ O último administrador local ativo também é preservado por transação serial
 Revogação local não remove acesso da mesma conta a outro paciente. Paciente
 inativo conserva histórico autorizado e recusa novas operações.
 
+## Autoridade em escalas e balanços
+
+Consulta própria, proposta, gestão própria, gestão de equipe e tipos são
+capacidades distintas. O profissional precisa de vínculo ativo; conflito de
+agenda entre pacientes informa somente a indisponibilidade do período.
+
+BAL no regime por plantão exige a pessoa realmente designada e uma janela
+vigente, também nas RPCs de criação, revisão e submissão. Gestão de agenda não
+autoriza deslocar o prazo do BAL. Aprovação de adiamento e revisão familiar
+exigem familiar/administrador local, mesmo se existir override incompatível para
+supervisão. Quem contou não aprova a própria contagem. Administração global não
+recebe essas competências sem vínculo e contexto local explícitos.
+
 ## Banco, APIs e objetos privados
 
 RLS, grants explícitos/defaults e SECURITY DEFINER são revisados em conjunto.

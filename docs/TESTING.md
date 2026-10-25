@@ -25,6 +25,12 @@ home-care-assistant neste repositório: API 54321, banco 54322 e Mailpit 54324.
 Esse é o mesmo banco utilizado no desenvolvimento. Não cria outro projeto.
 O preparo verifica os destinos locais antes de aplicar migrations.
 
+`npm run test:db:sql -- --sql-file service-role.sql` executa uma regressão SQL
+com rollback e sem reset. As suítes transacionais operacionais precisam das
+fixtures controladas iniciais; não suponha que um banco de desenvolvimento com
+documentos já criados possui esse estado. A instalação limpa e o upgrade legado
+da CI usam somente a stack efêmera do job, sem substituir os dados locais.
+
 ```sh
 npm run test:db:prepare
 ```
@@ -36,6 +42,13 @@ Guarde backup antes de autorizar a substituição de dados a preservar.
 Os helpers recusam hosts remotos e selecionam explicitamente o destino local.
 O vínculo administrativo do CLI com um projeto remoto não muda o destino
 da suíte. Nunca executar reset, fixtures ou E2E no remoto.
+
+balance-idempotency.test.mjs força duas requisições HTTP Auth reais a esperar
+pelo mesmo lock, cobrindo criação, revisão e envio com a mesma chave.
+balance-scheduler-fairness.sql usa rollback para verificar 101 regimes ativos,
+habilitação posterior, deduplicação e os privilégios do cursor privado.
+Testes de notificações percorrem lotes limitados para localizar suas fixtures
+mesmo quando o ambiente local conserva avisos de execuções anteriores.
 
 Para consentir com o replay, informe explicitamente a operação e um backup
 local já gerado, armazenado fora do repositório:
@@ -114,6 +127,15 @@ Antes da suíte completa, autorize o replay local e execute test:migrations e
 test:integration. A importação E2E aloca o próximo protocolo físico disponível
 em dados fictícios, preservando protocolos e eventos confirmados anteriores.
 Mailpit valida cadastro, confirmação e recuperação sem entrega externa.
+
+## Isolamento na CI
+
+Instalação limpa, evolução legada, SQL/RLS e integrações Auth executam uma vez
+no job de banco. Após sua aprovação, Chromium desktop, Pixel 7 e iPhone 13
+executam em jobs isolados, com a mesma stack local e provisionamento Auth
+fictício em cada runner efêmero. Cada projeto mantém todos os seus cenários.
+O check agregado database-and-browser exige sucesso no banco e nos três
+projetos. Não há exclusão de testes nem uso do Supabase remoto na suíte.
 
 ## Linux local
 

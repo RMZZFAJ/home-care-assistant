@@ -30,6 +30,8 @@ export type SupplyPayload = {
   source?: Custody;
   destination?: Custody;
   recipientId?: string;
+  balanceAssignment?: { id: string; version: number; referenceRevision: string };
+  balanceContext?: { cycleId: string; assignmentId: string; professionalId: string; professionalName: string; shiftId: string; shiftType: string; startsAt: string; endsAt: string; timezone: string; countedAt: string; weeks: string[]; kind: string };
 };
 export type DocumentEvent = {
   id: string;
@@ -125,4 +127,22 @@ export const documentStatuses: Record<string, string> = {
   cancelled: "Cancelado",
   under_review: "Em revisão",
   separated: "Separado",
+};
+
+export type DocumentSummary = {
+  id: string;
+  version: number;
+  type: DocumentType;
+  fulfillment?: { fulfilled: number; total: number };
+  code: string | null;
+  protocol: string | null;
+  status: string;
+  created_at: string;
+  recipient_id: string | null;
+  document_lines?: {
+    id: string;
+    fully_checked: boolean;
+    accepted_quantity: string;
+    quantity: string;
+  }[];
 };

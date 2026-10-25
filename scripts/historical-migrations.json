@@ -65,5 +65,22 @@
   "supabase/migrations/20261023120000_v4_review_regressions.sql": "a89e83d4de7ed07ce4d114ee55d3bc4cfdd11b919331f4d3c2a73d7a96cc10c1",
   "supabase/migrations/20261023173000_v4_preserve_authorized_worker_contract.sql": "f09c8d77c89498a16d4d45a04a33514c055d0c53a2dcfec9f1d6186f08f3e950",
   "supabase/migrations/20261023174500_v4_review_follow_up.sql": "f0d6e0e63a32eb880d5af210d11f7af32e14daa47165a322851b4f1b5c519813",
-  "supabase/migrations/20261023180000_v4_archive_authority_serialization.sql": "4c41dbc39d490940495c2b99f3f37f86f8fa17c130dbe2c9eaa9a2283834a2ac"
+  "supabase/migrations/20261023180000_v4_archive_authority_serialization.sql": "4c41dbc39d490940495c2b99f3f37f86f8fa17c130dbe2c9eaa9a2283834a2ac",
+  "supabase/migrations/20261024205813_fluent_administration_capabilities.sql": "7e8c4206ab4526e4104bc00a313c2e4db2bbbae25de3b7b92e3c4e7e0453c71c",
+  "supabase/migrations/20261024220543_scheduled_shifts.sql": "09205ab604076cca2d9d88693b78390c880059cf819205af4ae527f76038d834",
+  "supabase/migrations/20261024220943_schedule_decision_guard.sql": "7779c84f45aafec90baa1650368391bb479c83de1b6ce800975e7c18e5a019e3",
+  "supabase/migrations/20261024221017_schedule_decision_scope.sql": "00f28150f4a0c20ba9df8184bafcafa18afb28da5afa3084f38ad5303ac7205c",
+  "supabase/migrations/20261024221737_balance_shift_cycles.sql": "28a2cf846f78053f7edfc6611d3f184ef94af116b0efca9a4aeb7f8fa4f6c344",
+  "supabase/migrations/20261024222909_balance_assignment_resolution.sql": "e515b638c5bb0574c53f350cfe93795a6980e0073b5c7c53458bf7e2fb9b619c",
+  "supabase/migrations/20261024223046_balance_count_reference.sql": "3f20d1acf2b0a8412113d30d302a44efe3b79d50d64bef189237b279d3162e18",
+  "supabase/migrations/20261025092446_balance_schedule_choices.sql": "2a7fa18e7ac9871b39c519e7b88ea90da19979bab7de1c4779a9876ed196ccc2",
+  "supabase/migrations/20261025093655_explicit_business_conflicts.sql": "da8797029037a27fe7d6ad1212e6e49eeafa98048b2611d07bb3121c9e8e0dd7",
+  "supabase/migrations/20261025094057_balance_authority_projection.sql": "25b80039928bbcab18a3f0e5bea08e4c4d86b3669d77aeb777c1ce5a37931c46",
+  "supabase/migrations/20261025101209_balance_deadlines_and_schedule_separation.sql": "43ad3795e75dca85fb132996b73e0a58850268aeca7d7897ad15bafd7ed7114a",
+  "supabase/migrations/20261025102217_balance_window_availability.sql": "b4f41b0ee6b255c4cc7c30ddf3e394be02bca5623f0b2872edb09073fd2d32d5",
+  "supabase/migrations/20261025103452_effective_capability_matrix.sql": "8082f3263267230369f7a4d982a1b62a10088f38ddd279acfc2dbe9511493b71",
+  "supabase/migrations/20261025105017_policy_conflict_transport_compatibility.sql": "096cdc33699f44a62137982b3c3f1a3f760775fcb57db847886280076470df6a",
+  "supabase/migrations/20261025164621_notification_claim_conflict_recovery.sql": "accb881daca02b438f2008066ac66de231d4320563916db46551f902b33a5c90",
+  "supabase/migrations/20261025194512_balance_idempotency_serialization.sql": "d0f0fcb672cd942b1b5a93cd02a41495c28b8dbe3097752606862e23201640c6",
+  "supabase/migrations/20261025214537_balance_scheduler_rotation.sql": "bbd354d6f56e4c091f62d2d02dd06d00d73c8fda65e505fe7cd009e12f3f4098"
 }

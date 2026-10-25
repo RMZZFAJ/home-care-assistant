@@ -1,0 +1,5 @@
+export type ShiftType = { id: string; name: string; starts_local: string; duration_minutes: number; is_active: boolean; version: number };
+export type ScheduledShift = { id: string; series_id: string; professional_id: string; professional_name: string; shift_type_id: string; type_name: string; starts_at: string; ends_at: string; timezone: string; status: string; version: number; notes: string; is_exception: boolean };
+export type ShiftSeries = { id: string; professional_id: string; shift_type_id: string; recurrence: string; weekdays: number[]; anchor_date: string; valid_until: string; ended_on: string | null; status: string; version: number };
+export type ShiftChange = { id: string; shift_id: string; professional_id: string; proposed_professional_id: string; starts_at: string; ends_at: string; reason: string; status: string; shift_version: number };
+export type ScheduleWorkspace = { types: ShiftType[]; shifts: ScheduledShift[]; professionals: { id: string; name: string }[]; series: ShiftSeries[]; changes: ShiftChange[]; events: { id: string; action: string; reason: string; created_at: string }[] };

@@ -13,7 +13,9 @@ import {
 } from "../workspace";
 import { PermissionMatrix } from "./permission-matrix";
 import { NotificationMatrix } from "./notification-matrix";
-import { ReminderSettings } from "./reminder-settings";
+import { PolicyRules } from "./policy-rules";
+import { Button } from "@fluentui/react-components";
+import { useRouter, useSearchParams } from "next/navigation";
 import { roles } from "./admin-fields";
 import { useLiveRevision } from "@/lib/use-live-revision";
 type PolicyData = {
@@ -74,7 +76,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState("rules");
+  const params = useSearchParams();
+  const router = useRouter();
+  const tab = ["rules", "permissions", "notifications", "people"].includes(params.get("area") ?? "") ? params.get("area")! : "rules";
+  const setTab = (area: string) => { const query = new URLSearchParams(params.toString()); query.set("area", area); router.replace("/configuracoes?" + query, { scroll: false }); };
   const savingRef = useRef(false);
   const currentVersionRef = useRef<number | null>(null);
   const [invitationUrl, setInvitationUrl] = useState("");
@@ -205,7 +210,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
     };
     if (String(form.get("patientShortName") ?? "").trim())
       change.patientShortName = String(form.get("patientShortName")).trim();
-    void configure("settings", change);
+    return configure("settings", change);
   }
   if (!data)
     return (
@@ -214,8 +219,6 @@ function Policies({ context }: { context: WorkspaceContext }) {
       </Notice>
     );
   const settings = { ...defaults, ...data.data.settings };
-  const selected = (key: string, value: string) =>
-    (settings[key] as string[]).includes(value);
   return (
     <div className="space-y-5">
       <p className="text-sm text-(--muted)">
@@ -238,212 +241,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
           />
         </Notice>
       ) : null}
-      <label className="block max-w-md text-sm font-semibold">
-        Configurar
-        <select
-          className={inputClass}
-          value={tab}
-          onChange={(event) => setTab(event.target.value)}
-        >
-          <option value="rules">Regras de operação e ciência</option>
-          <option value="permissions">Matriz de permissões</option>
-          <option value="notifications">Matriz de notificações</option>
-          <option value="people">Pessoas e propostas</option>
-        </select>
-      </label>
-      {tab === "rules" ? (
-        <section className="ui-card">
-          <h2 className="font-semibold">Política do paciente</h2>
-          <p className="my-3 text-xs text-(--muted)">
-            Alterações se aplicam às novas requisições. Documentos existentes
-            preservam a política de emissão.
-          </p>
-          <form
-            key={
-              patientId +
-              ":" +
-              (editingVersion ?? data.data.version) +
-              ":" +
-              attempt
-            }
-            onSubmit={saveSettings}
-            onChange={() => {
-              setEditingVersion((current) => current ?? data.data.version);
-            }}
-            className="space-y-4"
-          >
-            <fieldset disabled={busy} className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-semibold">
-                Dia do BAL
-                <select
-                  name="balDay"
-                  className={inputClass}
-                  defaultValue={String(settings.balDay ?? "")}
-                >
-                  <option value="">Não configurado</option>
-                  {[
-                    "Domingo",
-                    "Segunda",
-                    "Terça",
-                    "Quarta",
-                    "Quinta",
-                    "Sexta",
-                    "Sábado",
-                  ].map((day, i) => (
-                    <option key={day} value={i}>
-                      {day}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="text-sm font-semibold">
-                Revisão do BAL
-                <select
-                  name="balReview"
-                  className={inputClass}
-                  defaultValue={String(settings.balReview)}
-                >
-                  <option value="optional">Opcional</option>
-                  <option value="required">Obrigatória</option>
-                </select>
-              </label>
-              <fieldset>
-                <legend className="text-sm font-semibold">
-                  Grupos revisores BAL
-                </legend>
-                {["family", "supervisor"].map((role) => (
-                  <label
-                    className="mr-4 inline-flex min-h-11 items-center gap-2 text-sm"
-                    key={role}
-                  >
-                    <input
-                      type="checkbox"
-                      name="balApprovers"
-                      value={role}
-                      defaultChecked={selected("balApprovers", role)}
-                    />
-                    {roles[role as keyof typeof roles]}
-                  </label>
-                ))}
-              </fieldset>
-              <label className="text-sm font-semibold">
-                Critério de aprovação BAL
-                <select
-                  name="balRequirement"
-                  className={inputClass}
-                  defaultValue={String(settings.balRequirement)}
-                >
-                  <option value="any">Qualquer grupo</option>
-                  <option value="all">Todos · pessoas distintas</option>
-                </select>
-              </label>
-              {[
-                [
-                  "whatsappSimpleAcceptance",
-                  "Aceite ENT simplificado pelo WhatsApp verificado",
-                ],
-                ["scienceRequired", "Exigir ciência familiar da REQ"],
-                [
-                  "scienceByDispatch",
-                  "Registrar ciência do entregador autorizado na expedição",
-                ],
-                [
-                  "scienceAutomatic",
-                  "Permitir ciência automática com consentimento pessoal",
-                ],
-                [
-                  "scienceWhatsApp",
-                  "Permitir ciência simplificada pelo WhatsApp com consentimento pessoal",
-                ],
-              ].map(([key, label]) => (
-                <label
-                  className="flex min-h-11 items-center gap-3 text-sm"
-                  key={key}
-                >
-                  <input
-                    type="checkbox"
-                    name={key}
-                    defaultChecked={settings[key] === true}
-                  />
-                  {label}
-                </label>
-              ))}
-              <fieldset className="sm:col-span-2">
-                <legend className="text-sm font-semibold">
-                  Funções responsáveis pela ciência
-                </legend>
-                {["admin", "family", "supervisor", "professional"].map(
-                  (role) => (
-                    <label
-                      className="mr-4 inline-flex min-h-11 items-center gap-2 text-sm"
-                      key={role}
-                    >
-                      <input
-                        name="scienceRoles"
-                        type="checkbox"
-                        value={role}
-                        defaultChecked={selected("scienceRoles", role)}
-                      />
-                      {roles[role as keyof typeof roles]}
-                    </label>
-                  ),
-                )}
-              </fieldset>
-              <label className="text-sm font-semibold">
-                Exigência de ciência
-                <select
-                  className={inputClass}
-                  name="scienceRequirement"
-                  defaultValue={String(settings.scienceRequirement)}
-                >
-                  <option value="any">Uma pessoa autorizada</option>
-                  <option value="all">Todas as pessoas responsáveis</option>
-                </select>
-              </label>
-              <label className="text-sm font-semibold">
-                Nome curto nas mensagens
-                <input
-                  name="patientShortName"
-                  className={inputClass}
-                  maxLength={60}
-                  defaultValue={String(settings.patientShortName)}
-                />
-              </label>
-              {[
-                ["archiveDays", "Arquivar após conclusão (dias)", 1, 365],
-                ["reminderHours", "Primeiro lembrete (horas)", 1, 720],
-                ["reminderRepeatHours", "Repetir lembrete (horas)", 1, 720],
-                [
-                  "shareWaitSeconds",
-                  "Acompanhamento inicial (segundos)",
-                  0,
-                  10,
-                ],
-              ].map(([key, label, min, max]) => (
-                <label className="text-sm font-semibold" key={String(key)}>
-                  {label}
-                  <input
-                    name={String(key)}
-                    className={inputClass}
-                    type="number"
-                    required
-                    min={Number(min)}
-                    max={Number(max)}
-                    defaultValue={Number(settings[String(key)])}
-                  />
-                </label>
-              ))}
-              <ReminderSettings
-                settings={settings}
-                directory={data.directory}
-              />
-            </fieldset>
-            <button className={primaryClass} disabled={busy}>
-              Registrar política
-            </button>
-          </form>
-        </section>
-      ) : null}
+      <nav aria-label="Áreas da configuração" className="hca-configuration-tabs">{[["rules", "Regras"], ["permissions", "Permissões"], ["notifications", "Notificações"], ["people", "Pessoas e propostas"]].map(([area, label]) => { const query = new URLSearchParams(params.toString()); query.set("area", area); return <Button key={area} as="a" appearance="subtle" className="hca-configuration-tab" href={"/configuracoes?" + query} aria-current={tab === area ? "page" : undefined} onClick={(event) => { if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) { event.preventDefault(); setTab(area); } }}>{label}</Button>; })}</nav>
+      <div hidden={tab !== "rules"}>
+        <PolicyRules key={patientId + ":" + attempt} settings={settings} directory={data.directory} busy={busy} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
+      </div>
       {tab === "permissions" ? (
         <PermissionMatrix
           definitions={data.definitions}
@@ -459,6 +260,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
           version={data.data.version}
           busy={busy}
           configure={configure}
+          configurationError={error}
         />
       ) : null}
       {tab === "people" ? (

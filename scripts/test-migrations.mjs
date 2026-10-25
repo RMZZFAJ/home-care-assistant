@@ -17,7 +17,8 @@ import {
   legacyRequisition,
 } from "./seed-test-fixtures.mjs";
 
-assertLocalReplay();
+if (process.argv.includes("--sql-only")) getTestEnvironment();
+else assertLocalReplay();
 function reset(version) {
   assertLocalReplay();
   console.log(
@@ -209,7 +210,7 @@ async function runSqlRegressions(fixtureIdentities) {
       ).error,
     );
   }
-  for (const file of [
+  const regressionFiles = [
     "transactions.sql",
     "invitations-import-outbox.sql",
     "alerts-routing.sql",
@@ -220,7 +221,13 @@ async function runSqlRegressions(fixtureIdentities) {
     "document-invariants.sql",
     "operational-reviews.sql",
     "whatsapp-receipts.sql",
-  ]) {
+    "business-conflicts.sql",
+    "balance-shift-authority.sql",
+    "notification-claim-recovery.sql",
+    "balance-scheduler-fairness.sql",
+  ];
+  if (process.argv.includes("--sql-file") && !regressionFiles.includes(process.argv[process.argv.indexOf("--sql-file") + 1])) throw new Error("Unknown SQL regression file.");
+  for (const file of regressionFiles) {
     if (
       process.argv.includes("--sql-file") &&
       file !== process.argv[process.argv.indexOf("--sql-file") + 1]
