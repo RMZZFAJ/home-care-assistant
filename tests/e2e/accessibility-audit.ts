@@ -1,6 +1,7 @@
 import {expect} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 export async function audit(page: import("@playwright/test").Page, label: string) {
+  await expect(page).toHaveTitle("Home Care Assistant");
   if (label === "login") await expect(page.getByLabel("E-mail", { exact: true })).toBeEnabled();
   // Enter the application as a keyboard user. Tabster's document-edge
   // sentinels redirect focus immediately and become untabbable inside the app.

@@ -42,6 +42,10 @@ async function logout(page: Page) {
   await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
 }
+async function get(page: Page, path: string) {
+  // Retry only a dropped transport connection on idempotent reads.
+  return page.request.get(path, { maxRetries: 1 });
+}
 async function post(page: Page, path: string, data: unknown) {
   const response = await page.request.post(path, { data });
   expect(response.ok(), await response.text()).toBeTruthy();
@@ -226,7 +230,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
     .click();
   await confirm(page);
   let stock = await (
-    await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+    await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
   expect(Number(stock.overview[0].family.confirmed)).toBe(0);
   await logout(page);
@@ -237,7 +241,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
     .click();
   await confirm(page);
   stock = await (
-    await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+    await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
   expect(Number(stock.overview[0].family.confirmed)).toBe(10);
   await logout(page);
@@ -267,7 +271,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
     page.getByText("0/1 linhas integralmente conferidas", { exact: true }),
   ).toBeVisible();
   stock = await (
-    await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+    await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
   expect(Number(stock.overview[0].team.confirmed)).toBe(6);
   expect(Number(stock.overview[0].team.incoming)).toBe(4);
@@ -293,7 +297,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await expect(
     page.getByRole("link", { name: "ficha-fisica.png", exact: true }),
   ).toBeVisible();
-  const pdf = await page.request.get(
+  const pdf = await get(page,
     "/api/documents/" + req.requisitionId + "/pdf",
   );
   expect(pdf.ok(), await pdf.text()).toBeTruthy();
@@ -302,7 +306,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await logout(page);
   await login(page, "adminA");
   const current = (
-    await (await page.request.get("/api/documents/" + delivery.id)).json()
+    await (await get(page, "/api/documents/" + delivery.id)).json()
   ).data;
   await post(page, "/api/documents/" + delivery.id, {
     action: "resolve",
@@ -321,7 +325,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   expect(balance.status).toBe("approved");
   expect(balance.code).toBe("BAL-0001");
   stock = await (
-    await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+    await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
   expect(Number(stock.overview[0].team.confirmed)).toBe(5);
   await page.goto("/historico?careRecipientId=" + patient);
@@ -364,7 +368,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
   ).receipt;
   const detail = (
     await (
-      await page.request.get("/api/requisitions/" + req.requisitionId)
+      await get(page, "/api/requisitions/" + req.requisitionId)
     ).json()
   ).data;
   const first = await post(page, "/api/documents", {
@@ -427,7 +431,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     page.getByText("8/10 linhas integralmente conferidas", { exact: true }),
   ).toBeVisible();
   expect(
-    (await page.request.get("/api/documents/" + first.data.id)).ok(),
+    (await get(page, "/api/documents/" + first.data.id)).ok(),
   ).toBeTruthy();
   expect(
     (
@@ -501,7 +505,7 @@ test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async (
     page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
   ).toBeVisible();
   const listing = await (
-    await page.request.get(
+    await get(page,
       "/api/documents?careRecipientId=" + patient + "&type=REQ",
     )
   ).json();
@@ -589,7 +593,7 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   await page.getByRole("button", { name: "Próxima", exact: true }).click();
   await expect(page.getByText("2 / 2", { exact: true })).toBeVisible();
   const history = await (
-    await page.request.get(
+    await get(page,
       "/api/stock/movements?careRecipientId=" + patient + "&page=2",
     )
   ).json();
@@ -615,7 +619,7 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
     page.getByText("Movimentação familiar confirmada.", { exact: false }),
   ).toBeVisible();
   const after = await (
-    await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+    await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
   expect(Number(after.overview[0].family.confirmed)).toBe(21);
   await post(page, "/api/admin", {
@@ -703,7 +707,7 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
     .fill("Contagem descartada após revisão operacional");
   await confirm(page);
   const detail = (
-    await (await page.request.get("/api/documents/" + bal.id)).json()
+    await (await get(page, "/api/documents/" + bal.id)).json()
   ).data;
   expect(detail.status).toBe("cancelled");
   expect(
@@ -764,7 +768,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await expect(page.getByRole("dialog")).not.toBeVisible();
   const original = (
     await (
-      await page.request.get("/api/requisitions/" + extra.requisitionId)
+      await get(page, "/api/requisitions/" + extra.requisitionId)
     ).json()
   ).data.requisition_items[0];
   expect(original.product_id).toBeNull();
@@ -928,7 +932,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await confirm(page);
   for (const id of [extra.requisitionId, second.requisitionId]) {
     const req = (
-      await (await page.request.get("/api/requisitions/" + id)).json()
+      await (await get(page, "/api/requisitions/" + id)).json()
     ).data;
     expect(req.fulfillment.fulfilled).toBe(1);
   }
@@ -1008,7 +1012,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   ).toBeVisible();
   let stock = (
     await (
-      await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+      await get(page, "/api/stock/balances?careRecipientId=" + patient)
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(4);
@@ -1028,7 +1032,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await confirm(page);
   stock = (
     await (
-      await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+      await get(page, "/api/stock/balances?careRecipientId=" + patient)
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(0);
@@ -1112,7 +1116,7 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   await expect(page.getByRole("dialog")).not.toBeVisible();
   let stock = (
     await (
-      await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+      await get(page, "/api/stock/balances?careRecipientId=" + patient)
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(5);
@@ -1133,7 +1137,7 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   ).toBeVisible();
   stock = (
     await (
-      await page.request.get("/api/stock/balances?careRecipientId=" + patient)
+      await get(page, "/api/stock/balances?careRecipientId=" + patient)
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(3);

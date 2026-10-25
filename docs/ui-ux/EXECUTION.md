@@ -331,3 +331,29 @@ Após esse ajuste, o fluxo iOS completo passou na primeira tentativa (1,2 min),
 incluindo COM por doação, validação, ENT parcial, saldo confirmado e BAL real.
 Contratos, lint, Markdown, tipagem, 98 unitários e build também passaram nesta
 rodada. Os resultados completos da nova candidata ficam nos checks da PR 5.
+
+A CI 40219651517 aprovou os 120 cenários, com duas repetições no mobile:
+uma auditoria axe apontou título vazio durante a navegação;
+uma leitura HTTP do BAL confirmado recebeu ECONNRESET. A auditoria passa a
+exigir o título real antes da análise, conservando todas as regras. Leituras
+GET da suíte de fluxos permitem uma reconexão apenas para ECONNRESET,
+usando maxRetries do Playwright; respostas HTTP continuam com as mesmas
+asserções e gravações conservam seu comportamento anterior.
+
+Os dois cenários mobile foram reexecutados sem repetição e passaram (48 s),
+assim como lint, Markdown e tipagem após os ajustes do verificador.
+No preview, foram confirmados cinco logins Auth, permissões/isolamento por
+API e RLS, a identidade global do proprietário, a separação do contexto local,
+PDF e heartbeat do scheduler. O remoto preserva 8 Auth, 6 perfis, 13 vínculos,
+59 produtos por paciente, 11 documentos e 8 movimentos; somente o paciente
+fictício está com o BAL novo ativo e as 82 migrations estão reconciliadas.
+
+A conferência online cobriu 135 visitas: 90 desktop/Android e 45 iPhone por
+links e menus reais, sem erros de página nas etapas validadas. Uma rodada
+anterior de trocas completas de documento registrou quatro diagnósticos
+WebKit, compatíveis com o [problema 43120](https://github.com/microsoft/playwright/issues/43120);
+foram preservados separadamente. A confirmação pelos menus no iPhone passou
+com zero erros. Isso não representa teste em aparelho físico.
+Os últimos ajustes são exclusivos de testes/documentação; o runtime permanece
+idêntico ao preview e91d156 já conferido. A CI da nova cabeça continua sendo
+pré-condição do merge, com estado e links atualizados na PR 5.
