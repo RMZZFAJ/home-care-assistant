@@ -204,3 +204,9 @@ Auth, 6 perfis, 13 vínculos, 59 produtos por paciente, 11 documentos e 8
 movimentos. Não foram criados plantões nem habilitados regimes automaticamente.
 Contratos, lint, Markdown, tipagem e 98 unitários passaram antes da publicação.
 Detalhes operacionais: [BAL por plantão](BALANCES.md).
+
+Bloco H em execução: a rodada completa concluiu 29 de 30 integrações e detectou
+que o adaptador V4 de política ainda capturava o SQLSTATE antigo. O incremento
+81 preserva a resposta PT409 desse contrato e deixa outros erros intactos.
+A regressão original de conflito, proposta, convite e aceite passou novamente;
+o contrato SQL de conflitos também passou. O teste não foi enfraquecido.
