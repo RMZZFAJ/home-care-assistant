@@ -6,8 +6,10 @@ Fluent UI React v9 e ícones oficiais são dependências exatas. O tema claro
 usa azul empresarial, superfícies neutras e tipografia do sistema, com Segoe UI
 quando disponível. Não há dependência de fonte externa para apresentar a tela.
 
-ThemeProvider mantém um renderer por montagem/renderização e injeta os estilos
-Griffel durante SSR e streaming. Fronteiras client ficam nos componentes
+ThemeProvider mantém um renderer por montagem/renderização e emite os estilos
+Griffel uma única vez no head durante SSR. A suíte verifica o HTML sem
+JavaScript e a navegação: cópias no corpo não podem sobrescrever regras de
+estado e variante inseridas pelo renderer no head. Fronteiras client ficam nos componentes
 interativos; o layout e as verificações de sessão permanecem no servidor.
 Imports Fluent são otimizados pelo Next para carregar os módulos utilizados.
 

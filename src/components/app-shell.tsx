@@ -22,8 +22,8 @@ export function AppWorkspace({ title, children, administration = false, administ
       {value?.activeContext ? <span className="context-tag">{value.activeContext.mode === "global" ? "Administração global" : roleLabels[value.patient?.role ?? ""]}</span> : null}
     </div>
     {loading && !value ? <div className="hca-loading" role="status"><Spinner size="small" />Validando sessão e pacientes autorizados…</div> : null}
-    {error ? <MessageBar intent="error" role="alert"><MessageBarBody><p>{error}</p><div className="hca-toolbar"><Button onClick={() => void load()}>Tentar novamente</Button><Link href="/login">Entrar novamente</Link></div></MessageBarBody></MessageBar> : null}
-    {value?.activeContext?.mode === "global" && !value.globalAdministrationAllowed ? <MessageBar intent="warning"><MessageBarBody>Confirme seu autenticador para administrar. <Link href="/perfil?mfa=required">Verificar autenticação em duas etapas</Link></MessageBarBody></MessageBar> : null}
+    {error ? <MessageBar layout="multiline" intent="error" role="alert"><MessageBarBody><p>{error}</p><div className="hca-toolbar"><Button onClick={() => void load()}>Tentar novamente</Button><Link href="/login">Entrar novamente</Link></div></MessageBarBody></MessageBar> : null}
+    {value?.activeContext?.mode === "global" && !value.globalAdministrationAllowed ? <MessageBar layout="multiline" intent="warning"><MessageBarBody>Confirme seu autenticador para administrar. <Link href="/perfil?mfa=required">Verificar autenticação em duas etapas</Link></MessageBarBody></MessageBar> : null}
     {choose ? <section className="ui-card hca-context-selection" aria-label="Mudar perfil">
       <h2 className="text-lg font-semibold">Escolha como deseja atuar</h2>
       {data?.documentContext ? <p>Este documento pertence a {data.documentContext.displayName}. Selecione seu vínculo para continuar na tarefa.</p> : null}
@@ -33,8 +33,8 @@ export function AppWorkspace({ title, children, administration = false, administ
         {value.patients.filter((patient) => patient.hasMembership).map((patient) => <Button key={patient.id} disabled={selecting} onClick={() => void selectProfile(patient.id)}>{patient.display_name} · {roleLabels[patient.role] ?? patient.role}</Button>)}
       </div>
     </section> : null}
-    {!error && value?.activeContext && !mismatch ? !value.patient && !value.isGlobalAdmin ? <MessageBar><MessageBarBody>Nenhum paciente autorizado está vinculado à sua conta.</MessageBarBody></MessageBar> : administration && !canAdminister ? <MessageBar intent="error"><MessageBarBody>Seu vínculo não permite administrar este paciente.</MessageBarBody></MessageBar> : <div key={`${value.patient?.id ?? "global"}:${value.activeContext.mode}`}>
-      {value.patient?.is_active === false ? <MessageBar intent="warning"><MessageBarBody>Paciente inativo. O histórico permanece disponível; novas operações estão suspensas.</MessageBarBody></MessageBar> : null}
+    {!error && value?.activeContext && !mismatch ? !value.patient && !value.isGlobalAdmin ? <MessageBar layout="multiline"><MessageBarBody>Nenhum paciente autorizado está vinculado à sua conta.</MessageBarBody></MessageBar> : administration && !canAdminister ? <MessageBar layout="multiline" intent="error"><MessageBarBody>Seu vínculo não permite administrar este paciente.</MessageBarBody></MessageBar> : <div key={`${value.patient?.id ?? "global"}:${value.activeContext.mode}`}>
+      {value.patient?.is_active === false ? <MessageBar layout="multiline" intent="warning"><MessageBarBody>Paciente inativo. O histórico permanece disponível; novas operações estão suspensas.</MessageBarBody></MessageBar> : null}
       {children(value)}
     </div> : null}
   </main>;

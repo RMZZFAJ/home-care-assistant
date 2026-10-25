@@ -13,19 +13,16 @@ import {
 
 const homeCareTheme = { ...webLightTheme, colorNeutralForegroundDisabled: "#616161" };
 
-/** Each server render owns its registry; streamed boundaries can add styles. */
+/** One request owns the registry; SSR styles must not outlive head overrides. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [renderer] = useState(() => createDOMRenderer());
-  const emittedRef = useRef(new Map<string, string>());
+  const didRenderRef = useRef(false);
   useServerInsertedHTML(() => {
-    const styles = renderToStyleElements(renderer).filter((element) => {
-      const key = String(element.key);
-      const content = JSON.stringify(element.props);
-      if (emittedRef.current.get(key) === content) return false;
-      emittedRef.current.set(key, content);
-      return true;
-    });
-    return <>{styles}</>;
+    // Later streaming flushes land in body. Their reset rules would override
+    // runtime rules in head after client navigation, regardless of bucket order.
+    if (didRenderRef.current) return;
+    didRenderRef.current = true;
+    return <>{renderToStyleElements(renderer)}</>;
   });
   return (
     <RendererProvider renderer={renderer}>

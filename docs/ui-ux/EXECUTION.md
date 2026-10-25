@@ -285,3 +285,38 @@ SHA-256 e dry-run exclusivo. As 82 migrations estão protegidas por hash.
 Na interface, o nome acessível da seleção é aplicado à lista de menu, removendo
 a referência automática ao acionador. Isso preserva a identificação dos
 contextos e a navegação de retorno, sem desabilitar verificações de acessibilidade.
+
+A CI 40213968412 aprovou todos os checks e 117 cenários de navegador, com
+repetição bem-sucedida de dois casos. A investigação dirigida reproduziu o
+Histórico mobile: o aviso de paciente inativo em linha única transbordava de
+412 para 594 px e deslocava a área visual do Chromium. Os avisos Fluent do
+workspace, login e edição agora usam layout multilinha explícito e texto
+quebrável. A regressão do Histórico verifica a largura real do documento;
+duas verificações legadas também passam a comparar com clientWidth, evitando
+que innerWidth expandido esconda transbordamento. O caso iOS falhou por
+ECONNRESET no transporte HTTP local, sem falha de asserção de estoque, e será
+revalidado no fluxo completo. Nenhum clique forçado ou teste removido.
+
+A revalidação encontrou a causa estrutural da cascata: o registro Griffel
+reemitia buckets modificados em flushes posteriores do streaming, gerando
+cópias no body que venciam regras de runtime no head após navegação.
+O registro agora faz uma única emissão por requisição, conforme a
+[orientação oficial Griffel para App Router](https://griffel.js.org/react/guides/ssr-usage/).
+Uma regressão verifica o HTML real sem JavaScript e a navegação autenticada,
+exigindo ausência de folhas Griffel no corpo, além da geometria do Histórico.
+
+O build de produção também reproduziu a duplicação do registro na retomada de
+Cache Components, mesmo com a proteção de emissão única. Esse comportamento
+está reportado no [Next.js 99905](https://github.com/vercel/next.js/issues/99905).
+Os opt-ins cacheComponents e partialPrefetching foram retirados; o aplicativo
+usa SSR convencional e não contém funções dependentes de use cache. A troca
+dispensa a casca parcialmente pré-renderizada; autenticação, APIs, estado de
+contexto e persistência dos rascunhos continuam com seus contratos e testes.
+As verificações de CSS, largura, navegação e acessibilidade permanecem ativas.
+
+O build compatível passou os nove casos dirigidos de SSR sem JavaScript,
+navegação autenticada e Histórico entre Chromium desktop, Pixel 7 e WebKit
+iPhone. O diagnóstico confirmou estilos r/d ordenados no head e larguras
+iguais de documento/viewport (412/412 e 390/390), com o aviso visível e
+quebrável. Os logs temporários de diagnóstico foram retirados; as asserções
+de ausência de CSS no corpo e de largura permanecem na suíte.

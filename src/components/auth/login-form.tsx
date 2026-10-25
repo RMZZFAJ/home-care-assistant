@@ -138,11 +138,11 @@ export function LoginForm() {
 
   return (
     <form onSubmit={submit} className="hca-auth-form">
-      {searchParams.get("error") ? <MessageBar intent="warning" role="alert"><MessageBarBody>Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</MessageBarBody></MessageBar> : null}
+      {searchParams.get("error") ? <MessageBar layout="multiline" intent="warning" role="alert"><MessageBarBody>Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</MessageBarBody></MessageBar> : null}
       <Field label={{ children: "E-mail", htmlFor: "login-email" }}><Input id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={(_, data) => setEmail(data.value)} size="large" /></Field>
       <Field label={{ children: "Senha", htmlFor: "login-password" }}><Input id="login-password" name="password" required disabled={!ready || loading} type="password" autoComplete="current-password" value={password} onChange={(_, data) => setPassword(data.value)} size="large" /></Field>
-      {error ? <MessageBar intent="error" role="alert"><MessageBarBody>{error}</MessageBarBody></MessageBar> : null}
-      {notice ? <MessageBar intent="success" role="status"><MessageBarBody>{notice}</MessageBarBody></MessageBar> : null}
+      {error ? <MessageBar layout="multiline" intent="error" role="alert"><MessageBarBody>{error}</MessageBarBody></MessageBar> : null}
+      {notice ? <MessageBar layout="multiline" intent="success" role="status"><MessageBarBody>{notice}</MessageBarBody></MessageBar> : null}
       <Button type="submit" appearance="primary" size="large" disabled={loading || !ready} icon={loading ? <Spinner size="tiny" /> : undefined}>{loading ? "Entrando..." : "Entrar"}</Button>
       <Button appearance="transparent" type="button" onClick={recoverPassword} disabled={loading || !ready}>Esqueci minha senha</Button>
       <div className="hca-auth-divider"><span />ou<span /></div>

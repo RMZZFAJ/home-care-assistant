@@ -538,6 +538,13 @@ test("histórico filtra código e período e conserva o documento de paciente re
   await page
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
+  await expect(page).toHaveURL(/search=REQ-0001/);
+  await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
+  await expect
+    .poll(() => page.evaluate(() =>
+      document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+    ))
+    .toBe(true);
   await expect(
     page.getByRole("link").filter({ hasText: "REQ-0001" }),
   ).toBeVisible();

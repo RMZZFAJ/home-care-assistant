@@ -63,6 +63,7 @@
 .hca-theme .workspace-navigation a[aria-current=page] { background: var(--brand-soft); color: var(--brand-dark); }
 .hca-dialog-surface { max-width: min(640px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; }
 .hca-dialog-content { overflow-wrap: anywhere; }
+.hca-theme .fui-MessageBarBody, .hca-record-drawer .fui-MessageBarBody, .hca-dialog-surface .fui-MessageBarBody { min-width: 0; overflow-wrap: anywhere; }
 .hca-theme .wizard-navigation { margin-bottom: 20px; }
 .hca-theme .wizard-steps { padding-bottom: 6px; }
 .hca-theme .wizard-steps button { border-radius: 4px; }

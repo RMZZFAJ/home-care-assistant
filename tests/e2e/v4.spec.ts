@@ -221,7 +221,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
     for (const device of [family, pro])
       expect(
         await device.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
+          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
         ),
       ).toBe(true);
     let trackingRequests = 0;
@@ -331,7 +331,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   expect(await inherited.count()).toBeGreaterThan(5);
   expect(
     await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
+      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
     ),
   ).toBe(true);
   const other = await browser.newContext();

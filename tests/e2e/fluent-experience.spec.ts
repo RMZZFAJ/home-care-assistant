@@ -23,6 +23,16 @@ async function capture(page: Page, name: string, project: string) {
   await page.screenshot({ path: `output/playwright/fluent/${name}-${project}.png`, fullPage: await page.getByRole("dialog").count() === 0, animations: "disabled" });
 }
 
+test.describe("registro SSR Fluent", () => {
+  test.use({ javaScriptEnabled: false });
+  test("estilos do streaming permanecem no head sem cópias no corpo", async ({ page }) => {
+    const response = await page.goto("/login?error=AUTHENTICATION_FAILED");
+    expect(response?.ok()).toBe(true);
+    await expect(page.locator("head style[data-make-styles-rehydration]")).not.toHaveCount(0);
+    await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
+  });
+});
+
 test("gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda", async ({ page }, info) => {
   const failures: string[] = [];
   page.on("pageerror", (error) => failures.push(error.message));
@@ -30,6 +40,7 @@ test("gestão Fluent troca contexto no submenu, mantém navegação e edita perf
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }).click();
   await expect(page).toHaveURL(/\/perfil/);
+  await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Identidade pessoal", exact: true })).toHaveAttribute("aria-expanded", "false");
   await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
   await expect(page.getByLabel("Nome", { exact: true })).toBeVisible();
