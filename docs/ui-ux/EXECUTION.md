@@ -413,3 +413,22 @@ catálogo/documentos/estoque/BAL e PDF válido. O heartbeat foi confirmado às
 grants anteriores; o cursor privado não permite acesso direto a anon,
 authenticated ou service_role. A nova cabeça ainda exige os checks da CI;
 a aprovação da cabeça anterior não autoriza o merge das correções.
+
+Na CI 40239766755, Windows/Linux, instalação limpa das 84 migrations, evolução
+legada, compatibilidade hospedada, 14 regressões SQL e 33 integrações passaram,
+sem falhas na integração. O preview fe2adde passou em mais 54 visitas
+autenticadas nos cinco perfis entre desktop, Android e iPhone emulado, sem
+erros de página. As sessões temporárias foram encerradas e as contagens
+remotas permaneceram preservadas.
+
+O job mobile dessa CI falhou antes dos testes: o Docker recebeu address already
+in use ao vincular a porta 54322. O workflow passa a reservar 54320–54329 contra
+alocação efêmera nos jobs Linux que usam Supabase, conservando reservas
+anteriores. A configuração segue o
+[mecanismo do kernel](https://docs.kernel.org/networking/ip-sysctl.html),
+e a falha tem precedente no
+[setup-cli 265](https://github.com/supabase/setup-cli/issues/265).
+O proprietário da conexão no runner encerrado não foi capturado; a origem
+efêmera é a hipótese tratada, não uma observação direta. Nenhuma porta da
+suíte mudou, nenhum processo foi encerrado e os testes continuam obrigatórios.
+O resultado dessa prevenção depende da nova execução da CI.
