@@ -226,3 +226,8 @@ e abrir os avisos recolhíveis. A troca de paciente deixou de disparar refresh
 RSC redundante; o sino aguarda a troca confirmada e descarta respostas antigas.
 As capturas móveis do BAL verificam topo e rodapé visíveis, incluindo geometria
 dos botões acima da navegação inferior, sem alterar CSS para a captura.
+
+As execuções anteriores concentravam banco e três navegadores em um limite de
+40 minutos e foram canceladas durante E2E. A CI passa a executar banco/upgrade
+e Auth uma vez, seguidos por três jobs de navegador isolados. O check agregado
+conserva a exigência de sucesso em todos, sem remover cenários ou permissões.

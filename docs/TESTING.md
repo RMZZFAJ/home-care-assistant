@@ -121,6 +121,15 @@ test:integration. A importação E2E aloca o próximo protocolo físico disponí
 em dados fictícios, preservando protocolos e eventos confirmados anteriores.
 Mailpit valida cadastro, confirmação e recuperação sem entrega externa.
 
+## Isolamento na CI
+
+Instalação limpa, evolução legada, SQL/RLS e integrações Auth executam uma vez
+no job de banco. Após sua aprovação, Chromium desktop, Pixel 7 e iPhone 13
+executam em jobs isolados, com a mesma stack local e provisionamento Auth
+fictício em cada runner efêmero. Cada projeto mantém todos os seus cenários.
+O check agregado database-and-browser exige sucesso no banco e nos três
+projetos. Não há exclusão de testes nem uso do Supabase remoto na suíte.
+
 ## Linux local
 
 scripts/verify-linux.sh roda dentro de container Node 24.22.0 com o repositório
