@@ -79,5 +79,6 @@
   "supabase/migrations/20261025101209_balance_deadlines_and_schedule_separation.sql": "43ad3795e75dca85fb132996b73e0a58850268aeca7d7897ad15bafd7ed7114a",
   "supabase/migrations/20261025102217_balance_window_availability.sql": "b4f41b0ee6b255c4cc7c30ddf3e394be02bca5623f0b2872edb09073fd2d32d5",
   "supabase/migrations/20261025103452_effective_capability_matrix.sql": "8082f3263267230369f7a4d982a1b62a10088f38ddd279acfc2dbe9511493b71",
-  "supabase/migrations/20261025105017_policy_conflict_transport_compatibility.sql": "096cdc33699f44a62137982b3c3f1a3f760775fcb57db847886280076470df6a"
+  "supabase/migrations/20261025105017_policy_conflict_transport_compatibility.sql": "096cdc33699f44a62137982b3c3f1a3f760775fcb57db847886280076470df6a",
+  "supabase/migrations/20261025164621_notification_claim_conflict_recovery.sql": "accb881daca02b438f2008066ac66de231d4320563916db46551f902b33a5c90"
 }

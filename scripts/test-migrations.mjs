@@ -223,6 +223,7 @@ async function runSqlRegressions(fixtureIdentities) {
     "whatsapp-receipts.sql",
     "business-conflicts.sql",
     "balance-shift-authority.sql",
+    "notification-claim-recovery.sql",
   ];
   if (process.argv.includes("--sql-file") && !regressionFiles.includes(process.argv[process.argv.indexOf("--sql-file") + 1])) throw new Error("Unknown SQL regression file.");
   for (const file of regressionFiles) {

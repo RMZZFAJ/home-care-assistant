@@ -270,3 +270,18 @@ Critérios, componentes e capturas estão na [matriz](ACCEPTANCE.md), no
 O registro final de checks, SHA de merge e validação da produção fica na
 [PR 5](https://github.com/RMZZFAJ/home-care-assistant/pull/5), evitando confundir
 evidências da candidata com resultados posteriores à integração.
+
+A CI 40212256797 detectou um deadlock real entre reservas concorrentes da
+outbox. O incremento 82 ordena a invalidação por usuário e recupera somente
+reservas abortadas por 40P01, em até três tentativas com rollback integral.
+O envio ao provedor continua posterior à reserva e não participa da repetição.
+Uma regressão SQL injeta falhas depois de produzir resultados/efeitos e verifica
+que não sobrevivem; também verifica o limite de tentativas. Os dois testes de
+workers HTTP e as 30 integrações completas passaram após a correção.
+A abordagem segue a [documentação PostgreSQL](https://www.postgresql.org/docs/17/explicit-locking.html#LOCKING-DEADLOCKS).
+
+O incremento 82 foi aplicado no remoto após backup de esquema/dados, manifesto
+SHA-256 e dry-run exclusivo. As 82 migrations estão protegidas por hash.
+Na interface, o nome acessível da seleção é aplicado à lista de menu, removendo
+a referência automática ao acionador. Isso preserva a identificação dos
+contextos e a navegação de retorno, sem desabilitar verificações de acessibilidade.
