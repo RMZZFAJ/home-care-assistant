@@ -132,6 +132,11 @@
 .hca-bottom-navigation a { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; flex: 1; min-width: 0; min-height: 52px; text-decoration: none; font-size: 11px; font-weight: 600; color: var(--muted); border-radius: 8px; }
 .hca-bottom-navigation a[aria-current=page] { color: var(--brand); background: var(--brand-soft); }
 .hca-operations-shell .workspace-content { max-width: 880px; padding-bottom: calc(var(--hca-bottom-navigation) + 32px + env(safe-area-inset-bottom)); }
+@media (max-width: 1023px) {
+  .hca-operations-shell :is(button, input, select, textarea, a) {
+    scroll-margin-bottom: calc(var(--hca-bottom-navigation) + 24px + env(safe-area-inset-bottom));
+  }
+}
 .hca-context-selection p { margin-top: 12px; color: var(--muted); }
 .hca-context-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; margin-top: 20px; }
 .hca-context-options button { min-height: 48px; justify-content: flex-start; text-align: left; }

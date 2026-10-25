@@ -320,3 +320,14 @@ iPhone. O diagnóstico confirmou estilos r/d ordenados no head e larguras
 iguais de documento/viewport (412/412 e 390/390), com o aviso visível e
 quebrável. Os logs temporários de diagnóstico foram retirados; as asserções
 de ausência de CSS no corpo e de largura permanecem na suíte.
+
+A repetição do fluxo iOS completo encontrou no BAL legado um avanço coberto
+pela navegação inferior durante a rolagem automática. Os controles da operação
+móvel recebem margem de rolagem compatível com a barra e a área segura,
+complementando o espaço já reservado no fim do conteúdo. O teste conserva
+o clique normal e as verificações de estoque; não usa force ou remoção da barra.
+
+Após esse ajuste, o fluxo iOS completo passou na primeira tentativa (1,2 min),
+incluindo COM por doação, validação, ENT parcial, saldo confirmado e BAL real.
+Contratos, lint, Markdown, tipagem, 98 unitários e build também passaram nesta
+rodada. Os resultados completos da nova candidata ficam nos checks da PR 5.
