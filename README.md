@@ -36,7 +36,8 @@ npm run dev
 Selecione o paciente no cabeçalho e use o menu recolhível: Visão geral,
 Fichas (REQ, COM, ENT, BAL), Histórico, Estoque e Administração.
 Um administrador de paciente gerencia somente
-aquele contexto. Administradores globais administram todos os pacientes.
+aquele contexto. Administração global gerencia a plataforma e propõe mudanças
+locais; competências operacionais exigem vínculo e contexto explícitos.
 Convites permitem cadastro pessoal e aceite; revogar um vínculo não bloqueia
 a conta em outros pacientes. Novos pacientes iniciam com catálogo vazio e
 podem adotar modelos explicitamente.

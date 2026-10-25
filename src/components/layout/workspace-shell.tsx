@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar, Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, Menu, MenuDivider, MenuItem, MenuItemRadio, MenuList, MenuPopover, MenuTrigger, OverlayDrawer, Select, useRestoreFocusTarget, useRestoreFocusSource } from "@fluentui/react-components";
@@ -22,27 +22,37 @@ function ProfileMenu() {
   const router = useRouter();
   const { data, value, selecting, selectProfile } = useWorkspaceState();
   const [open, setOpen] = useState(false);
-  const choose = async (id: string | null) => { if (await selectProfile(id)) setOpen(false); };
-  return <Menu open={open} onOpenChange={(_, next) => setOpen(next.open)}>
-    <MenuTrigger disableButtonEnhancement><Button appearance="subtle" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data}>
+  const [contexts, setContexts] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const frame = requestAnimationFrame(() => {
+      const target = contexts ? menuRef.current?.querySelector<HTMLElement>('[role="menuitemradio"][aria-checked="true"]') : null;
+      (target ?? menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]'))?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, contexts]);
+  const choose = async (id: string | null) => { if (await selectProfile(id)) { setOpen(false); setContexts(false); } };
+  return <Menu open={open} onOpenChange={(_, next) => { setOpen(next.open); if (!next.open) setContexts(false); }}>
+    <MenuTrigger disableButtonEnhancement><Button appearance="subtle" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data || selecting}>
       <Avatar name={data?.fullName} image={data?.avatarUrl ? { src: data.avatarUrl, alt: "" } : undefined} size={32} color="brand" />
       <span className="hca-profile-identity"><strong>{data?.fullName}</strong><small>{data?.activeContext?.mode === "global" ? "Administração global" : roleLabels[value?.patient?.role ?? ""]}</small></span>
       <Icon name="chevron" width={14} />
     </Button></MenuTrigger>
-    <MenuPopover><MenuList>
+    <MenuPopover className={contexts ? "hca-context-menu" : undefined}><MenuList ref={menuRef} aria-label={contexts ? "Contextos autorizados" : "Menu do usuário"} checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
+      {contexts ? <>
+        <MenuItem persistOnClick onClick={() => setContexts(false)}>← Voltar ao menu</MenuItem>
+        {data?.isGlobalAdmin ? <MenuItemRadio persistOnClick name="context" value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</MenuItemRadio> : null}
+        {data?.patients.filter((patient) => patient.hasMembership).map((patient) => <MenuItemRadio persistOnClick key={patient.id} name="context" value={patient.id} disabled={selecting} onClick={() => void choose(patient.id)}>
+          {patient.display_name} · {roleLabels[patient.role] ?? patient.role}
+        </MenuItemRadio>)}
+      </> : <>
       <MenuItem icon={<Icon name="user" />} onClick={() => router.push("/perfil")}>Meu perfil e segurança</MenuItem>
-      <Menu>
-        <MenuTrigger disableButtonEnhancement><MenuItem icon={<Icon name="team" />}>Mudar perfil</MenuItem></MenuTrigger>
-        <MenuPopover className="hca-context-menu"><MenuList aria-label="Contextos autorizados" checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
-          {data?.isGlobalAdmin ? <MenuItemRadio name="context" value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</MenuItemRadio> : null}
-          {data?.patients.filter((patient) => patient.hasMembership).map((patient) => <MenuItemRadio key={patient.id} name="context" value={patient.id} disabled={selecting} onClick={() => void choose(patient.id)}>
-            {patient.display_name} · {roleLabels[patient.role] ?? patient.role}
-          </MenuItemRadio>)}
-        </MenuList></MenuPopover>
-      </Menu>
+      <MenuItem persistOnClick icon={<Icon name="team" />} onClick={() => setContexts(true)}>Mudar perfil</MenuItem>
       <MenuItem icon={<Icon name="bell" />} onClick={() => router.push("/notificacoes")}>Preferências e notificações</MenuItem>
       <MenuDivider />
       <LogoutButton />
+      </>}
     </MenuList></MenuPopover>
   </Menu>;
 }

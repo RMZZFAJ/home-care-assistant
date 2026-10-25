@@ -110,6 +110,26 @@ WhatsApp, Flows, SMS, OAuth e transcrição dependem de configuração e/ou
 liberação externa. Consulte os resultados reais em
 [Execução](evolution/EXECUTION.md); não presumir homologação do provedor.
 
+## Escalas e novo balanço
+
+Em Escalas e plantões, cadastre os tipos e publique a programação real. Uma
+proposta permanece pendente até decisão de quem pode administrar a escala.
+Não há registro de presença ou botão de iniciar/encerrar plantão.
+
+Em Balanços e plantões, família/administração local pode habilitar o regime,
+escolhendo dia, tipo, fuso, data de início e eventual profissional designado.
+Comece em paciente fictício. Pausar não apaga obrigações ou atrasos existentes.
+O profissional designado conta durante a janela; supervisão pode solicitar
+adiamento, que só altera prazo e responsabilidade após decisão familiar.
+Troca de horário de um plantão com BAL vigente exige essa decisão antes de
+alterar a agenda. Substituição no mesmo período conserva a janela.
+
+Contagem física e revisão são etapas distintas. Na revisão, referência e
+diferenças ficam visíveis. Uma mudança no estoque exige nova conferência; uma
+resposta perdida oferece recuperação da mesma tentativa. Semanas anteriores
+regularizadas apontam para a contagem atual e conservam seus atrasos.
+Consulte [Escalas](ui-ux/SCHEDULES.md) e [BAL](ui-ux/BALANCES.md).
+
 ## Desenvolvimento e preservação
 
 A suíte utiliza somente a stack local home-care-assistant, com API em

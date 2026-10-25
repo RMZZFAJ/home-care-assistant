@@ -36,6 +36,12 @@ test("gestão Fluent troca contexto no submenu, mantém navegação e edita perf
   await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
   await expect(page.getByLabel("Nome", { exact: true })).not.toBeVisible();
   await capture(page, "perfil", info.project.name);
+  await page.getByLabel("Menu do usuário", { exact: true }).click();
+  await page.getByRole("menuitem", { name: "Mudar perfil", exact: true }).click();
+  await expect(page.getByRole("menu", { name: "Contextos autorizados", exact: true })).toBeVisible();
+  await page.getByRole("menuitem", { name: "← Voltar ao menu", exact: true }).click();
+  await expect(page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true })).toBeFocused();
+  await page.keyboard.press("Escape");
   await selectContext(page, patientB);
   await expect(page).toHaveURL(/\/perfil/);
   await expect(page.getByRole("region", { name: "Mudar perfil", exact: true })).toHaveCount(0);

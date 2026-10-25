@@ -87,3 +87,14 @@ novas migrations e movimentos compensatórios quando pertinente.
 
 O [estado verificável](PROJECT_STATUS.md) e a auditoria datada registram
 as ações efetivamente concluídas. Autorização não é evidência de execução.
+
+## Ativação gradual do BAL
+
+A cadeia Fluent inclui escalas persistentes e BAL por plantão. Aplicar as
+migrations não habilita nenhum paciente. Após backup, validação e deploy,
+ative pela interface autenticada somente o paciente de homologação autorizado.
+Confirme agenda, atribuição, elegibilidade e avisos no aplicativo antes de
+habilitar outro paciente. Preserve os regimes existentes; não use fixtures
+ou SQL de teste para ativar pacientes remotos. Pausar o regime conserva
+obrigações, contagens, atrasos e eventos. Detalhes em
+[BAL por plantão](ui-ux/BALANCES.md).

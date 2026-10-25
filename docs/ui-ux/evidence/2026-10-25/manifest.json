@@ -1,0 +1,81 @@
+{
+  "data": "Fictional local verification only",
+  "viewportNotes": "Full-page captures retain fixed navigation at its capture position; BAL includes separate viewport top and bottom evidence.",
+  "captures": [
+    {
+      "file": "dashboard-adminA-desktop-chromium.png",
+      "capturedAt": "2026-10-25T10:56:15.337Z",
+      "bytes": 122344
+    },
+    {
+      "file": "dashboard-supervisor-mobile-ios.png",
+      "capturedAt": "2026-10-25T11:27:12.333Z",
+      "bytes": 251694
+    },
+    {
+      "file": "catalogo-edicao-ios.png",
+      "capturedAt": "2026-10-25T11:27:25.339Z",
+      "bytes": 65071
+    },
+    {
+      "file": "permissoes-matriz-ios.png",
+      "capturedAt": "2026-10-25T11:27:29.996Z",
+      "bytes": 117145
+    },
+    {
+      "file": "notificacoes-matriz-ios.png",
+      "capturedAt": "2026-10-25T11:27:30.935Z",
+      "bytes": 172089
+    },
+    {
+      "file": "documento-ent-desktop-ios.png",
+      "capturedAt": "2026-10-25T11:26:50.634Z",
+      "bytes": 452883
+    },
+    {
+      "file": "documento-req-mobile-ios.png",
+      "capturedAt": "2026-10-25T11:26:47.128Z",
+      "bytes": 301971
+    },
+    {
+      "file": "historico-filtros-mobile-ios.png",
+      "capturedAt": "2026-10-25T11:26:54.747Z",
+      "bytes": 127799
+    },
+    {
+      "file": "estoque-mobile-ios.png",
+      "capturedAt": "2026-10-25T11:26:56.436Z",
+      "bytes": 177656
+    },
+    {
+      "file": "perfil-ios.png",
+      "capturedAt": "2026-10-25T11:26:23.036Z",
+      "bytes": 138820
+    },
+    {
+      "file": "escalas-mobile-ios.png",
+      "capturedAt": "2026-10-25T11:28:07.623Z",
+      "bytes": 178613
+    },
+    {
+      "file": "bal-contagem-ios.png",
+      "capturedAt": "2026-10-25T11:13:59.453Z",
+      "bytes": 129154
+    },
+    {
+      "file": "bal-contagem-ios-rodape.png",
+      "capturedAt": "2026-10-25T11:13:59.607Z",
+      "bytes": 127547
+    },
+    {
+      "file": "bal-revisao-ios.png",
+      "capturedAt": "2026-10-25T11:14:01.783Z",
+      "bytes": 129099
+    },
+    {
+      "file": "bal-adiamento-familiar-ios.png",
+      "capturedAt": "2026-10-25T11:26:04.390Z",
+      "bytes": 122564
+    }
+  ]
+}

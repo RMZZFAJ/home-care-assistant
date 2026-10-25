@@ -49,6 +49,8 @@
   font-size: 14px;
 }
 .hca-theme .ui-button { min-height: 36px; border-radius: 4px; padding: 7px 14px; font-weight: 600; }
+/* Interpolating disabled gray and enabled blue creates unreadable mid-colors. */
+.hca-theme .fui-Button, .hca-record-drawer .fui-Button, .hca-dialog-surface .fui-Button { transition-property: box-shadow, transform; }
 .hca-theme .ui-notice { border-radius: 6px; }
 .hca-theme .welcome-panel { background: white; border-radius: 8px; padding: 24px; }
 .hca-theme .page-heading h1 { font-size: 24px; letter-spacing: -.35px; }

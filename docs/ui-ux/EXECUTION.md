@@ -19,11 +19,11 @@ pré-condições. Nenhum reset de banco será realizado.
 | A | Fundação publicada | Referências, inventário, Fluent, tema e componentes |
 | B | Publicado | Shells, contexto, menus, login e perfil |
 | C | Publicado | Dashboards por contexto e tarefas |
-| D | Base publicada | Administração, matrizes, catálogo e unidades |
-| E | Base publicada | Documentos, wizards, estoque e histórico |
+| D | Publicado | Administração, matrizes, catálogo e unidades |
+| E | Publicado | Documentos, wizards, estoque e histórico |
 | F | Publicado | Escalas persistentes, permissões e interfaces |
-| G | Publicação incremental | BAL por plantão, prazos e regularização |
-| H | Pendente | Homologação, evidências, documentação e integração |
+| G | Publicado | BAL por plantão, prazos e regularização |
+| H | Evidências publicadas | Homologação e integração rastreadas na PR 5 |
 
 Cada bloco recebe commits coesos e publicação para atualizar o preview.
 Telas novas não usarão simulações como resultado de operações reais.
@@ -237,3 +237,36 @@ viewport. O menu agora limita altura/largura e permite rolagem interna, sem
 remover vínculos. A auditoria de teclado do login aguarda os campos interativos
 após a hidratação, mantendo a navegação e todas as regras axe. Esses casos serão
 reexecutados no build atualizado antes do fechamento.
+
+Na CI 40188155460, banco/upgrade, integrações e validações Windows/Linux foram
+aprovados. A homologação remota confirmou cinco logins por senha, proibições nas
+APIs e 135 consultas de telas entre cinco perfis e três projetos de navegador.
+Avisos de configuração, abertura, atribuição e disponibilidade do BAL foram
+confirmados como disponíveis no aplicativo pelo worker remoto. Não houve envio
+Meta, alteração de estoque ou contagem física presumida nessa verificação.
+
+A CI 40188155460 aprovou 98 unitários em Windows/Linux, instalação limpa,
+upgrade legado, 12 regressões SQL, compatibilidade hospedada e 30 integrações.
+Os projetos Chromium desktop e Pixel 7 concluíram seus 39 cenários cada.
+WebKit Linux identificou encerramento do flyout durante a seleção; a seleção
+de perfil passou para uma seção do mesmo dropdown, com retorno e foco explícito.
+Permissões e vínculos continuam no servidor. Uma regressão adicional verifica
+a navegação de ida e retorno no menu.
+
+O iPhone local corrigido passou 36 de 39 cenários. Os três restantes revelaram
+contraste durante interpolação de cores e duas asserções de captura que exigiam
+barra operacional nos perfis familiares. As cores agora mudam diretamente entre
+estados legíveis; animações de sombra/movimento são preservadas. Capturas exigem
+a barra somente na operação e verificam sua ausência na gestão. A rodada
+direcionada mantém todas as regras axe e repete os fluxos afetados.
+
+O remoto permanece reconciliado com 81 migrations e sem pendências no dry-run.
+As cinco contas também verificaram recusa de DML direto e isolamento RLS no
+banco remoto. Contagens preservadas: 8 Auth, 6 perfis, 13 vínculos, 59 produtos
+por paciente, 11 documentos e 8 movimentos. Somente o regime fictício está ativo.
+
+Critérios, componentes e capturas estão na [matriz](ACCEPTANCE.md), no
+[inventário](INVENTORY.md) e no [mapa de telas](SCREEN_MAP.md).
+O registro final de checks, SHA de merge e validação da produção fica na
+[PR 5](https://github.com/RMZZFAJ/home-care-assistant/pull/5), evitando confundir
+evidências da candidata com resultados posteriores à integração.

@@ -817,7 +817,7 @@ Dependências internas:
 
 ### src/components/layout/workspace-context.tsx
 
-Linhas: 135. Estados locais: 5.
+Linhas: 136. Estados locais: 5.
 
 Dependências internas:
 
@@ -828,7 +828,7 @@ Dependências internas:
 
 ### src/components/layout/workspace-shell.tsx
 
-Linhas: 81. Estados locais: 3.
+Linhas: 91. Estados locais: 4.
 
 Dependências internas:
 
@@ -879,7 +879,7 @@ Dependências internas:
 
 ### src/components/notifications/notification-bell.tsx
 
-Linhas: 170. Estados locais: 4.
+Linhas: 174. Estados locais: 4.
 
 Dependências internas:
 

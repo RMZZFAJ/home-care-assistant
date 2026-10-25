@@ -12,7 +12,7 @@ async function login(page:Page,email:string,patient:string) {
   await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);
 }
 async function logout(page:Page) {await page.getByLabel("Menu do usuário",{exact:true}).click();await page.getByRole("menuitem",{name:"Sair",exact:true}).click();await expect(page).toHaveURL(/\/login/);}
-async function capture(page:Page,name:string) {
+async function capture(page:Page,name:string,operational=false) {
   mkdirSync("output/playwright/fluent",{recursive:true});
   const dialog=await page.getByRole("dialog").count()>0,mobile=(page.viewportSize()?.width??1366)<768;
   if(!dialog){await page.getByRole("main").focus();await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));}
@@ -21,6 +21,9 @@ async function capture(page:Page,name:string) {
   await page.screenshot({path:`output/playwright/fluent/${name}.png`,fullPage:!dialog&&!mobile,animations:"disabled"});
   if(mobile&&!dialog){
     await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"}));await frame();
+    const navigation=page.getByRole("navigation",{name:"Navegação do plantão",exact:true});
+    if(operational)await expect(navigation).toBeInViewport({ratio:1});
+    else await expect(navigation).toHaveCount(0);
     const bounds=await page.evaluate(()=>{
       const nav=document.querySelector('.hca-bottom-navigation')?.getBoundingClientRect();
       return [...document.querySelectorAll('.hca-wizard-actions button')].map(button=>{const r=button.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,limit:nav?.top??innerHeight,width:innerWidth};});
@@ -71,7 +74,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await page.getByLabel("Observações da contagem",{exact:true}).fill("Conferência física atual; diferença para revisão familiar.");
   const widths=info.project.name==="chromium"?[320,360,390,428,768,1024,1366,1920]:[390];
   for(const width of widths){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);}
-  await capture(page,"bal-contagem-"+info.project.name);
+  await capture(page,"bal-contagem-"+info.project.name,true);
   await audit(page,"scheduled BAL count");
   await page.getByRole("button",{name:"Revisar",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Revisão da contagem",exact:true})).toBeVisible();
@@ -79,7 +82,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await audit(page,"scheduled BAL review");
   await page.getByRole("button",{name:"Voltar",exact:true}).click();
   await expect(page.getByLabel(`${catalogue[0].name} · ${catalogue[0].unit}`,{exact:true})).toHaveValue("1");
-  await page.getByRole("button",{name:"Revisar",exact:true}).click();await capture(page,"bal-revisao-"+info.project.name);
+  await page.getByRole("button",{name:"Revisar",exact:true}).click();await capture(page,"bal-revisao-"+info.project.name,true);
   let lost=false;
   await page.route("**/api/documents",async route=>{if(route.request().method()==="POST"&&!lost){await route.fetch();lost=true;await route.abort("failed");}else await route.continue();});
   await page.getByRole("button",{name:"Confirmar contagem",exact:true}).click();
@@ -94,7 +97,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   const stock=(await(await page.request.get("/api/stock/balances?careRecipientId="+patient)).json()).overview;
   expect(stock.every((p:{team:{confirmed:string}})=>p.team.confirmed==="0")).toBe(true);
   const pdf=await page.request.get("/api/documents/"+id+"/pdf");expect(pdf.ok()).toBe(true);expect((await pdf.body()).length).toBeGreaterThan(1000);
-  await capture(page,"bal-conclusao-"+info.project.name);
+  await capture(page,"bal-conclusao-"+info.project.name,true);
 });
 
 test("supervisão solicita adiamento, família decide e o prazo só muda após a aprovação",async({page},info)=>{

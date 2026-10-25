@@ -16,7 +16,9 @@ Cabeçalho compacto com paciente, sino e menu pessoal. Navegação lateral no
 desktop, recolhível, e drawer modal no celular. Grupos: área de trabalho,
 operações, gestão do paciente e administração global quando autorizada.
 
-O submenu Mudar perfil chama a seleção real de autoridade da sessão. A seleção
+Mudar perfil abre a seleção de autoridade dentro do mesmo dropdown, com retorno
+ao menu e rolagem de vínculos. Não depende de hover ou de um painel lateral.
+A seleção
 obrigatória aparece apenas sem contexto ou quando o destino exige outro vínculo.
 URLs e atualizações do servidor acompanham a seleção; navegação especulativa
 de links do shell fica desativada para evitar pré-carregar outro contexto.

@@ -1413,7 +1413,7 @@
     },
     {
       "file": "src/components/layout/workspace-context.tsx",
-      "lines": 135,
+      "lines": 136,
       "imports": [
         "react",
         "next/navigation",
@@ -1432,7 +1432,7 @@
     },
     {
       "file": "src/components/layout/workspace-shell.tsx",
-      "lines": 81,
+      "lines": 91,
       "imports": [
         "react",
         "next/link",
@@ -1448,7 +1448,7 @@
         "WorkspaceShell"
       ],
       "headings": [],
-      "stateHooks": 3,
+      "stateHooks": 4,
       "kind": "component"
     },
     {
@@ -1520,7 +1520,7 @@
     },
     {
       "file": "src/components/notifications/notification-bell.tsx",
-      "lines": 170,
+      "lines": 174,
       "imports": [
         "next/link",
         "react",

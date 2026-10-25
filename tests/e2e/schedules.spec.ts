@@ -22,6 +22,7 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   await drawer.getByLabel("Nome do plantão", { exact: true }).fill(name);
   await drawer.getByLabel("Início local", { exact: true }).fill("19:00");
   await audit(page,"shift type drawer");
+  await expect(drawer.getByLabel("Nome do plantão", { exact: true })).toHaveValue(name);
   await drawer.getByRole("button", { name: "Revisar alteração", exact: true }).click();
   await page.getByRole("dialog", { name: "Revisar escala", exact: true }).getByRole("button", { name: "Confirmar gravação", exact: true }).click();
   await expect(drawer).not.toBeVisible();
