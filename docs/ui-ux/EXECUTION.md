@@ -231,3 +231,9 @@ As execuções anteriores concentravam banco e três navegadores em um limite de
 40 minutos e foram canceladas durante E2E. A CI passa a executar banco/upgrade
 e Auth uma vez, seguidos por três jobs de navegador isolados. O check agregado
 conserva a exigência de sucesso em todos, sem remover cenários ou permissões.
+
+O banco local acumulado revelou no iPhone um submenu de perfis maior que o
+viewport. O menu agora limita altura/largura e permite rolagem interna, sem
+remover vínculos. A auditoria de teclado do login aguarda os campos interativos
+após a hidratação, mantendo a navegação e todas as regras axe. Esses casos serão
+reexecutados no build atualizado antes do fechamento.

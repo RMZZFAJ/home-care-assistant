@@ -33,7 +33,7 @@ function ProfileMenu() {
       <MenuItem icon={<Icon name="user" />} onClick={() => router.push("/perfil")}>Meu perfil e segurança</MenuItem>
       <Menu>
         <MenuTrigger disableButtonEnhancement><MenuItem icon={<Icon name="team" />}>Mudar perfil</MenuItem></MenuTrigger>
-        <MenuPopover><MenuList aria-label="Contextos autorizados" checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
+        <MenuPopover className="hca-context-menu"><MenuList aria-label="Contextos autorizados" checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
           {data?.isGlobalAdmin ? <MenuItemRadio name="context" value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</MenuItemRadio> : null}
           {data?.patients.filter((patient) => patient.hasMembership).map((patient) => <MenuItemRadio key={patient.id} name="context" value={patient.id} disabled={selecting} onClick={() => void choose(patient.id)}>
             {patient.display_name} · {roleLabels[patient.role] ?? patient.role}
