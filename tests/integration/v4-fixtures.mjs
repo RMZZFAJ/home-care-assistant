@@ -44,6 +44,20 @@ async function rpc(client, name, args) {
   assert.ifError(result.error);
   return result.data;
 }
+async function claimExternalFixtureJob(service, worker, predicate) {
+  // Retained local data can put the fixture beyond the first bounded batch.
+  // Exercise the worker queue without deleting notices or enlarging its limit.
+  const queueSize = Number(sql("select count(*) from public.requisition_notifications"));
+  for (let batch = 0; batch <= queueSize; batch++) {
+    const jobs = await rpc(service, "claim_notification_jobs", {
+      p_limit: 100, p_worker_id: worker, p_external_enabled: true,
+    });
+    const fixtureJob = jobs.find(predicate);
+    if (fixtureJob) return fixtureJob;
+    if (!jobs.length) break;
+  }
+  assert.fail("The fixture notification was not claimable within the existing queue");
+}
 const request = (patient, products) => ({
   p_care_recipient_id: patient,
   p_idempotency_key: randomUUID(),
@@ -132,4 +146,4 @@ async function delivery(patient, req, products, extras = {}) {
   });
 }
 
-export { env, fixtures, actor, rpc, setup, issue, delivery, request };
+export { env, fixtures, actor, rpc, setup, issue, delivery, request, claimExternalFixtureJob };

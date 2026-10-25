@@ -357,3 +357,59 @@ com zero erros. Isso não representa teste em aparelho físico.
 Os últimos ajustes são exclusivos de testes/documentação; o runtime permanece
 idêntico ao preview e91d156 já conferido. A CI da nova cabeça continua sendo
 pré-condição do merge, com estado e links atualizados na PR 5.
+
+## Revisão do Codex na PR 5
+
+Os [dois apontamentos](https://github.com/RMZZFAJ/home-care-assistant/pull/5#pullrequestreview-5644864253)
+foram confirmados por regressões antes da correção. Duas requisições Auth com
+a mesma chave produziram um resultado válido e uma rejeição por referência
+alterada; duas execuções do scheduler mantiveram somente 100 de 101 pacientes.
+
+O incremento 83 serializa a consulta idempotente antes da elegibilidade, nos
+três caminhos de BAL: criar, revisar e enviar. A autoridade é revalidada após
+a espera. Três testes com barreira real de PostgreSQL passaram, confirmando
+documento/versão únicos e somente uma conclusão da atribuição.
+
+O incremento 84 mantém cursor privado, com RLS e privilégios diretos revogados,
+para lotes de até 100 regimes habilitados. A regressão SQL confirmou os 101
+pacientes no segundo lote, habilitação posterior de outro paciente, semanas
+sem duplicação e ausência de contagens físicas inventadas. Nenhum regime é
+ativado pela migration. As 82 migrations anteriores permaneceram intactas.
+
+Contratos, lint, Markdown, tipagem, 98 unitários e build passaram. SQL de rotação,
+autoridade BAL e service_role também passou. Na integração completa, 31 casos
+passaram e dois expuseram pressupostos de fila vazia no banco local acumulado.
+Os testes passaram a percorrer lotes limitados até localizar seu item fictício;
+os três cenários afetados passaram após o ajuste. Registros são preservados.
+
+O aviso mobile foi uma captura após a primeira rolagem, antes da altura final
+do conteúdo. A verificação agora reposiciona no fim real e exige os mesmos
+limites de geometria por polling. A comparação horizontal usa clientWidth.
+O fluxo BAL com resposta perdida passou duas vezes sem repetição (56,3 s).
+Todas as regras axe e limites de toque/rodapé permanecem ativos.
+
+Backups locais e remotos foram armazenados fora do Git. O backup local foi
+verificado por hash e pg_restore --list; esquema e dados remotos receberam
+manifesto SHA-256 e verificação de cobertura de Auth, perfis, vínculos, catálogo,
+documentos, ledger e metadados Storage. Não se declara ensaio integral de
+restauração nem cópia dos arquivos binários de Storage. Nenhum reset foi feito.
+O advisor local não apontou erros; conserva o aviso preexistente de unaccent
+no schema public, sem relação com estes incrementos.
+
+Os incrementos 83 e 84 foram aplicados no projeto remoto autorizado após
+reconferir os hashes do backup e o dry-run exclusivo das duas migrations.
+O dry-run posterior confirmou 84 migrations reconciliadas, sem seeds ou roles.
+Permaneceram 8 identidades Auth, 6 perfis, 13 vínculos, 59 produtos por paciente,
+11 documentos e 8 movimentos. Somente a homologação continua com o BAL novo
+ativo. O cron existente avançou o cursor para esse paciente às 22:19 UTC,
+sem execução manual nem ativação adicional.
+
+Após a atualização do banco, cinco logins por senha passaram no preview,
+incluindo permissões, proibições nas APIs, RLS e isolamento por paciente.
+A sessão oficial do proprietário confirmou administração global, vínculo local
+explícito, bloqueio da administração global no contexto local, leitura de
+catálogo/documentos/estoque/BAL e PDF válido. O heartbeat foi confirmado às
+22:20 UTC. As funções preservam SECURITY DEFINER com search_path vazio e os
+grants anteriores; o cursor privado não permite acesso direto a anon,
+authenticated ou service_role. A nova cabeça ainda exige os checks da CI;
+a aprovação da cabeça anterior não autoriza o merge das correções.

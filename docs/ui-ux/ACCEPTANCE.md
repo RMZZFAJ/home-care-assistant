@@ -27,6 +27,8 @@ constitui evidência de persistência, autorização ou funcionamento visual.
 | Adiamento familiar | BAL Auth/E2E: pendência não suspende o prazo |
 | Regularização histórica | BAL Auth: data real e documento único |
 | Referência e autoria real | BAL Auth/E2E/PDF: reconto e revisão distinta |
+| BAL idempotente | Balance idempotency: criação/revisão/envio concorrentes |
+| Rotação do scheduler | SQL fairness: 101 regimes e cursor privado |
 | Preservação e migrations | Backup, clean/legacy, contratos e SQL/RLS |
 | Anexos, scanner e consumo | Workflows/Fluent: revisão e estoque |
 | Acessibilidade | Axe WCAG 2/2.1/2.2 AA, teclado, foco e toque |

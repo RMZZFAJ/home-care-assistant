@@ -43,6 +43,13 @@ Os helpers recusam hosts remotos e selecionam explicitamente o destino local.
 O vínculo administrativo do CLI com um projeto remoto não muda o destino
 da suíte. Nunca executar reset, fixtures ou E2E no remoto.
 
+balance-idempotency.test.mjs força duas requisições HTTP Auth reais a esperar
+pelo mesmo lock, cobrindo criação, revisão e envio com a mesma chave.
+balance-scheduler-fairness.sql usa rollback para verificar 101 regimes ativos,
+habilitação posterior, deduplicação e os privilégios do cursor privado.
+Testes de notificações percorrem lotes limitados para localizar suas fixtures
+mesmo quando o ambiente local conserva avisos de execuções anteriores.
+
 Para consentir com o replay, informe explicitamente a operação e um backup
 local já gerado, armazenado fora do repositório:
 

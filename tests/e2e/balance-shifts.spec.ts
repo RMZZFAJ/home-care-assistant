@@ -20,15 +20,19 @@ async function capture(page:Page,name:string,operational=false) {
   const frame=()=>page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));await frame();
   await page.screenshot({path:`output/playwright/fluent/${name}.png`,fullPage:!dialog&&!mobile,animations:"disabled"});
   if(mobile&&!dialog){
-    await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"}));await frame();
     const navigation=page.getByRole("navigation",{name:"Navegação do plantão",exact:true});
     if(operational)await expect(navigation).toBeInViewport({ratio:1});
     else await expect(navigation).toHaveCount(0);
-    const bounds=await page.evaluate(()=>{
-      const nav=document.querySelector('.hca-bottom-navigation')?.getBoundingClientRect();
-      return [...document.querySelectorAll('.hca-wizard-actions button')].map(button=>{const r=button.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,limit:nav?.top??innerHeight,width:innerWidth};});
-    });
-    for(const bound of bounds){expect(bound.left).toBeGreaterThanOrEqual(0);expect(bound.right).toBeLessThanOrEqual(bound.width);expect(bound.top).toBeGreaterThanOrEqual(0);expect(bound.bottom).toBeLessThanOrEqual(bound.limit);}
+    await expect.poll(async()=>{
+      // Async reference/eligibility updates can change the page height after
+      // the first scroll. Recheck its actual bottom without relaxing geometry.
+      await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"}));await frame();
+      return page.evaluate(()=>{
+        const nav=document.querySelector('.hca-bottom-navigation')?.getBoundingClientRect();
+        return [...document.querySelectorAll('.hca-wizard-actions button')].map(button=>{const r=button.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,limit:nav?.top??document.documentElement.clientHeight,width:document.documentElement.clientWidth};})
+          .filter(r=>r.left<0||r.right>r.width||r.top<0||r.bottom>r.limit);
+      });
+    },{message:"Wizard controls must fit above the mobile navigation at the final scroll position"}).toEqual([]);
     await page.screenshot({path:`output/playwright/fluent/${name}-rodape.png`,animations:"disabled"});
     await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));await frame();
   }

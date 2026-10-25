@@ -13,6 +13,7 @@ import {
   setup,
   issue,
   delivery,
+  claimExternalFixtureJob,
 } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -600,12 +601,7 @@ test("V4 review: external queue rejects app-only events and holds unapproved tem
       sqlLiteral(req.id),
   );
   const worker = randomUUID(),
-    jobs = await rpc(service, "claim_notification_jobs", {
-      p_limit: 100,
-      p_worker_id: worker,
-      p_external_enabled: true,
-    }),
-    job = jobs.find(
+    job = await claimExternalFixtureJob(service, worker,
       (j) => j.document_id === req.id && j.channel === "whatsapp",
     );
   assert.ok(job);
@@ -679,15 +675,7 @@ test("V4 review: external queue rejects app-only events and holds unapproved tem
     "t",
   );
   let nextWorker = randomUUID();
-  assert.ok(
-    (
-      await rpc(service, "claim_notification_jobs", {
-        p_limit: 100,
-        p_worker_id: nextWorker,
-        p_external_enabled: true,
-      })
-    ).some((j) => j.id === job.id),
-  );
+  assert.ok(await claimExternalFixtureJob(service, nextWorker, (j) => j.id === job.id));
   await rule("req.issued", ["internal", "whatsapp"], false);
   const pdfHold = await rpc(service, "complete_notification_job", {
     p_id: job.id,
@@ -721,15 +709,7 @@ test("V4 review: external queue rejects app-only events and holds unapproved tem
     "t",
   );
   nextWorker = randomUUID();
-  assert.ok(
-    (
-      await rpc(service, "claim_notification_jobs", {
-        p_limit: 100,
-        p_worker_id: nextWorker,
-        p_external_enabled: true,
-      })
-    ).some((j) => j.id === job.id),
-  );
+  assert.ok(await claimExternalFixtureJob(service, nextWorker, (j) => j.id === job.id));
   await rule("req.issued", []);
   assert.equal(
     await rpc(service, "validate_notification_job", {
