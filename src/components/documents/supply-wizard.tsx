@@ -67,7 +67,7 @@ export function SupplyWizard({ type }: { type: SupplyType }) {
     </Workspace>
   );
 }
-function PatientSupplyWizard({
+export function PatientSupplyWizard({
   context,
   type,
   requisitionId,

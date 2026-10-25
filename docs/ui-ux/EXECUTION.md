@@ -21,8 +21,8 @@ pré-condições. Nenhum reset de banco será realizado.
 | C | Publicado | Dashboards por contexto e tarefas |
 | D | Base publicada | Administração, matrizes, catálogo e unidades |
 | E | Base publicada | Documentos, wizards, estoque e histórico |
-| F | Publicação incremental | Escalas persistentes, permissões e interfaces |
-| G | Pendente | BAL por plantão, atrasos, adiamentos e regularização |
+| F | Publicado | Escalas persistentes, permissões e interfaces |
+| G | Publicação incremental | BAL por plantão, prazos e regularização |
 | H | Pendente | Homologação, evidências, documentação e integração |
 
 Cada bloco recebe commits coesos e publicação para atualizar o preview.
@@ -171,3 +171,36 @@ receberam execução de comandos de escala.
 O helper de backup local foi corrigido para consumir o arquivo inteiro antes
 da leitura do catálogo: pg_restore encerrava a entrada cedo em arquivos maiores
 no Windows. Novo backup SHA-256 e leitura do catálogo foram verificados.
+
+Bloco G: regime por paciente, obrigações semanais, atribuições por plantão real,
+adiamento familiar versionado, conservação de atrasos e regularização por uma
+única contagem atual. Contagem em duas etapas com referência do ledger, rascunho,
+recuperação idempotente e contexto documental/PDF produzido pelo banco.
+Substituição conserva autor original e identifica quem contou; essa pessoa não
+aprova a própria contagem. Mudança de período com BAL vigente exige decisão
+familiar. A matriz apresenta as restrições efetivas por função.
+
+Dez integrações Auth/HTTP direcionadas passaram, incluindo os oito cenários do
+novo BAL. Três regressões SQL cobrem grants, autoridade e códigos de conflito.
+Nove E2E direcionados passaram nos três projetos, incluindo axe, agenda,
+configuração, resposta perdida e decisão. A rodada integral do bloco H fará a
+regressão após os últimos ajustes de prazo e projeção de capacidades.
+PDF de duas páginas foi renderizado e inspecionado com dados fictícios.
+
+Conflitos manuais usavam SQLSTATE 40001 e acionavam repetição automática no
+PostgREST. Uma migration incremental troca somente esses conflitos de negócio
+por P0001, mantendo 409 na API e os erros reais de serialização do PostgreSQL.
+A regressão Auth que demorava mais de dois minutos passou a concluir em poucos
+segundos, sem remover as recusas. Referência técnica:
+[diagnóstico oficial Supabase](https://supabase.com/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions).
+
+Backup pré-G: esquema 675110 bytes e dados 434094 bytes, com manifesto SHA-256 e
+verificação das tabelas Auth, catálogo, documentos, ledger e escalas. Exportações
+sequenciais, sem binários Storage nem ensaio de restauração remota. O dry-run
+identificou somente as nove migrations 72–80. Nenhum reset foi executado.
+
+Os incrementos 72–80 foram aplicados no remoto. Permaneceram 8 identidades
+Auth, 6 perfis, 13 vínculos, 59 produtos por paciente, 11 documentos e 8
+movimentos. Não foram criados plantões nem habilitados regimes automaticamente.
+Contratos, lint, Markdown, tipagem e 98 unitários passaram antes da publicação.
+Detalhes operacionais: [BAL por plantão](BALANCES.md).

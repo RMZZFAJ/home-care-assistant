@@ -76,6 +76,8 @@ export async function api<T>(
         "A conexão excedeu o tempo de espera. Recupere a mesma tentativa para confirmar o resultado.",
         { cause: error },
       );
+    if (error instanceof TypeError && /fetch|network|load failed/i.test(error.message))
+      throw new Error("Não foi possível confirmar a resposta. Recupere a mesma tentativa para verificar o resultado.", { cause: error });
     throw error;
   } finally {
     clearTimeout(timeout);

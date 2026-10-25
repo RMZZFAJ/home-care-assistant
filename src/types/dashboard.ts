@@ -17,4 +17,5 @@ export type DashboardData = {
   pendingTasks: DashboardTask[];
   criticalStock: CriticalStock[];
   balanceEligibility?: { available: boolean; href: string; dueAt: string | null };
+  nextShift?: { id: string; professionalName: string; professional_id: string; starts_at: string; ends_at: string; timezone: string; active: boolean; shift_types: {name:string} | null } | null;
 };

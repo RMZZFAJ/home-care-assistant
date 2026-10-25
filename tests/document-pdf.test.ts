@@ -9,6 +9,15 @@ import {
 } from "@/lib/server/operational-pdf";
 
 describe("approved document presentation", () => {
+  it("renders the current BAL shift and all linked weeks without altering the historical source",async()=>{
+    const original=Object.values(demoDocuments).find(d=>d.type==="BAL")!;
+    const serialized=JSON.stringify(original);
+    const snapshot={...original,payload:{...original.payload,balanceContext:{professionalName:"Profissional fictícia",shiftType:"Diurno",startsAt:"2026-10-25T10:00:00Z",endsAt:"2026-10-25T22:00:00Z",countedAt:"2026-10-25T15:00:00Z",timezone:"America/Sao_Paulo",weeks:["2026-10-05","2026-10-12","2026-10-19"]}}};
+    const bytes=await renderDocumentPdf(snapshot,"b".repeat(64));
+    expect((await PDFDocument.load(bytes)).getPageCount()).toBeGreaterThanOrEqual(2);
+    expect(JSON.stringify(original)).toBe(serialized);
+    await mkdir("output/pdf",{recursive:true});await writeFile("output/pdf/bal-plantao-semanas.pdf",bytes);
+  });
   it("directs completed and archived requests to their actual next operation", () => {
     const req = Object.values(demoDocuments)[0];
     expect(requisitionNextStep(req)).toContain("Providenciar ENT");

@@ -3,6 +3,10 @@ import { api, authenticate, parseUuid, rpc } from "@/lib/server/api";
 import { whatsappEvents } from "@/lib/notifications/template-registry";
 
 export const notificationEvents = [
+  "bal.cycle.overdue",
+  "bal.cycle.available",
+  "schedule.published", "schedule.proposed", "schedule.approve", "schedule.reject", "schedule.change", "schedule.cancel", "schedule.end_series", "schedule.change_requested", "schedule.change_decided",
+  "bal.cycle.opened", "bal.cycle.assigned", "bal.cycle.missed", "bal.cycle.unassigned", "bal.cycle.invalidated", "bal.cycle.deferral_requested", "bal.cycle.deferral_rejected", "bal.cycle.deferred", "bal.cycle.recount_assigned", "bal.cycle.counted", "bal.cycle.assignment_resolved",
   "req.issued",
   "req.registered_author",
   "req.science_satisfied",

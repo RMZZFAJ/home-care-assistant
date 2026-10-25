@@ -414,11 +414,18 @@ export async function renderDocumentPdf(
           ["Situação", statusText],
         ] as [string, unknown][])),
   ]);
-  section(
-    snapshot.type === "REQ"
-      ? "Materiais solicitados"
-      : "Relação dos materiais declarados",
-  );
+  const balanceContext = snapshot.type === "BAL" ? snapshot.payload.balanceContext as Record<string,unknown> | undefined : undefined;
+  if (balanceContext) {
+    section("Plantão e obrigações do balanço");
+    const zone=String(balanceContext.timezone??"America/Sao_Paulo");
+    const stamp=(value:unknown)=>typeof value==="string"?new Intl.DateTimeFormat("pt-BR",{timeZone:zone,dateStyle:"short",timeStyle:"short"}).format(new Date(value)):"Registrado na ficha";
+    text("Profissional da contagem: "+String(balanceContext.professionalName)+" · Plantão: "+String(balanceContext.shiftType),9,true);
+    text("Plantão: "+stamp(balanceContext.startsAt)+" até "+stamp(balanceContext.endsAt)+" · "+zone,9);
+    text("Contagem efetiva atual: "+stamp(balanceContext.countedAt),9);
+    if (Array.isArray(balanceContext.weeks)) text("Semanas vinculadas: "+balanceContext.weeks.map(week=>String(week).split("-").reverse().join("/")).join(", "));
+    text("A contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no histórico.",8);
+  }
+  section(snapshot.type === "REQ" ? "Materiais solicitados" : "Relação dos materiais declarados");
   const name = (item: Record<string, unknown>) =>
     String(
       item.name_snapshot ??

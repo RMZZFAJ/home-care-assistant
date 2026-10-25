@@ -11,3 +11,7 @@ export function civilInstant(value: string, timezone: string) {
   if (localMinute(new Date(instant).toISOString(), timezone) !== value) throw new Error("Este horário não existe no fuso selecionado. Escolha outro horário.");
   return new Date(instant).toISOString();
 }
+export function formatZonedDate(value: string | null, timezone = "America/Sao_Paulo") {
+  if(!value || Number.isNaN(Date.parse(value))) return "Data não definida";
+  return new Intl.DateTimeFormat("pt-BR",{timeZone:timezone,dateStyle:"short",timeStyle:"short"}).format(new Date(value));
+}

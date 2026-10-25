@@ -122,6 +122,7 @@ export const errorCatalog = {
     recommendedAction:
       "Confira os itens pendentes e justifique a nova requisição.",
   },
+  SCHEDULE_OVERLAP: conflict,
   VERSION_CONFLICT: {
     ...conflict,
     recommendedAction:

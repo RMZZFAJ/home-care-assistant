@@ -38,8 +38,8 @@ function Agenda({ context }: { context: WorkspaceContext }) {
     if (!pendingRef.current && review) pendingRef.current = { careRecipientId: patient.id, command: review.command, expectedVersion: review.version ?? null, idempotencyKey: crypto.randomUUID() };
     if (!pendingRef.current) return false;
     setBusy(true); setError("");
-    try { await api("/api/schedules", pendingRef.current); pendingRef.current = null; setUncertain(false); setReview(null); setEditor(null); setMessage("Escala gravada. As responsabilidades documentais anteriores foram preservadas."); setAttempt(v => v + 1); return true; }
-    catch (reason) { if (reason instanceof ApiError && [400, 403, 404, 409, 422].includes(reason.status)) { pendingRef.current = null; setUncertain(false); } else setUncertain(true); setError(reason instanceof Error ? reason.message : "Não foi possível gravar."); return false; }
+    try { await api("/api/schedules", pendingRef.current); pendingRef.current = null; setUncertain(false); setReview(null); setEditor(null); setMessage(review?.command.action === "propose_change" || review?.command.action === "series" && !team && !publishOwn ? "Proposta registrada. A programação publicada será alterada somente após aprovação." : "Escala gravada. As responsabilidades documentais anteriores foram preservadas."); setAttempt(v => v + 1); return true; }
+    catch (reason) { if (reason instanceof ApiError && [400, 403, 404, 409, 422].includes(reason.status)) { pendingRef.current = null; setUncertain(false); if(reason.code==="VERSION_CONFLICT"){setReview(null);setEditor(null);setAttempt(v=>v+1);} } else setUncertain(true); setError(reason instanceof Error ? reason.message : "Não foi possível gravar."); return false; }
     finally { setBusy(false); }
   }
   const visible = data?.shifts.filter(s => (!person || s.professional_id === person) && (!status || s.status === status)) ?? [];

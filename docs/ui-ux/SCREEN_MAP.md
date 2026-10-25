@@ -7,7 +7,8 @@
 - `/fichas/req`: requisição sem quantidade solicitada, com sete etapas.
 - `/fichas/com`: compra ou doação para entrada familiar.
 - `/fichas/ent`: expedição entre custódias com destinatário explícito.
-- `/fichas/bal`: contagem da equipe; regime por plantão no bloco G.
+- `/fichas/bal`: contagem da equipe em duas etapas no regime por plantão;
+  fluxo compatível nos pacientes sem ativação.
 - `/documentos/[id]`: consulta comum, preservando adaptadores de negócio.
 - `/historico/[id]` e `/fichas/[id]`: URLs compatíveis para a mesma consulta.
 - `/historico`: busca, tipo, estado, período e página preservados na URL.
@@ -25,6 +26,8 @@ Classificação documental, paciente e permissões vêm do servidor.
 - `/consumo`: ocorrências, revisão de sugestões e confirmação autorizada.
 - `/notificacoes`: avisos pessoais e estados do aplicativo/provedor.
 - `/mais`: ações secundárias da operação, sem ampliar competências.
+- `/escalas`: agenda diária móvel, semana/mês no desktop e edição contextual.
+- `/balancos`: obrigações semanais, atribuições, decisões e regularização.
 
 ## Administração e identidade
 
@@ -40,5 +43,5 @@ Classificação documental, paciente e permissões vêm do servidor.
 - `/perfil`: identidade, segurança, contatos e preferências sob demanda.
 - `/login`, `/recuperar-senha`, `/convites/aceitar`: autenticação e ingresso.
 
-Escalas e acompanhamento BAL por plantão entram nos blocos F/G. A existência
-de uma rota ou de um botão não substitui autorização na API e no banco.
+A existência de uma rota ou de um botão não substitui autorização na API e no
+banco. Consulte [Escalas](SCHEDULES.md) e [BAL por plantão](BALANCES.md).

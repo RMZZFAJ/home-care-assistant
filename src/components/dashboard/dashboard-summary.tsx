@@ -6,6 +6,13 @@ import { DocumentRow } from "@/components/documents/document-history";
 import type { DashboardData } from "@/types/dashboard";
 import { formatQuantity } from "@/lib/quantity";
 
+export function ShiftSummary({data}:{data:DashboardData}) {
+  const s=data.nextShift;
+  if(!s)return null;
+  const stamp=(value:string)=>new Intl.DateTimeFormat("pt-BR",{timeZone:s.timezone,dateStyle:"short",timeStyle:"short"}).format(new Date(value));
+  return <section className="ui-card"><div className="hca-section-heading"><h2>{s.active?"Plantão previsto para agora":"Próximo plantão previsto"}</h2><Icon name="calendar"/></div><strong>{s.shift_types?.name} · {s.professionalName}</strong><p>{stamp(s.starts_at)} → {stamp(s.ends_at)}</p><Link href="/escalas" prefetch={false}>Consultar escala e alterações</Link></section>;
+}
+
 export function RecentDocuments({ data }: { data: DashboardData }) {
   return <section className="hca-records"><div className="hca-dashboard-section-heading"><h2>Movimentações recentes</h2><Link href="/historico" prefetch={false}>Ver histórico</Link></div>
     {data.recent.length ? data.recent.map((row) => <DocumentRow key={row.id} row={row} />) : <p className="p-5 text-sm text-(--muted)">As fichas emitidas aparecerão aqui.</p>}

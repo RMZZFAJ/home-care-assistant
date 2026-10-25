@@ -6,7 +6,7 @@ import { can } from "@/lib/client/capabilities";
 import { Icon } from "@/components/ui/primitives";
 import { MetricCard } from "./metric-card";
 import { TaskList } from "./task-list";
-import { CriticalStockSummary, RecentDocuments, RequestProgress } from "./dashboard-summary";
+import { CriticalStockSummary, RecentDocuments, RequestProgress, ShiftSummary } from "./dashboard-summary";
 
 export function ManagementDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData }) {
   return <div className="hca-dashboard">
@@ -24,5 +24,6 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
     </div>
     <div className="hca-dashboard-columns"><TaskList title="Ações que precisam de você" tasks={data.pendingTasks} /><div className="hca-dashboard-stack"><RequestProgress data={data} /><CriticalStockSummary data={data} /></div></div>
     <RecentDocuments data={data} />
+    <ShiftSummary data={data}/>
   </div>;
 }

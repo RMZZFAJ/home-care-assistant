@@ -30,6 +30,8 @@ export type SupplyPayload = {
   source?: Custody;
   destination?: Custody;
   recipientId?: string;
+  balanceAssignment?: { id: string; version: number; referenceRevision: string };
+  balanceContext?: { cycleId: string; assignmentId: string; professionalId: string; professionalName: string; shiftId: string; shiftType: string; startsAt: string; endsAt: string; timezone: string; countedAt: string; weeks: string[]; kind: string };
 };
 export type DocumentEvent = {
   id: string;
@@ -129,6 +131,7 @@ export const documentStatuses: Record<string, string> = {
 
 export type DocumentSummary = {
   id: string;
+  version: number;
   type: DocumentType;
   fulfillment?: { fulfilled: number; total: number };
   code: string | null;

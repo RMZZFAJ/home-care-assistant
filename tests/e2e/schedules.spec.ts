@@ -4,6 +4,7 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
 import { fixturePassword, patientA } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
+import { audit } from "./accessibility-audit";
 
 test("agenda publica uma programação real, recusa conflito e preserva contexto no mobile", async ({ page }, info) => {
   const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
@@ -20,6 +21,7 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   const drawer = page.getByRole("dialog", { name: "Tipo de plantão", exact: true });
   await drawer.getByLabel("Nome do plantão", { exact: true }).fill(name);
   await drawer.getByLabel("Início local", { exact: true }).fill("19:00");
+  await audit(page,"shift type drawer");
   await drawer.getByRole("button", { name: "Revisar alteração", exact: true }).click();
   await page.getByRole("dialog", { name: "Revisar escala", exact: true }).getByRole("button", { name: "Confirmar gravação", exact: true }).click();
   await expect(drawer).not.toBeVisible();
@@ -50,6 +52,7 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await expect(page.getByRole("article", { name: name + " · Teste professional", exact: true }).filter({ visible: true })).toBeVisible();
   await page.screenshot({ path: `output/playwright/fluent/escalas-mobile-${info.project.name}.png`, fullPage: true, animations: "disabled" });
+  await audit(page,"daily mobile schedule");
   const cancel = await page.request.post("/api/schedules", { data: { careRecipientId: patientA, idempotencyKey: randomUUID(), expectedVersion: shift.version, command: { action: "cancel", body: { id: shift.id, reason: "Fim da verificação fictícia" } } } });
   expect(cancel.ok()).toBe(true);
 });

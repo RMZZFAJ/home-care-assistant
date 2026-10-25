@@ -209,8 +209,9 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
       )
         actions.push("consent_cancel");
     } else if (data.type === "BAL" && data.status === "submitted") {
-      if (allowed("bal.approve.family")) actions.push("approve_family");
-      if (allowed("bal.approve.supervisor")) actions.push("approve_supervisor");
+      const ownCount=(data.payload.balanceContext?.professionalId??data.created_by)===context.userId;
+      if (!ownCount&&allowed("bal.approve.family") && ["admin","family"].includes(context.patient?.role??"")) actions.push("approve_family");
+      if (!ownCount&&allowed("bal.approve.supervisor")) actions.push("approve_supervisor");
     }
     if (
       data.status !== "cancellation_pending" &&
@@ -221,7 +222,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
         : data.type === "COM"
           ? allowed("com.approve") &&
             !data.lines.some((line) => quantity(line.purchased_quantity).gt(0))
-          : data.status !== "approved" && allowed("access.manage"))
+          : data.status !== "approved" && !data.payload.balanceContext && allowed("access.manage"))
     )
       actions.push("cancel");
   }
@@ -293,6 +294,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
               </Link>
             ) : null}
           </DocumentHeader>
+          {data.type==="BAL"&&data.payload.balanceContext?<section className="ui-card"><h2>Plantão e contagem física</h2><strong>{data.payload.balanceContext.professionalName} · {data.payload.balanceContext.shiftType}</strong><p>{formatBrazilDate(data.payload.balanceContext.startsAt)} → {formatBrazilDate(data.payload.balanceContext.endsAt)}</p><p>Contagem atual: {formatBrazilDate(data.payload.balanceContext.countedAt)}</p><p>Semanas vinculadas: {data.payload.balanceContext.weeks.map(week=>week.split("-").reverse().join("/")).join(", ")}</p><p className="hca-muted">Semanas anteriores são regularizadas pela contagem atual, preservando seus prazos e atrasos históricos.</p>{data.status==="draft"?<Notice>Rascunho: a obrigação ainda não foi concluída.</Notice>:null}</section>:null}
           {activeContext &&
           data.status === "draft" &&
           allowed(
@@ -312,7 +314,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
           {activeContext &&
           data.type === "BAL" &&
           data.status === "submitted" &&
-          allowed("bal.count") ? (
+          allowed("bal.count") && !data.payload.balanceContext ? (
             <Link
               className={buttonClass}
               href={"/fichas/bal?documentId=" + data.id + "&recount=true"}
@@ -320,6 +322,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
               Recontar com nova referência de estoque
             </Link>
           ) : null}
+          {data.type === "BAL" && data.payload.balanceContext ? <Link href="/balancos" className={buttonClass} prefetch={false}>Acompanhar plantão, revisão e reconto</Link> : null}
           {actions.length ? (
             <section className="ui-card">
               <h2 className="font-semibold">Próxima ação</h2>

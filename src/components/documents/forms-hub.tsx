@@ -40,11 +40,9 @@ export function FormsHub() {
                     </p>
                   </div>
                   <div className="mt-auto flex flex-wrap gap-2 pt-2">
-                    {can(
+                    {type === "BAL" ? <Link className={primaryClass} href="/balancos" prefetch={false}>Consultar programação e contagem</Link> : can(
                       context,
-                      type === "BAL"
-                        ? "bal.count"
-                        : type.toLowerCase() + ".create",
+                      type.toLowerCase() + ".create",
                     ) ? (
                       <Link
                         className={primaryClass}

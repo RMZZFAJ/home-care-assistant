@@ -397,3 +397,14 @@ constam no [relatório pós-merge](https://github.com/RMZZFAJ/home-care-assistan
 As credenciais permanecem somente em `.private/homologacao/ACESSOS.md`.
 Meta/Flows seguem desabilitados; os limites externos documentados continuam
 distintos da validação operacional e não são apresentados como homologação.
+
+## Evolução Fluent 2, escalas e BAL — 25/10/2026
+
+A execução posterior à V4 está registrada em
+[Execução da interface](../ui-ux/EXECUTION.md), na branch
+`codex/fluent-ui-escalas-bal` e na [PR 5](https://github.com/RMZZFAJ/home-care-assistant/pull/5).
+Os blocos A–F estão publicados; G integra o BAL por plantão e sua segregação
+de autoridade. O banco remoto recebeu os incrementos 68–80 após backups e
+validação local, preservando os dados. Nenhum reset foi feito; a ativação do
+novo BAL continua por paciente. Homologação integral e merge dependem dos
+checks e evidências finais registrados no checkpoint da interface.

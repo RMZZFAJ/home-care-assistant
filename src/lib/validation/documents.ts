@@ -28,6 +28,7 @@ export const supplyPayload = z
     source: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     destination: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     recipientId: identifier.optional(),
+    balanceAssignment: z.object({ id: identifier, version: z.number().int().positive(), referenceRevision: z.string().regex(/^\d+$/).max(20) }).strict().optional(),
   })
   .strict();
 export const createSupplySchema = z
@@ -40,6 +41,8 @@ export const createSupplySchema = z
   })
   .strict()
   .superRefine((value, ctx) => {
+    if (value.type !== "BAL" && value.payload.balanceAssignment)
+      ctx.addIssue({ code: "custom", path: ["payload", "balanceAssignment"], message: "A atribuição de contagem pertence somente ao BAL." });
     if (
       new Set(value.payload.lines.map((item) => item.productId)).size !==
       value.payload.lines.length

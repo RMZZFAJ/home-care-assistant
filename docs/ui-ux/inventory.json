@@ -16,6 +16,20 @@
       "kind": "page"
     },
     {
+      "file": "src/app/balancos/page.tsx",
+      "lines": 4,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/balances/balance-console"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
       "file": "src/app/configuracoes/page.tsx",
       "lines": 10,
       "imports": [
@@ -88,6 +102,20 @@
       "kind": "page"
     },
     {
+      "file": "src/app/escalas/page.tsx",
+      "lines": 4,
+      "imports": [
+        "src/components/authenticated-page",
+        "src/components/schedules/schedule-console"
+      ],
+      "exports": [
+        "Page"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "page"
+    },
+    {
       "file": "src/app/estoque/page.tsx",
       "lines": 4,
       "imports": [
@@ -123,7 +151,7 @@
       "lines": 10,
       "imports": [
         "src/components/authenticated-page",
-        "src/components/documents/supply-wizard"
+        "src/components/balances/balance-count-wizard"
       ],
       "exports": [
         "Page"
@@ -588,7 +616,7 @@
     },
     {
       "file": "src/components/admin/permission-matrix.tsx",
-      "lines": 37,
+      "lines": 38,
       "imports": [
         "react",
         "@fluentui/react-components",
@@ -794,6 +822,101 @@
       "kind": "component"
     },
     {
+      "file": "src/components/balances/balance-console.tsx",
+      "lines": 62,
+      "imports": [
+        "next/link",
+        "react",
+        "@fluentui/react-components",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/components/forms/record-drawer",
+        "src/lib/schedules/time",
+        "src/lib/notifications/event-labels",
+        "src/components/balances/balance-forms",
+        "src/components/balances/use-balance-workspace",
+        "src/lib/validation/balances",
+        "src/types/documents"
+      ],
+      "exports": [
+        "BalanceConsole"
+      ],
+      "headings": [
+        "Programação do balanço",
+        "Responsabilidade atual",
+        "Adiamentos",
+        "Obrigações por semana",
+        "Contagens em revisão"
+      ],
+      "stateHooks": 9,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/balances/balance-count-fields.tsx",
+      "lines": 11,
+      "imports": [
+        "@fluentui/react-components",
+        "src/types/documents",
+        "src/lib/quantity"
+      ],
+      "exports": [
+        "BalanceCountFields",
+        "BalanceReviewRows"
+      ],
+      "headings": [],
+      "stateHooks": 0,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/balances/balance-count-wizard.tsx",
+      "lines": 145,
+      "imports": [
+        "next/link",
+        "react",
+        "next/navigation",
+        "@fluentui/react-components",
+        "src/components/workspace",
+        "src/components/ui/primitives",
+        "src/components/documents/supply-wizard",
+        "src/components/forms/wizard-actions",
+        "src/components/documents/document-actions",
+        "src/components/notifications/document-delivery-status",
+        "src/components/catalog/barcode-scanner",
+        "src/lib/schedules/time",
+        "src/lib/quantity",
+        "src/types/documents",
+        "src/types/balances",
+        "src/types/stock",
+        "src/components/balances/use-balance-workspace",
+        "src/components/balances/balance-count-fields"
+      ],
+      "exports": [
+        "BalanceEntry"
+      ],
+      "headings": [
+        "Revisão da contagem"
+      ],
+      "stateHooks": 19,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/balances/balance-forms.tsx",
+      "lines": 42,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/lib/validation/balances",
+        "src/types/balances",
+        "src/lib/schedules/time"
+      ],
+      "exports": [
+        "BalanceForm"
+      ],
+      "headings": [],
+      "stateHooks": 3,
+      "kind": "component"
+    },
+    {
       "file": "src/components/catalog/barcode-scanner.tsx",
       "lines": 228,
       "imports": [
@@ -851,7 +974,7 @@
     },
     {
       "file": "src/components/dashboard/dashboard-summary.tsx",
-      "lines": 32,
+      "lines": 39,
       "imports": [
         "next/link",
         "@fluentui/react-components",
@@ -861,6 +984,7 @@
         "src/lib/quantity"
       ],
       "exports": [
+        "ShiftSummary",
         "RecentDocuments",
         "RequestProgress",
         "CriticalStockSummary"
@@ -896,7 +1020,7 @@
     },
     {
       "file": "src/components/dashboard/management-dashboard.tsx",
-      "lines": 29,
+      "lines": 30,
       "imports": [
         "next/link",
         "src/types/dashboard",
@@ -932,7 +1056,7 @@
     },
     {
       "file": "src/components/dashboard/operations-dashboard.tsx",
-      "lines": 25,
+      "lines": 26,
       "imports": [
         "next/link",
         "src/types/dashboard",
@@ -1105,7 +1229,7 @@
     },
     {
       "file": "src/components/documents/forms-hub.tsx",
-      "lines": 73,
+      "lines": 71,
       "imports": [
         "next/link",
         "src/components/workspace",
@@ -1155,7 +1279,7 @@
     },
     {
       "file": "src/components/documents/supply-detail.tsx",
-      "lines": 476,
+      "lines": 479,
       "imports": [
         "src/components/forms/settings-section",
         "src/lib/documents/presentation",
@@ -1178,6 +1302,7 @@
         "SupplyDocumentContent"
       ],
       "headings": [
+        "Plantão e contagem física",
         "Próxima ação",
         "Produtos e quantidades"
       ],
@@ -1233,7 +1358,8 @@
         "src/types/documents"
       ],
       "exports": [
-        "SupplyWizard"
+        "SupplyWizard",
+        "PatientSupplyWizard"
       ],
       "headings": [
         " "
@@ -1357,7 +1483,7 @@
     },
     {
       "file": "src/components/navigation/workspace-navigation.tsx",
-      "lines": 79,
+      "lines": 80,
       "imports": [
         "next/link",
         "next/navigation",
@@ -1601,6 +1727,47 @@
         "Identificar itens extras no catálogo"
       ],
       "stateHooks": 6,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "lines": 69,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/components/workspace",
+        "src/components/forms/record-drawer",
+        "src/components/ui/primitives",
+        "src/lib/use-live-revision",
+        "src/components/schedules/schedule-forms",
+        "src/lib/validation/schedules",
+        "src/types/schedules"
+      ],
+      "exports": [
+        "ScheduleConsole"
+      ],
+      "headings": [
+        "Propostas pendentes"
+      ],
+      "stateHooks": 14,
+      "kind": "component"
+    },
+    {
+      "file": "src/components/schedules/schedule-forms.tsx",
+      "lines": 60,
+      "imports": [
+        "react",
+        "@fluentui/react-components",
+        "src/lib/validation/schedules",
+        "src/types/schedules",
+        "src/lib/schedules/time"
+      ],
+      "exports": [
+        "ScheduleForm",
+        "addDays"
+      ],
+      "headings": [],
+      "stateHooks": 3,
       "kind": "component"
     },
     {

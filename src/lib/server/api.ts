@@ -22,8 +22,12 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/balance requires family deferral before schedule period change/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Este plantão tem um BAL designado. Registre a decisão familiar no acompanhamento do balanço antes de alterar o período ou cancelar o plantão.",409);
+  if (/distinct balance reviewer/i.test(message))
+    throw new ApiError("FORBIDDEN","A revisão precisa ser realizada por outra pessoa autorizada, distinta de quem fez a contagem.",403);
   if (/schedule overlap/i.test(message))
-    throw new ApiError("VERSION_CONFLICT", "Este profissional já possui um plantão nesse período. Revise os horários.", 409);
+    throw new ApiError("SCHEDULE_OVERLAP", "Este profissional já possui um plantão nesse período. Revise os horários.", 409);
   if (/duplicate review required/i.test(message))
     throw new ApiError(
       "DUPLICATE_REVIEW_REQUIRED",
@@ -31,7 +35,7 @@ export function databaseError(
       409,
     );
   if (
-    /stale document|stale policy|distinct patient administrator/i.test(message)
+    /stale document|stale policy|stale balance assignment|distinct patient administrator|existing balance document|another balance assignment/i.test(message)
   )
     throw new ApiError(
       "VERSION_CONFLICT",

@@ -36,6 +36,10 @@ horizontalmente para alcançar filtros, abas ou ações.
 - StockOverview: lista por custódia, cartões móveis e detalhes de real/estimado.
 - StatusBadge: estado com texto e cor semântica.
 - Dialog: confirmação acessível das operações definitivas.
+- ScheduleConsole/ScheduleForm: agenda, propostas e alterações versionadas.
+- BalanceConsole/BalanceForm: programação, obrigações e decisões familiares.
+- BalanceCountWizard/BalanceCountFields: contagem física e revisão, referência
+  do ledger e recuperação idempotente; janela validada pelo banco.
 
 As regras de autorização e persistência permanecem na API e nas RPCs. Os
 componentes não calculam competências a partir da identidade global nem

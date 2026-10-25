@@ -14,6 +14,15 @@ Dependências internas:
 - src/components/authenticated-page
 - src/components/admin/admin-console
 
+### src/app/balancos/page.tsx
+
+Linhas: 4. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/authenticated-page
+- src/components/balances/balance-console
+
 ### src/app/configuracoes/page.tsx
 
 Linhas: 10. Estados locais: 0.
@@ -60,6 +69,15 @@ Dependências internas:
 - src/components/authenticated-page
 - src/components/documents/delivery-inbox
 
+### src/app/escalas/page.tsx
+
+Linhas: 4. Estados locais: 0.
+
+Dependências internas:
+
+- src/components/authenticated-page
+- src/components/schedules/schedule-console
+
 ### src/app/estoque/page.tsx
 
 Linhas: 4. Estados locais: 0.
@@ -87,7 +105,7 @@ Linhas: 10. Estados locais: 0.
 Dependências internas:
 
 - src/components/authenticated-page
-- src/components/documents/supply-wizard
+- src/components/balances/balance-count-wizard
 
 ### src/app/fichas/com/page.tsx
 
@@ -342,7 +360,7 @@ Dependências internas:
 
 ### src/components/admin/permission-matrix.tsx
 
-Linhas: 37. Estados locais: 4.
+Linhas: 38. Estados locais: 4.
 
 Dependências internas:
 
@@ -450,6 +468,62 @@ Dependências internas:
 - src/lib/safe-return-path
 - src/lib/supabase/server
 
+### src/components/balances/balance-console.tsx
+
+Linhas: 62. Estados locais: 9.
+
+Dependências internas:
+
+- src/components/workspace
+- src/components/ui/primitives
+- src/components/forms/record-drawer
+- src/lib/schedules/time
+- src/lib/notifications/event-labels
+- src/components/balances/balance-forms
+- src/components/balances/use-balance-workspace
+- src/lib/validation/balances
+- src/types/documents
+
+### src/components/balances/balance-count-fields.tsx
+
+Linhas: 11. Estados locais: 0.
+
+Dependências internas:
+
+- src/types/documents
+- src/lib/quantity
+
+### src/components/balances/balance-count-wizard.tsx
+
+Linhas: 145. Estados locais: 19.
+
+Dependências internas:
+
+- src/components/workspace
+- src/components/ui/primitives
+- src/components/documents/supply-wizard
+- src/components/forms/wizard-actions
+- src/components/documents/document-actions
+- src/components/notifications/document-delivery-status
+- src/components/catalog/barcode-scanner
+- src/lib/schedules/time
+- src/lib/quantity
+- src/types/documents
+- src/types/balances
+- src/types/stock
+- src/components/balances/use-balance-workspace
+- src/components/balances/balance-count-fields
+
+### src/components/balances/balance-forms.tsx
+
+Linhas: 42. Estados locais: 3.
+
+Dependências internas:
+
+- src/lib/validation/balances
+- src/types/balances
+- src/lib/schedules/time
+
 ### src/components/catalog/barcode-scanner.tsx
 
 Linhas: 228. Estados locais: 4.
@@ -486,7 +560,7 @@ Dependências internas:
 
 ### src/components/dashboard/dashboard-summary.tsx
 
-Linhas: 32. Estados locais: 0.
+Linhas: 39. Estados locais: 0.
 
 Dependências internas:
 
@@ -506,7 +580,7 @@ Dependências internas:
 
 ### src/components/dashboard/management-dashboard.tsx
 
-Linhas: 29. Estados locais: 0.
+Linhas: 30. Estados locais: 0.
 
 Dependências internas:
 
@@ -528,7 +602,7 @@ Dependências internas:
 
 ### src/components/dashboard/operations-dashboard.tsx
 
-Linhas: 25. Estados locais: 0.
+Linhas: 26. Estados locais: 0.
 
 Dependências internas:
 
@@ -632,7 +706,7 @@ Dependências internas:
 
 ### src/components/documents/forms-hub.tsx
 
-Linhas: 73. Estados locais: 0.
+Linhas: 71. Estados locais: 0.
 
 Dependências internas:
 
@@ -662,7 +736,7 @@ Dependências internas:
 
 ### src/components/documents/supply-detail.tsx
 
-Linhas: 476. Estados locais: 10.
+Linhas: 479. Estados locais: 10.
 
 Dependências internas:
 
@@ -784,7 +858,7 @@ Dependências internas:
 
 ### src/components/navigation/workspace-navigation.tsx
 
-Linhas: 79. Estados locais: 0.
+Linhas: 80. Estados locais: 0.
 
 Dependências internas:
 
@@ -929,6 +1003,30 @@ Dependências internas:
 - src/components/workspace
 - src/components/ui/primitives
 - src/types/documents
+
+### src/components/schedules/schedule-console.tsx
+
+Linhas: 69. Estados locais: 14.
+
+Dependências internas:
+
+- src/components/workspace
+- src/components/forms/record-drawer
+- src/components/ui/primitives
+- src/lib/use-live-revision
+- src/components/schedules/schedule-forms
+- src/lib/validation/schedules
+- src/types/schedules
+
+### src/components/schedules/schedule-forms.tsx
+
+Linhas: 60. Estados locais: 3.
+
+Dependências internas:
+
+- src/lib/validation/schedules
+- src/types/schedules
+- src/lib/schedules/time
 
 ### src/components/stock/consumption-console.tsx
 

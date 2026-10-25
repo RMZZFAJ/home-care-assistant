@@ -285,6 +285,8 @@
 :root { --hca-agenda-border: #d1d1d1; }
 .hca-form-stack { display: grid; gap: 16px; }
 .hca-command-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.hca-bal-context { padding: 12px 16px; background: #eff6fc; border-left: 3px solid #0f6cbd; }
+.hca-count-row { padding: 12px 16px; background: #fff; border-bottom: 1px solid #e0e0e0; }
 .hca-weekdays { display: flex; flex-wrap: wrap; gap: 4px; }
 .hca-agenda-desktop { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--hca-agenda-border); border-left: 1px solid var(--hca-agenda-border); }
 .hca-agenda-day { min-width: 0; padding: 8px; border-right: 1px solid var(--hca-agenda-border); border-bottom: 1px solid var(--hca-agenda-border); }
