@@ -130,6 +130,11 @@ resposta perdida oferece recuperação da mesma tentativa. Semanas anteriores
 regularizadas apontam para a contagem atual e conservam seus atrasos.
 Consulte [Escalas](ui-ux/SCHEDULES.md) e [BAL](ui-ux/BALANCES.md).
 
+O processamento automático percorre até 100 pacientes habilitados por execução
+e continua do ponto confirmado no lote seguinte. A posição é interna ao worker;
+a configuração e sua versão pertencem às decisões da família. Obrigações,
+atribuições e cursor participam da mesma transação.
+
 ## Desenvolvimento e preservação
 
 A suíte utiliza somente a stack local home-care-assistant, com API em

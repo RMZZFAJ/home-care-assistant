@@ -61,6 +61,12 @@ segundo agendador. Avisos de atribuição, disponibilidade, atraso, transferênc
 e decisão usam a outbox e a central do aplicativo. Canais externos dependem do
 contrato de eventos e da liberação real do provedor.
 
+Cada execução atende até 100 pacientes habilitados e retoma o próximo lote
+por um cursor privado persistente. A rotação inclui pacientes habilitados
+depois e preserva a versão da configuração familiar. Chamadas simultâneas com
+a mesma chave de criação, revisão ou envio recuperam o resultado confirmado
+antes de reavaliar uma nova contagem, mesmo que a primeira tenha fechado a janela.
+
 Integrações com Auth real cobrem concorrência, idempotência, isolamento,
 referência desatualizada, contexto forjado, substituição, decisão familiar,
 regularização e conservação de atrasos. E2E cobre configuração, duas etapas,

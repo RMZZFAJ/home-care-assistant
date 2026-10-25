@@ -62,6 +62,14 @@ a cronologia. Comandos idempotentes privados e locks transacionais evitam
 atribuições/contagens concorrentes. O worker operacional existente processa
 apenas regimes habilitados, com limites e deduplicação.
 
+A recuperação idempotente de criar, revisar e enviar BAL adquire o lock do
+estoque antes de consultar o resultado anterior e antes de exigir elegibilidade
+para uma nova contagem. A autoridade é revalidada após a espera pelo lock.
+private.bal_scheduler_progress mantém o cursor de lotes de até 100 pacientes,
+com rotação ao fim dos UUIDs. Cursor e processamento confirmam juntos;
+uma falha desfaz ambos. A tabela possui RLS e nenhum acesso direto para anon,
+authenticated ou service_role, inclusive leitura.
+
 Essas tabelas possuem RLS e leitura por capacidade; cliente e service_role não
 possuem DML direto. Comandos públicos autorizados são a única entrada do usuário.
 Helpers, funções anteriores renomeadas e tabelas de controle ficam revogados.

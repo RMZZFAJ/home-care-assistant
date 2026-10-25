@@ -81,5 +81,6 @@
   "supabase/migrations/20261025103452_effective_capability_matrix.sql": "8082f3263267230369f7a4d982a1b62a10088f38ddd279acfc2dbe9511493b71",
   "supabase/migrations/20261025105017_policy_conflict_transport_compatibility.sql": "096cdc33699f44a62137982b3c3f1a3f760775fcb57db847886280076470df6a",
   "supabase/migrations/20261025164621_notification_claim_conflict_recovery.sql": "accb881daca02b438f2008066ac66de231d4320563916db46551f902b33a5c90",
-  "supabase/migrations/20261025194512_balance_idempotency_serialization.sql": "d0f0fcb672cd942b1b5a93cd02a41495c28b8dbe3097752606862e23201640c6"
+  "supabase/migrations/20261025194512_balance_idempotency_serialization.sql": "d0f0fcb672cd942b1b5a93cd02a41495c28b8dbe3097752606862e23201640c6",
+  "supabase/migrations/20261025214537_balance_scheduler_rotation.sql": "bbd354d6f56e4c091f62d2d02dd06d00d73c8fda65e505fe7cd009e12f3f4098"
 }
