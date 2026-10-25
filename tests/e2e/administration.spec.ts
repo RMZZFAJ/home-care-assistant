@@ -544,8 +544,8 @@ test.describe("administração integrada no ambiente local", () => {
       page.getByRole("heading", { name: protocol, exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText("Data: Data original desconhecida", { exact: true }),
-    ).toBeVisible();
+      page.locator(".hca-document-date"),
+    ).toHaveText(/^Data original desconhecida · Versão \d+$/);
     await expect(
       page.getByText("Solicitante: Solicitante desconhecido", { exact: true }),
     ).toBeVisible();
@@ -557,9 +557,8 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByText("Estoque desconhecido", { exact: false }),
     ).toHaveCount(2);
-    await expect(
-      page.getByText("Nenhum aviso disponível.", { exact: true }),
-    ).toBeVisible();
+    await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
+    await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
     const retry = await page.request.post("/api/admin", {
       data: { action: "historicalImport", rows, preview: false },
     });

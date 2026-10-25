@@ -11,6 +11,8 @@ import {
   webLightTheme,
 } from "@fluentui/react-components";
 
+const homeCareTheme = { ...webLightTheme, colorNeutralForegroundDisabled: "#616161" };
+
 /** Each server render owns its registry; streamed boundaries can add styles. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [renderer] = useState(() => createDOMRenderer());
@@ -28,7 +30,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <RendererProvider renderer={renderer}>
       <SSRProvider>
-        <FluentProvider theme={webLightTheme} className="hca-theme" style={{ backgroundColor: "var(--background)", color: "var(--foreground)" }}>
+        <FluentProvider theme={homeCareTheme} className="hca-theme" style={{ backgroundColor: "var(--background)", color: "var(--foreground)" }}>
           {children}
         </FluentProvider>
       </SSRProvider>

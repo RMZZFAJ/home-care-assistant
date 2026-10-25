@@ -318,6 +318,8 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
             .activeContext.care_recipient_id,
       )
       .toBe(otherPatient);
+    await expect(family.locator(".hca-workspace")).toHaveAttribute("data-context-patient", otherPatient);
+    await expect(picker).toBeEnabled();
     await expect(
       family.getByRole("button", { name: /^Notificações/ }),
     ).toBeVisible();
@@ -337,6 +339,8 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
             .activeContext.care_recipient_id,
       )
       .toBe(patient);
+    await expect(family.locator(".hca-workspace")).toHaveAttribute("data-context-patient", patient);
+    await expect(picker).toBeEnabled();
     await family.getByRole("button", { name: /^Notificações/ }).click();
     await expect(
       family

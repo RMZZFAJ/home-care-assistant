@@ -12,7 +12,24 @@ async function login(page:Page,email:string,patient:string) {
   await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);
 }
 async function logout(page:Page) {await page.getByLabel("Menu do usuário",{exact:true}).click();await page.getByRole("menuitem",{name:"Sair",exact:true}).click();await expect(page).toHaveURL(/\/login/);}
-async function capture(page:Page,name:string) {mkdirSync("output/playwright/fluent",{recursive:true});const dialog=await page.getByRole("dialog").count()>0;if(!dialog){await page.getByRole("main").focus();await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));}await page.waitForFunction(()=>document.getAnimations().every(a=>a.playState!=="running"||a.effect?.getComputedTiming().iterations===Infinity));await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));await page.screenshot({path:`output/playwright/fluent/${name}.png`,fullPage:!dialog,animations:"disabled"});}
+async function capture(page:Page,name:string) {
+  mkdirSync("output/playwright/fluent",{recursive:true});
+  const dialog=await page.getByRole("dialog").count()>0,mobile=(page.viewportSize()?.width??1366)<768;
+  if(!dialog){await page.getByRole("main").focus();await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));}
+  await page.waitForFunction(()=>document.getAnimations().every(a=>a.playState!=="running"||a.effect?.getComputedTiming().iterations===Infinity));
+  const frame=()=>page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));await frame();
+  await page.screenshot({path:`output/playwright/fluent/${name}.png`,fullPage:!dialog&&!mobile,animations:"disabled"});
+  if(mobile&&!dialog){
+    await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"}));await frame();
+    const bounds=await page.evaluate(()=>{
+      const nav=document.querySelector('.hca-bottom-navigation')?.getBoundingClientRect();
+      return [...document.querySelectorAll('.hca-wizard-actions button')].map(button=>{const r=button.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,limit:nav?.top??innerHeight,width:innerWidth};});
+    });
+    for(const bound of bounds){expect(bound.left).toBeGreaterThanOrEqual(0);expect(bound.right).toBeLessThanOrEqual(bound.width);expect(bound.top).toBeGreaterThanOrEqual(0);expect(bound.bottom).toBeLessThanOrEqual(bound.limit);}
+    await page.screenshot({path:`output/playwright/fluent/${name}-rodape.png`,animations:"disabled"});
+    await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));await frame();
+  }
+}
 
 test("BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real",async({page},info)=>{
   test.setTimeout(120_000);

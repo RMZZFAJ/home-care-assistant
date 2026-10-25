@@ -66,7 +66,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
         <option value="" disabled>Selecione um paciente</option>
         {data.patients.filter((patient) => data.activeContext?.mode !== "patient" || patient.hasMembership).map((patient) => <option key={patient.id} value={patient.id}>{patient.display_name}{patient.is_active === false ? " (inativo)" : ""}</option>)}
       </Select> : <span className="text-sm text-(--muted)">Home Care Assistant</span>}</div>
-      {value ? <NotificationBell key={value.patient?.id ?? "global"} patientId={value.patient?.id} /> : null}
+      {value ? <NotificationBell key={value.patient?.id ?? "global"} patientId={value.patient?.id} disabled={selecting} /> : null}
       <ProfileMenu />
     </header>
     {desktop && !collapsed ? <aside id="workspace-navigation" className="hca-desktop-navigation print:hidden">{navigation}</aside> : null}

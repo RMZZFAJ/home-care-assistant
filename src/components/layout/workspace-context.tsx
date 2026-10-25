@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { api, ApiError } from "@/lib/client/api";
 import type { PatientContext, WorkspaceContext } from "@/types/workspace";
 import { demoDocuments } from "@/lib/demo-documents";
@@ -42,7 +42,6 @@ export function useWorkspaceState() { return use(Context); }
 /** One authority read model survives navigation; browser selection never authorizes. */
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const requestedPatientId = useSearchParams().get("careRecipientId");
   const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})$/.exec(pathname)?.[1];
   const segment = pathname.split("/")[2];
@@ -111,7 +110,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         window.history.replaceState(null, "", url);
       }
       await load();
-      router.refresh();
+      // All patient read models consume this confirmed client context. A
+      // concurrent RSC refresh can restore an earlier query during a second
+      // switch; the server session gate depends on identity, not this selection.
       window.dispatchEvent(new Event("hca:context-changed"));
       return true;
     } catch (reason) {

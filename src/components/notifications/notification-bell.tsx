@@ -25,7 +25,7 @@ export type InboxNotification = {
   operational_documents?: { code: string; type: string; status: string } | null;
   document_events?: { action: string } | null;
 };
-export function NotificationBell({ patientId }: { patientId?: string }) {
+export function NotificationBell({ patientId, disabled = false }: { patientId?: string; disabled?: boolean }) {
   const liveRevision = useLiveRevision();
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<InboxNotification[]>([]);
@@ -34,7 +34,9 @@ export function NotificationBell({ patientId }: { patientId?: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const controller = new AbortController();
+    let latest = 0;
     const load = () => {
+      const sequence = ++latest;
       if (!document.hidden)
         void api<{ data: InboxNotification[]; unreadCount: number }>(
           "/api/notifications?surface=bell" +
@@ -43,12 +45,13 @@ export function NotificationBell({ patientId }: { patientId?: string }) {
           controller.signal,
         ).then(
           (result) => {
+            if (controller.signal.aborted || sequence !== latest) return;
             setRows(result.data);
             setUnread(result.unreadCount);
             setError("");
           },
           () => {
-            if (!controller.signal.aborted)
+            if (!controller.signal.aborted && sequence === latest)
               setError("Não foi possível atualizar as notificações.");
           },
         );
@@ -83,6 +86,7 @@ export function NotificationBell({ patientId }: { patientId?: string }) {
       <button
         className="ui-icon-button"
         type="button"
+        disabled={disabled}
         aria-label={
           "Notificações" + (unread ? ", " + unread + " não lidas" : "")
         }

@@ -104,6 +104,27 @@ Flows usa /api/whatsapp/flows para envelope cifrado e webhook autenticado,
 cria relato pendente, não uma movimentação. Ausência de configuração responde
 de forma controlada e não simula entrega externa.
 
+## Escalas e BAL por plantão
+
+`/api/schedules` consulta intervalos de até 42 dias e recebe comandos de tipo,
+série, proposta, decisão, exceção, substituição, cancelamento e encerramento.
+Toda escrita usa careRecipientId, idempotencyKey e expectedVersion quando o
+registro já existe. Sobreposição retorna SCHEDULE_OVERLAP sem revelar o outro
+paciente. Não há escrita direta em agenda ou operação de check-in.
+
+`/api/balances` consulta a atribuição, elegibilidade, obrigações, destinos e
+eventos. Comandos configuram o regime por paciente, solicitam/decidem adiamento,
+resolvem cobertura ambígua e designam reconto. A aprovação familiar é distinta
+da gestão de escala. Não se pode deslocar ou cancelar uma janela de BAL vigente
+por uma simples alteração de agenda.
+
+No regime ativado, payload BAL inclui balanceAssignment com id, version e
+referenceRevision capturados na leitura. O servidor revalida identidade,
+janela, vínculo e versão do ledger em criação, edição e submissão. Contexto
+documental é produzido pelo banco; não é aceito como autoridade do cliente.
+Recuperar uma tentativa confirmada reutiliza a chave e não duplica documento
+ou ajustes. [Regras e experiência](ui-ux/BALANCES.md).
+
 ## História e erros
 
 Importação preserva fatos conhecidos, identifica campos desconhecidos e

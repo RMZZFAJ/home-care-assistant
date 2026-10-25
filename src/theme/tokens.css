@@ -95,6 +95,7 @@
   .hca-theme .workspace-content { padding: 20px 14px 32px; }
   .hca-theme .ui-input { font-size: 16px; min-height: 44px; }
   .hca-theme .ui-button { min-height: 44px; }
+  .hca-theme main summary { min-height: 44px; padding-block: 12px; }
   .hca-theme .ui-card { padding: 18px; }
   .hca-theme .page-heading h1 { font-size: 22px; }
   .hca-theme .app-header { padding: 8px 12px; }

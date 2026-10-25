@@ -210,3 +210,19 @@ que o adaptador V4 de política ainda capturava o SQLSTATE antigo. O incremento
 81 preserva a resposta PT409 desse contrato e deixa outros erros intactos.
 A regressão original de conflito, proposta, convite e aceite passou novamente;
 o contrato SQL de conflitos também passou. O teste não foi enfraquecido.
+
+Incremento 81 aplicado no remoto após novo backup de esquema/dados e manifesto
+SHA-256. As cinco contas existentes autenticaram por senha no Auth remoto e
+verificaram consultas, proibições administrativas/COM e isolamento pelas APIs
+do preview. A ativação foi realizada por API autenticada somente em
+`Validação V4 fictícia d506812c`, preservando o paciente original e a homologação
+legada. Nenhuma fixture foi carregada no remoto. A atribuição profissional ficou
+disponível no plantão programado; não se presume presença física nem envio Meta.
+
+A homologação visual detectou contraste em estados desabilitados e área de
+toque de detalhes no estoque. O tema foi corrigido, mantendo todas as regras
+axe. O cenário de importação passou a consultar a nova data no cabeçalho comum
+e abrir os avisos recolhíveis. A troca de paciente deixou de disparar refresh
+RSC redundante; o sino aguarda a troca confirmada e descarta respostas antigas.
+As capturas móveis do BAL verificam topo e rodapé visíveis, incluindo geometria
+dos botões acima da navegação inferior, sem alterar CSS para a captura.
