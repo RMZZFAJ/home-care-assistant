@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-27T08:14:08.622Z",
+  "endedAt": "2026-10-27T08:14:12.923Z",
+  "exitCode": 2,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "typecheck-audit-artifacts.log"
+}

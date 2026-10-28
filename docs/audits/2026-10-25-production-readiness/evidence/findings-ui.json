@@ -1,0 +1,816 @@
+[
+  {
+    "id": "UX-001",
+    "title": "Aprovação de alteração de plantão não apresenta os dados que serão aplicados",
+    "nature": "DEFECT_CONFIRMED",
+    "domain": "UI_UX",
+    "priority": "P1",
+    "confidence": "CONFIRMED",
+    "status": "OPEN",
+    "persona": "Administrador do paciente; familiar autorizado a gerir escala",
+    "journey": "Revisar proposta de alteração de plantão",
+    "summary": "A lista apresenta somente o motivo e o diálogo pede revisar período e profissional sem exibir esses valores.",
+    "observed": "c.reason é o único resumo da mudança. A decisão envia c.id, approve=true e motivo fixo. O contrato contém shift_id, professional_id, proposed_professional_id, starts_at e ends_at.",
+    "expected": "Antes de aprovar, identificar o plantão, solicitante, profissional anterior/proposto, datas, horas, fuso e consequências para BAL.",
+    "reproduction": "Confirmado em Chromium local como adminA: proposta 07h–19h para 08h–20h em 10/11/2026; lista só mostra motivo; diálogo1440/390px não exibe pessoa/data/horas. Nenhuma decisão foi aplicada pelo navegador. Reprodutores: evidence/ui-runtime.mjs e evidence/ui-runtime-ready.mjs; somente stack local verificada.",
+    "evidence": [
+      "src/components/schedules/schedule-console.tsx:61",
+      "src/components/schedules/schedule-console.tsx:66",
+      "src/types/schedules.ts:4",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-scale-review-390.png",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-runtime.json"
+    ],
+    "files": [
+      "src/components/schedules/schedule-console.tsx",
+      "src/types/schedules.ts"
+    ],
+    "routes": [
+      "/escalas"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "O read model da proposta é reduzido ao motivo no render e não é preservado no objeto de revisão.",
+    "human_impact": "O aprovador precisa decidir sem a informação operacional necessária; o texto afirma revisão que a tela não possibilita.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Risco de programação equivocada e responsabilidade deslocada, sem alegar que o banco aceita sobreposição ou desrespeita aprovação familiar.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Consultar solicitante por canal externo e rejeitar propostas não compreendidas. Não existe revisão equivalente dentro da tela.",
+    "recommendation": "Exibir diff de negócio e consequências antes de confirmar; usar motivo de aprovação informado ou texto que não alegue revisão inexistente.",
+    "alternatives": [
+      "Drawer de revisão da proposta, ligado à ocorrência original",
+      "Resumo expandido na lista mais confirmação contextual"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "M",
+    "regression_risk": "Médio; preservar autoridade, concorrência e recuperação.",
+    "acceptance_criteria": [
+      "O aprovador vê a identidade do plantão e antes/depois de pessoa, período e fuso",
+      "Mudanças de horário e substituição têm resumos diferentes",
+      "Aprovação e rejeição preservam versão, idempotência e autoridade"
+    ],
+    "tests_required": [
+      "E2E gestor aprova proposta após ler valores concretos em desktop e390px",
+      "E2E proposta com alteração de pessoa/período e conflito409"
+    ],
+    "human_decision": "Definir resumo de impactos do BAL e política para aprovação de múltiplas ocorrências.",
+    "countercheck": "A agenda mostra a programação publicada e séries propostas, mas a alteração pontual não se aplica antes da aprovação. O contrato já retorna os valores. Autoridade transacional não substitui compreensão humana. Runtime: Confirmado em Chromium local como adminA: proposta 07h–19h para 08h–20h em 10/11/2026; lista só mostra motivo; diálogo1440/390px não exibe pessoa/data/horas. Nenhuma decisão foi aplicada pelo navegador.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  },
+  {
+    "id": "UX-002",
+    "title": "Ciência automática observa o cabeçalho antes da lista de materiais",
+    "nature": "RISK_SUPPORTED",
+    "domain": "UI_UX",
+    "priority": "P2",
+    "confidence": "CONFIRMED",
+    "status": "OPEN",
+    "persona": "Familiar com ciência automática habilitada",
+    "journey": "Abrir REQ recebida no celular",
+    "summary": "O sinal app_visible é disparado pela visibilidade do DocumentHeader; materiais ficam em seção posterior.",
+    "observed": "IntersectionObserver usa threshold0.5 e observa visibleRef anexada ao cabeçalho. A mensagem afirma exibição do conteúdo.",
+    "expected": "A semântica da ciência automática deve corresponder exatamente ao que foi exposto, sem sugerir leitura integral.",
+    "reproduction": "Confirmado em Chromium390x844 como family: POST mode=app_visible, expectedVersion=1; cabeçalho top217.5/bottom819.5; título dos materiais top858.5, fora do viewport. RPC subsequente confirma ciência family/app_visible. Reprodutores: evidence/ui-runtime.mjs e evidence/ui-runtime-ready.mjs; somente stack local verificada.",
+    "evidence": [
+      "src/components/requisitions/requisition-detail.tsx:130",
+      "src/components/requisitions/requisition-detail.tsx:142",
+      "src/components/requisitions/requisition-detail.tsx:175",
+      "src/components/requisitions/requisition-detail.tsx:226",
+      "src/components/requisitions/requisition-detail.tsx:278",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-science-top-390.png",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-runtime.json"
+    ],
+    "files": [
+      "src/components/requisitions/requisition-detail.tsx"
+    ],
+    "routes": [
+      "/documentos/[id]",
+      "/historico/[id]"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "A referência de visibilidade representa a área de identificação, não a lista de materiais.",
+    "human_impact": "Família e equipe podem atribuir significado excessivo ao registro automático.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Rastreabilidade de exposição do conteúdo menos precisa que a mensagem apresentada.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Usar ciência expressa e desativar preferência automática até definir a semântica.",
+    "recommendation": "Definir ciência automática como abertura do documento e nomear assim, ou observar conteúdo pertinente com critério explícito; preservar diferença de ciência expressa.",
+    "alternatives": [
+      "Registrar abertura como evento distinto sem satisfazer ciência",
+      "Exigir ação expressa para documentos selecionados"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "M",
+    "regression_risk": "Médio; preservar autoridade, concorrência e recuperação.",
+    "acceptance_criteria": [
+      "Texto descreve o sinal realmente medido",
+      "Teste viewport mostra qual conteúdo ficou visível antes do registro",
+      "Preferência, política, elegibilidade e modo são preservados"
+    ],
+    "tests_required": [
+      "E2E390px cabeçalho visível/material fora da tela",
+      "E2E aba oculta e preferência desativada"
+    ],
+    "human_decision": "Decidir se ciência significa abertura, exposição dos materiais ou confirmação expressa.",
+    "countercheck": "Há opt-in duplo, verificação document.hidden, autorização e modo app_visible distinto de ciência expressa. Não é alegada falsificação ou prova de leitura. O risco é a correspondência entre sinal e linguagem. Runtime: Confirmado em Chromium390x844 como family: POST mode=app_visible, expectedVersion=1; cabeçalho top217.5/bottom819.5; título dos materiais top858.5, fora do viewport. RPC subsequente confirma ciência family/app_visible.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  },
+  {
+    "id": "UX-003",
+    "title": "Falha de transporte no anexo mantém arquivo editável na mesma tentativa",
+    "nature": "DEFECT_CONFIRMED",
+    "domain": "UI_UX",
+    "priority": "P2",
+    "confidence": "CONFIRMED",
+    "status": "OPEN",
+    "persona": "Profissional ou familiar anexando ficha física",
+    "journey": "Recuperar upload após resposta perdida",
+    "summary": "O catch de fetch/JSON não marca uncertain, embora a FormData e a chave permaneçam reservadas.",
+    "observed": "pendingRef conserva FormData; a próxima execução faz form.set('file',file). Input só bloqueia busy||uncertain; uncertain é ativado para HTTPinesperado, não para exceção de transporte.",
+    "expected": "Uma tentativa de resultado desconhecido deve congelar arquivo e oferecer recuperação antes de iniciar outro upload.",
+    "reproduction": "Confirmado em Chromium390px: POST de foto sintética recebeu201 no servidor e a resposta foi abortada no navegador; input permanece habilitado e botão Enviar anexo, com Failed to fetch. A troca de arquivo e segundo envio não foram executados; risco de conflito permanece apoiado no fluxo estático. Reprodutores: evidence/ui-runtime.mjs e evidence/ui-runtime-ready.mjs; somente stack local verificada.",
+    "evidence": [
+      "src/components/documents/attachments.tsx:78",
+      "src/components/documents/attachments.tsx:84",
+      "src/components/documents/attachments.tsx:107",
+      "src/components/documents/attachments.tsx:189",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-attachment-lost-response.png",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-runtime.json"
+    ],
+    "files": [
+      "src/components/documents/attachments.tsx"
+    ],
+    "routes": [
+      "/documentos/[id]",
+      "/estoque"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Tratamento de incerteza incompleto no ramo de exceção; tentativa reutiliza payload mutável.",
+    "human_impact": "O usuário pode perder a compreensão de qual foto foi registrada e receber conflito ao tentar substituir.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Recuperação exige consultar anexos/reiniciar o fluxo.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Manter mesmo arquivo, repetir e conferir a lista de anexos antes de substituí-lo.",
+    "recommendation": "Marcar resultado incerto no catch de transporte e preservar payload imutável até reconciliação.",
+    "alternatives": [
+      "Consultar tentativa por chave antes de permitir outra seleção"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "M",
+    "regression_risk": "Médio; preservar autoridade, concorrência e recuperação.",
+    "acceptance_criteria": [
+      "Resposta perdida bloqueia edição do arquivo e apresenta Recuperar confirmação",
+      "Mesma chave recupera mesmo conteúdo",
+      "Novo arquivo só usa nova chave depois da reconciliação"
+    ],
+    "tests_required": [
+      "E2E resposta perdida após gravação",
+      "E2E falha antes de envio",
+      "Teste hash diferente na mesma chave continua recusado"
+    ],
+    "human_decision": "Não necessária para corrigir consistência da tentativa.",
+    "countercheck": "Backend reserva chave, verifica hash e usa upsert=false; a hipótese de sobrescrita silenciosa foi refutada pelo responsável backend. Achado limitado à experiência de recuperação. Runtime: Confirmado em Chromium390px: POST de foto sintética recebeu201 no servidor e a resposta foi abortada no navegador; input permanece habilitado e botão Enviar anexo, com Failed to fetch. A troca de arquivo e segundo envio não foram executados; risco de conflito permanece apoiado no fluxo estático.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  },
+  {
+    "id": "UX-004",
+    "title": "Algumas leituras apresentam vazio ou configuração ausente antes de concluir a consulta",
+    "nature": "DEFECT_CONFIRMED",
+    "domain": "UI_UX",
+    "priority": "P2",
+    "confidence": "CONFIRMED",
+    "status": "OPEN",
+    "persona": "Todos os perfis autorizados a consultar ocorrências, avisos e sugestões",
+    "journey": "Abrir listas com rede lenta ou falha",
+    "summary": "Listas iniciam vazias e não distinguem carregamento; erros podem coexistir com mensagens de ausência.",
+    "observed": "Consumo rows=[] e Nenhum relato; Flows configured=false e rows=[] geram configuração ausente/vazio; sino rows=[] gera Você está em dia.",
+    "expected": "Carregamento, erro com repetição, vazio confirmado e conteúdo devem ser estados distintos.",
+    "reproduction": "Confirmado em /consumo390px com GET retido e depois500 sintético: Nenhum relato registrado aparece pendente e junto da falha. Flows/sino continuam evidência estática, sem ampliar indevidamente a reprodução. Reprodutores: evidence/ui-runtime.mjs e evidence/ui-runtime-ready.mjs; somente stack local verificada.",
+    "evidence": [
+      "src/components/stock/consumption-console.tsx:45",
+      "src/components/stock/consumption-console.tsx:72",
+      "src/components/stock/consumption-console.tsx:291",
+      "src/components/stock/flow-reviews.tsx:36",
+      "src/components/stock/flow-reviews.tsx:115",
+      "src/components/stock/flow-reviews.tsx:166",
+      "src/components/notifications/notification-bell.tsx:31",
+      "src/components/notifications/notification-bell.tsx:115",
+      "docs/ui-ux/DESIGN_SYSTEM.md:42",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-consumption-error-390.png",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-runtime.json"
+    ],
+    "files": [
+      "src/components/stock/consumption-console.tsx",
+      "src/components/stock/flow-reviews.tsx",
+      "src/components/notifications/notification-bell.tsx",
+      "docs/ui-ux/DESIGN_SYSTEM.md"
+    ],
+    "routes": [
+      "/consumo",
+      "/notificacoes",
+      "sino global"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Ausência de estado independente de leitura; valores iniciais são tratados como respostas de negócio.",
+    "human_impact": "A pessoa pode concluir que não há pendências ou que a integração está desligada antes de conhecer o resultado.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Consulta pode ser abandonada cedo; repetições dependem de atualização de página em alguns módulos.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Aguardar/atualizar e conferir eventual erro; não é uma garantia de ausência.",
+    "recommendation": "Aplicar estados de leitura compartilhados com retry explícito e conservar dados anteriores marcados como atualização pendente.",
+    "alternatives": [
+      "Skeleton somente no primeiro carregamento e indicador discreto nas atualizações"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "M",
+    "regression_risk": "Médio; preservar autoridade, concorrência e recuperação.",
+    "acceptance_criteria": [
+      "Nenhum vazio é exibido antes de consulta bem-sucedida",
+      "Erro oferece repetição e não afirma ausência",
+      "Configuração desconhecida é distinta de indisponível"
+    ],
+    "tests_required": [
+      "E2E delay/500/200vazio/200comdados",
+      "Leitor de tela anuncia carregamento e falha"
+    ],
+    "human_decision": "Não necessária.",
+    "countercheck": "Workspace, histórico, estoque e outros módulos já têm loading/retry. A recomendação reutiliza padrão existente; não afirma ausência universal de estados. Runtime: Confirmado em /consumo390px com GET retido e depois500 sintético: Nenhum relato registrado aparece pendente e junto da falha. Flows/sino continuam evidência estática, sem ampliar indevidamente a reprodução.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  },
+  {
+    "id": "UX-005",
+    "title": "Aprovação de propostas de configuração exige interpretar JSON e identificadores",
+    "nature": "EXPERIENCE_INCONSISTENCY",
+    "domain": "UI_UX",
+    "priority": "P2",
+    "confidence": "CONFIRMED",
+    "status": "OPEN",
+    "persona": "Administrador local aprovando proposta global",
+    "journey": "Pessoas e propostas",
+    "summary": "A revisão mostra change.kind e JSON.stringify(change.proposed), sem comparação contextual em linguagem de negócio.",
+    "observed": "Kind e payload serializado antecedem Aceitar/Rejeitar; relações e efeitos dependem de interpretação técnica.",
+    "expected": "Nome da pessoa/recurso, política afetada, antes/depois e impacto compreensíveis antes da aprovação.",
+    "reproduction": "Criar proposta global autorizada e abrir Configurações > Pessoas e propostas como administrador local.",
+    "evidence": [
+      "src/components/admin/policy-console.tsx:319",
+      "src/components/admin/policy-console.tsx:321",
+      "src/components/admin/policy-console.tsx:337"
+    ],
+    "files": [
+      "src/components/admin/policy-console.tsx"
+    ],
+    "routes": [
+      "/configuracoes?area=people"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Payload técnico foi reutilizado como visualizador de decisão.",
+    "human_impact": "Aprovação depende de conhecimento dos contratos e aumenta carga cognitiva.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Erro de configuração pode persistir mesmo com autorização correta.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Revisar com operador técnico; preservar JSON como detalhe diagnóstico.",
+    "recommendation": "Criar resumos por kind, resolver nomes no contexto autorizado e mostrar diff; manter identificadores recolhidos.",
+    "alternatives": [
+      "Reutilizar resumos dos editores de política e vínculo"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação",
+      "BE-005 cobre UUID novo no retry; causa distinta da compreensão visual."
+    ],
+    "effort": "M",
+    "regression_risk": "Médio; preservar autoridade, concorrência e recuperação.",
+    "acceptance_criteria": [
+      "Uma pessoa não técnica identifica quem/o quê muda e o resultado",
+      "Valores anteriores/propostos aparecem juntos",
+      "JSON fica opcional e cópia diagnóstica é segura"
+    ],
+    "tests_required": [
+      "E2E proposta de vínculo e de regra",
+      "Conflito de versão obriga rever resumo"
+    ],
+    "human_decision": "Definir vocabulário para cada tipo de proposta.",
+    "countercheck": "JSON preserva exatidão e é útil em auditoria; não deve ser removido sem alternativa. A autorização local e aprovação separada são pontos fortes.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  },
+  {
+    "id": "UX-006",
+    "title": "Códigos internos e destinos ambíguos atravessam a linguagem da interface",
+    "nature": "EXPERIENCE_INCONSISTENCY",
+    "domain": "UI_UX",
+    "priority": "P3",
+    "confidence": "CONFIRMED",
+    "status": "OPEN",
+    "persona": "Família, supervisão e administração",
+    "journey": "Pesquisar pendências e configurar a operação",
+    "summary": "Filtros especiais mostram science_required/archive_pending; convite mostra status bruto; histórico da escala mostra action; preferências no menu levam à central de avisos.",
+    "observed": "Chips usam documentStatuses embora filtros especiais estejam em historyStatuses. Menu Preferências e notificações abre /notificacoes, enquanto preferências estão em /perfil.",
+    "expected": "Termos portugueses do domínio e rótulos que descrevem destino e ação.",
+    "reproduction": "Abrir link Ciências pendentes do dashboard e ler chip; abrir menu pessoal; revisar convite e histórico de escala.",
+    "evidence": [
+      "src/components/documents/document-history.tsx:36",
+      "src/components/documents/document-history.tsx:310",
+      "src/components/documents/document-history.tsx:321",
+      "src/components/layout/workspace-shell.tsx:52",
+      "src/components/profile-console.tsx:206",
+      "src/components/admin/admin-console.tsx:321",
+      "src/components/schedules/schedule-console.tsx:63"
+    ],
+    "files": [
+      "src/components/documents/document-history.tsx",
+      "src/components/layout/workspace-shell.tsx",
+      "src/components/profile-console.tsx",
+      "src/components/admin/admin-console.tsx",
+      "src/components/schedules/schedule-console.tsx"
+    ],
+    "routes": [
+      "/historico?type=REQ&status=science_required",
+      "/perfil",
+      "/notificacoes",
+      "/escalas"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Dicionários incompletamente reutilizados e rótulo de menu agregando intenções diferentes.",
+    "human_impact": "Exige traduzir códigos e procurar controles em outra área.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Atrito de treinamento e suporte, sem alteração de autorização.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Consultar perfil para preferências; usar filtros pelo formulário.",
+    "recommendation": "Centralizar rótulos por domínio; separar Meus avisos de Preferências de avisos; revisar nomes acessíveis dos chips.",
+    "alternatives": [
+      "Link de preferências dentro da central de avisos"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "S–M",
+    "regression_risk": "Baixo a médio; validar consumidores e linguagem.",
+    "acceptance_criteria": [
+      "Filtros especiais e ações exibem rótulos conhecidos",
+      "Menu leva ao destino indicado",
+      "Enums desconhecidos têm mensagem segura e diagnóstico separado"
+    ],
+    "tests_required": [
+      "Snapshots de rótulos de filtros especiais",
+      "E2E destino do menu e retorno"
+    ],
+    "human_decision": "Aprovar glossário, sem renomear contratos de banco.",
+    "countercheck": "StatusBadge tem vários rótulos já traduzidos; não se assume que todo fallback bruto é alcançável. Evidências restritas aos caminhos concretos.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  },
+  {
+    "id": "UX-007",
+    "title": "Rascunho dito salvo no dispositivo tem alcance de sessão da aba",
+    "nature": "RISK_SUPPORTED",
+    "domain": "UI_UX",
+    "priority": "P2",
+    "confidence": "STRONG",
+    "status": "OPEN",
+    "persona": "Profissional interrompido no preenchimento da REQ",
+    "journey": "Salvar e retomar requisição",
+    "summary": "O texto promete recuperação do dispositivo enquanto a REQ usa sessionStorage com prazo local.",
+    "observed": "Autosave500ms e botão manual gravam sessionStorage; recuperação valida savedAt e remove dados expirados.",
+    "expected": "A mensagem deve explicitar onde o rascunho existe, por quanto tempo e o que encerra sua recuperação.",
+    "reproduction": "Preencher REQ, salvar, recarregar na mesma aba; comparar com nova aba independente e encerramento da sessão. Persistência entre sessões ainda não testada.",
+    "evidence": [
+      "src/components/requisitions/requisition-wizard.tsx:78",
+      "src/components/requisitions/requisition-wizard.tsx:96",
+      "src/components/requisitions/requisition-wizard.tsx:149",
+      "src/components/requisitions/requisition-wizard.tsx:424"
+    ],
+    "files": [
+      "src/components/requisitions/requisition-wizard.tsx"
+    ],
+    "routes": [
+      "/fichas/req"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Mensagem de persistência mais ampla que o mecanismo escolhido.",
+    "human_impact": "Interrupção pode resultar em redigitação quando a pessoa espera armazenamento durável.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Perda de trabalho antes da emissão; documentos já emitidos não são afetados.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Retomar na mesma aba e emitir antes de encerrá-la; não copiar dados de cuidado para canais inseguros.",
+    "recommendation": "Mostrar origem, hora e alcance do rascunho; avaliar rascunho servidor para REQ se recuperação entre dispositivos for necessária.",
+    "alternatives": [
+      "Manter armazenamento de sessão com texto preciso",
+      "Rascunho servidor autorizado por usuário/paciente, com retenção definida"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "S–M",
+    "regression_risk": "Baixo a médio; validar consumidores e linguagem.",
+    "acceptance_criteria": [
+      "Mensagem descreve sessão da aba e expiração",
+      "Recuperação distingue rascunho local/servidor e tentativa incerta",
+      "Sair/trocar paciente não mistura rascunhos"
+    ],
+    "tests_required": [
+      "E2E reload/novaaba/logout/expiração",
+      "Teste de isolamento entre usuário e paciente"
+    ],
+    "human_decision": "Definir necessidade de continuidade entre abas/dispositivos e retenção.",
+    "countercheck": "Há autosave e recuperação idempotente; a hipótese de ausência de rascunho foi refutada. COM/BAL têm caminhos de documento servidor e não devem ser generalizados como exclusivamente locais.",
+    "countercheck_result": "DOWNGRADED"
+  },
+  {
+    "id": "UX-008",
+    "title": "Camadas visuais legadas mantêm decisões fora da fundação Fluent",
+    "nature": "ARCHITECTURE_DEBT",
+    "domain": "UI_UX",
+    "priority": "P3",
+    "confidence": "STRONG",
+    "status": "OPEN",
+    "persona": "Todos os perfis; manutenção de UI",
+    "journey": "Alternar entre gestão, wizards e comprovantes",
+    "summary": "Tokens, overrides globais, utilitários e controles locais coexistem; seleção de produto ainda possui cores próprias.",
+    "observed": "Fundação Fluent real convive com ui-* legadas, classes Tailwind e cores de seleção/recibo definidas nos consumidores.",
+    "expected": "Decisões recorrentes de seleção, espaçamento, foco e campo derivadas de padrões compartilhados com consumidores reais.",
+    "reproduction": "Comparar shell, edição administrativa, seleção REQ e recibo no mesmo viewport. Inspeção visual atual pendente; referências históricas foram vistas.",
+    "evidence": [
+      "src/app/globals.css:1",
+      "src/theme/tokens.css:1",
+      "src/app/design-system.css:48",
+      "src/components/requisitions/requisition-steps.tsx:1",
+      "src/components/requisitions/requisition-receipt.tsx:1"
+    ],
+    "files": [
+      "src/app/globals.css",
+      "src/theme/tokens.css",
+      "src/app/design-system.css",
+      "src/components/requisitions/requisition-steps.tsx",
+      "src/components/requisitions/requisition-receipt.tsx"
+    ],
+    "routes": [
+      "/admin",
+      "/fichas/req",
+      "/documentos/[id]"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Migração visual incremental preservou compatibilidade, sem finalizar consolidação dos consumidores.",
+    "human_impact": "Possível variação de hierarquia e estados; impacto perceptivo atual exige render, não inferência por nomes de classe.",
+    "technical_impact": "Aumenta superfície de manutenção e risco de mudança inconsistente.",
+    "operational_impact": "Manutenção precisa verificar múltiplas camadas para mudar o mesmo padrão.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Preservar contratos atuais e revisar cada consumidor antes de remover CSS.",
+    "recommendation": "Consolidar campo, grupo de quantidade, opção selecionável, sumário de revisão e mensagens; migrar por consumidor com captura e teclado.",
+    "alternatives": [
+      "Manter controles nativos padronizados onde são mais adequados à plataforma"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "S–M",
+    "regression_risk": "Baixo a médio; validar consumidores e linguagem.",
+    "acceptance_criteria": [
+      "Seleção não se confunde com sucesso",
+      "Mesmo estado usa tokens equivalentes",
+      "Não há regressão em toque/foco/contraste ou quantidades exatas"
+    ],
+    "tests_required": [
+      "Inspeção320–1920 e contraste",
+      "Regressão visual por componente migrado"
+    ],
+    "human_decision": "Escolher identidade documental e densidade; não copiar a marca Microsoft.",
+    "countercheck": "Usar Fluent não exige substituir todo input nativo. Roottokens antigos são sobrescritos e não provam cor final. Proposta de reescrita integral foi rejeitada por falta de necessidade.",
+    "countercheck_result": "DOWNGRADED"
+  },
+  {
+    "id": "UX-009",
+    "title": "Histórico documental pode explicar versões em linguagem de negócio",
+    "nature": "PRODUCT_OPPORTUNITY",
+    "domain": "UI_UX",
+    "priority": "P3",
+    "confidence": "MODERATE",
+    "status": "OPEN",
+    "persona": "Família e supervisor reconstruindo decisão antiga",
+    "journey": "Investigar documento meses após emissão",
+    "summary": "Eventos, autoria, versões e hashes existem, mas comparar versões e compreender mudanças requer leitura de registros técnicos.",
+    "observed": "Timeline REQ mostra evento, autor e versão; supply detail lista versões/eventos/hash. Não há diff de materiais antes/depois integrado.",
+    "expected": "Oferecer comparação pertinente à tarefa sem apagar cadeia de eventos.",
+    "reproduction": "Abrir documento com várias versões; expandir histórico e tentar explicar quem mudou o quê.",
+    "evidence": [
+      "src/components/documents/document-timeline.tsx:15",
+      "src/components/documents/supply-detail.tsx:1",
+      "src/components/documents/document-actions.tsx:5"
+    ],
+    "files": [
+      "src/components/documents/document-timeline.tsx",
+      "src/components/documents/supply-detail.tsx",
+      "src/components/documents/document-actions.tsx"
+    ],
+    "routes": [
+      "/documentos/[id]"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Visualização expõe trilha técnica, com pouca síntese de alterações de negócio.",
+    "human_impact": "Auditoria cotidiana demanda esforço de comparação manual.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Suporte pode precisar de consultas técnicas para reconstruir decisão.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Consultar eventos e comprovantes/versionamento já preservados.",
+    "recommendation": "Links para PDF da versão e diff de itens/estado/autor, distinguindo alteração e novo evento de comunicação.",
+    "alternatives": [
+      "Exportação resumida do histórico sem nova timeline"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "S–M",
+    "regression_risk": "Baixo a médio; validar consumidores e linguagem.",
+    "acceptance_criteria": [
+      "Documento atual e versão histórica são identificados inequivocamente",
+      "Comparação usa snapshots preservados",
+      "Sem confundir ciência/atendimento/conferência"
+    ],
+    "tests_required": [
+      "E2E documento com versões e PDF anterior",
+      "Controle de acesso também na versão histórica"
+    ],
+    "human_decision": "Definir quais diferenças são úteis e prioridade após correções de decisão.",
+    "countercheck": "Histórico e versões não estão ausentes. É melhoria de interpretação, sem alegação de perda de integridade.",
+    "countercheck_result": "DOWNGRADED"
+  },
+  {
+    "id": "UX-010",
+    "title": "Três componentes legados não possuem consumidores demonstráveis",
+    "nature": "REPOSITORY_HYGIENE",
+    "domain": "UI_UX",
+    "priority": "P3",
+    "confidence": "STRONG",
+    "status": "OPEN",
+    "persona": "Manutenção do produto",
+    "journey": "Alterar histórico, inventário e impressão",
+    "summary": "RequisitionHistory, InventoryConsole e PrintButton têm declarações, sem import/uso no código e testes examinados.",
+    "observed": "Busca de símbolos e caminhos em src/tests/scripts/docs/.github encontra declarações e inventário histórico. /inventarios redireciona para histórico BAL.",
+    "expected": "Código mantido tem consumidor ou razão de retenção explícita.",
+    "reproduction": "Executar rg dos três símbolos/caminhos e rastrear /inventarios até /historico?type=BAL.",
+    "evidence": [
+      "src/components/requisitions/requisition-history.tsx:1",
+      "src/components/stock/inventory-console.tsx:1",
+      "src/components/requisitions/print-button.tsx:1",
+      "src/app/inventarios/page.tsx:1"
+    ],
+    "files": [
+      "src/components/requisitions/requisition-history.tsx",
+      "src/components/stock/inventory-console.tsx",
+      "src/components/requisitions/print-button.tsx",
+      "src/app/inventarios/page.tsx"
+    ],
+    "routes": [
+      "/inventarios"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Adaptadores visuais anteriores permaneceram após unificação de histórico/documento.",
+    "human_impact": "Sem impacto direto comprovado no runtime atual.",
+    "technical_impact": "Aumenta superfície de manutenção e risco de mudança inconsistente.",
+    "operational_impact": "Confusão para manutenção e revisões que tratam componente órfão como fluxo ativo.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Marcar candidatos no inventário até alteração autorizada.",
+    "recommendation": "Candidatos a DELETE em fase posterior, após reconferir consumidores estáticos/dinâmicos e build. Preservar rotas de compatibilidade e contratos históricos.",
+    "alternatives": [
+      "Arquivar racional no histórico Git e remover arquivo",
+      "Reter somente com consumidor/documentação explícitos"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "S–M",
+    "regression_risk": "Baixo a médio; validar consumidores e linguagem.",
+    "acceptance_criteria": [
+      "Nenhum consumidor de build/importação/demonstração depende do arquivo",
+      "Compatibilidade de URLs permanece testada",
+      "Nenhuma migration/API histórica é removida por associação"
+    ],
+    "tests_required": [
+      "Busca completa de import e caminho",
+      "Build e smoke das rotas substitutas"
+    ],
+    "human_decision": "Autorizar limpeza em Fase B após decisão de retenção.",
+    "countercheck": "Nomes e caminhos foram buscados além de src, incluindo tests/scripts/docs/.github; referências de inventário são metadados, não execução. Não foi proposta remoção imediata nem do backend legado.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  },
+  {
+    "id": "UX-011",
+    "title": "Captura histórica rotulada revisão BAL ainda apresenta a primeira etapa",
+    "nature": "DOCUMENTATION_DRIFT",
+    "domain": "UI_UX",
+    "priority": "P3",
+    "confidence": "CONFIRMED",
+    "status": "OPEN",
+    "persona": "Revisor de evidências",
+    "journey": "Avaliar homologação visual anterior",
+    "summary": "bal-revisao-ios.png mostra Etapa 1 de 2 Contagem, revisão desabilitada e campos de contagem.",
+    "observed": "A imagem inspecionada não contém a tela de comparação/revisão, embora o nome e a matriz a apontem como evidência de revisão.",
+    "expected": "Captura deve identificar e mostrar o estado declarado.",
+    "reproduction": "Abrir a imagem e comparar texto com seu nome e o link da matriz ACCEPTANCE.",
+    "evidence": [
+      "docs/ui-ux/evidence/2026-10-25/bal-revisao-ios.png",
+      "docs/ui-ux/ACCEPTANCE.md:63",
+      "docs/ui-ux/evidence/2026-10-25/manifest.json:71"
+    ],
+    "files": [
+      "docs/ui-ux/evidence/2026-10-25/bal-revisao-ios.png",
+      "docs/ui-ux/ACCEPTANCE.md",
+      "docs/ui-ux/evidence/2026-10-25/manifest.json"
+    ],
+    "routes": [
+      "/fichas/bal"
+    ],
+    "components": [],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Captura histórica aparentemente produzida durante transição; causa não reproduzida nesta auditoria.",
+    "human_impact": "Leitor pode superestimar cobertura visual da etapa.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Evidência de homologação menos precisa; não prova defeito atual.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Tratar imagem como contagem/transição e gerar evidência atual da revisão com título/estado aguardados.",
+    "recommendation": "Nova captura datada da segunda etapa, com manifesto de SHA/viewport/perfil/estado e sem substituir história silenciosamente.",
+    "alternatives": [
+      "Corrigir descrição histórica e anexar evidência atual"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "S–M",
+    "regression_risk": "Baixo a médio; validar consumidores e linguagem.",
+    "acceptance_criteria": [
+      "Imagem mostra Etapa2 de2 e comparação contada/referência",
+      "Manifesto identifica commit e ambiente"
+    ],
+    "tests_required": [
+      "Inspeção humana da imagem além de assert de screenshot"
+    ],
+    "human_decision": "Não necessária para classificar alcance da evidência.",
+    "countercheck": "Contagem e rodapé têm imagens distintas coerentes; problema limitado à captura chamada revisão. Testes históricos podem ter validado o fluxo sem que essa imagem o prove.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  },
+  {
+    "id": "UX-012",
+    "title": "Acompanhamento inicial ignora configuração e altera mensagem ao vencer prazo fixo",
+    "nature": "DEFECT_CONFIRMED",
+    "domain": "UI_UX",
+    "priority": "P2",
+    "confidence": "CONFIRMED",
+    "status": "OPEN",
+    "persona": "Administrador local e pessoa consultando documento",
+    "journey": "Configurar acompanhamento e abrir comprovante",
+    "summary": "shareWaitSeconds é editável de 0 a 10, mas DocumentActions usa 10s fixos e sobrescreve o texto mesmo sem avisos pendentes.",
+    "observed": "PolicyRules apresenta campo; PolicyConsole salva valor. DocumentActions deadline10_000 aborta PDF/tracking e afirma processamento em andamento. O timeout não é limpo quando tracking conclui sem pendências.",
+    "expected": "Campo precisa alterar comportamento efetivo; após conclusão a mensagem não deve regredir para pendência sem nova evidência.",
+    "reproduction": "Confirmado em Chromium390px: política efetiva shareWaitSeconds=3 lida da API; consulta de avisos interceptada com 200/data[]; mensagem de estado concluído permanece após4s e é sobrescrita após~10s por avisos continuam sendo processados. Não simula entrega de provedor. Reprodutores: evidence/ui-runtime.mjs e evidence/ui-runtime-ready.mjs; somente stack local verificada.",
+    "evidence": [
+      "src/components/admin/policy-rules.tsx:42",
+      "src/components/admin/policy-console.tsx:189",
+      "src/components/documents/document-actions.tsx:22",
+      "src/components/documents/document-actions.tsx:28",
+      "src/components/documents/document-actions.tsx:33",
+      "src/components/documents/document-actions.tsx:62",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-document-deadline-390.png",
+      "docs/audits/2026-10-25-production-readiness/evidence/ui-runtime-ready.json"
+    ],
+    "files": [
+      "src/components/admin/policy-rules.tsx",
+      "src/components/admin/policy-console.tsx",
+      "src/components/documents/document-actions.tsx"
+    ],
+    "routes": [
+      "/configuracoes?area=rules",
+      "/documentos/[id]"
+    ],
+    "components": [
+      "PolicyRules",
+      "PolicyConsole",
+      "DocumentActions"
+    ],
+    "api": [],
+    "database_objects": [],
+    "root_cause": "Configuração persistida não é passada ao consumidor; timeout compartilhado muda mensagem sem considerar resultado final do tracking.",
+    "human_impact": "Configuração aparenta funcionar e feedback pode sugerir atraso inexistente.",
+    "technical_impact": "Contrato de autorização/transação não é declarado defeituoso por este achado.",
+    "operational_impact": "Dificulta distinguir atraso de comunicação de comportamento local fixo; compartilhar PDF depende de preparação que também usa esse limite.",
+    "security_integrity_impact": "Não constitui demonstração de bypass de autorização; avaliar impactos de decisão no domínio correspondente.",
+    "workaround": "Usar Baixar PDF e consultar estados individuais dos avisos; não inferir pendência somente pela mensagem do cabeçalho.",
+    "recommendation": "Consumir política efetiva ou retirar configuração; separar preparação PDF do prazo de acompanhamento e preservar resultado conhecido.",
+    "alternatives": [
+      "Prazo fixo documentado sem campo editável",
+      "Acompanhamento configurável com estado final e preparação PDF independente"
+    ],
+    "invariants": [
+      "Autorização servidor e paciente explícito",
+      "Preservação documental, versões e idempotência",
+      "Não incluir quantidade solicitada em REQ"
+    ],
+    "dependencies": [
+      "Validação runtime quando indicada",
+      "Revisão do domínio antes de implementação"
+    ],
+    "effort": "M",
+    "regression_risk": "Médio; preservar autoridade, concorrência e recuperação.",
+    "acceptance_criteria": [
+      "Valores 0/3/10s têm comportamento definido e verificável",
+      "Avisos concluídos não voltam a mensagem de processamento",
+      "Baixar/compartilhar PDF tem recuperação clara"
+    ],
+    "tests_required": [
+      "E2E política 0/3/10s com relógio controlado",
+      "E2E notifications vazio/concluído/pendente e PDF lento"
+    ],
+    "human_decision": "Definir se prazo limita acompanhamento dos avisos ou também preparação do arquivo.",
+    "countercheck": "A configuração é validada e persistida, mas busca de consumidores frontend/backend não encontrou uso efetivo; DocumentActions recebe somente id/code/version. Não é afirmada perda do documento nem entrega externa. Runtime: Confirmado em Chromium390px: política efetiva shareWaitSeconds=3 lida da API; consulta de avisos interceptada com 200/data[]; mensagem de estado concluído permanece após4s e é sobrescrita após~10s por avisos continuam sendo processados. Não simula entrega de provedor.",
+    "countercheck_result": "CONFIRMED_AFTER_CHALLENGE"
+  }
+]

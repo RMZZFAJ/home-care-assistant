@@ -1,0 +1,239 @@
+[WebServer] (node:45660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:62276) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:47688) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:52096) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:56708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:40208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:52044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:11716) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:58076) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:51728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:31424) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:57276) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:59520) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:39800) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 120 tests using 1 worker
+
+(node:38164) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] {"level":"error","operation":"documents.list","code":"NOT_FOUND","correlationId":"50a00af8-ab36-4336-988e-6a1204d6fe63"}
+  ok   1 [chromium] › tests\e2e\accessibility.spec.ts:13:5 › login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos (20.9s)
+  ok   2 [chromium] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil adminA (3.6s)
+  ok   3 [chromium] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil family (2.9s)
+  ok   4 [chromium] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil supervisor (2.3s)
+  ok   5 [chromium] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil professional (2.7s)
+  ok   6 [chromium] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil reader (2.3s)
+  ok   7 [chromium] › tests\e2e\administration.spec.ts:96:7 › administração integrada no ambiente local › catálogo edita nomes alternativos e inativa preservando a identidade (7.1s)
+[WebServer] {"level":"error","operation":"admin.read","code":"NOT_FOUND","correlationId":"72d838af-49c6-4749-9689-a1b0568ea7d5"}
+[WebServer] {"level":"error","operation":"catalog.read","code":"NOT_FOUND","correlationId":"ce08728c-84ee-47d3-9962-8c23c9cc3af4"}
+  ok   8 [chromium] › tests\e2e\administration.spec.ts:159:7 › administração integrada no ambiente local › administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente (21.2s)
+  ok   9 [chromium] › tests\e2e\administration.spec.ts:259:7 › administração integrada no ambiente local › convite é criado, reemitido e revogado pela interface (4.6s)
+  ok  10 [chromium] › tests\e2e\administration.spec.ts:325:7 › administração integrada no ambiente local › seletores administrativos salvam destinatário e limites por produto e custódia (6.5s)
+  ok  11 [chromium] › tests\e2e\administration.spec.ts:427:7 › administração integrada no ambiente local › importação histórica revisada preserva itens extras e estoque desconhecido no comprovante (6.9s)
+  ok  12 [chromium] › tests\e2e\administration.spec.ts:582:7 › administração integrada no ambiente local › sugestões por alias e grafia ambígua só associam o produto após escolha explícita (4.9s)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"d02539a8-3d45-4b97-9ce9-8193a89d043b"}
+  ok  13 [chromium] › tests\e2e\balance-shifts.spec.ts:41:5 › BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real (11.3s)
+  ok  14 [chromium] › tests\e2e\balance-shifts.spec.ts:107:5 › supervisão solicita adiamento, família decide e o prazo só muda após a aprovação (8.4s)
+  ok  15 [chromium] › tests\e2e\fluent-experience.spec.ts:28:7 › registro SSR Fluent › estilos do streaming permanecem no head sem cópias no corpo (123ms)
+  ok  16 [chromium] › tests\e2e\fluent-experience.spec.ts:36:5 › gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda (5.1s)
+[WebServer] {"level":"error","operation":"admin.write","code":"FORBIDDEN","correlationId":"713d5113-7375-4a78-a9a4-7de02181999c"}
+  ok  17 [chromium] › tests\e2e\fluent-experience.spec.ts:69:5 › documentos comuns, histórico com URL e estoque têm apresentação real em desktop e mobile (14.6s)
+  ok  18 [chromium] › tests\e2e\fluent-experience.spec.ts:130:5 › operação móvel oferece cinco destinos e caixa de entregas autorizada (1.4s)
+  ok  19 [chromium] › tests\e2e\fluent-experience.spec.ts:147:5 › dashboards apresentam tarefas reais por perfil e preservam a custódia autorizada (10.6s)
+  ok  20 [chromium] › tests\e2e\fluent-experience.spec.ts:174:5 › administração usa listas, painéis de edição e confirmação crítica sem perder o contexto (7.4s)
+  ok  21 [chromium] › tests\e2e\fluent-experience.spec.ts:222:5 › ocorrências e notificações preservam saldos e distinguem estados no aplicativo (2.3s)
+  ok  22 [chromium] › tests\e2e\login.spec.ts:9:5 › exibe a tela de login (286ms)
+  ok  23 [chromium] › tests\e2e\login.spec.ts:16:5 › login apresenta falha de credencial e de rede e permite recuperar a sessão (1.7s)
+[WebServer] {"level":"error","operation":"invitation.accept","code":"SESSION_EXPIRED","correlationId":"f89631db-f4e7-44d2-93c0-a65fbfc54a5a"}
+[WebServer] {"level":"error","operation":"workspace.sync","code":"FORBIDDEN","correlationId":"8924358c-842c-4f73-a624-1716c91468ce"}
+  ok  24 [chromium] › tests\e2e\onboarding.spec.ts:47:5 › convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha (5.8s)
+  ok  25 [chromium] › tests\e2e\personal-workspace.spec.ts:8:5 › perfil pessoal salva registro e foto privada e notificações distinguem ciência (2.8s)
+[WebServer] {"level":"error","operation":"schedules.write","code":"SCHEDULE_OVERLAP","correlationId":"62da2ffd-aa2e-461a-bfb2-5602f01a41ea"}
+  ok  26 [chromium] › tests\e2e\schedules.spec.ts:9:5 › agenda publica uma programação real, recusa conflito e preserva contexto no mobile (5.0s)
+[WebServer] {"level":"error","operation":"settings.configure","code":"VERSION_CONFLICT","correlationId":"d8c1901c-42b2-4911-a8af-e9b502ccc37f"}
+[WebServer] {"level":"error","operation":"settings.configure","code":"VERSION_CONFLICT","correlationId":"2a694445-f227-45f2-a0fd-8f1c6ba01fc9"}
+  ok  27 [chromium] › tests\e2e\v4-review.spec.ts:69:5 › V4 review: matriz reconcilia horários, intervalo, versões e falhas sem sobrescrever alterações (17.0s)
+  ok  28 [chromium] › tests\e2e\v4-review.spec.ts:214:5 › V4 review: sino filtra silenciosas antes da página e ficha acompanha estado posterior ao vivo (8.7s)
+[WebServer] {"level":"error","operation":"requisition.archive","code":"FORBIDDEN","correlationId":"4016ff88-d726-4e58-a977-f513b93d428f"}
+  ok  29 [chromium] › tests\e2e\v4-review.spec.ts:359:5 › V4 review: cartão de arquivamento abre exatamente as conclusões contadas (12.8s)
+  ok  30 [chromium] › tests\e2e\v4.spec.ts:69:5 › V4: dois usuários ao vivo, duplicidade contextual, ciência automática e compartilhamento do arquivo (21.7s)
+  ok  31 [chromium] › tests\e2e\v4.spec.ts:260:5 › V4: matrizes móveis, múltiplos canais no contrato visual e proposta global aprovada localmente (7.2s)
+  ok  32 [chromium] › tests\e2e\workflows.spec.ts:188:5 › REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real (33.9s)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"603235bb-0424-450e-9976-86be786490fa"}
+  x   33 [chromium] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API (27.2s)
+(node:60904) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  34 [chromium] › tests\e2e\workflows.spec.ts:476:5 › resposta perdida e recarga recuperam a mesma REQ e seu protocolo (7.1s)
+[WebServer] {"level":"error","operation":"requisitions.submit","code":"PATIENT_INACTIVE","correlationId":"947d3864-bbae-49d5-bdb6-a6482c6bb4f0"}
+  ok  35 [chromium] › tests\e2e\workflows.spec.ts:518:5 › histórico filtra código e período e conserva o documento de paciente renomeado e inativo (5.8s)
+  ok  36 [chromium] › tests\e2e\workflows.spec.ts:574:5 › estoque familiar: revisão, paginação, filtro e correção compensatória auditável (11.4s)
+  ok  37 [chromium] › tests\e2e\workflows.spec.ts:642:5 › BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento (9.3s)
+  ok  38 [chromium] › tests\e2e\workflows.spec.ts:721:5 › item extra identificado, múltiplas REQ, scanner e trânsito até o aceite (13.3s)
+[WebServer] {"level":"error","operation":"documents.command","code":"FORBIDDEN","correlationId":"009b29de-eef4-4369-94ae-6287153e85a4"}
+  ok  39 [chromium] › tests\e2e\workflows.spec.ts:941:5 › alteração de destinatário e cancelamento bilateral preservam os saldos reais (16.0s)
+  ok  40 [chromium] › tests\e2e\workflows.spec.ts:1042:5 › Flow exige revisão do autor e confirmação autorizada antes de debitar estoque (10.0s)
+(node:53756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] {"level":"error","operation":"documents.list","code":"NOT_FOUND","correlationId":"37db93b1-40ca-4537-9a02-a7791a567cbd"}
+  ok  41 [mobile] › tests\e2e\accessibility.spec.ts:13:5 › login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos (17.5s)
+  ok  42 [mobile] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil adminA (3.8s)
+  ok  43 [mobile] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil family (3.0s)
+  ok  44 [mobile] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil supervisor (2.2s)
+  ok  45 [mobile] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil professional (2.9s)
+  ok  46 [mobile] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil reader (2.9s)
+  ok  47 [mobile] › tests\e2e\administration.spec.ts:96:7 › administração integrada no ambiente local › catálogo edita nomes alternativos e inativa preservando a identidade (5.2s)
+[WebServer] {"level":"error","operation":"admin.read","code":"NOT_FOUND","correlationId":"3adc9ea4-398a-4253-9adc-bcd6bbcca788"}
+[WebServer] {"level":"error","operation":"catalog.read","code":"NOT_FOUND","correlationId":"03834dda-3325-4577-bd2a-889ff0041759"}
+  ok  48 [mobile] › tests\e2e\administration.spec.ts:159:7 › administração integrada no ambiente local › administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente (21.2s)
+  ok  49 [mobile] › tests\e2e\administration.spec.ts:259:7 › administração integrada no ambiente local › convite é criado, reemitido e revogado pela interface (4.5s)
+  ok  50 [mobile] › tests\e2e\administration.spec.ts:325:7 › administração integrada no ambiente local › seletores administrativos salvam destinatário e limites por produto e custódia (6.5s)
+  ok  51 [mobile] › tests\e2e\administration.spec.ts:427:7 › administração integrada no ambiente local › importação histórica revisada preserva itens extras e estoque desconhecido no comprovante (7.5s)
+  ok  52 [mobile] › tests\e2e\administration.spec.ts:582:7 › administração integrada no ambiente local › sugestões por alias e grafia ambígua só associam o produto após escolha explícita (5.1s)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"4205c518-ea4b-49f8-90d3-bd1d37933fa7"}
+  ok  53 [mobile] › tests\e2e\balance-shifts.spec.ts:41:5 › BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real (12.0s)
+  ok  54 [mobile] › tests\e2e\balance-shifts.spec.ts:107:5 › supervisão solicita adiamento, família decide e o prazo só muda após a aprovação (9.0s)
+  ok  55 [mobile] › tests\e2e\fluent-experience.spec.ts:28:7 › registro SSR Fluent › estilos do streaming permanecem no head sem cópias no corpo (151ms)
+  ok  56 [mobile] › tests\e2e\fluent-experience.spec.ts:36:5 › gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda (5.1s)
+[WebServer] {"level":"error","operation":"admin.write","code":"FORBIDDEN","correlationId":"2fec236d-9bc4-4c43-8c04-3452f4d03d35"}
+  ok  57 [mobile] › tests\e2e\fluent-experience.spec.ts:69:5 › documentos comuns, histórico com URL e estoque têm apresentação real em desktop e mobile (17.3s)
+  ok  58 [mobile] › tests\e2e\fluent-experience.spec.ts:130:5 › operação móvel oferece cinco destinos e caixa de entregas autorizada (1.5s)
+  ok  59 [mobile] › tests\e2e\fluent-experience.spec.ts:147:5 › dashboards apresentam tarefas reais por perfil e preservam a custódia autorizada (13.3s)
+  ok  60 [mobile] › tests\e2e\fluent-experience.spec.ts:174:5 › administração usa listas, painéis de edição e confirmação crítica sem perder o contexto (7.6s)
+  ok  61 [mobile] › tests\e2e\fluent-experience.spec.ts:222:5 › ocorrências e notificações preservam saldos e distinguem estados no aplicativo (3.1s)
+  ok  62 [mobile] › tests\e2e\login.spec.ts:9:5 › exibe a tela de login (273ms)
+  ok  63 [mobile] › tests\e2e\login.spec.ts:16:5 › login apresenta falha de credencial e de rede e permite recuperar a sessão (1.9s)
+[WebServer] {"level":"error","operation":"invitation.accept","code":"SESSION_EXPIRED","correlationId":"1a7ba6b3-dfad-4871-a4b8-c955c2d9b5bb"}
+[WebServer] {"level":"error","operation":"workspace.sync","code":"FORBIDDEN","correlationId":"773985ba-6835-43d5-a118-a520ed3d1a52"}
+  ok  64 [mobile] › tests\e2e\onboarding.spec.ts:47:5 › convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha (6.2s)
+  ok  65 [mobile] › tests\e2e\personal-workspace.spec.ts:8:5 › perfil pessoal salva registro e foto privada e notificações distinguem ciência (3.4s)
+[WebServer] {"level":"error","operation":"schedules.write","code":"SCHEDULE_OVERLAP","correlationId":"39c8c5f1-fbb5-4464-9753-7cfcda3201b5"}
+  ok  66 [mobile] › tests\e2e\schedules.spec.ts:9:5 › agenda publica uma programação real, recusa conflito e preserva contexto no mobile (5.7s)
+[WebServer] {"level":"error","operation":"settings.configure","code":"VERSION_CONFLICT","correlationId":"47e5c159-be30-403b-8eaf-570ce4749366"}
+[WebServer] {"level":"error","operation":"settings.configure","code":"VERSION_CONFLICT","correlationId":"da73d6c1-510d-41eb-8fa6-f49d598a2473"}
+  ok  67 [mobile] › tests\e2e\v4-review.spec.ts:69:5 › V4 review: matriz reconcilia horários, intervalo, versões e falhas sem sobrescrever alterações (14.2s)
+  ok  68 [mobile] › tests\e2e\v4-review.spec.ts:214:5 › V4 review: sino filtra silenciosas antes da página e ficha acompanha estado posterior ao vivo (9.1s)
+[WebServer] {"level":"error","operation":"requisition.archive","code":"FORBIDDEN","correlationId":"63294f14-b9d0-4164-995c-86300e20db8d"}
+  ok  69 [mobile] › tests\e2e\v4-review.spec.ts:359:5 › V4 review: cartão de arquivamento abre exatamente as conclusões contadas (10.2s)
+  ok  70 [mobile] › tests\e2e\v4.spec.ts:69:5 › V4: dois usuários ao vivo, duplicidade contextual, ciência automática e compartilhamento do arquivo (20.9s)
+  ok  71 [mobile] › tests\e2e\v4.spec.ts:260:5 › V4: matrizes móveis, múltiplos canais no contrato visual e proposta global aprovada localmente (7.0s)
+[WebServer] {"level":"error","operation":"workspace.sync","code":"SESSION_EXPIRED","correlationId":"d2c1dbaf-6343-4d8d-aca8-7095008ec5ac"}
+  ok  72 [mobile] › tests\e2e\workflows.spec.ts:188:5 › REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real (34.6s)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"b9041fc0-82bf-404b-afae-5f3795d4c488"}
+[WebServer] {"level":"error","operation":"stock.family.write","code":"FORBIDDEN","correlationId":"ec054f45-7030-4a95-b8a9-6fc82f4bf3c2"}
+  ok  73 [mobile] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API (15.0s)
+  ok  74 [mobile] › tests\e2e\workflows.spec.ts:476:5 › resposta perdida e recarga recuperam a mesma REQ e seu protocolo (6.7s)
+[WebServer] {"level":"error","operation":"requisitions.submit","code":"PATIENT_INACTIVE","correlationId":"f77e7575-c9af-4932-b7c3-47e5641955a8"}
+  ok  75 [mobile] › tests\e2e\workflows.spec.ts:518:5 › histórico filtra código e período e conserva o documento de paciente renomeado e inativo (5.5s)
+  ok  76 [mobile] › tests\e2e\workflows.spec.ts:574:5 › estoque familiar: revisão, paginação, filtro e correção compensatória auditável (9.6s)
+  ok  77 [mobile] › tests\e2e\workflows.spec.ts:642:5 › BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento (10.3s)
+  ok  78 [mobile] › tests\e2e\workflows.spec.ts:721:5 › item extra identificado, múltiplas REQ, scanner e trânsito até o aceite (12.4s)
+[WebServer] {"level":"error","operation":"documents.command","code":"FORBIDDEN","correlationId":"deb73218-1316-45e6-83f5-32742a71dde9"}
+  ok  79 [mobile] › tests\e2e\workflows.spec.ts:941:5 › alteração de destinatário e cancelamento bilateral preservam os saldos reais (17.6s)
+  ok  80 [mobile] › tests\e2e\workflows.spec.ts:1042:5 › Flow exige revisão do autor e confirmação autorizada antes de debitar estoque (11.3s)
+(node:56380) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] {"level":"error","operation":"documents.list","code":"NOT_FOUND","correlationId":"912cd4c3-0e75-44fb-9d68-044e2d465e91"}
+  ok  81 [ios] › tests\e2e\accessibility.spec.ts:13:5 › login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos (29.6s)
+  ok  82 [ios] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil adminA (6.3s)
+  ok  83 [ios] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil family (6.0s)
+  ok  84 [ios] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil supervisor (4.2s)
+  ok  85 [ios] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil professional (5.2s)
+  ok  86 [ios] › tests\e2e\accessibility.spec.ts:99:7 › menu e capacidades efetivas do perfil reader (4.4s)
+  ok  87 [ios] › tests\e2e\administration.spec.ts:96:7 › administração integrada no ambiente local › catálogo edita nomes alternativos e inativa preservando a identidade (8.7s)
+[WebServer] {"level":"error","operation":"admin.read","code":"NOT_FOUND","correlationId":"b24644f0-2d1c-4e78-97b0-9a9af012c7a7"}
+[WebServer] {"level":"error","operation":"catalog.read","code":"NOT_FOUND","correlationId":"493a973a-9412-47b8-98fc-08786fbfd919"}
+  ok  88 [ios] › tests\e2e\administration.spec.ts:159:7 › administração integrada no ambiente local › administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente (28.9s)
+  ok  89 [ios] › tests\e2e\administration.spec.ts:259:7 › administração integrada no ambiente local › convite é criado, reemitido e revogado pela interface (7.6s)
+  ok  90 [ios] › tests\e2e\administration.spec.ts:325:7 › administração integrada no ambiente local › seletores administrativos salvam destinatário e limites por produto e custódia (9.1s)
+  ok  91 [ios] › tests\e2e\administration.spec.ts:427:7 › administração integrada no ambiente local › importação histórica revisada preserva itens extras e estoque desconhecido no comprovante (9.7s)
+  ok  92 [ios] › tests\e2e\administration.spec.ts:582:7 › administração integrada no ambiente local › sugestões por alias e grafia ambígua só associam o produto após escolha explícita (7.4s)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"38fedad6-333e-452f-ae42-63ef36490719"}
+  ok  93 [ios] › tests\e2e\balance-shifts.spec.ts:41:5 › BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real (15.1s)
+  ok  94 [ios] › tests\e2e\balance-shifts.spec.ts:107:5 › supervisão solicita adiamento, família decide e o prazo só muda após a aprovação (11.4s)
+  ok  95 [ios] › tests\e2e\fluent-experience.spec.ts:28:7 › registro SSR Fluent › estilos do streaming permanecem no head sem cópias no corpo (205ms)
+  ok  96 [ios] › tests\e2e\fluent-experience.spec.ts:36:5 › gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda (6.2s)
+[WebServer] {"level":"error","operation":"admin.write","code":"FORBIDDEN","correlationId":"d02fedaf-0db8-4a9f-a9ef-fa74ce4f7d91"}
+[WebServer] {"level":"error","operation":"context.read","code":"SESSION_EXPIRED","correlationId":"f6c880c6-32d1-4b1d-b5b0-716ac592538e"}
+  ok  97 [ios] › tests\e2e\fluent-experience.spec.ts:69:5 › documentos comuns, histórico com URL e estoque têm apresentação real em desktop e mobile (25.6s)
+  ok  98 [ios] › tests\e2e\fluent-experience.spec.ts:130:5 › operação móvel oferece cinco destinos e caixa de entregas autorizada (2.7s)
+  ok  99 [ios] › tests\e2e\fluent-experience.spec.ts:147:5 › dashboards apresentam tarefas reais por perfil e preservam a custódia autorizada (16.6s)
+  ok 100 [ios] › tests\e2e\fluent-experience.spec.ts:174:5 › administração usa listas, painéis de edição e confirmação crítica sem perder o contexto (11.4s)
+  ok 101 [ios] › tests\e2e\fluent-experience.spec.ts:222:5 › ocorrências e notificações preservam saldos e distinguem estados no aplicativo (5.6s)
+  ok 102 [ios] › tests\e2e\login.spec.ts:9:5 › exibe a tela de login (456ms)
+  ok 103 [ios] › tests\e2e\login.spec.ts:16:5 › login apresenta falha de credencial e de rede e permite recuperar a sessão (2.6s)
+[WebServer] {"level":"error","operation":"invitation.accept","code":"SESSION_EXPIRED","correlationId":"1706090e-86a5-4805-b6db-28d90611dad9"}
+[WebServer] {"level":"error","operation":"workspace.sync","code":"FORBIDDEN","correlationId":"77227f2a-ee7e-4337-aee3-f2ada9c41fcd"}
+  ok 104 [ios] › tests\e2e\onboarding.spec.ts:47:5 › convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha (8.0s)
+  ok 105 [ios] › tests\e2e\personal-workspace.spec.ts:8:5 › perfil pessoal salva registro e foto privada e notificações distinguem ciência (5.6s)
+[WebServer] {"level":"error","operation":"schedules.write","code":"SCHEDULE_OVERLAP","correlationId":"f66d88d0-f2a0-4196-a6e8-1736c45be06c"}
+  ok 106 [ios] › tests\e2e\schedules.spec.ts:9:5 › agenda publica uma programação real, recusa conflito e preserva contexto no mobile (7.2s)
+[WebServer] {"level":"error","operation":"settings.configure","code":"VERSION_CONFLICT","correlationId":"87dc80cf-9609-4d72-9fd3-ec4ee37b8943"}
+[WebServer] {"level":"error","operation":"settings.configure","code":"VERSION_CONFLICT","correlationId":"fb7e75f1-def6-45e0-b17f-1caa25314d5c"}
+  ok 107 [ios] › tests\e2e\v4-review.spec.ts:69:5 › V4 review: matriz reconcilia horários, intervalo, versões e falhas sem sobrescrever alterações (20.9s)
+  ok 108 [ios] › tests\e2e\v4-review.spec.ts:214:5 › V4 review: sino filtra silenciosas antes da página e ficha acompanha estado posterior ao vivo (12.6s)
+[WebServer] {"level":"error","operation":"requisition.archive","code":"FORBIDDEN","correlationId":"fc399607-554c-47d7-b830-e727dc47db1e"}
+  ok 109 [ios] › tests\e2e\v4-review.spec.ts:359:5 › V4 review: cartão de arquivamento abre exatamente as conclusões contadas (15.2s)
+  ok 110 [ios] › tests\e2e\v4.spec.ts:69:5 › V4: dois usuários ao vivo, duplicidade contextual, ciência automática e compartilhamento do arquivo (27.8s)
+  ok 111 [ios] › tests\e2e\v4.spec.ts:260:5 › V4: matrizes móveis, múltiplos canais no contrato visual e proposta global aprovada localmente (11.7s)
+  ok 112 [ios] › tests\e2e\workflows.spec.ts:188:5 › REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real (52.9s)
+[WebServer] {"level":"error","operation":"workspace.sync","code":"SESSION_EXPIRED","correlationId":"0fbdef22-f1de-4679-b8ae-f9abefbff0e3"}
+[WebServer] {"level":"error","operation":"context.read","code":"SESSION_EXPIRED","correlationId":"1afa2a40-3910-404b-b2d8-60123f541f8e"}
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"40897408-c594-4958-8d83-59d010761170"}
+[WebServer] {"level":"error","operation":"stock.family.write","code":"FORBIDDEN","correlationId":"6c66de52-35e6-4a71-b76a-7bb161f229ff"}
+  ok 113 [ios] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API (21.0s)
+  ok 114 [ios] › tests\e2e\workflows.spec.ts:476:5 › resposta perdida e recarga recuperam a mesma REQ e seu protocolo (10.8s)
+[WebServer] {"level":"error","operation":"dashboard.read","code":"FORBIDDEN","correlationId":"bbcbd2d6-ff19-46c7-95ce-ccef0a2fc265"}
+[WebServer] {"level":"error","operation":"dashboard.read","code":"FORBIDDEN","correlationId":"cd17c73a-e4b3-4e29-8d03-df0b3e84cd91"}
+[WebServer] {"level":"error","operation":"requisitions.submit","code":"PATIENT_INACTIVE","correlationId":"e2c9388c-5d85-4a0b-8657-be6615ac2613"}
+  ok 115 [ios] › tests\e2e\workflows.spec.ts:518:5 › histórico filtra código e período e conserva o documento de paciente renomeado e inativo (9.3s)
+  ok 116 [ios] › tests\e2e\workflows.spec.ts:574:5 › estoque familiar: revisão, paginação, filtro e correção compensatória auditável (14.4s)
+  ok 117 [ios] › tests\e2e\workflows.spec.ts:642:5 › BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento (14.3s)
+  ok 118 [ios] › tests\e2e\workflows.spec.ts:721:5 › item extra identificado, múltiplas REQ, scanner e trânsito até o aceite (19.7s)
+[WebServer] {"level":"error","operation":"documents.command","code":"FORBIDDEN","correlationId":"9b5bf5bb-4a1e-4412-83aa-954ab1d74cbc"}
+  ok 119 [ios] › tests\e2e\workflows.spec.ts:941:5 › alteração de destinatário e cancelamento bilateral preservam os saldos reais (26.0s)
+  ok 120 [ios] › tests\e2e\workflows.spec.ts:1042:5 › Flow exige revisão do autor e confirmação autorizada antes de debitar estoque (15.8s)
+
+
+  1) [chromium] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+      - waiting for getByRole('navigation', { name: 'Navegação do plantão', exact: true }).getByRole('link', { name: 'Mais', exact: true })
+
+
+       at navigation.ts:10
+
+       8 |     if (await trigger.isVisible()) await trigger.click();
+       9 |     else {
+    > 10 |       await page.getByRole("navigation", { name: "Navegação do plantão", exact: true }).getByRole("link", { name: "Mais", exact: true }).click();
+         |                                                                                                                                          ^
+      11 |       nav = page.getByRole("navigation", { name: "Rotina e funções autorizadas", exact: true });
+      12 |     }
+      13 |   }
+        at openNavigation (C:\Users\renat\Projetos_Dev\home-care-assistant\tests\e2e\navigation.ts:10:138)
+        at C:\Users\renat\Projetos_Dev\home-care-assistant\tests\e2e\workflows.spec.ts:449:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\workflows-dez-linhas-5-10--9d852-egativas-na-interface-e-API-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\workflows-dez-linhas-5-10--9d852-egativas-na-interface-e-API-chromium\error-context.md
+
+  1 failed
+    [chromium] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API 
+  119 passed (21.1m)

@@ -1,0 +1,17 @@
+{
+  "command": [
+    "node",
+    "C:/nvm4w/nodejs/node_modules/npm/bin/npm-cli.js",
+    "audit",
+    "--omit=dev",
+    "--json"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-26T18:44:31.938Z",
+  "endedAt": "2026-10-26T18:44:51.100Z",
+  "exitCode": 0,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "audit-production.log"
+}

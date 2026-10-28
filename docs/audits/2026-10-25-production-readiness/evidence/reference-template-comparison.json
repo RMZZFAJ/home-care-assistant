@@ -1,0 +1,845 @@
+{
+  "auditedSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "createdAt": "2026-10-27T20:40:22.8466557Z",
+  "method": "Read-only JSON parse and semantic comparison; no generator/provider executed",
+  "v3Status": "NAO_SUBMETER_SEM_SUBSTITUIR_PLACEHOLDERS",
+  "v3Count": 23,
+  "submissionCount": 5,
+  "runtimeCatalogCount": 27,
+  "catalogOnlyNames": [
+    "hca_req_registrada_autor_v4",
+    "hca_req_ciencia_familia_v4",
+    "hca_req_ciencia_registrada_autor_v4",
+    "hca_req_ciencia_simplificada_v4"
+  ],
+  "prioritySubmissionMatches": [
+    {
+      "name": "hca_ent_concluida_pdf_v3",
+      "componentsMatch": true,
+      "priority": true,
+      "approvalInTrackedCatalog": "PREPARED"
+    },
+    {
+      "name": "hca_ent_conferencia_autenticada_v3",
+      "componentsMatch": true,
+      "priority": true,
+      "approvalInTrackedCatalog": "PREPARED"
+    },
+    {
+      "name": "hca_req_registrada_autor_v4",
+      "componentsMatch": true,
+      "priority": true,
+      "approvalInTrackedCatalog": "PREPARED"
+    },
+    {
+      "name": "hca_req_ciencia_familia_v4",
+      "componentsMatch": true,
+      "priority": true,
+      "approvalInTrackedCatalog": "PREPARED"
+    },
+    {
+      "name": "hca_req_ciencia_registrada_autor_v4",
+      "componentsMatch": true,
+      "priority": true,
+      "approvalInTrackedCatalog": "PREPARED"
+    }
+  ],
+  "templates": [
+    {
+      "source": "v3-payload",
+      "name": "hca_req_nova_familia_v3",
+      "namedParams": [
+        "data_hora",
+        "itens_urgentes",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_solicitante",
+        "numero_requisicao",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 443,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/historico/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_req_confirmacao_autor_v3",
+      "namedParams": [
+        "data_hora",
+        "itens_urgentes",
+        "nome_destinatario",
+        "nome_paciente",
+        "numero_requisicao",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 410,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/historico/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_req_atendimento_parcial_v3",
+      "namedParams": [
+        "data_hora",
+        "itens_atendidos",
+        "itens_pendentes",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_requisicao"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 436,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/historico/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_req_concluida_v3",
+      "namedParams": [
+        "data_hora",
+        "data_hora_conclusao",
+        "itens_atendidos",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_requisicao"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 360,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/historico/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_req_pendentes_lembrete_v3",
+      "namedParams": [
+        "data_hora",
+        "itens_pendentes",
+        "itens_total",
+        "itens_urgentes",
+        "nome_destinatario",
+        "nome_paciente",
+        "numero_requisicao"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 437,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/historico/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_com_aprovacao_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_solicitante",
+        "numero_compra",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 366,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_com_validar_recebimento_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_comprador",
+        "nome_destinatario",
+        "nome_paciente",
+        "numero_compra",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 403,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_com_validada_v3",
+      "namedParams": [
+        "data_hora_conclusao",
+        "itens_recebidos",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_validador",
+        "numero_compra"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 403,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ent_expedida_pdf_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_entregador",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_entrega",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 426,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ent_confirmar_pdf_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_entregador",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_entrega",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 560,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "QUICK_REPLY",
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ent_divergencia_v3",
+      "namedParams": [
+        "data_hora",
+        "itens_conferidos",
+        "itens_divergentes",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_entrega"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 451,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ent_regularizada_v3",
+      "namedParams": [
+        "data_hora",
+        "itens_divergentes",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_responsavel",
+        "numero_entrega"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 403,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ent_concluida_pdf_v3",
+      "namedParams": [
+        "data_hora",
+        "data_hora_conclusao",
+        "itens_conferidos",
+        "nome_destinatario",
+        "nome_entregador",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_entrega"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 452,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ent_cancelamento_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_recebedor",
+        "nome_responsavel",
+        "numero_entrega"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 518,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_bal_lembrete_v3",
+      "namedParams": [
+        "data_prevista",
+        "nome_destinatario",
+        "nome_paciente",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 422,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/bal?ref={{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_bal_aprovacao_v3",
+      "namedParams": [
+        "data_hora",
+        "itens_divergentes",
+        "nome_contador",
+        "nome_destinatario",
+        "nome_paciente",
+        "numero_balanco",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 421,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_bal_concluido_v3",
+      "namedParams": [
+        "data_hora_conclusao",
+        "itens_ajustados",
+        "nome_contador",
+        "nome_destinatario",
+        "nome_paciente",
+        "numero_balanco",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 426,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_estoque_alerta_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_local",
+        "nome_paciente",
+        "nome_produto",
+        "saldo_atual",
+        "saldo_minimo"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 423,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/estoque?produto={{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_plantao_ocorrencia_v3",
+      "namedParams": [
+        "nome_destinatario",
+        "nome_paciente",
+        "periodo_plantao"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 372,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL",
+        "QUICK_REPLY"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/consumo?ref={{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_documento_atualizado_pdf_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_responsavel",
+        "numero_documento",
+        "versao_documento"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 362,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ent_conferencia_autenticada_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_entregador",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_entrega",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 502,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ent_aceite_pendente_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_entregador",
+        "nome_paciente",
+        "numero_entrega",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 441,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v3-payload",
+      "name": "hca_ocorrencia_recebida_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_paciente",
+        "tipo_evento"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 385,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://DOMINIO_CONFIRMADO/consumo?ref={{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": true,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v4-submission",
+      "name": "hca_ent_concluida_pdf_v3",
+      "namedParams": [
+        "data_hora",
+        "data_hora_conclusao",
+        "itens_conferidos",
+        "nome_destinatario",
+        "nome_entregador",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_entrega"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 452,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://home-care-assistant.vercel.app/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": null,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v4-submission",
+      "name": "hca_ent_conferencia_autenticada_v3",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_entregador",
+        "nome_paciente",
+        "nome_recebedor",
+        "numero_entrega",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 502,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://home-care-assistant.vercel.app/fichas/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": null,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v4-submission",
+      "name": "hca_req_registrada_autor_v4",
+      "namedParams": [
+        "data_hora",
+        "itens_urgentes",
+        "nome_destinatario",
+        "nome_paciente",
+        "numero_requisicao",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 421,
+      "bodyWithinDeclared1024": true,
+      "header": "TEXT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://home-care-assistant.vercel.app/historico/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": null,
+      "documentHandlePlaceholder": false
+    },
+    {
+      "source": "v4-submission",
+      "name": "hca_req_ciencia_familia_v4",
+      "namedParams": [
+        "data_hora",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_solicitante",
+        "numero_requisicao",
+        "quantidade_itens"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 331,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://home-care-assistant.vercel.app/historico/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": null,
+      "documentHandlePlaceholder": true
+    },
+    {
+      "source": "v4-submission",
+      "name": "hca_req_ciencia_registrada_autor_v4",
+      "namedParams": [
+        "data_hora_conclusao",
+        "nome_destinatario",
+        "nome_paciente",
+        "nome_responsavel",
+        "numero_requisicao",
+        "origem_ciencia",
+        "versao_documento"
+      ],
+      "parameterExamplesMatch": true,
+      "bodyLength": 395,
+      "bodyWithinDeclared1024": true,
+      "header": "DOCUMENT",
+      "footerLength": 41,
+      "buttonTypes": [
+        "URL"
+      ],
+      "urls": [
+        "https://home-care-assistant.vercel.app/historico/{{1}}"
+      ],
+      "urlVariableAtEnd": true,
+      "exampleDomainMatches": true,
+      "bodyMatchesRuntimeCatalog": true,
+      "bodyFoundInV3Markdown": null,
+      "documentHandlePlaceholder": true
+    }
+  ]
+}

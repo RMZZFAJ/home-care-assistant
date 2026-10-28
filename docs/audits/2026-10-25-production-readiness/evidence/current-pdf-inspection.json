@@ -1,0 +1,36 @@
+{
+  "source": "ui-current-ent-partial.pdf",
+  "bytes": 30576,
+  "sha256": "cfedd35b02d8540742dab01e572668d72101d807ab1110d5d6bdc08285631416",
+  "pageCount": 4,
+  "pages": [
+    {
+      "page": 1,
+      "width": 595.280029296875,
+      "height": 841.8900146484375,
+      "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nCOMPROVANTE DE ENTREGA DE MATERIAIS\nENT-0001 · 27/10/2026, 23:29 · Divergência pendente\n14\nITENS DECLARADOS\n13\nCONFERIDOS INTEGRALMENTE\n1\nDIVERGÊNCIAS\nPENDENTE\nRECEBIMENTO\nIDENTIFICAÇÃO DA ENTREGA\nPACIENTE\nHomologação fictícia V4 548f1c39\nRESPONSÁVEL\nTeste family\nNÚMERO DO DOCUMENTO\nENT-0001\nPROTOCOLO\nENT-20261027-F7D29408-33568061-1-80DE1A2A\nORIGEM\nEstoque da família\nDESTINO\nEstoque da equipe\nRECEBEDOR DESIGNADO\nTeste professional\nEMISSÃO\n27/10/2026, 23:29\nRELAÇÃO DOS MATERIAIS DECLARADOS\nNº\nMATERIAL\nEXPEDIDO\nUNIDADE\n01\nMaterial sintético de auditoria 03\n2\nunidade\n02\nMaterial sintético de auditoria 12\n2\nunidade\n03\nMaterial sintético de auditoria 11\n2\nunidade\n04\nMaterial sintético de auditoria 04\n2\nunidade\n05\nMaterial sintético de auditoria 06\n2\nunidade\n06\nMaterial sintético de auditoria 08\n2\nunidade\n07\nMaterial sintético de auditoria 05\n2\nunidade\n08\nMaterial fictício V4 1\n2\nunidade\n09\nMaterial fictício V4 0\n10\nunidade\n10\nMaterial sintético de auditoria 13\n2\nunidade\n11\nMaterial sintético de auditoria 07\n2\nunidade\n12\nMaterial sintético de auditoria 09\n2\nunidade\nENT-0001 · v2 · Conteúdo autorizado\nPágina 1 de 4\n",
+      "image": "ui-current-ent-partial-page-1.png"
+    },
+    {
+      "page": 2,
+      "width": 595.280029296875,
+      "height": 841.8900146484375,
+      "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nNº\nMATERIAL\nEXPEDIDO\nUNIDADE\n13\nMaterial sintético de auditoria 02\n2\nunidade\n14\nMaterial sintético de auditoria 10\n2\nunidade\nA expedição não comprova recebimento. Apenas quantidades efetivamente aceitas entram no saldo confirmado do destino; diferenças\npermanecem registradas até resolução formal.\nENT-0001 · v2 · Conteúdo autorizado\nPágina 2 de 4\n",
+      "image": "ui-current-ent-partial-page-2.png"
+    },
+    {
+      "page": 3,
+      "width": 595.280029296875,
+      "height": 841.8900146484375,
+      "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nCONFERÊNCIA E AUDITORIA\nENT-0001 · Versão documental 2\nDECLARAÇÃO DO RECEBIMENTO\nConferência registrada em 27/10/2026, 23:29. Os aceites positivos são preservados independentemente das\ndivergências.\nMATERIAL\nACEITO\nCONCILIADO\nSITUAÇÃO\nMaterial sintético de auditoria 03\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 12\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 11\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 04\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 06\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 08\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 05\n2\n0\nIntegralmente conferido\nMaterial fictício V4 1\n2\n0\nIntegralmente conferido\nMaterial fictício V4 0\n6\n0\nDivergência aberta\nMaterial sintético de auditoria 13\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 07\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 09\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 02\n2\n0\nIntegralmente conferido\nMaterial sintético de auditoria 10\n2\n0\nIntegralmente conferido\nLINHA DO TEMPO OPERACIONAL\nDATA/HORA\nRESPONSÁVEL\nEVENTO\n27/10/2026, 23:29\nTeste family\nMateriais expedidos · v1\n27/10/2026, 23:29\nTeste professional\nRecebimento conferido · v2\nIDENTIFICAÇÃO E INTEGRIDADE\nDOCUMENTO\nENT-0001\nVERSÃO\n2\nENT-0001 · v2 · Conteúdo autorizado\nPágina 3 de 4\n",
+      "image": "ui-current-ent-partial-page-3.png"
+    },
+    {
+      "page": 4,
+      "width": 595.280029296875,
+      "height": 841.8900146484375,
+      "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nID TÉCNICO\n75db1a1e-69cf-4cea-bb24-fb0f9c970b64\nHASH DO CONTEÚDO CANÔNICO\neccd8ea5bbb72b5c775a2175624bcec804699a3cfb7fa\n5ca9ef85c80c1aec237\nO SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por\nadministradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado\nseparadamente.\nVerificação de integridade\nO QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso\nautorizado.\nENT-0001 · v2 · Conteúdo autorizado\nPágina 4 de 4\n",
+      "image": "ui-current-ent-partial-page-4.png"
+    }
+  ]
+}

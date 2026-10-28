@@ -1,0 +1,74 @@
+{
+  "inventory": 503,
+  "classified": 503,
+  "root": 128,
+  "missing": [],
+  "methods": [
+    {
+      "Name": "BINARY_STRUCTURE",
+      "Count": 1
+    },
+    {
+      "Name": "IMAGE_VISUAL_INSPECTION",
+      "Count": 22
+    },
+    {
+      "Name": "SEMANTIC_AND_BYTES_RECONCILIATION",
+      "Count": 1
+    },
+    {
+      "Name": "SEMANTIC_FULL",
+      "Count": 424
+    },
+    {
+      "Name": "SEMANTIC_FULL_SQL_AND_TEMPLATE_PROJECTION",
+      "Count": 1
+    },
+    {
+      "Name": "SEMANTIC_FULL; AUTOMATED_ASSISTED",
+      "Count": 1
+    },
+    {
+      "Name": "SEMANTIC_FULL; RUNTIME_VALIDATED",
+      "Count": 9
+    },
+    {
+      "Name": "STRUCTURAL",
+      "Count": 35
+    },
+    {
+      "Name": "STRUCTURAL_RECONCILIATION",
+      "Count": 2
+    },
+    {
+      "Name": "STRUCTURAL; AUTOMATED_ASSISTED; SEMANTIC_COMPARE",
+      "Count": 2
+    },
+    {
+      "Name": "STRUCTURAL;VISUAL_VALIDATED",
+      "Count": 3
+    },
+    {
+      "Name": "STRUCTURE_AND_INTERACTION_REVIEW",
+      "Count": 2
+    }
+  ],
+  "semantic": [
+    {
+      "Name": "NO",
+      "Count": 27
+    },
+    {
+      "Name": "NOT_APPLICABLE",
+      "Count": 36
+    },
+    {
+      "Name": "PARTIAL",
+      "Count": 2
+    },
+    {
+      "Name": "YES",
+      "Count": 438
+    }
+  ]
+}

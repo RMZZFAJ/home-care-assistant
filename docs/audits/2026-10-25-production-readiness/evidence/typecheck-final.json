@@ -1,0 +1,16 @@
+{
+  "command": [
+    "node",
+    "C:/nvm4w/nodejs/node_modules/npm/bin/npm-cli.js",
+    "run",
+    "typecheck"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-28T07:46:50.459Z",
+  "endedAt": "2026-10-28T07:46:56.430Z",
+  "exitCode": 0,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "typecheck-final.log"
+}

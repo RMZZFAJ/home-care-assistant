@@ -1,0 +1,18 @@
+{
+  "command": [
+    "node",
+    "scripts/run-e2e.mjs",
+    "--project=chromium",
+    "--grep",
+    "dez linhas",
+    "--repeat-each=3"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-27T20:37:37.508Z",
+  "endedAt": "2026-10-27T20:39:21.497Z",
+  "exitCode": 1,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "e2e-navigation-repeat.log"
+}

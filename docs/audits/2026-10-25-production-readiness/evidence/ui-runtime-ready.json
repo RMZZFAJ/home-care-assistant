@@ -1,0 +1,269 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "origin": "http://127.0.0.1:3100",
+  "startedAt": "2026-10-28T02:31:05.878Z",
+  "captures": [
+    {
+      "role": "adminA",
+      "width": 320,
+      "geometry": {
+        "viewport": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "dashboardVisible": true,
+        "bottomNav": []
+      },
+      "file": "ui-dashboard-ready-adminA-320.png"
+    },
+    {
+      "role": "adminA",
+      "width": 390,
+      "geometry": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "dashboardVisible": true,
+        "bottomNav": []
+      },
+      "file": "ui-dashboard-ready-adminA-390.png"
+    },
+    {
+      "role": "adminA",
+      "width": 768,
+      "geometry": {
+        "viewport": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "dashboardVisible": true,
+        "bottomNav": []
+      },
+      "file": "ui-dashboard-ready-adminA-768.png"
+    },
+    {
+      "role": "adminA",
+      "width": 1440,
+      "geometry": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "dashboardVisible": true,
+        "bottomNav": []
+      },
+      "file": "ui-dashboard-ready-adminA-1440.png"
+    },
+    {
+      "role": "adminA",
+      "width": 1920,
+      "geometry": {
+        "viewport": 1920,
+        "documentWidth": 1920,
+        "bodyWidth": 1920,
+        "dashboardVisible": true,
+        "bottomNav": []
+      },
+      "file": "ui-dashboard-ready-adminA-1920.png"
+    },
+    {
+      "role": "professional",
+      "width": 320,
+      "geometry": {
+        "viewport": 320,
+        "documentWidth": 320,
+        "bodyWidth": 320,
+        "dashboardVisible": true,
+        "bottomNav": [
+          {
+            "label": "Navegação do plantão",
+            "top": 776,
+            "bottom": 844,
+            "height": 68
+          }
+        ]
+      },
+      "file": "ui-dashboard-ready-professional-320.png"
+    },
+    {
+      "role": "professional",
+      "width": 390,
+      "geometry": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "dashboardVisible": true,
+        "bottomNav": [
+          {
+            "label": "Navegação do plantão",
+            "top": 776,
+            "bottom": 844,
+            "height": 68
+          }
+        ]
+      },
+      "file": "ui-dashboard-ready-professional-390.png"
+    },
+    {
+      "role": "professional",
+      "width": 768,
+      "geometry": {
+        "viewport": 768,
+        "documentWidth": 768,
+        "bodyWidth": 768,
+        "dashboardVisible": true,
+        "bottomNav": [
+          {
+            "label": "Navegação do plantão",
+            "top": 832,
+            "bottom": 900,
+            "height": 68
+          }
+        ]
+      },
+      "file": "ui-dashboard-ready-professional-768.png"
+    },
+    {
+      "role": "professional",
+      "width": 1440,
+      "geometry": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "dashboardVisible": true,
+        "bottomNav": [
+          {
+            "label": "Navegação do plantão",
+            "top": 0,
+            "bottom": 0,
+            "height": 0
+          }
+        ]
+      },
+      "file": "ui-dashboard-ready-professional-1440.png"
+    },
+    {
+      "role": "professional",
+      "width": 1920,
+      "geometry": {
+        "viewport": 1920,
+        "documentWidth": 1920,
+        "bodyWidth": 1920,
+        "dashboardVisible": true,
+        "bottomNav": [
+          {
+            "label": "Navegação do plantão",
+            "top": 0,
+            "bottom": 0,
+            "height": 0
+          }
+        ]
+      },
+      "file": "ui-dashboard-ready-professional-1920.png"
+    },
+    {
+      "role": "family",
+      "width": 390,
+      "geometry": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "dashboardVisible": true,
+        "bottomNav": []
+      },
+      "file": "ui-dashboard-ready-family-390.png"
+    },
+    {
+      "role": "reader",
+      "width": 390,
+      "geometry": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "dashboardVisible": true,
+        "bottomNav": []
+      },
+      "file": "ui-dashboard-ready-reader-390.png"
+    },
+    {
+      "role": "supervisor",
+      "width": 390,
+      "geometry": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "dashboardVisible": true,
+        "bottomNav": [
+          {
+            "label": "Navegação do plantão",
+            "top": 776,
+            "bottom": 844,
+            "height": 68
+          }
+        ]
+      },
+      "file": "ui-dashboard-ready-supervisor-390.png"
+    },
+    {
+      "role": "global",
+      "width": 390,
+      "geometry": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "dashboardVisible": true,
+        "bottomNav": []
+      },
+      "file": "ui-dashboard-ready-global-390.png"
+    }
+  ],
+  "configuredShareWaitSeconds": 3,
+  "UX012": {
+    "configured": 3,
+    "initial": "REQ\n\nREQUISIÇÃO\n\nREQ-0001\nAtendimento parcial\n\n27/10/2026, 23:28 · Versão 5\n\nPaciente: Homologação fictícia V4 548f1c39\n\nSolicitante: Teste professional\n\nAtendimento\n\n2/2 itens atendidos\n\nCompleto\n\nCiência familiar\n\nExigência satisfeita\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo. Consulte os estados individuais dos avisos abaixo.\n\nProtocolo e identificação",
+    "after4s": "REQ\n\nREQUISIÇÃO\n\nREQ-0001\nAtendimento parcial\n\n27/10/2026, 23:28 · Versão 5\n\nPaciente: Homologação fictícia V4 548f1c39\n\nSolicitante: Teste professional\n\nAtendimento\n\n2/2 itens atendidos\n\nCompleto\n\nCiência familiar\n\nExigência satisfeita\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo. Consulte os estados individuais dos avisos abaixo.\n\nProtocolo e identificação",
+    "afterDeadline": "REQ\n\nREQUISIÇÃO\n\nREQ-0001\nAtendimento parcial\n\n27/10/2026, 23:28 · Versão 5\n\nPaciente: Homologação fictícia V4 548f1c39\n\nSolicitante: Teste professional\n\nAtendimento\n\n2/2 itens atendidos\n\nCompleto\n\nCiência familiar\n\nExigência satisfeita\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo. Os avisos continuam sendo processados; consulte o acompanhamento.\n\nProtocolo e identificação",
+    "elapsed": 10544,
+    "notificationsMock": "200 data[] somente consulta para isolar apresentação",
+    "result": "CONFIRMED_RUNTIME"
+  },
+  "dialogKeyboard": {
+    "focus": [
+      {
+        "text": "",
+        "aria": "Fechar diálogo",
+        "insideDialog": true
+      },
+      {
+        "text": "Voltar",
+        "aria": null,
+        "insideDialog": true
+      },
+      {
+        "text": "Confirmar gravação",
+        "aria": null,
+        "insideDialog": true
+      },
+      {
+        "text": "",
+        "aria": "Fechar diálogo",
+        "insideDialog": true
+      },
+      {
+        "text": "Voltar",
+        "aria": null,
+        "insideDialog": true
+      },
+      {
+        "text": "Confirmar gravação",
+        "aria": null,
+        "insideDialog": true
+      }
+    ],
+    "closed": true,
+    "focusAfterEscape": {
+      "observation": "Amostra imediata produziu texto da página inteira; restauração após animação não foi medida.",
+      "aria": null,
+      "conclusion": "NOT_VERIFIED"
+    }
+  },
+  "finishedAt": "2026-10-28T02:31:31.853Z",
+  "initial_capture_limit": "Primeira rodada esperou h1 e parte das imagens registrou loading. Estas14 capturas ready aguardaram .hca-dashboard com conteúdo."
+}

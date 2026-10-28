@@ -1,0 +1,2452 @@
+[
+  {
+    "path": "docs/audits/2026-10-20/DEPENDENCY_AUDIT.json",
+    "bytes": 3679,
+    "sha256": "32d58a200fd3546f50003173a9a7ac8b0ac5f398177ab6a19d9085b395a96196",
+    "format": "json",
+    "rootType": "object",
+    "entries": 3,
+    "keys": [
+      "auditReportVersion",
+      "vulnerabilities",
+      "metadata"
+    ],
+    "shape": {
+      "auditReportVersion": {
+        "type": "number"
+      },
+      "vulnerabilities": {
+        "keys": [
+          "@next/eslint-plugin-next",
+          "braces",
+          "fast-glob",
+          "globby",
+          "markdownlint-cli2",
+          "micromatch"
+        ]
+      },
+      "metadata": {
+        "keys": [
+          "vulnerabilities",
+          "dependencies"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-20/DEPENDENCY_AUDIT_BEFORE.json",
+    "bytes": 8200,
+    "sha256": "cd0f9cc2815072753d541868f4ce93bbb88704bd51366aded7f79d5ca030501d",
+    "format": "json",
+    "rootType": "object",
+    "entries": 3,
+    "keys": [
+      "auditReportVersion",
+      "vulnerabilities",
+      "metadata"
+    ],
+    "shape": {
+      "auditReportVersion": {
+        "type": "number"
+      },
+      "vulnerabilities": {
+        "keys": [
+          "@next/eslint-plugin-next",
+          "braces",
+          "fast-glob",
+          "globby",
+          "katex",
+          "markdown-it",
+          "markdownlint",
+          "markdownlint-cli2",
+          "micromark-extension-math",
+          "micromatch",
+          "smol-toml"
+        ]
+      },
+      "metadata": {
+        "keys": [
+          "vulnerabilities",
+          "dependencies"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-20/REQUIREMENTS.csv",
+    "bytes": 51654,
+    "sha256": "5e1467795d340c0f4da39294448a54b0c036f5af1a85cf9cf04fd67754386eca",
+    "format": "csv",
+    "header": "id,source,description,components,initial_state,final_state,priority,evidence,validation_scope,gaps,change,acceptance,result",
+    "physicalLines": 75
+  },
+  {
+    "path": "docs/audits/2026-10-20/REQUIREMENTS.json",
+    "bytes": 68997,
+    "sha256": "b4a0584e581b1c49f11dba4791940629457cbee7a281e771a52bcc2fcc896aa3",
+    "format": "json",
+    "rootType": "array",
+    "entries": 74,
+    "keys": [
+      "id",
+      "source",
+      "description",
+      "components",
+      "initial_state",
+      "final_state",
+      "priority",
+      "evidence",
+      "validation_scope",
+      "gaps",
+      "change",
+      "acceptance",
+      "result"
+    ],
+    "shape": {
+      "0": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "1": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "2": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "3": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "4": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "5": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "6": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "7": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "8": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "9": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "10": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "11": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "12": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "13": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "14": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "15": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "16": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "17": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "18": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "19": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "20": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "21": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "22": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "23": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "24": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "25": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "26": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "27": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "28": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "29": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "30": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "31": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "32": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "33": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      },
+      "34": {
+        "keys": [
+          "id",
+          "source",
+          "description",
+          "components",
+          "initial_state",
+          "final_state",
+          "priority",
+          "evidence",
+          "validation_scope",
+          "gaps",
+          "change",
+          "acceptance",
+          "result"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-20/SOURCE_REQUIREMENTS.json",
+    "bytes": 173107,
+    "sha256": "43f6ba1931b7836cc8ec7dc32ef9aa103e044de07d4798bae43602b2ac3ad986",
+    "format": "json",
+    "rootType": "array",
+    "entries": 187,
+    "keys": [
+      "id",
+      "source",
+      "line",
+      "section",
+      "criteria"
+    ],
+    "shape": {
+      "0": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "1": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "2": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "3": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "4": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "5": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "6": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "7": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "8": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "9": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "10": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "11": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "12": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "13": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "14": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "15": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "16": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "17": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "18": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "19": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "20": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "21": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "22": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "23": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "24": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "25": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "26": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "27": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "28": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "29": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "30": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "31": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "32": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "33": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      },
+      "34": {
+        "keys": [
+          "id",
+          "source",
+          "line",
+          "section",
+          "criteria"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-20/verification.json",
+    "bytes": 1858,
+    "sha256": "d93edfcbec4d35c6d318cd0740176faffb96ccdc96fda4162f6d8a86a88f7e6a",
+    "format": "json",
+    "rootType": "object",
+    "entries": 24,
+    "keys": [
+      "generatedAt",
+      "preservation",
+      "unit",
+      "database",
+      "integration",
+      "e2e",
+      "onboarding",
+      "linux",
+      "linuxInstall",
+      "windowsInstall",
+      "documentation",
+      "remote",
+      "unitTests",
+      "integrationTests",
+      "sqlSuites",
+      "migrationCount",
+      "e2eUniqueCases",
+      "e2eMethod",
+      "publication",
+      "validatedRequirementIds",
+      "requirementGaps",
+      "publishedRun",
+      "verifiedCodeCommit",
+      "pullRequest"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "preservation": {
+        "type": "boolean"
+      },
+      "unit": {
+        "type": "boolean"
+      },
+      "database": {
+        "type": "boolean"
+      },
+      "integration": {
+        "type": "boolean"
+      },
+      "e2e": {
+        "type": "boolean"
+      },
+      "onboarding": {
+        "type": "boolean"
+      },
+      "linux": {
+        "type": "boolean"
+      },
+      "linuxInstall": {
+        "type": "boolean"
+      },
+      "windowsInstall": {
+        "type": "boolean"
+      },
+      "documentation": {
+        "type": "boolean"
+      },
+      "remote": {
+        "type": "string"
+      },
+      "unitTests": {
+        "type": "number"
+      },
+      "integrationTests": {
+        "type": "number"
+      },
+      "sqlSuites": {
+        "type": "number"
+      },
+      "migrationCount": {
+        "type": "number"
+      },
+      "e2eUniqueCases": {
+        "type": "number"
+      },
+      "e2eMethod": {
+        "type": "string"
+      },
+      "publication": {
+        "type": "boolean"
+      },
+      "validatedRequirementIds": {
+        "arrayLength": 72,
+        "firstKeys": []
+      },
+      "requirementGaps": {
+        "keys": []
+      },
+      "publishedRun": {
+        "type": "string"
+      },
+      "verifiedCodeCommit": {
+        "type": "string"
+      },
+      "pullRequest": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/CATALOGUE_AUDIT.json",
+    "bytes": 1529,
+    "sha256": "1b380ac8a509cf444581f91ebff623362ecfaff4d603d9b5686eb31015cbba06",
+    "format": "json",
+    "rootType": "object",
+    "entries": 6,
+    "keys": [
+      "generatedAt",
+      "method",
+      "reference",
+      "local",
+      "patientDefinitions",
+      "limits"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "method": {
+        "type": "string"
+      },
+      "reference": {
+        "keys": [
+          "source",
+          "sha256",
+          "count"
+        ]
+      },
+      "local": {
+        "keys": [
+          "lastMigration",
+          "migrationCount",
+          "hasPatientCatalogue",
+          "patientCount",
+          "emptyCatalogueCount",
+          "comparison",
+          "ambiguities",
+          "inactiveTemplateIds"
+        ]
+      },
+      "patientDefinitions": {
+        "keys": [
+          "count",
+          "scopes",
+          "exclusive",
+          "inactive",
+          "overrides",
+          "ambiguousTerms"
+        ]
+      },
+      "limits": {
+        "arrayLength": 3,
+        "firstKeys": []
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/CI_RESULTS.json",
+    "bytes": 1493,
+    "sha256": "dd93be8724ca1ca14a97f5c521145fa3766bd067f6b3277df91774c4c58283c7",
+    "format": "json",
+    "rootType": "object",
+    "entries": 13,
+    "keys": [
+      "generatedAt",
+      "url",
+      "headSha",
+      "conclusion",
+      "jobs",
+      "unitTestsPerPlatform",
+      "integrationTests",
+      "sqlSuites",
+      "migrationCount",
+      "e2e",
+      "remoteCredentialsUsed",
+      "preview",
+      "independentReview"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string"
+      },
+      "headSha": {
+        "type": "string"
+      },
+      "conclusion": {
+        "type": "string"
+      },
+      "jobs": {
+        "arrayLength": 3,
+        "firstKeys": [
+          "name",
+          "conclusion",
+          "url"
+        ]
+      },
+      "unitTestsPerPlatform": {
+        "type": "number"
+      },
+      "integrationTests": {
+        "type": "number"
+      },
+      "sqlSuites": {
+        "type": "number"
+      },
+      "migrationCount": {
+        "type": "number"
+      },
+      "e2e": {
+        "keys": [
+          "passed",
+          "failed",
+          "retriesUsed",
+          "scope"
+        ]
+      },
+      "remoteCredentialsUsed": {
+        "type": "boolean"
+      },
+      "preview": {
+        "keys": [
+          "url",
+          "ready",
+          "loginStatus",
+          "unauthenticatedContextStatus",
+          "code",
+          "deploymentProtectionPreserved"
+        ]
+      },
+      "independentReview": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/DATABASE_COMPARISON.json",
+    "bytes": 1696,
+    "sha256": "4ab6388fd331aee52a81c6145efbeee60df632c8fdc2bcfd95e73e276ef666dc",
+    "format": "json",
+    "rootType": "object",
+    "entries": 9,
+    "keys": [
+      "generatedAt",
+      "method",
+      "migrationCount",
+      "remoteMigrationCount",
+      "components",
+      "dataPreserved",
+      "aggregateUnchanged",
+      "baselineVerification",
+      "activeGlobalAdministrators"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "method": {
+        "type": "string"
+      },
+      "migrationCount": {
+        "type": "number"
+      },
+      "remoteMigrationCount": {
+        "type": "number"
+      },
+      "components": {
+        "keys": [
+          "tables",
+          "indexes",
+          "defaults",
+          "policies",
+          "security",
+          "functions",
+          "constraints",
+          "client_grants"
+        ]
+      },
+      "dataPreserved": {
+        "type": "boolean"
+      },
+      "aggregateUnchanged": {
+        "type": "boolean"
+      },
+      "baselineVerification": {
+        "keys": [
+          "backupSha256",
+          "originalRecordHashesPreserved",
+          "original",
+          "newRequests",
+          "newItems"
+        ]
+      },
+      "activeGlobalAdministrators": {
+        "type": "number"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/DATABASE_TEST_RESULTS.json",
+    "bytes": 1246,
+    "sha256": "9a189a032c53a102a156c43766eab8df2691f0a7b4ae7dffd606459eecba46ed",
+    "format": "json",
+    "rootType": "object",
+    "entries": 14,
+    "keys": [
+      "generatedAt",
+      "target",
+      "migrationFiles",
+      "maxVersion",
+      "cleanReplay",
+      "firstProtocol",
+      "legacyFrom",
+      "legacyUpgrade",
+      "historicalMigrationHashesUnchanged",
+      "sqlPassed",
+      "additionalCompatibilityScenario",
+      "integration",
+      "backupBeforeReplay",
+      "remoteFixturesOrReset"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "target": {
+        "type": "string"
+      },
+      "migrationFiles": {
+        "type": "number"
+      },
+      "maxVersion": {
+        "type": "string"
+      },
+      "cleanReplay": {
+        "type": "boolean"
+      },
+      "firstProtocol": {
+        "type": "string"
+      },
+      "legacyFrom": {
+        "type": "string"
+      },
+      "legacyUpgrade": {
+        "type": "boolean"
+      },
+      "historicalMigrationHashesUnchanged": {
+        "type": "number"
+      },
+      "sqlPassed": {
+        "arrayLength": 6,
+        "firstKeys": []
+      },
+      "additionalCompatibilityScenario": {
+        "type": "string"
+      },
+      "integration": {
+        "keys": [
+          "passed",
+          "failed",
+          "realAuth",
+          "concurrency",
+          "serviceRole"
+        ]
+      },
+      "backupBeforeReplay": {
+        "keys": [
+          "bytes",
+          "sha256",
+          "outsideGit",
+          "archiveListVerified"
+        ]
+      },
+      "remoteFixturesOrReset": {
+        "type": "boolean"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/DEPENDENCY_PRODUCTION.json",
+    "bytes": 387,
+    "sha256": "2d23268e07d0e12e1676560be35dd3fbea7145aa9a13590b6c72def442fa70ad",
+    "format": "json",
+    "rootType": "object",
+    "entries": 3,
+    "keys": [
+      "auditReportVersion",
+      "vulnerabilities",
+      "metadata"
+    ],
+    "shape": {
+      "auditReportVersion": {
+        "type": "number"
+      },
+      "vulnerabilities": {
+        "keys": []
+      },
+      "metadata": {
+        "keys": [
+          "vulnerabilities",
+          "dependencies"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/E2E_RESULTS.json",
+    "bytes": 7629,
+    "sha256": "bd0b7c268167dad25b1af6cd61bb58f603c02ad305a83e9b38d0fc3e9aa02702",
+    "format": "json",
+    "rootType": "object",
+    "entries": 10,
+    "keys": [
+      "generatedAt",
+      "database",
+      "migrationCount",
+      "first",
+      "correctionRun",
+      "uniqueCasesPassed",
+      "projects",
+      "method",
+      "cases",
+      "publishedFullRun"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "database": {
+        "type": "string"
+      },
+      "migrationCount": {
+        "type": "number"
+      },
+      "first": {
+        "keys": [
+          "passed",
+          "failed"
+        ]
+      },
+      "correctionRun": {
+        "keys": [
+          "passed",
+          "failed"
+        ]
+      },
+      "uniqueCasesPassed": {
+        "type": "number"
+      },
+      "projects": {
+        "arrayLength": 2,
+        "firstKeys": []
+      },
+      "method": {
+        "type": "string"
+      },
+      "cases": {
+        "arrayLength": 32,
+        "firstKeys": [
+          "id",
+          "project",
+          "title",
+          "status"
+        ]
+      },
+      "publishedFullRun": {
+        "keys": [
+          "url",
+          "headSha",
+          "passed",
+          "failed",
+          "singleExecution"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/LINUX_RESULTS.json",
+    "bytes": 1183,
+    "sha256": "7b661c4727af9101ebe487f056547cb0e205cf6bc0c60ef68e5a13794fd3c537",
+    "format": "json",
+    "rootType": "object",
+    "entries": 13,
+    "keys": [
+      "generatedAt",
+      "node",
+      "npm",
+      "image",
+      "install",
+      "packages",
+      "checks",
+      "unitTests",
+      "credentialsUsed",
+      "sourceMount",
+      "logSha256",
+      "scope",
+      "finalPublishedVerification"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "node": {
+        "type": "string"
+      },
+      "npm": {
+        "type": "string"
+      },
+      "image": {
+        "type": "string"
+      },
+      "install": {
+        "type": "string"
+      },
+      "packages": {
+        "type": "number"
+      },
+      "checks": {
+        "arrayLength": 7,
+        "firstKeys": [
+          "name",
+          "result"
+        ]
+      },
+      "unitTests": {
+        "type": "number"
+      },
+      "credentialsUsed": {
+        "type": "boolean"
+      },
+      "sourceMount": {
+        "type": "string"
+      },
+      "logSha256": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "finalPublishedVerification": {
+        "keys": [
+          "url",
+          "headSha",
+          "allChecks"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/LOCAL_METADATA.json",
+    "bytes": 64285,
+    "sha256": "94d2b8ad42a20f8baa31b983007569e8d03ab72bb762c6c44255c42f7c6e6674",
+    "format": "json",
+    "rootType": "object",
+    "entries": 8,
+    "keys": [
+      "tables",
+      "indexes",
+      "defaults",
+      "policies",
+      "security",
+      "functions",
+      "constraints",
+      "client_grants"
+    ],
+    "shape": {
+      "tables": {
+        "arrayLength": 21,
+        "firstKeys": [
+          "rls",
+          "name",
+          "force"
+        ]
+      },
+      "indexes": {
+        "arrayLength": 48,
+        "firstKeys": [
+          "name",
+          "table",
+          "definition"
+        ]
+      },
+      "defaults": {
+        "arrayLength": 4,
+        "firstKeys": [
+          "acl",
+          "type",
+          "schema",
+          "creator"
+        ]
+      },
+      "policies": {
+        "arrayLength": 22,
+        "firstKeys": [
+          "name",
+          "check",
+          "roles",
+          "table",
+          "using",
+          "command"
+        ]
+      },
+      "security": {
+        "keys": [
+          "client_dml",
+          "unvalidated",
+          "unmatched_items",
+          "anonymous_select",
+          "cross_parent_items",
+          "balance_view_options",
+          "temporary_hash_bridge",
+          "unsafe_definer_search_path",
+          "global_admin_count_consistent"
+        ]
+      },
+      "functions": {
+        "arrayLength": 60,
+        "firstKeys": [
+          "hash",
+          "name",
+          "definer",
+          "settings",
+          "arguments"
+        ]
+      },
+      "constraints": {
+        "arrayLength": 119,
+        "firstKeys": [
+          "name",
+          "table",
+          "validated",
+          "definition"
+        ]
+      },
+      "client_grants": {
+        "arrayLength": 19,
+        "firstKeys": [
+          "table",
+          "grantee",
+          "privilege"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/REMOTE_AFTER.json",
+    "bytes": 689,
+    "sha256": "7cc097bbf5b460645736bf522084eb967cf4991efc8310d9e31f438d15001ac4",
+    "format": "json",
+    "rootType": "object",
+    "entries": 3,
+    "keys": [
+      "boundary",
+      "rows",
+      "warning"
+    ],
+    "shape": {
+      "boundary": {
+        "type": "string"
+      },
+      "rows": {
+        "arrayLength": 1,
+        "firstKeys": [
+          "integrity"
+        ]
+      },
+      "warning": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/REMOTE_BEFORE.json",
+    "bytes": 720,
+    "sha256": "be1077272621c38658aba991aaa51e1513e5e64408f95e4f93cd594a47c4ec97",
+    "format": "json",
+    "rootType": "object",
+    "entries": 3,
+    "keys": [
+      "boundary",
+      "rows",
+      "warning"
+    ],
+    "shape": {
+      "boundary": {
+        "type": "string"
+      },
+      "rows": {
+        "arrayLength": 1,
+        "firstKeys": [
+          "integrity"
+        ]
+      },
+      "warning": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/REMOTE_METADATA.json",
+    "bytes": 76376,
+    "sha256": "86dbcac0fce6749ab5e4250326ca8573462954c10316b4c6298e9a895347a76b",
+    "format": "json",
+    "rootType": "object",
+    "entries": 3,
+    "keys": [
+      "boundary",
+      "rows",
+      "warning"
+    ],
+    "shape": {
+      "boundary": {
+        "type": "string"
+      },
+      "rows": {
+        "arrayLength": 1,
+        "firstKeys": [
+          "metadata"
+        ]
+      },
+      "warning": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/REMOTE_ORIGINAL_INTEGRITY.json",
+    "bytes": 527,
+    "sha256": "9ec11d0f8ff60092bd21039fb0f2382f1732c9c8368eb2cab29f6c2c12b575c7",
+    "format": "json",
+    "rootType": "object",
+    "entries": 5,
+    "keys": [
+      "backupSha256",
+      "originalRecordHashesPreserved",
+      "original",
+      "newRequests",
+      "newItems"
+    ],
+    "shape": {
+      "backupSha256": {
+        "type": "string"
+      },
+      "originalRecordHashesPreserved": {
+        "type": "boolean"
+      },
+      "original": {
+        "keys": [
+          "global_admins",
+          "item_integrity",
+          "items",
+          "migrations",
+          "movement_integrity",
+          "movements",
+          "patients",
+          "products",
+          "profiles",
+          "request_integrity",
+          "requests"
+        ]
+      },
+      "newRequests": {
+        "type": "number"
+      },
+      "newItems": {
+        "type": "number"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/SECRET_SCAN.json",
+    "bytes": 309,
+    "sha256": "5f2f073e522eef40cddf2eb015ab942340c665e3da6fe1b8002651110537d746",
+    "format": "json",
+    "rootType": "object",
+    "entries": 6,
+    "keys": [
+      "generatedAt",
+      "files",
+      "method",
+      "matches",
+      "unexpectedEnvironmentFiles",
+      "scope"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "files": {
+        "type": "number"
+      },
+      "method": {
+        "type": "string"
+      },
+      "matches": {
+        "type": "number"
+      },
+      "unexpectedEnvironmentFiles": {
+        "type": "number"
+      },
+      "scope": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/SERVICE_GRANTS_LOCAL.json",
+    "bytes": 5095,
+    "sha256": "0efe3613ea459ce43f3de2311673529cdda87bcc30ae24274676a52c95ba886d",
+    "format": "json",
+    "rootType": "object",
+    "entries": 5,
+    "keys": [
+      "role",
+      "default_acl",
+      "schema_usage",
+      "table_privileges",
+      "worker_functions"
+    ],
+    "shape": {
+      "role": {
+        "keys": [
+          "name",
+          "inherit",
+          "bypassrls",
+          "superuser"
+        ]
+      },
+      "default_acl": {
+        "arrayLength": 3,
+        "firstKeys": [
+          "acl",
+          "type",
+          "schema",
+          "creator"
+        ]
+      },
+      "schema_usage": {
+        "type": "boolean"
+      },
+      "table_privileges": {
+        "arrayLength": 22,
+        "firstKeys": [
+          "table",
+          "delete",
+          "insert",
+          "select",
+          "update",
+          "truncate"
+        ]
+      },
+      "worker_functions": {
+        "arrayLength": 4,
+        "firstKeys": [
+          "owner",
+          "definer",
+          "execute",
+          "settings",
+          "signature"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/SERVICE_GRANTS_LOCAL_AFTER.json",
+    "bytes": 5245,
+    "sha256": "d43e46ce62d31e4d28d7c4fe4d648258f1174c534c470a9b92d7000a2e2f9403",
+    "format": "json",
+    "rootType": "object",
+    "entries": 5,
+    "keys": [
+      "role",
+      "default_acl",
+      "schema_usage",
+      "table_privileges",
+      "worker_functions"
+    ],
+    "shape": {
+      "role": {
+        "keys": [
+          "name",
+          "inherit",
+          "bypassrls",
+          "superuser"
+        ]
+      },
+      "default_acl": {
+        "arrayLength": 4,
+        "firstKeys": [
+          "acl",
+          "type",
+          "schema",
+          "creator"
+        ]
+      },
+      "schema_usage": {
+        "type": "boolean"
+      },
+      "table_privileges": {
+        "arrayLength": 22,
+        "firstKeys": [
+          "table",
+          "delete",
+          "insert",
+          "select",
+          "update",
+          "truncate"
+        ]
+      },
+      "worker_functions": {
+        "arrayLength": 4,
+        "firstKeys": [
+          "owner",
+          "definer",
+          "execute",
+          "settings",
+          "signature"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/SERVICE_GRANTS_REMOTE.json",
+    "bytes": 6900,
+    "sha256": "7c47738f15ae7033fee0fffdda8bc0789affc14e7c982112c69da13a472b3e29",
+    "format": "json",
+    "rootType": "object",
+    "entries": 3,
+    "keys": [
+      "boundary",
+      "rows",
+      "warning"
+    ],
+    "shape": {
+      "boundary": {
+        "type": "string"
+      },
+      "rows": {
+        "arrayLength": 1,
+        "firstKeys": [
+          "privileges"
+        ]
+      },
+      "warning": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/SERVICE_GRANTS_REMOTE_AFTER.json",
+    "bytes": 7412,
+    "sha256": "084d58a6fbea5613bb21b9f703dfae4e707ba45a62e75596bc5844f510f9a246",
+    "format": "json",
+    "rootType": "object",
+    "entries": 3,
+    "keys": [
+      "boundary",
+      "rows",
+      "warning"
+    ],
+    "shape": {
+      "boundary": {
+        "type": "string"
+      },
+      "rows": {
+        "arrayLength": 1,
+        "firstKeys": [
+          "privileges"
+        ]
+      },
+      "warning": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/VALIDATION_PROPOSAL.json",
+    "bytes": 32289,
+    "sha256": "ac5c497b6d4a7c82d9839a9cf934e3039b0c96cb8bf095ba5648768a5e74c0c1",
+    "format": "json",
+    "rootType": "object",
+    "entries": 7,
+    "keys": [
+      "status",
+      "appliedToVerification",
+      "baseline",
+      "note",
+      "candidateIdsFromUnitSqlHttp",
+      "candidateIdsAfterFinalBrowser",
+      "requirements"
+    ],
+    "shape": {
+      "status": {
+        "type": "string"
+      },
+      "appliedToVerification": {
+        "type": "boolean"
+      },
+      "baseline": {
+        "type": "string"
+      },
+      "note": {
+        "type": "string"
+      },
+      "candidateIdsFromUnitSqlHttp": {
+        "arrayLength": 39,
+        "firstKeys": []
+      },
+      "candidateIdsAfterFinalBrowser": {
+        "arrayLength": 18,
+        "firstKeys": []
+      },
+      "requirements": {
+        "arrayLength": 74,
+        "firstKeys": [
+          "id",
+          "proposal",
+          "evidence",
+          "scope",
+          "remaining"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/audits/2026-10-21/WINDOWS_RESULTS.json",
+    "bytes": 426,
+    "sha256": "f72b2265448a934a1d199d738ff7ef1cbce6f492791483663fc3cc25b27845dd",
+    "format": "json",
+    "rootType": "object",
+    "entries": 5,
+    "keys": [
+      "generatedAt",
+      "node",
+      "npm",
+      "checks",
+      "scope"
+    ],
+    "shape": {
+      "generatedAt": {
+        "type": "string"
+      },
+      "node": {
+        "type": "string"
+      },
+      "npm": {
+        "type": "string"
+      },
+      "checks": {
+        "keys": [
+          "contracts",
+          "lint",
+          "markdown",
+          "typecheck",
+          "unit",
+          "build",
+          "e2eProductionBuild"
+        ]
+      },
+      "scope": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "docs/meta/flows/ent-conferencia-v4.json",
+    "bytes": 7659,
+    "sha256": "66e2af23b1189d1b9e72792168ab6c75674484bc94871d6ab25259b68de0f495",
+    "format": "json",
+    "rootType": "object",
+    "entries": 4,
+    "keys": [
+      "version",
+      "data_api_version",
+      "routing_model",
+      "screens"
+    ],
+    "shape": {
+      "version": {
+        "type": "string"
+      },
+      "data_api_version": {
+        "type": "string"
+      },
+      "routing_model": {
+        "keys": [
+          "RECEIPT_MODE",
+          "RECEIPT_LINE",
+          "RECEIPT_REVIEW",
+          "SUCCESS"
+        ]
+      },
+      "screens": {
+        "arrayLength": 4,
+        "firstKeys": [
+          "id",
+          "title",
+          "data",
+          "layout"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/meta/flows/ocorrencias-v4.json",
+    "bytes": 3896,
+    "sha256": "66828e5f1ad986c06ef7eeb20196c28a9ba0f02488a36b2bc3aab204229501a3",
+    "format": "json",
+    "rootType": "object",
+    "entries": 4,
+    "keys": [
+      "version",
+      "data_api_version",
+      "routing_model",
+      "screens"
+    ],
+    "shape": {
+      "version": {
+        "type": "string"
+      },
+      "data_api_version": {
+        "type": "string"
+      },
+      "routing_model": {
+        "keys": [
+          "REPORT_MODE",
+          "REPORT",
+          "SUCCESS"
+        ]
+      },
+      "screens": {
+        "arrayLength": 3,
+        "firstKeys": [
+          "id",
+          "title",
+          "data",
+          "layout"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/meta/templates-v4-submission.json",
+    "bytes": 12048,
+    "sha256": "2689a6aa2fedce0687c48799539ee33db134d92863d40a99b214d408a1ac9ef5",
+    "format": "json",
+    "rootType": "object",
+    "entries": 2,
+    "keys": [
+      "domain",
+      "requests"
+    ],
+    "shape": {
+      "domain": {
+        "type": "string"
+      },
+      "requests": {
+        "arrayLength": 5,
+        "firstKeys": [
+          "name",
+          "category",
+          "language",
+          "parameter_format",
+          "components"
+        ]
+      }
+    }
+  },
+  {
+    "path": "docs/references/v3/home_care_meta_payloads_v3_PREENCHER.json",
+    "bytes": 51688,
+    "sha256": "d3befa358cb8f615877c2895dcfc5518d98532c89e19278a217ab4c3d2ab066d",
+    "format": "json",
+    "rootType": "object",
+    "entries": 2,
+    "keys": [
+      "status",
+      "create_requests"
+    ],
+    "shape": {
+      "status": {
+        "type": "string"
+      },
+      "create_requests": {
+        "arrayLength": 23,
+        "firstKeys": [
+          "name",
+          "category",
+          "language",
+          "parameter_format",
+          "components"
+        ]
+      }
+    }
+  },
+  {
+    "path": "scripts/historical-migrations.json",
+    "bytes": 12100,
+    "sha256": "fb1bb925df5e261f12705e74569f8760dc0f4e4c6f0bd658f003d103b7b5a817",
+    "format": "json",
+    "rootType": "object",
+    "entries": 84,
+    "keys": [
+      "supabase/migrations/20261019000100_initial_schema.sql",
+      "supabase/migrations/20261019000200_catalog_and_submission_hardening.sql",
+      "supabase/migrations/20261020000300_update_product_units.sql",
+      "supabase/migrations/20261020000400_add_product_aliases.sql",
+      "supabase/migrations/20261020000500_set_fosfomicina_canonical_name.sql",
+      "supabase/migrations/20261020000600_grant_authenticated_permissions.sql",
+      "supabase/migrations/20261020000700_restrict_public_data_api_access.sql",
+      "supabase/migrations/20261020000800_requisition_integrity_and_remove_requested_quantity.sql",
+      "supabase/migrations/20261020000900_patient_scope_custody_inventory_notifications.sql",
+      "supabase/migrations/20261020001000_stock_movement_transaction.sql",
+      "supabase/migrations/20261020001100_add_family_role.sql",
+      "supabase/migrations/20261020001200_protocol_format_compatibility.sql",
+      "supabase/migrations/20261020001300_requisition_status_history.sql",
+      "supabase/migrations/20261020001400_authorized_status_transitions.sql",
+      "supabase/migrations/20261020001500_stock_balance_guard.sql",
+      "supabase/migrations/20261020001600_admin_import_and_operations.sql",
+      "supabase/migrations/20261020001700_inventory_workflow.sql",
+      "supabase/migrations/20261020001800_notification_processing.sql",
+      "supabase/migrations/20261020001900_submit_requisition_security_definer.sql",
+      "supabase/migrations/20261020002000_scoped_authority_and_catalogue.sql",
+      "supabase/migrations/20261020002050_extension_migration_compatibility.sql",
+      "supabase/migrations/20261020002100_transactional_operations.sql",
+      "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "supabase/migrations/20261020002300_cross_scope_invariants.sql",
+      "supabase/migrations/20261020002400_patient_directory_contracts.sql",
+      "supabase/migrations/20261020002500_notification_revocation_guard.sql",
+      "supabase/migrations/20261020002600_role_capability_boundaries.sql",
+      "supabase/migrations/20261020002700_invitation_registration.sql",
+      "supabase/migrations/20261020002800_historical_unknown_stock_and_extras.sql",
+      "supabase/migrations/20261020002900_alert_custody_routing_and_priority.sql",
+      "supabase/migrations/20261020003000_safe_notification_read_models.sql",
+      "supabase/migrations/20261020003100_explicit_uncertain_retry.sql",
+      "supabase/migrations/20261020003200_remove_migration_compatibility_bridge.sql",
+      "supabase/migrations/20261020003300_service_worker_privileges.sql",
+      "supabase/migrations/20261020003400_private_function_defaults.sql",
+      "supabase/migrations/20261022043226_operational_documents.sql",
+      "supabase/migrations/20261022043227_supply_workflows.sql",
+      "supabase/migrations/20261022043228_communications_attachments.sql",
+      "supabase/migrations/20261022044133_requisition_access_policies.sql",
+      "supabase/migrations/20261022052012_workflow_guards_and_read_models.sql",
+      "supabase/migrations/20261022052521_evidence_profile_and_drafts.sql",
+      "supabase/migrations/20261022053539_draft_recounts_and_catalogue_contracts.sql",
+      "supabase/migrations/20261022054021_custody_privacy_and_operational_tasks.sql",
+      "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "supabase/migrations/20261022055016_harden_function_privileges_and_history.sql",
+      "supabase/migrations/20261022061251_evidence_idempotency_and_final_contracts.sql",
+      "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "supabase/migrations/20261022085635_finalize_read_models_and_evidence_reviews.sql",
+      "supabase/migrations/20261022092041_workspace_context_query.sql",
+      "supabase/migrations/20261022093556_protect_patient_administrator_governance.sql",
+      "supabase/migrations/20261022095138_authoritative_receipt_verification_context.sql",
+      "supabase/migrations/20261022103707_transactional_global_administrator_guard.sql",
+      "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "supabase/migrations/20261023033155_v4_realtime_notifications_and_scheduler.sql",
+      "supabase/migrations/20261023034142_v4_administrative_contracts_and_scheduling.sql",
+      "supabase/migrations/20261023035102_v4_document_render_evidence.sql",
+      "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "supabase/migrations/20261023041150_v4_session_assurance_and_admin_directory.sql",
+      "supabase/migrations/20261023041624_v4_document_read_models_and_worker_cron.sql",
+      "supabase/migrations/20261023041917_v4_purpose_bound_whatsapp_flows.sql",
+      "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "supabase/migrations/20261023173000_v4_preserve_authorized_worker_contract.sql",
+      "supabase/migrations/20261023174500_v4_review_follow_up.sql",
+      "supabase/migrations/20261023180000_v4_archive_authority_serialization.sql",
+      "supabase/migrations/20261024205813_fluent_administration_capabilities.sql",
+      "supabase/migrations/20261024220543_scheduled_shifts.sql",
+      "supabase/migrations/20261024220943_schedule_decision_guard.sql",
+      "supabase/migrations/20261024221017_schedule_decision_scope.sql",
+      "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "supabase/migrations/20261024222909_balance_assignment_resolution.sql",
+      "supabase/migrations/20261024223046_balance_count_reference.sql",
+      "supabase/migrations/20261025092446_balance_schedule_choices.sql",
+      "supabase/migrations/20261025093655_explicit_business_conflicts.sql",
+      "supabase/migrations/20261025094057_balance_authority_projection.sql",
+      "supabase/migrations/20261025101209_balance_deadlines_and_schedule_separation.sql",
+      "supabase/migrations/20261025102217_balance_window_availability.sql",
+      "supabase/migrations/20261025103452_effective_capability_matrix.sql",
+      "supabase/migrations/20261025105017_policy_conflict_transport_compatibility.sql",
+      "supabase/migrations/20261025164621_notification_claim_conflict_recovery.sql",
+      "supabase/migrations/20261025194512_balance_idempotency_serialization.sql",
+      "supabase/migrations/20261025214537_balance_scheduler_rotation.sql"
+    ],
+    "shape": {
+      "supabase/migrations/20261019000100_initial_schema.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261019000200_catalog_and_submission_hardening.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020000300_update_product_units.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020000400_add_product_aliases.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020000500_set_fosfomicina_canonical_name.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020000600_grant_authenticated_permissions.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020000700_restrict_public_data_api_access.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020000800_requisition_integrity_and_remove_requested_quantity.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020000900_patient_scope_custody_inventory_notifications.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001000_stock_movement_transaction.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001100_add_family_role.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001200_protocol_format_compatibility.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001300_requisition_status_history.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001400_authorized_status_transitions.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001500_stock_balance_guard.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001600_admin_import_and_operations.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001700_inventory_workflow.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001800_notification_processing.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020001900_submit_requisition_security_definer.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002000_scoped_authority_and_catalogue.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002050_extension_migration_compatibility.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002100_transactional_operations.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002300_cross_scope_invariants.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002400_patient_directory_contracts.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002500_notification_revocation_guard.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002600_role_capability_boundaries.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002700_invitation_registration.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002800_historical_unknown_stock_and_extras.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020002900_alert_custody_routing_and_priority.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020003000_safe_notification_read_models.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020003100_explicit_uncertain_retry.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020003200_remove_migration_compatibility_bridge.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020003300_service_worker_privileges.sql": {
+        "type": "string"
+      },
+      "supabase/migrations/20261020003400_private_function_defaults.sql": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "path": "package-lock.json",
+    "lockfileVersion": 3,
+    "packages": 539,
+    "directDependenciesMatch": true,
+    "directDevDependenciesMatch": true,
+    "invalidIntegrityEntries": [],
+    "nonRegistrySources": []
+  }
+]

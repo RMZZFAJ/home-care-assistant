@@ -1,0 +1,75 @@
+[WebServer] (node:64304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:63468) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:64124) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:55876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:35756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:63480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:63024) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:60128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:64892) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:68548) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:54600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:68136) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:57676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:62404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:64292) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"25b9ab24-a8ee-4b01-aa2b-a18168fe25aa"}
+[WebServer] {"level":"error","operation":"stock.family.write","code":"FORBIDDEN","correlationId":"97b690ee-2bbb-40f2-8f1c-f09ce7c2b3b3"}
+  ok 1 [chromium] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API (25.8s)
+(node:39032) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"587746f8-7caa-44da-991e-f0f31dfdf053"}
+  x  2 [chromium] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API (30.9s)
+(node:55904) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"39a60962-0af7-49df-8795-06026e9c92cb"}
+[WebServer] {"level":"error","operation":"stock.family.write","code":"FORBIDDEN","correlationId":"33a48b80-cd8c-46c0-9c37-c7857b0ff10d"}
+  ok 3 [chromium] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API (18.3s)
+
+
+  1) [chromium] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+      - waiting for getByRole('navigation', { name: 'Navegação do plantão', exact: true }).getByRole('link', { name: 'Mais', exact: true })
+
+
+       at navigation.ts:10
+
+       8 |     if (await trigger.isVisible()) await trigger.click();
+       9 |     else {
+    > 10 |       await page.getByRole("navigation", { name: "Navegação do plantão", exact: true }).getByRole("link", { name: "Mais", exact: true }).click();
+         |                                                                                                                                          ^
+      11 |       nav = page.getByRole("navigation", { name: "Rotina e funções autorizadas", exact: true });
+      12 |     }
+      13 |   }
+        at openNavigation (C:\Users\renat\Projetos_Dev\home-care-assistant\tests\e2e\navigation.ts:10:138)
+        at C:\Users\renat\Projetos_Dev\home-care-assistant\tests\e2e\workflows.spec.ts:449:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\workflows-dez-linhas-5-10--9d852-egativas-na-interface-e-API-chromium-repeat1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\workflows-dez-linhas-5-10--9d852-egativas-na-interface-e-API-chromium-repeat1\error-context.md
+
+  1 failed
+    [chromium] › tests\e2e\workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API 
+  2 passed (1.7m)

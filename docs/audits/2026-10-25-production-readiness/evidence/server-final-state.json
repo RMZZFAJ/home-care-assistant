@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-10-28T08:08:10.4238906Z",
+  "expectedParent": 70092,
+  "expectedServer": 68096,
+  "port": 3100,
+  "listening": false,
+  "scope": "Only the verified audit Next server; Supabase stack preserved"
+}

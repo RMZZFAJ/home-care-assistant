@@ -1,0 +1,19 @@
+file:///C:/Users/renat/Projetos_Dev/home-care-assistant/scripts/test-environment.mjs:167
+    throw new Error(`Local SQL failed: ${result.stderr.trim()}`);
+          ^
+
+Error: Local SQL failed: ERROR:  column reference "e.body" is ambiguous
+LINE 1: ... cross join lateral jsonb_array_elements(coalesce(e.body->'e...
+                                                             ^
+DETAIL:  It could refer to either a PL/pgSQL variable or a table column.
+QUERY:  select coalesce(sum((z->>'consumedQuantity')::numeric),0)            from public.document_events e cross join lateral jsonb_array_elements(coalesce(e.body->'event'->'lines','[]')) z join public.document_lines dl on dl.id=(z->>'lineId')::uuid where e.care_recipient_id=d.care_recipient_id and e.action='ent.consent_cancel' and dl.product_id=l.product_id
+CONTEXT:  PL/pgSQL function public.audited_legacy_supply_command(uuid,text,jsonb,uuid,integer) line 137 at SQL statement
+PL/pgSQL function public.fluent_pre_shift_command(uuid,text,jsonb,uuid,integer) line 7 at RETURN
+PL/pgSQL function public.supply_document_command(uuid,text,jsonb,uuid,integer) line 16 at RETURN
+SQL statement "SELECT public.supply_document_command((d->>'id')::uuid,'consent_cancel',jsonb_build_object('reason','Consumo atual já confirmado','lines',jsonb_build_array(jsonb_build_object('lineId',d->'lines'->0->>'id','returnQuantity','0','consumedQuantity','1'))),gen_random_uuid(),(d->>'version')::integer)"
+PL/pgSQL function inline_code_block line 14 at PERFORM
+    at sql (file:///C:/Users/renat/Projetos_Dev/home-care-assistant/scripts/test-environment.mjs:167:11)
+    at file:///C:/Users/renat/Projetos_Dev/home-care-assistant/docs/audits/2026-10-25-production-readiness/evidence/run-database-probe.mjs:14:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.22.0

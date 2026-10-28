@@ -1,0 +1,2 @@
+# Preserve the exact evidence bytes recorded in MANIFEST.csv across platforms.
+evidence/** -text

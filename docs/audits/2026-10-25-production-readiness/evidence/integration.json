@@ -1,0 +1,22 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "--test-concurrency=1",
+    "tests/integration/balance-idempotency.test.mjs",
+    "tests/integration/balance-shifts.test.mjs",
+    "tests/integration/database.test.mjs",
+    "tests/integration/fluent-authority.test.mjs",
+    "tests/integration/schedules.test.mjs",
+    "tests/integration/v4-review.test.mjs",
+    "tests/integration/v4-workflows.test.mjs"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-26T18:43:59.600Z",
+  "endedAt": "2026-10-26T18:45:49.824Z",
+  "exitCode": 0,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "integration.log"
+}

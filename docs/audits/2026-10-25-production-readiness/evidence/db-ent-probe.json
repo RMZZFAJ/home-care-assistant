@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node",
+    "docs/audits/2026-10-25-production-readiness/evidence/run-database-probe.mjs",
+    "docs/audits/2026-10-25-production-readiness/evidence/probe-ent-cancel-history.sql"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-27T20:35:43.011Z",
+  "endedAt": "2026-10-27T20:35:44.749Z",
+  "exitCode": 1,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "db-ent-probe.log"
+}

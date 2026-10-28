@@ -1,0 +1,252 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-28T02:28:37.769Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalEnabled": false,
+  "cases": [
+    {
+      "name": "UX-001",
+      "result": "CONFIRMED_RUNTIME",
+      "dialog": "Revisar escala\n\nConfirme os dados da programação. A gravação é transacional e registra o responsável e a justificativa.\n\nRevise o período, o profissional e o efeito da alteração.\n\nVoltar\nConfirmar gravação",
+      "listText": "HOMOLOGAÇÃO FICTÍCIA V4 548F1C39\n\nEscalas e plantões\nAdministrador do paciente\nNova programação\nNovo tipo de plantão\nData de referência\nVisualização\nSemana\nMês\nProfissional\nToda a equipe\nProfissional fictício de plantão\nTeste professional\nTeste supervisor\nSituação\nTodas\nPublicado\nProposta\nCancelado\nRecusado\n\nProgramação prevista, sem registro de presença. Períodos adjacentes são permitidos; sobreposições do mesmo profissional são recusadas.\n\nseg., 09/11\n\nSem programação publicada\n\nter., 10/11\nAuditoria: manhã sintética\nPublicado\n\nProfissional fictício de plantão\n\n10/11/2026, 07:00 → 10/11/2026, 19:00\n\nFixture de revisão UX\n\nAlterar plantão\nqua., 11/11\n\nSem programação publicada\n\nqui., 12/11\n\nSem programação publicada\n\nsex., 13/11\n\nSem programação publicada\n\nsáb., 14/11\n\nSem programação publicada\n\ndom., 15/11\n\nSem programação publicada\n\nPropostas pendentes\nAlteração solicitada · Ajuste sintético para auditoria de compreensão\nAprovar alteração\nRejeitar alteração\nTipos e programações\nHistórico de mudanças\nAtualização ao vivo conectada",
+      "proposedTimesShown": false,
+      "evidence": [
+        "ui-scale-review-1440.png",
+        "ui-scale-review-390.png"
+      ]
+    },
+    {
+      "name": "UX-002",
+      "result": "CONFIRMED_RUNTIME",
+      "signal": {
+        "payload": {
+          "mode": "app_visible",
+          "expectedVersion": 1
+        },
+        "at": "2026-10-28T02:28:46.878Z",
+        "geometry": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "header": {
+            "top": 217.5,
+            "bottom": 819.5,
+            "height": 602
+          },
+          "materials": {
+            "top": 858.5,
+            "bottom": 878.5,
+            "height": 20
+          }
+        }
+      },
+      "science": [
+        {
+          "mode": "app_visible",
+          "user": "family"
+        }
+      ],
+      "evidence": [
+        "ui-science-top-390.png"
+      ]
+    },
+    {
+      "name": "UX-004",
+      "result": "CONFIRMED_RUNTIME",
+      "pendingSaysEmpty": true,
+      "errorSaysEmpty": true,
+      "pendingText": "HOMOLOGAÇÃO FICTÍCIA V4 548F1C39\n\nFaltas e consumo extraordinário\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.\n\nAtualização ao vivo conectada",
+      "failedText": "HOMOLOGAÇÃO FICTÍCIA V4 548F1C39\n\nFaltas e consumo extraordinário\nFalha sintética da auditoria\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.\n\nAtualização ao vivo conectada",
+      "evidence": [
+        "ui-consumption-pending-390.png",
+        "ui-consumption-error-390.png"
+      ]
+    },
+    {
+      "name": "UX-003",
+      "result": "CONFIRMED_RUNTIME",
+      "acceptedStatus": 201,
+      "fileInputEnabled": true,
+      "storedListStatus": 200,
+      "visible": "HOMOLOGAÇÃO FICTÍCIA V4 548F1C39\n\nRequisição e acompanhamento\n← Histórico\nREQ\n\nREQUISIÇÃO\n\nREQ-0001\nAguardando atendimento\n\n27/10/2026, 23:28 · Versão 3\n\nPaciente: Homologação fictícia V4 548f1c39\n\nSolicitante: Teste professional\n\nAtendimento\n\n0/2 itens atendidos\n\nAguardando ENT aceita\n\nCiência familiar\n\nExigência satisfeita\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo. Consulte os estados individuais dos avisos abaixo.\n\nProtocolo e identificação\nMateriais requisitados\n\nUma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n\nMaterial fictício V4 0\nPendente\nUrgente\n\nEstoque observado na emissão: 0 unidade\n\nMaterial fictício V4 1\nPendente\nUrgente\n\nEstoque observado na emissão: 0 unidade\n\nAbrir COM vinculada\nExpedir ENT vinculada\nCiência e responsáveis\n\nCiência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n\nTeste family\n\nAutomática · conteúdo exibido · 27/10/2026, 23:28\n\nLi a requisição e confirmo minha ciência\nLinha do tempo\n\n3 evento(s) registrados\n\nCancelar requisição\nAvisos e acompanhamento\n\n8 aviso(s) · estados do aplicativo e do provedor são independentes\n\nObservações\n\nSem observações.\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação\n\nAtualizar anexos\n\nFotos e PDFs ficam vinculados à operação. Até 10 arquivos de 10 MB. A foto da ficha física permanece disponível como alternativa ao formulário digital.\n\nFailed to fetch\n\nNenhum anexo registrado.\n\nAdicionar foto ou PDF\nEnviar anexo\nAtualização ao vivo conectada",
+      "evidence": [
+        "ui-attachment-lost-response.png"
+      ]
+    },
+    {
+      "name": "PDF_CURRENT",
+      "result": "GENERATED_CURRENT",
+      "id": "75db1a1e-69cf-4cea-bb24-fb0f9c970b64",
+      "version": 2,
+      "status": "disputed",
+      "lines": 14,
+      "bytes": 30576,
+      "evidence": [
+        "ui-current-ent-partial.pdf",
+        "ui-current-ent-partial-390.png"
+      ]
+    },
+    {
+      "name": "RESPONSIVE_PROFILES",
+      "result": "MEASURED",
+      "captures": [
+        {
+          "role": "adminA",
+          "width": 320,
+          "geometry": {
+            "viewport": 320,
+            "documentWidth": 320,
+            "bodyWidth": 320
+          },
+          "file": "ui-dashboard-adminA-320.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "adminA",
+          "width": 390,
+          "geometry": {
+            "viewport": 390,
+            "documentWidth": 390,
+            "bodyWidth": 390
+          },
+          "file": "ui-dashboard-adminA-390.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "adminA",
+          "width": 768,
+          "geometry": {
+            "viewport": 768,
+            "documentWidth": 768,
+            "bodyWidth": 768
+          },
+          "file": "ui-dashboard-adminA-768.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "adminA",
+          "width": 1440,
+          "geometry": {
+            "viewport": 1440,
+            "documentWidth": 1440,
+            "bodyWidth": 1440
+          },
+          "file": "ui-dashboard-adminA-1440.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "adminA",
+          "width": 1920,
+          "geometry": {
+            "viewport": 1920,
+            "documentWidth": 1920,
+            "bodyWidth": 1920
+          },
+          "file": "ui-dashboard-adminA-1920.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "professional",
+          "width": 320,
+          "geometry": {
+            "viewport": 320,
+            "documentWidth": 320,
+            "bodyWidth": 320
+          },
+          "file": "ui-dashboard-professional-320.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "professional",
+          "width": 390,
+          "geometry": {
+            "viewport": 390,
+            "documentWidth": 390,
+            "bodyWidth": 390
+          },
+          "file": "ui-dashboard-professional-390.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "professional",
+          "width": 768,
+          "geometry": {
+            "viewport": 768,
+            "documentWidth": 768,
+            "bodyWidth": 768
+          },
+          "file": "ui-dashboard-professional-768.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "professional",
+          "width": 1440,
+          "geometry": {
+            "viewport": 1440,
+            "documentWidth": 1440,
+            "bodyWidth": 1440
+          },
+          "file": "ui-dashboard-professional-1440.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "professional",
+          "width": 1920,
+          "geometry": {
+            "viewport": 1920,
+            "documentWidth": 1920,
+            "bodyWidth": 1920
+          },
+          "file": "ui-dashboard-professional-1920.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "family",
+          "width": 390,
+          "geometry": {
+            "viewport": 390,
+            "documentWidth": 390,
+            "bodyWidth": 390
+          },
+          "file": "ui-dashboard-family-390.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "reader",
+          "width": 390,
+          "geometry": {
+            "viewport": 390,
+            "documentWidth": 390,
+            "bodyWidth": 390
+          },
+          "file": "ui-dashboard-reader-390.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "supervisor",
+          "width": 390,
+          "geometry": {
+            "viewport": 390,
+            "documentWidth": 390,
+            "bodyWidth": 390
+          },
+          "file": "ui-dashboard-supervisor-390.png",
+          "title": "Visão geral"
+        },
+        {
+          "role": "global",
+          "width": 390,
+          "geometry": {
+            "viewport": 390,
+            "documentWidth": 390,
+            "bodyWidth": 390
+          },
+          "file": "ui-dashboard-global-390.png",
+          "title": "Visão geral"
+        }
+      ]
+    }
+  ],
+  "finishedAt": "2026-10-28T02:29:21.873Z"
+}

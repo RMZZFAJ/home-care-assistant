@@ -1,0 +1,14 @@
+{
+  "command": [
+    "node",
+    "scripts/run-e2e.mjs"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-26T23:52:48.261Z",
+  "endedAt": "2026-10-26T23:53:10.873Z",
+  "exitCode": 1,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "e2e.log"
+}

@@ -1,0 +1,30 @@
+
+> home-care-assistant@0.1.0 lint
+> eslint
+
+
+C:\Users\renat\Projetos_Dev\home-care-assistant\docs\audits\2026-10-25-production-readiness\evidence\ui-runtime-ready.mjs
+  26:51   error  'document' is not defined          no-undef
+  26:102  error  'document' is not defined          no-undef
+  26:149  error  'document' is not defined          no-undef
+  26:194  error  'document' is not defined          no-undef
+  26:249  error  'document' is not defined          no-undef
+  26:293  error  'getComputedStyle' is not defined  no-undef
+  45:80   error  'document' is not defined          no-undef
+  45:121  error  'document' is not defined          no-undef
+  45:187  error  'document' is not defined          no-undef
+  47:164  error  'document' is not defined          no-undef
+  47:205  error  'document' is not defined          no-undef
+
+C:\Users\renat\Projetos_Dev\home-care-assistant\docs\audits\2026-10-25-production-readiness\evidence\ui-runtime.mjs
+    3:25   error  'readFileSync' is defined but never used  no-unused-vars
+   68:29   error  'innerWidth' is not defined               no-undef
+   68:47   error  'innerHeight' is not defined              no-undef
+   68:72   error  'document' is not defined                 no-undef
+   68:139  error  'document' is not defined                 no-undef
+  119:55   error  'document' is not defined                 no-undef
+  119:106  error  'document' is not defined                 no-undef
+  119:153  error  'document' is not defined                 no-undef
+
+✖ 19 problems (19 errors, 0 warnings)
+

@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-10-28T08:09:12.682Z",
+  "localApi": "http://127.0.0.1:54321",
+  "method": "Guarded read-only SQL; no new Auth sessions or fixtures.",
+  "entProbePatients": 0,
+  "lifecycleProbePatients": 0,
+  "conclusion": "Probe patients did not persist; separate E2E/UI fixtures intentionally remain."
+}

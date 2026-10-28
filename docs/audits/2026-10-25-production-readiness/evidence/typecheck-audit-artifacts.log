@@ -1,0 +1,1 @@
+docs/audits/2026-10-25-production-readiness/evidence/backend-probes.test.ts(56,25): error TS2339: Property 'accepted' does not exist on type '{ externalConfigured: boolean; }'.

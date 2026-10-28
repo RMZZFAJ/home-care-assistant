@@ -1,0 +1,17 @@
+{
+  "command": [
+    "node",
+    "scripts/test-migrations.mjs",
+    "--replay-local",
+    "--backup",
+    "C:\\Users\\renat\\AppData\\Local\\home-care-assistant\\backups\\local-20261025T194132245Z.dump"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-26T18:40:17.499Z",
+  "endedAt": "2026-10-26T18:43:35.215Z",
+  "exitCode": 0,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "migrations.log"
+}

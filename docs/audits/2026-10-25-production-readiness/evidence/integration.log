@@ -1,0 +1,41 @@
+✔ overlapping BAL create requests recover the same successful idempotent result (4255.9743ms)
+✔ overlapping BAL revise requests recover the same successful idempotent result (4246.0959ms)
+✔ overlapping BAL submit requests recover the same successful idempotent result (4740.7347ms)
+✔ BAL is opt-in and all count entrypoints enforce actual designated shift and idempotency (3516.5499ms)
+✔ pending deferral does not change responsibility; supervisor cannot replace family approval (2562.129ms)
+✔ scheduler retains missed shifts and regularizes previous weeks with only one current physical count (2452.8796ms)
+✔ a pending request does not stop the scheduler deadline or survive a superseded assignment (1894.2936ms)
+✔ ambiguous coverage is unassigned until family resolution and stays isolated by patient (3816.1347ms)
+✔ ledger changes invalidate a captured count reference and forged schedule context cannot replace the DB snapshot (2438.6734ms)
+✔ schedule management cannot defer BAL, while a same-window handoff preserves the real counter and distinct review (2734.7645ms)
+✔ approved postponement preserves the original due date and does not turn into a historical delay (2522.4863ms)
+✔ Data API grants, local authority and cross-patient isolation use real Auth sessions (374.5809ms)
+✔ concurrent HTTP submissions persist one canonical request and immutable receipt snapshots (424.5031ms)
+✔ concurrent family withdrawals cannot overspend and ENT acceptance preserves both custodies (272.2063ms)
+✔ concurrent global administrator demotions retain one active administrator (1018.993ms)
+✔ competing outbox workers claim each notification once under real HTTP concurrency (7529.8801ms)
+✔ service-role HTTP worker operates through RPCs without private table grants (2085.384ms)
+✔ delegated catalogue and audit authority stays separate from local administration (3292.7704ms)
+✔ schedules persist proposals, overnight recurrences, revisions, scope and cross-patient exclusion (3827.7322ms)
+✔ V4 review: archive rechecks revoked capability after waiting for the patient transaction lock (3045.7625ms)
+✔ V4 review: collective science and dashboard archive filters match authoritative duties (8080.2777ms)
+✔ V4 review: global membership approval requires intended recipient acceptance and supports refusal (2686.9502ms)
+✔ V4 review: external queue rejects app-only events and holds unapproved templates without retries (7631.1789ms)
+✔ V4: concurrent local administrator revocations preserve one active administrator (1587.5126ms)
+✔ V4: shared needs, partial receipt, formal resolution and science remain independent (1774.9235ms)
+✔ V4: local changes apply immediately; global proposals need a different local person (1192.7063ms)
+✔ V4: completion without science permanently blocks automatic archive and preserves later acknowledgement (1447.3338ms)
+✔ V4: automatic science requires both policy and personal consent, preserving its actual origin (1179.1516ms)
+✔ V4: two Auth sessions receive private invalidations; another user's topic is refused (6685.4476ms)
+✔ V4: scheduled standalone reminders are idempotent, scoped and do not change stock (3332.0686ms)
+✔ V4: real Auth TOTP enforces AAL2 for administration and revoked sessions lose authority (1462.7532ms)
+✔ V4: purpose-bound receipt Flow preserves partial stock and no-issues never debits (1712.2933ms)
+✔ V4: WhatsApp science requires verified contact, consent and correlated template evidence (local provider contract) (2151.3774ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 110152.7326

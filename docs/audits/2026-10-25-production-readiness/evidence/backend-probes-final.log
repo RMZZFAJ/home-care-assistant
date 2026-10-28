@@ -1,0 +1,9 @@
+
+ RUN  v5.0.5 C:/Users/renat/Projetos_Dev/home-care-assistant
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  04:46:51
+   Duration  754ms (import 72%, transform 14%, tests 12%, worker 1%)
+

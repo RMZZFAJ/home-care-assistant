@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-26T18:39:26.976Z",
+  "endedAt": "2026-10-26T18:39:34.407Z",
+  "exitCode": 1,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "unit.log"
+}

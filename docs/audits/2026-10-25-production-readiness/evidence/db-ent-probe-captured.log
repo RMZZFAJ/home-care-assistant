@@ -1,0 +1,5 @@
+result=column reference "e.body" is ambiguous
+sqlstate=42702
+new_document=025a5520-f6a2-4012-a08b-13c02ff4a36d
+current_consumption_verified=1.000000
+previous_allocations=1

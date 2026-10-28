@@ -1,0 +1,8 @@
+src\components\stock\inventory-console.tsx:13:export function InventoryConsole() { return <Workspace title="Inventários e contagem semanal">{(context) => context.patient ? <PatientInventories context={context} /> : <Notice>Selecione ou cadastre um paciente.</Notice>}</Workspace>; }
+docs\audits\2026-10-20\SOURCE_REQUIREMENTS.json:3193:      "- `src/components/requisitions/requisition-history.tsx`\r",
+docs\audits\2026-10-20\sources\AUDITORIA.txt:541:- `src/components/requisitions/requisition-history.tsx`
+docs\audits\2026-10-21\CHANGED_FILES.md:136:- M `src/components/requisitions/print-button.tsx`
+docs\audits\2026-10-21\CHANGED_FILES.md:138:- M `src/components/requisitions/requisition-history.tsx`
+docs\audits\2026-10-21\CHANGED_FILES.md:140:- A `src/components/stock/inventory-console.tsx`
+src\components\requisitions\requisition-history.tsx:14:export function RequisitionHistory() { return <Workspace title="Histórico de requisições">{(context) => context.patient ? <PatientHistory context={context} /> : <Notice>Selecione ou cadastre um paciente para consultar o histórico.</Notice>}</Workspace>; }
+src\components\requisitions\print-button.tsx:3:export function PrintButton() {

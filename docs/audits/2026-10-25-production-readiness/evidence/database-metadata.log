@@ -1,0 +1,11 @@
+{"type": "inventory", "schema": "public", "tables": 62, "withoutRLS": 1}
+{"type": "inventory", "schema": "private", "tables": 9, "withoutRLS": 0}
+{"type": "public_table_without_rls", "table": "global_admin_guard", "anon_any": false, "authenticated_any": false}
+{"type": "anonymous_nonextension_rpc", "function": "invitation_registration_allowed(text,text)"}
+{"type": "anonymous_nonextension_rpc", "function": "verify_document_integrity(uuid,integer,text)"}
+{"type": "migration_count", "count": 84}
+{"id": "patient-evidence", "type": "storage_bucket", "public": false, "mime_types": ["image/jpeg", "image/png", "image/webp", "application/pdf"], "file_size_limit": 10485760}
+{"id": "document-receipts", "type": "storage_bucket", "public": false, "mime_types": ["application/pdf"], "file_size_limit": 10485760}
+{"id": "profile-avatars", "type": "storage_bucket", "public": false, "mime_types": ["image/jpeg"], "file_size_limit": 1048576}
+{"type": "final_hypothesis_predicates", "consent_unbounded_history": true}
+{"type": "final_hypothesis_predicates", "batch25": true, "lifecycle_cancel_continue": true}

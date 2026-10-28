@@ -1,0 +1,152 @@
+
+ RUN  v5.0.5 C:/Users/renat/Projetos_Dev/home-care-assistant
+
+stderr | tests/api/requisition-contract.test.ts > requisition API contract > rejects removed fields, spoofed actors and untrusted protocols before accessing storage
+{"level":"error","operation":"requisitions.submit","code":"INVALID_ORIGIN","correlationId":"2e52cac1-63db-49b5-bcf2-618d035d9eba"}
+
+ ❯ tests/api/requisition-contract.test.ts (3 tests | 1 failed) 48ms
+   ❯ requisition API contract (3)
+     × rejects removed fields, spoofed actors and untrusted protocols before accessing storage 29ms
+stderr | tests/api/requisition-persistence.test.ts > requisition persistence response > uses persisted original snapshots and excludes client catalogue labels from the transaction
+{"level":"error","operation":"requisitions.submit","code":"INVALID_ORIGIN","correlationId":"c6e1237e-dfeb-42ec-9d6f-3664656d452e"}
+
+stderr | tests/api/requisition-persistence.test.ts > requisition persistence response > returns the confirmed persistent identity when receipt recovery fails
+{"level":"error","operation":"requisitions.submit","code":"INVALID_ORIGIN","correlationId":"d5277a4a-7d37-4c55-98fb-88b8aba48c05"}
+
+stderr | tests/api/requisition-persistence.test.ts > requisition persistence response > reports conflicting idempotency content without emitting a receipt
+{"level":"error","operation":"requisitions.submit","code":"INVALID_ORIGIN","correlationId":"68f791c0-69d9-4d08-bc4d-f97534220f4e"}
+
+ ❯ tests/api/requisition-persistence.test.ts (4 tests | 3 failed) 155ms
+   ❯ requisition persistence response (4)
+     × uses persisted original snapshots and excludes client catalogue labels from the transaction 34ms
+     × returns the confirmed persistent identity when receipt recovery fails 4ms
+     × reports conflicting idempotency content without emitting a receipt 51ms
+ ❯ tests/api/guards.test.ts (10 tests | 2 failed) 151ms
+   ❯ cookie-authenticated mutation guards (4)
+     × rejects cross-site requests and deceptive origins 14ms
+     × requires JSON and rejects malformed or unknown fields 15ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/guards.test.ts > cookie-authenticated mutation guards > rejects cross-site requests and deceptive origins
+AssertionError: expected [Function] to not throw an error but 'Error: Origem da operação não autoriz…' was thrown
+
+- Expected:
+undefined
+
++ Received:
+"Error: Origem da operação não autorizada."
+
+ ❯ tests/api/guards.test.ts:67:11
+     65|     expect(() =>
+     66|       validateMutationRequest(request({}, { origin: "https://care.exam…
+     67|     ).not.toThrow();
+       |           ^
+     68|   });
+     69|   it("requires JSON and rejects malformed or unknown fields", async ()…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/api/guards.test.ts > cookie-authenticated mutation guards > requires JSON and rejects malformed or unknown fields
+AssertionError: expected Error: Origem da operação não autorizada. { …(3) } to match object { code: 'VALIDATION_ERROR' }
+(2 matching properties omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "code": "VALIDATION_ERROR",
++ ApiError {
++   "code": "INVALID_ORIGIN",
+  }
+
+ ❯ tests/api/guards.test.ts:76:6
+     74|     await expect(
+     75|       readJson(request({ id: 1, actorId: "forged" }), schema),
+     76|     ).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
+       |      ^
+     77|     await expect(
+     78|       readJson(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/api/requisition-contract.test.ts > requisition API contract > rejects removed fields, spoofed actors and untrusted protocols before accessing storage
+AssertionError: expected 403 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 403
+
+ ❯ tests/api/requisition-contract.test.ts:14:31
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/api/requisition-persistence.test.ts > requisition persistence response > uses persisted original snapshots and excludes client catalogue labels from the transaction
+AssertionError: expected 403 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 403
+
+ ❯ tests/api/requisition-persistence.test.ts:133:29
+    131|     const { rpc } = fixture();
+    132|     const response = await POST(request());
+    133|     expect(response.status).toBe(201);
+       |                             ^
+    134|     const result = await response.json();
+    135|     expect(result).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/api/requisition-persistence.test.ts > requisition persistence response > returns the confirmed persistent identity when receipt recovery fails
+AssertionError: expected 403 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 403
+
+ ❯ tests/api/requisition-persistence.test.ts:163:29
+    161|     fixture({ receiptFailure: true });
+    162|     const response = await POST(request());
+    163|     expect(response.status).toBe(503);
+       |                             ^
+    164|     expect(await response.json()).toMatchObject({
+    165|       code: "RECEIPT_PENDING",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/api/requisition-persistence.test.ts > requisition persistence response > reports conflicting idempotency content without emitting a receipt
+AssertionError: expected 403 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 403
+
+ ❯ tests/api/requisition-persistence.test.ts:175:29
+    173|     fixture({ conflict: true });
+    174|     const response = await POST(request());
+    175|     expect(response.status).toBe(409);
+       |                             ^
+    176|     expect(await response.json()).toMatchObject({
+    177|       code: "IDEMPOTENCY_CONFLICT",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  3 failed | 14 passed (17)
+      Tests  6 failed | 92 passed (98)
+   Start at  15:39:28
+   Duration  6.21s (import 54%, tests 35%, transform 10%, worker 1%)
+
+    Isolate  17 workers spawned · ~605ms startup each (spawn + environment, per file)
+             at least ~330ms faster with isolate: false — reuses workers across files instead of one per file
+

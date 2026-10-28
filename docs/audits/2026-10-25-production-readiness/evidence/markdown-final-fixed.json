@@ -1,0 +1,16 @@
+{
+  "command": [
+    "node",
+    "C:/nvm4w/nodejs/node_modules/npm/bin/npm-cli.js",
+    "run",
+    "lint:markdown"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-28T08:05:31.414Z",
+  "endedAt": "2026-10-28T08:05:32.895Z",
+  "exitCode": 0,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "markdown-final-fixed.log"
+}

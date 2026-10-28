@@ -1,0 +1,87 @@
+[
+  {
+    "path": "docs/references/v3/home_care_META_exemplo_ENT_concluida_profissional.pdf",
+    "sha256": "8bcc1ef613552931584afccdab30ed6336418acfa310a6717cf6b7eed1610bcf",
+    "pageCount": 2,
+    "pages": [
+      {
+        "page": 1,
+        "width": 595.2755737304688,
+        "height": 841.8897705078125,
+        "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS  /  COMPROVANTE OPERACIONAL\nEXEMPLO FICTÍCIO\nDocumento demonstrativo • Nenhum dado real • Não comprova recebimento de materiais\n22/10/2026  |  Página 1\nCOMPROVANTE DE ENTREGA DE MATERIAIS\nENT-0012 • 22/10/2026 às 08h10 • RECEBIMENTO CONFIRMADO\n8\nITENS ENTREGUES\n8\nITENS CONFERIDOS\n0\nDIVERGÊNCIAS\nCONCLUÍDO\nRECEBIMENTO\nIDENTIFICAÇÃO DA ENTREGA\nNÚMERO DA ENTREGA\nENT-0012\nPACIENTE\nPaciente Exemplo\nENTREGUE POR\nRenato - Responsável familiar\nRECEBEDOR DESIGNADO\nJuliana - Técnica de Enfermagem\nORIGEM\nEstoque da família\nDESTINO\nEstoque da equipe\nEMISSÃO\n22/10/2026 às 08h10\nPROTOCOLO\nHCA-ENT-261022-012-6B7D\nRELAÇÃO DOS MATERIAIS DECLARADOS\nNº\nMATERIAL\nEXPEDIDO\nUNIDADE\n01\nFralda geriátrica G\n20\nUnidades\n02\nLenço umedecido\n4\nPacotes\n03\nMemantina 10 mg\n30\nComprimidos\n04\nQuetiapina 100 mg\n20\nComprimidos\n05\nRisperidona 1 mg\n20\nComprimidos\n06\nGaze estéril\n3\nPacotes\n07\nEquipo para dieta\n10\nUnidades\n08\nSoro fisiológico 0,9%\n6\nFrascos\nOs materiais acima foram declarados pelo entregador. Quantidades recebidas somente serão tratadas como aceitas após\nconfirmação válida do destinatário. Este documento não comprova, sozinho, a transferência definitiva da custódia.\n",
+        "image": "home_care_META_exemplo_ENT_concluida_profissional-page-1.png"
+      },
+      {
+        "page": 2,
+        "width": 595.2755737304688,
+        "height": 841.8897705078125,
+        "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS  /  COMPROVANTE OPERACIONAL\nEXEMPLO FICTÍCIO\nDocumento demonstrativo • Nenhum dado real • Não comprova recebimento de materiais\n22/10/2026  |  Página 2\nCONFERÊNCIA E AUDITORIA\nENT-0012 • Recebimento concluído em 22/10/2026 às 09h18\nDECLARAÇÃO DO RECEBIMENTO\nA pessoa designada confirmou o recebimento integral dos materiais declarados, após conferência. Nenhuma divergência foi\ninformada neste exemplo fictício.\nCONFIRMADO POR\nJuliana - Técnica de Enfermagem\nDATA DO ACEITE\n22/10/2026 às 09h18\nITENS INTEGRALMENTE CONFERIDOS\n8 de 8\nDIVERGÊNCIAS PENDENTES\n0\nLINHA DO TEMPO OPERACIONAL\nHORA\nAGENTE\nEVENTO\nRESULTADO\n08h10\nRenato\nEntrega registrada\nExpedição declarada\n08h11\nSistema\nNotificação preparada\nPDF da versão inicial\n09h17\nJuliana\nConferência iniciada\nSessão autenticada\n09h18\nJuliana\nAceite integral confirmado\nMovimento de custódia\nDADOS PARA AUDITORIA\nDOCUMENTO\nENT-0012\nVERSÃO\n2 (exemplo)\nID DE CONTROLE\nUUID de demonstração\nHASH DO CONTEÚDO\nExemplo fictício; não verificável\nACEITE\nConfirmado no sistema\nNOTIFICAÇÃO EXTERNA\nEstado depende do provedor\nAVISO DE INTEGRIDADE: o SHA-256 real deve ser calculado sobre o snapshot canônico imutável da versão. Um hash isolado não é\nassinatura digital. Revisões devem gerar novas versões e eventos auditáveis. Este documento é apenas uma amostra visual e não contém\nevidências reais.\n",
+        "image": "home_care_META_exemplo_ENT_concluida_profissional-page-2.png"
+      }
+    ]
+  },
+  {
+    "path": "docs/references/v3/home_care_META_exemplo_ENT_pendente_profissional.pdf",
+    "sha256": "9d75c18e9f84bc417b79cff8d94323aa0d021e5b46d2db7510c4b376454d1ea6",
+    "pageCount": 2,
+    "pages": [
+      {
+        "page": 1,
+        "width": 595.2755737304688,
+        "height": 841.8897705078125,
+        "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS  /  COMPROVANTE OPERACIONAL\nEXEMPLO FICTÍCIO\nDocumento demonstrativo • Nenhum dado real • Não comprova recebimento de materiais\n22/10/2026  |  Página 1\nCOMPROVANTE DE ENTREGA DE MATERIAIS\nENT-0012 • 22/10/2026 às 08h10 • AGUARDANDO CONFERÊNCIA\n8\nITENS DECLARADOS\n8\nITENS A CONFERIR\n0\nCONFIRMAÇÕES\nPENDENTE\nRECEBIMENTO\nIDENTIFICAÇÃO DA ENTREGA\nNÚMERO DA ENTREGA\nENT-0012\nPACIENTE\nPaciente Exemplo\nENTREGUE POR\nRenato - Responsável familiar\nRECEBEDOR DESIGNADO\nJuliana - Técnica de Enfermagem\nORIGEM\nEstoque da família\nDESTINO\nEstoque da equipe\nEMISSÃO\n22/10/2026 às 08h10\nPROTOCOLO\nHCA-ENT-261022-012-6B7D\nRELAÇÃO DOS MATERIAIS DECLARADOS\nNº\nMATERIAL\nEXPEDIDO\nUNIDADE\n01\nFralda geriátrica G\n20\nUnidades\n02\nLenço umedecido\n4\nPacotes\n03\nMemantina 10 mg\n30\nComprimidos\n04\nQuetiapina 100 mg\n20\nComprimidos\n05\nRisperidona 1 mg\n20\nComprimidos\n06\nGaze estéril\n3\nPacotes\n07\nEquipo para dieta\n10\nUnidades\n08\nSoro fisiológico 0,9%\n6\nFrascos\nOs materiais acima foram declarados pelo entregador. Quantidades recebidas somente serão tratadas como aceitas após\nconfirmação válida do destinatário. Este documento não comprova, sozinho, a transferência definitiva da custódia.\n",
+        "image": "home_care_META_exemplo_ENT_pendente_profissional-page-1.png"
+      },
+      {
+        "page": 2,
+        "width": 595.2755737304688,
+        "height": 841.8897705078125,
+        "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS  /  COMPROVANTE OPERACIONAL\nEXEMPLO FICTÍCIO\nDocumento demonstrativo • Nenhum dado real • Não comprova recebimento de materiais\n22/10/2026  |  Página 2\nCONFERÊNCIA E AUDITORIA\nENT-0012 • Aguardando confirmação do recebedor\nDECLARAÇÃO DO RECEBIMENTO\nEste comprovante foi emitido antes do aceite. A pessoa designada deverá conferir cada item e registrar a quantidade\nefetivamente recebida. Se houver diferença, ela deverá ser informada no sistema ou no WhatsApp Flow autorizado.\nITENS\nSITUAÇÃO\nRESULTADO\n01 a 08\nAguardando conferência\n0 confirmados\nLINHA DO TEMPO OPERACIONAL\nHORA\nAGENTE\nEVENTO\nRESULTADO\n08h10\nRenato\nEntrega registrada\nExpedição declarada\n08h11\nSistema\nNotificação preparada\nPDF da versão inicial\n—\nJuliana\nConfirmação pendente\nNenhum aceite presumido\nDADOS PARA AUDITORIA\nDOCUMENTO\nENT-0012\nVERSÃO\n1 (exemplo)\nID DE CONTROLE\nUUID de demonstração\nHASH DO CONTEÚDO\nExemplo fictício; não verificável\nACEITE\nAinda não registrado\nNOTIFICAÇÃO EXTERNA\nEstado depende do provedor\nAVISO DE INTEGRIDADE: o SHA-256 real deve ser calculado sobre o snapshot canônico imutável da versão. Um hash isolado não é\nassinatura digital. Revisões devem gerar novas versões e eventos auditáveis. Este documento é apenas uma amostra visual e não contém\nevidências reais.\n",
+        "image": "home_care_META_exemplo_ENT_pendente_profissional-page-2.png"
+      }
+    ]
+  },
+  {
+    "path": "docs/references/v3/home_care_META_exemplo_REQ_profissional.pdf",
+    "sha256": "76b84b9f7699b3cdb370e7dda759ba30a834e7b7e75914881ac706c29eab81e7",
+    "pageCount": 2,
+    "pages": [
+      {
+        "page": 1,
+        "width": 595.2755737304688,
+        "height": 841.8897705078125,
+        "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS  /  COMPROVANTE OPERACIONAL\nEXEMPLO FICTÍCIO\nDocumento demonstrativo • Nenhum dado real • Não comprova recebimento de materiais\n22/10/2026  |  Página 1\nREQUISIÇÃO DE MATERIAIS\nREQ-0007 • Emitida em 22/10/2026 às 07h42\n6\nITENS SOLICITADOS\n2\nURGENTES\n0\nITENS ATENDIDOS\nABERTA\nREQUISIÇÃO\nIDENTIFICAÇÃO E RESPONSÁVEIS\nPACIENTE\nPaciente Exemplo\nSOLICITADO POR\nJuliana - Técnica de Enfermagem\nREGISTRO PROFISSIONAL\nCOREN/UF 000.000 - Exemplo\nSITUAÇÃO\nAguardando atendimento\nNÚMERO DA REQUISIÇÃO\nREQ-0007\nPROTOCOLO\nHCA-REQ-261022-007-4F2A\nMATERIAIS SOLICITADOS\nNº\nMATERIAL\nAPRESENTAÇÃO\nPRIORIDADE\n01\nFralda geriátrica G\nUnidade\nRotina\n02\nLenço umedecido\nPacote\nRotina\n03\nMemantina 10 mg\nComprimido\nURGENTE\n04\nGaze estéril\nPacote\nRotina\n05\nEquipo para dieta\nUnidade\nURGENTE\n06\nSoro fisiológico 0,9%\nFrasco\nRotina\nObservação: verificar reposição de Memantina e equipos até o próximo ciclo. Esta requisição não informa quantidades\nsolicitadas: o atendimento é acompanhado por item, após recebimento confirmado.\nSITUAÇÃO DO ATENDIMENTO\nLINHAS ATENDIDAS\n0 de 6\nLINHAS PENDENTES\n6\nENTREGA VINCULADA\nNenhuma até esta versão\nPRÓXIMO PASSO\nProvidenciar e confirmar ENT\n",
+        "image": "home_care_META_exemplo_REQ_profissional-page-1.png"
+      },
+      {
+        "page": 2,
+        "width": 595.2755737304688,
+        "height": 841.8897705078125,
+        "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS  /  COMPROVANTE OPERACIONAL\nEXEMPLO FICTÍCIO\nDocumento demonstrativo • Nenhum dado real • Não comprova recebimento de materiais\n22/10/2026  |  Página 2\nRASTREABILIDADE DA REQUISIÇÃO\nInformações complementares para consulta e auditoria do comprovante demonstrativo.\nCRONOLOGIA DO DOCUMENTO\nHORA\nRESPONSÁVEL\nEVENTO\nEVIDÊNCIA\n07h42\nJuliana\nRequisição criada\nVersão 1\n07h42\nSistema\nComprovante gerado\nSHA-256 ilustrativo\n07h43\nSistema\nAvisos encaminhados à fila\nEntrega externa não\ncomprovada\nCONTROLE DE NOTIFICAÇÕES\nDESTINATÁRIO\nCANAL\nSITUAÇÃO\nAdriana\nInterna\nDisponível no aplicativo\nSupervisão\nWhatsApp\nAguardando confirmação do provedor\nJuliana\nInterna\nDisponível no aplicativo\nIDENTIFICAÇÃO E INTEGRIDADE\nID TÉCNICO\nUUID de exemplo (não real)\nCÓDIGO SEQUENCIAL\nREQ-0007\nVERSÃO REGISTRADA\n1\nHASH SHA-256\nDemonstração, sem valor criptográfico\nIMPORTANTE: A geração da requisição não demonstra que os avisos externos foram entregues ou lidos. A confirmação dos itens dependerá\nde ENT posterior, assinada operacionalmente por aceite autenticado. Este PDF é uma amostra para submissão de template de WhatsApp.\n",
+        "image": "home_care_META_exemplo_REQ_profissional-page-2.png"
+      }
+    ]
+  },
+  {
+    "path": "public/fonts/NotoSans-Bold.ttf",
+    "sha256": "c976e4b1b99edc88775377fcc21692ca4bfa46b6d6ca6522bfda505b28ff9d6a",
+    "glyphs": 3748,
+    "portugueseGlyphsPresent": true,
+    "names": [
+      "Bold",
+      "Noto Sans",
+      "NotoSans-Bold"
+    ]
+  },
+  {
+    "path": "public/fonts/NotoSans-Regular.ttf",
+    "sha256": "b85c38ecea8a7cfb39c24e395a4007474fa5a4fc864f6ee33309eb4948d232d5",
+    "glyphs": 3748,
+    "portugueseGlyphsPresent": true,
+    "names": [
+      "Noto Sans",
+      "NotoSans-Regular",
+      "Regular"
+    ]
+  }
+]

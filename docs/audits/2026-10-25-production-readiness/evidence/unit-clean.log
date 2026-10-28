@@ -1,0 +1,12 @@
+
+ RUN  v5.0.5 C:/Users/renat/Projetos_Dev/home-care-assistant
+
+
+ Test Files  17 passed (17)
+      Tests  98 passed (98)
+   Start at  15:40:19
+   Duration  6.11s (import 53%, tests 41%, transform 5%, worker 1%)
+
+    Isolate  17 workers spawned · ~570ms startup each (spawn + environment, per file)
+             at least ~311ms faster with isolate: false — reuses workers across files instead of one per file
+

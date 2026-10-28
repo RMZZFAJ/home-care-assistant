@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-28T08:12:46.854618+00:00",
+  "status": "PASS",
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "inventory": 503,
+  "coverage": 503,
+  "requiredReports": 20,
+  "findings": 32,
+  "priorities": {
+    "P1": 2,
+    "P2": 21,
+    "P3": 9
+  },
+  "natures": {
+    "DEFECT_CONFIRMED": 9,
+    "RISK_SUPPORTED": 10,
+    "OBSERVABILITY_GAP": 1,
+    "OPEN_QUESTION": 1,
+    "EXTERNAL_DEPENDENCY": 1,
+    "TEST_GAP": 1,
+    "DOCUMENTATION_DRIFT": 2,
+    "EXPERIENCE_INCONSISTENCY": 2,
+    "PRODUCT_OPPORTUNITY": 2,
+    "REPOSITORY_HYGIENE": 2,
+    "ARCHITECTURE_DEBT": 1
+  },
+  "markdownLinksChecked": 50,
+  "evidenceReferencesChecked": 138,
+  "jsonFilesParsed": 50,
+  "textFilesScanned": 144,
+  "secretHits": [],
+  "productChanges": [],
+  "changesOutsideAllowedScope": [],
+  "gitIndexModifiedByValidator": false,
+  "manifestVerification": "Run --verify-manifest after final assembly; it does not modify files.",
+  "errors": []
+}

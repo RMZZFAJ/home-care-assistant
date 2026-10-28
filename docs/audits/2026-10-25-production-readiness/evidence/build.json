@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node",
+    "node_modules/next/dist/bin/next",
+    "build"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-26T18:41:21.359Z",
+  "endedAt": "2026-10-26T18:42:14.511Z",
+  "exitCode": 0,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "build.log"
+}

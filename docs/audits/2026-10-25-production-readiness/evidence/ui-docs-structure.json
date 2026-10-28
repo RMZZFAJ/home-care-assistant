@@ -1,0 +1,102 @@
+{
+  "inventory": {
+    "base": "d467f92",
+    "records": 107,
+    "unique_paths": 107,
+    "missing_paths": [],
+    "line_count_drift": []
+  },
+  "html": [
+    {
+      "path": "docs/ui-ux/references/Home_Care_Assistant_Equipe_Mobile/home-care-equipe-mobile.html",
+      "bytes": 51011,
+      "functions": [
+        "task",
+        "home",
+        "requestCard",
+        "requests",
+        "deliveries",
+        "reqDetail",
+        "entDetail",
+        "receive",
+        "newReq",
+        "balance",
+        "stockScreen",
+        "occurrence",
+        "notifications",
+        "supervision",
+        "more",
+        "success",
+        "screen",
+        "render",
+        "route",
+        "showToast",
+        "overlay",
+        "finish"
+      ],
+      "has_fetch": false,
+      "external_script_src": [],
+      "title": [
+        "Home Care Assistant • Equipe (protótipo)"
+      ]
+    },
+    {
+      "path": "docs/ui-ux/references/Home_Care_Assistant_Prototipo_Interativo/home-care-assistant-fluent-prototipo.html",
+      "bytes": 80601,
+      "functions": [
+        "I",
+        "esc",
+        "badge",
+        "title",
+        "route",
+        "sidebar",
+        "profileMenu",
+        "notificationPopover",
+        "topbar",
+        "banner",
+        "action",
+        "dashboard",
+        "docTable",
+        "history",
+        "stagesForDoc",
+        "documentView",
+        "docTabContent",
+        "stock",
+        "admin",
+        "adminContent",
+        "peopleContent",
+        "peoplePage",
+        "permValue",
+        "permissionMatrix",
+        "notifValue",
+        "notificationMatrix",
+        "rulesContent",
+        "notificationPage",
+        "listBy",
+        "reqWizard",
+        "reqStepContent",
+        "globalPage",
+        "preferences",
+        "pageContent",
+        "drawer",
+        "modal",
+        "cellPopover",
+        "toastHTML",
+        "render",
+        "refreshToasts",
+        "toast",
+        "nav",
+        "click"
+      ],
+      "has_fetch": false,
+      "external_script_src": [],
+      "title": [
+        "Home Care Assistant — Protótipo Fluent"
+      ]
+    }
+  ],
+  "manifest": {
+    "captures": 15,
+    "bytes_match": true
+  }
+}

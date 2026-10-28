@@ -1,0 +1,8 @@
+
+> home-care-assistant@0.1.0 lint:markdown
+> markdownlint-cli2 "README.md" "AGENTS.md" "docs/**/*.md"
+
+markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)
+Finding: README.md AGENTS.md docs/**/*.md
+Linting: 68 files
+Summary: 0 issues in 0 files

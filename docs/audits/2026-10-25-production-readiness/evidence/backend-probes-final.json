@@ -1,0 +1,17 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "--config",
+    "docs/audits/2026-10-25-production-readiness/evidence/backend-probes.config.mts"
+  ],
+  "node": "v24.22.0",
+  "startedAt": "2026-10-28T07:46:50.436Z",
+  "endedAt": "2026-10-28T07:46:51.938Z",
+  "exitCode": 0,
+  "localApi": "http://127.0.0.1:54321",
+  "appOrigin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "log": "backend-probes-final.log"
+}

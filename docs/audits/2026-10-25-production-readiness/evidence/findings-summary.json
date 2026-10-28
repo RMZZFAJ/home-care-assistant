@@ -1,0 +1,63 @@
+{
+  "total": 32,
+  "priorities": {
+    "P0": 0,
+    "P1": 2,
+    "P2": 21,
+    "P3": 9
+  },
+  "natures": {
+    "ARCHITECTURE_DEBT": 1,
+    "DEFECT_CONFIRMED": 9,
+    "DOCUMENTATION_DRIFT": 2,
+    "EXPERIENCE_INCONSISTENCY": 2,
+    "EXTERNAL_DEPENDENCY": 1,
+    "OBSERVABILITY_GAP": 1,
+    "OPEN_QUESTION": 1,
+    "PRODUCT_OPPORTUNITY": 2,
+    "REPOSITORY_HYGIENE": 2,
+    "RISK_SUPPORTED": 10,
+    "TEST_GAP": 1
+  },
+  "ids": [
+    "DB-002",
+    "UX-001",
+    "BE-001",
+    "BE-002",
+    "BE-003",
+    "BE-004",
+    "BE-005",
+    "DB-001",
+    "DB-003",
+    "DB-004",
+    "DB-006",
+    "DB-007",
+    "OPS-001",
+    "QA-001",
+    "REPO-001",
+    "REPO-003",
+    "REPO-004",
+    "UX-002",
+    "UX-003",
+    "UX-004",
+    "UX-005",
+    "UX-007",
+    "UX-012",
+    "BE-006",
+    "BE-007",
+    "DB-005",
+    "REPO-002",
+    "UX-006",
+    "UX-008",
+    "UX-009",
+    "UX-010",
+    "UX-011"
+  ],
+  "sourceFiles": [
+    "findings-backend.json",
+    "findings-database.json",
+    "findings-root.json",
+    "findings-testing.json",
+    "findings-ui.json"
+  ]
+}

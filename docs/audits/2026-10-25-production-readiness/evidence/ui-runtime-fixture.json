@@ -1,0 +1,27 @@
+{
+  "patient": "f7d29408-4f16-484d-b3b8-1784775aa44e",
+  "req": "6da15df0-fb8e-407c-9ebd-29b084ed7473",
+  "proposal": "5a749f09-a6d1-4a74-b90d-a6e3d513f471",
+  "shift": "58bfda68-d738-4a75-9006-0668e4e7fcc3",
+  "original": {
+    "startsAt": "2026-11-10T10:00:00+00:00",
+    "endsAt": "2026-11-10T22:00:00+00:00"
+  },
+  "proposed": {
+    "startsAt": "2026-11-10T11:00:00Z",
+    "endsAt": "2026-11-10T23:00:00Z"
+  },
+  "roles": [
+    "global",
+    "global2",
+    "adminA",
+    "adminB",
+    "supervisor",
+    "professional",
+    "family",
+    "reader",
+    "revoked",
+    "shared",
+    "unlinked"
+  ]
+}

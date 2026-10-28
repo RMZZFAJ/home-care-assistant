@@ -1,0 +1,19 @@
+Starting explicit local migration replay: complete migration chain.
+PASS clean installation: complete migrations, real Auth and independent first code REQ-0001.
+Starting explicit local migration replay: 20261020001900.
+PASS legacy upgrade: protocols, quantities, both patient balances, FKs and unassigned stock preserved.
+PASS PostgreSQL regression: transactions.sql
+PASS PostgreSQL regression: invitations-import-outbox.sql
+PASS PostgreSQL regression: alerts-routing.sql
+PASS PostgreSQL regression: notification-read-model.sql
+PASS PostgreSQL regression: protocol-and-stock-boundaries.sql
+PASS PostgreSQL regression: service-role.sql
+PASS PostgreSQL regression: supply-workflows.sql
+PASS PostgreSQL regression: document-invariants.sql
+PASS PostgreSQL regression: operational-reviews.sql
+PASS PostgreSQL regression: whatsapp-receipts.sql
+PASS PostgreSQL regression: business-conflicts.sql
+PASS PostgreSQL regression: balance-shift-authority.sql
+PASS PostgreSQL regression: notification-claim-recovery.sql
+PASS PostgreSQL regression: balance-scheduler-fairness.sql
+PASS hosted migration compatibility: restricted public search_path, canonical SHA-256, client privileges and bridge cleanup.

@@ -1,0 +1,13 @@
+
+> home-care-assistant@0.1.0 lint
+> eslint
+
+
+C:\Users\renat\Projetos_Dev\home-care-assistant\docs\audits\2026-10-25-production-readiness\evidence\ui-runtime-ready.mjs
+  26:293  error  'document' is not defined  no-undef
+
+C:\Users\renat\Projetos_Dev\home-care-assistant\docs\audits\2026-10-25-production-readiness\evidence\ui-runtime.mjs
+  68:172  error  'document' is not defined  no-undef
+
+✖ 2 problems (2 errors, 0 warnings)
+

@@ -1,0 +1,21 @@
+
+ RUN  v5.0.5 C:/Users/renat/Projetos_Dev/home-care-assistant
+
+stdout | docs/audits/2026-10-25-production-readiness/evidence/backend-probes.test.ts > records creation time instead of the later delivery resolution time
+{"probe":"event-time","observed":"20/10/2026, 07:00","expectedEventTime":"22/10/2026, 11:00"}
+
+stdout | docs/audits/2026-10-25-production-readiness/evidence/backend-probes.test.ts > reports zero BAL differences while one counted quantity differs from its reference
+{"probe":"bal-differences","observed":"0","actualDifferingLines":1}
+
+stdout | docs/audits/2026-10-25-production-readiness/evidence/backend-probes.test.ts > needs 140 virtual seconds for fifty jobs with two successful 14-second requests
+{"probe":"worker-budget","virtualElapsedMs":140000,"configuredDurationMs":120000,"caveat":"Mocks exclude database, rendering, lease enforcement and network; no external sends"}
+
+ ✓ docs/audits/2026-10-25-production-readiness/evidence/backend-probes.test.ts > records creation time instead of the later delivery resolution time 378ms
+ ✓ docs/audits/2026-10-25-production-readiness/evidence/backend-probes.test.ts > reports zero BAL differences while one counted quantity differs from its reference 2ms
+ ✓ docs/audits/2026-10-25-production-readiness/evidence/backend-probes.test.ts > needs 140 virtual seconds for fifty jobs with two successful 14-second requests 69ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  15:42:19
+   Duration  1.78s (import 51%, tests 29%, transform 19%, worker 1%)
+

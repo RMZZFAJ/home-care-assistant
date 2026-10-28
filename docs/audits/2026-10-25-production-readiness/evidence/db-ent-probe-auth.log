@@ -1,0 +1,15 @@
+file:///C:/Users/renat/Projetos_Dev/home-care-assistant/scripts/test-environment.mjs:167
+    throw new Error(`Local SQL failed: ${result.stderr.trim()}`);
+          ^
+
+Error: Local SQL failed: ERROR:  query returned no rows
+CONTEXT:  PL/pgSQL function pg_temp_76.assume_context(text,uuid) line 4 at SQL statement
+SQL statement "SELECT pg_temp.assume_context('adminA',p)"
+PL/pgSQL function inline_code_block line 2 at PERFORM
+    at sql (file:///C:/Users/renat/Projetos_Dev/home-care-assistant/scripts/test-environment.mjs:167:11)
+    at file:///C:/Users/renat/Projetos_Dev/home-care-assistant/docs/audits/2026-10-25-production-readiness/evidence/run-database-probe.mjs:4:13
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.22.0
