@@ -1,0 +1,73 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:03:03.929Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:03:08.650Z",
+      "role": "professional",
+      "label": "filter-pending",
+      "path": "/entregas",
+      "width": 390,
+      "state": "REFRESHING",
+      "note": "Select Concluídas, response held; old pending_receipt row still rendered.",
+      "file": "b15-followup-professional-filter-pending.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nEntregas e recebimentos\n\nConferências e recebimentos. Somente o destinatário autorizado pode confirmar os materiais.\n\nDestinadas a mim\nHistórico autorizado da equipe\nAguardando conferência\nCom divergência\nConcluídas\nCanceladas\nTodas\nENT\nENT-0001\nEntrega / Entrada · 29/10/2026, 00:18\nAguardando recebimento\n0/2 conferidas",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Entregas e recebimentos\" [level=1]\n  - paragraph: Conferências e recebimentos. Somente o destinatário autorizado pode confirmar os materiais.\n  - combobox \"Responsável pelas entregas\":\n    - option \"Destinadas a mim\" [selected]\n    - option \"Histórico autorizado da equipe\"\n  - combobox \"Situação das entregas\":\n    - option \"Aguardando conferência\"\n    - option \"Com divergência\"\n    - option \"Concluídas\" [selected]\n    - option \"Canceladas\"\n    - option \"Todas\"\n  - link \"ENT ENT-0001 Entrega / Entrada · 29/10/2026, 00:18 Aguardando recebimento 0/2 conferidas\":\n    - /url: /documentos/174bf9ba-72f4-4aad-ac79-91b8bbaa434c\n    - text: ENT\n    - strong: ENT-0001\n    - text: Entrega / Entrada · 29/10/2026, 00:18 Aguardando recebimento 0/2 conferidas",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:03:08.699Z",
+      "role": "professional",
+      "label": "filter-empty",
+      "path": "/entregas",
+      "width": 390,
+      "state": "EMPTY_CONFIRMED",
+      "note": "Injected200empty; no write.",
+      "file": "b15-followup-professional-filter-empty.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nEntregas e recebimentos\n\nConferências e recebimentos. Somente o destinatário autorizado pode confirmar os materiais.\n\nDestinadas a mim\nHistórico autorizado da equipe\nAguardando conferência\nCom divergência\nConcluídas\nCanceladas\nTodas\nNenhuma entrega nesta seleção\n\nNovas entregas aparecerão aqui quando forem expedidas.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Entregas e recebimentos\" [level=1]\n  - paragraph: Conferências e recebimentos. Somente o destinatário autorizado pode confirmar os materiais.\n  - combobox \"Responsável pelas entregas\":\n    - option \"Destinadas a mim\" [selected]\n    - option \"Histórico autorizado da equipe\"\n  - combobox \"Situação das entregas\":\n    - option \"Aguardando conferência\"\n    - option \"Com divergência\"\n    - option \"Concluídas\" [selected]\n    - option \"Canceladas\"\n    - option \"Todas\"\n  - heading \"Nenhuma entrega nesta seleção\" [level=2]\n  - paragraph: Novas entregas aparecerão aqui quando forem expedidas.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:03:12.032Z",
+      "role": "adminA",
+      "label": "partial-stock",
+      "path": "/estoque?custody=FAMILY",
+      "width": 390,
+      "state": "PARTIAL",
+      "note": "",
+      "file": "b15-followup-adminA-partial-stock.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nGestão dos estoques\nHistórico sintético indisponível\nSaldos e previsões\nAtualizar\nBuscar produto\nCustódia\nTodas autorizadas\nFamília\nEquipe\nMateriais em trânsito\n\nSaldo confirmado está disponível na custódia. Trânsito e compras pendentes são previsões e dependem de recebimento válido. Somente a ENT aceita atende as linhas REQ.\n\nNenhum produto encontrado\n\nConsulte o catálogo ou ajuste a busca.\n\nMovimentar estoque familiar\nHistórico auditável\nFiltrar\nSem movimentações neste filtro",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Gestão dos estoques\" [level=1]\n  - alert: Histórico sintético indisponível\n  - heading \"Saldos e previsões\" [level=2]\n  - button \"Atualizar\"\n  - text: Buscar produto\n  - textbox \"Buscar produto\"\n  - text: Custódia\n  - combobox \"Custódia\":\n    - option \"Todas autorizadas\"\n    - option \"Família\" [selected]\n    - option \"Equipe\"\n    - option \"Materiais em trânsito\"\n  - paragraph: Saldo confirmado está disponível na custódia. Trânsito e compras pendentes são previsões e dependem de recebimento válido. Somente a ENT aceita atende as linhas REQ.\n  - heading \"Nenhum produto encontrado\" [level=2]\n  - paragraph: Consulte o catálogo ou ajuste a busca.\n  - button \"Movimentar estoque familiar\"\n  - heading \"Histórico auditável\" [level=2]\n  - button \"Filtrar\"\n  - list\n  - heading \"Sem movimentações neste filtro\" [level=2]",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "scenario": "partial-stock",
+      "balanceStatus": 200,
+      "productsReturned": 2,
+      "historyStatus": "500 injected",
+      "visibleProductNames": 0
+    }
+  ],
+  "finishedAt": "2026-10-29T04:03:12.677Z"
+}

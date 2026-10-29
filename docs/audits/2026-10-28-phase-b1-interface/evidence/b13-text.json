@@ -1,0 +1,64 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T03:47:37.555Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T03:47:42.336Z",
+      "role": "adminA",
+      "label": "filter-science_required",
+      "path": "/historico?type=REQ&status=science_required",
+      "width": 390,
+      "state": "READY",
+      "note": "Real local GET; chip value differs from dropdown dictionary.",
+      "file": "b13-text-adminA-filter-science_required.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHistórico de fichas\nDocumentos e acompanhamento\n\n0 registro(s) no contexto autorizado\n\nPesquisar e filtrar\n2\nCódigo ou protocolo\nFicha\nTodas autorizadas\nREQ · Requisição\nCOM · Compra de insumos\nENT · Entrega / Entrada\nBAL · Balanço semanal\nSituação\nTodas\nRegistro histórico\nCiência familiar pendente\nAguardando atendimento\nAtendimento parcial\nAtendimento concluído\nConcluída · ciência pendente\nArquivada\nRascunho\nAguardando revisão\nAguardando aprovação\nAprovado\nParcialmente aprovado\nRejeitado\nCompra em andamento\nCompra efetivada\nRecebimento parcial\nRecebido\nAguardando recebimento\nDivergência pendente\nConfirmado\nCancelamento aguardando consentimento\nCancelado\nEm revisão\nSeparado\nConclusões para revisar e arquivar\nRequisições para sua ciência\nDe\nAté\nAplicar filtros\nLimpar\nFicha: REQ ×\nSituação: science_required ×\nNenhuma ficha encontrada\n\nAjuste os filtros ou registre uma nova ficha autorizada.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Histórico de fichas\" [level=1]\n  - heading \"Documentos e acompanhamento\" [level=2]\n  - paragraph: 0 registro(s) no contexto autorizado\n  - button \"Pesquisar e filtrar 2\" [expanded]\n  - text: Código ou protocolo\n  - textbox \"Código ou protocolo\":\n    - /placeholder: REQ-0001\n  - text: Ficha\n  - combobox \"Ficha\":\n    - option \"Todas autorizadas\"\n    - option \"REQ · Requisição\" [selected]\n    - option \"COM · Compra de insumos\"\n    - option \"ENT · Entrega / Entrada\"\n    - option \"BAL · Balanço semanal\"\n  - text: Situação\n  - combobox \"Situação\":\n    - option \"Todas\"\n    - option \"Registro histórico\"\n    - option \"Ciência familiar pendente\"\n    - option \"Aguardando atendimento\"\n    - option \"Atendimento parcial\"\n    - option \"Atendimento concluído\"\n    - option \"Concluída · ciência pendente\"\n    - option \"Arquivada\"\n    - option \"Rascunho\"\n    - option \"Aguardando revisão\"\n    - option \"Aguardando aprovação\"\n    - option \"Aprovado\"\n    - option \"Parcialmente aprovado\"\n    - option \"Rejeitado\"\n    - option \"Compra em andamento\"\n    - option \"Compra efetivada\"\n    - option \"Recebimento parcial\"\n    - option \"Recebido\"\n    - option \"Aguardando recebimento\"\n    - option \"Divergência pendente\"\n    - option \"Confirmado\"\n    - option \"Cancelamento aguardando consentimento\"\n    - option \"Cancelado\"\n    - option \"Em revisão\"\n    - option \"Separado\"\n    - option \"Conclusões para revisar e arquivar\"\n    - option \"Requisições para sua ciência\" [selected]\n  - text: De\n  - textbox \"De\"\n  - text: Até\n  - textbox \"Até\"\n  - button \"Aplicar filtros\"\n  - button \"Limpar\"\n  - button \"Remover filtro type\": \"Ficha: REQ ×\"\n  - button \"Remover filtro status\": \"Situação: science_required ×\"\n  - heading \"Nenhuma ficha encontrada\" [level=2]\n  - paragraph: Ajuste os filtros ou registre uma nova ficha autorizada.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:47:43.470Z",
+      "role": "adminA",
+      "label": "filter-archive_pending",
+      "path": "/historico?type=REQ&status=archive_pending",
+      "width": 390,
+      "state": "READY",
+      "note": "Real local GET; chip value differs from dropdown dictionary.",
+      "file": "b13-text-adminA-filter-archive_pending.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHistórico de fichas\nDocumentos e acompanhamento\n\n0 registro(s) no contexto autorizado\n\nPesquisar e filtrar\n2\nCódigo ou protocolo\nFicha\nTodas autorizadas\nREQ · Requisição\nCOM · Compra de insumos\nENT · Entrega / Entrada\nBAL · Balanço semanal\nSituação\nTodas\nRegistro histórico\nCiência familiar pendente\nAguardando atendimento\nAtendimento parcial\nAtendimento concluído\nConcluída · ciência pendente\nArquivada\nRascunho\nAguardando revisão\nAguardando aprovação\nAprovado\nParcialmente aprovado\nRejeitado\nCompra em andamento\nCompra efetivada\nRecebimento parcial\nRecebido\nAguardando recebimento\nDivergência pendente\nConfirmado\nCancelamento aguardando consentimento\nCancelado\nEm revisão\nSeparado\nConclusões para revisar e arquivar\nRequisições para sua ciência\nDe\nAté\nAplicar filtros\nLimpar\nFicha: REQ ×\nSituação: archive_pending ×\nNenhuma ficha encontrada\n\nAjuste os filtros ou registre uma nova ficha autorizada.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Histórico de fichas\" [level=1]\n  - heading \"Documentos e acompanhamento\" [level=2]\n  - paragraph: 0 registro(s) no contexto autorizado\n  - button \"Pesquisar e filtrar 2\" [expanded]\n  - text: Código ou protocolo\n  - textbox \"Código ou protocolo\":\n    - /placeholder: REQ-0001\n  - text: Ficha\n  - combobox \"Ficha\":\n    - option \"Todas autorizadas\"\n    - option \"REQ · Requisição\" [selected]\n    - option \"COM · Compra de insumos\"\n    - option \"ENT · Entrega / Entrada\"\n    - option \"BAL · Balanço semanal\"\n  - text: Situação\n  - combobox \"Situação\":\n    - option \"Todas\"\n    - option \"Registro histórico\"\n    - option \"Ciência familiar pendente\"\n    - option \"Aguardando atendimento\"\n    - option \"Atendimento parcial\"\n    - option \"Atendimento concluído\"\n    - option \"Concluída · ciência pendente\"\n    - option \"Arquivada\"\n    - option \"Rascunho\"\n    - option \"Aguardando revisão\"\n    - option \"Aguardando aprovação\"\n    - option \"Aprovado\"\n    - option \"Parcialmente aprovado\"\n    - option \"Rejeitado\"\n    - option \"Compra em andamento\"\n    - option \"Compra efetivada\"\n    - option \"Recebimento parcial\"\n    - option \"Recebido\"\n    - option \"Aguardando recebimento\"\n    - option \"Divergência pendente\"\n    - option \"Confirmado\"\n    - option \"Cancelamento aguardando consentimento\"\n    - option \"Cancelado\"\n    - option \"Em revisão\"\n    - option \"Separado\"\n    - option \"Conclusões para revisar e arquivar\" [selected]\n    - option \"Requisições para sua ciência\"\n  - text: De\n  - textbox \"De\"\n  - text: Até\n  - textbox \"Até\"\n  - button \"Aplicar filtros\"\n  - button \"Limpar\"\n  - button \"Remover filtro type\": \"Ficha: REQ ×\"\n  - button \"Remover filtro status\": \"Situação: archive_pending ×\"\n  - heading \"Nenhuma ficha encontrada\" [level=2]\n  - paragraph: Ajuste os filtros ou registre uma nova ficha autorizada.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:47:44.788Z",
+      "role": "adminA",
+      "label": "proposal-json",
+      "path": "/configuracoes?area=people",
+      "width": 390,
+      "state": "READY",
+      "note": "Injected synthetic read-model proposal only. No proposal created or approved in database.",
+      "file": "b13-text-adminA-proposal-json.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nPermissões, comunicação e regras\n\nAtuação local: alterações autorizadas são aplicadas imediatamente. · Política v1\n\nRegras\nPermissões\nNotificações\nPessoas e propostas\nFunção no paciente\nPessoa\nTeste adminA\nTeste reader\nTeste professional\nTeste global\nTeste family\nProfissional fictício de plantão\nFunção\nAdministrador do paciente\nSupervisor\nProfissional\nFamiliar\nLeitor\nRegistrar alteração\nPropostas globais aguardando aprovação local\n\nsettings\n\n{\n  \"archiveDays\": 14,\n  \"scienceRequired\": true\n}\nAprovar proposta\nRejeitar",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Permissões, comunicação e regras\" [level=1]\n  - paragraph: \"Atuação local: alterações autorizadas são aplicadas imediatamente. · Política v1\"\n  - navigation \"Áreas da configuração\":\n    - link \"Regras\":\n      - /url: /configuracoes?area=rules\n    - link \"Permissões\":\n      - /url: /configuracoes?area=permissions\n    - link \"Notificações\":\n      - /url: /configuracoes?area=notifications\n    - link \"Pessoas e propostas\":\n      - /url: /configuracoes?area=people\n  - heading \"Função no paciente\" [level=2]\n  - text: Pessoa\n  - combobox \"Pessoa\":\n    - option \"Teste adminA\" [selected]\n    - option \"Teste reader\"\n    - option \"Teste professional\"\n    - option \"Teste global\"\n    - option \"Teste family\"\n    - option \"Profissional fictício de plantão\"\n  - text: Função\n  - combobox \"Função\":\n    - option \"Administrador do paciente\" [selected]\n    - option \"Supervisor\"\n    - option \"Profissional\"\n    - option \"Familiar\"\n    - option \"Leitor\"\n  - button \"Registrar alteração\"\n  - heading \"Propostas globais aguardando aprovação local\" [level=2]\n  - article:\n    - paragraph: settings\n    - text: \"{ \\\"archiveDays\\\": 14, \\\"scienceRequired\\\": true }\"\n    - button \"Aprovar proposta\"\n    - button \"Rejeitar\"",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "finishedAt": "2026-10-29T03:47:45.416Z"
+}

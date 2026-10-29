@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-29T08:43:59.899Z",
+  "product_sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "surfaces": 97,
+  "screenAssessments": 91,
+  "browserCaptures": 223,
+  "pdfDocuments": 4,
+  "pdfPages": 8,
+  "inspectionRecords": 231,
+  "browserInspected": 223,
+  "surfacesWithRenderedEvidence": 92,
+  "coverageRows": 396,
+  "stateRows": 948,
+  "findings": 35,
+  "unrenderedSurfaces": [
+    {
+      "id": "SC-049",
+      "route": "sem rota consumidora",
+      "lifecycle": "UNCONSUMED"
+    },
+    {
+      "id": "SC-050",
+      "route": "sem rota consumidora",
+      "lifecycle": "UNCONSUMED"
+    },
+    {
+      "id": "SC-051",
+      "route": "sem rota consumidora",
+      "lifecycle": "UNCONSUMED"
+    },
+    {
+      "id": "OVL-019",
+      "route": "/fichas/req;/fichas/com;/fichas/ent;/fichas/bal;/documentos/[id];/historico/[id];/fichas/[id]",
+      "lifecycle": "CONDITIONAL_ACTIVE"
+    },
+    {
+      "id": "OVL-037",
+      "route": "/consumo",
+      "lifecycle": "CONDITIONAL_ACTIVE"
+    }
+  ],
+  "limitations": "Mapped contact-sheet regions inspected; not every full-page pixel,conditional branch or all states. No participants/physical devices/external providers."
+}

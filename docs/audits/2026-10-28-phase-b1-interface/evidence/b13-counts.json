@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-29T03:55:31.034Z",
+  "sourceCandidates": 12343,
+  "catalogRows": 4151,
+  "dynamicExpressions": 686,
+  "rewrites": 30,
+  "templates": 27,
+  "dispositions": {
+    "EXCLUDED_CONTRACT_KEY_OR_STYLE": 4986,
+    "INCLUDED_POTENTIAL_USER_COPY": 3464,
+    "EXCLUDED_MACHINE_ATTRIBUTE": 1760,
+    "EXCLUDED_STYLE_NOT_COPY": 4,
+    "EXCLUDED_CODE_PATH_COLOR": 131,
+    "EXCLUDED_TEST_DATA": 1998
+  },
+  "limits": "HUMAN_CLEAR is auditor source assessment, not user testing. Potential user strings intentionally broad; technical exclusions are auditable. Dynamic private values not copied."
+}

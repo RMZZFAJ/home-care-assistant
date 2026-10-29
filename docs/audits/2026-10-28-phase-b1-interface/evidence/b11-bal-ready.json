@@ -1,0 +1,28 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T03:28:15.502Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T03:28:18.754Z",
+      "role": "shiftWorker",
+      "label": "review-ready",
+      "path": "/fichas/bal",
+      "width": 390,
+      "state": "READY",
+      "note": "Readiness oracle: heading Revisão da contagem + Confirmar contagem visible. Supersedes transient capture b11-supplement scheduled-bal-review.",
+      "file": "b11-bal-ready-shiftWorker-review-ready.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Balanço semanal\nHomologação fictícia V4 9482191c\n\nProfissional fictício de plantão · Plantão diário fictício\n\n29/10/2026, 00:00 → 30/10/2026, 00:00\nEtapa 2 de 2\nRevisão\nContagem\n2\nRevisão\nRevisão da contagem\n\nConfira as quantidades físicas e as diferenças. A revisão seguirá a política do paciente.\n\nMaterial fictício V4 0\n\nQuantidade física: 1 unidade\n\nReferência: 0 unidade\n\nDiferença: 1 unidade\n\nMaterial fictício V4 1\n\nQuantidade física: 0 unidade\n\nReferência: 0 unidade\n\nSem diferença\n\nVoltar\nSalvar rascunho\nConfirmar contagem",
+      "snapshot": "- main:\n  - heading \"Balanço semanal\" [level=1]\n  - strong: Homologação fictícia V4 9482191c\n  - paragraph: Profissional fictício de plantão · Plantão diário fictício\n  - text: 29/10/2026, 00:00 → 30/10/2026, 00:00\n  - navigation \"Etapas da ficha\":\n    - text: Etapa 2 de 2\n    - strong: Revisão\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Contagem\"\n      - listitem:\n        - button \"2 Revisão\"\n  - group:\n    - heading \"Revisão da contagem\" [level=2]\n    - paragraph: Confira as quantidades físicas e as diferenças. A revisão seguirá a política do paciente.\n    - article:\n      - strong: Material fictício V4 0\n      - paragraph: \"Quantidade física: 1 unidade\"\n      - text: \"Referência: 0 unidade\"\n      - paragraph: \"Diferença: 1 unidade\"\n    - article:\n      - strong: Material fictício V4 1\n      - paragraph: \"Quantidade física: 0 unidade\"\n      - text: \"Referência: 0 unidade\"\n      - paragraph: Sem diferença\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Confirmar contagem\"",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "finishedAt": "2026-10-29T03:28:19.352Z"
+}

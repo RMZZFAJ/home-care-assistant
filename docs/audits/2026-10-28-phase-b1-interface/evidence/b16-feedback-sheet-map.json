@@ -1,0 +1,58 @@
+[
+  {
+    "capture": "b16-feedback-adminA-com-unknown.png",
+    "sheet": "b16-feedback-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b16-feedback-adminA-com-persisted.png",
+    "sheet": "b16-feedback-sheet-01.png",
+    "region": "top 950 of 2315px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b16-feedback-professional-ent-confirm-review.png",
+    "sheet": "b16-feedback-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b16-feedback-professional-ent-received.png",
+    "sheet": "b16-feedback-sheet-01.png",
+    "region": "top 950 of 2739px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b16-feedback-adminA-req-after-ent.png",
+    "sheet": "b16-feedback-sheet-01.png",
+    "region": "top 950 of 2247px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b16-feedback-shiftWorker-bal-review-after-receipt.png",
+    "sheet": "b16-feedback-sheet-01.png",
+    "region": "top 916 of 916px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b16-feedback-shiftWorker-bal-count-persisted.png",
+    "sheet": "b16-feedback-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b16-feedback-family-bal-final.png",
+    "sheet": "b16-feedback-sheet-02.png",
+    "region": "top 950 of 2146px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  }
+]

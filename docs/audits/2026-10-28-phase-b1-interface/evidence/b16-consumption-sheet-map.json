@@ -1,0 +1,23 @@
+[
+  {
+    "capture": "b16-consumption-adminA-report-registered.png",
+    "sheet": "b16-consumption-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b16-consumption-adminA-report-review.png",
+    "sheet": "b16-consumption-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b16-consumption-adminA-consumption-confirmed.png",
+    "sheet": "b16-consumption-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  }
+]

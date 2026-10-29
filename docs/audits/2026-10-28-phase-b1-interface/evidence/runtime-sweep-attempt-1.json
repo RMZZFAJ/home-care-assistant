@@ -1,0 +1,172 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "head": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "startedAt": "2026-10-29T03:03:03.675Z",
+  "origin": "http://127.0.0.1:3100",
+  "api": "http://127.0.0.1:54321",
+  "externalSending": false,
+  "mutations": [
+    "Auth session creation",
+    "local authority-context selection",
+    "document automatic science if enabled by current fixture"
+  ],
+  "captures": [
+    {
+      "at": "2026-10-29T03:03:06.486Z",
+      "role": "public",
+      "route": "/login",
+      "actualPath": "/login",
+      "label": "login",
+      "width": 390,
+      "file": "b11-public-login-390.png",
+      "ready": true,
+      "text": "HC\nHome Care Assistant\nEntrar\n\nAcesse sua conta para acompanhar o cuidado e suas próximas tarefas.\n\nE-mail\nSenha\nEntrar\nEsqueci minha senha\nou\nContinuar com Google",
+      "snapshot": "- main:\n  - text: HC\n  - strong: Home Care Assistant\n  - heading \"Entrar\" [level=1]\n  - paragraph: Acesse sua conta para acompanhar o cuidado e suas próximas tarefas.\n  - text: E-mail\n  - textbox \"E-mail\"\n  - text: Senha\n  - textbox \"Senha\"\n  - button \"Entrar\"\n  - button \"Esqueci minha senha\"\n  - text: ou\n  - button \"Continuar com Google\"",
+      "geometry": {
+        "viewport": 390,
+        "width": 390,
+        "main": 390,
+        "controls": [
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "name": "email",
+            "width": 306,
+            "height": 42,
+            "required": true,
+            "disabled": false
+          },
+          {
+            "tag": "INPUT",
+            "type": "password",
+            "name": "password",
+            "width": 306,
+            "height": 42,
+            "required": true,
+            "disabled": false
+          },
+          {
+            "tag": "BUTTON",
+            "type": "submit",
+            "name": "Entrar",
+            "width": 308,
+            "height": 44,
+            "required": false,
+            "disabled": false
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "name": "Esqueci minha senha",
+            "width": 308,
+            "height": 44,
+            "required": false,
+            "disabled": false
+          },
+          {
+            "tag": "BUTTON",
+            "type": "button",
+            "name": "Continuar com Google",
+            "width": 308,
+            "height": 44,
+            "required": false,
+            "disabled": false
+          }
+        ]
+      },
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:03:07.195Z",
+      "role": "public",
+      "route": "/recuperar-senha",
+      "actualPath": "/recuperar-senha",
+      "label": "recovery",
+      "width": 390,
+      "file": "b11-public-recovery-390.png",
+      "ready": true,
+      "text": "Definir nova senha\n\nAbra esta página pelo link de recuperação ou ativação recebido.\n\nNova senha\nConfirmar nova senha\nSalvar nova senha\nVoltar ao login",
+      "snapshot": "- main:\n  - heading \"Definir nova senha\" [level=1]\n  - paragraph: Abra esta página pelo link de recuperação ou ativação recebido.\n  - text: Nova senha\n  - textbox \"Nova senha\"\n  - text: Confirmar nova senha\n  - textbox \"Confirmar nova senha\"\n  - button \"Salvar nova senha\"\n  - link \"Voltar ao login\":\n    - /url: /login",
+      "geometry": {
+        "viewport": 390,
+        "width": 390,
+        "main": 390,
+        "controls": [
+          {
+            "tag": "INPUT",
+            "type": "password",
+            "name": "",
+            "width": 342,
+            "height": 46,
+            "required": true,
+            "disabled": false
+          },
+          {
+            "tag": "INPUT",
+            "type": "password",
+            "name": "",
+            "width": 342,
+            "height": 46,
+            "required": true,
+            "disabled": false
+          },
+          {
+            "tag": "BUTTON",
+            "type": null,
+            "name": "Salvar nova senha",
+            "width": 142.515625,
+            "height": 44,
+            "required": false,
+            "disabled": false
+          }
+        ]
+      },
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:03:07.823Z",
+      "role": "public",
+      "route": "/convites/aceitar",
+      "actualPath": "/convites/aceitar",
+      "label": "invite-missing",
+      "width": 390,
+      "file": "b11-public-invite-missing-390.png",
+      "ready": true,
+      "text": "HOME CARE ASSISTANT\n\nConvite de acesso ao paciente\nEste link não contém um convite válido. Solicite um novo link ao administrador do paciente.",
+      "snapshot": "- main:\n  - paragraph: Home Care Assistant\n  - heading \"Convite de acesso ao paciente\" [level=1]\n  - alert: Este link não contém um convite válido. Solicite um novo link ao administrador do paciente.",
+      "geometry": {
+        "viewport": 390,
+        "width": 390,
+        "main": 390,
+        "controls": []
+      },
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:03:08.543Z",
+      "role": "public",
+      "route": "/verificar/00000000-0000-4000-8000-000000000000",
+      "actualPath": "/verificar/00000000-0000-4000-8000-000000000000",
+      "label": "verify-invalid",
+      "width": 390,
+      "file": "b11-public-verify-invalid-390.png",
+      "ready": true,
+      "text": "Verificação do comprovante\n\nNão foi encontrada correspondência para este hash e versão.\n\nEsta consulta não revela dados do paciente. SHA-256 não é assinatura digital nem impede alteração por administradores do banco.\n\nAcessar documento com autorização",
+      "snapshot": "- main:\n  - heading \"Verificação do comprovante\" [level=1]\n  - status: Não foi encontrada correspondência para este hash e versão.\n  - paragraph: Esta consulta não revela dados do paciente. SHA-256 não é assinatura digital nem impede alteração por administradores do banco.\n  - link \"Acessar documento com autorização\":\n    - /url: /login",
+      "geometry": {
+        "viewport": 390,
+        "width": 390,
+        "main": 390,
+        "controls": []
+      },
+      "visualInspected": false
+    }
+  ],
+  "failures": [
+    {
+      "fatal": true,
+      "error": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('main') to be visible\u001b[22m\n"
+    }
+  ],
+  "finishedAt": "2026-10-29T03:03:41.054Z"
+}

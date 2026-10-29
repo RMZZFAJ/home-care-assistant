@@ -1,0 +1,51 @@
+[
+  {
+    "capture": "b15-states-adminA-consumption-pending.png",
+    "sheet": "b15-states-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b15-states-adminA-consumption-empty-confirmed.png",
+    "sheet": "b15-states-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b15-states-adminA-bell-pending.png",
+    "sheet": "b15-states-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b15-states-adminA-bell-error.png",
+    "sheet": "b15-states-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b15-states-adminA-stock-history-failed.png",
+    "sheet": "b15-states-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b15-states-adminA-deadline-after-completed.png",
+    "sheet": "b15-states-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b15-states-professional-offline-cached-dashboard.png",
+    "sheet": "b15-states-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  }
+]

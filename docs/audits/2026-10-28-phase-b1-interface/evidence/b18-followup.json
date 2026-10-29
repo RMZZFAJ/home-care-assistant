@@ -1,0 +1,144 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:36:29.490Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:36:34.625Z",
+      "role": "adminA",
+      "label": "decision-after-escape",
+      "path": "/escalas",
+      "width": 390,
+      "state": "READY",
+      "note": "Correct synthetic proposal fixture; no approval. Active element measured500ms after close.",
+      "file": "b18-followup-adminA-decision-after-escape.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 28
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 548F1C39\n\nEscalas e plantões\nNova programação\nNovo tipo de plantão\nData de referência\nVisualização\nSemana\nMês\nProfissional\nToda a equipe\nProfissional fictício de plantão\nTeste professional\nTeste supervisor\nSituação\nTodas\nPublicado\nProposta\nCancelado\nRecusado\n\nProgramação prevista, sem registro de presença. Períodos adjacentes são permitidos; sobreposições do mesmo profissional são recusadas.\n\nDia anterior\n29/10/2026\nPróximo dia\nNenhum plantão programado neste dia.\nPropostas pendentes\nAlteração solicitada · Ajuste sintético para auditoria de compreensão\nAprovar alteração\nRejeitar alteração\nTipos e programações\nHistórico de mudanças",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 548f1c39\n  - heading \"Escalas e plantões\" [level=1]\n  - button \"Nova programação\"\n  - button \"Novo tipo de plantão\"\n  - text: Data de referência\n  - textbox \"Data de referência\": 2026-10-29\n  - text: Visualização\n  - combobox \"Visualização\":\n    - option \"Semana\" [selected]\n    - option \"Mês\"\n  - text: Profissional\n  - combobox \"Profissional\":\n    - option \"Toda a equipe\" [selected]\n    - option \"Profissional fictício de plantão\"\n    - option \"Teste professional\"\n    - option \"Teste supervisor\"\n  - text: Situação\n  - combobox \"Situação\":\n    - option \"Todas\" [selected]\n    - option \"Publicado\"\n    - option \"Proposta\"\n    - option \"Cancelado\"\n    - option \"Recusado\"\n  - paragraph: Programação prevista, sem registro de presença. Períodos adjacentes são permitidos; sobreposições do mesmo profissional são recusadas.\n  - button \"Dia anterior\"\n  - strong: 29/10/2026\n  - button \"Próximo dia\"\n  - status: Nenhum plantão programado neste dia.\n  - heading \"Propostas pendentes\" [level=2]\n  - article:\n    - text: Alteração solicitada · Ajuste sintético para auditoria de compreensão\n    - button \"Aprovar alteração\"\n    - button \"Rejeitar alteração\"\n  - group: Tipos e programações\n  - group: Histórico de mudanças",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:36:41.423Z",
+      "role": "professional",
+      "label": "footer-bottom390",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Actual bottom scroll geometry, no final submit; distinguishes full-page screenshot artifact.",
+      "file": "b18-followup-professional-footer-bottom390.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 71
+      },
+      "text": "Requisição de insumos\nEtapa 7 de 7\nRevisão\nIdentificação\nMedicamentos\nHigiene\nDieta\nItens extras\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRevisão\n\nSolicitante\n\nTeste professional\n\nPessoa assistida\n\nHomologação fictícia V4 9482191c\n\nItens do catálogo\n\nNenhum registro.\n\nItens extras\nProva sintética do rodapé móvel — estoque atual: 0\nObservações\n\nNenhum registro.\n\nVoltar\nSalvar rascunho\nConcluir requisição",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 7 de 7\n    - strong: Revisão\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"Higiene\"\n      - listitem:\n        - button \"Dieta\"\n      - listitem:\n        - button \"Itens extras\"\n      - listitem:\n        - button \"Observações\"\n      - listitem:\n        - button \"7 Revisão\"\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Revisão\" [level=2]\n  - group:\n    - paragraph: Solicitante\n    - paragraph: Teste professional\n    - paragraph: Pessoa assistida\n    - paragraph: Homologação fictícia V4 9482191c\n    - heading \"Itens do catálogo\" [level=3]\n    - paragraph: Nenhum registro.\n    - heading \"Itens extras\" [level=3]\n    - list:\n      - listitem: \"Prova sintética do rodapé móvel — estoque atual: 0\"\n    - heading \"Observações\" [level=3]\n    - paragraph: Nenhum registro.\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Concluir requisição\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:36:42.637Z",
+      "role": "public",
+      "label": "login-keyboard",
+      "path": "/login",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-followup-public-login-keyboard.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HC\nHome Care Assistant\nEntrar\n\nAcesse sua conta para acompanhar o cuidado e suas próximas tarefas.\n\nE-mail\nSenha\nEntrar\nEsqueci minha senha\nou\nContinuar com Google",
+      "snapshot": "- main:\n  - text: HC\n  - strong: Home Care Assistant\n  - heading \"Entrar\" [level=1]\n  - paragraph: Acesse sua conta para acompanhar o cuidado e suas próximas tarefas.\n  - text: E-mail\n  - textbox \"E-mail\"\n  - text: Senha\n  - textbox \"Senha\"\n  - button \"Entrar\"\n  - button \"Esqueci minha senha\"\n  - text: ou\n  - button \"Continuar com Google\"",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "scenario": "dialog-return-after500ms",
+      "active": {
+        "tag": "BODY",
+        "aria": null,
+        "text": null,
+        "inDialog": false
+      },
+      "expectedTrigger": "Aprovar alteração"
+    },
+    {
+      "scenario": "next-tab-after-dialog",
+      "active": {
+        "tag": "A",
+        "aria": null,
+        "text": "Ir para o conteúdo",
+        "inDialog": false
+      }
+    },
+    {
+      "scenario": "continue-editing-focus250ms",
+      "active": {
+        "tag": "BODY",
+        "aria": null,
+        "text": null,
+        "inDialog": false
+      },
+      "valuePreserved": "Edição sintética sem gravação"
+    },
+    {
+      "scenario": "drawer-discard-return250ms",
+      "active": {
+        "tag": "BUTTON",
+        "aria": null,
+        "text": "Novo item",
+        "inDialog": false
+      },
+      "expected": "Novo item"
+    },
+    {
+      "scenario": "real-bottom-scroll-professional390",
+      "navTop": 776,
+      "buttons": [
+        {
+          "name": "Voltar",
+          "left": 33,
+          "right": 129,
+          "top": 655,
+          "bottom": 699,
+          "clear": true
+        },
+        {
+          "name": "Salvar rascunho",
+          "left": 231.25,
+          "right": 357,
+          "top": 629,
+          "bottom": 673,
+          "clear": true
+        },
+        {
+          "name": "Concluir requisição",
+          "left": 209.96875,
+          "right": 357,
+          "top": 681,
+          "bottom": 725,
+          "clear": true
+        }
+      ],
+      "allClear": true,
+      "documentWidth": 390
+    },
+    {
+      "scenario": "axe-login",
+      "violations": [],
+      "incomplete": [],
+      "passes": 22,
+      "scope": "Explicit context, whole page, no rule disabled"
+    }
+  ],
+  "finishedAt": "2026-10-29T04:36:44.461Z"
+}

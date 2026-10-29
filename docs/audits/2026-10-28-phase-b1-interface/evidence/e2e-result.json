@@ -1,0 +1,19 @@
+{
+  "recordedAt": "2026-10-29T08:37:51.885Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "command": "node scripts/run-e2e.mjs --project=chromium --project=mobile --grep BAL por plantão:|convite → cadastro pessoal|exibe a tela de login --reporter=list --output=docs/audits/2026-10-28-phase-b1-interface/evidence/e2e-artifacts",
+  "runner": "Existing guarded local runner, global setup and managed webServer; no reuse of unknown origin",
+  "node": "24.22.0",
+  "npm": "11.21.1",
+  "exitCode": 0,
+  "passed": 6,
+  "projects": [
+    "chromium",
+    "mobile"
+  ],
+  "durationReported": "1.1m",
+  "log": "e2e-current.log",
+  "externalSending": false,
+  "mutations": "Existing tests create new synthetic patients, accounts/invitations, BAL policy/assignments/count and reviews. Local Mailpit confirms/reset flow. No reset/seed replacement or external messages.",
+  "notRun": "Full E2E/WebKit,production/external providers; targeted green does not close current CI QA-001"
+}
