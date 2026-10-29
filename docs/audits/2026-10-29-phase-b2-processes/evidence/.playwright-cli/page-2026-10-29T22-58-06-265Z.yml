@@ -1,0 +1,20 @@
+- generic [active] [ref=e1]:
+  - main [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: HC
+        - strong [ref=e7]: Home Care Assistant
+      - heading "Entrar" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Acesse sua conta para acompanhar o cuidado e suas próximas tarefas.
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]: E-mail
+          - textbox "E-mail" [ref=e15]
+        - generic [ref=e16]:
+          - generic [ref=e17]: Senha
+          - textbox "Senha" [ref=e19]
+        - button "Entrar" [ref=e20] [cursor=pointer]
+        - button "Esqueci minha senha" [ref=e21] [cursor=pointer]
+        - generic [ref=e22]: ou
+        - button "Continuar com Google" [ref=e25] [cursor=pointer]
+  - alert [ref=e26]

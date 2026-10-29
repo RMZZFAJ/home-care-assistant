@@ -1,0 +1,113 @@
+{
+  "group": "B2.5S",
+  "startedAt": "2026-10-29T10:21:07.139Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B25-15",
+      "purpose": "Aprovação familiar de adiamento preserva prazo original;ensaio transacional com sessão Auth real",
+      "recordedAt": "2026-10-29T10:21:07.552Z",
+      "observed": {
+        "approvedInsideRollback": {
+          "status": "approved",
+          "assignment": {
+            "id": "f135f30d-e12d-426c-86fb-8461e234784e",
+            "kind": "deferred",
+            "status": "active",
+            "ends_at": "2026-10-31T03:00:00+00:00",
+            "version": 1,
+            "cycle_id": "086eafde-7040-478c-85fc-4b03c790c82f",
+            "shift_id": "6521ead2-701f-4510-bc44-773442fad70a",
+            "missed_at": null,
+            "starts_at": "2026-10-30T03:00:00+00:00",
+            "created_at": "2026-10-29T10:21:07.72946+00:00",
+            "shift_version": 2,
+            "professional_id": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd",
+            "care_recipient_id": "cdf49f73-d89f-4824-bf43-9f87d87d85c9"
+          },
+          "obligation": {
+            "id": "49ebd5a4-6502-425b-94c4-a7ec46e2ba54",
+            "state": "counted",
+            "cycle_id": "086eafde-7040-478c-85fc-4b03c790c82f",
+            "missed_at": null,
+            "created_at": "2026-10-29T10:19:12.259694+00:00",
+            "week_start": "2026-10-26",
+            "original_due": "2026-10-30T03:00:00+00:00",
+            "effective_due": "2026-10-30T03:00:00+00:00",
+            "original_start": "2026-10-29T03:00:00+00:00",
+            "regularized_by": null,
+            "actual_count_at": "2026-10-29T10:19:13.170883+00:00",
+            "regime_snapshot": {
+              "enabled": true,
+              "version": 1,
+              "weekday": 4,
+              "timezone": "America/Sao_Paulo",
+              "starts_on": "2026-10-29",
+              "updated_at": "2026-10-29T10:19:12.259694+00:00",
+              "updated_by": "9d379482-398d-4e98-882c-1156b20add06",
+              "activated_at": "2026-10-29T10:19:12.259694+00:00",
+              "shift_type_id": "4c3b555e-5315-499d-a426-bf5f0fc51dca",
+              "care_recipient_id": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+              "designated_professional_id": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd"
+            },
+            "care_recipient_id": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+            "count_document_id": "9be9dbb9-5c44-4a36-93d1-e425eed16027"
+          }
+        },
+        "rollbackRestoredOriginal": true,
+        "scope": "Formal recount;already-counted obligation correctly retains its deadline. Extension of a still-pending weekly obligation is not proven by this sample.",
+        "method": "DB authenticated role with claims from an officially issued live Auth session;not an HTTP transport or time-elapsed proof;no token exported"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B25-16",
+      "purpose": "Pausar regime conserva obrigação e reconto ativo;reativação não apaga história",
+      "recordedAt": "2026-10-29T10:21:07.836Z",
+      "observed": {
+        "pausedEnabled": false,
+        "activeAssignmentStillExecutable": true,
+        "obligationIdsPreserved": true,
+        "originalActivationPreserved": true,
+        "meaning": "Pausa suspende geração automática; não dispensa trabalho já atribuído nem devolve ao modo anterior"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B25-17",
+      "purpose": "Diferença física no reconto não vira débito de consumo nem ajuste antes da revisão",
+      "recordedAt": "2026-10-29T10:21:07.950Z",
+      "observed": {
+        "before": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 10
+        },
+        "after": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 10
+        },
+        "countedQuantity": "0.000000",
+        "referenceQuantity": 1,
+        "documentStatus": "submitted",
+        "documentVersion": 2,
+        "adjustmentNotYetApplied": true,
+        "next": "B2.6 handoff keeps count author/history and may test final distinct review"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "finishedAt": "2026-10-29T10:21:08.904Z"
+}

@@ -7,10 +7,18 @@ A criação de novos grupos depende da autorização correspondente.
 ## Estado atual
 
 - B1.1–B1.8: investigação concluída, sem correções de produto.
+- B2.0–B2.10: investigação de processos concluída, sem implementação.
+- [Executivo
+  B2](../2026-10-29-phase-b2-processes/16_GROUP_B2_EXECUTIVE_ASSESSMENT.md).
+- [Índice B2](../2026-10-29-phase-b2-processes/README.md).
+- [Achados B2](../2026-10-29-phase-b2-processes/13_FINDINGS_MASTER.md).
+- [Decisões pendentes para
+  C](../2026-10-29-phase-b2-processes/17_PHASE_C_DECISION_HANDOFF.md).
 - [Índice B1](../2026-10-28-phase-b1-interface/README.md).
 - [Achados B1](../2026-10-28-phase-b1-interface/12_FINDINGS_MASTER.md).
 - [Transferência](../2026-10-28-phase-b1-interface/15_CROSS_GROUP_DEPENDENCIES_AND_PHASE_C_HANDOFF.md).
-- [Entradas originais da Fase A](../2026-10-25-production-readiness/inputs/README.md).
+- [Entradas originais da Fase
+  A](../2026-10-25-production-readiness/inputs/README.md).
 
 O histórico inclui o commit temporário do responsável, o encerramento B1 e
 os checkpoints antigos. Os snapshots antigos são preservados por ancestralidade,

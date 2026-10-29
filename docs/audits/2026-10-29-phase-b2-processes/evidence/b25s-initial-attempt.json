@@ -1,0 +1,26 @@
+{
+  "group": "B2.5S",
+  "startedAt": "2026-10-29T10:20:37.608Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B25-15",
+      "purpose": "Aprovação familiar de adiamento preserva prazo original;ensaio transacional com sessão Auth real",
+      "recordedAt": "2026-10-29T10:20:37.879Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Expected values to be strictly equal:\n\nfalse !== true\n",
+        "sqlstate": null
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ]
+}

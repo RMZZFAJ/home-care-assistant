@@ -1,0 +1,1176 @@
+# ORDEM MESTRA — FASE B2
+## AUDITORIA ESPECIALIZADA DE PROCESSOS, JORNADAS OPERACIONAIS, REGRAS DE FUNCIONAMENTO E FUNCIONALIDADES
+### Projeto: Home Care Assistant
+
+---
+
+# I. MISSÃO E AUTORIDADE
+
+Você está autorizado a executar integralmente o **Grupo B2 da Fase B — Aprofundamentos Especializados** do Home Care Assistant.
+
+A estratégia de desenvolvimento aprovada pelo responsável é:
+
+**FASE A — Auditoria holística → FASE B — Aprofundamentos especializados → FASE C — Consolidação e decisões → FASE D — Implementação.**
+
+A Fase A e o Grupo B1 foram concluídos como investigações.
+
+O trabalho atual é exclusivamente o **Grupo B2**.
+
+**Sua missão não é implementar, corrigir ou refatorar o sistema. Sua missão é descobrir e documentar, em profundidade excepcional, como funcionam todos os processos operacionais existentes, quais problemas apresentam, o que ainda falta, quais funcionalidades deveriam ser consideradas e como esses processos poderiam ser aperfeiçoados.**
+
+Execute a investigação de ponta a ponta, considerando a experiência humana, os estados dos processos, suas regras, os atores, as responsabilidades, as transições, as relações entre documentos, os efeitos sobre os dados e as situações excepcionais.
+
+O produto deve ser examinado como uma solução real de gestão de assistência domiciliar, e não apenas como um conjunto de arquivos de programação.
+
+A auditoria deverá responder, entre outras perguntas:
+
+- O processo existe e atende à necessidade para a qual foi criado?
+- Ele está completo?
+- Sua sequência operacional faz sentido?
+- As responsabilidades estão corretamente distribuídas?
+- As regras implementadas correspondem à intenção operacional?
+- Existem etapas desnecessárias?
+- Existem etapas importantes ausentes?
+- A mesma informação é solicitada repetidamente sem necessidade?
+- Há oportunidades de automatizar tarefas repetitivas sem comprometer controle ou segurança?
+- O sistema permite acompanhar uma operação desde seu início até seu encerramento efetivo?
+- O que acontece quando uma operação não termina como previsto?
+- O usuário consegue corrigir um erro sem destruir registros válidos?
+- Os processos se integram adequadamente?
+- As ações realizadas produzem os efeitos esperados nos documentos e estoques?
+- Existem funcionalidades pouco utilizadas, incompletas, mal distribuídas ou ausentes?
+- Uma família e uma equipe de enfermagem conseguiriam operar o sistema de maneira segura e eficiente?
+
+Não considere essa relação exaustiva.
+
+**Sua obrigação é descobrir também problemas e oportunidades que ainda não foram imaginados ou mencionados pelo responsável.**
+
+---
+
+# II. REPOSITÓRIO, BASE E ORGANIZAÇÃO GIT
+
+Repositório:
+
+`RMZZFAJ/home-care-assistant`
+
+Branch única de trabalho para toda a Fase B:
+
+`audit/phase-b`
+
+A reorganização das branches foi concluída anteriormente.
+
+Existem somente:
+
+- `master`
+- `audit/phase-b`
+
+**NÃO crie outra branch.**
+
+**NÃO abra pull requests.**
+
+**NÃO realize merge na master.**
+
+**NÃO execute rebase, reset destrutivo, force push, limpeza indiscriminada ou qualquer operação que comprometa o histórico.**
+
+O estado conhecido da branch no início desta ordem é:
+
+`73bedcbc09f9edba8c8869b60ea84950cddc82fc`
+
+A versão do produto que fundamentou as auditorias A e B1 é:
+
+`37cb7f85e96e551d6419871f94dd950712e2565b`
+
+Essas referências devem ser verificadas novamente antes do trabalho.
+
+Se houver novos commits legítimos na branch, reconheça-os e documente a situação. Não sobrescreva trabalho existente.
+
+Não confunda commits documentais com alterações do código do produto.
+
+## Organização dos novos arquivos
+
+Crie exclusivamente a documentação e as evidências da B2 na pasta:
+
+`docs/audits/2026-10-29-phase-b2-processes/`
+
+Atualize, quando necessário, o índice geral:
+
+`docs/audits/phase-b/README.md`
+
+A pasta do Grupo B1 deve permanecer preservada.
+
+Não substitua relatórios, evidências, capturas ou registros históricos da Fase A ou B1.
+
+Ao concluir o B2, realize commits exclusivamente documentais na branch `audit/phase-b`.
+
+A documentação deverá ser produzida progressivamente, com checkpoints persistentes.
+
+O trabalho não poderá depender exclusivamente do histórico da conversa do Codex.
+
+---
+
+# III. LIMITES ABSOLUTOS
+
+A B2 é uma investigação.
+
+Não implemente correções.
+
+Não altere código de produção.
+
+Não altere migrations.
+
+Não altere tabelas, funções, políticas de autorização ou configurações remotas.
+
+Não altere dependências do produto.
+
+Não realize deploy.
+
+Não execute operações em produção.
+
+Não envie mensagens reais por WhatsApp, e-mail ou outros provedores.
+
+Não modifique contas ou dados reais.
+
+Não execute limpeza, reset ou reconstrução do banco existente.
+
+Não crie uma segunda infraestrutura local desnecessária.
+
+Testes com dados sintéticos poderão ser realizados exclusivamente no ambiente local já existente, após identificação rigorosa do projeto, dos dados e das condições de isolamento.
+
+Reprodutores auxiliares deverão permanecer dentro da pasta documental da B2.
+
+Se determinado cenário exigir uma mudança no produto para ser reproduzido, registre a limitação. Não implemente a mudança nesta fase.
+
+Preserve as regras existentes de autorização, versionamento, histórico, integridade e rastreabilidade.
+
+Não utilize operações artificiais de estoque para contornar um defeito e produzir um teste aparentemente aprovado.
+
+O repositório foi identificado anteriormente como público. Utilize somente dados fictícios e evidências sanitizadas.
+
+Não publique nomes de pacientes reais, informações clínicas identificáveis, documentos pessoais, credenciais, tokens, dados privados ou conteúdo sensível.
+
+Os documentos históricos da Fase A são fontes de contexto, não autorização para reproduzir informações pessoais nas novas evidências.
+
+---
+
+# IV. MATERIAL OBRIGATÓRIO DE REFERÊNCIA
+
+Antes de iniciar a investigação especializada, leia e compreenda:
+
+1. `AGENTS.md` e as instruções vigentes do projeto.
+2. A documentação de arquitetura e operação atualmente válida.
+3. O diagnóstico executivo da Fase A.
+4. Os 32 achados da Fase A.
+5. Os mapas de arquitetura, backend, banco, fluxos e jornadas da Fase A.
+6. O relatório executivo final da B1.
+7. Os 35 achados consolidados da B1.
+8. O documento de funcionalidades e necessidades novas da B1.
+9. A matriz de critérios de aceitação da B1.
+10. O documento de dependências e transferência da B1.
+11. Os inventários, coberturas e evidências relevantes para os processos examinados.
+
+Localizações principais:
+
+`docs/audits/2026-10-25-production-readiness/`
+
+`docs/audits/2026-10-28-phase-b1-interface/`
+
+`docs/audits/phase-b/`
+
+**Esses documentos constituem referências investigativas, não respostas definitivas.**
+
+A B2 deverá examinar independentemente o funcionamento atual.
+
+Não considere que os 32 achados da Fase A ou os 35 da B1 representam o universo completo dos problemas.
+
+Não reproduza as mesmas conclusões apenas com outras palavras.
+
+Procure causas ainda não identificadas, consequências não examinadas, processos incompletos, lacunas operacionais e oportunidades concretas.
+
+---
+
+# V. METODOLOGIA OBRIGATÓRIA
+
+Para cada processo, realize uma análise em múltiplas dimensões.
+
+## V.1. Reconstrução operacional
+
+Documente:
+
+- Objetivo do processo.
+- Necessidade humana atendida.
+- Quem pode iniciar.
+- Quem pode executar cada etapa.
+- Quem pode consultar.
+- Quem pode aprovar, rejeitar, cancelar, corrigir ou encerrar.
+- Condições para começar.
+- Informações necessárias.
+- Etapas executadas.
+- Documentos produzidos.
+- Efeitos sobre outros documentos.
+- Efeitos sobre estoque e responsabilidades.
+- Estados intermediários.
+- Condições de conclusão.
+- Histórico e comprovação.
+- Possibilidades de retomada.
+- Situações excepcionais.
+
+Não se limite a descrever o caminho principal.
+
+## V.2. Verificação técnica dirigida
+
+Rastreie cada operação relevante desde a ação do usuário até sua consequência efetiva.
+
+Quando necessário, examine:
+
+- Componentes de interface.
+- Rotas e procedimentos do servidor.
+- Validações.
+- Regras de negócio.
+- Operações do PostgreSQL.
+- Autorizações.
+- Mudanças de estado.
+- Movimentações de estoque.
+- Registros históricos.
+- Notificações e tarefas automáticas relacionadas.
+
+A análise deverá esclarecer o que realmente acontece.
+
+Entretanto, B2 não deverá se transformar em uma repetição integral da futura auditoria especializada de banco de dados ou backend.
+
+Investigue essas camadas na profundidade necessária para compreender o processo e registre questões estruturais para os grupos apropriados.
+
+## V.3. Teste do caminho normal
+
+Reproduza, quando seguro, o fluxo completo com contas e dados fictícios.
+
+Verifique não apenas se uma resposta de sucesso aparece, mas se os efeitos correspondentes foram realmente registrados.
+
+## V.4. Teste das exceções
+
+Procure situações como:
+
+- Operação parcialmente concluída.
+- Dados incompletos.
+- Quantidades divergentes.
+- Documento alterado por outra pessoa.
+- Mudança de responsável.
+- Alteração ou revogação de autorização.
+- Cancelamento.
+- Rejeição.
+- Repetição de solicitação.
+- Perda da resposta após gravação.
+- Interrupção antes da gravação.
+- Reabertura posterior.
+- Operação vinculada a documentos já encerrados.
+- Ações simultâneas de pessoas diferentes.
+- Informações antigas apresentadas como atuais.
+- Tarefas automáticas em execução durante mudanças manuais.
+
+Não simule situações sem correspondência possível no produto apenas para aumentar artificialmente a cobertura.
+
+## V.5. Perspectiva humana
+
+Para cada etapa, pergunte:
+
+A pessoa sabe por que precisa executá-la?
+
+Compreende o que mudou?
+
+Sabe qual responsabilidade possui?
+
+Consegue reconhecer a situação atual?
+
+Sabe quem deve agir em seguida?
+
+Consegue continuar depois de uma interrupção?
+
+Existe algum caminho mais simples sem perda de segurança?
+
+Uma pessoa pouco familiarizada com sistemas entenderia o processo?
+
+## V.6. Segunda investigação independente
+
+Depois da primeira análise de cada subgrupo, realize uma segunda passada procurando:
+
+- O que não foi investigado.
+- O que foi presumido incorretamente.
+- O que parece correto, mas pode falhar em uma exceção.
+- Funcionalidades ausentes.
+- Duplicações de tarefas.
+- Dependências escondidas.
+- Contradições entre regras.
+- Consequências indiretas.
+- Melhorias que podem reduzir esforço operacional.
+
+Analise também hipóteses contrárias às suas conclusões.
+
+Uma recomendação deverá ser abandonada quando já existir uma solução adequada ou quando introduzir custo ou risco desproporcional.
+
+---
+
+# VI. SUBGRUPOS OBRIGATÓRIOS
+
+Execute os dez subgrupos em sequência.
+
+Não considere um subgrupo concluído apenas porque encontrou alguns problemas.
+
+## B2.1 — INVENTÁRIO INTEGRAL DOS PROCESSOS
+
+Identifique todos os processos operacionais existentes no Home Care Assistant.
+
+Não organize o inventário apenas pelas páginas.
+
+Uma mesma página pode participar de processos distintos, enquanto um único processo pode envolver várias páginas, documentos, pessoas e mecanismos automáticos.
+
+Construa um mapa contendo:
+
+- Processo principal.
+- Subprocessos.
+- Objetivo.
+- Atores.
+- Responsabilidades.
+- Condições de entrada.
+- Condições de saída.
+- Estados.
+- Documentos relacionados.
+- Efeitos sobre dados.
+- Dependências.
+- Exceções.
+- Caminhos de recuperação.
+- Lacunas.
+
+Diferencie o que está implementado, parcialmente implementado, apenas documentado e não existente.
+
+Produza um catálogo identificável de processos e transições.
+
+A cobertura deverá permitir demonstrar que cada processo relevante foi localizado e recebeu investigação própria.
+
+**Entrega específica:** mapa canônico dos processos operacionais e suas relações.
+
+---
+
+## B2.2 — REQUISIÇÕES, COMPRAS, DOAÇÕES E ABASTECIMENTO
+
+Examine REQ e COM individualmente e em conjunto.
+
+### Requisição de materiais
+
+Investigue:
+
+- Identificação da necessidade.
+- Seleção dos materiais.
+- Produtos não catalogados.
+- Estoque observado.
+- Urgência.
+- Justificativas.
+- Requisições repetidas.
+- Rascunhos.
+- Emissão.
+- Ciência.
+- Atendimento.
+- Pendências.
+- Correções.
+- Cancelamentos.
+- Histórico.
+- Consequências para os processos seguintes.
+
+Preserve a regra central de que **REQ não registra quantidade solicitada como um campo próprio de pedido**.
+
+Não introduza esse conceito como recomendação automática.
+
+### Compra e doação
+
+Investigue:
+
+- Origem da aquisição.
+- Compra versus doação.
+- Escolha de materiais.
+- Quantidades.
+- Unidades e apresentações.
+- Conferência.
+- Aprovações.
+- Cancelamentos.
+- Documentos vinculados.
+- Efeitos no estoque.
+- Relações com requisições anteriores.
+- Recuperação de operações.
+
+Verifique se existem oportunidades de reduzir preenchimentos repetidos entre REQ e COM sem presumir que uma requisição gera automaticamente uma compra.
+
+Examine também como identificar materiais efetivamente adquiridos, ainda esperados, disponíveis ou destinados a uma entrega.
+
+**Entrega específica:** mapa integral do abastecimento, com estados, transições, exceções e funcionalidades ausentes.
+
+---
+
+## B2.3 — ENTREGAS, RECEBIMENTOS E VÍNCULOS DOCUMENTAIS
+
+Investigue o ciclo de vida completo da ENT.
+
+Inclua:
+
+- Preparação.
+- Origem dos materiais.
+- Destinatário.
+- Expedição.
+- Materiais em trânsito.
+- Recebimento integral.
+- Recebimento parcial.
+- Divergência.
+- Correção.
+- Cancelamento.
+- Documento relacionado.
+- Efeito sobre a requisição.
+- Efeito sobre cada custódia de estoque.
+- Responsabilidade pelo próximo passo.
+- Histórico e comprovação.
+
+Reconstrua todas as mudanças relevantes entre os estados da entrega.
+
+Investigue especialmente:
+
+- Cancelamento depois de eventos posteriores.
+- Entrega parcialmente recebida.
+- Material já consumido.
+- Diferenças entre quantidade expedida e aceita.
+- Tentativas repetidas.
+- Mudança de destinatário.
+- Operações simultâneas.
+- Anexos e registros complementares.
+- Relações com documentos concluídos ou cancelados.
+
+A Fase A identificou o problema DB-001, relacionado ao cancelamento de ENT com consumo positivo.
+
+A B2 deverá investigar sua consequência operacional e suas possíveis alternativas seguras, sem substituir a auditoria técnica especializada do banco.
+
+Não execute movimentações fictícias para contornar a regra.
+
+**Entrega específica:** ciclo completo da ENT e seus efeitos entre documentos e custódias.
+
+---
+
+## B2.4 — ESTOQUES, CUSTÓDIAS, MOVIMENTAÇÕES E CONVERSÕES
+
+Examine a experiência e a lógica operacional das diferentes custódias:
+
+- Estoque da família.
+- Estoque da equipe.
+- Materiais em trânsito.
+- Outras distinções efetivamente existentes no contrato.
+
+Investigue cada tipo de movimentação.
+
+Verifique:
+
+- Origem.
+- Destino.
+- Responsável.
+- Documento justificante.
+- Quantidade.
+- Unidade.
+- Precisão.
+- Conversão.
+- Confirmação.
+- Histórico.
+- Cancelamento ou correção.
+- Consequências em documentos relacionados.
+
+Analise o tratamento de materiais com diferentes apresentações.
+
+Exemplo investigativo: um produto pode estar cadastrado por unidade, mas ser adquirido em embalagem contendo várias unidades.
+
+O sistema permite compreender e conferir a conversão?
+
+O histórico preserva a unidade originalmente utilizada?
+
+Existem situações em que o usuário precisa fazer cálculos manualmente?
+
+A apresentação cadastrada consegue ser consultada e administrada depois?
+
+Não recomende arredondamentos silenciosos nem conversões sem equivalência conhecida.
+
+Investigue também:
+
+- Estoque inicial.
+- Ajustes manuais.
+- Divergências.
+- Produtos desativados.
+- Produtos duplicados.
+- Produtos sem apresentação.
+- Materiais em trânsito por períodos prolongados.
+- Consulta de movimentações antigas.
+- Conciliação documental.
+
+**Entrega específica:** mapa operacional de custódias, movimentações, correções e controles necessários.
+
+---
+
+## B2.5 — BALANÇOS, CONTAGENS, OCORRÊNCIAS E CONSUMO
+
+Este subgrupo deverá aprofundar dois processos relacionados, preservando suas diferenças.
+
+### Balanços
+
+Investigue:
+
+- Configuração do regime.
+- Definição de responsáveis.
+- Relação com plantões.
+- Periodicidade.
+- Janela temporal.
+- Contagem física.
+- Estoque de referência.
+- Divergência.
+- Revisão.
+- Aprovação automática.
+- Aprovação manual.
+- Rejeição.
+- Adiamento.
+- Cancelamento.
+- Encerramento.
+- Histórico e rastreabilidade.
+
+Verifique se as regras se comportam corretamente diante de mudanças de escala, ausência do profissional, mudança de regime, plantões noturnos e situações excepcionais.
+
+Preserve a distinção entre **contagem física e consumo efetivamente registrado**.
+
+Não proponha debitar automaticamente diferenças de balanço sem fundamento e autorização.
+
+### Ocorrências e consumo
+
+Investigue:
+
+- Registro de ocorrência.
+- Falta de material.
+- Consumo extraordinário.
+- Quantidades.
+- Custódia.
+- Responsável.
+- Confirmação.
+- Rejeição.
+- Efeito sobre estoque.
+- Consulta posterior.
+- Busca por pendências antigas.
+- Relação com outros documentos.
+
+Verifique se as operações permitem reconstruir claramente o que foi apenas relatado e aquilo que efetivamente produziu movimentação.
+
+**Entrega específica:** mapa completo de balanço, consumo e suas interdependências.
+
+---
+
+## B2.6 — ESCALAS, PLANTÕES E RESPONSABILIDADES
+
+Investigue os processos de programação e gestão de plantões.
+
+Inclua:
+
+- Tipos de plantão.
+- Programações.
+- Séries recorrentes.
+- Plantões individuais.
+- Substituições.
+- Propostas de alteração.
+- Aprovações.
+- Rejeições.
+- Encerramento de série.
+- Alterações pontuais.
+- Sobreposições.
+- Fusos.
+- Profissionais habilitados.
+- Responsabilidades sobre balanços.
+- Histórico e reconstrução das alterações.
+
+Não presuma que escala significa comprovação de presença.
+
+Investigue a coerência entre programação, autorização e responsabilidades operacionais.
+
+Examine especificamente:
+
+- Aprovação após encerramento de série.
+- Alteração de pessoa responsável.
+- Alteração de horário.
+- Mudanças simultâneas.
+- Propostas antigas ainda pendentes.
+- Relação com balanço já iniciado.
+- Relação com contagem já concluída.
+- Ausência de profissional programado.
+- Responsável substituído durante uma tarefa.
+
+A Fase A identificou DB-003 e UX-001; a B1 aprofundou a apresentação da decisão.
+
+A B2 deverá reconstruir o processo completo, procurando consequências operacionais adicionais.
+
+**Entrega específica:** mapa de estados da programação, decisões e vínculos com outros processos.
+
+---
+
+## B2.7 — PESSOAS, CONVITES, VÍNCULOS E ADMINISTRAÇÃO OPERACIONAL
+
+Investigue como as pessoas passam a integrar o sistema e assumem responsabilidades.
+
+Examine:
+
+- Identidades.
+- Convites.
+- Aceitação.
+- Vínculos.
+- Funções.
+- Capacidades.
+- Contexto do paciente.
+- Administração local.
+- Administração global.
+- Supervisão.
+- Profissionais.
+- Familiares.
+- Leitores.
+- Alterações de permissões.
+- Revogações.
+- Desligamento.
+- Substituições.
+- Histórico.
+
+Verifique a coerência operacional entre:
+
+**Pessoa convidada, convite aceito, vínculo ativo, função atribuída e acesso efetivamente permitido.**
+
+Esses fatos não são necessariamente equivalentes.
+
+Investigue o que acontece quando uma pessoa deixa de participar da equipe enquanto possui operações pendentes.
+
+Examine também a administração do catálogo, unidades, políticas, destinatários e configurações operacionais.
+
+Não trate a administração global como autorização automática para atuar em qualquer paciente.
+
+**Entrega específica:** mapa de responsabilidades, transições de vínculo e consequências operacionais.
+
+---
+
+## B2.8 — DOCUMENTOS, CIÊNCIA, COMUNICAÇÕES E CONTINUIDADE
+
+Examine como os processos produzem, vinculam e conservam seus registros.
+
+Investigue:
+
+- Criação documental.
+- Estados.
+- Versões.
+- Retificações.
+- Cancelamentos.
+- Eventos históricos.
+- Anexos.
+- PDFs.
+- Ciência.
+- Recebimento.
+- Atendimento.
+- Responsabilidade posterior.
+- Notificações internas.
+- Comunicações externas.
+- Consulta e recuperação.
+
+Preserve diferenças fundamentais:
+
+**Registrar não equivale a notificar.**
+
+**Notificar não equivale a entregar.**
+
+**Entregar não equivale a ler.**
+
+**Ler não equivale necessariamente a registrar ciência.**
+
+**Ciência não equivale a recebimento de material.**
+
+Investigue como cada processo prossegue quando uma dessas etapas não acontece.
+
+Verifique se existem pendências sem responsável claro, tarefas que não chegam ao destinatário adequado ou acontecimentos que não podem ser reencontrados depois.
+
+A auditoria especializada de infraestrutura e integrações ocorrerá em outro grupo.
+
+Aqui, o objetivo é reconstruir a consequência operacional dessas comunicações.
+
+**Entrega específica:** mapa de continuidade, responsabilidades e consequências documentais.
+
+---
+
+## B2.9 — EXCEÇÕES, FALHAS E CONSISTÊNCIA ENTRE PROCESSOS
+
+Este subgrupo deverá examinar o sistema de maneira transversal.
+
+Não repita apenas as exceções já mencionadas nos outros grupos.
+
+Construa situações em que dois ou mais processos interagem.
+
+Exemplos:
+
+- Uma requisição é atendida parcialmente e depois cancelada.
+- Uma compra foi registrada, mas a entrega não ocorreu.
+- Uma entrega foi recebida e posteriormente contestada.
+- Um material foi consumido antes da conclusão de uma correção documental.
+- Um balanço ocorre durante mudança de plantão.
+- Um profissional é desligado enquanto possui tarefas pendentes.
+- Uma política é alterada com documentos já iniciados.
+- Uma operação é registrada enquanto outra pessoa consulta dados antigos.
+- Uma resposta de gravação se perde.
+- Um processo termina tecnicamente, mas não existe comunicação suficiente para a próxima pessoa agir.
+
+Para cada situação:
+
+1. Identifique a sequência de acontecimentos.
+2. Determine os atores e autorizações.
+3. Registre os estados anteriores.
+4. Execute o cenário local quando seguro.
+5. Verifique os efeitos.
+6. Compare com o resultado esperado.
+7. Identifique riscos e oportunidades.
+8. Registre os mecanismos de recuperação.
+9. Defina critérios de aceitação futuros.
+
+Não confunda um cenário não reproduzido com defeito confirmado.
+
+**Entrega específica:** catálogo de exceções entre processos, com reprodução e consequências.
+
+---
+
+## B2.10 — FUNCIONALIDADES AUSENTES, SIMPLIFICAÇÕES E OPORTUNIDADES
+
+Este subgrupo deverá examinar o sistema como produto.
+
+Sua missão é descobrir possibilidades fundamentadas de melhoria, inclusive aquelas que não aparecem nos achados anteriores.
+
+Considere:
+
+- Funcionalidades incompletas.
+- Etapas desnecessárias.
+- Digitação repetitiva.
+- Informações que poderiam ser reaproveitadas.
+- Listas prontas.
+- Seleções inteligentes.
+- Configurações realmente úteis.
+- Acompanhamento de pendências.
+- Gestão de exceções.
+- Recuperação de operações.
+- Localização de registros antigos.
+- Melhor integração entre processos.
+- Informações ausentes nos painéis.
+- Atalhos operacionais.
+- Preparação da primeira residência.
+- Administração de várias residências e pacientes.
+- Atividades recorrentes.
+- Dificuldades de utilização por pessoas pouco familiarizadas com tecnologia.
+
+Não produza sugestões genéricas como “melhorar a experiência” ou “adicionar automações”.
+
+Cada proposta deverá informar:
+
+- Necessidade concreta.
+- Público beneficiado.
+- Situação em que ocorre.
+- Funcionamento atual.
+- Alternativa proposta.
+- Benefício esperado.
+- Esforço ou complexidade estimados.
+- Dependências.
+- Riscos.
+- Alternativas mais simples.
+- Necessidade de decisão do responsável.
+- Forma futura de verificar o benefício.
+
+Diferencie:
+
+**Defeito:** algo existente funciona incorretamente.
+
+**Lacuna:** uma necessidade relevante não é atendida.
+
+**Oportunidade:** uma solução existente poderia ser aperfeiçoada.
+
+**Preferência:** uma escolha de apresentação ou funcionamento que depende do responsável.
+
+**Hipótese:** possibilidade que ainda não foi suficientemente comprovada.
+
+Não transforme preferências do auditor em requisitos obrigatórios.
+
+Não proponha automaticamente novos módulos, novas tabelas, dashboards ou configurações se o problema puder ser resolvido com recursos existentes.
+
+**Entrega específica:** catálogo fundamentado de funcionalidades ausentes e oportunidades de simplificação.
+
+---
+
+# VII. ENTREGÁVEIS OBRIGATÓRIOS
+
+A documentação deverá ser granular, navegável e verificável.
+
+Estrutura inicial recomendada:
+
+`docs/audits/2026-10-29-phase-b2-processes/`
+
+Arquivos obrigatórios:
+
+`README.md`
+
+`CHECKPOINT.md`
+
+`00_BASELINE_SCOPE_AND_METHOD.md`
+
+`01_PROCESS_INVENTORY.csv`
+
+`01_PROCESS_COVERAGE.csv`
+
+`01_ACTORS_RESPONSIBILITIES_MATRIX.csv`
+
+`02_PROCESS_STATE_MAPS.md`
+
+`02_PROCESS_TRANSITIONS.csv`
+
+`03_REQUISITION_ACQUISITION_AUDIT.md`
+
+`04_DELIVERY_RECEIPT_AUDIT.md`
+
+`05_STOCK_CUSTODY_MOVEMENTS_AUDIT.md`
+
+`06_BALANCE_CONSUMPTION_AUDIT.md`
+
+`07_SCHEDULES_SHIFTS_AUDIT.md`
+
+`08_IDENTITIES_MEMBERSHIPS_ADMIN_AUDIT.md`
+
+`09_DOCUMENTS_SCIENCE_COMMUNICATION_AUDIT.md`
+
+`10_CROSS_PROCESS_EXCEPTIONS.md`
+
+`10_EXCEPTION_SCENARIOS.csv`
+
+`11_PERSONA_JOURNEYS_AND_OPERATIONAL_FRICTION.md`
+
+`12_NEW_FUNCTIONALITIES_AND_PROCESS_GAPS.md`
+
+`13_FINDINGS_MASTER.csv`
+
+`13_FINDINGS_MASTER.md`
+
+`14_ACCEPTANCE_SCENARIOS.md`
+
+`15_CROSS_GROUP_DEPENDENCIES.md`
+
+`16_GROUP_B2_EXECUTIVE_ASSESSMENT.md`
+
+`17_PHASE_C_DECISION_HANDOFF.md`
+
+Pasta:
+
+`evidence/`
+
+A estrutura poderá ser ampliada se necessário, sem eliminar os entregáveis.
+
+## VII.1. Inventário
+
+Cada processo deverá ter um identificador próprio.
+
+Relacione:
+
+- Processo.
+- Subprocesso.
+- Ação.
+- Responsável.
+- Pré-condição.
+- Estado inicial.
+- Estado final.
+- Efeito.
+- Documento.
+- Dependência.
+- Evidência.
+- Situação de verificação.
+
+Não considere uma busca textual no código como prova suficiente de funcionamento.
+
+## VII.2. Mapa de transições
+
+Para cada processo relevante, identifique as mudanças possíveis entre seus estados.
+
+Inclua transições legítimas, proibidas, condicionais e não verificadas.
+
+Mapeie explicitamente cancelamentos, rejeições, aprovações, correções e retomadas.
+
+## VII.3. Registro mestre dos achados
+
+Cada achado deverá ter:
+
+- Identificador único.
+- Título compreensível.
+- Domínio.
+- Processo afetado.
+- Prioridade.
+- Natureza.
+- Situação atual.
+- Resultado esperado.
+- Consequência operacional.
+- Evidências.
+- Reprodução.
+- Limitações.
+- Relação com achados A/B1.
+- Causa provável, quando sustentada.
+- Recomendação.
+- Alternativas.
+- Dependências.
+- Decisões necessárias.
+- Critérios futuros de aceitação.
+
+Não transforme cada manifestação do mesmo problema em um achado independente.
+
+Não elimine manifestações distintas que sejam relevantes para a correção.
+
+Não invente prioridades elevadas apenas para demonstrar profundidade.
+
+## VII.4. Catálogo de funcionalidades novas
+
+Separe propostas de melhoria de defeitos comprovados.
+
+Indique quais propostas são pequenas melhorias de processos existentes e quais exigiriam desenvolvimento de uma capacidade nova.
+
+## VII.5. Critérios de aceitação
+
+Descreva testes futuros que permitam verificar a correção dos achados.
+
+Inclua tanto o comportamento esperado quanto aquilo que **não deve acontecer**.
+
+Exemplo: uma correção de cancelamento não pode eliminar histórico válido nem realizar movimentação indevida de estoque.
+
+Esses testes não deverão ser implementados agora.
+
+## VII.6. Relatório executivo
+
+Produza explicações compreensíveis para o responsável, que não possui formação em programação.
+
+Evite apresentar apenas nomes de funções, endpoints, códigos de banco e estruturas de dados.
+
+Explique cada questão em termos operacionais:
+
+O que acontece?
+
+Quem é afetado?
+
+Por que importa?
+
+Qual consequência pode produzir?
+
+O que precisará ser decidido?
+
+O que poderá ser melhorado?
+
+---
+
+# VIII. QUALIDADE DAS EVIDÊNCIAS
+
+Cada investigação deverá distinguir:
+
+**LEITURA ESTÁTICA:** conclusão obtida pela análise do código.
+
+**TESTE LOCAL:** comportamento observado no ambiente fictício.
+
+**RENDERIZAÇÃO:** interface efetivamente apresentada.
+
+**VERIFICAÇÃO DE PERSISTÊNCIA:** resultado confirmado na fonte autorizada.
+
+**RISCO SUSTENTADO:** possibilidade fundamentada ainda não reproduzida.
+
+**NÃO VERIFICADO:** situação que depende de testes adicionais.
+
+**VALIDAÇÃO HUMANA:** compreensão confirmada por uma pessoa real, quando efetivamente realizada.
+
+Não apresente cliques automatizados como homologação humana.
+
+Não apresente testes com dados fictícios como validação de produção.
+
+Não apresente uma operação rejeitada como prova de gravação.
+
+Não apresente ausência de erro em uma amostra como inexistência de erros em todas as situações.
+
+Mantenha registros das tentativas inválidas, corrigindo os procedimentos de teste quando necessário.
+
+Toda evidência deve indicar versão do produto, ambiente, cenário, resultado e limites.
+
+---
+
+# IX. EXIGÊNCIA DE PROFUNDIDADE E COBERTURA
+
+Não encerre um subgrupo apenas com um relatório narrativo.
+
+Cada investigação deverá produzir:
+
+1. Inventário.
+2. Reconstrução do funcionamento atual.
+3. Matriz de estados e transições relevantes.
+4. Identificação de atores e responsabilidades.
+5. Verificação dirigida do código e dos contratos.
+6. Testes locais proporcionais, quando seguros.
+7. Exceções e caminhos não exercitados.
+8. Diagnóstico dos problemas.
+9. Identificação de méritos que devem ser preservados.
+10. Oportunidades de melhoria.
+11. Contraditório.
+12. Critérios de aceitação.
+13. Dependências com outros grupos.
+14. Checkpoint concluído.
+
+Não infle os relatórios repetindo os mesmos parágrafos.
+
+O objetivo é profundidade demonstrável.
+
+Se uma etapa exigir mais investigação, avance nela antes de declarar o subgrupo concluído.
+
+Se determinada investigação depender de uma decisão de produto, registre as alternativas e prossiga no restante do trabalho.
+
+Não interrompa a execução para perguntar questões que podem ser documentadas para a Fase C.
+
+Somente solicite intervenção caso exista um bloqueio material que impeça continuar com segurança.
+
+---
+
+# X. REGRAS OPERACIONAIS QUE DEVEM SER PRESERVADAS
+
+A auditoria não poderá recomendar simplificações que silenciosamente destruam as distinções existentes.
+
+Preserve especialmente:
+
+- REQ sem quantidade solicitada como requisito próprio.
+- Compra não equivalente a entrega.
+- Expedição não equivalente a recebimento.
+- Ciência não equivalente a aceite ou leitura integral comprovada.
+- Relato de consumo separado de débito confirmado.
+- BAL como contagem física.
+- Escala como programação, não comprovação de presença.
+- Custódias de estoque distintas.
+- Histórico imutável quando exigido pelo contrato.
+- Versionamento documental.
+- Autorizações por paciente e capacidade.
+- Administração global distinta da administração local.
+- Recuperação segura de tentativas.
+- Integridade de quantidades, unidades e conversões.
+- Preservação de eventos anteriores durante correções.
+
+Se encontrar uma regra aparentemente inadequada, registre o problema e proponha alternativas.
+
+Não a altere nesta fase.
+
+---
+
+# XI. INTEGRAÇÃO COM A FASE B1 E FUTUROS GRUPOS
+
+A B2 deve aproveitar o inventário humano da B1, mas não repetir sua finalidade.
+
+Se encontrar um defeito visual, referencie ou amplie o achado B1 correspondente.
+
+Se encontrar uma questão de banco de dados, examine seu efeito operacional e registre a necessidade de aprofundamento especializado.
+
+Se encontrar um problema de integração externa, documente sua consequência sobre o processo e encaminhe para auditoria própria.
+
+Não deixe de investigar problemas transversais apenas porque envolvem outros grupos.
+
+Entretanto, não transforme a B2 em uma auditoria indiscriminada de toda a arquitetura.
+
+**O eixo central desta investigação é a correção, completude, coerência e eficiência dos processos do produto.**
+
+---
+
+# XII. EXECUÇÃO E CHECKPOINTS
+
+Execute:
+
+**B2.0 — Reconhecimento e preparação.**
+
+Depois:
+
+**B2.1 → B2.2 → B2.3 → B2.4 → B2.5 → B2.6 → B2.7 → B2.8 → B2.9 → B2.10.**
+
+Por fim:
+
+**Consolidação e encerramento do Grupo B2.**
+
+Ao concluir cada subgrupo, atualize `CHECKPOINT.md` e registre as evidências.
+
+O checkpoint deve informar:
+
+- Subgrupo concluído.
+- Processos analisados.
+- Arquivos relevantes examinados.
+- Estados reconstruídos.
+- Cenários efetivamente testados.
+- Problemas descobertos.
+- Problemas não reproduzidos.
+- Limitações.
+- Dependências.
+- Próximos passos.
+
+Se o limite de execução impedir a conclusão, preserve os resultados e indique exatamente como retomar o mesmo grupo.
+
+Não declare o B2 concluído artificialmente.
+
+Se ocorrer compactação do contexto, utilize os documentos persistidos para continuar sem perder as decisões e os resultados anteriores.
+
+---
+
+# XIII. ENCERRAMENTO E VALIDAÇÃO FINAL
+
+Antes de declarar o B2 concluído:
+
+1. Confirme que todos os dez subgrupos foram investigados.
+2. Reconcilie o inventário dos processos.
+3. Confirme que cada achado possui origem e evidência apropriadas.
+4. Elimine duplicações injustificadas.
+5. Preserve referências aos achados anteriores.
+6. Registre expressamente os cenários não verificados.
+7. Confira referências, arquivos e evidências.
+8. Valide a integridade dos documentos produzidos.
+9. Confirme que nenhum código funcional ou migration foi modificado.
+10. Confirme a preservação da `master`.
+11. Confirme que a branch de trabalho continua sendo `audit/phase-b`.
+12. Faça commit exclusivamente documental, sem PR e sem merge.
+13. Atualize o índice geral da Fase B.
+14. Produza um relatório executivo final compreensível para o responsável.
+
+O relatório final deverá explicar:
+
+**O que existe.**
+
+**O que funciona corretamente.**
+
+**O que apresenta defeitos.**
+
+**O que apresenta riscos.**
+
+**O que ainda não foi verificado.**
+
+**O que está incompleto.**
+
+**O que poderia ser simplificado.**
+
+**Quais funcionalidades poderiam ser acrescentadas.**
+
+**Quais decisões caberão ao responsável na Fase C.**
+
+**Quais questões precisam de outros grupos especializados.**
+
+A Fase B2 estará concluída somente quando suas descobertas puderem ser utilizadas efetivamente na consolidação do produto, sem exigir que o responsável reconstrua toda a investigação a partir dos arquivos técnicos.
+
+**Não avance para o Grupo B3.**
+
+**Não execute a Fase C.**
+
+**Não implemente nenhuma correção.**
+
+A conclusão do B2 representa exclusivamente a conclusão de uma auditoria especializada.
+
+---
+
+# XIV. DIRETRIZ FINAL
+
+Esta auditoria precisa ir além de perguntar se as funcionalidades existentes funcionam.
+
+Ela deve investigar se **o Home Care Assistant possui os processos certos, na sequência certa, com as responsabilidades certas, produzindo os efeitos corretos e oferecendo as melhores condições razoáveis para sua utilização real**.
+
+Considere o uso inicial por uma família e sua equipe de assistência domiciliar, sem perder a perspectiva de uma plataforma multipaciente.
+
+O objetivo não é encontrar problemas por quantidade.
+
+O objetivo é compreender o produto em profundidade suficiente para decidir, posteriormente, quais mudanças realmente o tornarão mais correto, confiável, completo, eficiente e intuitivo.
+
+Execute a Fase B2 integralmente, começando agora pelo reconhecimento B2.0.

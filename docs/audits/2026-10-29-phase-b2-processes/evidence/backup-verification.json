@@ -1,0 +1,10 @@
+{
+  "createdAt": "2026-10-29T09:52:47.280Z",
+  "projectId": "home-care-assistant",
+  "container": "supabase_db_home-care-assistant",
+  "bytes": 4436803,
+  "sha256": "6dbb303bd262d7fc6b3b6b7aecd57c801349c4db438bbc842ca5ea298a7a8eb9",
+  "archiveListVerified": true,
+  "location": "Private user data directory outside Git",
+  "limits": "pg_restore --list succeeded; full restore not performed. No reset or data replacement authorized."
+}

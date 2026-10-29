@@ -1,0 +1,212 @@
+{
+  "group": "B2.8",
+  "startedAt": "2026-10-29T23:02:42.308Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B28-01",
+      "purpose": "REQ emitida por HTTP confirma persistência e PDF privado da versão1",
+      "recordedAt": "2026-10-29T23:02:42.584Z",
+      "observed": {
+        "requestId": "5ea971d3-756d-4428-b516-b099718ea058",
+        "httpStatus": 201,
+        "persistence": "confirmed",
+        "pdf": {
+          "status": 200,
+          "contentType": "application/pdf",
+          "cacheControl": "no-store",
+          "bytes": 26309,
+          "sha256": "64af3bbed52b831ffd521990e306b867819a963ab3d38c9be04cdb618ce9a670",
+          "pages": 2,
+          "version": 1
+        },
+        "stock": {
+          "FAMILY": "5.000000",
+          "TRANSIT": "1.000000",
+          "CARE_TEAM": "3.000000",
+          "movements": 12
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B28-02",
+      "purpose": "Marcar aviso visto não registra ciência nem atendimento",
+      "recordedAt": "2026-10-29T23:02:43.666Z",
+      "observed": {
+        "notification": {
+          "id": "d9de7833-9557-4f0e-84a9-104ce5238345",
+          "state": "pending",
+          "channel": "internal"
+        },
+        "seenHttpStatus": 200,
+        "scienceSatisfied": false,
+        "completedAt": null,
+        "fulfilled": 0,
+        "providerDeliveredOrReadProven": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B28-03",
+      "purpose": "Arquivo exige conclusão;aceite ENT completa necessidade sem ciência obrigatória",
+      "recordedAt": "2026-10-29T23:02:43.859Z",
+      "observed": {
+        "earlyArchive": {
+          "status": 400,
+          "code": "INVALID_OPERATION",
+          "error": "A operação não é compatível com o estado atual. Revise os dados e as permissões."
+        },
+        "deliveryId": "a3621d04-1319-4ffa-b936-7c7f02e45ace",
+        "receiptHttpStatus": 200,
+        "progress": {
+          "completedAt": "2026-10-29T23:02:44.513234+00:00",
+          "scienceSatisfied": false,
+          "manualArchiveRequired": true
+        },
+        "document": {
+          "id": "5ea971d3-756d-4428-b516-b099718ea058",
+          "lines": null,
+          "events": 3,
+          "number": 4,
+          "status": "submitted",
+          "version": 3,
+          "receipts": []
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B28-04",
+      "purpose": "Ciência expressa tardia não apaga exceção original;arquivo manual conserva motivos",
+      "recordedAt": "2026-10-29T23:02:44.889Z",
+      "observed": {
+        "scienceHttpStatus": 200,
+        "scienceMode": "express",
+        "manualExceptionPreserved": true,
+        "archiveHttpStatus": 200,
+        "archivedAt": "2026-10-29T23:02:45.28868+00:00",
+        "archiveReason": "Família conferiu a ciência tardia e encerrou a necessidade fictícia sem apagar a exceção",
+        "events": [
+          {
+            "id": "15bc3305-869c-4160-bdd1-4e3dd769ac80",
+            "action": "req.issued",
+            "actorId": "1be98412-e7d0-4616-959c-0d150aac79bc",
+            "version": 1,
+            "actorName": "Pessoa fictícia B2 professional",
+            "createdAt": "2026-10-29T23:02:42.883914+00:00"
+          },
+          {
+            "id": "f02da20a-4a80-4f17-a001-c9e0f2994185",
+            "action": "req.fulfillment_updated",
+            "actorId": "9d379482-398d-4e98-882c-1156b20add06",
+            "version": 2,
+            "actorName": "Pessoa fictícia B2 admin",
+            "createdAt": "2026-10-29T23:02:44.340519+00:00"
+          },
+          {
+            "id": "2faa8f22-b3a5-4213-a8ac-0ba340067a51",
+            "action": "req.completed",
+            "actorId": "1be98412-e7d0-4616-959c-0d150aac79bc",
+            "version": 3,
+            "actorName": "Pessoa fictícia B2 professional",
+            "createdAt": "2026-10-29T23:02:44.513234+00:00"
+          },
+          {
+            "id": "11556046-726f-4c18-aee5-6a8618a14d8c",
+            "action": "req.science_satisfied",
+            "actorId": "96353c67-7472-4f29-9f94-582d023b94dc",
+            "version": 4,
+            "actorName": "Pessoa fictícia B2 family",
+            "createdAt": "2026-10-29T23:02:45.10187+00:00"
+          },
+          {
+            "id": "42b88908-c62e-4142-bf50-61c8371c1086",
+            "action": "req.archived.manual",
+            "actorId": "9d379482-398d-4e98-882c-1156b20add06",
+            "version": 5,
+            "actorName": "Pessoa fictícia B2 admin",
+            "createdAt": "2026-10-29T23:02:45.28868+00:00"
+          }
+        ]
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B28-05",
+      "purpose": "PDF histórico conserva bytes após ciência/arquivo;versão atual e acesso indevido são distintos",
+      "recordedAt": "2026-10-29T23:02:45.329Z",
+      "observed": {
+        "versionOneHash": "64af3bbed52b831ffd521990e306b867819a963ab3d38c9be04cdb618ce9a670",
+        "oldHashAfterChanges": "64af3bbed52b831ffd521990e306b867819a963ab3d38c9be04cdb618ce9a670",
+        "currentVersion": 5,
+        "currentHash": "4fa03c8da1165171dad1e7e53a685e6d9ee58c60d354cfc964462fb76f89c3d4",
+        "currentPages": 2,
+        "unauthorizedComPdf": {
+          "status": 403,
+          "code": "FORBIDDEN",
+          "error": "Você não tem autorização para esta operação."
+        },
+        "publicVerification": true,
+        "limits": "Hash comparison and version persistence;not signature,physical QR or visual PDF acceptance"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B28-06",
+      "purpose": "Anexo privado por HTTP recupera mesma tentativa;bytes diferentes com mesma chave são recusados",
+      "recordedAt": "2026-10-29T23:02:46.029Z",
+      "observed": {
+        "firstStatus": 201,
+        "retryStatus": 201,
+        "sameId": true,
+        "conflictingBytes": {
+          "status": 409,
+          "code": "IDEMPOTENCY_CONFLICT",
+          "error": "A chave já foi utilizada com outro conteúdo. Inicie uma nova operação."
+        },
+        "attachment": {
+          "id": "c6282f6e-60af-4a5f-abaf-2c28fc164c4c",
+          "bytes": 274,
+          "state": "ready",
+          "sha256": "5a88c22ba46024288216b5d71869cabf1f309636e8c33ab486854d83a1c8fdd1",
+          "documentId": "5ea971d3-756d-4428-b516-b099718ea058"
+        },
+        "limits": "No lost transport injected here;API idempotency proven,not B1 visual recovery flaw fixed;no signed URL exported"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B28-07",
+      "purpose": "Dez reservas abandonadas consomem limite de anexo sem arquivo confirmado",
+      "recordedAt": "2026-10-29T23:02:46.756Z",
+      "observed": {
+        "documentId": "fd5286b4-bde0-4d2f-aaf2-dfdcbcdba544",
+        "states": [
+          {
+            "count": 10,
+            "state": "quarantine"
+          }
+        ],
+        "eleventh": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "reserve_attachment: attachment limit reached"
+        },
+        "knownFinding": "A DB-004 revalidated locally;abandoned reservations are not ready files;no cleanup performed",
+        "recoveryLimit": "Same-key retry can finish a retained reservation;lost keys have no explicit user abandonment path"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "finishedAt": "2026-10-29T23:02:47.253Z"
+}

@@ -1,0 +1,721 @@
+{
+  "group": "B2.6",
+  "startedAt": "2026-10-29T22:50:23.461Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B26-01",
+      "purpose": "Série noturna12x36 proposta materializa intervalos e retry preserva identidade",
+      "recordedAt": "2026-10-29T22:50:24.361Z",
+      "observed": {
+        "seriesId": "4862ce21-85c3-4bdd-9f3d-b4fdac6b8885",
+        "shifts": [
+          {
+            "id": "af475640-28c3-4751-a619-4d5f2a8995cf",
+            "end": "2026-11-09T10:00:00+00:00",
+            "start": "2026-11-08T22:00:00+00:00",
+            "status": "published",
+            "version": 2,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          },
+          {
+            "id": "4d3291d3-c211-4b9c-9aaf-78ebbd521fb7",
+            "end": "2026-11-11T10:00:00+00:00",
+            "start": "2026-11-10T22:00:00+00:00",
+            "status": "published",
+            "version": 2,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          },
+          {
+            "id": "0d2afe0a-db1f-4b42-ae80-4443bd199571",
+            "end": "2026-11-13T10:00:00+00:00",
+            "start": "2026-11-12T22:00:00+00:00",
+            "status": "published",
+            "version": 2,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          }
+        ],
+        "retrySameSeries": true,
+        "ownApprovalRefused": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "schedule_command: schedule authorization required"
+        },
+        "timezone": "America/Sao_Paulo",
+        "presenceProven": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-02",
+      "purpose": "Sobreposição recusa transação inteira;plantão adjacente é permitido",
+      "recordedAt": "2026-10-29T22:50:25.133Z",
+      "observed": {
+        "overlap": {
+          "rejected": true,
+          "sqlstate": "23P01",
+          "message": "schedule_command: schedule overlap"
+        },
+        "noPartialSeriesOnRefusal": true,
+        "adjacent": [
+          {
+            "id": "d5702b01-f51f-46cb-819b-02d07932265c",
+            "end": "2026-11-09T22:00:00+00:00",
+            "start": "2026-11-09T10:00:00+00:00",
+            "status": "published",
+            "version": 1,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          }
+        ]
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-03",
+      "purpose": "Proposta pontual não muda agenda antes da decisão autorizada",
+      "recordedAt": "2026-10-29T22:50:25.641Z",
+      "observed": {
+        "changeId": "6ccc1d5f-56e7-4cd7-9301-b3765d1c5aee",
+        "before": {
+          "id": "0d2afe0a-db1f-4b42-ae80-4443bd199571",
+          "end": "2026-11-13T10:00:00+00:00",
+          "start": "2026-11-12T22:00:00+00:00",
+          "status": "published",
+          "version": 2,
+          "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+        },
+        "after": {
+          "id": "0d2afe0a-db1f-4b42-ae80-4443bd199571",
+          "end": "2026-11-13T11:00:00+00:00",
+          "start": "2026-11-12T23:00:00+00:00",
+          "status": "published",
+          "version": 3,
+          "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+        },
+        "decisionSummarySource": "UI currently omits concrete before/after (A UX-001/B1-UX-001);not rendered by this RPC scenario"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-04",
+      "purpose": "Proposta antiga não reaplica versão superada,mas pode ser rejeitada explicitamente",
+      "recordedAt": "2026-10-29T22:50:26.161Z",
+      "observed": {
+        "approval": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "schedule_command: stale document"
+        },
+        "rejectionStatus": "rejected",
+        "currentShift": {
+          "id": "0d2afe0a-db1f-4b42-ae80-4443bd199571",
+          "end": "2026-11-13T11:00:00+00:00",
+          "start": "2026-11-12T23:00:00+00:00",
+          "status": "published",
+          "version": 4,
+          "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+        },
+        "oldVersionDidNotOverwrite": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-05",
+      "purpose": "Encerramento de série publicada conserva passado e cancela ocorrências após corte",
+      "recordedAt": "2026-10-29T22:50:26.394Z",
+      "observed": {
+        "endedOn": "2026-11-10",
+        "seriesStatus": "published",
+        "final": [
+          {
+            "id": "af475640-28c3-4751-a619-4d5f2a8995cf",
+            "end": "2026-11-09T10:00:00+00:00",
+            "start": "2026-11-08T22:00:00+00:00",
+            "status": "published",
+            "version": 2,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          },
+          {
+            "id": "4d3291d3-c211-4b9c-9aaf-78ebbd521fb7",
+            "end": "2026-11-11T10:00:00+00:00",
+            "start": "2026-11-10T22:00:00+00:00",
+            "status": "cancelled",
+            "version": 3,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          },
+          {
+            "id": "0d2afe0a-db1f-4b42-ae80-4443bd199571",
+            "end": "2026-11-13T11:00:00+00:00",
+            "start": "2026-11-12T23:00:00+00:00",
+            "status": "cancelled",
+            "version": 5,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          }
+        ],
+        "historyPreserved": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-06",
+      "purpose": "DB-003 revalidado:aprovar proposta após end_series republica ocorrências além do corte",
+      "recordedAt": "2026-10-29T22:50:26.724Z",
+      "observed": {
+        "seriesId": "4c4b1e81-a680-49a7-bf44-66278f74574e",
+        "cutoff": "2026-11-20",
+        "afterEnd": [
+          {
+            "id": "1356e48f-9b58-4c45-9cc3-c5aeb3f264f3",
+            "end": "2026-11-19T10:00:00+00:00",
+            "start": "2026-11-18T22:00:00+00:00",
+            "status": "proposed",
+            "version": 1,
+            "professional": "1be98412-e7d0-4616-959c-0d150aac79bc"
+          },
+          {
+            "id": "779279b7-05a2-49dc-ac13-8c373ae467b3",
+            "end": "2026-11-21T10:00:00+00:00",
+            "start": "2026-11-20T22:00:00+00:00",
+            "status": "cancelled",
+            "version": 2,
+            "professional": "1be98412-e7d0-4616-959c-0d150aac79bc"
+          },
+          {
+            "id": "7e5014b6-ccb5-467d-adeb-9767de69e7a4",
+            "end": "2026-11-23T10:00:00+00:00",
+            "start": "2026-11-22T22:00:00+00:00",
+            "status": "cancelled",
+            "version": 2,
+            "professional": "1be98412-e7d0-4616-959c-0d150aac79bc"
+          }
+        ],
+        "afterApproval": [
+          {
+            "id": "1356e48f-9b58-4c45-9cc3-c5aeb3f264f3",
+            "end": "2026-11-19T10:00:00+00:00",
+            "start": "2026-11-18T22:00:00+00:00",
+            "status": "published",
+            "version": 2,
+            "professional": "1be98412-e7d0-4616-959c-0d150aac79bc"
+          },
+          {
+            "id": "779279b7-05a2-49dc-ac13-8c373ae467b3",
+            "end": "2026-11-21T10:00:00+00:00",
+            "start": "2026-11-20T22:00:00+00:00",
+            "status": "published",
+            "version": 3,
+            "professional": "1be98412-e7d0-4616-959c-0d150aac79bc"
+          },
+          {
+            "id": "7e5014b6-ccb5-467d-adeb-9767de69e7a4",
+            "end": "2026-11-23T10:00:00+00:00",
+            "start": "2026-11-22T22:00:00+00:00",
+            "status": "published",
+            "version": 3,
+            "professional": "1be98412-e7d0-4616-959c-0d150aac79bc"
+          }
+        ],
+        "knownFinding": "A DB-003 now CONFIRMED_LOCAL;UI hides end action for proposed series but API/RPC accepts sequence",
+        "limits": "Not claiming this end action was clicked in current UI"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-07",
+      "purpose": "Mudança do tipo afeta definições futuras,sem retimar ocorrências já gravadas",
+      "recordedAt": "2026-10-29T22:50:27.190Z",
+      "observed": {
+        "intervalsUnchanged": true,
+        "typeDefinition": {
+          "startsLocal": "18:00",
+          "durationMinutes": 600
+        },
+        "existing": [
+          {
+            "id": "af475640-28c3-4751-a619-4d5f2a8995cf",
+            "end": "2026-11-09T10:00:00+00:00",
+            "start": "2026-11-08T22:00:00+00:00",
+            "status": "published",
+            "version": 2,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          },
+          {
+            "id": "4d3291d3-c211-4b9c-9aaf-78ebbd521fb7",
+            "end": "2026-11-11T10:00:00+00:00",
+            "start": "2026-11-10T22:00:00+00:00",
+            "status": "cancelled",
+            "version": 3,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          },
+          {
+            "id": "0d2afe0a-db1f-4b42-ae80-4443bd199571",
+            "end": "2026-11-13T11:00:00+00:00",
+            "start": "2026-11-12T23:00:00+00:00",
+            "status": "cancelled",
+            "version": 5,
+            "professional": "897b35ef-6e80-4d65-b9e0-fc7862982805"
+          }
+        ],
+        "historyMeaning": "Nome atual do tipo é projetado na consulta;intervalos originais permanecem"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-08",
+      "purpose": "Gestão de escala não desloca janela de BAL vigente",
+      "recordedAt": "2026-10-29T22:50:27.565Z",
+      "observed": {
+        "refused": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "schedule_command: balance requires family deferral before schedule period change"
+        },
+        "assignmentBefore": {
+          "id": "28bd1a08-d426-48b8-b0ce-b38e3ea59eaa",
+          "kind": "recount",
+          "status": "active",
+          "ends_at": "2026-10-30T03:00:00+00:00",
+          "version": 1,
+          "cycle_id": "086eafde-7040-478c-85fc-4b03c790c82f",
+          "shift_id": "edb74a74-f70e-465c-ada9-2fcd05133408",
+          "missed_at": null,
+          "starts_at": "2026-10-29T03:00:00+00:00",
+          "created_at": "2026-10-29T10:21:08.738547+00:00",
+          "shift_version": 1,
+          "professional_id": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd",
+          "care_recipient_id": "cdf49f73-d89f-4824-bf43-9f87d87d85c9"
+        },
+        "assignmentAfter": {
+          "id": "28bd1a08-d426-48b8-b0ce-b38e3ea59eaa",
+          "kind": "recount",
+          "status": "active",
+          "ends_at": "2026-10-30T03:00:00+00:00",
+          "version": 1,
+          "cycle_id": "086eafde-7040-478c-85fc-4b03c790c82f",
+          "shift_id": "edb74a74-f70e-465c-ada9-2fcd05133408",
+          "missed_at": null,
+          "starts_at": "2026-10-29T03:00:00+00:00",
+          "created_at": "2026-10-29T10:21:08.738547+00:00",
+          "shift_version": 1,
+          "professional_id": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd",
+          "care_recipient_id": "cdf49f73-d89f-4824-bf43-9f87d87d85c9"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-09",
+      "purpose": "Substituir pessoa na mesma janela durante reconto invalida atribuição sem sucessor automático",
+      "recordedAt": "2026-10-29T22:50:27.614Z",
+      "observed": {
+        "beforeAssignment": {
+          "id": "28bd1a08-d426-48b8-b0ce-b38e3ea59eaa",
+          "kind": "recount",
+          "status": "active",
+          "ends_at": "2026-10-30T03:00:00+00:00",
+          "version": 1,
+          "cycle_id": "086eafde-7040-478c-85fc-4b03c790c82f",
+          "shift_id": "edb74a74-f70e-465c-ada9-2fcd05133408",
+          "missed_at": null,
+          "starts_at": "2026-10-29T03:00:00+00:00",
+          "created_at": "2026-10-29T10:21:08.738547+00:00",
+          "shift_version": 1,
+          "professional_id": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd",
+          "care_recipient_id": "cdf49f73-d89f-4824-bf43-9f87d87d85c9"
+        },
+        "afterAssignment": null,
+        "oldAssignment": {
+          "id": "28bd1a08-d426-48b8-b0ce-b38e3ea59eaa",
+          "kind": "recount",
+          "status": "invalidated",
+          "ends_at": "2026-10-30T03:00:00+00:00",
+          "version": 2,
+          "cycle_id": "086eafde-7040-478c-85fc-4b03c790c82f",
+          "shift_id": "edb74a74-f70e-465c-ada9-2fcd05133408",
+          "missed_at": null,
+          "starts_at": "2026-10-29T03:00:00+00:00",
+          "type_name": "Plantão diário fictício B2 de contagem",
+          "created_at": "2026-10-29T10:21:08.738547+00:00",
+          "shift_version": 1,
+          "professional_id": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd",
+          "care_recipient_id": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+          "professional_name": "Pessoa fictícia B2 balance_counter"
+        },
+        "substituteShift": {
+          "id": "edb74a74-f70e-465c-ada9-2fcd05133408",
+          "notes": "Programação sintética para auditar BAL",
+          "status": "published",
+          "ends_at": "2026-10-30T03:00:00+00:00",
+          "version": 2,
+          "timezone": "America/Sao_Paulo",
+          "series_id": "f691059c-e3f4-4630-a273-1197fe51538a",
+          "starts_at": "2026-10-29T03:00:00+00:00",
+          "type_name": "Plantão diário fictício B2 de contagem",
+          "is_exception": true,
+          "shift_type_id": "4c3b555e-5315-499d-a426-bf5f0fc51dca",
+          "professional_id": "feb9bbc7-24d1-4c65-affc-90af69396dac",
+          "care_recipient_id": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+          "professional_name": "Pessoa fictícia B2 replacement",
+          "original_starts_at": "2026-10-29T03:00:00+00:00"
+        },
+        "document": {
+          "id": "9be9dbb9-5c44-4a36-93d1-e425eed16027",
+          "lines": [
+            {
+              "id": "24542dc1-1fab-42d2-9e06-ed9a8e847d6d",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 1
+              },
+              "quantity": "0.000000",
+              "productId": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            },
+            {
+              "id": "6fee6ce6-7443-4440-9270-bf2508a2b0ff",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 0
+              },
+              "quantity": "0.000000",
+              "productId": "patient-45f61a6e-8295-44c2-9765-1dc2063dbd1b",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            },
+            {
+              "id": "9957b2cf-897b-4765-ae66-e991b0af3b8b",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 0
+              },
+              "quantity": "0.000000",
+              "productId": "patient-676e1298-ba65-476c-9e2c-d89fb2268885",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            },
+            {
+              "id": "be82144f-ad38-47d9-a8ba-a92333bb0336",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 2
+              },
+              "quantity": "2.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            },
+            {
+              "id": "2b43d359-5acc-4dd4-9aac-3ba7d9965f5d",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 0
+              },
+              "quantity": "0.000000",
+              "productId": "patient-801fd317-315b-4aa6-9735-113debdcb16a",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            },
+            {
+              "id": "990a824c-6a57-4a10-92d8-f225406f2e0e",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 4
+              },
+              "quantity": "4.000000",
+              "productId": "patient-8ee5c488-c6b5-494f-b632-cb0a72521d8a",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            },
+            {
+              "id": "d291d8e5-0a2b-4153-b476-9c0d122da501",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 0
+              },
+              "quantity": "0.000000",
+              "productId": "patient-b5f2d5c1-2d95-49a6-be7c-5b3ec120870c",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            },
+            {
+              "id": "b2f62326-4599-4f71-8846-bed0ca3a3ff8",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 1
+              },
+              "quantity": "1.000000",
+              "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 2,
+          "number": 3,
+          "status": "submitted",
+          "version": 2,
+          "receipts": []
+        },
+        "recovery": "Revisor pode designar novo reconto no plantão substituído;não ocorreu transferência automática nesta modalidade counted/recount",
+        "limits": "Does not refute automatic same-window transfer in an OPEN cycle with draft,covered historically"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-10",
+      "purpose": "Designação formal recupera reconto com novo contador e conserva autor original",
+      "recordedAt": "2026-10-29T22:50:27.847Z",
+      "observed": {
+        "oldActorRefusal": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "revise_supply_document: balance shift authorization required"
+        },
+        "createdBy": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd",
+        "actualCounter": "feb9bbc7-24d1-4c65-affc-90af69396dac",
+        "documentVersion": 3,
+        "events": [
+          {
+            "id": "c2051523-0d4a-4561-9a26-21d2490a025f",
+            "hash": "cdc6b51dcd7c8f1ca82d83142ab2aa527f987187fe117b51e8343bdce63dd983",
+            "action": "bal.issued",
+            "actorId": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd",
+            "version": 1,
+            "createdAt": "2026-10-29T10:19:13.170883+00:00"
+          },
+          {
+            "id": "bc870b21-29a9-4eb9-9b9e-a6ab1e7cd5c5",
+            "hash": "05a1f0089bea15771d69980d43572210676552da521a9471cb6bf66460cc872d",
+            "action": "bal.recount",
+            "actorId": "a4daa9a5-86ec-44f8-b1a2-ed93b6b422bd",
+            "version": 2,
+            "createdAt": "2026-10-29T10:21:08.419238+00:00"
+          },
+          {
+            "id": "adc6e75a-6545-4ca7-a9fb-3dc14090ef27",
+            "hash": "ffae6ee82959e6760e422a49339c9407502ab220cceba8c1928682603487a51c",
+            "action": "bal.recount",
+            "actorId": "feb9bbc7-24d1-4c65-affc-90af69396dac",
+            "version": 3,
+            "createdAt": "2026-10-29T22:50:28.637638+00:00"
+          }
+        ],
+        "originalAuthorPreserved": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-11",
+      "purpose": "Revisores distintos aplicam diferença BAL como ajuste,sem debitá-la como consumo",
+      "recordedAt": "2026-10-29T22:50:28.719Z",
+      "observed": {
+        "before": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 10
+        },
+        "after": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "0.000000",
+          "movements": 11
+        },
+        "document": {
+          "id": "9be9dbb9-5c44-4a36-93d1-e425eed16027",
+          "lines": [
+            {
+              "id": "9c035e99-c2d9-4a9a-84e7-a11bcd08baf6",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 1
+              },
+              "quantity": "0.000000",
+              "productId": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            },
+            {
+              "id": "c7237534-907b-43e5-9f66-9b3cb6b4c5b4",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 0
+              },
+              "quantity": "0.000000",
+              "productId": "patient-45f61a6e-8295-44c2-9765-1dc2063dbd1b",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            },
+            {
+              "id": "c5b3aeb3-e59a-4c6b-b9a9-5c391ec45c24",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 0
+              },
+              "quantity": "0.000000",
+              "productId": "patient-676e1298-ba65-476c-9e2c-d89fb2268885",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            },
+            {
+              "id": "852849f9-f515-427d-81e1-55e1725f4d0d",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 2
+              },
+              "quantity": "2.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            },
+            {
+              "id": "61a2df6f-58ec-4794-9995-8ef48295e601",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 0
+              },
+              "quantity": "0.000000",
+              "productId": "patient-801fd317-315b-4aa6-9735-113debdcb16a",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            },
+            {
+              "id": "268518d0-c5db-495d-9edd-e2fa8addbde2",
+              "accepted": "4.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 4
+              },
+              "quantity": "4.000000",
+              "productId": "patient-8ee5c488-c6b5-494f-b632-cb0a72521d8a",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            },
+            {
+              "id": "379f146c-72dd-452b-a953-ae5977a656b0",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 0
+              },
+              "quantity": "0.000000",
+              "productId": "patient-b5f2d5c1-2d95-49a6-be7c-5b3ec120870c",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            },
+            {
+              "id": "e9cee74e-331f-419f-a83b-54cb55db4ba7",
+              "accepted": "1.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "expectedQuantity": 1
+              },
+              "quantity": "1.000000",
+              "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 5,
+          "number": 3,
+          "status": "approved",
+          "version": 5,
+          "receipts": []
+        },
+        "metricsBefore": [
+          {
+            "days": 2,
+            "location": "CARE_TEAM",
+            "quantity": "1.000000",
+            "movements": 1,
+            "productId": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+            "averagePerDay": "0.99930603747397640528"
+          },
+          {
+            "days": 2,
+            "location": "CARE_TEAM",
+            "quantity": "1.000000",
+            "movements": 1,
+            "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+            "averagePerDay": "0.99930603747397640528"
+          }
+        ],
+        "metricsAfter": [
+          {
+            "days": 2,
+            "location": "CARE_TEAM",
+            "quantity": "1.000000",
+            "movements": 1,
+            "productId": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+            "averagePerDay": "0.99930603747397640528"
+          },
+          {
+            "days": 2,
+            "location": "CARE_TEAM",
+            "quantity": "1.000000",
+            "movements": 1,
+            "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+            "averagePerDay": "0.99930603747397640528"
+          }
+        ],
+        "adjustmentReference": "bal,not consumption"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B26-12",
+      "purpose": "Conflito entre pacientes informa só indisponibilidade e conserva isolamento",
+      "recordedAt": "2026-10-29T22:50:29.749Z",
+      "observed": {
+        "otherPatient": "408a4107-be86-4d9a-96f8-2c2bafd2f332",
+        "conflict": {
+          "rejected": true,
+          "sqlstate": "23P01",
+          "message": "schedule_command: schedule overlap"
+        },
+        "crossContextRowsVisible": 0,
+        "limits": "Worker also has legitimate other membership,but active session context remains primary;no foreign scheduling detail returned"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "finishedAt": "2026-10-29T22:50:30.140Z"
+}

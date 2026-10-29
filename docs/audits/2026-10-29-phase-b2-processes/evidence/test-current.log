@@ -1,0 +1,12 @@
+
+> home-care-assistant@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 C:/Users/renat/Projetos_Dev/home-care-assistant
+
+
+ Test Files  17 passed (17)
+      Tests  98 passed (98)
+   Start at  20:13:28
+   Duration  2.54s (import 57%, tests 36%, transform 6%, worker 1%)

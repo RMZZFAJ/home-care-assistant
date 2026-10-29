@@ -1,0 +1,54 @@
+{
+  "entries": [
+    {
+      "file": "b28-professional-empty-pending.png",
+      "width": 1280,
+      "height": 720,
+      "scope": "1280x720 desktop viewport",
+      "state": "Default own pending_receipt inbox is empty",
+      "snapshot": "b28-professional-pending.txt",
+      "visualInspection": "INSPECTED_BY_AUDITOR",
+      "actor": "new synthetic professional",
+      "patient": "new synthetic B2 residence",
+      "interaction": "read,navigate,selectfilter,openform;no browser submit"
+    },
+    {
+      "file": "b28-professional-all.png",
+      "width": 1280,
+      "height": 720,
+      "scope": "1280x720 desktop viewport",
+      "state": "All deliveries includes two cancellation_pending documents",
+      "snapshot": "b28-professional-all.txt",
+      "visualInspection": "INSPECTED_BY_AUDITOR",
+      "actor": "new synthetic professional",
+      "patient": "new synthetic B2 residence",
+      "interaction": "read,navigate,selectfilter,openform;no browser submit"
+    },
+    {
+      "file": "b28-consent-mobile.png",
+      "width": 390,
+      "height": 844,
+      "scope": "390x844 emulated viewport;form below fold",
+      "state": "ENT0004 cancellation_pending header and start of next action",
+      "snapshot": "b28-consent-only.txt",
+      "visualInspection": "INSPECTED_BY_AUDITOR",
+      "actor": "new synthetic professional",
+      "patient": "new synthetic B2 residence",
+      "interaction": "read,navigate,selectfilter,openform;no browser submit"
+    },
+    {
+      "file": "b28-consent-mobile-full.png",
+      "width": 390,
+      "height": 4173,
+      "scope": "390x844 emulation with full-page capture;not physical device",
+      "state": "Full page shows only consent/reconcile decision;no reject or withdraw action",
+      "snapshot": "b28-consent-only.txt",
+      "visualInspection": "INSPECTED_BY_AUDITOR",
+      "actor": "new synthetic professional",
+      "patient": "new synthetic B2 residence",
+      "interaction": "read,navigate,selectfilter,openform;no browser submit"
+    }
+  ],
+  "method": "Playwright CLI real local browser;official Auth storage state kept outside Git",
+  "limits": "Four captures of specific states;not human acceptance,physical-device proof or all responsive breakpoints"
+}

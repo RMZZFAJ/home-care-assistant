@@ -1,0 +1,21 @@
+{
+  "startedAt": "2026-10-29T23:17:10.057Z",
+  "finishedAt": "2026-10-29T23:22:28.655Z",
+  "exitCode": 0,
+  "args": [
+    "scripts/run-e2e.mjs",
+    "tests/e2e/workflows.spec.ts",
+    "--project=chromium",
+    "--project=mobile",
+    "--project=ios",
+    "--grep",
+    "REQ → COM doação|resposta perdida e recarga",
+    "--reporter=line,json",
+    "--output=docs/audits/2026-10-29-phase-b2-processes/evidence/e2e-output"
+  ],
+  "node": "24.22.0",
+  "externalSending": false,
+  "localBackend": "127.0.0.1:54321",
+  "fixturePolicy": "Existing test creates new development patients/products/memberships;no reset or seed;existing official Auth fixtures only authenticate",
+  "limits": "Six selected cases,not complete suite;emulated mobile/iOS,not physical devices or human acceptance"
+}

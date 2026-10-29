@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-29T23:54:42.677716+00:00",
+  "passed": true,
+  "issues": [],
+  "mandatoryFiles": 25,
+  "processes": 66,
+  "transitions": 102,
+  "findings": 17,
+  "opportunities": 20,
+  "exceptions": 21,
+  "directedCases": 81,
+  "sourceHashesUnchanged": 371,
+  "branch": "audit/phase-b",
+  "master": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "headBeforeDocumentaryCommit": "73bedcbc09f9edba8c8869b60ea84950cddc82fc",
+  "functionalProduct": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "limits": "Artifact consistency and source preservation;does not certify complete branch combinations,humans,providers,physical devices or production"
+}
