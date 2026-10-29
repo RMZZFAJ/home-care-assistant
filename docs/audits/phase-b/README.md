@@ -1,0 +1,43 @@
+# Fase B — aprofundamentos especializados
+
+Branch única local e remota: `audit/phase-b`. Todos os subgrupos futuros da
+Fase B devem continuar nessa branch. `master` permanece na base documental A.
+A criação de novos grupos depende da autorização correspondente.
+
+## Estado atual
+
+- B1.1–B1.8: investigação concluída, sem correções de produto.
+- [Índice B1](../2026-10-28-phase-b1-interface/README.md).
+- [Achados B1](../2026-10-28-phase-b1-interface/12_FINDINGS_MASTER.md).
+- [Transferência](../2026-10-28-phase-b1-interface/15_CROSS_GROUP_DEPENDENCIES_AND_PHASE_C_HANDOFF.md).
+- [Entradas originais da Fase A](../2026-10-25-production-readiness/inputs/README.md).
+
+O histórico inclui o commit temporário do responsável, o encerramento B1 e
+os checkpoints antigos. Os snapshots antigos são preservados por ancestralidade,
+sem reaplicar versões anteriores de código ou migrations. Não há PR aberto
+por esta reorganização nem merge na `master`.
+
+## Ferramentas locais
+
+As verificações JavaScript/Markdown continuam usando Node/npm do projeto.
+Os scripts Python documentais usam ambiente virtual local com dependências
+fixadas em `requirements-audit.txt`:
+
+```powershell
+uv venv --python 3.13 .venv
+uv pip install --python .venv/Scripts/python.exe -r requirements-audit.txt
+```
+
+No VS Code, selecionar o interpretador `.venv` do workspace. O ambiente não é
+versionado. Isso resolve os imports reais de PyMuPDF/fonttools, mantendo
+Pylance e as validações habilitados. A instalação não executa os reprodutores
+mutáveis de banco nem regenera capturas ou resultados históricos.
+
+Markdown permanece validado. Colchetes literais em rotas e exemplos são
+escapados para não serem interpretados como referências. Tailwind continua
+validando o código; fragmentos documentais Markdown são tratados como texto,
+evitando analisar excertos truncados como se fossem componentes ativos.
+
+O projeto usa PostgreSQL. A extensão SQL Server removida precisa encerrar seu
+serviço na reinicialização do VS Code; seus diagnósticos T-SQL não devem ser
+usados para alterar migrations PostgreSQL históricas.

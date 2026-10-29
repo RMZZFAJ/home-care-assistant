@@ -1,0 +1,4 @@
+# Optional Python dependencies for PDF/font inspection in docs/audits.
+# These are tooling dependencies; the web application runs on Node.js.
+PyMuPDF==2.0
+fonttools==4.68.0

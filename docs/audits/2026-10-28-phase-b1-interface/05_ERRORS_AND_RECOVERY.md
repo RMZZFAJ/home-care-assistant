@@ -64,7 +64,7 @@ captura de anexo inclui refresh documental em curso, não um estado READY.
 ## Modelo de certeza para futura correção
 
 - **Certeza:** Não gravado, rejeição comprovada antes da mutação; **Mensagem
-proposta:** Revise [campo]. Nada foi registrado nesta tentativa.; **Ação
+proposta:** Revise \[campo\]. Nada foi registrado nesta tentativa.; **Ação
 segura:** Focar campo e preservar os outros valores.
 - **Certeza:** Gravado, comprovante pendente; **Mensagem proposta:** A ficha foi
 registrada. Ainda não foi possível abrir o comprovante.; **Ação segura:**
@@ -76,7 +76,7 @@ Consulta com referência; impedir novo comando equivalente.
 possível confirmar o resultado. Preserve estes dados e recupere a tentativa.;
 **Ação segura:** Reconsultar chave/objeto antes de permitir nova intenção.
 - **Certeza:** Leitura indisponível; **Mensagem proposta:** Não foi possível
-atualizar esta consulta. [Dados anteriores de hora X, se existirem.]; **Ação
+atualizar esta consulta. \[Dados anteriores de hora X, se existirem.\]; **Ação
 segura:** Atualizar consulta; nenhum envio a recuperar.
 
 O fallback de JSON inválido hoje diz Tente novamente tanto para leitura como

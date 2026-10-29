@@ -1,0 +1,2 @@
+# Preserve original verification bytes independently of checkout line endings.
+evidence/** -text

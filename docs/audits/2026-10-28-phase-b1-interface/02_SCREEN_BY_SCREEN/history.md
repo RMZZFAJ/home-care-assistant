@@ -22,7 +22,7 @@ condicionais constam nos inventários transversais; não foram todos acionados.
 className="document-type"&gt;{row.type}&lt;/span&gt; &lt;span
 className="min-w-0"&gt; &lt;strong&gt;{row.code ?? "Rascunho"}&lt;/strong&gt;
 &lt;span className="block text-xs text-(--muted)"&gt;
-{documentLabels[row.type]} · {formatBrazilDate(row.c; **Pré-condição e efeito
+{documentLabels\[row.type\]} · {formatBrazilDate(row.c; **Pré-condição e efeito
 verificável:** {"/documentos/" + row.id}.
 - **Linha:** 181; **Controle:** button; **Texto/nome ou expressão:** &lt;Icon
 name="search" /&gt; Pesquisar e filtrar {active.length ? ( &lt;span
@@ -53,7 +53,7 @@ filtros; **Pré-condição e efeito verificável:** "submit".
 setDraft(empty); setLoading(true); }}.
 - **Linha:** 302; **Controle:** button; **Texto/nome ou expressão:** {"Remover
 filtro " + key}; **Pré-condição e efeito verificável:** {() => { setFilters({
-...filters, [key]: "" }); setDraft({ ...draft, [key]: "" }); setLoading(true);
+...filters, \[key\]: "" }); setDraft({ ...draft, \[key\]: "" }); setLoading(true);
 }}.
 - **Linha:** 330; **Controle:** button; **Texto/nome ou expressão:** Tentar
 novamente; **Pré-condição e efeito verificável:** {() => { setAttempt((value)

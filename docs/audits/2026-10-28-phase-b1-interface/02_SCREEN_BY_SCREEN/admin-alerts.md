@@ -29,12 +29,12 @@ value="FAMILY"&gt;Família&lt;/option&gt;; **Pré-condição e efeito
 verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 57; **Controle:** input; **Texto/nome ou expressão:** Limite baixo
 &lt;input className={inputClass} name="lowThreshold" inputMode="decimal"
-defaultValue="0" required pattern="[0-9]+(`[.,][0-9]`{1,6})?" /&gt;;
+defaultValue="0" required pattern="\[0-9\]+(`[.,][0-9]`{1,6})?" /&gt;;
 **Pré-condição e efeito verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 68; **Controle:** input; **Texto/nome ou expressão:** Limite
 crítico &lt;input className={inputClass} name="criticalThreshold"
 inputMode="decimal" defaultValue="0" required
-pattern="[0-9]+(`[.,][0-9]`{1,6})?" /&gt;; **Pré-condição e efeito
+pattern="\[0-9\]+(`[.,][0-9]`{1,6})?" /&gt;; **Pré-condição e efeito
 verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 78; **Controle:** button; **Texto/nome ou expressão:** Salvar
 regra; **Pré-condição e efeito verificável:** "submit".

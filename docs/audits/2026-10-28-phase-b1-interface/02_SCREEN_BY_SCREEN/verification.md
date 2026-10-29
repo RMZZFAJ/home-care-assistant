@@ -2,7 +2,7 @@
 
 Rota: `/verificar/[id]` . Situação: ACTIVE.
 Fonte principal:
-[src/app/verificar/[id]/page.tsx](../../../../src/app/verificar/[id]/page.tsx).
+\[src/app/verificar/\[id\\]/page.tsx](../../../../src/app/verificar/\[id\]/page.tsx).
 
 ## Intenção e contexto
 

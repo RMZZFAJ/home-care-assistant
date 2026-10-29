@@ -49,7 +49,7 @@ Dependências internas:
 
 - src/components/admin/accept-invitation
 
-### src/app/documentos/[id]/page.tsx
+### src/app/documentos/\[id\]/page.tsx
 
 Linhas: 14. Estados locais: 0.
 
@@ -87,7 +87,7 @@ Dependências internas:
 - src/components/authenticated-page
 - src/components/stock/stock-console
 
-### src/app/fichas/[id]/page.tsx
+### src/app/fichas/\[id\]/page.tsx
 
 Linhas: 24. Estados locais: 0.
 
@@ -143,7 +143,7 @@ Dependências internas:
 - src/components/authenticated-page
 - src/components/requisitions/requisition-wizard
 
-### src/app/historico/[id]/page.tsx
+### src/app/historico/\[id\]/page.tsx
 
 Linhas: 28. Estados locais: 0.
 
@@ -241,7 +241,7 @@ Dependências internas:
 - src/components/authenticated-page
 - src/components/catalog/unit-console
 
-### src/app/verificar/[id]/page.tsx
+### src/app/verificar/\[id\]/page.tsx
 
 Linhas: 68. Estados locais: 0.
 

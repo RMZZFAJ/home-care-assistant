@@ -30,7 +30,7 @@ event.preventDefault(); setTab(area); } }}.
 value={person.id}&gt; {person.name} &lt;/option&gt; ))}; **Pré-condição e
 efeito verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 293; **Controle:** select; **Texto/nome ou expressão:**
-{Object.entries(roles).map(([key, label]) => ( &lt;option key={key}
+{Object.entries(roles).map((\[key, label\]) => ( &lt;option key={key}
 value={key}&gt; {label} &lt;/option&gt; ))}; **Pré-condição e efeito
 verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 301; **Controle:** button; **Texto/nome ou expressão:** Registrar

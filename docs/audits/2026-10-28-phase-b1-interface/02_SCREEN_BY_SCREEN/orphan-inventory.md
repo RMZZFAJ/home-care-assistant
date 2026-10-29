@@ -30,7 +30,7 @@ inventário; **Pré-condição e efeito verificável:** {busy || loading}.
 - **Linha:** 47; **Controle:** select; **Texto/nome ou expressão:** &lt;option
 value=""&gt;Selecione&lt;/option&gt; {rows.map((item) => &lt;option
 key={item.id} value={item.id}&gt;{formatBrazilDate(item.created_at)} ·
-{custody[item.location]} · {labels[item.status] ??
+{custody\[item.location\]} · {labels\[item.status\] ??
 item.status}&lt;/option&gt;)}; **Pré-condição e efeito verificável:**
 Consultar ramo condicional na fonte.
 - **Linha:** 48; **Controle:** button; **Texto/nome ou expressão:** Atualizar;

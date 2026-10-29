@@ -1,0 +1,10 @@
+/* Local standard checks only. Existing safe environment; no DB preparation,
+ * migrations, fixtures, providers or audit runtime probes are executed. */
+import {spawn} from 'node:child_process';
+import {writeFileSync,createWriteStream,readFileSync} from 'node:fs';
+import {gzipSync} from 'node:zlib';
+import {getE2EEnvironment} from '../../../../scripts/e2e-environment.mjs';
+const env=getE2EEnvironment(),out=new URL('./',import.meta.url),commands=['check:contracts','lint','lint:markdown','typecheck','test','build'];
+if(process.versions.node!=='24.22.0')throw Error('Use repository Node version');
+const result={startedAt:new Date().toISOString(),node:process.versions.node,scope:'Branch/document/editor maintenance; no business or schema changes',checks:[]};
+for(const command of commands){const log=command.replaceAll(':','-')+'.log',stream=createWriteStream(new URL(log,out)),childEnv={...env,HCA_E2E:'false',NEXT_PUBLIC_APP_URL:command==='test'?'https://care.example':env.NEXT_PUBLIC_APP_URL};for(const key of ['VERCEL','VERCEL_URL','VERCEL_PROJECT_PRODUCTION_URL','VERCEL_BRANCH_URL','NEXT_PUBLIC_VERCEL_URL'])delete childEnv[key];const child=spawn(process.execPath,['C:/nvm4w/nodejs/node_modules/npm/bin/npm-cli.js','run',command],{env:childEnv,stdio:['ignore','pipe','pipe'],windowsHide:true});child.stdout.pipe(stream,{end:false});child.stderr.pipe(stream,{end:false});const exitCode=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',resolve);});await new Promise(resolve=>stream.end(resolve));const raw=readFileSync(new URL(log,out));writeFileSync(new URL(log+'.gz',out),gzipSync(raw));writeFileSync(new URL(log,out),raw.toString('utf8').replace(/\r\n/g,'\n').replace(/[ \t]+$/gm,'').trimEnd()+'\n');result.checks.push({command:'npm run '+command,exitCode,log,rawLog:log+'.gz',logFormat:'Trailing whitespace normalized; gzip retains original bytes',finishedAt:new Date().toISOString()});writeFileSync(new URL('maintenance-checks.json',out),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({command,exitCode}));if(exitCode!==0){process.exitCode=exitCode;break;}}

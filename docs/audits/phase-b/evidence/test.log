@@ -1,0 +1,15 @@
+
+> home-care-assistant@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 C:/Users/renat/Projetos_Dev/home-care-assistant
+
+
+ Test Files  17 passed (17)
+      Tests  98 passed (98)
+   Start at  06:19:03
+   Duration  3.95s (import 59%, tests 35%, transform 4%, worker 1%)
+
+    Isolate  17 workers spawned · ~466ms startup each (spawn + environment, per file)
+             at least ~254ms faster with isolate: false — reuses workers across files instead of one per file

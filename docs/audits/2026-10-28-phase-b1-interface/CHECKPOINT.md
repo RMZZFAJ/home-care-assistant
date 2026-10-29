@@ -8,13 +8,15 @@ NO-GO; este pacote não homologa produção.
 
 Produto: `37cb7f85e96e551d6419871f94dd950712e2565b`.
 Base documental: `34dcb835c5c49068e0417f7306eb4e501aa868bc`.
-Branch final: `audit/phase-b1-interface-final-2026-10-29`.
+Branch única da Fase B: `audit/phase-b`.
 
-O temporário `d52d4d7` do usuário permanece na branch original publicada.
-A autorização posterior permitiu organizar uma nova branch com soft reset
-local à base, preservando arquivos e histórico remoto. Sem force push.
-Quatro anexos preexistentes da raiz permanecem staged fora do commit B1.
-O commit final restringe-se a esta pasta; seu SHA está no histórico Git.
+O temporário `d52d4d7` e o encerramento `bc278c4` são preservados por
+ancestralidade na branch única. A organização anterior com soft reset local
+está documentada no baseline como histórico da execução. Em nova autorização
+de 29/10, o responsável pediu consolidação e remoção das branches antigas.
+Os quatro anexos da raiz passaram para `inputs` da Fase A. O commit B1
+original permanece restrito a esta pasta; commits posteriores registram
+a reorganização e as correções documentais/editoriais.
 
 ## Oito subgrupos concluídos sequencialmente
 

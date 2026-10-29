@@ -65,7 +65,7 @@ className={inputClass} defaultValue={product.quantity_decimals ?? 0} required
 /&gt;; **Pré-condição e efeito verificável:** "number".
 - **Linha:** 248; **Controle:** input; **Texto/nome ou expressão:** EAN / GTIN /
 UPC opcional &lt;input name="barcode" inputMode="numeric"
-pattern="[0-9]{8,14}" className={inputClass} /&gt;; **Pré-condição e efeito
+pattern="\[0-9\]{8,14}" className={inputClass} /&gt;; **Pré-condição e efeito
 verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 257; **Controle:** input; **Texto/nome ou expressão:** Nome da
 apresentação &lt;input name="name" className={inputClass} placeholder="Caixa

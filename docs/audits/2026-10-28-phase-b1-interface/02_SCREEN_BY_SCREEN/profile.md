@@ -37,11 +37,11 @@ MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO" .split(" ") .map((state) => (
 verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 217; **Controle:** input; **Texto/nome ou expressão:** &lt;input
 type="checkbox" name={key} defaultChecked={
-profile.notification_preferences[key] ?? true } /&gt; {label}; **Pré-condição
+profile.notification_preferences\[key\] ?? true } /&gt; {label}; **Pré-condição
 e efeito verificável:** "checkbox".
 - **Linha:** 257; **Controle:** input; **Texto/nome ou expressão:** &lt;input
 name={key} type="checkbox" defaultChecked={
-profile.notification_preferences[key] ?? key === "scienceExpress" } /&gt;
+profile.notification_preferences\[key\] ?? key === "scienceExpress" } /&gt;
 {label}; **Pré-condição e efeito verificável:** "checkbox".
 - **Linha:** 281; **Controle:** button; **Texto/nome ou expressão:** Salvar
 perfil; **Pré-condição e efeito verificável:** {busy}.

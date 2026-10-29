@@ -2,7 +2,7 @@
 
 Rota: `/fichas/[id]` . Situação: COMPATIBILITY.
 Fonte principal:
-[src/app/fichas/[id]/page.tsx](../../../../src/app/fichas/[id]/page.tsx).
+\[src/app/fichas/\[id\\]/page.tsx](../../../../src/app/fichas/\[id\]/page.tsx).
 
 ## Intenção e contexto
 

@@ -17,8 +17,9 @@ como se já estivesse aprovada. O responsável distribuirá as frentes futuras.
 aqueles que B1 não repetiu. A conclusão A continua NO-GO.
 
 Produto:37cb7f85e96e551d6419871f94dd950712e2565b. Base documental A:
-34dcb835c5c49068e0417f7306eb4e501aa868bc. A branch final B1 parte dessa base;
-o checkpoint temporário do usuário permanece na branch publicada original.
+34dcb835c5c49068e0417f7306eb4e501aa868bc. O encerramento B1 parte dessa base.
+A organização posterior usa `audit/phase-b` para toda a fase; o temporário
+do responsável permanece no histórico por ancestralidade.
 Não confundir data de relatório, SHA de documentos e SHA do produto.
 
 ## Contratos que a interface não pode decidir sozinha

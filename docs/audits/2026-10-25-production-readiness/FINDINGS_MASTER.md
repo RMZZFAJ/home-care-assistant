@@ -70,9 +70,9 @@ evidence/database-metadata.log; evidence/db-lifecycle-probe.log
 **Arquivos:**
 supabase/migrations/20261023073958_v4_verification_corrections.sql;
 supabase/migrations/20261025214537_balance_scheduler_rotation.sql;
-src/app/api/requisitions/[id]/status/route.ts
+src/app/api/requisitions/\[id\]/status/route.ts
 
-**Rotas:** /historico/[id]
+**Rotas:** /historico/\[id\]
 
 **Componentes:** Lembretes e progresso de requisição
 
@@ -806,13 +806,13 @@ evidence/db-ent-probe-captured.log; evidence/db-ent-probe-final.log
 
 **Arquivos:**
 supabase/migrations/20261022053539_draft_recounts_and_catalogue_contracts.sql;
-src/app/api/documents/[id]/route.ts; src/lib/validation/documents.ts
+src/app/api/documents/\[id\]/route.ts; src/lib/validation/documents.ts
 
-**Rotas:** /fichas/[id]
+**Rotas:** /fichas/\[id\]
 
 **Componentes:** Conferência/cancelamento de entrega
 
-**API:** POST /api/documents/[id] -> supply_document_command
+**API:** POST /api/documents/\[id\] -> supply_document_command
 
 **Objetos de banco:** audited_legacy_supply_command; stock_movements;
 document_events; document_lines
@@ -1027,7 +1027,7 @@ supabase/migrations/20261022043228_communications_attachments.sql;
 supabase/migrations/20261022061251_evidence_idempotency_and_final_contracts.sql;
 src/app/api/attachments/route.ts
 
-**Rotas:** /fichas/[id]
+**Rotas:** /fichas/\[id\]
 
 **Componentes:** Upload de evidências
 
@@ -1441,7 +1441,7 @@ evidence/e2e-navigation-failure-context.md; tests/e2e/navigation.ts:6
 
 **Arquivos:** tests/e2e/navigation.ts; tests/e2e/workflows.spec.ts
 
-**Rotas:** /fichas/[id]
+**Rotas:** /fichas/\[id\]
 
 **Componentes:** WorkspaceShell
 
@@ -1827,7 +1827,7 @@ docs/audits/2026-10-25-production-readiness/evidence/ui-runtime.json
 
 **Arquivos:** src/components/requisitions/requisition-detail.tsx
 
-**Rotas:** /documentos/[id]; /historico/[id]
+**Rotas:** /documentos/\[id\]; /historico/\[id\]
 
 **Componentes:** Não aplicável.
 
@@ -1938,7 +1938,7 @@ docs/audits/2026-10-25-production-readiness/evidence/ui-runtime.json
 
 **Arquivos:** src/components/documents/attachments.tsx
 
-**Rotas:** /documentos/[id]; /estoque
+**Rotas:** /documentos/\[id\]; /estoque
 
 **Componentes:** Não aplicável.
 
@@ -2024,8 +2024,8 @@ sugestões
 **Resumo:** Listas iniciam vazias e não distinguem carregamento; erros podem
 coexistir com mensagens de ausência.
 
-**Observado:** Consumo rows=[] e Nenhum relato; Flows configured=false e
-rows=[] geram configuração ausente/vazio; sino rows=[] gera Você está em dia.
+**Observado:** Consumo rows=\[\] e Nenhum relato; Flows configured=false e
+rows=\[\] geram configuração ausente/vazio; sino rows=\[\] gera Você está em dia.
 
 **Esperado:** Carregamento, erro com repetição, vazio confirmado e conteúdo
 devem ser estados distintos.
@@ -2340,7 +2340,7 @@ mensagem não deve regredir para pendência sem nova evidência.
 
 **Reprodução e alcance:** Confirmado em Chromium390px: política efetiva
 shareWaitSeconds=3 lida da API; consulta de avisos interceptada com
-200/data[]; mensagem de estado concluído permanece após4s e é sobrescrita
+200/data\[\]; mensagem de estado concluído permanece após4s e é sobrescrita
 após~10s por avisos continuam sendo processados. Não simula entrega de
 provedor. Reprodutores: evidence/ui-runtime.mjs e
 evidence/ui-runtime-ready.mjs; somente stack local verificada.
@@ -2358,7 +2358,7 @@ docs/audits/2026-10-25-production-readiness/evidence/ui-runtime-ready.json
 src/components/admin/policy-console.tsx;
 src/components/documents/document-actions.tsx
 
-**Rotas:** /configuracoes?area=rules; /documentos/[id]
+**Rotas:** /configuracoes?area=rules; /documentos/\[id\]
 
 **Componentes:** PolicyRules; PolicyConsole; DocumentActions
 
@@ -2417,7 +2417,7 @@ consumidores frontend/backend não encontrou uso efetivo; DocumentActions
 recebe somente id/code/version. Não é afirmada perda do documento nem entrega
 externa. Runtime: Confirmado em Chromium390px: política efetiva
 shareWaitSeconds=3 lida da API; consulta de avisos interceptada com
-200/data[]; mensagem de estado concluído permanece após4s e é sobrescrita
+200/data\[\]; mensagem de estado concluído permanece após4s e é sobrescrita
 após~10s por avisos continuam sendo processados. Não simula entrega de
 provedor.
 
@@ -2676,7 +2676,7 @@ supabase/migrations/20261023073958_v4_verification_corrections.sql:328-336
 **Arquivos:**
 supabase/migrations/20261023073958_v4_verification_corrections.sql
 
-**Rotas:** /historico/[id]; /fichas/[id]
+**Rotas:** /historico/\[id\]; /fichas/\[id\]
 
 **Componentes:** Histórico e PDF versionado
 
@@ -2977,7 +2977,7 @@ src/components/requisitions/requisition-receipt.tsx:1
 src/app/design-system.css; src/components/requisitions/requisition-steps.tsx;
 src/components/requisitions/requisition-receipt.tsx
 
-**Rotas:** /admin; /fichas/req; /documentos/[id]
+**Rotas:** /admin; /fichas/req; /documentos/\[id\]
 
 **Componentes:** Não aplicável.
 
@@ -3075,7 +3075,7 @@ src/components/documents/document-actions.tsx:5
 src/components/documents/supply-detail.tsx;
 src/components/documents/document-actions.tsx
 
-**Rotas:** /documentos/[id]
+**Rotas:** /documentos/\[id\]
 
 **Componentes:** Não aplicável.
 

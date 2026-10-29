@@ -19,10 +19,10 @@ A tabela registra controles da fonte principal. Controles compostos e variantes
 condicionais constam nos inventários transversais; não foram todos acionados.
 
 - **Linha:** 20; **Controle:** Button; **Texto/nome ou expressão:** {"Consultar
-" + product.name + " · " + labels[key]}; **Pré-condição e efeito
+" + product.name + " · " + labels\[key\]}; **Pré-condição e efeito
 verificável:** {(event) => open(product.productId, key, event.currentTarget)}.
 - **Linha:** 21; **Controle:** Button; **Texto/nome ou expressão:** {"Consultar
-" + product.name + " · " + labels[key]}; **Pré-condição e efeito
+" + product.name + " · " + labels\[key\]}; **Pré-condição e efeito
 verificável:** {(event) => open(product.productId, key, event.currentTarget)}.
 - **Linha:** 22; **Controle:** Button; **Texto/nome ou expressão:** Anterior;
 **Pré-condição e efeito verificável:** {currentPage <= 1}.
@@ -75,7 +75,7 @@ consumo.
 
 Validação humana, aparelhos físicos e integrações reais: **NOT_VERIFIED**.
 
-## OVL-040 — {selected.product.name + " · " + labels[selected.custody]}
+## OVL-040 — {selected.product.name + " · " + labels\[selected.custody\]}
 
 Componente RecordDrawer, origem `src/components/stock/stock-overview.tsx:23` .
 Intenção: consulta/edição contextual dentro da jornada acima; o conteúdo exato

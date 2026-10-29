@@ -80,10 +80,12 @@ Sem reset/seed de banco, envio externo, deploy, merge ou push de conclusão.
 Fixtures são locais e fictícias; reprodutores declaram mutabilidade.
 Saídas ignoradas usuais de testes/build não integram alteração de produto.
 
-Branch final: `audit/phase-b1-interface-final-2026-10-29` . O temporário do
-usuário foi preservado na branch publicada original. Organização autorizada
-em 00. Quatro anexos preexistentes da raiz permanecem fora do commit B1.
-Verificar o SHA final por `git log -1 --` seguido do caminho desta pasta.
+Branch única da Fase B: `audit/phase-b`. O temporário do usuário e o commit
+de encerramento B1 são preservados por ancestralidade nessa branch.
+Os quatro anexos originais estão agora nas
+[entradas da Fase A](../2026-10-25-production-readiness/inputs/README.md).
+As branches intermediárias foram consolidadas conforme nova autorização;
+consultar o [índice da Fase B](../phase-b/README.md).
 
 ## Retomada e autoridade
 

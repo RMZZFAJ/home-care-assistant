@@ -14,9 +14,9 @@ conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: Para proposta de troca de pessoa e horário, aprovador explica
 antes/depois sem sair do diálogo em390/1440; payload usa versão exibida;
 conflito409 mantém revisão; nenhuma aprovação em leitura.
-- Texto e visual: Revisar alteração de plantão. Profissional: [atual] →
-[proposto]. Período: [início/fim atuais] → [novos], horário de [cidade/fuso].
-Responsabilidade BAL: [efeito ou não altera]. Motivo: [texto]. Comparação em
+- Texto e visual: Revisar alteração de plantão. Profissional: \[atual\] →
+\[proposto\]. Período: \[início/fim atuais\] → \[novos\], horário de \[cidade/fuso\].
+Responsabilidade BAL: \[efeito ou não altera\]. Motivo: \[texto\]. Comparação em
 linhas Atual/Proposto; resumo sempre visível acima dos botões; mudanças
 destacadas sem depender só de cor.
 - Comportamento/recuperação: Carregar resumo autorizado da versão esperada; se
@@ -42,10 +42,10 @@ contexto/paciente e versão conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: Cada variante mostra objeto, direção, unidade, pessoa/custódia e
 consequência; teste divergência parcial e movimento reverso; reconsulta
 coincide com resumo.
-- Texto e visual: Confirmar saída de [N unidade] de [material] do estoque
-familiar. ENT: Receber [N unidade] de [material]; [diferença] permanece
-divergente. BAL: Toda [dia], no plantão [tipo], a partir de [data], em [fuso];
-responsável [regra/pessoa]. Resumo compacto por item e escopo, com unidade e
+- Texto e visual: Confirmar saída de \[N unidade\] de \[material\] do estoque
+familiar. ENT: Receber \[N unidade\] de \[material\]; \[diferença\] permanece
+divergente. BAL: Toda \[dia\], no plantão \[tipo\], a partir de \[data\], em \[fuso\];
+responsável \[regra/pessoa\]. Resumo compacto por item e escopo, com unidade e
 efeito; evitar texto universal substituindo os dados.
 - Comportamento/recuperação: Gerar resumo do comando congelado; permitir voltar;
 recuperar mesma tentativa após resposta perdida.
@@ -69,8 +69,8 @@ e versão conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: Cobrir todos os kinds permitidos e fallback seguro desconhecido;
 nenhum UUID/JSON necessário para decisão; payload de aprovação preserva
 id/versão.
-- Texto e visual: [Autor] propõe alterar [regra/pessoa]. Atual: [valor humano].
-Proposto: [valor humano]. Efeito neste paciente: [efeito]. Comparação lado a
+- Texto e visual: \[Autor\] propõe alterar \[regra/pessoa\]. Atual: \[valor humano\].
+Proposto: \[valor humano\]. Efeito neste paciente: \[efeito\]. Comparação lado a
 lado ou empilhada no celular; detalhe técnico recolhido para administração
 autorizada.
 - Comportamento/recuperação: Resolver kind em presenter tipado; não tomar label
@@ -94,8 +94,8 @@ conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: Convite válido, expirado, revogado, conta errada e já aceito têm
 estado/CTA distintos; nenhum aceite pode alterar papel ou paciente por
 parâmetro do cliente.
-- Texto e visual: [Emissor] convida você para acompanhar [paciente] como
-[função]. Convite válido até [data/fuso]. Conta atual: [identidade]. Aceitar
+- Texto e visual: \[Emissor\] convida você para acompanhar \[paciente\] como
+\[função\]. Convite válido até \[data/fuso\]. Conta atual: \[identidade\]. Aceitar
 vínculo / Entrar com outra conta. Cartão de prévia antes do CTA; estado
 expirado/revogado explícito sem revelar dados a token inválido.
 - Comportamento/recuperação: Prévia por token com escopo mínimo e rate limit;
@@ -335,7 +335,7 @@ Achado: [B1-STATE-003](12_FINDINGS_MASTER.md#b1-state-003).
 conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: Cada endpoint falha isoladamente e ambos falham; saldos válidos
 ou indisponibilidade explícita permanecem; nenhum vazio falso.
-- Texto e visual: Saldos consultados às [hora]. Não foi possível carregar os
+- Texto e visual: Saldos consultados às \[hora\]. Não foi possível carregar os
 movimentos. CTA Consultar movimentos novamente. Seções independentes com erro
 local; não repetir nenhum movimento se a consulta falhou.
 - Comportamento/recuperação: Preservar resultado válido por seção e sua
@@ -386,7 +386,7 @@ e versão conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: Offline,reconexão,sessão revogada e troca de paciente mostram
 frescor correto; comandos revalidam e não são enfileirados silenciosamente.
 - Texto e visual: Sem conexão. Estas informações podem estar desatualizadas.
-Última consulta: [hora]. CTA Consultar novamente quando reconectar. Aviso
+Última consulta: \[hora\]. CTA Consultar novamente quando reconectar. Aviso
 discreto persistente próximo ao contexto, acessível e visível; conservar
 leitura com data.
 - Comportamento/recuperação: Revalidar contexto ao retorno e antes de comando;
@@ -412,7 +412,7 @@ dados fictícios, capacidade real.
 - Cenário-alvo: Selecionar,apagar0/7,voltar etapa,rascunho e submit não
 transformam ausência em contagem; zero explícito é aceito; nenhuma mudança de
 contrato só no browser.
-- Texto e visual: Estoque observado [campo inicialmente vazio]. Se não foi
+- Texto e visual: Estoque observado \[campo inicialmente vazio\]. Se não foi
 possível contar, oferecer opção explícita apenas se o contrato aceitar; zero
 continua significando nenhum disponível. Unidade junto ao campo e ajuda curta,
 sem expor saldo esperado como resposta física.
@@ -635,8 +635,8 @@ conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: Versões múltiplas,ator indisponível,catálogo alterado e
 permissões limitadas mostram diff humano consistente com snapshot;
 PDFversionado permanece acessível.
-- Texto e visual: [Pessoa] registrou aquisição de [itens] em[data]. Mudou
-[campo]: [antes] → [depois]. Manter evento e hash como detalhe técnico.
+- Texto e visual: \[Pessoa\] registrou aquisição de \[itens\] em\[data\]. Mudou
+\[campo\]: \[antes\] → \[depois\]. Manter evento e hash como detalhe técnico.
 Timeline de negócio compacta,expandir comparação por versão; estado vigente
 separado de história.
 - Comportamento/recuperação: Diff usa snapshots autorizados imutáveis; não
@@ -682,8 +682,8 @@ conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: Relatar,aceitar,rejeitar e recuperar tentativa mostram efeito e
 próximo responsável exatos; histórico e saldos coincidem.
 - Texto e visual: Relato registrado para revisão. O estoque ainda não foi
-alterado. / Consumo confirmado no estoque [custódia]. / Relato rejeitado,sem
-movimento. COM: Aquisição registrada; próximo passo [etapa vigente]. Status
+alterado. / Consumo confirmado no estoque \[custódia\]. / Relato rejeitado,sem
+movimento. COM: Aquisição registrada; próximo passo \[etapa vigente\]. Status
 persistente com código/objeto e link à reconsulta; não depender apenas de
 toast.
 - Comportamento/recuperação: Selecionar frase pelo comando e resultado
@@ -707,7 +707,7 @@ Achado: [B1-DOC-001](12_FINDINGS_MASTER.md#b1-doc-001).
 conhecidos, dados fictícios, capacidade real.
 - Cenário-alvo: REQ nova/legada,zero,decimal,texto longo e versão antiga:
 observação temporal correta e sem coluna de pedido; PDF mantém legibilidade.
-- Texto e visual: Estoque observado na emissão: [N unidade] por material,com
+- Texto e visual: Estoque observado na emissão: \[N unidade\] por material,com
 título temporal claro. Não adicionar quantidade solicitada. Coluna/campo
 legível em largura de papel e página longa; unidade explícita.
 - Comportamento/recuperação: Usar snapshot da versão,com fallback de legado sem

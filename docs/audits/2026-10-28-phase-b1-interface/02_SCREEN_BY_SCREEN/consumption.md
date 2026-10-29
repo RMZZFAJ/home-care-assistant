@@ -36,12 +36,12 @@ verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 183; **Controle:** input; **Texto/nome ou expressão:** &lt;input
 type="checkbox" checked={Object.hasOwn(lines, product.id)} onChange={(event)
 =&gt; setLines((current) => { const next = { ...current }; if
-(event.target.checked) next[product.id] = ""; else delete next[product.id];;
+(event.target.checked) next\[product.id\] = ""; else delete next\[product.id\];;
 **Pré-condição e efeito verificável:** "checkbox".
 - **Linha:** 200; **Controle:** input; **Texto/nome ou expressão:** Quantidade ·
 {product.unit} &lt;input className={inputClass} type="number"
-inputMode="decimal" min="0.000001" step="any" value={lines[product.id]}
-onChange={(event) =&gt; setLines({ ...lines, [product.id]:
+inputMode="decimal" min="0.000001" step="any" value={lines\[product.id\]}
+onChange={(event) =&gt; setLines({ ...lines, \[product.id\]:
 event.target.value,; **Pré-condição e efeito verificável:** "number".
 - **Linha:** 222; **Controle:** button; **Texto/nome ou expressão:** {uncertain
 ? "Recuperar relato" : "Registrar para conferência"}; **Pré-condição e efeito

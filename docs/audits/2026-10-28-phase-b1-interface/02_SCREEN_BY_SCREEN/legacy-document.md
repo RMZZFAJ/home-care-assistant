@@ -2,7 +2,7 @@
 
 Rota: `/historico/[id]` . Situação: COMPATIBILITY.
 Fonte principal:
-[src/app/historico/[id]/page.tsx](../../../../src/app/historico/[id]/page.tsx).
+\[src/app/historico/\[id\\]/page.tsx](../../../../src/app/historico/\[id\]/page.tsx).
 
 ## Intenção e contexto
 

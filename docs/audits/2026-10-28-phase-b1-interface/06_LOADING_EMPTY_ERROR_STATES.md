@@ -58,8 +58,8 @@ Manter esse ramo, com ajuda específica ao filtro e opção Todas.
 - **Superfície / experimento:** Perfil500 da etapa anterior; **Observado:** Erro
 e Carregando perfil simultâneos; **Proposta exata e transição:** Não foi
 possível carregar seu perfil. Consultar perfil novamente; sair de loading.
-- **Superfície / experimento:** Documento, avisos200/data[] e avançar relógio do
-browser11s; **Observado:** Texto concluído volta a avisos continuam sendo
+- **Superfície / experimento:** Documento, avisos200/data\[\] e avançar relógio
+do browser11s; **Observado:** Texto concluído volta a avisos continuam sendo
 processados; **Proposta exata e transição:** Preservar conclusão; encerrar
 acompanhamento sem inventar pendência.
 - **Superfície / experimento:** Painel profissional carregado, browser offline;

@@ -136,9 +136,9 @@ voltar sem confirmar.
 [src/components/schedules/schedule-console.tsx:66](../../../src/components/schedules/schedule-console.tsx#L66)
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
-**Texto recomendado:** Revisar alteração de plantão. Profissional: [atual] →
-[proposto]. Período: [início/fim atuais] → [novos], horário de [cidade/fuso].
-Responsabilidade BAL: [efeito ou não altera]. Motivo: [texto].
+**Texto recomendado:** Revisar alteração de plantão. Profissional: \[atual\] →
+\[proposto\]. Período: \[início/fim atuais\] → \[novos\], horário de \[cidade/fuso\].
+Responsabilidade BAL: \[efeito ou não altera\]. Motivo: \[texto\].
 
 **Proposta visual:** Comparação em linhas Atual/Proposto; resumo sempre visível
 acima dos botões; mudanças destacadas sem depender só de cor.
@@ -196,7 +196,7 @@ domínio. **P2 — EXPERIENCE_INCONSISTENCY**.
 
 **Superfícies:** SC-011; SC-015; SC-016; OVL-039
 
-**Rotas:** /estoque;/historico/[id];/balancos
+**Rotas:** /estoque;/historico/\[id\];/balancos
 
 **Pessoa e intenção:** Família, destinatário ENT e administrador local
 
@@ -212,8 +212,8 @@ recovery or barrier to use; domain-specific frequency
 
 **Frequência plausível:** Toda movimentação/revisão destas variantes.
 
-**Atual exato ou ramo:** Quantidade: [valor]; Revisar operação definitiva;
-Processamento ativado/pausado somente para [paciente], a partir de [data].
+**Atual exato ou ramo:** Quantidade: \[valor\]; Revisar operação definitiva;
+Processamento ativado/pausado somente para \[paciente\], a partir de \[data\].
 
 **Resultado observado:** Movimento manual não repete direção/unidade;
 divergência ENT não identifica item e quantidade aceita no resumo; configuração
@@ -245,10 +245,10 @@ widths tested
 [src/components/balances/balance-console.tsx:59](../../../src/components/balances/balance-console.tsx#L59)
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
-**Texto recomendado:** Confirmar saída de [N unidade] de [material] do estoque
-familiar. ENT: Receber [N unidade] de [material]; [diferença] permanece
-divergente. BAL: Toda [dia], no plantão [tipo], a partir de [data], em [fuso];
-responsável [regra/pessoa].
+**Texto recomendado:** Confirmar saída de \[N unidade\] de \[material\] do estoque
+familiar. ENT: Receber \[N unidade\] de \[material\]; \[diferença\] permanece
+divergente. BAL: Toda \[dia\], no plantão \[tipo\], a partir de \[data\], em \[fuso\];
+responsável \[regra/pessoa\].
 
 **Proposta visual:** Resumo compacto por item e escopo, com unidade e efeito;
 evitar texto universal substituindo os dados.
@@ -344,8 +344,8 @@ widths tested
 [src/components/admin/policy-console.tsx:321](../../../src/components/admin/policy-console.tsx#L321)
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
-**Texto recomendado:** [Autor] propõe alterar [regra/pessoa]. Atual: [valor
-humano]. Proposto: [valor humano]. Efeito neste paciente: [efeito].
+**Texto recomendado:** \[Autor\] propõe alterar \[regra/pessoa\]. Atual: [valor
+humano]. Proposto: \[valor humano\]. Efeito neste paciente: \[efeito\].
 
 **Proposta visual:** Comparação lado a lado ou empilhada no celular; detalhe
 técnico recolhido para administração autorizada.
@@ -440,8 +440,8 @@ widths tested
 [src/components/admin/accept-invitation.tsx:14](../../../src/components/admin/accept-invitation.tsx#L14)
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
-**Texto recomendado:** [Emissor] convida você para acompanhar [paciente] como
-[função]. Convite válido até [data/fuso]. Conta atual: [identidade]. Aceitar
+**Texto recomendado:** \[Emissor\] convida você para acompanhar \[paciente\] como
+\[função\]. Convite válido até \[data/fuso\]. Conta atual: \[identidade\]. Aceitar
 vínculo / Entrar com outra conta.
 
 **Proposta visual:** Cartão de prévia antes do CTA; estado expirado/revogado
@@ -497,7 +497,7 @@ EXPERIENCE_INCONSISTENCY**.
 
 **Superfícies:** SC-007; SC-039; SC-040; SC-034
 
-**Rotas:** /historico;/historico/[id];/configuracoes
+**Rotas:** /historico;/historico/\[id\];/configuracoes
 
 **Pessoa e intenção:** Todos os perfis leitores
 
@@ -515,7 +515,7 @@ existing workaround; no demonstrated irreversible harm
 confusão.
 
 **Atual exato ou ramo:** science_required; archive_pending; Remover filtro
-[search/from/to]; kind/role sem tradução em alguns fallbacks.
+\[search/from/to\]; kind/role sem tradução em alguns fallbacks.
 
 **Resultado observado:** Os dois filtros especiais aparecem crus nos chips
 apesar de terem opções humanas; aria-label de remoção usa chave. Catálogo separa
@@ -698,7 +698,7 @@ EXPERIENCE_INCONSISTENCY**.
 
 **Superfícies:** SC-010; SC-012; SC-046
 
-**Rotas:** /fichas/com;/fichas/bal;/api/documents/[id]/pdf
+**Rotas:** /fichas/com;/fichas/bal;/api/documents/\[id\]/pdf
 
 **Pessoa e intenção:** Família, supervisão e leitores de PDF
 
@@ -890,7 +890,7 @@ confirmada. **P2 — DEFECT_CONFIRMED**.
 
 **Superfícies:** SC-039; SC-040
 
-**Rotas:** /historico/[id]
+**Rotas:** /historico/\[id\]
 
 **Pessoa e intenção:** Pessoa anexando foto/ficha física
 
@@ -1431,7 +1431,7 @@ widths tested
 [src/components/stock/stock-console.tsx:87](../../../src/components/stock/stock-console.tsx#L87)
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
-**Texto recomendado:** Saldos consultados às [hora]. Não foi possível carregar
+**Texto recomendado:** Saldos consultados às \[hora\]. Não foi possível carregar
 os movimentos. CTA Consultar movimentos novamente.
 
 **Proposta visual:** Seções independentes com erro local; não repetir nenhum
@@ -1487,7 +1487,7 @@ PDF. **P2 — DEFECT_CONFIRMED**.
 
 **Superfícies:** SC-009; SC-010; SC-012; SC-039
 
-**Rotas:** /fichas/req;/fichas/com;/fichas/bal;/historico/[id]
+**Rotas:** /fichas/req;/fichas/com;/fichas/bal;/historico/\[id\]
 
 **Pessoa e intenção:** Emissor/consulta documental
 
@@ -1506,7 +1506,7 @@ aberto.
 **Atual exato ou ramo:** Preparando PDF; acompanhamento inicial dos avisos por
 até 10 segundos. / Os avisos continuam sendo processados.
 
-**Resultado observado:** Relógio virtual11s após notificações200data[] mudou
+**Resultado observado:** Relógio virtual11s após notificações200data\[\] mudou
 mensagem concluída para processamento. Consumidor fixa10s e não recebe
 shareWaitSeconds; mesmaAbortController cobre PDF e avisos.
 
@@ -1629,7 +1629,7 @@ widths tested
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
 **Texto recomendado:** Sem conexão. Estas informações podem estar
-desatualizadas. Última consulta: [hora]. CTA Consultar novamente quando
+desatualizadas. Última consulta: \[hora\]. CTA Consultar novamente quando
 reconectar.
 
 **Proposta visual:** Aviso discreto persistente próximo ao contexto, acessível e
@@ -1726,7 +1726,7 @@ widths tested
 [src/components/requisitions/requisition-steps.tsx:344](../../../src/components/requisitions/requisition-steps.tsx#L344)
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
-**Texto recomendado:** Estoque observado [campo inicialmente vazio]. Se não foi
+**Texto recomendado:** Estoque observado \[campo inicialmente vazio\]. Se não foi
 possível contar, oferecer opção explícita apenas se o contrato aceitar; zero
 continua significando nenhum disponível.
 
@@ -2575,7 +2575,7 @@ negócio. **P3 — PRODUCT_OPPORTUNITY**.
 
 **Superfícies:** SC-039; SC-040
 
-**Rotas:** /historico/[id]
+**Rotas:** /historico/\[id\]
 
 **Pessoa e intenção:** Família,supervisão,leitor autorizado
 
@@ -2616,8 +2616,8 @@ widths tested
 [src/components/documents/supply-detail.tsx:396](../../../src/components/documents/supply-detail.tsx#L396)
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
-**Texto recomendado:** [Pessoa] registrou aquisição de [itens] em[data]. Mudou
-[campo]: [antes] → [depois]. Manter evento e hash como detalhe técnico.
+**Texto recomendado:** \[Pessoa\] registrou aquisição de \[itens\] em\[data\]. Mudou
+\[campo\]: \[antes\] → \[depois\]. Manter evento e hash como detalhe técnico.
 
 **Proposta visual:** Timeline de negócio compacta,expandir comparação por
 versão; estado vigente separado de história.
@@ -2769,7 +2769,7 @@ Feedback genérico não distingue relato de consumo,confirmação e aquisição.
 
 **Superfícies:** SC-019; SC-039
 
-**Rotas:** /consumo;/historico/[id]
+**Rotas:** /consumo;/historico/\[id\]
 
 **Pessoa e intenção:** Relator,família e aprovador
 
@@ -2813,8 +2813,8 @@ widths tested
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
 **Texto recomendado:** Relato registrado para revisão. O estoque ainda não foi
-alterado. / Consumo confirmado no estoque [custódia]. / Relato rejeitado,sem
-movimento. COM: Aquisição registrada; próximo passo [etapa vigente].
+alterado. / Consumo confirmado no estoque \[custódia\]. / Relato rejeitado,sem
+movimento. COM: Aquisição registrada; próximo passo \[etapa vigente\].
 
 **Proposta visual:** Status persistente com código/objeto e link à reconsulta;
 não depender apenas de toast.
@@ -2867,7 +2867,7 @@ MISSING_CAPABILITY**.
 
 **Superfícies:** SC-045
 
-**Rotas:** /api/documents/[id]/pdf (REQ)
+**Rotas:** /api/documents/\[id\]/pdf (REQ)
 
 **Pessoa e intenção:** Leitor de PDF/ficha impressa
 
@@ -2908,7 +2908,7 @@ widths tested
 [src/lib/server/operational-pdf.ts:441](../../../src/lib/server/operational-pdf.ts#L441)
 . Linhas exatas no CSV; o link #L é referência textual, não execução.
 
-**Texto recomendado:** Estoque observado na emissão: [N unidade] por
+**Texto recomendado:** Estoque observado na emissão: \[N unidade\] por
 material,com título temporal claro. Não adicionar quantidade solicitada.
 
 **Proposta visual:** Coluna/campo legível em largura de papel e página longa;
@@ -2963,7 +2963,7 @@ RISK_SUPPORTED**.
 
 **Superfícies:** SC-045; SC-046; SC-047; SC-048
 
-**Rotas:** /api/documents/[id]/pdf
+**Rotas:** /api/documents/\[id\]/pdf
 
 **Pessoa e intenção:** Pessoa usando tecnologia assistiva ou navegação
 estrutural
@@ -3281,7 +3281,7 @@ existing workaround; no demonstrated irreversible harm
 **Frequência plausível:** Toda seleção de modo em tela estreita.
 
 **Atual exato ou ramo:** Mês selecionado em390; cabeçalho Dia
-anterior/[data]/Próximo dia.
+anterior/\[data\]/Próximo dia.
 
 **Resultado observado:** CSS/consumer força visão diária abaixo1024 apesar do
 seletor manter Mês. Não houve perda de plantão provada; expectativa de navegação
@@ -3456,7 +3456,7 @@ RISK_SUPPORTED**.
 
 **Superfícies:** SC-039; SC-040
 
-**Rotas:** /historico/[id] (REQ)
+**Rotas:** /historico/\[id\] (REQ)
 
 **Pessoa e intenção:** Família com ciência automática habilitada
 

@@ -5,7 +5,8 @@ Diagnóstico consolidado em 28/10/2026. Estado dos checks em
 
 Base auditada: `37cb7f85e96e551d6419871f94dd950712e2565b`, branch `master`.
 Inventário inicial: 503 artefatos versionados. Os quatro anexos de instruções
-não versionados preexistentes são preservados e não integram esse denominador.
+preexistentes não integram esse denominador. Em 29/10/2026 foram reunidos em
+[inputs](inputs/README.md), conforme solicitação do responsável.
 
 Esta fase produz diagnóstico e evidências; não implementa recomendações.
 Somente este diretório recebe novos artefatos versionáveis. Testes usam a stack

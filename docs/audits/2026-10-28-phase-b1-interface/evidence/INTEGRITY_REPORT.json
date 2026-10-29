@@ -1,12 +1,12 @@
 {
-  "at": "2026-10-29T08:50:32.311Z",
+  "at": "2026-10-29T09:21:24.056Z",
   "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
   "errors": [],
   "summary": {
     "requiredFiles": 26,
-    "checks": 4426,
+    "checks": 4428,
     "markdownFiles": 118,
-    "localLinks": 876,
+    "localLinks": 878,
     "surfaces": 97,
     "runtime": 223,
     "findings": 35,
@@ -22095,6 +22095,16 @@
     },
     {
       "name": "Markdown link README.md → evidence/e2e-result.json",
+      "pass": true,
+      "details": ""
+    },
+    {
+      "name": "Markdown link README.md → ../2026-10-25-production-readiness/inputs/README.md",
+      "pass": true,
+      "details": ""
+    },
+    {
+      "name": "Markdown link README.md → ../phase-b/README.md",
       "pass": true,
       "details": ""
     },

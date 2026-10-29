@@ -31,7 +31,7 @@ value="optional"&gt;Opcional&lt;/option&gt; &lt;option
 value="required"&gt;Obrigatória&lt;/option&gt;; **Pré-condição e efeito
 verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 31; **Controle:** Checkbox; **Texto/nome ou expressão:**
-{roles[role as keyof typeof roles]}; **Pré-condição e efeito verificável:**
+{roles\[role as keyof typeof roles\]}; **Pré-condição e efeito verificável:**
 Consultar ramo condicional na fonte.
 - **Linha:** 32; **Controle:** Select; **Texto/nome ou expressão:** &lt;option
 value="any"&gt;Qualquer grupo&lt;/option&gt; &lt;option value="all"&gt;Todos ·
@@ -40,7 +40,7 @@ Consultar ramo condicional na fonte.
 - **Linha:** 35; **Controle:** Checkbox; **Texto/nome ou expressão:** {label};
 **Pré-condição e efeito verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 36; **Controle:** Checkbox; **Texto/nome ou expressão:**
-{roles[role as keyof typeof roles]}; **Pré-condição e efeito verificável:**
+{roles\[role as keyof typeof roles\]}; **Pré-condição e efeito verificável:**
 Consultar ramo condicional na fonte.
 - **Linha:** 37; **Controle:** Select; **Texto/nome ou expressão:** &lt;option
 value="any"&gt;Uma pessoa autorizada&lt;/option&gt; &lt;option
@@ -55,7 +55,7 @@ defaultValue={String(values.patientShortName ?? "")} /&gt;; **Pré-condição e
 efeito verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 42; **Controle:** Input; **Texto/nome ou expressão:** &lt;Input
 name={String(key)} type="number" min={Number(min)} max={Number(max)} required
-defaultValue={String(values[String(key)])} /&gt;; **Pré-condição e efeito
+defaultValue={String(values\[String(key)\])} /&gt;; **Pré-condição e efeito
 verificável:** "number".
 - **Linha:** 45; **Controle:** Input; **Texto/nome ou expressão:** &lt;Input
 name="archiveDays" type="number" required min={1} max={365}

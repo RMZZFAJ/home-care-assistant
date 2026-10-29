@@ -41,7 +41,7 @@ value=""&gt;Toda a equipe&lt;/option&gt; {data?.professionals.map(p =>
 &lt;option key={p.id} value={p.id}&gt;{p.name}&lt;/option&gt;)};
 **Pré-condição e efeito verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 56; **Controle:** Select; **Texto/nome ou expressão:** &lt;option
-value=""&gt;Todas&lt;/option&gt; {Object.entries(stateLabels).map(([k, v]) =>
+value=""&gt;Todas&lt;/option&gt; {Object.entries(stateLabels).map((\[k, v\]) =>
 &lt;option key={k} value={k}&gt;{v}&lt;/option&gt;)}; **Pré-condição e efeito
 verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 60; **Controle:** Button; **Texto/nome ou expressão:** Dia

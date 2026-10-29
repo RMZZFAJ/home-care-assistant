@@ -25,7 +25,7 @@ className={inputClass} />; **Pré-condição e efeito verificável:** Consultar
 ramo condicional na fonte.
 - **Linha:** 34; **Controle:** select; **Texto/nome ou expressão:** &lt;option
 value=""&gt;Todos&lt;/option&gt;
-{Object.entries(statusLabels).map(([key,label]) => &lt;option key={key}
+{Object.entries(statusLabels).map((\[key,label\]) => &lt;option key={key}
 value={key}&gt;{label}&lt;/option&gt;)}; **Pré-condição e efeito
 verificável:** Consultar ramo condicional na fonte.
 - **Linha:** 35; **Controle:** input; **Texto/nome ou expressão:** De &lt;input
