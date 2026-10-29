@@ -1,0 +1,249 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:17:03.662Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:17:08.618Z",
+      "role": "professional",
+      "label": "extras-invalid",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "ERROR_RECOVERABLE",
+      "note": "",
+      "file": "b17-forms-professional-extras-invalid.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 133
+      },
+      "text": "Requisição de insumos\nEtapa 5 de 7\nItens extras\nIdentificação\nMedicamentos\nHigiene\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nItens extras\n\nAdicione materiais não disponíveis no catálogo e informe somente o estoque atual. As sugestões exigem sua escolha antes de vincular um item.\n\nNome\nEstoque atual\nRemover item 1\nReposição urgente\n+ Incluir novo item\nPreencha ou remova os itens extras incompletos.\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 5 de 7\n    - strong: Itens extras\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"Higiene\"\n      - listitem:\n        - button \"Dieta\"\n      - listitem:\n        - button \"5 Itens extras\"\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Itens extras\" [level=2]\n  - group:\n    - paragraph: Adicione materiais não disponíveis no catálogo e informe somente o estoque atual. As sugestões exigem sua escolha antes de vincular um item.\n    - text: Nome\n    - textbox \"Nome\"\n    - text: Estoque atual\n    - spinbutton \"Estoque atual\": \"0\"\n    - button \"Remover item 1\"\n    - checkbox \"Reposição urgente\"\n    - text: Reposição urgente\n    - button \"+ Incluir novo item\"\n  - alert: Preencha ou remova os itens extras incompletos.\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:17:09.951Z",
+      "role": "professional",
+      "label": "same-tab-recovered",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b17-forms-professional-same-tab-recovered.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 1 de 7\nIdentificação\n1\nIdentificação\n2\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\nRascunho deste dispositivo recuperado.\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nIdentificação\n\nPaciente: Homologação fictícia V4 9482191c\n\nSolicitante: Teste professional\n\nMarque os produtos necessários e informe o estoque observado com a equipe. A requisição não contém quantidade solicitada e não movimenta o estoque.\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 1 de 7\n    - strong: Identificação\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"1 Identificação\"\n      - listitem:\n        - button \"2 Medicamentos\" [disabled]\n      - listitem:\n        - button \"3 Higiene\" [disabled]\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - status: Rascunho deste dispositivo recuperado.\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Identificação\" [level=2]\n  - group:\n    - paragraph:\n      - text: \"Paciente:\"\n      - strong: Homologação fictícia V4 9482191c\n    - paragraph:\n      - text: \"Solicitante:\"\n      - strong: Teste professional\n    - status: Marque os produtos necessários e informe o estoque observado com a equipe. A requisição não contém quantidade solicitada e não movimenta o estoque.\n  - button \"Voltar\" [disabled]\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:17:11.333Z",
+      "role": "professional",
+      "label": "new-tab-no-draft",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b17-forms-professional-new-tab-no-draft.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 1 de 7\nIdentificação\n1\nIdentificação\n2\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nIdentificação\n\nPaciente: Homologação fictícia V4 9482191c\n\nSolicitante: Teste professional\n\nMarque os produtos necessários e informe o estoque observado com a equipe. A requisição não contém quantidade solicitada e não movimenta o estoque.\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 1 de 7\n    - strong: Identificação\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"1 Identificação\"\n      - listitem:\n        - button \"2 Medicamentos\" [disabled]\n      - listitem:\n        - button \"3 Higiene\" [disabled]\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Identificação\" [level=2]\n  - group:\n    - paragraph:\n      - text: \"Paciente:\"\n      - strong: Homologação fictícia V4 9482191c\n    - paragraph:\n      - text: \"Solicitante:\"\n      - strong: Teste professional\n    - status: Marque os produtos necessários e informe o estoque observado com a equipe. A requisição não contém quantidade solicitada e não movimenta o estoque.\n  - button \"Voltar\" [disabled]\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:17:24.937Z",
+      "role": "professional",
+      "label": "req-density-1",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Synthetic browser catalog only; labels/size inspection, not persisted or real volume benchmark.",
+      "file": "b17-forms-professional-req-density-1.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 3 de 7\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nBuscar produto\nMaterial simulado B1 000 — nome longo para avaliar quebra e unidade\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 3 de 7\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - text: Buscar produto\n    - textbox \"Buscar produto\":\n      - /placeholder: Nome ou nome alternativo\n      - text: Apelido sintético 0\n    - article:\n      - checkbox \"Material simulado B1 000 — nome longo para avaliar quebra e unidade frasco\"\n      - text: Material simulado B1 000 — nome longo para avaliar quebra e unidade frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:17:57.649Z",
+      "role": "professional",
+      "label": "req-density-5",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Synthetic browser catalog only; labels/size inspection, not persisted or real volume benchmark.",
+      "file": "b17-forms-professional-req-density-5.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 3 de 7\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nBuscar produto\nMaterial simulado B1 004\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 3 de 7\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - text: Buscar produto\n    - textbox \"Buscar produto\":\n      - /placeholder: Nome ou nome alternativo\n      - text: Apelido sintético 4\n    - article:\n      - checkbox \"Material simulado B1 004 frasco\"\n      - text: Material simulado B1 004 frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:18:30.283Z",
+      "role": "professional",
+      "label": "req-density-20",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Synthetic browser catalog only; labels/size inspection, not persisted or real volume benchmark.",
+      "file": "b17-forms-professional-req-density-20.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 3 de 7\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nBuscar produto\nMaterial simulado B1 019\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 3 de 7\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - text: Buscar produto\n    - textbox \"Buscar produto\":\n      - /placeholder: Nome ou nome alternativo\n      - text: Apelido sintético 19\n    - article:\n      - checkbox \"Material simulado B1 019 frasco\"\n      - text: Material simulado B1 019 frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:19:03.055Z",
+      "role": "professional",
+      "label": "req-density-100",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Synthetic browser catalog only; labels/size inspection, not persisted or real volume benchmark.",
+      "file": "b17-forms-professional-req-density-100.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 3 de 7\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nBuscar produto\nMaterial simulado B1 099\nfrasco\n\nFamília · saldo confirmado deste produto: consulta indisponível\n\nEstoque observado com a equipe\nReposição urgente\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 3 de 7\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - text: Buscar produto\n    - textbox \"Buscar produto\":\n      - /placeholder: Nome ou nome alternativo\n      - text: Apelido sintético 99\n    - article:\n      - checkbox \"Material simulado B1 099 frasco\" [checked]\n      - text: Material simulado B1 099 frasco\n      - paragraph: \"Família · saldo confirmado deste produto: consulta indisponível\"\n      - text: Estoque observado com a equipe\n      - spinbutton \"Estoque observado com a equipe\": \"1.5\"\n      - checkbox \"Reposição urgente\"\n      - text: Reposição urgente\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    }
+  ],
+  "failures": [
+    {
+      "label": "real-req-fields",
+      "error": "locator.click: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Avançar', exact: true })\u001b[22m\n"
+    },
+    {
+      "label": "density-1",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Avançar', exact: true })\u001b[22m\n"
+    },
+    {
+      "label": "density-5",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Avançar', exact: true })\u001b[22m\n"
+    },
+    {
+      "label": "density-20",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Avançar', exact: true })\u001b[22m\n"
+    },
+    {
+      "label": "density-100",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Avançar', exact: true })\u001b[22m\n"
+    }
+  ],
+  "observations": [
+    {
+      "scenario": "catalog-selection-default",
+      "value": "0",
+      "meaning": "Selected but no physical count typed; value starts0"
+    },
+    {
+      "scenario": "extra-validation",
+      "ariaInvalid": 0,
+      "focus": {
+        "tag": "BUTTON",
+        "text": "Avançar"
+      },
+      "step": "Etapa 5 de 7\nItens extras"
+    },
+    {
+      "scenario": "extra-cleared-number",
+      "value": "0",
+      "meaning": "Clear maps Number(empty string) to0"
+    },
+    {
+      "scenario": "same-tab-reload",
+      "drafts": [
+        {
+          "lines": 1,
+          "extras": [
+            {
+              "name": "Material fora do catálogo — prova sintética B1",
+              "currentStock": 0
+            }
+          ],
+          "hasIntent": false,
+          "savedAt": 1793247429904
+        }
+      ]
+    },
+    {
+      "scenario": "independent-tab-same-context",
+      "drafts": [],
+      "recoveredMessage": 0,
+      "method": "New browser page without opener; auth cookies shared; sessionStorage independent"
+    },
+    {
+      "scenario": "density",
+      "count": 1,
+      "type": "req",
+      "renderedCheckboxes": 1,
+      "searchAvailable": 1,
+      "afterAliasSearch": 1,
+      "localElapsedMs": 1300,
+      "measurement": "Not user speed or production latency; injected read model, no persist"
+    },
+    {
+      "scenario": "density",
+      "count": 5,
+      "type": "req",
+      "renderedCheckboxes": 5,
+      "searchAvailable": 1,
+      "afterAliasSearch": 1,
+      "localElapsedMs": 1389,
+      "measurement": "Not user speed or production latency; injected read model, no persist"
+    },
+    {
+      "scenario": "density",
+      "count": 20,
+      "type": "req",
+      "renderedCheckboxes": 20,
+      "searchAvailable": 1,
+      "afterAliasSearch": 1,
+      "localElapsedMs": 1334,
+      "measurement": "Not user speed or production latency; injected read model, no persist"
+    },
+    {
+      "scenario": "density",
+      "count": 100,
+      "type": "req",
+      "renderedCheckboxes": 100,
+      "searchAvailable": 1,
+      "afterAliasSearch": 1,
+      "localElapsedMs": 1303,
+      "measurement": "Not user speed or production latency; injected read model, no persist"
+    },
+    {
+      "scenario": "decimal-point",
+      "value": "1.5"
+    },
+    {
+      "scenario": "decimal-comma-key-emulation",
+      "value": "1.5",
+      "locale": "pt-BR; desktop Chromium emulation, not mobile virtual keyboard"
+    }
+  ],
+  "finishedAt": "2026-10-29T04:19:36.049Z"
+}

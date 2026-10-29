@@ -1,0 +1,37 @@
+[
+  {
+    "capture": "b14-recovery-adminA-invalid-json.png",
+    "sheet": "b14-recovery-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b14-recovery-adminA-network-abort.png",
+    "sheet": "b14-recovery-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b14-recovery-adminA-profile-error.png",
+    "sheet": "b14-recovery-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b14-recovery-adminA-permission-409.png",
+    "sheet": "b14-recovery-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b14-recovery-adminA-attachment-lost.png",
+    "sheet": "b14-recovery-sheet-01.png",
+    "region": "top 950 of 2681px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  }
+]

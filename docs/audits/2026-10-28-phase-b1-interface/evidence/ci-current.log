@@ -1,0 +1,17 @@
+Read-only GitHub connector consultation, 2026-10-29 UTC / 2026-10-28 Sao Paulo.
+Repository: RMZZFAJ/home-care-assistant; run 40656069166; job 122708993891.
+HEAD 34dcb835c5c49068e0417f7306eb4e501aa868bc. Selected diagnostic lines only.
+2026-10-28T08:32:36.6413034Z     TimeoutError: locator.click: Timeout 15000ms exceeded.
+2026-10-28T08:32:36.6413715Z       - waiting for getByRole('navigation', { name: 'Navegação do plantão', exact: true }).getByRole('link', { name: 'Mais', exact: true })
+2026-10-28T08:32:36.6414046Z        at navigation.ts:10
+2026-10-28T08:32:36.6415016Z     > 10 |       await page.getByRole("navigation", { name: "Navegação do plantão", exact: true }).getByRole("link", { name: "Mais", exact: true }).click();
+2026-10-28T08:32:36.6416518Z         at openNavigation (/home/runner/work/home-care-assistant/home-care-assistant/tests/e2e/navigation.ts:10:138)
+2026-10-28T08:32:36.6416928Z         at /home/runner/work/home-care-assistant/home-care-assistant/tests/e2e/workflows.spec.ts:449:22
+2026-10-28T08:32:36.6420012Z     TimeoutError: locator.click: Timeout 15000ms exceeded.
+2026-10-28T08:32:36.6420585Z       - waiting for getByRole('navigation', { name: 'Navegação do plantão', exact: true }).getByRole('link', { name: 'Mais', exact: true })
+2026-10-28T08:32:36.6420887Z        at navigation.ts:10
+2026-10-28T08:32:36.6421707Z     > 10 |       await page.getByRole("navigation", { name: "Navegação do plantão", exact: true }).getByRole("link", { name: "Mais", exact: true }).click();
+2026-10-28T08:32:36.6423131Z         at openNavigation (/home/runner/work/home-care-assistant/home-care-assistant/tests/e2e/navigation.ts:10:138)
+2026-10-28T08:32:36.6423537Z         at /home/runner/work/home-care-assistant/home-care-assistant/tests/e2e/workflows.spec.ts:449:22
+2026-10-28T08:32:36.6425583Z   1 failed
+2026-10-28T08:32:36.6426222Z   39 passed (5.4m)

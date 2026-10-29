@@ -1,0 +1,61 @@
+{
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "node": "24.22.0",
+  "checks": [
+    {
+      "command": "npm run check:contracts",
+      "startedAt": "2026-10-29T04:39:47.439Z",
+      "finishedAt": "2026-10-29T04:39:52.546Z",
+      "exitCode": 0,
+      "log": "check-contracts-current.log",
+      "localBackend": "127.0.0.1:54321",
+      "externalSending": false,
+      "appOrigin": "http://127.0.0.1:3100",
+      "limits": "No product change; check result is not UX/human or production acceptance"
+    },
+    {
+      "command": "npm run lint",
+      "startedAt": "2026-10-29T04:39:52.547Z",
+      "finishedAt": "2026-10-29T04:40:28.262Z",
+      "exitCode": 0,
+      "log": "lint-current.log",
+      "localBackend": "127.0.0.1:54321",
+      "externalSending": false,
+      "appOrigin": "http://127.0.0.1:3100",
+      "limits": "No product change; check result is not UX/human or production acceptance"
+    },
+    {
+      "command": "npm run typecheck",
+      "startedAt": "2026-10-29T04:40:28.263Z",
+      "finishedAt": "2026-10-29T04:40:31.441Z",
+      "exitCode": 0,
+      "log": "typecheck-current.log",
+      "localBackend": "127.0.0.1:54321",
+      "externalSending": false,
+      "appOrigin": "http://127.0.0.1:3100",
+      "limits": "No product change; check result is not UX/human or production acceptance"
+    },
+    {
+      "command": "npm run test",
+      "startedAt": "2026-10-29T04:40:31.442Z",
+      "finishedAt": "2026-10-29T04:40:39.187Z",
+      "exitCode": 0,
+      "log": "test-current.log",
+      "localBackend": "127.0.0.1:54321",
+      "externalSending": false,
+      "appOrigin": "https://care.example",
+      "limits": "No product change; check result is not UX/human or production acceptance"
+    },
+    {
+      "command": "npm run build",
+      "startedAt": "2026-10-29T04:40:39.188Z",
+      "finishedAt": "2026-10-29T04:40:54.030Z",
+      "exitCode": 0,
+      "log": "build-current.log",
+      "localBackend": "127.0.0.1:54321",
+      "externalSending": false,
+      "appOrigin": "http://127.0.0.1:3100",
+      "limits": "No product change; check result is not UX/human or production acceptance"
+    }
+  ]
+}

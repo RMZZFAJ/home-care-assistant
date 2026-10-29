@@ -1,0 +1,712 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:32:33.912Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:32:38.642Z",
+      "role": "adminA",
+      "label": "skip-link",
+      "path": "/admin?section=catalog",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-accessibility-adminA-skip-link.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nAdministração\n\nTodas as alterações desta área se limitam ao paciente selecionado.\n\nAdministração\n/\nCatálogo\nOutras áreas\nUnidades e apresentações / scanner\nCatálogo do paciente\n\n2 produtos cadastrados · aquisição e controle da família\n\nNovo item\nAdotar modelo\nAtivos\nInativos\nTodos\n2 resultados\nProduto\n\t\nCategoria / unidade\n\t\nSituação\n\t\nAções\n\nMaterial fictício V4 0\thigiene\nunidade\n\tAtivo\tEditar\nMaterial fictício V4 1\thigiene\nunidade\n\tAtivo\tEditar",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Administração\" [level=1]\n  - paragraph: Todas as alterações desta área se limitam ao paciente selecionado.\n  - link \"Administração\":\n    - /url: /admin?careRecipientId=bee824b9-3ac4-487c-a155-10ebee811956\n  - strong: Catálogo\n  - button \"Outras áreas\"\n  - link \"Unidades e apresentações / scanner\":\n    - /url: /unidades\n  - group:\n    - heading \"Catálogo do paciente\" [level=2]\n    - paragraph: 2 produtos cadastrados · aquisição e controle da família\n    - button \"Novo item\"\n    - button \"Adotar modelo\"\n    - searchbox \"Pesquisar catálogo\"\n    - combobox \"Situação dos produtos\":\n      - option \"Ativos\" [selected]\n      - option \"Inativos\"\n      - option \"Todos\"\n    - status: 2 resultados\n    - table \"Produtos do catálogo\":\n      - rowgroup:\n        - row \"Produto Categoria / unidade Situação Ações\":\n          - columnheader \"Produto\"\n          - columnheader \"Categoria / unidade\"\n          - columnheader \"Situação\"\n          - columnheader \"Ações\"\n      - rowgroup:\n        - row \"Material fictício V4 0 higiene unidade Ativo Editar Material fictício V4 0\":\n          - cell \"Material fictício V4 0\":\n            - strong: Material fictício V4 0\n          - cell \"higiene unidade\"\n          - cell \"Ativo\"\n          - cell \"Editar Material fictício V4 0\":\n            - button \"Editar Material fictício V4 0\": Editar\n        - row \"Material fictício V4 1 higiene unidade Ativo Editar Material fictício V4 1\":\n          - cell \"Material fictício V4 1\":\n            - strong: Material fictício V4 1\n          - cell \"higiene unidade\"\n          - cell \"Ativo\"\n          - cell \"Editar Material fictício V4 1\":\n            - button \"Editar Material fictício V4 1\": Editar",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:32:39.132Z",
+      "role": "adminA",
+      "label": "dirty-drawer",
+      "path": "/admin?section=catalog",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-accessibility-adminA-dirty-drawer.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Adicionar item exclusivo deste paciente\nHá alterações ainda não salvas.\nContinuar editando\nDescartar alterações\nNome\nCategoria\nMedicamentos\nHigiene\nDieta\nUnidade\nNomes alternativos, separados por vírgula\nDescrição operacional\nOrdem\nItem ativo\n\nA unidade de itens com histórico é preservada. Para outra unidade, cadastre um novo item.\n\nSalvar item",
+      "snapshot": "- dialog \"Adicionar item exclusivo deste paciente\":\n  - heading \"Adicionar item exclusivo deste paciente\" [level=2]\n  - button \"Fechar edição\"\n  - alert:\n    - text: Há alterações ainda não salvas.\n    - button \"Continuar editando\"\n    - button \"Descartar alterações\"\n  - group:\n    - text: Nome\n    - textbox \"Nome\": Edição sintética B1 não salva\n    - text: Categoria\n    - combobox \"Categoria\":\n      - option \"Medicamentos\" [selected]\n      - option \"Higiene\"\n      - option \"Dieta\"\n    - text: Unidade\n    - textbox \"Unidade\": unidade\n    - text: Nomes alternativos, separados por vírgula\n    - textbox \"Nomes alternativos, separados por vírgula\"\n    - text: Descrição operacional\n    - textbox \"Descrição operacional\"\n    - text: Ordem\n    - spinbutton \"Ordem\": \"0\"\n    - checkbox \"Item ativo\" [checked]\n    - text: Item ativo\n    - paragraph: A unidade de itens com histórico é preservada. Para outra unidade, cadastre um novo item.\n    - button \"Salvar item\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:32:53.228Z",
+      "role": "adminA",
+      "label": "matrix-keyboard",
+      "path": "/configuracoes?area=permissions",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-accessibility-adminA-matrix-keyboard.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 342
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nPermissões, comunicação e regras\n\nAtuação local: alterações autorizadas são aplicadas imediatamente. · Política v1\n\nRegras\nPermissões\nNotificações\nPessoas e propostas\nPermissões por função e exceções pessoais\n\nExceções pessoais respeitam os limites da função e do paciente.\n\nTodos os grupos\nAcessos\nAuditoria\nBalanços\nCatálogo\nCompras\nOcorrências\nEntregas\nComunicação\nRequisições\nEscalas\nEstoques\nTodas as funções\nTeste adminA\nTeste reader\nTeste professional\nTeste global\nTeste family\nProfissional fictício de plantão\nCapacidade\n\t\nAdministrador do paciente\n\t\nSupervisor\n\t\nProfissional\n\t\nFamiliar\n\t\nLeitor\n\nAdministrar acessos do paciente\nAcessos · Crítica\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nRestrito\n\t\nRestrito\n\nConsultar auditoria\nAuditoria\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nRevisar BAL pelo grupo familiar\nBalanços · Crítica\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nRevisar BAL pela supervisão\nBalanços · Crítica\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nContar estoque da equipe\nBalanços\n\t\nRestrito\n\t\nHerdar\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\nDecidir adiamento pelo grupo familiar\nBalanços · Crítica\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nSolicitar adiamento à família\nBalanços\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConsultar BAL\nBalanços\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConfigurar programação do BAL pela família\nBalanços · Crítica\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nAdministrar catálogo e medidas\nCatálogo\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nAprovar itens da COM\nCompras · Crítica\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nSolicitar compra ou doação\nCompras\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nRegistrar aquisição\nCompras\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nConsultar COM\nCompras\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nInformar recebimento da COM\nCompras\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nValidar entrada familiar\nCompras · Crítica\n\t\nHerdar\n\t\nRestrito\n\t\nRestrito\n\t\nHerdar\n\t\nRestrito\n\nConfirmar consumo extraordinário\nOcorrências · Crítica\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nRelatar faltas e consumo\nOcorrências\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nSolicitar cancelamento de ENT\nEntregas · Crítica\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nExpedir ENT\nEntregas\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConsultar ENT e trânsito\nEntregas\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConfirmar recebimento designado\nEntregas\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConfigurar notificações\nComunicação\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nreq.archive\nRequisições · Crítica\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nEmitir REQ\nRequisições\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nVer saldo familiar mínimo do produto na REQ\nRequisições\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConsultar requisições\nRequisições\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nRevisar etapas da REQ\nRequisições\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nreq.science\nRequisições\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nPublicar e alterar os próprios plantões\nEscalas · Crítica\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nAdministrar escala da equipe\nEscalas · Crítica\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nPropor programação e alterações\nEscalas\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConsultar os próprios plantões\nEscalas\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConsultar escala da equipe\nEscalas\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nAdministrar tipos de plantão\nEscalas\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nMovimentar e corrigir estoque familiar\nEstoques · Crítica\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConsultar estoque familiar\nEstoques · Crítica\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\nConsultar estoque da equipe\nEstoques\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar\n\t\nHerdar",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Permissões, comunicação e regras\" [level=1]\n  - paragraph: \"Atuação local: alterações autorizadas são aplicadas imediatamente. · Política v1\"\n  - navigation \"Áreas da configuração\":\n    - link \"Regras\":\n      - /url: /configuracoes?area=rules\n    - link \"Permissões\":\n      - /url: /configuracoes?area=permissions\n    - link \"Notificações\":\n      - /url: /configuracoes?area=notifications\n    - link \"Pessoas e propostas\":\n      - /url: /configuracoes?area=people\n  - region \"Matriz de permissões\":\n    - heading \"Permissões por função e exceções pessoais\" [level=2]\n    - paragraph: Exceções pessoais respeitam os limites da função e do paciente.\n    - searchbox \"Pesquisar permissões\"\n    - combobox \"Grupo de permissões\":\n      - option \"Todos os grupos\" [selected]\n      - option \"Acessos\"\n      - option \"Auditoria\"\n      - option \"Balanços\"\n      - option \"Catálogo\"\n      - option \"Compras\"\n      - option \"Ocorrências\"\n      - option \"Entregas\"\n      - option \"Comunicação\"\n      - option \"Requisições\"\n      - option \"Escalas\"\n      - option \"Estoques\"\n    - combobox \"Visualizar permissões\":\n      - option \"Todas as funções\" [selected]\n      - option \"Teste adminA\"\n      - option \"Teste reader\"\n      - option \"Teste professional\"\n      - option \"Teste global\"\n      - option \"Teste family\"\n      - option \"Profissional fictício de plantão\"\n    - region \"Tabela de permissões; rolagem horizontal por função\":\n      - table \"Permissões efetivas\":\n        - rowgroup:\n          - row \"Capacidade Administrador do paciente Supervisor Profissional Familiar Leitor\":\n            - columnheader \"Capacidade\"\n            - columnheader \"Administrador do paciente\"\n            - columnheader \"Supervisor\"\n            - columnheader \"Profissional\"\n            - columnheader \"Familiar\"\n            - columnheader \"Leitor\"\n        - rowgroup:\n          - row \"Administrar acessos do paciente Acessos · Crítica Administrar acessos do paciente · Administrador do paciente · Herdar · permitido Administrar acessos do paciente · Supervisor · Restrito por função Administrar acessos do paciente · Profissional · Restrito por função Administrar acessos do paciente · Familiar · Restrito por função Administrar acessos do paciente · Leitor · Restrito por função\":\n            - cell \"Administrar acessos do paciente Acessos · Crítica\":\n              - strong: Administrar acessos do paciente\n              - text: Acessos · Crítica\n            - cell \"Administrar acessos do paciente · Administrador do paciente · Herdar · permitido\":\n              - button \"Administrar acessos do paciente · Administrador do paciente · Herdar · permitido\" [disabled]: Herdar\n            - cell \"Administrar acessos do paciente · Supervisor · Restrito por função\":\n              - button \"Administrar acessos do paciente · Supervisor · Restrito por função\" [disabled]: Restrito\n            - cell \"Administrar acessos do paciente · Profissional · Restrito por função\":\n              - button \"Administrar acessos do paciente · Profissional · Restrito por função\" [disabled]: Restrito\n            - cell \"Administrar acessos do paciente · Familiar · Restrito por função\":\n              - button \"Administrar acessos do paciente · Familiar · Restrito por função\" [disabled]: Restrito\n            - cell \"Administrar acessos do paciente · Leitor · Restrito por função\":\n              - button \"Administrar acessos do paciente · Leitor · Restrito por função\" [disabled]: Restrito\n          - row \"Consultar auditoria Auditoria Consultar auditoria · Administrador do paciente · Herdar · permitido Consultar auditoria · Supervisor · Herdar · restrito Consultar auditoria · Profissional · Herdar · restrito Consultar auditoria · Familiar · Herdar · restrito Consultar auditoria · Leitor · Herdar · restrito\":\n            - cell \"Consultar auditoria Auditoria\":\n              - strong: Consultar auditoria\n              - text: Auditoria\n            - cell \"Consultar auditoria · Administrador do paciente · Herdar · permitido\":\n              - button \"Consultar auditoria · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Consultar auditoria · Supervisor · Herdar · restrito\":\n              - button \"Consultar auditoria · Supervisor · Herdar · restrito\": Herdar\n            - cell \"Consultar auditoria · Profissional · Herdar · restrito\":\n              - button \"Consultar auditoria · Profissional · Herdar · restrito\": Herdar\n            - cell \"Consultar auditoria · Familiar · Herdar · restrito\":\n              - button \"Consultar auditoria · Familiar · Herdar · restrito\": Herdar\n            - cell \"Consultar auditoria · Leitor · Herdar · restrito\":\n              - button \"Consultar auditoria · Leitor · Herdar · restrito\": Herdar\n          - row \"Revisar BAL pelo grupo familiar Balanços · Crítica Revisar BAL pelo grupo familiar · Administrador do paciente · Herdar · permitido Revisar BAL pelo grupo familiar · Supervisor · Restrito por função Revisar BAL pelo grupo familiar · Profissional · Restrito por função Revisar BAL pelo grupo familiar · Familiar · Herdar · permitido Revisar BAL pelo grupo familiar · Leitor · Restrito por função\":\n            - cell \"Revisar BAL pelo grupo familiar Balanços · Crítica\":\n              - strong: Revisar BAL pelo grupo familiar\n              - text: Balanços · Crítica\n            - cell \"Revisar BAL pelo grupo familiar · Administrador do paciente · Herdar · permitido\":\n              - button \"Revisar BAL pelo grupo familiar · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Revisar BAL pelo grupo familiar · Supervisor · Restrito por função\":\n              - button \"Revisar BAL pelo grupo familiar · Supervisor · Restrito por função\": Restrito\n            - cell \"Revisar BAL pelo grupo familiar · Profissional · Restrito por função\":\n              - button \"Revisar BAL pelo grupo familiar · Profissional · Restrito por função\": Restrito\n            - cell \"Revisar BAL pelo grupo familiar · Familiar · Herdar · permitido\":\n              - button \"Revisar BAL pelo grupo familiar · Familiar · Herdar · permitido\": Herdar\n            - cell \"Revisar BAL pelo grupo familiar · Leitor · Restrito por função\":\n              - button \"Revisar BAL pelo grupo familiar · Leitor · Restrito por função\": Restrito\n          - row \"Revisar BAL pela supervisão Balanços · Crítica Revisar BAL pela supervisão · Administrador do paciente · Herdar · restrito Revisar BAL pela supervisão · Supervisor · Herdar · permitido Revisar BAL pela supervisão · Profissional · Herdar · restrito Revisar BAL pela supervisão · Familiar · Herdar · restrito Revisar BAL pela supervisão · Leitor · Herdar · restrito\":\n            - cell \"Revisar BAL pela supervisão Balanços · Crítica\":\n              - strong: Revisar BAL pela supervisão\n              - text: Balanços · Crítica\n            - cell \"Revisar BAL pela supervisão · Administrador do paciente · Herdar · restrito\":\n              - button \"Revisar BAL pela supervisão · Administrador do paciente · Herdar · restrito\": Herdar\n            - cell \"Revisar BAL pela supervisão · Supervisor · Herdar · permitido\":\n              - button \"Revisar BAL pela supervisão · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Revisar BAL pela supervisão · Profissional · Herdar · restrito\":\n              - button \"Revisar BAL pela supervisão · Profissional · Herdar · restrito\": Herdar\n            - cell \"Revisar BAL pela supervisão · Familiar · Herdar · restrito\":\n              - button \"Revisar BAL pela supervisão · Familiar · Herdar · restrito\": Herdar\n            - cell \"Revisar BAL pela supervisão · Leitor · Herdar · restrito\":\n              - button \"Revisar BAL pela supervisão · Leitor · Herdar · restrito\": Herdar\n          - row \"Contar estoque da equipe Balanços Contar estoque da equipe · Administrador do paciente · Restrito por função Contar estoque da equipe · Supervisor · Herdar · permitido Contar estoque da equipe · Profissional · Herdar · permitido Contar estoque da equipe · Familiar · Restrito por função Contar estoque da equipe · Leitor · Restrito por função\":\n            - cell \"Contar estoque da equipe Balanços\":\n              - strong: Contar estoque da equipe\n              - text: Balanços\n            - cell \"Contar estoque da equipe · Administrador do paciente · Restrito por função\":\n              - button \"Contar estoque da equipe · Administrador do paciente · Restrito por função\": Restrito\n            - cell \"Contar estoque da equipe · Supervisor · Herdar · permitido\":\n              - button \"Contar estoque da equipe · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Contar estoque da equipe · Profissional · Herdar · permitido\":\n              - button \"Contar estoque da equipe · Profissional · Herdar · permitido\": Herdar\n            - cell \"Contar estoque da equipe · Familiar · Restrito por função\":\n              - button \"Contar estoque da equipe · Familiar · Restrito por função\": Restrito\n            - cell \"Contar estoque da equipe · Leitor · Restrito por função\":\n              - button \"Contar estoque da equipe · Leitor · Restrito por função\": Restrito\n          - row \"Decidir adiamento pelo grupo familiar Balanços · Crítica Decidir adiamento pelo grupo familiar · Administrador do paciente · Herdar · permitido Decidir adiamento pelo grupo familiar · Supervisor · Restrito por função Decidir adiamento pelo grupo familiar · Profissional · Restrito por função Decidir adiamento pelo grupo familiar · Familiar · Herdar · permitido Decidir adiamento pelo grupo familiar · Leitor · Restrito por função\":\n            - cell \"Decidir adiamento pelo grupo familiar Balanços · Crítica\":\n              - strong: Decidir adiamento pelo grupo familiar\n              - text: Balanços · Crítica\n            - cell \"Decidir adiamento pelo grupo familiar · Administrador do paciente · Herdar · permitido\":\n              - button \"Decidir adiamento pelo grupo familiar · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Decidir adiamento pelo grupo familiar · Supervisor · Restrito por função\":\n              - button \"Decidir adiamento pelo grupo familiar · Supervisor · Restrito por função\": Restrito\n            - cell \"Decidir adiamento pelo grupo familiar · Profissional · Restrito por função\":\n              - button \"Decidir adiamento pelo grupo familiar · Profissional · Restrito por função\": Restrito\n            - cell \"Decidir adiamento pelo grupo familiar · Familiar · Herdar · permitido\":\n              - button \"Decidir adiamento pelo grupo familiar · Familiar · Herdar · permitido\": Herdar\n            - cell \"Decidir adiamento pelo grupo familiar · Leitor · Restrito por função\":\n              - button \"Decidir adiamento pelo grupo familiar · Leitor · Restrito por função\": Restrito\n          - row \"Solicitar adiamento à família Balanços Solicitar adiamento à família · Administrador do paciente · Herdar · restrito Solicitar adiamento à família · Supervisor · Herdar · permitido Solicitar adiamento à família · Profissional · Herdar · permitido Solicitar adiamento à família · Familiar · Herdar · restrito Solicitar adiamento à família · Leitor · Herdar · restrito\":\n            - cell \"Solicitar adiamento à família Balanços\":\n              - strong: Solicitar adiamento à família\n              - text: Balanços\n            - cell \"Solicitar adiamento à família · Administrador do paciente · Herdar · restrito\":\n              - button \"Solicitar adiamento à família · Administrador do paciente · Herdar · restrito\": Herdar\n            - cell \"Solicitar adiamento à família · Supervisor · Herdar · permitido\":\n              - button \"Solicitar adiamento à família · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Solicitar adiamento à família · Profissional · Herdar · permitido\":\n              - button \"Solicitar adiamento à família · Profissional · Herdar · permitido\": Herdar\n            - cell \"Solicitar adiamento à família · Familiar · Herdar · restrito\":\n              - button \"Solicitar adiamento à família · Familiar · Herdar · restrito\": Herdar\n            - cell \"Solicitar adiamento à família · Leitor · Herdar · restrito\":\n              - button \"Solicitar adiamento à família · Leitor · Herdar · restrito\": Herdar\n          - row \"Consultar BAL Balanços Consultar BAL · Administrador do paciente · Herdar · permitido Consultar BAL · Supervisor · Herdar · permitido Consultar BAL · Profissional · Herdar · permitido Consultar BAL · Familiar · Herdar · permitido Consultar BAL · Leitor · Herdar · permitido\":\n            - cell \"Consultar BAL Balanços\":\n              - strong: Consultar BAL\n              - text: Balanços\n            - cell \"Consultar BAL · Administrador do paciente · Herdar · permitido\":\n              - button \"Consultar BAL · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Consultar BAL · Supervisor · Herdar · permitido\":\n              - button \"Consultar BAL · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Consultar BAL · Profissional · Herdar · permitido\":\n              - button \"Consultar BAL · Profissional · Herdar · permitido\": Herdar\n            - cell \"Consultar BAL · Familiar · Herdar · permitido\":\n              - button \"Consultar BAL · Familiar · Herdar · permitido\": Herdar\n            - cell \"Consultar BAL · Leitor · Herdar · permitido\":\n              - button \"Consultar BAL · Leitor · Herdar · permitido\": Herdar\n          - row \"Configurar programação do BAL pela família Balanços · Crítica Configurar programação do BAL pela família · Administrador do paciente · Herdar · permitido Configurar programação do BAL pela família · Supervisor · Restrito por função Configurar programação do BAL pela família · Profissional · Restrito por função Configurar programação do BAL pela família · Familiar · Herdar · permitido Configurar programação do BAL pela família · Leitor · Restrito por função\":\n            - cell \"Configurar programação do BAL pela família Balanços · Crítica\":\n              - strong: Configurar programação do BAL pela família\n              - text: Balanços · Crítica\n            - cell \"Configurar programação do BAL pela família · Administrador do paciente · Herdar · permitido\":\n              - button \"Configurar programação do BAL pela família · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Configurar programação do BAL pela família · Supervisor · Restrito por função\":\n              - button \"Configurar programação do BAL pela família · Supervisor · Restrito por função\": Restrito\n            - cell \"Configurar programação do BAL pela família · Profissional · Restrito por função\":\n              - button \"Configurar programação do BAL pela família · Profissional · Restrito por função\": Restrito\n            - cell \"Configurar programação do BAL pela família · Familiar · Herdar · permitido\":\n              - button \"Configurar programação do BAL pela família · Familiar · Herdar · permitido\": Herdar\n            - cell \"Configurar programação do BAL pela família · Leitor · Restrito por função\":\n              - button \"Configurar programação do BAL pela família · Leitor · Restrito por função\": Restrito\n          - row \"Administrar catálogo e medidas Catálogo Administrar catálogo e medidas · Administrador do paciente · Herdar · permitido Administrar catálogo e medidas · Supervisor · Herdar · restrito Administrar catálogo e medidas · Profissional · Herdar · restrito Administrar catálogo e medidas · Familiar · Herdar · restrito Administrar catálogo e medidas · Leitor · Herdar · restrito\":\n            - cell \"Administrar catálogo e medidas Catálogo\":\n              - strong: Administrar catálogo e medidas\n              - text: Catálogo\n            - cell \"Administrar catálogo e medidas · Administrador do paciente · Herdar · permitido\":\n              - button \"Administrar catálogo e medidas · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Administrar catálogo e medidas · Supervisor · Herdar · restrito\":\n              - button \"Administrar catálogo e medidas · Supervisor · Herdar · restrito\": Herdar\n            - cell \"Administrar catálogo e medidas · Profissional · Herdar · restrito\":\n              - button \"Administrar catálogo e medidas · Profissional · Herdar · restrito\": Herdar\n            - cell \"Administrar catálogo e medidas · Familiar · Herdar · restrito\":\n              - button \"Administrar catálogo e medidas · Familiar · Herdar · restrito\": Herdar\n            - cell \"Administrar catálogo e medidas · Leitor · Herdar · restrito\":\n              - button \"Administrar catálogo e medidas · Leitor · Herdar · restrito\": Herdar\n          - row \"Aprovar itens da COM Compras · Crítica Aprovar itens da COM · Administrador do paciente · Herdar · permitido Aprovar itens da COM · Supervisor · Restrito por função Aprovar itens da COM · Profissional · Restrito por função Aprovar itens da COM · Familiar · Herdar · restrito Aprovar itens da COM · Leitor · Restrito por função\":\n            - cell \"Aprovar itens da COM Compras · Crítica\":\n              - strong: Aprovar itens da COM\n              - text: Compras · Crítica\n            - cell \"Aprovar itens da COM · Administrador do paciente · Herdar · permitido\":\n              - button \"Aprovar itens da COM · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Aprovar itens da COM · Supervisor · Restrito por função\":\n              - button \"Aprovar itens da COM · Supervisor · Restrito por função\": Restrito\n            - cell \"Aprovar itens da COM · Profissional · Restrito por função\":\n              - button \"Aprovar itens da COM · Profissional · Restrito por função\": Restrito\n            - cell \"Aprovar itens da COM · Familiar · Herdar · restrito\":\n              - button \"Aprovar itens da COM · Familiar · Herdar · restrito\": Herdar\n            - cell \"Aprovar itens da COM · Leitor · Restrito por função\":\n              - button \"Aprovar itens da COM · Leitor · Restrito por função\": Restrito\n          - row \"Solicitar compra ou doação Compras Solicitar compra ou doação · Administrador do paciente · Herdar · permitido Solicitar compra ou doação · Supervisor · Restrito por função Solicitar compra ou doação · Profissional · Restrito por função Solicitar compra ou doação · Familiar · Herdar · permitido Solicitar compra ou doação · Leitor · Restrito por função\":\n            - cell \"Solicitar compra ou doação Compras\":\n              - strong: Solicitar compra ou doação\n              - text: Compras\n            - cell \"Solicitar compra ou doação · Administrador do paciente · Herdar · permitido\":\n              - button \"Solicitar compra ou doação · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Solicitar compra ou doação · Supervisor · Restrito por função\":\n              - button \"Solicitar compra ou doação · Supervisor · Restrito por função\": Restrito\n            - cell \"Solicitar compra ou doação · Profissional · Restrito por função\":\n              - button \"Solicitar compra ou doação · Profissional · Restrito por função\": Restrito\n            - cell \"Solicitar compra ou doação · Familiar · Herdar · permitido\":\n              - button \"Solicitar compra ou doação · Familiar · Herdar · permitido\": Herdar\n            - cell \"Solicitar compra ou doação · Leitor · Restrito por função\":\n              - button \"Solicitar compra ou doação · Leitor · Restrito por função\": Restrito\n          - row \"Registrar aquisição Compras Registrar aquisição · Administrador do paciente · Herdar · permitido Registrar aquisição · Supervisor · Restrito por função Registrar aquisição · Profissional · Restrito por função Registrar aquisição · Familiar · Herdar · permitido Registrar aquisição · Leitor · Restrito por função\":\n            - cell \"Registrar aquisição Compras\":\n              - strong: Registrar aquisição\n              - text: Compras\n            - cell \"Registrar aquisição · Administrador do paciente · Herdar · permitido\":\n              - button \"Registrar aquisição · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Registrar aquisição · Supervisor · Restrito por função\":\n              - button \"Registrar aquisição · Supervisor · Restrito por função\": Restrito\n            - cell \"Registrar aquisição · Profissional · Restrito por função\":\n              - button \"Registrar aquisição · Profissional · Restrito por função\": Restrito\n            - cell \"Registrar aquisição · Familiar · Herdar · permitido\":\n              - button \"Registrar aquisição · Familiar · Herdar · permitido\": Herdar\n            - cell \"Registrar aquisição · Leitor · Restrito por função\":\n              - button \"Registrar aquisição · Leitor · Restrito por função\": Restrito\n          - row \"Consultar COM Compras Consultar COM · Administrador do paciente · Herdar · permitido Consultar COM · Supervisor · Restrito por função Consultar COM · Profissional · Restrito por função Consultar COM · Familiar · Herdar · permitido Consultar COM · Leitor · Restrito por função\":\n            - cell \"Consultar COM Compras\":\n              - strong: Consultar COM\n              - text: Compras\n            - cell \"Consultar COM · Administrador do paciente · Herdar · permitido\":\n              - button \"Consultar COM · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Consultar COM · Supervisor · Restrito por função\":\n              - button \"Consultar COM · Supervisor · Restrito por função\": Restrito\n            - cell \"Consultar COM · Profissional · Restrito por função\":\n              - button \"Consultar COM · Profissional · Restrito por função\": Restrito\n            - cell \"Consultar COM · Familiar · Herdar · permitido\":\n              - button \"Consultar COM · Familiar · Herdar · permitido\": Herdar\n            - cell \"Consultar COM · Leitor · Restrito por função\":\n              - button \"Consultar COM · Leitor · Restrito por função\": Restrito\n          - row \"Informar recebimento da COM Compras Informar recebimento da COM · Administrador do paciente · Herdar · permitido Informar recebimento da COM · Supervisor · Restrito por função Informar recebimento da COM · Profissional · Restrito por função Informar recebimento da COM · Familiar · Herdar · permitido Informar recebimento da COM · Leitor · Restrito por função\":\n            - cell \"Informar recebimento da COM Compras\":\n              - strong: Informar recebimento da COM\n              - text: Compras\n            - cell \"Informar recebimento da COM · Administrador do paciente · Herdar · permitido\":\n              - button \"Informar recebimento da COM · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Informar recebimento da COM · Supervisor · Restrito por função\":\n              - button \"Informar recebimento da COM · Supervisor · Restrito por função\": Restrito\n            - cell \"Informar recebimento da COM · Profissional · Restrito por função\":\n              - button \"Informar recebimento da COM · Profissional · Restrito por função\": Restrito\n            - cell \"Informar recebimento da COM · Familiar · Herdar · permitido\":\n              - button \"Informar recebimento da COM · Familiar · Herdar · permitido\": Herdar\n            - cell \"Informar recebimento da COM · Leitor · Restrito por função\":\n              - button \"Informar recebimento da COM · Leitor · Restrito por função\": Restrito\n          - row \"Validar entrada familiar Compras · Crítica Validar entrada familiar · Administrador do paciente · Herdar · permitido Validar entrada familiar · Supervisor · Restrito por função Validar entrada familiar · Profissional · Restrito por função Validar entrada familiar · Familiar · Herdar · restrito Validar entrada familiar · Leitor · Restrito por função\":\n            - cell \"Validar entrada familiar Compras · Crítica\":\n              - strong: Validar entrada familiar\n              - text: Compras · Crítica\n            - cell \"Validar entrada familiar · Administrador do paciente · Herdar · permitido\":\n              - button \"Validar entrada familiar · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Validar entrada familiar · Supervisor · Restrito por função\":\n              - button \"Validar entrada familiar · Supervisor · Restrito por função\": Restrito\n            - cell \"Validar entrada familiar · Profissional · Restrito por função\":\n              - button \"Validar entrada familiar · Profissional · Restrito por função\": Restrito\n            - cell \"Validar entrada familiar · Familiar · Herdar · restrito\":\n              - button \"Validar entrada familiar · Familiar · Herdar · restrito\": Herdar\n            - cell \"Validar entrada familiar · Leitor · Restrito por função\":\n              - button \"Validar entrada familiar · Leitor · Restrito por função\": Restrito\n          - row \"Confirmar consumo extraordinário Ocorrências · Crítica Confirmar consumo extraordinário · Administrador do paciente · Herdar · permitido Confirmar consumo extraordinário · Supervisor · Herdar · permitido Confirmar consumo extraordinário · Profissional · Herdar · restrito Confirmar consumo extraordinário · Familiar · Herdar · restrito Confirmar consumo extraordinário · Leitor · Herdar · restrito\":\n            - cell \"Confirmar consumo extraordinário Ocorrências · Crítica\":\n              - strong: Confirmar consumo extraordinário\n              - text: Ocorrências · Crítica\n            - cell \"Confirmar consumo extraordinário · Administrador do paciente · Herdar · permitido\":\n              - button \"Confirmar consumo extraordinário · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Confirmar consumo extraordinário · Supervisor · Herdar · permitido\":\n              - button \"Confirmar consumo extraordinário · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Confirmar consumo extraordinário · Profissional · Herdar · restrito\":\n              - button \"Confirmar consumo extraordinário · Profissional · Herdar · restrito\": Herdar\n            - cell \"Confirmar consumo extraordinário · Familiar · Herdar · restrito\":\n              - button \"Confirmar consumo extraordinário · Familiar · Herdar · restrito\": Herdar\n            - cell \"Confirmar consumo extraordinário · Leitor · Herdar · restrito\":\n              - button \"Confirmar consumo extraordinário · Leitor · Herdar · restrito\": Herdar\n          - row \"Relatar faltas e consumo Ocorrências Relatar faltas e consumo · Administrador do paciente · Herdar · permitido Relatar faltas e consumo · Supervisor · Herdar · permitido Relatar faltas e consumo · Profissional · Herdar · permitido Relatar faltas e consumo · Familiar · Herdar · permitido Relatar faltas e consumo · Leitor · Herdar · restrito\":\n            - cell \"Relatar faltas e consumo Ocorrências\":\n              - strong: Relatar faltas e consumo\n              - text: Ocorrências\n            - cell \"Relatar faltas e consumo · Administrador do paciente · Herdar · permitido\":\n              - button \"Relatar faltas e consumo · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Relatar faltas e consumo · Supervisor · Herdar · permitido\":\n              - button \"Relatar faltas e consumo · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Relatar faltas e consumo · Profissional · Herdar · permitido\":\n              - button \"Relatar faltas e consumo · Profissional · Herdar · permitido\": Herdar\n            - cell \"Relatar faltas e consumo · Familiar · Herdar · permitido\":\n              - button \"Relatar faltas e consumo · Familiar · Herdar · permitido\": Herdar\n            - cell \"Relatar faltas e consumo · Leitor · Herdar · restrito\":\n              - button \"Relatar faltas e consumo · Leitor · Herdar · restrito\": Herdar\n          - row \"Solicitar cancelamento de ENT Entregas · Crítica Solicitar cancelamento de ENT · Administrador do paciente · Herdar · permitido Solicitar cancelamento de ENT · Supervisor · Herdar · restrito Solicitar cancelamento de ENT · Profissional · Herdar · restrito Solicitar cancelamento de ENT · Familiar · Herdar · restrito Solicitar cancelamento de ENT · Leitor · Herdar · restrito\":\n            - cell \"Solicitar cancelamento de ENT Entregas · Crítica\":\n              - strong: Solicitar cancelamento de ENT\n              - text: Entregas · Crítica\n            - cell \"Solicitar cancelamento de ENT · Administrador do paciente · Herdar · permitido\":\n              - button \"Solicitar cancelamento de ENT · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Solicitar cancelamento de ENT · Supervisor · Herdar · restrito\":\n              - button \"Solicitar cancelamento de ENT · Supervisor · Herdar · restrito\": Herdar\n            - cell \"Solicitar cancelamento de ENT · Profissional · Herdar · restrito\":\n              - button \"Solicitar cancelamento de ENT · Profissional · Herdar · restrito\": Herdar\n            - cell \"Solicitar cancelamento de ENT · Familiar · Herdar · restrito\":\n              - button \"Solicitar cancelamento de ENT · Familiar · Herdar · restrito\": Herdar\n            - cell \"Solicitar cancelamento de ENT · Leitor · Herdar · restrito\":\n              - button \"Solicitar cancelamento de ENT · Leitor · Herdar · restrito\": Herdar\n          - row \"Expedir ENT Entregas Expedir ENT · Administrador do paciente · Herdar · permitido Expedir ENT · Supervisor · Herdar · restrito Expedir ENT · Profissional · Herdar · restrito Expedir ENT · Familiar · Herdar · permitido Expedir ENT · Leitor · Herdar · restrito\":\n            - cell \"Expedir ENT Entregas\":\n              - strong: Expedir ENT\n              - text: Entregas\n            - cell \"Expedir ENT · Administrador do paciente · Herdar · permitido\":\n              - button \"Expedir ENT · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Expedir ENT · Supervisor · Herdar · restrito\":\n              - button \"Expedir ENT · Supervisor · Herdar · restrito\": Herdar\n            - cell \"Expedir ENT · Profissional · Herdar · restrito\":\n              - button \"Expedir ENT · Profissional · Herdar · restrito\": Herdar\n            - cell \"Expedir ENT · Familiar · Herdar · permitido\":\n              - button \"Expedir ENT · Familiar · Herdar · permitido\": Herdar\n            - cell \"Expedir ENT · Leitor · Herdar · restrito\":\n              - button \"Expedir ENT · Leitor · Herdar · restrito\": Herdar\n          - row \"Consultar ENT e trânsito Entregas Consultar ENT e trânsito · Administrador do paciente · Herdar · permitido Consultar ENT e trânsito · Supervisor · Herdar · permitido Consultar ENT e trânsito · Profissional · Herdar · permitido Consultar ENT e trânsito · Familiar · Herdar · permitido Consultar ENT e trânsito · Leitor · Herdar · permitido\":\n            - cell \"Consultar ENT e trânsito Entregas\":\n              - strong: Consultar ENT e trânsito\n              - text: Entregas\n            - cell \"Consultar ENT e trânsito · Administrador do paciente · Herdar · permitido\":\n              - button \"Consultar ENT e trânsito · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Consultar ENT e trânsito · Supervisor · Herdar · permitido\":\n              - button \"Consultar ENT e trânsito · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Consultar ENT e trânsito · Profissional · Herdar · permitido\":\n              - button \"Consultar ENT e trânsito · Profissional · Herdar · permitido\": Herdar\n            - cell \"Consultar ENT e trânsito · Familiar · Herdar · permitido\":\n              - button \"Consultar ENT e trânsito · Familiar · Herdar · permitido\": Herdar\n            - cell \"Consultar ENT e trânsito · Leitor · Herdar · permitido\":\n              - button \"Consultar ENT e trânsito · Leitor · Herdar · permitido\": Herdar\n          - row \"Confirmar recebimento designado Entregas Confirmar recebimento designado · Administrador do paciente · Herdar · permitido Confirmar recebimento designado · Supervisor · Herdar · permitido Confirmar recebimento designado · Profissional · Herdar · permitido Confirmar recebimento designado · Familiar · Herdar · permitido Confirmar recebimento designado · Leitor · Herdar · restrito\":\n            - cell \"Confirmar recebimento designado Entregas\":\n              - strong: Confirmar recebimento designado\n              - text: Entregas\n            - cell \"Confirmar recebimento designado · Administrador do paciente · Herdar · permitido\":\n              - button \"Confirmar recebimento designado · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Confirmar recebimento designado · Supervisor · Herdar · permitido\":\n              - button \"Confirmar recebimento designado · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Confirmar recebimento designado · Profissional · Herdar · permitido\":\n              - button \"Confirmar recebimento designado · Profissional · Herdar · permitido\": Herdar\n            - cell \"Confirmar recebimento designado · Familiar · Herdar · permitido\":\n              - button \"Confirmar recebimento designado · Familiar · Herdar · permitido\": Herdar\n            - cell \"Confirmar recebimento designado · Leitor · Herdar · restrito\":\n              - button \"Confirmar recebimento designado · Leitor · Herdar · restrito\": Herdar\n          - row \"Configurar notificações Comunicação Configurar notificações · Administrador do paciente · Herdar · permitido Configurar notificações · Supervisor · Herdar · restrito Configurar notificações · Profissional · Herdar · restrito Configurar notificações · Familiar · Herdar · restrito Configurar notificações · Leitor · Herdar · restrito\":\n            - cell \"Configurar notificações Comunicação\":\n              - strong: Configurar notificações\n              - text: Comunicação\n            - cell \"Configurar notificações · Administrador do paciente · Herdar · permitido\":\n              - button \"Configurar notificações · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Configurar notificações · Supervisor · Herdar · restrito\":\n              - button \"Configurar notificações · Supervisor · Herdar · restrito\": Herdar\n            - cell \"Configurar notificações · Profissional · Herdar · restrito\":\n              - button \"Configurar notificações · Profissional · Herdar · restrito\": Herdar\n            - cell \"Configurar notificações · Familiar · Herdar · restrito\":\n              - button \"Configurar notificações · Familiar · Herdar · restrito\": Herdar\n            - cell \"Configurar notificações · Leitor · Herdar · restrito\":\n              - button \"Configurar notificações · Leitor · Herdar · restrito\": Herdar\n          - row \"req.archive Requisições · Crítica req.archive · Administrador do paciente · Herdar · permitido req.archive · Supervisor · Herdar · restrito req.archive · Profissional · Herdar · restrito req.archive · Familiar · Herdar · restrito req.archive · Leitor · Herdar · restrito\":\n            - cell \"req.archive Requisições · Crítica\":\n              - strong: req.archive\n              - text: Requisições · Crítica\n            - cell \"req.archive · Administrador do paciente · Herdar · permitido\":\n              - button \"req.archive · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"req.archive · Supervisor · Herdar · restrito\":\n              - button \"req.archive · Supervisor · Herdar · restrito\": Herdar\n            - cell \"req.archive · Profissional · Herdar · restrito\":\n              - button \"req.archive · Profissional · Herdar · restrito\": Herdar\n            - cell \"req.archive · Familiar · Herdar · restrito\":\n              - button \"req.archive · Familiar · Herdar · restrito\": Herdar\n            - cell \"req.archive · Leitor · Herdar · restrito\":\n              - button \"req.archive · Leitor · Herdar · restrito\": Herdar\n          - row \"Emitir REQ Requisições Emitir REQ · Administrador do paciente · Herdar · permitido Emitir REQ · Supervisor · Herdar · permitido Emitir REQ · Profissional · Herdar · permitido Emitir REQ · Familiar · Herdar · restrito Emitir REQ · Leitor · Herdar · restrito\":\n            - cell \"Emitir REQ Requisições\":\n              - strong: Emitir REQ\n              - text: Requisições\n            - cell \"Emitir REQ · Administrador do paciente · Herdar · permitido\":\n              - button \"Emitir REQ · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Emitir REQ · Supervisor · Herdar · permitido\":\n              - button \"Emitir REQ · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Emitir REQ · Profissional · Herdar · permitido\":\n              - button \"Emitir REQ · Profissional · Herdar · permitido\": Herdar\n            - cell \"Emitir REQ · Familiar · Herdar · restrito\":\n              - button \"Emitir REQ · Familiar · Herdar · restrito\": Herdar\n            - cell \"Emitir REQ · Leitor · Herdar · restrito\":\n              - button \"Emitir REQ · Leitor · Herdar · restrito\": Herdar\n          - row \"Ver saldo familiar mínimo do produto na REQ Requisições Ver saldo familiar mínimo do produto na REQ · Administrador do paciente · Herdar · permitido Ver saldo familiar mínimo do produto na REQ · Supervisor · Herdar · permitido Ver saldo familiar mínimo do produto na REQ · Profissional · Herdar · permitido Ver saldo familiar mínimo do produto na REQ · Familiar · Herdar · restrito Ver saldo familiar mínimo do produto na REQ · Leitor · Herdar · restrito\":\n            - cell \"Ver saldo familiar mínimo do produto na REQ Requisições\":\n              - strong: Ver saldo familiar mínimo do produto na REQ\n              - text: Requisições\n            - cell \"Ver saldo familiar mínimo do produto na REQ · Administrador do paciente · Herdar · permitido\":\n              - button \"Ver saldo familiar mínimo do produto na REQ · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Ver saldo familiar mínimo do produto na REQ · Supervisor · Herdar · permitido\":\n              - button \"Ver saldo familiar mínimo do produto na REQ · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Ver saldo familiar mínimo do produto na REQ · Profissional · Herdar · permitido\":\n              - button \"Ver saldo familiar mínimo do produto na REQ · Profissional · Herdar · permitido\": Herdar\n            - cell \"Ver saldo familiar mínimo do produto na REQ · Familiar · Herdar · restrito\":\n              - button \"Ver saldo familiar mínimo do produto na REQ · Familiar · Herdar · restrito\": Herdar\n            - cell \"Ver saldo familiar mínimo do produto na REQ · Leitor · Herdar · restrito\":\n              - button \"Ver saldo familiar mínimo do produto na REQ · Leitor · Herdar · restrito\": Herdar\n          - row \"Consultar requisições Requisições Consultar requisições · Administrador do paciente · Herdar · permitido Consultar requisições · Supervisor · Herdar · permitido Consultar requisições · Profissional · Herdar · permitido Consultar requisições · Familiar · Herdar · permitido Consultar requisições · Leitor · Herdar · permitido\":\n            - cell \"Consultar requisições Requisições\":\n              - strong: Consultar requisições\n              - text: Requisições\n            - cell \"Consultar requisições · Administrador do paciente · Herdar · permitido\":\n              - button \"Consultar requisições · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Consultar requisições · Supervisor · Herdar · permitido\":\n              - button \"Consultar requisições · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Consultar requisições · Profissional · Herdar · permitido\":\n              - button \"Consultar requisições · Profissional · Herdar · permitido\": Herdar\n            - cell \"Consultar requisições · Familiar · Herdar · permitido\":\n              - button \"Consultar requisições · Familiar · Herdar · permitido\": Herdar\n            - cell \"Consultar requisições · Leitor · Herdar · permitido\":\n              - button \"Consultar requisições · Leitor · Herdar · permitido\": Herdar\n          - row \"Revisar etapas da REQ Requisições Revisar etapas da REQ · Administrador do paciente · Herdar · permitido Revisar etapas da REQ · Supervisor · Herdar · permitido Revisar etapas da REQ · Profissional · Herdar · restrito Revisar etapas da REQ · Familiar · Herdar · restrito Revisar etapas da REQ · Leitor · Herdar · restrito\":\n            - cell \"Revisar etapas da REQ Requisições\":\n              - strong: Revisar etapas da REQ\n              - text: Requisições\n            - cell \"Revisar etapas da REQ · Administrador do paciente · Herdar · permitido\":\n              - button \"Revisar etapas da REQ · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Revisar etapas da REQ · Supervisor · Herdar · permitido\":\n              - button \"Revisar etapas da REQ · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Revisar etapas da REQ · Profissional · Herdar · restrito\":\n              - button \"Revisar etapas da REQ · Profissional · Herdar · restrito\": Herdar\n            - cell \"Revisar etapas da REQ · Familiar · Herdar · restrito\":\n              - button \"Revisar etapas da REQ · Familiar · Herdar · restrito\": Herdar\n            - cell \"Revisar etapas da REQ · Leitor · Herdar · restrito\":\n              - button \"Revisar etapas da REQ · Leitor · Herdar · restrito\": Herdar\n          - row \"req.science Requisições req.science · Administrador do paciente · Herdar · permitido req.science · Supervisor · Herdar · restrito req.science · Profissional · Herdar · restrito req.science · Familiar · Herdar · permitido req.science · Leitor · Herdar · restrito\":\n            - cell \"req.science Requisições\":\n              - strong: req.science\n              - text: Requisições\n            - cell \"req.science · Administrador do paciente · Herdar · permitido\":\n              - button \"req.science · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"req.science · Supervisor · Herdar · restrito\":\n              - button \"req.science · Supervisor · Herdar · restrito\": Herdar\n            - cell \"req.science · Profissional · Herdar · restrito\":\n              - button \"req.science · Profissional · Herdar · restrito\": Herdar\n            - cell \"req.science · Familiar · Herdar · permitido\":\n              - button \"req.science · Familiar · Herdar · permitido\": Herdar\n            - cell \"req.science · Leitor · Herdar · restrito\":\n              - button \"req.science · Leitor · Herdar · restrito\": Herdar\n          - row \"Publicar e alterar os próprios plantões Escalas · Crítica Publicar e alterar os próprios plantões · Administrador do paciente · Herdar · restrito Publicar e alterar os próprios plantões · Supervisor · Herdar · restrito Publicar e alterar os próprios plantões · Profissional · Herdar · restrito Publicar e alterar os próprios plantões · Familiar · Herdar · restrito Publicar e alterar os próprios plantões · Leitor · Herdar · restrito\":\n            - cell \"Publicar e alterar os próprios plantões Escalas · Crítica\":\n              - strong: Publicar e alterar os próprios plantões\n              - text: Escalas · Crítica\n            - cell \"Publicar e alterar os próprios plantões · Administrador do paciente · Herdar · restrito\":\n              - button \"Publicar e alterar os próprios plantões · Administrador do paciente · Herdar · restrito\": Herdar\n            - cell \"Publicar e alterar os próprios plantões · Supervisor · Herdar · restrito\":\n              - button \"Publicar e alterar os próprios plantões · Supervisor · Herdar · restrito\": Herdar\n            - cell \"Publicar e alterar os próprios plantões · Profissional · Herdar · restrito\":\n              - button \"Publicar e alterar os próprios plantões · Profissional · Herdar · restrito\": Herdar\n            - cell \"Publicar e alterar os próprios plantões · Familiar · Herdar · restrito\":\n              - button \"Publicar e alterar os próprios plantões · Familiar · Herdar · restrito\": Herdar\n            - cell \"Publicar e alterar os próprios plantões · Leitor · Herdar · restrito\":\n              - button \"Publicar e alterar os próprios plantões · Leitor · Herdar · restrito\": Herdar\n          - row \"Administrar escala da equipe Escalas · Crítica Administrar escala da equipe · Administrador do paciente · Herdar · permitido Administrar escala da equipe · Supervisor · Herdar · permitido Administrar escala da equipe · Profissional · Herdar · restrito Administrar escala da equipe · Familiar · Herdar · permitido Administrar escala da equipe · Leitor · Herdar · restrito\":\n            - cell \"Administrar escala da equipe Escalas · Crítica\":\n              - strong: Administrar escala da equipe\n              - text: Escalas · Crítica\n            - cell \"Administrar escala da equipe · Administrador do paciente · Herdar · permitido\":\n              - button \"Administrar escala da equipe · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Administrar escala da equipe · Supervisor · Herdar · permitido\":\n              - button \"Administrar escala da equipe · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Administrar escala da equipe · Profissional · Herdar · restrito\":\n              - button \"Administrar escala da equipe · Profissional · Herdar · restrito\": Herdar\n            - cell \"Administrar escala da equipe · Familiar · Herdar · permitido\":\n              - button \"Administrar escala da equipe · Familiar · Herdar · permitido\": Herdar\n            - cell \"Administrar escala da equipe · Leitor · Herdar · restrito\":\n              - button \"Administrar escala da equipe · Leitor · Herdar · restrito\": Herdar\n          - row \"Propor programação e alterações Escalas Propor programação e alterações · Administrador do paciente · Herdar · restrito Propor programação e alterações · Supervisor · Herdar · permitido Propor programação e alterações · Profissional · Herdar · permitido Propor programação e alterações · Familiar · Herdar · restrito Propor programação e alterações · Leitor · Herdar · restrito\":\n            - cell \"Propor programação e alterações Escalas\":\n              - strong: Propor programação e alterações\n              - text: Escalas\n            - cell \"Propor programação e alterações · Administrador do paciente · Herdar · restrito\":\n              - button \"Propor programação e alterações · Administrador do paciente · Herdar · restrito\": Herdar\n            - cell \"Propor programação e alterações · Supervisor · Herdar · permitido\":\n              - button \"Propor programação e alterações · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Propor programação e alterações · Profissional · Herdar · permitido\":\n              - button \"Propor programação e alterações · Profissional · Herdar · permitido\": Herdar\n            - cell \"Propor programação e alterações · Familiar · Herdar · restrito\":\n              - button \"Propor programação e alterações · Familiar · Herdar · restrito\": Herdar\n            - cell \"Propor programação e alterações · Leitor · Herdar · restrito\":\n              - button \"Propor programação e alterações · Leitor · Herdar · restrito\": Herdar\n          - row \"Consultar os próprios plantões Escalas Consultar os próprios plantões · Administrador do paciente · Herdar · restrito Consultar os próprios plantões · Supervisor · Herdar · permitido Consultar os próprios plantões · Profissional · Herdar · permitido Consultar os próprios plantões · Familiar · Herdar · restrito Consultar os próprios plantões · Leitor · Herdar · restrito\":\n            - cell \"Consultar os próprios plantões Escalas\":\n              - strong: Consultar os próprios plantões\n              - text: Escalas\n            - cell \"Consultar os próprios plantões · Administrador do paciente · Herdar · restrito\":\n              - button \"Consultar os próprios plantões · Administrador do paciente · Herdar · restrito\": Herdar\n            - cell \"Consultar os próprios plantões · Supervisor · Herdar · permitido\":\n              - button \"Consultar os próprios plantões · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Consultar os próprios plantões · Profissional · Herdar · permitido\":\n              - button \"Consultar os próprios plantões · Profissional · Herdar · permitido\": Herdar\n            - cell \"Consultar os próprios plantões · Familiar · Herdar · restrito\":\n              - button \"Consultar os próprios plantões · Familiar · Herdar · restrito\": Herdar\n            - cell \"Consultar os próprios plantões · Leitor · Herdar · restrito\":\n              - button \"Consultar os próprios plantões · Leitor · Herdar · restrito\": Herdar\n          - row \"Consultar escala da equipe Escalas Consultar escala da equipe · Administrador do paciente · Herdar · permitido Consultar escala da equipe · Supervisor · Herdar · permitido Consultar escala da equipe · Profissional · Herdar · restrito Consultar escala da equipe · Familiar · Herdar · permitido Consultar escala da equipe · Leitor · Herdar · permitido\":\n            - cell \"Consultar escala da equipe Escalas\":\n              - strong: Consultar escala da equipe\n              - text: Escalas\n            - cell \"Consultar escala da equipe · Administrador do paciente · Herdar · permitido\":\n              - button \"Consultar escala da equipe · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Consultar escala da equipe · Supervisor · Herdar · permitido\":\n              - button \"Consultar escala da equipe · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Consultar escala da equipe · Profissional · Herdar · restrito\":\n              - button \"Consultar escala da equipe · Profissional · Herdar · restrito\": Herdar\n            - cell \"Consultar escala da equipe · Familiar · Herdar · permitido\":\n              - button \"Consultar escala da equipe · Familiar · Herdar · permitido\": Herdar\n            - cell \"Consultar escala da equipe · Leitor · Herdar · permitido\":\n              - button \"Consultar escala da equipe · Leitor · Herdar · permitido\": Herdar\n          - row \"Administrar tipos de plantão Escalas Administrar tipos de plantão · Administrador do paciente · Herdar · permitido Administrar tipos de plantão · Supervisor · Herdar · permitido Administrar tipos de plantão · Profissional · Herdar · restrito Administrar tipos de plantão · Familiar · Herdar · permitido Administrar tipos de plantão · Leitor · Herdar · restrito\":\n            - cell \"Administrar tipos de plantão Escalas\":\n              - strong: Administrar tipos de plantão\n              - text: Escalas\n            - cell \"Administrar tipos de plantão · Administrador do paciente · Herdar · permitido\":\n              - button \"Administrar tipos de plantão · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Administrar tipos de plantão · Supervisor · Herdar · permitido\":\n              - button \"Administrar tipos de plantão · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Administrar tipos de plantão · Profissional · Herdar · restrito\":\n              - button \"Administrar tipos de plantão · Profissional · Herdar · restrito\": Herdar\n            - cell \"Administrar tipos de plantão · Familiar · Herdar · permitido\":\n              - button \"Administrar tipos de plantão · Familiar · Herdar · permitido\": Herdar\n            - cell \"Administrar tipos de plantão · Leitor · Herdar · restrito\":\n              - button \"Administrar tipos de plantão · Leitor · Herdar · restrito\": Herdar\n          - row \"Movimentar e corrigir estoque familiar Estoques · Crítica Movimentar e corrigir estoque familiar · Administrador do paciente · Herdar · permitido Movimentar e corrigir estoque familiar · Supervisor · Herdar · restrito Movimentar e corrigir estoque familiar · Profissional · Herdar · restrito Movimentar e corrigir estoque familiar · Familiar · Herdar · restrito Movimentar e corrigir estoque familiar · Leitor · Herdar · restrito\":\n            - cell \"Movimentar e corrigir estoque familiar Estoques · Crítica\":\n              - strong: Movimentar e corrigir estoque familiar\n              - text: Estoques · Crítica\n            - cell \"Movimentar e corrigir estoque familiar · Administrador do paciente · Herdar · permitido\":\n              - button \"Movimentar e corrigir estoque familiar · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Movimentar e corrigir estoque familiar · Supervisor · Herdar · restrito\":\n              - button \"Movimentar e corrigir estoque familiar · Supervisor · Herdar · restrito\": Herdar\n            - cell \"Movimentar e corrigir estoque familiar · Profissional · Herdar · restrito\":\n              - button \"Movimentar e corrigir estoque familiar · Profissional · Herdar · restrito\": Herdar\n            - cell \"Movimentar e corrigir estoque familiar · Familiar · Herdar · restrito\":\n              - button \"Movimentar e corrigir estoque familiar · Familiar · Herdar · restrito\": Herdar\n            - cell \"Movimentar e corrigir estoque familiar · Leitor · Herdar · restrito\":\n              - button \"Movimentar e corrigir estoque familiar · Leitor · Herdar · restrito\": Herdar\n          - row \"Consultar estoque familiar Estoques · Crítica Consultar estoque familiar · Administrador do paciente · Herdar · permitido Consultar estoque familiar · Supervisor · Herdar · restrito Consultar estoque familiar · Profissional · Herdar · restrito Consultar estoque familiar · Familiar · Herdar · permitido Consultar estoque familiar · Leitor · Herdar · restrito\":\n            - cell \"Consultar estoque familiar Estoques · Crítica\":\n              - strong: Consultar estoque familiar\n              - text: Estoques · Crítica\n            - cell \"Consultar estoque familiar · Administrador do paciente · Herdar · permitido\":\n              - button \"Consultar estoque familiar · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Consultar estoque familiar · Supervisor · Herdar · restrito\":\n              - button \"Consultar estoque familiar · Supervisor · Herdar · restrito\": Herdar\n            - cell \"Consultar estoque familiar · Profissional · Herdar · restrito\":\n              - button \"Consultar estoque familiar · Profissional · Herdar · restrito\": Herdar\n            - cell \"Consultar estoque familiar · Familiar · Herdar · permitido\":\n              - button \"Consultar estoque familiar · Familiar · Herdar · permitido\": Herdar\n            - cell \"Consultar estoque familiar · Leitor · Herdar · restrito\":\n              - button \"Consultar estoque familiar · Leitor · Herdar · restrito\": Herdar\n          - row \"Consultar estoque da equipe Estoques Consultar estoque da equipe · Administrador do paciente · Herdar · permitido Consultar estoque da equipe · Supervisor · Herdar · permitido Consultar estoque da equipe · Profissional · Herdar · permitido Consultar estoque da equipe · Familiar · Herdar · permitido Consultar estoque da equipe · Leitor · Herdar · permitido\":\n            - cell \"Consultar estoque da equipe Estoques\":\n              - strong: Consultar estoque da equipe\n              - text: Estoques\n            - cell \"Consultar estoque da equipe · Administrador do paciente · Herdar · permitido\":\n              - button \"Consultar estoque da equipe · Administrador do paciente · Herdar · permitido\": Herdar\n            - cell \"Consultar estoque da equipe · Supervisor · Herdar · permitido\":\n              - button \"Consultar estoque da equipe · Supervisor · Herdar · permitido\": Herdar\n            - cell \"Consultar estoque da equipe · Profissional · Herdar · permitido\":\n              - button \"Consultar estoque da equipe · Profissional · Herdar · permitido\": Herdar\n            - cell \"Consultar estoque da equipe · Familiar · Herdar · permitido\":\n              - button \"Consultar estoque da equipe · Familiar · Herdar · permitido\": Herdar\n            - cell \"Consultar estoque da equipe · Leitor · Herdar · permitido\":\n              - button \"Consultar estoque da equipe · Leitor · Herdar · permitido\": Herdar",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:32:58.143Z",
+      "role": "adminA",
+      "label": "month-selected-day-rendered",
+      "path": "/escalas",
+      "width": 390,
+      "state": "READY",
+      "note": "Dropdown Mês; actual mobile view single day. No schedule command.",
+      "file": "b18-accessibility-adminA-month-selected-day-rendered.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nEscalas e plantões\nNova programação\nNovo tipo de plantão\nData de referência\nVisualização\nSemana\nMês\nProfissional\nToda a equipe\nProfissional fictício de plantão\nTeste professional\nSituação\nTodas\nPublicado\nProposta\nCancelado\nRecusado\n\nProgramação prevista, sem registro de presença. Períodos adjacentes são permitidos; sobreposições do mesmo profissional são recusadas.\n\nDia anterior\n29/10/2026\nPróximo dia\nPlantão diário fictício\nPublicado\n\nProfissional fictício de plantão\n\n29/10/2026, 00:00 → 30/10/2026, 00:00\n\nHomologação local\n\nAlterar plantão\nPropostas pendentes\n\nNão há propostas pendentes.\n\nTipos e programações\nHistórico de mudanças",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Escalas e plantões\" [level=1]\n  - button \"Nova programação\"\n  - button \"Novo tipo de plantão\"\n  - text: Data de referência\n  - textbox \"Data de referência\": 2026-10-29\n  - text: Visualização\n  - combobox \"Visualização\":\n    - option \"Semana\"\n    - option \"Mês\" [selected]\n  - text: Profissional\n  - combobox \"Profissional\":\n    - option \"Toda a equipe\" [selected]\n    - option \"Profissional fictício de plantão\"\n    - option \"Teste professional\"\n  - text: Situação\n  - combobox \"Situação\":\n    - option \"Todas\" [selected]\n    - option \"Publicado\"\n    - option \"Proposta\"\n    - option \"Cancelado\"\n    - option \"Recusado\"\n  - paragraph: Programação prevista, sem registro de presença. Períodos adjacentes são permitidos; sobreposições do mesmo profissional são recusadas.\n  - button \"Dia anterior\"\n  - strong: 29/10/2026\n  - button \"Próximo dia\"\n  - article \"Plantão diário fictício · Profissional fictício de plantão\":\n    - strong: Plantão diário fictício\n    - text: Publicado\n    - paragraph: Profissional fictício de plantão\n    - paragraph: 29/10/2026, 00:00 → 30/10/2026, 00:00\n    - paragraph: Homologação local\n    - button \"Alterar plantão\"\n  - heading \"Propostas pendentes\" [level=2]\n  - paragraph: Não há propostas pendentes.\n  - group: Tipos e programações\n  - group: Histórico de mudanças",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:33:01.523Z",
+      "role": "adminA",
+      "label": "long-text-reflow320",
+      "path": "/fichas/req",
+      "width": 320,
+      "state": "READY",
+      "note": "Valid-length unsaved observation, no request submitted; actual document overflow measured.",
+      "file": "b18-accessibility-adminA-long-text-reflow320.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 7 de 7\nRevisão\nIdentificação\nMedicamentos\nHigiene\nDieta\nItens extras\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRevisão\n\nSolicitante\n\nTeste adminA\n\nPessoa assistida\n\nHomologação fictícia V4 9482191c\n\nItens do catálogo\n\nNenhum registro.\n\nItens extras\nMaterial sintético de reflow — estoque atual: 0\nObservações\nReferência fictícia: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nVoltar\nSalvar rascunho\nConcluir requisição",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 7 de 7\n    - strong: Revisão\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"Higiene\"\n      - listitem:\n        - button \"Dieta\"\n      - listitem:\n        - button \"Itens extras\"\n      - listitem:\n        - button \"Observações\"\n      - listitem:\n        - button \"7 Revisão\"\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Revisão\" [level=2]\n  - group:\n    - paragraph: Solicitante\n    - paragraph: Teste adminA\n    - paragraph: Pessoa assistida\n    - paragraph: Homologação fictícia V4 9482191c\n    - heading \"Itens do catálogo\" [level=3]\n    - paragraph: Nenhum registro.\n    - heading \"Itens extras\" [level=3]\n    - list:\n      - listitem: \"Material sintético de reflow — estoque atual: 0\"\n    - heading \"Observações\" [level=3]\n    - list:\n      - listitem: \"Referência fictícia: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Concluir requisição\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:33:01.615Z",
+      "role": "adminA",
+      "label": "review-bottom320",
+      "path": "/fichas/req",
+      "width": 320,
+      "state": "READY",
+      "note": "",
+      "file": "b18-accessibility-adminA-review-bottom320.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 51
+      },
+      "text": "Requisição de insumos\nEtapa 7 de 7\nRevisão\nIdentificação\nMedicamentos\nHigiene\nDieta\nItens extras\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRevisão\n\nSolicitante\n\nTeste adminA\n\nPessoa assistida\n\nHomologação fictícia V4 9482191c\n\nItens do catálogo\n\nNenhum registro.\n\nItens extras\nMaterial sintético de reflow — estoque atual: 0\nObservações\nReferência fictícia: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nVoltar\nSalvar rascunho\nConcluir requisição",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 7 de 7\n    - strong: Revisão\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"Higiene\"\n      - listitem:\n        - button \"Dieta\"\n      - listitem:\n        - button \"Itens extras\"\n      - listitem:\n        - button \"Observações\"\n      - listitem:\n        - button \"7 Revisão\"\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Revisão\" [level=2]\n  - group:\n    - paragraph: Solicitante\n    - paragraph: Teste adminA\n    - paragraph: Pessoa assistida\n    - paragraph: Homologação fictícia V4 9482191c\n    - heading \"Itens do catálogo\" [level=3]\n    - paragraph: Nenhum registro.\n    - heading \"Itens extras\" [level=3]\n    - list:\n      - listitem: \"Material sintético de reflow — estoque atual: 0\"\n    - heading \"Observações\" [level=3]\n    - list:\n      - listitem: \"Referência fictícia: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Concluir requisição\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:33:04.230Z",
+      "role": "adminA",
+      "label": "text-size-stress",
+      "path": "/fichas/com",
+      "width": 320,
+      "state": "READY",
+      "note": "CSS root font-size stress only; NOT native browser zoom or WCAG resize-text certification.",
+      "file": "b18-accessibility-adminA-text-size-stress.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Compra de insumos\nEtapa 1 de 6\nIdentificação\n1\nIdentificação\n2\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nObservações\n6\nRevisão\n\nCOM · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nIdentificação\n\nSolicite os itens necessários à família. Compra ou doação entram pela mesma ficha, sem comprovante de pagamento obrigatório.\n\nForma de aquisição\nCompra pela família\nDoação / incorporação sem pagamento\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Compra de insumos\" [level=1]\n  - navigation \"Etapas da COM\":\n    - text: Etapa 1 de 6\n    - strong: Identificação\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"1 Identificação\"\n      - listitem:\n        - button \"2 Medicamentos\" [disabled]\n      - listitem:\n        - button \"3 Higiene\" [disabled]\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Observações\" [disabled]\n      - listitem:\n        - button \"6 Revisão\" [disabled]\n  - paragraph: COM · Homologação fictícia V4 9482191c\n  - heading \"Identificação\" [level=2]\n  - group:\n    - paragraph: Solicite os itens necessários à família. Compra ou doação entram pela mesma ficha, sem comprovante de pagamento obrigatório.\n    - text: Forma de aquisição\n    - combobox \"Forma de aquisição\":\n      - option \"Compra pela família\" [selected]\n      - option \"Doação / incorporação sem pagamento\"\n  - button \"Voltar\" [disabled]\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:33:05.409Z",
+      "role": "adminA",
+      "label": "forced-colors-emulated",
+      "path": "/unidades",
+      "width": 320,
+      "state": "READY",
+      "note": "Browser media emulation; not Windows high-contrast physical test.",
+      "file": "b18-accessibility-adminA-forced-colors-emulated.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nUnidades e apresentações\nUnidades disponíveis\n\nUnidades base e precisão dos produtos.\n\nNova unidade\nConfigurar apresentação\nUnidade\n\t\nPrecisão\n\t\nÂmbito\n\nBisnaga\nbisnaga\n\t0 casa(s)\tGlobal\nCaixa\ncaixa\n\t0 casa(s)\tGlobal\nComprimido\ncomprimido\n\t0 casa(s)\tGlobal\nEnvelope\nenvelope\n\t0 casa(s)\tGlobal\nFralda\nfralda\n\t0 casa(s)\tGlobal\nFrasco\nfrasco\n\t0 casa(s)\tGlobal\nGrama\ng\n\t3 casa(s)\tGlobal\nMililitro\nmL\n\t3 casa(s)\tGlobal\nPacote\npacote\n\t0 casa(s)\tGlobal\nUnidade\nunidade\n\t0 casa(s)\tGlobal",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Unidades e apresentações\" [level=1]\n  - heading \"Unidades disponíveis\" [level=2]\n  - paragraph: Unidades base e precisão dos produtos.\n  - button \"Nova unidade\"\n  - button \"Configurar apresentação\"\n  - searchbox \"Pesquisar unidades\"\n  - table \"Unidades base\":\n    - rowgroup:\n      - row \"Unidade Precisão Âmbito\":\n        - columnheader \"Unidade\"\n        - columnheader \"Precisão\"\n        - columnheader \"Âmbito\"\n    - rowgroup:\n      - row \"Bisnaga bisnaga 0 casa(s) Global\":\n        - cell \"Bisnaga bisnaga\":\n          - strong: Bisnaga\n          - text: bisnaga\n        - cell \"0 casa(s)\"\n        - cell \"Global\"\n      - row \"Caixa caixa 0 casa(s) Global\":\n        - cell \"Caixa caixa\":\n          - strong: Caixa\n          - text: caixa\n        - cell \"0 casa(s)\"\n        - cell \"Global\"\n      - row \"Comprimido comprimido 0 casa(s) Global\":\n        - cell \"Comprimido comprimido\":\n          - strong: Comprimido\n          - text: comprimido\n        - cell \"0 casa(s)\"\n        - cell \"Global\"\n      - row \"Envelope envelope 0 casa(s) Global\":\n        - cell \"Envelope envelope\":\n          - strong: Envelope\n          - text: envelope\n        - cell \"0 casa(s)\"\n        - cell \"Global\"\n      - row \"Fralda fralda 0 casa(s) Global\":\n        - cell \"Fralda fralda\":\n          - strong: Fralda\n          - text: fralda\n        - cell \"0 casa(s)\"\n        - cell \"Global\"\n      - row \"Frasco frasco 0 casa(s) Global\":\n        - cell \"Frasco frasco\":\n          - strong: Frasco\n          - text: frasco\n        - cell \"0 casa(s)\"\n        - cell \"Global\"\n      - row \"Grama g 3 casa(s) Global\":\n        - cell \"Grama g\":\n          - strong: Grama\n          - text: g\n        - cell \"3 casa(s)\"\n        - cell \"Global\"\n      - row \"Mililitro mL 3 casa(s) Global\":\n        - cell \"Mililitro mL\":\n          - strong: Mililitro\n          - text: mL\n        - cell \"3 casa(s)\"\n        - cell \"Global\"\n      - row \"Pacote pacote 0 casa(s) Global\":\n        - cell \"Pacote pacote\":\n          - strong: Pacote\n          - text: pacote\n        - cell \"0 casa(s)\"\n        - cell \"Global\"\n      - row \"Unidade unidade 0 casa(s) Global\":\n        - cell \"Unidade unidade\":\n          - strong: Unidade\n          - text: unidade\n        - cell \"0 casa(s)\"\n        - cell \"Global\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:33:10.699Z",
+      "role": "adminA",
+      "label": "decision-dialog1440",
+      "path": "/escalas",
+      "width": 1440,
+      "state": "READY",
+      "note": "Correct historical synthetic fixture patient, not canonical A; no approval applied.",
+      "file": "b18-accessibility-adminA-decision-dialog1440.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Revisar escala\n\nConfirme os dados da programação. A gravação é transacional e registra o responsável e a justificativa.\n\nRevise o período, o profissional e o efeito da alteração.\n\nVoltar\nConfirmar gravação",
+      "snapshot": "- dialog \"Revisar escala\":\n  - heading \"Revisar escala\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph: Confirme os dados da programação. A gravação é transacional e registra o responsável e a justificativa.\n  - paragraph: Revise o período, o profissional e o efeito da alteração.\n  - button \"Voltar\"\n  - button \"Confirmar gravação\"",
+      "visualInspected": false
+    }
+  ],
+  "failures": [
+    {
+      "label": "skip-and-drawer",
+      "error": "locator.click: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Descartar alterações', exact: true })\u001b[22m\n"
+    },
+    {
+      "label": "axe-login",
+      "error": "Please use browser.newContext()\n Please check out https://github.com/dequelabs/axe-core-npm/blob/develop/packages/playwright/error-handling.md"
+    }
+  ],
+  "keyboard": [
+    {
+      "scenario": "first-tab",
+      "active": {
+        "tag": "A",
+        "text": "Ir para o conteúdo",
+        "aria": null,
+        "inDialog": false,
+        "tabsterSentinel": false
+      }
+    },
+    {
+      "scenario": "skip-enter",
+      "active": {
+        "tag": "MAIN",
+        "text": "Homologação fictícia V4 9482191cAdministraçãoAdministrador do pacienteTodas as alterações desta área se limitam ao pacie",
+        "aria": null,
+        "inDialog": false,
+        "tabsterSentinel": false
+      }
+    },
+    {
+      "scenario": "dirty-escape",
+      "dialogs": 1,
+      "active": {
+        "tag": "INPUT",
+        "text": "",
+        "aria": null,
+        "inDialog": true,
+        "tabsterSentinel": false
+      }
+    },
+    {
+      "scenario": "matrix-scroll",
+      "before": 0,
+      "after": 13,
+      "active": {
+        "tag": "DIV",
+        "text": "CapacidadeAdministrador do pacienteSupervisorProfissionalFamiliarLeitorAdministrar acessos do pacienteAcessos · CríticaH",
+        "aria": "Tabela de permissões; rolagem horizontal por função",
+        "inDialog": false,
+        "tabsterSentinel": false
+      }
+    },
+    {
+      "scenario": "reduced-motion",
+      "matches": true
+    },
+    {
+      "scenario": "decision-dialog-trap-escape",
+      "entries": [
+        {
+          "tag": "BUTTON",
+          "text": "",
+          "aria": "Fechar diálogo",
+          "inDialog": true,
+          "tabsterSentinel": false
+        },
+        {
+          "tag": "BUTTON",
+          "text": "Voltar",
+          "aria": null,
+          "inDialog": true,
+          "tabsterSentinel": false
+        },
+        {
+          "tag": "BUTTON",
+          "text": "Confirmar gravação",
+          "aria": null,
+          "inDialog": true,
+          "tabsterSentinel": false
+        },
+        {
+          "tag": "BUTTON",
+          "text": "",
+          "aria": "Fechar diálogo",
+          "inDialog": true,
+          "tabsterSentinel": false
+        },
+        {
+          "tag": "BUTTON",
+          "text": "Voltar",
+          "aria": null,
+          "inDialog": true,
+          "tabsterSentinel": false
+        },
+        {
+          "tag": "BUTTON",
+          "text": "Confirmar gravação",
+          "aria": null,
+          "inDialog": true,
+          "tabsterSentinel": false
+        },
+        {
+          "tag": "BUTTON",
+          "text": "",
+          "aria": "Fechar diálogo",
+          "inDialog": true,
+          "tabsterSentinel": false
+        },
+        {
+          "tag": "BUTTON",
+          "text": "Voltar",
+          "aria": null,
+          "inDialog": true,
+          "tabsterSentinel": false
+        },
+        {
+          "tag": "BUTTON",
+          "text": "Confirmar gravação",
+          "aria": null,
+          "inDialog": true,
+          "tabsterSentinel": false
+        }
+      ],
+      "closed": true,
+      "after": {
+        "tag": "BODY",
+        "text": "Ir para o conteúdoHCHome Care AssistantGestão do cuidadoSelecione um pacienteHomologação E2E 00c6aae7Homologação E2E 0a9",
+        "aria": null,
+        "inDialog": false,
+        "tabsterSentinel": false
+      },
+      "fixture": "Prior audited synthetic patient"
+    }
+  ],
+  "geometry": [
+    {
+      "label": "mobile-month390",
+      "width": 390,
+      "documentWidth": 390,
+      "scrollY": 0,
+      "viewportHeight": 844,
+      "controls": [],
+      "navigation": null,
+      "overflow": []
+    },
+    {
+      "label": "valid320chars-review320",
+      "width": 320,
+      "documentWidth": 2190,
+      "scrollY": 0,
+      "viewportHeight": 844,
+      "controls": [
+        {
+          "text": "Voltar",
+          "left": 33,
+          "right": 129,
+          "top": 770,
+          "bottom": 814
+        },
+        {
+          "text": "Salvar rascunho",
+          "left": 161.25,
+          "right": 287,
+          "top": 740,
+          "bottom": 784
+        },
+        {
+          "text": "Concluir requisição",
+          "left": 141,
+          "right": 287,
+          "top": 792,
+          "bottom": 844
+        }
+      ],
+      "navigation": null,
+      "overflow": []
+    },
+    {
+      "label": "review-bottom-scroll320",
+      "width": 320,
+      "documentWidth": 2190,
+      "scrollY": 51,
+      "viewportHeight": 844,
+      "controls": [
+        {
+          "text": "Voltar",
+          "left": 33,
+          "right": 129,
+          "top": 719,
+          "bottom": 763
+        },
+        {
+          "text": "Salvar rascunho",
+          "left": 161.25,
+          "right": 287,
+          "top": 689,
+          "bottom": 733
+        },
+        {
+          "text": "Concluir requisição",
+          "left": 141,
+          "right": 287,
+          "top": 741,
+          "bottom": 793
+        }
+      ],
+      "navigation": null,
+      "overflow": []
+    },
+    {
+      "label": "font-size200percent-stress320",
+      "width": 320,
+      "documentWidth": 320,
+      "scrollY": 0,
+      "viewportHeight": 844,
+      "controls": [
+        {
+          "text": "Voltar",
+          "left": 33,
+          "right": 129,
+          "top": 988,
+          "bottom": 1032
+        },
+        {
+          "text": "Salvar rascunho",
+          "left": 161.25,
+          "right": 287,
+          "top": 962,
+          "bottom": 1006
+        },
+        {
+          "text": "Avançar",
+          "left": 184.46875,
+          "right": 287,
+          "top": 1014,
+          "bottom": 1058
+        }
+      ],
+      "navigation": null,
+      "overflow": [
+        {
+          "tag": "LI",
+          "right": 363.671875,
+          "width": 96,
+          "text": "3Higiene"
+        },
+        {
+          "tag": "BUTTON",
+          "right": 363.671875,
+          "width": 96,
+          "text": "3Higiene"
+        },
+        {
+          "tag": "LI",
+          "right": 467.671875,
+          "width": 96,
+          "text": "4Dieta"
+        },
+        {
+          "tag": "BUTTON",
+          "right": 467.671875,
+          "width": 96,
+          "text": "4Dieta"
+        },
+        {
+          "tag": "LI",
+          "right": 588.1875,
+          "width": 112.515625,
+          "text": "5Observações"
+        },
+        {
+          "tag": "BUTTON",
+          "right": 588.1875,
+          "width": 112.515625,
+          "text": "5Observações"
+        },
+        {
+          "tag": "LI",
+          "right": 692.1875,
+          "width": 96,
+          "text": "6Revisão"
+        },
+        {
+          "tag": "BUTTON",
+          "right": 692.1875,
+          "width": 96,
+          "text": "6Revisão"
+        }
+      ]
+    }
+  ],
+  "axe": [
+    {
+      "label": "permissions390",
+      "url": "/configuracoes",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".notification-dot"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(1) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(1) > .hca-matrix-name > .hca-cell-secondary"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(3) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(5) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(7) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(9) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(10) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(11) > .hca-matrix-name > .hca-cell-secondary"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(12) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(15) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(16) > .hca-matrix-name > .hca-cell-secondary"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(18) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(19) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(21) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(24) > .hca-matrix-name > .hca-cell-secondary"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(26) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(30) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(30) > .hca-matrix-name > .hca-cell-secondary"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(31) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(31) > .hca-matrix-name > .hca-cell-secondary"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(33) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(34) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(35) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(36) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(37) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [
+                ".___94gq4m0.f1wfn5kd.f1g4hkjv:nth-child(38) > .hca-matrix-name > strong"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "passedRules": 28,
+      "scope": "Whole page, no rules disabled; explicit keyboard entry prevents Tabster edge-sentinel misclassification"
+    },
+    {
+      "label": "REQ valid long unsaved review320",
+      "url": "/fichas/req",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".notification-dot"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "target": [
+                "button[aria-current=\"step\"] > span"
+              ],
+              "summary": "Fix any of the following:\n  Element content is too short to determine if it is actual text content"
+            }
+          ]
+        }
+      ],
+      "passedRules": 27,
+      "scope": "Whole page, no rules disabled; explicit keyboard entry prevents Tabster edge-sentinel misclassification"
+    },
+    {
+      "label": "reader /historico",
+      "url": "/historico",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": [],
+      "incomplete": [],
+      "passedRules": 24,
+      "scope": "Whole page, no rules disabled; explicit keyboard entry prevents Tabster edge-sentinel misclassification"
+    },
+    {
+      "label": "reader /documentos/174bf9ba-72f4-4aad-ac79-91b8bbaa434c",
+      "url": "/documentos/174bf9ba-72f4-4aad-ac79-91b8bbaa434c",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": [],
+      "incomplete": [],
+      "passedRules": 30,
+      "scope": "Whole page, no rules disabled; explicit keyboard entry prevents Tabster edge-sentinel misclassification"
+    },
+    {
+      "label": "reader /documentos/4ea0b69e-03e3-4b51-b938-bbee7becd325",
+      "url": "/documentos/4ea0b69e-03e3-4b51-b938-bbee7becd325",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "violations": [],
+      "incomplete": [],
+      "passedRules": 30,
+      "scope": "Whole page, no rules disabled; explicit keyboard entry prevents Tabster edge-sentinel misclassification"
+    }
+  ],
+  "finishedAt": "2026-10-29T04:33:32.869Z"
+}

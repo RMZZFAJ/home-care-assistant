@@ -1,0 +1,273 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:21:49.112Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:21:54.359Z",
+      "role": "adminA",
+      "label": "observation-1001-error",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "ERROR_RECOVERABLE",
+      "note": "",
+      "file": "b17-followup-adminA-observation-1001-error.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 7 de 7\nRevisão\nIdentificação\nMedicamentos\nHigiene\nDieta\nItens extras\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRevisão\n\nSolicitante\n\nTeste adminA\n\nPessoa assistida\n\nHomologação fictícia V4 9482191c\n\nItens do catálogo\nMaterial fictício V4 0 — estoque atual: 0\nItens extras\n\nNenhum registro.\n\nObservações\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nToo big: expected string to have <=1000 characters Referência: 34eb113d-2138-4a03-8d2d-d93edd147e5e\nVoltar\nSalvar rascunho\nConcluir requisição",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 7 de 7\n    - strong: Revisão\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"Higiene\"\n      - listitem:\n        - button \"Dieta\"\n      - listitem:\n        - button \"Itens extras\"\n      - listitem:\n        - button \"Observações\"\n      - listitem:\n        - button \"7 Revisão\"\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Revisão\" [level=2]\n  - group:\n    - paragraph: Solicitante\n    - paragraph: Teste adminA\n    - paragraph: Pessoa assistida\n    - paragraph: Homologação fictícia V4 9482191c\n    - heading \"Itens do catálogo\" [level=3]\n    - list:\n      - listitem: \"Material fictício V4 0 — estoque atual: 0\"\n    - heading \"Itens extras\" [level=3]\n    - paragraph: Nenhum registro.\n    - heading \"Observações\" [level=3]\n    - list:\n      - listitem: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n  - alert: \"Too big: expected string to have <=1000 characters Referência: 34eb113d-2138-4a03-8d2d-d93edd147e5e\"\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Concluir requisição\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:21:55.922Z",
+      "role": "adminA",
+      "label": "req-1",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Only top viewport and source field behavior; browser-injected fictional catalog. No final command.",
+      "file": "b17-followup-adminA-req-1.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 3 de 7\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nBuscar produto\nMaterial simulado B1 000 — nome longo para avaliar quebra e unidade\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 3 de 7\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - text: Buscar produto\n    - textbox \"Buscar produto\":\n      - /placeholder: Nome ou nome alternativo\n      - text: Apelido sintético 0\n    - article:\n      - checkbox \"Material simulado B1 000 — nome longo para avaliar quebra e unidade frasco\"\n      - text: Material simulado B1 000 — nome longo para avaliar quebra e unidade frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:21:57.472Z",
+      "role": "adminA",
+      "label": "com-1",
+      "path": "/fichas/com",
+      "width": 390,
+      "state": "READY",
+      "note": "Only top viewport and source field behavior; browser-injected fictional catalog. No final command.",
+      "file": "b17-followup-adminA-com-1.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Compra de insumos\nEtapa 3 de 6\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nObservações\n6\nRevisão\n\nCOM · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nLer código de barras\nLer de uma foto\nCódigo manual\nIdentificar\nMaterial simulado B1 000 — nome longo para avaliar quebra e unidade\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Compra de insumos\" [level=1]\n  - navigation \"Etapas da COM\":\n    - text: Etapa 3 de 6\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Observações\" [disabled]\n      - listitem:\n        - button \"6 Revisão\" [disabled]\n  - paragraph: COM · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - button \"Ler código de barras\"\n    - text: Ler de uma foto\n    - button \"Ler de uma foto\"\n    - text: Código manual\n    - textbox \"Código manual\":\n      - /placeholder: EAN / GTIN / UPC\n    - button \"Identificar\" [disabled]\n    - checkbox \"Material simulado B1 000 — nome longo para avaliar quebra e unidade frasco\"\n    - strong: Material simulado B1 000 — nome longo para avaliar quebra e unidade\n    - text: frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:21:58.957Z",
+      "role": "adminA",
+      "label": "req-5",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Only top viewport and source field behavior; browser-injected fictional catalog. No final command.",
+      "file": "b17-followup-adminA-req-5.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 3 de 7\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nBuscar produto\nMaterial simulado B1 004\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 3 de 7\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - text: Buscar produto\n    - textbox \"Buscar produto\":\n      - /placeholder: Nome ou nome alternativo\n      - text: Apelido sintético 4\n    - article:\n      - checkbox \"Material simulado B1 004 frasco\"\n      - text: Material simulado B1 004 frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:22:00.471Z",
+      "role": "adminA",
+      "label": "com-5",
+      "path": "/fichas/com",
+      "width": 390,
+      "state": "READY",
+      "note": "Only top viewport and source field behavior; browser-injected fictional catalog. No final command.",
+      "file": "b17-followup-adminA-com-5.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Compra de insumos\nEtapa 3 de 6\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nObservações\n6\nRevisão\n\nCOM · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nLer código de barras\nLer de uma foto\nCódigo manual\nIdentificar\nMaterial simulado B1 000 — nome longo para avaliar quebra e unidade\nfrasco\nMaterial simulado B1 001\nfrasco\nMaterial simulado B1 002\nfrasco\nMaterial simulado B1 003\nfrasco\nMaterial simulado B1 004\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Compra de insumos\" [level=1]\n  - navigation \"Etapas da COM\":\n    - text: Etapa 3 de 6\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Observações\" [disabled]\n      - listitem:\n        - button \"6 Revisão\" [disabled]\n  - paragraph: COM · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - button \"Ler código de barras\"\n    - text: Ler de uma foto\n    - button \"Ler de uma foto\"\n    - text: Código manual\n    - textbox \"Código manual\":\n      - /placeholder: EAN / GTIN / UPC\n    - button \"Identificar\" [disabled]\n    - checkbox \"Material simulado B1 000 — nome longo para avaliar quebra e unidade frasco\"\n    - strong: Material simulado B1 000 — nome longo para avaliar quebra e unidade\n    - text: frasco\n    - checkbox \"Material simulado B1 001 frasco\"\n    - strong: Material simulado B1 001\n    - text: frasco\n    - checkbox \"Material simulado B1 002 frasco\"\n    - strong: Material simulado B1 002\n    - text: frasco\n    - checkbox \"Material simulado B1 003 frasco\"\n    - strong: Material simulado B1 003\n    - text: frasco\n    - checkbox \"Material simulado B1 004 frasco\"\n    - strong: Material simulado B1 004\n    - text: frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:22:02.005Z",
+      "role": "adminA",
+      "label": "req-20",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Only top viewport and source field behavior; browser-injected fictional catalog. No final command.",
+      "file": "b17-followup-adminA-req-20.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 3 de 7\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nBuscar produto\nMaterial simulado B1 019\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 3 de 7\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - text: Buscar produto\n    - textbox \"Buscar produto\":\n      - /placeholder: Nome ou nome alternativo\n      - text: Apelido sintético 19\n    - article:\n      - checkbox \"Material simulado B1 019 frasco\"\n      - text: Material simulado B1 019 frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:22:03.422Z",
+      "role": "adminA",
+      "label": "com-20",
+      "path": "/fichas/com",
+      "width": 390,
+      "state": "READY",
+      "note": "Only top viewport and source field behavior; browser-injected fictional catalog. No final command.",
+      "file": "b17-followup-adminA-com-20.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Compra de insumos\nEtapa 3 de 6\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nObservações\n6\nRevisão\n\nCOM · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nLer código de barras\nLer de uma foto\nCódigo manual\nIdentificar\nMaterial simulado B1 000 — nome longo para avaliar quebra e unidade\nfrasco\nMaterial simulado B1 001\nfrasco\nMaterial simulado B1 002\nfrasco\nMaterial simulado B1 003\nfrasco\nMaterial simulado B1 004\nfrasco\nMaterial simulado B1 005\nfrasco\nMaterial simulado B1 006\nfrasco\nMaterial simulado B1 007\nfrasco\nMaterial simulado B1 008\nfrasco\nMaterial simulado B1 009\nfrasco\nMaterial simulado B1 010\nfrasco\nMaterial simulado B1 011\nfrasco\nMaterial simulado B1 012\nfrasco\nMaterial simulado B1 013\nfrasco\nMaterial simulado B1 014\nfrasco\nMaterial simulado B1 015\nfrasco\nMaterial simulado B1 016\nfrasco\nMaterial simulado B1 017\nfrasco\nMaterial simulado B1 018\nfrasco\nMaterial simulado B1 019\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Compra de insumos\" [level=1]\n  - navigation \"Etapas da COM\":\n    - text: Etapa 3 de 6\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Observações\" [disabled]\n      - listitem:\n        - button \"6 Revisão\" [disabled]\n  - paragraph: COM · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - button \"Ler código de barras\"\n    - text: Ler de uma foto\n    - button \"Ler de uma foto\"\n    - text: Código manual\n    - textbox \"Código manual\":\n      - /placeholder: EAN / GTIN / UPC\n    - button \"Identificar\" [disabled]\n    - checkbox \"Material simulado B1 000 — nome longo para avaliar quebra e unidade frasco\"\n    - strong: Material simulado B1 000 — nome longo para avaliar quebra e unidade\n    - text: frasco\n    - checkbox \"Material simulado B1 001 frasco\"\n    - strong: Material simulado B1 001\n    - text: frasco\n    - checkbox \"Material simulado B1 002 frasco\"\n    - strong: Material simulado B1 002\n    - text: frasco\n    - checkbox \"Material simulado B1 003 frasco\"\n    - strong: Material simulado B1 003\n    - text: frasco\n    - checkbox \"Material simulado B1 004 frasco\"\n    - strong: Material simulado B1 004\n    - text: frasco\n    - checkbox \"Material simulado B1 005 frasco\"\n    - strong: Material simulado B1 005\n    - text: frasco\n    - checkbox \"Material simulado B1 006 frasco\"\n    - strong: Material simulado B1 006\n    - text: frasco\n    - checkbox \"Material simulado B1 007 frasco\"\n    - strong: Material simulado B1 007\n    - text: frasco\n    - checkbox \"Material simulado B1 008 frasco\"\n    - strong: Material simulado B1 008\n    - text: frasco\n    - checkbox \"Material simulado B1 009 frasco\"\n    - strong: Material simulado B1 009\n    - text: frasco\n    - checkbox \"Material simulado B1 010 frasco\"\n    - strong: Material simulado B1 010\n    - text: frasco\n    - checkbox \"Material simulado B1 011 frasco\"\n    - strong: Material simulado B1 011\n    - text: frasco\n    - checkbox \"Material simulado B1 012 frasco\"\n    - strong: Material simulado B1 012\n    - text: frasco\n    - checkbox \"Material simulado B1 013 frasco\"\n    - strong: Material simulado B1 013\n    - text: frasco\n    - checkbox \"Material simulado B1 014 frasco\"\n    - strong: Material simulado B1 014\n    - text: frasco\n    - checkbox \"Material simulado B1 015 frasco\"\n    - strong: Material simulado B1 015\n    - text: frasco\n    - checkbox \"Material simulado B1 016 frasco\"\n    - strong: Material simulado B1 016\n    - text: frasco\n    - checkbox \"Material simulado B1 017 frasco\"\n    - strong: Material simulado B1 017\n    - text: frasco\n    - checkbox \"Material simulado B1 018 frasco\"\n    - strong: Material simulado B1 018\n    - text: frasco\n    - checkbox \"Material simulado B1 019 frasco\"\n    - strong: Material simulado B1 019\n    - text: frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:22:05.005Z",
+      "role": "adminA",
+      "label": "req-100",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Only top viewport and source field behavior; browser-injected fictional catalog. No final command.",
+      "file": "b17-followup-adminA-req-100.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\nEtapa 3 de 7\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nItens extras\n6\nObservações\n7\nRevisão\n\nREQ · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nBuscar produto\nMaterial simulado B1 099\nfrasco\n\nFamília · saldo confirmado deste produto: consulta indisponível\n\nEstoque observado com a equipe\nReposição urgente\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - navigation \"Etapas da requisição\":\n    - text: Etapa 3 de 7\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Itens extras\" [disabled]\n      - listitem:\n        - button \"6 Observações\" [disabled]\n      - listitem:\n        - button \"7 Revisão\" [disabled]\n  - paragraph: REQ · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - text: Buscar produto\n    - textbox \"Buscar produto\":\n      - /placeholder: Nome ou nome alternativo\n      - text: Apelido sintético 99\n    - article:\n      - checkbox \"Material simulado B1 099 frasco\" [checked]\n      - text: Material simulado B1 099 frasco\n      - paragraph: \"Família · saldo confirmado deste produto: consulta indisponível\"\n      - text: Estoque observado com a equipe\n      - spinbutton \"Estoque observado com a equipe\": \"1.5\"\n      - checkbox \"Reposição urgente\"\n      - text: Reposição urgente\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:22:06.540Z",
+      "role": "adminA",
+      "label": "com-100",
+      "path": "/fichas/com",
+      "width": 390,
+      "state": "READY",
+      "note": "Only top viewport and source field behavior; browser-injected fictional catalog. No final command.",
+      "file": "b17-followup-adminA-com-100.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Compra de insumos\nEtapa 3 de 6\nHigiene\nIdentificação\nMedicamentos\n3\nHigiene\n4\nDieta\n5\nObservações\n6\nRevisão\n\nCOM · HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nHigiene\nLer código de barras\nLer de uma foto\nCódigo manual\nIdentificar\nMaterial simulado B1 000 — nome longo para avaliar quebra e unidade\nfrasco\nMaterial simulado B1 001\nfrasco\nMaterial simulado B1 002\nfrasco\nMaterial simulado B1 003\nfrasco\nMaterial simulado B1 004\nfrasco\nMaterial simulado B1 005\nfrasco\nMaterial simulado B1 006\nfrasco\nMaterial simulado B1 007\nfrasco\nMaterial simulado B1 008\nfrasco\nMaterial simulado B1 009\nfrasco\nMaterial simulado B1 010\nfrasco\nMaterial simulado B1 011\nfrasco\nMaterial simulado B1 012\nfrasco\nMaterial simulado B1 013\nfrasco\nMaterial simulado B1 014\nfrasco\nMaterial simulado B1 015\nfrasco\nMaterial simulado B1 016\nfrasco\nMaterial simulado B1 017\nfrasco\nMaterial simulado B1 018\nfrasco\nMaterial simulado B1 019\nfrasco\nMaterial simulado B1 020\nfrasco\nMaterial simulado B1 021\nfrasco\nMaterial simulado B1 022\nfrasco\nMaterial simulado B1 023\nfrasco\nMaterial simulado B1 024\nfrasco\nMaterial simulado B1 025\nfrasco\nMaterial simulado B1 026\nfrasco\nMaterial simulado B1 027\nfrasco\nMaterial simulado B1 028\nfrasco\nMaterial simulado B1 029\nfrasco\nMaterial simulado B1 030\nfrasco\nMaterial simulado B1 031\nfrasco\nMaterial simulado B1 032\nfrasco\nMaterial simulado B1 033\nfrasco\nMaterial simulado B1 034\nfrasco\nMaterial simulado B1 035\nfrasco\nMaterial simulado B1 036\nfrasco\nMaterial simulado B1 037\nfrasco\nMaterial simulado B1 038\nfrasco\nMaterial simulado B1 039\nfrasco\nMaterial simulado B1 040\nfrasco\nMaterial simulado B1 041\nfrasco\nMaterial simulado B1 042\nfrasco\nMaterial simulado B1 043\nfrasco\nMaterial simulado B1 044\nfrasco\nMaterial simulado B1 045\nfrasco\nMaterial simulado B1 046\nfrasco\nMaterial simulado B1 047\nfrasco\nMaterial simulado B1 048\nfrasco\nMaterial simulado B1 049\nfrasco\nMaterial simulado B1 050\nfrasco\nMaterial simulado B1 051\nfrasco\nMaterial simulado B1 052\nfrasco\nMaterial simulado B1 053\nfrasco\nMaterial simulado B1 054\nfrasco\nMaterial simulado B1 055\nfrasco\nMaterial simulado B1 056\nfrasco\nMaterial simulado B1 057\nfrasco\nMaterial simulado B1 058\nfrasco\nMaterial simulado B1 059\nfrasco\nMaterial simulado B1 060\nfrasco\nMaterial simulado B1 061\nfrasco\nMaterial simulado B1 062\nfrasco\nMaterial simulado B1 063\nfrasco\nMaterial simulado B1 064\nfrasco\nMaterial simulado B1 065\nfrasco\nMaterial simulado B1 066\nfrasco\nMaterial simulado B1 067\nfrasco\nMaterial simulado B1 068\nfrasco\nMaterial simulado B1 069\nfrasco\nMaterial simulado B1 070\nfrasco\nMaterial simulado B1 071\nfrasco\nMaterial simulado B1 072\nfrasco\nMaterial simulado B1 073\nfrasco\nMaterial simulado B1 074\nfrasco\nMaterial simulado B1 075\nfrasco\nMaterial simulado B1 076\nfrasco\nMaterial simulado B1 077\nfrasco\nMaterial simulado B1 078\nfrasco\nMaterial simulado B1 079\nfrasco\nMaterial simulado B1 080\nfrasco\nMaterial simulado B1 081\nfrasco\nMaterial simulado B1 082\nfrasco\nMaterial simulado B1 083\nfrasco\nMaterial simulado B1 084\nfrasco\nMaterial simulado B1 085\nfrasco\nMaterial simulado B1 086\nfrasco\nMaterial simulado B1 087\nfrasco\nMaterial simulado B1 088\nfrasco\nMaterial simulado B1 089\nfrasco\nMaterial simulado B1 090\nfrasco\nMaterial simulado B1 091\nfrasco\nMaterial simulado B1 092\nfrasco\nMaterial simulado B1 093\nfrasco\nMaterial simulado B1 094\nfrasco\nMaterial simulado B1 095\nfrasco\nMaterial simulado B1 096\nfrasco\nMaterial simulado B1 097\nfrasco\nMaterial simulado B1 098\nfrasco\nMaterial simulado B1 099\nfrasco\nVoltar\nSalvar rascunho\nAvançar",
+      "snapshot": "- main:\n  - heading \"Compra de insumos\" [level=1]\n  - navigation \"Etapas da COM\":\n    - text: Etapa 3 de 6\n    - strong: Higiene\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Identificação\"\n      - listitem:\n        - button \"Medicamentos\"\n      - listitem:\n        - button \"3 Higiene\"\n      - listitem:\n        - button \"4 Dieta\" [disabled]\n      - listitem:\n        - button \"5 Observações\" [disabled]\n      - listitem:\n        - button \"6 Revisão\" [disabled]\n  - paragraph: COM · Homologação fictícia V4 9482191c\n  - heading \"Higiene\" [level=2]\n  - group:\n    - button \"Ler código de barras\"\n    - text: Ler de uma foto\n    - button \"Ler de uma foto\"\n    - text: Código manual\n    - textbox \"Código manual\":\n      - /placeholder: EAN / GTIN / UPC\n    - button \"Identificar\" [disabled]\n    - checkbox \"Material simulado B1 000 — nome longo para avaliar quebra e unidade frasco\"\n    - strong: Material simulado B1 000 — nome longo para avaliar quebra e unidade\n    - text: frasco\n    - checkbox \"Material simulado B1 001 frasco\"\n    - strong: Material simulado B1 001\n    - text: frasco\n    - checkbox \"Material simulado B1 002 frasco\"\n    - strong: Material simulado B1 002\n    - text: frasco\n    - checkbox \"Material simulado B1 003 frasco\"\n    - strong: Material simulado B1 003\n    - text: frasco\n    - checkbox \"Material simulado B1 004 frasco\"\n    - strong: Material simulado B1 004\n    - text: frasco\n    - checkbox \"Material simulado B1 005 frasco\"\n    - strong: Material simulado B1 005\n    - text: frasco\n    - checkbox \"Material simulado B1 006 frasco\"\n    - strong: Material simulado B1 006\n    - text: frasco\n    - checkbox \"Material simulado B1 007 frasco\"\n    - strong: Material simulado B1 007\n    - text: frasco\n    - checkbox \"Material simulado B1 008 frasco\"\n    - strong: Material simulado B1 008\n    - text: frasco\n    - checkbox \"Material simulado B1 009 frasco\"\n    - strong: Material simulado B1 009\n    - text: frasco\n    - checkbox \"Material simulado B1 010 frasco\"\n    - strong: Material simulado B1 010\n    - text: frasco\n    - checkbox \"Material simulado B1 011 frasco\"\n    - strong: Material simulado B1 011\n    - text: frasco\n    - checkbox \"Material simulado B1 012 frasco\"\n    - strong: Material simulado B1 012\n    - text: frasco\n    - checkbox \"Material simulado B1 013 frasco\"\n    - strong: Material simulado B1 013\n    - text: frasco\n    - checkbox \"Material simulado B1 014 frasco\"\n    - strong: Material simulado B1 014\n    - text: frasco\n    - checkbox \"Material simulado B1 015 frasco\"\n    - strong: Material simulado B1 015\n    - text: frasco\n    - checkbox \"Material simulado B1 016 frasco\"\n    - strong: Material simulado B1 016\n    - text: frasco\n    - checkbox \"Material simulado B1 017 frasco\"\n    - strong: Material simulado B1 017\n    - text: frasco\n    - checkbox \"Material simulado B1 018 frasco\"\n    - strong: Material simulado B1 018\n    - text: frasco\n    - checkbox \"Material simulado B1 019 frasco\"\n    - strong: Material simulado B1 019\n    - text: frasco\n    - checkbox \"Material simulado B1 020 frasco\"\n    - strong: Material simulado B1 020\n    - text: frasco\n    - checkbox \"Material simulado B1 021 frasco\"\n    - strong: Material simulado B1 021\n    - text: frasco\n    - checkbox \"Material simulado B1 022 frasco\"\n    - strong: Material simulado B1 022\n    - text: frasco\n    - checkbox \"Material simulado B1 023 frasco\"\n    - strong: Material simulado B1 023\n    - text: frasco\n    - checkbox \"Material simulado B1 024 frasco\"\n    - strong: Material simulado B1 024\n    - text: frasco\n    - checkbox \"Material simulado B1 025 frasco\"\n    - strong: Material simulado B1 025\n    - text: frasco\n    - checkbox \"Material simulado B1 026 frasco\"\n    - strong: Material simulado B1 026\n    - text: frasco\n    - checkbox \"Material simulado B1 027 frasco\"\n    - strong: Material simulado B1 027\n    - text: frasco\n    - checkbox \"Material simulado B1 028 frasco\"\n    - strong: Material simulado B1 028\n    - text: frasco\n    - checkbox \"Material simulado B1 029 frasco\"\n    - strong: Material simulado B1 029\n    - text: frasco\n    - checkbox \"Material simulado B1 030 frasco\"\n    - strong: Material simulado B1 030\n    - text: frasco\n    - checkbox \"Material simulado B1 031 frasco\"\n    - strong: Material simulado B1 031\n    - text: frasco\n    - checkbox \"Material simulado B1 032 frasco\"\n    - strong: Material simulado B1 032\n    - text: frasco\n    - checkbox \"Material simulado B1 033 frasco\"\n    - strong: Material simulado B1 033\n    - text: frasco\n    - checkbox \"Material simulado B1 034 frasco\"\n    - strong: Material simulado B1 034\n    - text: frasco\n    - checkbox \"Material simulado B1 035 frasco\"\n    - strong: Material simulado B1 035\n    - text: frasco\n    - checkbox \"Material simulado B1 036 frasco\"\n    - strong: Material simulado B1 036\n    - text: frasco\n    - checkbox \"Material simulado B1 037 frasco\"\n    - strong: Material simulado B1 037\n    - text: frasco\n    - checkbox \"Material simulado B1 038 frasco\"\n    - strong: Material simulado B1 038\n    - text: frasco\n    - checkbox \"Material simulado B1 039 frasco\"\n    - strong: Material simulado B1 039\n    - text: frasco\n    - checkbox \"Material simulado B1 040 frasco\"\n    - strong: Material simulado B1 040\n    - text: frasco\n    - checkbox \"Material simulado B1 041 frasco\"\n    - strong: Material simulado B1 041\n    - text: frasco\n    - checkbox \"Material simulado B1 042 frasco\"\n    - strong: Material simulado B1 042\n    - text: frasco\n    - checkbox \"Material simulado B1 043 frasco\"\n    - strong: Material simulado B1 043\n    - text: frasco\n    - checkbox \"Material simulado B1 044 frasco\"\n    - strong: Material simulado B1 044\n    - text: frasco\n    - checkbox \"Material simulado B1 045 frasco\"\n    - strong: Material simulado B1 045\n    - text: frasco\n    - checkbox \"Material simulado B1 046 frasco\"\n    - strong: Material simulado B1 046\n    - text: frasco\n    - checkbox \"Material simulado B1 047 frasco\"\n    - strong: Material simulado B1 047\n    - text: frasco\n    - checkbox \"Material simulado B1 048 frasco\"\n    - strong: Material simulado B1 048\n    - text: frasco\n    - checkbox \"Material simulado B1 049 frasco\"\n    - strong: Material simulado B1 049\n    - text: frasco\n    - checkbox \"Material simulado B1 050 frasco\"\n    - strong: Material simulado B1 050\n    - text: frasco\n    - checkbox \"Material simulado B1 051 frasco\"\n    - strong: Material simulado B1 051\n    - text: frasco\n    - checkbox \"Material simulado B1 052 frasco\"\n    - strong: Material simulado B1 052\n    - text: frasco\n    - checkbox \"Material simulado B1 053 frasco\"\n    - strong: Material simulado B1 053\n    - text: frasco\n    - checkbox \"Material simulado B1 054 frasco\"\n    - strong: Material simulado B1 054\n    - text: frasco\n    - checkbox \"Material simulado B1 055 frasco\"\n    - strong: Material simulado B1 055\n    - text: frasco\n    - checkbox \"Material simulado B1 056 frasco\"\n    - strong: Material simulado B1 056\n    - text: frasco\n    - checkbox \"Material simulado B1 057 frasco\"\n    - strong: Material simulado B1 057\n    - text: frasco\n    - checkbox \"Material simulado B1 058 frasco\"\n    - strong: Material simulado B1 058\n    - text: frasco\n    - checkbox \"Material simulado B1 059 frasco\"\n    - strong: Material simulado B1 059\n    - text: frasco\n    - checkbox \"Material simulado B1 060 frasco\"\n    - strong: Material simulado B1 060\n    - text: frasco\n    - checkbox \"Material simulado B1 061 frasco\"\n    - strong: Material simulado B1 061\n    - text: frasco\n    - checkbox \"Material simulado B1 062 frasco\"\n    - strong: Material simulado B1 062\n    - text: frasco\n    - checkbox \"Material simulado B1 063 frasco\"\n    - strong: Material simulado B1 063\n    - text: frasco\n    - checkbox \"Material simulado B1 064 frasco\"\n    - strong: Material simulado B1 064\n    - text: frasco\n    - checkbox \"Material simulado B1 065 frasco\"\n    - strong: Material simulado B1 065\n    - text: frasco\n    - checkbox \"Material simulado B1 066 frasco\"\n    - strong: Material simulado B1 066\n    - text: frasco\n    - checkbox \"Material simulado B1 067 frasco\"\n    - strong: Material simulado B1 067\n    - text: frasco\n    - checkbox \"Material simulado B1 068 frasco\"\n    - strong: Material simulado B1 068\n    - text: frasco\n    - checkbox \"Material simulado B1 069 frasco\"\n    - strong: Material simulado B1 069\n    - text: frasco\n    - checkbox \"Material simulado B1 070 frasco\"\n    - strong: Material simulado B1 070\n    - text: frasco\n    - checkbox \"Material simulado B1 071 frasco\"\n    - strong: Material simulado B1 071\n    - text: frasco\n    - checkbox \"Material simulado B1 072 frasco\"\n    - strong: Material simulado B1 072\n    - text: frasco\n    - checkbox \"Material simulado B1 073 frasco\"\n    - strong: Material simulado B1 073\n    - text: frasco\n    - checkbox \"Material simulado B1 074 frasco\"\n    - strong: Material simulado B1 074\n    - text: frasco\n    - checkbox \"Material simulado B1 075 frasco\"\n    - strong: Material simulado B1 075\n    - text: frasco\n    - checkbox \"Material simulado B1 076 frasco\"\n    - strong: Material simulado B1 076\n    - text: frasco\n    - checkbox \"Material simulado B1 077 frasco\"\n    - strong: Material simulado B1 077\n    - text: frasco\n    - checkbox \"Material simulado B1 078 frasco\"\n    - strong: Material simulado B1 078\n    - text: frasco\n    - checkbox \"Material simulado B1 079 frasco\"\n    - strong: Material simulado B1 079\n    - text: frasco\n    - checkbox \"Material simulado B1 080 frasco\"\n    - strong: Material simulado B1 080\n    - text: frasco\n    - checkbox \"Material simulado B1 081 frasco\"\n    - strong: Material simulado B1 081\n    - text: frasco\n    - checkbox \"Material simulado B1 082 frasco\"\n    - strong: Material simulado B1 082\n    - text: frasco\n    - checkbox \"Material simulado B1 083 frasco\"\n    - strong: Material simulado B1 083\n    - text: frasco\n    - checkbox \"Material simulado B1 084 frasco\"\n    - strong: Material simulado B1 084\n    - text: frasco\n    - checkbox \"Material simulado B1 085 frasco\"\n    - strong: Material simulado B1 085\n    - text: frasco\n    - checkbox \"Material simulado B1 086 frasco\"\n    - strong: Material simulado B1 086\n    - text: frasco\n    - checkbox \"Material simulado B1 087 frasco\"\n    - strong: Material simulado B1 087\n    - text: frasco\n    - checkbox \"Material simulado B1 088 frasco\"\n    - strong: Material simulado B1 088\n    - text: frasco\n    - checkbox \"Material simulado B1 089 frasco\"\n    - strong: Material simulado B1 089\n    - text: frasco\n    - checkbox \"Material simulado B1 090 frasco\"\n    - strong: Material simulado B1 090\n    - text: frasco\n    - checkbox \"Material simulado B1 091 frasco\"\n    - strong: Material simulado B1 091\n    - text: frasco\n    - checkbox \"Material simulado B1 092 frasco\"\n    - strong: Material simulado B1 092\n    - text: frasco\n    - checkbox \"Material simulado B1 093 frasco\"\n    - strong: Material simulado B1 093\n    - text: frasco\n    - checkbox \"Material simulado B1 094 frasco\"\n    - strong: Material simulado B1 094\n    - text: frasco\n    - checkbox \"Material simulado B1 095 frasco\"\n    - strong: Material simulado B1 095\n    - text: frasco\n    - checkbox \"Material simulado B1 096 frasco\"\n    - strong: Material simulado B1 096\n    - text: frasco\n    - checkbox \"Material simulado B1 097 frasco\"\n    - strong: Material simulado B1 097\n    - text: frasco\n    - checkbox \"Material simulado B1 098 frasco\"\n    - strong: Material simulado B1 098\n    - text: frasco\n    - checkbox \"Material simulado B1 099 frasco\"\n    - strong: Material simulado B1 099\n    - text: frasco\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Avançar\"",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "scenario": "observation-html-limit",
+      "maxLength": null,
+      "length": 1001
+    },
+    {
+      "scenario": "invalid-observation-ui",
+      "status": 400,
+      "code": "VALIDATION_ERROR",
+      "error": "Too big: expected string to have <=1000 characters",
+      "step": "Etapa 7 de 7\nRevisão",
+      "noDocument": true
+    },
+    {
+      "scenario": "density",
+      "type": "req",
+      "count": 1,
+      "before": 1,
+      "after": 1,
+      "searchAvailable": 1,
+      "elapsedMs": 1489,
+      "limits": "Synthetic browser response; not persisted or a user/remote benchmark"
+    },
+    {
+      "scenario": "density",
+      "type": "com",
+      "count": 1,
+      "before": 1,
+      "after": 1,
+      "searchAvailable": 0,
+      "elapsedMs": 1506,
+      "limits": "Synthetic browser response; not persisted or a user/remote benchmark"
+    },
+    {
+      "scenario": "density",
+      "type": "req",
+      "count": 5,
+      "before": 5,
+      "after": 1,
+      "searchAvailable": 1,
+      "elapsedMs": 1407,
+      "limits": "Synthetic browser response; not persisted or a user/remote benchmark"
+    },
+    {
+      "scenario": "density",
+      "type": "com",
+      "count": 5,
+      "before": 5,
+      "after": 5,
+      "searchAvailable": 0,
+      "elapsedMs": 1471,
+      "limits": "Synthetic browser response; not persisted or a user/remote benchmark"
+    },
+    {
+      "scenario": "density",
+      "type": "req",
+      "count": 20,
+      "before": 20,
+      "after": 1,
+      "searchAvailable": 1,
+      "elapsedMs": 1453,
+      "limits": "Synthetic browser response; not persisted or a user/remote benchmark"
+    },
+    {
+      "scenario": "density",
+      "type": "com",
+      "count": 20,
+      "before": 20,
+      "after": 20,
+      "searchAvailable": 0,
+      "elapsedMs": 1385,
+      "limits": "Synthetic browser response; not persisted or a user/remote benchmark"
+    },
+    {
+      "scenario": "density",
+      "type": "req",
+      "count": 100,
+      "before": 100,
+      "after": 1,
+      "searchAvailable": 1,
+      "elapsedMs": 1431,
+      "limits": "Synthetic browser response; not persisted or a user/remote benchmark"
+    },
+    {
+      "scenario": "number-format",
+      "dot": "1.5",
+      "comma": "1.5",
+      "locale": "pt-BR; Chromium key emulation; not physical keyboard"
+    },
+    {
+      "scenario": "density",
+      "type": "com",
+      "count": 100,
+      "before": 100,
+      "after": 100,
+      "searchAvailable": 0,
+      "elapsedMs": 1499,
+      "limits": "Synthetic browser response; not persisted or a user/remote benchmark"
+    }
+  ],
+  "finishedAt": "2026-10-29T04:22:08.250Z"
+}

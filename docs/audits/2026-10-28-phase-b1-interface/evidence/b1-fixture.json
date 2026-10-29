@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-29T03:18:43.084Z",
+  "finishedAt": "2026-10-29T03:18:48.119Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "localApi": "http://127.0.0.1:54321",
+  "externalSending": false,
+  "patient": "bee824b9-3ac4-487c-a155-10ebee811956",
+  "products": [
+    "patient-5b51329f-9731-4270-b9d9-f0ccad0a393f",
+    "patient-25b79387-94e9-4a7b-8dd8-c604ba42a9c6"
+  ],
+  "pro": {
+    "id": "29901a9c-aa9d-40e7-ace5-b24bd45bda59",
+    "email": "shift-8a19bf8f-278b-4334-9e01-805d4c29f891@example.invalid"
+  },
+  "req": "b8fc5ff1-826e-4acf-ab70-8c7b9950feb5",
+  "ent": "174bf9ba-72f4-4aad-ac79-91b8bbaa434c",
+  "com": "e0fb069b-a55b-4a62-8a90-f215fc82522d",
+  "shiftType": "e69469f8-9d0e-418c-8b7b-3859d23f1211",
+  "today": "2026-10-29",
+  "secondSeries": "fa7b619a-acc2-4b39-b4db-ddf5fcfebf93",
+  "mutations": [
+    "new synthetic patient and local memberships from reviewed setup",
+    "two synthetic catalog products",
+    "two family inbound ledger records, quantity 30 each",
+    "new official Auth shift-worker account",
+    "synthetic published shifts and activated BAL regime",
+    "REQ, ENT pending receipt and COM donation pending approval"
+  ],
+  "preservation": "Preexisting records retained. No cleanup; B1 fixture remains for inspection."
+}

@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-29T03:00:57.767Z",
+  "node": "v24.22.0",
+  "api": "http://127.0.0.1:54321",
+  "app": "http://127.0.0.1:3100",
+  "external": "false",
+  "flows": "false",
+  "fixtureKeys": [
+    "global",
+    "global2",
+    "adminA",
+    "adminB",
+    "supervisor",
+    "professional",
+    "family",
+    "reader",
+    "revoked",
+    "shared",
+    "unlinked"
+  ],
+  "patients": "114",
+  "migrations": "84",
+  "fixtureCredentialFilePresent": true
+}

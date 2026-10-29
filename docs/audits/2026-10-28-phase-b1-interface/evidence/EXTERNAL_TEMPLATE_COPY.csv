@@ -1,0 +1,337 @@
+"template","version","part","original_exact","approval","source","review","external_render","limits"
+"hca_req_nova_familia_v3","3","BODY","📋 *NOVA REQUISIÇÃO DE MATERIAIS*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_solicitante}}* solicitou materiais para os cuidados de *{{nome_paciente}}*.
+
+*Número da requisição:* {{numero_requisicao}}
+*Data:* {{data_hora}}
+*Itens solicitados:* {{quantidade_itens}}
+*Com urgência:* {{itens_urgentes}}
+
+O comprovante está anexado. Confira os itens e informe o atendimento no sistema. A solicitação continuará pendente até a confirmação das entregas.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_nova_familia_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_nova_familia_v3","3","BUTTON_URL","Ver requisição","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_confirmacao_autor_v3","3","BODY","✅ *REQUISIÇÃO ENVIADA*
+
+Olá, *{{nome_destinatario}}*!
+
+Sua requisição para *{{nome_paciente}}* foi registrada.
+
+*Número da requisição:* {{numero_requisicao}}
+*Data:* {{data_hora}}
+*Itens solicitados:* {{quantidade_itens}}
+*Itens urgentes:* {{itens_urgentes}}
+
+O comprovante está anexado. Você pode acompanhar o atendimento de cada item e verificar o andamento dos avisos enviados aos responsáveis pelo sistema.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_confirmacao_autor_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_confirmacao_autor_v3","3","BUTTON_URL","Acompanhar pedido","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_atendimento_parcial_v3","3","HEADER","REQUISIÇÃO PARCIALMENTE ATENDIDA","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_atendimento_parcial_v3","3","BODY","📦 *REQUISIÇÃO PARCIALMENTE ATENDIDA*
+
+Olá, *{{nome_destinatario}}*!
+
+A requisição *{{numero_requisicao}}*, feita em *{{data_hora}}* para *{{nome_paciente}}*, foi atendida em parte.
+
+*Itens já atendidos:* {{itens_atendidos}}
+*Itens ainda pendentes:* {{itens_pendentes}}
+*Último recebimento confirmado por:* {{nome_recebedor}}
+
+Os demais itens continuam em aberto. Consulte o acompanhamento para conferir exatamente o que falta entregar.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_atendimento_parcial_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_atendimento_parcial_v3","3","BUTTON_URL","Ver pendências","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_concluida_v3","3","HEADER","REQUISIÇÃO ATENDIDA","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_concluida_v3","3","BODY","✅ *REQUISIÇÃO ATENDIDA*
+
+Olá, *{{nome_destinatario}}*!
+
+Todos os itens da requisição *{{numero_requisicao}}*, emitida em *{{data_hora}}* para *{{nome_paciente}}*, foram atendidos.
+
+*Atendimento:* {{itens_atendidos}}
+*Última confirmação:* {{data_hora_conclusao}}
+*Confirmado por:* {{nome_recebedor}}
+
+O histórico das entregas permanece disponível para consulta.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_concluida_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_concluida_v3","3","BUTTON_URL","Ver comprovantes","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_pendentes_lembrete_v3","3","HEADER","PENDÊNCIAS DE REQUISIÇÃO","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_pendentes_lembrete_v3","3","BODY","⏳ *LEMBRETE DE MATERIAIS PENDENTES*
+
+Olá, *{{nome_destinatario}}*!
+
+A requisição *{{numero_requisicao}}*, de *{{data_hora}}*, ainda possui materiais não atendidos para *{{nome_paciente}}*.
+
+*Itens pendentes:* {{itens_pendentes}} de {{itens_total}}
+*Itens urgentes na solicitação:* {{itens_urgentes}}
+
+Confira a lista atualizada e registre o fornecimento quando ocorrer. Este aviso é apenas um lembrete; o pedido original continua válido.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_pendentes_lembrete_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_pendentes_lembrete_v3","3","BUTTON_URL","Consultar pendências","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_com_aprovacao_v3","3","HEADER","COMPRA AGUARDANDO APROVAÇÃO","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_aprovacao_v3","3","BODY","🛒 *COMPRA AGUARDANDO APROVAÇÃO*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_solicitante}}* preparou uma relação de materiais para aquisição destinada a *{{nome_paciente}}*.
+
+*Número da compra:* {{numero_compra}}
+*Data:* {{data_hora}}
+*Itens relacionados:* {{quantidade_itens}}
+
+Confira os produtos, as quantidades e a necessidade de reposição antes de aprovar a compra.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_aprovacao_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_aprovacao_v3","3","BUTTON_URL","Revisar compra","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_com_validar_recebimento_v3","3","HEADER","RECEBIMENTO DE COMPRA PENDENTE","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_validar_recebimento_v3","3","BODY","📥 *RECEBIMENTO AGUARDANDO VALIDAÇÃO*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_comprador}}* informou o recebimento de materiais para o estoque da família de *{{nome_paciente}}*.
+
+*Número da compra:* {{numero_compra}}
+*Data:* {{data_hora}}
+*Itens informados:* {{quantidade_itens}}
+
+Antes de considerar os materiais disponíveis no estoque confirmado, revise o recebimento e faça a validação administrativa.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_validar_recebimento_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_validar_recebimento_v3","3","BUTTON_URL","Validar entrada","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_com_validada_v3","3","HEADER","COMPRA VALIDADA","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_validada_v3","3","BODY","✅ *MATERIAIS INCORPORADOS AO ESTOQUE*
+
+Olá, *{{nome_destinatario}}*!
+
+O recebimento vinculado à compra *{{numero_compra}}* foi validado por *{{nome_validador}}*.
+
+*Paciente:* {{nome_paciente}}
+*Data da validação:* {{data_hora_conclusao}}
+*Itens validados:* {{itens_recebidos}}
+
+Os movimentos correspondentes estão disponíveis no histórico do estoque familiar. A validação não significa entrega à equipe.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_validada_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_com_validada_v3","3","BUTTON_URL","Ver recebimento","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_expedida_pdf_v3","3","BODY","📦 *ENTREGA DE MATERIAIS REGISTRADA*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_entregador}}* informou uma entrega de materiais para *{{nome_paciente}}*.
+
+*Número da entrega:* {{numero_entrega}}
+*Data:* {{data_hora}}
+*Entregue por:* {{nome_entregador}}
+*Recebedor designado:* {{nome_recebedor}}
+*Itens declarados:* {{quantidade_itens}}
+
+O comprovante está anexado. O recebimento ainda depende da conferência pela pessoa indicada.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_expedida_pdf_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_expedida_pdf_v3","3","BUTTON_URL","Acompanhar entrega","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_confirmar_pdf_v3","3","BODY","📋 *PRECISAMOS DA SUA CONFERÊNCIA*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_entregador}}* acabou de registrar uma entrega de materiais para *{{nome_paciente}}* e informou você como responsável pelo recebimento.
+
+*Número da entrega:* {{numero_entrega}}
+*Data:* {{data_hora}}
+*Quem entregou:* {{nome_entregador}}
+*Quem recebe:* {{nome_recebedor}}
+*Itens declarados:* {{quantidade_itens}}
+
+Confira o PDF anexo e veja se os materiais e as quantidades estão corretos. Se estiver tudo certo, confirme o recebimento. Se notar qualquer diferença, informe a divergência.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_confirmar_pdf_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_confirmar_pdf_v3","3","BUTTON_QUICK_REPLY","Confirmar tudo","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_confirmar_pdf_v3","3","BUTTON_URL","Informar diferença","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_divergencia_v3","3","HEADER","DIVERGÊNCIA NA ENTREGA","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_divergencia_v3","3","BODY","⚠️ *DIFERENÇA NA CONFERÊNCIA*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_recebedor}}* conferiu a entrega *{{numero_entrega}}* de *{{data_hora}}* para *{{nome_paciente}}* e informou uma diferença.
+
+*Linhas integralmente conferidas:* {{itens_conferidos}}
+*Linhas com diferença:* {{itens_divergentes}}
+*Situação:* aguardando regularização.
+
+Os materiais aceitos permanecem registrados. Consulte a ocorrência para identificar os itens que exigem providência.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_divergencia_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_divergencia_v3","3","BUTTON_URL","Ver divergências","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_regularizada_v3","3","HEADER","ENTREGA REGULARIZADA","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_regularizada_v3","3","BODY","🔄 *DIVERGÊNCIA ATUALIZADA*
+
+Olá, *{{nome_destinatario}}*!
+
+A situação da entrega *{{numero_entrega}}*, referente a *{{nome_paciente}}*, foi atualizada por *{{nome_responsavel}}*.
+
+*Data da atualização:* {{data_hora}}
+*Linhas ainda com diferença:* {{itens_divergentes}}
+
+Consulte as providências registradas e confira se ainda existe alguma ação pendente. O histórico original da entrega foi preservado.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_regularizada_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_regularizada_v3","3","BUTTON_URL","Revisar entrega","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_concluida_pdf_v3","3","BODY","✅ *RECEBIMENTO CONFIRMADO*
+
+Olá, *{{nome_destinatario}}*!
+
+O recebimento da entrega *{{numero_entrega}}*, registrada em *{{data_hora}}* para *{{nome_paciente}}*, foi concluído.
+
+*Entregue por:* {{nome_entregador}}
+*Recebido por:* {{nome_recebedor}}
+*Itens conferidos:* {{itens_conferidos}}
+*Confirmação:* {{data_hora_conclusao}}
+
+O comprovante atualizado está anexado. As etapas de conferência e eventuais resoluções continuam disponíveis no histórico.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_concluida_pdf_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_concluida_pdf_v3","3","BUTTON_URL","Ver comprovante","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_cancelamento_v3","3","HEADER","REVISÃO DE CANCELAMENTO","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_cancelamento_v3","3","BODY","🔐 *REVISÃO DE CANCELAMENTO DE ENTREGA*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_responsavel}}* solicitou uma revisão de cancelamento da entrega *{{numero_entrega}}*, referente a *{{nome_paciente}}*.
+
+*Data do pedido:* {{data_hora}}
+*Recebedor original:* {{nome_recebedor}}
+
+Sua manifestação é necessária quando você foi o responsável pelo aceite original. Consulte o motivo e as consequências da alteração antes de decidir.
+
+A operação preservará o histórico e exigirá movimentos de estoque compatíveis com o ocorrido.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_cancelamento_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_cancelamento_v3","3","BUTTON_URL","Revisar solicitação","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_bal_lembrete_v3","3","HEADER","CONTAGEM SEMANAL","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_lembrete_v3","3","BODY","📊 *CONTAGEM SEMANAL DO ESTOQUE*
+
+Olá, *{{nome_destinatario}}*!
+
+Está prevista a conferência física dos materiais sob responsabilidade da equipe de cuidado de *{{nome_paciente}}*.
+
+*Data prevista:* {{data_prevista}}
+*Produtos no catálogo:* {{quantidade_itens}}
+
+Quando realizar a contagem, informe as quantidades encontradas. O balanço permite ajustar diferenças provocadas pelo consumo diário e por materiais fracionados.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_lembrete_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_lembrete_v3","3","BUTTON_URL","Iniciar balanço","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_bal_aprovacao_v3","3","HEADER","BALANÇO PARA REVISÃO","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_aprovacao_v3","3","BODY","📋 *BALANÇO AGUARDANDO SUA REVISÃO*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_contador}}* concluiu a contagem do estoque da equipe de *{{nome_paciente}}*.
+
+*Número do balanço:* {{numero_balanco}}
+*Data:* {{data_hora}}
+*Itens conferidos:* {{quantidade_itens}}
+*Itens com diferença:* {{itens_divergentes}}
+
+Revise os números e as justificativas antes da aprovação, de acordo com as permissões configuradas para este paciente.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_aprovacao_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_aprovacao_v3","3","BUTTON_URL","Revisar balanço","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_bal_concluido_v3","3","HEADER","BALANÇO CONCLUÍDO","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_concluido_v3","3","BODY","✅ *BALANÇO DO ESTOQUE CONCLUÍDO*
+
+Olá, *{{nome_destinatario}}*!
+
+O balanço *{{numero_balanco}}* do estoque da equipe de *{{nome_paciente}}* foi concluído.
+
+*Responsável pela contagem:* {{nome_contador}}
+*Data da conclusão:* {{data_hora_conclusao}}
+*Itens conferidos:* {{quantidade_itens}}
+*Itens ajustados:* {{itens_ajustados}}
+
+As quantidades reconciliadas estão registradas no estoque, com histórico de ajustes e aprovações.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_concluido_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_bal_concluido_v3","3","BUTTON_URL","Consultar balanço","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_estoque_alerta_v3","3","HEADER","ALERTA DE ESTOQUE","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_estoque_alerta_v3","3","BODY","⚠️ *ATENÇÃO AO ESTOQUE*
+
+Olá, *{{nome_destinatario}}*!
+
+O estoque de *{{nome_produto}}* precisa ser verificado para *{{nome_paciente}}*.
+
+*Local:* {{nome_local}}
+*Saldo confirmado:* {{saldo_atual}}
+*Mínimo configurado:* {{saldo_minimo}}
+*Data da verificação:* {{data_hora}}
+
+Confira o saldo e as entregas pendentes antes de providenciar novos materiais. O consumo entre balanços pode alterar a quantidade física disponível.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_estoque_alerta_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_estoque_alerta_v3","3","BUTTON_URL","Consultar produto","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_plantao_ocorrencia_v3","3","HEADER","OCORRÊNCIA DE PLANTÃO","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_plantao_ocorrencia_v3","3","BODY","📝 *PRECISOU DE ALGUM MATERIAL?*
+
+Olá, *{{nome_destinatario}}*!
+
+O seu período de trabalho nos cuidados de *{{nome_paciente}}* foi: *{{periodo_plantao}}*.
+
+Houve falta de material, consumo extraordinário ou alguma diferença que precise ser informada?
+
+Se ocorreu algo, registre uma observação rápida pelo formulário. Não é necessário declarar o uso rotineiro de cada item.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_plantao_ocorrencia_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_plantao_ocorrencia_v3","3","BUTTON_URL","Registrar ocorrência","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_plantao_ocorrencia_v3","3","BUTTON_QUICK_REPLY","Sem ocorrências","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_documento_atualizado_pdf_v3","3","BODY","📄 *COMPROVANTE ATUALIZADO*
+
+Olá, *{{nome_destinatario}}*!
+
+Foi gerada uma nova versão do documento *{{numero_documento}}*, referente a *{{nome_paciente}}*.
+
+*Atualizado por:* {{nome_responsavel}}
+*Data:* {{data_hora}}
+*Versão:* {{versao_documento}}
+
+O PDF atualizado está anexado. As versões anteriores continuam preservadas no histórico do Home Care Assistant.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_documento_atualizado_pdf_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_documento_atualizado_pdf_v3","3","BUTTON_URL","Abrir documento","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_conferencia_autenticada_v3","3","BODY","📦 *CONFIRA O RECEBIMENTO*
+
+Olá, *{{nome_destinatario}}*!
+
+*{{nome_entregador}}* registrou a entrega *{{numero_entrega}}* para *{{nome_paciente}}*. Você foi indicado para receber os materiais.
+
+*Data:* {{data_hora}}
+*Itens declarados:* {{quantidade_itens}}
+*Recebedor:* {{nome_recebedor}}
+
+Confira os produtos e as quantidades no PDF anexado. Para confirmar o que realmente recebeu ou informar qualquer diferença, abra o formulário seguro no sistema.
+
+*A entrega continua pendente até sua confirmação.*","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_conferencia_autenticada_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_conferencia_autenticada_v3","3","BUTTON_URL","Conferir entrega","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ent_aceite_pendente_v3","3","HEADER","LEMBRETE DE CONFIRMAÇÃO","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_aceite_pendente_v3","3","BODY","⏳ *RECEBIMENTO AINDA NÃO CONFIRMADO*
+
+Olá, *{{nome_destinatario}}*!
+
+A entrega *{{numero_entrega}}*, registrada por *{{nome_entregador}}* em *{{data_hora}}* para *{{nome_paciente}}*, continua aguardando sua conferência.
+
+*Itens declarados:* {{quantidade_itens}}
+
+Se já recebeu os materiais, confira as quantidades e confirme pelo aplicativo. Se houver diferença, registre uma divergência. A ausência de resposta não será tratada como aceite.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_aceite_pendente_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ent_aceite_pendente_v3","3","BUTTON_URL","Conferir agora","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_ocorrencia_recebida_v3","3","HEADER","OCORRÊNCIA REGISTRADA","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ocorrencia_recebida_v3","3","BODY","✅ *SUA OCORRÊNCIA FOI REGISTRADA*
+
+Olá, *{{nome_destinatario}}*!
+
+Recebemos sua comunicação sobre os materiais utilizados ou em falta para *{{nome_paciente}}*.
+
+*Data:* {{data_hora}}
+*Tipo de comunicação:* {{tipo_evento}}
+
+O relato ficará disponível para revisão dos responsáveis. Nenhuma movimentação de estoque será considerada definitiva antes das verificações previstas no sistema.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ocorrencia_recebida_v3","3","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_ocorrencia_recebida_v3","3","BUTTON_URL","Acompanhar ocorrência","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_registrada_autor_v4","4","HEADER","REQUISIÇÃO REGISTRADA","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_registrada_autor_v4","4","BODY","Olá, {{nome_destinatario}}! Sua requisição {{numero_requisicao}} para {{nome_paciente}}, registrada em {{data_hora}}, foi encaminhada para ciência familiar. São {{quantidade_itens}} itens, dos quais {{itens_urgentes}} urgentes. Você receberá uma nova mensagem com o PDF atualizado quando a ciência exigida estiver registrada. Acompanhe pelo sistema; o PDF de emissão já está disponível, identificado com ciência pendente.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_registrada_autor_v4","4","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_registrada_autor_v4","4","BUTTON_URL","Consultar requisição","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_ciencia_familia_v4","4","BODY","Olá, {{nome_destinatario}}! {{nome_solicitante}} registrou a requisição {{numero_requisicao}} para {{nome_paciente}} em {{data_hora}}, com {{quantidade_itens}} itens. Consulte o PDF e registre sua ciência no aplicativo. A confirmação de ciência é independente do recebimento dos materiais; somente uma ENT recebida atende os itens.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_ciencia_familia_v4","4","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_ciencia_familia_v4","4","BUTTON_URL","Consultar requisição","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_ciencia_registrada_autor_v4","4","BODY","Olá, {{nome_destinatario}}! A ciência familiar exigida da requisição {{numero_requisicao}} para {{nome_paciente}} foi registrada. Responsável: {{nome_responsavel}}. Origem da evidência: {{origem_ciencia}}. Data: {{data_hora_conclusao}}. O PDF atualizado, versão {{versao_documento}}, está anexado. O atendimento dos materiais continua dependendo dos recebimentos válidos das entregas vinculadas.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_ciencia_registrada_autor_v4","4","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_ciencia_registrada_autor_v4","4","BUTTON_URL","Consultar requisição","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_ciencia_simplificada_v4","4","BODY","Olá, {{nome_destinatario}}! {{nome_solicitante}} registrou a requisição {{numero_requisicao}} para {{nome_paciente}} em {{data_hora}}, com {{quantidade_itens}} itens. Consulte o PDF e confirme sua ciência pelo botão autorizado ou pelo aplicativo. A confirmação de ciência é independente do recebimento dos materiais; somente uma ENT recebida atende os itens.","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_ciencia_simplificada_v4","4","FOOTER","Home Care Assistant • Mensagem automática","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","Parameters and provider approval/state can change; no external send"
+"hca_req_ciencia_simplificada_v4","4","BUTTON_QUICK_REPLY","Confirmar ciência","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
+"hca_req_ciencia_simplificada_v4","4","BUTTON_URL","Consultar requisição","PREPARED","src/lib/notifications/template-catalog.json","REVIEWED_STATIC_COPY_ONLY","NOT_VERIFIED","No quick reply or URL action submitted to provider"
