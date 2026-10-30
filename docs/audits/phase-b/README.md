@@ -9,8 +9,8 @@ A criação de novos grupos depende da autorização correspondente.
 - B7.0–B7.12: diagnóstico de infraestrutura e prontidão operacional concluído
   em 30/10/2026, sem correções. Sete registros (cinco P2/dois P3), dez provas
   locais controladas, 16 referências anteriores e 31 cenários reconciliados.
-  NO-GO preservado. Commit documental autorizado; push depende de impedir
-  preview automático, conforme a proibição de deploy/configuração da missão.
+  NO-GO preservado. Publicação documental com preview automático autorizada
+  posteriormente pelo responsável; configuração de provedor preservada.
 - [Executivo B7](../2026-10-30-phase-b7-operational-readiness/17_GROUP_B7_EXECUTIVE_ASSESSMENT.md).
 - [Índice B7](../2026-10-30-phase-b7-operational-readiness/README.md).
 - [Achados B7](../2026-10-30-phase-b7-operational-readiness/14_FINDINGS_MASTER.md).

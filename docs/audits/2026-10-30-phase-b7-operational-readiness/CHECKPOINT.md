@@ -10,14 +10,15 @@ funcional `37cb7f85e96e551d6419871f94dd950712e2565b`; `master` preservada em
 - Ordem mestra e objetivo lidos integralmente.
 - B7.0 concluído: baseline local/remoto e fontes reconciliadas.
 - B7.0–B7.12 e consolidação concluídos; validação final em evidence.
-- Commit documental autorizado após validação; publicação condicionada à guarda
-  real de não deployment descrita abaixo.
+- Commit documental f59ed2e validado. Publicação com preview automático
+  autorizada posteriormente; ver PUBLICATION_AUTHORIZATION.md em evidence.
 - Não repetir suítes globais, replay, build ou testes anteriores sem hipótese
   nova.
-- Não corrigir produto, configurar provedor, restaurar, publicar deploy, criar
-  PR, fazer merge ou iniciar C.
+- Não corrigir produto, configurar provedor, restaurar, promover produção, criar
+  PR, fazer merge ou iniciar C. Preview automático autorizado no push.
 - Escrever somente neste pacote e, no fechamento, no índice `phase-b`.
-- Commit/push documental único após validação e preservação.
+- Commit documental inicial e fechamento da autorização, publicados juntos após
+  validação e preservação; nenhuma configuração funcional alterada.
 
 ## Limites já identificados
 
@@ -162,3 +163,13 @@ Manifesto guarda hashes locais brutos e hashes de texto normalizado LF para
 checkout Git com CRLF. O diagnóstico está completo e o commit deve permanecer
 estritamente documental. Verificar git log/status para a referência efetiva; o
 SHA do próprio commit não pode constar do conteúdo que o determina.
+
+## Resolução posterior da publicação
+
+O responsável autorizou o preview automático do push documental em 30/10/2026,
+após o diagnóstico e o commit f59ed2e. Ver
+[autorização](evidence/PUBLICATION_AUTHORIZATION.md). A alternativa de alterar
+vercel.json não foi aplicada. A publicação pode prosseguir com verificação de
+SHA/ref e status Vercel, preservando o escopo documental e a master. A hipótese
+e o impedimento originais acima permanecem como histórico da investigação; esta
+decisão resolve a pendência sem iniciar a Fase C.

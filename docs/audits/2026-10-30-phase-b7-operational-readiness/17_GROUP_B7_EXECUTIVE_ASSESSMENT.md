@@ -2,9 +2,9 @@
 
 A infraestrutura tem uma base verificável, mas ainda não há prova suficiente
 para aprovar o primeiro uso real. O NO-GO anterior permanece. B7.0–B7.12
-terminaram como diagnóstico; não houve correção, migration, reset, restore,
-alteração de provedor, mensagem real, deploy, PR, merge ou início de C. A
-publicação documental tem uma dependência específica descrita ao final.
+terminaram como diagnóstico, sem correção, migration, reset, restore, alteração
+de provedor, mensagem real, deploy manual, PR, merge ou início de C. Depois, o
+responsável autorizou o preview automático associado ao push documental.
 
 ## O que foi demonstrado e deve ser preservado
 
@@ -96,3 +96,13 @@ createDeployments=disabled como guarda de não implantação: é opção de regi
 GitHub. Concluir commit documental é autorizado; publicar depende de um bloqueio
 real de auto-deploy ou autorização específica para a exceção mínima que o
 estabeleça. Não disparar preview para testar essa hipótese.
+
+## Resolução posterior da publicação
+
+O responsável autorizou o preview automático do push documental em 30/10/2026,
+após o diagnóstico e o commit f59ed2e. Ver
+[autorização](evidence/PUBLICATION_AUTHORIZATION.md). A alternativa de alterar
+vercel.json não foi aplicada. A publicação pode prosseguir com verificação de
+SHA/ref e status Vercel, preservando o escopo documental e a master. A hipótese
+e o impedimento originais acima permanecem como histórico da investigação; esta
+decisão resolve a pendência sem iniciar a Fase C.

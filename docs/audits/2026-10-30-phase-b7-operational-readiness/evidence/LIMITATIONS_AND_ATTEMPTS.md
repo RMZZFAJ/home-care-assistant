@@ -83,3 +83,12 @@ guarda real antes do push. Finalizar pacote/validação/commit e solicitar somen
 a decisão concreta ainda necessária, sem encerrar C ou produzir implantação
 indireta. Conferir ref e deployments após eventual publicação autorizada e
 registrar o resultado sem alegar CI do novo SHA.
+
+## Atualização de autorização
+
+A coleta encerrou-se antes do push. Depois de validar e commitar o diagnóstico,
+o responsável autorizou permitir seu preview automático. Ver
+[autorização](PUBLICATION_AUTHORIZATION.md). Publicar os documentos passa a ser
+permitido com esse efeito; os limites de dados, código, provedor e demais fases
+continuam preservados. Não se alegará ausência de deployment automático no
+encerramento; somente ausência de deploy manual/promoção e de mutação funcional.

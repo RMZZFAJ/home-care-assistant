@@ -223,7 +223,7 @@ report = {'recordedAt': datetime.now(timezone.utc).isoformat(),
           'helperChecksReusedByExactHash': '--documents-only' in sys.argv,
           'notRun': ['global build/typecheck/lint/unit/E2E', 'migration replay',
                      'restore', 'remote mutation', 'deploy or workflow dispatch'],
-          'publication': 'LOCAL_DOCUMENT_COMMIT_AUTHORIZED; PUSH_REQUIRES_NO_DEPLOY_GUARD'}
+          'publication': 'DOCUMENT_PUSH_AND_AUTOMATIC_PREVIEW_AUTHORIZED_BY_LATER_USER_INSTRUCTION'}
 (evidence / 'package-validation.json').write_text(
     json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 manifest = {'recordedAt': datetime.now(timezone.utc).isoformat(),

@@ -63,15 +63,14 @@ conclusões sem repetir ensaios. Manifesto SHA-256 e validador ficam em evidence
 Dumps, credenciais, dados pessoais e valores secretos não integram o pacote.
 Validar documentação e auxiliares não homologa o produto.
 
-## Dependência da publicação
+## Publicação autorizada posteriormente
 
-O commit documental é autorizado, mas o push exige impedir preview automático.
-Há deployments recentes source=git desta branch. A OpenAPI demonstra que
-createDeployments=disabled controla registros GitHub, sem garantir bloqueio de
-deploy Vercel. O vercel.json não contém git.deploymentEnabled=false para a
-branch. Não publicar para testar; a exceção mínima proposta está no handoff, sem
-aplicação. O diagnóstico fica revisável e commitado antes da decisão adicional
-necessária.
+Depois da validação e do commit documental f59ed2e, o responsável autorizou
+permitir o preview automático decorrente do push. A decisão está em [Autorização
+de publicação](evidence/PUBLICATION_AUTHORIZATION.md). O pacote e o índice
+continuam sendo os únicos arquivos alterados. Os metadados Git/Vercel do
+encerramento permitem verificar a publicação e o SHA efetivo; isso não constitui
+GO para operação real.
 
 ## Validação final
 

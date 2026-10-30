@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-10-30T22:39:30.176055+00:00",
+  "recordedAt": "2026-10-30T22:43:45.340049+00:00",
   "algorithm": "SHA-256",
   "verification": "sha256_lf normalizes CRLF to LF for Git portability; raw sha256/bytes retain local collection identity",
   "scope": "All package files except MANIFEST.json",
@@ -153,24 +153,24 @@
     },
     {
       "path": "17_GROUP_B7_EXECUTIVE_ASSESSMENT.md",
-      "bytes": 5804,
-      "sha256": "2a6017807d3dde17ce145653ee7cef8afd0903f31db1db2af4657602ec16c3b2",
-      "bytes_lf": 5804,
-      "sha256_lf": "2a6017807d3dde17ce145653ee7cef8afd0903f31db1db2af4657602ec16c3b2"
+      "bytes": 6360,
+      "sha256": "964d031af7ac408f2efc30f0fa154cb28ff42fbc7e99287063213d01fc8086ca",
+      "bytes_lf": 6360,
+      "sha256_lf": "964d031af7ac408f2efc30f0fa154cb28ff42fbc7e99287063213d01fc8086ca"
     },
     {
       "path": "18_PHASE_C_DECISION_HANDOFF.md",
-      "bytes": 4656,
-      "sha256": "c99bb5c073f9c3283b4e428611309bbccc5212c697de5d3082bf05f10a15fdc3",
-      "bytes_lf": 4656,
-      "sha256_lf": "c99bb5c073f9c3283b4e428611309bbccc5212c697de5d3082bf05f10a15fdc3"
+      "bytes": 5205,
+      "sha256": "16e622b6badf9c8d5d2e116293df7f7ac84da02fd5efde59e9fea4546a0e8f82",
+      "bytes_lf": 5205,
+      "sha256_lf": "16e622b6badf9c8d5d2e116293df7f7ac84da02fd5efde59e9fea4546a0e8f82"
     },
     {
       "path": "CHECKPOINT.md",
-      "bytes": 8559,
-      "sha256": "9f95c64d893cd7be348a9ec10ac224bdd360bd0e9499987f1a1748f4ad4ac5ad",
-      "bytes_lf": 8559,
-      "sha256_lf": "9f95c64d893cd7be348a9ec10ac224bdd360bd0e9499987f1a1748f4ad4ac5ad"
+      "bytes": 9263,
+      "sha256": "b6366c977691b75df105949cffcd6b1ec78aa54f1af0a0c51bb6bbf9737bddba",
+      "bytes_lf": 9263,
+      "sha256_lf": "b6366c977691b75df105949cffcd6b1ec78aa54f1af0a0c51bb6bbf9737bddba"
     },
     {
       "path": "evidence/assemble-evidence.mjs",
@@ -286,10 +286,10 @@
     },
     {
       "path": "evidence/LIMITATIONS_AND_ATTEMPTS.md",
-      "bytes": 5498,
-      "sha256": "dd4c117480b5b7e186015a6f7a9e36fa77cd44e5dcb58d82580c0c6d880d9cf4",
-      "bytes_lf": 5498,
-      "sha256_lf": "dd4c117480b5b7e186015a6f7a9e36fa77cd44e5dcb58d82580c0c6d880d9cf4"
+      "bytes": 6006,
+      "sha256": "455a6dd7ee81bfdc0dc435f6561a78f9c8051a9c3b2bbfb33f11858a96a225d5",
+      "bytes_lf": 6006,
+      "sha256_lf": "455a6dd7ee81bfdc0dc435f6561a78f9c8051a9c3b2bbfb33f11858a96a225d5"
     },
     {
       "path": "evidence/markdown-initial-attempt.log",
@@ -321,10 +321,10 @@
     },
     {
       "path": "evidence/package-validation.json",
-      "bytes": 6989,
-      "sha256": "40c237a64d1bf9de988c8d04e296477de2f8b12b6a8ac3f130d619efdbacc5e5",
-      "bytes_lf": 6872,
-      "sha256_lf": "635cee0536ec8e3e5d299ef595c5ee63fd9f5f09fc2c405a034101295b66650b"
+      "bytes": 7174,
+      "sha256": "393012883da41b005c68c6fb3f7bbd759b610388d6436c0db48e648bff556aab",
+      "bytes_lf": 7057,
+      "sha256_lf": "9cee7652e70136ae535179f0b95c49b5332fb98b243557a8298b01f0437676a9"
     },
     {
       "path": "evidence/platform-contracts.json",
@@ -353,6 +353,13 @@
       "sha256": "a1bde0c80fe5ac565db31545ac98f66bdbb7e51505d8c2ccf7880893c78ba8b6",
       "bytes_lf": 57739,
       "sha256_lf": "a1bde0c80fe5ac565db31545ac98f66bdbb7e51505d8c2ccf7880893c78ba8b6"
+    },
+    {
+      "path": "evidence/PUBLICATION_AUTHORIZATION.md",
+      "bytes": 1175,
+      "sha256": "d3e15a6bfd7b0693bed870f3924b6a8a94b18ebf28e9939974530ed57a2773ce",
+      "bytes_lf": 1175,
+      "sha256_lf": "d3e15a6bfd7b0693bed870f3924b6a8a94b18ebf28e9939974530ed57a2773ce"
     },
     {
       "path": "evidence/remote-baseline.json",
@@ -447,10 +454,10 @@
     },
     {
       "path": "evidence/validate-package.py",
-      "bytes": 11576,
-      "sha256": "acf3b30707569206dc07247d73cc3386f3b0eabbb31d3153bc16865d1fa89065",
-      "bytes_lf": 11576,
-      "sha256_lf": "acf3b30707569206dc07247d73cc3386f3b0eabbb31d3153bc16865d1fa89065"
+      "bytes": 11585,
+      "sha256": "007fa507a6efca1e059c4b9bd61096a830ac99ece3dd59c62b9032c6026f65d4",
+      "bytes_lf": 11585,
+      "sha256_lf": "007fa507a6efca1e059c4b9bd61096a830ac99ece3dd59c62b9032c6026f65d4"
     },
     {
       "path": "evidence/vitest.audit.mts",
@@ -461,10 +468,10 @@
     },
     {
       "path": "README.md",
-      "bytes": 4467,
-      "sha256": "c269767ed53849b7c2d909e9242b7587f15473cf38684a6dd39650532955f79f",
-      "bytes_lf": 4467,
-      "sha256_lf": "c269767ed53849b7c2d909e9242b7587f15473cf38684a6dd39650532955f79f"
+      "bytes": 4409,
+      "sha256": "deadcdc1e7d3003691e128a99faf3e1dfbe2addddd71597df8b14390ec22e4d3",
+      "bytes_lf": 4409,
+      "sha256_lf": "deadcdc1e7d3003691e128a99faf3e1dfbe2addddd71597df8b14390ec22e4d3"
     }
   ]
 }

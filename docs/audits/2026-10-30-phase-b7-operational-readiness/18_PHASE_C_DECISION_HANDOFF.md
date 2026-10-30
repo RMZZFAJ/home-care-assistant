@@ -76,3 +76,13 @@ desconectar integrações, alterar provedor ou publicar preview sem instrução.
 O pacote e o commit devem ficar completos/revisáveis antes de solicitar essa
 decisão. Depois de resolvida, verificar ref remota e ausência de deployment do
 SHA final; não chamar documentação publicada de produção homologada.
+
+## Resolução posterior da publicação
+
+O responsável autorizou o preview automático do push documental em 30/10/2026,
+após o diagnóstico e o commit f59ed2e. Ver
+[autorização](evidence/PUBLICATION_AUTHORIZATION.md). A alternativa de alterar
+vercel.json não foi aplicada. A publicação pode prosseguir com verificação de
+SHA/ref e status Vercel, preservando o escopo documental e a master. A hipótese
+e o impedimento originais acima permanecem como histórico da investigação; esta
+decisão resolve a pendência sem iniciar a Fase C.
