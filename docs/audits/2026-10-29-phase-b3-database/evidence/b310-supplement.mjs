@@ -1,0 +1,21 @@
+/* MUTABLE LOCAL B3. New files only; no deletes. Checks service trust and old JWT scope. */
+import sharp from 'sharp';
+import {createHash} from 'node:crypto';
+import {createClient} from '@supabase/supabase-js';
+import {actor,addAuditActor,state,env,service,rpc,recorder,rejected,assert,randomUUID,sql,sqlLiteral as lit,createDoc} from './local-harness.mjs';
+import {app} from './http-client.mjs';
+const audit=recorder('B3.10s',{resume:true});audit.result.method='Local Auth/Storage/RPC with independent metadata reads; no browser or remote. Missing-byte case is an explicitly privileged fixture, not normal API path.';
+const admin=await actor('admin'),family=await actor('family'),jpeg=await sharp({create:{width:8,height:8,channels:3,background:'#20a050'}}).jpeg().toBuffer(),hash=createHash('sha256').update(jpeg).digest('hex');
+await audit.scenario('B310-08','Revogar entre reserva e upload/finalização recusa nova gravação de evidência',async()=>{
+ const uploader=await addAuditActor('upload_departure','admin'),r=await rpc(uploader.client,'reserve_attachment',{p_patient:state.patient,p_document:state.objects.fileDocument,p_movement:null,p_filename:'revogacao-sintetica.jpg',p_mime:'image/jpeg',p_bytes:jpeg.length,p_key:randomUUID()});
+ await rpc(admin,'admin_set_membership_status',{p_care_recipient_id:state.patient,p_user_id:uploader.id,p_status:'revoked'});const upload=await uploader.client.storage.from('patient-evidence').upload(r.object_path,jpeg,{contentType:'image/jpeg'}),finalize=await rejected(()=>rpc(service,'finalize_attachment',{p_id:r.id,p_actor:uploader.id,p_hash:hash,p_mime:'image/jpeg',p_bytes:jpeg.length,p_valid:true}));assert.ok(upload.error);assert.equal(finalize.sqlstate,'42501');return {id:r.id,uploadDenied:true,finalizeDenied:finalize,state:sql(`select state from public.attachments where id=${lit(r.id)};`)};
+});
+await audit.scenario('B310-09','Finalizador confia no servidor; ready de banco não certifica bytes Storage',async()=>{
+ const d=await createDoc(family,'COM',{lines:[{productId:state.products[0],quantity:'1'}]},randomUUID(),true),r=await rpc(family,'reserve_attachment',{p_patient:state.patient,p_document:d.id,p_movement:null,p_filename:'fixture-sem-bytes.jpg',p_mime:'image/jpeg',p_bytes:jpeg.length,p_key:randomUUID()});
+ await rpc(service,'finalize_attachment',{p_id:r.id,p_actor:state.actors.family.id,p_hash:hash,p_mime:'image/jpeg',p_bytes:jpeg.length,p_valid:true});
+ const response=await app('family',`/api/attachments?careRecipientId=${state.patient}&documentId=${d.id}`),body=await response.json(),row=body.data.find(x=>x.id===r.id),objects=sql(`select count(*) from storage.objects where bucket_id='patient-evidence' and name=${lit(r.object_path)};`);assert.equal(row.state,'ready');assert.equal(objects,'0');assert.equal(row.url,null);return {id:r.id,metadataState:row.state,objects:Number(objects),apiStatus:response.status,urlAvailable:false,classification:'Cross-service reconciliation limitation under privileged missing-object fixture; normal upload API checks bytes before finalize'};
+});
+await audit.scenario('B310-10','Sessão encerrada no app versus política independente de avatar no Storage',async()=>{
+ const who=await addAuditActor('avatar_session','professional'),session=(await who.client.auth.getSession()).data.session,old=createClient(env.url,env.anonKey,{auth:{persistSession:false},global:{headers:{authorization:'Bearer '+session.access_token}}});assert.equal(await rpc(old,'my_session_valid'),true);const out=await who.client.auth.signOut({scope:'local'});assert.ifError(out.error);assert.equal(await rpc(old,'my_session_valid'),false);
+ const path=who.id+'/b3-after-logout-'+randomUUID()+'.jpg',upload=await old.storage.from('profile-avatars').upload(path,jpeg,{contentType:'image/jpeg',upsert:false}),stored=sql(`select count(*) from storage.objects where bucket_id='profile-avatars' and name=${lit(path)};`);return {sessionStillValidInApp:false,uploadAcceptedAfterLogout:!upload.error,storageCode:upload.error?.statusCode??null,newSyntheticObjects:Number(stored),scope:'Own avatar prefix only; JWT still within expiry; no patient evidence/cross-user access demonstrated',hypothesis:upload.error?'REFUTED_FOR_THIS_SETUP':'CONFIRMED_OWN_AVATAR_SESSION_REVOCATION_GAP'};
+});audit.finish();

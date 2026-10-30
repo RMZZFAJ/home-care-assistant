@@ -1,0 +1,95 @@
+{
+  "group": "B3.11",
+  "startedAt": "2026-10-30T05:00:27.709Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Official local Auth RPC, real local Next HTTP and independent persisted reads; no browser. Audit volume fixtures explicitly created by owner, not a permission proof.",
+  "scenarios": [
+    {
+      "id": "B311-01",
+      "purpose": "Relato antigo persiste, mas referência e paginação HTTP não o recuperam após cem posteriores",
+      "recordedAt": "2026-10-30T05:00:28.361Z",
+      "observed": {
+        "target": "98f1a313-826c-45d8-888d-755b1063931a",
+        "newReports": 101,
+        "httpStatus": 200,
+        "returned": 100,
+        "refFindsTarget": false,
+        "pageParameterChangesResult": false,
+        "directAuthenticatedRead": {
+          "id": "98f1a313-826c-45d8-888d-755b1063931a",
+          "status": "reported"
+        },
+        "pendingInDashboard": 101,
+        "classification": "Confirmed route completeness defect; persistence and RLS direct retrieval work; no data loss"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B311-02",
+      "purpose": "Auditoria administrativa limita cem eventos apesar de preservar e autorizar o antigo",
+      "recordedAt": "2026-10-30T05:00:32.865Z",
+      "observed": {
+        "existingB3PatientEvents": 201,
+        "newOwnerCreatedSyntheticFixtures": 0,
+        "target": "7669bf1f-4ca4-4251-9366-715919f26e62",
+        "returned": 100,
+        "queryParametersIgnored": true,
+        "directAuthorizedRead": true,
+        "classification": "Confirmed administrative read-model cap, not deleted history; fixture insertion is not client permission evidence"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B311-03",
+      "purpose": "Editar perfil próprio não incrementa a revisão de workspace embora leitura nova tenha o nome",
+      "recordedAt": "2026-10-30T05:00:34.217Z",
+      "observed": {
+        "revisionBefore": 1684,
+        "revisionAfter": 1684,
+        "profilePersisted": true,
+        "freshWorkspaceHasNewName": true,
+        "classification": "Confirmed missing invalidation; fresh reads correct; no stale-authority bypass or browser cache observation claimed"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B311-04",
+      "purpose": "Histórico de estoque paginado recupera todas as páginas e oculta saldos familiares da equipe",
+      "recordedAt": "2026-10-30T05:00:34.377Z",
+      "observed": {
+        "total": 28,
+        "walkedRows": 28,
+        "uniqueIds": 28,
+        "stableOrder": "created_at DESC,id DESC with no intervening writes",
+        "professionalHistoryRows": 17,
+        "familyBalancesHidden": true,
+        "limits": "Offset pagination under concurrent inserts can shift pages; this is a quiescent walk, not snapshot cursor proof"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B311-05",
+      "purpose": "Busca documental e páginas são coerentes com totais no estado estável",
+      "recordedAt": "2026-10-30T05:00:34.531Z",
+      "observed": {
+        "total": 16,
+        "walked": 16,
+        "unique": 16,
+        "codeSearchFound": true,
+        "ordering": "created_at DESC,id ASC",
+        "limits": "No concurrent insertion or exhaustive filter combination; no layout/human validation"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T05:00:34.712Z"
+}

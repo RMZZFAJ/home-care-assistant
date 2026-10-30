@@ -1,0 +1,14 @@
+{
+  "recordedAt": "2026-10-30T06:09:49.585Z",
+  "findings": 25,
+  "fields": 32,
+  "priorities": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 19,
+    "P3": 5
+  },
+  "inherited": 16,
+  "newObservations": 9,
+  "allLocalNotProduction": true
+}

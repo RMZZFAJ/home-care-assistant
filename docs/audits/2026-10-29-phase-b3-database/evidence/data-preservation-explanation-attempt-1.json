@@ -1,0 +1,173 @@
+{
+  "recordedAt": "2026-10-30T05:49:35.197Z",
+  "originalHeaderRows": 184,
+  "changedHeaders": 7,
+  "fieldCounts": {
+    "version": 7,
+    "canonical_snapshot": 7,
+    "content_hash": 7,
+    "updated_at": 7
+  },
+  "rows": [
+    {
+      "rowAlias": "original-header-1",
+      "changedFields": [
+        "version",
+        "canonical_snapshot",
+        "content_hash",
+        "updated_at"
+      ],
+      "backupMatchesOriginalPrivateHash": false,
+      "priorVersion": 7,
+      "currentVersion": 8,
+      "newEvents": [
+        {
+          "action": "req.reminder",
+          "version": 8,
+          "scheduled": false,
+          "systemActor": true,
+          "operationalCronRunMatched": true,
+          "previousHashMatchesBackup": true
+        }
+      ]
+    },
+    {
+      "rowAlias": "original-header-2",
+      "changedFields": [
+        "version",
+        "canonical_snapshot",
+        "content_hash",
+        "updated_at"
+      ],
+      "backupMatchesOriginalPrivateHash": false,
+      "priorVersion": 5,
+      "currentVersion": 6,
+      "newEvents": [
+        {
+          "action": "req.reminder",
+          "version": 6,
+          "scheduled": false,
+          "systemActor": true,
+          "operationalCronRunMatched": true,
+          "previousHashMatchesBackup": true
+        }
+      ]
+    },
+    {
+      "rowAlias": "original-header-3",
+      "changedFields": [
+        "version",
+        "canonical_snapshot",
+        "content_hash",
+        "updated_at"
+      ],
+      "backupMatchesOriginalPrivateHash": false,
+      "priorVersion": 8,
+      "currentVersion": 9,
+      "newEvents": [
+        {
+          "action": "req.reminder",
+          "version": 9,
+          "scheduled": false,
+          "systemActor": true,
+          "operationalCronRunMatched": true,
+          "previousHashMatchesBackup": true
+        }
+      ]
+    },
+    {
+      "rowAlias": "original-header-4",
+      "changedFields": [
+        "version",
+        "canonical_snapshot",
+        "content_hash",
+        "updated_at"
+      ],
+      "backupMatchesOriginalPrivateHash": false,
+      "priorVersion": 1,
+      "currentVersion": 2,
+      "newEvents": [
+        {
+          "action": "req.reminder",
+          "version": 2,
+          "scheduled": false,
+          "systemActor": true,
+          "operationalCronRunMatched": true,
+          "previousHashMatchesBackup": true
+        }
+      ]
+    },
+    {
+      "rowAlias": "original-header-5",
+      "changedFields": [
+        "version",
+        "canonical_snapshot",
+        "content_hash",
+        "updated_at"
+      ],
+      "backupMatchesOriginalPrivateHash": false,
+      "priorVersion": 1,
+      "currentVersion": 2,
+      "newEvents": [
+        {
+          "action": "req.reminder",
+          "version": 2,
+          "scheduled": false,
+          "systemActor": true,
+          "operationalCronRunMatched": true,
+          "previousHashMatchesBackup": true
+        }
+      ]
+    },
+    {
+      "rowAlias": "original-header-6",
+      "changedFields": [
+        "version",
+        "canonical_snapshot",
+        "content_hash",
+        "updated_at"
+      ],
+      "backupMatchesOriginalPrivateHash": false,
+      "priorVersion": 1,
+      "currentVersion": 2,
+      "newEvents": [
+        {
+          "action": "req.reminder",
+          "version": 2,
+          "scheduled": false,
+          "systemActor": true,
+          "operationalCronRunMatched": true,
+          "previousHashMatchesBackup": true
+        }
+      ]
+    },
+    {
+      "rowAlias": "original-header-7",
+      "changedFields": [
+        "version",
+        "canonical_snapshot",
+        "content_hash",
+        "updated_at"
+      ],
+      "backupMatchesOriginalPrivateHash": false,
+      "priorVersion": 1,
+      "currentVersion": 2,
+      "newEvents": [
+        {
+          "action": "req.reminder",
+          "version": 2,
+          "scheduled": false,
+          "systemActor": true,
+          "operationalCronRunMatched": true,
+          "previousHashMatchesBackup": true
+        }
+      ]
+    }
+  ],
+  "allBeforeRowsMatchPrivateBaseline": false,
+  "onlyVersionedReminderFieldsChanged": true,
+  "allAdvancesExplainedByScheduledEvents": false,
+  "method": "Read-only private backup COPY extraction; SELECT jsonb_populate_recordset validates baseline hash; current event metadata correlated with successful existing operational cron. No restore/revert/mutation.",
+  "limits": "Core20-table preservation snapshot is row-based; Auth session metadata/cron health may evolve normally. Does not claim every database row stayed byte-identical.",
+  "verdict": "REQUIRES_INVESTIGATION"
+}

@@ -1,0 +1,364 @@
+{
+  "group": "B3.5",
+  "startedAt": "2026-10-30T01:04:53.520Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B35-01",
+      "purpose": "Entrada e expedição conservam quantidades entre família e trânsito",
+      "recordedAt": "2026-10-30T01:04:53.843Z",
+      "observed": {
+        "before": {
+          "FAMILY": "0",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 0
+        },
+        "entered": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "after": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "4.000000",
+          "CARE_TEAM": "0",
+          "movements": 2
+        },
+        "document": "68b0a8ca-b1af-4112-88c1-354579aa9bec"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-02",
+      "purpose": "Aceite parcial muda custódia uma vez e divergência não inventa perda",
+      "recordedAt": "2026-10-30T01:04:54.471Z",
+      "observed": {
+        "before": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "4.000000",
+          "CARE_TEAM": "0",
+          "movements": 2
+        },
+        "after": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "2.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 3
+        },
+        "status": "disputed",
+        "retryNoDuplicate": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-03",
+      "purpose": "Devolução conserva quantidade; perda formal reduz somente o trânsito elegível",
+      "recordedAt": "2026-10-30T01:04:55.422Z",
+      "observed": {
+        "before": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "2.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 3
+        },
+        "returned": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "1.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 4
+        },
+        "after": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 5
+        },
+        "document": {
+          "id": "68b0a8ca-b1af-4112-88c1-354579aa9bec",
+          "lines": [
+            {
+              "id": "6ac46afb-eb3a-42be-b1eb-ee8e6e9d6596",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {
+                  "lineId": "6ac46afb-eb3a-42be-b1eb-ee8e6e9d6596",
+                  "problem": "Diferença fictícia de duas unidades B3",
+                  "acceptedQuantity": "2"
+                },
+                "issueOpen": false
+              },
+              "quantity": "4.000000",
+              "productId": "patient-c568e207-221a-4ca8-a865-81f50079b6db",
+              "purchased": "0.000000",
+              "reconciled": "2.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 4,
+          "number": 1,
+          "status": "confirmed",
+          "version": 4,
+          "receipts": []
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-04",
+      "purpose": "Relato não debita; confirmação única debita somente custódia correta",
+      "recordedAt": "2026-10-30T01:04:56.807Z",
+      "observed": {
+        "id": "e92b39fc-9a38-48c1-9651-e5c6b725ddb8",
+        "before": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 5
+        },
+        "after": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 6
+        },
+        "reportNoDebit": true,
+        "repeatNoDebit": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-05",
+      "purpose": "Retorno da equipe à família usa ENT com recebedor familiar",
+      "recordedAt": "2026-10-30T01:04:57.495Z",
+      "observed": {
+        "before": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 6
+        },
+        "after": {
+          "FAMILY": "8.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "0.000000",
+          "movements": 8
+        },
+        "document": "7ae183bb-f127-4b1c-90b9-f2dc2fd17787"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-06",
+      "purpose": "Compra, chegada familiar e validação são três fatos distintos",
+      "recordedAt": "2026-10-30T01:04:58.144Z",
+      "observed": {
+        "before": {
+          "FAMILY": "0",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 0
+        },
+        "after": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "final": {
+          "id": "3e123e1b-c6b6-4e03-bdab-990245ad97c5",
+          "lines": [
+            {
+              "id": "50c597af-a725-4e16-9f27-970825f0b5f2",
+              "accepted": "2.000000",
+              "approved": "3.000000",
+              "metadata": {},
+              "quantity": "3.000000",
+              "productId": "patient-4ff7294b-be29-44d1-a12d-bff6e8337491",
+              "purchased": "3.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 5,
+          "number": 2,
+          "status": "partially_received",
+          "version": 5,
+          "receipts": [
+            {
+              "id": "1b192c7b-b0d6-4521-b177-df56c5ae681b",
+              "lines": [
+                {
+                  "lineId": "50c597af-a725-4e16-9f27-970825f0b5f2",
+                  "quantity": "2"
+                }
+              ],
+              "state": "approved"
+            }
+          ]
+        },
+        "pendingReceiptBeforeValidation": "pending"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-07",
+      "purpose": "Sem quantidade negativa, não finita ou superior ao teto na entrada de ledger",
+      "recordedAt": "2026-10-30T01:04:59.697Z",
+      "observed": {
+        "rows": [
+          {
+            "quantity": "0",
+            "result": {
+              "rejected": true,
+              "sqlstate": "P0001",
+              "message": "family_stock_movement: invalid family movement"
+            }
+          },
+          {
+            "quantity": "-1",
+            "result": {
+              "rejected": true,
+              "sqlstate": "P0001",
+              "message": "family_stock_movement: invalid family movement"
+            }
+          },
+          {
+            "quantity": "NaN",
+            "result": {
+              "rejected": true,
+              "sqlstate": "P0001",
+              "message": "family_stock_movement: invalid family movement"
+            }
+          },
+          {
+            "quantity": "Infinity",
+            "result": {
+              "rejected": true,
+              "sqlstate": "P0001",
+              "message": "family_stock_movement: invalid family movement"
+            }
+          },
+          {
+            "quantity": "1000000001",
+            "result": {
+              "rejected": true,
+              "sqlstate": "P0001",
+              "message": "family_stock_movement: invalid family movement"
+            }
+          }
+        ],
+        "before": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "after": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "nonFiniteLedgerHypothesis": "REFUTED_AT_EXPOSED_BOUND"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-08",
+      "purpose": "Saída maior que saldo e precisão incompatível não deixam efeitos parciais",
+      "recordedAt": "2026-10-30T01:05:00.180Z",
+      "observed": {
+        "overdraw": {
+          "rejected": true,
+          "sqlstate": "23514",
+          "message": "family_stock_movement: insufficient stock"
+        },
+        "fraction": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "family_stock_movement: incompatible product precision"
+        },
+        "before": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "after": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-09",
+      "purpose": "Precisão além de seis casas é arredondada antes do trigger na RPC familiar",
+      "recordedAt": "2026-10-30T01:05:00.618Z",
+      "observed": {
+        "id": "c90a31a5-8aef-4f23-a47a-8c2430f8b363",
+        "requested": "1.0000004",
+        "stored": "1.000000",
+        "productPrecision": 0,
+        "apiRegexBlocksMoreThanSixDecimals": true,
+        "triggerReceivesAlreadyCoercedNumeric": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-10",
+      "purpose": "Fator NaN de apresentação passa pelo contrato direto de catálogo",
+      "recordedAt": "2026-10-30T01:05:00.791Z",
+      "observed": {
+        "presentationId": "13ed6076-941c-4f2f-8723-d5ea2e8d4ec0",
+        "requested": "NaN",
+        "stored": "NaN",
+        "stockMovements": 0,
+        "limits": "Catalogue factor only; no NaN ledger reproduced"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-11",
+      "purpose": "Correção sem referência reproduz B2-005; referência alheia é recusada",
+      "recordedAt": "2026-10-30T01:05:01.177Z",
+      "observed": {
+        "id": "4ba570e0-1a45-4646-aef6-c6754e8d1af4",
+        "stored": "family_manual:NULL",
+        "foreign": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "family_stock_movement: invalid compensation reference"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B35-12",
+      "purpose": "Unidade com ledger ou linha histórica não muda por contrato alternativo",
+      "recordedAt": "2026-10-30T01:05:01.353Z",
+      "observed": {
+        "rejected": true,
+        "sqlstate": "P0001",
+        "message": "configure_catalogue_unit: unit with operational history is immutable"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T01:05:01.664Z"
+}

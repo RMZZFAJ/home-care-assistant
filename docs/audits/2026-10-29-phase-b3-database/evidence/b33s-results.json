@@ -1,0 +1,1361 @@
+{
+  "group": "B3.3s",
+  "startedAt": "2026-10-30T00:58:49.298Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B33-11",
+      "purpose": "Privilégio DML efetivo de cada tabela pública pela API Auth real",
+      "recordedAt": "2026-10-30T00:58:49.304Z",
+      "observed": {
+        "attempts": 186,
+        "rows": [
+          {
+            "table": "access_change_requests",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "access_change_requests",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "access_change_requests",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "attachments",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "attachments",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "attachments",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "audit_events",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "audit_events",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "audit_events",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_approvals",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_approvals",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_approvals",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_assignments",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_assignments",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_assignments",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_cycle_events",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_cycle_events",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_cycle_events",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_cycles",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_cycles",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_cycles",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_deferrals",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_deferrals",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_deferrals",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_obligations",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_obligations",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_obligations",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_regimes",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_regimes",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "bal_regimes",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "capability_definitions",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "capability_definitions",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "capability_definitions",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "capability_overrides",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "capability_overrides",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "capability_overrides",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_invitations",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_invitations",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_invitations",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_memberships",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_memberships",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_memberships",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_products",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_products",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipient_products",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipients",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipients",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "care_recipients",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "consumption_reports",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "consumption_reports",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "consumption_reports",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_events",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_events",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_events",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_lines",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_lines",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_lines",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_pdf_renders",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_pdf_renders",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_pdf_renders",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_pdfs",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_pdfs",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_pdfs",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_request_links",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_request_links",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_request_links",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_series",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_series",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "document_series",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "flow_sessions",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "flow_sessions",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "flow_sessions",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "flow_submissions",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "flow_submissions",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "flow_submissions",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "global_admin_guard",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "global_admin_guard",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "global_admin_guard",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "historical_requisition_imports",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "historical_requisition_imports",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "historical_requisition_imports",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "inbound_messages",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "inbound_messages",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "inbound_messages",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "measurement_units",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "measurement_units",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "measurement_units",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "meta_template_versions",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "meta_template_versions",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "meta_template_versions",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "notification_event_rules",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "notification_event_rules",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "notification_event_rules",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "operational_documents",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "operational_documents",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "operational_documents",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "operational_reminders",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "operational_reminders",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "operational_reminders",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "patient_settings",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "patient_settings",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "patient_settings",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "product_presentations",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "product_presentations",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "product_presentations",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "products",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "products",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "products",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "profiles",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "profiles",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "profiles",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "purchase_receipts",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "purchase_receipts",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "purchase_receipts",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "recipient_notification_settings",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "recipient_notification_settings",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "recipient_notification_settings",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "reminder_challenges",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "reminder_challenges",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "reminder_challenges",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_import_batches",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_import_batches",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_import_batches",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_item_resolutions",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_item_resolutions",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_item_resolutions",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_items",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_items",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_items",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_lifecycle",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_lifecycle",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_lifecycle",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_notifications",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_notifications",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_notifications",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_observations",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_observations",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_observations",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_science_events",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_science_events",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_science_events",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_status_history",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_status_history",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisition_status_history",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisitions",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisitions",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "requisitions",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "scheduled_shifts",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "scheduled_shifts",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "scheduled_shifts",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "science_challenges",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "science_challenges",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "science_challenges",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_change_requests",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_change_requests",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_change_requests",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_events",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_events",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_events",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_series",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_series",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_series",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_types",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_types",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "shift_types",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_alert_events",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_alert_events",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_alert_events",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_alert_rules",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_alert_rules",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_alert_rules",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_inventories",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_inventories",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_inventories",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_inventory_items",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_inventory_items",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_inventory_items",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_movements",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_movements",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "stock_movements",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "verified_phones",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "verified_phones",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "verified_phones",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "whatsapp_challenges",
+            "operation": "INSERT",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "whatsapp_challenges",
+            "operation": "UPDATE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          },
+          {
+            "table": "whatsapp_challenges",
+            "operation": "DELETE",
+            "status": 403,
+            "sqlstate": "42501",
+            "denied": true
+          }
+        ]
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-12",
+      "purpose": "Escopo de documentos por UUID; COM oculta da equipe",
+      "recordedAt": "2026-10-30T00:58:50.556Z",
+      "observed": {
+        "professionalRows": 0,
+        "professionalRpc": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "operational_document: document not found"
+        },
+        "otherPatientRpc": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "operational_document: document not found"
+        },
+        "authorizedAdmin": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-13",
+      "purpose": "Schema privado não é superfície REST exposta",
+      "recordedAt": "2026-10-30T00:58:50.803Z",
+      "observed": {
+        "status": 406,
+        "code": "PGRST106"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T00:58:50.988Z"
+}

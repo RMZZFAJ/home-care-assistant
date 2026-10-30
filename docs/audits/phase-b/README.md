@@ -8,6 +8,13 @@ A criação de novos grupos depende da autorização correspondente.
 
 - B1.1–B1.8: investigação concluída, sem correções de produto.
 - B2.0–B2.10: investigação de processos concluída, sem implementação.
+- B3.0–B3.12: investigação de banco/autorização concluída em30/10/2026,
+  sem correções.94 cenários locais;25 achados,com16 recortes herdados e nove
+  observações/mecanismos adicionais. NO-GO anterior preservado.
+- [Executivo B3](../2026-10-29-phase-b3-database/17_GROUP_B3_EXECUTIVE_ASSESSMENT.md).
+- [Índice B3](../2026-10-29-phase-b3-database/README.md).
+- [Achados B3](../2026-10-29-phase-b3-database/14_FINDINGS_MASTER.md).
+- [Transferência documental B3](../2026-10-29-phase-b3-database/18_PHASE_C_DECISION_HANDOFF.md).
 - [Executivo
   B2](../2026-10-29-phase-b2-processes/16_GROUP_B2_EXECUTIVE_ASSESSMENT.md).
 - [Índice B2](../2026-10-29-phase-b2-processes/README.md).

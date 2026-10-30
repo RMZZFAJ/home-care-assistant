@@ -1,0 +1,314 @@
+{
+  "group": "B3.8",
+  "startedAt": "2026-10-30T01:18:45.022Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B38-01",
+      "purpose": "Duas saídas válidas isoladamente não ultrapassam o saldo compartilhado",
+      "recordedAt": "2026-10-30T01:18:45.474Z",
+      "observed": {
+        "barrier": {
+          "requests": 2,
+          "waiters": 2
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "1f65aa6e-b272-48df-9a9c-e6c86b188fd3",
+            "version": null,
+            "state": null,
+            "code": null,
+            "message": null
+          },
+          {
+            "status": 400,
+            "id": null,
+            "version": null,
+            "state": null,
+            "code": "23514",
+            "message": "insufficient stock"
+          }
+        ],
+        "before": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "after": {
+          "FAMILY": "0.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-02",
+      "purpose": "Mesma chave simultânea cria um único movimento e recupera mesmo ID",
+      "recordedAt": "2026-10-30T01:18:49.324Z",
+      "observed": {
+        "barrier": {
+          "requests": 2,
+          "waiters": 2
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "6bbe4907-f287-442e-9fe3-cbbb55528223",
+            "version": null,
+            "state": null,
+            "code": null,
+            "message": null
+          },
+          {
+            "status": 200,
+            "id": "6bbe4907-f287-442e-9fe3-cbbb55528223",
+            "version": null,
+            "state": null,
+            "code": null,
+            "message": null
+          }
+        ],
+        "before": {
+          "FAMILY": "0.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        },
+        "after": {
+          "FAMILY": "1.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 3
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-03",
+      "purpose": "Mesma chave com conteúdo diferente conflita sem nova escrita",
+      "recordedAt": "2026-10-30T01:18:53.221Z",
+      "observed": {
+        "result": {
+          "rejected": true,
+          "sqlstate": "23505",
+          "message": "family_stock_movement: idempotency conflict"
+        },
+        "before": {
+          "FAMILY": "1.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 3
+        },
+        "after": {
+          "FAMILY": "1.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 3
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-04",
+      "purpose": "Dois aprovadores da mesma versão COM produzem uma decisão",
+      "recordedAt": "2026-10-30T01:18:53.623Z",
+      "observed": {
+        "barrier": {
+          "requests": 2,
+          "waiters": 2
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "522ac8cb-74ad-49d3-93c0-b986fb1c5fa5",
+            "version": 2,
+            "state": "approved",
+            "code": "COM-0004",
+            "message": null
+          },
+          {
+            "status": 400,
+            "id": null,
+            "version": null,
+            "state": null,
+            "code": "P0001",
+            "message": "stale document version"
+          }
+        ],
+        "before": {
+          "id": "522ac8cb-74ad-49d3-93c0-b986fb1c5fa5",
+          "lines": [
+            {
+              "id": "9dd3921b-7fc9-4191-8982-0179d7b5eaf6",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {},
+              "quantity": "1.000000",
+              "productId": "patient-44e28689-6768-41c2-ab48-a34577d9e74f",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 1,
+          "number": 4,
+          "status": "pending_approval",
+          "version": 1,
+          "receipts": []
+        },
+        "after": {
+          "id": "522ac8cb-74ad-49d3-93c0-b986fb1c5fa5",
+          "lines": [
+            {
+              "id": "9dd3921b-7fc9-4191-8982-0179d7b5eaf6",
+              "accepted": "0.000000",
+              "approved": "1.000000",
+              "metadata": {},
+              "quantity": "1.000000",
+              "productId": "patient-44e28689-6768-41c2-ab48-a34577d9e74f",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 2,
+          "number": 4,
+          "status": "approved",
+          "version": 2,
+          "receipts": []
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-05",
+      "purpose": "Aceite simultâneo da mesma intenção e resposta ignorada não duplicam crédito",
+      "recordedAt": "2026-10-30T01:18:57.550Z",
+      "observed": {
+        "barrier": {
+          "requests": 2,
+          "waiters": 2
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "994b97b4-5aa2-4e42-80f5-42ee160a5266",
+            "version": 2,
+            "state": "confirmed",
+            "code": "ENT-0005",
+            "message": null
+          },
+          {
+            "status": 200,
+            "id": "994b97b4-5aa2-4e42-80f5-42ee160a5266",
+            "version": 2,
+            "state": "confirmed",
+            "code": "ENT-0005",
+            "message": null
+          }
+        ],
+        "before": {
+          "FAMILY": "0.000000",
+          "TRANSIT": "1.000000",
+          "CARE_TEAM": "0",
+          "movements": 4
+        },
+        "after": {
+          "FAMILY": "0.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 5
+        },
+        "recovered": {
+          "status": 200,
+          "id": "994b97b4-5aa2-4e42-80f5-42ee160a5266",
+          "version": 2,
+          "state": "confirmed",
+          "code": "ENT-0005",
+          "message": null
+        },
+        "physicalNetworkFailureInjected": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-06",
+      "purpose": "Revogação em transação anterior pode ser seguida de movimento já aguardando lock",
+      "recordedAt": "2026-10-30T01:19:04.024Z",
+      "observed": {
+        "barrier": {
+          "requests": 1,
+          "waiters": 1,
+          "revocationCommittedBeforeLockRelease": true
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "b099251b-fe88-4f7a-b7a8-80ca84d7eeda",
+            "version": null,
+            "state": null,
+            "code": null,
+            "message": null
+          }
+        ],
+        "membership": "revoked",
+        "before": {
+          "FAMILY": "0.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 5
+        },
+        "after": {
+          "FAMILY": "1.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 6
+        },
+        "newCallDenied": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "family_stock_movement: required permission: stock.family.manage"
+        },
+        "scope": "Only a command started before revocation and blocked behind its transaction; new calls correctly denied"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-07",
+      "purpose": "Chave de criação não compara flag draft; recuperação devolve o draft existente",
+      "recordedAt": "2026-10-30T01:19:08.924Z",
+      "observed": {
+        "id": "ffc46bfa-d12a-4a95-b38e-5be927611ca3",
+        "firstDraft": true,
+        "retryDraft": false,
+        "resultStatus": "draft",
+        "classification": "Intent modality omitted from key comparison; explicit response still says draft; no issuance or debit"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-08",
+      "purpose": "Confirmação e rejeição simultâneas preservam um fato mas ambas respondem sucesso",
+      "recordedAt": "2026-10-30T01:19:08.962Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Unexpected end of JSON input",
+        "sqlstate": null
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": []
+}

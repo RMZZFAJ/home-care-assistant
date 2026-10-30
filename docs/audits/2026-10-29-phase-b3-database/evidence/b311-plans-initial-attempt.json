@@ -1,0 +1,10 @@
+{
+  "id": "QP-07-ATTEMPT-1",
+  "execution": "CANCELED_INCOMPLETE",
+  "method": "1000 NEW ledger rows and NEW patient in local rollback transaction; all triggers enabled; owner fixture creation before Auth read role",
+  "termination": "Own identified backend canceled after statement exceeded 120 seconds; SQL57014; psql connection exited and transaction rolled back",
+  "observedStack": ["after_stock_alert", "evaluate_stock_alert", "current_stock_balances", "private.can", "recipient_role", "auth_session"],
+  "notProven": ["1000-row read plan", "Authenticated RPC throughput", "Production latency or capacity"],
+  "nextAttempt": "100 new rows, 30s statement timeout; no trigger disabled or schema altered",
+  "verification": "b311-plans.json initialAttemptRollbackCheck checks zero fixture patients and zero movement rows with exact synthetic marker"
+}

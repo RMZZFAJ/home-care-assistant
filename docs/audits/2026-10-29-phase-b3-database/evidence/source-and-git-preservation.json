@@ -1,0 +1,20 @@
+{
+  "recordedAt": "2026-10-30T06:22:04.472Z",
+  "branch": "audit/phase-b",
+  "prepublicationHead": "896590e9c3020d4759d22fb9df730c446249d133",
+  "initialHead": "896590e9c3020d4759d22fb9df730c446249d133",
+  "master": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "baselineMaster": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "functionalSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "protectedFiles": 371,
+  "protectedFilesChanged": [],
+  "disallowedWorkspacePaths": [],
+  "functionalDiffSinceProduct": [],
+  "remoteRefsBeforePublication": {
+    "refs/heads/audit/phase-b": "896590e9c3020d4759d22fb9df730c446249d133",
+    "refs/heads/master": "34dcb835c5c49068e0417f7306eb4e501aa868bc"
+  },
+  "noRemoteDatabaseOperations": true,
+  "limits": "Remote Git refs read-only snapshot before documentary publication; not a Supabase remote-state comparison. Source hashes cover recorded tracked product paths; allowed-path guard covers other workspace changes.",
+  "passed": true
+}

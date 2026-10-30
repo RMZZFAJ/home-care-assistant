@@ -1,0 +1,1701 @@
+{
+  "recordedAt": "2026-10-30T05:05:29.810Z",
+  "environment": "Local verified PostgreSQL17.11; actual Auth session/role; warm single samples, no production percentile claim",
+  "queries": [
+    {
+      "id": "QP-01",
+      "purpose": "Current stock view with actual Auth RLS",
+      "query": "select product_id,location,balance from public.current_stock_balances where care_recipient_id='7d39e2fb-4731-46b3-8478-793cbf14df40'",
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Subquery Scan",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Alias": "current_stock_balances",
+            "Startup Cost": 191.97,
+            "Total Cost": 192.39,
+            "Plan Rows": 13,
+            "Plan Width": 84,
+            "Actual Startup Time": 86.838,
+            "Actual Total Time": 86.85,
+            "Actual Rows": 11,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 4432,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Aggregate",
+                "Strategy": "Sorted",
+                "Partial Mode": "Simple",
+                "Parent Relationship": "Subquery",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 191.97,
+                "Total Cost": 192.26,
+                "Plan Rows": 13,
+                "Plan Width": 100,
+                "Actual Startup Time": 86.837,
+                "Actual Total Time": 86.848,
+                "Actual Rows": 11,
+                "Actual Loops": 1,
+                "Group Key": [
+                  "stock_movements.product_id",
+                  "stock_movements.destination_location"
+                ],
+                "Shared Hit Blocks": 4432,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Sort",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 191.97,
+                    "Total Cost": 192,
+                    "Plan Rows": 13,
+                    "Plan Width": 83,
+                    "Actual Startup Time": 86.829,
+                    "Actual Total Time": 86.833,
+                    "Actual Rows": 42,
+                    "Actual Loops": 1,
+                    "Sort Key": [
+                      "stock_movements.product_id",
+                      "stock_movements.destination_location"
+                    ],
+                    "Sort Method": "quicksort",
+                    "Sort Space Used": 28,
+                    "Sort Space Type": "Memory",
+                    "Shared Hit Blocks": 4432,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Result",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Startup Cost": 4.63,
+                        "Total Cost": 191.73,
+                        "Plan Rows": 13,
+                        "Plan Width": 83,
+                        "Actual Startup Time": 5.713,
+                        "Actual Total Time": 86.658,
+                        "Actual Rows": 42,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 4429,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0,
+                        "Plans": [
+                          {
+                            "Node Type": "Append",
+                            "Parent Relationship": "Outer",
+                            "Parallel Aware": false,
+                            "Async Capable": false,
+                            "Startup Cost": 4.63,
+                            "Total Cost": 191.6,
+                            "Plan Rows": 13,
+                            "Plan Width": 83,
+                            "Actual Startup Time": 5.712,
+                            "Actual Total Time": 86.622,
+                            "Actual Rows": 42,
+                            "Actual Loops": 1,
+                            "Shared Hit Blocks": 4429,
+                            "Shared Read Blocks": 0,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Local Hit Blocks": 0,
+                            "Local Read Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Temp Written Blocks": 0,
+                            "Subplans Removed": 0,
+                            "Plans": [
+                              {
+                                "Node Type": "Bitmap Heap Scan",
+                                "Parent Relationship": "Member",
+                                "Parallel Aware": false,
+                                "Async Capable": false,
+                                "Relation Name": "stock_movements",
+                                "Alias": "stock_movements",
+                                "Startup Cost": 4.63,
+                                "Total Cost": 95.76,
+                                "Plan Rows": 8,
+                                "Plan Width": 73,
+                                "Actual Startup Time": 5.711,
+                                "Actual Total Time": 48.987,
+                                "Actual Rows": 24,
+                                "Actual Loops": 1,
+                                "Recheck Cond": "((care_recipient_id IS NOT NULL) AND (care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid))",
+                                "Rows Removed by Index Recheck": 0,
+                                "Filter": "((destination_location IS NOT NULL) AND (private.can(care_recipient_id, 'stock.family.read'::text) OR (private.can(care_recipient_id, 'stock.team.read'::text) AND ((source_location = ANY ('{CARE_TEAM,TRANSIT}'::text[])) OR (destination_location = ANY ('{CARE_TEAM,TRANSIT}'::text[]))))) AND CASE destination_location WHEN 'FAMILY'::text THEN private.can(care_recipient_id, 'stock.family.read'::text) WHEN 'CARE_TEAM'::text THEN private.can(care_recipient_id, 'stock.team.read'::text) ELSE private.can(care_recipient_id, 'ent.read'::text) END)",
+                                "Rows Removed by Filter": 4,
+                                "Exact Heap Blocks": 2,
+                                "Lossy Heap Blocks": 0,
+                                "Shared Hit Blocks": 2985,
+                                "Shared Read Blocks": 0,
+                                "Shared Dirtied Blocks": 0,
+                                "Shared Written Blocks": 0,
+                                "Local Hit Blocks": 0,
+                                "Local Read Blocks": 0,
+                                "Local Dirtied Blocks": 0,
+                                "Local Written Blocks": 0,
+                                "Temp Read Blocks": 0,
+                                "Temp Written Blocks": 0,
+                                "Plans": [
+                                  {
+                                    "Node Type": "Bitmap Index Scan",
+                                    "Parent Relationship": "Outer",
+                                    "Parallel Aware": false,
+                                    "Async Capable": false,
+                                    "Index Name": "stock_movements_patient_product_idx",
+                                    "Startup Cost": 0,
+                                    "Total Cost": 4.63,
+                                    "Plan Rows": 35,
+                                    "Plan Width": 0,
+                                    "Actual Startup Time": 0.013,
+                                    "Actual Total Time": 0.013,
+                                    "Actual Rows": 28,
+                                    "Actual Loops": 1,
+                                    "Index Cond": "((care_recipient_id IS NOT NULL) AND (care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid))",
+                                    "Shared Hit Blocks": 2,
+                                    "Shared Read Blocks": 0,
+                                    "Shared Dirtied Blocks": 0,
+                                    "Shared Written Blocks": 0,
+                                    "Local Hit Blocks": 0,
+                                    "Local Read Blocks": 0,
+                                    "Local Dirtied Blocks": 0,
+                                    "Local Written Blocks": 0,
+                                    "Temp Read Blocks": 0,
+                                    "Temp Written Blocks": 0
+                                  }
+                                ]
+                              },
+                              {
+                                "Node Type": "Bitmap Heap Scan",
+                                "Parent Relationship": "Member",
+                                "Parallel Aware": false,
+                                "Async Capable": false,
+                                "Relation Name": "stock_movements",
+                                "Alias": "stock_movements_1",
+                                "Startup Cost": 4.63,
+                                "Total Cost": 95.77,
+                                "Plan Rows": 5,
+                                "Plan Width": 99,
+                                "Actual Startup Time": 2.149,
+                                "Actual Total Time": 37.609,
+                                "Actual Rows": 18,
+                                "Actual Loops": 1,
+                                "Recheck Cond": "((care_recipient_id IS NOT NULL) AND (care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid))",
+                                "Rows Removed by Index Recheck": 0,
+                                "Filter": "((source_location IS NOT NULL) AND (private.can(care_recipient_id, 'stock.family.read'::text) OR (private.can(care_recipient_id, 'stock.team.read'::text) AND ((source_location = ANY ('{CARE_TEAM,TRANSIT}'::text[])) OR (destination_location = ANY ('{CARE_TEAM,TRANSIT}'::text[]))))) AND CASE source_location WHEN 'FAMILY'::text THEN private.can(care_recipient_id, 'stock.family.read'::text) WHEN 'CARE_TEAM'::text THEN private.can(care_recipient_id, 'stock.team.read'::text) ELSE private.can(care_recipient_id, 'ent.read'::text) END)",
+                                "Rows Removed by Filter": 10,
+                                "Exact Heap Blocks": 2,
+                                "Lossy Heap Blocks": 0,
+                                "Shared Hit Blocks": 1444,
+                                "Shared Read Blocks": 0,
+                                "Shared Dirtied Blocks": 0,
+                                "Shared Written Blocks": 0,
+                                "Local Hit Blocks": 0,
+                                "Local Read Blocks": 0,
+                                "Local Dirtied Blocks": 0,
+                                "Local Written Blocks": 0,
+                                "Temp Read Blocks": 0,
+                                "Temp Written Blocks": 0,
+                                "Plans": [
+                                  {
+                                    "Node Type": "Bitmap Index Scan",
+                                    "Parent Relationship": "Outer",
+                                    "Parallel Aware": false,
+                                    "Async Capable": false,
+                                    "Index Name": "stock_movements_patient_product_idx",
+                                    "Startup Cost": 0,
+                                    "Total Cost": 4.63,
+                                    "Plan Rows": 35,
+                                    "Plan Width": 0,
+                                    "Actual Startup Time": 0.007,
+                                    "Actual Total Time": 0.007,
+                                    "Actual Rows": 28,
+                                    "Actual Loops": 1,
+                                    "Index Cond": "((care_recipient_id IS NOT NULL) AND (care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid))",
+                                    "Shared Hit Blocks": 2,
+                                    "Shared Read Blocks": 0,
+                                    "Shared Dirtied Blocks": 0,
+                                    "Shared Written Blocks": 0,
+                                    "Local Hit Blocks": 0,
+                                    "Local Read Blocks": 0,
+                                    "Local Dirtied Blocks": 0,
+                                    "Local Written Blocks": 0,
+                                    "Temp Read Blocks": 0,
+                                    "Temp Written Blocks": 0
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 284,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.839,
+          "Triggers": [],
+          "Execution Time": 86.959
+        }
+      ],
+      "summary": {
+        "planningMs": 0.839,
+        "executionMs": 86.959,
+        "sharedHits": 4432,
+        "sharedReads": 0,
+        "nodes": [
+          {
+            "type": "Subquery Scan",
+            "relation": null,
+            "index": null,
+            "actualRows": 11,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Aggregate",
+            "relation": null,
+            "index": null,
+            "actualRows": 11,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Sort",
+            "relation": null,
+            "index": null,
+            "actualRows": 42,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Result",
+            "relation": null,
+            "index": null,
+            "actualRows": 42,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Append",
+            "relation": null,
+            "index": null,
+            "actualRows": 42,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Bitmap Heap Scan",
+            "relation": "stock_movements",
+            "index": null,
+            "actualRows": 24,
+            "loops": 1,
+            "removed": 4
+          },
+          {
+            "type": "Bitmap Index Scan",
+            "relation": null,
+            "index": "stock_movements_patient_product_idx",
+            "actualRows": 28,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Bitmap Heap Scan",
+            "relation": "stock_movements",
+            "index": null,
+            "actualRows": 18,
+            "loops": 1,
+            "removed": 10
+          },
+          {
+            "type": "Bitmap Index Scan",
+            "relation": null,
+            "index": "stock_movements_patient_product_idx",
+            "actualRows": 28,
+            "loops": 1,
+            "removed": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "QP-02",
+      "purpose": "Stock history page SELECT (patient-only; no function visibility masking)",
+      "query": "select id,created_at,product_id,quantity from public.stock_movements where care_recipient_id='7d39e2fb-4731-46b3-8478-793cbf14df40' order by created_at desc,id desc limit 20",
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 69.6,
+            "Total Cost": 69.64,
+            "Plan Rows": 17,
+            "Plan Width": 73,
+            "Actual Startup Time": 30.606,
+            "Actual Total Time": 30.609,
+            "Actual Rows": 20,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 2166,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 69.6,
+                "Total Cost": 69.64,
+                "Plan Rows": 17,
+                "Plan Width": 73,
+                "Actual Startup Time": 30.604,
+                "Actual Total Time": 30.606,
+                "Actual Rows": 20,
+                "Actual Loops": 1,
+                "Sort Key": [
+                  "created_at DESC",
+                  "id DESC"
+                ],
+                "Sort Method": "quicksort",
+                "Sort Space Used": 28,
+                "Sort Space Type": "Memory",
+                "Shared Hit Blocks": 2166,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Bitmap Heap Scan",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Relation Name": "stock_movements",
+                    "Alias": "stock_movements",
+                    "Startup Cost": 4.54,
+                    "Total Cost": 69.25,
+                    "Plan Rows": 17,
+                    "Plan Width": 73,
+                    "Actual Startup Time": 3.411,
+                    "Actual Total Time": 30.521,
+                    "Actual Rows": 28,
+                    "Actual Loops": 1,
+                    "Recheck Cond": "(care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid)",
+                    "Rows Removed by Index Recheck": 0,
+                    "Filter": "(private.can(care_recipient_id, 'stock.family.read'::text) OR (private.can(care_recipient_id, 'stock.team.read'::text) AND ((source_location = ANY ('{CARE_TEAM,TRANSIT}'::text[])) OR (destination_location = ANY ('{CARE_TEAM,TRANSIT}'::text[])))))",
+                    "Rows Removed by Filter": 0,
+                    "Exact Heap Blocks": 2,
+                    "Lossy Heap Blocks": 0,
+                    "Shared Hit Blocks": 2160,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Bitmap Index Scan",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Index Name": "stock_movements_patient_product_idx",
+                        "Startup Cost": 0,
+                        "Total Cost": 4.54,
+                        "Plan Rows": 35,
+                        "Plan Width": 0,
+                        "Actual Startup Time": 0.013,
+                        "Actual Total Time": 0.013,
+                        "Actual Rows": 28,
+                        "Actual Loops": 1,
+                        "Index Cond": "(care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid)",
+                        "Shared Hit Blocks": 2,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 277,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.53,
+          "Triggers": [],
+          "Execution Time": 30.712
+        }
+      ],
+      "summary": {
+        "planningMs": 0.53,
+        "executionMs": 30.712,
+        "sharedHits": 2166,
+        "sharedReads": 0,
+        "nodes": [
+          {
+            "type": "Limit",
+            "relation": null,
+            "index": null,
+            "actualRows": 20,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Sort",
+            "relation": null,
+            "index": null,
+            "actualRows": 20,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Bitmap Heap Scan",
+            "relation": "stock_movements",
+            "index": null,
+            "actualRows": 28,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Bitmap Index Scan",
+            "relation": null,
+            "index": "stock_movements_patient_product_idx",
+            "actualRows": 28,
+            "loops": 1,
+            "removed": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "QP-03",
+      "purpose": "Consumption read route shape with RLS",
+      "query": "select id,status,created_at from public.consumption_reports where care_recipient_id='7d39e2fb-4731-46b3-8478-793cbf14df40' order by created_at desc limit 100",
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 72.62,
+            "Total Cost": 72.75,
+            "Plan Rows": 54,
+            "Plan Width": 33,
+            "Actual Startup Time": 100.668,
+            "Actual Total Time": 100.677,
+            "Actual Rows": 100,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 5386,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 72.62,
+                "Total Cost": 72.75,
+                "Plan Rows": 54,
+                "Plan Width": 33,
+                "Actual Startup Time": 100.667,
+                "Actual Total Time": 100.671,
+                "Actual Rows": 100,
+                "Actual Loops": 1,
+                "Sort Key": [
+                  "created_at DESC"
+                ],
+                "Sort Method": "quicksort",
+                "Sort Space Used": 32,
+                "Sort Space Type": "Memory",
+                "Shared Hit Blocks": 5386,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Bitmap Heap Scan",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Relation Name": "consumption_reports",
+                    "Alias": "consumption_reports",
+                    "Startup Cost": 4.96,
+                    "Total Cost": 71.07,
+                    "Plan Rows": 54,
+                    "Plan Width": 33,
+                    "Actual Startup Time": 3.223,
+                    "Actual Total Time": 100.561,
+                    "Actual Rows": 107,
+                    "Actual Loops": 1,
+                    "Recheck Cond": "(care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid)",
+                    "Rows Removed by Index Recheck": 0,
+                    "Filter": "CASE location WHEN 'FAMILY'::text THEN private.can(care_recipient_id, 'stock.family.read'::text) ELSE private.can(care_recipient_id, 'stock.team.read'::text) END",
+                    "Rows Removed by Filter": 0,
+                    "Exact Heap Blocks": 3,
+                    "Lossy Heap Blocks": 0,
+                    "Shared Hit Blocks": 5383,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Bitmap Index Scan",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Index Name": "consumption_patient",
+                        "Startup Cost": 0,
+                        "Total Cost": 4.95,
+                        "Plan Rows": 107,
+                        "Plan Width": 0,
+                        "Actual Startup Time": 0.014,
+                        "Actual Total Time": 0.014,
+                        "Actual Rows": 107,
+                        "Actual Loops": 1,
+                        "Index Cond": "(care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid)",
+                        "Shared Hit Blocks": 1,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 133,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.279,
+          "Triggers": [],
+          "Execution Time": 100.713
+        }
+      ],
+      "summary": {
+        "planningMs": 0.279,
+        "executionMs": 100.713,
+        "sharedHits": 5386,
+        "sharedReads": 0,
+        "nodes": [
+          {
+            "type": "Limit",
+            "relation": null,
+            "index": null,
+            "actualRows": 100,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Sort",
+            "relation": null,
+            "index": null,
+            "actualRows": 100,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Bitmap Heap Scan",
+            "relation": "consumption_reports",
+            "index": null,
+            "actualRows": 107,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Bitmap Index Scan",
+            "relation": null,
+            "index": "consumption_patient",
+            "actualRows": 107,
+            "loops": 1,
+            "removed": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "QP-04",
+      "purpose": "Audit read route shape with RLS",
+      "query": "select id,created_at,action from public.audit_events where metadata->>'care_recipient_id'='7d39e2fb-4731-46b3-8478-793cbf14df40' order by created_at desc limit 100",
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 188578.91,
+            "Total Cost": 188578.94,
+            "Plan Rows": 9,
+            "Plan Width": 42,
+            "Actual Startup Time": 199.457,
+            "Actual Total Time": 199.466,
+            "Actual Rows": 100,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 8141,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 188578.91,
+                "Total Cost": 188578.94,
+                "Plan Rows": 9,
+                "Plan Width": 42,
+                "Actual Startup Time": 199.456,
+                "Actual Total Time": 199.46,
+                "Actual Rows": 100,
+                "Actual Loops": 1,
+                "Sort Key": [
+                  "audit_events.created_at DESC"
+                ],
+                "Sort Method": "top-N heapsort",
+                "Sort Space Used": 39,
+                "Sort Space Type": "Memory",
+                "Shared Hit Blocks": 8141,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Relation Name": "audit_events",
+                    "Alias": "audit_events",
+                    "Startup Cost": 0,
+                    "Total Cost": 188578.77,
+                    "Plan Rows": 9,
+                    "Plan Width": 42,
+                    "Actual Startup Time": 76.234,
+                    "Actual Total Time": 199.36,
+                    "Actual Rows": 203,
+                    "Actual Loops": 1,
+                    "Filter": "((is_global_administrator() OR (ANY ((metadata ->> 'care_recipient_id'::text) = (hashed SubPlan 2).col1))) AND ((metadata ->> 'care_recipient_id'::text) = '7d39e2fb-4731-46b3-8478-793cbf14df40'::text))",
+                    "Rows Removed by Filter": 2530,
+                    "Shared Hit Blocks": 8138,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Seq Scan",
+                        "Parent Relationship": "SubPlan",
+                        "Subplan Name": "SubPlan 2",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Relation Name": "care_recipients",
+                        "Alias": "r",
+                        "Startup Cost": 0,
+                        "Total Cost": 68.37,
+                        "Plan Rows": 14,
+                        "Plan Width": 32,
+                        "Actual Startup Time": 25.036,
+                        "Actual Total Time": 55.062,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Filter": "(can_access_recipient(id) AND private.can(id, 'audit.read'::text))",
+                        "Rows Removed by Filter": 129,
+                        "Shared Hit Blocks": 2020,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 159,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.414,
+          "Triggers": [],
+          "Execution Time": 199.573
+        }
+      ],
+      "summary": {
+        "planningMs": 0.414,
+        "executionMs": 199.573,
+        "sharedHits": 8141,
+        "sharedReads": 0,
+        "nodes": [
+          {
+            "type": "Limit",
+            "relation": null,
+            "index": null,
+            "actualRows": 100,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Sort",
+            "relation": null,
+            "index": null,
+            "actualRows": 100,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Seq Scan",
+            "relation": "audit_events",
+            "index": null,
+            "actualRows": 203,
+            "loops": 1,
+            "removed": 2530
+          },
+          {
+            "type": "Seq Scan",
+            "relation": "care_recipients",
+            "index": null,
+            "actualRows": 1,
+            "loops": 1,
+            "removed": 129
+          }
+        ]
+      }
+    },
+    {
+      "id": "QP-05",
+      "purpose": "Document event index for one synthetic document",
+      "query": "select id,version,action,content_hash from public.document_events where document_id='da6947f8-9fe2-43b9-a1b7-486dba5f4f82' order by version",
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Sort",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 28.56,
+            "Total Cost": 28.56,
+            "Plan Rows": 1,
+            "Plan Width": 99,
+            "Actual Startup Time": 4.109,
+            "Actual Total Time": 4.11,
+            "Actual Rows": 2,
+            "Actual Loops": 1,
+            "Sort Key": [
+              "document_events.version"
+            ],
+            "Sort Method": "quicksort",
+            "Sort Space Used": 25,
+            "Sort Space Type": "Memory",
+            "Shared Hit Blocks": 1127,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Heap Scan",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "document_events",
+                "Alias": "document_events",
+                "Startup Cost": 4.29,
+                "Total Cost": 28.55,
+                "Plan Rows": 1,
+                "Plan Width": 99,
+                "Actual Startup Time": 3.062,
+                "Actual Total Time": 4.088,
+                "Actual Rows": 2,
+                "Actual Loops": 1,
+                "Recheck Cond": "(document_id = 'da6947f8-9fe2-43b9-a1b7-486dba5f4f82'::uuid)",
+                "Rows Removed by Index Recheck": 0,
+                "Filter": "EXISTS(SubPlan 1)",
+                "Rows Removed by Filter": 0,
+                "Exact Heap Blocks": 1,
+                "Lossy Heap Blocks": 0,
+                "Shared Hit Blocks": 1124,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Bitmap Index Scan",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Index Name": "document_events_document_id_version_key",
+                    "Startup Cost": 0,
+                    "Total Cost": 4.29,
+                    "Plan Rows": 2,
+                    "Plan Width": 0,
+                    "Actual Startup Time": 0.012,
+                    "Actual Total Time": 0.012,
+                    "Actual Rows": 2,
+                    "Actual Loops": 1,
+                    "Index Cond": "(document_id = 'da6947f8-9fe2-43b9-a1b7-486dba5f4f82'::uuid)",
+                    "Shared Hit Blocks": 2,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  },
+                  {
+                    "Node Type": "Index Scan",
+                    "Parent Relationship": "SubPlan",
+                    "Subplan Name": "SubPlan 1",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Scan Direction": "Forward",
+                    "Index Name": "operational_documents_id_care_recipient_id_key",
+                    "Relation Name": "operational_documents",
+                    "Alias": "d",
+                    "Startup Cost": 0.27,
+                    "Total Cost": 8.54,
+                    "Plan Rows": 1,
+                    "Plan Width": 0,
+                    "Actual Startup Time": 2.031,
+                    "Actual Total Time": 2.031,
+                    "Actual Rows": 1,
+                    "Actual Loops": 2,
+                    "Index Cond": "(id = document_events.document_id)",
+                    "Rows Removed by Index Recheck": 0,
+                    "Filter": "private.can(care_recipient_id, (lower(type) || '.read'::text))",
+                    "Rows Removed by Filter": 0,
+                    "Shared Hit Blocks": 1121,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 322,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.541,
+          "Triggers": [],
+          "Execution Time": 4.138
+        }
+      ],
+      "summary": {
+        "planningMs": 0.541,
+        "executionMs": 4.138,
+        "sharedHits": 1127,
+        "sharedReads": 0,
+        "nodes": [
+          {
+            "type": "Sort",
+            "relation": null,
+            "index": null,
+            "actualRows": 2,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Bitmap Heap Scan",
+            "relation": "document_events",
+            "index": null,
+            "actualRows": 2,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Bitmap Index Scan",
+            "relation": null,
+            "index": "document_events_document_id_version_key",
+            "actualRows": 2,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Index Scan",
+            "relation": "operational_documents",
+            "index": "operational_documents_id_care_recipient_id_key",
+            "actualRows": 1,
+            "loops": 2,
+            "removed": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "QP-06",
+      "purpose": "Published next shift patient/window shape with RLS",
+      "query": "select id,starts_at,ends_at from public.scheduled_shifts where care_recipient_id='7d39e2fb-4731-46b3-8478-793cbf14df40' and status='published' and ends_at>now() order by starts_at limit 1",
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0.14,
+            "Total Cost": 8.42,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 0.047,
+            "Actual Total Time": 0.048,
+            "Actual Rows": 0,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 1,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Index Scan",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Scan Direction": "Forward",
+                "Index Name": "scheduled_shifts_patient_window",
+                "Relation Name": "scheduled_shifts",
+                "Alias": "scheduled_shifts",
+                "Startup Cost": 0.14,
+                "Total Cost": 8.42,
+                "Plan Rows": 1,
+                "Plan Width": 32,
+                "Actual Startup Time": 0.046,
+                "Actual Total Time": 0.046,
+                "Actual Rows": 0,
+                "Actual Loops": 1,
+                "Index Cond": "(care_recipient_id = '7d39e2fb-4731-46b3-8478-793cbf14df40'::uuid)",
+                "Rows Removed by Index Recheck": 0,
+                "Filter": "((status = 'published'::text) AND (ends_at > now()) AND private.schedule_visible(care_recipient_id, professional_id))",
+                "Rows Removed by Filter": 0,
+                "Shared Hit Blocks": 1,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 192,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.352,
+          "Triggers": [],
+          "Execution Time": 0.07
+        }
+      ],
+      "summary": {
+        "planningMs": 0.352,
+        "executionMs": 0.07,
+        "sharedHits": 1,
+        "sharedReads": 0,
+        "nodes": [
+          {
+            "type": "Limit",
+            "relation": null,
+            "index": null,
+            "actualRows": 0,
+            "loops": 1,
+            "removed": 0
+          },
+          {
+            "type": "Index Scan",
+            "relation": "scheduled_shifts",
+            "index": "scheduled_shifts_patient_window",
+            "actualRows": 0,
+            "loops": 1,
+            "removed": 0
+          }
+        ]
+      }
+    }
+  ],
+  "volume": {
+    "id": "QP-07",
+    "method": "100 new positive movements/new patient in ROLLBACK with all product triggers, actual admin Auth context for read; owner inserts are not a client authorization/throughput proof",
+    "movements": 100,
+    "query": "select product_id,location,balance from public.current_stock_balances where care_recipient_id='7f6a11cd-1a08-401b-91b9-a9a353835c21'",
+    "plan": [
+      {
+        "Plan": {
+          "Node Type": "Subquery Scan",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Alias": "current_stock_balances",
+          "Startup Cost": 19.16,
+          "Total Cost": 19.22,
+          "Plan Rows": 2,
+          "Plan Width": 84,
+          "Actual Startup Time": 234.285,
+          "Actual Total Time": 234.287,
+          "Actual Rows": 1,
+          "Actual Loops": 1,
+          "Shared Hit Blocks": 8253,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0,
+          "Plans": [
+            {
+              "Node Type": "Aggregate",
+              "Strategy": "Sorted",
+              "Partial Mode": "Simple",
+              "Parent Relationship": "Subquery",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 19.16,
+              "Total Cost": 19.2,
+              "Plan Rows": 2,
+              "Plan Width": 100,
+              "Actual Startup Time": 234.285,
+              "Actual Total Time": 234.286,
+              "Actual Rows": 1,
+              "Actual Loops": 1,
+              "Group Key": [
+                "stock_movements.product_id",
+                "stock_movements.destination_location"
+              ],
+              "Shared Hit Blocks": 8253,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Sort",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Startup Cost": 19.16,
+                  "Total Cost": 19.16,
+                  "Plan Rows": 2,
+                  "Plan Width": 86,
+                  "Actual Startup Time": 234.265,
+                  "Actual Total Time": 234.269,
+                  "Actual Rows": 100,
+                  "Actual Loops": 1,
+                  "Sort Key": [
+                    "stock_movements.product_id",
+                    "stock_movements.destination_location"
+                  ],
+                  "Sort Method": "quicksort",
+                  "Sort Space Used": 30,
+                  "Sort Space Type": "Memory",
+                  "Shared Hit Blocks": 8253,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "Plans": [
+                    {
+                      "Node Type": "Result",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Startup Cost": 0.28,
+                      "Total Cost": 19.15,
+                      "Plan Rows": 2,
+                      "Plan Width": 86,
+                      "Actual Startup Time": 3.802,
+                      "Actual Total Time": 234.08,
+                      "Actual Rows": 100,
+                      "Actual Loops": 1,
+                      "Shared Hit Blocks": 8250,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "Plans": [
+                        {
+                          "Node Type": "Append",
+                          "Parent Relationship": "Outer",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 0.28,
+                          "Total Cost": 19.13,
+                          "Plan Rows": 2,
+                          "Plan Width": 86,
+                          "Actual Startup Time": 3.801,
+                          "Actual Total Time": 233.991,
+                          "Actual Rows": 100,
+                          "Actual Loops": 1,
+                          "Shared Hit Blocks": 8250,
+                          "Shared Read Blocks": 0,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0,
+                          "Subplans Removed": 0,
+                          "Plans": [
+                            {
+                              "Node Type": "Index Scan",
+                              "Parent Relationship": "Member",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Scan Direction": "Forward",
+                              "Index Name": "stock_movements_patient_product_idx",
+                              "Relation Name": "stock_movements",
+                              "Alias": "stock_movements",
+                              "Startup Cost": 0.28,
+                              "Total Cost": 9.56,
+                              "Plan Rows": 1,
+                              "Plan Width": 73,
+                              "Actual Startup Time": 3.8,
+                              "Actual Total Time": 233.9,
+                              "Actual Rows": 100,
+                              "Actual Loops": 1,
+                              "Index Cond": "((care_recipient_id IS NOT NULL) AND (care_recipient_id = '7f6a11cd-1a08-401b-91b9-a9a353835c21'::uuid))",
+                              "Rows Removed by Index Recheck": 0,
+                              "Filter": "((destination_location IS NOT NULL) AND (private.can(care_recipient_id, 'stock.family.read'::text) OR (private.can(care_recipient_id, 'stock.team.read'::text) AND ((source_location = ANY ('{CARE_TEAM,TRANSIT}'::text[])) OR (destination_location = ANY ('{CARE_TEAM,TRANSIT}'::text[]))))) AND CASE destination_location WHEN 'FAMILY'::text THEN private.can(care_recipient_id, 'stock.family.read'::text) WHEN 'CARE_TEAM'::text THEN private.can(care_recipient_id, 'stock.team.read'::text) ELSE private.can(care_recipient_id, 'ent.read'::text) END)",
+                              "Rows Removed by Filter": 0,
+                              "Shared Hit Blocks": 8243,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            },
+                            {
+                              "Node Type": "Index Scan",
+                              "Parent Relationship": "Member",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Scan Direction": "Forward",
+                              "Index Name": "stock_movements_patient_product_idx",
+                              "Relation Name": "stock_movements",
+                              "Alias": "stock_movements_1",
+                              "Startup Cost": 0.28,
+                              "Total Cost": 9.56,
+                              "Plan Rows": 1,
+                              "Plan Width": 99,
+                              "Actual Startup Time": 0.019,
+                              "Actual Total Time": 0.019,
+                              "Actual Rows": 0,
+                              "Actual Loops": 1,
+                              "Index Cond": "((care_recipient_id IS NOT NULL) AND (care_recipient_id = '7f6a11cd-1a08-401b-91b9-a9a353835c21'::uuid))",
+                              "Rows Removed by Index Recheck": 0,
+                              "Filter": "((source_location IS NOT NULL) AND (private.can(care_recipient_id, 'stock.family.read'::text) OR (private.can(care_recipient_id, 'stock.team.read'::text) AND ((source_location = ANY ('{CARE_TEAM,TRANSIT}'::text[])) OR (destination_location = ANY ('{CARE_TEAM,TRANSIT}'::text[]))))) AND CASE source_location WHEN 'FAMILY'::text THEN private.can(care_recipient_id, 'stock.family.read'::text) WHEN 'CARE_TEAM'::text THEN private.can(care_recipient_id, 'stock.team.read'::text) ELSE private.can(care_recipient_id, 'ent.read'::text) END)",
+                              "Rows Removed by Filter": 100,
+                              "Shared Hit Blocks": 7,
+                              "Shared Read Blocks": 0,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Planning": {
+          "Shared Hit Blocks": 49,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning Time": 0.475,
+        "Triggers": [],
+        "Execution Time": 234.4
+      }
+    ],
+    "summary": {
+      "planningMs": 0.475,
+      "executionMs": 234.4,
+      "sharedHits": 8253,
+      "sharedReads": 0,
+      "nodes": [
+        {
+          "type": "Subquery Scan",
+          "relation": null,
+          "index": null,
+          "actualRows": 1,
+          "loops": 1,
+          "removed": 0
+        },
+        {
+          "type": "Aggregate",
+          "relation": null,
+          "index": null,
+          "actualRows": 1,
+          "loops": 1,
+          "removed": 0
+        },
+        {
+          "type": "Sort",
+          "relation": null,
+          "index": null,
+          "actualRows": 100,
+          "loops": 1,
+          "removed": 0
+        },
+        {
+          "type": "Result",
+          "relation": null,
+          "index": null,
+          "actualRows": 100,
+          "loops": 1,
+          "removed": 0
+        },
+        {
+          "type": "Append",
+          "relation": null,
+          "index": null,
+          "actualRows": 100,
+          "loops": 1,
+          "removed": 0
+        },
+        {
+          "type": "Index Scan",
+          "relation": "stock_movements",
+          "index": "stock_movements_patient_product_idx",
+          "actualRows": 100,
+          "loops": 1,
+          "removed": 0
+        },
+        {
+          "type": "Index Scan",
+          "relation": "stock_movements",
+          "index": "stock_movements_patient_product_idx",
+          "actualRows": 0,
+          "loops": 1,
+          "removed": 100
+        }
+      ]
+    },
+    "originalTotalBefore": 618,
+    "totalAfterRollback": 618,
+    "fixturePatientRemaining": 0,
+    "rolledBack": true,
+    "limits": "Fresh rows have no ANALYZE statistics; sequence gaps survive rollback; insert time is not a measured throughput. Initial 1000-row attempt canceled: see b311-plans-initial-attempt.json"
+  },
+  "limits": [
+    "No production hardware/cardinality/concurrent workload",
+    "EXPLAIN on selected SELECTs only; function internals are not all represented by outer plan",
+    "No cost-based index recommendation is approved by this artifact"
+  ],
+  "initialAttemptRollbackCheck": {
+    "fixturePatients": 0,
+    "fixtureMovements": 0
+  },
+  "rpcSamples": [
+    {
+      "name": "stock_overview",
+      "wallMs": 42.69,
+      "method": "single authenticated HTTP RPC, includes network/Auth/database time"
+    },
+    {
+      "name": "operational_document_list",
+      "wallMs": 44.633,
+      "method": "single authenticated HTTP RPC, includes network/Auth/database time"
+    },
+    {
+      "name": "stock_history",
+      "wallMs": 28.61,
+      "method": "single authenticated HTTP RPC, includes network/Auth/database time"
+    },
+    {
+      "name": "balance_workspace",
+      "wallMs": 27.411,
+      "method": "single authenticated HTTP RPC, includes network/Auth/database time"
+    }
+  ],
+  "indexReview": [
+    {
+      "name": "audit_events_entity_idx",
+      "schema": "public",
+      "relation": "audit_events",
+      "definition": "CREATE INDEX audit_events_entity_idx ON public.audit_events USING btree (entity_type, entity_id)"
+    },
+    {
+      "name": "audit_events_pkey",
+      "schema": "public",
+      "relation": "audit_events",
+      "definition": "CREATE UNIQUE INDEX audit_events_pkey ON public.audit_events USING btree (id)"
+    },
+    {
+      "name": "consumption_patient",
+      "schema": "public",
+      "relation": "consumption_reports",
+      "definition": "CREATE INDEX consumption_patient ON public.consumption_reports USING btree (care_recipient_id, created_at DESC)"
+    },
+    {
+      "name": "consumption_reports_pkey",
+      "schema": "public",
+      "relation": "consumption_reports",
+      "definition": "CREATE UNIQUE INDEX consumption_reports_pkey ON public.consumption_reports USING btree (id)"
+    },
+    {
+      "name": "consumption_reports_reported_by_idempotency_key_key",
+      "schema": "public",
+      "relation": "consumption_reports",
+      "definition": "CREATE UNIQUE INDEX consumption_reports_reported_by_idempotency_key_key ON public.consumption_reports USING btree (reported_by, idempotency_key)"
+    },
+    {
+      "name": "document_event_patient",
+      "schema": "public",
+      "relation": "document_events",
+      "definition": "CREATE INDEX document_event_patient ON public.document_events USING btree (care_recipient_id, created_at DESC)"
+    },
+    {
+      "name": "document_events_actor_id_idempotency_key_key",
+      "schema": "public",
+      "relation": "document_events",
+      "definition": "CREATE UNIQUE INDEX document_events_actor_id_idempotency_key_key ON public.document_events USING btree (actor_id, idempotency_key)"
+    },
+    {
+      "name": "document_events_document_id_version_key",
+      "schema": "public",
+      "relation": "document_events",
+      "definition": "CREATE UNIQUE INDEX document_events_document_id_version_key ON public.document_events USING btree (document_id, version)"
+    },
+    {
+      "name": "document_events_pkey",
+      "schema": "public",
+      "relation": "document_events",
+      "definition": "CREATE UNIQUE INDEX document_events_pkey ON public.document_events USING btree (id)"
+    },
+    {
+      "name": "documents_patient_type",
+      "schema": "public",
+      "relation": "operational_documents",
+      "definition": "CREATE INDEX documents_patient_type ON public.operational_documents USING btree (care_recipient_id, type, created_at DESC)"
+    },
+    {
+      "name": "documents_recipient",
+      "schema": "public",
+      "relation": "operational_documents",
+      "definition": "CREATE INDEX documents_recipient ON public.operational_documents USING btree (recipient_id, status)"
+    },
+    {
+      "name": "operational_documents_care_recipient_id_type_number_key",
+      "schema": "public",
+      "relation": "operational_documents",
+      "definition": "CREATE UNIQUE INDEX operational_documents_care_recipient_id_type_number_key ON public.operational_documents USING btree (care_recipient_id, type, number)"
+    },
+    {
+      "name": "operational_documents_created_by_idempotency_key_key",
+      "schema": "public",
+      "relation": "operational_documents",
+      "definition": "CREATE UNIQUE INDEX operational_documents_created_by_idempotency_key_key ON public.operational_documents USING btree (created_by, idempotency_key)"
+    },
+    {
+      "name": "operational_documents_id_care_recipient_id_key",
+      "schema": "public",
+      "relation": "operational_documents",
+      "definition": "CREATE UNIQUE INDEX operational_documents_id_care_recipient_id_key ON public.operational_documents USING btree (id, care_recipient_id)"
+    },
+    {
+      "name": "operational_documents_pkey",
+      "schema": "public",
+      "relation": "operational_documents",
+      "definition": "CREATE UNIQUE INDEX operational_documents_pkey ON public.operational_documents USING btree (id)"
+    },
+    {
+      "name": "operational_documents_protocol_key",
+      "schema": "public",
+      "relation": "operational_documents",
+      "definition": "CREATE UNIQUE INDEX operational_documents_protocol_key ON public.operational_documents USING btree (protocol)"
+    },
+    {
+      "name": "requisition_lifecycle_pkey",
+      "schema": "public",
+      "relation": "requisition_lifecycle",
+      "definition": "CREATE UNIQUE INDEX requisition_lifecycle_pkey ON public.requisition_lifecycle USING btree (requisition_id)"
+    },
+    {
+      "name": "scheduled_shifts_care_recipient_id_id_key",
+      "schema": "public",
+      "relation": "scheduled_shifts",
+      "definition": "CREATE UNIQUE INDEX scheduled_shifts_care_recipient_id_id_key ON public.scheduled_shifts USING btree (care_recipient_id, id)"
+    },
+    {
+      "name": "scheduled_shifts_patient_window",
+      "schema": "public",
+      "relation": "scheduled_shifts",
+      "definition": "CREATE INDEX scheduled_shifts_patient_window ON public.scheduled_shifts USING btree (care_recipient_id, starts_at)"
+    },
+    {
+      "name": "scheduled_shifts_pkey",
+      "schema": "public",
+      "relation": "scheduled_shifts",
+      "definition": "CREATE UNIQUE INDEX scheduled_shifts_pkey ON public.scheduled_shifts USING btree (id)"
+    },
+    {
+      "name": "scheduled_shifts_professional_id_tstzrange_excl",
+      "schema": "public",
+      "relation": "scheduled_shifts",
+      "definition": "CREATE INDEX scheduled_shifts_professional_id_tstzrange_excl ON public.scheduled_shifts USING gist (professional_id, tstzrange(starts_at, ends_at, '[)'::text)) WHERE (status = 'published'::text)"
+    },
+    {
+      "name": "scheduled_shifts_series_id_original_starts_at_key",
+      "schema": "public",
+      "relation": "scheduled_shifts",
+      "definition": "CREATE UNIQUE INDEX scheduled_shifts_series_id_original_starts_at_key ON public.scheduled_shifts USING btree (series_id, original_starts_at)"
+    },
+    {
+      "name": "inventory_adjustment_once",
+      "schema": "public",
+      "relation": "stock_movements",
+      "definition": "CREATE UNIQUE INDEX inventory_adjustment_once ON public.stock_movements USING btree (reference_id, product_id) WHERE (reference_type = 'inventory'::text)"
+    },
+    {
+      "name": "stock_movements_idempotency_unique",
+      "schema": "public",
+      "relation": "stock_movements",
+      "definition": "CREATE UNIQUE INDEX stock_movements_idempotency_unique ON public.stock_movements USING btree (performed_by, idempotency_key) WHERE (idempotency_key IS NOT NULL)"
+    },
+    {
+      "name": "stock_movements_patient_product_idx",
+      "schema": "public",
+      "relation": "stock_movements",
+      "definition": "CREATE INDEX stock_movements_patient_product_idx ON public.stock_movements USING btree (care_recipient_id, product_id, created_at DESC)"
+    },
+    {
+      "name": "stock_movements_pkey",
+      "schema": "public",
+      "relation": "stock_movements",
+      "definition": "CREATE UNIQUE INDEX stock_movements_pkey ON public.stock_movements USING btree (id)"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "recordedAt": "2026-10-30T06:22:46.737Z",
+  "passed": true,
+  "mode": "--staged",
+  "preflight": false,
+  "mandatoryFiles": 35,
+  "artifacts": 413,
+  "inventoryObjects": 1098,
+  "coverageObjects": 306,
+  "invariants": 35,
+  "migrations": 84,
+  "authorizationRows": 1522,
+  "routines": 232,
+  "scenarios": 94,
+  "findings": 25,
+  "findingFields": 32,
+  "priorities": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 19,
+    "P3": 5
+  },
+  "linksChecked": 91,
+  "syntaxChecked": 46,
+  "secretPatternHits": 0,
+  "preservation": "No original row missing;7 versioned existing-cron advances separately proved;other20-table snapshot hashes preserved",
+  "manifest": {
+    "mode": "--staged",
+    "entries": 411,
+    "missing": [],
+    "extra": [],
+    "mismatches": [],
+    "exclusions": [
+      "docs/audits/2026-10-29-phase-b3-database/evidence/MANIFEST.sha256",
+      "docs/audits/2026-10-29-phase-b3-database/evidence/PACKAGE_INTEGRITY.json",
+      "docs/audits/2026-10-29-phase-b3-database/evidence/PACKAGE_INTEGRITY.md"
+    ],
+    "passed": true
+  },
+  "errors": [],
+  "limitations": [
+    "No B3 full migration replay,restore,remote/human/device/provider proof.",
+    "EXECUTED and matrix rows do not mean complete function/security certification."
+  ],
+  "generatedReportMarkdown": {
+    "command": "node node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs docs/audits/2026-10-29-phase-b3-database/evidence/PACKAGE_INTEGRITY.md",
+    "note": "Initial library-module invocation was not CLI and was not counted as proof; actual bin CLI result recorded here.",
+    "checkedFiles": 1,
+    "exitCode": 0
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "group": "B3.12",
+  "startedAt": "2026-10-30T05:13:22.775Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Second-pass independent local Auth/HTTP/Storage and persisted reads. Synthetic data only; no provider/browser/remote validation.",
+  "scenarios": [
+    {
+      "id": "B312-01",
+      "purpose": "JWT de sessão encerrada altera perfil e avatar próprios apesar da recusa da API",
+      "recordedAt": "2026-10-30T05:13:23.271Z",
+      "observed": {
+        "appSessionValid": false,
+        "apiProfileStatus": 401,
+        "directProfileWriteAccepted": true,
+        "directAvatarPointerAccepted": true,
+        "persisted": {
+          "nameChanged": true,
+          "avatarChanged": true
+        },
+        "businessReadDenied": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "stock_overview: stock permission required"
+        },
+        "scope": "Own new synthetic profile/avatar; JWT not expired. Other login of same new identity remains valid. No cross-user/patient access or password/email change demonstrated"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B312-02",
+      "purpose": "Trocar contexto enquanto movimento aguarda lock não revalida paciente depois da espera",
+      "recordedAt": "2026-10-30T05:13:24.768Z",
+      "observed": {
+        "barrierWaiters": 1,
+        "contextSwitchedBeforeRelease": true,
+        "response": [
+          {
+            "status": 200,
+            "id": "a7adb30d-c8c4-4553-948e-211d04023084",
+            "version": null,
+            "state": null,
+            "code": null,
+            "message": null
+          }
+        ],
+        "movementAddedToOriginalPatient": 1,
+        "newOldPatientCallDenied": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "family_stock_movement: required permission: stock.family.manage"
+        },
+        "relation": "Same authorization-before-lock family as B38-06; context change affects future calls, in-flight command keeps original explicit patient. No cross-patient ID substitution or loss of membership"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B312-03",
+      "purpose": "Mesmo produto e usuário em dois pacientes não permitem vincular necessidade estrangeira",
+      "recordedAt": "2026-10-30T05:13:26.784Z",
+      "observed": {
+        "foreignRequisition": "3232fcd3-fa4b-46d4-ae6e-1397e10c3e02",
+        "sameGlobalProduct": "fralda",
+        "professionalHasBothMemberships": true,
+        "denied": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "create_supply_document: invalid requisition line link"
+        },
+        "draftRowsPersisted": 0,
+        "mainDocumentCountUnchanged": true,
+        "scope": "Cross-tenant association rejected independently of product identity or membership; both patients synthetic"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B312-04",
+      "purpose": "Flow exige serviço, preserva replay igual, dono da confirmação e revogação atual",
+      "recordedAt": "2026-10-30T05:13:27.907Z",
+      "observed": {
+        "session": "dfa11d7d-7171-4672-b24e-7ba21b21901b",
+        "publicCallDenied": "42501",
+        "catalogLoaded": true,
+        "sameBodyReplay": true,
+        "differentBodyDenied": "42501",
+        "submissionRows": 1,
+        "otherActorDenied": "42501",
+        "reviewedStatus": "confirmed",
+        "newReportId": "77029e8a-5540-4fef-923e-f19d0035a036",
+        "revokedActorDenied": "42501",
+        "limits": "Service RPC contract only; no Meta cryptography/editor/publication/WhatsApp delivery/OTP validation"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B312-05",
+      "purpose": "Nulos nas opções de lista documental ignoram a limitação SQL apesar do limite numérico",
+      "recordedAt": "2026-10-30T05:13:28.738Z",
+      "observed": {
+        "ordinaryPageRows": 1,
+        "nullPageRows": 16,
+        "total": 16,
+        "returnedPage": null,
+        "returnedPageSize": null,
+        "classification": "Direct authorized RPC nullable parameter bypass of intended1..100 page bound; API pageParameters mitigates; no unauthorized rows demonstrated",
+        "cause": "SQL IF with NULL not-between yields NULL, LIMIT NULL means no limit"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T05:13:28.809Z"
+}

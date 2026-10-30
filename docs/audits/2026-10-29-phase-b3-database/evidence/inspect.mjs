@@ -1,0 +1,44 @@
+/* READ ONLY: catalog, counts and source hashes. No secrets or row payloads. */
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {getTestEnvironment,sql} from '../../../../scripts/test-environment.mjs';
+if(process.versions.node!=='24.22.0')throw new Error('Node 24.22.0 required');
+getTestEnvironment();
+const out=new URL('./',import.meta.url),git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim();
+if(git('branch','--show-current')!=='audit/phase-b')throw new Error('Wrong branch');
+const read=q=>JSON.parse(sql(`begin read only; select coalesce(jsonb_agg(x),'[]') from (${q}) x; rollback;`));
+const queries={
+ schemas:`select nspname,pg_get_userbyid(nspowner) owner,nspacl::text acl from pg_namespace where nspname not like 'pg_%' and nspname<>'information_schema' order by 1`,
+ extensions:`select e.extname,e.extversion,n.nspname schema from pg_extension e join pg_namespace n on n.oid=e.extnamespace order by 1`,
+ relations:`select c.oid,n.nspname schema,c.relname name,c.relkind kind,pg_get_userbyid(c.relowner) owner,c.relrowsecurity rls,c.relforcerowsecurity force_rls,c.relacl::text acl,c.reloptions,c.reltuples estimate from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname in ('public','private','storage','auth','cron','realtime') and c.relkind in ('r','p','v','m','S') order by 2,3`,
+ columns:`select n.nspname schema,c.relname relation,a.attname name,a.attnum ordinal,format_type(a.atttypid,a.atttypmod) type,a.attnotnull not_null,pg_get_expr(d.adbin,d.adrelid) default_expr,a.attidentity identity,a.attgenerated generated from pg_attribute a join pg_class c on c.oid=a.attrelid join pg_namespace n on n.oid=c.relnamespace left join pg_attrdef d on d.adrelid=a.attrelid and d.adnum=a.attnum where n.nspname in ('public','private','storage','auth') and c.relkind in ('r','p','v','m') and a.attnum>0 and not a.attisdropped order by 1,2,4`,
+ constraints:`select n.nspname schema,c.relname relation,co.conname name,co.contype type,pg_get_constraintdef(co.oid) definition,co.convalidated validated,co.condeferrable deferrable,co.condeferred deferred,co.confrelid::regclass::text referenced_relation from pg_constraint co join pg_class c on c.oid=co.conrelid join pg_namespace n on n.oid=c.relnamespace where n.nspname in ('public','private','storage','auth') order by 1,2,3`,
+ indexes:`select schemaname schema,tablename relation,indexname name,indexdef definition from pg_indexes where schemaname in ('public','private','storage','auth') order by 1,2,3`,
+ triggers:`select n.nspname schema,c.relname relation,t.tgname name,t.tgenabled enabled,pg_get_triggerdef(t.oid) definition,pn.nspname function_schema,p.proname function_name from pg_trigger t join pg_class c on c.oid=t.tgrelid join pg_namespace n on n.oid=c.relnamespace join pg_proc p on p.oid=t.tgfoid join pg_namespace pn on pn.oid=p.pronamespace where not t.tgisinternal and n.nspname in ('public','private','storage','auth') order by 1,2,3`,
+ policies:`select schemaname schema,tablename relation,policyname name,permissive,roles::text,cmd,qual,with_check from pg_policies where schemaname in ('public','private','storage','auth','realtime') order by 1,2,3`,
+ routines:`select p.oid,n.nspname schema,p.proname name,pg_get_function_identity_arguments(p.oid) signature,pg_get_function_result(p.oid) result,p.prokind kind,pg_get_userbyid(p.proowner) owner,p.prosecdef security_definer,p.provolatile volatility,p.proconfig config,p.proacl::text acl,pg_get_functiondef(p.oid) definition,has_function_privilege('anon',p.oid,'execute') anon_execute,has_function_privilege('authenticated',p.oid,'execute') authenticated_execute,has_function_privilege('service_role',p.oid,'execute') service_execute from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','private') and p.prokind in ('f','p') order by 2,3,4`,
+ roles:`select rolname,rolsuper,rolinherit,rolcreaterole,rolcreatedb,rolcanlogin,rolbypassrls,rolconnlimit from pg_roles order by 1`,
+ memberships:`select pg_get_userbyid(roleid) role,pg_get_userbyid(member) member,admin_option,inherit_option,set_option from pg_auth_members order by 1,2`,
+ defaults:`select pg_get_userbyid(defaclrole) owner,coalesce(n.nspname,'*') schema,defaclobjtype type,defaclacl::text acl from pg_default_acl a left join pg_namespace n on n.oid=a.defaclnamespace order by 1,2,3`,
+ grants:`select n.nspname schema,c.relname relation,r.rolname role,has_table_privilege(r.rolname,c.oid,'select') select_priv,has_table_privilege(r.rolname,c.oid,'insert') insert_priv,has_table_privilege(r.rolname,c.oid,'update') update_priv,has_table_privilege(r.rolname,c.oid,'delete') delete_priv,has_table_privilege(r.rolname,c.oid,'truncate') truncate_priv,has_schema_privilege(r.rolname,n.oid,'usage') schema_usage from pg_class c join pg_namespace n on n.oid=c.relnamespace cross join pg_roles r where n.nspname in ('public','private','storage','auth') and c.relkind in ('r','p','v','m') and r.rolname in ('anon','authenticated','service_role') order by 1,2,3`,
+ views:`select schemaname schema,viewname name,definition from pg_views where schemaname in ('public','private') order by 1,2`,
+ types:`select n.nspname schema,t.typname name,e.enumlabel label,e.enumsortorder ordinal from pg_type t join pg_namespace n on n.oid=t.typnamespace join pg_enum e on e.enumtypid=t.oid where n.nspname in ('public','private') order by 1,2,4`,
+ migrations:`select version,name,md5(array_to_string(statements,E'\\n')) statement_md5 from supabase_migrations.schema_migrations order by version`,
+ jobs:`select jobid,jobname,schedule,active,md5(command) command_md5,database,username from cron.job order by jobid`,
+ buckets:`select id,public,file_size_limit,allowed_mime_types from storage.buckets order by id`,
+ dependencies:`select distinct ns.nspname schema,c.relname object,rns.nspname referenced_schema,rc.relname referenced_object,d.deptype from pg_depend d join pg_class c on c.oid=d.objid and d.classid='pg_class'::regclass join pg_namespace ns on ns.oid=c.relnamespace join pg_class rc on rc.oid=d.refobjid and d.refclassid='pg_class'::regclass join pg_namespace rns on rns.oid=rc.relnamespace where ns.nspname in ('public','private') and rns.nspname not like 'pg_%' order by 1,2,3,4`,
+ isolation:`select exists(select 1 from vault.secrets where name='hca_worker_url') worker_url_configured,exists(select 1 from vault.secrets where name='hca_worker_bearer') worker_bearer_configured,(select count(*) from net.http_request_queue) network_queue_count`,
+ counts:`select current_database() database,current_setting('server_version') server_version,(select count(*) from auth.users) auth_users,(select count(*) from auth.sessions) auth_sessions,(select count(*) from public.care_recipients) patients,(select count(*) from public.operational_documents) documents,(select count(*) from public.stock_movements) movements,(select count(*) from storage.objects) storage_objects`
+};
+const catalog={recordedAt:new Date().toISOString()};
+for(const [k,q] of Object.entries(queries))catalog[k]=read(q);
+writeFileSync(new URL('catalog.json',out),JSON.stringify(catalog,null,2)+'\n');
+mkdirSync(new URL('contracts/',out),{recursive:true});
+for(const r of catalog.routines)writeFileSync(new URL(`contracts/${r.schema}.${r.name}.${r.oid}.sql`,out),r.definition+'\n');
+const paths=git('ls-files','src','supabase','tests','scripts','package.json','package-lock.json','AGENTS.md').split('\n');
+const hashes=paths.map(path=>({path,sha256:createHash('sha256').update(readFileSync(path)).digest('hex')}));
+writeFileSync(new URL('source-hashes.json',out),JSON.stringify(hashes,null,2)+'\n');
+const baseline={recordedAt:catalog.recordedAt,clientDate:'2026-10-29',timezone:'America/Sao_Paulo',node:process.versions.node,branch:git('branch','--show-current'),head:git('rev-parse','HEAD'),master:git('rev-parse','master'),originPhaseB:git('rev-parse','origin/audit/phase-b'),functionalSha:'37cb7f85e96e551d6419871f94dd950712e2565b',functionalDiff:git('diff','--name-only','37cb7f85e96e551d6419871f94dd950712e2565b','HEAD','--','src','supabase','tests','scripts','package.json','package-lock.json'),project:'home-care-assistant',container:'supabase_db_home-care-assistant',api:'127.0.0.1:54321',database:'127.0.0.1:54322',guardPassed:true,counts:catalog.counts[0],catalogCounts:Object.fromEntries(Object.entries(catalog).filter(([,v])=>Array.isArray(v)).map(([k,v])=>[k,v.length])),isolation:catalog.isolation[0],limits:'Local metadata only. No remote verification or data payload export. Catalog routines include extension-owned routines; coverage distinguishes these.'};
+writeFileSync(new URL('baseline.json',out),JSON.stringify(baseline,null,2)+'\n');
+console.log(JSON.stringify(baseline,null,2));

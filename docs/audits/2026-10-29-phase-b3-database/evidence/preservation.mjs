@@ -1,0 +1,12 @@
+/* READ ONLY DB. Private row hashes stay outside Git; only counts/results exported. */
+import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
+import {join} from 'node:path';
+import {getTestEnvironment,sql} from '../../../../scripts/test-environment.mjs';
+getTestEnvironment();
+const dir=join(process.env.LOCALAPPDATA,'home-care-assistant','audit-b3');mkdirSync(dir,{recursive:true});
+const file=join(dir,'preservation-before.json');
+const tables=['profiles','care_recipients','care_recipient_memberships','care_recipient_products','products','requisitions','requisition_items','requisition_observations','operational_documents','document_lines','document_events','stock_movements','attachments','document_pdfs','document_pdf_renders','purchase_receipts','bal_approvals','shift_series','scheduled_shifts','bal_obligations'];
+const read=(table,ids)=>JSON.parse(sql(`begin read only;select coalesce(jsonb_agg(jsonb_build_object('key',${table==='care_recipient_products'?'care_recipient_id::text||product_id':table==='bal_approvals'?'document_id::text||count_version::text||review_group':table==='document_pdf_renders'?'document_id::text||version::text||renderer::text':'id::text'},'hash',md5(row_to_json(t)::text))),'[]') from public.${table} t ${ids?'where '+ids:''};rollback;`));
+if(process.argv.includes('--before')){if(existsSync(file))throw new Error('Original preservation snapshot already exists; never overwrite');const state={recordedAt:new Date().toISOString(),tables:{}};for(const t of tables)state.tables[t]=read(t);writeFileSync(file,JSON.stringify(state),{mode:0o600});console.log(JSON.stringify({snapshot:'private outside Git',tables:tables.length,rows:Object.values(state.tables).reduce((n,a)=>n+a.length,0)}));}
+else if(process.argv.includes('--after')){const state=JSON.parse(readFileSync(file)),results=[];for(const [t,rows]of Object.entries(state.tables)){const current=read(t),map=new Map(current.map(x=>[x.key,x.hash]));results.push({table:t,originalRows:rows.length,missing:rows.filter(r=>!map.has(r.key)).length,changed:rows.filter(r=>map.has(r.key)&&map.get(r.key)!==r.hash).length});}const result={recordedAt:new Date().toISOString(),method:'Private per-original-row hashes; no payload export. New rows excluded.',results};writeFileSync(new URL('data-preservation.json',import.meta.url),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));}
+else throw new Error('Use --before ONCE or --after');

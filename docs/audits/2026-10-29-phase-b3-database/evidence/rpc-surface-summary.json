@@ -1,0 +1,10 @@
+{
+  "routines": 232,
+  "application": 228,
+  "exposedApplication": 116,
+  "internalOrRevoked": 112,
+  "definer": 220,
+  "withoutSearchPath": [],
+  "appCallers": 96,
+  "limits": "Markers and caller matches support semantic review, not proof by themselves"
+}

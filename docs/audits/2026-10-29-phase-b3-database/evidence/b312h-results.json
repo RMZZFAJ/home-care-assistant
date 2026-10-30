@@ -1,0 +1,98 @@
+{
+  "group": "B3.12h",
+  "startedAt": "2026-10-30T05:15:15.710Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Second-pass rollback history fixture with live Auth session claims; anonymous limited verification HTTP; rollback job contract with simulated service role. No provider proof.",
+  "scenarios": [
+    {
+      "id": "B312-06",
+      "purpose": "Duzentas versões preservam hash antigo mas acumulam20100 entradas resumidas",
+      "recordedAt": "2026-10-30T05:15:32.120Z",
+      "observed": {
+        "samples": [
+          {
+            "events": 10,
+            "summarizedEntries": 55,
+            "sumStoredBodyBytes": 10108,
+            "sumLogicalBodyBytes": 18453,
+            "latestLogicalBodyBytes": 2479
+          },
+          {
+            "events": 100,
+            "summarizedEntries": 5050,
+            "sumStoredBodyBytes": 120166,
+            "sumLogicalBodyBytes": 814865,
+            "latestLogicalBodyBytes": 15081
+          },
+          {
+            "events": 200,
+            "summarizedEntries": 20100,
+            "sumStoredBodyBytes": 285571,
+            "sumLogicalBodyBytes": 3035015,
+            "latestLogicalBodyBytes": 29181
+          }
+        ],
+        "digestMismatches": 0,
+        "oldVersionVerifies": true,
+        "authorizedDetailEventCount": 200,
+        "rolledBack": true,
+        "fixturePatientRemaining": 0,
+        "limits": "200 bounded versions, not1000 or production benchmark; owner events are fixture creation, not public command authorization. pg_column_size sum is not full relation/TOAST/index size"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B312-07",
+      "purpose": "Verificação pública limitada não retorna conteúdo e exige hash exato de versão existente",
+      "recordedAt": "2026-10-30T05:15:32.911Z",
+      "observed": {
+        "knownExactHash": true,
+        "wrongHash": false,
+        "missingId": false,
+        "privateContentReadDenied": true,
+        "returnType": "boolean",
+        "classification": "Deliberate public boolean verification surface; not a RLS finding. Hash is integrity anchor in database, not independent digital signature against a compromised owner"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B312-08",
+      "purpose": "Job histórico pode permanecer válido após cancelamento; nova ação documental continua bloqueada",
+      "recordedAt": "2026-10-30T05:15:33.161Z",
+      "observed": {
+        "currentStatus": "cancelled",
+        "jobStillValid": true,
+        "currentVersion": 2,
+        "externalSending": false,
+        "newActionBlocked": true,
+        "payloadHistoricalStatus": "approved",
+        "payloadHistoricalVersion": 1,
+        "rolledBack": true,
+        "classification": "Historical event notification contract, not permission to act on cancelled document; delivery ordering/labels require product/external validation",
+        "limits": "New COM and rollback job fixture; actual Auth claims for cancellation, simulated service SQL, no actual worker/provider"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [
+    {
+      "id": "B312-06",
+      "purpose": "Duzentas versões preservam hash antigo mas acumulam20100 entradas resumidas",
+      "recordedAt": "2026-10-30T05:15:15.983Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Local SQL failed: ERROR:  local administrator required\nCONTEXT:  PL/pgSQL function private.guard_membership_elevation() line 6 at RAISE",
+        "sqlstate": null
+      }
+    }
+  ],
+  "finishedAt": "2026-10-30T05:15:33.386Z"
+}

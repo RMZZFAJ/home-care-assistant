@@ -1,0 +1,56 @@
+{
+  "group": "B3.12v",
+  "startedAt": "2026-10-30T05:16:27.216Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "1000 NEW owner-generated synthetic document events in rollback with current triggers; actual Auth session for old/current reads; timeout30s per statement.",
+  "scenarios": [
+    {
+      "id": "B312-09",
+      "purpose": "Mil eventos mantêm versão antiga verificável e armazenam500500 resumos",
+      "recordedAt": "2026-10-30T05:16:27.217Z",
+      "observed": {
+        "samples": [
+          {
+            "events": 100,
+            "fixtureElapsedMs": 313.097,
+            "summarizedEntries": 5050,
+            "sumStoredBodyBytes": 120318,
+            "sumLogicalBodyBytes": 809915
+          },
+          {
+            "events": 500,
+            "fixtureElapsedMs": 2251.616,
+            "summarizedEntries": 125250,
+            "sumStoredBodyBytes": 1045047,
+            "sumLogicalBodyBytes": 18030715
+          },
+          {
+            "events": 1000,
+            "fixtureElapsedMs": 6361.283,
+            "summarizedEntries": 500500,
+            "sumStoredBodyBytes": 3194326,
+            "sumLogicalBodyBytes": 71056717
+          }
+        ],
+        "detailEvents": 1000,
+        "digestMismatches": 0,
+        "oldVersionVerifies": true,
+        "oldVersionAccessible": true,
+        "rolledBack": true,
+        "fixturePatientRemaining": 0,
+        "limits": "COM event fixture, one admin, no lines; elapsed includes fixture writes/metrics, not user-command latency or production throughput. Logical bytes differ from compressed storage, relation/TOAST/index size and backup size. REQ has additional snapshot fields."
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T05:16:34.294Z"
+}

@@ -1,0 +1,3485 @@
+{
+  "recordedAt": "2026-10-30T00:53:36.265Z",
+  "files": 84,
+  "statements": 1136,
+  "definitions": 334,
+  "renames": 32,
+  "drops": 5,
+  "routines": [
+    {
+      "name": "private.admin_assurance",
+      "signature": "",
+      "source": "supabase/migrations/20261023041150_v4_session_assurance_and_admin_directory.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "d331a3e4847c2a3ae190cd8a55ba69d46cd9d3734c3bd791399bd42c0649c01d",
+      "chainBodySha": "d331a3e4847c2a3ae190cd8a55ba69d46cd9d3734c3bd791399bd42c0649c01d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.adopt_catalogue_model",
+      "signature": "p_patient uuid, p_product text",
+      "source": "supabase/migrations/20261024205813_fluent_administration_capabilities.sql",
+      "sourceLine": 11,
+      "bodyEqual": true,
+      "installedBodySha": "296e394c66f3f822fd6f5a16d67da81f3c8c85d22a2fd3006ce3e269b66255a1",
+      "chainBodySha": "296e394c66f3f822fd6f5a16d67da81f3c8c85d22a2fd3006ce3e269b66255a1",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.apply_access_change",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 119,
+      "bodyEqual": true,
+      "installedBodySha": "b575f56e6b4af0addc9b07c3bf375e0a3a528154aa5f30cf164b7cbb3ef116a9",
+      "chainBodySha": "b575f56e6b4af0addc9b07c3bf375e0a3a528154aa5f30cf164b7cbb3ef116a9",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.apply_bal",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 80,
+      "bodyEqual": false,
+      "installedBodySha": "2b666bc9ac3afb1be26a7e2462d6deab3213671b600aadd4c84a16070b63f952",
+      "chainBodySha": "0f2af3b764dd0cabbfb0a5d43a1ed28c81d3bcfb09795a6ae34c0c7787db48cd",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.attachment_read",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022061251_evidence_idempotency_and_final_contracts.sql",
+      "sourceLine": 27,
+      "bodyEqual": true,
+      "installedBodySha": "28b0d52213a4144644782db7c251230dd64a7cdaf3e665d6c40111d91d888ae8",
+      "chainBodySha": "28b0d52213a4144644782db7c251230dd64a7cdaf3e665d6c40111d91d888ae8",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.auth_session",
+      "signature": "",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 19,
+      "bodyEqual": true,
+      "installedBodySha": "6bc322269332d55484b9ab127b4ef4b7487d89944e37ef3ed41a595b52656f8b",
+      "chainBodySha": "6bc322269332d55484b9ab127b4ef4b7487d89944e37ef3ed41a595b52656f8b",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.bal_assign",
+      "signature": "p_patient uuid, p_cycle uuid, p_shift uuid, p_kind text",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 94,
+      "bodyEqual": true,
+      "installedBodySha": "e19b2e0732647f0b2351d86f4f0e2306510b307f91769599f23f7ed687b37fdf",
+      "chainBodySha": "e19b2e0732647f0b2351d86f4f0e2306510b307f91769599f23f7ed687b37fdf",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.bal_count_context",
+      "signature": "p_patient uuid, p_document uuid, p_payload jsonb",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 285,
+      "bodyEqual": false,
+      "installedBodySha": "1777ec16b4f7b19accc324c9f2e35c50b38eae0e5976da5c71edfbfacd59edd6",
+      "chainBodySha": "f89e25f38013701c220d8b9fa7bc6033822a12eae9a0071a4872ab02a7e2d72e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.bal_event",
+      "signature": "p_patient uuid, p_cycle uuid, p_assignment uuid, p_action text, p_reason text, p_details jsonb, p_key text",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 81,
+      "bodyEqual": true,
+      "installedBodySha": "930d242979c5c7a0f1f4e4ccb06811eceef63e17874c10e314f5f1bb1ac44dae",
+      "chainBodySha": "930d242979c5c7a0f1f4e4ccb06811eceef63e17874c10e314f5f1bb1ac44dae",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.bal_family_authority",
+      "signature": "p_patient uuid, p_cap text",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 77,
+      "bodyEqual": true,
+      "installedBodySha": "67504587043f0fe283706e533eadea3ca0fdcd2c8114db222a3c47cd4e8af928",
+      "chainBodySha": "67504587043f0fe283706e533eadea3ca0fdcd2c8114db222a3c47cd4e8af928",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.can",
+      "signature": "p_patient uuid, p_capability text",
+      "source": "supabase/migrations/20261023041150_v4_session_assurance_and_admin_directory.sql",
+      "sourceLine": 12,
+      "bodyEqual": true,
+      "installedBodySha": "7723c04629394b3b8a2fb5463053fb5b45cc8789b335b85f69d39587f8973c16",
+      "chainBodySha": "7723c04629394b3b8a2fb5463053fb5b45cc8789b335b85f69d39587f8973c16",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.capability_definition_rows",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261025103452_effective_capability_matrix.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "0eba97148afb3452fd13dbae92bf01816eeb3157d74d29df7ea98c0e4a39e1af",
+      "chainBodySha": "0eba97148afb3452fd13dbae92bf01816eeb3157d74d29df7ea98c0e4a39e1af",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.close_admin_bootstrap",
+      "signature": "",
+      "source": "supabase/migrations/20261022052012_workflow_guards_and_read_models.sql",
+      "sourceLine": 52,
+      "bodyEqual": true,
+      "installedBodySha": "e7f31022ea1009309b7e91481bf306dbc91cac6c6e41d3b208cf30640190b63d",
+      "chainBodySha": "e7f31022ea1009309b7e91481bf306dbc91cac6c6e41d3b208cf30640190b63d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.credit_purchase_receipt",
+      "signature": "p_receipt uuid",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 144,
+      "bodyEqual": true,
+      "installedBodySha": "1c5b7750fb3a618220ba73b449c6ab8f18e1cc1f25e120d8d41e77fa27447114",
+      "chainBodySha": "1c5b7750fb3a618220ba73b449c6ab8f18e1cc1f25e120d8d41e77fa27447114",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.deliver_internal_notifications",
+      "signature": "",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 170,
+      "bodyEqual": false,
+      "installedBodySha": "ec860da52298576ee88065719c559b6d22c5001a12033b8496eabde37cf682fe",
+      "chainBodySha": "ef906623d15cc71337376c51b47f73593cff671ec6e5dc645eeb6e530b4bf29f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.delivery_science_and_progress",
+      "signature": "",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 146,
+      "bodyEqual": true,
+      "installedBodySha": "03fc58caf984e72c79bce07e258cff82e4c3b26d12a594c45fb4f3954515c4d8",
+      "chainBodySha": "03fc58caf984e72c79bce07e258cff82e4c3b26d12a594c45fb4f3954515c4d8",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.effective_requisition_product",
+      "signature": "p_item uuid",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 21,
+      "bodyEqual": true,
+      "installedBodySha": "f79a7ccc6c0219dd3c9e0dcb488d24230483592585bd0f059df494f8d6b4cee5",
+      "chainBodySha": "f79a7ccc6c0219dd3c9e0dcb488d24230483592585bd0f059df494f8d6b4cee5",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.emit_document",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022043226_operational_documents.sql",
+      "sourceLine": 141,
+      "bodyEqual": true,
+      "installedBodySha": "4649c94ff46176ed17188e031144654d98138959bf9005fbefb1fc0d640a5502",
+      "chainBodySha": "4649c94ff46176ed17188e031144654d98138959bf9005fbefb1fc0d640a5502",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.enqueue_document_event",
+      "signature": "",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 2,
+      "bodyEqual": true,
+      "installedBodySha": "e65de8cbba51d4ee57702466dcd75639ba660f94de5ad1007cbd1bd55541c069",
+      "chainBodySha": "e65de8cbba51d4ee57702466dcd75639ba660f94de5ad1007cbd1bd55541c069",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.enqueue_notice",
+      "signature": "p_patient uuid, p_user uuid, p_event text, p_document uuid, p_document_event uuid, p_alert uuid, p_report uuid, p_reminder uuid, p_pdf boolean",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 177,
+      "bodyEqual": true,
+      "installedBodySha": "303e2584883a88d915fec3102e611d78912e859b711e7891e51ec0d990237865",
+      "chainBodySha": "303e2584883a88d915fec3102e611d78912e859b711e7891e51ec0d990237865",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.enqueue_scheduled_reminders",
+      "signature": "",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 185,
+      "bodyEqual": false,
+      "installedBodySha": "16a76c72fc9aac0666a75b0410dc7084cbc98a31800503fd1f4afd35826eb081",
+      "chainBodySha": "dd6dfe7d85905e779f30e58699cc6dadfe9ef98203dbf44cd8d85c833a0ca5c0",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.finish_bal_count",
+      "signature": "p_id uuid, p_context jsonb",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 304,
+      "bodyEqual": true,
+      "installedBodySha": "10c71d44109b5ba2af93836f58896fd217e64daea759abfe96b4a070ab930a4d",
+      "chainBodySha": "10c71d44109b5ba2af93836f58896fd217e64daea759abfe96b4a070ab930a4d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.global_identity",
+      "signature": "",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 25,
+      "bodyEqual": true,
+      "installedBodySha": "8f58cca2e3b2b1303097422164838df27e35264e4fbf79f1d8247ab2a57105ac",
+      "chainBodySha": "8f58cca2e3b2b1303097422164838df27e35264e4fbf79f1d8247ab2a57105ac",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.guard_bal_schedule_window",
+      "signature": "",
+      "source": "supabase/migrations/20261025101209_balance_deadlines_and_schedule_separation.sql",
+      "sourceLine": 11,
+      "bodyEqual": true,
+      "installedBodySha": "08bf19e054b5d49911416ec0f57d17fddd7dc34ac5c935499fa72900b8dea503",
+      "chainBodySha": "08bf19e054b5d49911416ec0f57d17fddd7dc34ac5c935499fa72900b8dea503",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.guard_catalogue_unit",
+      "signature": "",
+      "source": "supabase/migrations/20261022053539_draft_recounts_and_catalogue_contracts.sql",
+      "sourceLine": 43,
+      "bodyEqual": true,
+      "installedBodySha": "b822544153d56f172bd42010d844ad72248b381a59e9df222d337d0e773bc22e",
+      "chainBodySha": "b822544153d56f172bd42010d844ad72248b381a59e9df222d337d0e773bc22e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.guard_closed_request_links",
+      "signature": "",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 176,
+      "bodyEqual": true,
+      "installedBodySha": "d65a5db63df6d8797640b93571e132955ccc80edbeffa0f9986681e23d313843",
+      "chainBodySha": "d65a5db63df6d8797640b93571e132955ccc80edbeffa0f9986681e23d313843",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.guard_membership_elevation",
+      "signature": "",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 62,
+      "bodyEqual": true,
+      "installedBodySha": "032209cbcb905b5781d86a26d3b24b66f5b22c5f63a9cfb88932e0a6f2bad369",
+      "chainBodySha": "032209cbcb905b5781d86a26d3b24b66f5b22c5f63a9cfb88932e0a6f2bad369",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.guard_notification_event_contract",
+      "signature": "",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 8,
+      "bodyEqual": true,
+      "installedBodySha": "6ab0bc4e2084ff19e49a95741cab08cbc61c1bd0399fd417d524280bc4b99c6c",
+      "chainBodySha": "6ab0bc4e2084ff19e49a95741cab08cbc61c1bd0399fd417d524280bc4b99c6c",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.has_patient_authority",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "sourceLine": 32,
+      "bodyEqual": true,
+      "installedBodySha": "074656d83d286cbed36de8c72a54b5c5161799bd77fa49ed3b71b0b740edfaab",
+      "chainBodySha": "074656d83d286cbed36de8c72a54b5c5161799bd77fa49ed3b71b0b740edfaab",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.immutable_event",
+      "signature": "",
+      "source": "supabase/migrations/20261022043226_operational_documents.sql",
+      "sourceLine": 137,
+      "bodyEqual": true,
+      "installedBodySha": "62827055cf0768fabbb562d012f7e6e32f64fdf91cca5226419d1ee230a2d58a",
+      "chainBodySha": "62827055cf0768fabbb562d012f7e6e32f64fdf91cca5226419d1ee230a2d58a",
+      "securityDefiner": false,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.init_requisition_science",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 23,
+      "bodyEqual": true,
+      "installedBodySha": "a28ce301e0b3efd91cd178b525f0e351ded7e4a274ade0208e896de70af5030d",
+      "chainBodySha": "a28ce301e0b3efd91cd178b525f0e351ded7e4a274ade0208e896de70af5030d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.invalidate_workspace",
+      "signature": "",
+      "source": "supabase/migrations/20261025164621_notification_claim_conflict_recovery.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "ec2e161d65989fd458f8aa92d8749ebb709d36a46c8cd9d272a062cbe7699520",
+      "chainBodySha": "ec2e161d65989fd458f8aa92d8749ebb709d36a46c8cd9d272a062cbe7699520",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.invoke_notification_worker",
+      "signature": "",
+      "source": "supabase/migrations/20261023041624_v4_document_read_models_and_worker_cron.sql",
+      "sourceLine": 53,
+      "bodyEqual": true,
+      "installedBodySha": "927d9592a95e2cfa7ea0151e78e58d28b2cce2adf0fd2c46df773c03c25fca7b",
+      "chainBodySha": "927d9592a95e2cfa7ea0151e78e58d28b2cce2adf0fd2c46df773c03c25fca7b",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.member_can",
+      "signature": "p_patient uuid, p_user uuid, p_capability text",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 63,
+      "bodyEqual": false,
+      "installedBodySha": "da95655928642cfc367fd1f6cd67781755c120972c7928c96904099dccef7a64",
+      "chainBodySha": "ae8c1d8fe657d4f28dbe5e6817a34811ff6c09e3b872571885beeb525f0b2869",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.move_stock",
+      "signature": "p_patient uuid, p_product text, p_quantity numeric, p_source text, p_destination text, p_reason text, p_reference text, p_id uuid",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 57,
+      "bodyEqual": true,
+      "installedBodySha": "07526ea51bb4f64b29d7295f44299552a254d5e603621b1fb5edac31c23828a7",
+      "chainBodySha": "07526ea51bb4f64b29d7295f44299552a254d5e603621b1fb5edac31c23828a7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.process_bal_patient",
+      "signature": "p_patient uuid, p_now timestamp with time zone",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 104,
+      "bodyEqual": false,
+      "installedBodySha": "e29d7024cdcb40584bdd1d9f979562d128c279f13361e6ef150ea76a5aabc494",
+      "chainBodySha": "664fae2a78b9df4b5a18be3caefdb440c728f0ed9e62f2a6c8964e92751fdc06",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.reconcile_declined_membership_invitation",
+      "signature": "",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 223,
+      "bodyEqual": true,
+      "installedBodySha": "552708f17dadc0d13643abcb9b9a5ce67bbad6e63cc5a80f4d217b96b31fa176",
+      "chainBodySha": "552708f17dadc0d13643abcb9b9a5ce67bbad6e63cc5a80f4d217b96b31fa176",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.record_document_event",
+      "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 288,
+      "bodyEqual": true,
+      "installedBodySha": "e37e6387347747b1e7123da687724606e4b77c2b9fbd02a3679083f1d5902016",
+      "chainBodySha": "e37e6387347747b1e7123da687724606e4b77c2b9fbd02a3679083f1d5902016",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.record_science",
+      "signature": "p_id uuid, p_user uuid, p_mode text, p_evidence jsonb",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 269,
+      "bodyEqual": true,
+      "installedBodySha": "fa97d655fd40a49b50695c0f1129c0918a08e87517c05458a97c991277caa4d9",
+      "chainBodySha": "fa97d655fd40a49b50695c0f1129c0918a08e87517c05458a97c991277caa4d9",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.refresh_requisition_lifecycle",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 187,
+      "bodyEqual": true,
+      "installedBodySha": "bd015201f21883da29e0fe7405525632da830242491734b5cfc11e016dc3a2dd",
+      "chainBodySha": "bd015201f21883da29e0fe7405525632da830242491734b5cfc11e016dc3a2dd",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.register_legacy_requisition",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022055016_harden_function_privileges_and_history.sql",
+      "sourceLine": 4,
+      "bodyEqual": true,
+      "installedBodySha": "1945945b2189e27b8a6340c6d0e396f1f6849ffcfdbffcf255636b9e650797f9",
+      "chainBodySha": "1945945b2189e27b8a6340c6d0e396f1f6849ffcfdbffcf255636b9e650797f9",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.reject_resolution_mutation",
+      "signature": "",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 17,
+      "bodyEqual": true,
+      "installedBodySha": "446b3a3773ce3859ec09e387e91d88177efeb9ce6a434491880106d4c861f000",
+      "chainBodySha": "446b3a3773ce3859ec09e387e91d88177efeb9ce6a434491880106d4c861f000",
+      "securityDefiner": false,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.release_pdf_configuration_holds",
+      "signature": "",
+      "source": "supabase/migrations/20261023174500_v4_review_follow_up.sql",
+      "sourceLine": 31,
+      "bodyEqual": true,
+      "installedBodySha": "8efacf8e113459907c494bace5111c6135446d7af423deff600f1263a8698c8e",
+      "chainBodySha": "8efacf8e113459907c494bace5111c6135446d7af423deff600f1263a8698c8e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.release_template_holds",
+      "signature": "",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 39,
+      "bodyEqual": true,
+      "installedBodySha": "3a1d1d3deb353378528dfb1a1077367cc66f9e9a23e7445667f9cf9495e803fe",
+      "chainBodySha": "3a1d1d3deb353378528dfb1a1077367cc66f9e9a23e7445667f9cf9495e803fe",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.reminder_recipient_can",
+      "signature": "p_reminder uuid, p_user uuid",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 387,
+      "bodyEqual": true,
+      "installedBodySha": "41b11f5f2302fb56c230c874f536899434f05c1c8a40084708b5a1ae62dc2187",
+      "chainBodySha": "41b11f5f2302fb56c230c874f536899434f05c1c8a40084708b5a1ae62dc2187",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.report_notice",
+      "signature": "",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 83,
+      "bodyEqual": true,
+      "installedBodySha": "c798601dae5c7ae3cb6ec521c2afb1d6b288d15d8fd9ea501489324807d7eb70",
+      "chainBodySha": "c798601dae5c7ae3cb6ec521c2afb1d6b288d15d8fd9ea501489324807d7eb70",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.require_cap",
+      "signature": "p_patient uuid, p_cap text",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 64,
+      "bodyEqual": true,
+      "installedBodySha": "69acf858bc9c834ecb3670417680cc48a7572375a7eb95c490772954f28bedcf",
+      "chainBodySha": "69acf858bc9c834ecb3670417680cc48a7572375a7eb95c490772954f28bedcf",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.requisition_archive_task",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261023174500_v4_review_follow_up.sql",
+      "sourceLine": 19,
+      "bodyEqual": true,
+      "installedBodySha": "8590883965225e8728e8a6ac111fcabbcacb1d684fda4d0eb23fffc44a44d71e",
+      "chainBodySha": "8590883965225e8728e8a6ac111fcabbcacb1d684fda4d0eb23fffc44a44d71e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.requisition_science_task",
+      "signature": "p_id uuid, p_user uuid",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 45,
+      "bodyEqual": true,
+      "installedBodySha": "970debd68ba0fa29a928ac2d8ae5e813c3b5054647f53f4cbcd00ee83bf7e9d7",
+      "chainBodySha": "970debd68ba0fa29a928ac2d8ae5e813c3b5054647f53f4cbcd00ee83bf7e9d7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.schedule_event",
+      "signature": "p_patient uuid, p_series uuid, p_shift uuid, p_worker uuid, p_action text, p_reason text, p_before jsonb, p_after jsonb",
+      "source": "supabase/migrations/20261024220543_scheduled_shifts.sql",
+      "sourceLine": 105,
+      "bodyEqual": false,
+      "installedBodySha": "66d213792c89997bde0678a2fd49fda219f3c4eaa4446ba32bce3c52c4fa6596",
+      "chainBodySha": "aa112335ae305a0d6842ac35df25884ccdbacb196181821dd74e3e2229c9762d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.schedule_visible",
+      "signature": "p_patient uuid, p_worker uuid",
+      "source": "supabase/migrations/20261024220543_scheduled_shifts.sql",
+      "sourceLine": 80,
+      "bodyEqual": true,
+      "installedBodySha": "17ffa1aaa0cd85fd9018f6a0993b5651a5dedd9d2ac669b73f7a930a4c102f23",
+      "chainBodySha": "17ffa1aaa0cd85fd9018f6a0993b5651a5dedd9d2ac669b73f7a930a4c102f23",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.schedule_worker",
+      "signature": "p_patient uuid, p_user uuid",
+      "source": "supabase/migrations/20261024220543_scheduled_shifts.sql",
+      "sourceLine": 75,
+      "bodyEqual": true,
+      "installedBodySha": "4e019ab0c9e8b9d5a5d1ce89c89f29439ca220b26bf2142491dec05342c07c74",
+      "chainBodySha": "4e019ab0c9e8b9d5a5d1ce89c89f29439ca220b26bf2142491dec05342c07c74",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.scheduled_operations",
+      "signature": "",
+      "source": "supabase/migrations/20261023041624_v4_document_read_models_and_worker_cron.sql",
+      "sourceLine": 45,
+      "bodyEqual": true,
+      "installedBodySha": "16346be975abe3b10c094f4c08b9c31d3149d4734ed59e32f917b38fa3616c48",
+      "chainBodySha": "16346be975abe3b10c094f4c08b9c31d3149d4734ed59e32f917b38fa3616c48",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.science_satisfied",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 41,
+      "bodyEqual": true,
+      "installedBodySha": "e0ffbd43d875e3bf3c15f2760bf49086e0f99e023272111b14c395ff61e15305",
+      "chainBodySha": "e0ffbd43d875e3bf3c15f2760bf49086e0f99e023272111b14c395ff61e15305",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.science_snapshot",
+      "signature": "",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 289,
+      "bodyEqual": true,
+      "installedBodySha": "5b80e4250ca80b07452aeef3f966361c24168e1a62a5465b0e0867da90b4a216",
+      "chainBodySha": "5b80e4250ca80b07452aeef3f966361c24168e1a62a5465b0e0867da90b4a216",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.stock_quantity",
+      "signature": "p_patient uuid, p_product text, p_location text",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 47,
+      "bodyEqual": true,
+      "installedBodySha": "e3652e9e226607a3ad1ea46e7e24e4de007e3f116e20a42576329df815bfdb48",
+      "chainBodySha": "e3652e9e226607a3ad1ea46e7e24e4de007e3f116e20a42576329df815bfdb48",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.team_revision",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 53,
+      "bodyEqual": true,
+      "installedBodySha": "7fbca2d89fa5be68670de4c8e02f1f83ab560ab77d964561ee7cb4b973e9da25",
+      "chainBodySha": "7fbca2d89fa5be68670de4c8e02f1f83ab560ab77d964561ee7cb4b973e9da25",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.user_can",
+      "signature": "p_patient uuid, p_user uuid, p_cap text",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 82,
+      "bodyEqual": true,
+      "installedBodySha": "fe3de888fa57a8da85b7cb9aed2bb7caba5f3429b8d23b439ee447d1d874034f",
+      "chainBodySha": "fe3de888fa57a8da85b7cb9aed2bb7caba5f3429b8d23b439ee447d1d874034f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.v3_apply_access_change",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022044133_requisition_access_policies.sql",
+      "sourceLine": 65,
+      "bodyEqual": true,
+      "installedBodySha": "bae0d44f701b8e55dbc5f4200bdab53d4defdfc3090a0b42a0238c5e59871438",
+      "chainBodySha": "bae0d44f701b8e55dbc5f4200bdab53d4defdfc3090a0b42a0238c5e59871438",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.validate_shared_need",
+      "signature": "p_payload jsonb",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 159,
+      "bodyEqual": true,
+      "installedBodySha": "4739361af580ab5625ef5497c5962b678a4db17afec57d2c4b679406ebe83d10",
+      "chainBodySha": "4739361af580ab5625ef5497c5962b678a4db17afec57d2c4b679406ebe83d10",
+      "securityDefiner": false,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.validate_supply_command",
+      "signature": "d operational_documents, p_action text, p_body jsonb",
+      "source": "supabase/migrations/20261022052012_workflow_guards_and_read_models.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "a203a84f556b65c6c7cc17779f80a21e55a3e60d0595a46479f1a87c68254102",
+      "chainBodySha": "a203a84f556b65c6c7cc17779f80a21e55a3e60d0595a46479f1a87c68254102",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.whatsapp_event_supported",
+      "signature": "p_event text",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 2,
+      "bodyEqual": true,
+      "installedBodySha": "d833493ff164de0855f54f01de6a5e9c43ad87ebcdbfbdcd233cc303d68fd729",
+      "chainBodySha": "d833493ff164de0855f54f01de6a5e9c43ad87ebcdbfbdcd233cc303d68fd729",
+      "securityDefiner": false,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.accept_invitation",
+      "signature": "p_token_hash text",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 155,
+      "bodyEqual": true,
+      "installedBodySha": "190d9b37ffa839fb92c76b7dd5ffe8f4c4fac739226ab9e5669822db8e20412c",
+      "chainBodySha": "190d9b37ffa839fb92c76b7dd5ffe8f4c4fac739226ab9e5669822db8e20412c",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.accept_whatsapp_receipt",
+      "signature": "p_provider_id text, p_phone text, p_hash text",
+      "source": "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "sourceLine": 44,
+      "bodyEqual": true,
+      "installedBodySha": "478b26de0e8569387c2e3fc4d6c6ae40a35a8302943b1b5def95906acdf86c1a",
+      "chainBodySha": "478b26de0e8569387c2e3fc4d6c6ae40a35a8302943b1b5def95906acdf86c1a",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.acknowledge_no_issues",
+      "signature": "p_provider_id text, p_phone text, p_hash text",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 153,
+      "bodyEqual": true,
+      "installedBodySha": "c1c0f7eb35d583686701f098e073cc9a55ae2f26eaa0ce6c1ae98a59b564efe8",
+      "chainBodySha": "c1c0f7eb35d583686701f098e073cc9a55ae2f26eaa0ce6c1ae98a59b564efe8",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.acknowledge_requisition",
+      "signature": "p_id uuid, p_mode text, p_version integer",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 77,
+      "bodyEqual": false,
+      "installedBodySha": "d3ab794f579abfe336b9fb118b5711aa7e4ea665f09fa5ce6707bf95e44a45b1",
+      "chainBodySha": "73b0a91c7720dcc9594fd81e298a9f7066636178258c689e1c16badad7b12375",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.add_stock_inventory_item",
+      "signature": "p_inventory_id uuid, p_product_id text, p_counted_quantity bigint, p_justification text",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 173,
+      "bodyEqual": true,
+      "installedBodySha": "0e9cd2baf58af9ec7feec763b098f1e34c74b27c7866f827ecc11e652032b789",
+      "chainBodySha": "0e9cd2baf58af9ec7feec763b098f1e34c74b27c7866f827ecc11e652032b789",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_adopt_product",
+      "signature": "p_care_recipient_id uuid, p_product_id text",
+      "source": "supabase/migrations/20261024205813_fluent_administration_capabilities.sql",
+      "sourceLine": 32,
+      "bodyEqual": true,
+      "installedBodySha": "c53a0d1e42889319af2d784a83154c8f34d00156278bb79fe44ae5aeb8744a08",
+      "chainBodySha": "c53a0d1e42889319af2d784a83154c8f34d00156278bb79fe44ae5aeb8744a08",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_create_invitation",
+      "signature": "p_care_recipient_id uuid, p_email text, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean, p_token_hash text, p_expires_at timestamp with time zone",
+      "source": "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "sourceLine": 9,
+      "bodyEqual": true,
+      "installedBodySha": "b4dad4538c9ce23242d116631ccd81c91c53c5b98477dd9608f850e0dc8c318c",
+      "chainBodySha": "b4dad4538c9ce23242d116631ccd81c91c53c5b98477dd9608f850e0dc8c318c",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_list_memberships",
+      "signature": "p_care_recipient_id uuid",
+      "source": "supabase/migrations/20261020002400_patient_directory_contracts.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "1021c3e929299e0ba876ea423ffa35b2cf9e2110468cf4425d3798989471d534",
+      "chainBodySha": "1021c3e929299e0ba876ea423ffa35b2cf9e2110468cf4425d3798989471d534",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_list_products",
+      "signature": "",
+      "source": "supabase/migrations/20261020001600_admin_import_and_operations.sql",
+      "sourceLine": 110,
+      "bodyEqual": true,
+      "installedBodySha": "fc167bd7108d79090ef890f0bbb8b04246a39d00efe3ad4550db0f47dd15b56e",
+      "chainBodySha": "fc167bd7108d79090ef890f0bbb8b04246a39d00efe3ad4550db0f47dd15b56e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_list_profiles",
+      "signature": "",
+      "source": "supabase/migrations/20261020001600_admin_import_and_operations.sql",
+      "sourceLine": 46,
+      "bodyEqual": true,
+      "installedBodySha": "6c0ff12509ab741b3a014eff4ad0f87211389f24dfc356cdda766e18f7270138",
+      "chainBodySha": "6c0ff12509ab741b3a014eff4ad0f87211389f24dfc356cdda766e18f7270138",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_list_recipients",
+      "signature": "",
+      "source": "supabase/migrations/20261020002000_scoped_authority_and_catalogue.sql",
+      "sourceLine": 127,
+      "bodyEqual": true,
+      "installedBodySha": "157573a6449393e1429957074fe67396fb3a6a25efa614db407631355f345ac9",
+      "chainBodySha": "157573a6449393e1429957074fe67396fb3a6a25efa614db407631355f345ac9",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_resend_invitation",
+      "signature": "p_invitation_id uuid, p_token_hash text, p_expires_at timestamp with time zone",
+      "source": "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "sourceLine": 19,
+      "bodyEqual": true,
+      "installedBodySha": "ec1f6632858708d64cd8165911468d08d8e27f315d3b1df479bfe4dc17c1ca98",
+      "chainBodySha": "ec1f6632858708d64cd8165911468d08d8e27f315d3b1df479bfe4dc17c1ca98",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_set_membership_status",
+      "signature": "p_care_recipient_id uuid, p_user_id uuid, p_status text",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 366,
+      "bodyEqual": true,
+      "installedBodySha": "26fd8681948643959edd20f3353b0b4ef2e7aa153221343c3e3cead6a3cc4bb6",
+      "chainBodySha": "26fd8681948643959edd20f3353b0b4ef2e7aa153221343c3e3cead6a3cc4bb6",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_set_profile",
+      "signature": "p_user_id uuid, p_full_name text, p_role profile_role, p_status text, p_global_scope boolean",
+      "source": "supabase/migrations/20261020001600_admin_import_and_operations.sql",
+      "sourceLine": 56,
+      "bodyEqual": true,
+      "installedBodySha": "5fb9dfb58971a5b1df7d78e7057b6a947dc132f83b914649d07be1a4fa205743",
+      "chainBodySha": "5fb9dfb58971a5b1df7d78e7057b6a947dc132f83b914649d07be1a4fa205743",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_upsert_membership",
+      "signature": "p_care_recipient_id uuid, p_user_id uuid, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 359,
+      "bodyEqual": true,
+      "installedBodySha": "25670007a579bf3d4a508538c8e3e957be76bebaefa42189d48b09d2abfe463f",
+      "chainBodySha": "25670007a579bf3d4a508538c8e3e957be76bebaefa42189d48b09d2abfe463f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_upsert_product",
+      "signature": "p_id text, p_name text, p_category product_category, p_unit text, p_aliases text[], p_is_active boolean",
+      "source": "supabase/migrations/20261020001600_admin_import_and_operations.sql",
+      "sourceLine": 115,
+      "bodyEqual": true,
+      "installedBodySha": "ee2890b5413a135e9311fc6ced2b2c1f4f9e84dd2c6dd1501b394a982d1139e5",
+      "chainBodySha": "ee2890b5413a135e9311fc6ced2b2c1f4f9e84dd2c6dd1501b394a982d1139e5",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_upsert_recipient",
+      "signature": "p_id uuid, p_display_name text, p_is_active boolean, p_is_development boolean",
+      "source": "supabase/migrations/20261023034142_v4_administrative_contracts_and_scheduling.sql",
+      "sourceLine": 31,
+      "bodyEqual": true,
+      "installedBodySha": "0d259345458a40f4974348d2c2e2ffb1e5a4fe11c8fe6e67469d129e1776bd9e",
+      "chainBodySha": "0d259345458a40f4974348d2c2e2ffb1e5a4fe11c8fe6e67469d129e1776bd9e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.admin_upsert_recipient_product",
+      "signature": "p_care_recipient_id uuid, p_product_id text, p_name text, p_category product_category, p_unit text, p_aliases text[], p_is_active boolean, p_description text, p_sort_order integer",
+      "source": "supabase/migrations/20261022053539_draft_recounts_and_catalogue_contracts.sql",
+      "sourceLine": 50,
+      "bodyEqual": true,
+      "installedBodySha": "a2dfd492ca66fdb911651b447ec22621d1f67730bcbb6d2f8c7e453b1f0704a4",
+      "chainBodySha": "a2dfd492ca66fdb911651b447ec22621d1f67730bcbb6d2f8c7e453b1f0704a4",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public, extensions"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.after_stock_alert",
+      "signature": "",
+      "source": "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "sourceLine": 149,
+      "bodyEqual": true,
+      "installedBodySha": "fb6079ecd47d98f7195fe4f5d89d7c30b0ea2c5f82f55b38edf898c49227b89d",
+      "chainBodySha": "fb6079ecd47d98f7195fe4f5d89d7c30b0ea2c5f82f55b38edf898c49227b89d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.approve_stock_inventory",
+      "signature": "p_inventory_id uuid",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 196,
+      "bodyEqual": false,
+      "installedBodySha": "f9dfe367d1674b2dcb5bf5fd4c70e88c4a9aecb351579416ed6f2b188b5803e3",
+      "chainBodySha": "0c4cf877563e4fcd7bade3affa9a4cbc91af2ada8d7dceed4c9ef10ba9f7feb2",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.archive_requisition",
+      "signature": "p_id uuid, p_reason text",
+      "source": "supabase/migrations/20261023180000_v4_archive_authority_serialization.sql",
+      "sourceLine": 4,
+      "bodyEqual": true,
+      "installedBodySha": "0708f70ea06c85c5cedb0030a9beac7878de94d26f58b0b0c3d937bd781eaa78",
+      "chainBodySha": "0708f70ea06c85c5cedb0030a9beac7878de94d26f58b0b0c3d937bd781eaa78",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.audited_legacy_supply_command",
+      "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+      "source": "supabase/migrations/20261022053539_draft_recounts_and_catalogue_contracts.sql",
+      "sourceLine": 79,
+      "bodyEqual": false,
+      "installedBodySha": "a3b111781e312851a79fc2f872d8c5ff118ffcb3f5bd10dd34eacbf0546bda20",
+      "chainBodySha": "d06598a92afb8130a196f584bf1a0105d6758f3e8690a13e182d0385c6087428",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.balance_command",
+      "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+      "source": "supabase/migrations/20261024222909_balance_assignment_resolution.sql",
+      "sourceLine": 1,
+      "bodyEqual": false,
+      "installedBodySha": "c49ff30bf6e34fccbda4bd73a5a31dc520b48e9d6647b7c1853a34c6a7f99778",
+      "chainBodySha": "95204d3f4f0359a8d4433537383fb2003a4ffe8b27c5d4b7240d263f648828c2",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.balance_workspace",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 185,
+      "bodyEqual": false,
+      "installedBodySha": "db64c7f172b7b92f220240cb0eda3daae15483ab9e820777fb0f23444a430e73",
+      "chainBodySha": "0f88de4f91a78e4b7554b4f579c3e785c5c06ad6d4694d3c175a02c6d646b113",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.bind_notification_template",
+      "signature": "p_id uuid, p_worker uuid, p_name text, p_version integer, p_language text",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 29,
+      "bodyEqual": true,
+      "installedBodySha": "ca98ce4ed2b334c4c896fbc8b815febfcfcee5666e846f08b36d5c651aef32a3",
+      "chainBodySha": "ca98ce4ed2b334c4c896fbc8b815febfcfcee5666e846f08b36d5c651aef32a3",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.bind_validated_attachment",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022052521_evidence_profile_and_drafts.sql",
+      "sourceLine": 20,
+      "bodyEqual": true,
+      "installedBodySha": "5669ec9a91f20659e85f51dbac1645745ce0b178e36737082919ec19eccf63b1",
+      "chainBodySha": "5669ec9a91f20659e85f51dbac1645745ce0b178e36737082919ec19eccf63b1",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.can_access_recipient",
+      "signature": "p_recipient_id uuid",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 57,
+      "bodyEqual": true,
+      "installedBodySha": "9d41b84abc66f6761fc9d879f55b922de523d69ecf27ea607dfb47f2d8e12505",
+      "chainBodySha": "9d41b84abc66f6761fc9d879f55b922de523d69ecf27ea607dfb47f2d8e12505",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.can_manage_recipient",
+      "signature": "p_recipient_id uuid",
+      "source": "supabase/migrations/20261023041150_v4_session_assurance_and_admin_directory.sql",
+      "sourceLine": 9,
+      "bodyEqual": true,
+      "installedBodySha": "f92b0c33e16cf2acf47d951e78afef1010b647988ce54778b8871b0cbd2a01fb",
+      "chainBodySha": "f92b0c33e16cf2acf47d951e78afef1010b647988ce54778b8871b0cbd2a01fb",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.claim_notification_jobs",
+      "signature": "p_limit integer, p_worker_id uuid, p_external_enabled boolean",
+      "source": "supabase/migrations/20261025164621_notification_claim_conflict_recovery.sql",
+      "sourceLine": 28,
+      "bodyEqual": true,
+      "installedBodySha": "01d2d0588b9e48f8188e21e8649552f1dfe6278b85b26094ba3356b71c0c982a",
+      "chainBodySha": "01d2d0588b9e48f8188e21e8649552f1dfe6278b85b26094ba3356b71c0c982a",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.complete_notification_job",
+      "signature": "p_id uuid, p_worker_id uuid, p_state text, p_provider_reference text, p_error text",
+      "source": "supabase/migrations/20261023174500_v4_review_follow_up.sql",
+      "sourceLine": 23,
+      "bodyEqual": true,
+      "installedBodySha": "954cecd5af25fbc0add1b8497ecdc1f9121190359c89ae37b612de6dcd1d42a4",
+      "chainBodySha": "954cecd5af25fbc0add1b8497ecdc1f9121190359c89ae37b612de6dcd1d42a4",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.configure_catalogue_unit",
+      "signature": "p_patient uuid, p_product text, p_unit text, p_decimals integer, p_barcode text, p_presentation text, p_base_quantity numeric",
+      "source": "supabase/migrations/20261022044133_requisition_access_policies.sql",
+      "sourceLine": 136,
+      "bodyEqual": true,
+      "installedBodySha": "873cc3f821f85385cc3152b5d7534933d43bc42105ccc46c43c334acba7b707e",
+      "chainBodySha": "873cc3f821f85385cc3152b5d7534933d43bc42105ccc46c43c334acba7b707e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.configure_notification_rule",
+      "signature": "p_patient uuid, p_event text, p_role text, p_channels text[], p_pdf boolean, p_cooldown integer, p_quiet_start integer, p_quiet_end integer",
+      "source": "supabase/migrations/20261023033155_v4_realtime_notifications_and_scheduler.sql",
+      "sourceLine": 40,
+      "bodyEqual": true,
+      "installedBodySha": "89cb47938bf65e64d1cc1e8422855c8139b81633171db9a07a869056bb57eae2",
+      "chainBodySha": "89cb47938bf65e64d1cc1e8422855c8139b81633171db9a07a869056bb57eae2",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.configure_patient_access",
+      "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 99,
+      "bodyEqual": false,
+      "installedBodySha": "fc4a28344df8cb75e380caa94a7e58a6832bb03852d8700b1b26f92e2092791a",
+      "chainBodySha": "5b40362a2d99b37631dfa487cf5ebcebe8f93bde151246161686aaa6bdf9a098",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.configure_recipient_notification",
+      "signature": "p_care_recipient_id uuid, p_recipient_user_id uuid, p_recipient_group text, p_channel text, p_destination text, p_enabled boolean, p_include_team_alerts boolean",
+      "source": "supabase/migrations/20261020002900_alert_custody_routing_and_priority.sql",
+      "sourceLine": 7,
+      "bodyEqual": true,
+      "installedBodySha": "036e20f887a03d8b052f023310b89ce01915b00bf42069fa56d62e1aded5396d",
+      "chainBodySha": "036e20f887a03d8b052f023310b89ce01915b00bf42069fa56d62e1aded5396d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.configure_stock_alert",
+      "signature": "p_care_recipient_id uuid, p_product_id text, p_location text, p_low_threshold numeric, p_critical_threshold numeric, p_is_enabled boolean",
+      "source": "supabase/migrations/20261023034142_v4_administrative_contracts_and_scheduling.sql",
+      "sourceLine": 42,
+      "bodyEqual": true,
+      "installedBodySha": "b08f1c70511b85ddfbf39cfc91a024b6ef8959e0d8038c03eef532040c4af206",
+      "chainBodySha": "b08f1c70511b85ddfbf39cfc91a024b6ef8959e0d8038c03eef532040c4af206",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.configure_worker_schedule",
+      "signature": "p_token text",
+      "source": "supabase/migrations/20261023041624_v4_document_read_models_and_worker_cron.sql",
+      "sourceLine": 60,
+      "bodyEqual": true,
+      "installedBodySha": "98bb6833eef28376016328aba39b2300d7d16bf7196cc516e3813a0e4a1cec91",
+      "chainBodySha": "98bb6833eef28376016328aba39b2300d7d16bf7196cc516e3813a0e4a1cec91",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.confirm_extraordinary_consumption",
+      "signature": "p_id uuid, p_accept boolean",
+      "source": "supabase/migrations/20261022043228_communications_attachments.sql",
+      "sourceLine": 165,
+      "bodyEqual": true,
+      "installedBodySha": "06b1c7a6177fc6ce6b97721e44d24293258779d8ba652e99ff528a91ae0bdbe8",
+      "chainBodySha": "06b1c7a6177fc6ce6b97721e44d24293258779d8ba652e99ff528a91ae0bdbe8",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.confirm_whatsapp_science",
+      "signature": "p_provider_id text, p_phone text, p_hash text",
+      "source": "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "sourceLine": 97,
+      "bodyEqual": true,
+      "installedBodySha": "0d3a0dd2261d8c9faf75959e11c11ace271a80c1bdf918680849202b788373fd",
+      "chainBodySha": "0d3a0dd2261d8c9faf75959e11c11ace271a80c1bdf918680849202b788373fd",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.create_flow_session",
+      "signature": "p_patient uuid, p_hash text",
+      "source": "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "sourceLine": 52,
+      "bodyEqual": true,
+      "installedBodySha": "d614a89712182d438e2864e2291a965903d7af6e9daddaca71c592f3b99a92ee",
+      "chainBodySha": "d614a89712182d438e2864e2291a965903d7af6e9daddaca71c592f3b99a92ee",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.create_measurement_unit",
+      "signature": "p_patient uuid, p_code text, p_name text, p_dimension text, p_decimals integer",
+      "source": "supabase/migrations/20261022044133_requisition_access_policies.sql",
+      "sourceLine": 152,
+      "bodyEqual": true,
+      "installedBodySha": "79d0547358c184eca0ec8d50170d8efaad99048b8c6f407596f5eb23e4723324",
+      "chainBodySha": "79d0547358c184eca0ec8d50170d8efaad99048b8c6f407596f5eb23e4723324",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.create_patient_with_administrator",
+      "signature": "p_name text, p_development boolean, p_administrator_email text",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 85,
+      "bodyEqual": true,
+      "installedBodySha": "58e979f52e8348cdbc40770e89bb39ff347897e8b87ca73052ec71a093601cbe",
+      "chainBodySha": "58e979f52e8348cdbc40770e89bb39ff347897e8b87ca73052ec71a093601cbe",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.create_receipt_flow_session",
+      "signature": "p_document uuid, p_hash text",
+      "source": "supabase/migrations/20261023041917_v4_purpose_bound_whatsapp_flows.sql",
+      "sourceLine": 4,
+      "bodyEqual": true,
+      "installedBodySha": "7e70964588a74c3a5e0a4d895a89f93a1b3a638414cacdcc6a3e7de06d2c3ba9",
+      "chainBodySha": "7e70964588a74c3a5e0a4d895a89f93a1b3a638414cacdcc6a3e7de06d2c3ba9",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.create_stock_inventory",
+      "signature": "p_care_recipient_id uuid, p_location text",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 156,
+      "bodyEqual": true,
+      "installedBodySha": "86fd17f9cbf32b5c4f9534fb0682f149eb7f0df15d9892b39958f94c44fef2bb",
+      "chainBodySha": "86fd17f9cbf32b5c4f9534fb0682f149eb7f0df15d9892b39958f94c44fef2bb",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.create_supply_document",
+      "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 319,
+      "bodyEqual": false,
+      "installedBodySha": "93add9ffa3fe96d64ee2b75a00a397b2d61f3a47ec3a6188386b82773bc96d35",
+      "chainBodySha": "754ae167838b6c2abca4aa9062fb968546bf78393a3264738abf8e40b6cff6bc",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.current_profile_role",
+      "signature": "",
+      "source": "supabase/migrations/20261019000100_initial_schema.sql",
+      "sourceLine": 87,
+      "bodyEqual": true,
+      "installedBodySha": "cc9146d34bb60675bc8e5d5c561cb6a9d549384df82e84d0e1e06a23166b1e95",
+      "chainBodySha": "cc9146d34bb60675bc8e5d5c561cb6a9d549384df82e84d0e1e06a23166b1e95",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.decline_invitation",
+      "signature": "p_token_hash text",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 163,
+      "bodyEqual": true,
+      "installedBodySha": "31186e4fd7ebe3fe47fe487784c20ef4e1d6e78dd8f059a10a39ffa1d3f08938",
+      "chainBodySha": "31186e4fd7ebe3fe47fe487784c20ef4e1d6e78dd8f059a10a39ffa1d3f08938",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.derive_item_patient",
+      "signature": "",
+      "source": "supabase/migrations/20261020002000_scoped_authority_and_catalogue.sql",
+      "sourceLine": 99,
+      "bodyEqual": true,
+      "installedBodySha": "6989f661a1e0e86b4169b814dab485d3f490a1fb61ff276ea30859e3b2eb8705",
+      "chainBodySha": "6989f661a1e0e86b4169b814dab485d3f490a1fb61ff276ea30859e3b2eb8705",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.document_delivery_status",
+      "signature": "p_document uuid",
+      "source": "supabase/migrations/20261023174500_v4_review_follow_up.sql",
+      "sourceLine": 44,
+      "bodyEqual": true,
+      "installedBodySha": "99142cef132143a0cb931d7abc085d9f0da26f7c2d0e92abcba1ca1d305b135b",
+      "chainBodySha": "99142cef132143a0cb931d7abc085d9f0da26f7c2d0e92abcba1ca1d305b135b",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.document_navigation_context",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 191,
+      "bodyEqual": true,
+      "installedBodySha": "505a7399525be7169274e2e30635b7f38332e9c44914fbaabd89d68c7ecea5a7",
+      "chainBodySha": "505a7399525be7169274e2e30635b7f38332e9c44914fbaabd89d68c7ecea5a7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.enqueue_patient_event",
+      "signature": "p_patient uuid, p_requisition uuid, p_alert uuid",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 90,
+      "bodyEqual": true,
+      "installedBodySha": "edd0af32ded45a1f8bed0c35634014a5b13adf0831e0857cce40b9200bc6692d",
+      "chainBodySha": "edd0af32ded45a1f8bed0c35634014a5b13adf0831e0857cce40b9200bc6692d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.enqueue_requisition_notifications",
+      "signature": "",
+      "source": "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "sourceLine": 128,
+      "bodyEqual": true,
+      "installedBodySha": "7b6f8e01d27db9fa401d9fce7ce8387a6fd624cb9d74ee88c6906d8bd132bdf7",
+      "chainBodySha": "7b6f8e01d27db9fa401d9fce7ce8387a6fd624cb9d74ee88c6906d8bd132bdf7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.evaluate_stock_alert",
+      "signature": "p_patient uuid, p_product text, p_location text",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 19,
+      "bodyEqual": true,
+      "installedBodySha": "93bdc26c74b8ee5fe233b0527e1eb18812e3157e35775651f46014b25e6d31e4",
+      "chainBodySha": "93bdc26c74b8ee5fe233b0527e1eb18812e3157e35775651f46014b25e6d31e4",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.extraordinary_stock_adjustment",
+      "signature": "p_care_recipient_id uuid, p_product_id text, p_quantity integer, p_location text, p_justification text, p_confirmation boolean, p_idempotency_key uuid",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 135,
+      "bodyEqual": true,
+      "installedBodySha": "9533a1f5032c84f3729e41682d88347b3010add0cf3a4b6613d2447cbeaaeffa",
+      "chainBodySha": "9533a1f5032c84f3729e41682d88347b3010add0cf3a4b6613d2447cbeaaeffa",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public, extensions"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.family_stock_movement",
+      "signature": "p_patient uuid, p_product text, p_quantity numeric, p_action text, p_reason text, p_key uuid, p_reference uuid",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 308,
+      "bodyEqual": true,
+      "installedBodySha": "69778be807d759bc45fe8541adb528c5ac208362be0c2384c6dbc7358bda3fbe",
+      "chainBodySha": "69778be807d759bc45fe8541adb528c5ac208362be0c2384c6dbc7358bda3fbe",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.finalize_attachment",
+      "signature": "p_id uuid, p_actor uuid, p_hash text, p_mime text, p_bytes bigint, p_valid boolean",
+      "source": "supabase/migrations/20261022061251_evidence_idempotency_and_final_contracts.sql",
+      "sourceLine": 32,
+      "bodyEqual": true,
+      "installedBodySha": "ed3a1f55575ded321bb35b84958281819fe47bb6e5575d95ac07bd8781e16bd3",
+      "chainBodySha": "ed3a1f55575ded321bb35b84958281819fe47bb6e5575d95ac07bd8781e16bd3",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.find_patient_product_by_alias",
+      "signature": "p_care_recipient_id uuid, p_query text",
+      "source": "supabase/migrations/20261020002400_patient_directory_contracts.sql",
+      "sourceLine": 8,
+      "bodyEqual": true,
+      "installedBodySha": "c0dc412bd8ed335b77b346396032503d48b26fe3963a8fdf4b7051b659373ef8",
+      "chainBodySha": "c0dc412bd8ed335b77b346396032503d48b26fe3963a8fdf4b7051b659373ef8",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public, extensions"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.find_product_by_alias",
+      "signature": "p_query text",
+      "source": "supabase/migrations/20261020000400_add_product_aliases.sql",
+      "sourceLine": 39,
+      "bodyEqual": true,
+      "installedBodySha": "de957c34887d2bbfc4aef608cfa80aef08264da7467d619902c18ffc02629090",
+      "chainBodySha": "de957c34887d2bbfc4aef608cfa80aef08264da7467d619902c18ffc02629090",
+      "securityDefiner": false,
+      "config": [
+        "search_path=public, extensions"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.flow_exchange",
+      "signature": "p_hash text, p_submit jsonb",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 125,
+      "bodyEqual": true,
+      "installedBodySha": "4b297ed8ce62339f0dd0a132fb8a9d00a47782266f6d4efa495c454acfdcf44a",
+      "chainBodySha": "4b297ed8ce62339f0dd0a132fb8a9d00a47782266f6d4efa495c454acfdcf44a",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.fluent_pre_matrix_governance",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 178,
+      "bodyEqual": true,
+      "installedBodySha": "06a5342ec40e83bf06e997efbf049e7c14a4878c7d616bc32959adc7476c7624",
+      "chainBodySha": "06a5342ec40e83bf06e997efbf049e7c14a4878c7d616bc32959adc7476c7624",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.fluent_pre_retry_claim_jobs",
+      "signature": "p_limit integer, p_worker_id uuid, p_external_enabled boolean",
+      "source": "supabase/migrations/20261020002900_alert_custody_routing_and_priority.sql",
+      "sourceLine": 67,
+      "bodyEqual": true,
+      "installedBodySha": "e3090012d38ba6ebd039433e90464f255255ad0ffb4333a234c74760e425e77d",
+      "chainBodySha": "e3090012d38ba6ebd039433e90464f255255ad0ffb4333a234c74760e425e77d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.fluent_pre_shift_command",
+      "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+      "source": "supabase/migrations/20261022095138_authoritative_receipt_verification_context.sql",
+      "sourceLine": 3,
+      "bodyEqual": true,
+      "installedBodySha": "48568f7ec7e058066a606a32a67796283d3cd9a0083f7709a2381cb1916e850a",
+      "chainBodySha": "48568f7ec7e058066a606a32a67796283d3cd9a0083f7709a2381cb1916e850a",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.fluent_pre_shift_create",
+      "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 169,
+      "bodyEqual": true,
+      "installedBodySha": "ee1af0959234080c519db923922bb2f39c3dafda76a6433af2f17127be26ec1f",
+      "chainBodySha": "ee1af0959234080c519db923922bb2f39c3dafda76a6433af2f17127be26ec1f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.fluent_pre_shift_revise",
+      "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 173,
+      "bodyEqual": true,
+      "installedBodySha": "9d6124e0735887a75170577aebd9c09f47e1736ffce5822b1ebefc751d1cb799",
+      "chainBodySha": "9d6124e0735887a75170577aebd9c09f47e1736ffce5822b1ebefc751d1cb799",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.fluent_pre_shift_scheduler",
+      "signature": "",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 204,
+      "bodyEqual": true,
+      "installedBodySha": "b5658a9b1881f84112c642c94910d71cb735b1184bb7d55bef91ce0822b4a743",
+      "chainBodySha": "b5658a9b1881f84112c642c94910d71cb735b1184bb7d55bef91ce0822b4a743",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.global_patient_administration",
+      "signature": "p_patient uuid, p_section text",
+      "source": "supabase/migrations/20261023041150_v4_session_assurance_and_admin_directory.sql",
+      "sourceLine": 17,
+      "bodyEqual": true,
+      "installedBodySha": "8dba34ab0b6dc2cd592f7fbcd024ca54242c3bd0074ae550318a3d774a783ee6",
+      "chainBodySha": "8dba34ab0b6dc2cd592f7fbcd024ca54242c3bd0074ae550318a3d774a783ee6",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.governance_legacy_patient_access",
+      "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 111,
+      "bodyEqual": true,
+      "installedBodySha": "f732cc45e3446e2a8976279b35383924ada16d5cd810c7efee6759338d91aafd",
+      "chainBodySha": "f732cc45e3446e2a8976279b35383924ada16d5cd810c7efee6759338d91aafd",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.guard_patient_product_owner",
+      "signature": "",
+      "source": "supabase/migrations/20261020002300_cross_scope_invariants.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "9295d548cc3548def45b60fe51ee9f34252ae52ca599c6685dee330ade17d472",
+      "chainBodySha": "9295d548cc3548def45b60fe51ee9f34252ae52ca599c6685dee330ade17d472",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.guard_requisition_item_stock",
+      "signature": "",
+      "source": "supabase/migrations/20261020002800_historical_unknown_stock_and_extras.sql",
+      "sourceLine": 3,
+      "bodyEqual": true,
+      "installedBodySha": "a36520616a7bba6e15609adf992bf18c2e0bb295886d0c4cb9fb8c875d52c7e5",
+      "chainBodySha": "a36520616a7bba6e15609adf992bf18c2e0bb295886d0c4cb9fb8c875d52c7e5",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.guard_stock_movement_balance",
+      "signature": "",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 9,
+      "bodyEqual": true,
+      "installedBodySha": "ff27f8d88cb68bcbb04041666a04cbfd58a78edc368ef5f92f4a5f33c68c7abb",
+      "chainBodySha": "ff27f8d88cb68bcbb04041666a04cbfd58a78edc368ef5f92f4a5f33c68c7abb",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.import_historical_requisitions",
+      "signature": "p_source_hash text, p_rows jsonb",
+      "source": "supabase/migrations/20261022055016_harden_function_privileges_and_history.sql",
+      "sourceLine": 130,
+      "bodyEqual": true,
+      "installedBodySha": "937babd3878bfd2dcd7daff41e5466e3e6df0e76dbd7294918bab57713f5587e",
+      "chainBodySha": "937babd3878bfd2dcd7daff41e5466e3e6df0e76dbd7294918bab57713f5587e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.inbound_report_context",
+      "signature": "p_phone text",
+      "source": "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "sourceLine": 73,
+      "bodyEqual": true,
+      "installedBodySha": "ba76f1d7c81089c8cb497e3207f75404e131f4c4537401e361eec7288d1024b5",
+      "chainBodySha": "ba76f1d7c81089c8cb497e3207f75404e131f4c4537401e361eec7288d1024b5",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.ingest_whatsapp_report",
+      "signature": "p_provider_id text, p_phone text, p_text text, p_lines jsonb, p_kind text",
+      "source": "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "sourceLine": 61,
+      "bodyEqual": true,
+      "installedBodySha": "b6c1abc4522a89cfddb1312ab7784eeaae5ddddd2984fb5e5d4cfb8f5244f1dd",
+      "chainBodySha": "b6c1abc4522a89cfddb1312ab7784eeaae5ddddd2984fb5e5d4cfb8f5244f1dd",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.invalidate_revoked_membership_invitations",
+      "signature": "",
+      "source": "supabase/migrations/20261020002500_notification_revocation_guard.sql",
+      "sourceLine": 14,
+      "bodyEqual": true,
+      "installedBodySha": "16aa7c08aaa9f4b3a32bbdddbfdf37eaa6c51e4a5779b64a5d1dfb459948f121",
+      "chainBodySha": "16aa7c08aaa9f4b3a32bbdddbfdf37eaa6c51e4a5779b64a5d1dfb459948f121",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.invalidate_revoked_profile_notifications",
+      "signature": "",
+      "source": "supabase/migrations/20261020002500_notification_revocation_guard.sql",
+      "sourceLine": 24,
+      "bodyEqual": true,
+      "installedBodySha": "0831b87cd54dc8f9b444ffef398c78ca391f3e4fd0c6bcc0aa5b84eaf5e61ca7",
+      "chainBodySha": "0831b87cd54dc8f9b444ffef398c78ca391f3e4fd0c6bcc0aa5b84eaf5e61ca7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.invitation_registration_allowed",
+      "signature": "p_token_hash text, p_email text",
+      "source": "supabase/migrations/20261020002700_invitation_registration.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "678af6bdf712f274ff0d923793da7a9b8ce4343aab71c3f7e048b411304b70a4",
+      "chainBodySha": "678af6bdf712f274ff0d923793da7a9b8ce4343aab71c3f7e048b411304b70a4",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.is_global_administrator",
+      "signature": "",
+      "source": "supabase/migrations/20261023041150_v4_session_assurance_and_admin_directory.sql",
+      "sourceLine": 6,
+      "bodyEqual": true,
+      "installedBodySha": "c5a7d8f13549601417a11544364e7ba9b4cbad071b7f8087e3690f431a503511",
+      "chainBodySha": "c5a7d8f13549601417a11544364e7ba9b4cbad071b7f8087e3690f431a503511",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.issue_reminder_challenge",
+      "signature": "p_notification uuid, p_worker uuid, p_hash text",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 144,
+      "bodyEqual": true,
+      "installedBodySha": "84070797be28b298b30755bb0dc72e661b11befafab3ec9e94ae8f2f4e38d21e",
+      "chainBodySha": "84070797be28b298b30755bb0dc72e661b11befafab3ec9e94ae8f2f4e38d21e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.issue_science_challenge",
+      "signature": "p_notification uuid, p_worker uuid, p_hash text",
+      "source": "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "sourceLine": 80,
+      "bodyEqual": true,
+      "installedBodySha": "6302ce72334839eae2cf9657b34823b0d7eed69f47886abed6c430d6cb0bb022",
+      "chainBodySha": "6302ce72334839eae2cf9657b34823b0d7eed69f47886abed6c430d6cb0bb022",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.issue_whatsapp_challenge",
+      "signature": "p_notification uuid, p_worker uuid, p_hash text",
+      "source": "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "sourceLine": 8,
+      "bodyEqual": true,
+      "installedBodySha": "2fabd82f565b1fc19dd7ed9e4adf5a99ec52eee79939cff0586ec63aa8980679",
+      "chainBodySha": "2fabd82f565b1fc19dd7ed9e4adf5a99ec52eee79939cff0586ec63aa8980679",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.legacy_import_historical_requisitions",
+      "signature": "p_source_hash text, p_rows jsonb",
+      "source": "supabase/migrations/20261020002800_historical_unknown_stock_and_extras.sql",
+      "sourceLine": 26,
+      "bodyEqual": true,
+      "installedBodySha": "a72629e0fcd773e24b7e784f8c417249c734404558ae5e748fddbac2ed605bbb",
+      "chainBodySha": "a72629e0fcd773e24b7e784f8c417249c734404558ae5e748fddbac2ed605bbb",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public, extensions"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.legacy_transition_requisition_status",
+      "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 67,
+      "bodyEqual": true,
+      "installedBodySha": "525d08f76d6928ab349475dfad7d74007a083a3961704fe1fd31fc60c7ef5810",
+      "chainBodySha": "525d08f76d6928ab349475dfad7d74007a083a3961704fe1fd31fc60c7ef5810",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.mark_notification_seen",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022043228_communications_attachments.sql",
+      "sourceLine": 48,
+      "bodyEqual": true,
+      "installedBodySha": "011703968f878888f7c9d63e0a5ee23b95ebd45268a42590e8d5fa9bca5dd539",
+      "chainBodySha": "011703968f878888f7c9d63e0a5ee23b95ebd45268a42590e8d5fa9bca5dd539",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.my_active_context",
+      "signature": "",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 28,
+      "bodyEqual": true,
+      "installedBodySha": "72fa844abbf43a4d8acc61913ec70cc63b51cabb371d95afe0136d0337f1ce0b",
+      "chainBodySha": "72fa844abbf43a4d8acc61913ec70cc63b51cabb371d95afe0136d0337f1ce0b",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.my_session_valid",
+      "signature": "",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 190,
+      "bodyEqual": true,
+      "installedBodySha": "4342a78228d7d2fee701c65de4ba8e612268403c60beed7ff6c45a3da50c243a",
+      "chainBodySha": "4342a78228d7d2fee701c65de4ba8e612268403c60beed7ff6c45a3da50c243a",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.my_sessions",
+      "signature": "",
+      "source": "supabase/migrations/20261022043228_communications_attachments.sql",
+      "sourceLine": 130,
+      "bodyEqual": true,
+      "installedBodySha": "f58b5f957bb9fdc23213c786a3d1c800d4bcc7626450cda8be98c8423ee8bf29",
+      "chainBodySha": "f58b5f957bb9fdc23213c786a3d1c800d4bcc7626450cda8be98c8423ee8bf29",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.my_workspace",
+      "signature": "",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 216,
+      "bodyEqual": true,
+      "installedBodySha": "ed5aceaa30095a54d8198dd8d8e9ff59aa604e014ec5da173ec38dc162a9f62f",
+      "chainBodySha": "ed5aceaa30095a54d8198dd8d8e9ff59aa604e014ec5da173ec38dc162a9f62f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.normalize_local_capabilities",
+      "signature": "",
+      "source": "supabase/migrations/20261020002600_role_capability_boundaries.sql",
+      "sourceLine": 16,
+      "bodyEqual": true,
+      "installedBodySha": "fa464ae2e29c9430df3233549daf2c32e3c01a5a1c5010b40d21fb6f59d0996c",
+      "chainBodySha": "fa464ae2e29c9430df3233549daf2c32e3c01a5a1c5010b40d21fb6f59d0996c",
+      "securityDefiner": false,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.notification_document_payload",
+      "signature": "p_id uuid, p_worker_id uuid",
+      "source": "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "sourceLine": 19,
+      "bodyEqual": true,
+      "installedBodySha": "f170dc7e23e4318d338b1062bfd771b79798ba86d04911f693c8ff3e3ef1c9ed",
+      "chainBodySha": "f170dc7e23e4318d338b1062bfd771b79798ba86d04911f693c8ff3e3ef1c9ed",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.notification_job_state",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261020003300_service_worker_privileges.sql",
+      "sourceLine": 15,
+      "bodyEqual": true,
+      "installedBodySha": "bf223daddb11ca2e5c64bb3ad5708faa88e1bcd76d61513401530f4890755d95",
+      "chainBodySha": "bf223daddb11ca2e5c64bb3ad5708faa88e1bcd76d61513401530f4890755d95",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.notification_notice_payload",
+      "signature": "p_id uuid, p_worker uuid",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 115,
+      "bodyEqual": true,
+      "installedBodySha": "03d1df85b9109acd0de0b0be3fd5012fb083c8c262485dd53636907d71e9ea4c",
+      "chainBodySha": "03d1df85b9109acd0de0b0be3fd5012fb083c8c262485dd53636907d71e9ea4c",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.notification_safe_failure",
+      "signature": "p_reference text, p_code text",
+      "source": "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "sourceLine": 95,
+      "bodyEqual": true,
+      "installedBodySha": "0ba82f801336ce51e7a5970bda5e7301c44a13f06eb20f0ef3429846c038ad21",
+      "chainBodySha": "0ba82f801336ce51e7a5970bda5e7301c44a13f06eb20f0ef3429846c038ad21",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.notification_webhook",
+      "signature": "p_provider_reference text, p_state text, p_notification_id uuid",
+      "source": "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "sourceLine": 118,
+      "bodyEqual": true,
+      "installedBodySha": "097cdf7b6b05083b2d23fbff073b0786c3588cdcdb499925acd08be85b13f084",
+      "chainBodySha": "097cdf7b6b05083b2d23fbff073b0786c3588cdcdb499925acd08be85b13f084",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.operational_document",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 68,
+      "bodyEqual": true,
+      "installedBodySha": "41457abd33daeacb72424bd7c840e596a9bd8c90cd61b3ae4dacde7eeba77614",
+      "chainBodySha": "41457abd33daeacb72424bd7c840e596a9bd8c90cd61b3ae4dacde7eeba77614",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.operational_document_list",
+      "signature": "p_patient uuid, p_type text, p_status text, p_search text, p_from timestamp with time zone, p_to timestamp with time zone, p_page integer, p_size integer",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 63,
+      "bodyEqual": true,
+      "installedBodySha": "a1fb480646d869137bf458429cace5590b55c75e9cf2e9298d69ed9e551c779f",
+      "chainBodySha": "a1fb480646d869137bf458429cace5590b55c75e9cf2e9298d69ed9e551c779f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.operational_tasks",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 53,
+      "bodyEqual": true,
+      "installedBodySha": "3763e67b547761ff5837cc02bc601a69ba852f979c59200ac6282facb671d0d9",
+      "chainBodySha": "3763e67b547761ff5837cc02bc601a69ba852f979c59200ac6282facb671d0d9",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.patient_capabilities",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261022043226_operational_documents.sql",
+      "sourceLine": 71,
+      "bodyEqual": true,
+      "installedBodySha": "8653bf420ed59f428ddbe9c62449d6349df1adf8216f32364ae28c9491b5ad0e",
+      "chainBodySha": "8653bf420ed59f428ddbe9c62449d6349df1adf8216f32364ae28c9491b5ad0e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.patient_capability_definitions",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261025103452_effective_capability_matrix.sql",
+      "sourceLine": 10,
+      "bodyEqual": true,
+      "installedBodySha": "3a7b42d722cbffa02928e4c5214f5453e287badfc9aa527848fbfa62e3c5da5a",
+      "chainBodySha": "3a7b42d722cbffa02928e4c5214f5453e287badfc9aa527848fbfa62e3c5da5a",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.patient_directory",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261022044133_requisition_access_policies.sql",
+      "sourceLine": 130,
+      "bodyEqual": true,
+      "installedBodySha": "d447530464fae260ddc642719b23f9c3a52a234c6432320bd45c2893ddf14b24",
+      "chainBodySha": "d447530464fae260ddc642719b23f9c3a52a234c6432320bd45c2893ddf14b24",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.patient_governance",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261025103452_effective_capability_matrix.sql",
+      "sourceLine": 16,
+      "bodyEqual": true,
+      "installedBodySha": "5db1c012531b497a92f74cce4c3548bffcc0aeff3576e93e63e6c5f2874e795b",
+      "chainBodySha": "5db1c012531b497a92f74cce4c3548bffcc0aeff3576e93e63e6c5f2874e795b",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.patient_notification_rules",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261023034142_v4_administrative_contracts_and_scheduling.sql",
+      "sourceLine": 63,
+      "bodyEqual": true,
+      "installedBodySha": "97ea7ee402951668f2c3a6f57a1edce56180d0cfe03be43fbb54f429ea23d354",
+      "chainBodySha": "97ea7ee402951668f2c3a6f57a1edce56180d0cfe03be43fbb54f429ea23d354",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.process_internal_notifications",
+      "signature": "p_limit integer",
+      "source": "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "sourceLine": 214,
+      "bodyEqual": true,
+      "installedBodySha": "506b83c079a620e33217ab9a4328f3d7012d0122f6cbc0e4dcbf28e4b68d6591",
+      "chainBodySha": "506b83c079a620e33217ab9a4328f3d7012d0122f6cbc0e4dcbf28e4b68d6591",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.protect_last_global_admin",
+      "signature": "",
+      "source": "supabase/migrations/20261020002000_scoped_authority_and_catalogue.sql",
+      "sourceLine": 42,
+      "bodyEqual": true,
+      "installedBodySha": "8938bed63af07205ba99b0d83e223f26771479cd47677ea07077fbc656cd08b7",
+      "chainBodySha": "8938bed63af07205ba99b0d83e223f26771479cd47677ea07077fbc656cd08b7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.protect_requisition_historical_origin",
+      "signature": "",
+      "source": "supabase/migrations/20261020002800_historical_unknown_stock_and_extras.sql",
+      "sourceLine": 14,
+      "bodyEqual": true,
+      "installedBodySha": "1f14ddb089042fe11d2128d177613df0101b4112a143c3b6be9a364f114c0cd1",
+      "chainBodySha": "1f14ddb089042fe11d2128d177613df0101b4112a143c3b6be9a364f114c0cd1",
+      "securityDefiner": false,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.protect_requisition_identity",
+      "signature": "",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 10,
+      "bodyEqual": true,
+      "installedBodySha": "1b1ff8369db52edd433592f90930e2fb9714e1b312c8a7295d75e6f26054c371",
+      "chainBodySha": "1b1ff8369db52edd433592f90930e2fb9714e1b312c8a7295d75e6f26054c371",
+      "securityDefiner": false,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.recent_session",
+      "signature": "",
+      "source": "supabase/migrations/20261022052521_evidence_profile_and_drafts.sql",
+      "sourceLine": 31,
+      "bodyEqual": true,
+      "installedBodySha": "95c3bce9115b0628b607f16113bb1a337aa699ba4690ba55fe0f83240e052887",
+      "chainBodySha": "95c3bce9115b0628b607f16113bb1a337aa699ba4690ba55fe0f83240e052887",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.recipient_can",
+      "signature": "p_recipient_id uuid, p_operation text",
+      "source": "supabase/migrations/20261022043226_operational_documents.sql",
+      "sourceLine": 76,
+      "bodyEqual": true,
+      "installedBodySha": "0bfbb473c4fd653b50dee7b236469c7810789eb17d25da74aca92e35a063dfed",
+      "chainBodySha": "0bfbb473c4fd653b50dee7b236469c7810789eb17d25da74aca92e35a063dfed",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.recipient_role",
+      "signature": "p_recipient_id uuid",
+      "source": "supabase/migrations/20261023040129_v4_meta_registry_and_verified_actions.sql",
+      "sourceLine": 39,
+      "bodyEqual": true,
+      "installedBodySha": "eda9a4c70eca53a848c52fe08e880629e2121f89c7d79b9fb8fcb042e59cfe00",
+      "chainBodySha": "eda9a4c70eca53a848c52fe08e880629e2121f89c7d79b9fb8fcb042e59cfe00",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.record_requisition_status_transition",
+      "signature": "",
+      "source": "supabase/migrations/20261020001300_requisition_status_history.sql",
+      "sourceLine": 13,
+      "bodyEqual": true,
+      "installedBodySha": "3669d1377815d037d4765ebb658b8df6119035689186cea0f456e29db47cd553",
+      "chainBodySha": "3669d1377815d037d4765ebb658b8df6119035689186cea0f456e29db47cd553",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.record_stock_movement",
+      "signature": "p_care_recipient_id uuid, p_product_id text, p_quantity integer, p_movement_type stock_movement_type, p_source_location text, p_destination_location text, p_justification text, p_idempotency_key uuid, p_reference_type text, p_reference_id uuid",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 116,
+      "bodyEqual": true,
+      "installedBodySha": "e8673867cd59b9ec5eed29b1822939224e4b824c78ac5632121024e379d49c72",
+      "chainBodySha": "e8673867cd59b9ec5eed29b1822939224e4b824c78ac5632121024e379d49c72",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public, extensions"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.recount_stock_inventory",
+      "signature": "p_inventory_id uuid",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 223,
+      "bodyEqual": true,
+      "installedBodySha": "d3969bafa3bdd6b0861e141b5fd093cfe12ddcea00a86c0afac9d2d6e335d82b",
+      "chainBodySha": "d3969bafa3bdd6b0861e141b5fd093cfe12ddcea00a86c0afac9d2d6e335d82b",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.register_document_pdf",
+      "signature": "p_document uuid, p_version integer, p_path text, p_hash text",
+      "source": "supabase/migrations/20261022052012_workflow_guards_and_read_models.sql",
+      "sourceLine": 279,
+      "bodyEqual": true,
+      "installedBodySha": "916ba28c07041a95c8fd2e6d2b3c702b1f3c5e72de8921f882def1dbf25ad5e0",
+      "chainBodySha": "916ba28c07041a95c8fd2e6d2b3c702b1f3c5e72de8921f882def1dbf25ad5e0",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.register_document_render",
+      "signature": "p_document uuid, p_version integer, p_renderer integer, p_path text, p_hash text",
+      "source": "supabase/migrations/20261023035102_v4_document_render_evidence.sql",
+      "sourceLine": 12,
+      "bodyEqual": true,
+      "installedBodySha": "0cd63cb5bcf330c5921ebee7e233cca8f3da84394c8e04dce9e59a4bd6373cf2",
+      "chainBodySha": "0cd63cb5bcf330c5921ebee7e233cca8f3da84394c8e04dce9e59a4bd6373cf2",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.register_verified_phone",
+      "signature": "",
+      "source": "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "85ec043fd710a928763afce6328443c20d89b6fa13a6fd7799ebc07cab54d244",
+      "chainBodySha": "85ec043fd710a928763afce6328443c20d89b6fa13a6fd7799ebc07cab54d244",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.report_extraordinary_consumption",
+      "signature": "p_patient uuid, p_kind text, p_location text, p_text text, p_lines jsonb, p_key uuid",
+      "source": "supabase/migrations/20261022054021_custody_privacy_and_operational_tasks.sql",
+      "sourceLine": 31,
+      "bodyEqual": true,
+      "installedBodySha": "abccc104f7d119f114aba6efbf33d6c577e2d1cc8c2ef872fa93cd2ecb478064",
+      "chainBodySha": "abccc104f7d119f114aba6efbf33d6c577e2d1cc8c2ef872fa93cd2ecb478064",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.requisition_delivery_status",
+      "signature": "p_requisition_ids uuid[]",
+      "source": "supabase/migrations/20261022055016_harden_function_privileges_and_history.sql",
+      "sourceLine": 136,
+      "bodyEqual": true,
+      "installedBodySha": "fbd0aa3782f27292b1e9d463bb654b9db73f8ec33f6e97fa7a5cac4b5696a437",
+      "chainBodySha": "fbd0aa3782f27292b1e9d463bb654b9db73f8ec33f6e97fa7a5cac4b5696a437",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.requisition_fulfillment",
+      "signature": "p_requisition uuid",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 233,
+      "bodyEqual": true,
+      "installedBodySha": "4c31b8e5157009020649d63d769c9ec1cce3563999d24026db5b5c80393ce15e",
+      "chainBodySha": "4c31b8e5157009020649d63d769c9ec1cce3563999d24026db5b5c80393ce15e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.requisition_fulfillments",
+      "signature": "p_ids uuid[]",
+      "source": "supabase/migrations/20261023034142_v4_administrative_contracts_and_scheduling.sql",
+      "sourceLine": 56,
+      "bodyEqual": true,
+      "installedBodySha": "5e4a698a0278d205fe4e7512a7ab5982d1fab1f455c2ee795abac8ee8e6e589e",
+      "chainBodySha": "5e4a698a0278d205fe4e7512a7ab5982d1fab1f455c2ee795abac8ee8e6e589e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.requisition_item_context",
+      "signature": "p_patient uuid, p_products text[]",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 227,
+      "bodyEqual": true,
+      "installedBodySha": "0475eda7eec3fdb9a61c1a993c535bb196a1558eba62373b7e8c80f79f8f1d42",
+      "chainBodySha": "0475eda7eec3fdb9a61c1a993c535bb196a1558eba62373b7e8c80f79f8f1d42",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.requisition_progress",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 66,
+      "bodyEqual": true,
+      "installedBodySha": "bf5de65904bd2b433143f1c302a8a3a89c4a077bb81da25ce6aa86a3ad6a91c6",
+      "chainBodySha": "bf5de65904bd2b433143f1c302a8a3a89c4a077bb81da25ce6aa86a3ad6a91c6",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.reserve_attachment",
+      "signature": "p_patient uuid, p_document uuid, p_movement uuid, p_filename text, p_mime text, p_bytes bigint, p_key uuid",
+      "source": "supabase/migrations/20261022061251_evidence_idempotency_and_final_contracts.sql",
+      "sourceLine": 4,
+      "bodyEqual": true,
+      "installedBodySha": "bad7e0bec84f6b0f3f040584b4274f07c94cad7f1252475e27d52d3318b1770f",
+      "chainBodySha": "bad7e0bec84f6b0f3f040584b4274f07c94cad7f1252475e27d52d3318b1770f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.resolve_balance_assignment",
+      "signature": "p_patient uuid, p_cycle uuid, p_shift uuid, p_reason text, p_key uuid",
+      "source": "supabase/migrations/20261025101209_balance_deadlines_and_schedule_separation.sql",
+      "sourceLine": 60,
+      "bodyEqual": true,
+      "installedBodySha": "6dbf504d8437abefaac6a0df7fb375aab54ee3ecd6abb436624664f81c11f9ce",
+      "chainBodySha": "6dbf504d8437abefaac6a0df7fb375aab54ee3ecd6abb436624664f81c11f9ce",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.resolve_requisition_item",
+      "signature": "p_item uuid, p_product text, p_reason text, p_key uuid",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 26,
+      "bodyEqual": true,
+      "installedBodySha": "ed9acd4b41ae51657abaaf7eb1b283db16b56d6a0e2cd5d88ca560cd28c76498",
+      "chainBodySha": "ed9acd4b41ae51657abaaf7eb1b283db16b56d6a0e2cd5d88ca560cd28c76498",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.retry_notification_job",
+      "signature": "p_id uuid, p_confirm_uncertain boolean",
+      "source": "supabase/migrations/20261020003100_explicit_uncertain_retry.sql",
+      "sourceLine": 2,
+      "bodyEqual": true,
+      "installedBodySha": "ef485b4c782ae906a3c6d9d492c96b41724cca4e2b9ecb28bd77f95dfd3d0152",
+      "chainBodySha": "ef485b4c782ae906a3c6d9d492c96b41724cca4e2b9ecb28bd77f95dfd3d0152",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.review_flow_submission",
+      "signature": "p_id uuid, p_accept boolean, p_kind text, p_text text, p_lines jsonb",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 90,
+      "bodyEqual": true,
+      "installedBodySha": "be815a3e979b66d053dc713f07a539674cadfb010db5ae4cc1c1b05c618f6f6b",
+      "chainBodySha": "be815a3e979b66d053dc713f07a539674cadfb010db5ae4cc1c1b05c618f6f6b",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.review_stock_inventory",
+      "signature": "p_inventory_id uuid, p_action text, p_reason text",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 236,
+      "bodyEqual": true,
+      "installedBodySha": "76d7aaec39452af6f95c2779bc2efa327f0028e88d52ee27e1a9264184ce362e",
+      "chainBodySha": "76d7aaec39452af6f95c2779bc2efa327f0028e88d52ee27e1a9264184ce362e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.revise_supply_document",
+      "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 333,
+      "bodyEqual": false,
+      "installedBodySha": "441d0e70b9952f613285e509a34abc888a3674d2334e679bc9848a0e8ee8003c",
+      "chainBodySha": "59ee09b26ca7f6b4b90b175f6257038515add8b06d572d98c98ac54c825fb147",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.revoke_invitation",
+      "signature": "p_invitation_id uuid",
+      "source": "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "sourceLine": 29,
+      "bodyEqual": true,
+      "installedBodySha": "2347a8bed7c2c76cc7a8a133ebddc50caaad9bd287ac9e3e7840e1e6e848d37e",
+      "chainBodySha": "2347a8bed7c2c76cc7a8a133ebddc50caaad9bd287ac9e3e7840e1e6e848d37e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.run_operational_schedule",
+      "signature": "",
+      "source": "supabase/migrations/20261025214537_balance_scheduler_rotation.sql",
+      "sourceLine": 11,
+      "bodyEqual": true,
+      "installedBodySha": "167a131965580cd3e44c91657a0452d1ea8afddf353955c6c0f50e5e76e54c34",
+      "chainBodySha": "167a131965580cd3e44c91657a0452d1ea8afddf353955c6c0f50e5e76e54c34",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.schedule_command",
+      "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+      "source": "supabase/migrations/20261024221017_schedule_decision_scope.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "4855423f4c1e4da1fd5109dd44c023dcb3f02c28c83cd4ed49d34799099f3021",
+      "chainBodySha": "4855423f4c1e4da1fd5109dd44c023dcb3f02c28c83cd4ed49d34799099f3021",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.schedule_workspace",
+      "signature": "p_patient uuid, p_from date, p_until date",
+      "source": "supabase/migrations/20261024220543_scheduled_shifts.sql",
+      "sourceLine": 116,
+      "bodyEqual": true,
+      "installedBodySha": "7e11e9b753491925f4e8bf05b7eccf35d977d314cd93dc5b27e2c2f72e2838c1",
+      "chainBodySha": "7e11e9b753491925f4e8bf05b7eccf35d977d314cd93dc5b27e2c2f72e2838c1",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.scheduler_health",
+      "signature": "",
+      "source": "supabase/migrations/20261023033155_v4_realtime_notifications_and_scheduler.sql",
+      "sourceLine": 115,
+      "bodyEqual": true,
+      "installedBodySha": "c5a1ee3240f9fc8f21da5bc5b6c3ae00223db05ab8beb42496bd45684d3dc6ca",
+      "chainBodySha": "c5a1ee3240f9fc8f21da5bc5b6c3ae00223db05ab8beb42496bd45684d3dc6ca",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.select_active_context",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 34,
+      "bodyEqual": true,
+      "installedBodySha": "8d8ba2bd734f586a0fdd9fd53fa0dedc083ccec4614cb01fc6a7c3c4f3ef0100",
+      "chainBodySha": "8d8ba2bd734f586a0fdd9fd53fa0dedc083ccec4614cb01fc6a7c3c4f3ef0100",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.set_my_avatar",
+      "signature": "p_path text",
+      "source": "supabase/migrations/20261022052521_evidence_profile_and_drafts.sql",
+      "sourceLine": 34,
+      "bodyEqual": true,
+      "installedBodySha": "e3fae2d3ee7921bb56cfb502f30b5515221b2c110e085d92f045e22dfea02a6e",
+      "chainBodySha": "e3fae2d3ee7921bb56cfb502f30b5515221b2c110e085d92f045e22dfea02a6e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.stock_consumption_metrics",
+      "signature": "p_patient uuid, p_from timestamp with time zone, p_to timestamp with time zone",
+      "source": "supabase/migrations/20261022085635_finalize_read_models_and_evidence_reviews.sql",
+      "sourceLine": 1,
+      "bodyEqual": true,
+      "installedBodySha": "97ce026216a9c17b980a932c3e98403dcc284691b646c892217e575389ca658c",
+      "chainBodySha": "97ce026216a9c17b980a932c3e98403dcc284691b646c892217e575389ca658c",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.stock_history",
+      "signature": "p_patient uuid, p_product text, p_from timestamp with time zone, p_to timestamp with time zone, p_location text, p_page integer, p_size integer",
+      "source": "supabase/migrations/20261022054021_custody_privacy_and_operational_tasks.sql",
+      "sourceLine": 3,
+      "bodyEqual": true,
+      "installedBodySha": "75f9cb5ea1414574b8df77fa888beeb9e38a6ee59ce76a03575c1aad594dea5f",
+      "chainBodySha": "75f9cb5ea1414574b8df77fa888beeb9e38a6ee59ce76a03575c1aad594dea5f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.stock_overview",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261022052012_workflow_guards_and_read_models.sql",
+      "sourceLine": 258,
+      "bodyEqual": true,
+      "installedBodySha": "1cb7495f2fadb069091392a7647d0843846fb3cdff68bf433e03a485b2e0a724",
+      "chainBodySha": "1cb7495f2fadb069091392a7647d0843846fb3cdff68bf433e03a485b2e0a724",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.stock_transit",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261022085635_finalize_read_models_and_evidence_reviews.sql",
+      "sourceLine": 15,
+      "bodyEqual": true,
+      "installedBodySha": "74ebac20c212c5708c9f87fc3f7fb4d65c4203ff5e1eaeee5bdb4c91ffb96184",
+      "chainBodySha": "74ebac20c212c5708c9f87fc3f7fb4d65c4203ff5e1eaeee5bdb4c91ffb96184",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.submit_requisition",
+      "signature": "p_care_recipient_id uuid, p_idempotency_key uuid, p_payload_hash text, p_lines jsonb, p_extra_items jsonb, p_observations jsonb",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 242,
+      "bodyEqual": true,
+      "installedBodySha": "cb62c3def221f48072fc6ed02c55608764d3fe3aa87d8421f784580c7321356e",
+      "chainBodySha": "cb62c3def221f48072fc6ed02c55608764d3fe3aa87d8421f784580c7321356e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.submit_stock_inventory",
+      "signature": "p_inventory_id uuid",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 185,
+      "bodyEqual": true,
+      "installedBodySha": "160961e9a581f554e48907a17f1c8a50bf588026f9a3274cbb78a7ac86b1fbec",
+      "chainBodySha": "160961e9a581f554e48907a17f1c8a50bf588026f9a3274cbb78a7ac86b1fbec",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.supply_document_command",
+      "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 347,
+      "bodyEqual": false,
+      "installedBodySha": "ee197657d3abc9710e20363b38ce91b74d49ee047fcf32c37e439545d577163d",
+      "chainBodySha": "860d53ff34e98c7d59acdd6392b6e5918e4ad8fdd6602c573bfcdeab535d6250",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.transition_requisition_status",
+      "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text",
+      "source": "supabase/migrations/20261023041150_v4_session_assurance_and_admin_directory.sql",
+      "sourceLine": 34,
+      "bodyEqual": true,
+      "installedBodySha": "59091bc24948d3d49b52cccb68e2506f725d3139c7cf9b6990d7b2e97781c942",
+      "chainBodySha": "59091bc24948d3d49b52cccb68e2506f725d3139c7cf9b6990d7b2e97781c942",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.update_my_profile",
+      "signature": "p_name text, p_registration text, p_state text, p_category text, p_preferences jsonb",
+      "source": "supabase/migrations/20261022043228_communications_attachments.sql",
+      "sourceLine": 124,
+      "bodyEqual": true,
+      "installedBodySha": "af2016ca536259d9aee73d11402b920687843bae02a167693d755e192ecbb83d",
+      "chainBodySha": "af2016ca536259d9aee73d11402b920687843bae02a167693d755e192ecbb83d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_accept_invitation",
+      "signature": "p_token_hash text",
+      "source": "supabase/migrations/20261020002300_cross_scope_invariants.sql",
+      "sourceLine": 39,
+      "bodyEqual": true,
+      "installedBodySha": "4f28c158685caac80526ab9b0cf5d156d3b2e24e893d3596a6d6a99890d383f7",
+      "chainBodySha": "4f28c158685caac80526ab9b0cf5d156d3b2e24e893d3596a6d6a99890d383f7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_admin_upsert_recipient",
+      "signature": "p_id uuid, p_display_name text, p_is_active boolean, p_is_development boolean",
+      "source": "supabase/migrations/20261020002000_scoped_authority_and_catalogue.sql",
+      "sourceLine": 132,
+      "bodyEqual": true,
+      "installedBodySha": "a010541fb4a9c0b73ca1e13736b45a22afb686e538299aee253108ec1e897050",
+      "chainBodySha": "a010541fb4a9c0b73ca1e13736b45a22afb686e538299aee253108ec1e897050",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_configure_stock_alert",
+      "signature": "p_care_recipient_id uuid, p_product_id text, p_location text, p_low_threshold bigint, p_critical_threshold bigint, p_is_enabled boolean",
+      "source": "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "sourceLine": 154,
+      "bodyEqual": true,
+      "installedBodySha": "17d586d36eefa7e2221116a5b09e3e11bb0ee515c6aca30c5494e839b21bf194",
+      "chainBodySha": "17d586d36eefa7e2221116a5b09e3e11bb0ee515c6aca30c5494e839b21bf194",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_create_supply_document",
+      "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 140,
+      "bodyEqual": true,
+      "installedBodySha": "fdf7773d6a1485e4be4b9c96143c46ac4302f1169133ae8c7d7454b183986550",
+      "chainBodySha": "fdf7773d6a1485e4be4b9c96143c46ac4302f1169133ae8c7d7454b183986550",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_flow_exchange",
+      "signature": "p_hash text, p_submit jsonb",
+      "source": "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "sourceLine": 57,
+      "bodyEqual": true,
+      "installedBodySha": "a8396eb8e5e63bbe638fd7065a69ef209961dcba18d9f07a6a01df272962d70d",
+      "chainBodySha": "a8396eb8e5e63bbe638fd7065a69ef209961dcba18d9f07a6a01df272962d70d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_ingest_whatsapp_report",
+      "signature": "p_provider_id text, p_phone text, p_text text, p_lines jsonb, p_kind text",
+      "source": "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "sourceLine": 81,
+      "bodyEqual": true,
+      "installedBodySha": "0960efbd30e0f6324a89ea2500f7679c6ada62af9d989c627ea029a556368339",
+      "chainBodySha": "0960efbd30e0f6324a89ea2500f7679c6ada62af9d989c627ea029a556368339",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_notification_webhook",
+      "signature": "p_provider_reference text, p_state text, p_notification_id uuid",
+      "source": "supabase/migrations/20261020002300_cross_scope_invariants.sql",
+      "sourceLine": 74,
+      "bodyEqual": true,
+      "installedBodySha": "2ba91b4421c0dd2fec8271310d97b254d8db6e841ae0349a60286005b598a119",
+      "chainBodySha": "2ba91b4421c0dd2fec8271310d97b254d8db6e841ae0349a60286005b598a119",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_operational_tasks",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261022054021_custody_privacy_and_operational_tasks.sql",
+      "sourceLine": 21,
+      "bodyEqual": true,
+      "installedBodySha": "667d3edbc00589fd88658b534d1e434a61b11da35aec56485b04c3f132429105",
+      "chainBodySha": "667d3edbc00589fd88658b534d1e434a61b11da35aec56485b04c3f132429105",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_revise_supply_document",
+      "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 190,
+      "bodyEqual": false,
+      "installedBodySha": "fca1d579a8302b234885b0fb339382b11e9a71e6c3239df203a2fedf0a196fe9",
+      "chainBodySha": "1dd500c0edb746f9ca7ca2b7ee48d88ce7c44f54805cf685ff3b35eec792522e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_transition_requisition_status",
+      "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text",
+      "source": "supabase/migrations/20261022044133_requisition_access_policies.sql",
+      "sourceLine": 55,
+      "bodyEqual": true,
+      "installedBodySha": "20852a22f21a48ca0690e0d2582748890cd900aad66ed032ed82425711b16939",
+      "chainBodySha": "20852a22f21a48ca0690e0d2582748890cd900aad66ed032ed82425711b16939",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_accept_invitation",
+      "signature": "p_token_hash text",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 71,
+      "bodyEqual": true,
+      "installedBodySha": "fefb642b3098bd55a80fed273748ca8eaab65f82b29e79bcc740040afb8ca2ad",
+      "chainBodySha": "fefb642b3098bd55a80fed273748ca8eaab65f82b29e79bcc740040afb8ca2ad",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_admin_set_membership_status",
+      "signature": "p_care_recipient_id uuid, p_user_id uuid, p_status text",
+      "source": "supabase/migrations/20261020002000_scoped_authority_and_catalogue.sql",
+      "sourceLine": 157,
+      "bodyEqual": true,
+      "installedBodySha": "913005c09010708fdcc3e0df69200604921d37d53cfbd99168b03810a000f3ca",
+      "chainBodySha": "913005c09010708fdcc3e0df69200604921d37d53cfbd99168b03810a000f3ca",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_admin_upsert_membership",
+      "signature": "p_care_recipient_id uuid, p_user_id uuid, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean",
+      "source": "supabase/migrations/20261020002300_cross_scope_invariants.sql",
+      "sourceLine": 11,
+      "bodyEqual": true,
+      "installedBodySha": "40b084a493a4774f3109846b87d45856b6f4b41f55daafc00f493bce7a447f72",
+      "chainBodySha": "40b084a493a4774f3109846b87d45856b6f4b41f55daafc00f493bce7a447f72",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_complete_notification_job",
+      "signature": "p_id uuid, p_worker_id uuid, p_state text, p_provider_reference text, p_error text",
+      "source": "supabase/migrations/20261020002200_invites_alerts_and_outbox.sql",
+      "sourceLine": 178,
+      "bodyEqual": true,
+      "installedBodySha": "5f0b69a7f779cdf40cb98f324a86b4873b13db9eb6965e33f030be9c9220fe3f",
+      "chainBodySha": "5f0b69a7f779cdf40cb98f324a86b4873b13db9eb6965e33f030be9c9220fe3f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_configure_patient_access",
+      "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 103,
+      "bodyEqual": false,
+      "installedBodySha": "bc9c11545625a2aed85d6cb2524d76df592a47a950707e745d83e5e39fd03171",
+      "chainBodySha": "a4d118fa64593f7d3badb56b053b32e961ca4f2ac6a9080dc25e7af28a883a0f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_lifecycle_schedule",
+      "signature": "",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 307,
+      "bodyEqual": true,
+      "installedBodySha": "807be3be1971b51d62a1dbaaf44ca09ec86096957ab023cae1a0089563606f65",
+      "chainBodySha": "807be3be1971b51d62a1dbaaf44ca09ec86096957ab023cae1a0089563606f65",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_review_archive_requisition",
+      "signature": "p_id uuid, p_reason text",
+      "source": "supabase/migrations/20261023174500_v4_review_follow_up.sql",
+      "sourceLine": 2,
+      "bodyEqual": true,
+      "installedBodySha": "99a182ab1a01e2f2f807571d20531384b39eaece6cae73ecfb9a705067470628",
+      "chainBodySha": "99a182ab1a01e2f2f807571d20531384b39eaece6cae73ecfb9a705067470628",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_review_patient_access",
+      "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+      "source": "supabase/migrations/20261023073958_v4_verification_corrections.sql",
+      "sourceLine": 100,
+      "bodyEqual": true,
+      "installedBodySha": "ee3ee302c1b2a4c4fd7648a3a673ac7a4cf045bf9fba9c01f40bd4746633c5fe",
+      "chainBodySha": "ee3ee302c1b2a4c4fd7648a3a673ac7a4cf045bf9fba9c01f40bd4746633c5fe",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_validate_notification_job",
+      "signature": "p_id uuid, p_worker_id uuid",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 100,
+      "bodyEqual": false,
+      "installedBodySha": "10fca4f578445da8fc4cb4375e6c6f982cd03eeea61248234c0fb6c4a15a84b5",
+      "chainBodySha": "dbdb7606f957a07b65dc61386004652a4efd242696d9ecd4971d3e37c7ac4030",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.validate_notification_job",
+      "signature": "p_id uuid, p_worker_id uuid",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 212,
+      "bodyEqual": true,
+      "installedBodySha": "e029f08514a2f39b431683fa575ec99f088f7ba16d28c8bc56bed2b474407ac6",
+      "chainBodySha": "e029f08514a2f39b431683fa575ec99f088f7ba16d28c8bc56bed2b474407ac6",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.validated_legacy_patient_access",
+      "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+      "source": "supabase/migrations/20261022044133_requisition_access_policies.sql",
+      "sourceLine": 88,
+      "bodyEqual": false,
+      "installedBodySha": "523609fd03030a2b15ae37d0c109bdd45cb782befefd17adc4673370099398db",
+      "chainBodySha": "cc6b0c2920b7132700b4abb5c49f1dfdf8e08cdb702a542675466b679689a0a7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.verified_legacy_whatsapp_receipt",
+      "signature": "p_provider_id text, p_phone text, p_hash text",
+      "source": "supabase/migrations/20261022054421_verified_messaging_and_flow_sessions.sql",
+      "sourceLine": 22,
+      "bodyEqual": true,
+      "installedBodySha": "aab89b6f8a2359f41d2405315d62dbe37ecea5a1c71d3263b02b4e5593d29832",
+      "chainBodySha": "aab89b6f8a2359f41d2405315d62dbe37ecea5a1c71d3263b02b4e5593d29832",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.verify_document_integrity",
+      "signature": "p_id uuid, p_version integer, p_hash text",
+      "source": "supabase/migrations/20261023035102_v4_document_render_evidence.sql",
+      "sourceLine": 24,
+      "bodyEqual": true,
+      "installedBodySha": "6557154548eb4e7b2a9df8f0ef67284085d7b2cb072c6614810837e7534a766a",
+      "chainBodySha": "6557154548eb4e7b2a9df8f0ef67284085d7b2cb072c6614810837e7534a766a",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.workspace_revision",
+      "signature": "",
+      "source": "supabase/migrations/20261023033155_v4_realtime_notifications_and_scheduler.sql",
+      "sourceLine": 4,
+      "bodyEqual": true,
+      "installedBodySha": "cef733281dff99e94f7052e2bab10a6cfc2b0ff47375fa927ee62fc5c7c9cd91",
+      "chainBodySha": "cef733281dff99e94f7052e2bab10a6cfc2b0ff47375fa927ee62fc5c7c9cd91",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    }
+  ],
+  "bodyEqual": 208,
+  "mismatches": [
+    {
+      "name": "private.apply_bal",
+      "signature": "p_id uuid",
+      "source": "supabase/migrations/20261022043227_supply_workflows.sql",
+      "sourceLine": 80,
+      "bodyEqual": false,
+      "installedBodySha": "2b666bc9ac3afb1be26a7e2462d6deab3213671b600aadd4c84a16070b63f952",
+      "chainBodySha": "0f2af3b764dd0cabbfb0a5d43a1ed28c81d3bcfb09795a6ae34c0c7787db48cd",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.bal_count_context",
+      "signature": "p_patient uuid, p_document uuid, p_payload jsonb",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 285,
+      "bodyEqual": false,
+      "installedBodySha": "1777ec16b4f7b19accc324c9f2e35c50b38eae0e5976da5c71edfbfacd59edd6",
+      "chainBodySha": "f89e25f38013701c220d8b9fa7bc6033822a12eae9a0071a4872ab02a7e2d72e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.deliver_internal_notifications",
+      "signature": "",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 170,
+      "bodyEqual": false,
+      "installedBodySha": "ec860da52298576ee88065719c559b6d22c5001a12033b8496eabde37cf682fe",
+      "chainBodySha": "ef906623d15cc71337376c51b47f73593cff671ec6e5dc645eeb6e530b4bf29f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.enqueue_scheduled_reminders",
+      "signature": "",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 185,
+      "bodyEqual": false,
+      "installedBodySha": "16a76c72fc9aac0666a75b0410dc7084cbc98a31800503fd1f4afd35826eb081",
+      "chainBodySha": "dd6dfe7d85905e779f30e58699cc6dadfe9ef98203dbf44cd8d85c833a0ca5c0",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.member_can",
+      "signature": "p_patient uuid, p_user uuid, p_capability text",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 63,
+      "bodyEqual": false,
+      "installedBodySha": "da95655928642cfc367fd1f6cd67781755c120972c7928c96904099dccef7a64",
+      "chainBodySha": "ae8c1d8fe657d4f28dbe5e6817a34811ff6c09e3b872571885beeb525f0b2869",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.process_bal_patient",
+      "signature": "p_patient uuid, p_now timestamp with time zone",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 104,
+      "bodyEqual": false,
+      "installedBodySha": "e29d7024cdcb40584bdd1d9f979562d128c279f13361e6ef150ea76a5aabc494",
+      "chainBodySha": "664fae2a78b9df4b5a18be3caefdb440c728f0ed9e62f2a6c8964e92751fdc06",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "private.schedule_event",
+      "signature": "p_patient uuid, p_series uuid, p_shift uuid, p_worker uuid, p_action text, p_reason text, p_before jsonb, p_after jsonb",
+      "source": "supabase/migrations/20261024220543_scheduled_shifts.sql",
+      "sourceLine": 105,
+      "bodyEqual": false,
+      "installedBodySha": "66d213792c89997bde0678a2fd49fda219f3c4eaa4446ba32bce3c52c4fa6596",
+      "chainBodySha": "aa112335ae305a0d6842ac35df25884ccdbacb196181821dd74e3e2229c9762d",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.acknowledge_requisition",
+      "signature": "p_id uuid, p_mode text, p_version integer",
+      "source": "supabase/migrations/20261023032906_v4_requisition_science_and_lifecycle.sql",
+      "sourceLine": 77,
+      "bodyEqual": false,
+      "installedBodySha": "d3ab794f579abfe336b9fb118b5711aa7e4ea665f09fa5ce6707bf95e44a45b1",
+      "chainBodySha": "73b0a91c7720dcc9594fd81e298a9f7066636178258c689e1c16badad7b12375",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.approve_stock_inventory",
+      "signature": "p_inventory_id uuid",
+      "source": "supabase/migrations/20261020002100_transactional_operations.sql",
+      "sourceLine": 196,
+      "bodyEqual": false,
+      "installedBodySha": "f9dfe367d1674b2dcb5bf5fd4c70e88c4a9aecb351579416ed6f2b188b5803e3",
+      "chainBodySha": "0c4cf877563e4fcd7bade3affa9a4cbc91af2ada8d7dceed4c9ef10ba9f7feb2",
+      "securityDefiner": true,
+      "config": [
+        "search_path=public"
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.audited_legacy_supply_command",
+      "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+      "source": "supabase/migrations/20261022053539_draft_recounts_and_catalogue_contracts.sql",
+      "sourceLine": 79,
+      "bodyEqual": false,
+      "installedBodySha": "a3b111781e312851a79fc2f872d8c5ff118ffcb3f5bd10dd34eacbf0546bda20",
+      "chainBodySha": "d06598a92afb8130a196f584bf1a0105d6758f3e8690a13e182d0385c6087428",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.balance_command",
+      "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+      "source": "supabase/migrations/20261024222909_balance_assignment_resolution.sql",
+      "sourceLine": 1,
+      "bodyEqual": false,
+      "installedBodySha": "c49ff30bf6e34fccbda4bd73a5a31dc520b48e9d6647b7c1853a34c6a7f99778",
+      "chainBodySha": "95204d3f4f0359a8d4433537383fb2003a4ffe8b27c5d4b7240d263f648828c2",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.balance_workspace",
+      "signature": "p_patient uuid",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 185,
+      "bodyEqual": false,
+      "installedBodySha": "db64c7f172b7b92f220240cb0eda3daae15483ab9e820777fb0f23444a430e73",
+      "chainBodySha": "0f88de4f91a78e4b7554b4f579c3e785c5c06ad6d4694d3c175a02c6d646b113",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.configure_patient_access",
+      "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+      "source": "supabase/migrations/20261023120000_v4_review_regressions.sql",
+      "sourceLine": 99,
+      "bodyEqual": false,
+      "installedBodySha": "fc4a28344df8cb75e380caa94a7e58a6832bb03852d8700b1b26f92e2092791a",
+      "chainBodySha": "5b40362a2d99b37631dfa487cf5ebcebe8f93bde151246161686aaa6bdf9a098",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.create_supply_document",
+      "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 319,
+      "bodyEqual": false,
+      "installedBodySha": "93add9ffa3fe96d64ee2b75a00a397b2d61f3a47ec3a6188386b82773bc96d35",
+      "chainBodySha": "754ae167838b6c2abca4aa9062fb968546bf78393a3264738abf8e40b6cff6bc",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.revise_supply_document",
+      "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 333,
+      "bodyEqual": false,
+      "installedBodySha": "441d0e70b9952f613285e509a34abc888a3674d2334e679bc9848a0e8ee8003c",
+      "chainBodySha": "59ee09b26ca7f6b4b90b175f6257038515add8b06d572d98c98ac54c825fb147",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.supply_document_command",
+      "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+      "source": "supabase/migrations/20261024221737_balance_shift_cycles.sql",
+      "sourceLine": 347,
+      "bodyEqual": false,
+      "installedBodySha": "ee197657d3abc9710e20363b38ce91b74d49ee047fcf32c37e439545d577163d",
+      "chainBodySha": "860d53ff34e98c7d59acdd6392b6e5918e4ad8fdd6602c573bfcdeab535d6250",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v3_revise_supply_document",
+      "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+      "source": "supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql",
+      "sourceLine": 190,
+      "bodyEqual": false,
+      "installedBodySha": "fca1d579a8302b234885b0fb339382b11e9a71e6c3239df203a2fedf0a196fe9",
+      "chainBodySha": "1dd500c0edb746f9ca7ca2b7ee48d88ce7c44f54805cf685ff3b35eec792522e",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_configure_patient_access",
+      "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+      "source": "supabase/migrations/20261023032230_v4_active_authority_and_governance.sql",
+      "sourceLine": 103,
+      "bodyEqual": false,
+      "installedBodySha": "bc9c11545625a2aed85d6cb2524d76df592a47a950707e745d83e5e39fd03171",
+      "chainBodySha": "a4d118fa64593f7d3badb56b053b32e961ca4f2ac6a9080dc25e7af28a883a0f",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.v4_validate_notification_job",
+      "signature": "p_id uuid, p_worker_id uuid",
+      "source": "supabase/migrations/20261023044520_v4_event_routing_and_scheduled_reminders.sql",
+      "sourceLine": 100,
+      "bodyEqual": false,
+      "installedBodySha": "10fca4f578445da8fc4cb4375e6c6f982cd03eeea61248234c0fb6c4a15a84b5",
+      "chainBodySha": "dbdb7606f957a07b65dc61386004652a4efd242696d9ecd4971d3e37c7ac4030",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    },
+    {
+      "name": "public.validated_legacy_patient_access",
+      "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+      "source": "supabase/migrations/20261022044133_requisition_access_policies.sql",
+      "sourceLine": 88,
+      "bodyEqual": false,
+      "installedBodySha": "523609fd03030a2b15ae37d0c109bdd45cb782befefd17adc4673370099398db",
+      "chainBodySha": "cc6b0c2920b7132700b4abb5c49f1dfdf8e08cdb702a542675466b679689a0a7",
+      "securityDefiner": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "limits": "Body comparison, not full replay or remote drift; rename tracked by name, overloads require manual review"
+    }
+  ]
+}

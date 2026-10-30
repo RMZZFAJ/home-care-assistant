@@ -1,0 +1,33 @@
+{
+  "group": "B3.7c",
+  "startedAt": "2026-10-30T01:14:13.001Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Local PostgreSQL future p_now simulation on NEW B3 patient; full rollback; not HTTP or actual time passage.",
+  "scenarios": [
+    {
+      "id": "B37-11",
+      "purpose": "Ocorrência republicada além do corte pode produzir responsabilidade BAL derivada",
+      "recordedAt": "2026-10-30T01:14:13.002Z",
+      "observed": {
+        "activeBeyondCutoff": 1,
+        "assignmentsBeyondCutoff": 1,
+        "series": "fd8b8d7a-66ab-45ba-9a63-c3125088a72b",
+        "cutoff": "2026-11-20",
+        "rolledBack": true,
+        "method": "Future p_now scheduler simulation; no real wait or count/presence claimed",
+        "relation": "New manifestation of A DB-003/B2-013, not a separate root cause"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T01:30:49.332Z"
+}
