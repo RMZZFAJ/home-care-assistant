@@ -1,0 +1,42 @@
+{
+  "B55-C01": {
+    "status": 200,
+    "processed": 0,
+    "ingestionCalls": 0,
+    "relation": "B4-011 extended to invalid middle item"
+  },
+  "B55-C02": {
+    "status": 200,
+    "statusRpc": 1,
+    "textRpc": 0,
+    "limit": "RPC controlled; no database commit claimed"
+  },
+  "B55-C03": {
+    "status": 200,
+    "processed": 1,
+    "ingestion": 0,
+    "recoveryRecord": 0
+  },
+  "B55-C04": {
+    "status": 200,
+    "processed": 1,
+    "commandResult": false
+  },
+  "B55-C05": {
+    "processed": 2,
+    "rpcCalls": 0
+  },
+  "B55-C06": {
+    "http": 503,
+    "ingestionAttempts": [
+      "a",
+      "b"
+    ],
+    "limit": "Prior commit/replay behavior depends on real RPC/provider, reviewed in SQL contracts"
+  },
+  "B55-C07": {
+    "validText": 200,
+    "unknownStatus": 400,
+    "unknownCommandNeverAuthorized": true
+  }
+}

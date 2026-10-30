@@ -6,12 +6,20 @@ A criação de novos grupos depende da autorização correspondente.
 
 ## Estado atual
 
+- B5.0–B5.12: investigação de automações/integrações concluída em 30/10/2026,
+  sem correções. 32 mecanismos, 25 eventos externos/34 variantes, 44 pontos
+  dirigidos e 14 registros (12 P2/2 P3). Provas locais/controladas separadas da
+  homologação externa; NO-GO anterior preservado. B6/C/D não iniciadas.
+- [Executivo B5](../2026-10-30-phase-b5-integrations/17_GROUP_B5_EXECUTIVE_ASSESSMENT.md).
+- [Índice B5](../2026-10-30-phase-b5-integrations/README.md).
+- [Achados B5](../2026-10-30-phase-b5-integrations/14_FINDINGS_MASTER.md).
+- [Insumos B5 para C](../2026-10-30-phase-b5-integrations/18_PHASE_C_DECISION_HANDOFF.md).
 - B1.1–B1.8: investigação concluída, sem correções de produto.
 - B2.0–B2.10: investigação de processos concluída, sem implementação.
 - B4.0–B4.12: investigação de backend/APIs concluída em 30/10/2026,
   sem correções. 61 métodos HTTP, 77 cenários dirigidos e 13 registros;
   dez P2/três P3, com causas novas, relacionadas e herdadas discriminadas.
-  NO-GO anterior preservado; B5/C/D não iniciadas.
+  NO-GO anterior preservado; estado posterior da B5 registrado acima.
 - [Executivo B4](../2026-10-30-phase-b4-backend/17_GROUP_B4_EXECUTIVE_ASSESSMENT.md).
 - [Índice B4](../2026-10-30-phase-b4-backend/README.md).
 - [Achados B4](../2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.md).

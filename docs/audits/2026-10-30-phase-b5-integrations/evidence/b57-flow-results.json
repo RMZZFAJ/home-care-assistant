@@ -1,0 +1,40 @@
+{
+  "recordedAt": "2026-10-30T11:29:58.606Z",
+  "method": "Local current SQL, owner-created synthetic patients; session/review with actual Auth claims, exchange with simulated service. Rollback, no Meta publication/delivery.",
+  "scenarios": {
+    "B57-S01": {
+      "scope": "occurrence bearer session; not ENT receipt",
+      "sessionCreatedWithoutRegisteredPhone": true
+    },
+    "B57-S02": {
+      "firstPending": true,
+      "oneSubmission": true,
+      "replayPending": true,
+      "reportsBeforeReview": 0
+    },
+    "B57-S03": {
+      "firstNoIssues": true,
+      "oneSubmission": true,
+      "identicalReplayRejected": true
+    },
+    "B57-S04": {
+      "noOperationalEffect": true,
+      "foreignPurposePayloadStored": true
+    },
+    "B57-S05": {
+      "expiredRejected": true
+    },
+    "B57-S06": {
+      "status": "confirmed",
+      "ledgerRows": 0,
+      "sameReport": true,
+      "reportsAfterReview": 1,
+      "repeatReturnsActualStatus": "confirmed"
+    },
+    "B57-S07": {
+      "revokedRejected": true
+    }
+  },
+  "rollback": true,
+  "externalCalls": 0
+}

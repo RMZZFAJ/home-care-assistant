@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-10-30T11:26:17.708Z",
+  "method": "Current SQL with synthetic official Auth phone; service context simulated; new rows rollback. No app opened, no Meta/SMS.",
+  "scenarios": {
+    "B56-S01": {
+      "expiredRejected": true,
+      "wrongPhoneRejected": true,
+      "wrongPurposeRejected": true
+    },
+    "B56-S02": {
+      "accepted": true,
+      "oneAudit": true,
+      "ledgerRows": 0,
+      "externalRowSeenAtSet": true
+    },
+    "B56-S03": {
+      "repeatRefusedWithoutNewAudit": true
+    },
+    "B56-S04": {
+      "revokedRejected": true,
+      "expiredReminderStillOpen": true
+    }
+  },
+  "externalCalls": 0,
+  "rollback": true
+}

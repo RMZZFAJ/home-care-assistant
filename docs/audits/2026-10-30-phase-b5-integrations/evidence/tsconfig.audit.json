@@ -1,0 +1,5 @@
+{
+  "extends": "../../../../tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": ["*.test.ts", "no-network.ts", "vitest.config.ts"]
+}

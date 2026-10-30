@@ -1,0 +1,23 @@
+{
+  "B57-C01": {
+    "http": 200,
+    "encryptedRoundtrip": true,
+    "rpcCalls": 0
+  },
+  "B57-C02": {
+    "http": 403,
+    "body": "generic JSON",
+    "officialSampleContract": "427 with encrypted error_msg for invalid token",
+    "limit": "RPC outcome controlled; external client behavior not exercised"
+  },
+  "B57-C03": {
+    "http": 400,
+    "acknowledged": false,
+    "rpcCalls": 0
+  },
+  "B57-C04": {
+    "badSignature": 403,
+    "badCiphertext": 421,
+    "rpcCalls": 0
+  }
+}

@@ -1,0 +1,229 @@
+{
+  "recordedAt": "2026-10-30T12:30:30.558Z",
+  "status": "PASS",
+  "node": "24.22.0",
+  "clientDate": "2026-10-30",
+  "requiredDeliverables": 24,
+  "inventoryMechanisms": 32,
+  "inventoryFields": 24,
+  "externalEvents": 25,
+  "eventVariants": 34,
+  "templateParametersReviewed": 34,
+  "findings": 14,
+  "findingFields": 31,
+  "priorProofs": 11,
+  "scenarios": 44,
+  "methods": {
+    "ADAPTADOR_CONTROLADO": 22,
+    "SQL_LOCAL_ROLLBACK": 20,
+    "NAVEGADOR_LOCAL_AUTH_RPC_READBACK": 2
+  },
+  "refutedHypotheses": 1,
+  "controlledTestsPassed": 22,
+  "linksChecked": 86,
+  "evidenceReferencesChecked": 30,
+  "credentialMatches": 0,
+  "protectedFilesUnchanged": 395,
+  "sqlFunctionsUnchanged": 232,
+  "publicData": "60 tables preserve all original hashes;1 document/lifecycle advanced by system reminder with stable fields and hash chain reconciled",
+  "authAccountsStable": 77,
+  "authFieldsCompared": 13,
+  "checks": [
+    {
+      "name": "syntax evidence\\b510-callback-attempts.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b510-callback-attempts.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b53-queue.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b53-queue.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b55-inbound.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b55-inbound.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b56-interactions.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b56-interactions.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b57-flow.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b57-flow.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b58-after.js",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b58-after.js"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b58-before.js",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b58-before.js"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b58-capture.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b58-capture.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b58-setup.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b58-setup.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b58-switch-capture.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b58-switch-capture.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\b58-switch.js",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\b58-switch.js"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\background-progress.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\background-progress.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\baseline.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\baseline.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\local-actor.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\local-actor.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\preservation.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\preservation.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\start-local.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\start-local.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax evidence\\validate-package.mjs",
+      "args": [
+        "--check",
+        "C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\docs\\audits\\2026-10-30-phase-b5-integrations\\evidence\\validate-package.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Markdown B5 and phase-B index",
+      "args": [
+        "node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs",
+        "docs/audits/2026-10-30-phase-b5-integrations/**/*.md",
+        "docs/audits/phase-b/README.md"
+      ],
+      "exitCode": 0,
+      "output": "markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)\nFinding: docs/audits/2026-10-30-phase-b5-integrations/**/*.md docs/audits/phase-b/README.md\nLinting: 23 files\nSummary: 0 issues in 0 files"
+    },
+    {
+      "name": "ESLint affected final auxiliaries",
+      "args": [
+        "node_modules/eslint/bin/eslint.js",
+        "docs/audits/2026-10-30-phase-b5-integrations/evidence/preservation.mjs",
+        "docs/audits/2026-10-30-phase-b5-integrations/evidence/background-progress.mjs",
+        "docs/audits/2026-10-30-phase-b5-integrations/evidence/validate-package.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "previousAuxiliaryChecks": {
+    "typecheck": {
+      "exitCode": 0,
+      "command": "Node24.22.0 node_modules/typescript/bin/tsc --noEmit --project evidence/tsconfig.audit.json",
+      "scope": "New audit TS/imports only; passed after type-only annotation, no runtime test rerun"
+    },
+    "eslintAllInstruments": {
+      "exitCode": 0,
+      "scope": "All audit js/mjs/ts passed before final preservation helpers; affected final helpers checked above"
+    }
+  },
+  "ownServerStopped": true,
+  "externalEffects": {
+    "realMessages": false,
+    "providerConfigMutations": false,
+    "remoteDatabaseMutations": false,
+    "deployCommand": false,
+    "pr": false,
+    "merge": false,
+    "provenance": "Session actions;not a remote-state audit. Authorized Git push is separate."
+  },
+  "limits": "No global build/typecheck/unit/E2E/migration replay. No provider/human/physical acceptance. Manifest excludes itself, includes this report, and is written after validation."
+}

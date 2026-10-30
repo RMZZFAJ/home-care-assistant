@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-10-30T11:32:59.139Z",
+  "pid": 49140,
+  "origin": "http://127.0.0.1:3100",
+  "external": false,
+  "flows": false,
+  "dist": ".next-e2e",
+  "buildId": "xmyfMmpMX4DoypZZsNBM1",
+  "provenance": "B3 build reused by B4; same product source; no rebuild B5",
+  "node": "24.22.0",
+  "stoppedAt": "2026-10-30T12:15:11.3204727Z",
+  "shutdownScope": "Only the own guarded local Next process; cron and Supabase left running"
+}

@@ -1,0 +1,13 @@
+{
+  "B59-C01": {
+    "firstHttp": 503,
+    "retryHttp": 400,
+    "simulatedAuthAlreadyConfirmed": true,
+    "registrationAttempts": 1,
+    "limit": "Auth committed/one-use OTP behavior simulated; no real OTP, Auth state change or SQL persistence in this probe"
+  },
+  "B59-C02": {
+    "http": 200,
+    "registryCalled": true
+  }
+}

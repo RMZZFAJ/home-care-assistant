@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-10-30T11:41:09.590Z",
+  "scope": "Running exact local Auth container; only boolean flags whitelisted, no provider credentials",
+  "flags": {
+    "GOTRUE_EXTERNAL_EMAIL_ENABLED": true,
+    "GOTRUE_MAILER_AUTOCONFIRM": false,
+    "GOTRUE_EXTERNAL_PHONE_ENABLED": false,
+    "GOTRUE_SMS_AUTOCONFIRM": true,
+    "GOTRUE_EXTERNAL_GOOGLE_ENABLED": "not declared",
+    "GOTRUE_SECURITY_MANUAL_LINKING_ENABLED": false
+  },
+  "mailpitLocalPort": 54324,
+  "remoteChecked": false,
+  "noMessages": true
+}

@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-30T11:36:18.652Z",
+  "id": "B58-U01",
+  "initial": {
+    "revision": "3",
+    "flowVisible": false
+  },
+  "beforeReload": {
+    "revision": "5",
+    "events": 1,
+    "flowQueries": 0,
+    "contextQueries": 1,
+    "bellQueries": 3,
+    "flowVisible": false
+  },
+  "afterReloadVisible": true,
+  "method": "Real local Chrome, actual Auth/RPC/read-back; no Meta; only one directed consumer scenario",
+  "externalSending": false,
+  "buildProvenance": "B3 .next-e2e build xmyfMmpMX4DoypZZsNBM1; product identical through B4/B5",
+  "limits": "Single desktop Chrome directed check; no Meta publication, physical device or human acceptance; UI has external Flow flag false but persisted submissions remain reviewable."
+}
