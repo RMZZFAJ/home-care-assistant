@@ -1,0 +1,44 @@
+HCA
+HOME CARE ASSISTANT
+GESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL
+COMPROVANTE DE ENTREGA DE MATERIAIS
+ENT-0001 · 27/10/2026, 23:30 · Cancelado
+1
+ITENS DECLARADOS
+0
+CONFERIDOS INTEGRALMENTE
+0
+DIVERGÊNCIAS
+PENDENTE
+RECEBIMENTO
+IDENTIFICAÇÃO DA ENTREGA
+PACIENTE
+Paciente fictício B6
+RESPONSÁVEL
+Emissora fictícia B6
+NÚMERO DO DOCUMENTO
+ENT-0001
+PROTOCOLO
+ENT-20261030-B6000000-B6000001-1-12345678
+ORIGEM
+Estoque da família
+DESTINO
+Estoque da equipe
+RECEBEDOR DESIGNADO
+Recebedora fictícia B6
+EMISSÃO
+27/10/2026, 23:30
+RELAÇÃO DOS MATERIAIS DECLARADOS
+Nº
+MATERIAL
+EXPEDIDO
+UNIDADE
+01
+Material fictício B6
+10
+unidade
+Observação: Dados exclusivamente fictícios para auditoria B6.
+A expedição não comprova recebimento. Apenas quantidades efetivamente aceitas entram no saldo confirmado do destino; diferenças
+permanecem registradas até resolução formal.
+ENT-0001 · v3 · Conteúdo autorizado
+Página 1 de 2

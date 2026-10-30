@@ -1,0 +1,26 @@
+{
+  "scenario": "B67-R02",
+  "recordedAt": "2026-10-30T15:52:57.155Z",
+  "method": "Local READ ONLY metadata;object existence not byte integrity;preexisting B3 fixtures included;no cleanup",
+  "data": {
+    "legacy": 0,
+    "renders": {
+      "records": 199,
+      "missingObjects": 0
+    },
+    "attachments": [
+      {
+        "state": "quarantine",
+        "records": 21,
+        "missing_objects": 21
+      },
+      {
+        "state": "ready",
+        "records": 13,
+        "missing_objects": 1
+      }
+    ],
+    "unregisteredReceiptObjects": 0,
+    "unregisteredEvidenceObjects": 0
+  }
+}
