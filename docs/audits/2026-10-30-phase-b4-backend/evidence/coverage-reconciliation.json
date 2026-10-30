@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-10-30T07:44:44.252Z",
+  "endpointMethods": 61,
+  "coverageRows": 102,
+  "routeFiles": 41,
+  "sourceSurfaces": 82,
+  "freshSharedSourceReviews": 27,
+  "historicalSharedSourceReviews": 14,
+  "scenarios": 77,
+  "controlled": 17,
+  "localHttpBrowserStorageAndAssets": 60,
+  "groups": [
+    "B42",
+    "B43",
+    "B44",
+    "B45",
+    "B46",
+    "B47",
+    "B48",
+    "B49",
+    "B410",
+    "B411",
+    "B412"
+  ],
+  "limits": "77 scenarios are diagnosis,including reproduced defects;not a product acceptance suite. 14 unchanged shared/presentation files reuse A review rather than fresh line-by-line coverage."
+}

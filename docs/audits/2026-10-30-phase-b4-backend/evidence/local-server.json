@@ -1,0 +1,11 @@
+{
+  "startedAt": "2026-10-30T06:56:49.649Z",
+  "pid": 43020,
+  "origin": "http://127.0.0.1:3100",
+  "external": false,
+  "flows": false,
+  "buildId": "xmyfMmpMX4DoypZZsNBM1",
+  "buildProvenance": "B3 local-app.log and local-app-process.json; guarded build .next-e2e; same functional source; no B4 rebuild",
+  "node": "24.22.0",
+  "dist": ".next-e2e"
+}

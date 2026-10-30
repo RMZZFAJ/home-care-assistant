@@ -1,0 +1,90 @@
+{
+  "recordedAt": "2026-10-30T07:05:10.355Z",
+  "category": "HTTP_REAL_AUTH_AND_SCOPED_READBACK",
+  "results": [
+    {
+      "id": "B44-01",
+      "contract": "Canonical API preserves same client key after discarded response",
+      "status": 200,
+      "sameProposalId": true,
+      "persistedId": "d92e7551-74b7-4d26-aa68-104a3a314ae5",
+      "category": "HTTP_REAL_AUTH_READBACK"
+    },
+    {
+      "id": "B44-02",
+      "contract": "PolicyConsole uses fresh UUID per invocation; two keys represent two proposals",
+      "status": 200,
+      "persistedPending": 2,
+      "firstId": "d92e7551-74b7-4d26-aa68-104a3a314ae5",
+      "secondId": "64ee22bc-ac21-4ae5-9eae-e8cb7b4c6f10",
+      "limits": "HTTP simulation of consumer key behavior; no rendered UI or actual packet drop;no double approval/application",
+      "relation": "BE-005 extended to canonical API consumer"
+    },
+    {
+      "id": "B44-03",
+      "contract": "Retry of approved new membership should recover actionable result or explicit recovery instruction",
+      "first": {
+        "status": 200,
+        "urlPresent": true
+      },
+      "retry": {
+        "status": 200,
+        "urlPresent": false,
+        "state": "awaiting_acceptance"
+      },
+      "persisted": {
+        "invitationCount": 1,
+        "state": "pending",
+        "firstTokenHashStillMatches": true
+      },
+      "cause": "Fresh server token on each approval; terminal request returns old resolution;URL emitted only when new token hash equals old stored hash",
+      "counterproof": "No duplicate invitation and no automatic membership;manual resend exists",
+      "limits": "First response deliberately ignored by test semantics;no UI or network interceptor. Tokens/hashes/URLs excluded from evidence."
+    },
+    {
+      "id": "B44-04",
+      "contract": "Manual resend provides authorized fallback after lost secret",
+      "status": 200,
+      "urlPresent": true,
+      "limits": "No message sent;URL never exported. Resend rotates token intentionally."
+    },
+    {
+      "id": "B44-05",
+      "contract": "Combined revise+submit must communicate revision committed before submit failure",
+      "requested": {
+        "reviseQuantity": "2",
+        "submit": true
+      },
+      "http": {
+        "status": 409,
+        "code": "INSUFFICIENT_STOCK",
+        "persistenceField": null
+      },
+      "persisted": {
+        "events": 2,
+        "status": "draft",
+        "version": 2,
+        "quantity": "2.000000"
+      },
+      "initialVersion": 1,
+      "retry": {
+        "status": 409,
+        "unchanged": true
+      },
+      "counterproof": "Submission never moved stock;draft is recoverable;retry did not duplicate revision",
+      "limits": "Two intended transactions are not themselves a defect;missing partial-result contract is the finding."
+    },
+    {
+      "id": "B44-06",
+      "contract": "REQ same intention recovers identity;changed body conflicts;labels untrusted",
+      "first": 201,
+      "retry": 201,
+      "sameId": true,
+      "changed": 409,
+      "changedCode": "IDEMPOTENCY_CONFLICT",
+      "persistedId": "74187be5-197f-4d51-ad69-a76eedee287e",
+      "snapshotLabel": "Material fictício B4-e482de19 1",
+      "forgedLabelDropped": true
+    }
+  ]
+}

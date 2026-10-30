@@ -8,6 +8,14 @@ A criação de novos grupos depende da autorização correspondente.
 
 - B1.1–B1.8: investigação concluída, sem correções de produto.
 - B2.0–B2.10: investigação de processos concluída, sem implementação.
+- B4.0–B4.12: investigação de backend/APIs concluída em 30/10/2026,
+  sem correções. 61 métodos HTTP, 77 cenários dirigidos e 13 registros;
+  dez P2/três P3, com causas novas, relacionadas e herdadas discriminadas.
+  NO-GO anterior preservado; B5/C/D não iniciadas.
+- [Executivo B4](../2026-10-30-phase-b4-backend/17_GROUP_B4_EXECUTIVE_ASSESSMENT.md).
+- [Índice B4](../2026-10-30-phase-b4-backend/README.md).
+- [Achados B4](../2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.md).
+- [Insumos B4 para C](../2026-10-30-phase-b4-backend/18_PHASE_C_DECISION_HANDOFF.md).
 - B3.0–B3.12: investigação de banco/autorização concluída em30/10/2026,
   sem correções.94 cenários locais;25 achados,com16 recortes herdados e nove
   observações/mecanismos adicionais. NO-GO anterior preservado.

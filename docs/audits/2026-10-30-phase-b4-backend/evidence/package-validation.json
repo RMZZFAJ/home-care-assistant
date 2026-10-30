@@ -1,0 +1,243 @@
+{
+  "recordedAt": "2026-10-30T10:49:41.525Z",
+  "status": "PASS",
+  "node": "24.22.0",
+  "requiredDeliverables": 25,
+  "endpointMethods": 61,
+  "coverageRows": 102,
+  "authorityRows": 61,
+  "findings": 13,
+  "fieldsPerFinding": 32,
+  "scenarios": 77,
+  "linksChecked": 86,
+  "deferredManifestLinksResolvedByIndexVerification": 2,
+  "syntaxChecked": 20,
+  "credentialMatches": 0,
+  "protectedFilesUnchanged": 395,
+  "sqlFunctionsUnchanged": 232,
+  "originalData": "60 tables retain all original row hashes;19 headers/lifecycle advanced by system reminder with original IDs/scope/status/hash chain reconciled",
+  "auxiliaryTypecheck": {
+    "command": "tsc -p evidence/tsconfig.audit.json --pretty false",
+    "exitCode": 0,
+    "scope": "Executed separately for new probes and their imports;not a global product typecheck"
+  },
+  "checks": [
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/architecture.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/architecture.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b410-security.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b410-security.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b412-create-state.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b412-create-state.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b412-freshness.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b412-freshness.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b42-auth.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b42-auth.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b43-input.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b43-input.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b44-commands.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b44-commands.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b45-reads.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b45-reads.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b47-pdf.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b47-pdf.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/b48-admin.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/b48-admin.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/background-progress.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/background-progress.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/baseline.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/baseline.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/build-findings.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/build-findings.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/build-index.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/build-index.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/format-docs.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/format-docs.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/http-local.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/http-local.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/inventory.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/inventory.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/preservation.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/preservation.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/start-local.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/start-local.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "syntax docs/audits/2026-10-30-phase-b4-backend/evidence/validate-package.mjs",
+      "args": [
+        "--check",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/validate-package.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Markdown package and Phase B index",
+      "args": [
+        "node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs",
+        "docs/audits/2026-10-30-phase-b4-backend/**/*.md",
+        "docs/audits/phase-b/README.md"
+      ],
+      "exitCode": 0,
+      "output": "markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)\nFinding: docs/audits/2026-10-30-phase-b4-backend/**/*.md docs/audits/phase-b/README.md\nLinting: 23 files\nSummary: 0 issues in 0 files"
+    },
+    {
+      "name": "Audit helpers ESLint only",
+      "args": [
+        "node_modules/eslint/bin/eslint.js",
+        "docs/audits/2026-10-30-phase-b4-backend/evidence/*.{mjs,ts}"
+      ],
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "priorProductChecks": "B3 evidence/checks.json reused as historical baseline only;no B4 global build,typecheck,unit,E2E or migration replay",
+  "boundaries": {
+    "functionalChanges": false,
+    "remoteChanges": false,
+    "reset": false,
+    "realMessages": false,
+    "deploy": false,
+    "pr": false,
+    "merge": false,
+    "nextPhaseStarted": false
+  },
+  "manifest": "Git index bytes sealed after staging;self excluded;verify-index and verify-head provide final byte-level proof",
+  "finalDocumentWhitespaceCheck": {
+    "command": "git diff --cached --check",
+    "note": "Only annex EOL and six Markdown header hard-break spaces normalized;original and committed SHA in baseline",
+    "originalOrderWordingUnchanged": true,
+    "exitCode": 0
+  }
+}

@@ -1,0 +1,1645 @@
+# ORDEM MESTRA — FASE B4
+## AUDITORIA ESPECIALIZADA DE BACKEND, APIs, CONTRATOS ENTRE CAMADAS, SEGURANÇA DE EXECUÇÃO E CONFIABILIDADE DOS SERVIÇOS
+
+**Projeto:** Home Care Assistant
+**Repositório:** `RMZZFAJ/home-care-assistant`
+**Branch obrigatória:** `audit/phase-b`
+**Natureza:** auditoria exclusivamente investigativa e documental
+**Modelo destinatário:** Codex Sol
+**Escopo autorizado:** B4.0–B4.12 e consolidação
+**Implementação de correções:** não autorizada
+
+---
+
+# I. INSTAURAÇÃO E OBJETIVO CENTRAL
+
+Execute integralmente a **Fase B4 — Backend, APIs, Contratos entre Camadas e Confiabilidade dos Serviços** do Home Care Assistant.
+
+Esta auditoria integra o programa de avaliação de prontidão operacional do produto:
+
+- **Fase A:** auditoria holística, concluída.
+- **Fase B1:** interface e experiência de utilização, concluída.
+- **Fase B2:** processos e jornadas operacionais, concluída.
+- **Fase B3:** banco, autorização e integridade transacional, concluída.
+- **Fase B4:** backend, APIs e serviços, objeto desta autorização.
+- **Fase C:** decisões consolidadas, ainda não autorizada.
+- **Fase D:** implementação, ainda não autorizada.
+
+A missão da B4 é investigar, de maneira independente, técnica, crítica, granular e verificável, **se o backend executa corretamente sua função de intermediário entre a interface, as identidades autenticadas, as regras do produto, as operações de banco, os documentos e os serviços externos**.
+
+Não basta verificar se uma rota responde HTTP 200 ou se a aplicação compila.
+
+É necessário descobrir se:
+
+1. A operação solicitada corresponde ao que efetivamente foi executado.
+2. A identidade e a autoridade são verificadas na camada e no momento adequados.
+3. As entradas são validadas antes de causar efeitos.
+4. Os contratos da API representam corretamente as regras do domínio.
+5. Os erros são classificados e comunicados sem enganar o usuário.
+6. Operações repetidas não criam duplicações.
+7. Respostas perdidas podem ser recuperadas.
+8. Os dados retornados são completos, atuais e adequadamente autorizados.
+9. As integrações entre módulos preservam estados e consequências.
+10. As operações administrativas respeitam o contexto e as capacidades.
+11. Os serviços assíncronos respeitam os resultados e limitações de seus contratos.
+12. Informações privadas não são divulgadas indevidamente.
+13. O sistema continua utilizável diante de falhas previsíveis.
+14. As dependências internas são coerentes e proporcionais.
+15. O backend permite evolução futura sem exigir reescrita desnecessária.
+
+A auditoria também deverá identificar **funcionalidades de backend ausentes, contratos incompletos, abstrações inadequadas, responsabilidades duplicadas, comportamentos contraditórios, mecanismos de recuperação insuficientes e oportunidades reais de simplificação**.
+
+A investigação não deverá ser limitada aos problemas já identificados.
+
+---
+
+# II. FRONTEIRA ENTRE B3 E B4
+
+A distinção entre as auditorias é obrigatória.
+
+A B3 examinou principalmente:
+
+**PostgreSQL, schemas, constraints, RLS, grants, RPCs, migrations, integridade persistida, concorrência transacional e garantias impostas pelo banco.**
+
+A B4 examinará principalmente:
+
+**Next.js, Route Handlers, serviços de servidor, autenticação e contexto HTTP, validação de entradas, transformação de comandos, contratos de resposta, recuperação de falhas, consultas, composição de operações e integrações entre os componentes do backend.**
+
+Exemplo:
+
+Se a B3 demonstrou que uma RPC aceita uma correção de estoque sem referência, a B4 deverá examinar se a API valida essa referência, como encaminha o comando, o que devolve ao cliente e se outros caminhos equivalentes possuem a mesma proteção.
+
+**Não é necessário repetir integralmente o teste SQL já comprovado pela B3.**
+
+Outro exemplo:
+
+Se a B3 demonstrou que uma operação pode concluir depois da revogação de acesso, a B4 deverá investigar a sequência de autenticação, autorização e execução HTTP, procurando janelas semelhantes em outros endpoints.
+
+A B4 poderá executar novos testes de banco quando forem necessários para demonstrar uma falha de integração, mas não deverá refazer indiscriminadamente a auditoria especializada anterior.
+
+Da mesma forma, a B4 poderá inspecionar contratos de WhatsApp, Meta, SMTP, workers e outras integrações na fronteira do backend, mas **não realizará homologação externa real de provedores**.
+
+Essa investigação especializada deverá permanecer separada, salvo autorização posterior.
+
+---
+
+# III. ESTADO DO REPOSITÓRIO E AUTORIDADE
+
+## III.1. Branch
+
+Trabalhe exclusivamente em:
+
+`audit/phase-b`
+
+Não crie nova branch.
+
+Não abra pull request.
+
+Não realize merge.
+
+Não modifique a `master`.
+
+Não execute rebase, squash, reset destrutivo ou force push.
+
+O último commit conhecido de encerramento da B3 é:
+
+`315399dc5c19cacc9d9cc3c609174498608f4af0`
+
+A base funcional anteriormente identificada é:
+
+`37cb7f85e96e551d6419871f94dd950712e2565b`
+
+A `master` foi preservada em:
+
+`34dcb835c5c49068e0417f7306eb4e501aa868bc`
+
+**Verifique os SHAs reais antes de iniciar.**
+
+Não presuma que o ambiente continua exatamente igual ao estado registrado.
+
+Registre:
+
+- Branch.
+- HEAD.
+- Estado da working tree.
+- Alterações locais preexistentes.
+- Base funcional.
+- Estado dos serviços.
+- Diferenças documentais.
+- Diferenças funcionais, se existirem.
+
+Não inclua alterações preexistentes não relacionadas no commit da B4.
+
+## III.2. Diretório
+
+Crie:
+
+`docs/audits/2026-10-30-phase-b4-backend/`
+
+Atualize apenas o índice geral da Fase B:
+
+`docs/audits/phase-b/README.md`
+
+Todos os relatórios, matrizes, scripts auxiliares e evidências devem permanecer dentro da pasta B4.
+
+## III.3. Autorização de commit
+
+Ao concluir a investigação:
+
+1. Valide a consistência do pacote.
+2. Confirme a preservação dos arquivos funcionais.
+3. Atualize o índice geral.
+4. Faça commit exclusivamente documental.
+5. Publique o commit na mesma branch `audit/phase-b`.
+
+Não faça PR ou merge.
+
+---
+
+# IV. RESTRIÇÕES ABSOLUTAS
+
+Esta fase é investigativa.
+
+Não está autorizada a:
+
+- Implementação de correções.
+- Alteração de código funcional.
+- Alteração de migrations.
+- Alteração de políticas de banco.
+- Alteração de configurações remotas.
+- Alteração de dependências.
+- Modificação de testes oficiais.
+- Modificação de arquivos de configuração do produto.
+- Deploy.
+- Publicação de novas versões.
+- Envio real de mensagens.
+- Execução de ações em provedores externos.
+- Reset de banco.
+- Substituição de dados existentes.
+- Exclusão de dados anteriores.
+- Limpeza de buckets.
+- Restauração sobre o ambiente atual.
+- Introdução de novos serviços.
+- Reorganização do repositório fora do escopo documental.
+
+Testes locais com dados sintéticos são permitidos somente após confirmação do ambiente, proteção dos dados existentes e isolamento de efeitos externos.
+
+Não utilize pacientes reais nos reprodutores.
+
+Não inclua nos relatórios credenciais, sessões reutilizáveis, dados pessoais identificáveis ou informações assistenciais privadas.
+
+O repositório deve ser tratado como potencialmente público.
+
+Se um teste não puder ser executado com segurança, registre a limitação e siga pela análise estática.
+
+**Não modifique o produto para facilitar a auditoria.**
+
+---
+
+# V. REFERÊNCIAS OBRIGATÓRIAS
+
+Antes de iniciar, leia as instruções do projeto, especialmente `AGENTS.md`.
+
+Consulte a Fase A:
+
+`docs/audits/2026-10-25-production-readiness/`
+
+Priorize:
+
+- `ARCHITECTURE_AND_BACKEND.md`
+- `AUTOMATION_INTEGRATIONS_RELIABILITY.md`
+- `DATABASE_AUTH_SECURITY.md`
+- `FINDINGS_MASTER.md`
+- `EXECUTIVE_READINESS.md`
+- `TESTING_PERFORMANCE_OBSERVABILITY.md`
+- `PHASE_B_HANDOFF.md`
+
+Consulte a B1:
+
+`docs/audits/2026-10-28-phase-b1-interface/`
+
+Priorize:
+
+- Achados consolidados.
+- Falhas de recuperação.
+- Estados de erro.
+- Estados de carregamento.
+- Dependências com backend.
+- Critérios futuros de aceitação.
+
+Consulte a B2:
+
+`docs/audits/2026-10-29-phase-b2-processes/`
+
+Priorize:
+
+- Inventário de processos.
+- Transições.
+- Exceções.
+- Achados.
+- Critérios de aceitação.
+- Dependências.
+- Relatório executivo.
+
+Consulte a B3:
+
+`docs/audits/2026-10-29-phase-b3-database/`
+
+Priorize:
+
+- `README.md`
+- `CHECKPOINT.md`
+- `14_FINDINGS_MASTER.md`
+- `15_ACCEPTANCE_AND_REGRESSION_MATRIX.md`
+- `16_CROSS_GROUP_DEPENDENCIES.md`
+- `17_GROUP_B3_EXECUTIVE_ASSESSMENT.md`
+- `18_PHASE_C_DECISION_HANDOFF.md`
+
+A documentação anterior constitui evidência histórica e material de referência.
+
+**Não reconstrua matrizes ou reproduza testes já existentes sem demonstrar o benefício adicional.**
+
+A B4 deverá acrescentar conhecimento novo, e não simplesmente reorganizar conclusões anteriores.
+
+---
+
+# VI. REGRA CENTRAL DE EFICIÊNCIA
+
+## VI.1. Profundidade máxima, repetição mínima
+
+A B3 demonstrou que uma investigação tecnicamente rigorosa pode produzir muitos arquivos e sucessivas rodadas de validação documental.
+
+A B4 deverá preservar a profundidade da análise e eliminar desperdícios de execução.
+
+**Não confunda rigor técnico com repetição indiscriminada de comandos.**
+
+O objetivo é maximizar a qualidade das evidências por unidade de esforço.
+
+A investigação deverá priorizar:
+
+1. Compreensão do contrato.
+2. Formulação da hipótese.
+3. Identificação da menor prova suficiente.
+4. Execução direcionada.
+5. Verificação independente do resultado.
+6. Contraprova.
+7. Registro do achado.
+8. Encerramento do cenário.
+
+Não execute testes amplos somente porque estão disponíveis.
+
+## VI.2. Proibição de retestes globais injustificados
+
+Como a B4 não modifica código funcional, **não existe obrigação de repetir toda a bateria de testes do repositório após cada documento, checkpoint ou alteração de formatação**.
+
+O seguinte comportamento deve ser evitado:
+
+Executar todos os testes → identificar problema de Markdown → corrigir texto → executar todos os testes novamente.
+
+Alterações documentais não justificam nova execução de testes funcionais.
+
+Não execute novamente:
+
+- Build completo.
+- Typecheck global.
+- Todos os testes unitários.
+- Suíte E2E completa.
+- Suítes de integração não relacionadas.
+- Replays de migrations.
+
+A menos que exista uma razão técnica concreta e documentada.
+
+É admissível consultar resultados recentes da B3 como baseline funcional quando o código permanece exatamente igual.
+
+Se uma verificação funcional completa for realmente necessária, justifique o motivo antes de executá-la e registre o que ela acrescentará.
+
+## VI.3. Validação em três níveis
+
+### Nível 1 — Verificação pontual
+
+Durante a investigação, valide apenas o cenário ou auxiliar em questão.
+
+Exemplos:
+
+- `node --check` para um script novo.
+- ESLint direcionado ao auxiliar criado.
+- Validação de JSON.
+- Validação de CSV.
+- Teste específico de API.
+- Cenário de autorização.
+- Consulta de confirmação do resultado.
+
+### Nível 2 — Encerramento do subgrupo
+
+Confira:
+
+- Coerência das evidências.
+- Referências.
+- Resultados.
+- Limites da prova.
+- Novos achados.
+- Preservação pertinente dos dados.
+
+Não repita testes anteriores sem necessidade.
+
+### Nível 3 — Encerramento global da B4
+
+Execute uma única consolidação final, verificando:
+
+- Entregáveis.
+- Links.
+- Integridade documental.
+- Ausência de segredos.
+- Consistência das matrizes.
+- Preservação do produto.
+- Estado do Git.
+
+Se houver erro exclusivamente documental, execute novamente somente a verificação documental afetada.
+
+## VI.4. Correções de formatação
+
+Desde a criação dos documentos:
+
+- Respeite as convenções Markdown do repositório.
+- Evite tabelas Markdown enormes.
+- Prefira CSV para matrizes extensas.
+- Evite linhas excessivamente longas.
+- Evite títulos incompatíveis com as regras existentes.
+- Utilize validação direcionada quando necessário.
+
+Não empregue sucessivas rodadas globais de lint para corrigir espaços, linhas em branco e pontuação.
+
+Não modifique as regras de lint para encobrir problemas.
+
+Também não transforme pequenas questões editoriais em impedimentos prolongados para concluir uma investigação tecnicamente válida.
+
+## VI.5. Scripts auxiliares
+
+Antes de executar um script novo:
+
+1. Confira a sintaxe.
+2. Confira imports e variáveis.
+3. Confira o destino.
+4. Confira os efeitos possíveis.
+5. Confirme o tipo de dado esperado.
+6. Confirme tratamento de respostas sem corpo.
+7. Confirme formato de erros.
+8. Confirme se existem operações mutáveis.
+9. Confirme isolamento.
+10. Execute somente o cenário necessário.
+
+Se um teste complexo depende de volume, comece com uma amostra pequena e amplie progressivamente quando os resultados justificarem.
+
+**Não gere milhares de registros apenas para demonstrar uma hipótese que pode ser comprovada com poucos.**
+
+## VI.6. Limite de tentativas
+
+Após duas tentativas malsucedidas pelo mesmo tipo de erro instrumental:
+
+- Interrompa a repetição mecânica.
+- Inspecione a causa.
+- Reconsidere a abordagem.
+- Corrija o instrumento.
+- Reduza o cenário quando apropriado.
+- Retome apenas o trecho necessário.
+
+Não refaça todos os cenários anteriores se eles já produziram evidência válida.
+
+## VI.7. Economia documental
+
+A quantidade de arquivos não representa a qualidade da auditoria.
+
+Reaproveite evidências anteriores por referência.
+
+Não copie novamente centenas de contratos SQL apenas para aumentar o pacote documental.
+
+Não produza múltiplas matrizes com o mesmo conteúdo reorganizado.
+
+Prefira:
+
+**Um registro mestre de achados.**
+
+**Uma matriz de cobertura.**
+
+**Um catálogo de contratos.**
+
+**Um índice de cenários.**
+
+**Relatórios especializados substantivos.**
+
+**Um relatório executivo.**
+
+**Um handoff para a Fase C.**
+
+Arquivos adicionais deverão existir somente quando oferecerem rastreabilidade, prova ou utilidade real.
+
+---
+
+# VII. METODOLOGIA TÉCNICA GERAL
+
+A investigação deverá reconstruir a execução real das operações:
+
+**Usuário → Interface → Requisição HTTP → Middleware/Route Handler → Autenticação → Contexto → Capacidade → Validação → Serviço → RPC/Storage → Persistência → Resposta → Atualização do cliente.**
+
+Para cada operação relevante, responda:
+
+- Quem pode iniciá-la?
+- Qual identidade é utilizada?
+- Qual paciente está selecionado?
+- Como o backend confirma esse contexto?
+- O que é aceito como entrada?
+- O que é rejeitado?
+- Qual função executa a ação?
+- Qual efeito é produzido?
+- Como o resultado é interpretado?
+- Qual resposta é enviada?
+- O que acontece se a resposta se perder?
+- O que acontece se o usuário repetir?
+- O que acontece se a operação concorrer com outra?
+- O que acontece após revogação?
+- Como a pessoa descobre o estado verdadeiro?
+- Como retoma uma operação interrompida?
+
+Diferencie:
+
+**Comportamento esperado.**
+
+**Implementação observada.**
+
+**Prova executada.**
+
+**Risco sustentado.**
+
+**Hipótese.**
+
+**Limite de validação.**
+
+Não classifique uma situação como defeito apenas porque o código utiliza uma abordagem diferente daquela que o auditor preferiria.
+
+---
+
+# VIII. SUBGRUPOS DA B4
+
+## B4.0 — RECONHECIMENTO E BASELINE
+
+Reconheça o repositório e o ambiente.
+
+Confira os arquivos funcionais e o estado documental.
+
+Inventarie as superfícies do backend:
+
+- Route Handlers.
+- Serviços de servidor.
+- Bibliotecas compartilhadas.
+- Helpers de autenticação.
+- Contexto.
+- Autorização.
+- Schemas de entrada.
+- Serialização.
+- Tratamento de erros.
+- Clientes Supabase.
+- Serviços privilegiados.
+- Integrações com Storage.
+- PDF.
+- Workers.
+- Webhooks.
+- Notificações.
+- Realtime.
+- Testes existentes.
+
+Identifique quais superfícies já foram examinadas nas fases anteriores.
+
+Registre quais exigem investigação própria da B4.
+
+**Entrega:** baseline, escopo e plano de cobertura.
+
+---
+
+## B4.1 — INVENTÁRIO E CONTRATOS DAS APIs
+
+Inventarie todas as rotas relevantes em `src/app/api` e quaisquer outras superfícies HTTP efetivamente existentes.
+
+Para cada endpoint, registre:
+
+- Caminho.
+- Método.
+- Finalidade.
+- Consumidor.
+- Tipo de operação.
+- Requisito de autenticação.
+- Contexto.
+- Capacidade.
+- Schema de entrada.
+- Limites.
+- Serviço chamado.
+- RPC ou operação de persistência.
+- Formato da resposta.
+- Códigos de erro.
+- Possibilidade de repetição.
+- Estratégia de recuperação.
+- Cobertura existente.
+
+Investigue:
+
+- Rotas duplicadas.
+- Contratos divergentes.
+- Operações equivalentes com validações diferentes.
+- Endpoints legados ainda acessíveis.
+- Parâmetros ignorados.
+- Parâmetros aceitos indevidamente.
+- Diferentes formatos de resposta para a mesma semântica.
+- Ausência de limites.
+- Divergência entre contrato documentado e implementação.
+
+**Não proponha uniformizar todos os endpoints automaticamente.**
+
+Uma diferença pode existir por necessidade legítima do domínio.
+
+**Entrega:** catálogo canônico de endpoints, contratos e cobertura.
+
+---
+
+## B4.2 — AUTENTICAÇÃO, SESSÃO, CONTEXTO E AUTORIZAÇÃO HTTP
+
+Examine o fluxo de autenticação efetivamente implementado.
+
+Priorize `src/lib/server/api.ts` e seus consumidores, sem limitar a análise a esse arquivo.
+
+Reconstrua:
+
+- Identificação da sessão.
+- Validação da sessão ativa.
+- Identidade.
+- Perfil.
+- Paciente selecionado.
+- Vínculo.
+- Papel.
+- Capacidade.
+- Nível de autenticação.
+- Revogação.
+- Troca de contexto.
+- Administração global.
+- Administração local.
+
+Diferencie funções de autenticação que legitimamente exigem graus diferentes de preparação da conta.
+
+Não substitua conceitualmente uma função menos restritiva por outra mais restritiva sem verificar os fluxos de convite e configuração inicial.
+
+Investigue:
+
+- Endpoint acessível sem sessão.
+- Endpoint acessível após logout.
+- Token ainda válido depois de revogação.
+- Contexto manipulado pelo cliente.
+- Identificador de paciente trocado.
+- Autorização verificada antes de uma espera prolongada.
+- Operação iniciada antes de revogação.
+- Endpoint administrativo usado por papel inadequado.
+- Exposição de dados de outro paciente.
+- Divergência entre API e banco.
+- Capacidades desatualizadas.
+- Erros que revelam existência de recursos privados.
+
+Utilize os achados B3-020 e B3-021 como referências obrigatórias.
+
+Entretanto, **não generalize a janela de autorização demonstrada pela B3 para todas as rotas sem evidência própria**.
+
+**Entrega:** matriz de autoridade HTTP e análise das fronteiras de sessão/contexto.
+
+---
+
+## B4.3 — VALIDAÇÃO DE ENTRADAS, NORMALIZAÇÃO E CONTRATOS DE DADOS
+
+Examine os schemas e validadores utilizados pelo servidor.
+
+Inclua:
+
+- Zod.
+- Tipos TypeScript.
+- Conversões numéricas.
+- Strings.
+- Datas.
+- Fusos.
+- UUIDs.
+- Enumerações.
+- Arrays.
+- Campos opcionais.
+- Campos nulos.
+- Valores desconhecidos.
+- Limites de tamanho.
+- Anexos.
+- Versões.
+- Chaves de idempotência.
+
+Investigue diferenças entre:
+
+**Valor recebido.**
+
+**Valor validado.**
+
+**Valor normalizado.**
+
+**Valor enviado à RPC.**
+
+**Valor persistido.**
+
+Especialmente:
+
+- Arredondamento prematuro.
+- Perda de precisão.
+- Conversão silenciosa.
+- `NaN`.
+- `Infinity`.
+- Strings numéricas inválidas.
+- Datas ambíguas.
+- Fusos incorretos.
+- `null` tratado como `false`.
+- Valor ausente tratado como zero.
+- Quantidade observada interpretada como quantidade solicitada.
+- Valores derivados de campos não confiáveis.
+
+Os achados B3-017, B3-018 e B3-019 deverão orientar a investigação.
+
+Verifique também limites de corpo, origem da requisição, tipos de conteúdo e validação de arquivos.
+
+**Entrega:** matriz de validações e diferenças entre API, domínio e banco.
+
+---
+
+## B4.4 — COMANDOS, TRANSAÇÕES, VERSÕES E IDEMPOTÊNCIA
+
+Audite os caminhos de execução dos comandos.
+
+Inclua:
+
+- REQ.
+- COM.
+- ENT.
+- BAL.
+- Consumo.
+- Estoque.
+- Escalas.
+- Administração.
+- Convites.
+- Ciência.
+- Arquivamento.
+- Anexos.
+
+Para cada operação relevante:
+
+- Identifique o comando original.
+- Verifique como a identidade da tentativa é criada.
+- Examine versionamento.
+- Examine repetição.
+- Examine conflitos.
+- Examine respostas perdidas.
+- Examine resultados já persistidos.
+- Examine retorno ao cliente.
+
+Diferencie:
+
+**Mesma intenção repetida.**
+
+**Intenção nova.**
+
+**Intenção contraditória.**
+
+**Conflito de versão.**
+
+**Falha antes do commit.**
+
+**Falha depois do commit.**
+
+**Resposta perdida após commit.**
+
+Investigue especialmente **BE-005**, relacionado à identidade de tentativa em operações administrativas.
+
+Procure comandos que gerem a chave exclusivamente no servidor quando a recuperação deveria depender de uma identidade estável conhecida pelo cliente.
+
+Não presuma que uma operação idempotente está correta apenas porque utiliza uma UUID.
+
+Verifique se a chave representa a intenção adequada.
+
+**Entrega:** matriz de comandos, efeitos, repetição e recuperação.
+
+---
+
+## B4.5 — CONSULTAS, LISTAGENS, PAGINAÇÃO E FRESCOR
+
+Examine todos os principais caminhos de leitura.
+
+Priorize:
+
+- Dashboard.
+- Documentos.
+- Histórico.
+- Consumo.
+- Estoque.
+- Balanços.
+- Escalas.
+- Administração.
+- Auditoria.
+- Notificações.
+- Catálogo.
+- Contexto do usuário.
+
+Investigue:
+
+- Paginação.
+- Limites.
+- Cursores.
+- Filtros.
+- Ordenação.
+- Busca por referência.
+- Busca por identificador.
+- Estados terminais.
+- Pendências antigas.
+- Registros arquivados.
+- Dados de múltiplos pacientes.
+- Invalidação de dados.
+- Realtime.
+- Cache.
+- Revalidação.
+- Respostas parciais.
+
+Utilize os achados:
+
+- A BE-001.
+- A BE-004.
+- B2-017.
+- B3-011.
+- B3-012.
+- B3-013.
+- B3-023.
+
+A B3 já examinou limites e consultas no banco.
+
+A B4 deverá demonstrar **como esses comportamentos chegam à API e como podem afetar seus consumidores**.
+
+Diferencie:
+
+- Nenhum registro existente.
+- Nenhum registro autorizado.
+- Filtro sem resultados.
+- Consulta incompleta.
+- Erro de consulta.
+- Falha de autenticação.
+- Resposta antiga.
+- Resultado parcial.
+
+Não classifique indiscriminadamente todos como lista vazia.
+
+**Entrega:** auditoria de completude, navegação, recuperação e atualização das APIs de leitura.
+
+---
+
+## B4.6 — ERROS, RESPOSTAS HTTP E RECUPERAÇÃO DE FALHAS
+
+Este subgrupo deverá examinar a qualidade semântica dos resultados enviados pelo backend.
+
+Investigue:
+
+- HTTP 200 sem efeito.
+- HTTP 201 com resultado desconhecido no cliente.
+- HTTP 204 sem corpo.
+- HTTP 400 para erro de negócio.
+- HTTP 401 e 403.
+- HTTP 404 por ocultação de recurso.
+- HTTP 409 por conflito.
+- HTTP 429.
+- HTTP 5xx.
+- Timeout.
+- Falha de rede.
+- Resposta interrompida.
+- Retry.
+- Erro de banco.
+- Erro de Storage.
+- Resultado parcialmente concluído.
+- Falha posterior ao commit.
+
+Não imponha códigos HTTP uniformes ignorando a segurança e as convenções efetivas do produto.
+
+Examine o envelope de resposta e sua interpretação.
+
+Uma operação pode ser corretamente recusada pelo banco, mas o backend pode transmitir uma informação incorreta.
+
+Uma operação pode ter sido confirmada, mas o cliente pode entender que falhou.
+
+Uma decisão contrária pode não ter efeito, mas receber resposta de sucesso.
+
+Investigue especialmente:
+
+- B1-ERR-001.
+- B1-ERR-002.
+- B2-011.
+- B3-007.
+
+Para cada problema, identifique a diferença entre:
+
+**Resultado solicitado.**
+
+**Resultado efetivamente persistido.**
+
+**Resultado comunicado pela API.**
+
+**Resultado percebido pelo usuário.**
+
+**Entrega:** taxonomia de falhas, contratos de retorno e estratégias existentes de recuperação.
+
+---
+
+## B4.7 — DOCUMENTOS, PDF, ANEXOS E CONSISTÊNCIA ENTRE SERVIÇOS
+
+Examine as operações de backend relacionadas a documentos e arquivos.
+
+Inclua:
+
+- Geração de documentos.
+- Obtenção de versões.
+- Renderização de PDF.
+- Reutilização de arquivos históricos.
+- Hashes.
+- Snapshots.
+- Storage.
+- Upload.
+- Sanitização.
+- Reservas.
+- Finalização.
+- Associação de anexos.
+- URLs assinadas.
+- Download.
+- Autorização após revogação.
+- Retomada após falha.
+
+Verifique se:
+
+- A versão renderizada corresponde ao documento solicitado.
+- Arquivos históricos permanecem imutáveis.
+- Um PDF antigo não é substituído silenciosamente.
+- Um arquivo autorizado não é confundido com outro.
+- O download respeita a identidade e o escopo.
+- Uma resposta perdida pode ser recuperada.
+- Um upload repetido não duplica evidências.
+- Uma reserva abandonada possui tratamento adequadamente representado.
+- Erros de Storage chegam ao cliente de maneira coerente.
+- Links temporários possuem limites documentados.
+
+Considere os resultados B3-004, B3-014 e B3-022.
+
+Investigue também a oportunidade BE-007 relacionada à apresentação do estoque observado no PDF REQ, sem transformá-la automaticamente em defeito de integridade.
+
+A B4 não deverá realizar nova auditoria visual completa dos PDFs.
+
+Seu foco será a confiabilidade da geração, da associação e da entrega.
+
+**Entrega:** mapa de contratos documentais e consistência entre serviços.
+
+---
+
+## B4.8 — ADMINISTRAÇÃO, IDENTIDADE E CONFIGURAÇÕES
+
+Examine as APIs de administração.
+
+Inclua:
+
+- Perfis.
+- Convites.
+- Vínculos.
+- Papéis.
+- Capacidades.
+- Administração global.
+- Administração local.
+- Configurações por paciente.
+- Catálogo.
+- Regras de ciência.
+- Regras de BAL.
+- Escalas.
+- Ativação e inativação.
+- Alterações de contexto.
+- Proteção de administradores essenciais.
+
+Investigue:
+
+- Mudança de dados com autorização obsoleta.
+- Confusão entre identidade global e vínculo local.
+- Aprovação pelo próprio proponente.
+- Perda de contexto.
+- Alteração em paciente errado.
+- Convite reutilizado.
+- Convite revogado.
+- Sessão encerrada.
+- Conflito entre edição e revogação.
+- Atualização sem notificação.
+- Efeito não refletido nos consumidores.
+- Resultado de operação com erro parcial.
+
+A análise deverá considerar os processos reais da B2.
+
+Por exemplo, a revogação de uma profissional pode ser correta no backend, mas a API pode não oferecer informações suficientes para identificar entregas ainda vinculadas àquela pessoa.
+
+Esse tipo de descoberta deve ser classificado corretamente como lacuna de integração ou consequência operacional, sem inventar um bypass de autorização.
+
+**Entrega:** auditoria da administração, das capacidades e da coerência dos efeitos.
+
+---
+
+## B4.9 — WORKERS, WEBHOOKS E CONTRATOS DE INTEGRAÇÃO
+
+Examine a fronteira de backend das integrações.
+
+Inclua os mecanismos efetivamente existentes de:
+
+- Scheduler.
+- Workers.
+- Outbox.
+- Notificações.
+- WhatsApp.
+- Templates.
+- Webhooks.
+- Flows.
+- E-mail, quando houver implementação.
+- Realtime.
+- Auth externo.
+- Storage.
+
+A investigação deverá determinar:
+
+- Como uma tarefa é iniciada.
+- Como é autenticada.
+- Como o destinatário é selecionado.
+- Como a autoridade é revalidada.
+- Como o payload é construído.
+- Como o resultado é interpretado.
+- Como o erro é classificado.
+- Como ocorre retry.
+- Como se distingue falha definitiva de resultado incerto.
+- Como se evita duplicação.
+- Como se preserva a ordem dos acontecimentos.
+- Como se identifica atraso ou bloqueio.
+
+Priorize os achados:
+
+- BE-002 — significado incorreto de parâmetros de notificação.
+- BE-003 — orçamento temporal do worker.
+- DB-002/B3-001 — falta de progresso do lifecycle.
+- DB-006/B3-025 — processamento bloqueado por candidatos inadequados.
+- B3-016 — limites de execução do worker.
+
+Não repita integralmente a investigação do scheduler feita pela B3.
+
+Concentre-se no comportamento do backend ao iniciar, orquestrar e interpretar esses serviços.
+
+**Não envie mensagens reais.**
+
+Não publique Flows.
+
+Não altere templates.
+
+Não configure provedores.
+
+Não declare entrega real comprovada a partir de mocks.
+
+**Entrega:** auditoria da orquestração e dos contratos de integração, com transferência das necessidades de homologação externa.
+
+---
+
+## B4.10 — SEGURANÇA DE APLICAÇÃO, PRIVACIDADE E SUPERFÍCIES EXPOSTAS
+
+Execute uma revisão adversarial da segurança do backend.
+
+Examine, conforme aplicável:
+
+- Sessões.
+- Cookies.
+- CSRF.
+- Verificação de origem.
+- CORS.
+- Headers.
+- Autorização por objeto.
+- Autorização por paciente.
+- Validação de input.
+- Limites de payload.
+- Rate limiting.
+- Uploads.
+- MIME.
+- Caminhos de arquivos.
+- URLs.
+- Redirecionamentos.
+- Logs.
+- Erros públicos.
+- Segredos de servidor.
+- Clientes privilegiados.
+- Variáveis de ambiente.
+- Cache.
+- SSR.
+- Realtime.
+- Webhooks.
+- Reprodução de requisições.
+
+Investigue especialmente riscos de:
+
+- IDOR/BOLA.
+- Escalada de privilégio.
+- Confusão de contexto.
+- Exposição de informações por respostas de erro.
+- Divulgação de tokens.
+- Uso indevido de clientes privilegiados.
+- Vazamento por logs.
+- Retorno de dados além do necessário.
+- Cache compartilhado indevido.
+- Redirecionamento inseguro.
+- Excesso de confiança em informações fornecidas pelo navegador.
+
+Não classifique uma superfície como vulnerável apenas porque possui determinado padrão técnico.
+
+Exija evidência do caminho de exploração ou, quando não for possível executá-lo, classifique o risco com os limites adequados.
+
+Não execute ataques contra serviços remotos.
+
+**Entrega:** matriz de segurança de aplicação, limites e evidências.
+
+---
+
+## B4.11 — ARQUITETURA, OBSERVABILIDADE, DESEMPENHO E RESILIÊNCIA
+
+Examine a estrutura efetiva do backend.
+
+Investigue:
+
+- Distribuição de responsabilidades.
+- Acoplamento.
+- Duplicação de regras.
+- Dependências circulares.
+- Fronteiras entre camadas.
+- Abstrações sem consumidor.
+- Operações com múltiplas chamadas.
+- Consultas redundantes.
+- Transformações repetidas.
+- Serviços excessivamente genéricos.
+- Contratos difíceis de recuperar.
+- Código legado ainda utilizado.
+- Código legado sem acesso público.
+- Observabilidade.
+- Logs.
+- Correlação.
+- Métricas.
+- Tempo limite.
+- Retries.
+- Falhas parciais.
+- Degradação controlada.
+- Continuidade operacional.
+
+Examine os custos e riscos de chamadas repetidas, mas **não proponha refatoração apenas porque um arquivo é grande ou porque existe uma abstração alternativa**.
+
+Considere o relatório de arquitetura da Fase A.
+
+A estrutura atual utiliza Route Handlers do Next.js e RPCs transacionais.
+
+Não recomende introduzir um novo backend, substituir indiscriminadamente as RPCs ou converter tudo para Server Actions sem demonstrar benefício concreto.
+
+Considere o BE-006 e os achados B3-015/B3-024.
+
+Toda recomendação de desempenho deverá identificar:
+
+- Problema.
+- Cenário.
+- Medição disponível.
+- Limitação.
+- Causa provável.
+- Alternativas.
+- Custo.
+- Risco de regressão.
+
+Não invente ganhos de latência.
+
+**Entrega:** diagnóstico arquitetural, observabilidade e oportunidades proporcionais.
+
+---
+
+## B4.12 — INVESTIGAÇÃO ADVERSARIAL TRANSVERSAL
+
+Execute uma segunda passagem crítica, cruzando os subgrupos.
+
+Procure situações que não aparecem quando cada API é examinada isoladamente.
+
+Exemplos:
+
+1. Uma operação é confirmada no banco, mas a resposta HTTP se perde.
+2. O cliente repete a tentativa e o backend cria nova identidade.
+3. A pessoa perde acesso entre validação e execução.
+4. Um usuário troca de paciente antes de concluir uma ação.
+5. Uma API devolve sucesso após o banco não aplicar uma decisão contrária.
+6. Um documento é cancelado enquanto o backend gera seu PDF.
+7. Um anexo é gravado, mas a associação documental falha.
+8. Uma consulta retorna apenas os cem registros recentes e omite a pendência procurada.
+9. Um worker recebe callback depois de timeout.
+10. Uma operação administrativa altera dados, mas não atualiza os consumidores.
+11. Uma transação sofre conflito, mas a resposta não oferece recuperação.
+12. Dois pacientes compartilham profissional, mas não autoridade operacional.
+13. Uma entrada numérica é transformada antes de chegar à RPC.
+14. Um documento histórico é solicitado após mudança de permissão.
+15. Uma tarefa fica pendente sem indicação de qual pessoa deve agir.
+16. Um usuário autenticado recebe HTTP 404 por ocultação legítima, mas a interface interpreta como desaparecimento definitivo de registro.
+17. Uma requisição é arquivada e posteriormente reaberta por mudança de fatos físicos.
+18. Um contrato de integração produz uma notificação cujo texto não corresponde ao evento persistido.
+
+Para cada cenário, identifique:
+
+- Contrato esperado.
+- Camadas envolvidas.
+- Resultado observado.
+- Evidência.
+- Consequência.
+- Recuperação.
+- Contraprova.
+- Limitações.
+
+Não execute indiscriminadamente todos os exemplos.
+
+Selecione os cenários que permitam descobrir ou delimitar causas ainda não suficientemente examinadas.
+
+**Entrega:** matriz adversarial e diagnóstico transversal final.
+
+---
+
+# IX. REGRAS DE PRESERVAÇÃO DO DOMÍNIO
+
+Nenhuma recomendação poderá descaracterizar os fundamentos do Home Care Assistant.
+
+Preserve:
+
+**REQ como registro de necessidade, urgência e estoque observado, sem quantidade solicitada obrigatória.**
+
+**COM como aquisição ou doação, distinta da entrega à equipe.**
+
+**ENT como movimentação, trânsito e aceite físico, preservando responsabilidade.**
+
+**BAL como contagem e reconciliação, não como declaração automática de consumo.**
+
+**Relato de consumo separado de débito confirmado.**
+
+**Ciência separada de atendimento e recebimento.**
+
+**Escala programada separada de presença comprovada.**
+
+**Administração global separada da autoridade local por paciente.**
+
+**Correção histórica separada de apagamento do fato original.**
+
+**Retry da mesma intenção separado de nova intenção.**
+
+**Documento histórico separado de sua representação PDF.**
+
+**Evento interno separado de entrega externa efetiva.**
+
+Simplificações são desejáveis, mas não podem eliminar silenciosamente essas distinções.
+
+---
+
+# X. CLASSIFICAÇÃO DOS ACHADOS
+
+Use:
+
+**P0 — Crítico.**
+
+**P1 — Bloqueador.**
+
+**P2 — Relevante.**
+
+**P3 — Melhoria.**
+
+Classifique a natureza do registro:
+
+- Defeito confirmado.
+- Falha de contrato.
+- Falha de recuperação.
+- Lacuna de domínio.
+- Inconsistência de autorização.
+- Risco sustentado.
+- Oportunidade.
+- Hipótese não confirmada.
+- Validação pendente.
+
+Registre separadamente:
+
+**Novo achado B4.**
+
+**Revalidação de A/B1/B2/B3.**
+
+**Nova manifestação de causa conhecida.**
+
+**Nova causa relacionada a problema conhecido.**
+
+Não infle a quantidade de descobertas por repetição.
+
+Não aumente a prioridade apenas pela quantidade de arquivos afetados.
+
+Não reduza a gravidade apenas porque o formulário dificulta atingir o caminho problemático.
+
+---
+
+# XI. ESTRUTURA DOS ENTREGÁVEIS
+
+Crie:
+
+`docs/audits/2026-10-30-phase-b4-backend/`
+
+Os entregáveis principais serão:
+
+### Controle
+
+`README.md`
+
+`CHECKPOINT.md`
+
+`00_BASELINE_SCOPE_AND_METHOD.md`
+
+### Inventário
+
+`01_BACKEND_API_INVENTORY.csv`
+
+`01_BACKEND_COVERAGE.csv`
+
+`01_ARCHITECTURE_AND_REQUEST_FLOW.md`
+
+### Autenticação e validação
+
+`02_AUTH_CONTEXT_AND_CAPABILITIES.md`
+
+`02_AUTHORIZATION_HTTP_MATRIX.csv`
+
+`03_INPUT_VALIDATION_AND_DATA_CONTRACTS.md`
+
+### Comandos e consultas
+
+`04_COMMANDS_IDEMPOTENCY_AND_RECOVERY.md`
+
+`05_READ_APIS_PAGINATION_AND_FRESHNESS.md`
+
+### Respostas e serviços
+
+`06_HTTP_ERRORS_AND_FAILURE_RECOVERY.md`
+
+`07_DOCUMENTS_PDF_ATTACHMENTS_SERVICES.md`
+
+`08_ADMINISTRATION_IDENTITY_AND_SETTINGS.md`
+
+`09_WORKERS_WEBHOOKS_AND_INTEGRATION_BOUNDARIES.md`
+
+### Segurança e arquitetura
+
+`10_APPLICATION_SECURITY_AND_PRIVACY.md`
+
+`11_ARCHITECTURE_OBSERVABILITY_AND_RESILIENCE.md`
+
+`12_CROSS_LAYER_ADVERSARIAL_SCENARIOS.md`
+
+### Consolidação
+
+`13_NEW_BACKEND_GAPS_AND_OPPORTUNITIES.md`
+
+`14_FINDINGS_MASTER.csv`
+
+`14_FINDINGS_MASTER.md`
+
+`15_ACCEPTANCE_AND_REGRESSION_CRITERIA.md`
+
+`16_CROSS_GROUP_DEPENDENCIES.md`
+
+`17_GROUP_B4_EXECUTIVE_ASSESSMENT.md`
+
+`18_PHASE_C_DECISION_HANDOFF.md`
+
+### Evidências
+
+`evidence/`
+
+Inclua nessa pasta somente os arquivos auxiliares realmente necessários.
+
+Utilize, quando pertinente:
+
+- Índice de cenários.
+- Resultados de testes dirigidos.
+- Logs sanitizados.
+- Comprovação de persistência.
+- Matriz de referências.
+- Contraprovas.
+- Registro de tentativas inválidas.
+- Manifesto.
+- Validação documental.
+
+**Não crie centenas de snapshots ou cópias de contratos já preservados nas auditorias anteriores.**
+
+Prefira referenciar a evidência existente, indicando SHA, caminho e limite.
+
+Se forem necessários documentos adicionais para registrar descobertas novas, crie-os de maneira justificada.
+
+Não omita evidências importantes para cumprir uma meta arbitrária de quantidade de arquivos.
+
+---
+
+# XII. PADRÃO DO REGISTRO MESTRE
+
+Cada achado deverá permitir identificar:
+
+1. ID.
+2. Título.
+3. Natureza.
+4. Prioridade.
+5. Estado.
+6. Confiança.
+7. Domínio.
+8. Processo.
+9. Persona afetada.
+10. Endpoint.
+11. Método HTTP.
+12. Serviço ou biblioteca.
+13. Contrato esperado.
+14. Comportamento observado.
+15. Causa sustentada.
+16. Evidência.
+17. Método de verificação.
+18. Resultado efetivamente persistido, quando aplicável.
+19. Consequência humana.
+20. Consequência operacional.
+21. Consequência de segurança.
+22. Reprodução mínima.
+23. Contraprova.
+24. Limitações.
+25. Relação com achados anteriores.
+26. Alternativas futuras.
+27. Riscos de alteração.
+28. Critérios de aceitação.
+29. Regressões necessárias.
+30. Decisão pendente.
+
+Os relatórios não deverão transformar resultados de leitura estática em execução comprovada.
+
+Da mesma forma, testes que apenas verificaram resposta HTTP não deverão ser descritos como comprovação de persistência.
+
+---
+
+# XIII. CRITÉRIOS DE QUALIDADE DA INVESTIGAÇÃO
+
+A B4 não deverá ser considerada concluída apenas porque:
+
+- Todos os arquivos foram listados.
+- Todos os endpoints foram catalogados.
+- Os testes existentes passaram.
+- O build passou.
+- A documentação está formatada.
+- Um manifesto foi gerado.
+- O relatório possui muitas páginas.
+
+A conclusão exige evidência de análise substantiva.
+
+Para cada área, verifique se foram examinados:
+
+**Caminho normal.**
+
+**Caminho de erro.**
+
+**Recuperação.**
+
+**Autorização.**
+
+**Repetição.**
+
+**Concorrência, quando pertinente.**
+
+**Consequência persistida.**
+
+**Limitações.**
+
+Nem todos os endpoints exigem um teste de concorrência próprio.
+
+A seleção deve considerar risco e importância operacional.
+
+Busque defeitos desconhecidos, mas não invente problemas para produzir achados inéditos.
+
+---
+
+# XIV. VERIFICAÇÃO FINAL PROPORCIONAL
+
+Ao encerrar, faça uma única validação global do pacote documental.
+
+Confira:
+
+1. Entregáveis principais.
+2. Coerência do inventário.
+3. Coerência da cobertura.
+4. IDs dos achados.
+5. Relação com as fases anteriores.
+6. Evidências essenciais.
+7. Testes dirigidos realizados.
+8. Limitações declaradas.
+9. Ausência de credenciais.
+10. Ausência de dados pessoais privados.
+11. Referências documentais.
+12. Consistência do handoff.
+13. Preservação dos arquivos funcionais.
+14. Preservação das migrations.
+15. Preservação da `master`.
+16. Estado da branch.
+17. Existência de alterações preexistentes.
+18. Integridade do commit documental.
+
+**Não execute novamente toda a suíte funcional apenas para validar esses requisitos.**
+
+Se o produto permaneceu funcionalmente idêntico à B3, registre esse fato e utilize os resultados anteriores como referência histórica, sem apresentá-los como testes executados na B4.
+
+Se houver necessidade específica de executar teste de produto, indique qual contrato da B4 ele comprova.
+
+O objetivo não é evitar testes necessários.
+
+O objetivo é eliminar testes que não acrescentem evidência.
+
+---
+
+# XV. RELATÓRIO EXECUTIVO
+
+O relatório executivo deverá ser compreensível ao responsável pelo produto, inclusive sem conhecimentos de programação.
+
+Para cada descoberta relevante, explique:
+
+**O que o usuário tenta fazer?**
+
+**O que o backend deveria executar?**
+
+**O que ele realmente executa?**
+
+**O problema foi demonstrado?**
+
+**A operação causa erro, duplicação, resultado incorreto ou impossibilidade de continuidade?**
+
+**Qual camada é responsável?**
+
+**Existe proteção compensatória?**
+
+**A falha já era conhecida ou foi descoberta na B4?**
+
+**O que precisará ser decidido ou corrigido futuramente?**
+
+Organize conclusões específicas sobre:
+
+- O que funciona corretamente.
+- O que deve ser preservado.
+- Defeitos confirmados.
+- Lacunas de integração.
+- Inconsistências de autorização.
+- Problemas de recuperação.
+- Melhorias proporcionais.
+- Descobertas inéditas.
+- Riscos ainda não comprovados.
+- Limitações de homologação.
+- Dependências com as fases anteriores.
+
+Não apresente a conclusão da B4 como autorização para produção.
+
+Os bloqueadores anteriores permanecem abertos enquanto não forem corrigidos e validados.
+
+---
+
+# XVI. TRANSFERÊNCIA PARA A FASE C
+
+A B4 deverá preparar um pacote de decisões.
+
+Para cada questão relevante, informe:
+
+- Problema.
+- Causa.
+- Efeito.
+- Prioridade.
+- Alternativas.
+- Dependências.
+- Risco de regressão.
+- Contrato a preservar.
+- Critérios futuros de aceitação.
+- Necessidade de decisão humana.
+- Necessidade de validação adicional.
+
+Diferencie:
+
+**Correção técnica obrigatória.**
+
+**Decisão de produto.**
+
+**Decisão operacional.**
+
+**Refatoração opcional.**
+
+**Homologação pendente.**
+
+**Mudança que deve ser descartada.**
+
+Não escolha automaticamente implementar todas as oportunidades encontradas.
+
+Não inicie a Fase C.
+
+---
+
+# XVII. CHECKPOINTS E EXECUÇÃO
+
+Execute sequencialmente:
+
+**B4.0 — Reconhecimento.**
+
+**B4.1 — Inventário de APIs.**
+
+**B4.2 — Autenticação e contexto.**
+
+**B4.3 — Entradas e contratos.**
+
+**B4.4 — Comandos e idempotência.**
+
+**B4.5 — Consultas e frescor.**
+
+**B4.6 — Erros e recuperação.**
+
+**B4.7 — Documentos e arquivos.**
+
+**B4.8 — Administração.**
+
+**B4.9 — Workers e integrações.**
+
+**B4.10 — Segurança de aplicação.**
+
+**B4.11 — Arquitetura e resiliência.**
+
+**B4.12 — Investigação adversarial.**
+
+**Consolidação final.**
+
+Após cada subgrupo, registre:
+
+- O que foi examinado.
+- O que foi demonstrado.
+- O que permaneceu não verificado.
+- Achados.
+- Contraprovas.
+- Evidências.
+- Próximo passo.
+
+Registre checkpoints de forma concisa e reutilizável.
+
+Não gere relatórios intermediários extensos que simplesmente repitam o conteúdo final.
+
+Se o contexto for compactado, utilize os checkpoints para retomar.
+
+Não reinicie investigações concluídas sem motivo.
+
+Não execute novamente reprodutores mutáveis antigos apenas para reconstruir o histórico de trabalho.
+
+---
+
+# XVIII. META FINAL E DETERMINAÇÃO DE ENCERRAMENTO
+
+A B4 deverá permitir responder com precisão:
+
+**O backend representa corretamente as regras do Home Care Assistant?**
+
+**As APIs executam as operações que afirmam executar?**
+
+**Os resultados HTTP correspondem aos resultados persistidos?**
+
+**As operações autorizadas são corretamente delimitadas?**
+
+**Os contratos de entrada impedem valores incompatíveis?**
+
+**Uma falha de conexão pode ser recuperada sem duplicação?**
+
+**Um conflito é comunicado corretamente?**
+
+**Uma operação interrompida pode ser retomada?**
+
+**Uma consulta recupera todos os registros autorizados necessários?**
+
+**Os documentos e arquivos preservam sua identidade e integridade?**
+
+**Os serviços assíncronos respeitam os resultados e estados reais?**
+
+**Os dados de pacientes diferentes permanecem isolados em toda a cadeia HTTP?**
+
+**Quais falhas ainda não haviam sido identificadas nas auditorias anteriores?**
+
+**Quais mecanismos existentes devem ser preservados?**
+
+**Quais mudanças são realmente necessárias antes da operação real?**
+
+**Quais oportunidades podem simplificar o backend sem reconstruí-lo desnecessariamente?**
+
+A meta não é gerar o maior número possível de testes, arquivos ou achados.
+
+A meta é produzir **o diagnóstico mais profundo, confiável, preciso e útil possível, com a menor quantidade de retrabalho e de validações redundantes compatível com o rigor exigido**.
+
+Conclua B4.0–B4.12, consolide as evidências, valide proporcionalmente os artefatos e publique um commit exclusivamente documental em `audit/phase-b`.
+
+**Não implemente correções.**
+
+**Não avance para B5.**
+
+**Não inicie a Fase C.**
+
+**Não inicie a Fase D.**
+
+**Inicie agora pelo reconhecimento B4.0, respeitando integralmente esta ordem mestre.**

@@ -1,0 +1,49 @@
+{
+  "recordedAt": "2026-10-30T07:17:27.876Z",
+  "category": "HTTP_REAL_AUTH",
+  "results": [
+    {
+      "id": "B48-01",
+      "contract": "Equivalent catalogue operations should respect the same effective capability",
+      "capabilities": {
+        "catalogManage": true,
+        "accessManage": false
+      },
+      "catalogRoute": 403,
+      "adminRoute": 200,
+      "createdProductId": "patient-acb21b01-d9c4-48b2-9912-6eb2ab1ca7a4",
+      "relation": "Divergence already observed in A;B4 provides HTTP/Auth proof",
+      "counterproof": "Active consumer uses /admin successfully;no privilege escalation;SQL still authorizes"
+    },
+    {
+      "id": "B48-02",
+      "contract": "Malformed patient identifier is input error independent of authority mode",
+      "mode": "global",
+      "status": 500,
+      "code": "INTERNAL_ERROR",
+      "retryable": true,
+      "limits": "No data mutation;global uses uuid.parse rather than parseUuid;local path uses patientContext"
+    },
+    {
+      "id": "B48-03",
+      "contract": "Malformed patient identifier is input error independent of authority mode",
+      "mode": "admin",
+      "status": 400,
+      "code": "PATIENT_REQUIRED",
+      "retryable": false,
+      "limits": "No data mutation;global uses uuid.parse rather than parseUuid;local path uses patientContext"
+    },
+    {
+      "id": "B48-04",
+      "contract": "Local administrator cannot change platform identity/global authority",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "id": "B48-05",
+      "contract": "Delegated capability belongs to selected patient only",
+      "status": 404,
+      "code": "NOT_FOUND"
+    }
+  ]
+}

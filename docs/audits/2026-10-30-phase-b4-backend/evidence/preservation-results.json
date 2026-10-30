@@ -1,0 +1,463 @@
+{
+  "recordedAt": "2026-10-30T10:39:31.082Z",
+  "protectedFiles": 395,
+  "protectedFilesChanged": [],
+  "branch": "audit/phase-b",
+  "headBeforeDocumentCommit": "315399dc5c19cacc9d9cc3c609174498608f4af0",
+  "master": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "routinesCompared": 232,
+  "routineDrift": [],
+  "tables": [
+    {
+      "table": "access_change_requests",
+      "originalRows": 94,
+      "currentRows": 146,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 52
+    },
+    {
+      "table": "attachments",
+      "originalRows": 34,
+      "currentRows": 34,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "audit_events",
+      "originalRows": 2768,
+      "currentRows": 2889,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 121
+    },
+    {
+      "table": "bal_approvals",
+      "originalRows": 12,
+      "currentRows": 12,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "bal_assignments",
+      "originalRows": 62,
+      "currentRows": 62,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "bal_cycle_events",
+      "originalRows": 232,
+      "currentRows": 232,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "bal_cycles",
+      "originalRows": 24,
+      "currentRows": 24,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "bal_deferrals",
+      "originalRows": 11,
+      "currentRows": 11,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "bal_obligations",
+      "originalRows": 26,
+      "currentRows": 26,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "bal_regimes",
+      "originalRows": 24,
+      "currentRows": 24,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "capability_definitions",
+      "originalRows": 38,
+      "currentRows": 38,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "capability_overrides",
+      "originalRows": 4,
+      "currentRows": 5,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "care_recipient_invitations",
+      "originalRows": 57,
+      "currentRows": 62,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 5
+    },
+    {
+      "table": "care_recipient_memberships",
+      "originalRows": 683,
+      "currentRows": 690,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 7
+    },
+    {
+      "table": "care_recipient_products",
+      "originalRows": 333,
+      "currentRows": 336,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 3
+    },
+    {
+      "table": "care_recipients",
+      "originalRows": 130,
+      "currentRows": 133,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 3
+    },
+    {
+      "table": "consumption_reports",
+      "originalRows": 218,
+      "currentRows": 219,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "document_events",
+      "originalRows": 721,
+      "currentRows": 744,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 23
+    },
+    {
+      "table": "document_lines",
+      "originalRows": 257,
+      "currentRows": 258,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "document_pdf_renders",
+      "originalRows": 198,
+      "currentRows": 199,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "document_pdfs",
+      "originalRows": 0,
+      "currentRows": 0,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "document_request_links",
+      "originalRows": 85,
+      "currentRows": 85,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "document_series",
+      "originalRows": 139,
+      "currentRows": 140,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "flow_sessions",
+      "originalRows": 7,
+      "currentRows": 7,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "flow_submissions",
+      "originalRows": 6,
+      "currentRows": 6,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "global_admin_guard",
+      "originalRows": 1,
+      "currentRows": 1,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "historical_requisition_imports",
+      "originalRows": 3,
+      "currentRows": 3,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "inbound_messages",
+      "originalRows": 1,
+      "currentRows": 1,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "measurement_units",
+      "originalRows": 10,
+      "currentRows": 10,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "meta_template_versions",
+      "originalRows": 27,
+      "currentRows": 27,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "notification_event_rules",
+      "originalRows": 8,
+      "currentRows": 8,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "operational_documents",
+      "originalRows": 208,
+      "currentRows": 210,
+      "originalHashesMissing": 19,
+      "newOrChangedHashes": 21
+    },
+    {
+      "table": "operational_reminders",
+      "originalRows": 1383,
+      "currentRows": 1383,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "patient_settings",
+      "originalRows": 127,
+      "currentRows": 128,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "product_presentations",
+      "originalRows": 5,
+      "currentRows": 5,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "products",
+      "originalRows": 263,
+      "currentRows": 266,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 3
+    },
+    {
+      "table": "profiles",
+      "originalRows": 73,
+      "currentRows": 77,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 4
+    },
+    {
+      "table": "purchase_receipts",
+      "originalRows": 14,
+      "currentRows": 14,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "recipient_notification_settings",
+      "originalRows": 5,
+      "currentRows": 5,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "reminder_challenges",
+      "originalRows": 0,
+      "currentRows": 0,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "requisition_import_batches",
+      "originalRows": 3,
+      "currentRows": 3,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "requisition_item_resolutions",
+      "originalRows": 3,
+      "currentRows": 3,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "requisition_items",
+      "originalRows": 152,
+      "currentRows": 153,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "requisition_lifecycle",
+      "originalRows": 77,
+      "currentRows": 78,
+      "originalHashesMissing": 19,
+      "newOrChangedHashes": 20
+    },
+    {
+      "table": "requisition_notifications",
+      "originalRows": 4990,
+      "currentRows": 5055,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 65
+    },
+    {
+      "table": "requisition_observations",
+      "originalRows": 11,
+      "currentRows": 11,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "requisition_science_events",
+      "originalRows": 48,
+      "currentRows": 48,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "requisition_status_history",
+      "originalRows": 1,
+      "currentRows": 1,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "requisitions",
+      "originalRows": 80,
+      "currentRows": 81,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "scheduled_shifts",
+      "originalRows": 119,
+      "currentRows": 119,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "science_challenges",
+      "originalRows": 1,
+      "currentRows": 1,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "shift_change_requests",
+      "originalRows": 4,
+      "currentRows": 4,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "shift_events",
+      "originalRows": 98,
+      "currentRows": 98,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "shift_series",
+      "originalRows": 36,
+      "currentRows": 36,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "shift_types",
+      "originalRows": 35,
+      "currentRows": 35,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "stock_alert_events",
+      "originalRows": 3,
+      "currentRows": 3,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "stock_alert_rules",
+      "originalRows": 3,
+      "currentRows": 3,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "stock_inventories",
+      "originalRows": 0,
+      "currentRows": 0,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "stock_inventory_items",
+      "originalRows": 0,
+      "currentRows": 0,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "stock_movements",
+      "originalRows": 619,
+      "currentRows": 620,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 1
+    },
+    {
+      "table": "verified_phones",
+      "originalRows": 2,
+      "currentRows": 2,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    },
+    {
+      "table": "whatsapp_challenges",
+      "originalRows": 0,
+      "currentRows": 0,
+      "originalHashesMissing": 0,
+      "newOrChangedHashes": 0
+    }
+  ],
+  "changedOriginalHashTables": [
+    {
+      "table": "operational_documents",
+      "originalRows": 208,
+      "currentRows": 210,
+      "originalHashesMissing": 19,
+      "newOrChangedHashes": 21
+    },
+    {
+      "table": "requisition_lifecycle",
+      "originalRows": 77,
+      "currentRows": 78,
+      "originalHashesMissing": 19,
+      "newOrChangedHashes": 20
+    }
+  ],
+  "limits": "Multiset hashes detect changed/deleted row representations,not their cause. New rows are synthetic B4;existing background cron remains active. Any original-hash difference needs separate interpretation before claiming preservation."
+}

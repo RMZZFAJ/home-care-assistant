@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-10-30T07:08:08.038Z",
+  "category": "HTTP_REAL_AUTH_AND_SCOPED_READBACK",
+  "results": [
+    {
+      "id": "B45-01",
+      "contract": "An old pending administrative proposal remains discoverable",
+      "added": 48,
+      "totalPersisted": 51,
+      "oldestStatus": "pending",
+      "localRows": 50,
+      "globalRows": 50,
+      "oldestVisible": false,
+      "pageOrIdFilterIgnored": true,
+      "responseHasPagination": false,
+      "counterproof": "All records remain authorized/persisted;known request ID can still be decided;most recent 50 accessible",
+      "limits": "51 synthetic changes,not production volume;created by authorized RPC to avoid redundant HTTP bootstrap"
+    },
+    {
+      "id": "B45-02",
+      "path": "/api/documents?careRecipientId=4fe07a94-cd1c-460f-958f-bbebae54fb46&page=1&pageSize=1",
+      "status": 200,
+      "code": null,
+      "rows": 1,
+      "total": 2,
+      "noStore": "no-store",
+      "limits": "Local selected administrator;read only. HTTP success is not an assertion of every result payload field."
+    },
+    {
+      "id": "B45-03",
+      "path": "/api/documents?careRecipientId=4fe07a94-cd1c-460f-958f-bbebae54fb46&search=74187be5-197f-4d51-ad69-a76eedee287e",
+      "status": 200,
+      "code": null,
+      "rows": 0,
+      "total": 0,
+      "noStore": "no-store",
+      "limits": "Local selected administrator;read only. HTTP success is not an assertion of every result payload field."
+    },
+    {
+      "id": "B45-04",
+      "path": "/api/requisitions?careRecipientId=4fe07a94-cd1c-460f-958f-bbebae54fb46&from=2026-02-30",
+      "status": 400,
+      "code": "INVALID_DATE",
+      "rows": null,
+      "total": null,
+      "noStore": "no-store",
+      "limits": "Local selected administrator;read only. HTTP success is not an assertion of every result payload field."
+    },
+    {
+      "id": "B45-05",
+      "path": "/api/schedules?careRecipientId=4fe07a94-cd1c-460f-958f-bbebae54fb46&from=2026-10-01&until=2026-12-01",
+      "status": 400,
+      "code": "INVALID_OPERATION",
+      "rows": null,
+      "total": null,
+      "noStore": "no-store",
+      "limits": "Local selected administrator;read only. HTTP success is not an assertion of every result payload field."
+    },
+    {
+      "id": "B45-06",
+      "path": "/api/documents?careRecipientId=4fe07a94-cd1c-460f-958f-bbebae54fb46&type=COM&search=NO-MATCH-B4",
+      "status": 200,
+      "code": null,
+      "rows": 0,
+      "total": 0,
+      "noStore": "no-store",
+      "limits": "Local selected administrator;read only. HTTP success is not an assertion of every result payload field."
+    }
+  ]
+}

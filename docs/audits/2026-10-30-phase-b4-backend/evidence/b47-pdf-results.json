@@ -1,0 +1,37 @@
+{
+  "recordedAt": "2026-10-30T07:13:56.731Z",
+  "category": "HTTP_REAL_AUTH_STORAGE_AND_HASH_READBACK",
+  "results": [
+    {
+      "id": "B47-01",
+      "contract": "Authorized versioned PDF returned;stored file hash matches HTTP bytes;repeat reuses bytes",
+      "first": 200,
+      "repeat": 200,
+      "bytes": 26135,
+      "version": 1,
+      "renderer": 4,
+      "fileHashMatches": true,
+      "sameBytes": true,
+      "noStore": "no-store",
+      "limits": "Real local storage;no visual review or signature certification"
+    },
+    {
+      "id": "B47-02",
+      "contract": "Missing version is not silently substituted with current version",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "id": "B47-03",
+      "contract": "Existing cached private PDF does not bypass selected-patient authority",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "id": "B47-04",
+      "contract": "Missing original renderer does not regenerate or overwrite historical original",
+      "status": 404,
+      "code": "NOT_FOUND"
+    }
+  ]
+}

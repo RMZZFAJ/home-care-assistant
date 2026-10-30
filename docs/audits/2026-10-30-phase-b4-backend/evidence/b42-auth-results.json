@@ -1,0 +1,166 @@
+{
+  "recordedAt": "2026-10-30T06:57:53.946Z",
+  "category": "HTTP_REAL_AUTH",
+  "results": [
+    {
+      "id": "B42-01",
+      "expected": "No session denied before private data",
+      "observed": {
+        "path": "/api/context",
+        "status": 401,
+        "code": "SESSION_EXPIRED",
+        "noStore": "no-store",
+        "correlation": true
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-02",
+      "expected": "No session denied before private data",
+      "observed": {
+        "path": "/api/sync",
+        "status": 401,
+        "code": "SESSION_EXPIRED",
+        "noStore": "no-store",
+        "correlation": true
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-03",
+      "expected": "No session denied before private data",
+      "observed": {
+        "path": "/api/profile",
+        "status": 401,
+        "code": "SESSION_EXPIRED",
+        "noStore": "no-store",
+        "correlation": true
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-04",
+      "expected": "No session denied before private data",
+      "observed": {
+        "path": "/api/units",
+        "status": 401,
+        "code": "SESSION_EXPIRED",
+        "noStore": "no-store",
+        "correlation": true
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-05",
+      "expected": "No session denied before private data",
+      "observed": {
+        "path": "/api/admin?section=profiles",
+        "status": 401,
+        "code": "SESSION_EXPIRED",
+        "noStore": "no-store",
+        "correlation": true
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-06",
+      "expected": "No session denied before private data",
+      "observed": {
+        "path": "/api/dashboard?careRecipientId=4fe07a94-cd1c-460f-958f-bbebae54fb46",
+        "status": 401,
+        "code": "SESSION_EXPIRED",
+        "noStore": "no-store",
+        "correlation": true
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-07",
+      "expected": "No session denied before private data",
+      "observed": {
+        "path": "/api/documents/8bed8bb1-eb52-4eb0-ba4c-96f9e9bba5e3",
+        "status": 401,
+        "code": "SESSION_EXPIRED",
+        "noStore": "no-store",
+        "correlation": true
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-08",
+      "expected": "No session denied before private data",
+      "observed": {
+        "path": "/api/attachments?careRecipientId=4fe07a94-cd1c-460f-958f-bbebae54fb46&documentId=aef309f7-c1d2-42b1-8406-43145f303617",
+        "status": 401,
+        "code": "SESSION_EXPIRED",
+        "noStore": "no-store",
+        "correlation": true
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-09",
+      "expected": "Legitimate selected patient is readable",
+      "observed": {
+        "status": 200,
+        "rows": 2
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-10",
+      "expected": "Membership elsewhere does not override selected context",
+      "observed": {
+        "status": 404,
+        "code": "NOT_FOUND"
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-11",
+      "expected": "Explicit switch to real second membership succeeds",
+      "observed": {
+        "status": 200,
+        "rows": 0
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-12",
+      "expected": "Professional cannot list platform identities",
+      "observed": {
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-13",
+      "expected": "Random patient ID grants no context",
+      "observed": {
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-14",
+      "expected": "Authenticated identity without membership cannot read patient",
+      "observed": {
+        "status": 404,
+        "code": "NOT_FOUND"
+      },
+      "limits": "Local HTTP and official Auth; no generalized RLS certification"
+    },
+    {
+      "id": "B42-15",
+      "expected": "API rejects replay of cookie from ended Auth session",
+      "observed": {
+        "before": 200,
+        "after": 401,
+        "code": "SESSION_EXPIRED"
+      },
+      "limits": "Captured cookie used only in memory. Does not retest direct profile/avatar bypass B3-021 or revoke-in-flight B3-020."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-30T07:27:49.759Z",
+  "files": 198,
+  "clientRoots": 82,
+  "runtimeImportEdges": 453,
+  "clientToServerPaths": [],
+  "cycles": [
+    [
+      "src/components/app-shell.tsx",
+      "src/components/layout/workspace-context.tsx",
+      "src/components/layout/workspace-shell.tsx",
+      "src/components/notifications/notification-bell.tsx",
+      "src/components/workspace.tsx"
+    ]
+  ],
+  "backendCycles": [],
+  "limits": "Literal static imports/reexports only;not a bundler proof;dynamic computed imports and dependency package internals not expanded. Built-asset secret check is separate."
+}
