@@ -1,0 +1,170 @@
+[
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.csv",
+    "bytes": 95937,
+    "sha256_lf": "1b0eec8ffff634c6a190fe5b0ec69dd75083bede7953532a01dce182ed30a989",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/REPOSITORY_HYGIENE_AND_DOCUMENTATION.md",
+    "bytes": 7704,
+    "sha256_lf": "31edafefc64cf0f3c7cd75eb91db506505e8a13d2222737b7a050e40f1c1d5ec",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/TESTING_PERFORMANCE_OBSERVABILITY.md",
+    "bytes": 6917,
+    "sha256_lf": "ce540c9dea92b910d749c626c0c8b854a7b388093ee5d6fb73cc2cc971fd7563",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/INTEGRATION_REVIEW.md",
+    "bytes": 7499,
+    "sha256_lf": "85109c7de101589b52c44e20028d1a2d53fce964efbf47441c6f37de8262242c",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/10_MOBILE_ACCESSIBILITY_AND_HUMAN_TEST_PLAN.md",
+    "bytes": 8979,
+    "sha256_lf": "8e4478242df062d27c13d35ac8520f99503424bd9b3273b0c4690dc4f1122c59",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/12_FINDINGS_MASTER.csv",
+    "bytes": 109981,
+    "sha256_lf": "eefc19f804b02c4b146c6afe01139772f206d3f99c0a98bfb24cfca9515d1348",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/b18-accessibility.json",
+    "bytes": 103527,
+    "sha256_lf": "b113ceff7f3b600b509308555f4387c74202c71e0e91a8c0a352a432a9872410",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/b18-followup.json",
+    "bytes": 7851,
+    "sha256_lf": "53e6502a4bdcdfb93bd624844674389de7ce826f8fe0d7c252a4ffc010294990",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/pdf-inspection.json",
+    "bytes": 12369,
+    "sha256_lf": "d0602c61260b3cc1b537d2cde69e434a0c69b63da61d23aaead4b84a89b6335a",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/01_PROCESS_INVENTORY.csv",
+    "bytes": 62570,
+    "sha256_lf": "e72f5de5e74ebc81d767d0923874c81c2943acadbf1ffbe20078d0d425ca0da9",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/13_FINDINGS_MASTER.csv",
+    "bytes": 35356,
+    "sha256_lf": "7e7e21fbc55d5c12939f0062654a80cf53d35ed26dbd275a2d9c5549f65cc1f7",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/11_QUERIES_READ_MODELS_AND_PERFORMANCE.md",
+    "bytes": 6230,
+    "sha256_lf": "cee6d1151e578489e3c941d0ddf9cabde5d5fb5e47715f1f3cb7119ddeb145e6",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.csv",
+    "bytes": 53759,
+    "sha256_lf": "905676ec825d518598343c0c05a7a8685701e152739238e39cc6887e7c21b400",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b311-plans.json",
+    "bytes": 69814,
+    "sha256_lf": "96d959c036cdb20571ccca5252caf828d056d1198aee03cce92fb800eb5a921b",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b312v-results.json",
+    "bytes": 2121,
+    "sha256_lf": "d747e8cfe3c2c85c7a9e7cbbf49a6a56991728daa96d83e2f506306cf6813a30",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.csv",
+    "bytes": 27524,
+    "sha256_lf": "266b9039ddeb02cf61cea1bc2c7d4c63f81d7a774d5d120b8c907f831fa819ac",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/15_ACCEPTANCE_AND_REGRESSION_CRITERIA.md",
+    "bytes": 5885,
+    "sha256_lf": "36d7fc5bf94335780177525e556268a6d1faf302dad3c80787fee5f969adf6ff",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/14_FINDINGS_MASTER.csv",
+    "bytes": 38276,
+    "sha256_lf": "58eac55ffccdf0e51959af2838f5fbd7faa186af230b0e70e36fdbfedea6e83c",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/15_ACCEPTANCE_AND_REGRESSION_CRITERIA.md",
+    "bytes": 15029,
+    "sha256_lf": "543ff21c28423985ab8d22c998524bfa5fb15dca2312ba9b2bc72fb41ce8ee9d",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/06_PDF_RENDERING_CONTENT_AND_LAYOUT.md",
+    "bytes": 5061,
+    "sha256_lf": "831dbc9d44df3235f64bcba4d429e586e8305aea9053ad2e1cac2c81c206aadb",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/14_FINDINGS_MASTER.csv",
+    "bytes": 30457,
+    "sha256_lf": "ff33ba5688027cfd0da35aaf33eb61c01d858e4fe8ff6b8a89c7b7de4f9af54e",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/15_ACCEPTANCE_AND_REGRESSION_CRITERIA.md",
+    "bytes": 6660,
+    "sha256_lf": "d06996ca215bd67ae364328a6021f9009da44885da8cc040f47d1ea7bb5be3ee",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b66-inspection-results.json",
+    "bytes": 22679,
+    "sha256_lf": "a0ce31700ff27a92150c61754d9405c01a7b747813e421049fc8dfde54cbcfd8",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/07_PERFORMANCE_SCALABILITY_AND_COST.md",
+    "bytes": 6291,
+    "sha256_lf": "6f123fc5f2bcf0392d73b84823d86df790cdacdcc9e620ae9c83ab6077497635",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/14_FINDINGS_MASTER.csv",
+    "bytes": 17504,
+    "sha256_lf": "4ce4234819689d44bfb626b7f5975068c75484354fbda9086292d35fc497d3bb",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/ci-metadata.json",
+    "bytes": 14499,
+    "sha256_lf": "d1f2f42520f94df7f03ca5d03d0907eeefb7066b6dca896897a08b4563fbba48",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/dependency-audit.json",
+    "bytes": 2231,
+    "sha256_lf": "abb8a72aab5ceab4ece4957b7eee045a97337dce1eaa554e37e4bdc4a82e0f8e",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/preservation.json",
+    "bytes": 944,
+    "sha256_lf": "21931931326983b71f09516a95fc846d1ce6e460f4e79fa73fa667494730d41c",
+    "use": "Source unchanged; scoped prior evidence, not a new B8 execution"
+  }
+]

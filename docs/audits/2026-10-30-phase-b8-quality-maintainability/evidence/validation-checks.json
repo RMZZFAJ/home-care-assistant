@@ -1,0 +1,88 @@
+[
+  {
+    "check": "Node syntax",
+    "command": "node --check (three B8 mjs instruments)",
+    "exitCode": 0,
+    "node": "24.22.0",
+    "sources": [
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/inventory.mjs",
+        "sha256_lf": "b9f27e06ba4756744164f47462c59afd681b697cb7d8c0c6c34cb6dcd0fcce60"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/maintenance.mjs",
+        "sha256_lf": "644bdde7767412836f28efd4b4a4ffc8794f0b3327202dd9196159c507217127"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/sql-oracles.mjs",
+        "sha256_lf": "95f25711bfef87f4c992d2076bc824d5c0d145b9f0e9288f07724b814bc730fc"
+      }
+    ],
+    "affectedRecheck": "inventory.mjs syntax/lint rechecked after separating preexisting audit requirements from product diff; other helper hashes unchanged"
+  },
+  {
+    "check": "ESLint scoped instruments",
+    "command": "node node_modules/eslint/bin/eslint.js (seven B8 JS/TS instruments)",
+    "exitCode": 0,
+    "node": "24.22.0",
+    "sources": [
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/inventory.mjs",
+        "sha256_lf": "b9f27e06ba4756744164f47462c59afd681b697cb7d8c0c6c34cb6dcd0fcce60"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/maintenance.mjs",
+        "sha256_lf": "644bdde7767412836f28efd4b4a4ffc8794f0b3327202dd9196159c507217127"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/sql-oracles.mjs",
+        "sha256_lf": "95f25711bfef87f4c992d2076bc824d5c0d145b9f0e9288f07724b814bc730fc"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/vitest.oracles.mts",
+        "sha256_lf": "95f7c7ffae513613451fc1cd69e390f967228e5554a59bbcb9eb8d1f1e9b1b16"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/playwright.probes.ts",
+        "sha256_lf": "637d384453643c9aedaf3050b32e29c145b46a1df3c75c2eaf09732dd13231eb"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/quality.probe.spec.ts",
+        "sha256_lf": "33c6cb186de330ad69efa7d8133bc274173e2093ee52856cb6c757ccf30fdeee"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/no-network.ts",
+        "sha256_lf": "693a459e4eefc0b81c109908b14fb619cef22a3fef652af86d9cb31634922bc5"
+      }
+    ],
+    "affectedRecheck": "inventory.mjs syntax/lint rechecked after separating preexisting audit requirements from product diff; other helper hashes unchanged"
+  },
+  {
+    "check": "TypeScript scoped probes",
+    "command": "node node_modules/typescript/bin/tsc -p docs\\audits\\2026-10-30-phase-b8-quality-maintainability\\evidence\\tsconfig.audit.json --noEmit",
+    "exitCode": 0,
+    "node": "24.22.0",
+    "sources": [
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/vitest.oracles.mts",
+        "sha256_lf": "95f7c7ffae513613451fc1cd69e390f967228e5554a59bbcb9eb8d1f1e9b1b16"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/playwright.probes.ts",
+        "sha256_lf": "637d384453643c9aedaf3050b32e29c145b46a1df3c75c2eaf09732dd13231eb"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/quality.probe.spec.ts",
+        "sha256_lf": "33c6cb186de330ad69efa7d8133bc274173e2093ee52856cb6c757ccf30fdeee"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/no-network.ts",
+        "sha256_lf": "693a459e4eefc0b81c109908b14fb619cef22a3fef652af86d9cb31634922bc5"
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/tsconfig.audit.json",
+        "sha256_lf": "f8ef67dc311b0ae6d97b4f4f38bf551d33262c4afa77caf1284c41ff8b13c749"
+      }
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "Q6-01",
+    "actual": "desktop ready; helper passes",
+    "scope": "synthetic DOM; real helper"
+  },
+  {
+    "id": "Q6-02",
+    "actual": "helper timed out on absent mobile branch while desktop trigger became visible",
+    "timeoutMs": 600,
+    "scope": "controlled scheduling; no estimate of CI frequency"
+  },
+  {
+    "id": "Q6-03",
+    "actual": "same DOM and helper pass after explicit readiness",
+    "scope": "counterproof, not a helper fix"
+  },
+  {
+    "id": "Q9-01",
+    "actual": "helper passes with review still required",
+    "incomplete": [
+      "color-contrast"
+    ],
+    "violations": [],
+    "scope": "synthetic gradient only; does not prove an application contrast defect"
+  },
+  {
+    "id": "Q9-02",
+    "actual": "helper rejects button-name violation",
+    "scope": "counterproof against a disabled or vacuous axe check"
+  }
+]

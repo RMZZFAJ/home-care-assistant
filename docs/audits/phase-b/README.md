@@ -6,6 +6,24 @@ A criação de novos grupos depende da autorização correspondente.
 
 ## Estado atual
 
+- B8: Qualidade, Testes, Acessibilidade e Sustentabilidade Técnica concluída
+  em 30/10/2026, última investigação especializada da Fase B. Eixos Q1–Q9 e
+  M1–M7 independentes, com revisão transversal. Nove registros (três novos e
+  seis revalidações), seis P2/três P3; 156 IDs anteriores em 119 famílias de
+  regressão. NO-GO e P1s anteriores preservados. Sem correções funcionais.
+- [Executivo B8](../2026-10-30-phase-b8-quality-maintainability/GROUP_B8_EXECUTIVE_ASSESSMENT.md).
+- [Índice B8](../2026-10-30-phase-b8-quality-maintainability/README.md).
+- [Achados B8](../2026-10-30-phase-b8-quality-maintainability/FINDINGS_MASTER.md).
+- [Regressões futuras](../2026-10-30-phase-b8-quality-maintainability/REGRESSION_COVERAGE_MATRIX.csv).
+- [Insumos B8 para C](../2026-10-30-phase-b8-quality-maintainability/PHASE_C_DECISION_HANDOFF.md).
+- A e B1–B8 possuem auditorias encerradas. Não foi demonstrado domínio
+  independente que justifique outro grupo B. C e D permanecem não iniciadas;
+  pendências seguem como insumos de decisão, correção e homologação sob nova
+  autorização. Commit/push documental e preview automático estão autorizados,
+  sem promoção de produção ou configuração de provedor.
+- Manutenção pontual pré-B8: nove avisos VS Code resolvidos por seleção da
+  `.venv` existente e crases em três linhas do relatório B4; imports, lógica
+  Python e produto preservados. Nenhuma atualização de dependências.
 - B7.0–B7.12: diagnóstico de infraestrutura e prontidão operacional concluído
   em 30/10/2026, sem correções. Sete registros (cinco P2/dois P3), dez provas
   locais controladas, 16 referências anteriores e 31 cenários reconciliados.

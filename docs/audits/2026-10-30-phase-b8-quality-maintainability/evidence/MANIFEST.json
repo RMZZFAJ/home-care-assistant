@@ -1,0 +1,320 @@
+{
+  "algorithm": "sha256; text CRLF normalized to LF only",
+  "files": [
+    {
+      "file": "ACCEPTANCE_AND_REGRESSION_CRITERIA.md",
+      "bytes_lf": 7371,
+      "sha256_lf": "e9e1d751d82fa2fae4e4729e2d4a302059f0c773505082c6f11fe0efa4ce059e"
+    },
+    {
+      "file": "CHECKPOINT.md",
+      "bytes_lf": 4360,
+      "sha256_lf": "8eddd3aac76a3dd58b6a4b2aca199428c3bfea32a9f92fc00f61f9c0396769fd"
+    },
+    {
+      "file": "CROSS_GROUP_DEPENDENCIES.md",
+      "bytes_lf": 3781,
+      "sha256_lf": "6d1527ab9ecdc975d5999aa3876860891e4e44d4dbcb690c012fd8cb6c729973"
+    },
+    {
+      "file": "evidence/ADVERSARIAL_REVIEW.md",
+      "bytes_lf": 4164,
+      "sha256_lf": "e8c8db3918bd98c4a34f4c8f2df20b81c1a742afc3df18c1ab47f89b92ef0331"
+    },
+    {
+      "file": "evidence/assemble-coverage.py",
+      "bytes_lf": 29505,
+      "sha256_lf": "9183025d6e0159a0a23b0c1fad741180fe45ee072828a04ab5fa3f336354330e"
+    },
+    {
+      "file": "evidence/assemble-evidence.py",
+      "bytes_lf": 18873,
+      "sha256_lf": "905fe54fc00e40c7799ecd3434c6bdeba130f680c052e928c8171b098389a5e0"
+    },
+    {
+      "file": "evidence/assemble-findings.py",
+      "bytes_lf": 22775,
+      "sha256_lf": "e795c7c7962e88e7ff9becf54617022a9f3ee447478bebd1b6cbbeddb017ef1f"
+    },
+    {
+      "file": "evidence/baseline.json",
+      "bytes_lf": 61709,
+      "sha256_lf": "85c9ac564f5d9d6e5bb215cb1f43296f6055bebfc239771b6926d18b931a29e1"
+    },
+    {
+      "file": "evidence/browser-discovery.json",
+      "bytes_lf": 23011,
+      "sha256_lf": "22b32a8215ddfacf6beee77a876de67f0f585f95ddf63b473ce94bcb44279e51"
+    },
+    {
+      "file": "evidence/browser-observations.json",
+      "bytes_lf": 865,
+      "sha256_lf": "3a093b25ef1ee6a21054d3e95c60c72c75894830f7a8835218b8702babbbb250"
+    },
+    {
+      "file": "evidence/browser-results.json",
+      "bytes_lf": 8637,
+      "sha256_lf": "e96a5987e4a9a5bf7e7a7ce25bfb783ffeebcafdce79bc2be44db5f03a89575c"
+    },
+    {
+      "file": "evidence/ci-recheck.json",
+      "bytes_lf": 986,
+      "sha256_lf": "574def0d2ceb821ab39dc5a9ceea1fb561ffc8b9a5a3f9292a3eea36016f5ab7"
+    },
+    {
+      "file": "evidence/consumer-review.json",
+      "bytes_lf": 126883,
+      "sha256_lf": "e7a7d0df6f8a5f294bcffff23830f113e78673e04b66e195dbd7de746c076018"
+    },
+    {
+      "file": "evidence/dependency-consumers.json",
+      "bytes_lf": 21903,
+      "sha256_lf": "559f45d7ee1392cf38f827eed5f5a1a67460af4551857ac1f7232d3b68a1729a"
+    },
+    {
+      "file": "evidence/documentation-links.json",
+      "bytes_lf": 5494,
+      "sha256_lf": "11786b125164545297a49adca5842c768becc318c750348fbcc7adaac087e310"
+    },
+    {
+      "file": "evidence/eslint-accessibility-config.json",
+      "bytes_lf": 393,
+      "sha256_lf": "9664960d5743cb04b60547e80f15f30728a54d639b4a1212abebd6ca8140ccbb"
+    },
+    {
+      "file": "evidence/EXCEPTION_TEST_COVERAGE.csv",
+      "bytes_lf": 4869,
+      "sha256_lf": "1af664fe81f977f57c1fe548c6a827d3e5718b44340bfe20e55f7d3ab6a8b8dd"
+    },
+    {
+      "file": "evidence/format-documents.py",
+      "bytes_lf": 3878,
+      "sha256_lf": "eea3b3f5171b426c6edceceb4e2b1aa54c8ae26339a1d0d8ae0d90532388d527"
+    },
+    {
+      "file": "evidence/inspect-oracle-pdfs.py",
+      "bytes_lf": 960,
+      "sha256_lf": "965313d6c09382358839925b66cab715583940e37b1d7dbc82624b7b6a8abaf7"
+    },
+    {
+      "file": "evidence/inventory.json",
+      "bytes_lf": 423712,
+      "sha256_lf": "270c5591789df478616f8b8ec1df199929d43f00f42622c8b65b0c7fd0e137c8"
+    },
+    {
+      "file": "evidence/inventory.mjs",
+      "bytes_lf": 7489,
+      "sha256_lf": "b9f27e06ba4756744164f47462c59afd681b697cb7d8c0c6c34cb6dcd0fcce60"
+    },
+    {
+      "file": "evidence/LIMITATIONS_AND_ATTEMPTS.md",
+      "bytes_lf": 4989,
+      "sha256_lf": "66b5f5ec8c8a7ae5e93b0aa8f3632ecfd7f734a715055dd3491eef87e85277f5"
+    },
+    {
+      "file": "evidence/maintenance.mjs",
+      "bytes_lf": 5361,
+      "sha256_lf": "644bdde7767412836f28efd4b4a4ffc8794f0b3327202dd9196159c507217127"
+    },
+    {
+      "file": "evidence/mutation-blank-text.json",
+      "bytes_lf": 173,
+      "sha256_lf": "f73175a8e7a98084cdcad21d2b5a41ae941fc734c5ecd845dc53d5358d067e96"
+    },
+    {
+      "file": "evidence/mutation-wrong-title.json",
+      "bytes_lf": 174,
+      "sha256_lf": "6815143859690a27d62992dfa364f45a424b64969edac4eeb69130943415315d"
+    },
+    {
+      "file": "evidence/no-network.ts",
+      "bytes_lf": 109,
+      "sha256_lf": "693a459e4eefc0b81c109908b14fb619cef22a3fef652af86d9cb31634922bc5"
+    },
+    {
+      "file": "evidence/oracle-baseline.json",
+      "bytes_lf": 4572,
+      "sha256_lf": "0714d751b4fd778ea25434b5c23611d331cfb11fedf635ba643b8dc3ea45cbf2"
+    },
+    {
+      "file": "evidence/oracle-blank-text.json",
+      "bytes_lf": 4563,
+      "sha256_lf": "ac522863467f0f003e458978f1c2684727e184faafef265ca9de5f70f89e9cbf"
+    },
+    {
+      "file": "evidence/oracle-wrong-title.json",
+      "bytes_lf": 4757,
+      "sha256_lf": "4207d9d6d2c700463000f8ab3833558b2df2ed8cf6e2714573a08325165eb55c"
+    },
+    {
+      "file": "evidence/package-validation.json",
+      "bytes_lf": 8779,
+      "sha256_lf": "7af0342c7354f1cde2f81fdd2c9ebfe84797d87b49eff2ce650e404902479740"
+    },
+    {
+      "file": "evidence/pdf-oracle-observations.json",
+      "bytes_lf": 1424,
+      "sha256_lf": "943167c37b2c35b478cf9225daca44d4d7b82970a798fcee260a3f94ff8645d5"
+    },
+    {
+      "file": "evidence/playwright.probes.ts",
+      "bytes_lf": 576,
+      "sha256_lf": "637d384453643c9aedaf3050b32e29c145b46a1df3c75c2eaf09732dd13231eb"
+    },
+    {
+      "file": "evidence/preservation.json",
+      "bytes_lf": 516,
+      "sha256_lf": "885aff1a8f07dc1932ba89f1def0785d511109aba338f166f9344544341edeff"
+    },
+    {
+      "file": "evidence/PRIOR_REFERENCES.json",
+      "bytes_lf": 7867,
+      "sha256_lf": "c17462ec158087304134e12089f2194ac7b9be4bf88bb518c0e3513a482d69fe"
+    },
+    {
+      "file": "evidence/PROCESS_TEST_COVERAGE.csv",
+      "bytes_lf": 6599,
+      "sha256_lf": "1748589595ee6dc680ae5680f4793387a02ae282afc35e55d75798383e8a36a9"
+    },
+    {
+      "file": "evidence/quality.probe.spec.ts",
+      "bytes_lf": 4522,
+      "sha256_lf": "33c6cb186de330ad69efa7d8133bc274173e2093ee52856cb6c757ccf30fdeee"
+    },
+    {
+      "file": "evidence/regression-reconciliation.json",
+      "bytes_lf": 2051,
+      "sha256_lf": "e860867039d697649c0d8e87b07a858adb462d2e618e3f95b4f4f328310afcd5"
+    },
+    {
+      "file": "evidence/ROLE_TEST_COVERAGE.csv",
+      "bytes_lf": 1616,
+      "sha256_lf": "c79ba7241c5f765103648d750e8468a8c7769009e5940bf339ca07a744ff038e"
+    },
+    {
+      "file": "evidence/SOURCE_ANCHORS.csv",
+      "bytes_lf": 12344,
+      "sha256_lf": "ea3ddc3fc6fa37ddb4e122cba579b4ba3acb22449e818921235542d9c36f690b"
+    },
+    {
+      "file": "evidence/sql-oracle-observations.json",
+      "bytes_lf": 1242,
+      "sha256_lf": "1936711ca5a570c5290b04c3586b43a5ea00d01f8b4a4ae3edf86b7beab2801d"
+    },
+    {
+      "file": "evidence/sql-oracles.mjs",
+      "bytes_lf": 1821,
+      "sha256_lf": "95f25711bfef87f4c992d2076bc824d5c0d145b9f0e9288f07724b814bc730fc"
+    },
+    {
+      "file": "evidence/tool-review.json",
+      "bytes_lf": 108482,
+      "sha256_lf": "e2bc241ab2b6bb2b06eeb989feb86eebb7401b7069cf37f12e63f1c20b669328"
+    },
+    {
+      "file": "evidence/tsconfig.audit.json",
+      "bytes_lf": 283,
+      "sha256_lf": "f8ef67dc311b0ae6d97b4f4f38bf551d33262c4afa77caf1284c41ff8b13c749"
+    },
+    {
+      "file": "evidence/validate-package.py",
+      "bytes_lf": 12384,
+      "sha256_lf": "c11c2550961322237218b2869b420e89575ac98b1c1ba869c4ff0c58b9dc5f35"
+    },
+    {
+      "file": "evidence/validation-checks.json",
+      "bytes_lf": 4050,
+      "sha256_lf": "bf810c93e8d7e367bf8a54e5c2f4f28e5af98bcf15c1bbef317e9be63a96673a"
+    },
+    {
+      "file": "evidence/vitest.oracles.mts",
+      "bytes_lf": 2960,
+      "sha256_lf": "95f7c7ffae513613451fc1cd69e390f967228e5554a59bbcb9eb8d1f1e9b1b16"
+    },
+    {
+      "file": "evidence/WEB_REFERENCES.json",
+      "bytes_lf": 667,
+      "sha256_lf": "6be41c73dd7fba79453d915d447436c3ebe8a9b08919c00c92af4adceb2d6414"
+    },
+    {
+      "file": "FINDINGS_MASTER.csv",
+      "bytes_lf": 18210,
+      "sha256_lf": "913796d72c5ece746b1cea11903dceb3d56b7d7e7113fd40a166bef572497fe8"
+    },
+    {
+      "file": "FINDINGS_MASTER.md",
+      "bytes_lf": 21419,
+      "sha256_lf": "b0e162f833a6e8fd37019dded2904397ce7ef2dcfd99a01faafadb7fccc3d680"
+    },
+    {
+      "file": "GROUP_B8_EXECUTIVE_ASSESSMENT.md",
+      "bytes_lf": 4304,
+      "sha256_lf": "2655214537255f0dfc09153103288a15f8fb979808b98300ad9c6f80e7c8cbd4"
+    },
+    {
+      "file": "M/01_REPOSITORY_AND_CANDIDATES.md",
+      "bytes_lf": 4999,
+      "sha256_lf": "40c44e415f33112a02e2327f9b1b077eb6c51526e889b7eac35d8df25701f572"
+    },
+    {
+      "file": "M/02_MAINTAINABILITY.md",
+      "bytes_lf": 4653,
+      "sha256_lf": "2b5b2817da8270e893ff08ba563ee9a768c69a36604b9d19b9ea18d323cf1523"
+    },
+    {
+      "file": "M/03_CURRENT_DOCUMENTATION.md",
+      "bytes_lf": 5242,
+      "sha256_lf": "7ef1bb94081e6a13eab8390209d8a2a9ad60aa5941e6c2e9385c29129d8c01a8"
+    },
+    {
+      "file": "M/04_TOOLS_DEPENDENCIES_AND_WORKFLOW.md",
+      "bytes_lf": 6096,
+      "sha256_lf": "2b0bba2aadef17387799f2c4fbdcc0b3104e696626084d2a2ac067c6303ad928"
+    },
+    {
+      "file": "PHASE_C_DECISION_HANDOFF.md",
+      "bytes_lf": 4074,
+      "sha256_lf": "09dad59b18607dd294107cfb190e0d7c04263d4fe0a10889e1d7c1a74f81f213"
+    },
+    {
+      "file": "Q/01_TEST_INVENTORY.md",
+      "bytes_lf": 4890,
+      "sha256_lf": "975a09568d02f27eb9d295b8187986272feaa6a99456f59e445d014d89f1a2c7"
+    },
+    {
+      "file": "Q/02_PROCESS_AND_EXCEPTION_COVERAGE.md",
+      "bytes_lf": 4878,
+      "sha256_lf": "2e8a842ce7afc1ae0a1c14dd549bc779ee4c598e6f4b097fbfed92511801a0b0"
+    },
+    {
+      "file": "Q/03_ORACLE_QUALITY.md",
+      "bytes_lf": 4960,
+      "sha256_lf": "60ac197f42badecc97563d693d1e5f4b33245ba7da5b735a780ef7e9ada45cb7"
+    },
+    {
+      "file": "Q/04_REGRESSION_CATALOGUE.md",
+      "bytes_lf": 3249,
+      "sha256_lf": "266ba295e07748204cee17c0e86bf2c22d7386d4fb5ac83c58846673f159a880"
+    },
+    {
+      "file": "Q/05_FLAKINESS_AND_ISOLATION.md",
+      "bytes_lf": 4579,
+      "sha256_lf": "af6d8fe68eb8bc06bdc2a4fe8622c6a6d11750f80aca6e36f60da68ef0eb44f4"
+    },
+    {
+      "file": "Q/06_PERFORMANCE_DEVICES_ACCESSIBILITY.md",
+      "bytes_lf": 8308,
+      "sha256_lf": "f62e0e04dc75af6c1752c89a5fd95c6ab5621fed1aab65c65699fee599a4a80f"
+    },
+    {
+      "file": "README.md",
+      "bytes_lf": 3292,
+      "sha256_lf": "bc21c7a9bbad274aca6bd53b8f12e3f7f072c11cd3e0fbce5f724470bd952d19"
+    },
+    {
+      "file": "REGRESSION_COVERAGE_MATRIX.csv",
+      "bytes_lf": 186805,
+      "sha256_lf": "71f548758639d0f138a0567c849dd559edd1e754b789795b07da2e2ffb75cc87"
+    }
+  ]
+}

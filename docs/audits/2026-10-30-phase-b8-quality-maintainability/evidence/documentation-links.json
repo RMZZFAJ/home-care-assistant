@@ -1,0 +1,221 @@
+{
+  "scope": [
+    "README.md",
+    "AGENTS.md",
+    "docs/ARCHITECTURE.md",
+    "docs/DATABASE.md",
+    "docs/API.md",
+    "docs/SECURITY.md",
+    "docs/TESTING.md",
+    "docs/OPERATIONS.md",
+    "docs/DEPLOYMENT.md",
+    "docs/PROJECT_STATUS.md"
+  ],
+  "method": "Inline local file links only; external URLs, reference definitions and heading anchors reviewed separately",
+  "links": [
+    {
+      "file": "README.md",
+      "target": "docs/TESTING.md",
+      "resolved": "docs/TESTING.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/ui-ux/SCHEDULES.md",
+      "resolved": "docs/ui-ux/SCHEDULES.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/ui-ux/BALANCES.md",
+      "resolved": "docs/ui-ux/BALANCES.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/OPERATIONS.md",
+      "resolved": "docs/OPERATIONS.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/evolution/EXECUTION.md",
+      "resolved": "docs/evolution/EXECUTION.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/TESTING.md",
+      "resolved": "docs/TESTING.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/audits/2026-10-21/FINAL_REPORT.md",
+      "resolved": "docs/audits/2026-10-21/FINAL_REPORT.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/ARCHITECTURE.md",
+      "resolved": "docs/ARCHITECTURE.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/DATABASE.md",
+      "resolved": "docs/DATABASE.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/SECURITY.md",
+      "resolved": "docs/SECURITY.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/OPERATIONS.md",
+      "resolved": "docs/OPERATIONS.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/API.md",
+      "resolved": "docs/API.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/DEPLOYMENT.md",
+      "resolved": "docs/DEPLOYMENT.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/WHATSAPP_AI.md",
+      "resolved": "docs/WHATSAPP_AI.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/AUDIT.md",
+      "resolved": "docs/AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/audits/2026-10-21/README.md",
+      "resolved": "docs/audits/2026-10-21/README.md",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/PROJECT_STATUS.md",
+      "resolved": "docs/PROJECT_STATUS.md",
+      "exists": true
+    },
+    {
+      "file": "docs/ARCHITECTURE.md",
+      "target": "evolution/EXECUTION.md",
+      "resolved": "docs/evolution/EXECUTION.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DATABASE.md",
+      "target": "evolution/EXECUTION.md",
+      "resolved": "docs/evolution/EXECUTION.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DATABASE.md",
+      "target": "TESTING.md",
+      "resolved": "docs/TESTING.md",
+      "exists": true
+    },
+    {
+      "file": "docs/API.md",
+      "target": "ui-ux/BALANCES.md",
+      "resolved": "docs/ui-ux/BALANCES.md",
+      "exists": true
+    },
+    {
+      "file": "docs/SECURITY.md",
+      "target": "evolution/EXECUTION.md",
+      "resolved": "docs/evolution/EXECUTION.md",
+      "exists": true
+    },
+    {
+      "file": "docs/OPERATIONS.md",
+      "target": "evolution/EXECUTION.md",
+      "resolved": "docs/evolution/EXECUTION.md",
+      "exists": true
+    },
+    {
+      "file": "docs/OPERATIONS.md",
+      "target": "ui-ux/SCHEDULES.md",
+      "resolved": "docs/ui-ux/SCHEDULES.md",
+      "exists": true
+    },
+    {
+      "file": "docs/OPERATIONS.md",
+      "target": "ui-ux/BALANCES.md",
+      "resolved": "docs/ui-ux/BALANCES.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DEPLOYMENT.md",
+      "target": "evolution/EXECUTION.md",
+      "resolved": "docs/evolution/EXECUTION.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DEPLOYMENT.md",
+      "target": "audits/2026-10-21/SUPABASE_CLI.md",
+      "resolved": "docs/audits/2026-10-21/SUPABASE_CLI.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DEPLOYMENT.md",
+      "target": "TESTING.md",
+      "resolved": "docs/TESTING.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DEPLOYMENT.md",
+      "target": "PROJECT_STATUS.md",
+      "resolved": "docs/PROJECT_STATUS.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DEPLOYMENT.md",
+      "target": "ui-ux/BALANCES.md",
+      "resolved": "docs/ui-ux/BALANCES.md",
+      "exists": true
+    },
+    {
+      "file": "docs/PROJECT_STATUS.md",
+      "target": "evolution/EXECUTION.md",
+      "resolved": "docs/evolution/EXECUTION.md",
+      "exists": true
+    },
+    {
+      "file": "docs/PROJECT_STATUS.md",
+      "target": "ui-ux/EXECUTION.md",
+      "resolved": "docs/ui-ux/EXECUTION.md",
+      "exists": true
+    },
+    {
+      "file": "docs/PROJECT_STATUS.md",
+      "target": "ui-ux/ACCEPTANCE.md",
+      "resolved": "docs/ui-ux/ACCEPTANCE.md",
+      "exists": true
+    },
+    {
+      "file": "docs/PROJECT_STATUS.md",
+      "target": "audits/2026-10-21/README.md",
+      "resolved": "docs/audits/2026-10-21/README.md",
+      "exists": true
+    }
+  ]
+}

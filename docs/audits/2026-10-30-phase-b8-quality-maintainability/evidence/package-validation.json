@@ -1,0 +1,243 @@
+{
+  "recordedAt": "2026-10-30T23:46:14.490687+00:00",
+  "status": "PASS",
+  "requiredCoreFiles": 9,
+  "thematicDocuments": 10,
+  "findings": 9,
+  "newQualityRecords": 3,
+  "revalidations": 6,
+  "regressionFamilies": 119,
+  "originalIds": 156,
+  "processes": 17,
+  "personas": 6,
+  "exceptionalScenarios": 22,
+  "directedObservations": 20,
+  "expectedCounterfactualFailures": 1,
+  "sourceAnchors": 125,
+  "priorReferences": 28,
+  "localLinks": 48,
+  "protectedFiles": 394,
+  "functionalDiff": [],
+  "secretMatches": [],
+  "pythonSyntaxFiles": [
+    "assemble-coverage.py",
+    "assemble-evidence.py",
+    "assemble-findings.py",
+    "format-documents.py",
+    "inspect-oracle-pdfs.py",
+    "validate-package.py"
+  ],
+  "historicalEdit": "Three B4 lines receive code quotes only; original manifest preserved",
+  "proportionalChecks": [
+    {
+      "check": "Node syntax",
+      "command": "node --check (three B8 mjs instruments)",
+      "exitCode": 0,
+      "node": "24.22.0",
+      "sources": [
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/inventory.mjs",
+          "sha256_lf": "b9f27e06ba4756744164f47462c59afd681b697cb7d8c0c6c34cb6dcd0fcce60"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/maintenance.mjs",
+          "sha256_lf": "644bdde7767412836f28efd4b4a4ffc8794f0b3327202dd9196159c507217127"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/sql-oracles.mjs",
+          "sha256_lf": "95f25711bfef87f4c992d2076bc824d5c0d145b9f0e9288f07724b814bc730fc"
+        }
+      ],
+      "affectedRecheck": "inventory.mjs syntax/lint rechecked after separating preexisting audit requirements from product diff; other helper hashes unchanged"
+    },
+    {
+      "check": "ESLint scoped instruments",
+      "command": "node node_modules/eslint/bin/eslint.js (seven B8 JS/TS instruments)",
+      "exitCode": 0,
+      "node": "24.22.0",
+      "sources": [
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/inventory.mjs",
+          "sha256_lf": "b9f27e06ba4756744164f47462c59afd681b697cb7d8c0c6c34cb6dcd0fcce60"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/maintenance.mjs",
+          "sha256_lf": "644bdde7767412836f28efd4b4a4ffc8794f0b3327202dd9196159c507217127"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/sql-oracles.mjs",
+          "sha256_lf": "95f25711bfef87f4c992d2076bc824d5c0d145b9f0e9288f07724b814bc730fc"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/vitest.oracles.mts",
+          "sha256_lf": "95f7c7ffae513613451fc1cd69e390f967228e5554a59bbcb9eb8d1f1e9b1b16"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/playwright.probes.ts",
+          "sha256_lf": "637d384453643c9aedaf3050b32e29c145b46a1df3c75c2eaf09732dd13231eb"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/quality.probe.spec.ts",
+          "sha256_lf": "33c6cb186de330ad69efa7d8133bc274173e2093ee52856cb6c757ccf30fdeee"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/no-network.ts",
+          "sha256_lf": "693a459e4eefc0b81c109908b14fb619cef22a3fef652af86d9cb31634922bc5"
+        }
+      ],
+      "affectedRecheck": "inventory.mjs syntax/lint rechecked after separating preexisting audit requirements from product diff; other helper hashes unchanged"
+    },
+    {
+      "check": "TypeScript scoped probes",
+      "command": "node node_modules/typescript/bin/tsc -p docs\\audits\\2026-10-30-phase-b8-quality-maintainability\\evidence\\tsconfig.audit.json --noEmit",
+      "exitCode": 0,
+      "node": "24.22.0",
+      "sources": [
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/vitest.oracles.mts",
+          "sha256_lf": "95f7c7ffae513613451fc1cd69e390f967228e5554a59bbcb9eb8d1f1e9b1b16"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/playwright.probes.ts",
+          "sha256_lf": "637d384453643c9aedaf3050b32e29c145b46a1df3c75c2eaf09732dd13231eb"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/quality.probe.spec.ts",
+          "sha256_lf": "33c6cb186de330ad69efa7d8133bc274173e2093ee52856cb6c757ccf30fdeee"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/no-network.ts",
+          "sha256_lf": "693a459e4eefc0b81c109908b14fb619cef22a3fef652af86d9cb31634922bc5"
+        },
+        {
+          "file": "docs/audits/2026-10-30-phase-b8-quality-maintainability/evidence/tsconfig.audit.json",
+          "sha256_lf": "f8ef67dc311b0ae6d97b4f4f38bf551d33262c4afa77caf1284c41ff8b13c749"
+        }
+      ]
+    }
+  ],
+  "markdownResult": "markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)\nFinding: docs/audits/2026-10-30-phase-b8-quality-maintainability/**/*.md docs/audits/2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.md docs/audits/phase-b/README.md\nLinting: 21 files\nSummary: 0 issues in 0 files",
+  "completionAudit": [
+    {
+      "criterion": 1,
+      "requirement": "Checks existentes",
+      "evidence": "Q/01_TEST_INVENTORY.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 2,
+      "requirement": "Comportamentos cobertos",
+      "evidence": "evidence/PROCESS_TEST_COVERAGE.csv",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 3,
+      "requirement": "Comportamentos não cobertos",
+      "evidence": "REGRESSION_COVERAGE_MATRIX.csv",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 4,
+      "requirement": "Oráculos insuficientes",
+      "evidence": "Q/03_ORACLE_QUALITY.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 5,
+      "requirement": "Resultados instáveis",
+      "evidence": "Q/05_FLAKINESS_AND_ISOLATION.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 6,
+      "requirement": "Regressões futuras",
+      "evidence": "REGRESSION_COVERAGE_MATRIX.csv",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 7,
+      "requirement": "Teste humano",
+      "evidence": "ACCEPTANCE_AND_REGRESSION_CRITERIA.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 8,
+      "requirement": "Aparelho físico",
+      "evidence": "Q/06_PERFORMANCE_DEVICES_ACCESSIBILITY.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 9,
+      "requirement": "Homologação remota",
+      "evidence": "REGRESSION_COVERAGE_MATRIX.csv",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 10,
+      "requirement": "Desempenho demonstrado",
+      "evidence": "Q/06_PERFORMANCE_DEVICES_ACCESSIBILITY.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 11,
+      "requirement": "Medição futura",
+      "evidence": "Q/06_PERFORMANCE_DEVICES_ACCESSIBILITY.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 12,
+      "requirement": "Estruturas a preservar",
+      "evidence": "M/01_REPOSITORY_AND_CANDIDATES.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 13,
+      "requirement": "Refatoração proporcional",
+      "evidence": "M/02_MAINTAINABILITY.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 14,
+      "requirement": "Candidatos sem remoção",
+      "evidence": "M/01_REPOSITORY_AND_CANDIDATES.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 15,
+      "requirement": "Instruções desatualizadas",
+      "evidence": "M/03_CURRENT_DOCUMENTATION.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 16,
+      "requirement": "Risco de ferramentas",
+      "evidence": "M/04_TOOLS_DEPENDENCIES_AND_WORKFLOW.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 17,
+      "requirement": "Dependências",
+      "evidence": "M/04_TOOLS_DEPENDENCIES_AND_WORKFLOW.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 18,
+      "requirement": "Decisões C",
+      "evidence": "PHASE_C_DECISION_HANDOFF.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 19,
+      "requirement": "Propostas desproporcionais",
+      "evidence": "PHASE_C_DECISION_HANDOFF.md",
+      "status": "ADDRESSED"
+    },
+    {
+      "criterion": 20,
+      "requirement": "Sem domínio independente para outro B",
+      "evidence": "PHASE_C_DECISION_HANDOFF.md",
+      "status": "ADDRESSED"
+    }
+  ],
+  "limits": "Completion means diagnostic scope addressed, not defects corrected, WCAG certified or release approved. C/D not started."
+}

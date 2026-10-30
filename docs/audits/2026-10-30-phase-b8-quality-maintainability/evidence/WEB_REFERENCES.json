@@ -1,0 +1,18 @@
+[
+  {
+    "url": "https://playwright.dev/docs/api/class-locator#locator-is-visible",
+    "used_for": "isVisible is immediate, readiness requires a deliberate wait"
+  },
+  {
+    "url": "https://www.deque.com/axe/core-documentation/api-documentation/",
+    "used_for": "violations, incomplete, passes and inapplicable are different result sets"
+  },
+  {
+    "url": "https://www.w3.org/WAI/test-evaluate/",
+    "used_for": "automated tools alone cannot determine complete accessibility conformity"
+  },
+  {
+    "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
+    "used_for": "SC2.5.8 AA minimum target size24x24CSSpx and exceptions"
+  }
+]

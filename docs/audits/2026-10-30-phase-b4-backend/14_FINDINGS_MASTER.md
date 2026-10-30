@@ -186,8 +186,8 @@ nova com quantidade2 em lugar de1.
 **Causa:** Duas RPCs confirmam separadamente;exceção da segunda usa envelope
 de erro genérico que perde o resultado da primeira.
 
-**Caminho:** POST /api/documents/[id]/revise.
-src/app/api/documents/[id]/revise/route.ts:32;src/components/documents/supply-wizard.tsx:476.
+**Caminho:** `POST /api/documents/[id]/revise`.
+`src/app/api/documents/[id]/revise/route.ts:32`;src/components/documents/supply-wizard.tsx:476.
 
 **Evidência/método:** evidence/b44-command-results.json#B44-05. HTTP
 real;leitura de versão,linhas,eventos antes/depois e retry das mesmas chaves.
@@ -295,7 +295,7 @@ AMBIGUOUS_PRODUCT com mensagem de apelido.
 **Causa:** Regex ambiguous/alias é aplicada sem discriminar SQLSTATE de
 implementação de erro de domínio.
 
-**Caminho:** POST /api/documents/[id].
+**Caminho:** `POST /api/documents/[id]`.
 src/lib/server/api.ts:92;src/lib/server/api.ts:58.
 
 **Evidência/método:**

@@ -1,0 +1,23 @@
+scenario,checks,protected,limit
+Erro antes de persistência,tests/api/requisition-contract.test.ts:18,Forte no ramo: origem/corpo recusados sem chamadaDB; mocks explícitos.,B3/B4 negativos com Auth real complementam; não generalizar para cada comando.
+Resposta perdida após persistência,tests/e2e/workflows.spec.ts:476;tests/e2e/balance-shifts.spec.ts:91,ForteREQ/BAL: route.fetch confirma e aborta resposta; ID/total conferidos.,"Anexo, settings, convite e telefone têm janelas próprias B1-ERR-001/B4-002/003/B5-012."
+Dupla submissão,tests/integration/database.test.mjs:127,ResultadoREQ único e snapshot; BAL tem barreira independente.,MesmoSDK Promise.all não garante sozinho sobreposição; não extrapolar para cada comando.
+Concorrência,tests/integration/balance-idempotency.test.mjs:12,Dois HTTP aguardam mesmo lock antes de commit; saldo/admin/outbox com provas específicas.,Não há carga multitenant ou p95 sob concorrência.
+Mudança de versão,tests/e2e/v4-review.spec.ts:69;tests/e2e/workflows.spec.ts:642,Atualização conflitante e reconto preservam versões.,Revisão já persistida seguida de submitfalho B4-004 precisa envelope próprio.
+Sessão expirada,tests/integration/v4-workflows.test.mjs:635;tests/e2e/login.spec.ts:16,Sessões reais e reautenticação; sem mockedidentity na integração.,DMLprofile/avatar com JWT e telefoneAuth parcial permanecem B3-021/B5-012.
+Revogação durante operação,tests/integration/v4-review.test.mjs:21,Archive atrás do lock possui teste forte.,Movimento familiar e preparo de mídia têm outros pontos de revalidação B3-020/B4-010.
+Troca de paciente,tests/e2e/fluent-experience.spec.ts:36;tests/e2e/administration.spec.ts:159,Contexto explícito e vínculoA/B.,"Interleavings de resposta velha, intenção incerta e revogação precisam cenário por consumidor."
+Falha de rede,tests/e2e/login.spec.ts:33;tests/e2e/workflows.spec.ts:487,Abort controlado antes e depois da escrita em ramos definidos.,Não equivale a rádio móvel real nem a indicador de leitura desatualizada B1-STATE-005.
+Arquivo rejeitado,tests/files.test.ts:22;tests/files.test.ts:47,PDF ativo e imagem inválida recusados.,Não cobre toda borda de limite/multipart nem fidelidade de anotação e hashcache.
+Resposta parcial,tests/api/requisition-persistence.test.ts:160,RECEIPT_PENDING conserva identidade confirmada.,"Revise+submit, upload+associação e Auth+telefone não compartilham automaticamente o contrato."
+Worker interrompido,tests/database/notification-claim-recovery.sql:1;tests/api/worker.test.ts:41,Lease recovery e completion sem confirmação têm checks.,Interrupção de processo real entre upload/send/callback e retorno operacional não foi homologada.
+Notificação incerta,tests/api/notifications.test.ts:59;tests/api/worker.test.ts:26,Timeout/falha incerta sem reenvio cego.,Timeout de upload antes da mensagem e callback de tentativa antiga B5-003/013 faltam no gate atual.
+Retry,tests/integration/balance-idempotency.test.mjs:50,BAL cria/revisa/submete e recupera mesmo ID após assignmentfechada.,"Proposta settings, hold template e Flow sem ocorrências ainda têm causas específicas."
+Reinício da aplicação,tests/e2e/workflows.spec.ts:501,Há reload da página para recuperarREQ.,"Não é reinício do servidor/worker, fechamento de aba nem reabertura do aparelho."
+Estado histórico,tests/e2e/workflows.spec.ts:518;tests/e2e/administration.spec.ts:427,Renomeado/inativo e importação explícita.,"Legacy unknown, supplyauthor e representação de versão antiga requerem B6-001/003/009."
+Registro legado,scripts/test-migrations.mjs:120,Replay limpo/019→84 histórico com backup e stackefêmeraCI.,Não executar novamente paraB8; scheduler malformado e BALlegado são cenários adicionais.
+Resultado vazio,tests/catalog-match.test.ts:49;tests/e2e/accessibility.spec.ts:44,Vazio determinístico de matcher e telas percorridas.,Vazio inicial antes de terminar consulta não é oráculo de resultado realmente vazio.
+Erro de permissão,tests/integration/database.test.mjs:65;tests/api/guards.test.ts:220,Authreal+RLS+API com negativas e flags leitor.,Menu não substitui todas as chamadas diretas; B4-008 tem divergência entre rotas equivalentes.
+Confirmação duplicada,tests/database/supply-workflows.sql:30;tests/integration/v4-workflows.test.mjs:324,Idempotência de recebimento e ciência explícita no evento.,Decisão oposta de consumo e callback de lease de outra tentativa não são repetição idêntica.
+Recuperação de intenção,tests/e2e/workflows.spec.ts:476,MesmaREQ após abort+reload.,Contrato sessionStorage não sustenta promessa entreabas/dispositivos B1-UX-005.
+Ordem de resultados,tests/e2e/v4-review.spec.ts:69,Governança tem resposta lenta/erro controlados.,History/stock/filter/Flow dependem de efeitos específicos e podem manter dados velhos B1-STATE-002/B5-010.
