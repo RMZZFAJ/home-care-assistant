@@ -1,0 +1,22 @@
+{
+  "scenario": "B68-C01",
+  "method": "Real sanitizeFile;two synthetic passive PDFs;no API/Storage and no physical signature",
+  "cases": [
+    {
+      "variant": "annotation",
+      "originalSha256": "a9955c5038a360fd02113b605b691d2f08bb738157d7080f1b38057b87adc878",
+      "storedDerivativeSha256": "170f55474f4865a57a0762cdafb1f89da24fe3647633934ba264d2289ba63278",
+      "originalHasAnnotations": true,
+      "derivativeHasAnnotations": false,
+      "bytesChanged": true
+    },
+    {
+      "variant": "content",
+      "originalSha256": "1ea332df49749ebe0ca104a9a6ab4b97e82ecaa715aee5644533697c5d461edd",
+      "storedDerivativeSha256": "b5d5529c510e1bdb38ea4fdab64d296a0624aed0eb51694161cc52947465fd64",
+      "originalHasAnnotations": false,
+      "derivativeHasAnnotations": false,
+      "bytesChanged": true
+    }
+  ]
+}

@@ -1,0 +1,2049 @@
+# ORDEM MESTRA — FASE B6
+## AUDITORIA ESPECIALIZADA DE DOCUMENTOS, PDFs, HISTÓRICO, RASTREABILIDADE, INTEGRIDADE PROBATÓRIA E FIDELIDADE DOS REGISTROS OPERACIONAIS
+
+**Projeto:** Home Care Assistant
+**Repositório:** `RMZZFAJ/home-care-assistant`
+**Branch obrigatória:** `audit/phase-b`
+**Modelo destinatário:** Codex Sol
+**Natureza:** investigação especializada e documental
+**Escopo autorizado:** B6.0–B6.12 e consolidação
+**Alterações funcionais:** não autorizadas
+**Fase C e implementação:** não autorizadas
+
+---
+
+# I. INSTAURAÇÃO, FINALIDADE E META CENTRAL
+
+Execute integralmente a **Fase B6 — Documentos, PDFs, Histórico, Rastreabilidade e Integridade Probatória** do Home Care Assistant.
+
+Esta fase integra o programa de auditoria de prontidão operacional:
+
+- Fase A: investigação holística, concluída.
+- B1: interface e experiência humana, concluída.
+- B2: processos e jornadas operacionais, concluída.
+- B3: banco, autorização e integridade transacional, concluída.
+- B4: backend, APIs e contratos, concluída.
+- B5: automações, notificações e integrações, concluída.
+- **B6: documentos, PDFs, história e evidências, objeto desta autorização.**
+- Fase C: decisões consolidadas, ainda não autorizada.
+- Fase D: implementação, ainda não autorizada.
+
+A missão da B6 é investigar, com profundidade excepcional, **se os documentos produzidos e preservados pelo Home Care Assistant constituem representações fiéis, completas, compreensíveis, rastreáveis, verificáveis e recuperáveis dos acontecimentos operacionais que afirmam registrar**.
+
+A auditoria deverá ultrapassar uma revisão estética de PDFs ou uma simples conferência de hashes.
+
+Deverá reconstruir toda a cadeia:
+
+**Acontecimento operacional → identidade e autoridade → comando → evento → snapshot → versão documental → representação no aplicativo → renderização PDF → armazenamento → disponibilização → recuperação histórica → interpretação humana.**
+
+Em cada etapa, examine se existe possibilidade de:
+
+1. Perda de informação.
+2. Alteração indevida de significado.
+3. Divergência entre fontes.
+4. Identificação incorreta de pessoas.
+5. Identificação incorreta de paciente.
+6. Registro de data ou horário enganoso.
+7. Informação atual apresentada como histórica.
+8. Histórico substituído silenciosamente.
+9. Versão incorreta recuperada.
+10. Documento incompleto.
+11. Anexo indevidamente vinculado.
+12. Evidência inacessível.
+13. PDF visualmente incompatível com os dados.
+14. Confirmação atribuída a quem não a realizou.
+15. Comunicação de fato ainda não ocorrido.
+16. Ocultação de ressalva importante.
+17. Confusão entre declaração e comprovação.
+18. Uso incorreto de uma evidência como prova de fato físico.
+19. Dificuldade de reconstrução cronológica.
+20. Perda de rastreabilidade em caso de falha ou restauração.
+
+A investigação deverá identificar tanto defeitos quanto oportunidades proporcionais de aprimoramento.
+
+**Não produza descobertas artificiais. Não confunda preferência visual com defeito de integridade. Não confunda integridade técnica com validade jurídica automática.**
+
+---
+
+# II. PRINCÍPIO CENTRAL: FIDELIDADE À REALIDADE OPERACIONAL
+
+Os documentos do Home Care Assistant não são apenas relatórios administrativos.
+
+Eles registram acontecimentos que podem ser relevantes para:
+
+- Controle dos insumos.
+- Responsabilidade de profissionais.
+- Acompanhamento familiar.
+- Conferência de materiais.
+- Histórico de entregas.
+- Revisão de consumo.
+- Reconciliação de estoque.
+- Ciência de requisições.
+- Divergências.
+- Acompanhamento de balanços.
+- Auditorias internas.
+- Identificação de falhas.
+- Prestação de contas.
+- Reconstrução de fatos.
+
+Por isso, cada documento deverá ser examinado em três dimensões independentes:
+
+### II.1. Dimensão material
+
+O que realmente aconteceu ou foi declarado?
+
+Exemplos:
+
+- Material solicitado ou necessidade registrada.
+- Material adquirido.
+- Material entregue.
+- Material recebido.
+- Divergência constatada.
+- Consumo relatado.
+- Consumo confirmado.
+- Contagem registrada.
+- Decisão administrativa.
+- Ciência expressa.
+
+### II.2. Dimensão informacional
+
+O que o sistema efetivamente registrou?
+
+Exemplos:
+
+- Quantidades.
+- Produtos.
+- Unidades.
+- Autores.
+- Datas.
+- Estados.
+- Justificativas.
+- Versões.
+- Vínculos.
+- Eventos.
+- Snapshots.
+- Referências a documentos relacionados.
+
+### II.3. Dimensão representativa
+
+O que uma pessoa consegue visualizar ou imprimir?
+
+Exemplos:
+
+- Documento na interface.
+- Histórico.
+- Comprovante.
+- PDF.
+- Mensagem de situação.
+- Indicador de pendência.
+- QR Code.
+- Identificação do responsável.
+- Anexo físico digitalizado.
+
+**Um sistema documental só pode ser considerado fiel ao seu contrato quando essas três dimensões são coerentes, respeitando os limites de prova de cada uma.**
+
+A auditoria deverá procurar divergências entre elas.
+
+---
+
+# III. FRONTEIRAS COM AS AUDITORIAS ANTERIORES
+
+Não repita indiscriminadamente as investigações A/B1/B2/B3/B4/B5.
+
+### B1
+
+Examinou interface e experiência.
+
+A B6 deverá aprofundar a **legibilidade, a interpretação e a fidelidade das representações documentais**, inclusive documentos impressos e PDFs.
+
+Não refaça toda a auditoria visual do aplicativo.
+
+### B2
+
+Examinou os processos.
+
+A B6 deverá verificar se **as ações e os estados definidos nesses processos estão corretamente documentados**.
+
+Não redesenhe os processos sem demonstrar lacuna específica.
+
+### B3
+
+Examinou banco, imutabilidade, versões, hashes e integridade.
+
+A B6 deverá verificar **como essas garantias se traduzem na identidade, na preservação e na recuperação de documentos efetivos**.
+
+Reutilize as provas anteriores quando os contratos permanecerem idênticos.
+
+### B4
+
+Examinou APIs, renderização, armazenamento e recuperação.
+
+A B6 deverá investigar a **fidelidade do conteúdo, o resultado visual, as diferenças entre versões e a interpretação documental**.
+
+Não repita todos os testes HTTP da B4.
+
+### B5
+
+Examinou comunicação externa.
+
+A B6 deverá verificar o documento em si, e não repetir toda a investigação sobre entrega de mensagens.
+
+Um PDF corretamente gerado não prova que foi entregue.
+
+Uma mensagem entregue não prova que o documento retrata corretamente o fato.
+
+Essas garantias devem permanecer separadas.
+
+---
+
+# IV. BASELINE, BRANCH E RESTRIÇÕES
+
+Trabalhe exclusivamente na branch:
+
+`audit/phase-b`
+
+Último HEAD conhecido de encerramento B5:
+
+`69048034dc2532ffbe5d1dbca7dbd041c1f4be16`
+
+Base funcional anteriormente identificada:
+
+`37cb7f85e96e551d6419871f94dd950712e2565b`
+
+`master` anteriormente identificada:
+
+`34dcb835c5c49068e0417f7306eb4e501aa868bc`
+
+**Verifique essas referências antes de iniciar.**
+
+Não presuma que o HEAD ou o ambiente continuam iguais.
+
+Registre:
+
+- Branch.
+- HEAD.
+- Working tree.
+- Arquivos modificados previamente.
+- Base funcional.
+- Ambiente local.
+- Serviços ativos.
+- Estado do banco.
+- Estado do Storage.
+- Testes anteriores.
+- Limitações de acesso.
+
+## IV.1. Diretório autorizado
+
+Crie:
+
+`docs/audits/2026-10-30-phase-b6-documents/`
+
+Atualize ao final:
+
+`docs/audits/phase-b/README.md`
+
+Não crie nova branch.
+
+Não abra PR.
+
+Não realize merge.
+
+Não modifique a `master`.
+
+Não execute reset destrutivo ou force push.
+
+## IV.2. Proibição de alterações funcionais
+
+Esta fase não autoriza:
+
+- Correções de produto.
+- Modificação de APIs.
+- Modificação de componentes.
+- Modificação do renderizador.
+- Alteração de templates.
+- Alteração de migrations.
+- Alteração de funções SQL.
+- Mudança de policies.
+- Alteração de dependências.
+- Mudança de configuração.
+- Regeneração substitutiva de documentos históricos.
+- Exclusão de arquivos.
+- Limpeza de buckets.
+- Restauração sobre o ambiente existente.
+- Deploy.
+- PR.
+- Merge.
+- Envio externo.
+- Publicação de documentos reais.
+
+São permitidos somente documentos de auditoria e testes controlados que respeitem a preservação do ambiente.
+
+## IV.3. Preservação de dados
+
+Não modifique, exclua, normalize ou reescreva registros anteriores para facilitar testes.
+
+Os ensaios deverão utilizar documentos e pacientes fictícios novos ou transações integralmente revertidas.
+
+Antes de testes mutáveis:
+
+1. Confirme ambiente e projeto.
+2. Verifique os containers.
+3. Confirme as portas.
+4. Registre o baseline.
+5. Identifique os serviços ativos.
+6. Confirme isolamento externo.
+7. Prepare backup verificável quando necessário.
+8. Preserve todas as informações existentes.
+
+Não reexecute scripts mutáveis de fases anteriores para reconstruir evidências já disponíveis.
+
+---
+
+# V. REFERÊNCIAS E CÓDIGO A EXAMINAR
+
+Leia integralmente `AGENTS.md` e as instruções do projeto.
+
+Consulte as auditorias anteriores pelos respectivos índices, achados, matrizes e relatórios executivos.
+
+A B6 deverá examinar particularmente os contratos vigentes nas seguintes superfícies, sem limitar a investigação a elas:
+
+### Renderização e recuperação
+
+`src/lib/server/document-pdf.ts`
+
+`src/lib/server/operational-pdf.ts`
+
+`src/lib/server/receipts.ts`
+
+`src/lib/receipt.ts`
+
+`src/lib/documents/presentation.ts`
+
+`src/app/api/documents/[id]/pdf/route.ts`
+
+`src/app/api/demonstracao/[id]/pdf/route.ts`
+
+### Documentos e histórico
+
+`src/app/api/documents/`
+
+`src/app/api/requisitions/`
+
+`src/app/documentos/[id]/page.tsx`
+
+`src/components/documents/`
+
+`src/components/requisitions/`
+
+`src/types/documents.ts`
+
+`src/lib/demo-documents.ts`
+
+### Anexos
+
+`src/app/api/attachments/route.ts`
+
+`src/components/documents/attachments.tsx`
+
+### Testes e contratos históricos
+
+`tests/document-pdf.test.ts`
+
+`tests/database/document-invariants.sql`
+
+`tests/database/supply-workflows.sql`
+
+`tests/api/requisition-contract.test.ts`
+
+`tests/api/requisition-persistence.test.ts`
+
+Outros testes e definições pertinentes deverão ser descobertos pelo inventário.
+
+### Evidências anteriores obrigatórias
+
+Consulte especialmente:
+
+- A BE-007.
+- B1-ERR-001.
+- B2-004.
+- B2-008.
+- B2-011.
+- B3-002.
+- B3-004.
+- B3-005.
+- B3-014.
+- B3-015.
+- B3-022.
+- B4-004.
+- B4-007.
+- B5-004.
+- B5-005.
+
+Consulte também os achados relacionados a estados documentais, ciência, consumo, cancelamentos, revisão de BAL, histórico e recuperação.
+
+Essas referências são pontos iniciais.
+
+**Investigue independentemente o restante do universo documental.**
+
+---
+
+# VI. EFICIÊNCIA E VALIDAÇÃO PROPORCIONAL
+
+Preserve a metodologia eficiente das fases B4 e B5.
+
+A B6 deve ser profundamente investigativa, mas não burocraticamente repetitiva.
+
+## VI.1. Reutilização de evidências
+
+Antes de executar um cenário, confira se:
+
+1. Já foi executado anteriormente.
+2. A prova permanece aplicável à mesma base funcional.
+3. O resultado ainda responde à pergunta.
+4. Existe nova hipótese que justifique teste adicional.
+
+Não reproduza dezenas de testes apenas para conferir novamente que a mesma função conserva o mesmo hash.
+
+## VI.2. Testes selecionados pelo risco
+
+Priorize cenários capazes de descobrir:
+
+- Informação omitida.
+- Atribuição incorreta.
+- Divergência de versão.
+- Alteração de conteúdo.
+- PDF incorreto.
+- Paginação defeituosa.
+- Falha de recuperação.
+- Contradição entre histórico e estado atual.
+- Inconsistência documental.
+- Problemas de autorização.
+- Perda de valor informativo.
+
+Não produza grandes volumes sintéticos sem finalidade específica.
+
+## VI.3. Validação de PDFs
+
+Os testes existentes já verificam determinados aspectos, como geração, tamanho A4 e paginação de listas longas.
+
+Reaproveite essas provas quando aplicável.
+
+A B6 deverá complementar o que não foi suficientemente examinado:
+
+**Resultado visual real.**
+
+**Texto renderizado.**
+
+**Fidelidade semântica.**
+
+**Distribuição das informações.**
+
+**Legibilidade.**
+
+**Páginas múltiplas.**
+
+**Consistência histórica.**
+
+Para isso, é permitido renderizar PDFs sintéticos e inspecionar suas páginas.
+
+Evite OCR quando o PDF possuir texto extraível diretamente.
+
+Não utilize documentos reais em relatórios versionados.
+
+Não regenere nem substitua PDFs históricos para realizar comparações.
+
+## VI.4. Não repetir suítes globais
+
+Não execute novamente:
+
+- Build completo.
+- Typecheck global.
+- Suíte unitária completa.
+- E2E integral.
+- Replay de migrations.
+
+A menos que uma hipótese concreta exija determinada verificação.
+
+Alterações de Markdown não justificam repetir testes funcionais.
+
+Após corrigir apenas documentos, repita somente a validação documental pertinente.
+
+## VI.5. Instrumentos de auditoria
+
+Verifique sintaxe, imports, efeitos e destinos antes de executar scripts novos.
+
+Após duas falhas instrumentais semelhantes, investigue a causa antes de repetir.
+
+Não reinicie todos os cenários porque um instrumento falhou ao interpretar uma resposta.
+
+## VI.6. Pacote documental proporcional
+
+Não copie novamente centenas de definições SQL.
+
+Não crie matrizes redundantes.
+
+Utilize registros mestres, referências e evidências direcionadas.
+
+**Profundidade deverá ser medida pela qualidade das conclusões e pela capacidade de demonstrá-las, não pela quantidade de arquivos.**
+
+---
+
+# VII. SUBGRUPOS DA B6
+
+## B6.0 — RECONHECIMENTO E INVENTÁRIO PRELIMINAR
+
+Reconheça o estado do repositório.
+
+Identifique todas as superfícies capazes de produzir, alterar, exibir, renderizar, armazenar ou recuperar documentos.
+
+Determine:
+
+- Tipos documentais.
+- Entidades relacionadas.
+- Eventos.
+- Snapshots.
+- Versões.
+- Históricos.
+- Anexos.
+- PDFs.
+- Renderizadores.
+- Comprovantes.
+- Documentos legados.
+- Importações.
+- Documentos demonstrativos.
+- Rotas de visualização.
+- Rotas de download.
+- Instrumentos de verificação.
+- Testes existentes.
+
+Diferencie documento operacional efetivo de arquivo de demonstração.
+
+Não assuma que um tipo de documento existe apenas por estar mencionado em uma enumeração.
+
+**Entrega:** baseline e universo documental verificado.
+
+---
+
+## B6.1 — TAXONOMIA DOCUMENTAL E FONTE DE VERDADE
+
+Investigue os documentos principais:
+
+**REQ — Requisição de materiais.**
+
+**COM — Compra de materiais.**
+
+**ENT — Entrega de materiais.**
+
+**BAL — Balanço e reconciliação de estoque.**
+
+Inclua registros complementares que possuam função documental ou probatória:
+
+- Relatos de consumo.
+- Conferências.
+- Correções de estoque.
+- Movimentos.
+- Divergências.
+- Ciência.
+- Arquivamentos.
+- Cancelamentos.
+- Recontos.
+- Escalas e decisões, quando relacionados.
+- Registros de comunicação.
+- Anexos.
+- Documentos históricos.
+
+Para cada tipo, registre:
+
+1. Finalidade.
+2. Evento que origina o documento.
+3. Autor ou responsável.
+4. Paciente.
+5. Identidade.
+6. Papel.
+7. Estado.
+8. Campos.
+9. Fonte de verdade.
+10. Snapshot.
+11. Versões.
+12. Eventos vinculados.
+13. Comprovante.
+14. PDF.
+15. Histórico.
+16. Anexos.
+17. Dependências.
+18. Limites da evidência.
+19. Recuperação.
+20. Possíveis consequências de inconsistência.
+
+Diferencie:
+
+**Documento primário.**
+
+**Evento histórico.**
+
+**Representação derivada.**
+
+**Comprovante.**
+
+**Declaração.**
+
+**Confirmação.**
+
+**Evidência física digitalizada.**
+
+**Registro importado.**
+
+**Documento demonstrativo.**
+
+O PDF não deve se tornar automaticamente uma fonte de verdade superior ao evento persistido.
+
+**Entrega:** catálogo documental e matriz de origem/representação.
+
+---
+
+## B6.2 — IDENTIDADE DOCUMENTAL, PROTOCOLOS E AUTORIA
+
+Examine:
+
+- UUID.
+- Código.
+- Número sequencial.
+- Protocolo.
+- Paciente.
+- Documento relacionado.
+- Autor.
+- Emissor.
+- Recebedor.
+- Contador.
+- Revisor.
+- Aprovador.
+- Ator sistema.
+- Identidade de sessão.
+- Papel no momento do ato.
+- Vínculo vigente.
+- Nome histórico.
+- Identificação profissional, quando existente.
+
+Investigue:
+
+- Códigos duplicados.
+- Identidade ambígua.
+- Número ausente.
+- Protocolo indevidamente reutilizado.
+- Confusão entre documento novo e versão.
+- Autor da declaração apresentado como autor da confirmação.
+- Nome atual substituindo nome histórico.
+- Usuário revogado em documentos anteriores.
+- Pessoa que atuava em determinado papel e deixou de atuar.
+- Registro atribuído ao sistema sem evidência da rotina.
+- Importações sem autoria original demonstrável.
+
+Examine se o sistema distingue:
+
+**Quem registrou.**
+
+**Quem realizou o fato declarado.**
+
+**Quem recebeu.**
+
+**Quem conferiu.**
+
+**Quem aprovou.**
+
+**Quem tomou ciência.**
+
+**Quem apenas visualizou.**
+
+Não atribua automaticamente à pessoa que confirmou um evento a autoria de toda a informação confirmada.
+
+**Entrega:** auditoria de identidade, autoria e rastreabilidade dos atos.
+
+---
+
+## B6.3 — EVENTOS, SNAPSHOTS, HASHES E IMUTABILIDADE
+
+Este será um dos subgrupos centrais.
+
+Reconstrua o modelo documental:
+
+**Documento → evento → snapshot canônico → hash → versão → representação.**
+
+Examine:
+
+- Algoritmos.
+- Serialização.
+- Canonicalização.
+- Ordem dos campos.
+- Identidade das linhas.
+- Valores numéricos.
+- Datas.
+- Nulos.
+- Metadados.
+- Hash de conteúdo.
+- Referência à versão anterior.
+- Encadeamento.
+- Autoria.
+- Estado.
+- Recontos.
+- Correções.
+- Eventos de sistema.
+- Eventos produzidos automaticamente.
+
+Investigue:
+
+- Alteração posterior de snapshot.
+- Divergência entre evento e cabeçalho.
+- Hash incompatível.
+- Evento sem referência necessária.
+- Versão sem evento correspondente.
+- Evento com versão duplicada.
+- Intervalo na sequência.
+- Relação incorreta entre versões.
+- Dados atuais incorporados à reconstrução histórica.
+- Mudança de produto alterando documento anterior.
+- Alteração de nome alterando identificação histórica.
+- Reprocessamento gerando documento diferente.
+- Importação histórica descrita como registro originalmente autenticado.
+
+**Não conclua que um hash comprova autoria humana ou verdade material.**
+
+O hash pode sustentar a detecção de alteração de determinados bytes ou conteúdo canônico, dentro de suas condições técnicas.
+
+Uma cadeia histórica pode demonstrar continuidade dos registros, mas não transforma automaticamente uma declaração incorreta em fato verdadeiro.
+
+Examine essas distinções.
+
+**Entrega:** relatório de integridade canônica, encadeamento e limites probatórios.
+
+---
+
+## B6.4 — FIDELIDADE DOCUMENTAL POR TIPO: REQ, COM, ENT E BAL
+
+Realize uma revisão semântica profunda dos documentos.
+
+### B6.4.1. REQ
+
+Verifique:
+
+- Natureza da necessidade.
+- Itens.
+- Produto.
+- Nome histórico.
+- Unidade.
+- Categoria.
+- Urgência.
+- Estoque observado.
+- Observações.
+- Solicitante.
+- Paciente.
+- Ciência.
+- Atendimento.
+- Situação parcial.
+- Conclusão.
+- Arquivamento.
+- Cancelamento.
+- Origem histórica.
+
+**Preserve a regra de que REQ não possui quantidade solicitada obrigatória.**
+
+Não converta estoque observado em saldo oficial.
+
+Não interprete o número de itens relacionados como quantidade física solicitada.
+
+Investigue a nomenclatura dos indicadores do PDF e o risco de o leitor interpretar campos de forma equivocada.
+
+Considere a oportunidade anterior BE-007: o estoque observado consta do registro, mas pode não aparecer na representação PDF correspondente.
+
+Não classifique automaticamente essa omissão como corrupção de dados.
+
+Avalie a utilidade, a fidelidade e o contexto.
+
+### B6.4.2. COM
+
+Verifique:
+
+- Origem da aquisição.
+- Quantidade aprovada.
+- Quantidade adquirida.
+- Quantidade recebida.
+- Quantidade pendente.
+- Quantidade não realizada.
+- Preço, quando existir.
+- Unidade.
+- Responsável.
+- Aprovação.
+- Data.
+- Recebimento.
+- Conferência.
+- Conclusão parcial.
+- Cancelamento.
+- Vínculos documentais.
+
+Diferencie aprovação de compra, compra efetiva e entrada física.
+
+Não permita que o documento sugira recebimento integral quando apenas parte foi adquirida ou validada.
+
+### B6.4.3. ENT
+
+Verifique:
+
+- Origem.
+- Destino.
+- Família.
+- Equipe.
+- Trânsito.
+- Responsável pela entrega.
+- Recebedor.
+- Quantidade enviada.
+- Quantidade aceita.
+- Quantidade recusada.
+- Divergência.
+- Devolução.
+- Consumo anterior.
+- Cancelamento.
+- Consentimento.
+- Reconciliação.
+- Estado final.
+
+Não confunda material entregue com material efetivamente recebido.
+
+Não represente material consumido como material devolvido.
+
+Não atribua recebimento físico a uma pessoa apenas porque ela possui autorização para visualizar o documento.
+
+### B6.4.4. BAL
+
+Verifique:
+
+- Ciclo.
+- Plantão.
+- Profissional designado.
+- Profissional que contou.
+- Data da contagem.
+- Prazo.
+- Período.
+- Semanas relacionadas.
+- Quantidade contada.
+- Quantidade teórica.
+- Diferença.
+- Reconto.
+- Revisor.
+- Aprovação.
+- Adiamento.
+- Responsabilidade.
+- Origem da obrigação.
+- Estado final.
+
+Não use escala programada como prova de presença.
+
+Não represente revisão como contagem física realizada por quem apenas aprovou.
+
+Diferencie BAL legado de BAL agendado.
+
+### B6.4.5. Comparação transversal
+
+Para cada tipo:
+
+**Compare o fato do processo, o registro persistido, a interface documental e o PDF.**
+
+Identifique campos ausentes, rótulos ambíguos e diferenças de significado.
+
+**Entrega:** matriz granular de fidelidade por tipo, campo e estado.
+
+---
+
+## B6.5 — VERSÕES, EVOLUÇÃO DOCUMENTAL E RECONSTRUÇÃO HISTÓRICA
+
+Examine o histórico dos documentos ao longo do tempo.
+
+Inclua:
+
+- Criação.
+- Emissão.
+- Revisão.
+- Submissão.
+- Aprovação.
+- Recusa.
+- Ciência.
+- Atendimento.
+- Recebimento.
+- Consumo.
+- Divergência.
+- Reconto.
+- Cancelamento.
+- Arquivamento.
+- Reabertura.
+- Registros automáticos.
+- Eventos concorrentes.
+
+Para cada sequência relevante, verifique:
+
+- Versão anterior.
+- Versão posterior.
+- Autor.
+- Horário.
+- Justificativa.
+- Alterações efetivas.
+- Efeito sobre linhas.
+- Efeito sobre documentos relacionados.
+- Efeito sobre o PDF.
+- Efeito sobre os anexos.
+- Estado final.
+
+Investigue se uma pessoa consegue reconstruir:
+
+**Como o documento era originalmente.**
+
+**Quem realizou cada alteração.**
+
+**O que mudou.**
+
+**Quando mudou.**
+
+**Por qual motivo.**
+
+**Qual versão prevalece operacionalmente.**
+
+**Quais versões continuam historicamente acessíveis.**
+
+Examine a reabertura de requisição após fatos posteriores, preservando documentos e comprovantes antigos.
+
+Verifique se o histórico diferencia:
+
+**Estado atual.**
+
+**Estado histórico.**
+
+**Estado declarado.**
+
+**Estado confirmado.**
+
+**Consequência física.**
+
+A reconstrução não deve apagar ou reinterpretar silenciosamente eventos anteriores.
+
+**Entrega:** auditoria cronológica, versões e capacidade de reconstrução.
+
+---
+
+## B6.6 — RENDERIZAÇÃO PDF E FIDELIDADE DO CONTEÚDO
+
+Examine detalhadamente:
+
+`src/lib/server/operational-pdf.ts`
+
+`src/lib/server/document-pdf.ts`
+
+O renderizador vigente identificado nas fases anteriores utiliza o identificador **4**.
+
+Verifique o estado real antes de iniciar.
+
+### B6.6.1. Fonte de dados
+
+Determine exatamente:
+
+- Qual snapshot é utilizado.
+- Qual evento fornece os campos.
+- Qual versão é selecionada.
+- Quais informações são derivadas.
+- Quais informações são omitidas.
+- Quais informações vêm do estado atual.
+- Quais informações pertencem ao evento histórico.
+- Quais campos possuem fallback.
+- Quais campos são apresentados como não informados.
+
+Examine se algum fallback altera o significado histórico.
+
+### B6.6.2. Conteúdo
+
+Para REQ, COM, ENT e BAL, confira:
+
+- Título.
+- Protocolo.
+- Número.
+- Data.
+- Paciente.
+- Responsáveis.
+- Situação.
+- Linhas.
+- Quantidades.
+- Unidades.
+- Observações.
+- Divergências.
+- Histórico.
+- Ciência.
+- Aceite.
+- Próxima providência.
+- Ressalvas.
+- Versão.
+- Identificadores de verificação.
+
+Não considere um PDF correto somente porque abre e possui páginas.
+
+### B6.6.3. Layout
+
+Examine:
+
+- Dimensões.
+- Margens.
+- Cabeçalho.
+- Rodapé.
+- Numeração de páginas.
+- Tabelas.
+- Quebra de linhas.
+- Quebra de páginas.
+- Seções órfãs.
+- Células extensas.
+- Alinhamento.
+- Hierarquia tipográfica.
+- Contraste.
+- Legibilidade.
+- Espaçamento.
+- Organização.
+- Densidade informacional.
+- Identificação de versão.
+- Continuidade visual entre páginas.
+
+### B6.6.4. Casos adversariais de apresentação
+
+Selecione cenários sintéticos representativos:
+
+- Nenhuma linha.
+- Uma linha.
+- Muitas linhas.
+- Nome de produto extenso.
+- Observação extensa.
+- Palavra sem espaços.
+- Código longo.
+- Hash longo.
+- Muitas divergências.
+- Várias páginas.
+- Datas de fusos diferentes.
+- Identificação profissional ausente.
+- Registro histórico.
+- Documento cancelado.
+- Documento arquivado.
+- Requisição parcialmente atendida.
+- Entrega com recebimento parcial.
+- BAL com múltiplas semanas.
+- Reconto.
+- Campos opcionais não preenchidos.
+
+Verifique se há:
+
+- Sobreposição.
+- Corte.
+- Informação invisível.
+- Texto fora da página.
+- Perda de linha.
+- Descontinuidade de tabela.
+- Campo sem rótulo.
+- Informação sem contexto.
+- Rótulo semanticamente incompatível.
+- Página em branco desnecessária.
+- Situação apresentada incorretamente.
+
+Não gere centenas de PDFs.
+
+Utilize um conjunto representativo que demonstre as diferentes classes de risco.
+
+### B6.6.5. Inspeção efetivamente visual
+
+Para os casos relevantes:
+
+1. Gere PDFs exclusivamente sintéticos.
+2. Confirme que abrem.
+3. Extraia seu texto quando possível.
+4. Renderize páginas para imagem.
+5. Examine visualmente as páginas representativas.
+6. Compare com o snapshot original.
+7. Registre problemas concretos.
+8. Preserve somente evidências sanitizadas necessárias.
+
+**Uma asserção sobre contagem de páginas não é prova de legibilidade.**
+
+Da mesma forma, uma inspeção visual não substitui a comparação com a fonte de verdade.
+
+**Entrega:** relatório técnico e visual do renderizador PDF.
+
+---
+
+## B6.7 — PDF HISTÓRICO, CACHE, STORAGE E RECUPERAÇÃO
+
+Examine o percurso:
+
+**Documento autorizado → versão → evento → renderização → Storage → registro do hash → download → reutilização.**
+
+A B4 já confirmou aspectos importantes desse fluxo.
+
+A B6 deverá aprofundar os limites ainda relevantes.
+
+Investigue:
+
+- Renderização de versão específica.
+- Renderização da versão atual.
+- PDF legado original.
+- PDF de renderizador posterior.
+- Cache.
+- Caminho do objeto.
+- Hash dos bytes.
+- Hash do conteúdo.
+- Arquivo inexistente.
+- Arquivo parcialmente disponível.
+- Falha de download.
+- Falha após upload.
+- Registro sem bytes.
+- Bytes sem registro.
+- Resultado incerto.
+- Corrida de renderização.
+- Recuperação de comprovante.
+- Imutabilidade.
+- Versões antigas.
+
+### Distinção obrigatória
+
+**Hash do snapshot canônico não é hash do arquivo PDF.**
+
+**Hash do PDF não é assinatura digital.**
+
+**Preservar um PDF registrado não é o mesmo que reconstruir um PDF com o renderizador atual.**
+
+Verifique especificamente o comportamento ao recuperar PDFs previamente armazenados.
+
+A B4 identificou que o download do cache não recalcula necessariamente o hash dos bytes antes da resposta.
+
+Isso deve ser examinado como possível risco de recuperação e corrupção administrativa, sem declarar vulnerabilidade pública sem prova.
+
+Não altere, sobrescreva ou remova arquivos reais.
+
+Não use restauração destrutiva como teste.
+
+**Entrega:** relatório de identidade, armazenamento, cache e recuperação de PDFs.
+
+---
+
+## B6.8 — ANEXOS, FICHAS FÍSICAS DIGITALIZADAS E CADEIA DE CUSTÓDIA
+
+Examine os anexos como evidências documentais.
+
+Considere:
+
+- Fotografias.
+- PDFs enviados.
+- Digitalizações.
+- Documentos físicos fotografados.
+- Comprovantes externos.
+- Anexos vinculados a documentos.
+- Anexos vinculados a movimentações.
+
+Investigue:
+
+- Origem.
+- Autor do envio.
+- Paciente.
+- Documento relacionado.
+- Momento do registro.
+- Nome do arquivo.
+- MIME.
+- Bytes.
+- Hash.
+- Sanitização.
+- Conversão.
+- Remoção de metadados.
+- Reserva.
+- Finalização.
+- Associação.
+- Versão.
+- Retentativa.
+- Acesso.
+- Revogação.
+- Retenção.
+- Recuperação.
+
+### B6.8.1. Original e derivado
+
+Se a aplicação modifica uma imagem durante a sanitização, investigue como isso afeta a descrição da evidência.
+
+Diferencie:
+
+**Arquivo recebido.**
+
+**Arquivo sanitizado.**
+
+**Arquivo armazenado.**
+
+**Arquivo associado ao documento.**
+
+**Representação visual apresentada.**
+
+Não descreva automaticamente uma imagem sanitizada como cópia bit a bit idêntica ao arquivo original.
+
+Não presuma que a remoção de EXIF torna o conteúdo falso; avalie a finalidade, a rastreabilidade e a necessidade de preservar metadados originais.
+
+### B6.8.2. Continuidade da custódia
+
+Examine:
+
+- Upload interrompido.
+- Associação falha.
+- Resposta perdida.
+- Repetição da mesma tentativa.
+- Novo arquivo com mesma chave.
+- Reserva abandonada.
+- Arquivo sem vínculo.
+- Documento sem bytes.
+- Vínculo revogado.
+- Arquivo histórico.
+- Retenção.
+
+Considere o achado B3-004 sobre reservas abandonadas.
+
+Não proponha exclusão automática sem política de retenção, evidência de abandono e proteção contra exclusão de arquivo ainda utilizado.
+
+### B6.8.3. Força da evidência
+
+Diferencie:
+
+- Prova de que bytes foram armazenados.
+- Prova de que determinada pessoa autenticada realizou upload.
+- Declaração sobre o conteúdo.
+- Confirmação de outra pessoa.
+- Prova de recebimento físico.
+- Prova de ocorrência assistencial.
+
+Não equipare esses fatos automaticamente.
+
+**Entrega:** matriz de proveniência, associação e limites da evidência anexada.
+
+---
+
+## B6.9 — VERIFICAÇÃO, QR CODES, IDENTIFICADORES E APRESENTAÇÃO EXTERNA
+
+Examine os mecanismos de identificação e verificação documental.
+
+Inclua:
+
+- Protocolo.
+- Código.
+- Versão.
+- Hash.
+- QR Code.
+- URL.
+- Domínio.
+- Rota de verificação.
+- Autenticação.
+- Autorização.
+- Dados públicos.
+- Dados privados.
+- Resposta após revogação.
+- Documento inexistente.
+- Documento substituído.
+- Documento cancelado.
+- Versão antiga.
+
+Verifique o comportamento efetivo do QR Code presente nos PDFs.
+
+Examine se:
+
+- Aponta ao ambiente correto.
+- Utiliza domínio canônico coerente.
+- Identifica o documento pretendido.
+- Identifica a versão quando isso for necessário.
+- Permite verificação autorizada.
+- Revela informação além do necessário.
+- Confunde comprovante com assinatura.
+- Continua fazendo sentido após mudança de domínio.
+- Aponta indevidamente a um documento atual em lugar de uma versão histórica.
+
+Considere o risco de URLs permanentes em PDFs historicamente imutáveis.
+
+A B5 identificou decisões pendentes sobre o domínio canônico utilizado em mensagens e documentos.
+
+Examine essas dependências sem reabrir toda a auditoria de integração.
+
+### Limite jurídico e técnico
+
+Não afirme que o QR Code autentica juridicamente um documento apenas por apontar a uma página.
+
+Não afirme que SHA-256 equivale a assinatura ICP-Brasil.
+
+Não afirme que metadados de PDF demonstram autoria ou consentimento humano.
+
+Diferencie:
+
+**Identificação.**
+
+**Consulta.**
+
+**Verificação de integridade.**
+
+**Autenticação.**
+
+**Assinatura eletrônica.**
+
+**Assinatura digital.**
+
+**Carimbo do tempo.**
+
+**Certificação.**
+
+**Comprovação do fato declarado.**
+
+Verifique quais desses mecanismos existem efetivamente.
+
+Os demais deverão ser identificados como ausentes, não implementados ou dependentes de decisão futura, conforme sua relevância.
+
+**Entrega:** relatório de verificação documental, identificação e limites probatórios.
+
+---
+
+## B6.10 — HISTÓRICO, IMPRESSÃO, LEGIBILIDADE E COMPREENSÃO HUMANA
+
+Examine como os documentos são consultados e interpretados.
+
+Inclua:
+
+- Histórico.
+- Linha do tempo.
+- Versões.
+- Comparação de estados.
+- Busca.
+- Paginação.
+- Filtros.
+- Arquivados.
+- Cancelados.
+- Documentos antigos.
+- Documentos relacionados.
+- Impressão.
+- Salvar como PDF.
+- Download do PDF operacional.
+- Impressão da página web.
+- Compartilhamento autorizado.
+
+Diferencie:
+
+**PDF operacional gerado pelo servidor.**
+
+**Página do aplicativo impressa pelo navegador.**
+
+**Arquivo legado registrado.**
+
+**Comprovante de demonstração.**
+
+Examine se esses caminhos podem produzir documentos com diferenças relevantes de conteúdo, identificação ou contexto.
+
+### Qualidade humana
+
+Verifique se uma pessoa consegue:
+
+- Identificar o paciente.
+- Identificar o documento.
+- Entender o propósito.
+- Reconhecer a situação.
+- Diferenciar pendência de conclusão.
+- Localizar responsáveis.
+- Entender o que foi confirmado.
+- Identificar divergências.
+- Saber a próxima providência.
+- Consultar versões anteriores.
+- Reconhecer ressalvas.
+- Encontrar documento relacionado.
+- Perceber que determinada informação é histórica.
+
+### Qualidade de impressão
+
+Examine:
+
+- A4.
+- Margens.
+- Tamanho de texto.
+- Quebras.
+- Contraste em impressão sem cor.
+- Espaço utilizado.
+- Continuidade de tabelas.
+- Cabeçalhos repetidos.
+- Rodapés.
+- Número de páginas.
+- Identificação do documento em páginas seguintes.
+
+Não crie exigência de formato A5 se isso não fizer parte do contrato real.
+
+Quando um formato alternativo melhorar comprovadamente a operação, registre como oportunidade, sem implementação.
+
+### Sobriedade documental
+
+A aparência deve ser analisada sob critérios de clareza, profissionalismo, legibilidade e proporcionalidade.
+
+Não recomende design futurista, excesso de elementos decorativos ou recursos que tornem os documentos menos sérios.
+
+O objetivo é uma apresentação operacional confiável.
+
+**Entrega:** avaliação da experiência documental e da impressão.
+
+---
+
+## B6.11 — PRIVACIDADE, SEGURANÇA, RETENÇÃO E RECUPERAÇÃO
+
+Examine os riscos relacionados ao ciclo de vida das evidências.
+
+Inclua:
+
+- Dados pessoais.
+- Dados assistenciais.
+- Identificação de profissionais.
+- Informações de pacientes.
+- Nomes em PDFs.
+- Dados em anexos.
+- Identificadores em QR Codes.
+- URLs.
+- Metadados.
+- Compartilhamento.
+- Download.
+- Cache.
+- Logs.
+- Storage.
+- Revogação.
+- Retenção.
+- Exclusão.
+- Preservação histórica.
+- Backups.
+- Restauração.
+
+### B6.11.1. Minimização e acesso
+
+Verifique se cada representação apresenta somente o conteúdo adequado à finalidade e ao destinatário.
+
+Não conclua automaticamente que a presença do nome do paciente é ilícita.
+
+Investigue finalidade, necessidade, acesso e controles.
+
+### B6.11.2. Revogação
+
+Examine a distinção entre:
+
+- Impedir nova consulta.
+- Revogar vínculo.
+- Encerrar sessão.
+- Expirar URL assinada.
+- Invalidar cache.
+- Impedir novos downloads.
+- Documento já obtido por destinatário.
+
+A B3 demonstrou uma janela de validade para URLs anteriormente emitidas.
+
+Não prometa revogação de cópias que já foram baixadas.
+
+### B6.11.3. Preservação e retenção
+
+Examine:
+
+- Documentos ativos.
+- Documentos arquivados.
+- Documentos históricos.
+- Anexos antigos.
+- Reservas.
+- PDFs de versões anteriores.
+- Arquivos sem associação.
+- Objetos ausentes.
+- Documentos importados.
+
+A retenção deverá respeitar decisões futuras de produto, operação e conformidade.
+
+Não implemente exclusão.
+
+### B6.11.4. Recuperação de desastre
+
+Considere OPS-001/B3-014.
+
+Verifique se o conjunto necessário para reconstruir o sistema inclui:
+
+- Banco.
+- Auth.
+- Histórico.
+- Snapshots.
+- PDFs.
+- Anexos.
+- Buckets.
+- Configuração.
+- Chaves.
+- Referências externas.
+- Jobs e estados.
+
+**Um backup do banco não significa que os bytes armazenados no Storage também estejam disponíveis.**
+
+Não execute restauração integral sobre o ambiente existente.
+
+A ausência de ensaio completo deve permanecer NOT_VERIFIED.
+
+### B6.11.5. Aspectos jurídicos
+
+Examine tecnicamente os elementos relevantes à autenticidade, integridade, autoria, conservação e rastreabilidade.
+
+Quando discutir valor probatório, diferencie os mecanismos implementados dos requisitos jurídicos que dependem do contexto.
+
+Não declare admissibilidade, autenticidade jurídica absoluta, equivalência a documento assinado ou conformidade integral com a LGPD sem fundamento específico.
+
+**Entrega:** relatório de privacidade, segurança documental, retenção e recuperabilidade.
+
+---
+
+## B6.12 — INVESTIGAÇÃO ADVERSARIAL TRANSVERSAL E CONTRADITÓRIO
+
+Realize uma segunda passagem crítica.
+
+A questão central será:
+
+**Uma pessoa consegue reconstruir corretamente o acontecimento a partir dos documentos disponíveis, mesmo quando o processo teve alterações, falhas, cancelamentos, versões e responsáveis diferentes?**
+
+Selecione cenários como:
+
+1. REQ emitida e posteriormente arquivada.
+2. REQ parcialmente atendida.
+3. REQ reaberta após cancelamento de ENT.
+4. COM parcialmente recebida.
+5. ENT entregue e parcialmente aceita.
+6. ENT com divergência.
+7. ENT com consumo anterior e tentativa de cancelamento.
+8. BAL com reconto.
+9. BAL com contador e revisor diferentes.
+10. Documento revisado antes da emissão.
+11. Documento editado e com submissão recusada.
+12. Documento com grande histórico de versões.
+13. Profissional desligado após atuar.
+14. Nome ou dados cadastrais modificados após a emissão.
+15. Paciente inativado.
+16. PDF antigo solicitado depois de nova versão.
+17. Documento com anexo originalmente enviado como imagem.
+18. Anexo recebido, mas não associado.
+19. QR Code consultado por pessoa não autorizada.
+20. Arquivo previamente baixado após revogação.
+21. Documento histórico importado.
+22. Documento sem comprovação de ciência original.
+23. Evento de sistema sem atuação humana.
+24. Linha com unidade histórica diferente da unidade atual.
+25. Registro cuja representação precisa explicitar incerteza.
+
+Não execute todos mecanicamente.
+
+Selecione os casos que acrescentem evidência nova.
+
+Para cada cenário, compare:
+
+**Fato ou declaração.**
+
+**Fonte persistida.**
+
+**Evento.**
+
+**Versão.**
+
+**Snapshot.**
+
+**Histórico.**
+
+**Interface.**
+
+**PDF.**
+
+**Anexos.**
+
+**Recuperação.**
+
+**Interpretação humana.**
+
+### Contraditório obrigatório
+
+Antes de confirmar um achado:
+
+1. Procure a regra de domínio.
+2. Procure o mecanismo compensatório.
+3. Consulte a evidência anterior.
+4. Confirme a versão vigente.
+5. Execute uma contraprova proporcional.
+6. Delimite o impacto.
+7. Diferencie defeito de opção documental.
+8. Diferencie falha atual de legado conhecido.
+9. Diferencie ausência de mecanismo de ausência de homologação.
+10. Registre limitações.
+
+Não atribua ao produto falhas produzidas pelo próprio teste.
+
+**Entrega:** matriz adversarial e diagnóstico transversal.
+
+---
+
+# VIII. GARANTIAS QUE NÃO PODEM SER DESTRUÍDAS
+
+As futuras recomendações não deverão eliminar os mecanismos corretos existentes.
+
+Preserve:
+
+- Imutabilidade de eventos.
+- Encadeamento histórico.
+- Identificação de versão.
+- Snapshots canônicos.
+- Hashes.
+- Autorização por paciente.
+- Autoria registrada.
+- Separação entre declaração e confirmação.
+- Separação entre ciência e recebimento.
+- Separação entre escala e presença.
+- Separação entre relato e débito.
+- Custódias distintas de estoque.
+- História de cancelamentos.
+- História de correções.
+- PDFs anteriores.
+- Anexos históricos.
+- Arquivos legados.
+- Distinção entre documento original e reconstruído.
+- Distinção entre hash de conteúdo e hash de arquivo.
+- Identidade de tentativas.
+- Recuperação segura.
+
+Não recomende apagar histórico para reduzir volume.
+
+Não recomende sobrescrever versões antigas para corrigir apresentação.
+
+Não recomende atribuir assinaturas fictícias.
+
+Não recomende transformar o PDF em fonte de verdade superior à transação original.
+
+Não recomende afirmar recebimento físico a partir de ciência ou leitura de mensagem.
+
+---
+
+# IX. CLASSIFICAÇÃO DOS ACHADOS
+
+Utilize:
+
+**P0 — Crítico.**
+
+**P1 — Bloqueador.**
+
+**P2 — Relevante.**
+
+**P3 — Melhoria.**
+
+Classifique também a natureza:
+
+- Defeito confirmado.
+- Falha de fidelidade documental.
+- Inconsistência de autoria.
+- Inconsistência de versão.
+- Falha de rastreabilidade.
+- Falha de recuperação.
+- Falha de apresentação.
+- Falha de impressão.
+- Falha de autorização.
+- Lacuna documental.
+- Risco de integridade.
+- Risco de retenção.
+- Questão de governança.
+- Limitação probatória.
+- Oportunidade de melhoria.
+- Hipótese não confirmada.
+- Validação pendente.
+
+Registre separadamente:
+
+**Causa nova B6.**
+
+**Nova manifestação.**
+
+**Revalidação de causa anterior.**
+
+**Risco sustentado.**
+
+**Questão de produto.**
+
+**Ausência de homologação.**
+
+Não duplique achados apenas porque a mesma inconsistência aparece na interface e no PDF.
+
+Não transforme uma preferência de design em defeito técnico sem consequência demonstrável.
+
+---
+
+# X. ENTREGÁVEIS
+
+Crie:
+
+`docs/audits/2026-10-30-phase-b6-documents/`
+
+## Controle e baseline
+
+`README.md`
+
+`CHECKPOINT.md`
+
+`00_BASELINE_SCOPE_AND_METHOD.md`
+
+## Inventário e identidade
+
+`01_DOCUMENT_OBJECT_AND_SOURCE_INVENTORY.csv`
+
+`01_DOCUMENT_DOMAIN_AND_SOURCE_MAP.md`
+
+`02_DOCUMENT_IDENTITY_AUTHORSHIP_AND_PROVENANCE.md`
+
+## Integridade e fidelidade
+
+`03_EVENTS_SNAPSHOTS_HASHES_AND_IMMUTABILITY.md`
+
+`04_DOCUMENT_SEMANTIC_FIDELITY.md`
+
+`04_DOCUMENT_FIELD_FIDELITY_MATRIX.csv`
+
+`05_VERSIONS_HISTORY_AND_RECONSTRUCTION.md`
+
+## PDF
+
+`06_PDF_RENDERING_CONTENT_AND_LAYOUT.md`
+
+`06_PDF_VISUAL_CASES.csv`
+
+`07_PDF_STORAGE_CACHE_AND_RECOVERY.md`
+
+## Evidências e verificação
+
+`08_ATTACHMENTS_PROVENANCE_AND_CUSTODY.md`
+
+`09_QR_VERIFICATION_AND_EVIDENTIARY_LIMITS.md`
+
+## Operação, privacidade e recuperação
+
+`10_HISTORY_PRINTING_AND_HUMAN_INTERPRETATION.md`
+
+`11_DOCUMENT_SECURITY_RETENTION_AND_RESTORE.md`
+
+`12_ADVERSARIAL_DOCUMENT_RECONSTRUCTION.md`
+
+## Consolidação
+
+`13_NEW_DOCUMENT_GAPS_AND_OPPORTUNITIES.md`
+
+`14_FINDINGS_MASTER.csv`
+
+`14_FINDINGS_MASTER.md`
+
+`15_ACCEPTANCE_AND_REGRESSION_CRITERIA.md`
+
+`16_CROSS_GROUP_DEPENDENCIES.md`
+
+`17_GROUP_B6_EXECUTIVE_ASSESSMENT.md`
+
+`18_PHASE_C_DECISION_HANDOFF.md`
+
+## Evidências complementares
+
+`evidence/`
+
+Inclua apenas o que for necessário:
+
+- Índice de cenários.
+- Resultados técnicos.
+- PDFs fictícios selecionados.
+- Imagens renderizadas sanitizadas.
+- Comparações de campos.
+- Contraprovas.
+- Referências a evidências antigas.
+- Registro de tentativas instrumentais.
+- Validação final.
+- Manifesto.
+
+**Não há meta de quantidade de PDFs, screenshots ou cenários.**
+
+A cobertura deverá ser definida pelo risco e pela diversidade das situações documentais.
+
+Não produza arquivos redundantes para aparentar maior profundidade.
+
+---
+
+# XI. PADRÃO DO REGISTRO MESTRE
+
+Cada achado deverá registrar, quando aplicável:
+
+1. ID.
+2. Título.
+3. Prioridade.
+4. Natureza.
+5. Estado.
+6. Confiança.
+7. Documento afetado.
+8. Processo.
+9. Pessoa afetada.
+10. Evento de origem.
+11. Fonte persistida.
+12. Versão.
+13. Snapshot.
+14. Representação afetada.
+15. Contrato esperado.
+16. Comportamento observado.
+17. Causa sustentada.
+18. Caminho técnico.
+19. Evidência.
+20. Método de prova.
+21. Contraprova.
+22. Limitações.
+23. Consequência operacional.
+24. Consequência informacional.
+25. Consequência humana.
+26. Consequência probatória, quando sustentada.
+27. Relação A/B1/B2/B3/B4/B5.
+28. Alternativas futuras.
+29. Riscos da alteração.
+30. Critérios de aceitação.
+31. Regressões necessárias.
+32. Decisão pendente.
+
+Não classifique mera inspeção visual como comprovação de integridade persistida.
+
+Não classifique conferência de hash como prova de autoria humana.
+
+Não classifique texto extraído corretamente como prova de legibilidade física.
+
+Não classifique imagem renderizada como prova de que o documento representa corretamente o acontecimento.
+
+Cada conclusão deverá respeitar o método que a sustentou.
+
+---
+
+# XII. RELATÓRIO EXECUTIVO
+
+O relatório executivo deverá explicar de maneira clara:
+
+**O que os documentos do Home Care Assistant já registram corretamente?**
+
+**O que permanece historicamente preservado?**
+
+**Quais diferenças existem entre evento, snapshot, interface e PDF?**
+
+**Existe documento que representa incorretamente uma operação?**
+
+**Algum campo pode induzir a pessoa a uma interpretação equivocada?**
+
+**Há situações em que o autor aparente não corresponde ao responsável pelo ato?**
+
+**As versões anteriores podem ser recuperadas?**
+
+**Um PDF pode apresentar dados diferentes da versão efetiva?**
+
+**Os anexos possuem origem e associação suficientemente rastreáveis?**
+
+**Um documento impresso é legível e compreensível?**
+
+**O QR Code efetivamente oferece qual tipo de verificação?**
+
+**O sistema possui assinatura digital ou apenas registros e hashes?**
+
+**Quais mecanismos fornecem indícios de integridade?**
+
+**Quais fatos físicos continuam dependendo de confirmação humana?**
+
+**Quais questões documentais precisam ser corrigidas antes do primeiro uso?**
+
+**Quais oportunidades são apenas melhorias editoriais?**
+
+**Quais decisões exigem definição do responsável?**
+
+**Quais garantias ainda dependem de homologação externa ou física?**
+
+As conclusões devem ser tecnicamente precisas e compreensíveis para quem administra uma residência.
+
+Evite jargão sem explicação.
+
+Não atribua força jurídica automática a um mecanismo técnico.
+
+Não apresente a B6 como autorização para produção.
+
+---
+
+# XIII. TRANSFERÊNCIA PARA A FASE C
+
+Organize os resultados em grupos de decisão:
+
+### Correções técnicas
+
+Inconsistências demonstradas que precisam ser corrigidas.
+
+### Correções documentais
+
+Rótulos, campos, estados, autores, datas e informações cuja representação esteja inadequada.
+
+### Decisões de produto
+
+Informações que deverão constar dos documentos e seus limites.
+
+### Decisões operacionais
+
+Responsabilidades de conferência, assinatura, ciência, guarda, arquivo e recuperação.
+
+### Governança e privacidade
+
+Retenção, acesso, compartilhamento, dados mínimos e tratamento de documentos históricos.
+
+### Recursos opcionais
+
+Assinaturas eletrônicas, verificação adicional, exportações, formatos de impressão e outros mecanismos que não deverão ser presumidos obrigatórios sem análise de necessidade.
+
+### Homologação pendente
+
+Impressão real, dispositivos físicos, restauração conjunta, uso humano e demais verificações apropriadas ao escopo do primeiro lançamento.
+
+Para cada decisão, indique:
+
+- Problema.
+- Evidência.
+- Causa.
+- Alternativas.
+- Benefício.
+- Custo.
+- Risco de regressão.
+- Dependências.
+- Critério de aceitação.
+- Responsável pela decisão.
+
+Não implemente nenhuma alternativa.
+
+---
+
+# XIV. VALIDAÇÃO FINAL PROPORCIONAL
+
+Ao terminar a B6:
+
+1. Confirme B6.0–B6.12 concluídos.
+2. Confira o inventário.
+3. Reconcilie os cenários.
+4. Confira os achados.
+5. Confira os documentos sintéticos utilizados.
+6. Confira os resultados de inspeção visual.
+7. Confira as comparações semânticas.
+8. Confira hashes, quando examinados.
+9. Registre contraprovas.
+10. Registre limitações.
+11. Identifique hipóteses refutadas.
+12. Confira a distinção entre autenticação e integridade.
+13. Confira a distinção entre documento e fato físico.
+14. Verifique referências.
+15. Verifique ausência de dados pessoais.
+16. Verifique ausência de credenciais.
+17. Confirme preservação do código funcional.
+18. Confirme preservação das migrations.
+19. Confirme preservação das funções SQL.
+20. Confirme ausência de alterações remotas.
+21. Confirme ausência de substituição de PDFs históricos.
+22. Confirme preservação da `master`.
+23. Valide os arquivos documentais.
+24. Atualize o índice geral.
+25. Faça commit e push exclusivamente documentais.
+
+Não execute novamente toda a suíte do produto para validar o pacote de auditoria.
+
+Não reexecute geração de PDFs porque houve alteração apenas no relatório Markdown.
+
+Não repita testes já concluídos quando somente sua descrição foi ajustada.
+
+---
+
+# XV. CHECKPOINTS E EXECUÇÃO
+
+Execute sequencialmente:
+
+**B6.0 — Reconhecimento.**
+
+**B6.1 — Taxonomia e fonte de verdade.**
+
+**B6.2 — Identidade e autoria.**
+
+**B6.3 — Eventos, snapshots e hashes.**
+
+**B6.4 — Fidelidade por tipo documental.**
+
+**B6.5 — Versões e reconstrução histórica.**
+
+**B6.6 — Renderização e fidelidade PDF.**
+
+**B6.7 — Cache, Storage e recuperação.**
+
+**B6.8 — Anexos e cadeia de custódia.**
+
+**B6.9 — QR Code, identificação e verificação.**
+
+**B6.10 — Histórico, impressão e interpretação.**
+
+**B6.11 — Privacidade, retenção e recuperação.**
+
+**B6.12 — Contraditório e investigação adversarial.**
+
+**Consolidação final.**
+
+Após cada subgrupo, registre:
+
+- Escopo examinado.
+- Evidências.
+- Resultados.
+- Descobertas.
+- Contraprovas.
+- Limitações.
+- Checkpoint.
+- Próximo passo.
+
+Preserve a capacidade de retomada após compactação de contexto.
+
+Não reexecute provas mutáveis antigas apenas para recuperar a memória da sessão.
+
+---
+
+# XVI. DETERMINAÇÃO E META FINAL
+
+A B6 deverá produzir **o diagnóstico mais completo e tecnicamente rigoroso possível sobre a fidelidade, integridade, rastreabilidade, apresentação, preservação e recuperabilidade dos documentos do Home Care Assistant**.
+
+Ao final, o responsável deverá compreender:
+
+**Quais documentos são confiáveis nos limites de seus contratos.**
+
+**Quais informações representam corretamente os fatos registrados.**
+
+**Quais informações podem induzir a erro.**
+
+**Quais versões são preservadas.**
+
+**Quais evidências podem ser recuperadas.**
+
+**Quais responsabilidades estão corretamente atribuídas.**
+
+**Quais controles de integridade existem.**
+
+**Quais controles não existem.**
+
+**Quais documentos precisam de melhoria visual ou informacional.**
+
+**Quais lacunas podem prejudicar uma auditoria ou reconstrução dos fatos.**
+
+**Quais limitações probatórias precisam ser explicitadas.**
+
+**Quais correções são indispensáveis.**
+
+**Quais melhorias são opcionais.**
+
+**Quais decisões ainda pertencem ao responsável pelo produto.**
+
+A meta não é gerar o maior número de PDFs, screenshots, tabelas ou achados.
+
+A meta é demonstrar a verdade técnica e operacional sobre o sistema documental com profundidade, independência, precisão e economia de execução.
+
+**Não implemente correções.**
+
+**Não inicie a Fase C.**
+
+**Não inicie a Fase D.**
+
+**Não execute deploy.**
+
+**Não abra PR.**
+
+**Não realize merge.**
+
+Conclua B6.0–B6.12, consolide as evidências, valide proporcionalmente o pacote e publique um commit exclusivamente documental na branch `audit/phase-b`.
+
+**Inicie imediatamente pelo reconhecimento B6.0.**

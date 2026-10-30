@@ -1,0 +1,36 @@
+{
+  "scenario": "B69-O01",
+  "method": "PDF embedded PNG pixels decoded with installed ZXing;no browser/provider/production call;physical camera NOT_VERIFIED",
+  "results": [
+    {
+      "id": "PV01",
+      "decoded": "https://home-care-assistant.vercel.app/verificar/b6000000-0000-4000-8000-000000000001?version=3&hash=799c032aad9e42b5797cb8acb714b38235159382a981da67cbd01907ffd22d84",
+      "versionExact": true,
+      "hashExact": true,
+      "parameters": [
+        "version",
+        "hash"
+      ],
+      "pixelSize": [
+        180,
+        180
+      ],
+      "urlFetched": false
+    },
+    {
+      "id": "PV05",
+      "decoded": "https://home-care-assistant.vercel.app/verificar/b6000000-0000-4000-8000-000000000001?version=5&hash=152d307314cb13ac5b722e1d1ed3379617e810c6eb063063b880235b57964c31",
+      "versionExact": true,
+      "hashExact": true,
+      "parameters": [
+        "version",
+        "hash"
+      ],
+      "pixelSize": [
+        180,
+        180
+      ],
+      "urlFetched": false
+    }
+  ]
+}

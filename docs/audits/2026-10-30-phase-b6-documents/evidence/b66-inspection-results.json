@@ -1,0 +1,928 @@
+{
+  "tool": "PyMuPDF2.0/MuPDF1.28.5;Poppler unavailable in PATH",
+  "method": "Native text extraction and page rasterization;no OCR;physical printing NOT_VERIFIED",
+  "cases": [
+    {
+      "id": "PV01",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 1068,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1072,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        1,
+        2
+      ],
+      "textContainsOmittedMarkers": {},
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "REQ-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v3 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV02",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 808,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1047,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        2
+      ],
+      "textContainsOmittedMarkers": {
+        "RECIBO_PENDENTE_B6": false,
+        "RESSALVA_COMPRA_B6": false
+      },
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "COM-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v3 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV03",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 910,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1187,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        1,
+        2
+      ],
+      "textContainsOmittedMarkers": {
+        "CAIXA_AVARIADA_B6": false,
+        "RESSALVA_ENT_B6_NAO_USAR": false
+      },
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "ENT-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v3 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV04",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 899,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1235,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        1,
+        2
+      ],
+      "textContainsOmittedMarkers": {
+        "MOTIVO_CANCELAMENTO_B6": false
+      },
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "ENT-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v3 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV05",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 1174,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1298,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        1,
+        2
+      ],
+      "textContainsOmittedMarkers": {},
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "BAL-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v5 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV06",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 1018,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1082,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        1
+      ],
+      "textContainsOmittedMarkers": {},
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "HC-20261030-7090A953 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v1 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261030141003Z",
+        "modDate": "D:20261030141003Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV07",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 1563,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 2218,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 3,
+          "textLength": 3304,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 4,
+          "textLength": 2287,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 5,
+          "textLength": 2423,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 6,
+          "textLength": 1951,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 7,
+          "textLength": 1929,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 8,
+          "textLength": 851,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "textContainsOmittedMarkers": {},
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "ENT-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v48 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV08",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 2129,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1189,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        1
+      ],
+      "textContainsOmittedMarkers": {},
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "COM-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v3 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV09",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 642,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 289,
+          "outsidePage": [
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                839.3380126953125,
+                89.69279479980469,
+                850.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                850.3380126953125,
+                89.69279479980469,
+                861.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                861.3380126953125,
+                89.69279479980469,
+                872.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                872.3380126953125,
+                89.69279479980469,
+                883.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                883.3380126953125,
+                89.69279479980469,
+                894.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                894.3380126953125,
+                89.69279479980469,
+                905.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                905.3380126953125,
+                89.69279479980469,
+                916.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                916.3380126953125,
+                89.69279479980469,
+                927.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                927.3380126953125,
+                89.69279479980469,
+                938.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                938.3380126953125,
+                89.69279479980469,
+                949.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                949.3380126953125,
+                89.69279479980469,
+                960.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                960.3380126953125,
+                89.69279479980469,
+                971.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                82.43679809570312,
+                971.3380126953125,
+                89.69279479980469,
+                982.2340087890625
+              ]
+            },
+            {
+              "text": "FIM_B6",
+              "bbox": [
+                82.43679809570312,
+                982.3380126953125,
+                109.88479614257812,
+                993.2340087890625
+              ]
+            }
+          ],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 3,
+          "textLength": 291,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 4,
+          "textLength": 397,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 5,
+          "textLength": 309,
+          "outsidePage": [
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                839.3380126953125,
+                59.25600051879883,
+                850.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                850.3380126953125,
+                59.25600051879883,
+                861.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                861.3380126953125,
+                59.25600051879883,
+                872.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                872.3380126953125,
+                59.25600051879883,
+                883.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                883.3380126953125,
+                59.25600051879883,
+                894.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                894.3380126953125,
+                59.25600051879883,
+                905.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                905.3380126953125,
+                59.25600051879883,
+                916.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                916.3380126953125,
+                59.25600051879883,
+                927.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                927.3380126953125,
+                59.25600051879883,
+                938.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                938.3380126953125,
+                59.25600051879883,
+                949.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                949.3380126953125,
+                59.25600051879883,
+                960.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                960.3380126953125,
+                59.25600051879883,
+                971.2340087890625
+              ]
+            },
+            {
+              "text": "M",
+              "bbox": [
+                52.0,
+                971.3380126953125,
+                59.25600051879883,
+                982.2340087890625
+              ]
+            },
+            {
+              "text": "FIM_B6",
+              "bbox": [
+                52.0,
+                982.3380126953125,
+                79.447998046875,
+                993.2340087890625
+              ]
+            }
+          ],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 6,
+          "textLength": 908,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        2,
+        3,
+        5
+      ],
+      "textContainsOmittedMarkers": {},
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "ENT-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v3 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV10",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 797,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1040,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        1
+      ],
+      "textContainsOmittedMarkers": {},
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "COM-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v3 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    },
+    {
+      "id": "PV11",
+      "pages": [
+        {
+          "page": 1,
+          "textLength": 754,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        },
+        {
+          "page": 2,
+          "textLength": 1038,
+          "outsidePage": [],
+          "size": [
+            595.280029296875,
+            841.8900146484375
+          ]
+        }
+      ],
+      "selectedImages": [
+        1
+      ],
+      "textContainsOmittedMarkers": {},
+      "endMarkerVisible": false,
+      "catalogLang": [
+        "null",
+        "null"
+      ],
+      "structureTree": [
+        "null",
+        "null"
+      ],
+      "metadata": {
+        "format": "PDF 1.7",
+        "title": "BAL-0001 - Home Care Assistant",
+        "author": "Home Care Assistant",
+        "subject": "Comprovante operacional · conteúdo v3 · renderizador V4",
+        "keywords": "",
+        "creator": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+        "creationDate": "D:20261028023000Z",
+        "modDate": "D:20261028023000Z",
+        "trapped": "",
+        "encryption": null
+      },
+      "links": [],
+      "annotations": 0
+    }
+  ]
+}

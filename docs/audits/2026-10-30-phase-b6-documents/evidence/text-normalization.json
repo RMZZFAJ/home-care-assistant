@@ -1,0 +1,7 @@
+{
+  "file": "text/PV07-p3.txt",
+  "rawSha256": "b064435ea7484d603d53a44fa714f921b174d84755f20ee191db2218a01c7408",
+  "rawPreserved": "text/PV07-p3.txt.raw-b064435ea748.gz",
+  "normalizedSha256": "a47207c41bfcc6b499be081face64eb466a073102bdc2cf0b38be8e77b59f4e5",
+  "normalization": "Trailing whitespace removed from committed native-text copy;original PDF and gzip raw unchanged;inspection textLength metrics refer to raw extraction;no renderer rerun"
+}

@@ -1,0 +1,46 @@
+HCA
+HOME CARE ASSISTANT
+GESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL
+BALANÇO DO ESTOQUE DA EQUIPE
+BAL-0001 · 27/10/2026, 23:30 · Aprovado
+1
+ITENS REGISTRADOS
+5
+VERSÃO
+BAL
+OPERAÇÃO
+CONCLUÍDO
+SITUAÇÃO
+IDENTIFICAÇÃO E RESPONSÁVEIS
+PACIENTE
+Paciente fictício B6
+RESPONSÁVEL
+Emissora fictícia B6
+NÚMERO DO DOCUMENTO
+BAL-0001
+PROTOCOLO
+BAL-20261030-B6000000-B6000001-1-12345678
+REGISTRO PROFISSIONAL
+Não informado
+SITUAÇÃO
+Aprovado
+PLANTÃO E OBRIGAÇÕES DO BALANÇO
+Profissional da contagem: Contadora fictícia B6 · Plantão: Diurno fictício B6
+Plantão: 30/10/2026, 06:00 até 30/10/2026, 18:00 · America/Manaus
+Contagem efetiva atual: 30/10/2026, 12:00
+Semanas vinculadas: 05/10/2026, 12/10/2026, 19/10/2026, 26/10/2026
+A contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no
+histórico.
+RELAÇÃO DOS MATERIAIS DECLARADOS
+Nº
+MATERIAL
+CONTADO
+UNIDADE
+01
+Material fictício B6
+8
+unidade
+Observação: Dados exclusivamente fictícios para auditoria B6.
+Contagem física exclusiva da equipe. Ajustes aplicados ao ledger dependem da política e das aprovações registradas.
+BAL-0001 · v5 · Conteúdo autorizado
+Página 1 de 2

@@ -1,0 +1,11 @@
+{
+  "bytes": 6403958,
+  "projectId": "home-care-assistant",
+  "container": "supabase_db_home-care-assistant",
+  "createdAt": "2026-10-30T14:08:45.453Z",
+  "sha256": "a145cb6de276ead57f19e45f4dbdf992267481a145b1bd10315cafd95f0a7bf3",
+  "format": "pg_dump-custom",
+  "archiveListVerified": true,
+  "privateLocation": "LOCALAPPDATA/home-care-assistant/backups",
+  "scope": "TOC and SHA verified; no restore; Storage bytes excluded"
+}
