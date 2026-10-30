@@ -6,20 +6,10 @@ A criação de novos grupos depende da autorização correspondente.
 
 ## Estado atual
 
-- B6.0–B6.12: auditoria documental concluída em 30/10/2026,sem correções.
-  17 classes,71 linhas de fidelidade e13 registros(11P2/2P3),com nove
-  causas novas,duas manifestações,um risco aprofundado e uma revalidação.
-  Onze PDFs sintéticos/32páginas e anexos origem/derivado examinados;23pontos
-  novos e12provas reutilizadas. NO-GO preservado;C/D não iniciadas.
-- [Executivo B6](../2026-10-30-phase-b6-documents/17_GROUP_B6_EXECUTIVE_ASSESSMENT.md).
-- [Índice B6](../2026-10-30-phase-b6-documents/README.md).
-- [Achados B6](../2026-10-30-phase-b6-documents/14_FINDINGS_MASTER.md).
-- [Insumos B6 para C](../2026-10-30-phase-b6-documents/18_PHASE_C_DECISION_HANDOFF.md).
 - B5.0–B5.12: investigação de automações/integrações concluída em 30/10/2026,
   sem correções. 32 mecanismos, 25 eventos externos/34 variantes, 44 pontos
   dirigidos e 14 registros (12 P2/2 P3). Provas locais/controladas separadas da
-  homologação externa; NO-GO anterior preservado. B6 encerrada acima;C/D
-  continuam não iniciadas.
+  homologação externa; NO-GO anterior preservado. B6/C/D não iniciadas.
 - [Executivo B5](../2026-10-30-phase-b5-integrations/17_GROUP_B5_EXECUTIVE_ASSESSMENT.md).
 - [Índice B5](../2026-10-30-phase-b5-integrations/README.md).
 - [Achados B5](../2026-10-30-phase-b5-integrations/14_FINDINGS_MASTER.md).
