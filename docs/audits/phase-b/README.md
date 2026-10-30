@@ -6,6 +6,15 @@ A criação de novos grupos depende da autorização correspondente.
 
 ## Estado atual
 
+- B7.0–B7.12: diagnóstico de infraestrutura e prontidão operacional concluído
+  em 30/10/2026, sem correções. Sete registros (cinco P2/dois P3), dez provas
+  locais controladas, 16 referências anteriores e 31 cenários reconciliados.
+  NO-GO preservado. Commit documental autorizado; push depende de impedir
+  preview automático, conforme a proibição de deploy/configuração da missão.
+- [Executivo B7](../2026-10-30-phase-b7-operational-readiness/17_GROUP_B7_EXECUTIVE_ASSESSMENT.md).
+- [Índice B7](../2026-10-30-phase-b7-operational-readiness/README.md).
+- [Achados B7](../2026-10-30-phase-b7-operational-readiness/14_FINDINGS_MASTER.md).
+- [Insumos B7 para C](../2026-10-30-phase-b7-operational-readiness/18_PHASE_C_DECISION_HANDOFF.md).
 - B6.0–B6.12: auditoria documental concluída em 30/10/2026,sem correções.
   17 classes,71 linhas de fidelidade e13 registros(11P2/2P3),com nove
   causas novas,duas manifestações,um risco aprofundado e uma revalidação.

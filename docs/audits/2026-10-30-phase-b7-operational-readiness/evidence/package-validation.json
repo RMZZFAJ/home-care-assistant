@@ -1,0 +1,117 @@
+{
+  "recordedAt": "2026-10-30T22:39:30.175438+00:00",
+  "status": "PASS",
+  "node": "24.22.0",
+  "requiredDeliverables": 24,
+  "dependencies": 17,
+  "recoveryComponents": 20,
+  "readinessDomains": 14,
+  "findings": 7,
+  "scenarios": 31,
+  "priorProofs": 16,
+  "sourceAnchors": 46,
+  "findingFields": 28,
+  "P2": 5,
+  "P3": 2,
+  "controlledTestsPassed": 10,
+  "controlledNetworkCalls": 0,
+  "localLinksChecked": 60,
+  "evidenceReferencesChecked": 59,
+  "sourceAnchorsChecked": 46,
+  "secretMatches": 0,
+  "protectedFiles": 395,
+  "preservation": {
+    "productFilesChanged": 0,
+    "tablesObserved": 108,
+    "unchangedTables": 106,
+    "expectedCronProgressChanges": [
+      "private.scheduler_health",
+      "private.bal_scheduler_progress"
+    ],
+    "unexpectedRowChanges": 0,
+    "masterPreserved": true
+  },
+  "phaseIndexSha256": "60f88b5b8aadeab6a796a2c08173e25fe3093f086ea083837938556e6ff834f0",
+  "changedPathsOutsideScope": [],
+  "checks": [
+    {
+      "name": "Syntax assemble-evidence.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax assemble-findings.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax backup-inventory.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax ci-metadata.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax collect-baseline.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax observability-metadata.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax remote-metadata.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax schema-metadata.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax security-metadata.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "ESLint B7 helpers",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "TypeScript B7 probes only",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Markdown B7 and phase index",
+      "exitCode": 0,
+      "output": "markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)\nFinding: docs/audits/2026-10-30-phase-b7-operational-readiness/**/*.md docs/audits/phase-b/README.md\nLinting: 23 files\nSummary: 0 issues in 0 files"
+    },
+    {
+      "name": "Git whitespace working tree",
+      "exitCode": 0,
+      "output": "warning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/00_BASELINE_SCOPE_AND_METHOD.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/01_RUNTIME_TOPOLOGY_AND_ENVIRONMENTS.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/02_CI_CD_RELEASE_GATES_AND_PROVENANCE.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/03_CONFIGURATION_SECRETS_AND_FEATURE_FLAGS.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/04_DATABASE_MIGRATION_AND_DEPLOY_COMPATIBILITY.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/05_BACKUP_RESTORE_AND_DISASTER_RECOVERY.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/06_OBSERVABILITY_HEALTH_AND_ALERTING.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/07_PERFORMANCE_SCALABILITY_AND_COST.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/08_QUALITY_GATES_AND_RELEASE_VERIFICATION.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/09_DEVSECOPS_SUPPLY_CHAIN_AND_ENVIRONMENT_SECURITY.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/10_INCIDENT_RESPONSE_AND_OPERATIONAL_CONTINGENCY.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/11_DEPLOYMENT_CUTOVER_ROLLBACK_AND_READINESS.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/12_CROSS_LAYER_ADVERSARIAL_READINESS_REVIEW.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/13_NEW_OPERATIONAL_GAPS_AND_OPPORTUNITIES.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/14_FINDINGS_MASTER.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/15_ACCEPTANCE_AND_VERIFICATION_CRITERIA.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/16_CROSS_GROUP_DEPENDENCIES.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/17_GROUP_B7_EXECUTIVE_ASSESSMENT.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/18_PHASE_C_DECISION_HANDOFF.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/CHECKPOINT.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/README.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/LIMITATIONS_AND_ATTEMPTS.md', LF will be replaced by CRLF the next time Git touches it"
+    },
+    {
+      "name": "Git whitespace index",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "helperChecksReusedByExactHash": true,
+  "notRun": [
+    "global build/typecheck/lint/unit/E2E",
+    "migration replay",
+    "restore",
+    "remote mutation",
+    "deploy or workflow dispatch"
+  ],
+  "publication": "LOCAL_DOCUMENT_COMMIT_AUTHORIZED; PUSH_REQUIRES_NO_DEPLOY_GUARD"
+}

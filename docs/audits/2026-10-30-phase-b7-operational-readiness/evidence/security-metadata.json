@@ -1,0 +1,142 @@
+{
+  "recordedAt": "2026-10-30T22:16:40.465Z",
+  "auditFileModifiedAt": "2026-10-30T22:14:27.121Z",
+  "lockfileVersion": 3,
+  "lockedPackages": 538,
+  "topLevelVersionMismatch": [],
+  "missingIntegrity": [],
+  "nonRegistryPackages": [],
+  "installScriptPackages": [
+    {
+      "package": "node_modules/fsevents",
+      "dev": true,
+      "optional": true
+    }
+  ],
+  "auditSummary": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 3,
+      "critical": 0,
+      "total": 3
+    },
+    "dependencies": {
+      "prod": 164,
+      "dev": 337,
+      "optional": 92,
+      "peer": 36,
+      "peerOptional": 0,
+      "total": 538
+    }
+  },
+  "vulnerabilityNodes": [
+    {
+      "name": "markdownlint",
+      "version": "0.42.0",
+      "devOnly": true,
+      "severity": "high"
+    },
+    {
+      "name": "markdownlint-cli2",
+      "version": "0.24.0",
+      "devOnly": true,
+      "severity": "high"
+    },
+    {
+      "name": "re2js",
+      "version": "2.8.6",
+      "devOnly": true,
+      "severity": "high"
+    }
+  ],
+  "uniqueAdvisories": [
+    {
+      "source": 1243620,
+      "name": "re2js",
+      "title": "RE2JS: Quadratic-time denial of service in re2js lookbehind matching",
+      "url": "https://github.com/advisories/GHSA-gg6h-894w-4m9c",
+      "severity": "high",
+      "range": ">=2.2.0 <2.8.7"
+    }
+  ],
+  "actionRefs": [
+    {
+      "repository": "actions/checkout",
+      "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "tag": "v7.0.1",
+      "tagMatches": true,
+      "metadataRead": true
+    },
+    {
+      "repository": "actions/setup-node",
+      "sha": "949feb2413d6458794dcd2491c4babbbce0c15c1",
+      "tag": "v7.1.0",
+      "tagMatches": true,
+      "metadataRead": true
+    },
+    {
+      "repository": "supabase/setup-cli",
+      "sha": "45a513f8c64c0bc8e0e3dfe572b5c95be85f6359",
+      "tag": "v3.0.1",
+      "tagMatches": true,
+      "metadataRead": true
+    },
+    {
+      "repository": "actions/upload-artifact",
+      "sha": "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+      "tag": "v7.0.2",
+      "tagMatches": true,
+      "metadataRead": true
+    }
+  ],
+  "headers": [
+    {
+      "url": "https://home-care-assistant.vercel.app/login",
+      "method": "HEAD",
+      "status": 200,
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-security-policy": null,
+        "content-security-policy-report-only": null,
+        "x-frame-options": null,
+        "x-content-type-options": null,
+        "referrer-policy": null,
+        "permissions-policy": null,
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "server": "Vercel"
+      },
+      "setCookiePresent": false,
+      "limits": "Anonymous public shell only; no cookies/HTML retained, no authenticated navigation or frame exploit."
+    },
+    {
+      "url": "https://home-care-assistant-8j9z02yc2-rmzzfajs-projects.vercel.app/login",
+      "method": "HEAD",
+      "status": 302,
+      "headers": {
+        "cache-control": "no-store, max-age=0",
+        "content-security-policy": null,
+        "content-security-policy-report-only": null,
+        "x-frame-options": "DENY",
+        "x-content-type-options": null,
+        "referrer-policy": null,
+        "permissions-policy": null,
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "server": "Vercel"
+      },
+      "setCookiePresent": true,
+      "limits": "Anonymous public shell only; no cookies/HTML retained, no authenticated navigation or frame exploit."
+    }
+  ],
+  "drains": {
+    "status": "READ_METADATA",
+    "count": 0,
+    "limits": "Only count retained; endpoints/credentials/log data not requested."
+  },
+  "trackedEnvPaths": [
+    ".env.example"
+  ],
+  "trackedPrivatePaths": [],
+  "limits": "Registry classification is not exploitability. re2js advisory requires opt-in LOOKBEHINDS plus repeated matching. Runtime auth/cookies not exercised; no dependency update/install, secret decryption or full history secret scan."
+}

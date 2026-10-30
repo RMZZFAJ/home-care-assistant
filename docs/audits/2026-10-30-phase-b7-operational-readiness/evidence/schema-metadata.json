@@ -1,0 +1,3504 @@
+{
+  "recordedAt": "2026-10-30T22:04:44.527Z",
+  "method": "Catalogs and normalized history hashes only; no data payload or migration executed",
+  "historicalProtected": 84,
+  "historicalDrift": [],
+  "migrationFiles": 84,
+  "duplicateVersions": [],
+  "functionalMigrationDiff": "",
+  "local": {
+    "routines": [
+      {
+        "name": "admin_assurance",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "2af7568ea3dacee1ab9f5f25cea4b29c",
+        "normalized_md5": "88bef1a6e764010fad23d360735707ce"
+      },
+      {
+        "name": "adopt_catalogue_model",
+        "schema": "private",
+        "signature": "p_patient uuid, p_product text",
+        "definition_md5": "b010b0802127211fde4ebe4503c8d197",
+        "normalized_md5": "7fa7863551d93735aa963a4eb040d5b3"
+      },
+      {
+        "name": "apply_access_change",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "3f3e610e4f4cb8bd0404c0de414eeb94",
+        "normalized_md5": "43293514591489f006aed8b1ce47b236"
+      },
+      {
+        "name": "apply_bal",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "1f0dc5d54703718c40c80341a03abd76",
+        "normalized_md5": "db1a3720a549a6ac992f5bb722cfcfa4"
+      },
+      {
+        "name": "attachment_read",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "b88d35d09324785f7e5e170eb25e186f",
+        "normalized_md5": "ddb8356098e437e0445a868d3bd90816"
+      },
+      {
+        "name": "auth_session",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "909b838c3d1effad38c861c8c4f8edf6",
+        "normalized_md5": "8821678bf0425cd2e3e81abd2325b754"
+      },
+      {
+        "name": "bal_assign",
+        "schema": "private",
+        "signature": "p_patient uuid, p_cycle uuid, p_shift uuid, p_kind text",
+        "definition_md5": "a8926acc16e6dbf0e7629160863f4cb3",
+        "normalized_md5": "06224659b2bcd7ac6e42dbd281988515"
+      },
+      {
+        "name": "bal_count_context",
+        "schema": "private",
+        "signature": "p_patient uuid, p_document uuid, p_payload jsonb",
+        "definition_md5": "ae41b3fdf806efea28e50d68c65049e0",
+        "normalized_md5": "958c138b99e27971ab05e07b644296da"
+      },
+      {
+        "name": "bal_event",
+        "schema": "private",
+        "signature": "p_patient uuid, p_cycle uuid, p_assignment uuid, p_action text, p_reason text, p_details jsonb, p_key text",
+        "definition_md5": "3e821205985f625a1053058f5b1ed278",
+        "normalized_md5": "094bab1d5a4338738248d7fa4e5a0c0e"
+      },
+      {
+        "name": "bal_family_authority",
+        "schema": "private",
+        "signature": "p_patient uuid, p_cap text",
+        "definition_md5": "68b122cb07b30a088ec9e05f2b945d55",
+        "normalized_md5": "82ef398e21d5b5fe6ee6034c807057da"
+      },
+      {
+        "name": "can",
+        "schema": "private",
+        "signature": "p_patient uuid, p_capability text",
+        "definition_md5": "9199abe7a4d16ff843133f112259eafc",
+        "normalized_md5": "f4220499575dd859748a06bb95cfd282"
+      },
+      {
+        "name": "capability_definition_rows",
+        "schema": "private",
+        "signature": "p_patient uuid",
+        "definition_md5": "d8c3524b3d1bebadf8d529a70d65dd16",
+        "normalized_md5": "723cead074bd56ea69d60d49c1a99752"
+      },
+      {
+        "name": "close_admin_bootstrap",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "d1b6e7c0bde205e8a8dd4967a848e268",
+        "normalized_md5": "2c2526d1ba1909f8635c206bbfe2c8e0"
+      },
+      {
+        "name": "credit_purchase_receipt",
+        "schema": "private",
+        "signature": "p_receipt uuid",
+        "definition_md5": "e676233972c4543d8bae06a2fb28d1f7",
+        "normalized_md5": "a00d7093e37102c5e0de6924997c9c12"
+      },
+      {
+        "name": "deliver_internal_notifications",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "76a39af9996e214aad9f9e1172652dcf",
+        "normalized_md5": "d92b6142b00b1c94b47cd5d7679effd1"
+      },
+      {
+        "name": "delivery_science_and_progress",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "9cd25f622eda23d3c4ff6e9fcce51e4b",
+        "normalized_md5": "af90a3c711ba2f09f52d4378e2757ed4"
+      },
+      {
+        "name": "effective_requisition_product",
+        "schema": "private",
+        "signature": "p_item uuid",
+        "definition_md5": "4708e83db3b9a1f4f5d58a428b58b8a0",
+        "normalized_md5": "71e78e062c5396bf6cc8903abe36205c"
+      },
+      {
+        "name": "emit_document",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "13377b7c0fa31ba4ef4f04e87e1c9f9c",
+        "normalized_md5": "b4b5c35dcef1c935383192b53070397a"
+      },
+      {
+        "name": "enqueue_document_event",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "e82321b49aeaeef24450d6844b1e0219",
+        "normalized_md5": "dfbfc435601b2d101e1a5c7e2c1bfb9c"
+      },
+      {
+        "name": "enqueue_notice",
+        "schema": "private",
+        "signature": "p_patient uuid, p_user uuid, p_event text, p_document uuid, p_document_event uuid, p_alert uuid, p_report uuid, p_reminder uuid, p_pdf boolean",
+        "definition_md5": "e6a2b0a5e08ef28673771a8ef9c8965b",
+        "normalized_md5": "828e735ab274f68af430883d9de314ca"
+      },
+      {
+        "name": "enqueue_scheduled_reminders",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "cfd1736fed8e5623224bbaf0b9991aaf",
+        "normalized_md5": "853ffc266a17be54639fbb6e1cadd743"
+      },
+      {
+        "name": "finish_bal_count",
+        "schema": "private",
+        "signature": "p_id uuid, p_context jsonb",
+        "definition_md5": "6b16493372e6219e8f67873cd94c86eb",
+        "normalized_md5": "6be39b9038abc2c1baef6c69a9bcc379"
+      },
+      {
+        "name": "global_identity",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "ee8cbc438b45fcdf387c64a9686c0028",
+        "normalized_md5": "307286e558a177445687891d79da0ca1"
+      },
+      {
+        "name": "guard_bal_schedule_window",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "73d4a9c0a327f3fd2df52ed3598b4e46",
+        "normalized_md5": "71b62fc572d19e97d668cab85fc13c96"
+      },
+      {
+        "name": "guard_catalogue_unit",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "66a5e4ac5e2b58ed8ae0d56dbd198388",
+        "normalized_md5": "cdaaf3468992a6b8c64756740097ff85"
+      },
+      {
+        "name": "guard_closed_request_links",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "644b25e23a2ee80cc7a14d004877e377",
+        "normalized_md5": "a8958c42067d4c678ab4ff7a90c1c3e5"
+      },
+      {
+        "name": "guard_membership_elevation",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "089248d0030dbefe2108c602a69e3a34",
+        "normalized_md5": "9a8216625cc0ee010c48be8859b9ff34"
+      },
+      {
+        "name": "guard_notification_event_contract",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "f541bd9f466beb31df1be7cc0cf26174",
+        "normalized_md5": "fc264ab9202648377775c21e3d0403f8"
+      },
+      {
+        "name": "has_patient_authority",
+        "schema": "private",
+        "signature": "p_patient uuid",
+        "definition_md5": "a56bddc72ee886d0ba5ecb840802eff7",
+        "normalized_md5": "273976a25c0b31368db1fe328c1164ef"
+      },
+      {
+        "name": "immutable_event",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "9cd0d7f1a17ceadb6d45cf36711f3d9c",
+        "normalized_md5": "4982b45ac49d233d38525e8255509966"
+      },
+      {
+        "name": "init_requisition_science",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "f3a368ade013dd627cbe2b690efe5a79",
+        "normalized_md5": "65d0695a8d5bd90cbe2883b0b98eebe7"
+      },
+      {
+        "name": "invalidate_workspace",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "e43765fa42498fdd605472a0c62cde78",
+        "normalized_md5": "dcd3d331a76a4bc3d59a3785ee96feb5"
+      },
+      {
+        "name": "invoke_notification_worker",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "bf4757ddf04ddba5dd0380af72658a69",
+        "normalized_md5": "728d017ab914b91dbd36ed3fb051822e"
+      },
+      {
+        "name": "member_can",
+        "schema": "private",
+        "signature": "p_patient uuid, p_user uuid, p_capability text",
+        "definition_md5": "279e81ba507d9723a14c945534c38daf",
+        "normalized_md5": "07c328af3cdecede3a2ce29313725271"
+      },
+      {
+        "name": "move_stock",
+        "schema": "private",
+        "signature": "p_patient uuid, p_product text, p_quantity numeric, p_source text, p_destination text, p_reason text, p_reference text, p_id uuid",
+        "definition_md5": "86ae2ca743f17a125b97e08043d783bd",
+        "normalized_md5": "1bbc6efcf6243be1248ee455b658f7d7"
+      },
+      {
+        "name": "process_bal_patient",
+        "schema": "private",
+        "signature": "p_patient uuid, p_now timestamp with time zone",
+        "definition_md5": "be9fc56164928b02593a7483b13831a3",
+        "normalized_md5": "7215361aacc638de0040b41360bbafd5"
+      },
+      {
+        "name": "reconcile_declined_membership_invitation",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "f99b8756109d0e57c09055f6e3472d4c",
+        "normalized_md5": "7842ee6a767294706869e9fcbdfcf5e1"
+      },
+      {
+        "name": "record_document_event",
+        "schema": "private",
+        "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid",
+        "definition_md5": "4cf666ff14ae52c60c4689766d43c072",
+        "normalized_md5": "9dcfe13b80c5b3a9cfede3f8bbab8f57"
+      },
+      {
+        "name": "record_science",
+        "schema": "private",
+        "signature": "p_id uuid, p_user uuid, p_mode text, p_evidence jsonb",
+        "definition_md5": "09d0086f65180b436d55b0ac5f4e7ec8",
+        "normalized_md5": "df2c587d6b56533ba61f3354cb76b1de"
+      },
+      {
+        "name": "refresh_requisition_lifecycle",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "71e14ed9278702fd6e8f947707d2af41",
+        "normalized_md5": "59b2b66fe348d4ad94ebb330d420eaed"
+      },
+      {
+        "name": "register_legacy_requisition",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "0d8aefe1cedc017d6df052c45e86474e",
+        "normalized_md5": "e23e2b774f4f77d0ce1be4e25fc01313"
+      },
+      {
+        "name": "reject_resolution_mutation",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "acd4afbb4c7d01fcc793d20c90c848c1",
+        "normalized_md5": "4c56ba37a0cc9fc26c621a5410c8fc25"
+      },
+      {
+        "name": "release_pdf_configuration_holds",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "186bf477da85ad90a4e96e1f44c2e0ae",
+        "normalized_md5": "e57644b86fa0b7008c89ea3c48aa0e25"
+      },
+      {
+        "name": "release_template_holds",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "e5d92ad57ceba31e29506f144bb9032b",
+        "normalized_md5": "dfea978ed17d2074e5753861abd0a5b2"
+      },
+      {
+        "name": "reminder_recipient_can",
+        "schema": "private",
+        "signature": "p_reminder uuid, p_user uuid",
+        "definition_md5": "74e589f198f8f731d85bc1d80ef69798",
+        "normalized_md5": "57f031cc2c173643275f61df91ce29af"
+      },
+      {
+        "name": "report_notice",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "68462cab7fa82696d34249e7f15702e9",
+        "normalized_md5": "457766e97a6d1c2e7057cee58385151c"
+      },
+      {
+        "name": "require_cap",
+        "schema": "private",
+        "signature": "p_patient uuid, p_cap text",
+        "definition_md5": "1b4730bcce215248752868636501748c",
+        "normalized_md5": "159f8ed4e8de47087d1572ae452099a8"
+      },
+      {
+        "name": "requisition_archive_task",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "5ab25073843229fa0e205a52d6bcdf11",
+        "normalized_md5": "83a9aaafaadc680f3cac913064f7f82d"
+      },
+      {
+        "name": "requisition_science_task",
+        "schema": "private",
+        "signature": "p_id uuid, p_user uuid",
+        "definition_md5": "99c9a2420ea0e9ed1d37ff0b34a99f3f",
+        "normalized_md5": "df4ec60a7bbb1c73af5ce105adf8f47e"
+      },
+      {
+        "name": "schedule_event",
+        "schema": "private",
+        "signature": "p_patient uuid, p_series uuid, p_shift uuid, p_worker uuid, p_action text, p_reason text, p_before jsonb, p_after jsonb",
+        "definition_md5": "9081aa8f8e46604ee6ad8a61f53ec0d6",
+        "normalized_md5": "40b5dbe1f8c9805f40b83662488f75ec"
+      },
+      {
+        "name": "schedule_visible",
+        "schema": "private",
+        "signature": "p_patient uuid, p_worker uuid",
+        "definition_md5": "452ea79e25f64d701760ea328ba234ff",
+        "normalized_md5": "6af8b62102fd50cfc3629bd2172b3fa9"
+      },
+      {
+        "name": "schedule_worker",
+        "schema": "private",
+        "signature": "p_patient uuid, p_user uuid",
+        "definition_md5": "df018ad1d5e4c444165502b34ecfd6a5",
+        "normalized_md5": "1259aa4a8b7fdcee706db90659ce90ff"
+      },
+      {
+        "name": "scheduled_operations",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "6d1d209174feea857dc473675589fe0f",
+        "normalized_md5": "72c40966303b2b6d5340b7ab4aa2d195"
+      },
+      {
+        "name": "science_satisfied",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "85e25f55e8469aeac436012f8c05ed3e",
+        "normalized_md5": "ae5a9f55d416ca3705b3923db9d61855"
+      },
+      {
+        "name": "science_snapshot",
+        "schema": "private",
+        "signature": "",
+        "definition_md5": "5b88cc8d35ec5732b77e7d14ffd951fe",
+        "normalized_md5": "1693364b988d7c8b6bf7b8667d2c0659"
+      },
+      {
+        "name": "stock_quantity",
+        "schema": "private",
+        "signature": "p_patient uuid, p_product text, p_location text",
+        "definition_md5": "d19067f81f884d816f9111c0ec1f3e32",
+        "normalized_md5": "a1793e08ba85bcde414dc1487c267dd5"
+      },
+      {
+        "name": "team_revision",
+        "schema": "private",
+        "signature": "p_patient uuid",
+        "definition_md5": "bb5e9f9033533039271707c906719c10",
+        "normalized_md5": "33c659f384de92aa63106d2e6884798a"
+      },
+      {
+        "name": "user_can",
+        "schema": "private",
+        "signature": "p_patient uuid, p_user uuid, p_cap text",
+        "definition_md5": "3a5a02015590e01a15f24a2dc80ad759",
+        "normalized_md5": "3a5a02015590e01a15f24a2dc80ad759"
+      },
+      {
+        "name": "v3_apply_access_change",
+        "schema": "private",
+        "signature": "p_id uuid",
+        "definition_md5": "742a9a858b6d2f112fead599b6e4d1a9",
+        "normalized_md5": "72fe56b838679fe5a86fb44fdac09344"
+      },
+      {
+        "name": "validate_shared_need",
+        "schema": "private",
+        "signature": "p_payload jsonb",
+        "definition_md5": "c38e2863c119f7184da638cd943c2c13",
+        "normalized_md5": "94f3c8d20395e9f4b45b08db79454291"
+      },
+      {
+        "name": "validate_supply_command",
+        "schema": "private",
+        "signature": "d operational_documents, p_action text, p_body jsonb",
+        "definition_md5": "551e2997dd8d013b37540f9302eb9675",
+        "normalized_md5": "aa23dfe1df0ab63a828c1025c3933fcf"
+      },
+      {
+        "name": "whatsapp_event_supported",
+        "schema": "private",
+        "signature": "p_event text",
+        "definition_md5": "863050c64e4d0d20e0499c3a01bc46fa",
+        "normalized_md5": "ef817ff2ed4e4159885fbc9355933628"
+      },
+      {
+        "name": "accept_invitation",
+        "schema": "public",
+        "signature": "p_token_hash text",
+        "definition_md5": "49b668b6dddde276edcd188cff2c902b",
+        "normalized_md5": "8f9327c2a88577a5244882eeb8c076d8"
+      },
+      {
+        "name": "accept_whatsapp_receipt",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_hash text",
+        "definition_md5": "f61e58f57a4274759f03e0969d4f0137",
+        "normalized_md5": "c76fe9868edac3045e948abacbae7934"
+      },
+      {
+        "name": "acknowledge_no_issues",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_hash text",
+        "definition_md5": "2259e2a0bb22ee5b3db7d1032c719350",
+        "normalized_md5": "b35d87e9f8244594488190b3c9c6e542"
+      },
+      {
+        "name": "acknowledge_requisition",
+        "schema": "public",
+        "signature": "p_id uuid, p_mode text, p_version integer",
+        "definition_md5": "6e3954c7df6d8f4ad567e0e3c477ba64",
+        "normalized_md5": "9e36346011dfc4830f0a3831fe00f532"
+      },
+      {
+        "name": "add_stock_inventory_item",
+        "schema": "public",
+        "signature": "p_inventory_id uuid, p_product_id text, p_counted_quantity bigint, p_justification text",
+        "definition_md5": "ea561b4783cb846921b402fce00c4ada",
+        "normalized_md5": "8e3a14ed1cf3f3673a744cd57d04a740"
+      },
+      {
+        "name": "admin_adopt_product",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text",
+        "definition_md5": "6676476381b28e245bde0f9e10db4240",
+        "normalized_md5": "54ae243a289cfb6639e0c41f47ddbe3e"
+      },
+      {
+        "name": "admin_create_invitation",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_email text, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean, p_token_hash text, p_expires_at timestamp with time zone",
+        "definition_md5": "5fa1ce424594f41241b8dff4b0252040",
+        "normalized_md5": "f373d6cfc2f0e3473ce37b334a158c49"
+      },
+      {
+        "name": "admin_list_memberships",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid",
+        "definition_md5": "d71edc82a411e88422c1a9236f8ac597",
+        "normalized_md5": "e0a17c90d97d3d2db2a95ba4748d986f"
+      },
+      {
+        "name": "admin_list_products",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "f15f222d776172f4877c04fd59258d1e",
+        "normalized_md5": "f15f222d776172f4877c04fd59258d1e"
+      },
+      {
+        "name": "admin_list_profiles",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "1938aec4e2679d09ac2c3a36262bd57a",
+        "normalized_md5": "05bab860bc4977f241d49bce05149e02"
+      },
+      {
+        "name": "admin_list_recipients",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "348254baa8d633bc47c755db2e82b10b",
+        "normalized_md5": "d703527c27fdb1f0a0525ce55b9e1ca4"
+      },
+      {
+        "name": "admin_resend_invitation",
+        "schema": "public",
+        "signature": "p_invitation_id uuid, p_token_hash text, p_expires_at timestamp with time zone",
+        "definition_md5": "47ba39c9421fe0412729914225de0415",
+        "normalized_md5": "bdb994c68fe33e712fbea23cc11f006b"
+      },
+      {
+        "name": "admin_set_membership_status",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_user_id uuid, p_status text",
+        "definition_md5": "4605f72f7f73bb7f8bd97fffa1a20345",
+        "normalized_md5": "9fa5906e15cf80751edff54c14bfc584"
+      },
+      {
+        "name": "admin_set_profile",
+        "schema": "public",
+        "signature": "p_user_id uuid, p_full_name text, p_role profile_role, p_status text, p_global_scope boolean",
+        "definition_md5": "f056ea534394aaad03bc6605fd08668c",
+        "normalized_md5": "d6df25786f7253608327284afef330da"
+      },
+      {
+        "name": "admin_upsert_membership",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_user_id uuid, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean",
+        "definition_md5": "2d71d7b461dabfbb9393e97406f4b3e2",
+        "normalized_md5": "0a37e5990611c66a019e3c5ff826a473"
+      },
+      {
+        "name": "admin_upsert_product",
+        "schema": "public",
+        "signature": "p_id text, p_name text, p_category product_category, p_unit text, p_aliases text[], p_is_active boolean",
+        "definition_md5": "297c5170cb015b9b3521ddb0202e0c6f",
+        "normalized_md5": "598069b4bee0ef61e065fb2b8a560b0d"
+      },
+      {
+        "name": "admin_upsert_recipient",
+        "schema": "public",
+        "signature": "p_id uuid, p_display_name text, p_is_active boolean, p_is_development boolean",
+        "definition_md5": "c425d24f5c19b4f27415bd96d4b9c191",
+        "normalized_md5": "dc61cb4f270ec7361e51b6d5c2d0fd43"
+      },
+      {
+        "name": "admin_upsert_recipient_product",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_name text, p_category product_category, p_unit text, p_aliases text[], p_is_active boolean, p_description text, p_sort_order integer",
+        "definition_md5": "7a656eedd87173975a29a0c066350f8f",
+        "normalized_md5": "e11c154ae10601a36c2b27f9a0000c26"
+      },
+      {
+        "name": "after_stock_alert",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "7e70bde696c2d69909898ded68a27e79",
+        "normalized_md5": "09de3ea4f6518b82dc2229824a91f791"
+      },
+      {
+        "name": "approve_stock_inventory",
+        "schema": "public",
+        "signature": "p_inventory_id uuid",
+        "definition_md5": "3b2af2cc8500798d4dc63d946f5d8227",
+        "normalized_md5": "e1b4187607a263d34d6de672655d13ae"
+      },
+      {
+        "name": "archive_requisition",
+        "schema": "public",
+        "signature": "p_id uuid, p_reason text",
+        "definition_md5": "ace0cc752b72a484e2ff23494d63b7e4",
+        "normalized_md5": "e82098b1707be5eb0cff5ac136add533"
+      },
+      {
+        "name": "audited_legacy_supply_command",
+        "schema": "public",
+        "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+        "definition_md5": "af701440308e0a481c31c6278ce9bc34",
+        "normalized_md5": "f7799de6d2a1d38a844158ea052ce13f"
+      },
+      {
+        "name": "balance_command",
+        "schema": "public",
+        "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+        "definition_md5": "f73f0e01386738d8f9c1b96aca5b467b",
+        "normalized_md5": "1a3b7da98ed10b3bb8aec376fc26c6d3"
+      },
+      {
+        "name": "balance_workspace",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "bf99a3e43284fad14593875d0e5dd11c",
+        "normalized_md5": "5e1d0f5c37640260c94f95a5ac38fb8e"
+      },
+      {
+        "name": "bind_notification_template",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker uuid, p_name text, p_version integer, p_language text",
+        "definition_md5": "582489426083988f86266cc1a7da99a5",
+        "normalized_md5": "f1fa90b1f8cf64d35d81a6fda7f3bb29"
+      },
+      {
+        "name": "bind_validated_attachment",
+        "schema": "public",
+        "signature": "p_id uuid",
+        "definition_md5": "65e3c8600336b09d7efa75a6ad66f0c6",
+        "normalized_md5": "418ffedb535a1684de06c754344aa60c"
+      },
+      {
+        "name": "can_access_recipient",
+        "schema": "public",
+        "signature": "p_recipient_id uuid",
+        "definition_md5": "ec985c4e691f2e2c408faba6c942a271",
+        "normalized_md5": "a9e0e5939abcf622d6c181dae2a538a9"
+      },
+      {
+        "name": "can_manage_recipient",
+        "schema": "public",
+        "signature": "p_recipient_id uuid",
+        "definition_md5": "5a3dbd68b7d4ff90f3d9dde7474dd3e3",
+        "normalized_md5": "6b056587f583498c251938cd8433e437"
+      },
+      {
+        "name": "claim_notification_jobs",
+        "schema": "public",
+        "signature": "p_limit integer, p_worker_id uuid, p_external_enabled boolean",
+        "definition_md5": "0b5101c0cd04243fb1ff09f25fddb562",
+        "normalized_md5": "20fde34a947e4bf2a6dfcbf20a3cfeb6"
+      },
+      {
+        "name": "complete_notification_job",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid, p_state text, p_provider_reference text, p_error text",
+        "definition_md5": "56fa966e777ec2760a209e3153dd2fa8",
+        "normalized_md5": "90ed8991ed1bff4ecb16a644df8a5286"
+      },
+      {
+        "name": "configure_catalogue_unit",
+        "schema": "public",
+        "signature": "p_patient uuid, p_product text, p_unit text, p_decimals integer, p_barcode text, p_presentation text, p_base_quantity numeric",
+        "definition_md5": "01982c083538f02803295e289ee39aa1",
+        "normalized_md5": "22fd071d247cba27404d1cb2ae83fbec"
+      },
+      {
+        "name": "configure_notification_rule",
+        "schema": "public",
+        "signature": "p_patient uuid, p_event text, p_role text, p_channels text[], p_pdf boolean, p_cooldown integer, p_quiet_start integer, p_quiet_end integer",
+        "definition_md5": "c99ed652f8ee7673d6ec5102697e5444",
+        "normalized_md5": "050792bb46a2e66d99e0b1bb3208be3f"
+      },
+      {
+        "name": "configure_patient_access",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+        "definition_md5": "204c3a5e00ff22d83887cec2c4e94d29",
+        "normalized_md5": "e7b89c7b4e8a289dcd3fdfb0de3d59b3"
+      },
+      {
+        "name": "configure_recipient_notification",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_recipient_user_id uuid, p_recipient_group text, p_channel text, p_destination text, p_enabled boolean, p_include_team_alerts boolean",
+        "definition_md5": "e1445e470001195d2daea955306e93b8",
+        "normalized_md5": "946ed623d6cd88fda0c0727bee431946"
+      },
+      {
+        "name": "configure_stock_alert",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_location text, p_low_threshold numeric, p_critical_threshold numeric, p_is_enabled boolean",
+        "definition_md5": "7a0deb071b51b7dbafdc19e4d00fd8a2",
+        "normalized_md5": "7aaa6309b93cc9fa4c2c3e9d7bd87f3a"
+      },
+      {
+        "name": "configure_worker_schedule",
+        "schema": "public",
+        "signature": "p_token text",
+        "definition_md5": "557271c5044fe2bc4ec5fc23f1e7b6f8",
+        "normalized_md5": "20aade856d1bd1ef37152a6761de4b34"
+      },
+      {
+        "name": "confirm_extraordinary_consumption",
+        "schema": "public",
+        "signature": "p_id uuid, p_accept boolean",
+        "definition_md5": "789525122b73c7ca459ab2080236e4c2",
+        "normalized_md5": "e20d69e0c42e424a1625ec27fa8b7ddc"
+      },
+      {
+        "name": "confirm_whatsapp_science",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_hash text",
+        "definition_md5": "f713c797420ec0fc608cd7f124e23144",
+        "normalized_md5": "77e06fc72ce3dd2494152f1cc576bb05"
+      },
+      {
+        "name": "create_flow_session",
+        "schema": "public",
+        "signature": "p_patient uuid, p_hash text",
+        "definition_md5": "21e267c9f4f60e3a76b2273c48325f4e",
+        "normalized_md5": "6e89f1bb8bf9e8e000718262208b0090"
+      },
+      {
+        "name": "create_measurement_unit",
+        "schema": "public",
+        "signature": "p_patient uuid, p_code text, p_name text, p_dimension text, p_decimals integer",
+        "definition_md5": "eccd3332d65081ec898143859e0616d1",
+        "normalized_md5": "7c7c79f7c8c29cc85f1adebcfc6c474d"
+      },
+      {
+        "name": "create_patient_with_administrator",
+        "schema": "public",
+        "signature": "p_name text, p_development boolean, p_administrator_email text",
+        "definition_md5": "06a4bd6b17db5907c882dd4438502570",
+        "normalized_md5": "eec0ef53db783597ec3700079a8bf8aa"
+      },
+      {
+        "name": "create_receipt_flow_session",
+        "schema": "public",
+        "signature": "p_document uuid, p_hash text",
+        "definition_md5": "826ffb63fdbaf570e62bac78821f769f",
+        "normalized_md5": "dfb356215c93b2924fa6d2147fb18a90"
+      },
+      {
+        "name": "create_stock_inventory",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_location text",
+        "definition_md5": "68ca8e4d364781b98e56b8d90d88223d",
+        "normalized_md5": "6ce7424c65589a41e6ae990e64d1b45d"
+      },
+      {
+        "name": "create_supply_document",
+        "schema": "public",
+        "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean",
+        "definition_md5": "0c120951141000a82f30558267aa526d",
+        "normalized_md5": "af1596c4f7a4d99d75b6e32f7e650e9c"
+      },
+      {
+        "name": "current_profile_role",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "4e7c7e70ae44fc32afc3fab359061798",
+        "normalized_md5": "4ad249f7c15207d123e42bec5e04455b"
+      },
+      {
+        "name": "decline_invitation",
+        "schema": "public",
+        "signature": "p_token_hash text",
+        "definition_md5": "724ce8c2d881adecce263cd5b338277d",
+        "normalized_md5": "8492ff21f47214c73dbf3daf2cb922c8"
+      },
+      {
+        "name": "derive_item_patient",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "d36d419fe0bcb23c1dfb94022481656d",
+        "normalized_md5": "45703747283a62ed9ac5acbf4df23977"
+      },
+      {
+        "name": "document_delivery_status",
+        "schema": "public",
+        "signature": "p_document uuid",
+        "definition_md5": "8263fbe01325b132a3b2e6506db3c2b7",
+        "normalized_md5": "f6ead9c1eb80a4765dc2ce644a51a797"
+      },
+      {
+        "name": "document_navigation_context",
+        "schema": "public",
+        "signature": "p_id uuid",
+        "definition_md5": "2a13a0db2c5a7f201b2cd5e3cbb3616a",
+        "normalized_md5": "e03a23b8e4526b87d6bbb74a8e18e618"
+      },
+      {
+        "name": "enqueue_patient_event",
+        "schema": "public",
+        "signature": "p_patient uuid, p_requisition uuid, p_alert uuid",
+        "definition_md5": "6f854b6046c0d11cc2b416bd4b0b2146",
+        "normalized_md5": "9d48a3d33f8dfc4792dffc5bb648d7ad"
+      },
+      {
+        "name": "enqueue_requisition_notifications",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "d00682298ff977f9a614d6a1f635feca",
+        "normalized_md5": "c1025194e8cb16e949fd6766ca413583"
+      },
+      {
+        "name": "evaluate_stock_alert",
+        "schema": "public",
+        "signature": "p_patient uuid, p_product text, p_location text",
+        "definition_md5": "449465f3a9f19df8eafc227fd5c02bb9",
+        "normalized_md5": "d34aedd66b2fe12eecc4be3febb7233d"
+      },
+      {
+        "name": "extraordinary_stock_adjustment",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_quantity integer, p_location text, p_justification text, p_confirmation boolean, p_idempotency_key uuid",
+        "definition_md5": "5f7b8b374df4da3ca4b270f679ac0519",
+        "normalized_md5": "b8b79571b65ad89942791499fbd1b411"
+      },
+      {
+        "name": "family_stock_movement",
+        "schema": "public",
+        "signature": "p_patient uuid, p_product text, p_quantity numeric, p_action text, p_reason text, p_key uuid, p_reference uuid",
+        "definition_md5": "a0946ad8e2061da3b1d452d70efc2c17",
+        "normalized_md5": "3a37aee202bfc9c7cea5eaace5ac1b97"
+      },
+      {
+        "name": "finalize_attachment",
+        "schema": "public",
+        "signature": "p_id uuid, p_actor uuid, p_hash text, p_mime text, p_bytes bigint, p_valid boolean",
+        "definition_md5": "d3fb84fb680c4bfe96de76dca0798f25",
+        "normalized_md5": "3e10c299f36877132d6643f5d6f5ff75"
+      },
+      {
+        "name": "find_patient_product_by_alias",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_query text",
+        "definition_md5": "878819eab9234377c66e8653a5fa4e01",
+        "normalized_md5": "c4e57deeb0b9b3d281838784fc93330d"
+      },
+      {
+        "name": "find_product_by_alias",
+        "schema": "public",
+        "signature": "p_query text",
+        "definition_md5": "91b79b81f4b49d73ba06df37c202d37b",
+        "normalized_md5": "15570bbde2648f0e57a5cd0ef2f2ca74"
+      },
+      {
+        "name": "flow_exchange",
+        "schema": "public",
+        "signature": "p_hash text, p_submit jsonb",
+        "definition_md5": "410f34a3a5905f14d01de1009f3f4df3",
+        "normalized_md5": "493f305551d11cdb09dd9d797f8b71a1"
+      },
+      {
+        "name": "fluent_pre_matrix_governance",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "5f213e6d88d725317259c2a145f412aa",
+        "normalized_md5": "afbd454c8ba6e19efa95819f6f5835b0"
+      },
+      {
+        "name": "fluent_pre_retry_claim_jobs",
+        "schema": "public",
+        "signature": "p_limit integer, p_worker_id uuid, p_external_enabled boolean",
+        "definition_md5": "9103029578d9e0427f55295c1fe242d8",
+        "normalized_md5": "1fd97b8e6dec0f4b73493b5d4f9ea788"
+      },
+      {
+        "name": "fluent_pre_shift_command",
+        "schema": "public",
+        "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+        "definition_md5": "3f9da9fffd2616ef185c1ad869ca720e",
+        "normalized_md5": "3641c313a64b4d6781107eb0cd6b5f88"
+      },
+      {
+        "name": "fluent_pre_shift_create",
+        "schema": "public",
+        "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean",
+        "definition_md5": "c6d52de4ce5be63554a84b3d4a8fe885",
+        "normalized_md5": "497546a808c523ebbb6a515a4a07a89e"
+      },
+      {
+        "name": "fluent_pre_shift_revise",
+        "schema": "public",
+        "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+        "definition_md5": "cf1c812ea09285c66c9a24ac58055267",
+        "normalized_md5": "a3e4063d85b3a999cbf4deb536ab62f7"
+      },
+      {
+        "name": "fluent_pre_shift_scheduler",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "53a7ad25dac43ee4657073de83b3f0cd",
+        "normalized_md5": "6e211932a17de5522fa2720f44df71d6"
+      },
+      {
+        "name": "global_patient_administration",
+        "schema": "public",
+        "signature": "p_patient uuid, p_section text",
+        "definition_md5": "abedabdb62144d217ab8bdd6b9944594",
+        "normalized_md5": "21f8ba317e282033593f124f3f0f4757"
+      },
+      {
+        "name": "governance_legacy_patient_access",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+        "definition_md5": "554f7e89861684d3bd3aa5ab601fa7f9",
+        "normalized_md5": "7e304b2b7981956325158a10326ef406"
+      },
+      {
+        "name": "guard_patient_product_owner",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "65f7701ef52b162a750a0b0aa5c1704e",
+        "normalized_md5": "f5787a649efc65a5c6dc682f00c148c7"
+      },
+      {
+        "name": "guard_requisition_item_stock",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "52b734051e33f8f83d25af5c8eb5e590",
+        "normalized_md5": "f5fc1e046b43a37006d80644854852ab"
+      },
+      {
+        "name": "guard_stock_movement_balance",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "fb595614993afdbfc1816ad29d86fd9e",
+        "normalized_md5": "00b2515229bba8d1f0e750cbdd95c972"
+      },
+      {
+        "name": "import_historical_requisitions",
+        "schema": "public",
+        "signature": "p_source_hash text, p_rows jsonb",
+        "definition_md5": "445dba25eb2a769aaa7637cad38e15d8",
+        "normalized_md5": "de085601fa478fe1972d7787a44235fc"
+      },
+      {
+        "name": "inbound_report_context",
+        "schema": "public",
+        "signature": "p_phone text",
+        "definition_md5": "8096fc677c7f76850d5b35c70cacef3e",
+        "normalized_md5": "bba051eee3f60081edbd9523c7b8f799"
+      },
+      {
+        "name": "ingest_whatsapp_report",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_text text, p_lines jsonb, p_kind text",
+        "definition_md5": "684540ed82cb619306477a23c82611b1",
+        "normalized_md5": "b5594a82153b8ba548f2b7dbfd26219f"
+      },
+      {
+        "name": "invalidate_revoked_membership_invitations",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "415a344fc7ebe34821c8561c62a31bd0",
+        "normalized_md5": "e8090ab7a3e977adddca37d2b404aea6"
+      },
+      {
+        "name": "invalidate_revoked_profile_notifications",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "1a3490c1bc8785a3370abfbe3b534eeb",
+        "normalized_md5": "065d06e907c3bc3985b9301b280b169a"
+      },
+      {
+        "name": "invitation_registration_allowed",
+        "schema": "public",
+        "signature": "p_token_hash text, p_email text",
+        "definition_md5": "2a7ece44b0b31a713d4916749224cb43",
+        "normalized_md5": "90dbeb4d7acddba5b27b81c21d1a5762"
+      },
+      {
+        "name": "is_global_administrator",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "a794b44de3b550b8e072af278fe7b11b",
+        "normalized_md5": "8a69ce7379abed5fbf543a30b47ee2b5"
+      },
+      {
+        "name": "issue_reminder_challenge",
+        "schema": "public",
+        "signature": "p_notification uuid, p_worker uuid, p_hash text",
+        "definition_md5": "029ad613e37255c0c1e1bbb73c79d85a",
+        "normalized_md5": "24cf7a5feaac66c7488aef3f0d2e5c50"
+      },
+      {
+        "name": "issue_science_challenge",
+        "schema": "public",
+        "signature": "p_notification uuid, p_worker uuid, p_hash text",
+        "definition_md5": "7c2fb511ae316d25b96175ca2ac1774a",
+        "normalized_md5": "a7accfd649a0073206e3749d5e119fff"
+      },
+      {
+        "name": "issue_whatsapp_challenge",
+        "schema": "public",
+        "signature": "p_notification uuid, p_worker uuid, p_hash text",
+        "definition_md5": "877d2390a13042213436bd1735a11aae",
+        "normalized_md5": "dfe79a36f3384605b03bae3e3c7d32f0"
+      },
+      {
+        "name": "legacy_import_historical_requisitions",
+        "schema": "public",
+        "signature": "p_source_hash text, p_rows jsonb",
+        "definition_md5": "819a7b676e42b0d045c35d14dba44f63",
+        "normalized_md5": "ef17d102f4d7be9b02dcd0aaee60e70e"
+      },
+      {
+        "name": "legacy_transition_requisition_status",
+        "schema": "public",
+        "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text",
+        "definition_md5": "9a381ab8ac6ee616e72ecee59542b18e",
+        "normalized_md5": "d630aee0c99d6d4ed1d66605ef750342"
+      },
+      {
+        "name": "mark_notification_seen",
+        "schema": "public",
+        "signature": "p_id uuid",
+        "definition_md5": "26243850ce7360bd5be5ac1a7cff5389",
+        "normalized_md5": "e02fcf2e2065e26de96d27d281bc7802"
+      },
+      {
+        "name": "my_active_context",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "c362dd6429b3a638658b112d0f773a34",
+        "normalized_md5": "b52e909a8bdcce872dd83a27a8f84cd3"
+      },
+      {
+        "name": "my_session_valid",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "45cf1bb388de8a96a63ebc9b5ca3f38a",
+        "normalized_md5": "45cf1bb388de8a96a63ebc9b5ca3f38a"
+      },
+      {
+        "name": "my_sessions",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "77b842d4ef97a3344b12c06b9f3d928b",
+        "normalized_md5": "837cd5deec5c63c300a599bc2582b818"
+      },
+      {
+        "name": "my_workspace",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "c975275ccea80ee8a151ff830c9ade9b",
+        "normalized_md5": "b161b5d9d41273022409853c08e9458a"
+      },
+      {
+        "name": "normalize_local_capabilities",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "73e029e039baf9b9eb2c1021716247cf",
+        "normalized_md5": "774a30fc8a8d3f1847b04361a1bf65f7"
+      },
+      {
+        "name": "notification_document_payload",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid",
+        "definition_md5": "b468d1911a93ea063fbed2e440b29b7a",
+        "normalized_md5": "942c75eb16393d5b26e6d3c1657dcae0"
+      },
+      {
+        "name": "notification_job_state",
+        "schema": "public",
+        "signature": "p_id uuid",
+        "definition_md5": "03261316cb5bbc0c539d97c87ef4b015",
+        "normalized_md5": "03261316cb5bbc0c539d97c87ef4b015"
+      },
+      {
+        "name": "notification_notice_payload",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker uuid",
+        "definition_md5": "4fd8d3d6a2fc23b4502a9e1d6e0d8e31",
+        "normalized_md5": "1cf64e664b1feb67e343e75df10ec208"
+      },
+      {
+        "name": "notification_safe_failure",
+        "schema": "public",
+        "signature": "p_reference text, p_code text",
+        "definition_md5": "dd64bdc627041aab96d5f8d9275f5be3",
+        "normalized_md5": "8f15aa8ac4465eb1b07e42f2ad8bee34"
+      },
+      {
+        "name": "notification_webhook",
+        "schema": "public",
+        "signature": "p_provider_reference text, p_state text, p_notification_id uuid",
+        "definition_md5": "33558cee7d340f04e276fe0c7dfa081b",
+        "normalized_md5": "06abc1872f921ebbd90f0dff09b13f8b"
+      },
+      {
+        "name": "operational_document",
+        "schema": "public",
+        "signature": "p_id uuid",
+        "definition_md5": "16ba7725c2f1f73739b2f18266b7ea7d",
+        "normalized_md5": "40e71826de4db08c3b97565c0501e141"
+      },
+      {
+        "name": "operational_document_list",
+        "schema": "public",
+        "signature": "p_patient uuid, p_type text, p_status text, p_search text, p_from timestamp with time zone, p_to timestamp with time zone, p_page integer, p_size integer",
+        "definition_md5": "90b66ad07e8e27ed4d70c99a2f40ba0d",
+        "normalized_md5": "770c81567b7d15457cd2d20ee485cc81"
+      },
+      {
+        "name": "operational_tasks",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "211d800f275e4908ab69b897978abbd9",
+        "normalized_md5": "f9c4249d9b5d110304dfecc58d57b2a8"
+      },
+      {
+        "name": "patient_capabilities",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "d5c09e9c02962d555b8f55e0d620e0b6",
+        "normalized_md5": "70172f75f2b3f6d5456ab903768c4eb2"
+      },
+      {
+        "name": "patient_capability_definitions",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "b456502c0e81d462ebd3a3badf927f0f",
+        "normalized_md5": "69f7b863067984459ae3cd50b82527b7"
+      },
+      {
+        "name": "patient_directory",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "81f6e62af91cb10c204cfd7c8540b613",
+        "normalized_md5": "21df1bb999f881a788f9cac5a18b6893"
+      },
+      {
+        "name": "patient_governance",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "13b9d5ed0d971f624bba04567d1abad5",
+        "normalized_md5": "327a8451432cf34a92fe79aeb1796b6f"
+      },
+      {
+        "name": "patient_notification_rules",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "25f5fd93a42e2ba02f0596f14c2e25e7",
+        "normalized_md5": "45e4fd6efe1d056683d32c585aeae2ec"
+      },
+      {
+        "name": "process_internal_notifications",
+        "schema": "public",
+        "signature": "p_limit integer",
+        "definition_md5": "e67cd62b80cb74f52fdc3832e79c45c1",
+        "normalized_md5": "c2bfae30f2f8fd5bd81591bcf5e22d96"
+      },
+      {
+        "name": "protect_last_global_admin",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "e93e79c2915844adfc13dd5e01fe25a5",
+        "normalized_md5": "2c32d5d8ee852688cb6681e8b2cd08c5"
+      },
+      {
+        "name": "protect_requisition_historical_origin",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "b1e5899c4791a4c16fef2910cd8b4e29",
+        "normalized_md5": "13b9d42bf5d8c475e07d4dcba92e8497"
+      },
+      {
+        "name": "protect_requisition_identity",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "bec0b2b63fdd88343878fee2f7c30f70",
+        "normalized_md5": "3dd00b597480ee8294714822c46f15cd"
+      },
+      {
+        "name": "recent_session",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "dee8e820f14be78f1e5be6f7bb6f6434",
+        "normalized_md5": "84af86f01868d0e57cdbbee0793d535d"
+      },
+      {
+        "name": "recipient_can",
+        "schema": "public",
+        "signature": "p_recipient_id uuid, p_operation text",
+        "definition_md5": "5b39f741306e7e10387e0455410b13ff",
+        "normalized_md5": "6b78327591c54a0ca46f2f16c3304a1c"
+      },
+      {
+        "name": "recipient_role",
+        "schema": "public",
+        "signature": "p_recipient_id uuid",
+        "definition_md5": "345d13f34881929fc355223612f7de9d",
+        "normalized_md5": "d1e9e7134a0d7a38d3d2e719c6e09945"
+      },
+      {
+        "name": "record_requisition_status_transition",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "ab054e94930d4deb0391dae89de6242a",
+        "normalized_md5": "e3b019d9c7d4a2391ae615e3d851404e"
+      },
+      {
+        "name": "record_stock_movement",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_quantity integer, p_movement_type stock_movement_type, p_source_location text, p_destination_location text, p_justification text, p_idempotency_key uuid, p_reference_type text, p_reference_id uuid",
+        "definition_md5": "b8635ec267e85db5f9db46ad93f7665f",
+        "normalized_md5": "5fb4c8605342334fcea0c45a01764dbd"
+      },
+      {
+        "name": "recount_stock_inventory",
+        "schema": "public",
+        "signature": "p_inventory_id uuid",
+        "definition_md5": "e069a848c87b8664fc1b6dc2fdf5e021",
+        "normalized_md5": "354dfabd3d1e566fe5e7b146661610e7"
+      },
+      {
+        "name": "register_document_pdf",
+        "schema": "public",
+        "signature": "p_document uuid, p_version integer, p_path text, p_hash text",
+        "definition_md5": "5fb784d1289ddf2c9eaf3d706b71c5e6",
+        "normalized_md5": "9f327ba5b04efaead38d8f1a3d5a38be"
+      },
+      {
+        "name": "register_document_render",
+        "schema": "public",
+        "signature": "p_document uuid, p_version integer, p_renderer integer, p_path text, p_hash text",
+        "definition_md5": "1b84514d6a92f5be718e35a76da9047c",
+        "normalized_md5": "617d2363bf062b6cb6a387901ad59456"
+      },
+      {
+        "name": "register_verified_phone",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "478ee2eaaa05515974cbb9a5f9ace634",
+        "normalized_md5": "aa534a337f53f5692b2500b10728e061"
+      },
+      {
+        "name": "report_extraordinary_consumption",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_location text, p_text text, p_lines jsonb, p_key uuid",
+        "definition_md5": "274a50d15ab399777b7b879bb4d34ece",
+        "normalized_md5": "933d9fc7c154f07b88c7b014d8a26d5a"
+      },
+      {
+        "name": "requisition_delivery_status",
+        "schema": "public",
+        "signature": "p_requisition_ids uuid[]",
+        "definition_md5": "4fb2417d9718fbad609220ea9c813b63",
+        "normalized_md5": "fbd42470067c1dcd2a500d3687207c8d"
+      },
+      {
+        "name": "requisition_fulfillment",
+        "schema": "public",
+        "signature": "p_requisition uuid",
+        "definition_md5": "ab3dd23817e4f312bb4a7cdbe8795b95",
+        "normalized_md5": "4ef26961a8e5505ff13a6f8bd455ec89"
+      },
+      {
+        "name": "requisition_fulfillments",
+        "schema": "public",
+        "signature": "p_ids uuid[]",
+        "definition_md5": "57a15cbab1d0484180a1c27ee098452b",
+        "normalized_md5": "abef1ac5b66ce537f77998447f12fac5"
+      },
+      {
+        "name": "requisition_item_context",
+        "schema": "public",
+        "signature": "p_patient uuid, p_products text[]",
+        "definition_md5": "a4d7e53888745cfdebb7a8d9bc01f567",
+        "normalized_md5": "469c20956db55e34bd46f074056e0a0c"
+      },
+      {
+        "name": "requisition_progress",
+        "schema": "public",
+        "signature": "p_id uuid",
+        "definition_md5": "e3c27f9257be2ec08a05343b8ea87a29",
+        "normalized_md5": "fc1da7b901deed5e58c55652c9734671"
+      },
+      {
+        "name": "reserve_attachment",
+        "schema": "public",
+        "signature": "p_patient uuid, p_document uuid, p_movement uuid, p_filename text, p_mime text, p_bytes bigint, p_key uuid",
+        "definition_md5": "afdedaee86f8ea2de7a4437bb27bc6ed",
+        "normalized_md5": "d09d4932f19d393b520053caee0fcd35"
+      },
+      {
+        "name": "resolve_balance_assignment",
+        "schema": "public",
+        "signature": "p_patient uuid, p_cycle uuid, p_shift uuid, p_reason text, p_key uuid",
+        "definition_md5": "3120f978c025a5a823233298ecfd307e",
+        "normalized_md5": "bdd58407074aaba48717808b307694e0"
+      },
+      {
+        "name": "resolve_requisition_item",
+        "schema": "public",
+        "signature": "p_item uuid, p_product text, p_reason text, p_key uuid",
+        "definition_md5": "cd448f8dded9c024bec0a98cfe2642a2",
+        "normalized_md5": "bca42ce754c84f3cdb47d416fb234237"
+      },
+      {
+        "name": "retry_notification_job",
+        "schema": "public",
+        "signature": "p_id uuid, p_confirm_uncertain boolean",
+        "definition_md5": "fdb97d4abc87ccf3cd169dd915ea50ac",
+        "normalized_md5": "7d03ce57e13465bb2cbf8195cf0d8d21"
+      },
+      {
+        "name": "review_flow_submission",
+        "schema": "public",
+        "signature": "p_id uuid, p_accept boolean, p_kind text, p_text text, p_lines jsonb",
+        "definition_md5": "ac291f8960f0c420c9686d362ce4b009",
+        "normalized_md5": "ef706f5c02016331d2d046adbb2532a0"
+      },
+      {
+        "name": "review_stock_inventory",
+        "schema": "public",
+        "signature": "p_inventory_id uuid, p_action text, p_reason text",
+        "definition_md5": "627e57a4617338b3722319b0139c4f13",
+        "normalized_md5": "419ebbf703075ac57f01bdb05fe3d862"
+      },
+      {
+        "name": "revise_supply_document",
+        "schema": "public",
+        "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+        "definition_md5": "7082291fef9c0ebe506c36bb0a458f6a",
+        "normalized_md5": "9850ae35895d5140be7e32154149fa5b"
+      },
+      {
+        "name": "revoke_invitation",
+        "schema": "public",
+        "signature": "p_invitation_id uuid",
+        "definition_md5": "aa5cd30f04819ddfefbf9cebfa41b3e7",
+        "normalized_md5": "7224952576984d424c70879fb3a2e417"
+      },
+      {
+        "name": "run_operational_schedule",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "b59ce99f63077bab545edb79793a4d60",
+        "normalized_md5": "f96eba25aed21d171bdbe1b80a075d46"
+      },
+      {
+        "name": "schedule_command",
+        "schema": "public",
+        "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+        "definition_md5": "2aeb7c62afa470b48da77b946e2d6871",
+        "normalized_md5": "96cfe03ad08f99bcc926aed561e6d697"
+      },
+      {
+        "name": "schedule_workspace",
+        "schema": "public",
+        "signature": "p_patient uuid, p_from date, p_until date",
+        "definition_md5": "7012b873d97454ddb9af1a97830b336f",
+        "normalized_md5": "c96bc97e3a087cc6d9c4449e3262509f"
+      },
+      {
+        "name": "scheduler_health",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "caeeda1d608c5de3fbb05bdb335f48d9",
+        "normalized_md5": "d26e4d67c1c4d6551e6d2f2b048d421a"
+      },
+      {
+        "name": "select_active_context",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "6882c47e4c1df321a7c068b2abcd0126",
+        "normalized_md5": "49091470e0c93f34570f05bc741f5bfb"
+      },
+      {
+        "name": "set_my_avatar",
+        "schema": "public",
+        "signature": "p_path text",
+        "definition_md5": "ca7ab7c81735052e47bddf927f58d10d",
+        "normalized_md5": "6e145cd56af50d1faf3463bb27b54e4c"
+      },
+      {
+        "name": "stock_consumption_metrics",
+        "schema": "public",
+        "signature": "p_patient uuid, p_from timestamp with time zone, p_to timestamp with time zone",
+        "definition_md5": "b1832d317d54281d0d74cb07f9207496",
+        "normalized_md5": "c5f7a1109a8ffe4bb3a464d6c07165d1"
+      },
+      {
+        "name": "stock_history",
+        "schema": "public",
+        "signature": "p_patient uuid, p_product text, p_from timestamp with time zone, p_to timestamp with time zone, p_location text, p_page integer, p_size integer",
+        "definition_md5": "ced3ad4fefde72b2e27a833ef7497889",
+        "normalized_md5": "ff8858a745445df1625089f2927edf96"
+      },
+      {
+        "name": "stock_overview",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "5179abeac3591e79dc2fe9c21f744daf",
+        "normalized_md5": "1ab978f41db119fb33fdebde4db649c3"
+      },
+      {
+        "name": "stock_transit",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "0d51a8b5a2c8548df0e14a24d5733b55",
+        "normalized_md5": "32c55fa0621db61dd4c653842db982d5"
+      },
+      {
+        "name": "submit_requisition",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_idempotency_key uuid, p_payload_hash text, p_lines jsonb, p_extra_items jsonb, p_observations jsonb",
+        "definition_md5": "ee10307ee1e3bdf231edbf18ba6b72df",
+        "normalized_md5": "d57c4ac5737d8fc637e181a972ae36d5"
+      },
+      {
+        "name": "submit_stock_inventory",
+        "schema": "public",
+        "signature": "p_inventory_id uuid",
+        "definition_md5": "ee45a082e4fe43800c4a9ef0fbb83342",
+        "normalized_md5": "cf98725f8c7f1aff7b9e7967ca37c953"
+      },
+      {
+        "name": "supply_document_command",
+        "schema": "public",
+        "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+        "definition_md5": "3979e923500deac19445f1005fc78bec",
+        "normalized_md5": "711a99f1096af20d51b87f4bedf2b1b8"
+      },
+      {
+        "name": "transition_requisition_status",
+        "schema": "public",
+        "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text",
+        "definition_md5": "01f1bee7042d0419531bd7002b468d29",
+        "normalized_md5": "f8e49ce792ebea1989784344fe61d855"
+      },
+      {
+        "name": "unaccent",
+        "schema": "public",
+        "signature": "regdictionary, text",
+        "definition_md5": "732e7240010ae6ee51752c269f22d1d8",
+        "normalized_md5": "732e7240010ae6ee51752c269f22d1d8"
+      },
+      {
+        "name": "unaccent",
+        "schema": "public",
+        "signature": "text",
+        "definition_md5": "c63fff9d5f6e608be381ae34c5a6bef7",
+        "normalized_md5": "c63fff9d5f6e608be381ae34c5a6bef7"
+      },
+      {
+        "name": "unaccent_init",
+        "schema": "public",
+        "signature": "internal",
+        "definition_md5": "3a1118dbb02cc3984f7fa23d2ee3a37e",
+        "normalized_md5": "3a1118dbb02cc3984f7fa23d2ee3a37e"
+      },
+      {
+        "name": "unaccent_lexize",
+        "schema": "public",
+        "signature": "internal, internal, internal, internal",
+        "definition_md5": "c8bbc42e6e1b37ea2584ba9a1006af8f",
+        "normalized_md5": "c8bbc42e6e1b37ea2584ba9a1006af8f"
+      },
+      {
+        "name": "update_my_profile",
+        "schema": "public",
+        "signature": "p_name text, p_registration text, p_state text, p_category text, p_preferences jsonb",
+        "definition_md5": "38f113c25062ab6a36cb6588f397e8b3",
+        "normalized_md5": "75302bf767351512aef2a59e2bcc7912"
+      },
+      {
+        "name": "v3_accept_invitation",
+        "schema": "public",
+        "signature": "p_token_hash text",
+        "definition_md5": "a5cc56bb630ee67f111df06835313eac",
+        "normalized_md5": "70672163643f815ce826ba5563cd8cf2"
+      },
+      {
+        "name": "v3_admin_upsert_recipient",
+        "schema": "public",
+        "signature": "p_id uuid, p_display_name text, p_is_active boolean, p_is_development boolean",
+        "definition_md5": "a7b71261bd4bedf26bd544eba0b9cab8",
+        "normalized_md5": "21898187857f2fec6a734b9682bb47ce"
+      },
+      {
+        "name": "v3_configure_stock_alert",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_location text, p_low_threshold bigint, p_critical_threshold bigint, p_is_enabled boolean",
+        "definition_md5": "7dd71ca6dc1570d1cdc4385308784fef",
+        "normalized_md5": "72f1ef75f5c8fdac3b91eeafe61f1b9a"
+      },
+      {
+        "name": "v3_create_supply_document",
+        "schema": "public",
+        "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean",
+        "definition_md5": "7bcff80d36d8695ad1b4743a190b989f",
+        "normalized_md5": "0d4af76b36799f55b6ec829110d812bd"
+      },
+      {
+        "name": "v3_flow_exchange",
+        "schema": "public",
+        "signature": "p_hash text, p_submit jsonb",
+        "definition_md5": "99b6189482bbd80deff8b2b2a9f33c95",
+        "normalized_md5": "3d096fe41874ae1cf5ae5da4ef07f944"
+      },
+      {
+        "name": "v3_ingest_whatsapp_report",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_text text, p_lines jsonb, p_kind text",
+        "definition_md5": "9dde569f1c273372fedac78365ea71df",
+        "normalized_md5": "d68cdf5a31e7f1741951135053f2cb8a"
+      },
+      {
+        "name": "v3_notification_webhook",
+        "schema": "public",
+        "signature": "p_provider_reference text, p_state text, p_notification_id uuid",
+        "definition_md5": "a9c13e97ec551176045bdcec9a2357c0",
+        "normalized_md5": "e919e188eb64a5c6278f516a4cc5ecfd"
+      },
+      {
+        "name": "v3_operational_tasks",
+        "schema": "public",
+        "signature": "p_patient uuid",
+        "definition_md5": "02f443c441182749109f75aef58280e6",
+        "normalized_md5": "7fe9fca7376593485bfea729b1e7e60f"
+      },
+      {
+        "name": "v3_revise_supply_document",
+        "schema": "public",
+        "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+        "definition_md5": "3b81ea1fcec859fca29604f8fc02db15",
+        "normalized_md5": "a09d12bf46309bf42a135b80dd5c2284"
+      },
+      {
+        "name": "v3_transition_requisition_status",
+        "schema": "public",
+        "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text",
+        "definition_md5": "c3358cd3e34f431f29b4a1355ae9c6a8",
+        "normalized_md5": "a5003aa1bd88970aff1428a919c80231"
+      },
+      {
+        "name": "v4_accept_invitation",
+        "schema": "public",
+        "signature": "p_token_hash text",
+        "definition_md5": "7578801c43f2448ec3a65e943ce06e2c",
+        "normalized_md5": "79e4f9c446872296ab9d7c61e2b6b4c3"
+      },
+      {
+        "name": "v4_admin_set_membership_status",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_user_id uuid, p_status text",
+        "definition_md5": "c5e2f5f0ca88b78fbe947315099b3c5b",
+        "normalized_md5": "e9bb1101d2d41d63817c5fbb121f0059"
+      },
+      {
+        "name": "v4_admin_upsert_membership",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_user_id uuid, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean",
+        "definition_md5": "aa985b39a9ce9fd2699d6161485c88da",
+        "normalized_md5": "669dac7745f4f17e99d0f1662f927d11"
+      },
+      {
+        "name": "v4_complete_notification_job",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid, p_state text, p_provider_reference text, p_error text",
+        "definition_md5": "14eb66420638806fdee92b5c198c111f",
+        "normalized_md5": "463e0bd668f521677a07c67e51f28108"
+      },
+      {
+        "name": "v4_configure_patient_access",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+        "definition_md5": "8250c10d8935f2466b028935b8712501",
+        "normalized_md5": "d013a447dd527e20d869e5366d2e9c87"
+      },
+      {
+        "name": "v4_lifecycle_schedule",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "3cab3f0ed53a3a75ecf36c08216028f0",
+        "normalized_md5": "eb7d448250ff828cf41f11eb75315771"
+      },
+      {
+        "name": "v4_review_archive_requisition",
+        "schema": "public",
+        "signature": "p_id uuid, p_reason text",
+        "definition_md5": "a36d40fca495ec3f4bda906a0656ae60",
+        "normalized_md5": "2dd1352b2f8c2b6daf4ef006220648b2"
+      },
+      {
+        "name": "v4_review_patient_access",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+        "definition_md5": "155eb807a54387a4a29c05e4ee303828",
+        "normalized_md5": "457774587e237f8e5a57daf2c41dec84"
+      },
+      {
+        "name": "v4_validate_notification_job",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid",
+        "definition_md5": "94eeb5c85cc4870446f3d8d7ef61bbb1",
+        "normalized_md5": "68d3c2fabb15a5cf38b520acf5391b5c"
+      },
+      {
+        "name": "validate_notification_job",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid",
+        "definition_md5": "0b7a9187bfbe3fb14dcabe0da0ad1404",
+        "normalized_md5": "1a8363766763c8177f8afa98012356c9"
+      },
+      {
+        "name": "validated_legacy_patient_access",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+        "definition_md5": "db81113b068537be2dcdee60217302ba",
+        "normalized_md5": "7b36dc1ae7f9d7df59ef148c471d367e"
+      },
+      {
+        "name": "verified_legacy_whatsapp_receipt",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_hash text",
+        "definition_md5": "1210880f2d1acd2e46d6e0b517e73258",
+        "normalized_md5": "44b584f48088d7b29f2e33f980f5846e"
+      },
+      {
+        "name": "verify_document_integrity",
+        "schema": "public",
+        "signature": "p_id uuid, p_version integer, p_hash text",
+        "definition_md5": "1697c2c50f203ee33581cfa85e82845b",
+        "normalized_md5": "76b4166693b7cdd41b893b854c5d424e"
+      },
+      {
+        "name": "workspace_revision",
+        "schema": "public",
+        "signature": "",
+        "definition_md5": "aeba3e0615cc58d6d90e251e43efacbb",
+        "normalized_md5": "0be2bd015c1820fef87396daaff375e6"
+      }
+    ],
+    "extensions": [
+      {
+        "name": "btree_gist",
+        "version": "1.7"
+      },
+      {
+        "name": "pg_cron",
+        "version": "1.6.4"
+      },
+      {
+        "name": "pg_net",
+        "version": "0.20.4"
+      },
+      {
+        "name": "pgcrypto",
+        "version": "1.3"
+      },
+      {
+        "name": "supabase_vault",
+        "version": "0.3.1"
+      }
+    ],
+    "migrations": {
+      "count": 84,
+      "latest": "20261025214537",
+      "versions": [
+        "20261019000100",
+        "20261019000200",
+        "20261020000300",
+        "20261020000400",
+        "20261020000500",
+        "20261020000600",
+        "20261020000700",
+        "20261020000800",
+        "20261020000900",
+        "20261020001000",
+        "20261020001100",
+        "20261020001200",
+        "20261020001300",
+        "20261020001400",
+        "20261020001500",
+        "20261020001600",
+        "20261020001700",
+        "20261020001800",
+        "20261020001900",
+        "20261020002000",
+        "20261020002050",
+        "20261020002100",
+        "20261020002200",
+        "20261020002300",
+        "20261020002400",
+        "20261020002500",
+        "20261020002600",
+        "20261020002700",
+        "20261020002800",
+        "20261020002900",
+        "20261020003000",
+        "20261020003100",
+        "20261020003200",
+        "20261020003300",
+        "20261020003400",
+        "20261022043226",
+        "20261022043227",
+        "20261022043228",
+        "20261022044133",
+        "20261022052012",
+        "20261022052521",
+        "20261022053539",
+        "20261022054021",
+        "20261022054421",
+        "20261022055016",
+        "20261022061251",
+        "20261022085111",
+        "20261022085635",
+        "20261022092041",
+        "20261022093556",
+        "20261022095138",
+        "20261022103707",
+        "20261023032230",
+        "20261023032906",
+        "20261023033155",
+        "20261023034142",
+        "20261023035102",
+        "20261023040129",
+        "20261023041150",
+        "20261023041624",
+        "20261023041917",
+        "20261023044520",
+        "20261023073958",
+        "20261023120000",
+        "20261023173000",
+        "20261023174500",
+        "20261023180000",
+        "20261024205813",
+        "20261024220543",
+        "20261024220943",
+        "20261024221017",
+        "20261024221737",
+        "20261024222909",
+        "20261024223046",
+        "20261025092446",
+        "20261025093655",
+        "20261025094057",
+        "20261025101209",
+        "20261025102217",
+        "20261025103452",
+        "20261025105017",
+        "20261025164621",
+        "20261025194512",
+        "20261025214537"
+      ]
+    },
+    "lock_timeout": "0",
+    "database_version": "17.11",
+    "statement_timeout": "15s"
+  },
+  "remote": {
+    "database_version": "17.11",
+    "extensions": [
+      {
+        "name": "btree_gist",
+        "version": "1.7"
+      },
+      {
+        "name": "pg_cron",
+        "version": "1.6.4"
+      },
+      {
+        "name": "pg_net",
+        "version": "0.20.4"
+      },
+      {
+        "name": "pgcrypto",
+        "version": "1.3"
+      },
+      {
+        "name": "supabase_vault",
+        "version": "0.3.1"
+      }
+    ],
+    "lock_timeout": "0",
+    "migrations": {
+      "count": 84,
+      "latest": "20261025214537",
+      "versions": [
+        "20261019000100",
+        "20261019000200",
+        "20261020000300",
+        "20261020000400",
+        "20261020000500",
+        "20261020000600",
+        "20261020000700",
+        "20261020000800",
+        "20261020000900",
+        "20261020001000",
+        "20261020001100",
+        "20261020001200",
+        "20261020001300",
+        "20261020001400",
+        "20261020001500",
+        "20261020001600",
+        "20261020001700",
+        "20261020001800",
+        "20261020001900",
+        "20261020002000",
+        "20261020002050",
+        "20261020002100",
+        "20261020002200",
+        "20261020002300",
+        "20261020002400",
+        "20261020002500",
+        "20261020002600",
+        "20261020002700",
+        "20261020002800",
+        "20261020002900",
+        "20261020003000",
+        "20261020003100",
+        "20261020003200",
+        "20261020003300",
+        "20261020003400",
+        "20261022043226",
+        "20261022043227",
+        "20261022043228",
+        "20261022044133",
+        "20261022052012",
+        "20261022052521",
+        "20261022053539",
+        "20261022054021",
+        "20261022054421",
+        "20261022055016",
+        "20261022061251",
+        "20261022085111",
+        "20261022085635",
+        "20261022092041",
+        "20261022093556",
+        "20261022095138",
+        "20261022103707",
+        "20261023032230",
+        "20261023032906",
+        "20261023033155",
+        "20261023034142",
+        "20261023035102",
+        "20261023040129",
+        "20261023041150",
+        "20261023041624",
+        "20261023041917",
+        "20261023044520",
+        "20261023073958",
+        "20261023120000",
+        "20261023173000",
+        "20261023174500",
+        "20261023180000",
+        "20261024205813",
+        "20261024220543",
+        "20261024220943",
+        "20261024221017",
+        "20261024221737",
+        "20261024222909",
+        "20261024223046",
+        "20261025092446",
+        "20261025093655",
+        "20261025094057",
+        "20261025101209",
+        "20261025102217",
+        "20261025103452",
+        "20261025105017",
+        "20261025164621",
+        "20261025194512",
+        "20261025214537"
+      ]
+    },
+    "routines": [
+      {
+        "definition_md5": "88bef1a6e764010fad23d360735707ce",
+        "name": "admin_assurance",
+        "normalized_md5": "88bef1a6e764010fad23d360735707ce",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "7fa7863551d93735aa963a4eb040d5b3",
+        "name": "adopt_catalogue_model",
+        "normalized_md5": "7fa7863551d93735aa963a4eb040d5b3",
+        "schema": "private",
+        "signature": "p_patient uuid, p_product text"
+      },
+      {
+        "definition_md5": "43293514591489f006aed8b1ce47b236",
+        "name": "apply_access_change",
+        "normalized_md5": "43293514591489f006aed8b1ce47b236",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "db1a3720a549a6ac992f5bb722cfcfa4",
+        "name": "apply_bal",
+        "normalized_md5": "db1a3720a549a6ac992f5bb722cfcfa4",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "ddb8356098e437e0445a868d3bd90816",
+        "name": "attachment_read",
+        "normalized_md5": "ddb8356098e437e0445a868d3bd90816",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "8821678bf0425cd2e3e81abd2325b754",
+        "name": "auth_session",
+        "normalized_md5": "8821678bf0425cd2e3e81abd2325b754",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "06224659b2bcd7ac6e42dbd281988515",
+        "name": "bal_assign",
+        "normalized_md5": "06224659b2bcd7ac6e42dbd281988515",
+        "schema": "private",
+        "signature": "p_patient uuid, p_cycle uuid, p_shift uuid, p_kind text"
+      },
+      {
+        "definition_md5": "958c138b99e27971ab05e07b644296da",
+        "name": "bal_count_context",
+        "normalized_md5": "958c138b99e27971ab05e07b644296da",
+        "schema": "private",
+        "signature": "p_patient uuid, p_document uuid, p_payload jsonb"
+      },
+      {
+        "definition_md5": "094bab1d5a4338738248d7fa4e5a0c0e",
+        "name": "bal_event",
+        "normalized_md5": "094bab1d5a4338738248d7fa4e5a0c0e",
+        "schema": "private",
+        "signature": "p_patient uuid, p_cycle uuid, p_assignment uuid, p_action text, p_reason text, p_details jsonb, p_key text"
+      },
+      {
+        "definition_md5": "82ef398e21d5b5fe6ee6034c807057da",
+        "name": "bal_family_authority",
+        "normalized_md5": "82ef398e21d5b5fe6ee6034c807057da",
+        "schema": "private",
+        "signature": "p_patient uuid, p_cap text"
+      },
+      {
+        "definition_md5": "f4220499575dd859748a06bb95cfd282",
+        "name": "can",
+        "normalized_md5": "f4220499575dd859748a06bb95cfd282",
+        "schema": "private",
+        "signature": "p_patient uuid, p_capability text"
+      },
+      {
+        "definition_md5": "723cead074bd56ea69d60d49c1a99752",
+        "name": "capability_definition_rows",
+        "normalized_md5": "723cead074bd56ea69d60d49c1a99752",
+        "schema": "private",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "2c2526d1ba1909f8635c206bbfe2c8e0",
+        "name": "close_admin_bootstrap",
+        "normalized_md5": "2c2526d1ba1909f8635c206bbfe2c8e0",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "a00d7093e37102c5e0de6924997c9c12",
+        "name": "credit_purchase_receipt",
+        "normalized_md5": "a00d7093e37102c5e0de6924997c9c12",
+        "schema": "private",
+        "signature": "p_receipt uuid"
+      },
+      {
+        "definition_md5": "d92b6142b00b1c94b47cd5d7679effd1",
+        "name": "deliver_internal_notifications",
+        "normalized_md5": "d92b6142b00b1c94b47cd5d7679effd1",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "af90a3c711ba2f09f52d4378e2757ed4",
+        "name": "delivery_science_and_progress",
+        "normalized_md5": "af90a3c711ba2f09f52d4378e2757ed4",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "71e78e062c5396bf6cc8903abe36205c",
+        "name": "effective_requisition_product",
+        "normalized_md5": "71e78e062c5396bf6cc8903abe36205c",
+        "schema": "private",
+        "signature": "p_item uuid"
+      },
+      {
+        "definition_md5": "b4b5c35dcef1c935383192b53070397a",
+        "name": "emit_document",
+        "normalized_md5": "b4b5c35dcef1c935383192b53070397a",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "dfbfc435601b2d101e1a5c7e2c1bfb9c",
+        "name": "enqueue_document_event",
+        "normalized_md5": "dfbfc435601b2d101e1a5c7e2c1bfb9c",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "828e735ab274f68af430883d9de314ca",
+        "name": "enqueue_notice",
+        "normalized_md5": "828e735ab274f68af430883d9de314ca",
+        "schema": "private",
+        "signature": "p_patient uuid, p_user uuid, p_event text, p_document uuid, p_document_event uuid, p_alert uuid, p_report uuid, p_reminder uuid, p_pdf boolean"
+      },
+      {
+        "definition_md5": "853ffc266a17be54639fbb6e1cadd743",
+        "name": "enqueue_scheduled_reminders",
+        "normalized_md5": "853ffc266a17be54639fbb6e1cadd743",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "6be39b9038abc2c1baef6c69a9bcc379",
+        "name": "finish_bal_count",
+        "normalized_md5": "6be39b9038abc2c1baef6c69a9bcc379",
+        "schema": "private",
+        "signature": "p_id uuid, p_context jsonb"
+      },
+      {
+        "definition_md5": "307286e558a177445687891d79da0ca1",
+        "name": "global_identity",
+        "normalized_md5": "307286e558a177445687891d79da0ca1",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "71b62fc572d19e97d668cab85fc13c96",
+        "name": "guard_bal_schedule_window",
+        "normalized_md5": "71b62fc572d19e97d668cab85fc13c96",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "cdaaf3468992a6b8c64756740097ff85",
+        "name": "guard_catalogue_unit",
+        "normalized_md5": "cdaaf3468992a6b8c64756740097ff85",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "a8958c42067d4c678ab4ff7a90c1c3e5",
+        "name": "guard_closed_request_links",
+        "normalized_md5": "a8958c42067d4c678ab4ff7a90c1c3e5",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "9a8216625cc0ee010c48be8859b9ff34",
+        "name": "guard_membership_elevation",
+        "normalized_md5": "9a8216625cc0ee010c48be8859b9ff34",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "fc264ab9202648377775c21e3d0403f8",
+        "name": "guard_notification_event_contract",
+        "normalized_md5": "fc264ab9202648377775c21e3d0403f8",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "273976a25c0b31368db1fe328c1164ef",
+        "name": "has_patient_authority",
+        "normalized_md5": "273976a25c0b31368db1fe328c1164ef",
+        "schema": "private",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "4982b45ac49d233d38525e8255509966",
+        "name": "immutable_event",
+        "normalized_md5": "4982b45ac49d233d38525e8255509966",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "65d0695a8d5bd90cbe2883b0b98eebe7",
+        "name": "init_requisition_science",
+        "normalized_md5": "65d0695a8d5bd90cbe2883b0b98eebe7",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "dcd3d331a76a4bc3d59a3785ee96feb5",
+        "name": "invalidate_workspace",
+        "normalized_md5": "dcd3d331a76a4bc3d59a3785ee96feb5",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "728d017ab914b91dbd36ed3fb051822e",
+        "name": "invoke_notification_worker",
+        "normalized_md5": "728d017ab914b91dbd36ed3fb051822e",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "07c328af3cdecede3a2ce29313725271",
+        "name": "member_can",
+        "normalized_md5": "07c328af3cdecede3a2ce29313725271",
+        "schema": "private",
+        "signature": "p_patient uuid, p_user uuid, p_capability text"
+      },
+      {
+        "definition_md5": "1bbc6efcf6243be1248ee455b658f7d7",
+        "name": "move_stock",
+        "normalized_md5": "1bbc6efcf6243be1248ee455b658f7d7",
+        "schema": "private",
+        "signature": "p_patient uuid, p_product text, p_quantity numeric, p_source text, p_destination text, p_reason text, p_reference text, p_id uuid"
+      },
+      {
+        "definition_md5": "7215361aacc638de0040b41360bbafd5",
+        "name": "process_bal_patient",
+        "normalized_md5": "7215361aacc638de0040b41360bbafd5",
+        "schema": "private",
+        "signature": "p_patient uuid, p_now timestamp with time zone"
+      },
+      {
+        "definition_md5": "7842ee6a767294706869e9fcbdfcf5e1",
+        "name": "reconcile_declined_membership_invitation",
+        "normalized_md5": "7842ee6a767294706869e9fcbdfcf5e1",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "9dcfe13b80c5b3a9cfede3f8bbab8f57",
+        "name": "record_document_event",
+        "normalized_md5": "9dcfe13b80c5b3a9cfede3f8bbab8f57",
+        "schema": "private",
+        "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid"
+      },
+      {
+        "definition_md5": "df2c587d6b56533ba61f3354cb76b1de",
+        "name": "record_science",
+        "normalized_md5": "df2c587d6b56533ba61f3354cb76b1de",
+        "schema": "private",
+        "signature": "p_id uuid, p_user uuid, p_mode text, p_evidence jsonb"
+      },
+      {
+        "definition_md5": "59b2b66fe348d4ad94ebb330d420eaed",
+        "name": "refresh_requisition_lifecycle",
+        "normalized_md5": "59b2b66fe348d4ad94ebb330d420eaed",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "e23e2b774f4f77d0ce1be4e25fc01313",
+        "name": "register_legacy_requisition",
+        "normalized_md5": "e23e2b774f4f77d0ce1be4e25fc01313",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "4c56ba37a0cc9fc26c621a5410c8fc25",
+        "name": "reject_resolution_mutation",
+        "normalized_md5": "4c56ba37a0cc9fc26c621a5410c8fc25",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "e57644b86fa0b7008c89ea3c48aa0e25",
+        "name": "release_pdf_configuration_holds",
+        "normalized_md5": "e57644b86fa0b7008c89ea3c48aa0e25",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "dfea978ed17d2074e5753861abd0a5b2",
+        "name": "release_template_holds",
+        "normalized_md5": "dfea978ed17d2074e5753861abd0a5b2",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "57f031cc2c173643275f61df91ce29af",
+        "name": "reminder_recipient_can",
+        "normalized_md5": "57f031cc2c173643275f61df91ce29af",
+        "schema": "private",
+        "signature": "p_reminder uuid, p_user uuid"
+      },
+      {
+        "definition_md5": "457766e97a6d1c2e7057cee58385151c",
+        "name": "report_notice",
+        "normalized_md5": "457766e97a6d1c2e7057cee58385151c",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "159f8ed4e8de47087d1572ae452099a8",
+        "name": "require_cap",
+        "normalized_md5": "159f8ed4e8de47087d1572ae452099a8",
+        "schema": "private",
+        "signature": "p_patient uuid, p_cap text"
+      },
+      {
+        "definition_md5": "83a9aaafaadc680f3cac913064f7f82d",
+        "name": "requisition_archive_task",
+        "normalized_md5": "83a9aaafaadc680f3cac913064f7f82d",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "df4ec60a7bbb1c73af5ce105adf8f47e",
+        "name": "requisition_science_task",
+        "normalized_md5": "df4ec60a7bbb1c73af5ce105adf8f47e",
+        "schema": "private",
+        "signature": "p_id uuid, p_user uuid"
+      },
+      {
+        "definition_md5": "40b5dbe1f8c9805f40b83662488f75ec",
+        "name": "schedule_event",
+        "normalized_md5": "40b5dbe1f8c9805f40b83662488f75ec",
+        "schema": "private",
+        "signature": "p_patient uuid, p_series uuid, p_shift uuid, p_worker uuid, p_action text, p_reason text, p_before jsonb, p_after jsonb"
+      },
+      {
+        "definition_md5": "6af8b62102fd50cfc3629bd2172b3fa9",
+        "name": "schedule_visible",
+        "normalized_md5": "6af8b62102fd50cfc3629bd2172b3fa9",
+        "schema": "private",
+        "signature": "p_patient uuid, p_worker uuid"
+      },
+      {
+        "definition_md5": "1259aa4a8b7fdcee706db90659ce90ff",
+        "name": "schedule_worker",
+        "normalized_md5": "1259aa4a8b7fdcee706db90659ce90ff",
+        "schema": "private",
+        "signature": "p_patient uuid, p_user uuid"
+      },
+      {
+        "definition_md5": "72c40966303b2b6d5340b7ab4aa2d195",
+        "name": "scheduled_operations",
+        "normalized_md5": "72c40966303b2b6d5340b7ab4aa2d195",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "ae5a9f55d416ca3705b3923db9d61855",
+        "name": "science_satisfied",
+        "normalized_md5": "ae5a9f55d416ca3705b3923db9d61855",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "1693364b988d7c8b6bf7b8667d2c0659",
+        "name": "science_snapshot",
+        "normalized_md5": "1693364b988d7c8b6bf7b8667d2c0659",
+        "schema": "private",
+        "signature": ""
+      },
+      {
+        "definition_md5": "a1793e08ba85bcde414dc1487c267dd5",
+        "name": "stock_quantity",
+        "normalized_md5": "a1793e08ba85bcde414dc1487c267dd5",
+        "schema": "private",
+        "signature": "p_patient uuid, p_product text, p_location text"
+      },
+      {
+        "definition_md5": "33c659f384de92aa63106d2e6884798a",
+        "name": "team_revision",
+        "normalized_md5": "33c659f384de92aa63106d2e6884798a",
+        "schema": "private",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "3a5a02015590e01a15f24a2dc80ad759",
+        "name": "user_can",
+        "normalized_md5": "3a5a02015590e01a15f24a2dc80ad759",
+        "schema": "private",
+        "signature": "p_patient uuid, p_user uuid, p_cap text"
+      },
+      {
+        "definition_md5": "72fe56b838679fe5a86fb44fdac09344",
+        "name": "v3_apply_access_change",
+        "normalized_md5": "72fe56b838679fe5a86fb44fdac09344",
+        "schema": "private",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "94f3c8d20395e9f4b45b08db79454291",
+        "name": "validate_shared_need",
+        "normalized_md5": "94f3c8d20395e9f4b45b08db79454291",
+        "schema": "private",
+        "signature": "p_payload jsonb"
+      },
+      {
+        "definition_md5": "aa23dfe1df0ab63a828c1025c3933fcf",
+        "name": "validate_supply_command",
+        "normalized_md5": "aa23dfe1df0ab63a828c1025c3933fcf",
+        "schema": "private",
+        "signature": "d operational_documents, p_action text, p_body jsonb"
+      },
+      {
+        "definition_md5": "ef817ff2ed4e4159885fbc9355933628",
+        "name": "whatsapp_event_supported",
+        "normalized_md5": "ef817ff2ed4e4159885fbc9355933628",
+        "schema": "private",
+        "signature": "p_event text"
+      },
+      {
+        "definition_md5": "8f9327c2a88577a5244882eeb8c076d8",
+        "name": "accept_invitation",
+        "normalized_md5": "8f9327c2a88577a5244882eeb8c076d8",
+        "schema": "public",
+        "signature": "p_token_hash text"
+      },
+      {
+        "definition_md5": "c76fe9868edac3045e948abacbae7934",
+        "name": "accept_whatsapp_receipt",
+        "normalized_md5": "c76fe9868edac3045e948abacbae7934",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_hash text"
+      },
+      {
+        "definition_md5": "b35d87e9f8244594488190b3c9c6e542",
+        "name": "acknowledge_no_issues",
+        "normalized_md5": "b35d87e9f8244594488190b3c9c6e542",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_hash text"
+      },
+      {
+        "definition_md5": "9e36346011dfc4830f0a3831fe00f532",
+        "name": "acknowledge_requisition",
+        "normalized_md5": "9e36346011dfc4830f0a3831fe00f532",
+        "schema": "public",
+        "signature": "p_id uuid, p_mode text, p_version integer"
+      },
+      {
+        "definition_md5": "8e3a14ed1cf3f3673a744cd57d04a740",
+        "name": "add_stock_inventory_item",
+        "normalized_md5": "8e3a14ed1cf3f3673a744cd57d04a740",
+        "schema": "public",
+        "signature": "p_inventory_id uuid, p_product_id text, p_counted_quantity bigint, p_justification text"
+      },
+      {
+        "definition_md5": "54ae243a289cfb6639e0c41f47ddbe3e",
+        "name": "admin_adopt_product",
+        "normalized_md5": "54ae243a289cfb6639e0c41f47ddbe3e",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text"
+      },
+      {
+        "definition_md5": "f373d6cfc2f0e3473ce37b334a158c49",
+        "name": "admin_create_invitation",
+        "normalized_md5": "f373d6cfc2f0e3473ce37b334a158c49",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_email text, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean, p_token_hash text, p_expires_at timestamp with time zone"
+      },
+      {
+        "definition_md5": "e0a17c90d97d3d2db2a95ba4748d986f",
+        "name": "admin_list_memberships",
+        "normalized_md5": "e0a17c90d97d3d2db2a95ba4748d986f",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid"
+      },
+      {
+        "definition_md5": "f15f222d776172f4877c04fd59258d1e",
+        "name": "admin_list_products",
+        "normalized_md5": "f15f222d776172f4877c04fd59258d1e",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "1938aec4e2679d09ac2c3a36262bd57a",
+        "name": "admin_list_profiles",
+        "normalized_md5": "05bab860bc4977f241d49bce05149e02",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "d703527c27fdb1f0a0525ce55b9e1ca4",
+        "name": "admin_list_recipients",
+        "normalized_md5": "d703527c27fdb1f0a0525ce55b9e1ca4",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "bdb994c68fe33e712fbea23cc11f006b",
+        "name": "admin_resend_invitation",
+        "normalized_md5": "bdb994c68fe33e712fbea23cc11f006b",
+        "schema": "public",
+        "signature": "p_invitation_id uuid, p_token_hash text, p_expires_at timestamp with time zone"
+      },
+      {
+        "definition_md5": "9fa5906e15cf80751edff54c14bfc584",
+        "name": "admin_set_membership_status",
+        "normalized_md5": "9fa5906e15cf80751edff54c14bfc584",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_user_id uuid, p_status text"
+      },
+      {
+        "definition_md5": "f056ea534394aaad03bc6605fd08668c",
+        "name": "admin_set_profile",
+        "normalized_md5": "d6df25786f7253608327284afef330da",
+        "schema": "public",
+        "signature": "p_user_id uuid, p_full_name text, p_role profile_role, p_status text, p_global_scope boolean"
+      },
+      {
+        "definition_md5": "0a37e5990611c66a019e3c5ff826a473",
+        "name": "admin_upsert_membership",
+        "normalized_md5": "0a37e5990611c66a019e3c5ff826a473",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_user_id uuid, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean"
+      },
+      {
+        "definition_md5": "297c5170cb015b9b3521ddb0202e0c6f",
+        "name": "admin_upsert_product",
+        "normalized_md5": "598069b4bee0ef61e065fb2b8a560b0d",
+        "schema": "public",
+        "signature": "p_id text, p_name text, p_category product_category, p_unit text, p_aliases text[], p_is_active boolean"
+      },
+      {
+        "definition_md5": "dc61cb4f270ec7361e51b6d5c2d0fd43",
+        "name": "admin_upsert_recipient",
+        "normalized_md5": "dc61cb4f270ec7361e51b6d5c2d0fd43",
+        "schema": "public",
+        "signature": "p_id uuid, p_display_name text, p_is_active boolean, p_is_development boolean"
+      },
+      {
+        "definition_md5": "e11c154ae10601a36c2b27f9a0000c26",
+        "name": "admin_upsert_recipient_product",
+        "normalized_md5": "e11c154ae10601a36c2b27f9a0000c26",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_name text, p_category product_category, p_unit text, p_aliases text[], p_is_active boolean, p_description text, p_sort_order integer"
+      },
+      {
+        "definition_md5": "09de3ea4f6518b82dc2229824a91f791",
+        "name": "after_stock_alert",
+        "normalized_md5": "09de3ea4f6518b82dc2229824a91f791",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "e1b4187607a263d34d6de672655d13ae",
+        "name": "approve_stock_inventory",
+        "normalized_md5": "e1b4187607a263d34d6de672655d13ae",
+        "schema": "public",
+        "signature": "p_inventory_id uuid"
+      },
+      {
+        "definition_md5": "e82098b1707be5eb0cff5ac136add533",
+        "name": "archive_requisition",
+        "normalized_md5": "e82098b1707be5eb0cff5ac136add533",
+        "schema": "public",
+        "signature": "p_id uuid, p_reason text"
+      },
+      {
+        "definition_md5": "f7799de6d2a1d38a844158ea052ce13f",
+        "name": "audited_legacy_supply_command",
+        "normalized_md5": "f7799de6d2a1d38a844158ea052ce13f",
+        "schema": "public",
+        "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer"
+      },
+      {
+        "definition_md5": "1a3b7da98ed10b3bb8aec376fc26c6d3",
+        "name": "balance_command",
+        "normalized_md5": "1a3b7da98ed10b3bb8aec376fc26c6d3",
+        "schema": "public",
+        "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer"
+      },
+      {
+        "definition_md5": "5e1d0f5c37640260c94f95a5ac38fb8e",
+        "name": "balance_workspace",
+        "normalized_md5": "5e1d0f5c37640260c94f95a5ac38fb8e",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "f1fa90b1f8cf64d35d81a6fda7f3bb29",
+        "name": "bind_notification_template",
+        "normalized_md5": "f1fa90b1f8cf64d35d81a6fda7f3bb29",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker uuid, p_name text, p_version integer, p_language text"
+      },
+      {
+        "definition_md5": "418ffedb535a1684de06c754344aa60c",
+        "name": "bind_validated_attachment",
+        "normalized_md5": "418ffedb535a1684de06c754344aa60c",
+        "schema": "public",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "a9e0e5939abcf622d6c181dae2a538a9",
+        "name": "can_access_recipient",
+        "normalized_md5": "a9e0e5939abcf622d6c181dae2a538a9",
+        "schema": "public",
+        "signature": "p_recipient_id uuid"
+      },
+      {
+        "definition_md5": "6b056587f583498c251938cd8433e437",
+        "name": "can_manage_recipient",
+        "normalized_md5": "6b056587f583498c251938cd8433e437",
+        "schema": "public",
+        "signature": "p_recipient_id uuid"
+      },
+      {
+        "definition_md5": "20fde34a947e4bf2a6dfcbf20a3cfeb6",
+        "name": "claim_notification_jobs",
+        "normalized_md5": "20fde34a947e4bf2a6dfcbf20a3cfeb6",
+        "schema": "public",
+        "signature": "p_limit integer, p_worker_id uuid, p_external_enabled boolean"
+      },
+      {
+        "definition_md5": "90ed8991ed1bff4ecb16a644df8a5286",
+        "name": "complete_notification_job",
+        "normalized_md5": "90ed8991ed1bff4ecb16a644df8a5286",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid, p_state text, p_provider_reference text, p_error text"
+      },
+      {
+        "definition_md5": "22fd071d247cba27404d1cb2ae83fbec",
+        "name": "configure_catalogue_unit",
+        "normalized_md5": "22fd071d247cba27404d1cb2ae83fbec",
+        "schema": "public",
+        "signature": "p_patient uuid, p_product text, p_unit text, p_decimals integer, p_barcode text, p_presentation text, p_base_quantity numeric"
+      },
+      {
+        "definition_md5": "050792bb46a2e66d99e0b1bb3208be3f",
+        "name": "configure_notification_rule",
+        "normalized_md5": "050792bb46a2e66d99e0b1bb3208be3f",
+        "schema": "public",
+        "signature": "p_patient uuid, p_event text, p_role text, p_channels text[], p_pdf boolean, p_cooldown integer, p_quiet_start integer, p_quiet_end integer"
+      },
+      {
+        "definition_md5": "e7b89c7b4e8a289dcd3fdfb0de3d59b3",
+        "name": "configure_patient_access",
+        "normalized_md5": "e7b89c7b4e8a289dcd3fdfb0de3d59b3",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text"
+      },
+      {
+        "definition_md5": "946ed623d6cd88fda0c0727bee431946",
+        "name": "configure_recipient_notification",
+        "normalized_md5": "946ed623d6cd88fda0c0727bee431946",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_recipient_user_id uuid, p_recipient_group text, p_channel text, p_destination text, p_enabled boolean, p_include_team_alerts boolean"
+      },
+      {
+        "definition_md5": "7aaa6309b93cc9fa4c2c3e9d7bd87f3a",
+        "name": "configure_stock_alert",
+        "normalized_md5": "7aaa6309b93cc9fa4c2c3e9d7bd87f3a",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_location text, p_low_threshold numeric, p_critical_threshold numeric, p_is_enabled boolean"
+      },
+      {
+        "definition_md5": "20aade856d1bd1ef37152a6761de4b34",
+        "name": "configure_worker_schedule",
+        "normalized_md5": "20aade856d1bd1ef37152a6761de4b34",
+        "schema": "public",
+        "signature": "p_token text"
+      },
+      {
+        "definition_md5": "e20d69e0c42e424a1625ec27fa8b7ddc",
+        "name": "confirm_extraordinary_consumption",
+        "normalized_md5": "e20d69e0c42e424a1625ec27fa8b7ddc",
+        "schema": "public",
+        "signature": "p_id uuid, p_accept boolean"
+      },
+      {
+        "definition_md5": "77e06fc72ce3dd2494152f1cc576bb05",
+        "name": "confirm_whatsapp_science",
+        "normalized_md5": "77e06fc72ce3dd2494152f1cc576bb05",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_hash text"
+      },
+      {
+        "definition_md5": "6e89f1bb8bf9e8e000718262208b0090",
+        "name": "create_flow_session",
+        "normalized_md5": "6e89f1bb8bf9e8e000718262208b0090",
+        "schema": "public",
+        "signature": "p_patient uuid, p_hash text"
+      },
+      {
+        "definition_md5": "7c7c79f7c8c29cc85f1adebcfc6c474d",
+        "name": "create_measurement_unit",
+        "normalized_md5": "7c7c79f7c8c29cc85f1adebcfc6c474d",
+        "schema": "public",
+        "signature": "p_patient uuid, p_code text, p_name text, p_dimension text, p_decimals integer"
+      },
+      {
+        "definition_md5": "eec0ef53db783597ec3700079a8bf8aa",
+        "name": "create_patient_with_administrator",
+        "normalized_md5": "eec0ef53db783597ec3700079a8bf8aa",
+        "schema": "public",
+        "signature": "p_name text, p_development boolean, p_administrator_email text"
+      },
+      {
+        "definition_md5": "dfb356215c93b2924fa6d2147fb18a90",
+        "name": "create_receipt_flow_session",
+        "normalized_md5": "dfb356215c93b2924fa6d2147fb18a90",
+        "schema": "public",
+        "signature": "p_document uuid, p_hash text"
+      },
+      {
+        "definition_md5": "6ce7424c65589a41e6ae990e64d1b45d",
+        "name": "create_stock_inventory",
+        "normalized_md5": "6ce7424c65589a41e6ae990e64d1b45d",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_location text"
+      },
+      {
+        "definition_md5": "af1596c4f7a4d99d75b6e32f7e650e9c",
+        "name": "create_supply_document",
+        "normalized_md5": "af1596c4f7a4d99d75b6e32f7e650e9c",
+        "schema": "public",
+        "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean"
+      },
+      {
+        "definition_md5": "4e7c7e70ae44fc32afc3fab359061798",
+        "name": "current_profile_role",
+        "normalized_md5": "4ad249f7c15207d123e42bec5e04455b",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "8492ff21f47214c73dbf3daf2cb922c8",
+        "name": "decline_invitation",
+        "normalized_md5": "8492ff21f47214c73dbf3daf2cb922c8",
+        "schema": "public",
+        "signature": "p_token_hash text"
+      },
+      {
+        "definition_md5": "45703747283a62ed9ac5acbf4df23977",
+        "name": "derive_item_patient",
+        "normalized_md5": "45703747283a62ed9ac5acbf4df23977",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "f6ead9c1eb80a4765dc2ce644a51a797",
+        "name": "document_delivery_status",
+        "normalized_md5": "f6ead9c1eb80a4765dc2ce644a51a797",
+        "schema": "public",
+        "signature": "p_document uuid"
+      },
+      {
+        "definition_md5": "e03a23b8e4526b87d6bbb74a8e18e618",
+        "name": "document_navigation_context",
+        "normalized_md5": "e03a23b8e4526b87d6bbb74a8e18e618",
+        "schema": "public",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "9d48a3d33f8dfc4792dffc5bb648d7ad",
+        "name": "enqueue_patient_event",
+        "normalized_md5": "9d48a3d33f8dfc4792dffc5bb648d7ad",
+        "schema": "public",
+        "signature": "p_patient uuid, p_requisition uuid, p_alert uuid"
+      },
+      {
+        "definition_md5": "c1025194e8cb16e949fd6766ca413583",
+        "name": "enqueue_requisition_notifications",
+        "normalized_md5": "c1025194e8cb16e949fd6766ca413583",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "d34aedd66b2fe12eecc4be3febb7233d",
+        "name": "evaluate_stock_alert",
+        "normalized_md5": "d34aedd66b2fe12eecc4be3febb7233d",
+        "schema": "public",
+        "signature": "p_patient uuid, p_product text, p_location text"
+      },
+      {
+        "definition_md5": "b8b79571b65ad89942791499fbd1b411",
+        "name": "extraordinary_stock_adjustment",
+        "normalized_md5": "b8b79571b65ad89942791499fbd1b411",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_quantity integer, p_location text, p_justification text, p_confirmation boolean, p_idempotency_key uuid"
+      },
+      {
+        "definition_md5": "3a37aee202bfc9c7cea5eaace5ac1b97",
+        "name": "family_stock_movement",
+        "normalized_md5": "3a37aee202bfc9c7cea5eaace5ac1b97",
+        "schema": "public",
+        "signature": "p_patient uuid, p_product text, p_quantity numeric, p_action text, p_reason text, p_key uuid, p_reference uuid"
+      },
+      {
+        "definition_md5": "3e10c299f36877132d6643f5d6f5ff75",
+        "name": "finalize_attachment",
+        "normalized_md5": "3e10c299f36877132d6643f5d6f5ff75",
+        "schema": "public",
+        "signature": "p_id uuid, p_actor uuid, p_hash text, p_mime text, p_bytes bigint, p_valid boolean"
+      },
+      {
+        "definition_md5": "c4e57deeb0b9b3d281838784fc93330d",
+        "name": "find_patient_product_by_alias",
+        "normalized_md5": "c4e57deeb0b9b3d281838784fc93330d",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_query text"
+      },
+      {
+        "definition_md5": "91b79b81f4b49d73ba06df37c202d37b",
+        "name": "find_product_by_alias",
+        "normalized_md5": "15570bbde2648f0e57a5cd0ef2f2ca74",
+        "schema": "public",
+        "signature": "p_query text"
+      },
+      {
+        "definition_md5": "493f305551d11cdb09dd9d797f8b71a1",
+        "name": "flow_exchange",
+        "normalized_md5": "493f305551d11cdb09dd9d797f8b71a1",
+        "schema": "public",
+        "signature": "p_hash text, p_submit jsonb"
+      },
+      {
+        "definition_md5": "afbd454c8ba6e19efa95819f6f5835b0",
+        "name": "fluent_pre_matrix_governance",
+        "normalized_md5": "afbd454c8ba6e19efa95819f6f5835b0",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "1fd97b8e6dec0f4b73493b5d4f9ea788",
+        "name": "fluent_pre_retry_claim_jobs",
+        "normalized_md5": "1fd97b8e6dec0f4b73493b5d4f9ea788",
+        "schema": "public",
+        "signature": "p_limit integer, p_worker_id uuid, p_external_enabled boolean"
+      },
+      {
+        "definition_md5": "3641c313a64b4d6781107eb0cd6b5f88",
+        "name": "fluent_pre_shift_command",
+        "normalized_md5": "3641c313a64b4d6781107eb0cd6b5f88",
+        "schema": "public",
+        "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer"
+      },
+      {
+        "definition_md5": "497546a808c523ebbb6a515a4a07a89e",
+        "name": "fluent_pre_shift_create",
+        "normalized_md5": "497546a808c523ebbb6a515a4a07a89e",
+        "schema": "public",
+        "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean"
+      },
+      {
+        "definition_md5": "a3e4063d85b3a999cbf4deb536ab62f7",
+        "name": "fluent_pre_shift_revise",
+        "normalized_md5": "a3e4063d85b3a999cbf4deb536ab62f7",
+        "schema": "public",
+        "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean"
+      },
+      {
+        "definition_md5": "6e211932a17de5522fa2720f44df71d6",
+        "name": "fluent_pre_shift_scheduler",
+        "normalized_md5": "6e211932a17de5522fa2720f44df71d6",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "21f8ba317e282033593f124f3f0f4757",
+        "name": "global_patient_administration",
+        "normalized_md5": "21f8ba317e282033593f124f3f0f4757",
+        "schema": "public",
+        "signature": "p_patient uuid, p_section text"
+      },
+      {
+        "definition_md5": "7e304b2b7981956325158a10326ef406",
+        "name": "governance_legacy_patient_access",
+        "normalized_md5": "7e304b2b7981956325158a10326ef406",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text"
+      },
+      {
+        "definition_md5": "f5787a649efc65a5c6dc682f00c148c7",
+        "name": "guard_patient_product_owner",
+        "normalized_md5": "f5787a649efc65a5c6dc682f00c148c7",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "f5fc1e046b43a37006d80644854852ab",
+        "name": "guard_requisition_item_stock",
+        "normalized_md5": "f5fc1e046b43a37006d80644854852ab",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "00b2515229bba8d1f0e750cbdd95c972",
+        "name": "guard_stock_movement_balance",
+        "normalized_md5": "00b2515229bba8d1f0e750cbdd95c972",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "de085601fa478fe1972d7787a44235fc",
+        "name": "import_historical_requisitions",
+        "normalized_md5": "de085601fa478fe1972d7787a44235fc",
+        "schema": "public",
+        "signature": "p_source_hash text, p_rows jsonb"
+      },
+      {
+        "definition_md5": "bba051eee3f60081edbd9523c7b8f799",
+        "name": "inbound_report_context",
+        "normalized_md5": "bba051eee3f60081edbd9523c7b8f799",
+        "schema": "public",
+        "signature": "p_phone text"
+      },
+      {
+        "definition_md5": "b5594a82153b8ba548f2b7dbfd26219f",
+        "name": "ingest_whatsapp_report",
+        "normalized_md5": "b5594a82153b8ba548f2b7dbfd26219f",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_text text, p_lines jsonb, p_kind text"
+      },
+      {
+        "definition_md5": "e8090ab7a3e977adddca37d2b404aea6",
+        "name": "invalidate_revoked_membership_invitations",
+        "normalized_md5": "e8090ab7a3e977adddca37d2b404aea6",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "065d06e907c3bc3985b9301b280b169a",
+        "name": "invalidate_revoked_profile_notifications",
+        "normalized_md5": "065d06e907c3bc3985b9301b280b169a",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "90dbeb4d7acddba5b27b81c21d1a5762",
+        "name": "invitation_registration_allowed",
+        "normalized_md5": "90dbeb4d7acddba5b27b81c21d1a5762",
+        "schema": "public",
+        "signature": "p_token_hash text, p_email text"
+      },
+      {
+        "definition_md5": "8a69ce7379abed5fbf543a30b47ee2b5",
+        "name": "is_global_administrator",
+        "normalized_md5": "8a69ce7379abed5fbf543a30b47ee2b5",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "24cf7a5feaac66c7488aef3f0d2e5c50",
+        "name": "issue_reminder_challenge",
+        "normalized_md5": "24cf7a5feaac66c7488aef3f0d2e5c50",
+        "schema": "public",
+        "signature": "p_notification uuid, p_worker uuid, p_hash text"
+      },
+      {
+        "definition_md5": "a7accfd649a0073206e3749d5e119fff",
+        "name": "issue_science_challenge",
+        "normalized_md5": "a7accfd649a0073206e3749d5e119fff",
+        "schema": "public",
+        "signature": "p_notification uuid, p_worker uuid, p_hash text"
+      },
+      {
+        "definition_md5": "dfe79a36f3384605b03bae3e3c7d32f0",
+        "name": "issue_whatsapp_challenge",
+        "normalized_md5": "dfe79a36f3384605b03bae3e3c7d32f0",
+        "schema": "public",
+        "signature": "p_notification uuid, p_worker uuid, p_hash text"
+      },
+      {
+        "definition_md5": "ef17d102f4d7be9b02dcd0aaee60e70e",
+        "name": "legacy_import_historical_requisitions",
+        "normalized_md5": "ef17d102f4d7be9b02dcd0aaee60e70e",
+        "schema": "public",
+        "signature": "p_source_hash text, p_rows jsonb"
+      },
+      {
+        "definition_md5": "d630aee0c99d6d4ed1d66605ef750342",
+        "name": "legacy_transition_requisition_status",
+        "normalized_md5": "d630aee0c99d6d4ed1d66605ef750342",
+        "schema": "public",
+        "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text"
+      },
+      {
+        "definition_md5": "e02fcf2e2065e26de96d27d281bc7802",
+        "name": "mark_notification_seen",
+        "normalized_md5": "e02fcf2e2065e26de96d27d281bc7802",
+        "schema": "public",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "b52e909a8bdcce872dd83a27a8f84cd3",
+        "name": "my_active_context",
+        "normalized_md5": "b52e909a8bdcce872dd83a27a8f84cd3",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "45cf1bb388de8a96a63ebc9b5ca3f38a",
+        "name": "my_session_valid",
+        "normalized_md5": "45cf1bb388de8a96a63ebc9b5ca3f38a",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "837cd5deec5c63c300a599bc2582b818",
+        "name": "my_sessions",
+        "normalized_md5": "837cd5deec5c63c300a599bc2582b818",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "b161b5d9d41273022409853c08e9458a",
+        "name": "my_workspace",
+        "normalized_md5": "b161b5d9d41273022409853c08e9458a",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "774a30fc8a8d3f1847b04361a1bf65f7",
+        "name": "normalize_local_capabilities",
+        "normalized_md5": "774a30fc8a8d3f1847b04361a1bf65f7",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "942c75eb16393d5b26e6d3c1657dcae0",
+        "name": "notification_document_payload",
+        "normalized_md5": "942c75eb16393d5b26e6d3c1657dcae0",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid"
+      },
+      {
+        "definition_md5": "03261316cb5bbc0c539d97c87ef4b015",
+        "name": "notification_job_state",
+        "normalized_md5": "03261316cb5bbc0c539d97c87ef4b015",
+        "schema": "public",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "1cf64e664b1feb67e343e75df10ec208",
+        "name": "notification_notice_payload",
+        "normalized_md5": "1cf64e664b1feb67e343e75df10ec208",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker uuid"
+      },
+      {
+        "definition_md5": "8f15aa8ac4465eb1b07e42f2ad8bee34",
+        "name": "notification_safe_failure",
+        "normalized_md5": "8f15aa8ac4465eb1b07e42f2ad8bee34",
+        "schema": "public",
+        "signature": "p_reference text, p_code text"
+      },
+      {
+        "definition_md5": "06abc1872f921ebbd90f0dff09b13f8b",
+        "name": "notification_webhook",
+        "normalized_md5": "06abc1872f921ebbd90f0dff09b13f8b",
+        "schema": "public",
+        "signature": "p_provider_reference text, p_state text, p_notification_id uuid"
+      },
+      {
+        "definition_md5": "40e71826de4db08c3b97565c0501e141",
+        "name": "operational_document",
+        "normalized_md5": "40e71826de4db08c3b97565c0501e141",
+        "schema": "public",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "770c81567b7d15457cd2d20ee485cc81",
+        "name": "operational_document_list",
+        "normalized_md5": "770c81567b7d15457cd2d20ee485cc81",
+        "schema": "public",
+        "signature": "p_patient uuid, p_type text, p_status text, p_search text, p_from timestamp with time zone, p_to timestamp with time zone, p_page integer, p_size integer"
+      },
+      {
+        "definition_md5": "f9c4249d9b5d110304dfecc58d57b2a8",
+        "name": "operational_tasks",
+        "normalized_md5": "f9c4249d9b5d110304dfecc58d57b2a8",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "70172f75f2b3f6d5456ab903768c4eb2",
+        "name": "patient_capabilities",
+        "normalized_md5": "70172f75f2b3f6d5456ab903768c4eb2",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "69f7b863067984459ae3cd50b82527b7",
+        "name": "patient_capability_definitions",
+        "normalized_md5": "69f7b863067984459ae3cd50b82527b7",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "21df1bb999f881a788f9cac5a18b6893",
+        "name": "patient_directory",
+        "normalized_md5": "21df1bb999f881a788f9cac5a18b6893",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "327a8451432cf34a92fe79aeb1796b6f",
+        "name": "patient_governance",
+        "normalized_md5": "327a8451432cf34a92fe79aeb1796b6f",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "45e4fd6efe1d056683d32c585aeae2ec",
+        "name": "patient_notification_rules",
+        "normalized_md5": "45e4fd6efe1d056683d32c585aeae2ec",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "c2bfae30f2f8fd5bd81591bcf5e22d96",
+        "name": "process_internal_notifications",
+        "normalized_md5": "c2bfae30f2f8fd5bd81591bcf5e22d96",
+        "schema": "public",
+        "signature": "p_limit integer"
+      },
+      {
+        "definition_md5": "2c32d5d8ee852688cb6681e8b2cd08c5",
+        "name": "protect_last_global_admin",
+        "normalized_md5": "2c32d5d8ee852688cb6681e8b2cd08c5",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "13b9d42bf5d8c475e07d4dcba92e8497",
+        "name": "protect_requisition_historical_origin",
+        "normalized_md5": "13b9d42bf5d8c475e07d4dcba92e8497",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "3dd00b597480ee8294714822c46f15cd",
+        "name": "protect_requisition_identity",
+        "normalized_md5": "3dd00b597480ee8294714822c46f15cd",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "84af86f01868d0e57cdbbee0793d535d",
+        "name": "recent_session",
+        "normalized_md5": "84af86f01868d0e57cdbbee0793d535d",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "6b78327591c54a0ca46f2f16c3304a1c",
+        "name": "recipient_can",
+        "normalized_md5": "6b78327591c54a0ca46f2f16c3304a1c",
+        "schema": "public",
+        "signature": "p_recipient_id uuid, p_operation text"
+      },
+      {
+        "definition_md5": "d1e9e7134a0d7a38d3d2e719c6e09945",
+        "name": "recipient_role",
+        "normalized_md5": "d1e9e7134a0d7a38d3d2e719c6e09945",
+        "schema": "public",
+        "signature": "p_recipient_id uuid"
+      },
+      {
+        "definition_md5": "ab054e94930d4deb0391dae89de6242a",
+        "name": "record_requisition_status_transition",
+        "normalized_md5": "e3b019d9c7d4a2391ae615e3d851404e",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "5fb4c8605342334fcea0c45a01764dbd",
+        "name": "record_stock_movement",
+        "normalized_md5": "5fb4c8605342334fcea0c45a01764dbd",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_quantity integer, p_movement_type stock_movement_type, p_source_location text, p_destination_location text, p_justification text, p_idempotency_key uuid, p_reference_type text, p_reference_id uuid"
+      },
+      {
+        "definition_md5": "354dfabd3d1e566fe5e7b146661610e7",
+        "name": "recount_stock_inventory",
+        "normalized_md5": "354dfabd3d1e566fe5e7b146661610e7",
+        "schema": "public",
+        "signature": "p_inventory_id uuid"
+      },
+      {
+        "definition_md5": "9f327ba5b04efaead38d8f1a3d5a38be",
+        "name": "register_document_pdf",
+        "normalized_md5": "9f327ba5b04efaead38d8f1a3d5a38be",
+        "schema": "public",
+        "signature": "p_document uuid, p_version integer, p_path text, p_hash text"
+      },
+      {
+        "definition_md5": "617d2363bf062b6cb6a387901ad59456",
+        "name": "register_document_render",
+        "normalized_md5": "617d2363bf062b6cb6a387901ad59456",
+        "schema": "public",
+        "signature": "p_document uuid, p_version integer, p_renderer integer, p_path text, p_hash text"
+      },
+      {
+        "definition_md5": "aa534a337f53f5692b2500b10728e061",
+        "name": "register_verified_phone",
+        "normalized_md5": "aa534a337f53f5692b2500b10728e061",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "933d9fc7c154f07b88c7b014d8a26d5a",
+        "name": "report_extraordinary_consumption",
+        "normalized_md5": "933d9fc7c154f07b88c7b014d8a26d5a",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_location text, p_text text, p_lines jsonb, p_key uuid"
+      },
+      {
+        "definition_md5": "fbd42470067c1dcd2a500d3687207c8d",
+        "name": "requisition_delivery_status",
+        "normalized_md5": "fbd42470067c1dcd2a500d3687207c8d",
+        "schema": "public",
+        "signature": "p_requisition_ids uuid[]"
+      },
+      {
+        "definition_md5": "4ef26961a8e5505ff13a6f8bd455ec89",
+        "name": "requisition_fulfillment",
+        "normalized_md5": "4ef26961a8e5505ff13a6f8bd455ec89",
+        "schema": "public",
+        "signature": "p_requisition uuid"
+      },
+      {
+        "definition_md5": "abef1ac5b66ce537f77998447f12fac5",
+        "name": "requisition_fulfillments",
+        "normalized_md5": "abef1ac5b66ce537f77998447f12fac5",
+        "schema": "public",
+        "signature": "p_ids uuid[]"
+      },
+      {
+        "definition_md5": "469c20956db55e34bd46f074056e0a0c",
+        "name": "requisition_item_context",
+        "normalized_md5": "469c20956db55e34bd46f074056e0a0c",
+        "schema": "public",
+        "signature": "p_patient uuid, p_products text[]"
+      },
+      {
+        "definition_md5": "fc1da7b901deed5e58c55652c9734671",
+        "name": "requisition_progress",
+        "normalized_md5": "fc1da7b901deed5e58c55652c9734671",
+        "schema": "public",
+        "signature": "p_id uuid"
+      },
+      {
+        "definition_md5": "d09d4932f19d393b520053caee0fcd35",
+        "name": "reserve_attachment",
+        "normalized_md5": "d09d4932f19d393b520053caee0fcd35",
+        "schema": "public",
+        "signature": "p_patient uuid, p_document uuid, p_movement uuid, p_filename text, p_mime text, p_bytes bigint, p_key uuid"
+      },
+      {
+        "definition_md5": "bdd58407074aaba48717808b307694e0",
+        "name": "resolve_balance_assignment",
+        "normalized_md5": "bdd58407074aaba48717808b307694e0",
+        "schema": "public",
+        "signature": "p_patient uuid, p_cycle uuid, p_shift uuid, p_reason text, p_key uuid"
+      },
+      {
+        "definition_md5": "bca42ce754c84f3cdb47d416fb234237",
+        "name": "resolve_requisition_item",
+        "normalized_md5": "bca42ce754c84f3cdb47d416fb234237",
+        "schema": "public",
+        "signature": "p_item uuid, p_product text, p_reason text, p_key uuid"
+      },
+      {
+        "definition_md5": "7d03ce57e13465bb2cbf8195cf0d8d21",
+        "name": "retry_notification_job",
+        "normalized_md5": "7d03ce57e13465bb2cbf8195cf0d8d21",
+        "schema": "public",
+        "signature": "p_id uuid, p_confirm_uncertain boolean"
+      },
+      {
+        "definition_md5": "ef706f5c02016331d2d046adbb2532a0",
+        "name": "review_flow_submission",
+        "normalized_md5": "ef706f5c02016331d2d046adbb2532a0",
+        "schema": "public",
+        "signature": "p_id uuid, p_accept boolean, p_kind text, p_text text, p_lines jsonb"
+      },
+      {
+        "definition_md5": "419ebbf703075ac57f01bdb05fe3d862",
+        "name": "review_stock_inventory",
+        "normalized_md5": "419ebbf703075ac57f01bdb05fe3d862",
+        "schema": "public",
+        "signature": "p_inventory_id uuid, p_action text, p_reason text"
+      },
+      {
+        "definition_md5": "9850ae35895d5140be7e32154149fa5b",
+        "name": "revise_supply_document",
+        "normalized_md5": "9850ae35895d5140be7e32154149fa5b",
+        "schema": "public",
+        "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean"
+      },
+      {
+        "definition_md5": "7224952576984d424c70879fb3a2e417",
+        "name": "revoke_invitation",
+        "normalized_md5": "7224952576984d424c70879fb3a2e417",
+        "schema": "public",
+        "signature": "p_invitation_id uuid"
+      },
+      {
+        "definition_md5": "f96eba25aed21d171bdbe1b80a075d46",
+        "name": "run_operational_schedule",
+        "normalized_md5": "f96eba25aed21d171bdbe1b80a075d46",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "96cfe03ad08f99bcc926aed561e6d697",
+        "name": "schedule_command",
+        "normalized_md5": "96cfe03ad08f99bcc926aed561e6d697",
+        "schema": "public",
+        "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer"
+      },
+      {
+        "definition_md5": "c96bc97e3a087cc6d9c4449e3262509f",
+        "name": "schedule_workspace",
+        "normalized_md5": "c96bc97e3a087cc6d9c4449e3262509f",
+        "schema": "public",
+        "signature": "p_patient uuid, p_from date, p_until date"
+      },
+      {
+        "definition_md5": "d26e4d67c1c4d6551e6d2f2b048d421a",
+        "name": "scheduler_health",
+        "normalized_md5": "d26e4d67c1c4d6551e6d2f2b048d421a",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "49091470e0c93f34570f05bc741f5bfb",
+        "name": "select_active_context",
+        "normalized_md5": "49091470e0c93f34570f05bc741f5bfb",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "6e145cd56af50d1faf3463bb27b54e4c",
+        "name": "set_my_avatar",
+        "normalized_md5": "6e145cd56af50d1faf3463bb27b54e4c",
+        "schema": "public",
+        "signature": "p_path text"
+      },
+      {
+        "definition_md5": "c5f7a1109a8ffe4bb3a464d6c07165d1",
+        "name": "stock_consumption_metrics",
+        "normalized_md5": "c5f7a1109a8ffe4bb3a464d6c07165d1",
+        "schema": "public",
+        "signature": "p_patient uuid, p_from timestamp with time zone, p_to timestamp with time zone"
+      },
+      {
+        "definition_md5": "ff8858a745445df1625089f2927edf96",
+        "name": "stock_history",
+        "normalized_md5": "ff8858a745445df1625089f2927edf96",
+        "schema": "public",
+        "signature": "p_patient uuid, p_product text, p_from timestamp with time zone, p_to timestamp with time zone, p_location text, p_page integer, p_size integer"
+      },
+      {
+        "definition_md5": "1ab978f41db119fb33fdebde4db649c3",
+        "name": "stock_overview",
+        "normalized_md5": "1ab978f41db119fb33fdebde4db649c3",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "32c55fa0621db61dd4c653842db982d5",
+        "name": "stock_transit",
+        "normalized_md5": "32c55fa0621db61dd4c653842db982d5",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "d57c4ac5737d8fc637e181a972ae36d5",
+        "name": "submit_requisition",
+        "normalized_md5": "d57c4ac5737d8fc637e181a972ae36d5",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_idempotency_key uuid, p_payload_hash text, p_lines jsonb, p_extra_items jsonb, p_observations jsonb"
+      },
+      {
+        "definition_md5": "cf98725f8c7f1aff7b9e7967ca37c953",
+        "name": "submit_stock_inventory",
+        "normalized_md5": "cf98725f8c7f1aff7b9e7967ca37c953",
+        "schema": "public",
+        "signature": "p_inventory_id uuid"
+      },
+      {
+        "definition_md5": "711a99f1096af20d51b87f4bedf2b1b8",
+        "name": "supply_document_command",
+        "normalized_md5": "711a99f1096af20d51b87f4bedf2b1b8",
+        "schema": "public",
+        "signature": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer"
+      },
+      {
+        "definition_md5": "f8e49ce792ebea1989784344fe61d855",
+        "name": "transition_requisition_status",
+        "normalized_md5": "f8e49ce792ebea1989784344fe61d855",
+        "schema": "public",
+        "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text"
+      },
+      {
+        "definition_md5": "732e7240010ae6ee51752c269f22d1d8",
+        "name": "unaccent",
+        "normalized_md5": "732e7240010ae6ee51752c269f22d1d8",
+        "schema": "public",
+        "signature": "regdictionary, text"
+      },
+      {
+        "definition_md5": "c63fff9d5f6e608be381ae34c5a6bef7",
+        "name": "unaccent",
+        "normalized_md5": "c63fff9d5f6e608be381ae34c5a6bef7",
+        "schema": "public",
+        "signature": "text"
+      },
+      {
+        "definition_md5": "3a1118dbb02cc3984f7fa23d2ee3a37e",
+        "name": "unaccent_init",
+        "normalized_md5": "3a1118dbb02cc3984f7fa23d2ee3a37e",
+        "schema": "public",
+        "signature": "internal"
+      },
+      {
+        "definition_md5": "c8bbc42e6e1b37ea2584ba9a1006af8f",
+        "name": "unaccent_lexize",
+        "normalized_md5": "c8bbc42e6e1b37ea2584ba9a1006af8f",
+        "schema": "public",
+        "signature": "internal, internal, internal, internal"
+      },
+      {
+        "definition_md5": "75302bf767351512aef2a59e2bcc7912",
+        "name": "update_my_profile",
+        "normalized_md5": "75302bf767351512aef2a59e2bcc7912",
+        "schema": "public",
+        "signature": "p_name text, p_registration text, p_state text, p_category text, p_preferences jsonb"
+      },
+      {
+        "definition_md5": "70672163643f815ce826ba5563cd8cf2",
+        "name": "v3_accept_invitation",
+        "normalized_md5": "70672163643f815ce826ba5563cd8cf2",
+        "schema": "public",
+        "signature": "p_token_hash text"
+      },
+      {
+        "definition_md5": "21898187857f2fec6a734b9682bb47ce",
+        "name": "v3_admin_upsert_recipient",
+        "normalized_md5": "21898187857f2fec6a734b9682bb47ce",
+        "schema": "public",
+        "signature": "p_id uuid, p_display_name text, p_is_active boolean, p_is_development boolean"
+      },
+      {
+        "definition_md5": "72f1ef75f5c8fdac3b91eeafe61f1b9a",
+        "name": "v3_configure_stock_alert",
+        "normalized_md5": "72f1ef75f5c8fdac3b91eeafe61f1b9a",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_product_id text, p_location text, p_low_threshold bigint, p_critical_threshold bigint, p_is_enabled boolean"
+      },
+      {
+        "definition_md5": "0d4af76b36799f55b6ec829110d812bd",
+        "name": "v3_create_supply_document",
+        "normalized_md5": "0d4af76b36799f55b6ec829110d812bd",
+        "schema": "public",
+        "signature": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean"
+      },
+      {
+        "definition_md5": "3d096fe41874ae1cf5ae5da4ef07f944",
+        "name": "v3_flow_exchange",
+        "normalized_md5": "3d096fe41874ae1cf5ae5da4ef07f944",
+        "schema": "public",
+        "signature": "p_hash text, p_submit jsonb"
+      },
+      {
+        "definition_md5": "d68cdf5a31e7f1741951135053f2cb8a",
+        "name": "v3_ingest_whatsapp_report",
+        "normalized_md5": "d68cdf5a31e7f1741951135053f2cb8a",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_text text, p_lines jsonb, p_kind text"
+      },
+      {
+        "definition_md5": "e919e188eb64a5c6278f516a4cc5ecfd",
+        "name": "v3_notification_webhook",
+        "normalized_md5": "e919e188eb64a5c6278f516a4cc5ecfd",
+        "schema": "public",
+        "signature": "p_provider_reference text, p_state text, p_notification_id uuid"
+      },
+      {
+        "definition_md5": "7fe9fca7376593485bfea729b1e7e60f",
+        "name": "v3_operational_tasks",
+        "normalized_md5": "7fe9fca7376593485bfea729b1e7e60f",
+        "schema": "public",
+        "signature": "p_patient uuid"
+      },
+      {
+        "definition_md5": "a09d12bf46309bf42a135b80dd5c2284",
+        "name": "v3_revise_supply_document",
+        "normalized_md5": "a09d12bf46309bf42a135b80dd5c2284",
+        "schema": "public",
+        "signature": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean"
+      },
+      {
+        "definition_md5": "a5003aa1bd88970aff1428a919c80231",
+        "name": "v3_transition_requisition_status",
+        "normalized_md5": "a5003aa1bd88970aff1428a919c80231",
+        "schema": "public",
+        "signature": "p_requisition_id uuid, p_to_status requisition_status, p_reason text"
+      },
+      {
+        "definition_md5": "79e4f9c446872296ab9d7c61e2b6b4c3",
+        "name": "v4_accept_invitation",
+        "normalized_md5": "79e4f9c446872296ab9d7c61e2b6b4c3",
+        "schema": "public",
+        "signature": "p_token_hash text"
+      },
+      {
+        "definition_md5": "e9bb1101d2d41d63817c5fbb121f0059",
+        "name": "v4_admin_set_membership_status",
+        "normalized_md5": "e9bb1101d2d41d63817c5fbb121f0059",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_user_id uuid, p_status text"
+      },
+      {
+        "definition_md5": "669dac7745f4f17e99d0f1662f927d11",
+        "name": "v4_admin_upsert_membership",
+        "normalized_md5": "669dac7745f4f17e99d0f1662f927d11",
+        "schema": "public",
+        "signature": "p_care_recipient_id uuid, p_user_id uuid, p_role profile_role, p_can_manage_stock boolean, p_can_count_stock boolean"
+      },
+      {
+        "definition_md5": "463e0bd668f521677a07c67e51f28108",
+        "name": "v4_complete_notification_job",
+        "normalized_md5": "463e0bd668f521677a07c67e51f28108",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid, p_state text, p_provider_reference text, p_error text"
+      },
+      {
+        "definition_md5": "d013a447dd527e20d869e5366d2e9c87",
+        "name": "v4_configure_patient_access",
+        "normalized_md5": "d013a447dd527e20d869e5366d2e9c87",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text"
+      },
+      {
+        "definition_md5": "eb7d448250ff828cf41f11eb75315771",
+        "name": "v4_lifecycle_schedule",
+        "normalized_md5": "eb7d448250ff828cf41f11eb75315771",
+        "schema": "public",
+        "signature": ""
+      },
+      {
+        "definition_md5": "2dd1352b2f8c2b6daf4ef006220648b2",
+        "name": "v4_review_archive_requisition",
+        "normalized_md5": "2dd1352b2f8c2b6daf4ef006220648b2",
+        "schema": "public",
+        "signature": "p_id uuid, p_reason text"
+      },
+      {
+        "definition_md5": "457774587e237f8e5a57daf2c41dec84",
+        "name": "v4_review_patient_access",
+        "normalized_md5": "457774587e237f8e5a57daf2c41dec84",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text"
+      },
+      {
+        "definition_md5": "68d3c2fabb15a5cf38b520acf5391b5c",
+        "name": "v4_validate_notification_job",
+        "normalized_md5": "68d3c2fabb15a5cf38b520acf5391b5c",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid"
+      },
+      {
+        "definition_md5": "1a8363766763c8177f8afa98012356c9",
+        "name": "validate_notification_job",
+        "normalized_md5": "1a8363766763c8177f8afa98012356c9",
+        "schema": "public",
+        "signature": "p_id uuid, p_worker_id uuid"
+      },
+      {
+        "definition_md5": "7b36dc1ae7f9d7df59ef148c471d367e",
+        "name": "validated_legacy_patient_access",
+        "normalized_md5": "7b36dc1ae7f9d7df59ef148c471d367e",
+        "schema": "public",
+        "signature": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text"
+      },
+      {
+        "definition_md5": "44b584f48088d7b29f2e33f980f5846e",
+        "name": "verified_legacy_whatsapp_receipt",
+        "normalized_md5": "44b584f48088d7b29f2e33f980f5846e",
+        "schema": "public",
+        "signature": "p_provider_id text, p_phone text, p_hash text"
+      },
+      {
+        "definition_md5": "76b4166693b7cdd41b893b854c5d424e",
+        "name": "verify_document_integrity",
+        "normalized_md5": "76b4166693b7cdd41b893b854c5d424e",
+        "schema": "public",
+        "signature": "p_id uuid, p_version integer, p_hash text"
+      },
+      {
+        "definition_md5": "0be2bd015c1820fef87396daaff375e6",
+        "name": "workspace_revision",
+        "normalized_md5": "0be2bd015c1820fef87396daaff375e6",
+        "schema": "public",
+        "signature": ""
+      }
+    ],
+    "statement_timeout": "15s"
+  },
+  "comparison": {
+    "migrationVersionsEqual": true,
+    "localMissingFiles": [],
+    "remoteMissingFiles": [],
+    "routineDrift": [],
+    "remoteExtraRoutines": [],
+    "limits": "Routine equality and migration versions do not certify all tables, data, Auth config, Storage bytes or rollout compatibility.",
+    "rawRoutineDriftCount": 218
+  }
+}

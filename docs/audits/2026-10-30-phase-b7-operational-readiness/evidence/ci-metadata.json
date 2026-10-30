@@ -1,0 +1,360 @@
+{
+  "recordedAt": "2026-10-30T22:00:49.353Z",
+  "identity": "RMZZFAJ",
+  "runs": [
+    {
+      "id": 40656069166,
+      "sha": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+      "branch": "master",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166",
+      "createdAt": "2026-10-28T08:20:24Z"
+    },
+    {
+      "id": 40241890885,
+      "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+      "branch": "master",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40241890885",
+      "createdAt": "2026-10-25T22:48:22Z"
+    },
+    {
+      "id": 40240543318,
+      "sha": "abc5951dcc1dec336eb475fd7fbc7ee03ab85d4a",
+      "branch": "codex/fluent-ui-escalas-bal",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40240543318",
+      "createdAt": "2026-10-25T22:30:51Z"
+    },
+    {
+      "id": 40239766755,
+      "sha": "fe2adde65b4d5d3f9836055eab1d698dc0da29cc",
+      "branch": "codex/fluent-ui-escalas-bal",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40239766755",
+      "createdAt": "2026-10-25T22:20:57Z"
+    },
+    {
+      "id": 40222898351,
+      "sha": "df6ef00861ccd4eafa03b234566808873dfeece3",
+      "branch": "codex/fluent-ui-escalas-bal",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40222898351",
+      "createdAt": "2026-10-25T18:47:12Z"
+    },
+    {
+      "id": 40219651517,
+      "sha": "e91d1567eade0103eea43287bd74ccdfcd2cf39c",
+      "branch": "codex/fluent-ui-escalas-bal",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40219651517",
+      "createdAt": "2026-10-25T18:06:20Z"
+    },
+    {
+      "id": 40219294010,
+      "sha": "6e64616f80be2d587ef1bd4dd3465bf64520e459",
+      "branch": "codex/fluent-ui-escalas-bal",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40219294010",
+      "createdAt": "2026-10-25T18:01:55Z"
+    },
+    {
+      "id": 40213968412,
+      "sha": "82920169fdece50dbaedc996f9d033915080c2da",
+      "branch": "codex/fluent-ui-escalas-bal",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40213968412",
+      "createdAt": "2026-10-25T16:55:09Z"
+    },
+    {
+      "id": 40212256797,
+      "sha": "92cd210848e34f0c8df5b64a5cb5d7c909e2d6bc",
+      "branch": "codex/fluent-ui-escalas-bal",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40212256797",
+      "createdAt": "2026-10-25T16:33:33Z"
+    },
+    {
+      "id": 40188155460,
+      "sha": "d9bf8261b24fe4b84b31781132d76cf00bdd49af",
+      "branch": "codex/fluent-ui-escalas-bal",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40188155460",
+      "createdAt": "2026-10-25T11:16:13Z"
+    }
+  ],
+  "40656069166": {
+    "jobs": [
+      {
+        "id": 122707286385,
+        "name": "validate (ubuntu-latest)",
+        "conclusion": "success",
+        "startedAt": "2026-10-28T08:20:28Z",
+        "completedAt": "2026-10-28T08:22:10Z",
+        "failedSteps": []
+      },
+      {
+        "id": 122707286765,
+        "name": "database",
+        "conclusion": "success",
+        "startedAt": "2026-10-28T08:20:28Z",
+        "completedAt": "2026-10-28T08:24:47Z",
+        "failedSteps": []
+      },
+      {
+        "id": 122707286871,
+        "name": "validate (windows-latest)",
+        "conclusion": "success",
+        "startedAt": "2026-10-28T08:20:28Z",
+        "completedAt": "2026-10-28T08:23:21Z",
+        "failedSteps": []
+      },
+      {
+        "id": 122708993891,
+        "name": "browser (chromium, chromium)",
+        "conclusion": "failure",
+        "startedAt": "2026-10-28T08:24:50Z",
+        "completedAt": "2026-10-28T08:32:40Z",
+        "failedSteps": [
+          "Run npm run e2e -- --project=chromium"
+        ]
+      },
+      {
+        "id": 122708993938,
+        "name": "browser (ios, webkit)",
+        "conclusion": "success",
+        "startedAt": "2026-10-28T08:24:50Z",
+        "completedAt": "2026-10-28T08:36:22Z",
+        "failedSteps": []
+      },
+      {
+        "id": 122708993950,
+        "name": "browser (mobile, chromium)",
+        "conclusion": "success",
+        "startedAt": "2026-10-28T08:24:50Z",
+        "completedAt": "2026-10-28T08:34:14Z",
+        "failedSteps": []
+      },
+      {
+        "id": 122713644525,
+        "name": "database-and-browser",
+        "conclusion": "failure",
+        "startedAt": "2026-10-28T08:36:25Z",
+        "completedAt": "2026-10-28T08:36:29Z",
+        "failedSteps": [
+          "Require database and every browser project"
+        ]
+      }
+    ],
+    "artifacts": [
+      {
+        "name": "browser-test-report-chromium",
+        "bytes": 656939,
+        "expired": false,
+        "createdAt": "2026-10-28T08:32:37Z",
+        "expiresAt": "2026-11-04T08:32:36Z"
+      }
+    ]
+  },
+  "40241890885": {
+    "jobs": [
+      {
+        "id": 121315264552,
+        "name": "validate (ubuntu-latest)",
+        "conclusion": "success",
+        "startedAt": "2026-10-25T22:48:26Z",
+        "completedAt": "2026-10-25T22:50:19Z",
+        "failedSteps": []
+      },
+      {
+        "id": 121315264717,
+        "name": "validate (windows-latest)",
+        "conclusion": "success",
+        "startedAt": "2026-10-25T22:48:26Z",
+        "completedAt": "2026-10-25T22:51:49Z",
+        "failedSteps": []
+      },
+      {
+        "id": 121315264830,
+        "name": "database",
+        "conclusion": "success",
+        "startedAt": "2026-10-25T22:48:26Z",
+        "completedAt": "2026-10-25T22:52:50Z",
+        "failedSteps": []
+      },
+      {
+        "id": 121316255424,
+        "name": "browser (chromium, chromium)",
+        "conclusion": "success",
+        "startedAt": "2026-10-25T22:52:53Z",
+        "completedAt": "2026-10-25T23:02:20Z",
+        "failedSteps": []
+      },
+      {
+        "id": 121316255433,
+        "name": "browser (mobile, chromium)",
+        "conclusion": "success",
+        "startedAt": "2026-10-25T22:52:53Z",
+        "completedAt": "2026-10-25T23:02:47Z",
+        "failedSteps": []
+      },
+      {
+        "id": 121316255467,
+        "name": "browser (ios, webkit)",
+        "conclusion": "success",
+        "startedAt": "2026-10-25T22:52:53Z",
+        "completedAt": "2026-10-25T23:03:07Z",
+        "failedSteps": []
+      },
+      {
+        "id": 121318565403,
+        "name": "database-and-browser",
+        "conclusion": "success",
+        "startedAt": "2026-10-25T23:03:10Z",
+        "completedAt": "2026-10-25T23:03:12Z",
+        "failedSteps": []
+      }
+    ],
+    "artifacts": []
+  },
+  "378298ac4df887df95a92d27cf360700a97dfeed": {
+    "checks": [
+      {
+        "name": "Vercel Preview Comments",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://vercel.com/github",
+        "app": "vercel"
+      }
+    ],
+    "statuses": [
+      {
+        "context": "Vercel",
+        "state": "success",
+        "url": "https://vercel.com/rmzzfajs-projects/home-care-assistant/5YWPQgQXEfbUdUzMfAeMc3KAYf2t"
+      }
+    ]
+  },
+  "34dcb835c5c49068e0417f7306eb4e501aa868bc": {
+    "checks": [
+      {
+        "name": "database-and-browser",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166/job/122713644525",
+        "app": "github-actions"
+      },
+      {
+        "name": "browser (mobile, chromium)",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166/job/122708993950",
+        "app": "github-actions"
+      },
+      {
+        "name": "browser (ios, webkit)",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166/job/122708993938",
+        "app": "github-actions"
+      },
+      {
+        "name": "browser (chromium, chromium)",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166/job/122708993891",
+        "app": "github-actions"
+      },
+      {
+        "name": "Socket Security: Project Report",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://socket.dev/dashboard/org/mazzarino-corp/sbom/3384e064-3088-4657-9f4d-e7caa4806ab2",
+        "app": "socket-security"
+      },
+      {
+        "name": "validate (windows-latest)",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166/job/122707286871",
+        "app": "github-actions"
+      },
+      {
+        "name": "database",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166/job/122707286765",
+        "app": "github-actions"
+      },
+      {
+        "name": "validate (ubuntu-latest)",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166/job/122707286385",
+        "app": "github-actions"
+      }
+    ],
+    "statuses": [
+      {
+        "context": "Vercel",
+        "state": "success",
+        "url": "https://vercel.com/rmzzfajs-projects/home-care-assistant/EMwXxHgxdVrpQqU8UUVzpVZo1DJZ"
+      }
+    ]
+  },
+  "rulesets": {
+    "ok": true,
+    "data": []
+  },
+  "masterProtection": {
+    "ok": false,
+    "status": 1,
+    "error": "gh: Branch not protected (HTTP 404)\n"
+  },
+  "failedLog": {
+    "exit": 0,
+    "lines": [
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:31:18.5160689Z   ✘  33 [chromium] › tests/e2e/workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API (24.3s)",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:31:43.3523895Z   ✘  34 [chromium] › tests/e2e/workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API (retry #1) (24.4s)",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6412380Z   1) [chromium] › tests/e2e/workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API ",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6413034Z     TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6413715Z       - waiting for getByRole('navigation', { name: 'Navegação do plantão', exact: true }).getByRole('link', { name: 'Mais', exact: true })",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6414046Z        at navigation.ts:10",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6415016Z     > 10 |       await page.getByRole(\"navigation\", { name: \"Navegação do plantão\", exact: true }).getByRole(\"link\", { name: \"Mais\", exact: true }).click();",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6416518Z         at openNavigation (/home/runner/work/home-care-assistant/home-care-assistant/tests/e2e/navigation.ts:10:138)",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6418271Z     test-results/workflows-dez-linhas-5-10--9d852-egativas-na-interface-e-API-chromium/test-failed-1.png",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6419750Z     Retry #1 ───────────────────────────────────────────────────────────────────────────────────────",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6420012Z     TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6420585Z       - waiting for getByRole('navigation', { name: 'Navegação do plantão', exact: true }).getByRole('link', { name: 'Mais', exact: true })",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6420887Z        at navigation.ts:10",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6421707Z     > 10 |       await page.getByRole(\"navigation\", { name: \"Navegação do plantão\", exact: true }).getByRole(\"link\", { name: \"Mais\", exact: true }).click();",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6423131Z         at openNavigation (/home/runner/work/home-care-assistant/home-care-assistant/tests/e2e/navigation.ts:10:138)",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6424391Z     test-results/workflows-dez-linhas-5-10--9d852-egativas-na-interface-e-API-chromium-retry1/test-failed-1.png",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6425258Z     Error Context: test-results/workflows-dez-linhas-5-10--9d852-egativas-na-interface-e-API-chromium-retry1/error-context.md",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6425583Z   1 failed",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6425941Z     [chromium] › tests/e2e/workflows.spec.ts:342:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API ",
+      "browser (chromium, chromium)\tUNKNOWN STEP\t2026-10-28T08:32:36.6426222Z   39 passed (5.4m)"
+    ],
+    "limits": "Only matching failure/count lines retained; complete runtime logs not copied."
+  }
+}

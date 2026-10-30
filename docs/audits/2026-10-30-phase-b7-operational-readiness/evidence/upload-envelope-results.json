@@ -1,0 +1,29 @@
+{
+  "recordedAt": "2026-10-30T22:12:05.189Z",
+  "method": "Real local boundedUpload/sanitizeFile; synthetic valid PDF padded with whitespace; platform limit is documentary, not a remote 413 test",
+  "networkCalls": 0,
+  "cases": [
+    {
+      "id": "UPL-1",
+      "fileBytes": 1048576,
+      "wireBytes": 1048759,
+      "localAccepted": true,
+      "sanitizedBytes": 572,
+      "aboveDocumentedVercelLimit": false
+    },
+    {
+      "id": "UPL-6",
+      "fileBytes": 6291456,
+      "wireBytes": 6291639,
+      "localAccepted": true,
+      "sanitizedBytes": 572,
+      "aboveDocumentedVercelLimit": true
+    },
+    {
+      "id": "UPL-11",
+      "fileBytes": 11534336,
+      "wireBytes": 11534519,
+      "localAccepted": false
+    }
+  ]
+}

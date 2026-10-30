@@ -1,0 +1,9 @@
+{
+  "recordedAt": "2026-10-30T22:22:33.534Z",
+  "source": "https://openapi.vercel.sh",
+  "path": "/v9/projects/{idOrName}",
+  "field": "gitProviderOptions.createDeployments",
+  "description": "Whether the Vercel bot should automatically create GitHub deployments https://docs.github.com/en/rest/deployments/deployments#about-deployments NOTE: repository-dispatch events should be used instead",
+  "interpretation": "This field concerns GitHub deployment records. It is not evidence of disabled Vercel builds/deployments.",
+  "consequence": "Do not push until an actual no-deploy mechanism is verified or an authorized boundary change is received."
+}
