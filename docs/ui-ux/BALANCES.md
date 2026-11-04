@@ -1,5 +1,10 @@
 # BAL por plantão
 
+Guia da base funcional auditada e de seus contratos requeridos. Os desvios
+A/B e as mudanças futuras C não foram corrigidos por este documento.
+Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
+[projeto C3](../audits/C/C3-functional-specification/README.md).
+
 ## Ativação e autoridade
 
 O regime novo é opt-in por paciente. Nenhuma migration ativa pacientes ou cria

@@ -1,0 +1,9 @@
+{
+  "html_files": 2,
+  "references": 2,
+  "classifications": {
+    "HTML_FRAGMENT_EXISTS": 1,
+    "HISTORICAL_DYNAMIC_FRAGMENT_UNVERIFIED": 1
+  },
+  "method": "Static inventory only; original HTML bytes preserved; no JavaScript/browser/network execution"
+}

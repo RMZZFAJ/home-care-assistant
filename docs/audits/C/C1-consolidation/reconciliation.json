@@ -1,0 +1,45 @@
+{
+  "raw_records": 165,
+  "source_counts": {
+    "A": 32,
+    "B1": 35,
+    "B2": 17,
+    "B3": 25,
+    "B4": 13,
+    "B5": 14,
+    "B6": 13,
+    "B7": 7,
+    "B8": 9
+  },
+  "b8_input_ids": 156,
+  "b8_input_families": 119,
+  "c_independent_causes": 121,
+  "adjudication": "119 - 1 overlapping REQ PDF projection + 3 independent B8 quality causes = 121; six B8 revalidations attached, not added",
+  "gates": {
+    "GATED_BY_FEATURE": 19,
+    "BLOCKS_FIRST_RELEASE": 92,
+    "CAN_DEFER": 8,
+    "REQUIRES_HOMOLOGATION": 1,
+    "OWNER_DECISION": 1
+  },
+  "classifications": {
+    "SUPPORTED_RISK": 23,
+    "QUALITY_GAP": 8,
+    "DEFECT_CONFIRMED": 69,
+    "MISSING_CAPABILITY": 18,
+    "NOT_HOMOLOGATED": 1,
+    "DECISION_NEEDED": 2
+  },
+  "p1_causes": [
+    {
+      "cause_id": "C-CAUSE-009",
+      "source_ids": "B1-UX-001;UX-001",
+      "title": "Aprovação de alteração pontual de escala não mostra o objeto da decisão"
+    },
+    {
+      "cause_id": "C-CAUSE-049",
+      "source_ids": "B3-001;DB-002",
+      "title": "Candidatos terminais podem impedir indefinidamente o progresso de REQ"
+    }
+  ]
+}

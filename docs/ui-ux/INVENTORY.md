@@ -1,5 +1,10 @@
 # Inventário de interface
 
+Inventário gerado datado, mantido por compatibilidade do consumidor. Não foi
+regenerado em C e não representa aceite atual.
+Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
+[projeto C3](../audits/C/C3-functional-specification/README.md).
+
 Gerado por scripts/inventory-ui.mjs. O JSON adjacente registra dependências,
 exports e pontos de estado, incluindo componentes renderizados indiretamente.
 

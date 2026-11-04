@@ -1,5 +1,10 @@
 # Arquitetura de informação
 
+Guia da base funcional auditada e de seus contratos requeridos. Os desvios
+A/B e as mudanças futuras C não foram corrigidos por este documento.
+Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
+[projeto C3](../audits/C/C3-functional-specification/README.md).
+
 ## Contexto e estrutura
 
 WorkspaceProvider mantém o read model autorizado durante a navegação. O layout

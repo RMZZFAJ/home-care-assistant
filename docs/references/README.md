@@ -1,5 +1,9 @@
 # Referências aprovadas
 
+Material de referência datado; os arquivos V3 e seus caminhos permanecem
+intactos para consumidores/história. Decisões atuais em
+[decisions](../decisions/README.md), contratos em [current](../current/README.md).
+
 Os cinco arquivos em `v3/` são os originais fornecidos pelo usuário em 23/10/2026.
 Preservam linguagem, layout, identidade e exemplos de criação de templates Meta.
 São exemplos fictícios e não comprovantes de operações reais.

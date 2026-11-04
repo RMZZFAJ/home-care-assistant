@@ -1,0 +1,2 @@
+path,before_sha256,after_sha256,reason
+docs/audits/B/B1/2026-10-28-phase-b1-interface/12_FINDINGS_MASTER.md,6a4c3e7ee5000273e774eb36e5ddad63f05d364eb5cc4342ab2fd46725592372,865c7ed154f1fffb8998868508e2dd638836d9124a4084e7ad5992bdc9714236,Wrap only the line length introduced by longer link destination; conclusion and link unchanged

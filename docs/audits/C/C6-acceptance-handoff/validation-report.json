@@ -1,0 +1,254 @@
+{
+  "status": "PASS",
+  "client_date": "2026-11-04",
+  "branch": "audit/phase-b",
+  "input_sha": "227f26ca695a3d01512a854f4b19f2639b91ba87",
+  "head_at_validation": "227f26ca695a3d01512a854f4b19f2639b91ba87",
+  "raw_records": 165,
+  "causes": 121,
+  "requirements_grouped": 28,
+  "acceptance_criteria": 149,
+  "screens": 66,
+  "fields": 174,
+  "original_document_paths": 1932,
+  "original_files_byte_identical": 1844,
+  "raw_evidence_files_checked": 1588,
+  "historical_manifests_checked": 14,
+  "non_documentary_files_checked": 394,
+  "link_classes": {
+    "EXTERNAL_REFERENCE_NOT_RETESTED": 88,
+    "LOCAL_PATH_EXISTS": 1651,
+    "SOURCE_LINE_REFERENCE": 55,
+    "STRUCTURED_RECORD_FRAGMENT": 21
+  },
+  "checks": [
+    {
+      "check": "branch",
+      "status": "PASS",
+      "details": "Exclusive authorized branch"
+    },
+    {
+      "check": "master",
+      "status": "PASS",
+      "details": "Master unchanged from C0"
+    },
+    {
+      "check": "relocation_bijection",
+      "status": "PASS",
+      "details": "All 1932 original paths have one final location"
+    },
+    {
+      "check": "original_inventory_preserved",
+      "status": "PASS",
+      "details": "No original source/hash omitted or changed"
+    },
+    {
+      "check": "all_original_files_exist",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "check": "raw_evidence_bytes",
+      "status": "PASS",
+      "details": {
+        "checked": 1588,
+        "manifests": 14,
+        "changed": []
+      }
+    },
+    {
+      "check": "historical_conclusions_preserved",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "check": "all_non_documentary_bytes",
+      "status": "PASS",
+      "details": {
+        "checked": 394,
+        "changed": [],
+        "original_snapshot_entries": 398,
+        "authorized_owner_document_inputs_reclassified": [
+          "DOCS_REORGANIZATION_POLICY.md",
+          "PHASE_C_MASTER_ORDER.md",
+          "PHASE_C_SUBPHASES.md",
+          "PRODUCT_DECISIONS_MASTER.md"
+        ],
+        "reason": "C0 captured the staged root inputs too; original snapshot remains intact; input bytes checked separately"
+      }
+    },
+    {
+      "check": "diff_scope",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "check": "next_managed_block",
+      "status": "PASS",
+      "details": "Managed Next instructions retained exactly modulo checkout newline"
+    },
+    {
+      "check": "migration_guard_count",
+      "status": "PASS",
+      "details": "No migration/dependency/runtime changes"
+    },
+    {
+      "check": "owner_input_bytes_and_meaning",
+      "status": "PASS",
+      "details": {
+        "inputs": 5,
+        "errors": [],
+        "method": "Gzip roundtrip hash; all original cells and words retained in canonical formatted inputs"
+      }
+    },
+    {
+      "check": "independent_original_165",
+      "status": "PASS",
+      "details": {
+        "A": 32,
+        "B1": 35,
+        "B2": 17,
+        "B3": 25,
+        "B4": 13,
+        "B5": 14,
+        "B6": 13,
+        "B7": 7,
+        "B8": 9
+      }
+    },
+    {
+      "check": "crosswalk_no_loss_or_duplicate",
+      "status": "PASS",
+      "details": "Each original record maps exactly once to one cause"
+    },
+    {
+      "check": "cause_adjudication",
+      "status": "PASS",
+      "details": "One overlapping REQ projection merged; 3 new quality causes; 6 revalidations attached"
+    },
+    {
+      "check": "two_independent_p1",
+      "status": "PASS",
+      "details": [
+        "B1-UX-001;UX-001",
+        "B3-001;DB-002"
+      ]
+    },
+    {
+      "check": "source_provenance",
+      "status": "PASS",
+      "details": "Original CSV/evidence context retained, not reissued experiments"
+    },
+    {
+      "check": "decisions_complete_and_conditional",
+      "status": "PASS",
+      "details": "30 DEC, 20 O, 15 details; no approval inferred"
+    },
+    {
+      "check": "opportunity_status",
+      "status": "PASS",
+      "details": "Explicit later decisions override old recommendations"
+    },
+    {
+      "check": "decision_to_spec_trace",
+      "status": "PASS",
+      "details": "All decisions trace to existing specifications, including deferred/existing states"
+    },
+    {
+      "check": "screen_field_inventory",
+      "status": "PASS",
+      "details": {
+        "screens": 66,
+        "fields": 174,
+        "domains": 14,
+        "errors": []
+      }
+    },
+    {
+      "check": "specification_depth",
+      "status": "PASS",
+      "details": "Each domain has AS_IS/TO_BE, fields, transitions, recovery, evidence and domain acceptance; shared policies explicitly inherited"
+    },
+    {
+      "check": "shared_states",
+      "status": "PASS",
+      "details": "All 66 surfaces inherit states, focus/AT/reflow and specific exceptions"
+    },
+    {
+      "check": "impact_and_acceptance_bijections",
+      "status": "PASS",
+      "details": "121 causes + 28 grouped owner requirements; not 149 independent defects/tests"
+    },
+    {
+      "check": "acceptance_discriminants",
+      "status": "PASS",
+      "details": "Positive/negative, independent read-back, layers and D gate per criterion"
+    },
+    {
+      "check": "seven_sequence_diagrams",
+      "status": "PASS",
+      "details": "ENT, bilateral, consumption, science/access, draft, schedule/BAL, push"
+    },
+    {
+      "check": "d_packages_and_dependencies",
+      "status": "PASS",
+      "details": "Entry/exit/owner/QA/conditions; no D execution results"
+    },
+    {
+      "check": "editorial_paths_and_anchors",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "check": "documentary_python_syntax",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "check": "verifier_negative_controls",
+      "status": "PASS",
+      "details": "Missing ID, changed bytes and missing path are rejected by the same predicates"
+    },
+    {
+      "check": "new_document_secret_patterns",
+      "status": "PASS",
+      "details": {
+        "matches": [],
+        "scope": "New C/current text only; no .env or private file read; not a universal DLP claim"
+      }
+    },
+    {
+      "check": "state_boundary_README.md",
+      "status": "PASS",
+      "details": "README.md"
+    },
+    {
+      "check": "state_boundary_docs/current/PROJECT_STATUS.md",
+      "status": "PASS",
+      "details": "docs/current/PROJECT_STATUS.md"
+    },
+    {
+      "check": "state_boundary_docs/audits/C/README.md",
+      "status": "PASS",
+      "details": "docs/audits/C/README.md"
+    },
+    {
+      "check": "state_boundary_docs/audits/D/README.md",
+      "status": "PASS",
+      "details": "docs/audits/D/README.md"
+    },
+    {
+      "check": "requirement_artifacts",
+      "status": "PASS",
+      "details": {
+        "requirements": 47,
+        "method": "Per requirement source mapping plus authored semantic review; not a runtime acceptance claim"
+      }
+    }
+  ],
+  "failed_checks": [],
+  "functional_tests_executed": false,
+  "runtime_or_external_mutations": "NONE_BY_C; database/background state not revalidated or asserted frozen",
+  "external_links": "Only selected technical primary sources consulted; no global external-link crawl",
+  "publication": "Git commit and remote ref are the publication authority, external to the self-referential content; final SHA supplied with handoff"
+}
