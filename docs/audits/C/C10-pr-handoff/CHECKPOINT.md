@@ -21,18 +21,47 @@ commits à frente de master, sem divergência. Master observada:
 - C10: documentos canônicos reconciliados; kit retirado da raiz após arquivo
   exato e movimento dos assets; fontes/histórico preservados.
 
-## Validação e publicação
+## Validação e publicação concluídas
 
-Status inicial desta seção: conteúdo pronto; validação/publicação em curso. O
-encerramento registra resultados reais no relatório de validação e no PR. Não
-afirmar CI verde ou PR aberto antes da consulta do GitHub.
+27 verificações documentais passaram, mais a verificação dos hashes do
+manifesto. Markdown em 521 arquivos, contratos estáticos e diff checks
+passaram com Node24.22.0/npm11.21.1. Nenhuma suíte funcional local foi
+repetida por texto.
+
+Commit de conteúdo `ddb2b695cf363f3e8116802ffed4334f7fa98b7a` publicado por
+push em audit/phase-b.
+[Draft PR#6](https://github.com/RMZZFAJ/home-care-assistant/pull/6) aberto
+efetivamente para master e confirmado OPEN/isDraft=true. Registro original da
+CI em [PR_PUBLICATION.json](evidence/PR_PUBLICATION.json), com SHA e instante
+próprios. Esta atualização documental gera HEAD novo: os checks do primeiro
+snapshot não certificam o último candidato. O estado mais recente fica no PR e
+na entrega final, sem esperar toda a CI.
 
 SHA final é o commit que contém este checkpoint, resolvido por Git/ref; não
-inserir hash autorreferente no próprio manifesto. CI só vale para HEAD do PR.
-Não aguardar toda a CI nesta missão, não fazer merge, não excluir branches,
-não criar branch D e não promover preview para produção.
+inserir hash autorreferente no manifesto. Nenhum merge, exclusão de branch,
+criação de branch D ou promoção para produção. P02 individual segue
+OWNER_REVIEW_REQUIRED; D NÃO INICIADA e produção NO-GO.
 
-Node portátil24.22.0 verificado por SHA256 oficial foi usado sem alterar Node
-global24.13.0; npm11.21.1. Python da .venv apenas para ferramentas
-documentais. Nenhuma leitura de .env.local, operação DB/Auth/Storage, restore,
-contratação, envio real ou alteração funcional foi necessária.
+Node portátil24.22.0 verificado por SHA256 oficial, sem mudar Node global;
+npm11.21.1. Python .venv somente para documentação. Nenhuma leitura de
+.env.local, DB/Auth/Storage, restore, contratação, envio ou patch funcional.
+
+## Checks observados no primeiro snapshot
+
+- validate (ubuntu-latest): IN_PROGRESS.
+
+- validate (windows-latest): IN_PROGRESS.
+
+- database: IN_PROGRESS.
+
+- Vercel: PENDING.
+
+- Socket Security: Project Report: SUCCESS.
+
+- Socket Security: Pull Request Alerts: SUCCESS.
+
+- Vercel Preview Comments: SUCCESS.
+
+Jobs browser Chromium/mobile/iOS e agregado dependem do banco conforme
+workflow; ausência momentânea de check não significa sucesso. Preview Comments
+não substitui os gates CI. Não aguardar a conclusão nesta missão.

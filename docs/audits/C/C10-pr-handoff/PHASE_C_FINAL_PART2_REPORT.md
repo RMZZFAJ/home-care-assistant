@@ -40,3 +40,11 @@ direção visual não foram reabertas.
 Commit/push e Draft PR encerram a missão. Revisão, CI do último HEAD,
 autorização posterior de merge e verificação de efeito Vercel precedem
 qualquer integração. Não há branch cleanup, início de D ou GO produtivo.
+
+## Publicação observada
+
+[Draft PR#6](https://github.com/RMZZFAJ/home-care-assistant/pull/6) aberto de
+audit/phase-b para master; conteúdo publicado por commit/push. Snapshot da CI
+em PR_PUBLICATION.json identifica seu próprio SHA; HEAD final e checks mais
+recentes são resolvidos no PR/Git, sem CI verde presumida. Sem merge, cleanup
+de branches, deploy deliberado ou início D.

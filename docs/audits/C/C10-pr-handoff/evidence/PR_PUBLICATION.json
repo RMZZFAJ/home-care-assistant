@@ -1,0 +1,100 @@
+{
+  "captured_at_America_Sao_Paulo": "2026-11-04T16:03:50.161657-03:00",
+  "scope": "FIRST_PUBLICATION_SNAPSHOT;final provenance commit will have a newer HEAD;consult PR for latest SHA checks",
+  "pull_request": {
+    "baseRefName": "master",
+    "headRefName": "audit/phase-b",
+    "headRefOid": "ddb2b695cf363f3e8116802ffed4334f7fa98b7a",
+    "isDraft": true,
+    "number": 6,
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/41893054476/job/126795220849",
+        "name": "validate (ubuntu-latest)",
+        "startedAt": "2026-11-04T19:02:39Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/41893054476/job/126795221164",
+        "name": "validate (windows-latest)",
+        "startedAt": "2026-11-04T19:02:39Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/41893054476/job/126795221358",
+        "name": "database",
+        "startedAt": "2026-11-04T19:02:39Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "Vercel",
+        "startedAt": "2026-11-04T19:01:53Z",
+        "state": "PENDING",
+        "targetUrl": "https://vercel.com/rmzzfajs-projects/home-care-assistant/63TcNmAKF8569hiBiGevtfTfgMSo"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-04T19:02:41Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://socket.dev/dashboard/org/mazzarino-corp/sbom/6d1e7af5-f1b9-44e8-a78f-49c5ff7fe53a",
+        "name": "Socket Security: Project Report",
+        "startedAt": "2026-11-04T19:02:36Z",
+        "status": "COMPLETED",
+        "workflowName": ""
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-04T19:02:56Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://socket.dev",
+        "name": "Socket Security: Pull Request Alerts",
+        "startedAt": "2026-11-04T19:02:42Z",
+        "status": "COMPLETED",
+        "workflowName": ""
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-04T19:02:35Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://vercel.com/github",
+        "name": "Vercel Preview Comments",
+        "startedAt": "2026-11-04T19:02:35Z",
+        "status": "COMPLETED",
+        "workflowName": ""
+      }
+    ],
+    "url": "https://github.com/RMZZFAJ/home-care-assistant/pull/6"
+  },
+  "workflow_runs": [
+    {
+      "conclusion": "",
+      "databaseId": 41893054476,
+      "event": "pull_request",
+      "headSha": "ddb2b695cf363f3e8116802ffed4334f7fa98b7a",
+      "status": "in_progress",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/41893054476"
+    }
+  ],
+  "expected_downstream_jobs": [
+    "browser (chromium)",
+    "browser (mobile)",
+    "browser (ios)",
+    "database-and-browser"
+  ],
+  "production": "NOT_VERIFIED;no deliberate deploy or merge",
+  "master_preserved": "34dcb835c5c49068e0417f7306eb4e501aa868bc"
+}

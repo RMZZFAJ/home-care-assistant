@@ -34,3 +34,11 @@ recebe merge e nenhuma branch é excluída. Estado produtivo remoto não foi
 reinspecionado; permanece NOT_VERIFIED nesta missão, sem promoção/deploy
 deliberado. Preview automático eventualmente iniciado é efeito da integração
 existente, separado de aceite de produto ou operação real.
+
+## Publicação observada
+
+[Draft PR#6](https://github.com/RMZZFAJ/home-care-assistant/pull/6) aberto de
+audit/phase-b para master; conteúdo publicado por commit/push. Snapshot da CI
+em PR_PUBLICATION.json identifica seu próprio SHA; HEAD final e checks mais
+recentes são resolvidos no PR/Git, sem CI verde presumida. Sem merge, cleanup
+de branches, deploy deliberado ou início D.

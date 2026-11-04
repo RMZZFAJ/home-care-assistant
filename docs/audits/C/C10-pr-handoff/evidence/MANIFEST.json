@@ -23,8 +23,8 @@
     },
     {
       "path": "docs/audits/C/C10-pr-handoff/BRANCH_AND_PROVENANCE_REPORT.md",
-      "sha256": "eb2bdde23a92c9f054c68b5e84f51baeaef000de6ad9932b9ea2ab9e2414831d",
-      "bytes_under_hash_policy": 2086,
+      "sha256": "64e544544fc1245db671053f3bf6c641fe1f711d5aecfb66d2e5589b36619812",
+      "bytes_under_hash_policy": 2472,
       "hash_policy": "UTF8_TEXT_LF_NEWLINES"
     },
     {
@@ -41,8 +41,8 @@
     },
     {
       "path": "docs/audits/C/C10-pr-handoff/CHECKPOINT.md",
-      "sha256": "d71d12cc5de51f25fc4b91446a2f5343c68e8479536162a709bfe6577c1c431c",
-      "bytes_under_hash_policy": 1852,
+      "sha256": "6ab649f5ae690a6996242d5fa9df2a6bc34919dedbcab43018c2d96b468cda55",
+      "bytes_under_hash_policy": 2862,
       "hash_policy": "UTF8_TEXT_LF_NEWLINES"
     },
     {
@@ -109,6 +109,12 @@
       "path": "docs/audits/C/C10-pr-handoff/evidence/markdownlint.txt",
       "sha256": "f14ab9004b2b639b1433a308251fd06a527f600079c67ab102ce8064a55cffda",
       "bytes_under_hash_policy": 242,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/PR_PUBLICATION.json",
+      "sha256": "a87a4d93b2e2dc5afc29b4bb6d294f47971b4f50be8c6142228e89c017de01ab",
+      "bytes_under_hash_policy": 3555,
       "hash_policy": "UTF8_TEXT_LF_NEWLINES"
     },
     {
@@ -611,8 +617,8 @@
     },
     {
       "path": "docs/audits/C/C10-pr-handoff/PHASE_C_FINAL_PART2_REPORT.md",
-      "sha256": "139e0d6c1ea55222a407365629ba53a403c328d487061924e8aa820da6e712d0",
-      "bytes_under_hash_policy": 2490,
+      "sha256": "36452503d5e963c2826c8dc9017f8be49d9679210eca1dbd205e3954037a2102",
+      "bytes_under_hash_policy": 2876,
       "hash_policy": "UTF8_TEXT_LF_NEWLINES"
     },
     {
@@ -635,8 +641,14 @@
     },
     {
       "path": "docs/audits/C/C10-pr-handoff/README.md",
-      "sha256": "96005aa77ca02ecb22d6b8a9eecba6e397a78a548408697140628eb8a7e24176",
-      "bytes_under_hash_policy": 1325,
+      "sha256": "a4bf97ba85c8275ced9dbc7a5756b431ee71618eea4ea0552fa95d32ff1f60cc",
+      "bytes_under_hash_policy": 1711,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/record_publication.py",
+      "sha256": "9eda04b6ebec4a62d51269832b5d69ce33203d24575deb51476c9ad922008aa6",
+      "bytes_under_hash_policy": 4348,
       "hash_policy": "UTF8_TEXT_LF_NEWLINES"
     },
     {

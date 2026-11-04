@@ -27,3 +27,11 @@ Fontes Markdown/CSV C0–C6 anteriores e os sete Markdown recebidos estão em
 C8/prototype, sem alteração de bytes. Auditorias datadas A/B e suas provas não
 foram reemitidas. Scripts novos deste diretório produzem/verificam só
 documentação; não executam banco, fixtures, envio, deploy ou testes da D.
+
+## Publicação observada
+
+[Draft PR#6](https://github.com/RMZZFAJ/home-care-assistant/pull/6) aberto de
+audit/phase-b para master; conteúdo publicado por commit/push. Snapshot da CI
+em PR_PUBLICATION.json identifica seu próprio SHA; HEAD final e checks mais
+recentes são resolvidos no PR/Git, sem CI verde presumida. Sem merge, cleanup
+de branches, deploy deliberado ou início D.
