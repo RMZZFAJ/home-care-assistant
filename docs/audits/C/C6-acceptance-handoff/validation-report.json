@@ -3,7 +3,7 @@
   "client_date": "2026-11-04",
   "branch": "audit/phase-b",
   "input_sha": "227f26ca695a3d01512a854f4b19f2639b91ba87",
-  "head_at_validation": "227f26ca695a3d01512a854f4b19f2639b91ba87",
+  "head_at_validation": "edfde8d2d6e0f802cbb3a820c2d6b3f14ea63489",
   "raw_records": 165,
   "causes": 121,
   "requirements_grouped": 28,

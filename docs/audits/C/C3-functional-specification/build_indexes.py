@@ -2,12 +2,13 @@
 from pathlib import Path
 import csv
 import json
-import sys
+import runpy
 
 BASE=Path(__file__).resolve().parent.parent
 OUT=Path(__file__).resolve().parent
-sys.path.insert(0,str(BASE/'C6-acceptance-handoff'))
-from format_documentation import parse_tables
+# Audit directories contain hyphens, so load the shared parser by file path.
+# run_path leaves the formatter's guarded __main__ routine unexecuted.
+parse_tables=runpy.run_path(str(BASE/'C6-acceptance-handoff/format_documentation.py'))['parse_tables']
 
 def read(path):
     with path.open(encoding='utf-8-sig',newline='') as f:return list(csv.DictReader(f))

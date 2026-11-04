@@ -1,0 +1,122 @@
+{
+  "baseline_commit": "edfde8d2d6e0f802cbb3a820c2d6b3f14ea63489",
+  "origin": "User pasted the 159 diagnostics from 9 editor resources",
+  "reported_diagnostics": {
+    "total": 159,
+    "obsolete_root_document_diagnostics": 154,
+    "malformed_markdown_links": 3,
+    "unresolved_python_imports": 2
+  },
+  "current_source_validation": "PASS",
+  "obsolete_resources": [
+    {
+      "old_resource": "DOCS_REORGANIZATION_POLICY.md",
+      "current_resource": "docs/audits/C/C0-baseline/mandate/DOCS_REORGANIZATION_POLICY.md",
+      "old_path_exists": false,
+      "current_sha256": "39c3af2ecd4db17f76fced3cb3f3f1b5227d6161a293595e15598d9199d14d3a"
+    },
+    {
+      "old_resource": "PHASE_C_MASTER_ORDER.md",
+      "current_resource": "docs/audits/C/C0-baseline/mandate/PHASE_C_MASTER_ORDER.md",
+      "old_path_exists": false,
+      "current_sha256": "09bdd3c13538df67ecab1f0add5b5cfa93b8c814d21155e2c53eabd11f4a1d17"
+    },
+    {
+      "old_resource": "PHASE_C_SUBPHASES.md",
+      "current_resource": "docs/audits/C/C0-baseline/mandate/PHASE_C_SUBPHASES.md",
+      "old_path_exists": false,
+      "current_sha256": "470a83a8b3dafc01e6c52c09daa706a1df4aa33c4d0e0b9d7af240e76466e698"
+    },
+    {
+      "old_resource": "PRODUCT_DECISIONS_MASTER.md",
+      "current_resource": "docs/decisions/PRODUCT_DECISIONS_MASTER.md",
+      "old_path_exists": false,
+      "current_sha256": "94680d13961d2b75cba28e2fdbf2e59896f65e152091653e16bdf0f558448f00"
+    }
+  ],
+  "actual_repairs": [
+    {
+      "path": "docs/audits/B/B1/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/legacy-document.md",
+      "before_sha256": "4534493db6da9fd6756591755f0a05110aa167622e25ea6e24640d29e565dbbc",
+      "after_sha256": "39c127272097b4c85935562af41a1a7de39c13d56b6946a3c30fe8c8f93f1d49",
+      "before_line_5": "\\[src/app/historico/\\[id\\\\]/page.tsx](../../../../../../src/app/historico/[id]/page.tsx).",
+      "after_line_5": "[src/app/historico/\\[id\\]/page.tsx](../../../../../../src/app/historico/[id]/page.tsx).",
+      "change": "Correct escaped link label; same source target and historical conclusions"
+    },
+    {
+      "path": "docs/audits/B/B1/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/legacy-form.md",
+      "before_sha256": "c2ea8e71f7a076b95e6730901bafe04dfb094d325377ed12b98e5d32a6f0a4fd",
+      "after_sha256": "9d4aae66592b2f4b07315c95e5bd0329eed6cffde6cb0277430f05d664d448dc",
+      "before_line_5": "\\[src/app/fichas/\\[id\\\\]/page.tsx](../../../../../../src/app/fichas/[id]/page.tsx).",
+      "after_line_5": "[src/app/fichas/\\[id\\]/page.tsx](../../../../../../src/app/fichas/[id]/page.tsx).",
+      "change": "Correct escaped link label; same source target and historical conclusions"
+    },
+    {
+      "path": "docs/audits/B/B1/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/verification.md",
+      "before_sha256": "9c199c8c5ea19610bcb1cfb7504d85dab9bd086167d012d44c6977014f27cfcb",
+      "after_sha256": "9b6d3ee3d54482193aea0e9b058b8bef6337df4f742f2811023e8e996c78f9a0",
+      "before_line_5": "\\[src/app/verificar/\\[id\\\\]/page.tsx](../../../../../../src/app/verificar/[id]/page.tsx).",
+      "after_line_5": "[src/app/verificar/\\[id\\]/page.tsx](../../../../../../src/app/verificar/[id]/page.tsx).",
+      "change": "Correct escaped link label; same source target and historical conclusions"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/build_indexes.py",
+      "before_sha256": "286325b9bc4b6a8bb8d707a158d9ddfdd63715b2ea4a46a74a18d57df1456639",
+      "after_sha256": "b8177b684744a8398fb93e292003b46c65e727e47686f2f45678a28ff227fb07",
+      "change": "Load existing shared parser by explicit path with runpy; no sys.path mutation, unresolved static import or formatter main execution"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/enrich_impact.py",
+      "before_sha256": "7d3bb8c83443a2508a6b9634e5c11d2325841a902a5a8dfc2ffb7c5dc7075c05",
+      "after_sha256": "136abc326dc41af214492ef55b54096197e20b940aea52ea46fbaeaea1ae7e71",
+      "change": "Load existing shared parser by explicit path with runpy; no sys.path mutation, unresolved static import or formatter main execution"
+    },
+    {
+      "path": "docs/audits/C/C6-acceptance-handoff/validate_documentation.py",
+      "before_sha256": "8343bb5ce192b6a23161a37d67526023921786826185c570dc2c9e951bf92a33",
+      "after_sha256": "4392ddcbb05487a2e770667fc2b8ee72d7e494446e9bbf3b85a4294eb0ec44e4",
+      "change": "Compare the three exact repaired labels canonically; prose tampering remains rejected by negative control"
+    }
+  ],
+  "checks": {
+    "repository_markdownlint": {
+      "version": "0.42.0",
+      "files": 429,
+      "issues": 0
+    },
+    "editor_markdownlint": {
+      "version": "0.41.1",
+      "targeted_files": 9,
+      "issues": 0,
+      "note": "Seven current Markdown targets from the supplied report, plus README and AGENTS; Python checked separately"
+    },
+    "installed_vscode_markdown_language_service": {
+      "files": 429,
+      "diagnostics": 0,
+      "positive_and_negative_controls": "PASS",
+      "transport": "Offline service extracted from installed serverWorkerMain.js; diagnostic implementation unchanged"
+    },
+    "pyright": {
+      "version": "1.1.414",
+      "files": 2,
+      "errors": 0,
+      "warnings": 0
+    },
+    "shared_parser": {
+      "loaders": 2,
+      "documents_compared_per_loader": 19,
+      "output_equivalence": "PASS",
+      "artifact_mutations": 0
+    },
+    "historical_link_comparator": {
+      "exact_label_repairs": 3,
+      "changed_prose_rejected": true
+    }
+  },
+  "editor_state": {
+    "native_ui_connection": "UNAVAILABLE: native pipe not found",
+    "live_problem_panel_zero_observed": false,
+    "remaining_action": "Close obsolete root-document tabs and run Developer: Reload Window; reopen canonical paths. Do not recreate relocated sources or overwrite unsaved owner edits."
+  },
+  "limits": "No product code, dependency manifests, migrations, provider configuration, diagnostic suppressions, lint rules or global functional tests changed/run."
+}

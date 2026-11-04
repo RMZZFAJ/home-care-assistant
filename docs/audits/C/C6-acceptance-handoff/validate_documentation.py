@@ -35,6 +35,12 @@ def check(name,condition,details):
     if not condition:errors.append(name)
 def normalized(text):return re.sub(r'\s+',' ',text).strip()
 def body_without_destinations(text):
+    # Exact syntax repairs from the editor-diagnostics follow-up: the three
+    # source labels had an escaped opening bracket and a double closing escape.
+    # Normalize only those labels; prose, targets and all other text stay checked.
+    for route in ('historico','fichas','verificar'):
+        text=text.replace(r'\[src/app/'+route+r'/\[id\\]/page.tsx]',
+                          r'[src/app/'+route+r'/\[id\]/page.tsx]')
     text=re.sub(r'(\]\()(<[^>]+>|[^\s)]+)',r'\1DESTINATION',text)
     text=re.sub(r'(?m)^(\[[^\]]+\]:\s*)\S+',r'\1DESTINATION',text)
     return normalized(text)

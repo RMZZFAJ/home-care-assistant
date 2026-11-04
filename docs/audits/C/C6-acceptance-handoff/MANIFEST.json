@@ -2,7 +2,7 @@
   "algorithm": "SHA-256",
   "scope": "C package and current/canonical guidance; original corpus covered by RELOCATION_MAP plus immutable historical manifests",
   "self_excluded": "docs/audits/C/C6-acceptance-handoff/MANIFEST.json",
-  "files": 126,
+  "files": 127,
   "entries": [
     {
       "path": "AGENTS.md",
@@ -204,9 +204,9 @@
     },
     {
       "path": "docs/audits/C/C3-functional-specification/build_indexes.py",
-      "bytes": 16094,
-      "sha256": "286325b9bc4b6a8bb8d707a158d9ddfdd63715b2ea4a46a74a18d57df1456639",
-      "sha256_lf": "286325b9bc4b6a8bb8d707a158d9ddfdd63715b2ea4a46a74a18d57df1456639"
+      "bytes": 16248,
+      "sha256": "b8177b684744a8398fb93e292003b46c65e727e47686f2f45678a28ff227fb07",
+      "sha256_lf": "b8177b684744a8398fb93e292003b46c65e727e47686f2f45678a28ff227fb07"
     },
     {
       "path": "docs/audits/C/C3-functional-specification/CATALOGUE_AND_PRESENTATIONS.md",
@@ -342,9 +342,9 @@
     },
     {
       "path": "docs/audits/C/C4-technical-design/enrich_impact.py",
-      "bytes": 2925,
-      "sha256": "7d3bb8c83443a2508a6b9634e5c11d2325841a902a5a8dfc2ffb7c5dc7075c05",
-      "sha256_lf": "7d3bb8c83443a2508a6b9634e5c11d2325841a902a5a8dfc2ffb7c5dc7075c05"
+      "bytes": 3079,
+      "sha256": "136abc326dc41af214492ef55b54096197e20b940aea52ea46fbaeaea1ae7e71",
+      "sha256_lf": "136abc326dc41af214492ef55b54096197e20b940aea52ea46fbaeaea1ae7e71"
     },
     {
       "path": "docs/audits/C/C4-technical-design/FAILURE_RECOVERY_AND_IDEMPOTENCY.md",
@@ -441,6 +441,12 @@
       "bytes": 1843,
       "sha256": "eba7553832e495efdcd7475c05d9ef5d4dc435c351f39f3705b24b03bdc5732d",
       "sha256_lf": "7626df7ffd38e563c6217dcd95120e0a9ba88bc3343504fb3f59c667ac97b64b"
+    },
+    {
+      "path": "docs/audits/C/C6-acceptance-handoff/EDITOR_DIAGNOSTICS_REPAIRS.json",
+      "bytes": 6184,
+      "sha256": "ae57af0da4f067bfb5f1cc4d2d69c376c1051c7169c4a496ffd3d21ed018d8e7",
+      "sha256_lf": "dcab11a1327984a76b8d0856a17b7c96ad6a9265a86234c97818288c792001ea"
     },
     {
       "path": "docs/audits/C/C6-acceptance-handoff/EDITORIAL_HASH_CHANGES.csv",
@@ -606,15 +612,15 @@
     },
     {
       "path": "docs/audits/C/C6-acceptance-handoff/validate_documentation.py",
-      "bytes": 28174,
-      "sha256": "8343bb5ce192b6a23161a37d67526023921786826185c570dc2c9e951bf92a33",
-      "sha256_lf": "8343bb5ce192b6a23161a37d67526023921786826185c570dc2c9e951bf92a33"
+      "bytes": 28602,
+      "sha256": "4392ddcbb05487a2e770667fc2b8ee72d7e494446e9bbf3b85a4294eb0ec44e4",
+      "sha256_lf": "4392ddcbb05487a2e770667fc2b8ee72d7e494446e9bbf3b85a4294eb0ec44e4"
     },
     {
       "path": "docs/audits/C/C6-acceptance-handoff/validation-report.json",
       "bytes": 7532,
-      "sha256": "c63ff6b8c6937f73b073ead7852d001b407cdbbb7ba757650030ef5364ab7062",
-      "sha256_lf": "7d3d1799e3b9a1fea912e21d39e4231e616a7e401883235dffce70ce442a9e9c"
+      "sha256": "8fe56f3ef8b7bdcf666d0e2d43847e0a0bb9cc53c0f4625dae1ae94bd23be0f9",
+      "sha256_lf": "f77208b7bf5797d836b603ba474c2acb7514fc669f8f5495c426a3d831e866ce"
     },
     {
       "path": "docs/audits/C/CHECKPOINT.md",
@@ -739,8 +745,8 @@
     {
       "path": "docs/RELOCATION_MAP.csv",
       "bytes": 987071,
-      "sha256": "3172ee47049dec3f2842dc6dc0035e7c138ff43ffdf601851c7a8688f52a5473",
-      "sha256_lf": "69fc2a021c5e35cd7a26f302909806cf4e66debea2209e5dc52acc901337d43d"
+      "sha256": "5008dd80f4f0a1c0e9dfb2cca3e4e8ae139f1924cf366ee718e114add831e149",
+      "sha256_lf": "27d2d79261a121cc63bfbafdcddca0583112ec3408792bea945d67bdcef0d481"
     },
     {
       "path": "docs/runbooks/README.md",

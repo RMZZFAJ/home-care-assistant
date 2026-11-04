@@ -2,12 +2,13 @@
 from pathlib import Path
 import csv
 import re
-import sys
+import runpy
 
 ROOT=Path(__file__).resolve().parents[4]
 BASE=ROOT/'docs/audits/C'
-sys.path.insert(0,str(BASE/'C6-acceptance-handoff'))
-from format_documentation import parse_tables
+# Audit directories contain hyphens, so load the shared parser by file path.
+# run_path leaves the formatter's guarded __main__ routine unexecuted.
+parse_tables=runpy.run_path(str(BASE/'C6-acceptance-handoff/format_documentation.py'))['parse_tables']
 def read(path):
     with path.open(encoding='utf-8-sig',newline='') as f:return list(csv.DictReader(f))
 relocation={r['old_path']:r['new_path'] for r in read(BASE/'C0-baseline/DOCUMENTATION_MIGRATION_INVENTORY.csv')}
