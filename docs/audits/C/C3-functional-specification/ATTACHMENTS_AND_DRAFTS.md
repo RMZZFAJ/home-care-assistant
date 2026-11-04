@@ -4,8 +4,7 @@ AS_IS: Attachments, /api/attachments, reserva idempotente, quarantine/ready,
 hash e Storage privado; REQ usa sessionStorage de 24h, COM também tem draft
 documental de servidor. São objetos diferentes. B1-ERR-001, B3-004, B4-007,
 B6-008 e B7-005 delimitam editabilidade incerta, capacidade, avatar,
-fidelidade
-e limite de transporte. TO_BE DEC-011/012/017, O13 e P08/P12/P15.
+fidelidade e limite de transporte. TO_BE DEC-011/012/017, O13 e P08/P12/P15.
 
 ## Telas e campos
 
@@ -178,17 +177,17 @@ não prova rejeição. Anexo salvo sem resposta não vira duas cópias por retry
 
 Abandono é ato formal sobre reserva incompleta e sem upload ativo/resultado
 pendente. Expiração requer política P08 e proteção contra corrida com
-finalize.
-Ready, derivado válido, original restrito e história não são removidos para
-recuperar a vaga. Job de limpeza futuro usa estado/lease/versão, grace period
-aprovado e trilha, não contagem indiscriminada do bucket. Dez reservas
-abandonadas não devem impedir nova intenção para sempre.
+finalize. Ready, derivado válido, original restrito e história não são
+removidos para recuperar a vaga. Job de limpeza futuro usa
+estado/lease/versão, grace period aprovado e trilha, não contagem
+indiscriminada do bucket. Dez reservas abandonadas não devem impedir nova
+intenção para sempre.
 
-PDF ativo é recusado ou transformado por mecanismo seguro. Ressalva visível
-em FreeText/Ink/campo passivo deve sobreviver em derivado fiel ou o arquivo
-ser recusado com explicação. Não retirar sanitização para corrigir B6-008.
-Original, se retido, fica em custódia restrita sem execução no navegador;
-hash do derivado não é chamado hash do original. Política por classe P08.
+PDF ativo é recusado ou transformado por mecanismo seguro. Ressalva visível em
+FreeText/Ink/campo passivo deve sobreviver em derivado fiel ou o arquivo ser
+recusado com explicação. Não retirar sanitização para corrigir B6-008.
+Original, se retido, fica em custódia restrita sem execução no navegador; hash
+do derivado não é chamado hash do original. Política por classe P08.
 
 Teto de negócio não pode exceder o transporte vigente. Alternativas em D4:
 limite seguro com overhead e aviso antecipado, ou upload direto autorizado com
@@ -199,28 +198,26 @@ próprio.
 ## Fluxo do rascunho e concorrência
 
 Abrir formulário consulta rascunho do usuário no paciente/intenção.
-Encontrado,
-mostra tipo, target, data e continuar/descartar. Save de servidor versionado
-não
-consome protocolo, não aceita recebimento, não aprova nem movimenta estoque.
-Abrange preenchimento e decisões de múltiplas etapas, inclusive divergência,
-aprovação, correção e pedido; conclusão sempre é comando separado revalidado.
+Encontrado, mostra tipo, target, data e continuar/descartar. Save de servidor
+versionado não consome protocolo, não aceita recebimento, não aprova nem
+movimenta estoque. Abrange preenchimento e decisões de múltiplas etapas,
+inclusive divergência, aprovação, correção e pedido; conclusão sempre é
+comando separado revalidado.
 
 Outro aparelho carrega a versão confirmada. Dois editores usam
-expectedDraftVersion;
-segundo save obsoleto recebe conflito e conserva sua edição local para
-comparar.
-Não aplicar LWW a quantidades, recebedor ou decisão. Retomar amanhã relê
-permissões, catálogo, documento, assignment e ledger. Base antiga pode ser
-revisada como rascunho, jamais executada automaticamente.
+expectedDraftVersion; segundo save obsoleto recebe conflito e conserva sua
+edição local para comparar. Não aplicar LWW a quantidades, recebedor ou
+decisão. Retomar amanhã relê permissões, catálogo, documento, assignment e
+ledger. Base antiga pode ser revisada como rascunho, jamais executada
+automaticamente.
 
 Offline informa edição ainda não salva; não promete disponibilização em outro
 aparelho até confirmar sync. Não enfileira recebimento/aceite em background.
 Na conclusão confirmada, marcar rascunho consumido pela identidade do
-resultado;
-se resposta se perde, recuperar comando antes de descartar. Logout/revogação
-retiram acesso local a conteúdo; servidor guarda conforme política, sem
-transferir a outro usuário. Retenção/abandono temporal aguardam P08/P12.
+resultado; se resposta se perde, recuperar comando antes de descartar.
+Logout/revogação retiram acesso local a conteúdo; servidor guarda conforme
+política, sem transferir a outro usuário. Retenção/abandono temporal aguardam
+P08/P12.
 
 Aceites: queda antes/depois do commit mantém mesmo arquivo; fingerprint
 diferente conflita; abandono concorrente com ready não apaga pronto; PDF com
@@ -228,3 +225,17 @@ anotação não perde informação silenciosamente; save em A recupera em B aman
 save concorrente exige revisão; descartar não remove ENT emitida; retomar
 aprovação obsoleta impede efeito; troca de usuário/paciente não recupera dados
 alheios. Revisão móvel/AT cobre foco, arquivo e estado uncertain.
+
+## Atualização vinculante C7–C10
+
+P12 aprova um rascunho de criação por usuário/paciente/tipo e contextuais por
+intenção/alvo; continuar ou descartar/iniciar. P08 separa save privado de
+documento, sem protocolo/PDF/ciência/ledger. Descarte não apaga
+ready/oficial/backups/preservação obrigatória; nenhum TTL automático de 90/180
+dias aprovado.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).

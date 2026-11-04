@@ -7,19 +7,25 @@ P01/P02/P04/P08/P15 têm contratos condicionais próprios.
 ## Fronteiras verificáveis
 
 - Identidade oficial Auth, sessão vigente e contexto selecionado; não confiar
-em user_metadata, flags, telefone informado, nome ou UUID como autorização.
+  em user_metadata, flags, telefone informado, nome ou UUID como autorização.
+
 - Ação local exige membership/capacidade real e paciente do alvo; global
-  apenas
-administra plataforma/propostas. Segunda aprovação é de identidade distinta.
+  apenas administra plataforma/propostas. Segunda aprovação é de identidade
+  distinta.
+
 - Revalidar após espera de lock conforme garantia P15; nova ação revogada é
-sempre negada. Considerar perfil/avatar/Storage diretos, não só a API.
+  sempre negada. Considerar perfil/avatar/Storage diretos, não só a API.
+
 - Rever RLS, grants explícitos/defaults, views security_invoker e EXECUTE de
-SECURITY DEFINER juntos. Nenhum novo service_role com DML público irrestrito.
+  SECURITY DEFINER juntos. Nenhum novo service_role com DML público
+  irrestrito.
+
 - Lock em ordem consistente para paciente/documento/estoque/intenção;
-  callbacks
-de tentativa antiga não alteram lease nova; recusa não confirma fato parcial.
+  callbacks de tentativa antiga não alteram lease nova; recusa não confirma
+  fato parcial.
+
 - Origem/CSRF, limite/schema e códigos seguros por rota; payload não entra em
-logs/traces. Publicação de segredos nunca é instrumento de diagnóstico.
+  logs/traces. Publicação de segredos nunca é instrumento de diagnóstico.
 
 RLS limita linhas, mas precisa dos privilégios de acesso correspondentes;
 definir policy e grants no mesmo desenho. Documentação oficial de sessões
@@ -94,10 +100,9 @@ produto requer validação pertinente, não só expiração eventual do token.
 
 Conservação conservadora não significa indefinida automática. Critérios legais
 dependem da classe/contexto e avaliação apropriada; C não inventa prazo de
-lei.
-Pedido de direito do titular e obrigação de preservação exigem procedimento
-com responsável, exceção registrada e minimização, sem editar ledger
-histórico.
+lei. Pedido de direito do titular e obrigação de preservação exigem
+procedimento com responsável, exceção registrada e minimização, sem editar
+ledger histórico.
 
 ## Revogação e eventos verdadeiros
 
@@ -116,13 +121,20 @@ não reutilizar URL/segredo antigo por acidente. PWA/push requer minimização e
 lockscreen e deep link autenticado; Meta segue deferred com minimização ainda
 pendente, sem afirmar que templates atuais omitem nome/material.
 
-Changelog consultado em 30/10 e referências pertinentes atualizadas
-em 04/11/2026:
-há retirada anunciada de cifras TLS antigas a partir de 10/11 no serviço
-gerenciado e correção de tzdata para três zonas. P10/D6 devem verificar
-clientes
-reais e zonas usadas; isso não autoriza upgrade/configuração em C nem
-demonstra
-impacto em America/Sao_Paulo.
+Changelog consultado em 30/10 e referências pertinentes atualizadas em
+04/11/2026: há retirada anunciada de cifras TLS antigas a partir de 10/11 no
+serviço gerenciado e correção de tzdata para três zonas. P10/D6 devem
+verificar clientes reais e zonas usadas; isso não autoriza
+upgrade/configuração em C nem demonstra impacto em America/Sao_Paulo.
 [TLS](https://supabase.com/changelog/cbc-tls-ciphers-deprecated),
 [tzdata](https://supabase.com/changelog/tzdata-local-time-vancouver-edmonton-casablanca).
+
+## Precedência técnica C7–C10
+
+As matrizes causais foram revisadas semanticamente, com domínios secundários
+explícitos. P06/P11/P12/P14 e garantia de comando P15 já foram respondidos;
+P02 por SCI-ID, retenção, fornecedores e parâmetros operacionais continuam
+delimitados em C7. P09-B é obrigatório, com identidade própria por emissão;
+não ativar núcleo só de hash como substituto. Toda evolução de schema usa
+migration incremental e preserva os 84 hashes históricos.
+[Adendo vigente](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).

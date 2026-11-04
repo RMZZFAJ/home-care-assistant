@@ -1,11 +1,17 @@
 # Decisões que ainda precisam do responsável
 
+> Registro inicial preservado como história de deliberação. O
+> [adendo C7 de 04/11/2026](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md)
+> contém as respostas atuais e prevalece: P09-B obrigatório, P11 facultativo,
+> P12 limite por tipo, O01+ wizard global e P02 por SCI-ID ainda pendente.
+> Recomendações/pendências abaixo não são todas as decisões vigentes.
+
 A finalidade dos recursos já foi decidida. As escolhas abaixo ajustam limites
 de uso e responsabilidade; **nenhuma recomendação é aprovação**. Todas estão
 `PENDING_OWNER`, mesmo quando parte da questão já foi resolvida. A C pode
 concluir o desenho condicional; D só implementa o ramo com contrato
-autorizado.
-Não são quinze perguntas a responder agora para continuar a documentação.
+autorizado. Não são quinze perguntas a responder agora para continuar a
+documentação.
 
 ## P01 — Como identificar e verificar um profissional
 
@@ -22,24 +28,21 @@ campos obrigatórios e quem verifica. Nenhum número fictício vira credencial.
 **A:** somente manual; simples, aumenta tarefas e não atende sozinho à direção
 de oferecer três modalidades. **B:** preferência individual por tipo com lista
 de atos excluídos; preserva escolha e impede presumir recebimento. **C:**
-mínimos
-por residência além das preferências; exige governança e explicação de
-conflito.
-Recomendação não aprovada: B, com C apenas se o responsável definir mínimos.
-O acesso sempre terá trilha própria; recebimento ENT e aprovação operacional
-nunca são substituídos. D2/D5 bloqueiam apenas a política tácita até a
-definição.
+mínimos por residência além das preferências; exige governança e explicação de
+conflito. Recomendação não aprovada: B, com C apenas se o responsável definir
+mínimos. O acesso sempre terá trilha própria; recebimento ENT e aprovação
+operacional nunca são substituídos. D2/D5 bloqueiam apenas a política tácita
+até a definição.
 
 ## P03 — Quanta informação pode ser perdida e quanto tempo pode ficar parado
 
 **A:** backup periódico externo e recuperação manual; custo menor, maior
-janela
-de perda/parada. **B:** mecanismo de recuperação mais frequente com ensaios;
-reduz janela e aumenta custo/operação. **C:** redundância adicional, só se o
-impacto justificar. Recomendação não aprovada: escolher A/B por capacidade e
-medir o ensaio antes de prometer RPO/RTO. Não há valor numérico aceito. D6
-exige
-frequência, destino, retenção, titular e substituto, incluindo arquivos/Auth.
+janela de perda/parada. **B:** mecanismo de recuperação mais frequente com
+ensaios; reduz janela e aumenta custo/operação. **C:** redundância adicional,
+só se o impacto justificar. Recomendação não aprovada: escolher A/B por
+capacidade e medir o ensaio antes de prometer RPO/RTO. Não há valor numérico
+aceito. D6 exige frequência, destino, retenção, titular e substituto,
+incluindo arquivos/Auth.
 
 ## P04 — Onde ficará a operação real
 
@@ -65,26 +68,22 @@ Resolvido: DEC-028 torna a escala uma sugestão editável e o aceite pessoal
 indelegável. **A:** escolher pessoa vinculada/capaz manualmente, com motivo;
 permite operação sem confundir agenda e presença. **B:** exigir regularização
 da escala antes da expedição; mais controle e potencial atraso. **C:**
-registrar
-pendência física por contingência, sem emitir aceite fictício. Recomendação
-não
-aprovada: A se elegibilidade for satisfeita e houver confirmação da
-identidade;
-C se não houver pessoa apta. D2 depende da regra de exceção, nunca de terceiro
-confirmar em nome do recebedor.
+registrar pendência física por contingência, sem emitir aceite fictício.
+Recomendação não aprovada: A se elegibilidade for satisfeita e houver
+confirmação da identidade; C se não houver pessoa apta. D2 depende da regra de
+exceção, nunca de terceiro confirmar em nome do recebedor.
 
 ## P07 — Transferência simples e confirmação da contraparte
 
 **A:** interface simples cria ENT; contraparte valida a declaração e o efetivo
 recebedor confirma o físico em atos separados quando forem pessoas diferentes.
 Reutiliza trânsito/ledger e exige explicar dois fatos. **B:** documento
-próprio
-de transferência bilateral, com máquina equivalente; maior custo e risco de
-duplicar motores. **C:** manter apenas ENT completa até validar a
-simplificação.
-Recomendação não aprovada: A; C é caminho condicional sem inventar nova ficha.
-D2 aguarda escolha. Contraparte familiar confirmando relato de profissional
-que recebeu não pode produzir o aceite pessoal desse profissional.
+próprio de transferência bilateral, com máquina equivalente; maior custo e
+risco de duplicar motores. **C:** manter apenas ENT completa até validar a
+simplificação. Recomendação não aprovada: A; C é caminho condicional sem
+inventar nova ficha. D2 aguarda escolha. Contraparte familiar confirmando
+relato de profissional que recebeu não pode produzir o aceite pessoal desse
+profissional.
 
 ## P08 — Por quanto tempo guardar cada categoria
 
@@ -101,11 +100,11 @@ restritos.
 Já aprovado: comparar bytes com referência confiável. **A:** verificador de
 hash e registro final protegido, sem assinatura incorporada; menor custo,
 depende da confiança no serviço. **B:** assinatura criptográfica do sistema
-com verificação de chaves; autentica origem técnica, amplia governança.
-**C:** certificado pessoal qualificado/carimbo externo; escopo e custo ainda
-não aprovados. Recomendação não aprovada: A primeiro, avaliar B por uso; C não
-é requisito presumido. D4 pode desenhar o núcleo A; extensão aguarda escolha.
-O QR não prova bytes nem a realidade do ato.
+com verificação de chaves; autentica origem técnica, amplia governança. **C:**
+certificado pessoal qualificado/carimbo externo; escopo e custo ainda não
+aprovados. Recomendação não aprovada: A primeiro, avaliar B por uso; C não é
+requisito presumido. D4 pode desenhar o núcleo A; extensão aguarda escolha. O
+QR não prova bytes nem a realidade do ato.
 
 ## P10 — Quem e quais aparelhos participarão do aceite
 
@@ -121,11 +120,10 @@ rede, teclado, leitor de tela e impressão. Nenhum aceite físico ocorreu em C.
 **A:** adiar capacidades próprias e configurar revisão familiar legítima onde
 for permitida; menor escopo. **B:** incluir o mínimo necessário da supervisão
 quando a política BAL escolhida a exigir. **C:** ativar todos os perfis;
-aumenta
-homologação. Recomendação não aprovada: A/B conforme a residência, nunca
-excluir
-uma revisão obrigatória para conseguir verde. D2/D6 exigem política que tenha
-pessoas efetivamente elegíveis. Guias de supervisão continuam no plano.
+aumenta homologação. Recomendação não aprovada: A/B conforme a residência,
+nunca excluir uma revisão obrigatória para conseguir verde. D2/D6 exigem
+política que tenha pessoas efetivamente elegíveis. Guias de supervisão
+continuam no plano.
 
 ## P12 — Quando um rascunho pode ser abandonado
 
@@ -149,13 +147,12 @@ D5/D6 dependem dos prazos, pessoas e teto de custo; não derivar SLO de mocks.
 
 **A:** concluir a ficha só após validação das parcelas físicas e dispensa
 expressa do que não será adquirido. **B:** encerrar apenas expectativa de
-novas
-aquisições, mantendo validações pendentes visíveis e sem dizer “concluída”.
-**C:** nova revisão aprovada da previsão antes da dispensa; mais etapas.
-Recomendação não aprovada: A como percurso simples, B quando recebimentos
-pendentes exigirem continuidade separada. Finalidade já aprovada em DEC-004;
-D2 aguarda o ponto de fechamento. Recebidos 2 de 10 continuam 2, sem crédito
-8.
+novas aquisições, mantendo validações pendentes visíveis e sem dizer
+“concluída”. **C:** nova revisão aprovada da previsão antes da dispensa; mais
+etapas. Recomendação não aprovada: A como percurso simples, B quando
+recebimentos pendentes exigirem continuidade separada. Finalidade já aprovada
+em DEC-004; D2 aguarda o ponto de fechamento. Recebidos 2 de 10 continuam 2,
+sem crédito 8.
 
 ## P15 — Até quando revogação impede uma operação iniciada
 
@@ -166,9 +163,8 @@ permitindo a já autorizada concluir; simplifica, mantém janela residual que
 precisa aceite explícito. **C:** pausar e conciliar operações em andamento;
 não substitui a barreira de acesso e aumenta trabalho. Recomendação não
 aprovada: A no comando transacional; para envio já aceito, conciliação e
-limite
-honesto. D1/D4/D7 aguardam garantia/TTL aprovada. Nova chamada após revogação
-sempre é recusada; baixar novamente não recolhe cópia que já saiu.
+limite honesto. D1/D4/D7 aguardam garantia/TTL aprovada. Nova chamada após
+revogação sempre é recusada; baixar novamente não recolhe cópia que já saiu.
 
 ## Registro de resposta e conflitos resolvidos
 

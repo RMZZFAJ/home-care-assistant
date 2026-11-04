@@ -2,11 +2,9 @@
 
 AS_IS: wizard em /fichas/req, detalhe /historico/:id e visualizador
 /documentos/:id; src/lib/validation/requisition.ts exige currentStock
-numérico;
-B1-FORM-001 mostra zero automático, B1-UX-005 limita rascunho à aba.
-Atendimento
-vem de ENT aceita vinculada, não de compra ou quantidade pedida. O TO_BE
-preserva isso e aplica DEC-002/003/012/030 e O11/O16.
+numérico; B1-FORM-001 mostra zero automático, B1-UX-005 limita rascunho à aba.
+Atendimento vem de ENT aceita vinculada, não de compra ou quantidade pedida. O
+TO_BE preserva isso e aplica DEC-002/003/012/030 e O11/O16.
 
 ## Telas e campos
 
@@ -189,13 +187,11 @@ preserva isso e aplica DEC-002/003/012/030 e O11/O16.
 <!-- c-table:end -->
 
 Estoque TO_BE tem três valores semânticos: `observed` com quantidade
-(inclusive
-zero), `unknown` por escolha expressa e `unfilled` quando deixado vazio.
-Campo vazio não impede por si emitir segundo DEC-003; o PDF diz “Não
-informado”.
-O desconhecido diz “Não sei informar”; nenhum deles é convertido em 0. O
-saldo calculado pode ser mostrado em área autorizada separada, nunca preenche
-contagem. Seleção recorrente traz só materiais, não urgência/estoque
+(inclusive zero), `unknown` por escolha expressa e `unfilled` quando deixado
+vazio. Campo vazio não impede por si emitir segundo DEC-003; o PDF diz “Não
+informado”. O desconhecido diz “Não sei informar”; nenhum deles é convertido
+em 0. O saldo calculado pode ser mostrado em área autorizada separada, nunca
+preenche contagem. Seleção recorrente traz só materiais, não urgência/estoque
 anteriores.
 
 ## Jornada, transições e responsáveis
@@ -257,44 +253,51 @@ Manual registra ato expresso. Modal condicionado informa **antes de abrir**:
 “Continuar registra sua ciência; não declara leitura integral”. Cancelar não
 registra ciência e retorna ao ponto anterior. Tácita registra na emissão com
 origem `tacit_preference` e versão da preferência. Mudança posterior é
-prospectiva.
-Acesso efetivo tem evento independente por abertura autorizada; duplicação por
-retry técnico não fabrica várias aberturas, mas nova abertura real é
-registrada.
-Prévia negada ou ciência tácita não cria acesso fictício. P02 define atos
-excluídos.
+prospectiva. Acesso efetivo tem evento independente por abertura autorizada;
+duplicação por retry técnico não fabrica várias aberturas, mas nova abertura
+real é registrada. Prévia negada ou ciência tácita não cria acesso fictício.
+P02 define atos excluídos.
 
 ## Erro, concorrência e recuperação
 
-Emitir congela conteúdo/chave; resposta perdida consulta a mesma tentativa.
-Se persistiu, abrir documento e informar registro salvo; se não confirmado,
+Emitir congela conteúdo/chave; resposta perdida consulta a mesma tentativa. Se
+persistiu, abrir documento e informar registro salvo; se não confirmado,
 manter uncertain. Não enviar novamente com chave nova. Campo inválido leva ao
 campo exato; trocar paciente conserva rascunho no escopo original e exige
 contexto atual antes de concluir. Mudança de catálogo/política/versão
-apresenta
-diferença na retomada. Revogado não emite nem declara ciência nova.
+apresenta diferença na retomada. Revogado não emite nem declara ciência nova.
 
 P1 C-CAUSE-049 exige seleção automática com progresso entre pacientes e entre
 documentos do mesmo paciente, terminais fora do lote elegível e dedup de cada
-lembrete. Dado legado inválido deve gerar diagnóstico/continuidade segura,
-sem limpar história ou inventar prazo. A ciência, o atendimento e o deadline
-não podem depender do êxito de WhatsApp/push.
+lembrete. Dado legado inválido deve gerar diagnóstico/continuidade segura, sem
+limpar história ou inventar prazo. A ciência, o atendimento e o deadline não
+podem depender do êxito de WhatsApp/push.
 
 ## Documento, privacidade e aceite
 
 PDF inclui observação com modo e instante da emissão, urgência, estado por
 linha, ciência com origem, vínculos e ressalvas. Nunca imprime “solicitado:
-0”.
-A equipe continua sem acesso ao estoque familiar geral. Pendência interna
-aponta
-para documento e responsável, sem provar leitura ou recebimento.
+0”. A equipe continua sem acesso ao estoque familiar geral. Pendência interna
+aponta para documento e responsável, sem provar leitura ou recebimento.
 
 Aceites D: escolher material/apagar 7 conserva unfilled; digitar 0 conserva
 observed=0; escolher desconhecido produz unknown; reabrir em outro aparelho
 mantém distinções. Emitir sob resposta perdida cria uma REQ. ENT parcial
-ligada
-a duas REQs credita só uma vez e permite nova necessidade motivada. Ciência
-nas três modalidades tem texto/ator/origem corretos; nenhum usuário sem
-capacidade a registra. Família/profissional explicam cada diferença por
-teclado,
-AT e celular real. Matrizes C-AC-025/032/036/041/049 e CAPs complementam.
+ligada a duas REQs credita só uma vez e permite nova necessidade motivada.
+Ciência nas três modalidades tem texto/ator/origem corretos; nenhum usuário
+sem capacidade a registra. Família/profissional explicam cada diferença por
+teclado, AT e celular real. Matrizes C-AC-025/032/036/041/049 e CAPs
+complementam.
+
+## Atualização vinculante C7–C10
+
+P02 segue OWNER_REVIEW_REQUIRED por SCI-ID. Abertura, ciência e leitura não se
+confundem. P12 aprova um draft de criação por tipo e retomada privada;
+observação antiga conserva instante. Blueprint REQ-01–05 e casos C9 detalham
+controles e oráculos.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).

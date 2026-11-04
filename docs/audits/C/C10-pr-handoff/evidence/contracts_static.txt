@@ -1,0 +1,5 @@
+
+> home-care-assistant@0.1.0 check:contracts
+> node scripts/check-contracts.mjs
+
+Contract guard passed; 84 historical migrations unchanged.

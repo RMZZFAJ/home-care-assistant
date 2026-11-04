@@ -9,20 +9,23 @@ migration.
 ## Sequência expandir, migrar consumidor, contrair quando autorizado
 
 1. Congelar contratos de entrada/saída por cenário e produzir regressões que
-discriminem o defeito no baseline; salvar prova antiga sem sobrescrever B.
+   discriminem o defeito no baseline; salvar prova antiga sem sobrescrever B.
+
 2. Introduzir coluna/estado/contrato novo de forma aditiva quando realmente
-necessário. Criar RPC e grants restritos no mesmo incremento; não deixar
-intervalo com tabela exposta por permissões default.
-3. Ler registro antigo e novo com origem explícita. Não inferir campos
-   físicos
-ausentes. Só fazer backfill determinístico de metadado técnico derivável,
-com contagem/hash antes/depois e amostra, nunca assinatura/data inventada.
+   necessário. Criar RPC e grants restritos no mesmo incremento; não deixar
+   intervalo com tabela exposta por permissões default.
+
+3. Ler registro antigo e novo com origem explícita. Não inferir campos físicos
+   ausentes. Só fazer backfill determinístico de metadado técnico derivável,
+   com contagem/hash antes/depois e amostra, nunca assinatura/data inventada.
+
 4. Trocar API e UI sob feature gate/versionamento onde a compatibilidade
-   exigir;
-validar cliente antigo com schema expandido e cliente novo com requisito
-mínimo.
+   exigir; validar cliente antigo com schema expandido e cliente novo com
+   requisito mínimo.
+
 5. Encerrar caminho antigo somente com consumidor/URL inventariados, plano de
-reversão compatível e autorização própria. Não remover histórico por estética.
+   reversão compatível e autorização própria. Não remover histórico por
+   estética.
 
 ## Grupos de alteração e salvaguardas
 
@@ -115,20 +118,19 @@ schema.
 
 ## Modelos novos propostos e integridade referencial
 
-Draft, subscription e acesso têm consumidores demonstrados. Chaves e FKs
-devem incluir paciente/usuário pertinentes ou validar vínculo transacional;
-um UUID global sozinho não prova contexto. Referências históricas não usam
-ON DELETE CASCADE que apague fatos ao desligar pessoa ou inativar produto.
-Autor e alvo mantêm identidade estável, com dados pessoais sob política P08.
-Índices seguem predicados reais de titular/target/cursor e FKs, com EXPLAIN
-em volume representativo somente se necessário; sem programa de índices por
-hábito.
+Draft, subscription e acesso têm consumidores demonstrados. Chaves e FKs devem
+incluir paciente/usuário pertinentes ou validar vínculo transacional; um UUID
+global sozinho não prova contexto. Referências históricas não usam ON DELETE
+CASCADE que apague fatos ao desligar pessoa ou inativar produto. Autor e alvo
+mantêm identidade estável, com dados pessoais sob política P08. Índices seguem
+predicados reais de titular/target/cursor e FKs, com EXPLAIN em volume
+representativo somente se necessário; sem programa de índices por hábito.
 
 Cada tabela exposta recebe RLS, USING/WITH CHECK apropriados e grants/defaults
 revisados. Preferir acesso restrito por RPC onde o produto já o exige. Função
 privilegiada precisa search_path fixo, autorização explícita, EXECUTE mínimo e
-review de helper/serviço; service_role não é bypass de regra de domínio.
-Não usar GUC arbitrário definido pelo cliente como identidade autorizada.
+review de helper/serviço; service_role não é bypass de regra de domínio. Não
+usar GUC arbitrário definido pelo cliente como identidade autorizada.
 
 ## Backfill, rollout e retorno
 
@@ -136,18 +138,27 @@ Diagnóstico de legado é read-only antes da decisão. Campo desconhecido recebe
 marcação de origem desconhecida; nenhuma conta/protocolo antigo é recriado.
 Backfill técnico, quando autorizado, opera em lotes com checkpoint, chave,
 predicado estável e recuperação; recusa colisões em vez de escolher
-silenciosamente.
-Comparar contagens/FKs/hashes e representação dos casos críticos antes/depois.
+silenciosamente. Comparar contagens/FKs/hashes e representação dos casos
+críticos antes/depois.
 
 Rollback da aplicação só ocorre para artefato compatível com schema expandido.
 Evento/ledger confirmado não é revertido por checkout do código; corrigir com
 novo evento/compensação legítima ou forward fix incremental. Se houver
-incerteza
-física/external, conter novas ações e conciliar, sem reenviar/reaplicar
-cegamente.
-Migration destrutiva ou remoção de campo antigo fica fora do primeiro rollout
-salvo necessidade demonstrada e aprovação específica.
+incerteza física/external, conter novas ações e conciliar, sem
+reenviar/reaplicar cegamente. Migration destrutiva ou remoção de campo antigo
+fica fora do primeiro rollout salvo necessidade demonstrada e aprovação
+específica.
 
 Release exige atestado de artefato, schema mínimo, runtime, configuração de
 capacidades e destino. Sem compatibilidade comprovada, parar antes de mutação
 ou promoção. Backup legível não autoriza restore sobre ambiente existente.
+
+## Precedência técnica C7–C10
+
+As matrizes causais foram revisadas semanticamente, com domínios secundários
+explícitos. P06/P11/P12/P14 e garantia de comando P15 já foram respondidos;
+P02 por SCI-ID, retenção, fornecedores e parâmetros operacionais continuam
+delimitados em C7. P09-B é obrigatório, com identidade própria por emissão;
+não ativar núcleo só de hash como substituto. Toda evolução de schema usa
+migration incremental e preserva os 84 hashes históricos.
+[Adendo vigente](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).

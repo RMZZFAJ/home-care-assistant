@@ -2,11 +2,10 @@
 
 AS_IS: /notificacoes, sino, regras por paciente, outbox e invalidação privada.
 A busca dirigida em src/public não encontrou manifest/service
-worker/subscription
-Web Push implementados. Preferência e-mail não é transporte operacional;
-WhatsApp/Flows dependem de homologação. TO_BE DEC-001/002/019/020/024: PWA e
-push são novos requisitos do primeiro escopo, sem trocar a fonte interna de
-estado.
+worker/subscription Web Push implementados. Preferência e-mail não é
+transporte operacional; WhatsApp/Flows dependem de homologação. TO_BE
+DEC-001/002/019/020/024: PWA e push são novos requisitos do primeiro escopo,
+sem trocar a fonte interna de estado.
 
 ## Telas e campos
 
@@ -262,16 +261,14 @@ significa ciência, compreensão, comparecimento ou aceite de material.
 Entrar → entender utilidade/privacidade → instalar quando disponível → gesto
 “Ativar avisos neste aparelho” → permissão do navegador → inscrição vinculada.
 Permissão negada mostra instruções para configuração, sem insistência
-repetida;
-aparelho sem suporte mantém aplicativo web e pendências internas. Cada
-aparelho
-tem inscrição própria; remover um não remove todos. Sair/revogar impede novos
-avisos sensíveis e desassocia a conta conforme política de dispositivo.
+repetida; aparelho sem suporte mantém aplicativo web e pendências internas.
+Cada aparelho tem inscrição própria; remover um não remove todos. Sair/revogar
+impede novos avisos sensíveis e desassocia a conta conforme política de
+dispositivo.
 
 Web Push exige service worker e inscrição; a especificação da API também
-alerta
-para proteção CSRF e sigilo do endpoint. Esta é base de desenho, não aceite
-do aparelho.
+alerta para proteção CSRF e sigilo do endpoint. Esta é base de desenho, não
+aceite do aparelho.
 [Referência oficial MDN](https://developer.mozilla.org/en-US/docs/Web/API/Push_API).
 No iOS/iPadOS, a referência WebKit documenta suporte para web apps adicionados
 à tela inicial a partir de 16.4 e pedido de permissão por interação direta;
@@ -281,22 +278,18 @@ verificar versões e comportamento reais de P10 antes de prometer suporte.
 Desktop Chromium/Android, Safari/iOS instalado e outros navegadores entram em
 matriz com OS/versão/browser, instalação, permissionamento, app fechado,
 economia de bateria/Focus, expiração e clique. Não inferir compatibilidade
-apenas
-pelo nome do navegador. Instalação e remoção variam; não prometer que
-desinstalar
-o ícone apaga toda informação armazenada.
+apenas pelo nome do navegador. Instalação e remoção variam; não prometer que
+desinstalar o ícone apaga toda informação armazenada.
 [Instalação](https://web.dev/learn/pwa/installation).
 
 ## Falha, atualização e recuperação
 
 Subscription expirada/410 é retirada do envio com trilha; falha transitória
-usa
-tentativa/backoff limitado, sem apagar evento interno. Duplicata do mesmo
-evento
-e destinatário/dispositivo é suprimida por chave. Resultado incerto permanece
-conciliável; push duplicado residual não cria fato operacional duplicado.
-Revogação entre seleção e envio exige revalidação e conteúdo mínimo; aviso já
-aceito pelo serviço não pode ser recolhido garantidamente.
+usa tentativa/backoff limitado, sem apagar evento interno. Duplicata do mesmo
+evento e destinatário/dispositivo é suprimida por chave. Resultado incerto
+permanece conciliável; push duplicado residual não cria fato operacional
+duplicado. Revogação entre seleção e envio exige revalidação e conteúdo
+mínimo; aviso já aceito pelo serviço não pode ser recolhido garantidamente.
 
 Clique abre identificador de notificação em origem confiável, autentica e
 revalida vínculo/paciente. Link vencido/resolvido informa estado real, sem
@@ -309,6 +302,18 @@ Aceites D5/D6: opt-in e recusa; dois aparelhos e duas contas sem cruzamento;
 revogação/expiração; navegador fechado; reconexão; deep link resolvido/sem
 acesso; dedup; push indisponível com pendência interna completa; ausência de
 dados do paciente no lockscreen. Homologação física e SLO são gates
-independentes.
-Meta/Flows continuam desligados por decisão, com defeitos B5 preservados no
-plano D7.
+independentes. Meta/Flows continuam desligados por decisão, com defeitos B5
+preservados no plano D7.
+
+## Atualização vinculante C7–C10
+
+P02 permanece por tipo; P13 aprova segregação técnica para global/suporte e
+orientação operacional à equipe. P10 aprova quatro classes reais de aparelho,
+com modelos/versões a definir. Lembretes internos legados são D5/OPS-01,
+separados de Meta/Flows D7 diferidos.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).

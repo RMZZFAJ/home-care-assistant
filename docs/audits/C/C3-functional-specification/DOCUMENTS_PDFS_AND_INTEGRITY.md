@@ -161,12 +161,10 @@ TO_BE DEC-015/016/017/018, com composição `PROPOSED_TECHNICAL_DEFAULT` e P09.
 
 Todos: identidade/protocolo/tipo/versão; paciente conforme autorização;
 fonte/origem; estado; autores dos atos; data do fato, do registro e da
-emissão;
-itens/unidades; ressalvas; links/QR de consulta; digest de arquivo
-identificado
-sem circularidade; hash canônico e revisão do renderer; página e continuidade.
-Não imprimir segredo, token ou URL assinada de arquivo privado como prova
-pública.
+emissão; itens/unidades; ressalvas; links/QR de consulta; digest de arquivo
+identificado sem circularidade; hash canônico e revisão do renderer; página e
+continuidade. Não imprimir segredo, token ou URL assinada de arquivo privado
+como prova pública.
 
 <!-- c-table:start -->
 
@@ -213,27 +211,27 @@ pública.
 
 Legado: nome e data históricos conhecidos têm prioridade com proveniência;
 ausente imprime “Não informado na origem”. Data de importação aparece
-separada.
-Original preservado é distinto de representação derivada do legado. Nenhum
-renderer novo substitui bytes históricos já emitidos; nova representação
-recebe identidade própria e continua vinculada à versão de conteúdo.
+separada. Original preservado é distinto de representação derivada do legado.
+Nenhum renderer novo substitui bytes históricos já emitidos; nova
+representação recebe identidade própria e continua vinculada à versão de
+conteúdo.
 
 ## Fidelidade, layout e acessibilidade
 
 Célula que excede a área útil deve ser dividida em fragmentos, com cabeçalho
 repetido e marcador de continuidade; nunca desenhar a célula inteira além do
-rodapé. Nome válido com 160 caracteres com quebras internas e observação longa são
-casos obrigatórios. Texto final deve estar visível, extraível e dentro da
+rodapé. Nome válido com 160 caracteres com quebras internas e observação longa
+são casos obrigatórios. Texto final deve estar visível, extraível e dentro da
 geometria da página. Não resolver cortando silenciosamente
-observação/material.
-Se não representável, erro explícito recuperável, sem arquivo incompleto
-anunciado como válido. Compra e doação, BAL/reconto e cancelados têm títulos
-corretos. Rodapé não pode sobrepor conteúdo, inclusive em impressão em cinza.
+observação/material. Se não representável, erro explícito recuperável, sem
+arquivo incompleto anunciado como válido. Compra e doação, BAL/reconto e
+cancelados têm títulos corretos. Rodapé não pode sobrepor conteúdo, inclusive
+em impressão em cinza.
 
 Idioma, headings/tabelas e ordem semântica precisam de teste estrutural e AT.
 Extração de texto sozinha não demonstra PDF acessível. Se a biblioteca atual
-não atender tags, avaliar evolução ou alternativa HTML completa/autorizada
-com os mesmos campos/versão; aceite da alternativa depende de P10 e uso real.
+não atender tags, avaliar evolução ou alternativa HTML completa/autorizada com
+os mesmos campos/versão; aceite da alternativa depende de P10 e uso real.
 Layout inicial pode ser sóbrio sem novo redesenho gráfico amplo.
 
 ## Verificador e limites da autenticidade
@@ -246,39 +244,47 @@ existente, mas não confundir as duas referências.
 
 Selecionar exemplar calcula hash em ambiente controlado e consulta referência
 mínima confiável. Caminho inicial proposto: cálculo local dos bytes no
-browser,
-sem enviar conteúdo; comparação no serviço confiável. Se for necessária prova
-de digest calculado no servidor, endpoint faz streaming limitado sem
-interpretar
-o PDF e descarta bytes após comparação. Não aceitar digest informado pelo
-usuário
-como prova independente de que ele enviou determinado arquivo ao servidor.
-Resultado não revela nome/material nem prova realidade do fato ou autoria
-legal.
+browser, sem enviar conteúdo; comparação no serviço confiável. Se for
+necessária prova de digest calculado no servidor, endpoint faz streaming
+limitado sem interpretar o PDF e descarta bytes após comparação. Não aceitar
+digest informado pelo usuário como prova independente de que ele enviou
+determinado arquivo ao servidor. Resultado não revela nome/material nem prova
+realidade do fato ou autoria legal.
 
 QR de um documento legítimo pode ser copiado para PDF alterado: consulta pode
 achar o registro, mas a comparação do exemplar deve divergir. Sem referência
 ou serviço indisponível não significa falso; informar impossibilidade de
-verificar. Assinatura criptográfica do sistema é extensão P09, com chaves e
-confiança explícitas, sem alegar assinatura pessoal/ICP-Brasil.
+verificar. Assinatura criptográfica incorporada do sistema é mínimo P09-B, com
+chaves/cadeia/custos a definir, sem alegar assinatura pessoal/ICP-Brasil.
 
 ## Recuperação e aceitação
 
 Download revalida acesso e digest do cache; mismatch não transmite bytes como
 válidos nem substitui original silenciosamente. Dois renders da mesma
-identidade
-seguem determinismo definido; geração interrompida usa tentativa/registro
-atômico de ready. Compartilhar não muda estado operacional. Revogar não
-recolhe
-cópia baixada; novo download segue P15. Restauração inclui bytes e
-referências.
+identidade seguem determinismo definido; geração interrompida usa
+tentativa/registro atômico de ready. Compartilhar não muda estado operacional.
+Revogar não recolhe cópia baixada; novo download segue P15. Restauração inclui
+bytes e referências.
 
 Oráculo B8-Q001 deve reprovar PDF sem texto/fato crítico, mesmo com páginas,
 metadata e QR corretos; contraprova com conteúdo esperado passa. Conferir por
 tipo/estado: campos/atores/versão extraídos, geometria, raster e impressão/AT
 humanos. Mutante de título e mutante em branco devem falhar por razões
-próprias.
-Cache alterado diverge; legado dataNULL continua desconhecida; anotação
-passiva
-não desaparece silenciosamente; versão antiga continua recuperável. B6-007/008
-são gates dos caminhos documentais afetados, sem homologação presumida em C.
+próprias. Cache alterado diverge; legado dataNULL continua desconhecida;
+anotação passiva não desaparece silenciosamente; versão antiga continua
+recuperável. B6-007/008 são gates dos caminhos documentais afetados, sem
+homologação presumida em C.
+
+## Atualização vinculante C7–C10
+
+P09-B aprova assinatura criptográfica incorporada do sistema como mínimo
+obrigatório. Versão da ficha, emissão, hash canônico e hash dos bytes finais
+são distintos. Baixar mesmo exemplar conserva bytes; nova emissão tem
+ID/instante/solicitante/assinatura próprios. Perfil/cadeia/custo são gates,
+sem IP/GPS no PDF/QR por padrão.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).

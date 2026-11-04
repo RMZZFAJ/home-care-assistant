@@ -2,9 +2,9 @@
 
 Este é conteúdo-base TO_BE de DEC-026/O01/O19, a completar com screenshots e
 procedimentos comprovados **depois de D**. Não é manual de uma interface
-futura
-já homologada. AS_IS tem caminhos operacionais e alternativa física/foto;
-restore integral, entendimento humano e aparelho real continuam pendentes.
+futura já homologada. AS_IS tem caminhos operacionais e alternativa
+física/foto; restore integral, entendimento humano e aparelho real continuam
+pendentes.
 
 ## Telas e campos de apoio
 
@@ -21,8 +21,8 @@ restore integral, entendimento humano e aparelho real continuam pendentes.
 
   **Rota e situação:** Roteiro da primeira residência, novo processo
 
-  **Objetivo e ações:** Verificar preparação sem criar wizard obrigatório
-  adicional.
+  **Objetivo e ações:** Wizard de preparação por etapas, com criação exclusiva
+  ao administrador global; configuração não é homologação.
 
 - **Tela:** GUI-03
 
@@ -138,37 +138,40 @@ restore integral, entendimento humano e aparelho real continuam pendentes.
 ## Roteiro da primeira residência
 
 1. Responsável aprova ambiente P04, participantes/papéis P01/P11 e
-   contingência
-P05. Não importar fixtures da auditoria como cadastro real.
+   contingência P05. Não importar fixtures da auditoria como cadastro real.
+
 2. Titulares criam/confirmam suas contas; administração inicial e convites
-seguem aceite pessoal. Conferir paciente/modo no cabeçalho e capacidades.
+   seguem aceite pessoal. Conferir paciente/modo no cabeçalho e capacidades.
+
 3. Configurar unidades/precisão e catálogo sob responsabilidade familiar;
-adotar modelos explicitamente, apresentações equivalentes e nomes usados.
+   adotar modelos explicitamente, apresentações equivalentes e nomes usados.
+
 4. Registrar abertura de estoque com origem, quantidade e motivo reais; não
-preencher balanços fictícios para simular histórico. Validar custódias.
-5. Programar escala, recorrências, exceções e pessoas; explicar que escala
-não comprova presença. Configurar BAL e revisão com pessoas elegíveis.
-6. Definir política de ciência, avisos, donos e alternativa sem push;
-   instalar
-PWA nos aparelhos homologados e optar por avisos conscientemente.
+   preencher balanços fictícios para simular histórico. Validar custódias.
+
+5. Programar escala, recorrências, exceções e pessoas; explicar que escala não
+   comprova presença. Configurar BAL e revisão com pessoas elegíveis.
+
+6. Definir política de ciência, avisos, donos e alternativa sem push; instalar
+   PWA nos aparelhos homologados e optar por avisos conscientemente.
+
 7. Em ambiente de homologação autorizado, executar ciclo acompanhado
-REQ→COM→validação→ENT→aceite pessoal→BAL e consumo; praticar erro/retomada.
+   REQ→COM→validação→ENT→aceite pessoal→BAL e consumo; praticar erro/retomada.
+
 8. Conferir PDF/versionamento/impressão, acessibilidade e recuperação; testar
-contingência e restore no destino isolado. Só liberar após os gates D6.
+   contingência e restore no destino isolado. Só liberar após os gates D6.
 
 ## Guia da equipe
 
-Entrar e selecionar paciente; verificar tarefa atual e próxima pessoa.
-Na REQ, selecionar material, contar apenas o que observou ou indicar
-desconhecido;
-não pedir quantidade como compra. Em ENT, conferir o que recebeu de fato,
+Entrar e selecionar paciente; verificar tarefa atual e próxima pessoa. Na REQ,
+selecionar material, contar apenas o que observou ou indicar desconhecido; não
+pedir quantidade como compra. Em ENT, conferir o que recebeu de fato,
 registrar exceções e confirmar pessoalmente; se não recebeu, não aceitar por
 colega. Relatar falta/consumo sem presumir débito. Complementar informação
-quando
-solicitado. No BAL designado, contar na primeira etapa, revisar diferença
-depois;
-reconto novo tem autoria própria. Se não conseguir cumprir, solicitar fluxo
-legítimo de adiamento/designação, não editar agenda para apagar prazo.
+quando solicitado. No BAL designado, contar na primeira etapa, revisar
+diferença depois; reconto novo tem autoria própria. Se não conseguir cumprir,
+solicitar fluxo legítimo de adiamento/designação, não editar agenda para
+apagar prazo.
 
 Em erro de leitura, consultar novamente; em envio incerto, recuperar a mesma
 tentativa. Se acesso mudou, procurar administração local, sem compartilhar
@@ -182,16 +185,16 @@ Consultar pendências antigas/filtros, não só sino. Aprovar COM com quantidade
 prevista explícita; validar cada chegada; concluir inferior somente conforme
 regra escolhida. Expedir com pessoa recebedora indicada e resumo de custódia;
 conferir divergência/cancelamento com fatos reais. Corrigir estoque por
-compensação referenciada, não edição de saldo. Revisar BAL de versão atual
-sem autoaprovar contagem própria. Antes de trocar escala, ler antes/depois e
+compensação referenciada, não edição de saldo. Revisar BAL de versão atual sem
+autoaprovar contagem própria. Antes de trocar escala, ler antes/depois e
 efeito na obrigação; antes de desligar alguém, ver inventário, sem atrasar
 revogação urgente. Encerramento administrativo nunca afirma aceite alheio.
 
 Gerir catálogo inativo sem perder saldo e resolver duplicata sem apagar ID.
 Não promover profissional a administrador para contornar um fluxo defeituoso.
 Suporte técnico recebe correlação; família decide somente atos locais
-legítimos.
-Guardar evidências e papéis conforme P08, não em grupo público de mensagens.
+legítimos. Guardar evidências e papéis conforme P08, não em grupo público de
+mensagens.
 
 ## Guia da supervisão
 
@@ -211,28 +214,37 @@ Conciliar um fato físico com chave e referência estáveis; comparar ledger,
 documento e papel. Duplicata é vinculada, não creditada de novo.
 
 Se o recebedor ainda tem acesso, ele próprio confirma seu ato no fluxo
-permitido,
-com data do fato e registro posterior claramente distintos. Se saiu ou não
-pode confirmar, guardar declaração física com origem e conciliador próprios;
-eventual encerramento administrativo não simula confirmação no aplicativo.
-P05 define autoridade/dupla conferência e P08 a guarda; C não presume sua
-escolha.
+permitido, com data do fato e registro posterior claramente distintos. Se saiu
+ou não pode confirmar, guardar declaração física com origem e conciliador
+próprios; eventual encerramento administrativo não simula confirmação no
+aplicativo. P05 define autoridade/dupla conferência e P08 a guarda; C não
+presume sua escolha.
 
 ## Incidente e aceite dos guias
 
 Suporte identifica evento/estado/versão/correlação, preserva evidência mínima,
 avalia impacto e decide contenção autorizada. Restore tem quarentena e
 reconciliação, nunca simples “voltar backup” sobre ambiente em uso.
-Dono/substituto,
-RPO/RTO e gatilho de continuidade dependem P03/P05/P13. Não medir sucesso só
-por 200.
+Dono/substituto, RPO/RTO e gatilho de continuidade dependem P03/P05/P13. Não
+medir sucesso só por 200.
 
 Após D, cada guia recebe capturas do mesmo SHA e revisão por pessoa do
-público.
-Aceite por tarefa: localizar pendência antiga, preencher sem ajuda indevida,
-explicar efeito, recuperar resposta perdida e registrar contingência sem
-duplicar.
-Screenshot/emulação não substituem participante, AT, aparelho e impressão
-reais.
-Versão/data/origem do manual acompanham o artefato; rótulos futuros não são
-apresentados como produto implementado.
+público. Aceite por tarefa: localizar pendência antiga, preencher sem ajuda
+indevida, explicar efeito, recuperar resposta perdida e registrar contingência
+sem duplicar. Screenshot/emulação não substituem participante, AT, aparelho e
+impressão reais. Versão/data/origem do manual acompanham o artefato; rótulos
+futuros não são apresentados como produto implementado.
+
+## Atualização vinculante C7–C10
+
+O01+ aprova wizard próprio de preparação/criação exclusivamente ao global;
+família executa tarefas locais autorizadas. O01 aprova guia opcional no
+primeiro login configurável pela administração e reabrível no perfil. P03
+proteção intermediária aprovada, 1h/4h são hipóteses; P05 regularização com
+PDF/aviso proporcional e P10 aparelhos reais.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).

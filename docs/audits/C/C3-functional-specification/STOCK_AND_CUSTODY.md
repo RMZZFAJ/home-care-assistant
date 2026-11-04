@@ -79,9 +79,8 @@ TO_BE preserva movimentos oficiais, DEC-007/013/015, O09/O12 e P07/P15.
 
   **Obrigatório e default:** Sim, vazio
 
-  **Validação/unidade:** Positiva, finita, até 1 bilhão, até 6 casas e precisão
-do
-  produto antes de coerção
+  **Validação/unidade:** Positiva, finita, até 1 bilhão, até 6 casas e
+  precisão do produto antes de coerção
 
   **Ajuda e exemplo:** 1,5 aceita apenas em unidade fracionável.
 
@@ -169,37 +168,32 @@ com referência obrigatória, nunca UPDATE/DELETE do ledger. Se corrigir um fato
 afetaria documentos aceitos, exigir conciliação do domínio; não admitir atalho
 que desfaça aceite pessoal. Nenhuma operação pública produz saldo negativo.
 
-Transferência proposta P07-A usa ENT e conserva quantidade: origem reduz e
-trânsito aumenta na expedição; destino só aumenta no aceite pessoal. A
-interface
-simples reduz preenchimento e explicita contraparte, não elimina as etapas.
-P07-B exige mecanismo equivalente; C mantém o plano sem selecionar por conta
-própria. Retorno de equipe à família tem os mesmos controles e direção clara.
+Transferência simples aprovada P07 usa preferencialmente ENT e conserva
+quantidade: origem reduz e trânsito aumenta na expedição; destino só aumenta
+no aceite pessoal. A interface simples reduz preenchimento e explicita
+contraparte, não elimina as etapas. P07-B exige mecanismo equivalente; C
+mantém o plano sem selecionar por conta própria. Retorno de equipe à família
+tem os mesmos controles e direção clara.
 
 Produto inativo com saldo continua na custódia verdadeira e em consulta
 histórica. Inativar não gera movimento. Saldo da equipe pode permanecer
-inativo
-ou ser transferido legitimamente para família por escolha explícita.
-Transferir
-não vira débito fictício nem ação unilateral. Reativar torna disponível o
-saldo
-que permaneceu na mesma custódia; não cria saldo em outro produto.
-Se um fato antigo do inativo precisa ser conciliado, oferecer ação específica
-com autoridade e referência, preservando proteção contra novas operações
-comuns
-indevidas. Prazos/processo dessa exceção constam na decisão, sem “reativar
-tudo”.
+inativo ou ser transferido legitimamente para família por escolha explícita.
+Transferir não vira débito fictício nem ação unilateral. Reativar torna
+disponível o saldo que permaneceu na mesma custódia; não cria saldo em outro
+produto. Se um fato antigo do inativo precisa ser conciliado, oferecer ação
+específica com autoridade e referência, preservando proteção contra novas
+operações comuns indevidas. Prazos/processo dessa exceção constam na decisão,
+sem “reativar tudo”.
 
 ## Precisão, erro e consulta
 
 Validar valor original em API e SQL antes de numeric(18,6). Number e string
 equivalentes inválidos devem ser recusados; NaN/Infinity/negativo/excesso de
-casas
-não viram movimento arredondado. A fronteira de RPC continua exigida mesmo se
-formulário limita entrada. Zero é legítimo no saldo agregado, não como
-movimento
-positivo vazio. Readmodel deve definir ausência como zero só onde essa é a
-representação do contrato; crédito positivo esperado não aceita NULL no teste.
+casas não viram movimento arredondado. A fronteira de RPC continua exigida
+mesmo se formulário limita entrada. Zero é legítimo no saldo agregado, não
+como movimento positivo vazio. Readmodel deve definir ausência como zero só
+onde essa é a representação do contrato; crédito positivo esperado não aceita
+NULL no teste.
 
 Lock serializa saldo e idempotência; após espera, revalidar autoridade segundo
 P15. Duas saídas competem, uma recusa sem parcial quando saldo insuficiente.
@@ -210,12 +204,26 @@ antigas sem rótulo de atualização; resposta de outro paciente é descartada.
 
 Cada movimento abre sua origem exata: purchase_receipt, ENT, BAL, consumo ou
 movimento compensado. Resolver tipo e ID no servidor; link não concede acesso
-à COM familiar a leitor da equipe. Mostrar “Origem restrita ao seu acesso”
-sem inventar 404 de outro tipo. Histórico preserva nomes e unidades do fato.
+à COM familiar a leitor da equipe. Mostrar “Origem restrita ao seu acesso” sem
+inventar 404 de outro tipo. Histórico preserva nomes e unidades do fato.
 
 Aceites: correção sem referência falha em HTTP/RPC; correção válida se repete
 sem duplicar; fator 1.0000004 em unidade inteira é recusado antes de
-arredondar;
-duas saídas não tornam saldo negativo; saldo 4 inativo permanece 4 e reativa na
-mesma custódia; transferência não libera a mesma unidade dos dois lados;
-origem antiga abre com permissão correta. Validar resumo com família/equipe.
+arredondar; duas saídas não tornam saldo negativo; saldo 4 inativo permanece 4
+e reativa na mesma custódia; transferência não libera a mesma unidade dos dois
+lados; origem antiga abre com permissão correta. Validar resumo com
+família/equipe.
+
+## Atualização vinculante C7–C10
+
+P07 aprova interface simples baseada preferencialmente em ENT, condicionando
+retirada da UI antiga à equivalência. A taxonomia C7 distingue transferência
+física, COM, consumo, abertura, BAL, compensação e descarte; é proibido
+deslocamento fictício para ajustar saldo. P15 exige autoridade após espera no
+comando.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).

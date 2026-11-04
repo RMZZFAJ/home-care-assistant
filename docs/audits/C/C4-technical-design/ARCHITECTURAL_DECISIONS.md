@@ -49,7 +49,8 @@ proposto têm status distintos. Nenhum ADR concede execução.
   chaves/confiança. QR não substitui comparação.
 
   **Status/condição:** OWNER_APPROVED resultado DEC-018;
-  TECHNICAL_IMPLEMENTATION_DELEGATED núcleo; P09 extensão pendente.
+  TECHNICAL_IMPLEMENTATION_DELEGATED núcleo; P09-B assinatura incorporada
+  obrigatória; perfil/custo pendentes.
 
 - **ID:** C-ADR-05
 
@@ -102,5 +103,15 @@ Alternativas rejeitadas por regra expressa: DML direto para contornar RPC,
 aceite físico por terceiro, saldo apagado para inativar, autores retroativos,
 ciência chamada leitura e reset de operação/fixtures reais. São REJECTED por
 invariante, não opções pendentes. Limpeza de módulos/URLs depende grafo
-completo
-e autorização D-LATER; AppWorkspace e /inventarios continuam preservados.
+completo e autorização D-LATER; AppWorkspace e /inventarios continuam
+preservados.
+
+## Precedência técnica C7–C10
+
+As matrizes causais foram revisadas semanticamente, com domínios secundários
+explícitos. P06/P11/P12/P14 e garantia de comando P15 já foram respondidos;
+P02 por SCI-ID, retenção, fornecedores e parâmetros operacionais continuam
+delimitados em C7. P09-B é obrigatório, com identidade própria por emissão;
+não ativar núcleo só de hash como substituto. Toda evolução de schema usa
+migration incremental e preserva os 84 hashes históricos.
+[Adendo vigente](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).

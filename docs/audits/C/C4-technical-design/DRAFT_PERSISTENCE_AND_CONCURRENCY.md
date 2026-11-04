@@ -3,8 +3,8 @@
 DEC-012 aprova edição entre aparelhos/dias; P08/P12 deixam retenção e abandono
 temporal pendentes. Este desenho não grava documento oficial nem substitui
 idempotência da operação. O10 e drafts documentais existentes serão
-reutilizados
-onde atendem, sem fingir que sessionStorage já oferece persistência remota.
+reutilizados onde atendem, sem fingir que sessionStorage já oferece
+persistência remota.
 
 ## Modelo e API propostos
 
@@ -55,8 +55,9 @@ onde atendem, sem fingir que sessionStorage já oferece persistência remota.
 
   **Campos/contrato:** Listar próprios por paciente/kind/target e buscar id
 
-  **Restrição verificável:** Mais de um rascunho mostra escolha por
-  título/data; não escolher o último silenciosamente.
+  **Restrição verificável:** Um ativo por criação/usuário/paciente/tipo;
+  contextual por alvo/intenção. Continuar ou descartar/iniciar, sem lista
+  infinita.
 
 - **Elemento:** Save proposto
 
@@ -78,35 +79,32 @@ onde atendem, sem fingir que sessionStorage já oferece persistência remota.
 Tabela privada com RLS defensiva e RPC pública autorizada segue o padrão do
 produto; nenhum DML geral novo. Se houver estrutura equivalente vigente no
 candidato, adaptar em vez de duplicar. Referências históricas de fatos não
-usam
-cascade de exclusão por desligamento. Índice por owner/paciente/status/kind e
-saved_at atende a consulta demonstrada; avaliar plano antes de índices extras.
+usam cascade de exclusão por desligamento. Índice por
+owner/paciente/status/kind e saved_at atende a consulta demonstrada; avaliar
+plano antes de índices extras.
 
 ## Save, retomada e comando
 
 Autosave propõe um intervalo adequado à edição, sem prometer SLA numérico em
-C.
-Só anuncia salvo após confirmação com revision/saved_at. Estado em memória
+C. Só anuncia salvo após confirmação com revision/saved_at. Estado em memória
 não confirmado é “ainda não salvo”. Erro transitório mantém conteúdo e oferece
 retry da mesma tentativa. Campos inválidos para emissão podem existir no draft
 com marcação de validação parcial; não transportar segredo Auth, OTP ou
-endpoint
-push para conteúdo genérico de rascunho.
+endpoint push para conteúdo genérico de rascunho.
 
 Retomada verifica titular, vínculo, target, schemaVersion e bases atuais.
 Conteúdo legado passa por adaptação explícita de schema com versão;
-desconhecido
-é recuperável para revisão, não descartado automaticamente. Alteração de
-catálogo,
-recebedor, escala ou ledger abre comparação e marca campos afetados.
-Quantidade
-observada antiga fica com sua data, jamais anunciada como nova contagem.
+desconhecido é recuperável para revisão, não descartado automaticamente.
+Alteração de catálogo, recebedor, escala ou ledger abre comparação e marca
+campos afetados. Quantidade observada antiga fica com sua data, jamais
+anunciada como nova contagem.
 
-Dois aparelhos editam revision 5. A salva e obtém 6; B recebe 409 em expected 5,
-conserva o texto local e consulta 6. Usuário compara/copia campos permitidos e
-salva revisão nova. Não mesclar automaticamente decisão, quantidade, pessoa,
-ciência ou significado operacional por ordem de chegada. Metadata de tentativa
-permite saber que o save de A ocorreu mesmo se sua resposta se perdeu.
+Dois aparelhos editam revision 5. A salva e obtém 6; B recebe 409 em expected
+5, conserva o texto local e consulta 6. Usuário compara/copia campos
+permitidos e salva revisão nova. Não mesclar automaticamente decisão,
+quantidade, pessoa, ciência ou significado operacional por ordem de chegada.
+Metadata de tentativa permite saber que o save de A ocorreu mesmo se sua
+resposta se perdeu.
 
 Finalizar envia comando com chave estável e versão operacional atual. Se o
 comando confirma, marcar consumido com referência; falha nessa marcação não
@@ -119,14 +117,23 @@ permanece editável. Se uncertain, identidade/conteúdo congelados até consulta
 Logout limpa exposição local; revogação impede consulta/save/finalização nova.
 Conservação no servidor segue P08/P12, sem acesso de outro membro ou conta.
 Descartar é ato sobre rascunho, com confirmação só quando há conteúdo
-relevante;
-não apaga anexos ready ou documento emitido. Expiração automática fica inativa
-até política aprovada, com salvaguarda contra finalize/save concorrentes.
+relevante; não apaga anexos ready ou documento emitido. Expiração automática
+fica inativa até política aprovada, com salvaguarda contra finalize/save
+concorrentes.
 
 Aceites: nova aba, outro aparelho e dia seguinte; duas edições com 409;
-resposta
-de save perdida; finalize confirmado e marcação de draft falha; target
-obsoleto;
-usuário/paciente trocado; revogado; discard concorrente com consumo. Oráculos
-comparam um fato oficial, versões e ausência de acesso cruzado. Backup inclui
-drafts e metadados necessários à recuperação, respeitando retenção.
+resposta de save perdida; finalize confirmado e marcação de draft falha;
+target obsoleto; usuário/paciente trocado; revogado; discard concorrente com
+consumo. Oráculos comparam um fato oficial, versões e ausência de acesso
+cruzado. Backup inclui drafts e metadados necessários à recuperação,
+respeitando retenção.
+
+## Refinamento aprovado C7
+
+P12 fixa limite por tipo de criação e chaves contextuais por alvo/intenção.
+P08 fixa objeto privado não oficial; save não gera protocolo, PDF, ciência,
+ledger ou versão oficial. TTL automático não aprovado. RLS/RPC e índices devem
+impor unicidade também sob dois aparelhos concorrentes, sem converter draft
+documental antigo em objeto privado por simples renomeação. Contrato de
+descarte/preservação e efeitos em
+[rascunhos C7](../C7-decision-closure/DRAFT_NON_OFFICIAL_CONTRACT.md).

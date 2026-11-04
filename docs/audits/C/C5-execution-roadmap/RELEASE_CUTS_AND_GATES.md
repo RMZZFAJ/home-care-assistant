@@ -3,8 +3,8 @@
 Primeiro corte pretendido: REQ/COM/ENT/BAL/estoque completos, identificação e
 acesso de profissional/família/admin local, escala multi-dia/recorrências,
 PDFs fiéis/verificáveis, draft durável, PWA/Web Push e contingência. A
-existência
-do plano não torna esse corte apto. Nenhum deploy ou GO foi realizado em C.
+existência do plano não torna esse corte apto. Nenhum deploy ou GO foi
+realizado em C.
 
 <!-- c-table:start -->
 
@@ -91,34 +91,41 @@ Preservar flags reais NOTIFICATIONS_EXTERNAL_ENABLED e META_FLOWS_ENABLED
 desligadas até autorização/homologação específicas. Flags novas para ciência,
 draft/push ou interface simplificada são propostas técnicas e não existem por
 força deste texto. Ativar por paciente/capacidade/aparelho só após prova;
-rollback
-de flag não apaga evento confirmado. Legado de lembretes só pode ficar fora
-se houver desativação verificável e alternativa que cubra a obrigação.
+rollback de flag não apaga evento confirmado. Legado de lembretes só pode
+ficar fora se houver desativação verificável e alternativa que cubra a
+obrigação.
 
 Supervisão/leitor específicos podem aguardar, mas política BAL que os exige
 precisa ser atendida ou alterada legitimamente. Não remover funcionalidade
 existente para simular menor escopo. O17/O18 aguardam evolução. Assinatura
-criptográfica adicional P09 não bloqueia núcleo de comparação de bytes se esse
-ramo atender ao resultado aprovado. Headers/advisory/otimização P3 exigem
-triagem,
-dono e risco residual explícito, sem atualização indiscriminada.
+criptográfica incorporada P09-B é mínimo obrigatório. Núcleo só de hash não
+satisfaz o primeiro escopo; perfil/cadeia/custos precisam ser fechados.
+Headers/advisory/otimização P3 exigem triagem, dono e risco residual
+explícito, sem atualização indiscriminada.
 
 ## Estratégia de PR/CI e parada futura
 
 PRs pequenos por contrato/lote, com problema concreto, resultado, invariantes,
 testes discriminantes e migração/compatibilidade. Nada de PR nesta C. CI usa
 fixtures fictícias e stack local do runner; ambiente real não recebe
-seed/reset.
-Migrations novas têm review de ACL/RLS/definer e clean/legacy no marco. Branch
-protection/atestado de release são mudanças D autorizáveis, não configuração
-alterada silenciosamente em C.
+seed/reset. Migrations novas têm review de ACL/RLS/definer e clean/legacy no
+marco. Branch protection/atestado de release são mudanças D autorizáveis, não
+configuração alterada silenciosamente em C.
 
 Parar expansão se há saldo divergente, autoria indevida, perda documental,
 pendência essencial inacessível, envio incerto não conciliado,
-incompatibilidade
-de schema, restore sem prova ou gate reprovado. Conter novas operações do
-ramo,
-preservar fatos e aplicar rollback compatível/forward fix; não restaurar
-backup
-sobre operação existente por conveniência. Liberação gradual tem dono, escopo
-e critério de parada; não há percentual fictício de prontidão.
+incompatibilidade de schema, restore sem prova ou gate reprovado. Conter novas
+operações do ramo, preservar fatos e aplicar rollback compatível/forward fix;
+não restaurar backup sobre operação existente por conveniência. Liberação
+gradual tem dono, escopo e critério de parada; não há percentual fictício de
+prontidão.
+
+## Gates atualizados C7
+
+Direção visual já aprovada; P02 por SCI-ID continua aberta. BAL tem revisão
+facultativa no primeiro uso e não exige perfil exclusivo de supervisão para
+todas as contagens. P04 ambiente separado, P06 recebedor manual apto, P12
+limite de draft e P14 COM foram aprovados; faltam somente parâmetros
+expressamente registrados em OPEN_OWNER_GATES. Esta missão abre Draft PR sem
+esperar toda CI, sem merge. Promoção produtiva requer nova autorização e todos
+os checks do mesmo SHA/schema/config.

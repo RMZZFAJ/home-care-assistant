@@ -75,8 +75,8 @@ TO_BE DEC-001/006/021/022/028, P01/P11/P15 e contratos atuais preservados.
 
   **Obrigatório e default:** Só cadastro/troca
 
-  **Validação/unidade:** Contrato atual: mínimo 12 caracteres e máximo 72 bytes
-  UTF-8; ajuda consistente
+  **Validação/unidade:** Contrato atual: mínimo 12 caracteres e máximo 72
+  bytes UTF-8; ajuda consistente
 
   **Ajuda e exemplo:** Erro explica limite sem repetir valor.
 
@@ -94,7 +94,8 @@ TO_BE DEC-001/006/021/022/028, P01/P11/P15 e contratos atuais preservados.
 
   **Tipo/origem:** Texto do titular
 
-  **Obrigatório e default:** P01 define obrigatoriedade/verificação
+  **Obrigatório e default:** P01: função individual e registro quando
+  aplicável; conferência familiar registrada
 
   **Validação/unidade:** Registro até 30 e categoria até 80 atuais; rótulo
   informado/validado
@@ -118,8 +119,8 @@ TO_BE DEC-001/006/021/022/028, P01/P11/P15 e contratos atuais preservados.
 
   **Obrigatório e default:** Só se vincular canal
 
-  **Validação/unidade:** Telefone + e 7–15 dígitos; código de 6–8 dígitos conforme
-  atual; não usar metadata
+  **Validação/unidade:** Telefone + e 7–15 dígitos; código de 6–8 dígitos
+  conforme atual; não usar metadata
 
   **Ajuda e exemplo:** A confirmação de telefone não é homologação SMS do
   sistema.
@@ -219,13 +220,12 @@ TO_BE DEC-001/006/021/022/028, P01/P11/P15 e contratos atuais preservados.
 ## Jornadas e fronteiras
 
 Convite válido apresenta paciente/papel/emissor/validade mínima antes do
-aceite;
-token removido da URL e não enviado a analytics. Conta diferente orienta
-trocar
-conta; expirado/revogado já não aceita; já aceito oferece abrir contexto sem
-novo vínculo. Cadastro inicial de residência exige administrador de e-mail
-confirmado, sem promoção derivada de metadata. Inativo escolhido na criação
-deve permanecer inativo ou ser recusado antes de persistir, nunca ignorado.
+aceite; token removido da URL e não enviado a analytics. Conta diferente
+orienta trocar conta; expirado/revogado já não aceita; já aceito oferece abrir
+contexto sem novo vínculo. Cadastro inicial de residência exige administrador
+de e-mail confirmado, sem promoção derivada de metadata. Inativo escolhido na
+criação deve permanecer inativo ou ser recusado antes de persistir, nunca
+ignorado.
 
 Retry de aprovação de ingresso com link perdido informa o estado confirmado.
 Proposta técnica: oferecer reemissão explícita com rotação, invalidando link
@@ -242,10 +242,9 @@ acessível.
 Sessão encerrada deve ser recusada também nos contratos diretos de perfil e
 Storage pertinentes, além do Route Handler. Atualizar claims não substitui
 consulta de sessão/autoridade necessária. MFA e AAL2 usam Auth oficial;
-segredo
-TOTP/QR de cadastro é privado, nunca artefato de teste versionado.
-OAuth/SMTP/SMS
-reais seguem homologação do canal selecionado, não condição de teste simulado.
+segredo TOTP/QR de cadastro é privado, nunca artefato de teste versionado.
+OAuth/SMTP/SMS reais seguem homologação do canal selecionado, não condição de
+teste simulado.
 
 ## Erros, recuperação e aceitação
 
@@ -253,16 +252,29 @@ Cada operação do perfil tem estado próprio, sem spinner infinito após 500.
 Conflito de permissão conserva diálogo, intenção e foco. JWT revogado não
 atualiza perfil/avatar/ponteiro; nova sessão legítima funciona. Falha entre
 Auth e registro interno de telefone retoma etapa concluída sem exigir OTP
-usado;
-número não confirmado nunca entra em verified_phones. Avatar salvo sem
-ponteiro
-tem tentativa recuperável ou reconciliação, sem apagar objetos por varredura.
+usado; número não confirmado nunca entra em verified_phones. Avatar salvo sem
+ponteiro tem tentativa recuperável ou reconciliação, sem apagar objetos por
+varredura.
 
 Aceites: convite válido/expirado/revogado/conta errada/já aceito; revogação
-com
-ENT parcial e BAL futuro sem bloqueio; último administrador protegido sob
+com ENT parcial e BAL futuro sem bloqueio; último administrador protegido sob
 concorrência; global sem membership não opera estoque; sessão encerrada negada
 diretamente; campo nome curto manter/remover coerentes; retorno seguro em
-login.
-P01/P15 permanecem condições humanas. Guias usam dados fictícios e validação
-real em dispositivo; não exportar senha/OTP/cookie em screenshots ou traces.
+login. P01 e garantia do comando P15 já foram aprovados; o transporte/TTL de
+arquivo e eventual validação externa têm gates próprios. Guias usam dados
+fictícios e validação real em dispositivo; não exportar senha/OTP/cookie em
+screenshots ou traces.
+
+## Atualização vinculante C7–C10
+
+P01 aprova nome/função individual, registro quando aplicável e conferência
+familiar com autor/data/resultado; informado/conferido/validado externo são
+distintos. P15 aprova revalidação de comando e barreira persistente; arquivo
+já entregue tem limite próprio. O01 aprova tour opcional/reabertura pelo
+titular.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).

@@ -1,8 +1,13 @@
 # Documentação do Home Care Assistant
 
 **Estado atual:** [fonte por SHA](current/PROJECT_STATUS.md). Produção NO-GO;
-A e B1–B8 concluídas como diagnóstico; C é planejamento e organização;
-**D NÃO INICIADA**. Decisão aprovada não é funcionalidade implementada.
+A e B1–B8 concluídas como diagnóstico; C é planejamento e organização; **D NÃO
+INICIADA**. Decisão aprovada não é funcionalidade implementada.
+
+Entrada mais recente: [C7–C10](audits/C/C10-pr-handoff/README.md),
+[decisões vigentes](audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[projeto visual](audits/C/C8-visual-blueprint/README.md) e
+[casos de aceite](audits/C/C9-acceptance-refinement/README.md).
 
 <!-- c-table:start -->
 
@@ -20,12 +25,13 @@ A e B1–B8 concluídas como diagnóstico; C é planejamento e organização;
 
   **Começar aqui:**
   [Projeto C3](audits/C/C3-functional-specification/README.md) e
-  [questões humanas](audits/C/C2-decisions/HUMAN_DECISIONS_REVIEW.md).
+  [questões humanas atuais](audits/C/C7-decision-closure/OPEN_DECISIONS.md).
 
 - **Preciso de…:** Implementar depois da autorização
 
   **Começar aqui:** [Arquitetura C4](audits/C/C4-technical-design/README.md),
-  [lotes D](audits/C/C5-execution-roadmap/README.md) e handoff C6.
+  [lotes D](audits/C/C5-execution-roadmap/README.md) e
+  [handoff C10](audits/C/C10-pr-handoff/PHASE_D_HANDOFF_UPDATED.md).
 
 - **Preciso de…:** Conferir uma prova ou achado
 
@@ -48,12 +54,11 @@ current descreve contratos AS_IS e desvios conhecidos. decisions registra
 regra humana; audits/C especifica TO_BE ainda não implementado. Auditorias
 datadas preservam conclusões e evidências, mesmo quando dizem que C ainda não
 começou naquele momento. runbooks distingue procedimento planejado de
-executado.
-Nenhum índice autoriza envio, migration, restore, deploy, PR ou merge.
+executado. Nenhum índice autoriza envio, migration, restore, deploy, PR ou
+merge.
 
 Guias UI mantidos por compatibilidade ficam em [ui-ux](ui-ux/README.md).
 [Meta](meta/README.md) e [referências](references/README.md) são
-contratos/amostras,
-não aprovação/publicação externa. Não há duas versões ativas concorrentes dos
-contratos principais. Dados fictícios e arquivos privados não são operação
-real.
+contratos/amostras, não aprovação/publicação externa. Não há duas versões
+ativas concorrentes dos contratos principais. Dados fictícios e arquivos
+privados não são operação real.

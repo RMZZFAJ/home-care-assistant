@@ -1,11 +1,11 @@
 # BAL — contagem, revisão e reconto autoral
 
 AS_IS: /balancos para regime/atribuição, /fichas/bal para contagem e
-/fichas/:id
-para revisão. Contratos em src/lib/validation/balances.ts e documents.ts;
-bal_obligations/cycles/assignments e bal_approvals preservam versões. Regime
-agendado protege contador distinto; B3-006 demonstra desvio no legado.
-TO_BE aplica DEC-009/010/012/013/029, mantendo obrigações/atrasos reais.
+/fichas/:id para revisão. Contratos em src/lib/validation/balances.ts e
+documents.ts; bal_obligations/cycles/assignments e bal_approvals preservam
+versões. Regime agendado protege contador distinto; B3-006 demonstra desvio no
+legado. TO_BE aplica DEC-009/010/012/013/029, mantendo obrigações/atrasos
+reais.
 
 ## Telas e campos
 
@@ -196,16 +196,14 @@ Quando revisão é exigida, confirmar grupos conforme política e contador real
 distinto em todos os caminhos, inclusive legado. Se o ledger mudou desde a
 contagem, impedir aplicação antiga, explicar mudança e pedir reconto. Ajuste
 de BAL é diferença de inventário, não consumo relatado; ledger conserva
-origem.
-Contagem atual regulariza obrigações anteriores por vínculo explícito, sem
-fingir que foi realizada nos dias passados ou apagar atraso original.
+origem. Contagem atual regulariza obrigações anteriores por vínculo explícito,
+sem fingir que foi realizada nos dias passados ou apagar atraso original.
 
-Pedido de adiamento conserva prazo atual até decisão familiar legítima.
-Se plantão, pessoa ou versão mudou, não aprovar o alvo antigo.
-Rejeitar/inativar
+Pedido de adiamento conserva prazo atual até decisão familiar legítima. Se
+plantão, pessoa ou versão mudou, não aprovar o alvo antigo. Rejeitar/inativar
 como obsoleto deve poder concluir o pedido, registrando motivo; não ficar
-preso
-na mesma checagem que proíbe aprovação. Nova proposta é outro fato ligado.
+preso na mesma checagem que proíbe aprovação. Nova proposta é outro fato
+ligado.
 
 Troca na agenda mostra efeito BAL antes de confirmar. Se o contador anterior
 está indisponível em reconto, designador cria nova atribuição para Sheila,
@@ -215,23 +213,22 @@ com próximo responsável pela designação. Nunca modificar o autor anterior.
 ## Falhas, identidade e documento
 
 Criar/revisar/submeter adquire lock antes de recuperar idempotência e antes de
-testar elegibilidade de nova contagem; revalida autoridade após espera, como
-o contrato correto atual agendado. Retry de ato confirmado recupera mesmo BAL
+testar elegibilidade de nova contagem; revalida autoridade após espera, como o
+contrato correto atual agendado. Retry de ato confirmado recupera mesmo BAL
 mesmo se janela avançou; não permite iniciar ato novo fora da janela. Duas
 revisões concorrentes aplicam no máximo uma versão e um ajuste.
 
 Na UI, conflito conserva contagem e diferença para revisar; offline permite
 ver snapshot marcado desatualizado, sem aplicar. Rascunho retomado revalida
 itens, referência, assignment e pessoa. Revogado perde nova ação; nova
-designação
-não equivale a delegado assinar. P11 define grupos efetivamente disponíveis.
+designação não equivale a delegado assinar. P11 define grupos efetivamente
+disponíveis.
 
 PDF inclui contado/referência/diferença, autor de cada contagem,
-revisor/grupo,
-versão revisada, regime, janela e regularização de obrigações. Não imprime
-aprovação velha como vigente nem título “semanal” para todo BAL. Alertas
-internos
-apontam próxima pessoa, sem transformar atraso em contagem automática.
+revisor/grupo, versão revisada, regime, janela e regularização de obrigações.
+Não imprime aprovação velha como vigente nem título “semanal” para todo BAL.
+Alertas internos apontam próxima pessoa, sem transformar atraso em contagem
+automática.
 
 Aceites: contador não revisa própria versão legado/agendado; reconto por
 Sheila é novo ato; ledger alterado impede aprovação antiga; pedido obsoleto
@@ -239,3 +236,17 @@ termina sem alterar prazo original; duas submissões com mesma chave preservam
 um ajuste; UI móvel mostra comparação completa e devolve foco ao contador.
 Operadores devem explicar por que contagem física e revisão são etapas
 distintas.
+
+## Atualização vinculante C7–C10
+
+P11 foi aprovado: revisão facultativa no primeiro uso, sem fila universal.
+Contagem confirmada explicita efeito; autosave não aplica inventário e
+diferença não vira consumo inferido. Revisão iniciada tem autor/versão
+próprios e revisor distinto do contador efetivo. Reconto por substituta
+preserva original.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).

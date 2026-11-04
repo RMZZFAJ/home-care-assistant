@@ -1,5 +1,11 @@
 # PRODUCT DECISIONS MASTER — HOME CARE ASSISTANT
 
+> Registro inicial preservado como história de deliberação. O
+> [adendo C7 de 04/11/2026](../audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md)
+> contém as respostas atuais e prevalece: P09-B obrigatório, P11 facultativo,
+> P12 limite por tipo, O01+ wizard global e P02 por SCI-ID ainda pendente.
+> Recomendações/pendências abaixo não são todas as decisões vigentes.
+
 Registro inicial das decisões expressas do responsável | Entrada canônica da
 Fase C
 
@@ -7,14 +13,12 @@ Fase C
 dividir, mover e renomear este arquivo, inclusive para
 `docs/decisions/PRODUCT_DECISIONS_MASTER.md`, preservando integralmente as
 decisões expressas e a proveniência. **Não confundir decisão aprovada com
-funcionalidade já implementada.**
-**Referência temporal:** decisões comunicadas em 30/10/2026, depois do
-encerramento da B8.
-**Produto:** Home Care Assistant; aplicação de gestão operacional de home
-care, sem pressupor prescrição ou decisão clínica.
-**Estado das auditorias:** A e B1–B8 concluídas, ainda NO-GO para operação.
-**Diretriz principal:** especificar integralmente em C; implementar somente
-após autorização da D.
+funcionalidade já implementada.** **Referência temporal:** decisões
+comunicadas em 30/10/2026, depois do encerramento da B8. **Produto:** Home
+Care Assistant; aplicação de gestão operacional de home care, sem pressupor
+prescrição ou decisão clínica. **Estado das auditorias:** A e B1–B8
+concluídas, ainda NO-GO para operação. **Diretriz principal:** especificar
+integralmente em C; implementar somente após autorização da D.
 
 ## Semântica de status
 
@@ -61,18 +65,25 @@ após autorização da D.
 
 - Paciente, papel de plataforma, papel por paciente, vínculo profissional,
   escala e identidade de um ato têm significados diferentes.
+
 - REQ **não tem quantidade solicitada obrigatória**; necessidade e estoque
   observado não são a mesma coisa.
+
 - Registrar relato não é confirmar consumo; ciência não é recebimento; escala
   não é presença.
+
 - ENT só recebe confirmação física pela pessoa que efetivamente recebeu,
   **indelegável**; não simular assinatura após desligamento.
+
 - A gestão de estoque deve preservar custódia, trânsito, movimentos oficiais,
   quantidade e proveniência, sem duplicação.
+
 - Dados históricos, versões e autores são preservados mesmo depois de
   alterações cadastrais ou revogações.
+
 - Documentação de ciência tácita não pode afirmar acesso ou leitura de
   conteúdo não visualizado.
+
 - Dados e documentos reais devem ser separados de fixtures/snapshots das
   auditorias.
 
@@ -123,10 +134,12 @@ registrar quem e quando; distinguir acesso de ciência. Para obrigação de
 ciência, oferecer:
 
 1. **Manual:** ação expressa de ciência.
-2. **Automática condicionada a diálogo:** na primeira abertura elegível,
-   antes de mostrar a ficha, dialog informa que continuar registrará ciência;
+
+2. **Automática condicionada a diálogo:** na primeira abertura elegível, antes
+   de mostrar a ficha, dialog informa que continuar registrará ciência;
    continuar equivale ao ato de confirmar ciência, cancelar não registra. Não
    rotular como leitura integral de conteúdo ainda não visto.
+
 3. **Tácita sem interação:** usuário pode optar por ciência presumida na
    emissão da ficha, possivelmente com preferência por tipo; registrar evento
    com origem `tacit_preference`, sem afirmar acesso/leitura.
@@ -454,10 +467,13 @@ continua indelegável; são atos distintos.
 **Status:** O05/O11 `OWNER_APPROVED`; O17/O18 `OWNER_DEFERRED`.
 
 - O05: complementar consumo textual no app, sem aguardar WhatsApp.
+
 - O11: após atendimento parcial de REQ, permitir informar necessidade
   remanescente/novo documento vinculado e justificado, **sem introduzir
   quantidade solicitada na REQ nem duplicar crédito físico**.
+
 - O17: lote/validade fica para evolução futura com OCR/código de barras.
+
 - O18: visão consolidada de tarefas entre residências fica para evolução
   futura.
 
@@ -726,20 +742,28 @@ explícita e fonte da decisão**.
 
 1. Nenhum dos dois bloqueadores P1 antigos é resolvido apenas por texto ou
    reorganização: exigem implementação e regressão.
+
 2. Fichas REQ/COM/ENT/BAL devem registrar processo normal e exceções sem
    inventar fatos ou duplicar movimentos.
+
 3. Interface humana: termos corretos, textos de apoio, exemplos de
    preenchimento, botões no lugar apropriado, foco, teclado, navegação móvel,
    estados de carregamento e erros, recuperação de respostas incertas.
+
 4. PDFs: conteúdo efetivo, geometria, ressalvas, datas, autoria, integridade
    de bytes, acessibilidade; testes B8-Q001 precisam reprovar PDF em branco.
+
 5. Banco: saldo, precisão, referencial, revisão independente, revogação e
    histórico; assert B8-Q002 deve reprovar NULL indevido.
+
 6. Web Push é novo: testar inscrição, expiração, revoke, retry, privacidade,
    canal desabilitado e limites de plataforma.
+
 7. Backup/restore devem ser provados separadamente de `pg_dump` e incluir
    objetos/Auth/jobs.
+
 8. Publicação só após gate do mesmo SHA e compatibilidade do schema.
+
 9. Decisões do responsável não autorizam bypass por papel de administrador
    global nem confirmação de recebimento por terceiro.
 

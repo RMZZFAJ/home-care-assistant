@@ -1,0 +1,160 @@
+cause_id,field,before,after,basis,source_ids
+C-CAUSE-001,domain,REQ,PWA_PUSH_AND_NOTIFICATIONS,DB-006 seleciona patient_settings de lembretes BAL/turno; cursor bal_regimes não cobre esse mecanismo. Não pertence ao estoque observado REQ.,DB-006
+C-CAUSE-001,decision_refs,DEC-003;DEC-002;DEC-030;O11;O16,DEC-024;P13,DB-006 seleciona patient_settings de lembretes BAL/turno; cursor bal_regimes não cobre esse mecanismo. Não pertence ao estoque observado REQ.,DB-006
+C-CAUSE-001,specification,docs/audits/C/C3-functional-specification/REQ.md,docs/audits/C/C3-functional-specification/PWA_PUSH_AND_NOTIFICATIONS.md,DB-006 seleciona patient_settings de lembretes BAL/turno; cursor bal_regimes não cobre esse mecanismo. Não pertence ao estoque observado REQ.,DB-006
+C-CAUSE-001,planned_package,D1,D5,DB-006 seleciona patient_settings de lembretes BAL/turno; cursor bal_regimes não cobre esse mecanismo. Não pertence ao estoque observado REQ.,DB-006
+C-CAUSE-002,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-026,"REPO-001/B8-M001 revalidam divergência editorial; C6 já tratou entradas, sem corrigir produto.",REPO-001;B8-M001
+C-CAUSE-003,domain,USER_GUIDES_AND_CONTINUITY,PWA_PUSH_AND_NOTIFICATIONS,"REPO-003/B8-M003 são submissão implícita e seleção de destino em ferramenta Meta, não regra de guias do produto.",REPO-003;B8-M003
+C-CAUSE-003,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-019;DEC-024,"REPO-003/B8-M003 são submissão implícita e seleção de destino em ferramenta Meta, não regra de guias do produto.",REPO-003;B8-M003
+C-CAUSE-003,specification,docs/audits/C/C3-functional-specification/USER_GUIDES_AND_CONTINUITY.md,docs/audits/C/C3-functional-specification/PWA_PUSH_AND_NOTIFICATIONS.md,"REPO-003/B8-M003 são submissão implícita e seleção de destino em ferramenta Meta, não regra de guias do produto.",REPO-003;B8-M003
+C-CAUSE-004,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-023;DEC-025,Exportação Linux é fronteira de arquivos; ignore Git não governa tar. CI limpa não demonstra vazamento atual.,REPO-004;B8-M004
+C-CAUSE-005,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-014;DEC-024,"BE-006 mede viagens estáticas, não lentidão remota; otimização depende de orçamento.",BE-006
+C-CAUSE-006,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-023;DEC-026,Destino histórico hardcoded é risco da ferramenta; não reexecutar para revalidar prova.,REPO-002;B8-M002
+C-CAUSE-007,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-001;DEC-026,Ausência de consumidor é candidata a limpeza; reexport AppWorkspace e redirect continuam ativos.,UX-010;B8-M005
+C-CAUSE-008,domain,USER_GUIDES_AND_CONTINUITY,BAL,"UX-011 é lacuna de evidência da revisão BAL, não defeito funcional reproduzido.",UX-011
+C-CAUSE-008,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-026;P10,"UX-011 é lacuna de evidência da revisão BAL, não defeito funcional reproduzido.",UX-011
+C-CAUSE-008,specification,docs/audits/C/C3-functional-specification/USER_GUIDES_AND_CONTINUITY.md,docs/audits/C/C3-functional-specification/BAL.md,"UX-011 é lacuna de evidência da revisão BAL, não defeito funcional reproduzido.",UX-011
+C-CAUSE-008,planned_package,D-LATER,D6,"UX-011 é lacuna de evidência da revisão BAL, não defeito funcional reproduzido.",UX-011
+C-CAUSE-009,decision_refs,DEC-001;DEC-009;DEC-013;O06,DEC-013;O06,B1 e A mostram ausência do objeto decisório; não é mero texto do botão.,B1-UX-001;UX-001
+C-CAUSE-010,decision_refs,DEC-005;DEC-006;DEC-028;P06;P07,DEC-013,B1-UX-002 abrange três confirmadores; ENT sozinho não cobre estoque e configuração BAL.,B1-UX-002
+C-CAUSE-011,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-013;DEC-021,A e B1 descrevem presenter administrativo técnico; prova GET simulada não é aprovação real.,B1-UX-003;UX-005
+C-CAUSE-012,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-021;P01,Convite precisa prévia mínima; não expor paciente com token inválido.,B1-UX-004
+C-CAUSE-013,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-013;DEC-015,"UX-006 inclui linguagem e destino; rótulos são primários aqui, navegação fica também em 014.",B1-TEXT-001;UX-006
+C-CAUSE-014,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-014;O01,"Destino e intenção não são sinônimos: central, preferências e unidades têm rotas próprias.",B1-NAV-001
+C-CAUSE-015,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-016;DEC-013,Título enganoso ocorre no HTML e PDF; doação e BAL legado/reconto são variantes obrigatórias.,B1-TEXT-002
+C-CAUSE-016,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-001;DEC-014,Fallback público 404 é recuperação de navegação; não substituir tratamento 401/403.,B1-TEXT-003
+C-CAUSE-017,decision_refs,DEC-011;DEC-012;DEC-017;P12,DEC-011;DEC-012,B1 separou erro MIME sem persistência de resposta perdida depois de ready; ambos precisam casos.,B1-ERR-001;UX-003
+C-CAUSE-018,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-013;DEC-014,Read failure e escrita incerta exigem modelos distintos; status sozinho não prova efeito.,B1-ERR-002
+C-CAUSE-019,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-013;DEC-021,409 de permissão perde intenção/foco; não há evidência de mudança aplicada indevida.,B1-ERR-003
+C-CAUSE-020,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-014;O15,Zeros iniciais e loading infinito são defeitos de estado em consumidores diferentes.,B1-STATE-001;UX-004
+C-CAUSE-021,domain,ADMINISTRATIVE_OPERATIONS,ENT,"Filtro e dados divergentes atingem inbox e estoque, não apenas administração.",B1-STATE-002
+C-CAUSE-021,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-014;O15,"Filtro e dados divergentes atingem inbox e estoque, não apenas administração.",B1-STATE-002
+C-CAUSE-021,specification,docs/audits/C/C3-functional-specification/ADMINISTRATIVE_OPERATIONS.md,docs/audits/C/C3-functional-specification/ENT.md,"Filtro e dados divergentes atingem inbox e estoque, não apenas administração.",B1-STATE-002
+C-CAUSE-022,decision_refs,DEC-007;DEC-013;O09;O12,DEC-014;O15,Promise conjunta perde saldo válido quando movimentos falham; não é saldo zero persistido.,B1-STATE-003
+C-CAUSE-023,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-014;DEC-020,Timeout compartilha PDF/avisos e ignora configuração; não converter terminal em pendente.,B1-STATE-004;UX-012
+C-CAUSE-024,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-014;O15,Leitura offline aparenta atualidade; não foi provado bypass de comando.,B1-STATE-005
+C-CAUSE-025,decision_refs,DEC-003;DEC-002;DEC-030;O11;O16,DEC-003,Seleção/apagamento convertem vazio em zero; contrato precisa tagged modes em todas as camadas.,B1-FORM-001
+C-CAUSE-026,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-013,Validação de observação/extra/apresentação não acompanha limite e foco; não limitar só um formulário.,B1-FORM-002
+C-CAUSE-027,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-021,Limite de bytes de senha difere de caracteres; não testar alterando conta real.,B1-FORM-003
+C-CAUSE-028,decision_refs,DEC-007;O08;O20,DEC-001;O08,Busca existente em REQ é contraprova; listas simuladas não comprovam lentidão remota.,B1-FORM-004
+C-CAUSE-029,decision_refs,DEC-007;O08;O20,O08;O09,"Consulta de apresentações falta no consumidor, apesar de upsert já existir.",B1-FORM-005
+C-CAUSE-030,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-021;P01,"Trocar alvo no editor é ambiguidade, não revogação comprovada; separar editar de vincular.",B1-FORM-006
+C-CAUSE-030,planned_package,D1,D3,"Trocar alvo no editor é ambiguidade, não revogação comprovada; separar editar de vincular.",B1-FORM-006
+C-CAUSE-031,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-021,Omissão e remoção de nome curto divergem no payload; escolher intenção explícita.,B1-FORM-007
+C-CAUSE-031,planned_package,D1,D3,Omissão e remoção de nome curto divergem no payload; escolher intenção explícita.,B1-FORM-007
+C-CAUSE-032,decision_refs,DEC-011;DEC-012;DEC-017;P12,DEC-012;P08;P12,"Mensagem promete dispositivo, mas REQ é aba/24h; draft servidor COM é objeto distinto.",B1-UX-005;UX-007
+C-CAUSE-033,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-001,B1 mede convergência e exceções; tokens não são defeito só por cor histórica. C8 agora aprova direção.,B1-VIS-001;UX-008
+C-CAUSE-033,planned_package,D-LATER,D3,B1 mede convergência e exceções; tokens não são defeito só por cor histórica. C8 agora aprova direção.,B1-VIS-001;UX-008
+C-CAUSE-034,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-015;O14,"Diff humano falta, mas versões reais existem; não alegar perda de histórico.",B1-UX-006;UX-009
+C-CAUSE-035,decision_refs,DEC-008;DEC-013;DEC-030;O05,DEC-008;DEC-013;P14,Feedback de relato/decisão/aquisição tem efeitos diferentes; crédito de COM é secundário mantido.,B1-FEED-001
+C-CAUSE-036,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-003;DEC-016,"Fontes A/B1/B6 convergem na omissão; B6 acrescenta atendimento por item, que não pode se perder.",B1-DOC-001;BE-007;B6-013
+C-CAUSE-037,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-001;DEC-013,Trap funciona; retorno do foco em fechar/continuar é problema diferente.,B1-A11Y-002
+C-CAUSE-038,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-001,Texto válido contínuo rompe reflow; axe sem violations não detecta geometria.,B1-A11Y-003
+C-CAUSE-039,decision_refs,DEC-001;DEC-009;DEC-013;O06,DEC-001;O06,"Mês selecionado e dia renderizado são incoerência de intervalo, não perda comprovada de agenda.",B1-NAV-002
+C-CAUSE-040,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-001;DEC-024,A/B1/B8 sustentam decisão transitória do helper; não assumir defeito permanente no shell.,B1-QA-001;QA-001;B8-Q004
+C-CAUSE-041,decision_refs,DEC-003;DEC-002;DEC-030;O11;O16,DEC-002;P02,Cabeçalho visível não prova leitura; nova modalidade depende de P02 e não de limiar de scroll.,B1-UX-008;UX-002
+C-CAUSE-041,planned_package,D1,D2,Cabeçalho visível não prova leitura; nova modalidade depende de P02 e não de limiar de scroll.,B1-UX-008;UX-002
+C-CAUSE-042,decision_refs,DEC-005;DEC-006;DEC-028;P06;P07,DEC-005,"Falta transição de recusa/retirada, enquanto proibição de cancelamento unilateral é correta.",B2-002
+C-CAUSE-043,decision_refs,DEC-005;DEC-006;DEC-028;P06;P07,DEC-014;O04,"Documento existe em Todas, mas fila padrão omite ação do recebedor.",B2-003
+C-CAUSE-044,decision_refs,DEC-007;O08;O20,O08,Scan perde proveniência no payload; alterar fator atual não pode reescrever 2×10.,B2-006
+C-CAUSE-045,decision_refs,DEC-007;DEC-013;O09;O12,DEC-007;O12,"Inativação conserva saldo corretamente; falta percurso de destinação, não zeragem.",B2-007
+C-CAUSE-046,decision_refs,DEC-007;DEC-013;O09;O12,O09,"reference_type heterogêneo exige resolver receipt/BAL/consumo, não usar todo ID como documentId.",B2-008
+C-CAUSE-047,decision_refs,DEC-008;DEC-013;DEC-030;O05,DEC-008;O05,Texto é relato legítimo; falta complemento estruturado sem apagar original.,B2-010
+C-CAUSE-048,decision_refs,DEC-005;DEC-006;DEC-028;P06;P07,DEC-006;DEC-022;P05;P15,Proteção do recebedor original é correta; sucessão futura não pode impersonar aceite parcial passado.,B2-015
+C-CAUSE-049,decision_refs,DEC-003;DEC-002;DEC-030;O11;O16,DEC-024;DEC-030;P13,DB-002/B3-001 são lifecycle terminal antes do LIMIT; risco independente de 001 e cursor BAL.,B3-001;DB-002
+C-CAUSE-050,decision_refs,DEC-005;DEC-006;DEC-028;P06;P07,DEC-005;DEC-007,"42702 impede ramo consumo positivo; hipótese temporal ainda precisa teste após correção, sem presumir aritmética resolvida.",B3-002;DB-001;B2-004
+C-CAUSE-051,decision_refs,DEC-001;DEC-009;DEC-013;O06,DEC-009;O06,A/B2/B3 revalidam corte; B3 adiciona BAL derivado de ocorrência indevida.,B3-003;DB-003;B2-013
+C-CAUSE-052,decision_refs,DEC-011;DEC-012;DEC-017;P12,DEC-011;O13;P08,Dez quarantine sem bytes esgotam vaga; serialização do limite já funciona.,B3-004;DB-004;B2-016
+C-CAUSE-053,decision_refs,DEC-007;DEC-013;O09;O12,DEC-007;O09,"UI exige referência, RPC/HTTP a omitem; falta deve falhar em ambas, sem bloquear inbound legítimo.",B3-005;B2-005
+C-CAUSE-054,decision_refs,DEC-009;DEC-010;DEC-029;O06,DEC-010;DEC-029;P11,Legado permite autoaprovação; optional não autoriza auto-revisão quando revisão é iniciada.,B3-006;B2-009
+C-CAUSE-055,decision_refs,DEC-008;DEC-013;DEC-030;O05,DEC-008;DEC-013,Resposta terminal null mascara decisão oposta; proteção de débito único é contraprova mantida.,B3-007;B2-011
+C-CAUSE-056,decision_refs,DEC-009;DEC-010;DEC-029;O06,DEC-009,Rejeição não deveria exigir alvo antigo ainda aprovável; prazo original não pode mudar sozinho.,B3-008;B2-012
+C-CAUSE-057,decision_refs,DEC-009;DEC-010;DEC-029;O06,DEC-010;DEC-029,"Ciclo counted tem lacuna de sucessão; assign_recount já recupera, não perda definitiva.",B3-009;B2-014
+C-CAUSE-058,decision_refs,DEC-004;DEC-013;O02;O08,DEC-004;P14,Cancelamento total protege fatos; novo encerramento precisa atingir somente expectativa.,B3-010;B2-001
+C-CAUSE-059,decision_refs,DEC-008;DEC-013;DEC-030;O05,DEC-014;O04,A/B1/B2/B3 convergem no corte consumo; auditoria citada em B1 tem causa 060 separada.,B3-011;BE-001;B2-017;B1-UX-007
+C-CAUSE-060,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-014;DEC-015,Auditoria antiga existe no banco; truncamento é contrato distinto da fila consumo 059.,B3-012;BE-004
+C-CAUSE-061,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-014;DEC-021,profiles.id e proponente global sem membership faltam no fan-out; B3 não mediu efeito visual.,B3-013;DB-007
+C-CAUSE-062,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-025;P03;P04,Backup legível não é falha de restore nem prova de recuperação; ensaio segue não executado.,B3-014;OPS-001
+C-CAUSE-063,domain,USER_GUIDES_AND_CONTINUITY,DOCUMENTS_PDFS_AND_INTEGRITY,"DB-005/B3-015 medem resumos cumulativos quadráticos, não cópia recursiva integral. Primário é snapshot documental.",B3-015;DB-005
+C-CAUSE-063,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-015;DEC-023;DEC-024,"DB-005/B3-015 medem resumos cumulativos quadráticos, não cópia recursiva integral. Primário é snapshot documental.",B3-015;DB-005
+C-CAUSE-063,specification,docs/audits/C/C3-functional-specification/USER_GUIDES_AND_CONTINUITY.md,docs/audits/C/C3-functional-specification/DOCUMENTS_PDFS_AND_INTEGRITY.md,"DB-005/B3-015 medem resumos cumulativos quadráticos, não cópia recursiva integral. Primário é snapshot documental.",B3-015;DB-005
+C-CAUSE-064,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-024;P13,Risco do worker externo tem simulação A de 140s; B3 não repetiu medição real.,B3-016;BE-003
+C-CAUSE-065,decision_refs,DEC-008;DEC-013;DEC-030;O05,DEC-008,CASE NULL vira rejeição na RPC direta; boolean API mitiga só caminho normal.,B3-017
+C-CAUSE-066,decision_refs,DEC-007;DEC-013;O09;O12,DEC-007,"Validação SQL ocorre depois de numeric(18,6); API não protege RPC direta.",B3-018
+C-CAUSE-067,decision_refs,DEC-007;O08;O20,O08,NaN numeric passa positividade/arredondamento; exige finitude direta no catálogo.,B3-019
+C-CAUSE-068,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-022;P15,require_cap anterior ao lock deixa janela; P15 agora escolhe revalidação antes do commit.,B3-020
+C-CAUSE-069,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-021;DEC-022;P15,Sessão encerrada ainda escreve próprio perfil/avatar direto; não é acesso a paciente alheio.,B3-021
+C-CAUSE-070,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-022;P15,URL já emitida dura TTL; prazo expirado não foi testado. Garantia do transporte continua gate.,B3-022
+C-CAUSE-070,planned_package,D1,D4,URL já emitida dura TTL; prazo expirado não foi testado. Garantia do transporte continua gate.,B3-022
+C-CAUSE-071,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-014,NULL em BETWEEN escapa validação e LIMIT NULL remove teto; não demonstrou DoS.,B3-023
+C-CAUSE-072,decision_refs,DEC-007;DEC-013;O09;O12,DEC-024,Amostra owner sem claims não mede throughput Auth; não atribuir toda latência a RLS.,B3-024
+C-CAUSE-073,domain,REQ,PWA_PUSH_AND_NOTIFICATIONS,"Cast de política legada aborta lote comum; é isolamento/recuperação scheduler, não estoque REQ.",B3-025
+C-CAUSE-073,decision_refs,DEC-003;DEC-002;DEC-030;O11;O16,DEC-024;P13,"Cast de política legada aborta lote comum; é isolamento/recuperação scheduler, não estoque REQ.",B3-025
+C-CAUSE-073,specification,docs/audits/C/C3-functional-specification/REQ.md,docs/audits/C/C3-functional-specification/PWA_PUSH_AND_NOTIFICATIONS.md,"Cast de política legada aborta lote comum; é isolamento/recuperação scheduler, não estoque REQ.",B3-025
+C-CAUSE-074,decision_refs,DEC-007;DEC-013;O09;O12,DEC-007,Braço JSON number aceita sete casas enquanto string recusa; mesma regra precisa ambas fronteiras.,B4-001
+C-CAUSE-075,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-013;DEC-021,A observa alias API gerando UUID; B4 observa consumidor settings. Ambos precisam transportar intenção estável.,B4-002;BE-005
+C-CAUSE-076,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-021,"Convite não duplica, mas retry perde URL porque novo token não corresponde ao hash antigo.",B4-003
+C-CAUSE-077,domain,COM,ENT,"B4-004 reproduziu ENT, não COM. Revisão e submit são commits separados em todos os supply; lote é recuperação D3.",B4-004
+C-CAUSE-077,decision_refs,DEC-004;DEC-013;O02;O08,DEC-012;DEC-013,"B4-004 reproduziu ENT, não COM. Revisão e submit são commits separados em todos os supply; lote é recuperação D3.",B4-004
+C-CAUSE-077,specification,docs/audits/C/C3-functional-specification/COM.md,docs/audits/C/C3-functional-specification/ENT.md,"B4-004 reproduziu ENT, não COM. Revisão e submit são commits separados em todos os supply; lote é recuperação D3.",B4-004
+C-CAUSE-077,planned_package,D2,D3,"B4-004 reproduziu ENT, não COM. Revisão e submit são commits separados em todos os supply; lote é recuperação D3.",B4-004
+C-CAUSE-078,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-014;O04,Corte 50 de access changes é diferente de auditoria 100; manter ID próprio.,B4-005
+C-CAUSE-079,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021,DEC-013,Regex ambiguous/alias confunde SQLSTATE 42702 com ambiguidade de catálogo; não é erro do produto.,B4-006
+C-CAUSE-080,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-011;P08,Upload avatar gera novo caminho depois de falha de ponteiro; P3 sem Storage real ensaiado.,B4-007
+C-CAUSE-080,planned_package,D1,D4,Upload avatar gera novo caminho depois de falha de ponteiro; P3 sem Storage real ensaiado.,B4-007
+C-CAUSE-081,decision_refs,DEC-007;O08;O20,DEC-021;O08,Delegado catalog.manage funciona em admin mas alias pede access.manage; não ampliar papel para contornar.,B4-008
+C-CAUSE-082,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-021,UUID malformado global lança ZodError não traduzido; local já retorna 400.,B4-009
+C-CAUSE-083,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-022;P15,Cancelamento durante upload ainda permite messages; complete preserva cancelled mas não impede transporte.,B4-010
+C-CAUSE-084,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019,safeParse do lote perde texto válido junto de interactive não reconhecido; HMAC continua necessário.,B4-011
+C-CAUSE-085,decision_refs,DEC-001;DEC-006;DEC-021;DEC-022;P01,DEC-021;P04,Criação ignora isActive=false apesar de atualizar existente funcionar; wizard precisa respeitar estado.,B4-013
+C-CAUSE-085,planned_package,D1,D3,Criação ignora isActive=false apesar de atualizar existente funcionar; wizard precisa respeitar estado.,B4-013
+C-CAUSE-086,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-024;P13,Lembretes legados são internos também; não adiar toda falha para D7 Meta. Catch-up exige política OPS-01.,B5-001
+C-CAUSE-086,planned_package,D7,D5,Lembretes legados são internos também; não adiar toda falha para D7 Meta. Catch-up exige política OPS-01.,B5-001
+C-CAUSE-087,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019,Hold pending/infinity sem template vinculado não libera; contrato conhecido já funciona.,B5-002
+C-CAUSE-088,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-013,Exceção media e messages têm certezas diferentes; não chamar upload de entrega incerta.,B5-003
+C-CAUSE-089,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-013;DEC-015,"BE-002 e B5-004 compartilham presenter genérico, mas datas/contadores/autores por tipo ficam casos distintos.",B5-004;BE-002
+C-CAUSE-090,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-023;P08,Conteúdo externo real contradiz minimização anunciada; opt-in não decide sozinho conjunto de campos.,B5-005
+C-CAUSE-091,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-008,NeedsAuthenticatedSelection é ignorado; processed conta arrays sem efeito durável.,B5-006
+C-CAUSE-092,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-002,seen_at mistura resposta externa e visto no app; não apagar resolução legítima do lembrete.,B5-007
+C-CAUSE-093,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-012,Flow no_issues não recupera replay; texto já o faz. Não prova presença em plantão.,B5-008
+C-CAUSE-094,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019,Boundary Flow usa JSON aberto em erro cifrado; resultado local não homologa cliente Meta.,B5-009
+C-CAUSE-095,domain,PWA_PUSH_AND_NOTIFICATIONS,CONSUMPTION_AND_OCCURRENCES,"Produtor revision funciona; consumo/FlowReviews/fila admin não dependem dela. Primário é consumidor de lista, não instalação PWA.",B5-010;B4-012
+C-CAUSE-095,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-014;O15,"Produtor revision funciona; consumo/FlowReviews/fila admin não dependem dela. Primário é consumidor de lista, não instalação PWA.",B5-010;B4-012
+C-CAUSE-095,specification,docs/audits/C/C3-functional-specification/PWA_PUSH_AND_NOTIFICATIONS.md,docs/audits/C/C3-functional-specification/CONSUMPTION_AND_OCCURRENCES.md,"Produtor revision funciona; consumo/FlowReviews/fila admin não dependem dela. Primário é consumidor de lista, não instalação PWA.",B5-010;B4-012
+C-CAUSE-095,planned_package,D5,D3,"Produtor revision funciona; consumo/FlowReviews/fila admin não dependem dela. Primário é consumidor de lista, não instalação PWA.",B5-010;B4-012
+C-CAUSE-096,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-021,"Union mistura propósitos; sessão occurrence armazena body de ENT sem criar movimento, efeito limitado.",B5-011
+C-CAUSE-097,domain,PWA_PUSH_AND_NOTIFICATIONS,IDENTITY_ACCESS_MEMBERSHIPS,"Auth confirma telefone antes de falha no vínculo; ensaio foi simulado, não incidente OTP real.",B5-012
+C-CAUSE-097,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-021,"Auth confirma telefone antes de falha no vínculo; ensaio foi simulado, não incidente OTP real.",B5-012
+C-CAUSE-097,specification,docs/audits/C/C3-functional-specification/PWA_PUSH_AND_NOTIFICATIONS.md,docs/audits/C/C3-functional-specification/IDENTITY_ACCESS_MEMBERSHIPS.md,"Auth confirma telefone antes de falha no vínculo; ensaio foi simulado, não incidente OTP real.",B5-012
+C-CAUSE-098,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-012,Referência única atravessa retries; callback de tentativa antiga encerra lease nova.,B5-013
+C-CAUSE-099,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019;DEC-024;P13,Operador recebe pedido de conciliação sem referência/tentativa; nulo pode ser desconhecido real.,B5-014
+C-CAUSE-100,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-015;DEC-016,Legado conserva fonte mas reconstrução usa now/cadastro atual; desconhecido precisa continuar desconhecido.,B6-001
+C-CAUSE-101,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-016;P09;O10,"created_at é criação de draft, não emissão; novo exemplar também tem instante distinto.",B6-002
+C-CAUSE-102,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-015;DEC-022,Supply histórico reconsulta diretório atual; PDF já usa snapshot como contraprova.,B6-003
+C-CAUSE-103,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-016,Renderer omite avaria/nota/resolution; quantidades corretas não bastam.,B6-004
+C-CAUSE-104,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-016;DEC-029;P11,PDF mistura versão documental e de contagem; autoaprovação SQL é causa 054 distinta.,B6-005
+C-CAUSE-105,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-016;DEC-013,Fallbacks de renderer tratam terminal/desconhecido como pendente; estado persistido correto é contraprova.,B6-006
+C-CAUSE-106,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-016,Nome válido com LF gera célula maior que folha; wrap comum não corrige paginação interna.,B6-007
+C-CAUSE-107,domain,DOCUMENTS_PDFS_AND_INTEGRITY,ATTACHMENTS_AND_DRAFTS,Sanitização remove Annots visíveis; preservar segurança sem perder FreeText/Ink silenciosamente.,B6-008
+C-CAUSE-107,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-017;DEC-023;P08,Sanitização remove Annots visíveis; preservar segurança sem perder FreeText/Ink silenciosamente.,B6-008
+C-CAUSE-107,specification,docs/audits/C/C3-functional-specification/DOCUMENTS_PDFS_AND_INTEGRITY.md,docs/audits/C/C3-functional-specification/ATTACHMENTS_AND_DRAFTS.md,Sanitização remove Annots visíveis; preservar segurança sem perder FreeText/Ink silenciosamente.,B6-008
+C-CAUSE-108,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-015;O14;O10,"API de versão exata existe; falta ação humana por evento, não retenção.",B6-009
+C-CAUSE-109,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-016;P14,"Recibos permanecem no banco, mas event body não carrega receiptId; manter distinção entre persistência e representação.",B6-010
+C-CAUSE-110,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-018;P09,Cache baixa sem digest; não é incidente público demonstrado. Assinatura agora também é obrigatória.,B6-011
+C-CAUSE-111,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09,DEC-016;P10,Texto extraível não é árvore semântica; AT real permanece gate separado.,B6-012;B1-A11Y-001
+C-CAUSE-112,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-024;DEC-025,B7 demonstrou gates não vinculados à promoção; preview documental foi autorizado depois e não é requisito de zero preview vigente.,B7-001
+C-CAUSE-113,decision_refs,DEC-019;DEC-020;DEC-022;DEC-024,DEC-019,API só olha flag/token/ID truthy; provider valida conjunto maior; anúncio não é entrega.,B7-002
+C-CAUSE-114,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-025;P04,Compatibilidade não é defeito de schema atual; hashes normalizados B7 eram iguais.,B7-003
+C-CAUSE-115,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-025;P03;P13,"TOC cron/Vault sustenta risco condicionado, não envio indevido observado.",B7-004
+C-CAUSE-116,domain,USER_GUIDES_AND_CONTINUITY,ATTACHMENTS_AND_DRAFTS,"Upload é contrato de transporte do arquivo; sanitizar depois não evita limite de entrada. D4, não só gate D6.",B7-005
+C-CAUSE-116,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-011;P15,"Upload é contrato de transporte do arquivo; sanitizar depois não evita limite de entrada. D4, não só gate D6.",B7-005
+C-CAUSE-116,specification,docs/audits/C/C3-functional-specification/USER_GUIDES_AND_CONTINUITY.md,docs/audits/C/C3-functional-specification/ATTACHMENTS_AND_DRAFTS.md,"Upload é contrato de transporte do arquivo; sanitizar depois não evita limite de entrada. D4, não só gate D6.",B7-005
+C-CAUSE-116,planned_package,D6,D4,"Upload é contrato de transporte do arquivo; sanitizar depois não evita limite de entrada. D4, não só gate D6.",B7-005
+C-CAUSE-117,domain,USER_GUIDES_AND_CONTINUITY,IDENTITY_ACCESS_MEMBERSHIPS,Ausência de headers em amostra pública não prova XSS/frame autenticado; política precisa teste de compatibilidade.,B7-006
+C-CAUSE-117,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-021;DEC-023,Ausência de headers em amostra pública não prova XSS/frame autenticado; política precisa teste de compatibilidade.,B7-006
+C-CAUSE-117,specification,docs/audits/C/C3-functional-specification/USER_GUIDES_AND_CONTINUITY.md,docs/audits/C/C3-functional-specification/IDENTITY_ACCESS_MEMBERSHIPS.md,Ausência de headers em amostra pública não prova XSS/frame autenticado; política precisa teste de compatibilidade.,B7-006
+C-CAUSE-118,decision_refs,DEC-024;DEC-025;DEC-026;P03;P04;P05;P10;P13,DEC-024,"Três nós dev são um advisory, com alcance condicionado; não classificar como três falhas de produção.",B7-007
+C-CAUSE-119,decision_refs,DEC-015;DEC-016;DEC-017;DEC-018;P09;P10,DEC-016,B8 provou teste passar sem texto; contrato do oráculo deve nascer D0 e validar renderer D4.,B8-Q001
+C-CAUSE-119,planned_package,D4,D0,B8 provou teste passar sem texto; contrato do oráculo deve nascer D0 e validar renderer D4.,B8-Q001
+C-CAUSE-120,decision_refs,DEC-007;DEC-013;O09;O12;P10,DEC-007,Predicado isolado aceita NULL; não prova que suíte inteira aceita toda remoção de ledger.,B8-Q002
+C-CAUSE-121,decision_refs,DEC-001;DEC-013;DEC-014;DEC-021;P10,DEC-001;P10,"incomplete não é violação automática, mas descartá-lo elimina revisão; axe não prova tarefa humana.",B8-Q003

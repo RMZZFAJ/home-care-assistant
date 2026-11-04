@@ -9,14 +9,12 @@ disponíveis hoje. Nenhum código, teste funcional ou migration foi criado em C.
 
 Comando autenticado leva contexto explícito, intenção estável, conteúdo
 normalizado e expectedVersion quando altera fato existente. Identidade
-efetiva,
-paciente do alvo e capacidade vêm do servidor/RPC, nunca de metadata/nome.
-Requisição aceita retorna outcome tipado: `committed`, `recovered`,
-`rejected`,
-`conflict` ou `uncertain`, com resourceId/version seguros e resultado por
-etapa
-quando houver múltiplos commits. `recovered` só corresponde à mesma intenção.
-HTTP200 genérico sem decisão aplicada não representa confirmação oposta.
+efetiva, paciente do alvo e capacidade vêm do servidor/RPC, nunca de
+metadata/nome. Requisição aceita retorna outcome tipado: `committed`,
+`recovered`, `rejected`, `conflict` ou `uncertain`, com resourceId/version
+seguros e resultado por etapa quando houver múltiplos commits. `recovered` só
+corresponde à mesma intenção. HTTP200 genérico sem decisão aplicada não
+representa confirmação oposta.
 
 Ordem proposta: autenticar/limitar entrada → resolver alvo/contexto → adquirir
 locks em ordem consistente → revalidar autoridade vigente conforme P15 →
@@ -31,8 +29,8 @@ Quantidade de entrada é decimal exato validado antes de coerção, finito e
 limitado à unidade. Compatibilidade de number/string não pode aceitar perda
 silenciosa; novo cliente prefere string decimal e servidor valida ambos ou
 versiona recusa explícita. Boolean decisório exige true/false; NULL é
-inválido.
-Versão inválida ou antiga não é preenchida silenciosamente pelo servidor.
+inválido. Versão inválida ou antiga não é preenchida silenciosamente pelo
+servidor.
 
 ## Mapa concreto de consumidores
 
@@ -169,8 +167,8 @@ Versão inválida ou antiga não é preenchida silenciosamente pelo servidor.
 
   **UI/rota atual:** Admin/Policy/Dashboard
 
-  **API e contrato de dados planejado:** paginação/keyset/detalhe nas
-  listas de 50/100; presenter por kind; erros SQLSTATE corretos
+  **API e contrato de dados planejado:** paginação/keyset/detalhe nas listas
+  de 50/100; presenter por kind; erros SQLSTATE corretos
 
   **RPC/estado/evento a preservar ou ampliar:** access_change_requests e
   audit; idempotência estável, duas identidades e contexto local preservados.
@@ -189,9 +187,8 @@ Versão inválida ou antiga não é preenchida silenciosamente pelo servidor.
 
 Nomes exatos de RPC devem ser obtidos das últimas definições das migrations e
 catálogo, não de funções fluent_pre/legacy retidas como histórico. Um wrapper
-de compatibilidade não torna todas as versões antigas executáveis. A matriz
-de C1 conserva source_anchors, e as fontes originais acrescentam
-technical_path,
+de compatibilidade não torna todas as versões antigas executáveis. A matriz de
+C1 conserva source_anchors, e as fontes originais acrescentam technical_path,
 object e files por ID para esse confronto em D.
 
 ## Projeções, listas e invalidação
@@ -199,9 +196,9 @@ object e files por ID para esse confronto em D.
 Readmodel oferece ordem estável (instante+ID), cursor com limites validados,
 filtros aplicados no servidor, detalhe por referência e semântica de total
 conhecido/hasMore. NULL explícito de limite não remove teto. Deep link busca
-alvo diretamente e autoriza antes de expor; não depende de estar
-nos 100 recentes.
-Não reunir consultas com escopos diferentes apenas para reduzir viagens.
+alvo diretamente e autoriza antes de expor; não depende de estar nos 100
+recentes. Não reunir consultas com escopos diferentes apenas para reduzir
+viagens.
 
 Produtor incrementa revisão para a identidade autorizada pertinente, inclusive
 profiles.id e proponente global. Broadcast leva só revisão/identidade segura.
@@ -213,28 +210,33 @@ FlowReviews/consumo/fila admin; cada consumidor tem teste de duas sessões.
 
 Novo evento inclui identidade do fato, ator do ato e do registro, instante do
 fato quando conhecido, instante de registro, versão, origem, decisão e
-referência
-de causalidade. Ciência presume modalidade, não leitura. Acesso efetivo nasce
-de abertura explícita em foreground com chave de abertura, excluindo prefetch
-e GET técnico; registrar entrega/exibição observável com semântica honesta.
-Não afirmar atenção humana ou tempo lido.
+referência de causalidade. Ciência presume modalidade, não leitura. Acesso
+efetivo nasce de abertura explícita em foreground com chave de abertura,
+excluindo prefetch e GET técnico; registrar entrega/exibição observável com
+semântica honesta. Não afirmar atenção humana ou tempo lido.
 
 Snapshot de receipt inclui receiptId, linhas declaradas/validadas/rejeitadas e
 origem. História apresenta nomes históricos, não diretório atual silencioso.
 Nova projeção/renderização versionada conserva consumidor legado; não
-retropreenche
-nome/data/aceite desconhecidos como fatos. Crescimento de resumo de eventos
-é risco a medir; não reescrever 500500 resumos para otimizar a fotografia
-atual.
+retropreenche nome/data/aceite desconhecidos como fatos. Crescimento de resumo
+de eventos é risco a medir; não reescrever 500500 resumos para otimizar a
+fotografia atual.
 
 ## Código seguro de erro e envio externo
 
-Classificar domínio por código/SQLSTATE, não regex genérica que
-transforme 42702
-em nome de produto ambíguo. Envelope seguro mantém correlação, certeza e
-próxima
-ação; nunca SQL/payload. Timeout antes de iniciar messages difere de resposta
-perdida durante messages. Tentativa externa tem geração/referência própria;
-callback antigo atualiza tentativa antiga sem encerrar lease nova. Só
-conciliar
-com identidade suficiente; canal desligado não é sucesso de entrega.
+Classificar domínio por código/SQLSTATE, não regex genérica que transforme
+42702 em nome de produto ambíguo. Envelope seguro mantém correlação, certeza e
+próxima ação; nunca SQL/payload. Timeout antes de iniciar messages difere de
+resposta perdida durante messages. Tentativa externa tem geração/referência
+própria; callback antigo atualiza tentativa antiga sem encerrar lease nova. Só
+conciliar com identidade suficiente; canal desligado não é sucesso de entrega.
+
+## Precedência técnica C7–C10
+
+As matrizes causais foram revisadas semanticamente, com domínios secundários
+explícitos. P06/P11/P12/P14 e garantia de comando P15 já foram respondidos;
+P02 por SCI-ID, retenção, fornecedores e parâmetros operacionais continuam
+delimitados em C7. P09-B é obrigatório, com identidade própria por emissão;
+não ativar núcleo só de hash como substituto. Toda evolução de schema usa
+migration incremental e preserva os 84 hashes históricos.
+[Adendo vigente](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).

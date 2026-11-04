@@ -1,0 +1,1513 @@
+{
+  "date": "2026-11-04",
+  "scope": "C7_C10_AND_CHANGED_LIVING_DOCUMENTS;SELF_EXCLUDED",
+  "text_policy": "LF normalization only; input gzip/HTML/PNG exact bytes; no source evidence rewritten",
+  "files": [
+    {
+      "path": "docs/audits/C/C1-consolidation/CAUSE_FAMILIES_MASTER.csv",
+      "sha256": "aada4af0736b3f256c43e7d1d9a0ab615344480d75555d89fe2c41ed6afa74cf",
+      "bytes_under_hash_policy": 183992,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C1-consolidation/CAUSE_FAMILIES_MASTER.md",
+      "sha256": "37cd490526361a40b6c61e19a4c9a7b67b3c3d1c2dfd88084805ed2ca52611c2",
+      "bytes_under_hash_policy": 86528,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C1-consolidation/FINDINGS_165_SOURCE_CROSSWALK.csv",
+      "sha256": "80a8078b1a17c3eff6a8ae3349c3757c3adc98c1134696e9ab0c107fecebb05e",
+      "bytes_under_hash_policy": 111913,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/BRANCH_AND_PROVENANCE_REPORT.md",
+      "sha256": "eb2bdde23a92c9f054c68b5e84f51baeaef000de6ad9932b9ea2ab9e2414831d",
+      "bytes_under_hash_policy": 2086,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/build_semantic_and_acceptance.py",
+      "sha256": "ec1d11339cc143ae07f52f0f5f199a1b81b9bc67da633f9689232df47b27581b",
+      "bytes_under_hash_policy": 24540,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/capture_baseline.py",
+      "sha256": "f03b6c8b94ee9e725cdf6baa49a33c8e1f9e60ed5d541a0503f37b0abb22a61d",
+      "bytes_under_hash_policy": 2812,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/CHECKPOINT.md",
+      "sha256": "d71d12cc5de51f25fc4b91446a2f5343c68e8479536162a709bfe6577c1c431c",
+      "bytes_under_hash_policy": 1852,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/DOCUMENTARY_VALIDATION_REPORT.md",
+      "sha256": "267d81bb88ad5ad9df3caa5358b1a0fc34efa75da1bf9529f3cfa452c77e788d",
+      "bytes_under_hash_policy": 1030,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/BASELINE.json",
+      "sha256": "541e48e0f5fa2e0e4db87af84e43bd059df6176e1ccc25911867c3ebc5f1bb37",
+      "bytes_under_hash_policy": 369151,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/CANONICAL_UPDATE_LOG.csv",
+      "sha256": "5d09bc7f9407b33536832035899981929e696ffbea66c05ab3b07e8176bd3e9f",
+      "bytes_under_hash_policy": 5106,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/checks.json",
+      "sha256": "75e7b26801602208013354bd8526565bc350549f1775d15c8104fee77d685e77",
+      "bytes_under_hash_policy": 1044,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/contracts_static.txt",
+      "sha256": "d1ca5eaeec9d10bc189143ecff16963070ec93321391463820f3fd5d7e81ab19",
+      "bytes_under_hash_policy": 140,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/FORMATTING_LOG.csv",
+      "sha256": "cd002c398915a9f9c5e1223d191ef0510a490f1c37a28022da47e93eb46fbd27",
+      "bytes_under_hash_policy": 298,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/git_diff_check.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes_under_hash_policy": 0,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/git_staged_diff_check.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes_under_hash_policy": 0,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/INPUT_PROVENANCE.csv",
+      "sha256": "ebfb38860a1f957322b7b4f995f03f166fb0de59d2f1ea71b4a2172a108642c3",
+      "bytes_under_hash_policy": 21381,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/KIT_RELOCATION.csv",
+      "sha256": "621edee16b4cd74201b4a87edc1e50e497909fed691dd64385bd3ce65dd83120",
+      "bytes_under_hash_policy": 4775,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/markdownlint.txt",
+      "sha256": "f14ab9004b2b639b1433a308251fd06a527f600079c67ab102ce8064a55cffda",
+      "bytes_under_hash_policy": 242,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/evidence/validation-report.json",
+      "sha256": "f9904dddeea0af659922a259df2f9af93eb31fcab7773be6a6fc2682f203502d",
+      "bytes_under_hash_policy": 5804,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/finalize_documentary_files.py",
+      "sha256": "a81bf82fc15a8e424c0f7ccf07d07ba18496321b9a4e0c5eeab32b6f4e014320",
+      "bytes_under_hash_policy": 3865,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/format_part2.py",
+      "sha256": "38d5d66ec7b53aa7ce913e705fb87c682428cbbda97ff5987ae0eddd07858618",
+      "bytes_under_hash_policy": 7306,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C0-baseline__DOCUMENTATION_MIGRATION_INVENTORY.csv.gz",
+      "sha256": "2a810a585b8a6217c415f8cdfc5c2c14555c103fb72fed6255eae8f561923ac2",
+      "bytes_under_hash_policy": 120552,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C0-baseline__ENVIRONMENT_AND_GIT_BASELINE.md.gz",
+      "sha256": "73387b17cbf481f69c726a9063fe130c5e27d2d2b4054e5d7eb625b469305cee",
+      "bytes_under_hash_policy": 1879,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C0-baseline__INPUTS_PROVENANCE.csv.gz",
+      "sha256": "aa8ab17476c27c0e9b86d450b382fc69dad91958a9a0156d55c3293268800406",
+      "bytes_under_hash_policy": 498,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C0-baseline__mandate__DOCS_REORGANIZATION_POLICY.md.gz",
+      "sha256": "7d545e1d365d6f340fe6fb6380206ff088072e854325936c812636a50c55a7ad",
+      "bytes_under_hash_policy": 6687,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C0-baseline__mandate__PHASE_C_MASTER_ORDER.md.gz",
+      "sha256": "22e50bf6b7fdd66a927f05be5848e6b451a61005aaef81d5de373d33f6ab8357",
+      "bytes_under_hash_policy": 13978,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C0-baseline__mandate__PHASE_C_SUBPHASES.md.gz",
+      "sha256": "ab28cd10f8f0a2345b710989496215c7bde39a0adf5808967de6715ebc86f173",
+      "bytes_under_hash_policy": 8608,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C0-baseline__MARKDOWN_LINKS_BEFORE.csv.gz",
+      "sha256": "1f722c7dd66f65560c1858a93c7a16fd1b095c5bb14367c850279536b0dc9b8a",
+      "bytes_under_hash_policy": 18165,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C0-baseline__PATH_CONSUMERS.csv.gz",
+      "sha256": "c67fbeacc72efac9b30b51eb029ae21639d3653adc68f50b90046a8fd428e3a4",
+      "bytes_under_hash_policy": 23474,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C1-consolidation__CAUSE_FAMILIES_MASTER.csv.gz",
+      "sha256": "4e0ececbe431131357ff2e5bcaad4535305b94d37bb07935951ad0bbcf9a8aa1",
+      "bytes_under_hash_policy": 35166,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C1-consolidation__CAUSE_FAMILIES_MASTER.md.gz",
+      "sha256": "53e65af59de0ba60e9683377c3465e3523a7a8bb046fca0b42b5bc868101b690",
+      "bytes_under_hash_policy": 3166,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C1-consolidation__FINDINGS_165_SOURCE_CROSSWALK.csv.gz",
+      "sha256": "7dc8a8dce46c3f5ba6eaa4f7c4b19637b7fc8d924c9cbe637b6753c0ea90f1cb",
+      "bytes_under_hash_policy": 17871,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C2-decisions__DECISION_SPECIFICATION_CROSSWALK.csv.gz",
+      "sha256": "38b1cb184f4ca26bf18750bb457de2fbaec042a02457cc8b2b51de599e036eb3",
+      "bytes_under_hash_policy": 1781,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C2-decisions__DECISIONS_REGISTER.csv.gz",
+      "sha256": "0c98feccaad12be186f15d6f31d4b4844eafd62398d683dcbdc714a513a3e233",
+      "bytes_under_hash_policy": 8798,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C2-decisions__GLOSSARY_AND_NONNEGOTIABLE_RULES.md.gz",
+      "sha256": "a1ea9acc008978bf7c2ba9080b59d4c28c932a5302b9507b98056597313c5719",
+      "bytes_under_hash_policy": 2083,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C2-decisions__HUMAN_DECISIONS_REVIEW.md.gz",
+      "sha256": "7e6792dcabefc5cde40d12f64136dc104497b4a83d49aa1d6e76f8fd4f0a740d",
+      "bytes_under_hash_policy": 4347,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__ADMINISTRATIVE_OPERATIONS.md.gz",
+      "sha256": "44fca586752bf66d2285513d8faf228fe9d5698d545fd65e79dd2dbc39827226",
+      "bytes_under_hash_policy": 3187,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__ATTACHMENTS_AND_DRAFTS.md.gz",
+      "sha256": "9df828a954a1d9ca3d0102d3bfd91370b3fe8c0a85ebd1e68b9b9c27d4bc8251",
+      "bytes_under_hash_policy": 3268,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__BAL.md.gz",
+      "sha256": "341a7d42a3e17bff64b465ac89c5cecf735e61166f5e1d72d7415278ffe9ba39",
+      "bytes_under_hash_policy": 3015,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__CATALOGUE_AND_PRESENTATIONS.md.gz",
+      "sha256": "03d4d9b4643e6973089e91843ba07506419224598428ee6f85a7d6fdf5b05457",
+      "bytes_under_hash_policy": 2795,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__COM.md.gz",
+      "sha256": "73276b3903b6db6899c962757a025784b8f9f029d7830067335ecb80e8925bb1",
+      "bytes_under_hash_policy": 3080,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__CONSUMPTION_AND_OCCURRENCES.md.gz",
+      "sha256": "f51af6eb9d974e2f0ceb2a1ceedf294f05cff6fd760bb5fb5b483fccfde4acda",
+      "bytes_under_hash_policy": 2655,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__DOCUMENTS_PDFS_AND_INTEGRITY.md.gz",
+      "sha256": "40608b0ec6168d784bbf8cbd1efd9d6fcc7c5999ccdd84d8ce28d05e163cd848",
+      "bytes_under_hash_policy": 4076,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__ENT.md.gz",
+      "sha256": "3057001fff484fac729976242f1497b6a3126359c800ea60e4a294f42fa45383",
+      "bytes_under_hash_policy": 3751,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__HUMAN_JOURNEYS_AND_EDGE_CASES.md.gz",
+      "sha256": "237ced735946e4ca5e0c53adb33a063e784c1c47c96fb88a72030c66e6975112",
+      "bytes_under_hash_policy": 2290,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__IDENTITY_ACCESS_MEMBERSHIPS.md.gz",
+      "sha256": "a92a2b1e6a18c45c14363465f4a067ad480523e64925963d87eadb29ec0b8a07",
+      "bytes_under_hash_policy": 3293,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__PERSONAS_PERMISSIONS_AND_ACTORS.md.gz",
+      "sha256": "2782b12efb04e0c0bfb81237878920522f0885e88b3f79e885536144e7b54edd",
+      "bytes_under_hash_policy": 2189,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__PWA_PUSH_AND_NOTIFICATIONS.md.gz",
+      "sha256": "3e0afe1eef7e17d641f23023515f9413847f07f248949e78c184aadfd70efca2",
+      "bytes_under_hash_policy": 3908,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__README.md.gz",
+      "sha256": "19abb15c4152c468ab7e3f244ab7d4f4375f39b3a553b9995007578cdeb5e47f",
+      "bytes_under_hash_policy": 1494,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__REQ.md.gz",
+      "sha256": "630271b4780bfba808f31184325c5a8f983b8922c1efd8047aeef2cba3933e73",
+      "bytes_under_hash_policy": 3691,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__SCHEDULES_AND_STAFFING.md.gz",
+      "sha256": "03db95e7071426abdf44b973fce6a54c61855515a54794b4244c19f824017c6b",
+      "bytes_under_hash_policy": 2963,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__SCREEN_FIELD_ACTION_INVENTORY.csv.gz",
+      "sha256": "83c40615dbabcbc6565bc8d6e2f1729192f5153d70f3ff680a1937d73f9b743e",
+      "bytes_under_hash_policy": 17730,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__STOCK_AND_CUSTODY.md.gz",
+      "sha256": "d4fe4d1d066db25d18086f5921f22c4cd36cca7f087bf31f4445aa7fd2fa0255",
+      "bytes_under_hash_policy": 3092,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__UI_STATES_AND_MICROCOPY.md.gz",
+      "sha256": "4d022045c4ba880acfc86461c0abe2dcb272a8eaf5ab7f145c1758dca1a0fe15",
+      "bytes_under_hash_policy": 2812,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C3-functional-specification__USER_GUIDES_AND_CONTINUITY.md.gz",
+      "sha256": "23c40932ce01e0828a1a4d4adb1df3781c91f41b0ec11464584c4ad8dfe1ccaf",
+      "bytes_under_hash_policy": 3795,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__APPROVED_CAPABILITY_CHANGE_PLAN.csv.gz",
+      "sha256": "c2edc9b215f811e6b244f38c320e07ffa01d04549522a9a6fbe2ce59701657bf",
+      "bytes_under_hash_policy": 2276,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__ARCHITECTURAL_DECISIONS.md.gz",
+      "sha256": "d325e7b7023a9d5c11232a8508e6481e704d8af4d95b54a5b8c06ae6f7854738",
+      "bytes_under_hash_policy": 1726,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__CHANGE_IMPACT_MATRIX.csv.gz",
+      "sha256": "41714263c9aff7f2d0e88f83e01f933c3d3017fce54d959882400ba786d05f0c",
+      "bytes_under_hash_policy": 18085,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__DATA_API_UI_EVENT_CONTRACTS.md.gz",
+      "sha256": "774bc3df12edd7ad74ad25278c8f334cf34d7396b38595a61bcbf0fc46744bfe",
+      "bytes_under_hash_policy": 4065,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__DRAFT_PERSISTENCE_AND_CONCURRENCY.md.gz",
+      "sha256": "d379a602bd563e0d89b799af16f9dd7889f98c03ef63bb86aff4c1157aa26eaa",
+      "bytes_under_hash_policy": 2531,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__FAILURE_RECOVERY_AND_IDEMPOTENCY.md.gz",
+      "sha256": "4359c1408be22a213a960c5a29df3f45dc50b0cdd23c791e0e7135ce95b0e5b3",
+      "bytes_under_hash_policy": 2627,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__MIGRATION_COMPATIBILITY_PLAN.md.gz",
+      "sha256": "8145d88e57beb6c2ba10df8bdacc31289128dda8d59b65c1738349981762ec20",
+      "bytes_under_hash_policy": 3276,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__PDF_VERIFICATION_ARCHITECTURE.md.gz",
+      "sha256": "d6a9678e5ab0a58d4990b2629bb62904f56cb6bbba761c1efdd91d900d37c02e",
+      "bytes_under_hash_policy": 2418,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__PWA_PUSH_DELIVERY_ARCHITECTURE.md.gz",
+      "sha256": "95d2741b1d7b45a16374552d690abf898886689c4dff74d72b89167f25f56ab8",
+      "bytes_under_hash_policy": 2630,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__README.md.gz",
+      "sha256": "35b903af34f17cded77a71e509429ddb220c8ac6eded3841b183583d610df682",
+      "bytes_under_hash_policy": 902,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C4-technical-design__SECURITY_PRIVACY_AND_TRACEABILITY.md.gz",
+      "sha256": "f3ec52410526ab60378ca2f274766809341c60d6d7d0484f50ddd11e8f343f40",
+      "bytes_under_hash_policy": 2630,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C5-execution-roadmap__DEPENDENCY_SEQUENCE.csv.gz",
+      "sha256": "1c85b0938852cc9e5560c5568203eb42d37e0d2c80e577b93df8a29eed6743b8",
+      "bytes_under_hash_policy": 1473,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C5-execution-roadmap__ENVIRONMENT_BACKUP_AND_HOMOLOGATION.md.gz",
+      "sha256": "cfd2421b39c52ad244a09d92f4a2f2091b4c507cb98ea83aee91f88267af5ab6",
+      "bytes_under_hash_policy": 3097,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C5-execution-roadmap__PHASE_D_WORK_PACKAGES.md.gz",
+      "sha256": "c2df9fcdc3b4bb751f8d4340a54274f78d0a01cd59476d0a64b6fd9f2da00054",
+      "bytes_under_hash_policy": 4556,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C5-execution-roadmap__README.md.gz",
+      "sha256": "7958ef431765e7e96054e7a252eb9edf6c035b95d5538605e8b280bd6ba048f6",
+      "bytes_under_hash_policy": 332,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C5-execution-roadmap__RELEASE_CUTS_AND_GATES.md.gz",
+      "sha256": "cde9574d1a2114c99cc8eea9cc0152d65940d11713b42ec2aac6e9a589d2890d",
+      "bytes_under_hash_policy": 2414,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__ACCEPTANCE_CRITERIA_MASTER.csv.gz",
+      "sha256": "68e5d5039dc5f5c24395b8981f796131839ad12b48fe9aaa63011d6bbde468a4",
+      "bytes_under_hash_policy": 31640,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__COMPLETION_REQUIREMENTS.csv.gz",
+      "sha256": "8053c857e08b3e496ee9ae99a3d626c7f38be7f58cf4878140c501a886d44f2e",
+      "bytes_under_hash_policy": 2454,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__CURRENT_DOCUMENT_EDITS.csv.gz",
+      "sha256": "868b6f52a439c1db66450a970c868ba1c346155ac1fe2ccdbbb01d9e7fc4858f",
+      "bytes_under_hash_policy": 3371,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__DOCS_RELOCATION_REPORT.md.gz",
+      "sha256": "acab50fdc00eb3057278a901aeeed548eacb726c90ec0d4084089bafb713835d",
+      "bytes_under_hash_policy": 2111,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__EDITORIAL_HASH_CHANGES.csv.gz",
+      "sha256": "279e47c41e639de505bb8a1bfc25d2397d6100327e85e7a1b41cf207344809d4",
+      "bytes_under_hash_policy": 7053,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__EDITORIAL_LAYOUT_CHANGES.csv.gz",
+      "sha256": "77187507ffd5f37bc310b255c9ba9751a8e2ee8c4550ad8f4c4355ead0674414",
+      "bytes_under_hash_policy": 278,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__EDITORIAL_LINK_EDITS.csv.gz",
+      "sha256": "560b94fca1c0325888a7a539474b65fb21e85f363622dedc38641d71e7cb636e",
+      "bytes_under_hash_policy": 3794,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__FORMAT_ONLY_EDITS.csv.gz",
+      "sha256": "a4ac43d6bdde46fed9abc773c7fb8bff17c237292dc5b204baad6968b817a07b",
+      "bytes_under_hash_policy": 6605,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__HTML_REFERENCE_DETAILS.csv.gz",
+      "sha256": "9a307375fd8de40917aca2430950012b4d568b8d1da3a8367858fd62f3969187",
+      "bytes_under_hash_policy": 223,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__LINK_VALIDATION_DETAILS.csv.gz",
+      "sha256": "bf13cc4b37491537df8329dd3b78cd135cb9aa19984c86a1498347f7187a7ceb",
+      "bytes_under_hash_policy": 26190,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__MIGRATION_ATTEMPTS.md.gz",
+      "sha256": "ca72b586f456dd67943a85c58fe16363680f63281835ea24ce811c1561cc664f",
+      "bytes_under_hash_policy": 1194,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__PHASE_C_FINAL_EXECUTIVE_REPORT.md.gz",
+      "sha256": "08171890f1a2ff1f3c8539b394fb7df0d88d3a283f7e96a67909f4239a01dfc6",
+      "bytes_under_hash_policy": 2588,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__PHASE_D_IMPLEMENTATION_HANDOFF.md.gz",
+      "sha256": "d94b42c9c55259f520261f5a9b6b15bf0a09d323084ed36611708c519d1b7814",
+      "bytes_under_hash_policy": 2303,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__PREEXISTING_LINK_EXCEPTIONS.csv.gz",
+      "sha256": "b83d24e5c168da1358cb9c9d6318016c8157552ec1d34fdcc3dca144fb36c571",
+      "bytes_under_hash_policy": 71,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__RAW_INPUT_REPACK.csv.gz",
+      "sha256": "a35b5c9b294bd15b6944d2b7299c4d13194cd09294e4212c6e0395063f3ac38b",
+      "bytes_under_hash_policy": 699,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__READABILITY_EDITS.csv.gz",
+      "sha256": "b66455ac1bf3b328d8f8bc02a60918dc6fd31fc4f54f1cba299b8f8f5faaec6d",
+      "bytes_under_hash_policy": 2488,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__REGRESSION_PLAN.md.gz",
+      "sha256": "161f3d40e3b652b6ca8e26ad8f32e9dc40c5d9b417fc9cd0e12950a6957a7086",
+      "bytes_under_hash_policy": 953,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__C6-acceptance-handoff__SOURCE_OF_TRUTH_INDEX.md.gz",
+      "sha256": "ce4899554c1e04dfb02a3b7141ffaf49ab09f6bb064510b5027f00eb955df62f",
+      "bytes_under_hash_policy": 1688,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__CHECKPOINT.md.gz",
+      "sha256": "129c928e45d872e6f2497829f80b6b1fd5ff79b0d8e48a241d8bdbd950cc1508",
+      "bytes_under_hash_policy": 1915,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__audits__C__README.md.gz",
+      "sha256": "b48c2f325008907ab963c72069eab1ca3d554f3971e606d854b3b914b8c529f8",
+      "bytes_under_hash_policy": 1251,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/docs__decisions__PRODUCT_DECISIONS_MASTER.md.gz",
+      "sha256": "942c70cb551e401a3b91cb9f3efd4945b82f2f25690478f516a3d62568ad2690",
+      "bytes_under_hash_policy": 10735,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/HOME_CARE_ASSISTANT_C7_C10_PROTOTIPOS_KIT__00_LEIA_PRIMEIRO.md.gz",
+      "sha256": "1be9fbf41fd8f69d4042fbab86f51762de383f08c7c8e3ae2ac8469411c1df46",
+      "bytes_under_hash_policy": 2081,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/HOME_CARE_ASSISTANT_C7_C10_PROTOTIPOS_KIT__documentos__01_DECISOES_APROVADAS_E_LIMITES.md.gz",
+      "sha256": "25f41496cdf9de84675937d6d1d64754a971e1b4d6dde7b6a4fdf542c4b2ae96",
+      "bytes_under_hash_policy": 6441,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/HOME_CARE_ASSISTANT_C7_C10_PROTOTIPOS_KIT__documentos__02_INVENTARIO_DE_CIENCIAS_E_ATOS.md.gz",
+      "sha256": "ff9694c180ba3b8e33e59afc51425a7e336a46a14c01ffc04184d5d39c2dc5f3",
+      "bytes_under_hash_policy": 2071,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/HOME_CARE_ASSISTANT_C7_C10_PROTOTIPOS_KIT__documentos__03_BRIEF_VISUAL_C8.md.gz",
+      "sha256": "754dae5a10b74e454d25b7feb1531e81e56002d7aa36c29c0a8f669bd9923b3a",
+      "bytes_under_hash_policy": 3093,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/HOME_CARE_ASSISTANT_C7_C10_PROTOTIPOS_KIT__documentos__04_QUALIDADE_DE_ACEITE_C9.md.gz",
+      "sha256": "a5c89d9c8ff878e1bbdf7f2ae28459aa2ff06b731eb3f2e7831aff09360ecfb1",
+      "bytes_under_hash_policy": 2756,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/HOME_CARE_ASSISTANT_C7_C10_PROTOTIPOS_KIT__documentos__05_POLITICA_PR_CI_BRANCHES.md.gz",
+      "sha256": "86e3aa675bdd5cc92f33a08e2edc74c9c7989f095c4fdb3e5a042b2b45719a2b",
+      "bytes_under_hash_policy": 2401,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/inputs/HOME_CARE_ASSISTANT_C7_C10_PROTOTIPOS_KIT__documentos__06_ORDEM_MESTRA_FASE_C_PARTE_2.md.gz",
+      "sha256": "dd1dfd0362954a689c5b431b542b64fde4d12d4b1bc04d7574d4c7ac2f04a511",
+      "bytes_under_hash_policy": 7889,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/OPEN_OWNER_GATES.md",
+      "sha256": "ba1318d20c2a516fd388840590bcdd7d7d6d6cb32fc90fb396b172f25ec1d9f9",
+      "bytes_under_hash_policy": 1334,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/OWNER_MANDATE.md",
+      "sha256": "e74053349befda9c0da9a2247a2f82446e737f2a5c131d9640370ba6995be412",
+      "bytes_under_hash_policy": 18599,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/PHASE_C_FINAL_PART2_REPORT.md",
+      "sha256": "139e0d6c1ea55222a407365629ba53a403c328d487061924e8aa820da6e712d0",
+      "bytes_under_hash_policy": 2490,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/PHASE_D_HANDOFF_UPDATED.md",
+      "sha256": "343414d4f096eb0aa21a8b690be37b8457e9702d4ee93130556a3e69bbac91e4",
+      "bytes_under_hash_policy": 3471,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/PR_REVIEW_CHECKLIST.md",
+      "sha256": "8924385f1f27a8e48a933259a43d86464254fb5fa20d0c6d96d53646f9b92a6f",
+      "bytes_under_hash_policy": 1595,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/read_review_sources.py",
+      "sha256": "c6c72631730a9ae607e49c048b0f13d48e8241f2c802e39cbf8b90273bb135dc",
+      "bytes_under_hash_policy": 1270,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/README.md",
+      "sha256": "96005aa77ca02ecb22d6b8a9eecba6e397a78a548408697140628eb8a7e24176",
+      "bytes_under_hash_policy": 1325,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/reorganize_owner_inputs.py",
+      "sha256": "06a82b0ec40683ce67891e292a58853bd315c3300218de68460478b784dbd7f8",
+      "bytes_under_hash_policy": 4138,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/run_documentary_checks.py",
+      "sha256": "0d159cf5e74b5647f77ab20b8349d85c01a1e5f34fd1933bd5249e91d5b798a0",
+      "bytes_under_hash_policy": 2523,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/update_canonical_documents.py",
+      "sha256": "162d4929b8ee9973561d810bc2df2a170aa88136750afef8fa615e69218c80ad",
+      "bytes_under_hash_policy": 23026,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C10-pr-handoff/validate_part2.py",
+      "sha256": "f4d0a0a750d1c4f6585c1875bb217bd9b2d7f1c3f4cba2111e53ca610ed9bd01",
+      "bytes_under_hash_policy": 17889,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C2-decisions/DECISION_SPECIFICATION_CROSSWALK.csv",
+      "sha256": "f0d2a4dc82ad4ab9b559f09be679db999706673eea94af7875e32b51b09e92c9",
+      "bytes_under_hash_policy": 27404,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C2-decisions/DECISIONS_REGISTER.csv",
+      "sha256": "f80d773a4ae0e7ebe75f586b866eabcdddb82c51d9e3d9001035de8f40010ea4",
+      "bytes_under_hash_policy": 43929,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C2-decisions/HUMAN_DECISIONS_REVIEW.md",
+      "sha256": "f7294eb449cf25c50c234c8596775cda5f3689be9652d0da7fb70ec8eb064316",
+      "bytes_under_hash_policy": 10500,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/ATTACHMENTS_AND_DRAFTS.md",
+      "sha256": "bab6cfd8eb597d32285ed70ee88c931ab905223f4d4fb5ac7a6a2d93e051313b",
+      "bytes_under_hash_policy": 8759,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/BAL.md",
+      "sha256": "205fd49bc5b3566bb69161a65440ba70f48bed1170afea000ca794b5641ba8f9",
+      "bytes_under_hash_policy": 8674,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/COM.md",
+      "sha256": "38b19ede9851d6ad709f769ddba0bee2ae908a8cd12f682aac04f7f2afbc5f7b",
+      "bytes_under_hash_policy": 9540,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/DOCUMENTS_PDFS_AND_INTEGRITY.md",
+      "sha256": "02fc114d105d5adc1f1e30291a2b41f3688ae1c827e510fcb8c46f6589fad631",
+      "bytes_under_hash_policy": 10996,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/ENT.md",
+      "sha256": "23f52c6122d1762185334697b5af1678233ef383d16a453683f249d7bae6f01f",
+      "bytes_under_hash_policy": 10721,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/IDENTITY_ACCESS_MEMBERSHIPS.md",
+      "sha256": "b79a46aa6d49d815a037bbce122c2fba3e5762b3fec833643ed2e72f596fb8f6",
+      "bytes_under_hash_policy": 9425,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/PWA_PUSH_AND_NOTIFICATIONS.md",
+      "sha256": "81ce88cf72b0a915e3ca1411906ae16d0812deef60da4d9569526c14fdc725a2",
+      "bytes_under_hash_policy": 10898,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/REQ.md",
+      "sha256": "6281df7b4460ca0c9752951fa4e9fc40e753c13b4473703695d06ac671cbec92",
+      "bytes_under_hash_policy": 10313,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/SCREEN_FIELD_ACTION_INVENTORY.csv",
+      "sha256": "0f9ed8d01f53bbed19cf7e73bae9e61096796c9a9ee6caa2da419f1f5009b474",
+      "bytes_under_hash_policy": 107461,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/STOCK_AND_CUSTODY.md",
+      "sha256": "9aad86eb7d316dfc8daf3170df697b42e35b8c923a1d89a14ad892aebb64b2f6",
+      "bytes_under_hash_policy": 8247,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C3-functional-specification/USER_GUIDES_AND_CONTINUITY.md",
+      "sha256": "95551ad867229f96458d202fee009f09f689cba04cb9573e6ccdd81ef4f8652b",
+      "bytes_under_hash_policy": 10013,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/APPROVED_CAPABILITY_CHANGE_PLAN.csv",
+      "sha256": "214cfa33c16096c14b57051d7694fd6c7af97de068779d3cfcb472e0c771e720",
+      "bytes_under_hash_policy": 11275,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/ARCHITECTURAL_DECISIONS.md",
+      "sha256": "3dc3f55b4300189714bc33a630546b017534a01c881d61cf37527e9d35142194",
+      "bytes_under_hash_policy": 4414,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/CHANGE_IMPACT_MATRIX.csv",
+      "sha256": "0bfb395d9b6776376fc6089e32af7a25ac0ab017bf0114ed8493bffefb12bac9",
+      "bytes_under_hash_policy": 172850,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/DATA_API_UI_EVENT_CONTRACTS.md",
+      "sha256": "bca7682a7d623d3101ccf76b3afd545e1498f8536e917193ec71a70b6b09e29a",
+      "bytes_under_hash_policy": 10439,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/DRAFT_PERSISTENCE_AND_CONCURRENCY.md",
+      "sha256": "f89d45fc6da55e3d228cdfb41b09390a338472ebee926e72cad799b4ca8a9cdb",
+      "bytes_under_hash_policy": 6138,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/MIGRATION_COMPATIBILITY_PLAN.md",
+      "sha256": "9b04b311b313d29104eca8e83254d18923b0e3777dd6b158b9221cbccf840908",
+      "bytes_under_hash_policy": 7613,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/PDF_VERIFICATION_ARCHITECTURE.md",
+      "sha256": "f9d615366a4ed56cf6387a49d7b8e79cef6dbf7bf1d25e692b5267865e0b6fac",
+      "bytes_under_hash_policy": 2209,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C4-technical-design/SECURITY_PRIVACY_AND_TRACEABILITY.md",
+      "sha256": "ff44835a4fc4aad7f0f8266d52ff08b726dcb58dd6b78ba5e5535a4ed0824e7d",
+      "bytes_under_hash_policy": 6125,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C5-execution-roadmap/DEPENDENCY_SEQUENCE.csv",
+      "sha256": "134e926df58bdc250c0893c1d34fb27a66d1283a934a6c8d2a009c8faf9285ac",
+      "bytes_under_hash_policy": 3178,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C5-execution-roadmap/PHASE_D_WORK_PACKAGES.md",
+      "sha256": "eec90c3a59a6efdc96165a77b97eeca48b2e3b5571064ca9301dbeb2f2892bf7",
+      "bytes_under_hash_policy": 10281,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C5-execution-roadmap/RELEASE_CUTS_AND_GATES.md",
+      "sha256": "3b9ec5b7226bf16139eee93e8a61d57fc6fa129d29605aa65618e8e15d0ea9f4",
+      "bytes_under_hash_policy": 5635,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C6-acceptance-handoff/ACCEPTANCE_CRITERIA_MASTER.csv",
+      "sha256": "0d96ba52d31d5adaaab961c632d685f3d5a16562f7b12a25a1c6f18c4baa1b13",
+      "bytes_under_hash_policy": 163610,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C6-acceptance-handoff/PHASE_D_IMPLEMENTATION_HANDOFF.md",
+      "sha256": "5860dc2a62cc2523ae7e781b8cd2e711f9ecc644a9a0315084f3fbdd79ee0276",
+      "bytes_under_hash_policy": 1118,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/BACKUP_OPERATING_MODEL_FOR_OWNER.md",
+      "sha256": "d4062f5e61a95e0ea848f3dcb7d4c47d3fc39cb6defec541a8d051d0948e2017",
+      "bytes_under_hash_policy": 6308,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/build_science_inventory.py",
+      "sha256": "f61446fd2a5c0e96e679da2510cf51db2179ddaf66c3b66c32c6d3cf3ee82444",
+      "bytes_under_hash_policy": 23346,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/CAUSE_SEMANTIC_VERIFICATION.csv",
+      "sha256": "f1c6be9d7b4d24fcf33fbd89b891321696e44e6d10fee78534f302cb0b8be2b8",
+      "bytes_under_hash_policy": 75911,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/DRAFT_NON_OFFICIAL_CONTRACT.md",
+      "sha256": "b8ab2c807ba0ad6b0a3a3ceb9671d321352444fcc69c9f05959fbe4e72518b5a",
+      "bytes_under_hash_policy": 3877,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/OPEN_DECISIONS.md",
+      "sha256": "55bcd303eee0e9e7c98e27841e703824ca62539b9a2804e420b134137045f32f",
+      "bytes_under_hash_policy": 4444,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/PDF_SIGNING_ISSUANCE_AND_VERIFICATION.md",
+      "sha256": "d15dd10c41d2d37dea83e14a5cd8362cf3db3aa5d98652a2f1a63c80cfe7b3a1",
+      "bytes_under_hash_policy": 5760,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md",
+      "sha256": "9ccd9b1ba3815c271a3cf9702170a4db350ac42f3f0839d637424aff6898aa4b",
+      "bytes_under_hash_policy": 8270,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/README.md",
+      "sha256": "ea4083ac0683a70502b25fccb3c80e9b35365d3fdfba0049cf1db057c67e4d20",
+      "bytes_under_hash_policy": 1492,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/review_design_data.py",
+      "sha256": "6620ac258ee19bc6fbfd93b34f7ea35ec1ef54f7b860abde9958501772473696",
+      "bytes_under_hash_policy": 45926,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/SCIENCE_AND_ACKNOWLEDGEMENT_INVENTORY.csv",
+      "sha256": "a1484bf59140f216ac34daa30f014bac8732594621464793afeb0616d7794050",
+      "bytes_under_hash_policy": 46190,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/SCIENCE_OWNER_REVIEW.md",
+      "sha256": "d52bed7d7e583108887b74d0d6029b5985b35853cf66030039096593b4424940",
+      "bytes_under_hash_policy": 28230,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/SEMANTIC_CHANGE_REPORT.md",
+      "sha256": "a865e009f4ff5db7474c53c62e8132a5d81945ef2c9c1ce680d4a99c7aefe4d5",
+      "bytes_under_hash_policy": 2234,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/SEMANTIC_CHANGES.csv",
+      "sha256": "17c667561282530dfd08db490ab8350c3618816b2f4da052433643a8c8148045",
+      "bytes_under_hash_policy": 29403,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/SOURCE_ASSOCIATION_REVIEW.csv",
+      "sha256": "fb275908c08665f2fce20ab105fd4d3f9cec23104be1fff0152e2fa0797037c4",
+      "bytes_under_hash_policy": 118559,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C7-decision-closure/STOCK_MOVEMENT_TAXONOMY.md",
+      "sha256": "9f6c0a0c4da56bd11b8ecf931b87d517e51062c930e9ba1ec16d5203cd2aff0d",
+      "bytes_under_hash_policy": 12615,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/B1_TO_C3_SURFACE_CROSSWALK.csv",
+      "sha256": "82d1b74fa64cd3c6d1b90c6ef04aef4a39706cc8654f0932a0a6f7d5fdffd91e",
+      "bytes_under_hash_policy": 98409,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/blueprint_design_data.py",
+      "sha256": "6f9188a1dd081b6c888e905249e3ac4ddc4b1ce8666246c52ae1bfc09b10b673",
+      "bytes_under_hash_policy": 27210,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/build_visual_blueprint.py",
+      "sha256": "90a2120deb639b50952e5f66e45bb3576de03f036919449ccb95681980e5d7be",
+      "bytes_under_hash_policy": 29386,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/COMPONENT_DECISIONS.md",
+      "sha256": "ac54808abf6312b9a39a234708cb60e63d4e839de3689e750e6aa1d556089065",
+      "bytes_under_hash_policy": 3799,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/FORM_CONTROL_CATALOG.csv",
+      "sha256": "a3be1e06206b35f5e3ac74cde7e7ef4f8dc3ffcb32c303e3de2976c412328f81",
+      "bytes_under_hash_policy": 218887,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/GUIDED_HELP_AND_SCREENSHOTS_PLAN.md",
+      "sha256": "5990a719d0955fa743670a7365ca982e116518a2c78a3490d81145c0d5fc4a51",
+      "bytes_under_hash_policy": 3697,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/01-visao-geral-desktop.png",
+      "sha256": "c65d6eab9dda9e91623bc24170a459349cfbc80af4d285dd1046a23c054e5946",
+      "bytes_under_hash_policy": 188495,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/02-visao-geral-mobile.png",
+      "sha256": "39880e059476c9bbaf065efe8640355734660351ee771e20a6e3f224e4b7b126",
+      "bytes_under_hash_policy": 149789,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/docs-desktop.png",
+      "sha256": "cba39ce980b8730e75128958970b91d5c4e7a3834e6e2b43661b846c1970d2aa",
+      "bytes_under_hash_policy": 149280,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/ent-desktop.png",
+      "sha256": "5b7614770a88ba1a6c91ffc771ad514aae20e333c36581f7e01341200a8aed12",
+      "bytes_under_hash_policy": 161566,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/ent-mobile.png",
+      "sha256": "3d75f1bba0f1dff07d21f3004651a0bd806d1e3cd8446aeb1f4d40e6bf096f6f",
+      "bytes_under_hash_policy": 107936,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/home-care-prototipo.html",
+      "sha256": "f00533968ef6398d66de69992b5e1f4c45cfd0af5e7f440f1e1703c6d83f6f96",
+      "bytes_under_hash_policy": 64365,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/req-desktop.png",
+      "sha256": "11b15eef98d20767b00607ff7fe1eb5653be169694acd19888059cf6873b244f",
+      "bytes_under_hash_policy": 167843,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/schedule-desktop.png",
+      "sha256": "4f31b1c144b58fcf85991aeb26613ea26d46b292786aa8368f9105bf32d89485",
+      "bytes_under_hash_policy": 143619,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/prototype/stock-desktop.png",
+      "sha256": "4401e841ee41f1ba8eefd1d16f1374f1c426a8d6ffa72a1e55be6b9e42e558fb",
+      "bytes_under_hash_policy": 115028,
+      "hash_policy": "EXACT_BYTES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/README.md",
+      "sha256": "7b91968e87d28130172134fcc6aceb070b553138e8a3f31fe15dcd0b2b9dd269",
+      "bytes_under_hash_policy": 1668,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/SCREEN_BLUEPRINTS.csv",
+      "sha256": "e26958409d593278741e9f94ba1de35aedcfd1ed8e04a516b6062602440a9cc5",
+      "bytes_under_hash_policy": 50801,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ADM-01.md",
+      "sha256": "3504d36ddad768e097539ad800634757aee00e105c3f63f302407100336ab4c4",
+      "bytes_under_hash_policy": 8138,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ADM-02.md",
+      "sha256": "f1116109ddd1da6f6091be8fe0de60f3428ffd639231876eddccdc39806c401b",
+      "bytes_under_hash_policy": 9676,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ADM-03.md",
+      "sha256": "235d434762fc75a10d7f19073423a9b3c5617e0441b7e82367678b8553fb1324",
+      "bytes_under_hash_policy": 5424,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ADM-04.md",
+      "sha256": "8bdde261fec01812967c67cb13c9f369539bc4d962688ac436f08d6c88d77688",
+      "bytes_under_hash_policy": 5200,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ADM-05.md",
+      "sha256": "93cb9eb5704ceca7265548a334b4f464c450794824f6ff825b0206553c9c4b01",
+      "bytes_under_hash_policy": 8280,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ADM-06.md",
+      "sha256": "31e8d565a86704c76b550ec9410751ad251a6f374bc5a11a790e6f5e92676d1e",
+      "bytes_under_hash_policy": 3229,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ARQ-01.md",
+      "sha256": "2b0f1aa1741586d4c375847f4e2b889c18af4056fc5203e585f66943fbe681c8",
+      "bytes_under_hash_policy": 5986,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ARQ-02.md",
+      "sha256": "9ddea9074b8d7e340d8f8ad8a28da42cf9404ba407cefaeaa01543c91f71354c",
+      "bytes_under_hash_policy": 3736,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/BAL-01.md",
+      "sha256": "c03de93ecab189bf4b4d795d4d08df90e3ae070e9219ef26b6ae5e787fa48cac",
+      "bytes_under_hash_policy": 7375,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/BAL-02.md",
+      "sha256": "64b841146ec401674be6ac69bff4fd12a130d4585b420ffc3a2d647503d0d496",
+      "bytes_under_hash_policy": 5627,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/BAL-03.md",
+      "sha256": "080c3eeeb128c01465c0af158155709c179091a183ff8659f5d006c4274ad5f2",
+      "bytes_under_hash_policy": 6130,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/BAL-04.md",
+      "sha256": "fbf48033d5add3f68401ba1aef8ec5b3c22a3a579df7e4010ead048671cb81db",
+      "bytes_under_hash_policy": 3763,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/BAL-05.md",
+      "sha256": "cc35ae88178beba29350d30ef8c6e93ad1dfbf28ad5b5b2cf8cce55ec20a7f95",
+      "bytes_under_hash_policy": 3675,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CAT-01.md",
+      "sha256": "ba3f1cd9ebd0b80f0750fae471d888006da312c8628745bcc375503a0b041e92",
+      "bytes_under_hash_policy": 6567,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CAT-02.md",
+      "sha256": "235b528c581f4bc43944bcaae8efb1add5d9cf60cee854129018480a289a1fb6",
+      "bytes_under_hash_policy": 3680,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CAT-03.md",
+      "sha256": "0a5f272c9bd97462c98cedc8721189c04ee4e62232dda2a8443edc3c627e09ae",
+      "bytes_under_hash_policy": 4357,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CAT-04.md",
+      "sha256": "c38a7d2bcd9efc268074ab7211d2a43123640b3c7d653714167f21e6688204b3",
+      "bytes_under_hash_policy": 3770,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CAT-05.md",
+      "sha256": "de479c6efb8bfb04fc346182a29870ee9f5b1a91b798d2c7411fd0732e2cf216",
+      "bytes_under_hash_policy": 4000,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/COM-01.md",
+      "sha256": "b07b7b8bc0e80fdd4118c57aae6ae6283cb0273567ccac5176ab21281b09b0a7",
+      "bytes_under_hash_policy": 4906,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/COM-02.md",
+      "sha256": "71605d262304395c745898b47b56f27defe0d4f1c5082bfb484324a2d8193a91",
+      "bytes_under_hash_policy": 5816,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/COM-03.md",
+      "sha256": "f72e411504ee461799e5cf186a764ad5fce7a9832e7fa69593653e7a4d6832af",
+      "bytes_under_hash_policy": 4559,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/COM-04.md",
+      "sha256": "7562e7373ab158da8c52ad2a3067945333556b276a640585dcb02419171a4438",
+      "bytes_under_hash_policy": 4202,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CON-01.md",
+      "sha256": "92ff15527fcea91156447e9ec1cabe2ff31084be7c9c4a0baa2f91ed484d6c9c",
+      "bytes_under_hash_policy": 3352,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CON-02.md",
+      "sha256": "c7a965452f72add8bb6393489da54cbea13444827a4461d9d02d8fa04157ea51",
+      "bytes_under_hash_policy": 4887,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CON-03.md",
+      "sha256": "83fc24e723eb3a883516ca4c558719a72eba42437eea0960deb288357e0ccc1e",
+      "bytes_under_hash_policy": 4568,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/CON-04.md",
+      "sha256": "3db7414984e7fad0b22bc9965b3e2d1b46d174ea87b162508ce1a5d2b03bb0b9",
+      "bytes_under_hash_policy": 4153,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/DOC-01.md",
+      "sha256": "89f7b3226a58e11e9582391674dc66350f6102bda8ba3b54cde9cfee56f11f9a",
+      "bytes_under_hash_policy": 4090,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/DOC-02.md",
+      "sha256": "3aebccd6b94b152010f98eb148b6ab5ed8ed4f118fe93ab2824eded1f8d9e9bc",
+      "bytes_under_hash_policy": 9765,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/DOC-03.md",
+      "sha256": "9e49765ca38abc0e9491eea086af557d609a871f168f83b72cdd29bcc232a32e",
+      "bytes_under_hash_policy": 11648,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/DOC-04.md",
+      "sha256": "727e4f4c3ae073e9197e01fa32ecd9e1036d67bf0c5579e0637d9f39521600d4",
+      "bytes_under_hash_policy": 6231,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/DOC-05.md",
+      "sha256": "af8fa3aebd75d865582124d930335f4d782979f74b893e605bb15326b5d72efd",
+      "bytes_under_hash_policy": 4786,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ENT-01.md",
+      "sha256": "e0f1d295228cba0053d50fe09d5148ba15cbcd39aeca4ce27814b10407c6dbe0",
+      "bytes_under_hash_policy": 6677,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ENT-02.md",
+      "sha256": "281997c4bd3a09cbffd9e71d402ec87ffa309b1111610b8aa915861b4bd41617",
+      "bytes_under_hash_policy": 3171,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ENT-03.md",
+      "sha256": "cab396d940a45493d12c0ba0d3474610d185e505670a89f2f1d02729e15fb1a9",
+      "bytes_under_hash_policy": 6111,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ENT-04.md",
+      "sha256": "6b299aa6628f83e7243572c3d1ea45d08f9bb59befe6d48ce504d99e2a51e468",
+      "bytes_under_hash_policy": 4814,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ENT-05.md",
+      "sha256": "4c96279673e956ff55924ad42b84d26cd05ebbda78466a0b77c823ac094a6687",
+      "bytes_under_hash_policy": 4821,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ENT-06.md",
+      "sha256": "7b7868aab3fbb49bd776cd21a5692a451f6ab8d232494e479e35c95d41034a6e",
+      "bytes_under_hash_policy": 4605,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ESC-01.md",
+      "sha256": "e2da28ebea05124fe5c8935f865cb7202e3425c14b7fc0eb4082d0cef5997083",
+      "bytes_under_hash_policy": 3699,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ESC-02.md",
+      "sha256": "d774c403b9c6fc0924916b01d967f172fc469d88b947f967cbc15008d6a85319",
+      "bytes_under_hash_policy": 9776,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ESC-03.md",
+      "sha256": "5e1595ed342995bc75f053226794cce98d83a44f2c70bd080ccce3fbaf27e314",
+      "bytes_under_hash_policy": 4460,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ESC-04.md",
+      "sha256": "a737280f618c25d8cf34a66e09a5f52fae4f1bdbe788bd5df91b028cb4fb1dc4",
+      "bytes_under_hash_policy": 5835,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/EST-01.md",
+      "sha256": "23ac2f86d0016ba02d780531731bc17d17b595e1a2f678a8e6f6ebfdf2595528",
+      "bytes_under_hash_policy": 3404,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/EST-02.md",
+      "sha256": "fab21232d0a084efd40d3e4b9cfcf43e8dc858417bbc0fdcd2c2581bdaf62a18",
+      "bytes_under_hash_policy": 5911,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/EST-03.md",
+      "sha256": "8ec5c270437f8c4bb899650cfe3a341b62496311f876551c03c26fa5551c869a",
+      "bytes_under_hash_policy": 4177,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/EST-04.md",
+      "sha256": "cf5007060cd022ea7c296801bdc09b54237e6cb177167c85a5214315c9f40212",
+      "bytes_under_hash_policy": 5985,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/GUI-01.md",
+      "sha256": "42702c87b74b931a4a060c5db922a0cb0f4ae5f80b197274c148b9c16cf32781",
+      "bytes_under_hash_policy": 3229,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/GUI-02.md",
+      "sha256": "6b34333faed22522d794737573342363aee6b7d96c733dfe7826c40a85a2c6af",
+      "bytes_under_hash_policy": 9480,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/GUI-03.md",
+      "sha256": "25f03f82f123eeb880b0b701ec3bcbf70337287a182647f2fdb8c58d2f1b8adf",
+      "bytes_under_hash_policy": 11172,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/GUI-04.md",
+      "sha256": "16d97c1cec2e26d22ab56ecd0aba3c6b93a844e03835dcf11cea65c7d2613f38",
+      "bytes_under_hash_policy": 4760,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ID-01.md",
+      "sha256": "34b5aedcfcfcae69c68f0d7b5411fe5118644db54f350e65218bcdd743ad6b3b",
+      "bytes_under_hash_policy": 3966,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ID-02.md",
+      "sha256": "e6232c2a3eec880521ce57fd0b3b719ead0d0aa3d5aad01dda4fe1e0ea8c1cc8",
+      "bytes_under_hash_policy": 10275,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ID-03.md",
+      "sha256": "2f24e1d58aa2c47a9ce9646e27f648b973de2c719a28dac4a2221e40a0736c80",
+      "bytes_under_hash_policy": 4306,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ID-04.md",
+      "sha256": "255d57f9984b887ed804c7d70cb04eddd6a3e0de2a653d354625bec86bae67e5",
+      "bytes_under_hash_policy": 8729,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/ID-05.md",
+      "sha256": "38f3eaf73b15d475e8bfb0b3e863a90a0f1104356aa6fcd6a8773502036b611c",
+      "bytes_under_hash_policy": 3717,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/NOT-01.md",
+      "sha256": "5150782a039665bd558acae627540e125604bd5609291d2f8e4484aafb22e372",
+      "bytes_under_hash_policy": 3478,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/NOT-02.md",
+      "sha256": "60dd047cdb827449ee7bde3886f4c969672c5a9d8e79357d31300c02c4c5c498",
+      "bytes_under_hash_policy": 5444,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/NOT-03.md",
+      "sha256": "2e7051aab61caaea956d34aab18141212227cd59226bf57ec0c324530ec6d4e0",
+      "bytes_under_hash_policy": 5284,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/NOT-04.md",
+      "sha256": "89bba54a85c92273f2677b8fe15c225d4c0e1c1eea61208eb9baa4678d20cdd6",
+      "bytes_under_hash_policy": 3307,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/NOT-05.md",
+      "sha256": "82fde858d0598b4157d263b92e651f2e0353b5dcbe903095e75cb788e16896cb",
+      "bytes_under_hash_policy": 3632,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/RAS-01.md",
+      "sha256": "7cf790fdf169f8aa3d3276a0921ddee72f65f8bdafdf7ca638311bfea3db521f",
+      "bytes_under_hash_policy": 7893,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/RAS-02.md",
+      "sha256": "42432e8e88557d49427f8ace9ac88ff35ffd2fe087c60e9a35fc2fdb7293db87",
+      "bytes_under_hash_policy": 3409,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/REQ-01.md",
+      "sha256": "66ea9c42e5cb2685d21ebf36cf0abab86638313c6f5932f2099630f06d571aad",
+      "bytes_under_hash_policy": 7062,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/REQ-02.md",
+      "sha256": "08f054ab5550b89617205b2670914f682f7b5f177e367348aaeecd697e8aa19c",
+      "bytes_under_hash_policy": 7081,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/REQ-03.md",
+      "sha256": "65ca49f6c002ea79b6e77f88ae7a7db2e11fbe93d6f9c96d5dad9c7f929f1ff9",
+      "bytes_under_hash_policy": 4143,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/REQ-04.md",
+      "sha256": "c81b2ba613afb1f721bb02dd8496b4e39f8a06697abb75676b9139756d63dfec",
+      "bytes_under_hash_policy": 3740,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/screens/REQ-05.md",
+      "sha256": "001de7987edcb9dbe4a5ef8c41701942e97b3380ee2603c36f684b127e33fbfc",
+      "bytes_under_hash_policy": 3300,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/UI_COPY_AND_MICROCOPY_MASTER.csv",
+      "sha256": "ceb8f9244866957f6e048e6414d23f3947f424296d0cf5256a6660b20d3974b5",
+      "bytes_under_hash_policy": 2566244,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md",
+      "sha256": "cfb46bffa82d69564679d752288d74e3b76f02a5e5075a8875c8b805c3adbcca",
+      "bytes_under_hash_policy": 6659,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C8-visual-blueprint/VISUAL_OWNER_REVIEW.md",
+      "sha256": "e1d7f51fc62577079fead6716b92b5236e121d2d1c0aa972b5bdf9e688102b6f",
+      "bytes_under_hash_policy": 4017,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C9-acceptance-refinement/ACCEPTANCE_CASES.csv",
+      "sha256": "270904e4f5f384541991ec43ad4d936e785a272ce31834e54e8b5744528f39b4",
+      "bytes_under_hash_policy": 437423,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C9-acceptance-refinement/ACCEPTANCE_EXECUTION_BLUEPRINT.md",
+      "sha256": "c66f38e08ce571238985cf35ee111da1f2a46e4f60e182441c6da19406bf40f4",
+      "bytes_under_hash_policy": 4969,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C9-acceptance-refinement/C9_GAP_AND_DECISION_MATRIX.csv",
+      "sha256": "6c739919d2a1ca640bf0505deacc7f92509856d17068cfe1e1f06efabc4b7a4d",
+      "bytes_under_hash_policy": 74428,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C9-acceptance-refinement/capability_case_design.py",
+      "sha256": "e5a64eaa65148dea914f6f75a6febdb0a1b2e42ee107558433cc3c80e42c2480",
+      "bytes_under_hash_policy": 14643,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C9-acceptance-refinement/DISCRIMINATING_EXAMPLES.md",
+      "sha256": "5ae317861529898fbf9ba775c01fad111828edd2760ae38cfb58a7506fba39f6",
+      "bytes_under_hash_policy": 6792,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/C9-acceptance-refinement/README.md",
+      "sha256": "841cc171b755e6a166878c3001209b91ccfa8a7a9ff1be3ce3771602d570cb2b",
+      "bytes_under_hash_policy": 1104,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/CHECKPOINT.md",
+      "sha256": "8badd1e400fef0164c5c5a6788f18d22fb5e78be41a7857436792460303ab15c",
+      "bytes_under_hash_policy": 3658,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/audits/C/README.md",
+      "sha256": "71d213caa70f65826ea6cdfde6eb9a546ecb4657219e0b18a63320544398686e",
+      "bytes_under_hash_policy": 3148,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/current/PROJECT_STATUS.md",
+      "sha256": "8d929b9b3b0a350d1a4978997574e0b76f9cc13ce8184b00434d142f92b5c821",
+      "bytes_under_hash_policy": 3689,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/decisions/PRODUCT_DECISIONS_MASTER.md",
+      "sha256": "e958814d43f8a9889bc80a1d0bca1ac6b9c1d11706e8dde2a45a553696b9bd6b",
+      "bytes_under_hash_policy": 30311,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/decisions/README.md",
+      "sha256": "ccf63420c7c0b53ccf30494d6e61a558282e98cce215f17ff2bfaed39eeecf2c",
+      "bytes_under_hash_policy": 1559,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "e4d8372bff07e9940f5846a6505cd15cec74959e9b21f075b7be524ac9cc7563",
+      "bytes_under_hash_policy": 2706,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    },
+    {
+      "path": "README.md",
+      "sha256": "1324cb5bf7b15f8fd3cf8eac98f317408727f230d5e39b70c901f014fd7c954b",
+      "bytes_under_hash_policy": 2572,
+      "hash_policy": "UTF8_TEXT_LF_NEWLINES"
+    }
+  ]
+}

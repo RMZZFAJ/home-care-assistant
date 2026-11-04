@@ -1,8 +1,20 @@
 # Estado verificável do projeto
 
-Referência editorial:04/11/2026, America/Sao_Paulo. **Produção NO-GO.**
-Esta é a entrada canônica de estado; contratos atuais ficam em current,
-decisões humanas em decisions e especificações futuras em audits/C.
+Referência editorial:04/11/2026, America/Sao_Paulo. **Produção NO-GO.** Esta é
+a entrada canônica de estado; contratos atuais ficam em current, decisões
+humanas em decisions e especificações futuras em audits/C.
+
+**C7–C10 concluídas como planejamento em 04/11/2026.**
+[Checkpoint e publicação](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121
+causas e 165 associações foram revistas individualmente. Os 149 aceites
+anteriores e 12 complementos formam 161 casos PLANNED_NOT_EXECUTED. Direção
+visual aprovada: 97 B1/66 C3, 66 fichas e 262 controles. P02 permanece
+OWNER_REVIEW_REQUIRED por cinco origens reais REQ. P09-B é mínimo obrigatório,
+P11 revisão facultativa, P12 um draft por criação/tipo e O01+ wizard global.
+Essas regras são TO_BE; nenhuma foi implementada por esta documentação. O kit
+temporário foi incorporado/removido, preservando sete Markdown exatos, HTML e
+oito PNG. Auditorias datadas A/B não mudaram. Draft PR não autoriza merge,
+cleanup de branches, publicação produtiva ou início de D.
 
 <!-- c-table:start -->
 
@@ -34,10 +46,9 @@ decisões humanas em decisions e especificações futuras em audits/C.
 
 - **Referência:** Fase C
 
-  **Estado e prova:** C0–C6 documentalmente concluídas: decisões,
-  especificação, planos e
-  reorganização validados. A autoridade de publicação é o commit/ref
-  resolvido no Git.
+  **Estado e prova:** C0–C10 documentalmente concluídas: decisões,
+  especificação, planos e reorganização validados. A autoridade de publicação
+  é o commit/ref resolvido no Git.
 
 - **Referência:** Fase D
 
@@ -53,13 +64,13 @@ git log -1 --format=%H -- docs/audits/C
 git ls-remote origin refs/heads/audit/phase-b
 ```
 
-Os 165 registros originais foram reconciliados em 121 causas, e 28 grupos de requisitos
-aprovados, vários sobre os mesmos processos; não são 149 defeitos novos.
-Existem 30 DEC,
-20 oportunidades e 15 detalhes pendentes de decisão (P01–P12 originais e
-P13–P15
-derivados). Os dois P1 de decisão de escala e progresso REQ seguem abertos.
-O guard protege 84 migrations; contagens de suítes anteriores ficam nos pacotes
+Os 165 registros originais foram reconciliados em 121 causas, e 28 grupos de
+requisitos aprovados, vários sobre os mesmos processos; não são 149 defeitos
+novos. Existem 30 DEC, 20 oportunidades e 15 questões atualizadas pelas
+respostas C7 (P01–P12 originais e P13–P15 derivados). As pendências restantes
+estão no [registro atual](../audits/C/C7-decision-closure/OPEN_DECISIONS.md).
+Os dois P1 de decisão de escala e progresso REQ seguem abertos. O guard
+protege 84 migrations; contagens de suítes anteriores ficam nos pacotes
 datados e não são apresentadas como CI verde atual.
 
 PWA/Web Push, modalidades futuras de ciência, draft cross-device e verificador
@@ -69,7 +80,7 @@ TOC, emulação, screenshots e transporte controlado não substituem restore,
 participante, aparelho/AT/impressão ou provedor real.
 
 Consultar [C](../audits/C/README.md),
-[gate futuro](../audits/C/C5-execution-roadmap/RELEASE_CUTS_AND_GATES.md)
-e [história A/B](../audits/README.md). Os históricos de PRs/deploys e
-autorizações
-ficam em archive e auditorias datadas, sem renovar permissão corrente.
+[gate futuro](../audits/C/C5-execution-roadmap/RELEASE_CUTS_AND_GATES.md) e
+[história A/B](../audits/README.md). Os históricos de PRs/deploys e
+autorizações ficam em archive e auditorias datadas, sem renovar permissão
+corrente.

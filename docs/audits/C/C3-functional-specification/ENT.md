@@ -96,7 +96,8 @@ alheia.
   **Obrigatório e default:** Sim, sugestão pela escala se inequívoca; editável
   antes de emissão
 
-  **Validação/unidade:** Sem escala não presumir; P06 define exceção
+  **Validação/unidade:** Sem escala não presumir; P06 permite escolha manual
+  elegível pela família
 
   **Ajuda e exemplo:** “Quem receberá fisicamente? Confirme a pessoa.”
 
@@ -219,18 +220,16 @@ alheia.
 
 Rascunho → expedida/em trânsito → recebida ou divergência → conciliação →
 encerrada. Cancelamento é uma dimensão com
-pedido/consentimento/recusa/retirada,
-não uma borracha da história. Preservar estado anterior no pedido para
-retornar
-a ele quando retirado/recusado, revalidando fatos ocorridos durante a espera.
+pedido/consentimento/recusa/retirada, não uma borracha da história. Preservar
+estado anterior no pedido para retornar a ele quando retirado/recusado,
+revalidando fatos ocorridos durante a espera.
 
 Expedir debita origem e credita trânsito na mesma transação. Aceite pessoal
 positivo debita trânsito e credita destino uma vez; zero aceita nada e
-conserva
-pendência. Linhas não marcadas em divergências são integralmente aceitas só
-quando o recebedor confirma resumo completo. Não chamar 2/3 unidades aceitas
-de “linha integralmente conferida”; atendimento REQ e encerramento ENT
-diferem.
+conserva pendência. Linhas não marcadas em divergências são integralmente
+aceitas só quando o recebedor confirma resumo completo. Não chamar 2/3
+unidades aceitas de “linha integralmente conferida”; atendimento REQ e
+encerramento ENT diferem.
 
 Antes de emitir, família indica pessoa sugerida pela agenda, podendo editar.
 Após emitir e antes do fato físico, reassign existente deve invalidar desafios
@@ -254,22 +253,20 @@ aceitar o passado em nome dela. Parcial irrecuperável admite encerramento
 administrativo motivado, com situação física desconhecida explícita e saldo
 conciliado apenas por fatos comprovados/compensação autorizada referenciada.
 
-Transferência simples proposta P07-A reutiliza ENT: declaração do iniciador,
-contrassinatura da contraparte, aceite do efetivo recebedor. Se a contraparte
-também é recebedora, um gesto pode registrar dois eventos com significados
-separados e resumo claro. Se não for, sua concordância não cria aceite físico.
-P07-B exigiria contrato equivalente independente e é mais custoso; P07-C
-mantém
-ENT completa. A escolha continua pendente, sem uma quinta ficha presumida.
+P07 aprovou transferência simples preferencialmente no motor ENT: declaração
+do iniciador, concordância da contraparte e aceite do recebedor real são fatos
+distintos quando as pessoas diferem. Se a mesma pessoa faz dois atos, resumo e
+eventos mantêm seus significados. Devolução física pode seguir esse percurso;
+compra, consumo, abertura e compensação permanecem próprios. A UI antiga só é
+retirada após equivalência/regressões demonstradas na D.
 
 ## Recuperação, comunicação e provas
 
 Chave estável por expedição/recebimento/resolução/pedido; versão do estado
 apresentado. Resposta perdida recupera o mesmo ato e quantidades; saldo
-negativo,
-revogação, paciente trocado e versão antiga recusam sem efeitos parciais.
-Revisão salva e expedição recusada têm resposta por etapa. Estado uncertain
-proíbe mudar recebedor/conteúdo da tentativa até conciliar.
+negativo, revogação, paciente trocado e versão antiga recusam sem efeitos
+parciais. Revisão salva e expedição recusada têm resposta por etapa. Estado
+uncertain proíbe mudar recebedor/conteúdo da tentativa até conciliar.
 
 Fila padrão inclui a tarefa certa do destinatário: receber, decidir pedido ou
 resolver divergência, com próximo responsável. PDF mostra autores, emissão
@@ -279,10 +276,22 @@ Aplicar estados comuns, foco de retorno e layout de quantidades em móvel/AT.
 
 Aceites: profissional escalado diferente não aceita sem ser recebedor;
 admin/global não aceitam por ela; 3 expedidos e 2 aceitos conservam 1 em
-trânsito;
-consumo 1 e devolução 1 não debitam consumo 2; recusar/retirar pedido mantém
-fatos;
-revogar parcial não bloqueia segurança nem cria assinatura substituta; duas
-REQs vinculadas não duplicam crédito. Familiares e recebedor explicam o
-resumo,
-inclusive cenário sem escala e assinatura indisponível, antes do GO.
+trânsito; consumo 1 e devolução 1 não debitam consumo 2; recusar/retirar
+pedido mantém fatos; revogar parcial não bloqueia segurança nem cria
+assinatura substituta; duas REQs vinculadas não duplicam crédito. Familiares e
+recebedor explicam o resumo, inclusive cenário sem escala e assinatura
+indisponível, antes do GO.
+
+## Atualização vinculante C7–C10
+
+P06 foi aprovado: sugestão de escala editável pela família para pessoa
+vinculada/elegível com motivo. Aceite físico pessoal permanece indelegável.
+P07 aprova interface simples preferencialmente ENT; antiga devolução só sai
+após equivalência demonstrada. P05 exige dossiê/PDF de regularização sem
+simular assinatura de desligado.
+
+Esta atualização substitui alternativas/recomendações anteriores conflitantes;
+não anuncia implementação. Contrato detalhado no
+[adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
+[blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
+[casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
