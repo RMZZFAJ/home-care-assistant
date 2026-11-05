@@ -407,3 +407,125 @@ Duas rodadas iOS dirigidas adicionais passaram para a inspeção visual de 320 p
 A captura full-page conserva a barra fixa na posição de scroll da captura;
 a viewport real foi conferida separadamente, com summary focalizado, cartões
 legíveis e sem rolagem horizontal. Não equivale a aparelho físico/AT humano.
+
+Incremento de abertura publicado em 592db38; Draft PR 7 atualizado e mantido
+como rascunho. A alteração local independente de conexão Sonar em
+.vscode/settings.json foi preservada fora dos commits funcionais.
+
+## D2.3 — COM: parcelas, expectativa e autoridade
+
+Migrations 20261105184500, 20261105191000 e 20261105192800 aplicadas somente
+na stack local após controles transacionais com rollback. Expectativa não
+adquirida é calculada no banco e dispensada em waived_quantity, sem alterar
+quantidades originais/aprovadas/adquiridas/validadas ou escrever ledger.
+Decisão conserva motivo, ator, instante e resumo da versão. Capacidade crítica
+com.close_expectation tem padrão admin, com delegação familiar explícita no
+próprio paciente. Não amplia autoridade global nem representa ato alheio.
+
+P14-A conserva 10→2 validados+8 dispensados. P14-B encerra expectativa com
+parcela pendente e mantém conferência aberta; rejeição conserva declaração e
+aquisição ainda sem chegada válida. Uma nova chegada substituta tem identidade
+própria. Compra já adquirida não é dispensável. Cancelamento preserva as
+proteções físicas anteriores e também recusa apagar o novo encerramento.
+
+Novas chegadas têm submission_key; evento/snapshot contêm receiptId, parcela
+causal e declarações/decisões. Nome de quem informou/decidiu é preservado no
+fato novo. Campos históricos sem nome continuam desconhecidos. Grants e RLS
+foram conferidos: authenticated não tem INSERT/UPDATE/DELETE em linhas ou
+parcelas. Validação/rejeição recusam corpo com quantidade editada.
+
+Interface mostra parcela/autor/horário/quantidades em leitura ao decidir;
+chegada e aquisição começam vazias, com limite informativo. Contraprova UI
+encontrou 8 pré-preenchidos após adquirir 10 e validar 2. Primeiro seletor não
+localizava o campo por incluir a ajuda no label; corrigido para o ID real da
+linha antes de aceitar essa contraprova. A nova revisão informa se a chegada
+vai aguardar conferência ou receber validação administrativa imediata.
+
+Perda de resposta conserva intenção e recupera chegada, validação, rejeição
+ou encerramento sem duplicar fatos. Erro/explicação ficam dentro do modal e
+o fechamento permanece desabilitado enquanto incerto. Conflito de versão
+oferece comparação original/atual antes de adotar o novo resumo; conserva
+motivo, reinicia concordância e leva foco ao controle. Sucesso foca o título
+do resultado. São estados na mesma tela, sem promessa de persistência D3.
+
+Quatro causas de autoridade foram reproduzidas antes da correção:
+
+- Administrador com com.validate negado ainda validava chegada por papel.
+- Administrador com com.approve negado ainda emitia COM já aprovada.
+- Rejeição aguardando a linha da parcela concluía após perder com.validate.
+- Criação aguardando FK do catálogo concluía após perder com.create.
+
+As duas primeiras agora conservam pendência quando a capacidade é negada;
+submeter draft recalcula a aprovação e não promove valor provisório. As duas
+esperas tardias agora retornam 42501 e deixam documento/parcela/estoque sem
+novo efeito. Revalidação final cobre criação e comandos COM; validação
+automática também exige sua capacidade até o final. O primeiro controle de FK
+apontava products, mas o FK real é composto em care_recipient_products: o
+oráculo recusou esse ensaio por não observar espera. Foi corrigido antes de
+reproduzir o defeito. pg_blocking_pids identifica o bloqueador real; nenhum
+sleep ou timeout é usado como prova de chegada à barreira.
+
+11 integrações dirigidas passaram após as correções de papel/capacidade;
+as duas barreiras tardias adicionais passaram após a migration 100. Incluem
+concorrência, idempotência, parcelas múltiplas, rejeição/substituição, versão
+antiga, consentimento inválido, delegação familiar e negativas de identidade/
+paciente. 130 unitários, contratos, lint e tipos passaram. Quatro E2E Chromium
+funcionais passaram; o fluxo anterior REQ→COM doação→estoque→ENT parcial→BAL
+também passou com quantidades agora explicitamente preenchidas e mensagens
+específicas. Replay limpo/legado de 100 migrations, 16 SQL/search_path e as
+86 integrações completas passaram. Dezoito E2E passaram nos três projetos,
+incluindo os quatro COM, diálogo P02 e o ciclo operacional completo.
+
+Erros intermediários de teste foram preservados: recuperação precisava usar o
+botão dentro do modal, label exato de textarea controlada foi trocado pelo
+papel/nome acessível, e a revisão ganhou explicação adicional. Uma rodada
+ainda usava asserção carregada antes de editar o arquivo; não certifica a
+árvore posterior. A rodada seguinte manteve fontes congelados até terminar.
+Nenhuma regra, timeout, retry ou asserção de quantidade/ledger foi reduzida.
+
+Dois PDFs locais v4/v5 de 3ab0a931 foram confrontados com snapshots imutáveis,
+parcela causal, crédito no instante do evento e hash dos bytes registrados.
+O oráculo normaliza decimal textual da declaração e caixa do título, sem
+alterar os dados. Todas as seis páginas foram renderizadas e inspecionadas.
+A primeira versão separava título/campos de integridade e chamava a doação
+de compra na trilha; ajustes proporcionais foram validados abaixo. Artefatos
+anteriores preservados, com escopo de hashes do renderer no manifesto local;
+não certificam fontes UI editados entre as rodadas preliminares.
+
+PDFs finais de 6f0efa22, v4 pendente e v5 encerrada, três páginas cada:
+9d0fedb706d15ee2a4dc6c99b0c67959bceb5f361a9e66ae321e794a5db1f7dd e
+faff650cbae590c59f048706b8f5fd0ba2f04447ff9bd799a7a6566222926d0b.
+As seis páginas finais foram renderizadas/inspecionadas. Extração confrontou
+10/10/2/0/8 e 10/10/2/2/8, receiptId, autor, estado, crédito no instante do
+evento e hash registrado dos bytes. Título/campos/QR de integridade agora
+ficam na mesma página e a trilha identifica doação. Manifesto local preserva
+snapshots, limites e hashes do renderer; nenhum arquivo anterior regravado.
+Um E2E Chromium dirigido adicional passou no renderer final.
+
+CI de 592db38: run 42086896970 concluído com success; status Vercel success
+na mesma consulta. Isso cobre a abertura REQ publicada, não este incremento
+COM ainda não commitado. A suíte local completa desse incremento passou
+conforme resultados acima; não substitui CI do futuro commit.
+
+A inspeção visual posterior aos 18 E2E encontrou texto de estado fora da
+cápsula a 320 px e o cabeçalho genérico de compra numa doação. Uma nova
+asserção geométrica reprovou antes da correção. A cápsula agora acompanha a
+altura do texto, e cabeçalhos respeitam a origem; ausência de origem fica
+neutra, sem presumir compra ou afirmar um fato histórico inexistente.
+WebKit passou com a nova asserção e a captura foi inspecionada. A primeira
+rodada Chromium parou no carregamento do login, antes do campo de e-mail;
+não certifica o cabeçalho. Repetição isolada passou, assim como o ciclo
+REQ→COM doação→ENT parcial→BAL no Chromium. Fontes permaneceram congelados
+durante cada execução. Sem aumento de timeout ou redução de asserções.
+Contratos, lint, tipos, 130 unitários e build final passaram novamente.
+
+Último par PDF da árvore final: 953bc84c, v4/v5, três páginas cada, hashes
+3491fb94f876695e7fa6961615161ab94d25ed496aaac61a3bd67c232ca197dd e
+3ced677323c14788eb4115b63c616f6cd97a9a1a2190abdc3da2ca6faeb6227a.
+Extração/ledger/snapshots/hashes e as seis páginas renderizadas foram
+verificados novamente. A origem ausente agora recebe título neutro; não se
+reescrevem exemplares anteriores. Paginação geral/assinatura seguem D4.
+
+D-A integral permanece aberta; ENT, BAL, estoque/custódia, consumo, catálogo,
+recorrências e demais critérios D1/D2 ainda exigem conclusão. Sem GO/merge,
+reset remoto, alteração Auth remota, assinatura ou comunicação externa real.

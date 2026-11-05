@@ -13,6 +13,7 @@ export type SupplyLine = {
   purchased_quantity: string;
   accepted_quantity: string;
   reconciled_quantity: string;
+  waived_quantity?: string;
   fully_checked: boolean;
   metadata: Record<string, unknown>;
   requisitionItemIds: string[];
@@ -47,6 +48,25 @@ export type PurchaseReceipt = {
   submitted_by: string;
   lines: { lineId: string; quantity: string }[];
   created_at: string;
+  submission_key?: string | null;
+  submitted_name?: string | null;
+  validated_name?: string | null;
+  validated_by?: string | null;
+  validated_at?: string | null;
+  reason?: string | null;
+};
+export type PurchaseProgressLine = {
+  lineId: string; name: string; unit: string;
+  plannedQuantity: string | number; approvedQuantity: string | number;
+  purchasedQuantity: string | number; validatedQuantity: string | number;
+  pendingValidationQuantity: string | number; unarrivedQuantity: string | number;
+  waivedQuantity: string | number; waivableQuantity: string | number;
+  remainingExpectation: string | number;
+};
+export type PurchaseProgress = {
+  state: string; expectationClosed: boolean; expectationPending: boolean;
+  physicalPending: boolean; validationPending: boolean; lines: PurchaseProgressLine[];
+  closure: { actorId: string; actorName: string | null; recordedAt: string; reason: string; referenceVersion: number } | null;
 };
 export type SupplyDocument = {
   id: string;
@@ -68,6 +88,7 @@ export type SupplyDocument = {
   lines: SupplyLine[];
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];
+  purchaseProgress?: PurchaseProgress;
   approvals: {
     review_group: string;
     actor_id: string;
@@ -119,6 +140,10 @@ export const documentStatuses: Record<string, string> = {
   purchasing: "Compra em andamento",
   purchased: "Compra efetivada",
   partially_received: "Recebimento parcial",
+  closed_below_quantity: "Encerrada com quantidade inferior",
+  closed_pending_validation: "Expectativa encerrada · parcelas aguardam conferência",
+  closed_pending_arrival: "Expectativa encerrada · aquisição aguarda chegada válida",
+  pending_validation: "Parcela aguardando conferência",
   received: "Recebido",
   pending_receipt: "Aguardando recebimento",
   disputed: "Divergência pendente",

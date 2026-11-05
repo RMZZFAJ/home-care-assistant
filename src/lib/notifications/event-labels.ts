@@ -41,13 +41,14 @@ const labels: Record<string, string> = {
   "ent.reminder": "Lembrete de conferência",
   "req.status": "Etapa da requisição atualizada",
   "req.item_resolved": "Item extra identificado",
-  "com.issued": "Compra registrada",
-  "com.approve": "Itens da compra aprovados",
+  "com.issued": "Ficha de compra ou doação emitida",
+  "com.approve": "Itens de compra ou doação aprovados",
   "com.purchase": "Aquisição registrada",
   "com.receive": "Recebimento informado",
   "com.validate_receipt": "Recebimento validado",
   "com.reject_receipt": "Recebimento rejeitado",
-  "com.cancel": "Compra cancelada",
+  "com.close_expectation": "Expectativa não adquirida encerrada",
+  "com.cancel": "Ficha de compra ou doação cancelada",
   "ent.issued": "Materiais expedidos",
   "ent.receive": "Recebimento conferido",
   "ent.resolve": "Divergência conciliada",
@@ -60,8 +61,12 @@ const labels: Record<string, string> = {
   "bal.cancel": "Balanço cancelado",
   "attachment.bound": "Anexo vinculado",
 };
-export function documentEventLabel(action?: string) {
+export function documentEventLabel(action?: string, origin?: "purchase" | "donation") {
   if (!action) return "Atualização disponível";
+  if (origin === "donation") {
+    const donation: Record<string, string> = { "com.issued": "Ficha de doação emitida", "com.approve": "Itens da doação aprovados", "com.cancel": "Ficha de doação cancelada" };
+    if (donation[action]) return donation[action];
+  }
   return (
     labels[action] ??
     (action.endsWith(".draft")

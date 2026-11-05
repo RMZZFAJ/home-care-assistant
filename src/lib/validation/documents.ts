@@ -88,6 +88,7 @@ export const supplyCommandSchema = z
       "receive",
       "validate_receipt",
       "reject_receipt",
+      "close_expectation",
       "reassign",
       "resolve",
       "cancel",
@@ -129,6 +130,7 @@ export const supplyCommandSchema = z
       ]),
       validate_receipt: z.object({ receiptId: identifier }).strict(),
       reject_receipt: z.object({ receiptId: identifier, reason }).strict(),
+      close_expectation: z.object({ reason, confirmed: z.literal(true) }).strict(),
       reassign: z.object({ recipientId: identifier, reason }).strict(),
       resolve: z
         .object({

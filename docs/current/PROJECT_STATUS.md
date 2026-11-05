@@ -31,11 +31,24 @@ PDFs de observação e diálogo confrontados com banco/snapshot e inspecionados.
 A trilha independente de abertura informada pelo aplicativo foi acrescentada
 na migration seguinte, sem alterar ciência/versão/ledger. 97 migrations em
 instalação limpa/evolução legada, 73 integrações completas, 128 unitários e
-15 E2E nos três projetos passaram, além dos checks e build. A CI de `5fb888c`
-estava em execução na consulta; não foi promovida a aprovada.
+15 E2E nos três projetos passaram, além dos checks e build. CI de `592db38`
+concluída com success e status Vercel success na consulta desse SHA.
+
+COM ganhou parcelas com identidade causal, decisões em leitura e dispensa
+somente da expectativa não adquirida. Pendência física continua aberta após
+dispensa; rejeição preserva a declaração e validação credita uma única vez.
+Capacidades efetivas governam aprovação/validação imediatas; revogação durante
+esperas reais de linha/FK agora impede o efeito tardio. Replay local de 100
+migrations, 16 SQL/search_path, 86 integrações completas, 130 unitários e 18
+E2E dos três projetos passaram. Dois PDFs de fatos distintos foram extraídos,
+confrontados com snapshots/ledger/hashes e inspecionados em todas as páginas.
+O ajuste visual final de cápsula/cabeçalho passou em WebKit e Chromium,
+incluindo uma asserção que reprovou antes da correção; checks e build finais
+passaram novamente. Evidência local não conclui homologação humana/física.
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não
-atesta estes incrementos posteriores.
+atesta os incrementos posteriores; CI e preview não são validação remota de
+banco ou homologação humana/física.
 
 **C7–C10 concluídas e fechamento definitivo incorporado em 04/11/2026.**
 [Checkpoint](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121 causas e 165

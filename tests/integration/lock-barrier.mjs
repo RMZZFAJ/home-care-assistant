@@ -35,3 +35,35 @@ export async function whileAdvisoryWaits(lockName, send, whileWaiting) {
   }
   return pending;
 }
+
+// These existing rows expose later waits after the patient's advisory lock.
+export async function whileRowWaits(target, id, requestName, send, whileWaiting) {
+  getTestEnvironment();
+  const table = { catalogue: "public.care_recipient_products", purchase_receipts: "public.purchase_receipts" }[target];
+  assert.ok(table && ["create_supply_document", "supply_document_command"].includes(requestName));
+  const holder = spawn("docker", ["exec", "-i", testContainer, "psql", "-U", "postgres", "-d", "postgres", "-X", "-qAt", "-v", "ON_ERROR_STOP=1"], { stdio: ["pipe", "pipe", "pipe"] });
+  const closed = new Promise(resolve => holder.once("close", resolve));
+  const ready = new Promise((resolve, reject) => {
+    let output = "";
+    const timer = setTimeout(() => reject(new Error("Local row barrier did not start")), 10_000);
+    holder.once("error", error => { clearTimeout(timer); reject(error); });
+    holder.stdout.on("data", chunk => { output += chunk.toString(); const match = output.match(/barrier-ready:(\d+)/); if (match) { clearTimeout(timer); resolve(Number(match[1])); } });
+  });
+  let pending;
+  const predicate = target === "catalogue" ? `care_recipient_id=${sqlLiteral(id.patient)} and product_id=${sqlLiteral(id.product)}` : `id=${sqlLiteral(id)}`;
+  holder.stdin.write(`begin; select 1 from ${table} where ${predicate} for update; select 'barrier-ready:'||pg_backend_pid();\n`);
+  try {
+    const blocker = await ready;
+    pending = Promise.resolve(send());
+    const started = Date.now();
+    while (Number(sql(`select count(*) from pg_stat_activity a where ${blocker}=any(pg_blocking_pids(a.pid)) and a.query ilike ${sqlLiteral("%" + requestName + "%")};`)) === 0) {
+      assert.ok(Date.now() - started < 15_000, "Authenticated request must actually wait for the specified row holder");
+      await delay(25);
+    }
+    await whileWaiting();
+  } finally {
+    holder.stdin.end("rollback;\n\\q\n");
+    assert.equal(await closed, 0, "Local row barrier must release its transaction");
+  }
+  return pending;
+}

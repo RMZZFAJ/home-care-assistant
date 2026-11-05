@@ -65,7 +65,28 @@ banco.
 Protocolos e fatos históricos anteriores permanecem preservados.
 
 purchase_receipts separa recebimento informado e validação da entrada
-familiar.
+familiar. submission_key liga cada nova chegada ao evento/intenção; nomes de
+quem informou/decidiu são snapshots novos, sem preencher o passado por consulta
+ao diretório atual. Eventos COM novos preservam a parcela causal e a lista
+das declarações/decisões pertinentes; JSON/hash anteriores não são regravados.
+
+document_lines.waived_quantity guarda expectativa não adquirida dispensada,
+separada de approved/purchased/accepted_quantity. workflow_data conserva
+purchaseExpectationClosure com motivo, ator, instante e resumo da versão
+revisada. A RPC usa lock de estoque/documento, versão, capacidade própria e
+intenção idempotente. A restrição impede adquirir quantidade já dispensada.
+O cálculo não dispensa físico nem altera saldo; pendência de parcela sobrevive
+ao encerramento da expectativa. Progresso por linha distingue aquisição,
+validação pendente, chegada ainda não válida, dispensa e restante a adquirir.
+
+com.close_expectation é capacidade crítica com padrão admin, delegável
+explicitamente no paciente. Aprovação e crédito imediatos também verificam
+as capacidades efetivas; deny de com.approve/com.validate não é contornado
+pelo papel admin. Draft não constitui aprovação oficial, e sua submissão
+recalcula autoridade/quantidades aprovadas. Crédito exige sessão/contexto/
+capacidade vigentes e conserva autoria da decisão. Clientes não editam as
+quantidades declaradas ao validar/rejeitar uma parcela.
+
 bal_approvals identifica grupo, ator e versão de contagem. Reconto conserva
 aprovações antigas e captura nova referência; elas não aprovam o novo balanço.
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent, type Ref } from "react";
 import {
   buttonClass,
+  can,
   inputClass,
   Notice,
   primaryClass,
@@ -10,6 +11,9 @@ import {
 } from "@/components/workspace";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
 import type { PatientPerson, SupplyDocument } from "@/types/documents";
+import { acquisitionRemaining, arrivalRemaining } from "@/lib/documents/purchase";
+import { formatBrazilDate } from "@/lib/receipt";
+import { PurchaseReceiptContent } from "./purchase-details";
 
 export type DocumentAction =
   | "submit"
@@ -19,6 +23,7 @@ export type DocumentAction =
   | "divergence"
   | "validate_receipt"
   | "reject_receipt"
+  | "close_expectation"
   | "reassign"
   | "resolve"
   | "approve_family"
@@ -32,6 +37,7 @@ export function CommandEditor({
   context,
   onCancel,
   onReview,
+  formRef,
 }: {
   action: DocumentAction;
   data: SupplyDocument;
@@ -39,18 +45,22 @@ export function CommandEditor({
   context: WorkspaceContext;
   onCancel: () => void;
   onReview: (action: string, body: unknown, summary: string) => void;
+  formRef?: Ref<HTMLFormElement>;
 }) {
   const [error, setError] = useState("");
+  const instanceId = useId();
   const [reasonText, setReasonText] = useState("");
+  const [receiptId, setReceiptId] = useState(data.receipts.find(receipt => receipt.state === "pending")?.id ?? "");
+  const selectedReceipt = data.receipts.find(receipt => receipt.id === receiptId && receipt.state === "pending");
   const [divergent, setDivergent] = useState<string[]>([]);
   const [selectedLine, setSelectedLine] = useState(
     data.lines.find((line) => line.metadata.issueOpen)?.id ?? "",
   );
   const lines = data.lines.filter((line) =>
     action === "purchase"
-      ? quantity(line.approved_quantity).gt(line.purchased_quantity)
+      ? acquisitionRemaining(line).gt(0)
       : action === "receive" && data.type === "COM"
-        ? quantity(line.purchased_quantity).gt(line.accepted_quantity)
+        ? arrivalRemaining(line, data).gt(0)
         : true,
   );
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -74,11 +84,14 @@ export function CommandEditor({
         (action === "receive" && data.type === "COM")
       ) {
         const values = lines
-          .map((line) => {
-            const value = String(form.get(line.id) ?? "0");
+          .flatMap((line) => {
+            const value = String(form.get(line.id) ?? "").trim();
+            if (!value && action !== "approve") return [];
             if (!validQuantity(value, 6, true))
               throw new Error("Confira a quantidade de " + line.name_snapshot);
-            return { lineId: line.id, quantity: quantity(value).toFixed() };
+            const limit = action === "approve" ? quantity(line.quantity) : action === "purchase" ? acquisitionRemaining(line) : arrivalRemaining(line, data);
+            if (quantity(value).gt(limit)) throw new Error("A quantidade supera o limite deste ato para " + line.name_snapshot);
+            return [{ lineId: line.id, quantity: quantity(value).toFixed() }];
           })
           .filter(
             (line) => action === "approve" || quantity(line.quantity).gt(0),
@@ -99,6 +112,7 @@ export function CommandEditor({
             );
           })
           .join("\n");
+        if (action === "receive" && data.type === "COM") summary += context.patient?.role === "admin" && can(context, "com.validate") ? "\nEsta chegada será validada imediatamente pela sua permissão administrativa, com entrada das quantidades declaradas no estoque familiar." : "\nRegistrar esta chegada para conferência, sem entrada no estoque até a validação autorizada.";
       } else if (action === "receive" || action === "divergence") {
         command = "receive";
         if (action === "divergence" && !divergent.length)
@@ -120,8 +134,9 @@ export function CommandEditor({
             ? "Confirmar o recebimento integral de todas as linhas e incorporar as quantidades ao estoque do destino."
             : "Aceitar integralmente as linhas não marcadas. Nas linhas selecionadas, incorporar imediatamente apenas a quantidade informada e abrir divergência para resolução.";
       } else if (action === "validate_receipt" || action === "reject_receipt") {
+        if (!selectedReceipt) throw new Error("Selecione uma parcela pendente para conferir.");
         body = {
-          receiptId: form.get("receiptId"),
+          receiptId: selectedReceipt.id,
           ...(action === "reject_receipt" ? { reason } : {}),
         };
         summary =
@@ -129,6 +144,15 @@ export function CommandEditor({
             ? "Validar este recebimento e incorporar suas quantidades ao estoque familiar."
             : "Rejeitar o recebimento indicado, sem entrada no estoque. Motivo: " +
               reason;
+        summary += "\nParcela informada por " + (selectedReceipt.submitted_name ?? "autor histórico não preservado") + " em " + formatBrazilDate(selectedReceipt.created_at) + ".\n" + selectedReceipt.lines.map(item => {
+          const line = data.lines.find(line => line.id === item.lineId);
+          return (line?.name_snapshot ?? "Material registrado") + ": " + formatQuantity(item.quantity, line?.unit_snapshot);
+        }).join("\n");
+      } else if (action === "close_expectation") {
+        if (!data.purchaseProgress?.expectationPending || data.purchaseProgress.expectationClosed) throw new Error("Não existe expectativa restante elegível para encerrar nesta versão.");
+        if (form.get("confirmed") !== "on") throw new Error("Confirme expressamente o resumo antes de encerrar a expectativa.");
+        body = { reason, confirmed: true };
+        summary = data.purchaseProgress.lines.map(line => `${line.name}: aprovado ${formatQuantity(line.approvedQuantity, line.unit)}; adquirido ${formatQuantity(line.purchasedQuantity, line.unit)}; validado ${formatQuantity(line.validatedQuantity, line.unit)}; em conferência ${formatQuantity(line.pendingValidationQuantity, line.unit)}; não será adquirido ${formatQuantity(line.waivableQuantity, line.unit)}.`).join("\n") + "\n\nDispensar somente a expectativa não adquirida, sem entrada ou baixa de material. Parcelas pendentes continuam exigindo conferência.\nMotivo: " + reason;
       } else if (action === "reassign") {
         body = { recipientId: form.get("recipientId"), reason };
         summary =
@@ -174,6 +198,7 @@ export function CommandEditor({
     "approve",
     "divergence",
     "reject_receipt",
+    "close_expectation",
     "reassign",
     "resolve",
     "cancel",
@@ -185,6 +210,7 @@ export function CommandEditor({
       : ["admin", "professional", "supervisor"];
   return (
     <form
+      ref={formRef}
       className="mt-5 space-y-4 border-t border-(--line) pt-5"
       onSubmit={submit}
     >
@@ -201,30 +227,25 @@ export function CommandEditor({
               action === "approve"
                 ? line.quantity
                 : action === "purchase"
-                  ? quantity(line.approved_quantity)
-                      .minus(line.purchased_quantity)
-                      .toFixed()
-                  : quantity(line.purchased_quantity)
-                      .minus(line.accepted_quantity)
-                      .toFixed();
+                  ? acquisitionRemaining(line).toFixed()
+                  : arrivalRemaining(line, data).toFixed();
             return (
-              <label key={line.id} className="block text-sm font-semibold">
+              <div key={line.id} className="space-y-1"><label htmlFor={instanceId + line.id} className="block text-sm font-semibold">
                 {line.name_snapshot} · {line.unit_snapshot}
+                </label>
                 <input
+                  id={instanceId + line.id}
                   className={inputClass}
                   name={line.id}
-                  type="number"
+                  type="text"
                   inputMode="decimal"
-                  min="0"
-                  max={remaining}
-                  step="any"
-                  defaultValue={remaining}
-                  required
+                  maxLength={64}
+                  defaultValue={action === "approve" ? remaining : ""}
+                  required={action === "approve"}
+                  aria-describedby={instanceId + line.id + "-help"}
                 />
-                <span className="text-xs font-normal text-(--muted)">
-                  Limite deste ato: {formatQuantity(remaining)}
-                </span>
-              </label>
+                <p id={instanceId + line.id + "-help"} className="text-xs text-(--muted)">Limite deste ato: {formatQuantity(remaining, line.unit_snapshot)}. {action === "receive" ? "Informe somente o que chegou nesta parcela. Deixe vazio se não chegou." : action === "purchase" ? "Informe somente o adquirido agora. Deixe vazio para as outras linhas." : "Aprovar não registra aquisição ou entrada no estoque."}</p>
+              </div>
             );
           })
         : null}
@@ -279,9 +300,9 @@ export function CommandEditor({
           ))
         : null}
       {["validate_receipt", "reject_receipt"].includes(action) ? (
-        <label className="block text-sm font-semibold">
+        <div className="space-y-3"><label className="block text-sm font-semibold">
           Recebimento pendente
-          <select className={inputClass} name="receiptId" required>
+          <select className={inputClass} name="receiptId" required value={receiptId} onChange={event => setReceiptId(event.target.value)}>
             {data.receipts
               .filter((receipt) => receipt.state === "pending")
               .map((receipt) => (
@@ -291,8 +312,9 @@ export function CommandEditor({
                 </option>
               ))}
           </select>
-        </label>
+        </label>{selectedReceipt ? <section className="space-y-2"><h3 className="font-semibold">Parcela selecionada</h3><PurchaseReceiptContent receipt={selectedReceipt} lines={data.lines} /></section> : <Notice error>Não há parcela pendente disponível para esta decisão.</Notice>}</div>
       ) : null}
+      {action === "close_expectation" ? <section className="space-y-3"><h3 className="font-semibold">Expectativa que não será adquirida</h3>{data.purchaseProgress?.lines.map(line => <article key={line.lineId} className="rounded-xl border border-(--line) p-4 text-sm"><strong>{line.name}</strong><dl className="mt-2 grid grid-cols-2 gap-3"><div><dt>Aprovado</dt><dd>{formatQuantity(line.approvedQuantity, line.unit)}</dd></div><div><dt>Adquirido</dt><dd>{formatQuantity(line.purchasedQuantity, line.unit)}</dd></div><div><dt>Validado</dt><dd>{formatQuantity(line.validatedQuantity, line.unit)}</dd></div><div><dt>Em conferência</dt><dd>{formatQuantity(line.pendingValidationQuantity, line.unit)}</dd></div><div><dt>Não será adquirido</dt><dd className="font-semibold">{formatQuantity(line.waivableQuantity, line.unit)}</dd></div></dl></article>)}<Notice>Encerrar não recebe materiais nem altera o estoque. Aquisições já registradas e parcelas pendentes continuam exigindo chegada e conferência.</Notice><label className="flex items-start gap-2 text-sm"><input key={data.version} type="checkbox" name="confirmed" required />Conferi o resumo e confirmo dispensar somente a expectativa não adquirida.</label></section> : null}
       {action === "reassign" ? (
         <label className="block text-sm font-semibold">
           Novo destinatário

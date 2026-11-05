@@ -27,6 +27,8 @@ import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { DocumentHeader } from "./document-header";
+import { PurchaseDetails, PurchaseExpectationComparison } from "./purchase-details";
+import { acquisitionRemaining, arrivalRemaining } from "@/lib/documents/purchase";
 
 export function SupplyDocumentContent({ id, context }: { id: string; context: WorkspaceContext }) {
   const liveRevision = useLiveRevision();
@@ -46,6 +48,21 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
     expectedVersion: number;
   } | null>(null);
   const [uncertain, setUncertain] = useState(false);
+  const [purchaseConflict, setPurchaseConflict] = useState(false);
+  const [comparison, setComparison] = useState<SupplyDocument | null>(null);
+  const commandFormRef = useRef<HTMLFormElement | null>(null);
+  const decisionFocusRef = useRef(false);
+  const headerRef = useRef<HTMLElement | null>(null);
+  const resultFocusRef = useRef(false);
+  useEffect(() => {
+    if (decisionFocusRef.current) {
+      decisionFocusRef.current = false;
+      commandFormRef.current?.querySelector<HTMLElement>("input,textarea,select")?.focus();
+    } else if (resultFocusRef.current) {
+      resultFocusRef.current = false;
+      headerRef.current?.querySelector<HTMLElement>("h2")?.focus();
+    }
+  }, [data?.version]);
   useEffect(() => {
     editingRef.current = Boolean(action || review || uncertain);
   }, [action, review, uncertain]);
@@ -111,24 +128,37 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
     if (!pendingRef.current) return;
     setBusy(true);
     setError("");
+    const intention = pendingRef.current;
     try {
       const result = await api<{ data: SupplyDocument }>(
         "/api/documents/" + id,
-        pendingRef.current,
+        intention,
       );
+      resultFocusRef.current = true;
       setData(result.data);
       pendingRef.current = null;
       setUncertain(false);
       setReview(null);
       setAction(null);
-      setMessage(
-        "Operação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.",
-      );
+      setPurchaseConflict(false); setComparison(null);
+      const receipt = result.data.receipts.find(receipt => receipt.submission_key === intention.idempotencyKey);
+      const purchaseMessages: Record<string, string> = {
+        approve: "Decisão de aprovação registrada. Quantidades adquiridas e recebidas não mudaram.",
+        purchase: "Aquisição registrada. Este ato não confirma chegada nem entrada no estoque.",
+        receive: receipt?.state === "approved" ? "Chegada registrada e validada. As quantidades desta parcela foram incorporadas ao estoque familiar." : receipt?.state === "pending" ? "Chegada registrada e aguardando conferência. Nenhuma quantidade desta parcela foi incorporada ao estoque." : "Chegada registrada. Consulte a parcela e seu estado de conferência.",
+        validate_receipt: "Parcela validada. As quantidades declaradas integram o estoque familiar.",
+        reject_receipt: "Parcela rejeitada. A declaração original foi preservada, sem entrada desta parcela no estoque.",
+        close_expectation: "Expectativa restante encerrada, sem entrada ou baixa de material." + (result.data.purchaseProgress?.physicalPending ? " Parcelas que ainda aguardam chegada válida ou conferência continuam pendentes." : " As quantidades efetivamente validadas foram preservadas."),
+        submit: "COM emitida. A emissão não comprova aquisição, chegada ou entrada no estoque.",
+        cancel: "Ficha cancelada com histórico preservado, sem entrada ou baixa de material.",
+      };
+      setMessage(result.data.type === "COM" ? purchaseMessages[intention.action] ?? "Decisão registrada na ficha." : "Operação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.");
     } catch (reason) {
       const rejected =
         reason instanceof ApiError &&
         [400, 403, 404, 409, 422].includes(reason.status);
       if (rejected) {
+        if (data.type === "COM" && reason instanceof ApiError && reason.code === "VERSION_CONFLICT") setPurchaseConflict(true);
         pendingRef.current = null;
         setReview(null);
       }
@@ -141,6 +171,14 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
     } finally {
       setBusy(false);
     }
+  }
+  async function comparePurchaseVersion() {
+    setBusy(true); setError("");
+    try {
+      const result = await api<{ data: SupplyDocument }>("/api/documents/" + id);
+      setComparison(result.data);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível consultar a versão atual."); }
+    finally { setBusy(false); }
   }
   const activeContext = data?.care_recipient_id === context.patient?.id;
   const allowed = (cap: string) => Boolean(activeContext && can(context, cap));
@@ -169,7 +207,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
         ].includes(data.status) &&
         allowed("com.purchase") &&
         data.lines.some((line) =>
-          quantity(line.approved_quantity).gt(line.purchased_quantity),
+          acquisitionRemaining(line).gt(0),
         )
       )
         actions.push("purchase");
@@ -177,7 +215,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
         ["purchased", "purchasing", "partially_received"].includes(
           data.status,
         ) &&
-        allowed("com.receive")
+        allowed("com.receive") && data.lines.some(line => arrivalRemaining(line, data).gt(0))
       )
         actions.push("receive");
       if (
@@ -185,6 +223,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
         allowed("com.validate")
       )
         actions.push("validate_receipt", "reject_receipt");
+      if (data.purchaseProgress?.expectationPending && !data.purchaseProgress.expectationClosed && allowed("com.close_expectation")) actions.push("close_expectation");
     } else if (data.type === "ENT") {
       if (
         data.status === "pending_receipt" &&
@@ -221,7 +260,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
             !data.lines.some((line) => quantity(line.accepted_quantity).gt(0)))
         : data.type === "COM"
           ? allowed("com.approve") &&
-            !data.lines.some((line) => quantity(line.purchased_quantity).gt(0))
+            !data.lines.some((line) => quantity(line.purchased_quantity).gt(0)) && !data.receipts.length && !data.purchaseProgress?.expectationClosed
           : data.status !== "approved" && !data.payload.balanceContext && allowed("access.manage"))
     )
       actions.push("cancel");
@@ -247,6 +286,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
       {loading ? <Notice>Consultando documento persistido…</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
+      {purchaseConflict && data?.type === "COM" ? <section className="ui-card space-y-3"><Notice error>A COM mudou desde o resumo que você revisou. Seus campos permanecem preservados; consulte a versão atual antes de preparar outra confirmação.</Notice>{comparison ? <><PurchaseExpectationComparison original={data} current={comparison} /><button type="button" className={primaryClass} disabled={busy || !comparison.purchaseProgress} onClick={() => { decisionFocusRef.current = true; setData(comparison); setComparison(null); setPurchaseConflict(false); setReview(null); setMessage("Versão atual carregada. Confira os valores preservados e prepare uma nova revisão. O encerramento exige nova concordância com o resumo."); }}>Usar versão atual e revisar novamente</button></> : <button type="button" className={buttonClass} disabled={busy} onClick={() => void comparePurchaseVersion()}>Consultar versão atual da COM</button>}</section> : null}
       {uncertain ? (
         <Notice>
           Esta tentativa está preservada.{" "}
@@ -261,7 +301,8 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
       ) : null}
       {data ? (
         <>
-          <DocumentHeader id={data.id} type={data.type} code={data.code ?? "Rascunho"} status={data.status} protocol={data.protocol} version={data.version} createdAt={data.created_at} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado no documento")}>
+          <DocumentHeader observedRef={headerRef} id={data.id} type={data.type} typeLabel={data.type === "COM" ? data.payload.origin === "donation" ? "Doação de insumos" : data.payload.origin === "purchase" ? "Compra de insumos" : "Compra ou doação de insumos" : undefined} code={data.code ?? "Rascunho"} status={data.type === "COM" ? data.purchaseProgress?.state ?? data.status : data.status} protocol={data.protocol} version={data.version} createdAt={data.created_at} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado no documento")}>
+            {data.type === "COM" ? <p className="mt-3 text-sm">Origem: {data.payload.origin === "donation" ? "Doação" : data.payload.origin === "purchase" ? "Compra" : "Não informada no registro"}</p> : null}
             {data.type === "ENT" ? (
               <div className="mt-4 space-y-2">
                 <p className="font-semibold">
@@ -294,6 +335,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
               </Link>
             ) : null}
           </DocumentHeader>
+          {data.type === "COM" ? <PurchaseDetails data={data} /> : null}
           {data.type==="BAL"&&data.payload.balanceContext?<section className="ui-card"><h2>Plantão e contagem física</h2><strong>{data.payload.balanceContext.professionalName} · {data.payload.balanceContext.shiftType}</strong><p>{formatBrazilDate(data.payload.balanceContext.startsAt)} → {formatBrazilDate(data.payload.balanceContext.endsAt)}</p><p>Contagem atual: {formatBrazilDate(data.payload.balanceContext.countedAt)}</p><p>Semanas vinculadas: {data.payload.balanceContext.weeks.map(week=>week.split("-").reverse().join("/")).join(", ")}</p><p className="hca-muted">Semanas anteriores são regularizadas pela contagem atual, preservando seus prazos e atrasos históricos.</p>{data.status==="draft"?<Notice>Rascunho: a obrigação ainda não foi concluída.</Notice>:null}</section>:null}
           {activeContext &&
           data.status === "draft" &&
@@ -337,19 +379,20 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
                       setReview(null);
                     }}
                   >
-                    {actionLabels[item]}
+                    {data.type === "COM" && item === "receive" ? "Informar nova chegada" : actionLabels[item]}
                   </button>
                 ))}
               </div>
               {action ? (
                 <CommandEditor
-                  key={data.version + action}
+                  key={data.id + action}
                   action={action}
                   data={data}
                   people={people.filter(
                     (person) => person.id !== data.created_by,
                   )}
                   context={context}
+                  formRef={commandFormRef}
                   onCancel={() => setAction(null)}
                   onReview={(command, body, summary) =>
                     setReview({
@@ -372,6 +415,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
                   line={line}
                   type={data.type}
                   status={data.status}
+                  purchaseLine={data.purchaseProgress?.lines.find(item => item.lineId ===line.id)}
                 />
               ))}{" "}
             </div>
@@ -403,7 +447,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
               {data.events.map((event) => (
                 <li key={event.id} className="text-sm">
                   <strong>
-                    v{event.version} · {documentEventLabel(event.action)}
+                    v{event.version} · {documentEventLabel(event.action, data.type === "COM" ? data.payload.origin : undefined)}
                   </strong>
                   <p className="text-xs text-(--muted)">
                     {formatBrazilDate(event.createdAt)} ·{" "}
@@ -426,11 +470,14 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
       ) : null}
       <Dialog
         open={Boolean(review)}
-        title="Revisar operação definitiva"
+        title={review?.action === "close_expectation" ? "Revisar encerramento da expectativa" : "Revisar operação definitiva"}
+        closeDisabled={busy || uncertain}
         onClose={() => {
           if (!busy && !uncertain) setReview(null);
         }}
       >
+        {error ? <Notice error>{error}</Notice> : null}
+        {uncertain ? <Notice>O resultado ainda não foi confirmado. Esta tentativa permanece preservada; recupere o resultado antes de editar ou iniciar outra operação.</Notice> : null}
         <p className="whitespace-pre-wrap text-sm leading-6">
           {review?.summary}
         </p>
@@ -443,7 +490,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
             disabled={busy || uncertain}
             onClick={() => setReview(null)}
           >
-            Voltar à edição
+            {review?.action === "close_expectation" ? "Manter restante" : "Voltar à edição"}
           </button>
           <button
             className={primaryClass}
@@ -454,7 +501,7 @@ export function SupplyDocumentContent({ id, context }: { id: string; context: Wo
               ? "Confirmando…"
               : uncertain
                 ? "Recuperar tentativa"
-                : "Confirmar operação"}
+                : review?.action === "close_expectation" ? "Confirmar encerramento da expectativa" : "Confirmar operação"}
           </button>
         </div>
       </Dialog>
@@ -469,6 +516,7 @@ export const actionLabels: Record<DocumentAction, string> = {
   divergence: "Informar divergência",
   validate_receipt: "Validar recebimento",
   reject_receipt: "Rejeitar recebimento",
+  close_expectation: "Encerrar expectativa restante",
   reassign: "Alterar destinatário",
   resolve: "Conciliar divergência",
   approve_family: "Revisão da família",

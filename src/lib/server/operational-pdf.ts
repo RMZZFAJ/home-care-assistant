@@ -3,7 +3,8 @@ import path from "node:path";
 import { PDFDocument, rgb, degrees, type PDFFont } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import QRCode from "qrcode";
-import { documentStatuses, type DocumentType } from "@/types/documents";
+import { documentStatuses, type DocumentType, type PurchaseProgress, type PurchaseReceipt } from "@/types/documents";
+import { receiptStates } from "@/lib/documents/purchase";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -27,6 +28,8 @@ export type DocumentSnapshot = {
   createdAt?: string;
   materialIdentity?: string;
   materialIdentitySource?: string;
+  purchaseProgress?: PurchaseProgress;
+  purchaseReceipts?: PurchaseReceipt[];
   actors?: { issuer?: Person; recipient?: Person; patient?: Person };
   lines: Record<string, unknown>[];
   payload: Record<string, unknown>;
@@ -284,13 +287,14 @@ export async function renderDocumentPdf(
   }
   const title = {
     REQ: "REQUISIÇÃO DE MATERIAIS",
-    COM: "COMPRA DE INSUMOS DA FAMÍLIA",
+    COM: snapshot.payload.origin === "donation" ? "DOAÇÃO DE INSUMOS À FAMÍLIA" : snapshot.payload.origin === "purchase" ? "COMPRA DE INSUMOS DA FAMÍLIA" : "COMPRA OU DOAÇÃO DE INSUMOS",
     ENT: "COMPROVANTE DE ENTREGA DE MATERIAIS",
     BAL: "BALANÇO DO ESTOQUE DA EQUIPE",
   }[snapshot.type];
   text(title, snapshot.type === "ENT" ? 17 : 19, true);
   y -= 6;
   const familyAware = snapshot.sciencePolicy?.familyAware ?? Boolean(snapshot.sciencePolicy?.science_satisfied_at);
+  const purchaseOrigin = snapshot.type === "COM" && (snapshot.payload.origin === "purchase" || snapshot.payload.origin === "donation") ? snapshot.payload.origin : undefined;
   const statusText = snapshot.isHistorical
     ? "Registro histórico · ciência original não comprovada"
     : snapshot.type === "REQ" && snapshot.status !== "cancelled"
@@ -301,7 +305,7 @@ export async function renderDocumentPdf(
           : familyAware
             ? "Aguardando atendimento"
             : "Ciência e atendimento pendentes"
-      : (documentStatuses[snapshot.status] ?? snapshot.status);
+      : (documentStatuses[snapshot.type === "COM" ? snapshot.purchaseProgress?.state ?? snapshot.status : snapshot.status] ?? snapshot.status);
   text(
     `${snapshot.code} · ${formatBrazilDate(snapshot.createdAt ?? null)} · ${statusText}`,
     9,
@@ -483,7 +487,7 @@ export async function renderDocumentPdf(
       : snapshot.type === "ENT"
         ? "A expedição não comprova recebimento. Apenas quantidades efetivamente aceitas entram no saldo confirmado do destino; diferenças permanecem registradas até resolução formal."
         : snapshot.type === "COM"
-          ? "Aquisição e recebimento abastecem o estoque familiar após validação. Doações não exigem comprovante de pagamento. Somente ENT recebida pode atender a equipe."
+          ? "Somente uma parcela de chegada validada credita o estoque familiar. Aquisição e dispensa de expectativa não movimentam estoque. Doações não exigem comprovante de pagamento. Somente ENT recebida pode atender a equipe."
           : "Contagem física exclusiva da equipe. Ajustes aplicados ao ledger dependem da política e das aprovações registradas.",
     8,
   );
@@ -569,15 +573,38 @@ export async function renderDocumentPdf(
   } else if (snapshot.type === "COM") {
     section("Aquisição e validação");
     table(
-      ["MATERIAL", "APROVADO", "ADQUIRIDO", "VALIDADO"],
-      [0.46, 0.18, 0.18, 0.18],
+      snapshot.purchaseProgress ? ["MATERIAL", "PREVISTO", "APROVADO", "ADQUIRIDO", "VALIDADO", "DISPENSADO"] : ["MATERIAL", "APROVADO", "ADQUIRIDO", "VALIDADO"],
+      snapshot.purchaseProgress ? [0.35, 0.13, 0.13, 0.13, 0.13, 0.13] : [0.46, 0.18, 0.18, 0.18],
       snapshot.lines.map((item) => [
         name(item),
+        ...(snapshot.purchaseProgress ? [formatQuantity(String(item.quantity ?? 0))] : []),
         formatQuantity(String(item.approved_quantity ?? 0)),
         formatQuantity(String(item.purchased_quantity ?? 0)),
         formatQuantity(String(item.accepted_quantity ?? 0)),
+        ...(snapshot.purchaseProgress ? [formatQuantity(String(item.waived_quantity ?? 0))] : []),
       ]),
     );
+    if (snapshot.purchaseProgress) {
+      const progress = snapshot.purchaseProgress;
+      table(["MATERIAL", "EM CONFERÊNCIA", "SEM CHEGADA VÁLIDA", "POR ADQUIRIR"], [0.4, 0.2, 0.2, 0.2], progress.lines.map(line => [line.name, formatQuantity(line.pendingValidationQuantity, line.unit), formatQuantity(line.unarrivedQuantity, line.unit), formatQuantity(line.remainingExpectation, line.unit)]));
+      if (progress.closure) {
+        ensure(80); section("Encerramento da expectativa");
+        text(`${progress.closure.actorName ?? "Nome não preservado"} · ${formatBrazilDate(progress.closure.recordedAt)}`, 9);
+        text("Motivo: " + progress.closure.reason, 9);
+        text(progress.physicalPending ? "Expectativa não adquirida encerrada. Parcelas em conferência ou aquisição sem chegada válida continuam pendentes. Não é conclusão física." : "Expectativa encerrada com quantidade inferior. A parte dispensada não foi recebida e não gerou entrada ou baixa de estoque.", 9);
+      }
+    }
+    for (const [index, receipt] of (snapshot.purchaseReceipts ?? []).entries()) {
+      ensure(100); section(`Parcela ${index + 1} · ${receiptStates[receipt.state] ?? receipt.state}`);
+      text(`Informada por ${receipt.submitted_name ?? "Autor histórico não preservado"} · ${formatBrazilDate(receipt.created_at)}`, 9);
+      text("Identificador da parcela: " + receipt.id, 8);
+      table(["MATERIAL", "DECLARADO NESTA PARCELA", "UNIDADE"], [0.5, 0.3, 0.2], receipt.lines.map(item => {
+        const line = snapshot.lines.find(line => line.id === item.lineId);
+        return [line ? name(line) : "Material identificado na parcela", formatQuantity(item.quantity), String(line?.unit_snapshot ?? "Não preservada")];
+      }));
+      if (receipt.validated_at) text(`${receipt.state === "rejected" ? "Rejeitada" : "Validada"} por ${receipt.validated_name ?? "Nome histórico não preservado"} · ${formatBrazilDate(receipt.validated_at)}`, 9);
+      if (receipt.reason) text("Motivo: " + receipt.reason, 9);
+    }
   } else {
     section("Referência e reconciliação");
     table(
@@ -602,9 +629,10 @@ export async function renderDocumentPdf(
     (snapshot.history ?? []).map((event) => [
       formatBrazilDate(event.createdAt),
       event.actorName || "Sistema",
-      `${documentEventLabel(event.action)} · v${event.version}`,
+      `${documentEventLabel(event.action, purchaseOrigin)} · v${event.version}`,
     ]),
   );
+  if (snapshot.type === "COM" && snapshot.purchaseProgress) ensure(300);
   section("Identificação e integridade");
   fields([
     ["Documento", snapshot.code],

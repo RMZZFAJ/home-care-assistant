@@ -25,6 +25,10 @@ export function databaseError(
   const message = error?.message ?? "";
   if (/historical requisition is read only/i.test(message))
     throw new ApiError("VALIDATION_ERROR", "Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.", 400);
+  if (/no purchase expectation remaining/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Não existe expectativa não adquirida elegível para encerrar nesta versão. Materiais já adquiridos continuam sujeitos à chegada e conferência.", 400);
+  if (/purchase has acquisition or receipt facts/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Esta ficha já tem aquisição, parcelas ou encerramento registrados. Preserve esses fatos; confira as parcelas e encerre somente a expectativa ainda não adquirida.", 400);
   if (/stale preference version/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "Sua preferência mudou em outra sessão. Recarregue o estado antes de confirmar uma nova alteração.", 409);
   if (/science preference or authority changed/i.test(message))

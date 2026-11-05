@@ -92,7 +92,7 @@ async function prepare(page: Page, count = 1) {
 async function next(page: Page) {
   await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
 }
-async function confirm(page: Page) {
+async function confirm(page: Page, expectedMessage = "Operação confirmada e registrada na ficha.") {
   await page
     .getByRole("button", { name: "Revisar operação", exact: true })
     .click();
@@ -110,7 +110,7 @@ async function confirm(page: Page) {
   expect(response.ok(), await response.text()).toBeTruthy();
   await expect(dialog).not.toBeVisible();
   await expect(
-    page.getByText("Operação confirmada e registrada na ficha.", {
+    page.getByText(expectedMessage, {
       exact: false,
     }),
   ).toBeVisible();
@@ -217,18 +217,20 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await page
     .getByRole("button", { name: "Aprovar itens", exact: true })
     .click();
-  await confirm(page);
+  await confirm(page, "Decisão de aprovação registrada.");
   await logout(page);
   await login(page, "family");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
   await page
     .getByRole("button", { name: "Registrar aquisição", exact: true })
     .click();
-  await confirm(page);
+  await page.getByLabel(product.name + " · unidade", { exact: true }).fill("10");
+  await confirm(page, "Aquisição registrada.");
   await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
+    .getByRole("button", { name: "Informar nova chegada", exact: true })
     .click();
-  await confirm(page);
+  await page.getByLabel(product.name + " · unidade", { exact: true }).fill("10");
+  await confirm(page, "Chegada registrada e aguardando conferência.");
   let stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
@@ -239,7 +241,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await page
     .getByRole("button", { name: "Validar recebimento", exact: true })
     .click();
-  await confirm(page);
+  await confirm(page, "Parcela validada.");
   stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();

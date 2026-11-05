@@ -189,7 +189,8 @@ produtos ativos da equipe e sua referência. Campos financeiros não são
 obrigatórios e não existe ficha de abastecimento externo.
 
 Comandos incluem approve, purchase, receive, validate_receipt, reject_receipt,
-reassign, resolve, cancel e consent_cancel, conforme tipo e estado.
+close_expectation, reassign, resolve, cancel e consent_cancel, conforme tipo
+e estado.
 ENT receive exige divergences, mesmo vazio. Linhas não selecionadas são
 integralmente aceitas; acceptedQuantity positiva parcial credita o destino.
 Resolução registra received, returned ou missing com quantidade e motivo.
@@ -198,6 +199,46 @@ Atendimento da REQ deriva exclusivamente de aceite positivo de ENT vinculada.
 Não é um estado administrativo nem a soma de quantidades requisitadas.
 fullyCheckedLines da ENT não inclui linhas parcialmente aceitas, mesmo
 quando sua diferença já foi conciliada.
+
+## COM — parcelas e encerramento da expectativa
+
+receive declara uma nova chegada, com campos inicialmente vazios. A decisão
+validate_receipt/reject_receipt recebe somente receiptId e, na rejeição,
+motivo obrigatório; quantidades são leitura da parcela original. A resposta
+contém estado, autores/instantes preservados e purchaseProgress por linha.
+submission_key vincula a chegada ao evento sem alterar sua intenção canônica.
+Eventos novos guardam receiptId, purchaseReceipt e purchaseReceipts no snapshot.
+Não se presume autoria histórica quando o nome não foi preservado.
+
+close_expectation exige motivo, confirmed=true, versão atual e capacidade
+com.close_expectation. O padrão é administrador local; delegação familiar
+explícita usa a política de capacidades do próprio paciente. O servidor calcula
+somente aprovado menos adquirido e dispensado; o cliente não informa quantidade
+a dispensar. A operação não escreve ledger. Não se dispensa material adquirido,
+nem se apaga compra/parcela por cancelamento integral.
+
+Para 10 aprovados, 2 adquiridos e 2 validados, a decisão conserva 10→2+8
+dispensados e entrada real de 2. Se os 2 ainda aguardam conferência, o estado
+é closed_pending_validation; rejeição conserva o relato e deixa aquisição
+sem chegada válida como closed_pending_arrival. Só após resolver as parcelas
+físicas há closed_below_quantity. approved_quantity não é reescrito para 2.
+O estado operacional received corresponde à expectativa líquida resolvida;
+purchaseProgress conserva a classificação específica e todas as dimensões.
+
+Aprovação/validação imediatas por administrador exigem também com.approve e
+com.validate efetivos, respectivamente. Negação explícita conserva a nova
+emissão em pending_approval ou a parcela em pending; papel sozinho não concede
+o ato. Submeter draft recalcula a aprovação vigente, sem reaproveitar valor
+provisório como decisão oficial. Validação reconsulta autoridade após lock e
+antes de retornar. Retry recupera a mesma parcela/evento, sem novo crédito.
+
+Conflito de versão conserva edição e oferece consulta/comparação explícita
+antes de usar o novo resumo. O motivo permanece; a concordância do encerramento
+volta desmarcada. Resposta incerta conserva intenção e bloqueia fechamento/
+edição do modal até recuperar; a explicação aparece dentro do diálogo.
+Mensagens distinguem aquisição, chegada pendente, validação, rejeição e
+dispensa da expectativa. Persistência entre navegações/aparelhos pertence ao
+contrato D3 e não foi comprovada por esse estado mantido na mesma tela.
 
 Movimento familiar recebe productId, quantity positiva, action inbound,
 outbound, correction_in ou correction_out, reason e idempotencyKey.

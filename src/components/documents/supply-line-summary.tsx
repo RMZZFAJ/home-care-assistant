@@ -1,14 +1,16 @@
-import type { SupplyLine, DocumentType } from "@/types/documents";
+import type { SupplyLine, DocumentType, PurchaseProgressLine } from "@/types/documents";
 import { formatQuantity, quantity } from "@/lib/quantity";
 
 export function SupplyLineSummary({
   line,
   type,
   status,
+  purchaseLine,
 }: {
   line: SupplyLine;
   type: DocumentType;
   status: string;
+  purchaseLine?: PurchaseProgressLine;
 }) {
   return (
     <article className="rounded-xl border border-(--line) p-4">
@@ -36,6 +38,7 @@ export function SupplyLineSummary({
               <dt>Adquirido</dt>
               <dd>{formatQuantity(line.purchased_quantity)}</dd>
             </div>
+            {purchaseLine ? <><div><dt>Em conferência</dt><dd>{formatQuantity(purchaseLine.pendingValidationQuantity)}</dd></div><div><dt>Aquisição sem chegada válida</dt><dd>{formatQuantity(purchaseLine.unarrivedQuantity)}</dd></div><div><dt>Não será adquirido</dt><dd>{formatQuantity(purchaseLine.waivedQuantity)}</dd></div><div><dt>Por adquirir</dt><dd>{formatQuantity(purchaseLine.remainingExpectation)}</dd></div></> : null}
           </>
         ) : type === "ENT" ? (
           <>
@@ -72,7 +75,7 @@ export function SupplyLineSummary({
           </div>
         )}
         <div>
-          <dt>{type === "ENT" ? "Conciliado" : "Recebido / validado"}</dt>
+          <dt>{type === "ENT" ? "Conciliado" : type === "COM" ? "Validado" : "Recebido / validado"}</dt>
           <dd>
             {formatQuantity(
               type === "ENT"
