@@ -13,7 +13,7 @@ export function RecordDrawer({ title, children, onClose, busy = false, restoreFo
     if (restoreFocusTo?.isConnected) requestAnimationFrame(() => restoreFocusTo.focus());
   }, [restoreFocusTo]);
   const requestClose = () => { if (!busy && !preventClose) { if (dirty) setDiscard(true); else onClose(); } };
-  return <OverlayDrawer open position="end" size="medium" className="hca-record-drawer" onOpenChange={(_, data) => { if (!data.open) requestClose(); }}>
+  return <OverlayDrawer open aria-label={title} position="end" size="medium" className="hca-record-drawer" onOpenChange={(_, data) => { if (!data.open) requestClose(); }}>
     <DrawerHeader><DrawerHeaderTitle action={<Button appearance="subtle" icon={<Icon name="close" />} aria-label="Fechar edição" disabled={busy || preventClose} onClick={requestClose} />}>{title}</DrawerHeaderTitle></DrawerHeader>
     <DrawerBody>
       {discard ? <MessageBar layout="multiline" intent="warning" role="alert"><MessageBarBody>Há alterações ainda não salvas.<div className="hca-toolbar"><Button onClick={() => setDiscard(false)}>Continuar editando</Button><Button onClick={onClose}>Descartar alterações</Button></div></MessageBarBody></MessageBar> : null}

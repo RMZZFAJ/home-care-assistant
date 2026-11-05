@@ -131,7 +131,11 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 - **Rota:** /api/consumption
 
-  **Contrato:** Relatos e confirmação autorizada
+  **Contrato:** Relatos, complementos e decisões versionados; páginas e filtros
+
+- **Rota:** /api/consumption/[id]
+
+  **Contrato:** Original, complementos, decisão e movimentos no escopo autorizado
 
 - **Rota:** /api/dashboard
 
@@ -199,6 +203,36 @@ Atendimento da REQ deriva exclusivamente de aceite positivo de ENT vinculada.
 Não é um estado administrativo nem a soma de quantidades requisitadas.
 fullyCheckedLines da ENT não inclui linhas parcialmente aceitas, mesmo
 quando sua diferença já foi conciliada.
+
+## Relatos e consumo
+
+GET /api/consumption usa páginas de 20 por created_at/id, cursor beforeAt/
+beforeId e filtros q (texto original), kind, status, from e to. Datas seguem
+America/Sao_Paulo. A referência abre GET /api/consumption/[id] mesmo fora da
+página recente; filtros não comandam movimentos.
+
+POST action=report conserva texto e linhas originais, autor e nome capturado
+no novo fato. Texto livre sem linhas é um relato válido, sem desconto.
+action=supplement exige id, text, lines, expectedVersion e idempotencyKey;
+cria complemento com autoria própria e nova versão, sem substituir original
+nem movimentar estoque. As linhas do último complemento formam a estrutura
+proposta completa. O relator vigente e outro responsável autorizado podem
+esclarecer no próprio escopo; a equipe não assume custódia familiar.
+
+action=confirm exige id, accept booleano explícito, expectedVersion e
+idempotencyKey. Rejeição exige reason de 3–1000 caracteres; confirmação não
+recebe texto ou quantidade novos. Consumo exige estrutura suficiente, unidade,
+precisão, saldo e autoridade vigentes. Falta e rejeição não debitam. O banco
+preserva snapshot da versão decidida e referencia cada movimento ao relato.
+Mesmo resultado recupera a primeira decisão; resultado oposto ou estrutura
+obsoleta retorna conflito. NULL não representa rejeição.
+
+A RPC antiga de dois argumentos confirma/recupera somente v1 sem complemento;
+não pode decidir uma estrutura nova sem versão explícita. Nova rejeição exige
+motivo na RPC versionada. Replays não fabricam motivos/autores históricos.
+Leituras, carregamento, erros e catálogo são independentes na tela. Conteúdo,
+versão e chave ficam congelados durante escrita incerta; atualização concorrente
+não troca a referência do formulário ou da revisão silenciosamente.
 
 ## COM — parcelas e encerramento da expectativa
 

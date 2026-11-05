@@ -529,3 +529,69 @@ reescrevem exemplares anteriores. Paginação geral/assinatura seguem D4.
 D-A integral permanece aberta; ENT, BAL, estoque/custódia, consumo, catálogo,
 recorrências e demais critérios D1/D2 ainda exigem conclusão. Sem GO/merge,
 reset remoto, alteração Auth remota, assinatura ou comunicação externa real.
+
+## D2.4 — relatos, complemento e decisão de consumo
+
+COM publicado em e8669818dd401d4c377349dda88d8e201d9e2e1e; Draft PR 7
+atualizado e preservado. A alteração independente de .vscode fica fora do
+incremento. Por orientação do responsável, validações passam a ser concentradas
+nos defeitos/contratos alterados; suítes gerais já programadas são aproveitadas
+na CI. Repetição local ampla exige mudança relevante, falha ou hipótese nova.
+
+Antes da migration nova, duas regressões Auth reproduziram NULL aceito como
+rejeição e oposição respondendo sucesso após confirmação. Migration
+20261105200752 acrescenta original protegido, complementos/decisões append-only,
+autoria/instante próprios, versão e intenção. Não altera relato/linha históricos
+nem preenche nomes antigos com o diretório atual. Texto livre pode receber
+estrutura por complemento próprio ou de outro autorizado, sem débito.
+Confirmação decide a versão exata, falta/rejeição não descontam e consumo
+confirmado tem movimento causal único. RPC legada não decide complemento sem
+versão, nem inventa justificativa para uma rejeição nova.
+
+Primeira execução revelou nome de coluna incorreto no novo código; corrigido
+para profiles.full_name antes de aceitar o teste. Conflitos de domínio usam
+P0001 e mensagens tipadas; tentativa preliminar com 40001 terminou em timeout
+do upstream e não foi tomada como decisão válida. O oráculo de saldo também
+foi corrigido: a view exige contexto Auth, e ausência não pode virar zero por
+Number de string vazia. Consulta autenticada single agora exige linha/valor.
+
+Dez das onze integrações dirigidas passaram na rodada completa; o único caso
+afetado pelo oráculo passou depois da correção, sem repetir os dez demais.
+Incluem complemento por outra identidade, relator profissional, ausência de
+estrutura, falta, rejeição motivada, oposição concorrente, repetição, versão
+antiga, precisão, RLS/grants e revogação em esperas observadas de paciente/linha.
+Três testes da fronteira API passaram; tipos e lint dirigido sem avisos.
+
+Interface ganhou estados de consulta/erro/retry independentes, filtros/páginas,
+referência antiga, complemento editável e revisão/decisão em leitura. Resposta
+incerta congela intenção e impede fechar; conflito exige consulta e revisão
+nova. Os quatro casos de browser passaram em execuções dirigidas. A fixture
+inicial usava o nome de estado ENT errado; o contrato confirmado foi mantido
+com asserts adicionais de quantidade e conferência. Seletores de label foram
+ajustados para o papel/nome acessível real e o combobox é aberto por teclado.
+Nenhuma asserção de quantidade/movimento foi removida.
+
+A tarefa principal também expôs foco perdido ao desmontar a edição na revisão.
+Agora o foco vai ao título do resumo e volta à edição ao retornar; rejeição e
+adoção de nova versão seguem o mesmo cuidado. Painéis possuem nome acessível.
+A regressão exige título focalizado e Tab até o botão de revisão; passou com
+axe/overflow a 320/390/768/1440. Respostas perdidas recuperam relato e decisão
+sem duplicar; outra sessão observou o resultado sem recarregar manualmente.
+Capturas locais de revisão/resultado a 320 px foram inspecionadas. Materiais
+novos mostram nome/unidade; identificador técnico fica só quando o nome não
+foi preservado. Movimento mostra o material e oferece sua referência sob
+consulta. O caso adicional de decisão oposta passou: outra identidade decide
+primeiro, a oposição conflita e a tela abre o resultado original, sem novo
+débito nem troca do decisor. Fontes foram formatados com o Prettier já instalado
+no editor, sem dependência nova e sem repetir suítes por formatação.
+
+Advisor de segurança local terminou com exit 0, sem ERROR. O único WARN é a
+extensão unaccent no schema public, já pertencente à base anterior. RLS,
+grants e search_path dos objetos novos foram conferidos; não se move uma
+extensão histórica como efeito lateral deste incremento.
+
+Replay limpo/legado completo e suítes gerais deste novo SHA ficam para a CI;
+não foram repetidos localmente nem presumidos aprovados. D-A permanece aberta.
+
+Consulta pontual de e866981: CI 42100271575 concluída com success e status
+Vercel success. Isso valida o incremento COM publicado, não o novo consumo.

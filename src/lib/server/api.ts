@@ -27,6 +27,12 @@ export function databaseError(
     throw new ApiError("VALIDATION_ERROR", "Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.", 400);
   if (/no purchase expectation remaining/i.test(message))
     throw new ApiError("VALIDATION_ERROR", "Não existe expectativa não adquirida elegível para encerrar nesta versão. Materiais já adquiridos continuam sujeitos à chegada e conferência.", 400);
+  if (/consumption decision conflict/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Outro responsável já decidiu esta versão. Consulte o relato e a decisão registrada antes de continuar.", 409);
+  if (/stale consumption report/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "O relato recebeu um complemento. Consulte a versão atual e revise seu conteúdo antes de decidir.", 409);
+  if (/structured consumption supplement required/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Este consumo precisa de material e quantidade. Registre um complemento antes de confirmar o desconto.", 400);
   if (/purchase has acquisition or receipt facts/i.test(message))
     throw new ApiError("VALIDATION_ERROR", "Esta ficha já tem aquisição, parcelas ou encerramento registrados. Preserve esses fatos; confira as parcelas e encerre somente a expectativa ainda não adquirida.", 400);
   if (/stale preference version/i.test(message))

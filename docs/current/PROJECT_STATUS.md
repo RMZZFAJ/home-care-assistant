@@ -45,6 +45,16 @@ confrontados com snapshots/ledger/hashes e inspecionados em todas as páginas.
 O ajuste visual final de cápsula/cabeçalho passou em WebKit e Chromium,
 incluindo uma asserção que reprovou antes da correção; checks e build finais
 passaram novamente. Evidência local não conclui homologação humana/física.
+Relatos de consumo agora preservam original e complementos por versão, com
+autoria própria e decisão explícita. NULL/oposição não viram sucesso, falta
+não debita e confirmação recupera um único movimento por material. Consulta
+por referência e páginas mantém relatos antigos alcançáveis. Onze integrações
+dirigidas Auth, três testes API e quatro tarefas Chromium passaram em rodadas
+proporcionais, incluindo resposta perdida, atualização de outra sessão e
+revogação durante esperas reais. Tipos, lint dirigido e o build do runner
+passaram. Replay completo e suítes gerais do novo SHA serão executados pela
+CI programada; não foram duplicados localmente nem declarados aprovados.
+
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não
 atesta os incrementos posteriores; CI e preview não são validação remota de

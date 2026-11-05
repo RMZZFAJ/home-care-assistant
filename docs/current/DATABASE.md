@@ -217,6 +217,23 @@ telefone confirmado no Auth. whatsapp_challenges associa identidade, telefone,
 versão, prazo e uso único. flow_submissions e consumption_reports preservam
 sugestões pendentes até revisão e confirmação autorizada.
 
+consumption_reports conserva texto/linhas/autor/instante originais. Novos fatos
+capturam reported_name e submitted_intent; campos históricos não são preenchidos
+com nomes atuais. version aponta para a estrutura vigente. Complementos ficam
+em consumption_report_revisions; decisões em consumption_report_decisions, com
+versão exata, motivo quando rejeitada e snapshot. Ambos são append-only, com
+SELECT por RLS do relato pai e sem escrita direta por clientes. Original tem
+trigger de preservação. Mudança de versão/estado invalida o workspace existente.
+
+RPCs usam lock por paciente e linha, revalidam sessão/contexto/capacidade após
+espera e ao finalizar. Decisão autoriza por custódia, exige booleano não NULL
+e credita nenhuma unidade: somente consumo confirmado debita pelo ledger
+existente. Falta, complemento e rejeição não movimentam. Um relato tem uma
+decisão final; replay igual recupera e oposição conflita. Estrutura sem material/
+quantidade pede complemento. Inativo com saldo continua elegível na custódia;
+unidade e precisão são verificadas antes de confirmar. Correção posterior não
+edita relato/decisão/ledger originais e depende de compensação referenciada.
+
 workspace_revisions e broadcasts privados invalidam leituras autorizadas, sem
 enviar snapshots clínicos. Perfis usam profiles.id para alcançar a própria
 pessoa, consumidores relacionados e administração global autorizada. Proponente
