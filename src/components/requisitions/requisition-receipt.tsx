@@ -8,6 +8,7 @@ import { DocumentActions } from "@/components/documents/document-actions";
 import type { RequisitionReceipt } from "@/types/requisition";
 import { Summary } from "./requisition-steps";
 import { RequisitionOpening } from "./requisition-opening";
+import { RequisitionDisplay } from "./requisition-display";
 
 export type SavedReceipt = RequisitionReceipt & {
   id?: string;
@@ -19,8 +20,10 @@ export function Receipt({ receipt }: { receipt: SavedReceipt }) {
   return id ? <><p className="text-sm">Requisição registrada · {receipt.protocol}</p><RequisitionOpening id={id}><ReceiptContent receipt={receipt} /></RequisitionOpening></> : <ReceiptContent receipt={receipt} />;
 }
 function ReceiptContent({ receipt }: { receipt: SavedReceipt }) {
+  const id = receipt.requisitionId ?? receipt.id;
   return (
     <div className="p-3 sm:p-5">
+      {id ? <RequisitionDisplay key={id} id={id} /> : null}
       <section className="mx-auto max-w-3xl rounded-2xl border border-(--line) bg-white p-5 shadow-sm sm:p-10">
         <p className="text-sm font-bold uppercase tracking-wider text-emerald-700">
           Requisição registrada

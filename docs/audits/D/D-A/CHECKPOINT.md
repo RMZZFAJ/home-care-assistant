@@ -362,3 +362,48 @@ Push de d7cfa44 foi confirmado no ref remoto, mas a leitura da PR ainda exibia
 001158b; não apareceu CI para o novo SHA na consulta. A aprovação de 001158b
 não cobre estes fontes. Publicação/consulta final serão registradas por SHA.
 D-A permanece parcial, sem GO, merge, banco remoto ou início de D-B/D-C.
+
+Incremento acima publicado em 5fb888c. Draft PR 7 passou a refletir esse HEAD
+após atualizar a descrição. CI 42083091244 em execução na consulta seguinte;
+nenhum resultado aprovado foi presumido para esse SHA.
+
+## D2.2 — abertura observável independente
+
+Migration 20261105182500 cria requisition_openings append-only, com RLS de
+leitura por paciente e grants explícitos; somente RPC registra o próprio ator,
+nome preservado, material, versão de referência, chave e horário do servidor.
+Lock por pessoa/intenção seguido de nova validação Auth/contexto/req.read
+protege recuperação concorrente. Outra chave registra nova abertura; retry
+mantém o mesmo fato. Nenhum backfill, ciência, versão, snapshot, outbox ou
+movimento de estoque é produzido por esse registro.
+
+O aplicativo reporta somente após carregar/renderizar conteúdo em primeiro
+plano. Prévia, GET técnico/prefetch, corpo falho, download e ciência tácita
+não são abertura. Detalhe, comprovante e prévia vinculada usam o mesmo controle;
+a preparação COM/ENT que apenas consulta links não fabrica exibição da REQ.
+Falha do reporte oferece recuperar a mesma intenção, mantendo o conteúdo e
+a ciência já confirmada. Histórico lista 20 por página, atualiza e carrega
+anteriores com cursor instante/ID sem truncar precisão textual.
+
+Quatro integrações dirigidas aprovadas: leitura inerte, concorrência/retry,
+nova intenção, SCI independente, escrita direta recusada, RLS de outro
+paciente/global sem vínculo e revalidação de sessão/capacidade após lock
+observado. Quatro E2E Chromium aprovados: diálogo/cancelar, perda da resposta
+de ciência e de abertura, corpo falho, recuperação, nova abertura e 22 fatos
+paginados sem duplicação. Sinal document.visibilityState controlado verifica
+o ramo de primeiro plano; não é teste de aparelho físico nem atenção humana.
+
+Lint inicialmente pediu convenções React 19 para Context/use/provider;
+ajustadas sem suprimir regras. Tipos detectaram mensagem de asserção passada
+ao método incorreto no teste; corrigida antes de executar E2E. 128 unitários,
+lint, tipos e Markdown aprovados. Replay limpo/legado de 97 migrations e
+16 SQL/search_path passaram; 73 integrações completas, 15 E2E nos três
+projetos e build aprovados. Renderer não mudou neste incremento; a inspeção
+PDF de D2.1 permanece evidência desse renderer, sem promover homologação D4.
+
+Duas negativas finais dirigidas passaram após a suíte: identidade global sem
+vínculo local não registra SCI e ciência tácita conserva zero aberturas.
+Duas rodadas iOS dirigidas adicionais passaram para a inspeção visual de 320 px.
+A captura full-page conserva a barra fixa na posição de scroll da captura;
+a viewport real foi conferida separadamente, com summary focalizado, cartões
+legíveis e sem rolagem horizontal. Não equivale a aparelho físico/AT humano.

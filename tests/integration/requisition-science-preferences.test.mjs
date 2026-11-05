@@ -80,6 +80,7 @@ test("P02 tacit SCI uses the prior opt-in at official emission, system authorshi
     assert.equal(sql(`select actor_id is null from public.document_events where document_id=${sqlLiteral(second.id)} and action='req.science_satisfied';`), "t");
     const versions = JSON.parse(sql(`select jsonb_agg(action order by version) from public.document_events where document_id=${sqlLiteral(second.id)};`));
     assert.deepEqual(versions, ["req.issued", "req.science_satisfied"]);
+    assert.equal(sql(`select count(*) from public.requisition_openings where requisition_id=${sqlLiteral(second.id)};`), "0", "Tacit SCI is not an observable opening");
     assert.equal(sql(`select canonical_snapshot->>'action' from public.operational_documents where id=${sqlLiteral(second.id)};`), "req.science_satisfied", "The outer issuance must not overwrite the newer technical snapshot");
     const before = JSON.stringify(view.science);
     await prefer(family, "manual");

@@ -4,6 +4,7 @@ import { Dialog } from "@/components/ui/primitives";
 import { api, Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
+import { RequisitionDisplay } from "@/components/requisitions/requisition-display";
 import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 
@@ -58,6 +59,7 @@ function RelatedContent({ id, type }: { id: string; type: string }) {
   >[];
   return (
     <div className="space-y-4">
+      {type === "REQ" ? <RequisitionDisplay key={id} id={id} reference={data.progress as { version: number; materialIdentity: string }} /> : null}
       <p>
         {String(data.code ?? data.protocol)} ·{" "}
         {formatBrazilDate(String(data.created_at))}

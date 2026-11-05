@@ -71,6 +71,11 @@ documentais também exigem expectedVersion para detectar concorrência.
   **Contrato:** Prévia mínima autorizada, preferência pessoal e necessidade de
   diálogo; sem linhas ou ciência por consulta
 
+- **Rota:** /api/requisitions/:id/openings
+
+  **Contrato:** POST de exibição informada pelo aplicativo, independente de
+  ciência; GET autorizado com paginação por instante e ID, sem mutação
+
 - **Rota:** /api/profile/science
 
   **Contrato:** GET da preferência própria; POST versionado e idempotente,
@@ -167,7 +172,7 @@ RECEIPT_PENDING preserva o ID e a chave se a leitura posterior falhar.
 COM, ENT e BAL usam type, payload.lines, idempotencyKey e draft.
 Quantidades são exatas e limitadas à precisão da unidade. O parser compara o
 token numérico JSON com o valor decodificado antes da validação: arredondamento,
-underflow e inteiros inseguros são recusados. Strings decimais seguem a mesma
+underflow e valores não finitos são recusados. Strings decimais seguem a mesma
 validação exata no servidor e no banco. O campo de observação conserva texto
 e vírgula decimal durante edição/retomada. B4-001 permanece evidência histórica;
 a regressão atual reproduz o token 1.0000000000000001 que antes virava 1.
@@ -311,9 +316,22 @@ edição e exige consulta explícita. A alternativa manual permanece acessível.
 
 O diálogo usa referência material, não exige que a versão técnica continue
 igual depois de um evento. Confirmação salva seguida de falha do conteúdo é
-informada como tal; recuperar não duplica ciência. A trilha independente de
-aberturas observáveis ainda precisa ser implementada; prévia e ciência não
-constituem prova de abertura, atenção ou leitura integral.
+informada como tal; recuperar não duplica ciência.
+
+POST de openings recebe materialIdentity, referenceVersion e openingKey;
+identidade, nome e horário do registro vêm do servidor. O aplicativo só o
+chama junto ao conteúdo carregado e renderizado em primeiro plano. Prévia,
+prefetch/GET técnico, falha do corpo, ciência tácita e download não o chamam.
+Repetir a chave recupera a mesma abertura; nova abertura usa chave própria.
+Referência técnica anterior continua válida para o mesmo material.
+Falha do registro não transforma conteúdo exibido em ciência nem retira uma
+ciência confirmada; a recuperação conserva a intenção. A API revalida Auth,
+paciente e req.read após espera; o registro não concede autoridade.
+
+GET lista 20 registros por página, com beforeAt/beforeId recebidos no cursor;
+instantes conservam a precisão textual do servidor. A interface oferece
+histórico, atualização e páginas anteriores sem modificar o documento.
+O aplicativo informa exibição; isso não comprova atenção ou leitura humana.
 
 Importação preserva fatos conhecidos, identifica campos desconhecidos e
 exige revisão explícita. Protocolos físicos não geram fatos nem notificações

@@ -28,8 +28,12 @@ revogação durante o trigger tácito receberam contraprovas e correções.
 127 unitários e 30 E2E dos três projetos passaram localmente. Contratos,
 lint, Markdown, tipos e build aprovados.
 PDFs de observação e diálogo confrontados com banco/snapshot e inspecionados.
-A trilha independente de abertura observável ainda falta; P02 e o núcleo
-REQ/COM/ENT/BAL completos continuam em execução. Evidências por camada e
+A trilha independente de abertura informada pelo aplicativo foi acrescentada
+na migration seguinte, sem alterar ciência/versão/ledger. 97 migrations em
+instalação limpa/evolução legada, 73 integrações completas, 128 unitários e
+15 E2E nos três projetos passaram, além dos checks e build. A CI de `5fb888c`
+estava em execução na consulta; não foi promovida a aprovada.
+O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não
 atesta estes incrementos posteriores.
 

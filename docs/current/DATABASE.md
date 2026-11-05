@@ -167,8 +167,16 @@ escolhas não criam ciência retroativa. Flags antigas não viram consentimento.
 
 Compatibilidade ALL passa a ANY por evento técnico do sistema; eventos pessoais
 e snapshots anteriores permanecem intactos. Importações não inventam ciência
-ou data e novos vínculos operacionais a REQ histórica são recusados. A abertura
-observável independente ainda não tem trilha implementada neste incremento.
+ou data e novos vínculos operacionais a REQ histórica são recusados.
+
+requisition_openings conserva exibições informadas pelo aplicativo em tabela
+append-only separada. Identidade/nome/horário de registro são do servidor;
+material, versão de referência e chave da abertura permitem recuperar uma
+resposta perdida sem duplicação. RPC revalida Auth/contexto/req.read após
+lock por pessoa/chave; RLS usa a mesma autoridade de leitura e clientes não
+escrevem diretamente. Não há backfill de GET, ciência ou download. O índice
+documento/instante/ID sustenta paginação estável. Registrar/consultar abertura
+não altera versão, ciência, snapshot, ledger ou avisos e não comprova atenção.
 
 my_workspace retorna pacientes e capacidades em uma chamada autorizada.
 Browser metadata, IDs e seleção local não concedem acesso. RLS, grants

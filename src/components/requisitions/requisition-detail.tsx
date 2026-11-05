@@ -26,6 +26,7 @@ import {
 import { RelatedDocument } from "@/components/documents/related-document";
 import { Dialog } from "@/components/ui/primitives";
 import { ResolveExtraItem } from "./resolve-extra-item";
+import { RequisitionDisplay } from "./requisition-display";
 import {
   deliveryLabels,
   type DeliveryStatus,
@@ -363,6 +364,7 @@ export function RequisitionDocumentContent({
           </p>
         ) : null}
       </section>
+      <RequisitionDisplay key={id} id={id} reference={p} showHistory />
       <DocumentTimeline events={p.events} />
       {!data.is_historical &&
       !p.archivedAt &&

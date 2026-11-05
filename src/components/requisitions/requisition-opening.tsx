@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { createContext, use, useEffect, useState, type ReactNode } from "react";
 import { api, buttonClass, Notice, primaryClass } from "@/components/workspace";
 import { Dialog } from "@/components/ui/primitives";
 
 type Opening = { code: string; protocol: string; version: number; materialIdentity: string; requiresDialog: boolean };
+const OpeningReferenceContext = createContext<Opening | null>(null);
+export function useRequisitionOpeningReference() { return use(OpeningReferenceContext); }
 export function RequisitionOpening({ id, onCancel, withinDialog = false, children }: { id: string; onCancel?: () => void; withinDialog?: boolean; children: ReactNode }) {
   const [opening, setOpening] = useState<Opening | null>(null);
   const [error, setError] = useState("");
@@ -30,7 +32,7 @@ export function RequisitionOpening({ id, onCancel, withinDialog = false, childre
   }
   if (cancelled) return <div className="space-y-3"><Notice>Consulta cancelada. Voltar não registra nova ciência.</Notice><Link className={buttonClass} href="/historico">Voltar ao histórico</Link><button type="button" className={buttonClass} onClick={() => { setCancelled(false); setOpening(null); setAttempt(value => value + 1); }}>Abrir novamente</button></div>;
   if (!opening) return <div className="space-y-3"><Notice error={Boolean(error)}>{error || "Consultando referência e preferência de abertura…"}</Notice>{error ? <button type="button" className={buttonClass} onClick={() => setAttempt(value => value + 1)}>Tentar novamente</button> : null}</div>;
-  if (!opening.requiresDialog || confirmed) return <>{confirmed ? <Notice>Sua ciência foi registrada pela confirmação do diálogo. A consulta do conteúdo é a etapa seguinte; se falhar, tente abrir novamente.</Notice> : null}{children}</>;
+  if (!opening.requiresDialog || confirmed) return <OpeningReferenceContext value={opening}>{confirmed ? <Notice>Sua ciência foi registrada pela confirmação do diálogo. A consulta do conteúdo é a etapa seguinte; se falhar, tente abrir novamente.</Notice> : null}{children}</OpeningReferenceContext>;
   const content = <div className="space-y-4">
       <p>Requisição <strong>{opening.code ?? opening.protocol}</strong></p>
       <p>Sua preferência pede uma confirmação antes de abrir. Confirmar registra sua ciência pessoal do conteúdo emitido. Não declara leitura integral nem recebimento de materiais.</p>
