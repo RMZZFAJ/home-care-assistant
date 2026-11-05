@@ -249,8 +249,29 @@ vigentes, precisão e conciliação completa; somente a devolução real acresce
 movimento. Recusa e retirada não movem estoque. Locks e verificações finais
 de sessão/capacidade cobrem espera de paciente e FK tardia do movimento.
 Snapshots incluem a conciliação antes do hash canônico; histórico, aceite e
-débitos anteriores permanecem imutáveis. Regularização administrativa de
-desligados e transferência bilateral continuam incrementos distintos.
+débitos anteriores permanecem imutáveis. Transferência bilateral continua
+incremento distinto.
+
+delivery_regularizations preserva proposta/base/antes da ficha, proponente,
+conferente independente e responsabilidade futura. Uma proposta pendente por
+ENT; transição final guarda decisão própria e não permite reescrever o original.
+delivery_regularization_findings é append-only e amarra procedimento, documento
+e paciente por FK composta. Ambas possuem RLS ent.read, SELECT autenticado e
+sem DML de clientes. Helpers privados têm search_path vazio e execução revogada.
+
+Aprovação administrativa usa movimentos referenciados pelo procedimento e
+performer real; soma apenas fatos conhecidos em reconciled_quantity. Desconhecido
+fica em trânsito. Autoria/quantidades/instantes do aceite pessoal não mudam.
+Locks por paciente/documento serializam decisões; sessão e autoridades reais,
+elegibilidade do recebedor, unidade e responsável futuro são revalidados ao final.
+Recuperação confirmada antecede a exigência de nova escrita, mantendo leitura
+viva obrigatória. Caso obsoleto pode ser encerrado por autoridade familiar com
+seu próprio motivo; nenhum suporte toma o lugar de recebedor ou família.
+
+delivery_task_list conta/filtra tarefas autorizadas antes da paginação, incluindo
+pedidos de cancelamento e tarefas administrativas designadas. stock_history
+expõe reference_document_id de regularização somente com ent.read do paciente,
+permitindo chegar ao dossiê sem abrir acesso ao conteúdo por uma referência.
 
 P06 deriva sugestão das scheduled_shifts publicadas vigentes e pessoas
 vinculadas/ativas com ent.receive efetivo no destino. Múltiplas pessoas não

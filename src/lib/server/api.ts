@@ -23,6 +23,10 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/administrative regularization required/i.test(message))throw new ApiError("VALIDATION_ERROR","O recebedor está indisponível. Abra a regularização administrativa para registrar base, fatos conhecidos e conferência independente, preservando o recebimento anterior.",400);
+  if (/stale regularization|regularization decision conflict|regularization proposal not eligible/i.test(message))throw new ApiError("VERSION_CONFLICT","A entrega ou a proposta de regularização mudou. Consulte a versão e a decisão atuais antes de preparar outra confirmação.",409);
+  if (/unknown physical facts require an active follow-up owner/i.test(message))throw new ApiError("VALIDATION_ERROR","Indique uma pessoa ativa e elegível para encaminhar a apuração das quantidades ainda desconhecidas. Nenhuma quantidade desconhecida será baixada.",400);
+  if (/regularization exceeds pending transit/i.test(message))throw new ApiError("VALIDATION_ERROR","As quantidades apuradas excedem a pendência em trânsito. Confira somente a nova declaração física; os aceites anteriores permanecem preservados.",400);
   if (/purchase origin required/i.test(message))
     throw new ApiError("VALIDATION_ERROR", "Escolha compra ou doação antes de emitir esta ficha. A origem histórica não informada continua preservada.", 400);
   if (/stale delivery recipient reference/i.test(message))

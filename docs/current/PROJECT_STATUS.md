@@ -93,6 +93,23 @@ não creditou estoque. Fixtures de negativas antigas foram atualizadas para
 continuarem discriminando quantidade zero e permissão negada. CI geral do
 novo SHA permanece necessária; D-A continua em execução.
 
+P05 agora possui proposta administrativa, base da apuração, conferente
+independente e responsável futuro para quantidade desconhecida. Efeitos críticos
+só ocorrem na decisão própria do conferente; aceite pessoal, autoria e trânsito
+desconhecido permanecem preservados. A caixa de entregas usa tarefas executáveis
+da identidade, incluindo decisões de cancelamento e apuração designada, com
+contagem/filtro antes da página. Quatorze casos Auth e três testes API passaram
+em rodadas dirigidas; quatro tarefas Chromium e dois PDFs de fatos distintos
+passaram, com as seis páginas finais inspecionadas. Limites no checkpoint.
+Preview de
+desligamento, transferência bilateral e demais processos D2 continuam abertos.
+
+Consulta de d6db5f0/CI 42121891337: checks gerais e replay/integrações aprovados;
+WebKit aprovado, Chromium/móvel com 74 aprovados e uma falha comum de retomada
+antes de a consulta P06 concluir. O avanço passou a aguardar essa fonte, e só
+o percurso afetado foi revalidado localmente, com sucesso. Vercel success desse
+SHA não substitui a falha anterior nem valida o próximo commit.
+
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não
 atesta os incrementos posteriores; CI e preview não são validação remota de

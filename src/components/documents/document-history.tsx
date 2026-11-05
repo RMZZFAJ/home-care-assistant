@@ -49,6 +49,7 @@ export function DocumentRow({ row }: { row: DocumentSummary }) {
         <span className="block text-xs text-(--muted)">
           {documentLabels[row.type]} · {formatBrazilDate(row.created_at)}
         </span>
+        {row.task?<span className="mt-1 block text-sm font-semibold">{row.task.label}</span>:null}
       </span>
       <span className="grid justify-items-end gap-1">
         <StatusBadge status={row.status} />

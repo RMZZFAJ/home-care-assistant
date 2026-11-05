@@ -458,6 +458,7 @@ function PatientStock({
                   Abrir ficha
                 </Link>
               ) : null}
+              {movement.reference_type === "delivery_regularization" && movement.reference_document_id ? <Link className="mt-2 inline-block underline" href={"/fichas/" + movement.reference_document_id}>Abrir dossiê administrativo</Link> : null}
               <details className="mt-2">
                 <summary className="cursor-pointer text-xs">
                   Referência da movimentação

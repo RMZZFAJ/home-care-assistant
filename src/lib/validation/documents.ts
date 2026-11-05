@@ -128,6 +128,10 @@ export const supplyCommandSchema = z
       "consent_cancel",
       "refuse_cancellation",
       "withdraw_cancellation",
+      "propose_regularization",
+      "review_regularization",
+      "withdraw_regularization",
+      "record_regularization_finding",
     ]),
     idempotencyKey: identifier,
     expectedVersion: z.number().int().positive(),
@@ -136,6 +140,39 @@ export const supplyCommandSchema = z
   .strict()
   .transform((value, ctx) => {
     const schemas: Record<string, z.ZodType> = {
+      propose_regularization: z
+        .object({
+          reason,
+          basis: z.string().trim().min(3).max(2000),
+          reviewerId: identifier,
+          followUpOwnerId: identifier.optional(),
+          lines: z
+            .array(
+              z
+                .object({
+                  lineId: identifier,
+                  receivedQuantity: exactQuantity,
+                  returnedQuantity: exactQuantity,
+                  missingQuantity: exactQuantity,
+                })
+                .strict(),
+            )
+            .min(1)
+            .max(1000),
+        })
+        .strict(),
+      review_regularization: z
+        .object({ caseId: identifier, accept: z.boolean(), reason })
+        .strict(),
+      withdraw_regularization: z
+        .object({ caseId: identifier, reason })
+        .strict(),
+      record_regularization_finding: z
+        .object({
+          caseId: identifier,
+          text: z.string().trim().min(3).max(2000),
+        })
+        .strict(),
       submit: z.object({}).strict(),
       approve: z.union([
         z.object({ lines: commandLines, reason: reason.optional() }).strict(),

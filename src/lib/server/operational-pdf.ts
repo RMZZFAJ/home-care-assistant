@@ -10,6 +10,7 @@ import {
   type PurchaseReceipt,
   type DeliveryCancellationContext,
   type DeliveryRecipientSelection,
+  type DeliveryRegularizationContext,
 } from "@/types/documents";
 import { receiptStates } from "@/lib/documents/purchase";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
@@ -44,6 +45,7 @@ export type DocumentSnapshot = {
   purchaseProgress?: PurchaseProgress;
   purchaseReceipts?: PurchaseReceipt[];
   deliveryCancellation?: DeliveryCancellationContext | null;
+  deliveryRegularization?: DeliveryRegularizationContext | null;
   actors?: { issuer?: Person; recipient?: Person; patient?: Person };
   lines: Record<string, unknown>[];
   payload: Record<string, unknown>;
@@ -706,7 +708,13 @@ export async function renderDocumentPdf(
         refused: "Recusado pelo recebedor",
         withdrawn: "Retirado pelo solicitante",
       };
-      text(labels[request.status], 10, true);
+      text(
+        cancellation.historical
+          ? "Pedido anterior sem decisão pessoal"
+          : labels[request.status],
+        10,
+        true,
+      );
       text(
         `Pedido de ${request.requestedName ?? "nome não preservado"} · ${formatBrazilDate(request.requestedAt)}`,
         9,
@@ -719,7 +727,12 @@ export async function renderDocumentPdf(
         );
         text("Justificativa da decisão: " + request.outcome.reason, 9);
       }
-      if (request.status === "pending") {
+      if (cancellation.historical) {
+        text(
+          "Pedido preservado após encerramento administrativo. Não houve consentimento pessoal atribuído ao recebedor; consulte o dossiê de regularização e os efeitos efetivamente apurados.",
+          9,
+        );
+      } else if (request.status === "pending") {
         text(
           "Pedido pendente não estorna material. Devolução real e consumo já confirmado dependem da conciliação pessoal do recebedor.",
           9,
@@ -783,6 +796,103 @@ export async function renderDocumentPdf(
             `Decisão de ${previous.outcome.actorName ?? "nome não preservado"}: ${previous.outcome.reason}`,
             9,
           );
+      }
+    }
+    for (const item of snapshot.deliveryRegularization?.cases ?? []) {
+      ensure(150);
+      section("Regularização administrativa");
+      const states = {
+        pending: "Proposta aguardando conferência independente",
+        approved: "Encerramento administrativo aprovado",
+        rejected: "Proposta rejeitada, sem movimentação",
+        withdrawn: "Proposta retirada, sem movimentação",
+        obsolete: "Proposta obsoleta encerrada, sem movimentação",
+      };
+      text(states[item.state], 10, true);
+      text("Procedimento: " + item.id, 8);
+      text(
+        `Proposta de ${item.proposal.proposedName} · ${formatBrazilDate(item.proposed_at)} · referência v${item.before_snapshot.version}`,
+        9,
+      );
+      text(
+        item.before_snapshot.acceptedBy
+          ? `Recebimento pessoal original preservado: ${item.before_snapshot.receiptName ?? "nome não preservado"} · ${formatBrazilDate(item.before_snapshot.acceptedAt)}`
+          : "Sem recebimento pessoal declarado no registro original.",
+        9,
+      );
+      text("Motivo original: " + item.proposal.reason, 9);
+      text("Evidências e limites: " + item.proposal.basis, 9);
+      text(
+        "Conferente independente designado: " + item.proposal.reviewerName,
+        9,
+      );
+      text(
+        item.state === "approved"
+          ? "Efeitos administrativos abaixo não alteram a autoria nem as quantidades do aceite pessoal original."
+          : "Quantidades propostas abaixo não representam movimentação confirmada. O histórico e o estoque anterior permanecem preservados.",
+        9,
+      );
+      const lines = item.decision?.lines.length
+        ? item.decision.lines
+        : item.proposal.lines;
+      for (const line of lines) {
+        ensure(130);
+        text(line.name + " · " + line.unit, 10, true);
+        text(
+          `Expedido: ${formatQuantity(line.expeditedQuantity)} · Aceite pessoal preservado: ${formatQuantity(line.acceptedQuantity)} · Conciliação anterior: ${formatQuantity(line.priorReconciledQuantity)}`,
+          9,
+        );
+        text(
+          "Em trânsito antes desta proposta: " +
+            formatQuantity(line.pendingQuantity, line.unit),
+          9,
+        );
+        table(
+          [
+            "RECEBIMENTO APURADO",
+            "DEVOLUÇÃO APURADA",
+            "FALTA APURADA",
+            "DESCONHECIDO",
+          ],
+          [0.25, 0.25, 0.25, 0.25],
+          [
+            [
+              formatQuantity(line.receivedQuantity),
+              formatQuantity(line.returnedQuantity),
+              formatQuantity(line.missingQuantity),
+              formatQuantity(line.unknownQuantity),
+            ],
+          ],
+        );
+        for (const id of line.movementIds ?? [])
+          text("Movimento administrativo vinculado: " + id, 8);
+      }
+      if (item.decision) {
+        ensure(70);
+        text(
+          `Decisão própria de ${item.decision.actorName} · ${formatBrazilDate(item.decision.recordedAt)} · v${item.decision.version}`,
+          9,
+          true,
+        );
+        text("Justificativa da decisão: " + item.decision.reason, 9);
+      }
+      if (quantity(item.proposal.unknownQuantity).gt(0)) {
+        ensure(65);
+        text(
+          "Situação física desconhecida permanece em trânsito. Responsável designado para apuração futura: " +
+            (item.proposal.followUpOwnerName ?? "nome não preservado") +
+            ". Relatos futuros não equivalem a aceite pela pessoa desligada.",
+          9,
+        );
+      }
+      for (const finding of item.findings) {
+        ensure(65);
+        text(
+          `Apuração própria de ${finding.actor_name} · ${formatBrazilDate(finding.recorded_at)}`,
+          9,
+          true,
+        );
+        text(finding.body, 9);
       }
     }
   } else if (snapshot.type === "COM") {
@@ -890,6 +1000,8 @@ export async function renderDocumentPdf(
       ]),
     );
   }
+  if (snapshot.type === "ENT" && snapshot.deliveryRegularization?.cases.length)
+    ensure(115);
   section("Linha do tempo operacional");
   table(
     ["DATA/HORA", "RESPONSÁVEL", "EVENTO"],
@@ -902,7 +1014,9 @@ export async function renderDocumentPdf(
   );
   if (
     (snapshot.type === "COM" && snapshot.purchaseProgress) ||
-    (snapshot.type === "ENT" && snapshot.deliveryCancellation)
+    (snapshot.type === "ENT" &&
+      (snapshot.deliveryCancellation ||
+        snapshot.deliveryRegularization?.cases.length))
   )
     ensure(300);
   section("Identificação e integridade");

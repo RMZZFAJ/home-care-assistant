@@ -1,6 +1,7 @@
 "use client";
 import { SettingsSection } from "@/components/forms/settings-section";
 import { DeliveryRecipientFacts } from "./delivery-recipient";
+import { DeliveryRegularization } from "./delivery-regularization";
 import { documentPatientName } from "@/lib/documents/presentation";
 import { SupplyLineSummary } from "./supply-line-summary";
 
@@ -64,6 +65,7 @@ export function SupplyDocumentContent({
   const [uncertain, setUncertain] = useState(false);
   const [purchaseConflict, setPurchaseConflict] = useState(false);
   const [deliveryConflict, setDeliveryConflict] = useState(false);
+  const [regularizationEditing, setRegularizationEditing] = useState(false);
   const [focusRevision, setFocusRevision] = useState(0);
   const [comparison, setComparison] = useState<SupplyDocument | null>(null);
   const commandFormRef = useRef<HTMLFormElement | null>(null);
@@ -82,8 +84,10 @@ export function SupplyDocumentContent({
     }
   }, [data?.version, focusRevision]);
   useEffect(() => {
-    editingRef.current = Boolean(action || review || uncertain);
-  }, [action, review, uncertain]);
+    editingRef.current = Boolean(
+      action || review || uncertain || regularizationEditing,
+    );
+  }, [action, review, uncertain, regularizationEditing]);
   const pendingRef = useRef<{
     action: string;
     body: unknown;
@@ -331,6 +335,7 @@ export function SupplyDocumentContent({
                 .minus(line.reconciled_quantity)
                 .gt(0),
             ))) &&
+        data.deliveryRegularization?.recipientAvailable !== false &&
         ((data.recipient_id === context.userId && allowed("ent.receive")) ||
           allowed("access.manage"))
       )
@@ -368,7 +373,9 @@ export function SupplyDocumentContent({
         actions.push("approve_supervisor");
     }
     if (
-      data.status !== "cancellation_pending" &&
+      !["cancellation_pending", "administratively_closed"].includes(
+        data.status,
+      ) &&
       (data.type === "ENT"
         ? allowed("ent.cancel") ||
           (data.created_by === context.userId &&
@@ -570,7 +577,9 @@ export function SupplyDocumentContent({
                 <p className="text-xs text-(--muted)">
                   {data.status === "cancelled"
                     ? "O histórico preserva o recebimento. Consulte abaixo as devoluções e o consumo conciliados no cancelamento."
-                    : "Quantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal."}
+                    : data.status === "administratively_closed"
+                      ? "Recebimento pessoal preservado. O dossiê distingue os efeitos administrativos comprovados da parcela física ainda desconhecida."
+                      : "Quantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal."}
                 </p>
               </div>
             ) : null}
@@ -609,6 +618,14 @@ export function SupplyDocumentContent({
                 </details>
               ) : null}
             </section>
+          ) : null}
+          {data.type === "ENT" ? (
+            <DeliveryRegularization
+              data={data}
+              context={context}
+              onEditingChange={setRegularizationEditing}
+              onUpdated={setData}
+            />
           ) : null}
           {data.type === "ENT" && data.deliveryCancellation ? (
             <DeliveryCancellationDetails

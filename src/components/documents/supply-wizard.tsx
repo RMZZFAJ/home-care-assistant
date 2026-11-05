@@ -858,6 +858,7 @@ export function PatientSupplyWizard({
                 total={6}
                 saving={busy}
                 uncertain={uncertain}
+                blocked={type === "ENT" && step === 0 && recipientLoading}
                 onBack={() => {
                   setStep((value) => value - 1);
                   setError("");

@@ -47,8 +47,8 @@ export function DeliveryConsumptionReferences({
     </p>
   );
 }
-function RequestFacts({ request }: { request: DeliveryCancellationRequest }) {
-  const status = cancellationStatuses[request.status];
+function RequestFacts({ request,historical=false }: { request: DeliveryCancellationRequest;historical?:boolean }) {
+  const status = historical&&request.status==="pending"?"Pedido anterior sem decisão pessoal":cancellationStatuses[request.status];
   return (
     <div className="space-y-2">
       <p className="font-semibold">{status}</p>
@@ -83,12 +83,13 @@ export function DeliveryCancellationDetails({
   return (
     <section className="ui-card space-y-4" aria-label="Cancelamento da entrega">
       <h2 className="font-semibold">
-        {context.request.status === "pending"
+        {context.historical?"Pedido anterior preservado":context.request.status === "pending"
           ? "Pedido de cancelamento vigente"
           : "Resultado do pedido de cancelamento"}
       </h2>
-      <RequestFacts request={context.request} />
-      {context.request.status === "pending" ? (
+      <RequestFacts request={context.request} historical={context.historical}/>
+      {context.historical?<Notice>O pedido não recebeu consentimento pessoal. A regularização administrativa tem decisão e autoria próprias; consulte seu dossiê nesta ficha.</Notice>:null}
+      {context.request.status === "pending"&&!context.historical ? (
         <>
           <Notice>
             O pedido mantém os fatos de recebimento e o estoque. O recebedor

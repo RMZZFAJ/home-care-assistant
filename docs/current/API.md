@@ -244,6 +244,47 @@ workflow_data.recipientSelection preserva pessoa escolhida/sugerida, escala,
 motivo, indicador e instante; indicações anteriores permanecem no histórico.
 Indicação não é presença, assinatura ou recebimento pessoal.
 
+## ENT — regularização administrativa e tarefas
+
+Quando o recebedor original perde a autorização, resolve exige o procedimento
+administrativo. O aceite pessoal e sua autoria permanecem preservados.
+POST /api/documents/:id aceita quatro ações versionadas com chave própria:
+
+- propose_regularization: reason, basis, reviewerId e todas as linhas com
+  lineId/receivedQuantity/returnedQuantity/missingQuantity explícitos. O banco
+  calcula unknownQuantity; se houver desconhecido, followUpOwnerId é obrigatório.
+- review_regularization: caseId, accept booleano e motivo próprio. Somente o
+  conferente independente designado decide; não altera as quantidades propostas.
+- withdraw_regularization: caseId e motivo próprio. Autor retira sua proposta;
+  autoridade familiar pode encerrar uma proposta obsoleta com sua própria autoria.
+- record_regularization_finding: caseId e text do responsável futuro designado.
+  O relato preserva os fatos anteriores e não movimenta estoque.
+
+ent.regularize exige capacidade efetiva e vínculo local ativo de família/admin.
+Suporte global sem esse vínculo não administra o procedimento. Conferente deve
+ser outra pessoa elegível; situação desconhecida exige responsável ativo com
+ent.follow_up/ent.read e papel operacional compatível. Leitor não assume relato
+físico por flag. Confirmação crítica revalida autoridade, destinatário e unidade
+após esperas; proposta, recusa, retirada e relato não produzem movimentos.
+
+deliveryRegularization apresenta dossiês, antes/depois, evidências, decisões,
+movimentos e relatos com autores próprios. Aprovação credita apenas recebimento
+físico apurado, devolve apenas retorno comprovado e baixa apenas falta apurada.
+Desconhecido conserva trânsito e responsabilidade futura. Não altera
+accepted_quantity, acceptedBy/At ou fully_checked do recebimento pessoal.
+Pedido de cancelamento anterior sem decisão pessoal permanece histórico,
+identificado como tal; não se fabrica consentimento da pessoa desligada.
+Recuperação da mesma intenção confirmada exige ent.read vivo, sem exigir
+novamente a capacidade de escrita. Decisão oposta conflita sem efeito parcial.
+
+GET /api/deliveries usa delivery_task_list; padrão scope=own/status=tasks.
+Filtra tarefas executáveis da identidade antes de contar/paginar: recebimento,
+divergência, cancelamento pessoal, conferência administrativa ou apuração futura.
+Não equivale a filtrar apenas recipient_id. Histórico autorizado usa status
+específico ou vazio e scope own/team; tasks exige own. Terminal sai da fila,
+salvo uma nova obrigação administrativa explicitamente designada. Falha de
+consulta mantém a última lista identificada como anterior, sem vazio falso.
+
 ## Relatos e consumo
 
 GET /api/consumption usa páginas de 20 por created_at/id, cursor beforeAt/

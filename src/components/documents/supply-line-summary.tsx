@@ -89,6 +89,10 @@ export function SupplyLineSummary({
         <p className="mt-3 text-xs">
           {line.fully_checked
             ? "Linha integralmente conferida"
+            : status === "administratively_closed"
+              ? line.metadata.issueOpen
+                ? "Encerramento administrativo · situação física ainda desconhecida"
+                : "Conciliação administrativa registrada · aceite pessoal preservado"
             : line.metadata.issueOpen
               ? "Divergência aberta"
               : status === "confirmed"

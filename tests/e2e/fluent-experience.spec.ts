@@ -137,7 +137,7 @@ test("operação móvel oferece cinco destinos e caixa de entregas autorizada", 
   await expect(page.getByRole("heading", { name: "Entregas e recebimentos", exact: true })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Responsável pelas entregas", exact: true })).toHaveValue("own");
   await noOverflow(page);
-  const response = await page.request.get(`/api/deliveries?careRecipientId=${patientA}&scope=own`);
+  const response = await page.request.get(`/api/deliveries?careRecipientId=${patientA}&scope=own&status=pending_receipt`);
   expect(response.ok()).toBeTruthy();
   const context = (await (await page.request.get("/api/context")).json()).data;
   for (const row of (await response.json()).data) expect(row.recipient_id).toBe(context.userId);

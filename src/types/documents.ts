@@ -180,6 +180,7 @@ export type DeliveryCancellationRequest = {
   };
 };
 export type DeliveryCancellationContext = {
+  historical?: boolean;
   request: DeliveryCancellationRequest;
   history: DeliveryCancellationRequest[];
   lines: DeliveryCancellationLine[];
@@ -188,6 +189,87 @@ export type DeliveryCancellationContext = {
   unresolvedTransit?: string;
   referenceHash: string | null;
   referenceVersion?: number;
+};
+export type DeliveryRegularizationLine = {
+  lineId: string;
+  productId: string;
+  name: string;
+  unit: string;
+  quantityDecimals: number;
+  expeditedQuantity: string;
+  acceptedQuantity: string;
+  priorReconciledQuantity: string;
+  pendingQuantity: string;
+  receivedQuantity: string;
+  returnedQuantity: string;
+  missingQuantity: string;
+  unknownQuantity: string;
+  movementIds?: string[];
+};
+export type DeliveryRegularizationCase = {
+  id: string;
+  document_id: string;
+  care_recipient_id: string;
+  proposed_by: string;
+  reviewer_id: string;
+  follow_up_owner_id: string | null;
+  proposed_at: string;
+  reference_version: number;
+  state: "pending" | "approved" | "rejected" | "withdrawn" | "obsolete";
+  before_snapshot: {
+    version: number;
+    status: string;
+    recipientId: string | null;
+    acceptedBy: string | null;
+    acceptedAt: string | null;
+    receiptName: string | null;
+    lines: SupplyLine[];
+  };
+  proposal: {
+    reason: string;
+    basis: string;
+    lines: DeliveryRegularizationLine[];
+    unknownQuantity: string;
+    proposedName: string;
+    reviewerName: string;
+    followUpOwnerName: string | null;
+    personalReceipt: false;
+  };
+  decision: null | {
+    action: string;
+    actorId: string;
+    actorName: string;
+    recordedAt: string;
+    reason: string;
+    version: number;
+    lines: DeliveryRegularizationLine[];
+  };
+  findings: {
+    id: string;
+    actor_id: string;
+    actor_name: string;
+    recorded_at: string;
+    body: string;
+  }[];
+};
+export type DeliveryRegularizationContext = {
+  recipientAvailable: boolean;
+  pendingTransit: string;
+  sourceReady: boolean;
+  sourceLines: {
+    lineId: string;
+    quantityDecimals: number | null;
+    sourceReady: boolean;
+  }[];
+  cases: DeliveryRegularizationCase[];
+  currentId: string | null;
+  canPropose: boolean;
+  canReview: boolean;
+  canApprove: boolean;
+  canRecordFinding: boolean;
+  canClose: boolean;
+  reviewers: PatientPerson[];
+  followUpPeople: PatientPerson[];
 };
 export type SupplyDocument = {
   id: string;
@@ -214,6 +296,7 @@ export type SupplyDocument = {
   receipts: PurchaseReceipt[];
   purchaseProgress?: PurchaseProgress;
   deliveryCancellation?: DeliveryCancellationContext | null;
+  deliveryRegularization?: DeliveryRegularizationContext | null;
   commandOutcome?: {
     state: "committed" | "recovered";
     action: string;
@@ -284,6 +367,7 @@ export const documentStatuses: Record<string, string> = {
   confirmed: "Confirmado",
   cancellation_pending: "Cancelamento aguardando consentimento",
   cancelled: "Cancelado",
+  administratively_closed: "Encerrada administrativamente",
   under_review: "Em revisão",
   separated: "Separado",
 };
@@ -298,6 +382,7 @@ export type DocumentSummary = {
   status: string;
   created_at: string;
   recipient_id: string | null;
+  task?: { code: string; label: string } | null;
   document_lines?: {
     id: string;
     fully_checked: boolean;

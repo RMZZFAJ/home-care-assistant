@@ -772,3 +772,68 @@ Replay limpo/legado e demais suítes ficam para a CI do novo SHA.
 Permanecem ENT/P05/P07, BAL e revisão facultativa/reconto, estoque/custódia/
 compensações, catálogo/apresentações, profissionais/desligamento e escala.
 Sem conclusão D-A, merge, alteração de banco remoto ou homologação final.
+
+## D2.8 — P05: regularização com autoria própria
+
+Origem COM publicada em d6db5f016555b0b32f163c31fbb5f896125bd7f1.
+Consulta pontual da CI 42121891337: checks gerais Windows/Ubuntu, instalação
+limpa/evolução legada de 105 migrations e integrações passaram. WebKit passou;
+Chromium/móvel passaram 74 casos e falharam no mesmo teste antigo de retomada
+ENT, que avançava antes da consulta P06 terminar. Artefatos mostram o recebedor
+e motivo corretos, com aviso de fonte ainda pendente. Avanço agora aguarda a
+consulta necessária; recheck apenas desse percurso passou. Vercel success
+do mesmo SHA não substitui essa falha de teste nem valida o novo incremento.
+
+Hipótese inicial de aceite substituto por administrador não se reproduziu:
+resolve received já recusava com 42501. A contraprova distinta de resolve
+returned após desligamento reproduziu uma movimentação crítica sem proposta,
+conferência independente ou dossiê. Migration 20261105224000 introduz o
+procedimento tipado, preservando a proteção original do recebimento pessoal.
+
+Proposta registra base, motivo, fatos conhecidos e desconhecido calculado,
+conferente independente e responsável futuro elegível. Aprovação crítica
+registra somente movimentos comprovados; desconhecido fica em trânsito.
+Aceite pessoal/autoria/fully_checked permanecem. Retirada, rejeição, encerramento
+de obsoleta e relato futuro têm autores próprios e não escrevem ledger.
+Pedido anterior de cancelamento sem consentimento permanece história explícita.
+
+Três casos Auth iniciais e onze fronteiras passaram entre rodada e rechecks.
+As duas falhas iniciais das fronteiras eram da fixture: precisão de unidade com
+histórico corretamente imutável e código esperado errado da tarefa pessoal de
+cancelamento. Corrigidas sem relaxar guards/asserts; só as duas foram repetidas.
+Foram comprovados papéis locais, desconhecido, futuro profissional, RLS/grants,
+concorrência/oposição, recuperação após perda só da escrita e ausência de
+efeitos após esperas observadas de paciente e FK tardia do produto. A paginação
+encontra a tarefa antiga diante de 22 drafts posteriores sem tarefa executável.
+
+Três testes API passaram. Dois percursos Chromium P05 passaram; o terceiro
+chegou ao resultado administrativo correto e falhou na auditoria axe depois
+de restaurar foco/alterar viewport, com controle anterior parcialmente atrás
+da borda sticky. A inspeção responsiva agora reinicia a origem de leitura;
+recheck somente desse percurso passou, sem remover regras. Quatro percursos
+Chromium distintos passaram entre as rodadas: proposta/conferência com resposta
+perdida, apuração futura própria, conflito com comparação/adoção explícita e
+caixa padrão de decisão pessoal de cancelamento. No último, a expectativa de
+rota foi corrigida para documentos/:id; depois a fixture terminal foi corrigida
+para recebimento integral, pois a declaração de divergência anterior deixava
+legitimamente outra tarefa de conciliação. Nenhuma tarefa necessária foi ocultada.
+
+Exemplar desconhecido revelou título de linha do tempo separado da tabela;
+paginação ajustada somente para o novo dossiê e repetido apenas seu caso gerador.
+Os PDFs de fatos distintos a54cd04a/981d2db4, ambos v5, foram confrontados com
+snapshots/atores/ledger e hashes registrados. Todas as seis páginas finais
+renderizadas por PDFium e inspecionadas. SHA-256 dos arquivos:
+b0c9356ec3fd6f1b030fa9e5f13199738804d5ad86eb737ffbc3bdca03ac2525 e
+d6fb0666326c884be81a82a49292d3b9e7b1b3465a826fc53d28095b065d9a4a.
+Manifestos em output/pdf/phase-d/delivery-regularization-...-verification.json;
+o exemplar anterior ao ajuste de layout também permanece preservado. Na UI,
+o resumo distingue conciliação administrativa de desconhecido ainda em trânsito.
+Auditoria axe/overflow a 320/390/768/1440, foco e captura de 320 px conferidos.
+
+Lint dos fontes afetados e tipos/build do runner aprovados. check:contracts
+preservou as 84 migrations históricas; há 106 fontes incrementais/legados no
+total. Advisor local retornou apenas o aviso histórico de unaccent em public,
+sem novo alerta. Replay limpo/legado e suítes completas do novo SHA ficam para
+a CI programada; não foram duplicados localmente. Preview de desligamento,
+P07, BAL e demais etapas D2 continuam abertas. Comunicação legítima externa,
+assinatura D4 e aceite humano/físico são gates distintos, sem conclusão D-A/GO.
