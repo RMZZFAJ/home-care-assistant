@@ -46,149 +46,262 @@ aprovado.
 
 - **Campo:** Origem
 
-  **Tipo/origem:** Seleção compra/doação
+  **Tipo/origem por tela e estado:** COM-01 Origem: EDITABLE
+  (RADIO_OR_SELECT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; COM-02 Origem: READ_ONLY
+  (TEXT_VALUE); Origem já emitida
 
-  **Obrigatório e default:** Sim, escolha explícita
+  **Obrigatoriedade/default na preparação:** COM-01 Origem: Sim, escolha
+  explícita; COM-02 Origem: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** `purchase`/`donation`; título correspondente
+  **Validação/unidade:** COM-01 Origem: `purchase`/`donation`; título
+  correspondente; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; COM-02 Origem: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Origem já emitida
 
-  **Ajuda e exemplo:** “Compra ou doação?”, sem chamar toda COM de compra.
+  **Ajuda/exemplo:** COM-01 Origem: “Compra ou doação?”, sem chamar toda COM
+  de compra.; COM-02 Origem: Informação do registro indicado, somente para
+  consulta nesta etapa. Ausência de dado histórico permanece explicitamente
+  identificada.
 
 - **Campo:** Material
 
-  **Tipo/origem:** Busca no catálogo do paciente
+  **Tipo/origem por tela e estado:** COM-01 Material: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; COM-02 Material:
+  READ_ONLY (TEXT_VALUE); Material da linha emitida
 
-  **Obrigatório e default:** Ao menos um, vazio
+  **Obrigatoriedade/default na preparação:** COM-01 Material: Ao menos um,
+  vazio; COM-02 Material: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Único por linha, até 1000
+  **Validação/unidade:** COM-01 Material: Único por linha, até 1000; Somente
+  no subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; COM-02 Material: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Material da linha emitida
 
-  **Ajuda e exemplo:** Seleção manual e alias; sem produto implícito pelo
-  scan.
+  **Ajuda/exemplo:** COM-01 Material: Seleção manual e alias; sem produto
+  implícito pelo scan.; COM-02 Material: Identificação do item registrado. A
+  consulta não substitui o material ou reinterpreta sua unidade.
 
 - **Campo:** Previsto
 
-  **Tipo/origem:** Decimal informado
+  **Tipo/origem por tela e estado:** COM-01 Previsto: EDITABLE
+  (DECIMAL_TEXT_INPUT); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; COM-02 Previsto: READ_ONLY
+  (QUANTITY_WITH_UNIT); Quantidade prevista original
 
-  **Obrigatório e default:** Sim por linha, vazio
+  **Obrigatoriedade/default na preparação:** COM-01 Previsto: Sim por linha,
+  vazio; COM-02 Previsto: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Positivo, até 1 bilhão, até seis casas e precisão da
-  unidade
+  **Validação/unidade:** COM-01 Previsto: Positivo, até 1 bilhão, até seis
+  casas e precisão da unidade; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; COM-02 Previsto:
+  Revalidar acesso, referência e estado na leitura/ação. Não solicitar ao
+  usuário correção deste valor nesta tela. Quantidade prevista original
 
-  **Ajuda e exemplo:** “Quantidade que pretende adquirir: 10 unidades.”
+  **Ajuda/exemplo:** COM-01 Previsto: “Quantidade que pretende adquirir: 10
+  unidades.”; COM-02 Previsto: Quantidade registrada para a etapa indicada.
+  Não é uma nova declaração de quantidade e não movimenta material ao ser
+  consultada.
 
 - **Campo:** Apresentação
 
-  **Tipo/origem:** Seleção/código, opcional
+  **Tipo/origem por tela e estado:** COM-01 Apresentação: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; COM-02 Apresentação:
+  READ_ONLY (EQUIVALENCE_DESCRIPTION); Apresentação/fator da emissão
 
-  **Obrigatório e default:** Não, unidade base
+  **Obrigatoriedade/default na preparação:** COM-01 Apresentação: Não, unidade
+  base; COM-02 Apresentação: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Conversão finita/exata, snapshot do fator/código
+  **Validação/unidade:** COM-01 Apresentação: Conversão finita/exata, snapshot
+  do fator/código; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; COM-02 Apresentação: Revalidar
+  acesso, referência e estado na leitura/ação. Não solicitar ao usuário
+  correção deste valor nesta tela. Apresentação/fator da emissão
 
-  **Ajuda e exemplo:** “2 pacotes de 10 = 20 unidades.”
+  **Ajuda/exemplo:** COM-01 Apresentação: “2 pacotes de 10 = 20 unidades.”;
+  COM-02 Apresentação: Informação do registro indicado, somente para consulta
+  nesta etapa. Ausência de dado histórico permanece explicitamente
+  identificada.
 
 - **Campo:** Aprovado
 
-  **Tipo/origem:** Decimal pelo aprovador
+  **Tipo/origem por tela e estado:** COM-02 Aprovado: EDITABLE_SUBFORM
+  (DECIMAL_TEXT_INPUT); Somente ao preparar aprovação autorizada; depois em
+  leitura
 
-  **Obrigatório e default:** Sim ao aprovar, proposta exibida
+  **Obrigatoriedade/default na preparação:** COM-02 Aprovado: Sim ao aprovar,
+  proposta exibida
 
-  **Validação/unidade:** Não confundir com adquirido/validado; mudança
-  explícita
+  **Validação/unidade:** COM-02 Aprovado: Não confundir com
+  adquirido/validado; mudança explícita; Somente ao preparar aprovação
+  autorizada; depois em leitura
 
-  **Ajuda e exemplo:** “Autorizar 8 unidades.”
+  **Ajuda/exemplo:** COM-02 Aprovado: “Autorizar 8 unidades.”
 
 - **Campo:** Adquirido
 
-  **Tipo/origem:** Decimal do fato de aquisição
+  **Tipo/origem por tela e estado:** COM-02 Adquirido: EDITABLE_SUBFORM
+  (DECIMAL_TEXT_INPUT); Somente Registrar aquisição; não é declaração de
+  chegada
 
-  **Obrigatório e default:** Sim nessa etapa, vazio
+  **Obrigatoriedade/default na preparação:** COM-02 Adquirido: Sim nessa
+  etapa, vazio
 
-  **Validação/unidade:** Positivo, versão e limites por linha
+  **Validação/unidade:** COM-02 Adquirido: Positivo, versão e limites por
+  linha; Somente Registrar aquisição; não é declaração de chegada
 
-  **Ajuda e exemplo:** “Foram adquiridas 2 unidades.”
+  **Ajuda/exemplo:** COM-02 Adquirido: “Foram adquiridas 2 unidades.”
 
 - **Campo:** Recebido nesta parcela
 
-  **Tipo/origem:** Decimal declarado
+  **Tipo/origem por tela e estado:** COM-03 Recebido nesta parcela:
+  EDITABLE_SUBFORM (DECIMAL_TEXT_INPUT_OR_READ_ONLY_QUANTITY); Só
+  NOVA_CHEGADA; na decisão VALIDAR/REJEITAR é READ_ONLY, sem correção da
+  declaração
 
-  **Obrigatório e default:** Sim ao informar chegada, vazio
+  **Obrigatoriedade/default na preparação:** COM-03 Recebido nesta parcela:
+  Sim ao informar chegada, vazio
 
-  **Validação/unidade:** Quantidade física desta parcela, sem preencher o
-  restante automaticamente
+  **Validação/unidade:** COM-03 Recebido nesta parcela: Quantidade física
+  desta parcela, sem preencher o restante automaticamente; Só NOVA_CHEGADA; na
+  decisão VALIDAR/REJEITAR é READ_ONLY, sem correção da declaração
 
-  **Ajuda e exemplo:** “Chegaram 2 unidades agora.”
+  **Ajuda/exemplo:** COM-03 Recebido nesta parcela: “Chegaram 2 unidades
+  agora.”
 
 - **Campo:** Parcela e autor
 
-  **Tipo/origem:** Identidade de servidor
+  **Tipo/origem por tela e estado:** COM-03 Parcela e autor: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim, somente leitura
+  **Obrigatoriedade/default na preparação:** COM-03 Parcela e autor: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** ID correlacionado ao evento, não escolhido pelo
-  browser
+  **Validação/unidade:** COM-03 Parcela e autor: Revalidar acesso, referência
+  e estado na leitura/ação. Não solicitar ao usuário correção deste valor
+  nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** “Chegada informada por Maria às…”
+  **Ajuda/exemplo:** COM-03 Parcela e autor: Identifica a pessoa relacionada a
+  este ato; não permite transferir sua autoria para quem consulta.
 
 - **Campo:** Validado/rejeitado
 
-  **Tipo/origem:** Decisão explícita da parcela
+  **Tipo/origem por tela e estado:** COM-03 Validado/rejeitado:
+  EXPLICIT_ACTION (DECISION_BUTTONS); Parcela pendente/versão atual; dois
+  botões com consequência própria
 
-  **Obrigatório e default:** Sim ao decidir
+  **Obrigatoriedade/default na preparação:** COM-03 Validado/rejeitado: Sem
+  concordância material inicial ou clique automático
 
-  **Validação/unidade:** Boolean não nulo; capability/política aplicáveis
+  **Validação/unidade:** COM-03 Validado/rejeitado: Boolean não nulo;
+  capability/política aplicáveis; Parcela pendente/versão atual; dois botões
+  com consequência própria
 
-  **Ajuda e exemplo:** Validar gera crédito; rejeitar não apaga a declaração.
+  **Ajuda/exemplo:** COM-03 Validado/rejeitado: Validar gera crédito; rejeitar
+  não apaga a declaração.
 
 - **Campo:** Motivo de rejeição
 
-  **Tipo/origem:** Texto do decisor
+  **Tipo/origem por tela e estado:** COM-03 Motivo de rejeição: EDITABLE
+  (TEXTAREA); Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim na rejeição
+  **Obrigatoriedade/default na preparação:** COM-03 Motivo de rejeição: Sim na
+  rejeição
 
-  **Validação/unidade:** 3–1000 caracteres
+  **Validação/unidade:** COM-03 Motivo de rejeição: 3–1000 caracteres; Somente
+  no subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura
 
-  **Ajuda e exemplo:** “Quantidade declarada ainda não conferida.”
+  **Ajuda/exemplo:** COM-03 Motivo de rejeição: “Quantidade declarada ainda
+  não conferida.”
 
 - **Campo:** Observações
 
-  **Tipo/origem:** Texto, autor
+  **Tipo/origem por tela e estado:** COM-01 Observações: EDITABLE (TEXTAREA);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; COM-02 Observações: READ_ONLY
+  (TEXT_VALUE); Observação da emissão; etapa nova tem nota própria
+  identificada
 
-  **Obrigatório e default:** Não, vazio
+  **Obrigatoriedade/default na preparação:** COM-01 Observações: Não, vazio;
+  COM-02 Observações: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Até 2000 na ficha; até 1000 na aquisição
+  **Validação/unidade:** COM-01 Observações: Até 2000 na ficha; até 1000 na
+  aquisição; Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; COM-02 Observações: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Observação da emissão; etapa nova tem nota própria
+  identificada
 
-  **Ajuda e exemplo:** Comprovante financeiro não é obrigatório.
+  **Ajuda/exemplo:** COM-01 Observações: Comprovante financeiro não é
+  obrigatório.; COM-02 Observações: Informação do registro indicado, somente
+  para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.
 
 - **Campo:** Não será adquirido
 
-  **Tipo/origem:** Quantidade remanescente calculada e selecionada
+  **Tipo/origem por tela e estado:** COM-04 Não será adquirido: CALCULATED
+  (QUANTITY_WITH_UNIT); Restante dispensável calculado na versão exibida; não
+  é input de baixa
 
-  **Obrigatório e default:** Sim ao fechar inferior
+  **Obrigatoriedade/default na preparação:** COM-04 Não será adquirido: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Nunca inclui material adquirido/recebido como baixa
-  fictícia
+  **Validação/unidade:** COM-04 Não será adquirido: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Restante dispensável calculado na versão exibida; não é
+  input de baixa
 
-  **Ajuda e exemplo:** “Dispensar previsão de 8 unidades.”
+  **Ajuda/exemplo:** COM-04 Não será adquirido: Resultado calculado a partir
+  dos fatos desta tarefa, apresentado para conferência. Ele não pode ser
+  digitado ou corrigido aqui.
 
 - **Campo:** Motivo de encerramento
 
-  **Tipo/origem:** Texto, responsável autorizado
+  **Tipo/origem por tela e estado:** COM-04 Motivo de encerramento: EDITABLE
+  (TEXTAREA); Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim no fechamento
+  **Obrigatoriedade/default na preparação:** COM-04 Motivo de encerramento:
+  Sim no fechamento
 
-  **Validação/unidade:** 3–1000, proposta técnica de limite herdado
+  **Validação/unidade:** COM-04 Motivo de encerramento: 3–1000, proposta
+  técnica de limite herdado; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Decidimos encerrar com as 2 unidades já validadas.”
+  **Ajuda/exemplo:** COM-04 Motivo de encerramento: “Decidimos encerrar com as
+  2 unidades já validadas.”
 
 - **Campo:** Concordância com resumo
 
-  **Tipo/origem:** Ação pessoal do responsável
+  **Tipo/origem por tela e estado:** COM-04 Concordância com resumo: EDITABLE
+  (EXPLICIT_UNCHECKED_CONFIRMATION); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim ao confirmar, desmarcada
+  **Obrigatoriedade/default na preparação:** COM-04 Concordância com resumo:
+  Se confirmação de resumo adotada: desmarcada e escolha pessoal explícita;
+  botão explica o efeito
 
-  **Validação/unidade:** Versão do resumo deve ser a aplicada
+  **Validação/unidade:** COM-04 Concordância com resumo: Versão do resumo deve
+  ser a aplicada; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Concluir com quantidade menor.”
+  **Ajuda/exemplo:** COM-04 Concordância com resumo: “Concluir com quantidade
+  menor.”
 
 <!-- c-table:end -->
 
@@ -292,3 +405,12 @@ não anuncia implementação. Contrato detalhado no
 [adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
 [blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
 [casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
+
+## Fechamento definitivo — tarefa, estado e política
+
+COM-02 lê origem, materiais, previsto e observações emitidos; aprovação e
+aquisição abrem subformulários próprios. COM-03 distingue NOVA_CHEGADA
+(quantidade inicialmente vazia/editável) de DECIDIR_PARCELA (quantidade, autor
+e instante originais em leitura). Decidir não corrige a prova. COM-04 calcula
+o dispensável na versão revista; não pede baixa fictícia nem altera o previsto
+para fazer a conta fechar.

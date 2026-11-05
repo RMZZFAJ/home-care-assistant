@@ -1,67 +1,232 @@
 # ENT-02 — Minhas tarefas de entrega
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Recebedor/responsável competente. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /entregas, atual a alterar. Gatilho: navegar pela tarefa ou
-abrir o alvo contextual autorizado. Objetivo: Ver todas as tarefas
-executáveis, inclusive consentimento de cancelamento; filtros e referência
-antiga.
+Fila de receber, decidir cancelamento ou resolver diferença; filtros de
+consulta separados de atos materiais.
 
-## Composição e sequência
+Finalidade: Minhas tarefas de entrega.
 
-Filtros por tarefa/estado; lista com protocolo, pessoa, prazo e próxima ação;
-contador do conjunto consultado.
+Recebedor vê suas tarefas; demais leitores só o conjunto autorizado. Abrir
+tarefa não transfere capacidade pessoal.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /entregas, atual a alterar.
 
-Incluir consentimento de cancelamento e divergência, além de pending_receipt.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Todos os dados da lista, quantidades e destinatário. Filtros não alteram a
+entrega.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-157-01 — Estado
+
+**Modo/componente:** FILTER / RADIO_OR_SELECT.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Opções do domínio rotuladas; escolha material
+explícita, sem concordância presumida. Autocomplete: off.
+
+**Validação:** Tarefa de receber/decidir pedido/resolver diferença e estado
+real da entrega; nunca selecionar outro recebedor como autorização; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** “Pendentes sob minha responsabilidade.”
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-157-02 — Tipo
+
+**Modo/componente:** FILTER / RADIO_OR_SELECT.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Opções do domínio rotuladas; escolha material
+explícita, sem concordância presumida. Autocomplete: off.
+
+**Validação:** Tarefa de receber/decidir pedido/resolver diferença e estado
+real da entrega; nunca selecionar outro recebedor como autorização; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** “Pendentes sob minha responsabilidade.”
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-157-03 — Data inicial
+
+**Modo/componente:** FILTER / DATE_INPUT.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Data DD/MM/AAAA na apresentação, sem conversão
+silenciosa de fuso; limites do período visíveis. Autocomplete: off.
+
+**Validação:** Tarefa de receber/decidir pedido/resolver diferença e estado
+real da entrega; nunca selecionar outro recebedor como autorização; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** “Pendentes sob minha responsabilidade.”
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-157-04 — Data final
+
+**Modo/componente:** FILTER / DATE_INPUT.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Data DD/MM/AAAA na apresentação, sem conversão
+silenciosa de fuso; limites do período visíveis. Autocomplete: off.
+
+**Validação:** Tarefa de receber/decidir pedido/resolver diferença e estado
+real da entrega; nunca selecionar outro recebedor como autorização; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** “Pendentes sob minha responsabilidade.”
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-C8-006 — Buscar no conjunto autorizado
+
+**Modo/componente:** FILTER / SEARCH_INPUT.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Termo textual de busca no conjunto autorizado;
+Limpar remove o filtro, sem alterar registros. Autocomplete: off.
+
+**Validação:** Tarefa de receber/decidir pedido/resolver diferença e estado
+real da entrega; nunca selecionar outro recebedor como autorização; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** Busque pelo nome ou referência apresentados nesta tarefa.
+Limpe a busca para voltar ao conjunto autorizado.
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Filtros por tarefa/estado → protocolo/pessoa/pendência → próxima ação legítima
+→ detalhe autorizado com retorno ao filtro.
+
+Filtros no topo, tarefas com identidade/próxima pessoa/estado e ação por
+linha; contadores identificam o conjunto consultado.
 
 Primária: **Abrir tarefa**. Secundárias: Filtrar; Atualizar; Carregar
 anteriores.
 
-Consequência: Abertura leva ao alvo exato; não confirma. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Abertura leva ao alvo exato; não confirma.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Tarefa aberta para consulta. Nenhum recebimento foi
+confirmado.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhuma tarefa corresponde aos filtros atuais. Limpe os
+filtros ou consulte entregas anteriores.”
 
-Tela de orientação/consulta sem novo campo de dado. Links/botões têm nome,
-alvo e estado próprios; não adicionar formulário sem necessidade.
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-## Estado, teclado e ajuda
+## 19–20. Falhas, recuperação e continuidade
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-ENT-02` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `ent`; ausência de exemplo no HTML é declarada, sem novo mockup
-equivalente. B1: SC-013.
+Falha na fila não significa nenhuma entrega. Conservar filtro e última
+consulta identificada; link direto busca alvo fora da página recente.
 
-Critérios C9 relacionados: C-AC-010, C-AC-021, C-AC-028, C-AC-042, C-AC-043,
-C-AC-044, C-AC-048, C-AC-050, C-AC-074, C-AC-077, C-AC-079, C-AC-089,
-C-AC-096, C-AC-101, C-AC-103, C-AC-105, C-NEW-AC-006, C-NEW-AC-007,
-C-NEW-AC-009, C-NEW-AC-015, C-NEW-AC-016, C-NEW-AC-022, C-NEW-AC-028,
-C7-AC-002, C7-AC-010. A associação é por domínio; cada caso preserva seu
-discriminante específico e não significa que todos os critérios foram
-executados nesta tela. Fonte funcional:
-[ENT](../../C3-functional-specification/ENT.md).
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
+
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
+
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Cartões rotulados com alvo e próximo passo antes do botão; filtros podem
+recolher preservando resumo e foco; paginação alcançável.
+
+Lista e número de resultados anunciados sem flood; atualização conserva item
+focado e não transforma carregamento em ausência.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: ent. Sem captura real ou aceite humano de interface
+futura nesta C.
+
+EVOLUIR fila e paginação; incluir decisões/diferenças sem pressupor só
+pending_receipt.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-010;C-AC-021;C-AC-028;C-AC-042;C-AC-043;C-AC-044;C-AC-048;C-AC-050;C-AC-074;C-AC-077;C-AC-079;C-AC-089;C-AC-096;C-AC-101;C-AC-103;C-AC-105;C-NEW-AC-006;C-NEW-AC-007;C-NEW-AC-009;C-NEW-AC-015;C-NEW-AC-016;C-NEW-AC-022;C-NEW-AC-028;C7-AC-002;C7-AC-010;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

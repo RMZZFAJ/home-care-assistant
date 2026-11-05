@@ -1,77 +1,143 @@
 # CAT-05 — Selecionar e conferir apresentação
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Autor de REQ/COM/ENT competente. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Seleção/scan nos formulários, atual a alterar. Gatilho:
-navegar pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Buscar
-nome/alias; manual/câmera/foto quando disponível; confirmar equivalência.
+Seleção auxiliar de material/apresentação em formulário privado; câmera é
+conveniência.
 
-## Composição e sequência
+Finalidade: Selecionar e conferir apresentação.
 
-Combobox de material com alias; ação de scan secundária; equivalência
-código/embalagens/base em cartão.
+Autor competente no formulário consumidor; código não concede acesso ou
+registra movimento.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Seleção/scan nos formulários, atual a alterar.
 
-Câmera negada/offline sempre oferecem manual; nunca copiar contagem antiga.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Identidade encontrada e equivalência calculada; usuário confirma
+correspondência física. Nunca copiar estoque observado da seleção antiga.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-090-01 — Código de barras
+
+**Modo/componente:** EDITABLE / BARCODE_TEXT_WITH_SCAN.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Opcional se seleção manual; obrigatório ao
+associar scan.
+
+**Máscara/apresentação:** Código textual com zeros iniciais preservados;
+câmera opcional e alternativa manual; nunca converter para número.
+Autocomplete: off.
+
+**Validação:** Preservar zeros; formato/check digit aplicável; unicidade
+conforme catálogo; Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Não tratar código desconhecido como produto autorizado.
+
+**Mensagem e condição:** “Confira o código completo, incluindo os zeros
+iniciais, ou selecione o material manualmente.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-092-01 — Número de embalagens
+
+**Modo/componente:** EDITABLE / DECIMAL_TEXT_INPUT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Quando apresentação usada.
+
+**Máscara/apresentação:** Quantidade textual exata com unidade; vírgula/ponto,
+inputmode decimal e precisão explícita antes da coerção. Autocomplete: off.
+
+**Validação:** Produto do fator exato; não converter unidade incompatível;
+Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “2 pacotes = 20 unidades.”
+
+**Mensagem e condição:** “Informe número de embalagens na unidade indicada e
+com a precisão permitida. O campo precisa de correção antes de confirmar.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Busca manual ou câmera por gesto → material reconhecido → apresentação/fator →
+embalagens → quantidade base calculada → usar na edição.
+
+Drawer de busca com resultados e seleção; prévia separada das ações do
+documento consumidor.
 
 Primária: **Usar material e equivalência**. Secundárias: Digitar código; Usar
 câmera; Selecionar manualmente.
 
-Consequência: Scan auxilia, autor confirma material; não autoriza por código.
-Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Scan auxilia, autor confirma material; não autoriza por código.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Material e apresentação selecionados para conferência no
+formulário. Nenhum documento foi emitido.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Código não encontrado. Busque o material pelo nome ou
+digite o código de outra apresentação.”
 
-- **CTRL-090-01 — Código de barras**. SEARCHABLE_COMBOBOX. Ordem 90.1;
-  Opcional se seleção manual; obrigatório ao associar scan.
-  Máscara/autocomplete: Busca por nome/alias autorizado; seleção por ID;
-  nenhum ID digitado como autorização; off. Dependência/validação: Preservar
-  zeros; formato/check digit aplicável; unicidade conforme catálogo.
-  Ajuda/exemplo: Não tratar código desconhecido como produto autorizado..
-  Erro: Revise código de barras: Preservar zeros; formato/check digit
-  aplicável; unicidade conforme catálogo..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-092-01 — Número de embalagens**. DECIMAL_TEXT_INPUT. Ordem 92.1;
-  Quando apresentação usada. Máscara/autocomplete: Vírgula/ponto; inputmode
-  decimal; precisão antes da coerção; zero só onde permitido; off.
-  Dependência/validação: Produto do fator exato; não converter unidade
-  incompatível. Ajuda/exemplo: “2 pacotes = 20 unidades.”. Erro: Revise número
-  de embalagens: Produto do fator exato; não converter unidade incompatível..
+## 19–20. Falhas, recuperação e continuidade
 
-## Estado, teclado e ajuda
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Câmera negada/sem suporte mantém entrada manual; fator ausente ou incompatível
+não gera quantidade presumida.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-CAT-05` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `req`; ausência de exemplo no HTML é declarada, sem novo mockup
-equivalente. B1: OVL-031.
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-Critérios C9 relacionados: C-AC-026, C-AC-028, C-AC-029, C-AC-044, C-AC-045,
-C-AC-067, C-AC-081, C-NEW-AC-008, C-NEW-AC-022, C-NEW-AC-024, C-NEW-AC-025. A
-associação é por domínio; cada caso preserva seu discriminante específico e
-não significa que todos os critérios foram executados nesta tela. Fonte
-funcional:
-[CATALOGUE_AND_PRESENTATIONS](../../C3-functional-specification/CATALOGUE_AND_PRESENTATIONS.md).
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
+
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Painel de uma coluna; busca permanece rotulada; seleção e retorno à tarefa sem
+depender de hover.
+
+Combobox setas/Enter/Escape; quantidade de resultados anunciada; fechar
+devolve ao acionador do formulário.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: req. Sem captura real ou aceite humano de interface
+futura nesta C.
+
+EVOLUIR seleção e câmera; resultado exige confirmação humana e preservação dos
+zeros do código.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-026;C-AC-028;C-AC-029;C-AC-044;C-AC-045;C-AC-067;C-AC-081;C-NEW-AC-008;C-NEW-AC-022;C-NEW-AC-024;C-NEW-AC-025;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-019.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

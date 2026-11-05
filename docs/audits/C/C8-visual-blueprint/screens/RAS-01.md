@@ -1,140 +1,383 @@
 # RAS-01 — Continuar edição privada
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Titular no paciente/tipo/intenção. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Retomada em cada formulário, novo contrato durável. Gatilho:
-navegar pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Continuar
-ou descartar somente rascunho; comparar estado atual.
+Resumo privado de edição encontrada; escolher continuar ou descartar e iniciar
+nova.
 
-## Composição e sequência
+Finalidade: Continuar edição privada.
 
-Diálogo resumo tipo/paciente/itens e salvo no servidor; duas escolhas claras,
-sem destrutiva default.
+Titular no paciente/tipo/intenção corretos; um draft de criação por
+usuário/paciente/tipo.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Retomada em cada formulário, novo contrato durável.
 
-Um por criação/tipo; contextuais por alvo; REQ não aparece ao iniciar BAL.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Conteúdo, etapa e versões-base no diálogo. Continuar abre o formulário de
+origem; não editar JSON ou texto serializado no resumo.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-125-01 — Tipo do rascunho
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Tipo do
+rascunho”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-125-02 — Alvo e intenção
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Alvo e
+intenção”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-126-01 — Conteúdo da edição
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Resumo estruturado por campo, sem JSON/payload
+editável. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Confira o conteúdo salvo; para alterá-lo, continue no
+formulário de origem.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Conteúdo da
+edição”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-126-02 — Etapa atual
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome humano da etapa salva, com ação de continuar.
+Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A etapa mostra onde continuar o preenchimento; ela não é um
+texto para editar.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Etapa
+atual”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-127-01 — Versão documental base
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Versão
+documental base”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-127-02 — Revisão do ledger base
+
+**Modo/componente:** INTERNAL / NO_USER_CONTROL.
+
+**Quando/ator:** Dado de comando/transporte; nunca input ou identificador
+técnico exigido ao usuário.
+
+**Obrigatoriedade/inicial:** Não renderizar controle.
+
+**Máscara/apresentação:** NÃO APLICÁVEL. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Somente contrato interno, com validação no servidor; não expor
+segredo/UUID como decisão do usuário.
+
+**Ajuda/exemplo:** “A entrega mudou desde ontem. Revise antes de continuar.”
+
+**Acessibilidade:** Não inserir campo escondido na ordem de foco, texto
+acessível ou mensagem para o usuário comum.
+
+### CTRL-127-03 — Versão da política base
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Versão da
+política base”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-128-01 — Salvo em
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Salvo em”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-128-02 — Revisão do rascunho
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Revisão do
+rascunho”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-129-01 — Escolha na retomada
+
+**Modo/componente:** EXPLICIT_ACTION / RESUME_OR_DISCARD_BUTTONS.
+
+**Quando/ator:** Continuar, descartar e começar nova ou voltar; nenhuma
+destrutiva preselecionada.
+
+**Obrigatoriedade/inicial:** Sem concordância material inicial ou clique
+automático.
+
+**Máscara/apresentação:** Botão/ação com nome de consequência; sem campo
+textual de aceite. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Descartar não elimina documento emitido ou ato confirmado;
+Continuar, descartar e começar nova ou voltar; nenhuma destrutiva
+preselecionada.
+
+**Ajuda/exemplo:** Continuar rascunho ou Descartar e começar nova; um por
+usuário/paciente/tipo de criação e por alvo contextual P12.
+
+**Mensagem e condição:** “Esta ação não está disponível no estado atual.
+Consulte o resultado ou volte à tarefa; nenhuma confirmação será presumida.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Botão com verbo/alvo/efeito; confirmação por
+teclado/touch; foco retorna ao resumo, sem aria-invalid em texto de leitura.
+
+### CTRL-C7-020 — Confirmar descarte somente do rascunho
+
+**Modo/componente:** EXPLICIT_ACTION / SCOPED_DESTRUCTIVE_CONFIRMATION.
+
+**Quando/ator:** Somente após escolha de descartar; confirma exatamente draft
+privado/versão.
+
+**Obrigatoriedade/inicial:** Sem concordância material inicial ou clique
+automático.
+
+**Máscara/apresentação:** Botão/ação com nome de consequência; sem campo
+textual de aceite. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Escopo privado/tipo/alvo e versão; sem apagar documentos, ready
+ou preservação obrigatória; Somente após escolha de descartar; confirma
+exatamente draft privado/versão.
+
+**Ajuda/exemplo:** Sem opção destrutiva default
+
+**Mensagem e condição:** “Esta ação não está disponível no estado atual.
+Consulte o resultado ou volte à tarefa; nenhuma confirmação será presumida.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Botão com verbo/alvo/efeito; confirmação por
+teclado/touch; foco retorna ao resumo, sem aria-invalid em texto de leitura.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Tipo/paciente/alvo → resumo e etapa salva → instante confirmado → Continuar /
+Descartar e começar nova / Voltar.
+
+Resumo ou comparação de versões com tipo/paciente/intenção e instantes; ações
+não destrutivas antes do descarte.
 
 Primária: **Continuar rascunho**. Secundárias: Descartar e começar nova;
 Voltar.
 
-Consequência: Descarta só edição elegível; nenhuma emissão oficial por save.
-Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Descarta só edição elegível; nenhuma emissão oficial por save.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Rascunho aberto no formulário de origem. Nenhum documento
+foi emitido ou estoque alterado.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhum rascunho deste tipo foi encontrado. Você pode
+iniciar um novo preenchimento.”
 
-- **CTRL-125-01 — Tipo do rascunho**. READ_ONLY_DESCRIPTION. Ordem 125.1; Sim,
-  origem implícita visível em resumo. Máscara/autocomplete: SEM_MASCARA;valor
-  do servidor; off. Dependência/validação: Usuário/paciente/tipo/target; não
-  mistura REQ e aprovação. Ajuda/exemplo: “Rascunho de nova ENT para
-  Residência Exemplo.”. Erro: Revise tipo do rascunho:
-  Usuário/paciente/tipo/target; não mistura REQ e aprovação..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-125-02 — Alvo e intenção**. READ_ONLY_DESCRIPTION. Ordem 125.2; Sim,
-  origem implícita visível em resumo. Máscara/autocomplete: SEM_MASCARA;valor
-  do servidor; off. Dependência/validação: Usuário/paciente/tipo/target; não
-  mistura REQ e aprovação. Ajuda/exemplo: “Rascunho de nova ENT para
-  Residência Exemplo.”. Erro: Revise alvo e intenção:
-  Usuário/paciente/tipo/target; não mistura REQ e aprovação..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-126-01 — Conteúdo da edição**. TEXTAREA. Ordem 126.1; Automático após
-  confirmação de save. Máscara/autocomplete: Sem máscara; contador e limite do
-  contrato visíveis; quebra de linha/reflow; off. Dependência/validação:
-  Validação parcial não emite fato; esquema versionado. Ajuda/exemplo: Campos
-  vazios ficam vazios.. Erro: Revise conteúdo da edição: Validação parcial não
-  emite fato; esquema versionado..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-126-02 — Etapa atual**. TEXTAREA. Ordem 126.2; Automático após
-  confirmação de save. Máscara/autocomplete: Sem máscara; contador e limite do
-  contrato visíveis; quebra de linha/reflow; off. Dependência/validação:
-  Validação parcial não emite fato; esquema versionado. Ajuda/exemplo: Campos
-  vazios ficam vazios.. Erro: Revise etapa atual: Validação parcial não emite
-  fato; esquema versionado..
+Descarte exige intenção/versão do draft e não apaga documento oficial, anexo
+pronto ou prova preservada. Não confundir REQ ao iniciar BAL.
 
-- **CTRL-127-01 — Versão documental base**. READ_ONLY_DESCRIPTION. Ordem
-  127.1; Sim quando ação depende de fato. Máscara/autocomplete:
-  SEM_MASCARA;valor do servidor; off. Dependência/validação:
-  Versões/assignment/contexto na retomada. Ajuda/exemplo: “A entrega mudou
-  desde ontem. Revise antes de continuar.”. Erro: Revise versão documental
-  base: Versões/assignment/contexto na retomada..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-127-02 — Revisão do ledger base**. READ_ONLY_DESCRIPTION. Ordem
-  127.2; Sim quando ação depende de fato. Máscara/autocomplete:
-  SEM_MASCARA;valor do servidor; off. Dependência/validação:
-  Versões/assignment/contexto na retomada. Ajuda/exemplo: “A entrega mudou
-  desde ontem. Revise antes de continuar.”. Erro: Revise revisão do ledger
-  base: Versões/assignment/contexto na retomada..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-127-03 — Versão da política base**. READ_ONLY_DESCRIPTION. Ordem
-  127.3; Sim quando ação depende de fato. Máscara/autocomplete:
-  SEM_MASCARA;valor do servidor; off. Dependência/validação:
-  Versões/assignment/contexto na retomada. Ajuda/exemplo: “A entrega mudou
-  desde ontem. Revise antes de continuar.”. Erro: Revise versão da política
-  base: Versões/assignment/contexto na retomada..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-- **CTRL-128-01 — Salvo em**. READ_ONLY_DESCRIPTION. Ordem 128.1; Somente
-  leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Não mostrar salvo se request falhou. Ajuda/exemplo:
-  “Salvo no servidor às 09:10; disponível em outro aparelho.”. Erro: Revise
-  salvo em: Não mostrar salvo se request falhou..
+Versões empilhadas por campo; cópia manual mantém valor legível; descarte não
+é ação primária preselecionada.
 
-- **CTRL-128-02 — Revisão do rascunho**. READ_ONLY_DESCRIPTION. Ordem 128.2;
-  Somente leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Não mostrar salvo se request falhou. Ajuda/exemplo:
-  “Salvo no servidor às 09:10; disponível em outro aparelho.”. Erro: Revise
-  revisão do rascunho: Não mostrar salvo se request falhou..
+Diferenças em texto, escolha por teclado e foco de retorno ao formulário; não
+expor JSON serializado como campo de edição.
 
-- **CTRL-129-01 — Escolha na retomada**. RADIO_OR_SELECT. Ordem 129.1; Sim,
-  sem descarte preselecionado. Máscara/autocomplete: Opções finitas com rótulo
-  humano; sem opção material preaceita; off. Dependência/validação: Descartar
-  não elimina documento emitido ou ato confirmado. Ajuda/exemplo: Continuar
-  rascunho ou Descartar e começar nova; um por usuário/paciente/tipo de
-  criação e por alvo contextual P12.. Erro: Revise escolha na retomada:
-  Descartar não elimina documento emitido ou ato confirmado..
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-- **CTRL-C7-020 — Confirmar descarte somente do rascunho**.
-  EXPLICIT_DESTRUCTIVE_CONFIRMATION. Ordem C7.20; Conforme etapa; leitura de
-  servidor ou escolha explícita; sem confirmação material por default.
-  Máscara/autocomplete: Conforme tipo; string decimal exata/data local com
-  fuso; identificador opaco só leitura; off. Dependência/validação: Escopo
-  privado/tipo/alvo e versão; sem apagar documentos, ready ou preservação
-  obrigatória. Ajuda/exemplo: Sem opção destrutiva default. Erro: Revise
-  confirmar descarte somente do rascunho. Escopo privado/tipo/alvo e versão;
-  sem apagar documentos, ready ou preservação obrigatória.
+Referência do protótipo: req/draft. Sem captura real ou aceite humano de
+interface futura nesta C.
 
-## Estado, teclado e ajuda
+RECONSTRUIR resumo: conteúdo/etapa automáticos não são textareas editáveis.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+## Contratos e aceites relacionados
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-RAS-01` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `req/draft`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-009, SC-010, SC-011, SC-012.
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
 
-Critérios C9 relacionados: C-AC-017, C-AC-032, C-AC-052, C-AC-070, C-AC-080,
-C-AC-107, C-AC-110, C-AC-116, C-NEW-AC-013, C-NEW-AC-014, C-NEW-AC-019,
-C7-AC-004. A associação é por domínio; cada caso preserva seu discriminante
-específico e não significa que todos os critérios foram executados nesta tela.
-Fonte funcional:
-[ATTACHMENTS_AND_DRAFTS](../../C3-functional-specification/ATTACHMENTS_AND_DRAFTS.md).
+Aceites relacionados:
+C-AC-017;C-AC-032;C-AC-052;C-AC-070;C-AC-080;C-AC-107;C-AC-110;C-AC-116;C-NEW-AC-013;C-NEW-AC-014;C-NEW-AC-019;C7-AC-004;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-005;C-FINAL-AC-017.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

@@ -124,4 +124,11 @@ para o HEAD candidato e não é substituída por comentário de preview.
 
 P02 recebe casos por SCI-ID só após deliberação individual. P09-B já é
 requisito: verificador apenas de hash não satisfaz primeiro escopo. Os
-exemplos discriminantes complementam os 161 casos integralmente no CSV.
+exemplos discriminantes complementam os 187 casos integralmente no CSV.
+
+## Casos finais e execução futura
+
+C-FINAL-AC-001–026 acrescentam discriminantes P02/C8; 20 casos existentes
+refinados e 161 IDs preservados. Todos PLANNED_NOT_EXECUTED. Controle válido
+deve passar e contraprova falhar por razão própria na implementação D, sem
+resultado de execução fabricado nesta C.

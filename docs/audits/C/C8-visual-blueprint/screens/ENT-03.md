@@ -1,114 +1,307 @@
 # ENT-03 — Conferir entrega pessoalmente
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Recebedor designado e leitores autorizados. Banco/API
-revalidam capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /fichas/:id, atual a alterar. Gatilho: navegar pela tarefa ou
-abrir o alvo contextual autorizado. Objetivo: Conferir tudo ou indicar
-divergências; ver trânsito, aceites e responsável.
+Entrega expedida aguardando recebimento pessoal; após confirmação, somente
+consulta e próximas ações próprias.
 
-## Composição e sequência
+Finalidade: Conferir entrega pessoalmente.
 
-Resumo origem/trânsito/destino; todas as linhas e quantidades; bloco exclusivo
-do recebedor para declaração.
+Leitores consultam. Somente o recebedor efetivo designado e autorizado
+confirma seu próprio recebimento; administração/global não assinam por ele.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /fichas/:id, atual a alterar.
 
-Somente recebedor; linhas não divergentes também aparecem no resumo de aceite
-integral.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Origem, destino, material, quantidade expedida, unidade e REQs vinculadas são
+imutáveis nesta confirmação. Não renderizar seletores ou inputs para eles.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-028-01 — Origem
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da custódia de origem da emissão, por exemplo
+Família; não seletor. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Mostra de onde os materiais desta entrega foram expedidos.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Origem”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-028-02 — Destino
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da custódia de destino da emissão, por exemplo
+Equipe; não seletor. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Mostra o destino previsto. O crédito depende do recebimento
+pessoal pertinente.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Destino”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-029-01 — Material
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome completo e unidade da origem, com quebra de
+linha sem corte. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Identificação do item registrado. A consulta não substitui
+o material ou reinterpreta sua unidade.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Material”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-029-02 — Quantidade expedida
+
+**Modo/componente:** READ_ONLY / QUANTITY_WITH_UNIT.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Quantidade decimal exata com unidade e precisão da
+origem, sem input. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Quantidade registrada para a etapa indicada. Não é uma nova
+declaração de quantidade e não movimenta material ao ser consultada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Quantidade
+expedida”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-030-01 — REQs atendidas
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Lista de referências humanas das REQs vinculadas,
+com acesso próprio. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Vínculos da expedição emitida; consultar uma REQ não altera
+o material ou o crédito.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “REQs
+atendidas”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-031-01 — Recebedor
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da pessoa e papel no ato, conforme registro
+histórico; sem token ou ID de sessão. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Identifica a pessoa relacionada a este ato; não permite
+transferir sua autoria para quem consulta.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Recebedor”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-034-01 — Conferência integral
+
+**Modo/componente:** EXPLICIT_ACTION / EXPLICIT_CONFIRM_BUTTON.
+
+**Quando/ator:** Somente recebedor; confirmação após resumo de TODAS as
+linhas.
+
+**Obrigatoriedade/inicial:** Sem concordância material inicial ou clique
+automático.
+
+**Máscara/apresentação:** Botão/ação com nome de consequência; sem campo
+textual de aceite. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Resumo de todas as linhas e quantidades; Somente recebedor;
+confirmação após resumo de TODAS as linhas.
+
+**Ajuda/exemplo:** “Confirmo que recebi os materiais listados.”
+
+**Mensagem e condição:** “Esta ação não está disponível no estado atual.
+Consulte o resultado ou volte à tarefa; nenhuma confirmação será presumida.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Botão com verbo/alvo/efeito; confirmação por
+teclado/touch; foco retorna ao resumo, sem aria-invalid em texto de leitura.
+
+### CTRL-038-01 — Resolução da diferença
+
+**Modo/componente:** EDITABLE_SUBFORM / DOMAIN_ACTION_CHOICES.
+
+**Quando/ator:** Painel Resolver pendência por capacidade específica; nunca
+parte da confirmação pessoal comum.
+
+**Obrigatoriedade/inicial:** Sim ao conciliar.
+
+**Máscara/apresentação:** Ações distintas Recebido, Devolvido e Falta apurada,
+com efeito e autoridade; cada ação abre seu próprio formulário. Autocomplete:
+off.
+
+**Validação:** Quantidade positiva até pendência; motivo 3–1000; Painel
+Resolver pendência por capacidade específica; nunca parte da confirmação
+pessoal comum.
+
+**Ajuda/exemplo:** Recebido, devolvido e falta apurada têm efeitos diferentes.
+Abra a ação permitida e confira quantidade, motivo e custódias.
+
+**Mensagem e condição:** “Escolha uma opção válida para resolução da diferença
+no escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Documento e recebedor → origem/trânsito/destino em leitura → TODAS as linhas
+expedidas → confirmar integralmente ou abrir divergência → resultado.
+
+Resumo de custódias e recebedor antes das linhas; expedido e aceito em colunas
+identificadas; ação pessoal após todas as linhas.
 
 Primária: **Confirmar meu recebimento**. Secundárias: Informar divergência;
 Ver histórico; Resolver diferença quando autorizado.
 
-Consequência: Credita somente aceito real uma vez. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Credita somente aceito real uma vez.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Seu recebimento foi confirmado para as quantidades
+exibidas. Consulte o resultado por linha e eventuais pendências.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Esta entrega não tem recebimento pendente para você.
+Consulte o resultado ou peça à família que confira o destinatário.”
 
-- **CTRL-028-01 — Origem**. RADIO_OR_SELECT. Ordem 28.1; Sim, contexto de
-  intenção visível. Máscara/autocomplete: Opções finitas com rótulo humano;
-  sem opção material preaceita; off. Dependência/validação: FAMILY e CARE_TEAM
-  distintos; autorização em cada direção. Ajuda/exemplo: “Da família para a
-  equipe.”. Erro: Revise origem: FAMILY e CARE_TEAM distintos; autorização em
-  cada direção..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-028-02 — Destino**. RADIO_OR_SELECT. Ordem 28.2; Sim, contexto de
-  intenção visível. Máscara/autocomplete: Opções finitas com rótulo humano;
-  sem opção material preaceita; off. Dependência/validação: FAMILY e CARE_TEAM
-  distintos; autorização em cada direção. Ajuda/exemplo: “Da família para a
-  equipe.”. Erro: Revise destino: FAMILY e CARE_TEAM distintos; autorização em
-  cada direção..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-029-01 — Material**. SEARCHABLE_COMBOBOX. Ordem 29.1; Sim, vazio.
-  Máscara/autocomplete: Busca nome/alias; ID selecionado; off.
-  Dependência/validação: Positivo/exato; saldo disponível na origem;
-  unidade/fator junto. Ajuda/exemplo: “3 unidades saem da família.”. Erro:
-  Revise material: Positivo/exato; saldo disponível na origem; unidade/fator
-  junto..
+Sem origem/destino, recebedor, linhas/unidades e expedido confiáveis, não
+oferecer confirmação integral. Atualizar a seção; não pedir ao recebedor que
+digite os dados imutáveis ausentes.
 
-- **CTRL-029-02 — Quantidade expedida**. DECIMAL_TEXT_INPUT. Ordem 29.2; Sim,
-  vazio. Máscara/autocomplete: Vírgula/ponto; string exata; unidade junto; sem
-  arredondar; off. Dependência/validação: Positivo/exato; saldo disponível na
-  origem; unidade/fator junto. Ajuda/exemplo: “3 unidades saem da família.”.
-  Erro: Revise quantidade expedida: Positivo/exato; saldo disponível na
-  origem; unidade/fator junto..
+Conflito mantém resumo e mostra decisão atual. Resposta perdida consulta o
+aceite; nunca repetir crédito com nova chave. Conciliação é painel separado
+por capacidade.
 
-- **CTRL-030-01 — REQs atendidas**. SEARCHABLE_COMBOBOX. Ordem 30.1; Não,
-  nenhuma. Máscara/autocomplete: Busca por nome/alias autorizado; seleção por
-  ID; nenhum ID digitado como autorização; off. Dependência/validação: Mesmo
-  paciente/produto, justificativa se várias necessidades. Ajuda/exemplo:
-  Vincular não duplica material ou crédito.. Erro: Revise reqs atendidas:
-  Mesmo paciente/produto, justificativa se várias necessidades..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-034-01 — Conferência integral**. TEXT_INPUT. Ordem 34.1; Escolha
-  explícita, nunca por silêncio. Máscara/autocomplete: Sem máscara artificial;
-  preservar texto e limite do contrato; off. Dependência/validação: Resumo de
-  todas as linhas e quantidades. Ajuda/exemplo: “Confirmo que recebi os
-  materiais listados.”. Erro: Revise conferência integral: Resumo de todas as
-  linhas e quantidades..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-038-01 — Resolução da diferença**. SEARCHABLE_COMBOBOX. Ordem 38.1;
-  Sim ao conciliar. Máscara/autocomplete: Busca por nome/alias autorizado;
-  seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Quantidade positiva até pendência; motivo 3–1000.
-  Ajuda/exemplo: Cada opção tem movimento e significado próprios.. Erro:
-  Revise resolução da diferença: Quantidade positiva até pendência; motivo
-  3–1000..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-## Estado, teclado e ajuda
+Cartões por material: expedido/unidade, aceito quando editável e restante
+calculado; não cortar quantidade no viewport como a tabela do exemplo móvel.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Resumo integral anunciado antes da confirmação; erro foca quantidade
+aceita/motivo editável, nunca origem/destino/expedido em leitura.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-ENT-03` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `ent`; ausência de exemplo no HTML é declarada, sem novo mockup
-equivalente. B1: SC-018, SC-039, SC-041, OVL-021.
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-Critérios C9 relacionados: C-AC-010, C-AC-021, C-AC-028, C-AC-042, C-AC-043,
-C-AC-044, C-AC-048, C-AC-050, C-AC-074, C-AC-077, C-AC-079, C-AC-089,
-C-AC-096, C-AC-101, C-AC-103, C-AC-105, C-NEW-AC-006, C-NEW-AC-007,
-C-NEW-AC-009, C-NEW-AC-015, C-NEW-AC-016, C-NEW-AC-022, C-NEW-AC-028,
-C7-AC-002, C7-AC-010. A associação é por domínio; cada caso preserva seu
-discriminante específico e não significa que todos os critérios foram
-executados nesta tela. Fonte funcional:
-[ENT](../../C3-functional-specification/ENT.md).
+Referência do protótipo: ent. Sem captura real ou aceite humano de interface
+futura nesta C.
+
+RECONSTRUIR confirmador: a ficha atual descrevia campos da expedição como
+editáveis e uma conferência como texto livre.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-010;C-AC-021;C-AC-028;C-AC-042;C-AC-043;C-AC-044;C-AC-048;C-AC-050;C-AC-074;C-AC-077;C-AC-079;C-AC-089;C-AC-096;C-AC-101;C-AC-103;C-AC-105;C-NEW-AC-006;C-NEW-AC-007;C-NEW-AC-009;C-NEW-AC-015;C-NEW-AC-016;C-NEW-AC-022;C-NEW-AC-028;C7-AC-002;C7-AC-010;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-012;C-FINAL-AC-019.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

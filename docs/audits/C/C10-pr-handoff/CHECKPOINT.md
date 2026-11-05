@@ -1,67 +1,38 @@
-# Checkpoint C7–C10
+# Checkpoint — fechamento definitivo C
 
-04/11/2026, America/Sao_Paulo. Branch `audit/phase-b`. Entrada:
-`992c6303e9da158073f2e3e75957d0faa49fa4ee`; origem e HEAD idênticos, 18
-commits à frente de master, sem divergência. Master observada:
-`34dcb835c5c49068e0417f7306eb4e501aa868bc`. Base funcional:
-`37cb7f85e96e551d6419871f94dd950712e2565b`.
+04/11/2026, America/Sao_Paulo. Branch audit/phase-b; entrada
+266c6541bd5d3268b7e08a839df601e823ec74b5. PR 6 OPEN/Draft para master. Master
+observada: 34dcb835c5c49068e0417f7306eb4e501aa868bc. Entrada com CI
+integralmente aprovada; não usar seus resultados como prova do novo SHA. Não
+aguardar todos os jobs no encerramento.
 
-## Conteúdo concluído
+## Conclusão do conteúdo
 
-- C7: quinze respostas normalizadas,66 atos com cinco origens reais de
-  ciência,121 revisões causais e165 associações individuais; backups,
-  movimentações, drafts e assinatura/emissão especificados.
+P02 OWNER_APPROVED, ANY familiar e SCI-005 invariável por ator efetivo
+habilitado. Verificação AS_IS constatou scienceByDispatch/created_by;
+alteração futura especificada, sem corrigir produto. 66 fichas, 262 controles
+e 171 relações originais examinados. Catálogo: 274 controles, 424 usos. 58
+componentes e 150 propostas de copy corrigidos. 20 dos 161 aceites refinados,
+26 novos: 187 PLANNED_NOT_EXECUTED. C2–C10, contratos/índices/decisões e
+relatório reconciliados.
 
-- C8: direção visual já aprovada,97 B1 ×66 C3 reconciliadas em 171 relações;
-  66 fichas,262 controles e catálogo de textos/estados/ações.
+## Preservação e validação
 
-- C9:149 critérios refinados e12 complementos;161 casos de design completos,
-  todos PLANNED_NOT_EXECUTED. P02 permanece humana por SCI-ID.
+Baseline de 2.654 arquivos rastreados e 213 versões documentais exatas em
+final-closure; ordem original em gzip com hash. Arquivos não documentais,
+A/B/C0 e HTML/oito PNG preservados. Kit temporário continua ausente.
+Validações atuais e detalhes: DOCUMENTARY_VALIDATION_REPORT.md e evidências.
+Os snapshots de publicação/validação anteriores continuam preservados; o
+validador atual usa a base desta ordem, mantendo o reparo CI 266c654.
 
-- C10: documentos canônicos reconciliados; kit retirado da raiz após arquivo
-  exato e movimento dos assets; fontes/histórico preservados.
+## Publicação e limites
 
-## Validação e publicação concluídas
-
-27 verificações documentais passaram, mais a verificação dos hashes do
-manifesto. Markdown em 521 arquivos, contratos estáticos e diff checks
-passaram com Node24.22.0/npm11.21.1. Nenhuma suíte funcional local foi
-repetida por texto.
-
-Commit de conteúdo `ddb2b695cf363f3e8116802ffed4334f7fa98b7a` publicado por
-push em audit/phase-b.
-[Draft PR#6](https://github.com/RMZZFAJ/home-care-assistant/pull/6) aberto
-efetivamente para master e confirmado OPEN/isDraft=true. Registro original da
-CI em [PR_PUBLICATION.json](evidence/PR_PUBLICATION.json), com SHA e instante
-próprios. Esta atualização documental gera HEAD novo: os checks do primeiro
-snapshot não certificam o último candidato. O estado mais recente fica no PR e
-na entrega final, sem esperar toda a CI.
-
-SHA final é o commit que contém este checkpoint, resolvido por Git/ref; não
-inserir hash autorreferente no manifesto. Nenhum merge, exclusão de branch,
-criação de branch D ou promoção para produção. P02 individual segue
-OWNER_REVIEW_REQUIRED; D NÃO INICIADA e produção NO-GO.
-
-Node portátil24.22.0 verificado por SHA256 oficial, sem mudar Node global;
-npm11.21.1. Python .venv somente para documentação. Nenhuma leitura de
-.env.local, DB/Auth/Storage, restore, contratação, envio ou patch funcional.
-
-## Checks observados no primeiro snapshot
-
-- validate (ubuntu-latest): IN_PROGRESS.
-
-- validate (windows-latest): IN_PROGRESS.
-
-- database: IN_PROGRESS.
-
-- Vercel: PENDING.
-
-- Socket Security: Project Report: SUCCESS.
-
-- Socket Security: Pull Request Alerts: SUCCESS.
-
-- Vercel Preview Comments: SUCCESS.
-
-Jobs browser Chromium/mobile/iOS e agregado dependem do banco conforme
-workflow; ausência momentânea de check não significa sucesso. Preview Comments
-não substitui os gates CI. Não aguardar a conclusão nesta missão.
+Commit/push na mesma branch e atualização do Draft PR 6 autorizados. O SHA
+final é resolvido pelo Git/ref que contém este checkpoint; não há hash
+autorreferente no manifesto. A entrega e descrição do PR informam CI do último
+SHA e jobs pendentes, sem acompanhá-los até concluir. Sem merge/exclusão de
+branch/código/migration/banco/ambiente remoto/deploy
+deliberado/contratação/pesquisa comercial/início D.
+P03/P05/P07/P08/P09/P10/P13/P15/OPS-01/PERF-01 conservam gates por ramo, sem
+impedir D0 geral ou D1 independente. Branch D exige integrar PR6 à master e
+autorização posterior. Produção NO-GO.

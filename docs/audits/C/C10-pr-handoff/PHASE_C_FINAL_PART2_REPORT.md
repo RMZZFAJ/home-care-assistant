@@ -1,50 +1,68 @@
-# Fechamento C7–C10
+# Fechamento definitivo da Fase C
 
-Planejamento integral entregue. **D NÃO INICIADA; produção NO-GO.** As
-decisões humanas foram incorporadas com precedência sobre propostas
-anteriores, mantendo as deliberações e provas originais recuperáveis.
+04/11/2026, America/Sao_Paulo. Ordem complementar incorporada na
+audit/phase-b, Draft PR 6 para master. C0–C10 não foram repetidas. Base de
+entrada: 266c6541bd5d3268b7e08a839df601e823ec74b5, com CI integral aprovada na
+consulta inicial. Este novo candidato tem verificações próprias.
 
-C7 registra P01–P15/O01/O10,66 atos e cinco origens reais de ciência REQ. A
-classificação por tipo permanece OWNER_REVIEW_REQUIRED; nenhum ato material
-foi oferecido como tácito. As 121 causas e165 associações têm justificativa
-individual, fonte/linha/limite e discriminante. Foram corrigidos vínculos de
-scheduler, ENT/COM/BAL, listas, snapshots e upload, sem fundir DB-006 com
-DB-002 ou reduzir prioridades históricas.
+## Decisões registradas
 
-C8 usa o HTML já aprovado. As 97 superfícies B1 e66 C3 foram relacionadas com
-denominadores explícitos e órfãos/redirects/demos preservados ou justificados
-como candidatos futuros. Há 66 fichas e262 controles com tipo, ordem, máscara,
-default, dependência, ajuda, erro e acesso. Microcopy atual, proposta e
-expressão técnica possuem estados distintos. Guia tem capturas reais futuras;
-oito PNG recebidos continuam referências estáticas.
+P02 OWNER_APPROVED: cinco origens definidas, três modalidades informativas
+elegíveis, ANY familiar e SCI-005 obrigatória/permanente/não configurável.
+SCI-005 usa ator efetivo habilitado da expedição oficial, não created_by, e
+nunca save/draft. Read WhatsApp é comunicação; confirmação futura depende de
+homologação externa. REQ materialmente imutável; eventos/PDF não invalidam
+ciência do mesmo conteúdo.
+[Política](../C7-decision-closure/SCIENCE_OWNER_REVIEW.md) e
+[confronto AS_IS](../C7-decision-closure/SCIENCE_AS_IS_TO_BE_ANALYSIS.md).
 
-C9 refina149 aceites e acrescenta12 complementos:161 casos com fixture, ator,
-passos, esperado/proibido, leitura independente, efeitos, erro/retry, camadas
-e gates. Exemplos cobrem ENT pessoal, BAL facultativo, P02, P09, rascunhos,
-P15, devolução/transferência, PWA, scheduler, PDF vazio, NULL e axe. Nenhum
-teste executável ou comportamento funcional foi alterado.
+## Revisão visual executada
 
-C10 atualiza índices, decisões e planos C3–C6; preserva relatórios datados. O
-kit temporário foi removido após preservação de 16 entradas, com HTML/PNG
-movidos byte a byte e Markdown arquivado exato. As fontes anteriores das
-matrizes editadas estão no arquivo de proveniência. Validação e estado de
-publicação são registrados no checkpoint/relatório/PR, com SHA externo ao
-conteúdo autorreferente.
+66 fichas, 262 controles e 171 relações originais individualmente revistos. 58
+tipos de componente corrigidos, 150 propostas B1 corrigidas e 12 controles
+ausentes adicionados. Catálogo atual: 274 controles, 424 usos por tela/estado,
+171 relações reconciliadas e 6.479 linhas de copy, com 4.205 fontes B1 exatas.
+As 24 dimensões de cada ficha estão no registro semântico. HTML e oito PNG
+aprovados preservados, sem recriar protótipo equivalente.
 
-Pendências: P02 por SCI-ID; custos/metas/donos de backup; conservação por
-classe; certificado/perfil/chaves/TSA; participantes/aparelhos efetivos;
-limiares de alertas; transporte/TTL de arquivos revogados; equivalência futura
-da UI de devolução e política de lembretes legados. P01/P04/P06/P11/ P12/P14 e
-direção visual não foram reabertas.
+Correções incluem ENT-03 sem edição de expedição, ESC-03 sem editar proposta,
+COM-03 chegada separada de decisão, ENT-05 sem redebitar consumo, BAL-03 com
+parecer próprio, RAS-01 sem editor de payload, DOC com histórico/resultados em
+leitura e mensagens por etapa/certidão. Relações globais, de consulta e de
+cancelamento foram corrigidas com rastro. Composição móvel evita cortes e
+prioriza tarefa.
+[Achados e correções](../C8-visual-blueprint/FINAL_SEMANTIC_REVIEW_REPORT.md).
+Isso é revisão de especificação, não correção funcional ou aceite humano.
 
-Commit/push e Draft PR encerram a missão. Revisão, CI do último HEAD,
-autorização posterior de merge e verificação de efeito Vercel precedem
-qualquer integração. Não há branch cleanup, início de D ou GO produtivo.
+## Aceites e coerência documental
 
-## Publicação observada
+161 IDs anteriores preservados; 20 casos refinados e 26 discriminantes novos,
+total 187 PLANNED_NOT_EXECUTED. C2/C3/C4/C5/C7/C8/C9/C10, decisões, índices e
+estado atual reconciliados. Não foram escritos/executados testes funcionais
+novos nesta missão.
+[Alterações](../C9-acceptance-refinement/FINAL_ACCEPTANCE_CHANGES.csv). 121
+causas/165 origens históricas conservadas, sem inflar defeitos com a contagem
+de correções editoriais/decisórias.
 
-[Draft PR#6](https://github.com/RMZZFAJ/home-care-assistant/pull/6) aberto de
-audit/phase-b para master; conteúdo publicado por commit/push. Snapshot da CI
-em PR_PUBLICATION.json identifica seu próprio SHA; HEAD final e checks mais
-recentes são resolvidos no PR/Git, sem CI verde presumida. Sem merge, cleanup
-de branches, deploy deliberado ou início D.
+## Gates e fronteiras
+
+P03/P05/P07/P08/P09/P10/P13/P15/OPS-01/PERF-01 não impedem D0 geral/D1
+independente. Cada ramo/implementação/homologação mantém seu gate, nenhum
+aprovado por completar documento. P03/P09/P13 terão pesquisa comercial externa
+pelo responsável com ChatGPT; não houve pesquisa ou contratação. P09-B
+permanece mínimo obrigatório; Meta/Flows/O17/O18 postergados.
+[Matriz de gates](../C7-decision-closure/GATE_CLASSIFICATION.csv).
+
+Branch D depende de integrar PR6 à master e autorização posterior. Sem merge,
+branch excluída, código funcional/configuração/teste alterados, migration,
+banco/ambiente remoto modificado, deploy deliberado ou início D. Produção
+permanece NO-GO.
+
+## Evidências e validação
+
+Ordem exata, baseline e 213 documentos anteriores arquivados por hash/gzip em
+final-closure. Auditorias A/B/C0, fontes/protótipo e não documentais
+preservados. Resultados atuais em
+[validação documental](DOCUMENTARY_VALIDATION_REPORT.md) e
+[checkpoint](CHECKPOINT.md). SHA final é o commit publicado que contém este
+relatório; estado do PR/CI será informado na entrega, sem aguardar todos jobs.

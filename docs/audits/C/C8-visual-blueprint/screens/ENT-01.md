@@ -1,122 +1,330 @@
 # ENT-01 — Preparar entrega
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Emissor autorizado na custódia. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /fichas/ent, atual a alterar. Gatilho: navegar pela tarefa ou
-abrir o alvo contextual autorizado. Objetivo: Preparar materiais/quantidades,
-custódias e recebedor; revisar e expedir.
+Preparação privada → revisão → expedição oficial; nenhum efeito de estoque ou
+ciência no save.
 
-## Composição e sequência
+Finalidade: Preparar entrega.
 
-Passos Preparar/Conferir/Expedir; origem/destino e recebedor antes dos itens;
-ajuda sobre aceite ao lado.
+Emissor autorizado à direção de custódia. Recebedor é pessoa elegível
+escolhida pela família; ator da expedição é a sessão atual, não o criador do
+draft.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /fichas/ent, atual a alterar.
 
-Escala sugere, família pode escolher vinculada apta com motivo; nada de
-confirmar por outra pessoa.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Saldo permitido como referência, identidade do ator e regra permanente
+SCI-005. Expedição de ator familiar habilitado registra ciência das REQs
+vinculadas obrigatoriamente.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-028-01 — Origem
+
+**Modo/componente:** EDITABLE / RADIO_OR_SELECT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim, contexto de intenção visível.
+
+**Máscara/apresentação:** Opções do domínio rotuladas; escolha material
+explícita, sem concordância presumida. Autocomplete: off.
+
+**Validação:** FAMILY e CARE_TEAM distintos; autorização em cada direção;
+Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Da família para a equipe.”
+
+**Mensagem e condição:** “Escolha uma opção válida para origem no escopo desta
+tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-028-02 — Destino
+
+**Modo/componente:** EDITABLE / RADIO_OR_SELECT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim, contexto de intenção visível.
+
+**Máscara/apresentação:** Opções do domínio rotuladas; escolha material
+explícita, sem concordância presumida. Autocomplete: off.
+
+**Validação:** FAMILY e CARE_TEAM distintos; autorização em cada direção;
+Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Da família para a equipe.”
+
+**Mensagem e condição:** “Escolha uma opção válida para destino no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-029-01 — Material
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim, vazio.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Positivo/exato; saldo disponível na origem; unidade/fator
+junto; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “3 unidades saem da família.”
+
+**Mensagem e condição:** “Escolha uma opção válida para material no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-029-02 — Quantidade expedida
+
+**Modo/componente:** EDITABLE / DECIMAL_TEXT_INPUT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim, vazio.
+
+**Máscara/apresentação:** Quantidade textual exata com unidade; vírgula/ponto,
+inputmode decimal e precisão explícita antes da coerção. Autocomplete: off.
+
+**Validação:** Positivo/exato; saldo disponível na origem; unidade/fator
+junto; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “3 unidades saem da família.”
+
+**Mensagem e condição:** “Informe quantidade expedida na unidade indicada e
+com a precisão permitida. O campo precisa de correção antes de confirmar.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-030-01 — REQs atendidas
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Não, nenhuma.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Mesmo paciente/produto, justificativa se várias necessidades;
+Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Vincular não duplica material ou crédito.
+
+**Mensagem e condição:** “Escolha uma opção válida para reqs atendidas no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-031-01 — Recebedor
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim, sugestão pela escala se inequívoca; editável
+antes de emissão.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Pessoa vinculada/elegível; escala sugere; escolha manual pela
+família com exceção registrada P06; Somente no subestado de preparação
+autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Quem receberá fisicamente? Confirme a pessoa.”
+
+**Mensagem e condição:** “Escolha uma opção válida para recebedor no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-032-01 — Justificativa de troca
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Se mudar destinatário fora da sugestão ou depois
+da preparação.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** 3–1000; versão/instante preservados; Somente no subestado de
+preparação autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Outro profissional receberá os materiais.”
+
+**Mensagem e condição:** “Confira justificativa de troca e o limite indicado.
+Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-033-01 — Observações de expedição
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Não, vazio.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** Até 2000; não substitui ressalva de recebimento; Somente no
+subestado de preparação autorizado indicado na ficha; resumo/decisão posterior
+é leitura.
+
+**Ajuda/exemplo:** “Pacote fechado entregue para conferência.”
+
+**Mensagem e condição:** “Confira observações de expedição e o limite
+indicado. Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-C8-005 — Ciência obrigatória pela expedição
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Regra permanente, independente de preferências;
+nenhum toggle, checkbox de desligamento ou override.
+
+**Máscara/apresentação:** Aviso permanente de regra, em texto, sem campo ou
+controle de desativação. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Expedir a entrega vinculada registra a ciência do
+responsável familiar autorizado que realiza a expedição. Isso não confirma
+recebimento ou consumo.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Ciência
+obrigatória pela expedição”. Atualize esta seção. O dado registrado não pode
+ser alterado aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Origem/destino → recebedor e sugestão da escala →
+materiais/quantidades/unidades → vínculos REQ → observações → revisão →
+expedir.
+
+Conteúdo em até duas colunas: editor principal flexível e ajuda lateral de
+cerca de um terço; etapas no topo e resumo de itens antes do rodapé.
 
 Primária: **Revisar e expedir**. Secundárias: Salvar rascunho; Adicionar
 material; Voltar.
 
-Consequência: Expedição debita origem/credita trânsito; destino aguarda
-aceite. Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão
-material. Retorno/Voltar preserva edição e contexto; próximo destino é
-resultado do ato ou tarefa pertinente, nunca novo envio automático. Em
-resposta incerta consultar intenção antes de prosseguir.
+Efeito: Expedição debita origem/credita trânsito; destino aguarda aceite.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Entrega expedida. Os materiais estão em trânsito e
+aguardam confirmação pessoal do recebedor indicado.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Prepare os materiais e indique quem poderá confirmar o
+recebimento antes de revisar a entrega.”
 
-- **CTRL-028-01 — Origem**. RADIO_OR_SELECT. Ordem 28.1; Sim, contexto de
-  intenção visível. Máscara/autocomplete: Opções finitas com rótulo humano;
-  sem opção material preaceita; off. Dependência/validação: FAMILY e CARE_TEAM
-  distintos; autorização em cada direção. Ajuda/exemplo: “Da família para a
-  equipe.”. Erro: Revise origem: FAMILY e CARE_TEAM distintos; autorização em
-  cada direção..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-028-02 — Destino**. RADIO_OR_SELECT. Ordem 28.2; Sim, contexto de
-  intenção visível. Máscara/autocomplete: Opções finitas com rótulo humano;
-  sem opção material preaceita; off. Dependência/validação: FAMILY e CARE_TEAM
-  distintos; autorização em cada direção. Ajuda/exemplo: “Da família para a
-  equipe.”. Erro: Revise destino: FAMILY e CARE_TEAM distintos; autorização em
-  cada direção..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-029-01 — Material**. SEARCHABLE_COMBOBOX. Ordem 29.1; Sim, vazio.
-  Máscara/autocomplete: Busca nome/alias; ID selecionado; off.
-  Dependência/validação: Positivo/exato; saldo disponível na origem;
-  unidade/fator junto. Ajuda/exemplo: “3 unidades saem da família.”. Erro:
-  Revise material: Positivo/exato; saldo disponível na origem; unidade/fator
-  junto..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-029-02 — Quantidade expedida**. DECIMAL_TEXT_INPUT. Ordem 29.2; Sim,
-  vazio. Máscara/autocomplete: Vírgula/ponto; string exata; unidade junto; sem
-  arredondar; off. Dependência/validação: Positivo/exato; saldo disponível na
-  origem; unidade/fator junto. Ajuda/exemplo: “3 unidades saem da família.”.
-  Erro: Revise quantidade expedida: Positivo/exato; saldo disponível na
-  origem; unidade/fator junto..
+Edição salva e expedição recusada têm resultados separados. Se a expedição
+está incerta, congelar conteúdo/recebedor e consultar a mesma intenção.
 
-- **CTRL-030-01 — REQs atendidas**. SEARCHABLE_COMBOBOX. Ordem 30.1; Não,
-  nenhuma. Máscara/autocomplete: Busca por nome/alias autorizado; seleção por
-  ID; nenhum ID digitado como autorização; off. Dependência/validação: Mesmo
-  paciente/produto, justificativa se várias necessidades. Ajuda/exemplo:
-  Vincular não duplica material ou crédito.. Erro: Revise reqs atendidas:
-  Mesmo paciente/produto, justificativa se várias necessidades..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-031-01 — Recebedor**. SEARCHABLE_COMBOBOX. Ordem 31.1; Sim, sugestão
-  pela escala se inequívoca; editável antes de emissão. Máscara/autocomplete:
-  Busca por nome/alias autorizado; seleção por ID; nenhum ID digitado como
-  autorização; off. Dependência/validação: Pessoa vinculada/elegível; escala
-  sugere; escolha manual pela família com exceção registrada P06.
-  Ajuda/exemplo: “Quem receberá fisicamente? Confirme a pessoa.”. Erro: Revise
-  recebedor: Pessoa vinculada/elegível; escala sugere; escolha manual pela
-  família com exceção registrada P06..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-032-01 — Justificativa de troca**. TEXTAREA. Ordem 32.1; Se mudar
-  destinatário fora da sugestão ou depois da preparação. Máscara/autocomplete:
-  Sem máscara; contador e limite do contrato visíveis; quebra de linha/reflow;
-  off. Dependência/validação: 3–1000; versão/instante preservados.
-  Ajuda/exemplo: “Outro profissional receberá os materiais.”. Erro: Revise
-  justificativa de troca: 3–1000; versão/instante preservados..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-- **CTRL-033-01 — Observações de expedição**. TEXTAREA. Ordem 33.1; Não,
-  vazio. Máscara/autocomplete: Sem máscara; contador e limite do contrato
-  visíveis; quebra de linha/reflow; off. Dependência/validação: Até 2000; não
-  substitui ressalva de recebimento. Ajuda/exemplo: “Pacote fechado entregue
-  para conferência.”. Erro: Revise observações de expedição: Até 2000; não
-  substitui ressalva de recebimento..
+Uma coluna; cada material vira cartão com nome/unidade antes da quantidade;
+contexto antes da ação. Não esconder quantidade em tabela horizontal.
 
-## Estado, teclado e ajuda
+Inserir item move foco ao campo da nova linha; remover devolve à linha
+vizinha; etapas preservam valores e ordem de leitura.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-ENT-01` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `ent/entReview`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-011, OVL-019.
+Referência do protótipo: ent/entReview. Sem captura real ou aceite humano de
+interface futura nesta C.
 
-Critérios C9 relacionados: C-AC-010, C-AC-021, C-AC-028, C-AC-042, C-AC-043,
-C-AC-044, C-AC-048, C-AC-050, C-AC-074, C-AC-077, C-AC-079, C-AC-089,
-C-AC-096, C-AC-101, C-AC-103, C-AC-105, C-NEW-AC-006, C-NEW-AC-007,
-C-NEW-AC-009, C-NEW-AC-015, C-NEW-AC-016, C-NEW-AC-022, C-NEW-AC-028,
-C7-AC-002, C7-AC-010. A associação é por domínio; cada caso preserva seu
-discriminante específico e não significa que todos os critérios foram
-executados nesta tela. Fonte funcional:
-[ENT](../../C3-functional-specification/ENT.md).
+EVOLUIR identidade do protótipo; reconstruir comando/resultado para autoria
+efetiva e invariável SCI-005 em D.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-010;C-AC-021;C-AC-028;C-AC-042;C-AC-043;C-AC-044;C-AC-048;C-AC-050;C-AC-074;C-AC-077;C-AC-079;C-AC-089;C-AC-096;C-AC-101;C-AC-103;C-AC-105;C-NEW-AC-006;C-NEW-AC-007;C-NEW-AC-009;C-NEW-AC-015;C-NEW-AC-016;C-NEW-AC-022;C-NEW-AC-028;C7-AC-002;C7-AC-010;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-001;C-FINAL-AC-002;C-FINAL-AC-003;C-FINAL-AC-004;C-FINAL-AC-005;C-FINAL-AC-006;C-FINAL-AC-007.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

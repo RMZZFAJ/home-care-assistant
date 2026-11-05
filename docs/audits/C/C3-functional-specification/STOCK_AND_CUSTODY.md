@@ -43,120 +43,226 @@ TO_BE preserva movimentos oficiais, DEC-007/013/015, O09/O12 e P07/P15.
 
 - **Campo:** Custódia consultada
 
-  **Tipo/origem:** Seleção de áreas autorizadas
+  **Tipo/origem por tela e estado:** EST-01 Custódia consultada: FILTER
+  (AUTHORIZED_CUSTODY_FILTER); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade
 
-  **Obrigatório e default:** Sim, contexto permitido
+  **Obrigatoriedade/default na preparação:** EST-01 Custódia consultada: Sem
+  restrição adicional inicialmente, salvo filtro de tarefa explicitamente
+  indicado no link; vazio limpa filtro, não cria zero ou estado material
 
-  **Validação/unidade:** Equipe não vê saldo geral familiar
+  **Validação/unidade:** EST-01 Custódia consultada: Filtro tipado da
+  seção/tarefa, com valores permitidos e escopo autorizados; não aceitar um
+  enum universal para processos distintos; datas em DD/MM/AAAA na apresentação
+  e limites de consulta validados; manter filtros ao voltar
 
-  **Ajuda e exemplo:** “Disponível na equipe”, não “Estoque total”
-  indiscriminado.
+  **Ajuda/exemplo:** EST-01 Custódia consultada: “Disponível na equipe”, não
+  “Estoque total” indiscriminado.
 
 - **Campo:** Material
 
-  **Tipo/origem:** Busca no catálogo/identidade histórica
+  **Tipo/origem por tela e estado:** EST-02 Material: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; EST-04 Material:
+  EDITABLE (SEARCHABLE_COMBOBOX); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim ao movimentar
+  **Obrigatoriedade/default na preparação:** EST-02 Material: Sim ao
+  movimentar; EST-04 Material: Sim ao movimentar
 
-  **Validação/unidade:** Ativo para nova operação normal; inativo tem caminho
-  específico
+  **Validação/unidade:** EST-02 Material: Ativo para nova operação normal;
+  inativo tem caminho específico; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura; EST-04
+  Material: Ativo para nova operação normal; inativo tem caminho específico;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Unidade e precisão visíveis.
+  **Ajuda/exemplo:** EST-02 Material: Unidade e precisão visíveis.; EST-04
+  Material: Unidade e precisão visíveis.
 
 - **Campo:** Ação
 
-  **Tipo/origem:** Entrada/retirada/correção de entrada/correção de saída
+  **Tipo/origem por tela e estado:** EST-02 Ação: EDITABLE (RADIO_OR_SELECT);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim, escolha explícita
+  **Obrigatoriedade/default na preparação:** EST-02 Ação: Sim, escolha
+  explícita
 
-  **Validação/unidade:** Direção não inferida de sinal negativo
+  **Validação/unidade:** EST-02 Ação: Direção não inferida de sinal negativo;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Retirar 1 unidade do estoque familiar.”
+  **Ajuda/exemplo:** EST-02 Ação: “Retirar 1 unidade do estoque familiar.”
 
 - **Campo:** Quantidade
 
-  **Tipo/origem:** Decimal, autor
+  **Tipo/origem por tela e estado:** EST-02 Quantidade: EDITABLE
+  (DECIMAL_TEXT_INPUT); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; EST-04 Quantidade: EDITABLE
+  (DECIMAL_TEXT_INPUT); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim, vazio
+  **Obrigatoriedade/default na preparação:** EST-02 Quantidade: Sim, vazio;
+  EST-04 Quantidade: Sim, vazio
 
-  **Validação/unidade:** Positiva, finita, até 1 bilhão, até 6 casas e
-  precisão do produto antes de coerção
+  **Validação/unidade:** EST-02 Quantidade: Positiva, finita, até 1 bilhão,
+  até 6 casas e precisão do produto antes de coerção; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura;
+  EST-04 Quantidade: Positiva, finita, até 1 bilhão, até 6 casas e precisão do
+  produto antes de coerção; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** 1,5 aceita apenas em unidade fracionável.
+  **Ajuda/exemplo:** EST-02 Quantidade: 1,5 aceita apenas em unidade
+  fracionável.; EST-04 Quantidade: 1,5 aceita apenas em unidade fracionável.
 
 - **Campo:** Movimento original
 
-  **Tipo/origem:** Referência pesquisável, servidor
+  **Tipo/origem por tela e estado:** EST-02 Movimento original: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim para correção
+  **Obrigatoriedade/default na preparação:** EST-02 Movimento original: Sim
+  para correção
 
-  **Validação/unidade:** Mesmo paciente/produto/custódia e fato compatível;
-  obrigatório também API/RPC
+  **Validação/unidade:** EST-02 Movimento original: Mesmo
+  paciente/produto/custódia e fato compatível; obrigatório também API/RPC;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Corrigir a entrada de 2 unidades registrada em…”
+  **Ajuda/exemplo:** EST-02 Movimento original: “Corrigir a entrada de 2
+  unidades registrada em…”
 
 - **Campo:** Motivo
 
-  **Tipo/origem:** Texto do ator
+  **Tipo/origem por tela e estado:** EST-02 Motivo: EDITABLE (TEXTAREA);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; EST-04 Motivo: EDITABLE (TEXTAREA);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim
+  **Obrigatoriedade/default na preparação:** EST-02 Motivo: Sim; EST-04
+  Motivo: Sim
 
-  **Validação/unidade:** 3–1000 caracteres
+  **Validação/unidade:** EST-02 Motivo: 3–1000 caracteres; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; EST-04 Motivo: 3–1000 caracteres; Somente no subestado
+  de preparação autorizado indicado na ficha; resumo/decisão posterior é
+  leitura
 
-  **Ajuda e exemplo:** “Entrada registrada em quantidade maior que a
-  conferida.”
+  **Ajuda/exemplo:** EST-02 Motivo: “Entrada registrada em quantidade maior
+  que a conferida.”; EST-04 Motivo: “Entrada registrada em quantidade maior
+  que a conferida.”
 
 - **Campo:** Antes/depois
 
-  **Tipo/origem:** Projeção do servidor
+  **Tipo/origem por tela e estado:** EST-02 Antes/depois: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim no resumo
+  **Obrigatoriedade/default na preparação:** EST-02 Antes/depois: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Versão/ledger atual e direção/unidade
+  **Validação/unidade:** EST-02 Antes/depois: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** “Família: 5 → 4 unidades.”
+  **Ajuda/exemplo:** EST-02 Antes/depois: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.
 
 - **Campo:** Anexo
 
-  **Tipo/origem:** Reserva/arquivo privado
+  **Tipo/origem por tela e estado:** EST-02 Anexo: EDITABLE
+  (ATTACHMENT_SECTION); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Opcional
+  **Obrigatoriedade/default na preparação:** EST-02 Anexo: Opcional
 
-  **Validação/unidade:** Regra de anexos e recuperação por tentativa
+  **Validação/unidade:** EST-02 Anexo: Regra de anexos e recuperação por
+  tentativa; Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Não bloquear consulta do movimento já confirmado por
-  falha de anexo.
+  **Ajuda/exemplo:** EST-02 Anexo: Anexe evidência pelo fluxo de arquivo
+  autorizado; um nome ou caminho digitado não equivale a arquivo pronto.
 
 - **Campo:** Origem/destino da transferência
 
-  **Tipo/origem:** Custódias distintas
+  **Tipo/origem por tela e estado:** EST-04 Origem: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; EST-04 Destino:
+  EDITABLE (SEARCHABLE_COMBOBOX); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim no novo painel
+  **Obrigatoriedade/default na preparação:** EST-04 Origem: Sim no novo
+  painel; EST-04 Destino: Sim no novo painel
 
-  **Validação/unidade:** Autorização, saldo e P07
+  **Validação/unidade:** EST-04 Origem: Autorização, saldo e P07; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; EST-04 Destino: Autorização, saldo e P07; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura
 
-  **Ajuda e exemplo:** Sem edição direta das duas colunas de saldo.
+  **Ajuda/exemplo:** EST-04 Origem: Sem edição direta das duas colunas de
+  saldo.; EST-04 Destino: Sem edição direta das duas colunas de saldo.
 
 - **Campo:** Contraparte/recebedor
 
-  **Tipo/origem:** Pessoas elegíveis
+  **Tipo/origem por tela e estado:** EST-04 Contraparte: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; EST-04 Recebedor
+  físico: EDITABLE (SEARCHABLE_COMBOBOX); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim conforme P07
+  **Obrigatoriedade/default na preparação:** EST-04 Contraparte: Sim conforme
+  P07; EST-04 Recebedor físico: Sim conforme P07
 
-  **Validação/unidade:** Contrassinatura distinta de aceite físico se pessoas
-  diferentes
+  **Validação/unidade:** EST-04 Contraparte: Pessoa competente na contraparte;
+  concordância não substitui aceite pessoal do recebedor real; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; EST-04 Recebedor físico: Contrassinatura distinta de
+  aceite físico se pessoas diferentes; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Identificar quem declara, valida e recebe.
+  **Ajuda/exemplo:** EST-04 Contraparte: Identificar quem declara, valida e
+  recebe.; EST-04 Recebedor físico: Identificar quem declara, valida e recebe.
 
 - **Campo:** Estado e período do histórico
 
-  **Tipo/origem:** Filtros de consulta
+  **Tipo/origem por tela e estado:** EST-03 Tipo ou origem do movimento:
+  FILTER (FILTER_SELECT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; EST-03 Data inicial: FILTER
+  (DATE_INPUT); Apenas consulta no escopo permitido; não altera documento,
+  movimento ou autoridade; EST-03 Data final: FILTER (DATE_INPUT); Apenas
+  consulta no escopo permitido; não altera documento, movimento ou autoridade
 
-  **Obrigatório e default:** Não, defaults explícitos
+  **Obrigatoriedade/default na preparação:** EST-03 Tipo ou origem do
+  movimento: Sem restrição adicional inicialmente, salvo filtro de tarefa
+  explicitamente indicado no link; vazio limpa filtro, não cria zero ou estado
+  material; EST-03 Data inicial: Sem restrição adicional inicialmente, salvo
+  filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não
+  cria zero ou estado material; EST-03 Data final: Sem restrição adicional
+  inicialmente, salvo filtro de tarefa explicitamente indicado no link; vazio
+  limpa filtro, não cria zero ou estado material
 
-  **Validação/unidade:** Cursor estável, ID antigo alcançável
+  **Validação/unidade:** EST-03 Tipo ou origem do movimento: Filtro tipado da
+  seção/tarefa, com valores permitidos e escopo autorizados; não aceitar um
+  enum universal para processos distintos; datas em DD/MM/AAAA na apresentação
+  e limites de consulta validados; manter filtros ao voltar; EST-03 Data
+  inicial: Filtro tipado da seção/tarefa, com valores permitidos e escopo
+  autorizados; não aceitar um enum universal para processos distintos; datas
+  em DD/MM/AAAA na apresentação e limites de consulta validados; manter
+  filtros ao voltar; EST-03 Data final: Filtro tipado da seção/tarefa, com
+  valores permitidos e escopo autorizados; não aceitar um enum universal para
+  processos distintos; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar
 
-  **Ajuda e exemplo:** “Movimentos de novembro; há páginas anteriores.”
+  **Ajuda/exemplo:** EST-03 Tipo ou origem do movimento: “Movimentos de
+  novembro; há páginas anteriores.”; EST-03 Data inicial: “Movimentos de
+  novembro; há páginas anteriores.”; EST-03 Data final: “Movimentos de
+  novembro; há páginas anteriores.”
 
 <!-- c-table:end -->
 

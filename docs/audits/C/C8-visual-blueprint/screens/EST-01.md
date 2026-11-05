@@ -1,68 +1,119 @@
 # EST-01 — Consultar estoques
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Capacidade por custódia. Banco/API revalidam capacidade,
-alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /estoque, atual a alterar. Gatilho: navegar pela tarefa ou
-abrir o alvo contextual autorizado. Objetivo: Saldos confirmados por custódia,
-trânsito e previsão separados; atualizar sem apagar painel válido.
+Consulta por custódia autorizada; confirmado, trânsito e previsão são
+grandezas distintas.
 
-## Composição e sequência
+Finalidade: Consultar estoques.
 
-Cards Família/Equipe/Trânsito com previsão separada; busca e lista; erro de
-movimentos não apaga saldo válido.
+Capacidade de leitura da custódia; equipe não vê saldo familiar geral por
+seleção de filtro.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /estoque, atual a alterar.
 
-Equipe não vê saldo familiar geral; item inativo com saldo permanece listado.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Todos os saldos e totais; nenhum saldo é input editável. Inativo com saldo
+permanece na custódia verdadeira.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-070-01 — Custódia consultada
+
+**Modo/componente:** FILTER / AUTHORIZED_CUSTODY_FILTER.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Somente custódias consultáveis com nome humano;
+limpar filtro conserva o escopo autorizado. Autocomplete: off.
+
+**Validação:** Filtro tipado da seção/tarefa, com valores permitidos e escopo
+autorizados; não aceitar um enum universal para processos distintos; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** “Disponível na equipe”, não “Estoque total” indiscriminado.
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Custódia permitida → busca/filtros → saldo com unidade/frescor →
+trânsito/previsão separados → origem ou movimento autorizado.
+
+Cards de custódia, previsão separada, filtros e lista detalhada; movimentos em
+painel independente do saldo.
 
 Primária: **Abrir material**. Secundárias: Atualizar; Filtrar custódia; Ver
 trânsito.
 
-Consequência: Consulta não movimenta. Mostrar objeto/quantidade/pessoa/versão
-antes de qualquer decisão material. Retorno/Voltar preserva edição e contexto;
-próximo destino é resultado do ato ou tarefa pertinente, nunca novo envio
-automático. Em resposta incerta consultar intenção antes de prosseguir.
+Efeito: Consulta não movimenta.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Estoque consultado. Previsões e materiais em trânsito não
+foram somados ao disponível.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhum material corresponde aos filtros. Isso não altera o
+estoque; limpe a busca para consultar o conjunto permitido.”
 
-- **CTRL-070-01 — Custódia consultada**. SEARCHABLE_COMBOBOX. Ordem 70.1; Sim,
-  contexto permitido. Máscara/autocomplete: Busca por nome/alias autorizado;
-  seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Equipe não vê saldo geral familiar. Ajuda/exemplo:
-  “Disponível na equipe”, não “Estoque total” indiscriminado.. Erro: Revise
-  custódia consultada: Equipe não vê saldo geral familiar..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-## Estado, teclado e ajuda
+## 19–20. Falhas, recuperação e continuidade
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-EST-01` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `stock`; ausência de exemplo no HTML é declarada, sem novo mockup
-equivalente. B1: SC-016, SC-017, SC-018.
+Falha no histórico não apaga saldo válido; marcar última atualização e isolar
+a falha. Resposta de outro paciente é descartada.
 
-Critérios C9 relacionados: C-AC-010, C-AC-021, C-AC-022, C-AC-045, C-AC-046,
-C-AC-053, C-AC-066, C-AC-068, C-AC-072, C-AC-074, C-AC-120, C-NEW-AC-008,
-C-NEW-AC-009, C-NEW-AC-015, C-NEW-AC-023, C-NEW-AC-025, C7-AC-010. A
-associação é por domínio; cada caso preserva seu discriminante específico e
-não significa que todos os critérios foram executados nesta tela. Fonte
-funcional:
-[STOCK_AND_CUSTODY](../../C3-functional-specification/STOCK_AND_CUSTODY.md).
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
+
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
+
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Cartões de material com cada custódia rotulada; nunca deixar ação/quantidade
+fora da tela por largura mínima de tabela.
+
+Saldo com unidade e data de consulta; cores de inativo/trânsito têm texto;
+filtro limita somente custódias autorizadas.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: stock. Sem captura real ou aceite humano de interface
+futura nesta C.
+
+EVOLUIR cards aprovados e separar dados/restrições por custódia; lista móvel
+não exige rolagem global.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-010;C-AC-021;C-AC-022;C-AC-045;C-AC-046;C-AC-053;C-AC-066;C-AC-068;C-AC-072;C-AC-074;C-AC-120;C-NEW-AC-008;C-NEW-AC-009;C-NEW-AC-015;C-NEW-AC-023;C-NEW-AC-025;C7-AC-010;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

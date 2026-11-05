@@ -51,138 +51,346 @@ TO_BE preserva isso e aplica DEC-002/003/012/030 e O11/O16.
 
 - **Campo:** Paciente
 
-  **Tipo/origem:** Contexto de servidor, somente leitura
+  **Tipo/origem por tela e estado:** REQ-01 Paciente: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; REQ-02 Paciente: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; REQ-03 Paciente:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim, contexto selecionado
+  **Obrigatoriedade/default na preparação:** REQ-01 Paciente: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; REQ-02 Paciente: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; REQ-03 Paciente: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Revalidar vínculo na emissão
+  **Validação/unidade:** REQ-01 Paciente: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; REQ-02 Paciente: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; REQ-03 Paciente: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** “Você está solicitando para Residência Exemplo.”
+  **Ajuda/exemplo:** REQ-01 Paciente: Confira a residência desta tarefa.
+  Trocar contexto é uma ação separada e exige acesso autorizado.; REQ-02
+  Paciente: Confira a residência desta tarefa. Trocar contexto é uma ação
+  separada e exige acesso autorizado.; REQ-03 Paciente: Confira a residência
+  desta tarefa. Trocar contexto é uma ação separada e exige acesso autorizado.
 
 - **Campo:** Materiais
 
-  **Tipo/origem:** Multi-seleção buscável, catálogo ativo
+  **Tipo/origem por tela e estado:** REQ-01 Materiais: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; REQ-02 Materiais:
+  READ_ONLY (TEXT_VALUE); Estado de consulta/revisão da tarefa; não herdar
+  edição do formulário de origem
 
-  **Obrigatório e default:** Ao menos um material ou extra; vazio
+  **Obrigatoriedade/default na preparação:** REQ-01 Materiais: Ao menos um
+  material ou extra; vazio; REQ-02 Materiais: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado
 
-  **Validação/unidade:** IDs únicos, até 1000 linhas herdadas; alias busca
+  **Validação/unidade:** REQ-01 Materiais: IDs únicos, até 1000 linhas
+  herdadas; alias busca; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; REQ-02 Materiais:
+  Revalidar acesso, referência e estado na leitura/ação. Não solicitar ao
+  usuário correção deste valor nesta tela. Estado de consulta/revisão da
+  tarefa; não herdar edição do formulário de origem
 
-  **Ajuda e exemplo:** “Escolha os materiais de que precisa.”
+  **Ajuda/exemplo:** REQ-01 Materiais: “Escolha os materiais de que precisa.”;
+  REQ-02 Materiais: Informação do registro indicado, somente para consulta
+  nesta etapa. Ausência de dado histórico permanece explicitamente
+  identificada.
 
 - **Campo:** Estoque observado
 
-  **Tipo/origem:** Decimal por linha, declaração atual
+  **Tipo/origem por tela e estado:** REQ-01 Estoque observado: EDITABLE
+  (DECIMAL_TEXT_INPUT); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; REQ-02 Estoque observado:
+  READ_ONLY (TEXT_VALUE); Estado de consulta/revisão da tarefa; não herdar
+  edição do formulário de origem
 
-  **Obrigatório e default:** Não, vazio
+  **Obrigatoriedade/default na preparação:** REQ-01 Estoque observado: Não,
+  vazio; REQ-02 Estoque observado: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** 0–100000, precisão da unidade até seis casas; valor
-  original exato
+  **Validação/unidade:** REQ-01 Estoque observado: 0–100000, precisão da
+  unidade até seis casas; valor original exato; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura;
+  REQ-02 Estoque observado: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Estado de consulta/revisão da tarefa; não herdar edição do formulário de
+  origem
 
-  **Ajuda e exemplo:** “Quanto você contou agora? Ex.: 0 ou 1,5.”
+  **Ajuda/exemplo:** REQ-01 Estoque observado: “Quanto você contou agora? Ex.:
+  0 ou 1,5.”; REQ-02 Estoque observado: Quantidade registrada para a etapa
+  indicada. Não é uma nova declaração de quantidade e não movimenta material
+  ao ser consultada.
 
 - **Campo:** Não sei informar
 
-  **Tipo/origem:** Checkbox por linha, usuário
+  **Tipo/origem por tela e estado:** REQ-01 Não sei informar: EDITABLE
+  (CHECKBOX_OR_SWITCH); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; REQ-02 Não sei informar:
+  READ_ONLY (TEXT_VALUE); Estado de consulta/revisão da tarefa; não herdar
+  edição do formulário de origem
 
-  **Obrigatório e default:** Não, desmarcado
+  **Obrigatoriedade/default na preparação:** REQ-01 Não sei informar: Não,
+  desmarcado; REQ-02 Não sei informar: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Exclusivo com valor observado; não altera ledger
+  **Validação/unidade:** REQ-01 Não sei informar: Exclusivo com valor
+  observado; não altera ledger; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; REQ-02 Não sei
+  informar: Revalidar acesso, referência e estado na leitura/ação. Não
+  solicitar ao usuário correção deste valor nesta tela. Estado de
+  consulta/revisão da tarefa; não herdar edição do formulário de origem
 
-  **Ajuda e exemplo:** “Use quando não puder contar.”
+  **Ajuda/exemplo:** REQ-01 Não sei informar: “Use quando não puder contar.”;
+  REQ-02 Não sei informar: Informação do registro indicado, somente para
+  consulta nesta etapa. Ausência de dado histórico permanece explicitamente
+  identificada.
 
 - **Campo:** Urgente
 
-  **Tipo/origem:** Checkbox por linha
+  **Tipo/origem por tela e estado:** REQ-01 Urgente: EDITABLE
+  (CHECKBOX_OR_SWITCH); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; REQ-02 Urgente: READ_ONLY
+  (TEXT_VALUE); Estado de consulta/revisão da tarefa; não herdar edição do
+  formulário de origem
 
-  **Obrigatório e default:** Sim como boolean, false
+  **Obrigatoriedade/default na preparação:** REQ-01 Urgente: Sim como boolean,
+  false; REQ-02 Urgente: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Não inferir por saldo mínimo
+  **Validação/unidade:** REQ-01 Urgente: Não inferir por saldo mínimo; Somente
+  no subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; REQ-02 Urgente: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Estado de consulta/revisão da tarefa; não herdar edição do formulário de
+  origem
 
-  **Ajuda e exemplo:** “Precisa de atenção mais rápida.”
+  **Ajuda/exemplo:** REQ-01 Urgente: “Precisa de atenção mais rápida.”; REQ-02
+  Urgente: Informação do registro indicado, somente para consulta nesta etapa.
+  Ausência de dado histórico permanece explicitamente identificada.
 
 - **Campo:** Justificativa de repetição
 
-  **Tipo/origem:** Texto, autor
+  **Tipo/origem por tela e estado:** REQ-01 Justificativa de repetição:
+  EDITABLE (TEXTAREA); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; REQ-02 Justificativa de
+  repetição: READ_ONLY (TEXT_VALUE); Estado de consulta/revisão da tarefa; não
+  herdar edição do formulário de origem
 
-  **Obrigatório e default:** Condicional se necessidade anterior pendente;
-  vazio
+  **Obrigatoriedade/default na preparação:** REQ-01 Justificativa de
+  repetição: Condicional se necessidade anterior pendente; vazio; REQ-02
+  Justificativa de repetição: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** 3–1000 caracteres, preserva vínculo anterior
+  **Validação/unidade:** REQ-01 Justificativa de repetição: 3–1000 caracteres,
+  preserva vínculo anterior; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; REQ-02 Justificativa
+  de repetição: Revalidar acesso, referência e estado na leitura/ação. Não
+  solicitar ao usuário correção deste valor nesta tela. Estado de
+  consulta/revisão da tarefa; não herdar edição do formulário de origem
 
-  **Ajuda e exemplo:** “Ainda precisamos do material após atendimento
-  parcial.”
+  **Ajuda/exemplo:** REQ-01 Justificativa de repetição: “Ainda precisamos do
+  material após atendimento parcial.”; REQ-02 Justificativa de repetição:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.
 
 - **Campo:** Item extra
 
-  **Tipo/origem:** Nome textual, autor
+  **Tipo/origem por tela e estado:** REQ-01 Item extra: EDITABLE (TEXT_INPUT);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; REQ-02 Item extra: READ_ONLY
+  (TEXT_VALUE); Estado de consulta/revisão da tarefa; não herdar edição do
+  formulário de origem
 
-  **Obrigatório e default:** Nome se extra adicionado; vazio
+  **Obrigatoriedade/default na preparação:** REQ-01 Item extra: Nome se extra
+  adicionado; vazio; REQ-02 Item extra: Valor emitido, proposto ou calculado
+  da fonte identificada; ausência explicitamente informada, sem valor
+  inventado
 
-  **Validação/unidade:** 1–200 caracteres, até 20 extras, identidade própria
+  **Validação/unidade:** REQ-01 Item extra: 1–200 caracteres, até 20 extras,
+  identidade própria; Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; REQ-02 Item extra: Revalidar
+  acesso, referência e estado na leitura/ação. Não solicitar ao usuário
+  correção deste valor nesta tela. Estado de consulta/revisão da tarefa; não
+  herdar edição do formulário de origem
 
-  **Ajuda e exemplo:** “Material não encontrado no catálogo.”
+  **Ajuda/exemplo:** REQ-01 Item extra: “Material não encontrado no
+  catálogo.”; REQ-02 Item extra: Informação do registro indicado, somente para
+  consulta nesta etapa. Ausência de dado histórico permanece explicitamente
+  identificada.
 
 - **Campo:** Observação do extra
 
-  **Tipo/origem:** Mesmo modo de estoque e urgência
+  **Tipo/origem por tela e estado:** REQ-01 Observação e urgência do item
+  extra: EDITABLE (EXTRA_ITEM_CONTEXT_GROUP); Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura;
+  REQ-02 Observação e urgência do item extra: READ_ONLY (TEXT_VALUE); Estado
+  de consulta/revisão da tarefa; não herdar edição do formulário de origem
 
-  **Obrigatório e default:** Conforme linha extra
+  **Obrigatoriedade/default na preparação:** REQ-01 Observação e urgência do
+  item extra: Conforme linha extra; REQ-02 Observação e urgência do item
+  extra: Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Zero explícito/unknown/unfilled distintos
+  **Validação/unidade:** REQ-01 Observação e urgência do item extra: Reusar os
+  três modos de observação e a urgência por extra; nome preservado; não cria
+  produto ou quantidade solicitada; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura; REQ-02
+  Observação e urgência do item extra: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Estado de consulta/revisão da tarefa; não herdar edição do formulário de
+  origem
 
-  **Ajuda e exemplo:** Não criar produto automaticamente.
+  **Ajuda/exemplo:** REQ-01 Observação e urgência do item extra: No item não
+  encontrado, informe só o que observou agora; Não sei informar continua sendo
+  uma escolha própria.; REQ-02 Observação e urgência do item extra: Informação
+  do registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.
 
 - **Campo:** Observações gerais
 
-  **Tipo/origem:** Lista de textos, autor
+  **Tipo/origem por tela e estado:** REQ-01 Observações gerais: EDITABLE
+  (TEXTAREA); Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; REQ-02 Observações gerais: READ_ONLY
+  (TEXT_VALUE); Estado de consulta/revisão da tarefa; não herdar edição do
+  formulário de origem
 
-  **Obrigatório e default:** Não, lista vazia
+  **Obrigatoriedade/default na preparação:** REQ-01 Observações gerais: Não,
+  lista vazia; REQ-02 Observações gerais: Valor emitido, proposto ou calculado
+  da fonte identificada; ausência explicitamente informada, sem valor
+  inventado
 
-  **Validação/unidade:** Até 50 entradas de 1–1000 caracteres
+  **Validação/unidade:** REQ-01 Observações gerais: Até 50 entradas de 1–1000
+  caracteres; Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; REQ-02 Observações gerais: Revalidar
+  acesso, referência e estado na leitura/ação. Não solicitar ao usuário
+  correção deste valor nesta tela. Estado de consulta/revisão da tarefa; não
+  herdar edição do formulário de origem
 
-  **Ajuda e exemplo:** “Embalagem encontrada aberta”, sem dado clínico
-  desnecessário.
+  **Ajuda/exemplo:** REQ-01 Observações gerais: “Embalagem encontrada aberta”,
+  sem dado clínico desnecessário.; REQ-02 Observações gerais: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.
 
 - **Campo:** Nome da seleção recorrente
 
-  **Tipo/origem:** Texto do usuário, novo
+  **Tipo/origem por tela e estado:** REQ-05 Nome da seleção recorrente:
+  EDITABLE (TEXT_INPUT); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Se salvar seleção; vazio
+  **Obrigatoriedade/default na preparação:** REQ-05 Nome da seleção
+  recorrente: Se salvar seleção; vazio
 
-  **Validação/unidade:** Proposta: 2–80 caracteres; escopo paciente/usuário
+  **Validação/unidade:** REQ-05 Nome da seleção recorrente: Proposta: 2–80
+  caracteres; escopo paciente/usuário; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Materiais habituais do turno.”
+  **Ajuda/exemplo:** REQ-05 Nome da seleção recorrente: “Materiais habituais
+  do turno.”
 
 - **Campo:** Motivo de necessidade remanescente
 
-  **Tipo/origem:** Texto e referência à REQ
+  **Tipo/origem por tela e estado:** REQ-03 Motivo de necessidade
+  remanescente: EDITABLE_SUBFORM (TEXTAREA); Somente ao preparar NOVA REQ
+  remanescente vinculada; conteúdo emitido permanece imutável
 
-  **Obrigatório e default:** Sim ao abrir nova necessidade vinculada
+  **Obrigatoriedade/default na preparação:** REQ-03 Motivo de necessidade
+  remanescente: Sim ao abrir nova necessidade vinculada
 
-  **Validação/unidade:** 3–1000; sem quantidade solicitada
+  **Validação/unidade:** REQ-03 Motivo de necessidade remanescente: 3–1000;
+  sem quantidade solicitada; Somente ao preparar NOVA REQ remanescente
+  vinculada; conteúdo emitido permanece imutável
 
-  **Ajuda e exemplo:** “O material entregue não encerrou a necessidade.”
+  **Ajuda/exemplo:** REQ-03 Motivo de necessidade remanescente: “O material
+  entregue não encerrou a necessidade.”
 
 - **Campo:** Modalidade de ciência
 
-  **Tipo/origem:** Preferência/política por tipo
+  **Tipo/origem por tela e estado:** REQ-04 Modalidade de ciência: READ_ONLY
+  (POLICY_DESCRIPTION); Modalidade/política aplicada ao diálogo; alteração de
+  preferência em ID-02/NOT-02
 
-  **Obrigatório e default:** Conforme P02, sem opt-in tácito implícito
+  **Obrigatoriedade/default na preparação:** REQ-04 Modalidade de ciência:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Snapshot da regra vigente na emissão
+  **Validação/unidade:** REQ-04 Modalidade de ciência: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Modalidade/política aplicada ao diálogo; alteração de
+  preferência em ID-02/NOT-02
 
-  **Ajuda e exemplo:** “Manual”, “Ao continuar antes de abrir”, “Presumida na
-  emissão”.
+  **Ajuda/exemplo:** REQ-04 Modalidade de ciência: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.
 
 - **Campo:** Versão e intenção
 
-  **Tipo/origem:** Servidor/chave estável, ocultos
+  **Tipo/origem por tela e estado:** REQ-01 Versão e intenção: INTERNAL
+  (NO_USER_CONTROL); Dado de comando/transporte; nunca input ou identificador
+  técnico exigido ao usuário; REQ-02 Versão e intenção: INTERNAL
+  (NO_USER_CONTROL); Dado de comando/transporte; nunca input ou identificador
+  técnico exigido ao usuário; REQ-03 Versão e intenção: INTERNAL
+  (NO_USER_CONTROL); Dado de comando/transporte; nunca input ou identificador
+  técnico exigido ao usuário; REQ-04 Versão e intenção: INTERNAL
+  (NO_USER_CONTROL); Dado de comando/transporte; nunca input ou identificador
+  técnico exigido ao usuário
 
-  **Obrigatório e default:** Sim na ação
+  **Obrigatoriedade/default na preparação:** REQ-01 Versão e intenção: Não
+  renderizar controle; REQ-02 Versão e intenção: Não renderizar controle;
+  REQ-03 Versão e intenção: Não renderizar controle; REQ-04 Versão e intenção:
+  Não renderizar controle
 
-  **Validação/unidade:** Conflito se conteúdo diverge ou versão muda
+  **Validação/unidade:** REQ-01 Versão e intenção: Somente contrato interno,
+  com validação no servidor; não expor segredo/UUID como decisão do usuário;
+  REQ-02 Versão e intenção: Somente contrato interno, com validação no
+  servidor; não expor segredo/UUID como decisão do usuário; REQ-03 Versão e
+  intenção: Somente contrato interno, com validação no servidor; não expor
+  segredo/UUID como decisão do usuário; REQ-04 Versão e intenção: Somente
+  contrato interno, com validação no servidor; não expor segredo/UUID como
+  decisão do usuário
 
-  **Ajuda e exemplo:** Não pedir UUID ao usuário.
+  **Ajuda/exemplo:** REQ-01 Versão e intenção: Não pedir UUID ao usuário.;
+  REQ-02 Versão e intenção: Não pedir UUID ao usuário.; REQ-03 Versão e
+  intenção: Não pedir UUID ao usuário.; REQ-04 Versão e intenção: Não pedir
+  UUID ao usuário.
+
+- **Campo:** Minha ciência
+
+  **Tipo/origem por tela e estado:** READ_ONLY_DESCRIPTION;context by
+  CONTROL_SCREEN_CONTRACTS.csv
+
+  **Obrigatoriedade/default na preparação:** Resultado pessoal da identidade
+  autenticada para o conteúdo material emitido
+
+  **Validação/unidade:** Pendente ou registrada com origem/instante próprios;
+  Família ciente não é atribuído como ciência de todos
+
+  **Ajuda/exemplo:** Outra pessoa pode ter satisfeito a obrigação familiar.
+  Aqui aparece somente a sua ciência pessoal.
+
+- **Campo:** Ciência da família
+
+  **Tipo/origem por tela e estado:** READ_ONLY_DESCRIPTION;context by
+  CONTROL_SCREEN_CONTRACTS.csv
+
+  **Obrigatoriedade/default na preparação:** Agregado calculado; ANY entre
+  pessoas familiares autorizadas
+
+  **Validação/unidade:** Uma ciência válida basta; nenhuma exigência de todos
+  e nenhuma conclusão jurídica automática
+
+  **Ajuda/exemplo:** Família ciente significa que uma pessoa habilitada já
+  registrou ciência válida deste conteúdo.
 
 <!-- c-table:end -->
 
@@ -291,8 +499,8 @@ complementam.
 
 ## Atualização vinculante C7–C10
 
-P02 segue OWNER_REVIEW_REQUIRED por SCI-ID. Abertura, ciência e leitura não se
-confundem. P12 aprova um draft de criação por tipo e retomada privada;
+P02 está OWNER_APPROVED pela ordem definitiva. Abertura, ciência e leitura não
+se confundem. P12 aprova um draft de criação por tipo e retomada privada;
 observação antiga conserva instante. Blueprint REQ-01–05 e casos C9 detalham
 controles e oráculos.
 
@@ -301,3 +509,32 @@ não anuncia implementação. Contrato detalhado no
 [adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
 [blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
 [casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
+
+## Fechamento definitivo — tarefa, estado e política
+
+P02 está **OWNER_APPROVED**. Fonte vinculante:
+[política SCI-001–SCI-005](../C7-decision-closure/SCIENCE_OWNER_REVIEW.md).
+Manual expressa, diálogo antes de abrir e tácita por preferência anterior
+expressa são configuráveis somente para obrigação informativa elegível.
+Cabeçalho exposto não registra ciência. WhatsApp read é comunicação;
+confirmação identificada futura depende de homologação do canal postergado.
+
+A administração familiar define quem pode declarar no paciente. Uma ciência
+válida de qualquer habilitado satisfaz a obrigação (ANY); equipe vê “Família
+ciente”, sem atribuir evento a todos. Minha ciência permanece pessoal. Sem
+habilitado, mostrar pendência de designação. Não exigir todos, gerenciar
+conversas familiares ou concluir responsabilidade civil pelo estado.
+
+SCI-005 é obrigatória/permanente/não configurável na expedição oficial de ENT
+vinculada por ator familiar habilitado. Nunca em save/draft; não depende de
+scienceByDispatch ou created_by. Não autoriza quem não representa a família
+nem confirma recebimento/consumo.
+[Divergências AS_IS](../C7-decision-closure/SCIENCE_AS_IS_TO_BE_ANALYSIS.md)
+serão tratadas na D.
+
+REQ material emitida permanece imutável; não se identificou editor autorizado
+vigente. Estado, atendimento, resolução auditada de extra, ciência e histórico
+são fatos separados. Versão técnica/eventos/PDF do mesmo conteúdo não reinicia
+ciência. Não criar editor para justificar versões. Se alteração material for
+autorizada futuramente: identidade nova, ciência própria, agregado pendente e
+aviso pertinente, sem reescrever o passado.

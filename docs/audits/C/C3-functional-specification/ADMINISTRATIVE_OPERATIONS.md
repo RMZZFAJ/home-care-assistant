@@ -1,12 +1,10 @@
 # Administração, listas, propostas e suporte
 
 AS_IS: /, /fichas, /mais, /admin, /configuracoes e /notificacoes;
-AdminConsole,
-PolicyConsole e endpoints com governança local/global. Há listas e painéis
-úteis;
-B3-012/B4-005 truncam história/propostas e B1-UX-003 exige interpretar JSON.
-TO_BE DEC-013/014/015/021/024 e O01/O04/O15, sem nova central genérica por
-padrão.
+AdminConsole, PolicyConsole e endpoints com governança local/global. Há listas
+e painéis úteis; B3-012/B4-005 truncam história/propostas e B1-UX-003 exige
+interpretar JSON. TO_BE DEC-013/014/015/021/024 e O01/O04/O15, sem nova
+central genérica por padrão.
 
 ## Telas e campos
 
@@ -59,139 +57,678 @@ padrão.
 
 - **Campo:** Paciente/modo
 
-  **Tipo/origem:** Contexto de servidor
+  **Tipo/origem por tela e estado:** ADM-01 Paciente: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-02 Paciente: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; ADM-03 Paciente:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; ADM-01 Modo de atuação: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-02 Modo de atuação: READ_ONLY (TEXT_VALUE); Consulta do
+  valor de origem; mudanças só no processo legitimamente responsável; ADM-03
+  Modo de atuação: READ_ONLY (TEXT_VALUE); Consulta do valor de origem;
+  mudanças só no processo legitimamente responsável
 
-  **Obrigatório e default:** Sim
+  **Obrigatoriedade/default na preparação:** ADM-01 Paciente: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; ADM-02 Paciente: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; ADM-03 Paciente: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado;
+  ADM-01 Modo de atuação: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado; ADM-02
+  Modo de atuação: Valor emitido, proposto ou calculado da fonte identificada;
+  ausência explicitamente informada, sem valor inventado; ADM-03 Modo de
+  atuação: Valor emitido, proposto ou calculado da fonte identificada;
+  ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Global e local explícitos
+  **Validação/unidade:** ADM-01 Paciente: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-02 Paciente: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-03 Paciente: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-01 Modo de atuação: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-02 Modo de atuação: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-03 Modo de atuação: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** Nenhuma seleção no browser concede acesso.
+  **Ajuda/exemplo:** ADM-01 Paciente: Confira a residência desta tarefa.
+  Trocar contexto é uma ação separada e exige acesso autorizado.; ADM-02
+  Paciente: Confira a residência desta tarefa. Trocar contexto é uma ação
+  separada e exige acesso autorizado.; ADM-03 Paciente: Confira a residência
+  desta tarefa. Trocar contexto é uma ação separada e exige acesso
+  autorizado.; ADM-01 Modo de atuação: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; ADM-02 Modo de atuação: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; ADM-03 Modo de atuação: Informação
+  do registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.
 
 - **Campo:** Nome/estado do paciente
 
-  **Tipo/origem:** Texto/boolean administrativo
+  **Tipo/origem por tela e estado:** ADM-02 Nome do paciente: EDITABLE_SUBFORM
+  (TEXT_INPUT); Cadastro/edição de nome apenas no escopo administrativo
+  competente; ADM-02 Estado ativo: EDITABLE (CHECKBOX_OR_SWITCH); Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura
 
-  **Obrigatório e default:** Sim ao cadastrar
+  **Obrigatoriedade/default na preparação:** ADM-02 Nome do paciente: Sim ao
+  cadastrar; ADM-02 Estado ativo: Sim ao cadastrar
 
-  **Validação/unidade:** Nome com 2–160 caracteres; isActive=false deve ser respeitado;
-  isDevelopment identificado
+  **Validação/unidade:** ADM-02 Nome do paciente: Nome de paciente com 2–160
+  caracteres; escopo/autoridade conferidos no comando; Cadastro/edição de nome
+  apenas no escopo administrativo competente; ADM-02 Estado ativo: Estado
+  ativo booleano explícito respeitado; false não pode ser ignorado.
+  isDevelopment não é permissão; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Ambiente fictício não vira operação por renomear
-  paciente.
+  **Ajuda/exemplo:** ADM-02 Nome do paciente: Ambiente fictício não vira
+  operação por renomear paciente.; ADM-02 Estado ativo: Ambiente fictício não
+  vira operação por renomear paciente.
 
 - **Campo:** Administrador inicial
 
-  **Tipo/origem:** E-mail confirmado
+  **Tipo/origem por tela e estado:** ADM-02 Administrador inicial:
+  EDITABLE_SUBFORM (EMAIL_INPUT); Só criação GLOBAL da residência; titular
+  confirma o convite/conta pelo Auth
 
-  **Obrigatório e default:** Sim na criação com primeiro vínculo
+  **Obrigatoriedade/default na preparação:** ADM-02 Administrador inicial: Sim
+  na criação com primeiro vínculo
 
-  **Validação/unidade:** Autoridade de criação global não substitui vínculo
-  operacional
+  **Validação/unidade:** ADM-02 Administrador inicial: Autoridade de criação
+  global não substitui vínculo operacional; Só criação GLOBAL da residência;
+  titular confirma o convite/conta pelo Auth
 
-  **Ajuda e exemplo:** “Quem administrará esta residência?”
+  **Ajuda/exemplo:** ADM-02 Administrador inicial: “Quem administrará esta
+  residência?”
 
 - **Campo:** Seção e busca
 
-  **Tipo/origem:** Seletores/termo
+  **Tipo/origem por tela e estado:** ADM-01 Seção: FILTER (RADIO_OR_SELECT);
+  Apenas consulta no escopo permitido; não altera documento, movimento ou
+  autoridade; ADM-02 Seção: FILTER (RADIO_OR_SELECT); Apenas consulta no
+  escopo permitido; não altera documento, movimento ou autoridade; ADM-03
+  Seção: FILTER (RADIO_OR_SELECT); Apenas consulta no escopo permitido; não
+  altera documento, movimento ou autoridade; ADM-01 Buscar: FILTER
+  (SEARCH_INPUT); Apenas consulta no escopo permitido; não altera documento,
+  movimento ou autoridade; ADM-02 Buscar: FILTER (SEARCH_INPUT); Apenas
+  consulta no escopo permitido; não altera documento, movimento ou autoridade;
+  ADM-03 Buscar: FILTER (SEARCH_INPUT); Apenas consulta no escopo permitido;
+  não altera documento, movimento ou autoridade
 
-  **Obrigatório e default:** Não, estado de consulta explícito
+  **Obrigatoriedade/default na preparação:** ADM-01 Seção: Sem restrição
+  adicional inicialmente, salvo filtro de tarefa explicitamente indicado no
+  link; vazio limpa filtro, não cria zero ou estado material; ADM-02 Seção:
+  Sem restrição adicional inicialmente, salvo filtro de tarefa explicitamente
+  indicado no link; vazio limpa filtro, não cria zero ou estado material;
+  ADM-03 Seção: Sem restrição adicional inicialmente, salvo filtro de tarefa
+  explicitamente indicado no link; vazio limpa filtro, não cria zero ou estado
+  material; ADM-01 Buscar: Sem restrição adicional inicialmente, salvo filtro
+  de tarefa explicitamente indicado no link; vazio limpa filtro, não cria zero
+  ou estado material; ADM-02 Buscar: Sem restrição adicional inicialmente,
+  salvo filtro de tarefa explicitamente indicado no link; vazio limpa filtro,
+  não cria zero ou estado material; ADM-03 Buscar: Sem restrição adicional
+  inicialmente, salvo filtro de tarefa explicitamente indicado no link; vazio
+  limpa filtro, não cria zero ou estado material
 
-  **Validação/unidade:** Termo/cursor por paciente e seção
+  **Validação/unidade:** ADM-01 Seção: Filtro tipado da seção/tarefa, com
+  valores permitidos e escopo autorizados; não aceitar um enum universal para
+  processos distintos; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar; ADM-02 Seção: Filtro tipado da
+  seção/tarefa, com valores permitidos e escopo autorizados; não aceitar um
+  enum universal para processos distintos; datas em DD/MM/AAAA na apresentação
+  e limites de consulta validados; manter filtros ao voltar; ADM-03 Seção:
+  Filtro tipado da seção/tarefa, com valores permitidos e escopo autorizados;
+  não aceitar um enum universal para processos distintos; datas em DD/MM/AAAA
+  na apresentação e limites de consulta validados; manter filtros ao voltar;
+  ADM-01 Buscar: Filtro tipado da seção/tarefa, com valores permitidos e
+  escopo autorizados; não aceitar um enum universal para processos distintos;
+  datas em DD/MM/AAAA na apresentação e limites de consulta validados; manter
+  filtros ao voltar; ADM-02 Buscar: Filtro tipado da seção/tarefa, com valores
+  permitidos e escopo autorizados; não aceitar um enum universal para
+  processos distintos; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar; ADM-03 Buscar: Filtro tipado
+  da seção/tarefa, com valores permitidos e escopo autorizados; não aceitar um
+  enum universal para processos distintos; datas em DD/MM/AAAA na apresentação
+  e limites de consulta validados; manter filtros ao voltar
 
-  **Ajuda e exemplo:** Rótulo “Catálogo do paciente” difere de “Unidades”.
+  **Ajuda/exemplo:** ADM-01 Seção: Rótulo “Catálogo do paciente” difere de
+  “Unidades”.; ADM-02 Seção: Rótulo “Catálogo do paciente” difere de
+  “Unidades”.; ADM-03 Seção: Rótulo “Catálogo do paciente” difere de
+  “Unidades”.; ADM-01 Buscar: Digite um termo de busca na seção atual. Buscar
+  não altera recursos nem troca paciente.; ADM-02 Buscar: Digite um termo de
+  busca na seção atual. Buscar não altera recursos nem troca paciente.; ADM-03
+  Buscar: Digite um termo de busca na seção atual. Buscar não altera recursos
+  nem troca paciente.
 
 - **Campo:** Estado/tipo/período/responsável
 
-  **Tipo/origem:** Filtros combináveis
+  **Tipo/origem por tela e estado:** ADM-01 Estado: FILTER (RADIO_OR_SELECT);
+  Apenas consulta no escopo permitido; não altera documento, movimento ou
+  autoridade; ADM-02 Estado: FILTER (RADIO_OR_SELECT); Apenas consulta no
+  escopo permitido; não altera documento, movimento ou autoridade; ADM-05
+  Estado: FILTER (RADIO_OR_SELECT); Apenas consulta no escopo permitido; não
+  altera documento, movimento ou autoridade; ENT-02 Estado: FILTER
+  (RADIO_OR_SELECT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; CON-01 Estado: FILTER (RADIO_OR_SELECT);
+  Apenas consulta no escopo permitido; não altera documento, movimento ou
+  autoridade; NOT-01 Estado: FILTER (RADIO_OR_SELECT); Apenas consulta no
+  escopo permitido; não altera documento, movimento ou autoridade; DOC-01
+  Estado: FILTER (RADIO_OR_SELECT); Apenas consulta no escopo permitido; não
+  altera documento, movimento ou autoridade; ADM-01 Tipo: FILTER
+  (RADIO_OR_SELECT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; ADM-02 Tipo: FILTER (RADIO_OR_SELECT);
+  Apenas consulta no escopo permitido; não altera documento, movimento ou
+  autoridade; ADM-05 Tipo: FILTER (RADIO_OR_SELECT); Apenas consulta no escopo
+  permitido; não altera documento, movimento ou autoridade; ENT-02 Tipo:
+  FILTER (RADIO_OR_SELECT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; CON-01 Tipo: FILTER (RADIO_OR_SELECT);
+  Apenas consulta no escopo permitido; não altera documento, movimento ou
+  autoridade; NOT-01 Tipo: FILTER (RADIO_OR_SELECT); Apenas consulta no escopo
+  permitido; não altera documento, movimento ou autoridade; DOC-01 Tipo:
+  FILTER (RADIO_OR_SELECT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; ADM-01 Data inicial: FILTER
+  (DATE_INPUT); Apenas consulta no escopo permitido; não altera documento,
+  movimento ou autoridade; ADM-02 Data inicial: FILTER (DATE_INPUT); Apenas
+  consulta no escopo permitido; não altera documento, movimento ou autoridade;
+  ADM-05 Data inicial: FILTER (DATE_INPUT); Apenas consulta no escopo
+  permitido; não altera documento, movimento ou autoridade; ENT-02 Data
+  inicial: FILTER (DATE_INPUT); Apenas consulta no escopo permitido; não
+  altera documento, movimento ou autoridade; CON-01 Data inicial: FILTER
+  (DATE_INPUT); Apenas consulta no escopo permitido; não altera documento,
+  movimento ou autoridade; NOT-01 Data inicial: FILTER (DATE_INPUT); Apenas
+  consulta no escopo permitido; não altera documento, movimento ou autoridade;
+  DOC-01 Data inicial: FILTER (DATE_INPUT); Apenas consulta no escopo
+  permitido; não altera documento, movimento ou autoridade; ADM-01 Data final:
+  FILTER (DATE_INPUT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; ADM-02 Data final: FILTER (DATE_INPUT);
+  Apenas consulta no escopo permitido; não altera documento, movimento ou
+  autoridade; ADM-05 Data final: FILTER (DATE_INPUT); Apenas consulta no
+  escopo permitido; não altera documento, movimento ou autoridade; ENT-02 Data
+  final: FILTER (DATE_INPUT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; CON-01 Data final: FILTER (DATE_INPUT);
+  Apenas consulta no escopo permitido; não altera documento, movimento ou
+  autoridade; NOT-01 Data final: FILTER (DATE_INPUT); Apenas consulta no
+  escopo permitido; não altera documento, movimento ou autoridade; DOC-01 Data
+  final: FILTER (DATE_INPUT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; ADM-01 Responsável: FILTER
+  (SEARCHABLE_COMBOBOX); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; ADM-02 Responsável: FILTER
+  (SEARCHABLE_COMBOBOX); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade; ADM-05 Responsável: FILTER
+  (SEARCHABLE_COMBOBOX); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade
 
-  **Obrigatório e default:** Defaults declarados
+  **Obrigatoriedade/default na preparação:** ADM-01 Estado: Sem restrição
+  adicional inicialmente, salvo filtro de tarefa explicitamente indicado no
+  link; vazio limpa filtro, não cria zero ou estado material; ADM-02 Estado:
+  Sem restrição adicional inicialmente, salvo filtro de tarefa explicitamente
+  indicado no link; vazio limpa filtro, não cria zero ou estado material;
+  ADM-05 Estado: Sem restrição adicional inicialmente, salvo filtro de tarefa
+  explicitamente indicado no link; vazio limpa filtro, não cria zero ou estado
+  material; ENT-02 Estado: Sem restrição adicional inicialmente, salvo filtro
+  de tarefa explicitamente indicado no link; vazio limpa filtro, não cria zero
+  ou estado material; CON-01 Estado: Sem restrição adicional inicialmente,
+  salvo filtro de tarefa explicitamente indicado no link; vazio limpa filtro,
+  não cria zero ou estado material; NOT-01 Estado: Sem restrição adicional
+  inicialmente, salvo filtro de tarefa explicitamente indicado no link; vazio
+  limpa filtro, não cria zero ou estado material; DOC-01 Estado: Sem restrição
+  adicional inicialmente, salvo filtro de tarefa explicitamente indicado no
+  link; vazio limpa filtro, não cria zero ou estado material; ADM-01 Tipo: Sem
+  restrição adicional inicialmente, salvo filtro de tarefa explicitamente
+  indicado no link; vazio limpa filtro, não cria zero ou estado material;
+  ADM-02 Tipo: Sem restrição adicional inicialmente, salvo filtro de tarefa
+  explicitamente indicado no link; vazio limpa filtro, não cria zero ou estado
+  material; ADM-05 Tipo: Sem restrição adicional inicialmente, salvo filtro de
+  tarefa explicitamente indicado no link; vazio limpa filtro, não cria zero ou
+  estado material; ENT-02 Tipo: Sem restrição adicional inicialmente, salvo
+  filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não
+  cria zero ou estado material; CON-01 Tipo: Sem restrição adicional
+  inicialmente, salvo filtro de tarefa explicitamente indicado no link; vazio
+  limpa filtro, não cria zero ou estado material; NOT-01 Tipo: Sem restrição
+  adicional inicialmente, salvo filtro de tarefa explicitamente indicado no
+  link; vazio limpa filtro, não cria zero ou estado material; DOC-01 Tipo: Sem
+  restrição adicional inicialmente, salvo filtro de tarefa explicitamente
+  indicado no link; vazio limpa filtro, não cria zero ou estado material;
+  ADM-01 Data inicial: Sem restrição adicional inicialmente, salvo filtro de
+  tarefa explicitamente indicado no link; vazio limpa filtro, não cria zero ou
+  estado material; ADM-02 Data inicial: Sem restrição adicional inicialmente,
+  salvo filtro de tarefa explicitamente indicado no link; vazio limpa filtro,
+  não cria zero ou estado material; ADM-05 Data inicial: Sem restrição
+  adicional inicialmente, salvo filtro de tarefa explicitamente indicado no
+  link; vazio limpa filtro, não cria zero ou estado material; ENT-02 Data
+  inicial: Sem restrição adicional inicialmente, salvo filtro de tarefa
+  explicitamente indicado no link; vazio limpa filtro, não cria zero ou estado
+  material; CON-01 Data inicial: Sem restrição adicional inicialmente, salvo
+  filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não
+  cria zero ou estado material; NOT-01 Data inicial: Sem restrição adicional
+  inicialmente, salvo filtro de tarefa explicitamente indicado no link; vazio
+  limpa filtro, não cria zero ou estado material; DOC-01 Data inicial: Sem
+  restrição adicional inicialmente, salvo filtro de tarefa explicitamente
+  indicado no link; vazio limpa filtro, não cria zero ou estado material;
+  ADM-01 Data final: Sem restrição adicional inicialmente, salvo filtro de
+  tarefa explicitamente indicado no link; vazio limpa filtro, não cria zero ou
+  estado material; ADM-02 Data final: Sem restrição adicional inicialmente,
+  salvo filtro de tarefa explicitamente indicado no link; vazio limpa filtro,
+  não cria zero ou estado material; ADM-05 Data final: Sem restrição adicional
+  inicialmente, salvo filtro de tarefa explicitamente indicado no link; vazio
+  limpa filtro, não cria zero ou estado material; ENT-02 Data final: Sem
+  restrição adicional inicialmente, salvo filtro de tarefa explicitamente
+  indicado no link; vazio limpa filtro, não cria zero ou estado material;
+  CON-01 Data final: Sem restrição adicional inicialmente, salvo filtro de
+  tarefa explicitamente indicado no link; vazio limpa filtro, não cria zero ou
+  estado material; NOT-01 Data final: Sem restrição adicional inicialmente,
+  salvo filtro de tarefa explicitamente indicado no link; vazio limpa filtro,
+  não cria zero ou estado material; DOC-01 Data final: Sem restrição adicional
+  inicialmente, salvo filtro de tarefa explicitamente indicado no link; vazio
+  limpa filtro, não cria zero ou estado material; ADM-01 Responsável: Sem
+  restrição adicional inicialmente, salvo filtro de tarefa explicitamente
+  indicado no link; vazio limpa filtro, não cria zero ou estado material;
+  ADM-02 Responsável: Sem restrição adicional inicialmente, salvo filtro de
+  tarefa explicitamente indicado no link; vazio limpa filtro, não cria zero ou
+  estado material; ADM-05 Responsável: Sem restrição adicional inicialmente,
+  salvo filtro de tarefa explicitamente indicado no link; vazio limpa filtro,
+  não cria zero ou estado material
 
-  **Validação/unidade:** Início/fim válidos; paginação estável por data+ID
+  **Validação/unidade:** ADM-01 Estado: Filtro tipado da seção/tarefa, com
+  valores permitidos e escopo autorizados; não aceitar um enum universal para
+  processos distintos; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar; ADM-02 Estado: Filtro tipado
+  da seção/tarefa, com valores permitidos e escopo autorizados; não aceitar um
+  enum universal para processos distintos; datas em DD/MM/AAAA na apresentação
+  e limites de consulta validados; manter filtros ao voltar; ADM-05 Estado:
+  Filtro tipado da seção/tarefa, com valores permitidos e escopo autorizados;
+  não aceitar um enum universal para processos distintos; datas em DD/MM/AAAA
+  na apresentação e limites de consulta validados; manter filtros ao voltar;
+  ENT-02 Estado: Tarefa de receber/decidir pedido/resolver diferença e estado
+  real da entrega; nunca selecionar outro recebedor como autorização; datas em
+  DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros
+  ao voltar; CON-01 Estado: Tipo Falta/Consumo e estado de complemento/decisão
+  do relato; nunca transformar busca em comando de consumo; datas em
+  DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros
+  ao voltar; NOT-01 Estado: Visto/Não visto do aviso são distintos de
+  obrigação resolvida; tipo pelo catálogo de eventos, sem categoria essencial
+  ou prazo P13 inventados; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar; DOC-01 Estado: Tipo
+  REQ/COM/ENT/BAL; estado traduzido por tipo e período válido; filtro não
+  troca versão documental; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar; ADM-01 Tipo: Filtro tipado da
+  seção/tarefa, com valores permitidos e escopo autorizados; não aceitar um
+  enum universal para processos distintos; datas em DD/MM/AAAA na apresentação
+  e limites de consulta validados; manter filtros ao voltar; ADM-02 Tipo:
+  Filtro tipado da seção/tarefa, com valores permitidos e escopo autorizados;
+  não aceitar um enum universal para processos distintos; datas em DD/MM/AAAA
+  na apresentação e limites de consulta validados; manter filtros ao voltar;
+  ADM-05 Tipo: Filtro tipado da seção/tarefa, com valores permitidos e escopo
+  autorizados; não aceitar um enum universal para processos distintos; datas
+  em DD/MM/AAAA na apresentação e limites de consulta validados; manter
+  filtros ao voltar; ENT-02 Tipo: Tarefa de receber/decidir pedido/resolver
+  diferença e estado real da entrega; nunca selecionar outro recebedor como
+  autorização; datas em DD/MM/AAAA na apresentação e limites de consulta
+  validados; manter filtros ao voltar; CON-01 Tipo: Tipo Falta/Consumo e
+  estado de complemento/decisão do relato; nunca transformar busca em comando
+  de consumo; datas em DD/MM/AAAA na apresentação e limites de consulta
+  validados; manter filtros ao voltar; NOT-01 Tipo: Visto/Não visto do aviso
+  são distintos de obrigação resolvida; tipo pelo catálogo de eventos, sem
+  categoria essencial ou prazo P13 inventados; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar;
+  DOC-01 Tipo: Tipo REQ/COM/ENT/BAL; estado traduzido por tipo e período
+  válido; filtro não troca versão documental; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar;
+  ADM-01 Data inicial: Filtro tipado da seção/tarefa, com valores permitidos e
+  escopo autorizados; não aceitar um enum universal para processos distintos;
+  datas em DD/MM/AAAA na apresentação e limites de consulta validados; manter
+  filtros ao voltar; ADM-02 Data inicial: Filtro tipado da seção/tarefa, com
+  valores permitidos e escopo autorizados; não aceitar um enum universal para
+  processos distintos; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar; ADM-05 Data inicial: Filtro
+  tipado da seção/tarefa, com valores permitidos e escopo autorizados; não
+  aceitar um enum universal para processos distintos; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar;
+  ENT-02 Data inicial: Tarefa de receber/decidir pedido/resolver diferença e
+  estado real da entrega; nunca selecionar outro recebedor como autorização;
+  datas em DD/MM/AAAA na apresentação e limites de consulta validados; manter
+  filtros ao voltar; CON-01 Data inicial: Tipo Falta/Consumo e estado de
+  complemento/decisão do relato; nunca transformar busca em comando de
+  consumo; datas em DD/MM/AAAA na apresentação e limites de consulta
+  validados; manter filtros ao voltar; NOT-01 Data inicial: Visto/Não visto do
+  aviso são distintos de obrigação resolvida; tipo pelo catálogo de eventos,
+  sem categoria essencial ou prazo P13 inventados; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar;
+  DOC-01 Data inicial: Tipo REQ/COM/ENT/BAL; estado traduzido por tipo e
+  período válido; filtro não troca versão documental; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar;
+  ADM-01 Data final: Filtro tipado da seção/tarefa, com valores permitidos e
+  escopo autorizados; não aceitar um enum universal para processos distintos;
+  datas em DD/MM/AAAA na apresentação e limites de consulta validados; manter
+  filtros ao voltar; ADM-02 Data final: Filtro tipado da seção/tarefa, com
+  valores permitidos e escopo autorizados; não aceitar um enum universal para
+  processos distintos; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar; ADM-05 Data final: Filtro
+  tipado da seção/tarefa, com valores permitidos e escopo autorizados; não
+  aceitar um enum universal para processos distintos; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar;
+  ENT-02 Data final: Tarefa de receber/decidir pedido/resolver diferença e
+  estado real da entrega; nunca selecionar outro recebedor como autorização;
+  datas em DD/MM/AAAA na apresentação e limites de consulta validados; manter
+  filtros ao voltar; CON-01 Data final: Tipo Falta/Consumo e estado de
+  complemento/decisão do relato; nunca transformar busca em comando de
+  consumo; datas em DD/MM/AAAA na apresentação e limites de consulta
+  validados; manter filtros ao voltar; NOT-01 Data final: Visto/Não visto do
+  aviso são distintos de obrigação resolvida; tipo pelo catálogo de eventos,
+  sem categoria essencial ou prazo P13 inventados; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar;
+  DOC-01 Data final: Tipo REQ/COM/ENT/BAL; estado traduzido por tipo e período
+  válido; filtro não troca versão documental; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar;
+  ADM-01 Responsável: Filtro tipado da seção/tarefa, com valores permitidos e
+  escopo autorizados; não aceitar um enum universal para processos distintos;
+  datas em DD/MM/AAAA na apresentação e limites de consulta validados; manter
+  filtros ao voltar; ADM-02 Responsável: Filtro tipado da seção/tarefa, com
+  valores permitidos e escopo autorizados; não aceitar um enum universal para
+  processos distintos; datas em DD/MM/AAAA na apresentação e limites de
+  consulta validados; manter filtros ao voltar; ADM-05 Responsável: Filtro
+  tipado da seção/tarefa, com valores permitidos e escopo autorizados; não
+  aceitar um enum universal para processos distintos; datas em DD/MM/AAAA na
+  apresentação e limites de consulta validados; manter filtros ao voltar
 
-  **Ajuda e exemplo:** “Pendentes sob minha responsabilidade.”
+  **Ajuda/exemplo:** ADM-01 Estado: “Pendentes sob minha responsabilidade.”;
+  ADM-02 Estado: “Pendentes sob minha responsabilidade.”; ADM-05 Estado:
+  “Pendentes sob minha responsabilidade.”; ENT-02 Estado: “Pendentes sob minha
+  responsabilidade.”; CON-01 Estado: “Pendentes sob minha responsabilidade.”;
+  NOT-01 Estado: “Pendentes sob minha responsabilidade.”; DOC-01 Estado:
+  “Pendentes sob minha responsabilidade.”; ADM-01 Tipo: “Pendentes sob minha
+  responsabilidade.”; ADM-02 Tipo: “Pendentes sob minha responsabilidade.”;
+  ADM-05 Tipo: “Pendentes sob minha responsabilidade.”; ENT-02 Tipo:
+  “Pendentes sob minha responsabilidade.”; CON-01 Tipo: “Pendentes sob minha
+  responsabilidade.”; NOT-01 Tipo: “Pendentes sob minha responsabilidade.”;
+  DOC-01 Tipo: “Pendentes sob minha responsabilidade.”; ADM-01 Data inicial:
+  “Pendentes sob minha responsabilidade.”; ADM-02 Data inicial: “Pendentes sob
+  minha responsabilidade.”; ADM-05 Data inicial: “Pendentes sob minha
+  responsabilidade.”; ENT-02 Data inicial: “Pendentes sob minha
+  responsabilidade.”; CON-01 Data inicial: “Pendentes sob minha
+  responsabilidade.”; NOT-01 Data inicial: “Pendentes sob minha
+  responsabilidade.”; DOC-01 Data inicial: “Pendentes sob minha
+  responsabilidade.”; ADM-01 Data final: “Pendentes sob minha
+  responsabilidade.”; ADM-02 Data final: “Pendentes sob minha
+  responsabilidade.”; ADM-05 Data final: “Pendentes sob minha
+  responsabilidade.”; ENT-02 Data final: “Pendentes sob minha
+  responsabilidade.”; CON-01 Data final: “Pendentes sob minha
+  responsabilidade.”; NOT-01 Data final: “Pendentes sob minha
+  responsabilidade.”; DOC-01 Data final: “Pendentes sob minha
+  responsabilidade.”; ADM-01 Responsável: “Pendentes sob minha
+  responsabilidade.”; ADM-02 Responsável: “Pendentes sob minha
+  responsabilidade.”; ADM-05 Responsável: “Pendentes sob minha
+  responsabilidade.”
 
 - **Campo:** Referência direta
 
-  **Tipo/origem:** UUID/protocolo resolvido no servidor
+  **Tipo/origem por tela e estado:** ADM-01 Referência direta: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; ADM-02 Referência direta: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-05 Referência direta: READ_ONLY (TEXT_VALUE); Consulta do
+  valor de origem; mudanças só no processo legitimamente responsável
 
-  **Obrigatório e default:** Se abrir link de tarefa
+  **Obrigatoriedade/default na preparação:** ADM-01 Referência direta: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; ADM-02 Referência direta:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; ADM-05 Referência direta:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** GET por ID independente da janela recente
+  **Validação/unidade:** ADM-01 Referência direta: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; ADM-02 Referência direta: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; ADM-05 Referência direta: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** Acesso negado não enumera outro paciente.
+  **Ajuda/exemplo:** ADM-01 Referência direta: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; ADM-02 Referência direta: Informação
+  do registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.; ADM-05 Referência direta:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.
 
 - **Campo:** Página/cursor/total
 
-  **Tipo/origem:** Resposta do servidor
+  **Tipo/origem por tela e estado:** ADM-01 Página: CALCULATED
+  (CALCULATED_DESCRIPTION); Resultado derivado dos fatos/valores apresentados;
+  sem edição manual; ADM-02 Página: CALCULATED (CALCULATED_DESCRIPTION);
+  Resultado derivado dos fatos/valores apresentados; sem edição manual; ADM-05
+  Página: CALCULATED (CALCULATED_DESCRIPTION); Resultado derivado dos
+  fatos/valores apresentados; sem edição manual; ADM-01 Cursor: INTERNAL
+  (NO_USER_CONTROL); Dado de comando/transporte; nunca input ou identificador
+  técnico exigido ao usuário; ADM-02 Cursor: INTERNAL (NO_USER_CONTROL); Dado
+  de comando/transporte; nunca input ou identificador técnico exigido ao
+  usuário; ADM-05 Cursor: INTERNAL (NO_USER_CONTROL); Dado de
+  comando/transporte; nunca input ou identificador técnico exigido ao usuário;
+  ADM-01 Total consultado: CALCULATED (CALCULATED_DESCRIPTION); Resultado
+  derivado dos fatos/valores apresentados; sem edição manual; ADM-02 Total
+  consultado: CALCULATED (CALCULATED_DESCRIPTION); Resultado derivado dos
+  fatos/valores apresentados; sem edição manual; ADM-05 Total consultado:
+  CALCULATED (CALCULATED_DESCRIPTION); Resultado derivado dos fatos/valores
+  apresentados; sem edição manual
 
-  **Obrigatório e default:** Somente leitura
+  **Obrigatoriedade/default na preparação:** ADM-01 Página: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; ADM-02 Página: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; ADM-05 Página: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado;
+  ADM-01 Cursor: Não renderizar controle; ADM-02 Cursor: Não renderizar
+  controle; ADM-05 Cursor: Não renderizar controle; ADM-01 Total consultado:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; ADM-02 Total consultado:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; ADM-05 Total consultado:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Indicar total conhecido ou existência de próxima
-  página
+  **Validação/unidade:** ADM-01 Página: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Resultado derivado dos fatos/valores apresentados; sem edição manual; ADM-02
+  Página: Revalidar acesso, referência e estado na leitura/ação. Não solicitar
+  ao usuário correção deste valor nesta tela. Resultado derivado dos
+  fatos/valores apresentados; sem edição manual; ADM-05 Página: Revalidar
+  acesso, referência e estado na leitura/ação. Não solicitar ao usuário
+  correção deste valor nesta tela. Resultado derivado dos fatos/valores
+  apresentados; sem edição manual; ADM-01 Cursor: Somente contrato interno,
+  com validação no servidor; não expor segredo/UUID como decisão do usuário;
+  ADM-02 Cursor: Somente contrato interno, com validação no servidor; não
+  expor segredo/UUID como decisão do usuário; ADM-05 Cursor: Somente contrato
+  interno, com validação no servidor; não expor segredo/UUID como decisão do
+  usuário; ADM-01 Total consultado: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Resultado derivado dos fatos/valores apresentados; sem edição manual; ADM-02
+  Total consultado: Revalidar acesso, referência e estado na leitura/ação. Não
+  solicitar ao usuário correção deste valor nesta tela. Resultado derivado dos
+  fatos/valores apresentados; sem edição manual; ADM-05 Total consultado:
+  Revalidar acesso, referência e estado na leitura/ação. Não solicitar ao
+  usuário correção deste valor nesta tela. Resultado derivado dos
+  fatos/valores apresentados; sem edição manual
 
-  **Ajuda e exemplo:** Não rotular 100 recentes como todos.
+  **Ajuda/exemplo:** ADM-01 Página: Resultado calculado a partir dos fatos
+  desta tarefa, apresentado para conferência. Ele não pode ser digitado ou
+  corrigido aqui.; ADM-02 Página: Resultado calculado a partir dos fatos desta
+  tarefa, apresentado para conferência. Ele não pode ser digitado ou corrigido
+  aqui.; ADM-05 Página: Resultado calculado a partir dos fatos desta tarefa,
+  apresentado para conferência. Ele não pode ser digitado ou corrigido aqui.;
+  ADM-01 Cursor: Não rotular 100 recentes como todos.; ADM-02 Cursor: Não
+  rotular 100 recentes como todos.; ADM-05 Cursor: Não rotular 100 recentes
+  como todos.; ADM-01 Total consultado: Resultado calculado a partir dos fatos
+  desta tarefa, apresentado para conferência. Ele não pode ser digitado ou
+  corrigido aqui.; ADM-02 Total consultado: Resultado calculado a partir dos
+  fatos desta tarefa, apresentado para conferência. Ele não pode ser digitado
+  ou corrigido aqui.; ADM-05 Total consultado: Resultado calculado a partir
+  dos fatos desta tarefa, apresentado para conferência. Ele não pode ser
+  digitado ou corrigido aqui.
 
 - **Campo:** Proposta e versão
 
-  **Tipo/origem:** Servidor
+  **Tipo/origem por tela e estado:** ADM-04 Proposta: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-04 Versão da proposta: READ_ONLY (TEXT_VALUE); Consulta do
+  valor de origem; mudanças só no processo legitimamente responsável
 
-  **Obrigatório e default:** Sim ao decidir
+  **Obrigatoriedade/default na preparação:** ADM-04 Proposta: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; ADM-04 Versão da proposta: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado
 
-  **Validação/unidade:** Kind conhecido traduzido; desconhecido não aprovável
+  **Validação/unidade:** ADM-04 Proposta: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-04 Versão da proposta: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** Valores atuais/propostos lado a lado.
+  **Ajuda/exemplo:** ADM-04 Proposta: Informação do registro indicado, somente
+  para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; ADM-04 Versão da proposta: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.
 
 - **Campo:** Motivo da alteração/decisão
 
-  **Tipo/origem:** Texto do ator
+  **Tipo/origem por tela e estado:** ADM-03 Motivo da alteração/decisão:
+  EDITABLE (TEXTAREA); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; ADM-04 Motivo da
+  alteração/decisão: EDITABLE_SUBFORM (TEXTAREA); Motivo da decisão é próprio;
+  motivo e conteúdo originais permanecem em leitura
 
-  **Obrigatório e default:** Quando ação crítica
+  **Obrigatoriedade/default na preparação:** ADM-03 Motivo da
+  alteração/decisão: Quando ação crítica; ADM-04 Motivo da alteração/decisão:
+  Quando ação crítica
 
-  **Validação/unidade:** 3–1000 onde contrato herdado
+  **Validação/unidade:** ADM-03 Motivo da alteração/decisão: 3–1000 onde
+  contrato herdado; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; ADM-04 Motivo da
+  alteração/decisão: 3–1000 onde contrato herdado; Motivo da decisão é
+  próprio; motivo e conteúdo originais permanecem em leitura
 
-  **Ajuda e exemplo:** “Por que esta permissão precisa mudar?”
+  **Ajuda/exemplo:** ADM-03 Motivo da alteração/decisão: “Por que esta
+  permissão precisa mudar?”; ADM-04 Motivo da alteração/decisão: “Por que esta
+  permissão precisa mudar?”
 
 - **Campo:** Capacidade/política proposta
 
-  **Tipo/origem:** Seleção tipada
+  **Tipo/origem por tela e estado:** ADM-04 Capacidade proposta: READ_ONLY
+  (CAPABILITY_COMPARISON); Capacidade proposta congelada e antes/depois por
+  pessoa/alcance; ADM-04 Política proposta: READ_ONLY (POLICY_COMPARISON);
+  Política proposta tipada; nenhum JSON ou seletor para editar na aprovação
 
-  **Obrigatório e default:** Conforme kind
+  **Obrigatoriedade/default na preparação:** ADM-04 Capacidade proposta: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; ADM-04 Política proposta:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Alvo local, segunda identidade, versão da política
+  **Validação/unidade:** ADM-04 Capacidade proposta: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Capacidade proposta congelada e antes/depois por
+  pessoa/alcance; ADM-04 Política proposta: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Política proposta tipada; nenhum JSON ou seletor para editar na
+  aprovação
 
-  **Ajuda e exemplo:** Nunca pedir ao usuário ler JSON para aprovar.
+  **Ajuda/exemplo:** ADM-04 Capacidade proposta: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; ADM-04 Política proposta: Informação
+  do registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.
 
 - **Campo:** Prazo de acompanhamento
 
-  **Tipo/origem:** Política do paciente
+  **Tipo/origem por tela e estado:** ADM-03 Prazo de acompanhamento: EDITABLE
+  (DURATION_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Conforme configuração
+  **Obrigatoriedade/default na preparação:** ADM-03 Prazo de acompanhamento:
+  Conforme configuração
 
-  **Validação/unidade:** Valor configurado governa só acompanhamento, não
-  desfaz persistência
+  **Validação/unidade:** ADM-03 Prazo de acompanhamento: Duração configurada
+  válida e unidade visível; muda só acompanhamento, nunca desfaz persistência;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** PDF lento não cancela consulta de avisos.
+  **Ajuda/exemplo:** ADM-03 Prazo de acompanhamento: PDF lento não cancela
+  consulta de avisos.
 
 - **Campo:** Correlação de erro
 
-  **Tipo/origem:** Código seguro de servidor
+  **Tipo/origem por tela e estado:** ADM-05 Correlação de erro: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Em falha técnica
+  **Obrigatoriedade/default na preparação:** ADM-05 Correlação de erro: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Sem SQL, segredo ou payload privado
+  **Validação/unidade:** ADM-05 Correlação de erro: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** “Informe esta referência ao suporte.”
+  **Ajuda/exemplo:** ADM-05 Correlação de erro: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.
 
 - **Campo:** Job/tentativa/referência externa
 
-  **Tipo/origem:** Readmodel administrativo
+  **Tipo/origem por tela e estado:** ADM-05 Job: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-05 Tentativa: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; ADM-05 Referência
+  externa: READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no
+  processo legitimamente responsável
 
-  **Obrigatório e default:** Ao conciliar envio incerto
+  **Obrigatoriedade/default na preparação:** ADM-05 Job: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; ADM-05 Tentativa: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; ADM-05 Referência externa: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado
 
-  **Validação/unidade:** Escopo, origem, timestamps e tentativa exata
+  **Validação/unidade:** ADM-05 Job: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-05 Tentativa: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ADM-05 Referência externa: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** Referência vazia significa desconhecida, não “não
-  enviado”.
+  **Ajuda/exemplo:** ADM-05 Job: Informação do registro indicado, somente para
+  consulta nesta etapa. Ausência de dado histórico permanece explicitamente
+  identificada.; ADM-05 Tentativa: Informação do registro indicado, somente
+  para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; ADM-05 Referência externa: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.
 
 <!-- c-table:end -->
 
@@ -200,23 +737,18 @@ padrão.
 Melhorar cada lista existente: filtros coerentes, busca, página seguinte,
 consulta individual, total quando disponível, responsável e ação correta.
 Consumo/entregas/propostas/auditoria não podem esconder pending antigo atrás
-de
-50/100 recentes. Links internos preservam filtros e retorno seguro. Resultado
-é identificado por paciente, query, cursor e revisão; resposta tardia de
-filtro
-anterior não troca a lista. Em erro secundário, painel válido permanece
-marcado
-com sua data, sem afirmar zero dados.
+de 50/100 recentes. Links internos preservam filtros e retorno seguro.
+Resultado é identificado por paciente, query, cursor e revisão; resposta
+tardia de filtro anterior não troca a lista. Em erro secundário, painel válido
+permanece marcado com sua data, sem afirmar zero dados.
 
 Proposta global guarda intenção, alvo e versão; outra identidade local decide.
 Resumo apresenta nome da regra, pessoa afetada, antes/depois, alcance e
-próxima
-autoridade. Todo kind permitido tem presenter próprio; kind desconhecido
-mostra
-indisponibilidade segura e encaminhamento, sem aprovar objeto opaco. Overrides
-críticos mantêm diálogo e foco em 409. Editar intenção depois de resultado
-incerto
-não usa a mesma chave; primeiro recuperar/encerrar a tentativa anterior.
+próxima autoridade. Todo kind permitido tem presenter próprio; kind
+desconhecido mostra indisponibilidade segura e encaminhamento, sem aprovar
+objeto opaco. Overrides críticos mantêm diálogo e foco em 409. Editar intenção
+depois de resultado incerto não usa a mesma chave; primeiro recuperar/encerrar
+a tentativa anterior.
 
 Criar paciente inativo respeita false em API/RPC ou recusa a opção antes de
 persistir; não declarar sucesso diferente da escolha. Nome curto tem ações
@@ -227,27 +759,21 @@ instante e diferença, sem usar nome atual como se fosse histórico.
 
 Profissional recebe ação operacional: consultar, conferir, complementar,
 aguardar responsável ou contatar suporte. Família/admin local decide
-pendências
-administrativas do paciente. Suporte/global trata configuração, erro interno,
-Storage/integração e recuperação, com acesso mínimo e trilha; não assume
-recebimento físico ou poderes locais para “destravar”.
+pendências administrativas do paciente. Suporte/global trata configuração,
+erro interno, Storage/integração e recuperação, com acesso mínimo e trilha;
+não assume recebimento físico ou poderes locais para “destravar”.
 
 Leitura falhou: repetir GET. Comando falhou antes de efeito comprovado:
-corrigir
-campo/autoridade. Resposta perdida: consultar mesma intenção. Comando
-multi-etapa
-mostra etapa confirmada e recusada/uncertain. Erro SQL de implementação não
-vira
-conflito de nome de produto. UUID malformado é 4xx seguro e não retryable, sem
-alterar recurso oculto para enumerável. Mensagem concluída não regride após
-timeout fixo; PDF e entrega de aviso têm cancelamento/acompanhamento
-separados.
+corrigir campo/autoridade. Resposta perdida: consultar mesma intenção. Comando
+multi-etapa mostra etapa confirmada e recusada/uncertain. Erro SQL de
+implementação não vira conflito de nome de produto. UUID malformado é 4xx
+seguro e não retryable, sem alterar recurso oculto para enumerável. Mensagem
+concluída não regride após timeout fixo; PDF e entrega de aviso têm
+cancelamento/acompanhamento separados.
 
 Aceites:51 propostas/101 eventos antigos alcançáveis; erro de uma seção não
 zera outra; duas sessões atualizam lista sem perder edição; proposta
-desconhecida
-não aprova; retry com chave estável não duplica;409 mantém resumo/foco;
-usuário
-leigo explica objeto e consequência antes de decidir. /inventarios e links
-antigos permanecem compatíveis; limpeza de módulos órfãos é lote futuro
-opcional.
+desconhecida não aprova; retry com chave estável não duplica;409 mantém
+resumo/foco; usuário leigo explica objeto e consequência antes de decidir.
+/inventarios e links antigos permanecem compatíveis; limpeza de módulos órfãos
+é lote futuro opcional.

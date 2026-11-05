@@ -1,68 +1,116 @@
 # REQ-05 — Usar lista frequente
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Equipe/família autorizada. Banco/API revalidam capacidade,
-alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Lista recorrente, novo painel do wizard. Gatilho: navegar
-pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Salvar/usar
-seleção de materiais do paciente, sem copiar contagem antiga.
+Seleção auxiliar em uma REQ privada; lista frequente pertence ao
+usuário/paciente permitido.
 
-## Composição e sequência
+Finalidade: Usar lista frequente.
 
-Drawer com busca de listas; prévia de materiais e seleção marcada só por
-escolha; salvar nome ao final.
+Usuário autorizado a preparar REQ; lista não amplia acesso ao catálogo.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Lista recorrente, novo painel do wizard.
 
-Duplicata de item informa já selecionado; contagem segue vazia.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Descrição da lista e disponibilidade atual. Nenhuma contagem, urgência ou
+justificativa antiga é copiada como declaração atual.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-010-01 — Nome da seleção recorrente
+
+**Modo/componente:** EDITABLE / TEXT_INPUT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Se salvar seleção; vazio.
+
+**Máscara/apresentação:** Texto legível sem máscara artificial;
+contador/limite específico junto ao campo. Autocomplete: off.
+
+**Validação:** Proposta: 2–80 caracteres; escopo paciente/usuário; Somente no
+subestado de preparação autorizado indicado na ficha; resumo/decisão posterior
+é leitura.
+
+**Ajuda/exemplo:** “Materiais habituais do turno.”
+
+**Mensagem e condição:** “Confira nome da seleção recorrente e o limite
+indicado. Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Buscar lista → conferir materiais ainda elegíveis → selecionar → adicionar à
+edição atual; salvar nome é ação separada.
+
+Drawer de busca com resultados e seleção; prévia separada das ações do
+documento consumidor.
 
 Primária: **Adicionar materiais selecionados**. Secundárias: Voltar; Salvar
 seleção como lista.
 
-Consequência: Copia seleção, jamais contagem antiga. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Copia seleção, jamais contagem antiga.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Materiais selecionados adicionados ao preenchimento.
+Confira a observação e a urgência de cada item.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Você ainda não tem uma lista frequente neste paciente.
+Selecione materiais na requisição para salvar uma lista.”
 
-- **CTRL-010-01 — Nome da seleção recorrente**. TEXT_INPUT. Ordem 10.1; Se
-  salvar seleção; vazio. Máscara/autocomplete: Sem máscara artificial;
-  preservar texto e limite do contrato; off. Dependência/validação: Proposta:
-  2–80 caracteres; escopo paciente/usuário. Ajuda/exemplo: “Materiais
-  habituais do turno.”. Erro: Revise nome da seleção recorrente: Proposta:
-  2–80 caracteres; escopo paciente/usuário..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-## Estado, teclado e ajuda
+## 19–20. Falhas, recuperação e continuidade
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-REQ-05` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `req/recurring`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-009.
+Item já escolhido é identificado sem duplicar linha; item inativo é explicado
+e fica fora da nova inclusão. Falha não apaga a seleção original.
 
-Critérios C9 relacionados: C-AC-025, C-AC-026, C-AC-036, C-AC-041, C-AC-049,
-C-AC-073, C-AC-089, C-AC-105, C-NEW-AC-003, C-NEW-AC-004, C-NEW-AC-024,
-C-NEW-AC-028, C7-AC-012. A associação é por domínio; cada caso preserva seu
-discriminante específico e não significa que todos os critérios foram
-executados nesta tela. Fonte funcional:
-[REQ](../../C3-functional-specification/REQ.md).
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
+
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
+
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Painel de uma coluna; busca permanece rotulada; seleção e retorno à tarefa sem
+depender de hover.
+
+Combobox setas/Enter/Escape; quantidade de resultados anunciada; fechar
+devolve ao acionador do formulário.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: req/recurring. Sem captura real ou aceite humano de
+interface futura nesta C.
+
+NOVO PAINEL: preservar busca e retorno ao campo de material; não criar pedido
+oficial pelo uso da lista.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-025;C-AC-026;C-AC-036;C-AC-041;C-AC-049;C-AC-073;C-AC-089;C-AC-105;C-NEW-AC-003;C-NEW-AC-004;C-NEW-AC-024;C-NEW-AC-028;C7-AC-012;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

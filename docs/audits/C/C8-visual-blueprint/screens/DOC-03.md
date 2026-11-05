@@ -1,203 +1,662 @@
 # DOC-03 — Baixar ou emitir exemplar
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Solicitante autorizado. Banco/API revalidam capacidade,
-alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: PDF privado, atual a corrigir. Gatilho: navegar pela tarefa
-ou abrir o alvo contextual autorizado. Objetivo: Gerar/recuperar bytes
-corretos, imprimir/compartilhar conforme acesso.
+Selecionar emissão existente para baixar; solicitar nova emissão é intenção
+separada e explicitamente nomeada.
 
-## Composição e sequência
+Finalidade: Baixar ou emitir exemplar.
 
-Seletor de emissão existente e ação separada de emitir novo;
-versão/solicitante/instante/assinante sistema visíveis.
+Solicitante autorizado à versão; novo download revalida acesso. Assinatura
+técnica do sistema não é assinatura pessoal do solicitante.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: PDF privado, atual a corrigir.
 
-Compor/QR antes de assinar; hash final no registro externo; não IP/GPS no PDF.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Conteúdo histórico, datas, autores, hashes e emissões. Baixar não edita dados
+nem cria outra emissão.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-143-01 — Documento
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Documento”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-143-02 — Tipo
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Tipo”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-143-03 — Protocolo
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Protocolo”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-144-01 — Versão da ficha
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Versão da
+ficha”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-144-02 — Revisão do renderizador
+
+**Modo/componente:** INTERNAL / NO_USER_CONTROL.
+
+**Quando/ator:** Metadado interno da emissão/cache; usuário escolhe versão e
+exemplar, não implementação do renderizador.
+
+**Obrigatoriedade/inicial:** Não renderizar controle.
+
+**Máscara/apresentação:** NÃO APLICÁVEL. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Somente contrato interno, com validação no servidor; não expor
+segredo/UUID como decisão do usuário.
+
+**Ajuda/exemplo:** “Versão 3, representação PDF rX.”
+
+**Acessibilidade:** Não inserir campo escondido na ordem de foco, texto
+acessível ou mensagem para o usuário comum.
+
+### CTRL-145-01 — Data do fato
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Data do
+fato”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-145-02 — Data do registro
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Data do
+registro”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-145-03 — Data da emissão
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Data da
+emissão”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-146-01 — Autor do fato
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da pessoa e papel no ato, conforme registro
+histórico; sem token ou ID de sessão. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Identifica a pessoa relacionada a este ato; não permite
+transferir sua autoria para quem consulta.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Autor do
+fato”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-146-02 — Revisor
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da pessoa e papel no ato, conforme registro
+histórico; sem token ou ID de sessão. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Identifica a pessoa relacionada a este ato; não permite
+transferir sua autoria para quem consulta.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Revisor”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-146-03 — Recebedor
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da pessoa e papel no ato, conforme registro
+histórico; sem token ou ID de sessão. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Identifica a pessoa relacionada a este ato; não permite
+transferir sua autoria para quem consulta.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Recebedor”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-147-01 — Estado da linha
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Estado da
+linha”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-147-02 — Estado do documento
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Estado do
+documento”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-148-01 — Motivo
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Texto histórico completo ou comparação rotulada, com
+quebras de linha. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação registrada no ato de origem. Não pode ser
+reescrita nesta consulta ou decisão.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Motivo”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-148-02 — Ressalva
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Texto histórico completo ou comparação rotulada, com
+quebras de linha. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação registrada no ato de origem. Não pode ser
+reescrita nesta consulta ou decisão.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Ressalva”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-148-03 — Antes e depois
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Texto histórico completo ou comparação rotulada, com
+quebras de linha. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação registrada no ato de origem. Não pode ser
+reescrita nesta consulta ou decisão.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Antes e
+depois”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-150-01 — Hash canônico
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Hash
+canônico”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-151-01 — Hash dos bytes finais
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Hash dos
+bytes finais”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-C7-005 — Identificador da emissão
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação
+“Identificador da emissão”. Atualize esta seção. O dado registrado não pode
+ser alterado aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-C7-006 — Exemplar a baixar
+
+**Modo/componente:** SELECTION / ISSUANCE_RADIO_CARDS.
+
+**Quando/ator:** Escolher emissão existente, com solicitante/instante; seleção
+não emite novo PDF.
+
+**Obrigatoriedade/inicial:** Seleção explícita da emissão/versão correta,
+nunca da versão atual como substituta automática.
+
+**Máscara/apresentação:** Uma emissão por opção com versão material,
+solicitante, instante e estado de assinatura; escolher não emite novo
+exemplar. Autocomplete: off.
+
+**Validação:** Selecionar emissão existente; bytes idênticos no novo download;
+Escolher emissão existente, com solicitante/instante; seleção não emite novo
+PDF.
+
+**Ajuda/exemplo:** Não selecionar nova emissão silenciosamente
+
+**Mensagem e condição:** “Escolha uma opção válida para exemplar a baixar no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-C7-007 — Solicitante e instante da emissão
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Solicitante
+e instante da emissão”. Atualize esta seção. O dado registrado não pode ser
+alterado aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Versão de conteúdo → emissão/solicitante/instante → estado da assinatura →
+baixar exemplar; Emitir novo exemplar em ação própria.
+
+Cartões/lista de emissões por versão, solicitante e instante; Baixar separado
+visualmente de Emitir novo.
 
 Primária: **Baixar este exemplar**. Secundárias: Emitir novo exemplar;
 Verificar arquivo; Imprimir.
 
-Consequência: Novo pedido emite ID/assinatura; download mantém bytes. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Novo pedido emite ID/assinatura; download mantém bytes.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Exemplar disponibilizado para download. A identidade da
+emissão e seus bytes foram preservados.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Ainda não há exemplar pronto desta versão. Solicite uma
+emissão quando autorizado; não use outra versão como substituta.”
 
-- **CTRL-143-01 — Documento**. READ_ONLY_DESCRIPTION. Ordem 143.1; Sim,
-  leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Série por paciente/tipo, UUID e versão.
-  Ajuda/exemplo: Protocolo físico importado tem origem própria.. Erro: Revise
-  documento: Série por paciente/tipo, UUID e versão..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-143-02 — Tipo**. READ_ONLY_DESCRIPTION. Ordem 143.2; Sim, leitura.
-  Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Série por paciente/tipo, UUID e versão.
-  Ajuda/exemplo: Protocolo físico importado tem origem própria.. Erro: Revise
-  tipo: Série por paciente/tipo, UUID e versão..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-143-03 — Protocolo**. READ_ONLY_DESCRIPTION. Ordem 143.3; Sim,
-  leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Série por paciente/tipo, UUID e versão.
-  Ajuda/exemplo: Protocolo físico importado tem origem própria.. Erro: Revise
-  protocolo: Série por paciente/tipo, UUID e versão..
+Sem emissão exata/versão/digest pronto e acesso vigente, não baixar outro
+arquivo como substituto. Falha na geração é separada da ficha oficial já
+registrada.
 
-- **CTRL-144-01 — Versão da ficha**. READ_ONLY_DESCRIPTION. Ordem 144.1; Sim
-  em cada download. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Não substituir versão ausente pela atual.
-  Ajuda/exemplo: “Versão 3, representação PDF rX.”. Erro: Revise versão da
-  ficha: Não substituir versão ausente pela atual..
+PDF em processamento fica separado de ficha salva. Divergência de bytes
+bloqueia download como válido; recuperar a emissão sem sobrescrever arquivo
+histórico.
 
-- **CTRL-144-02 — Revisão do renderizador**. READ_ONLY_DESCRIPTION. Ordem
-  144.2; Sim em cada download. Máscara/autocomplete: SEM_MASCARA;valor do
-  servidor; off. Dependência/validação: Não substituir versão ausente pela
-  atual. Ajuda/exemplo: “Versão 3, representação PDF rX.”. Erro: Revise
-  revisão do renderizador: Não substituir versão ausente pela atual..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-145-01 — Data do fato**. READ_ONLY_DESCRIPTION. Ordem 145.1;
-  Conhecidos; desconhecido explícito. Máscara/autocomplete: SEM_MASCARA;valor
-  do servidor; off. Dependência/validação: Fuso/offset e rótulos próprios.
-  Ajuda/exemplo: Criação de draft em D1 não é emissão em D2.. Erro: Revise
-  data do fato: Fuso/offset e rótulos próprios..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-145-02 — Data do registro**. READ_ONLY_DESCRIPTION. Ordem 145.2;
-  Conhecidos; desconhecido explícito. Máscara/autocomplete: SEM_MASCARA;valor
-  do servidor; off. Dependência/validação: Fuso/offset e rótulos próprios.
-  Ajuda/exemplo: Criação de draft em D1 não é emissão em D2.. Erro: Revise
-  data do registro: Fuso/offset e rótulos próprios..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-- **CTRL-145-03 — Data da emissão**. READ_ONLY_DESCRIPTION. Ordem 145.3;
-  Conhecidos; desconhecido explícito. Máscara/autocomplete: SEM_MASCARA;valor
-  do servidor; off. Dependência/validação: Fuso/offset e rótulos próprios.
-  Ajuda/exemplo: Criação de draft em D1 não é emissão em D2.. Erro: Revise
-  data da emissão: Fuso/offset e rótulos próprios..
+Uma emissão por cartão com estado/assinatura e ações; impressão é consequência
+do exemplar selecionado, sem esconder a versão.
 
-- **CTRL-146-01 — Autor do fato**. READ_ONLY_DESCRIPTION. Ordem 146.1;
-  Conforme fato, leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor;
-  off. Dependência/validação: Nome histórico e identidade; atual rotulado
-  separadamente. Ajuda/exemplo: Revogação/rename não muda autoria antiga..
-  Erro: Revise autor do fato: Nome histórico e identidade; atual rotulado
-  separadamente..
+Seleção acessível por rádio/lista; progresso da emissão anunciado sem dizer
+documento não salvo; download não muda escolha de versão.
 
-- **CTRL-146-02 — Revisor**. READ_ONLY_DESCRIPTION. Ordem 146.2; Conforme
-  fato, leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Nome histórico e identidade; atual rotulado
-  separadamente. Ajuda/exemplo: Revogação/rename não muda autoria antiga..
-  Erro: Revise revisor: Nome histórico e identidade; atual rotulado
-  separadamente..
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-- **CTRL-146-03 — Recebedor**. READ_ONLY_DESCRIPTION. Ordem 146.3; Conforme
-  fato, leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Nome histórico e identidade; atual rotulado
-  separadamente. Ajuda/exemplo: Revogação/rename não muda autoria antiga..
-  Erro: Revise recebedor: Nome histórico e identidade; atual rotulado
-  separadamente..
+Referência do protótipo: docs/pdfInfo. Sem captura real ou aceite humano de
+interface futura nesta C.
 
-- **CTRL-147-01 — Estado da linha**. READ_ONLY_DESCRIPTION. Ordem 147.1; Sim
-  quando aplicável. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Terminal não cai em “pendente” por fallback.
-  Ajuda/exemplo: Cancelada não orienta receber.. Erro: Revise estado da linha:
-  Terminal não cai em “pendente” por fallback..
+RECONSTRUIR ações de emitir/baixar; assinatura incorporada P09-B é obrigatória
+para o escopo futuro.
 
-- **CTRL-147-02 — Estado do documento**. READ_ONLY_DESCRIPTION. Ordem 147.2;
-  Sim quando aplicável. Máscara/autocomplete: SEM_MASCARA;valor do servidor;
-  off. Dependência/validação: Terminal não cai em “pendente” por fallback.
-  Ajuda/exemplo: Cancelada não orienta receber.. Erro: Revise estado do
-  documento: Terminal não cai em “pendente” por fallback..
+## Contratos e aceites relacionados
 
-- **CTRL-148-01 — Motivo**. TEXTAREA. Ordem 148.1; Quando conhecido.
-  Máscara/autocomplete: Sem máscara; contador e limite do contrato visíveis;
-  quebra de linha/reflow; off. Dependência/validação: Não reconstruir por
-  cadastro atual. Ajuda/exemplo: Desconhecido não é preenchido com texto
-  inventado.. Erro: Revise motivo: Não reconstruir por cadastro atual..
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
 
-- **CTRL-148-02 — Ressalva**. TEXTAREA. Ordem 148.2; Quando conhecido.
-  Máscara/autocomplete: Sem máscara; contador e limite do contrato visíveis;
-  quebra de linha/reflow; off. Dependência/validação: Não reconstruir por
-  cadastro atual. Ajuda/exemplo: Desconhecido não é preenchido com texto
-  inventado.. Erro: Revise ressalva: Não reconstruir por cadastro atual..
-
-- **CTRL-148-03 — Antes e depois**. TEXTAREA. Ordem 148.3; Quando conhecido.
-  Máscara/autocomplete: Sem máscara; contador e limite do contrato visíveis;
-  quebra de linha/reflow; off. Dependência/validação: Não reconstruir por
-  cadastro atual. Ajuda/exemplo: Desconhecido não é preenchido com texto
-  inventado.. Erro: Revise antes e depois: Não reconstruir por cadastro
-  atual..
-
-- **CTRL-150-01 — Hash canônico**. READ_ONLY_DESCRIPTION. Ordem 150.1;
-  Leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Identifica conteúdo lógico, não bytes PDF.
-  Ajuda/exemplo: Não usar esse hash como digest do arquivo.. Erro: Revise hash
-  canônico: Identifica conteúdo lógico, não bytes PDF..
-
-- **CTRL-151-01 — Hash dos bytes finais**. READ_ONLY_DESCRIPTION. Ordem 151.1;
-  Sim para PDF emitido. Máscara/autocomplete: SEM_MASCARA;valor do servidor;
-  off. Dependência/validação: SHA-256 após todos os bytes finais; comparar no
-  cache/download. Ajuda/exemplo: QR sozinho não verifica o exemplar.. Erro:
-  Revise hash dos bytes finais: SHA-256 após todos os bytes finais; comparar
-  no cache/download..
-
-- **CTRL-C7-005 — Identificador da emissão**. READ_ONLY_DESCRIPTION. Ordem
-  C7.5; Conforme etapa; leitura de servidor ou escolha explícita; sem
-  confirmação material por default. Máscara/autocomplete: Conforme tipo;
-  string decimal exata/data local com fuso; identificador opaco só leitura;
-  off. Dependência/validação: ID opaco do exemplar emitido; distinto da versão
-  da ficha. Ajuda/exemplo: Emissão nº2 da versão3. Erro: Revise identificador
-  da emissão. ID opaco do exemplar emitido; distinto da versão da ficha.
-
-- **CTRL-C7-006 — Exemplar a baixar**. RADIO_OR_SELECT. Ordem C7.6; Conforme
-  etapa; leitura de servidor ou escolha explícita; sem confirmação material
-  por default. Máscara/autocomplete: Conforme tipo; string decimal exata/data
-  local com fuso; identificador opaco só leitura; off. Dependência/validação:
-  Selecionar emissão existente; bytes idênticos no novo download.
-  Ajuda/exemplo: Não selecionar nova emissão silenciosamente. Erro: Revise
-  exemplar a baixar. Selecionar emissão existente; bytes idênticos no novo
-  download.
-
-- **CTRL-C7-007 — Solicitante e instante da emissão**. READ_ONLY_DESCRIPTION.
-  Ordem C7.7; Conforme etapa; leitura de servidor ou escolha explícita; sem
-  confirmação material por default. Máscara/autocomplete: Conforme tipo;
-  string decimal exata/data local com fuso; identificador opaco só leitura;
-  off. Dependência/validação: Pessoa autorizada solicitante e timestamp/fuso
-  persistidos. Ajuda/exemplo: Sistema é signatário técnico, não a pessoa
-  solicitante. Erro: Revise solicitante e instante da emissão. Pessoa
-  autorizada solicitante e timestamp/fuso persistidos.
-
-## Estado, teclado e ajuda
-
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
-
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-DOC-03` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `docs/pdfInfo`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-045, SC-046, SC-047, SC-048, SC-051, DEMO-1,
-DEMO-2, DEMO-3, DEMO-4, DEMO-5, DEMO-6.
-
-Critérios C9 relacionados: C-AC-013, C-AC-015, C-AC-023, C-AC-034, C-AC-036,
-C-AC-046, C-AC-063, C-AC-071, C-AC-100, C-AC-101, C-AC-102, C-AC-103,
-C-AC-104, C-AC-105, C-AC-106, C-AC-107, C-AC-108, C-AC-109, C-AC-110,
-C-AC-111, C-AC-119, C-NEW-AC-017, C-NEW-AC-018, C-NEW-AC-019, C-NEW-AC-020,
-C-NEW-AC-023, C7-AC-002, C7-AC-011. A associação é por domínio; cada caso
-preserva seu discriminante específico e não significa que todos os critérios
-foram executados nesta tela. Fonte funcional:
-[DOCUMENTS_PDFS_AND_INTEGRITY](../../C3-functional-specification/DOCUMENTS_PDFS_AND_INTEGRITY.md).
+Aceites relacionados:
+C-AC-013;C-AC-015;C-AC-023;C-AC-034;C-AC-036;C-AC-046;C-AC-063;C-AC-071;C-AC-100;C-AC-101;C-AC-102;C-AC-103;C-AC-104;C-AC-105;C-AC-106;C-AC-107;C-AC-108;C-AC-109;C-AC-110;C-AC-111;C-AC-119;C-NEW-AC-017;C-NEW-AC-018;C-NEW-AC-019;C-NEW-AC-020;C-NEW-AC-023;C7-AC-002;C7-AC-011;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-008;C-FINAL-AC-018;C-FINAL-AC-026.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

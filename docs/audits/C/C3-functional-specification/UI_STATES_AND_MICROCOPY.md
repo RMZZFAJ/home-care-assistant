@@ -120,42 +120,63 @@ Rótulo visível, ajuda associada, indicação de obrigatório antes do envio,
 exemplo fictício e erro junto do campo. Validação local orienta; API/RPC
 decidem. Mostrar todos os erros em resumo com links e mover foco ao primeiro
 campo inválido; aria-invalid/descrição coerentes. Ao voltar etapa, manter
-valores.
-Decimal aceita vírgula/ponto na entrada, normaliza string exata sem
-arredondar;
-quantidade e unidade sempre próximas. Nulo/ausente/zero seguem o domínio.
+valores. Decimal aceita vírgula/ponto na entrada, normaliza string exata sem
+arredondar; quantidade e unidade sempre próximas. Nulo/ausente/zero seguem o
+domínio.
 
 Resumo antes da ação relevante mostra paciente, pessoa, versão, situação
-atual,
-proposta, quantidades/custódia, consequência e próxima etapa. Botão usa verbo
-específico (“Expedir 3 unidades”, “Registrar novo reconto”), evitando “OK”.
-Não adicionar confirmação extra para mudar filtro ou salvar campo trivial.
-Escape/Voltar/Continuar devolvem foco ao acionador ou campo válido; nunca
-BODY.
-Diálogo contém foco e rótulo, mas não esconde erro fora dele.
+atual, proposta, quantidades/custódia, consequência e próxima etapa. Botão usa
+verbo específico (“Expedir 3 unidades”, “Registrar novo reconto”), evitando
+“OK”. Não adicionar confirmação extra para mudar filtro ou salvar campo
+trivial. Escape/Voltar/Continuar devolvem foco ao acionador ou campo válido;
+nunca BODY. Diálogo contém foco e rótulo, mas não esconde erro fora dele.
 
 Em 320px/reflow e zoom nativo 400%, nomes contínuos e observações válidas
-quebram
-linha; sem rolagem global indevida. Tabela pode ter região rotulada de rolagem
-quando indispensável. Resumos e ações ficam alcançáveis por teclado, alto
-contraste, leitor de tela e touch; não depender de cor, hover ou gesto.
+quebram linha; sem rolagem global indevida. Tabela pode ter região rotulada de
+rolagem quando indispensável. Resumos e ações ficam alcançáveis por teclado,
+alto contraste, leitor de tela e touch; não depender de cor, hover ou gesto.
 Barra de ações não cobre teclado virtual/conteúdo. Calendário Mês deve mostrar
 intervalo correspondente em móvel ou explicar explicitamente a alternativa.
 
 ## Microcopy de efeitos distintos
 
 - “Relato registrado. Nenhum material foi descontado. Aguarda conferência.”
+
 - “Consumo confirmado: 1 unidade saiu do estoque da equipe.”
+
 - “Você declarou ciência antes de abrir. Isso não registra leitura integral.”
+
 - “Ciência presumida pela preferência vigente na emissão. Acesso não
   registrado.”
+
 - “Você recebeu 2 de 3 unidades. Uma unidade permanece em divergência.”
+
 - “Pedido de cancelamento retirado. A entrega voltou à situação anterior.”
+
 - “A edição foi salva; a expedição não ocorreu por saldo insuficiente.”
+
 - “Rascunho de ontem encontrado. Continuar ou descartar somente este
   rascunho?”
 
 Badges traduzem eventos/papéis/filtros com fallback seguro. Histórico mostra
-data do fato, do registro e da emissão com seus rótulos, quando conhecidos.
-Se desconhecido, dizer “Não informado”; não usar hoje como preenchimento.
-Guia técnico fica no suporte; profissional recebe próximo passo operacional.
+data do fato, do registro e da emissão com seus rótulos, quando conhecidos. Se
+desconhecido, dizer “Não informado”; não usar hoje como preenchimento. Guia
+técnico fica no suporte; profissional recebe próximo passo operacional.
+
+## Fechamento definitivo — tarefa, estado e política
+
+Fonte granular: C8 CONTROL_SCREEN_CONTRACTS.csv por tela/controle/estado.
+READ_ONLY/CALCULATED/AUTO_FILLED são texto/comparação, não input disabled ou
+aria-invalid. Falha de leitura pertence à seção com Atualizar.
+EDITABLE_SUBFORM só aparece no estado/ator indicados; revisão/história não
+herdam editor. INTERNAL/HIDDEN não entram no foco ou texto acessível.
+
+B1 no catálogo de microcopy é referência histórica, não texto futuro
+automaticamente aprovado. Não substituir strings por compartilharem uma linha
+de código. Label, título, ação, vazio, sucesso e erro têm funções distintas.
+Expressões dinâmicas usam presenter tipado. Placeholders só usam resultados
+confirmados, sem chaves/enums/instruções técnicas na UI comum. GET falho não é
+envio incerto; timeout não prova recusa. Parcial identifica etapa real.
+Diálogo só para decisão/consentimento/descarte pertinentes; filtros/avisos de
+seção não exigem diálogo. Contraste/reflow/AT/aparelhos continuam provas do
+candidato D, sem aceite por linter.

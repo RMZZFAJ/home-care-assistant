@@ -1,90 +1,201 @@
 # GUI-04 — Recuperar serviço com segurança
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Titular/substituto e operador autorizado. Banco/API
-revalidam capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Incidente/continuidade, runbook planejado. Gatilho: navegar
-pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Identificar
-responsável, preservar referência e recuperar no ambiente autorizado.
+Runbook de recuperação; orientação e checkpoints não disparam restore ou envio
+automaticamente.
 
-## Composição e sequência
+Finalidade: Recuperar serviço com segurança.
 
-Runbook simples: impacto, última cópia válida, conjuntos, quarentena e
-checkpoints de retomada.
+Titular/substituto/operador previamente designados e autorizados à operação;
+acesso restrito a detalhes de recuperação.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Incidente/continuidade, runbook planejado.
 
-RPO1h/RTO4h não garantidos; jobs externos permanecem em quarentena até
-conciliação.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Titular/substituto/prazos aprovados e estado dos checkpoints; não são
+configurações editáveis por quem apenas consulta o procedimento.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-173-01 — Incidente/correlação
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação
+“Incidente/correlação”. Atualize esta seção. O dado registrado não pode ser
+alterado aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-174-01 — Titular
+
+**Modo/componente:** READ_ONLY / RESPONSIBLE_DESCRIPTION.
+
+**Quando/ator:** Titular designado previamente; consulta do runbook não altera
+governança.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da pessoa e papel no ato, conforme registro
+histórico; sem token ou ID de sessão. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Titular designado
+previamente; consulta do runbook não altera governança.
+
+**Ajuda/exemplo:** Identifica a pessoa relacionada a este ato; não permite
+transferir sua autoria para quem consulta.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Titular”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-174-02 — Substituto
+
+**Modo/componente:** READ_ONLY / RESPONSIBLE_DESCRIPTION.
+
+**Quando/ator:** Substituto designado; sem nome fictício ou herança de sessão.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da pessoa e papel no ato, conforme registro
+histórico; sem token ou ID de sessão. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Substituto designado;
+sem nome fictício ou herança de sessão.
+
+**Ajuda/exemplo:** Identifica a pessoa relacionada a este ato; não permite
+transferir sua autoria para quem consulta.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Substituto”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-174-03 — Prazo de resposta
+
+**Modo/componente:** READ_ONLY / SERVICE_TARGET_DESCRIPTION.
+
+**Quando/ator:** Prazo aprovado ou A definir; não digitar SLA durante
+incidente.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Prazo aprovado ou A
+definir; não digitar SLA durante incidente.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Prazo de
+resposta”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Impacto/correlação → responsável → cópia válida/conjuntos → quarentena →
+checkpoints de ensaio/restore autorizado → reconciliação → aceite de retomada.
+
+Impacto, responsáveis e checkpoints em ordem de recuperação; evidência e
+quarentena antes de retomada, sem botão automático genérico.
 
 Primária: **Abrir procedimento autorizado**. Secundárias: Acionar substituto;
 Usar contingência; Preservar evidência.
 
-Consequência: Nenhum restore/envio automático por botão genérico. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Nenhum restore/envio automático por botão genérico.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Procedimento aberto. Execute apenas as etapas autorizadas
+e registre as evidências antes da retomada.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Procedimento ou responsável ainda não definido. Use a
+contingência e acione a administração; não improvise restore.”
 
-- **CTRL-173-01 — Incidente/correlação**. TEXT_INPUT. Ordem 173.1; Em falha
-  técnica. Máscara/autocomplete: Sem máscara artificial; preservar texto e
-  limite do contrato; off. Dependência/validação: Sem senha, OTP, token ou
-  payload de paciente no chamado. Ajuda/exemplo: Suporte acessa só dados
-  necessários.. Erro: Revise incidente/correlação: Sem senha, OTP, token ou
-  payload de paciente no chamado..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-174-01 — Titular**. SEARCHABLE_COMBOBOX. Ordem 174.1; P05/P13, sem
-  default fictício. Máscara/autocomplete: Busca por nome/alias autorizado;
-  seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Deve existir antes do uso real. Ajuda/exemplo: Não
-  “monitorar depois” sem responsável.. Erro: Revise titular: Deve existir
-  antes do uso real..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-174-02 — Substituto**. SEARCHABLE_COMBOBOX. Ordem 174.2; P05/P13, sem
-  default fictício. Máscara/autocomplete: Busca por nome/alias autorizado;
-  seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Deve existir antes do uso real. Ajuda/exemplo: Não
-  “monitorar depois” sem responsável.. Erro: Revise substituto: Deve existir
-  antes do uso real..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-174-03 — Prazo de resposta**. TEXT_INPUT. Ordem 174.3; P05/P13, sem
-  default fictício. Máscara/autocomplete: Sem máscara artificial; preservar
-  texto e limite do contrato; off. Dependência/validação: Deve existir antes
-  do uso real. Ajuda/exemplo: Não “monitorar depois” sem responsável.. Erro:
-  Revise prazo de resposta: Deve existir antes do uso real..
+Falha em checkpoint conserva evidência e quarentena; não prometer RPO/RTO ou
+retomada só por existir backup/TOC. Contratação externa pertence ao
+responsável.
 
-## Estado, teclado e ajuda
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-GUI-04` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `SEM_EQUIVALENTE_NO_HTML`; ausência de exemplo no HTML é declarada,
-sem novo mockup equivalente. B1: Nova superfície C3, sem equivalente B1.
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-Critérios C9 relacionados: C-AC-002, C-AC-003, C-AC-004, C-AC-006, C-AC-007,
-C-AC-008, C-AC-040, C-AC-062, C-AC-063, C-AC-112, C-AC-114, C-AC-115,
-C-AC-117, C-AC-118, C-AC-119, C-AC-120, C-AC-121, C-NEW-AC-026, C-NEW-AC-027,
-C7-AC-002, C7-AC-006, C7-AC-007, C7-AC-008, C7-AC-009. A associação é por
-domínio; cada caso preserva seu discriminante específico e não significa que
-todos os critérios foram executados nesta tela. Fonte funcional:
-[USER_GUIDES_AND_CONTINUITY](../../C3-functional-specification/USER_GUIDES_AND_CONTINUITY.md).
+Lista de passos com estado, responsável e bloqueio; telefone/canal legítimo
+legível sem copiar segredos.
+
+Procedimento navegável por headings/listas; checkpoints não são caixas
+previamente marcadas; consulta não autoriza operação remota.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: SEM_EQUIVALENTE_NO_HTML. Sem captura real ou aceite
+humano de interface futura nesta C.
+
+NOVO RUNBOOK: sem botão genérico de recuperar que modifique ambientes ou
+reative jobs.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-002;C-AC-003;C-AC-004;C-AC-006;C-AC-007;C-AC-008;C-AC-040;C-AC-062;C-AC-063;C-AC-112;C-AC-114;C-AC-115;C-AC-117;C-AC-118;C-AC-119;C-AC-120;C-AC-121;C-NEW-AC-026;C-NEW-AC-027;C7-AC-002;C7-AC-006;C7-AC-007;C7-AC-008;C7-AC-009;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-026.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

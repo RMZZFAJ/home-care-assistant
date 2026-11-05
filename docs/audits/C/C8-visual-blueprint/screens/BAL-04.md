@@ -1,75 +1,143 @@
 # BAL-04 — Designar substituta para reconto
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Designador autorizado. Banco/API revalidam capacidade,
-alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Designação de reconto, atual a ampliar. Gatilho: navegar pela
-tarefa ou abrir o alvo contextual autorizado. Objetivo: Escolher substituta e
-janela autorizadas com autoria preservada.
+Designação de nova contagem para substituir tarefa indisponível, preservando a
+anterior.
 
-## Composição e sequência
+Finalidade: Designar substituta para reconto.
 
-Drawer identifica contadora original, nova pessoa, janela e motivo; comparação
-de atribuição.
+Designador familiar autorizado; substituta deve estar vinculada e elegível à
+nova janela.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Designação de reconto, atual a ampliar.
 
-Sheila substitui tarefa, não o nome de Juliana na história.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Autor e valores da contagem anterior; não há troca do nome do ato já
+registrado.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-054-01 — Substituta do reconto
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim ao redesignar.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Vínculo/capacidade/janela; registro do designador; Somente no
+subestado de preparação autorizado indicado na ficha; resumo/decisão posterior
+é leitura.
+
+**Ajuda/exemplo:** “Sheila fará novo reconto; Juliana permanece autora da
+contagem anterior.”
+
+**Mensagem e condição:** “Escolha uma opção válida para substituta do reconto
+no escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-055-01 — Motivo da decisão
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim em adiamento/reconto/configuração.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** 3–1000 caracteres; Somente no subestado de preparação
+autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Explicar efeito e próxima pessoa.
+
+**Mensagem e condição:** “Confira motivo da decisão e o limite indicado.
+Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Contagem/atribuição anterior → nova pessoa e janela → motivo → prévia da nova
+tarefa → designar reconto.
+
+Diálogo rotulado curto com identidade-alvo, efeito e ações específicas; não
+reaproveitar formulário de criação.
 
 Primária: **Designar novo reconto**. Secundárias: Voltar; Ver contagem
 anterior.
 
-Consequência: Nova contagem/autoria; não reescreve original. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Nova contagem/autoria; não reescreve original.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Novo reconto designado. A contagem anterior permanece com
+sua autora original.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhuma pessoa elegível disponível. Mantenha a tarefa
+pendente e peça à família que regularize a designação.”
 
-- **CTRL-054-01 — Substituta do reconto**. SEARCHABLE_COMBOBOX. Ordem 54.1;
-  Sim ao redesignar. Máscara/autocomplete: Busca por nome/alias autorizado;
-  seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Vínculo/capacidade/janela; registro do designador.
-  Ajuda/exemplo: “Sheila fará novo reconto; Juliana permanece autora da
-  contagem anterior.”. Erro: Revise substituta do reconto:
-  Vínculo/capacidade/janela; registro do designador..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-055-01 — Motivo da decisão**. TEXTAREA. Ordem 55.1; Sim em
-  adiamento/reconto/configuração. Máscara/autocomplete: Sem máscara; contador
-  e limite do contrato visíveis; quebra de linha/reflow; off.
-  Dependência/validação: 3–1000 caracteres. Ajuda/exemplo: Explicar efeito e
-  próxima pessoa.. Erro: Revise motivo da decisão: 3–1000 caracteres..
+## 19–20. Falhas, recuperação e continuidade
 
-## Estado, teclado e ajuda
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Conflito relê atribuição atual e conserva motivo; não redesigna a mesma
+intenção para outra pessoa após resultado incerto.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-BAL-04` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `bal/balReassign`; ausência de exemplo no HTML é declarada, sem
-novo mockup equivalente. B1: SC-015.
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-Critérios C9 relacionados: C-AC-001, C-AC-008, C-AC-009, C-AC-010, C-AC-015,
-C-AC-051, C-AC-054, C-AC-056, C-AC-057, C-AC-074, C-AC-077, C-AC-086,
-C-AC-089, C-AC-104, C-NEW-AC-007, C-NEW-AC-011, C-NEW-AC-012, C-NEW-AC-015,
-C7-AC-003. A associação é por domínio; cada caso preserva seu discriminante
-específico e não significa que todos os critérios foram executados nesta tela.
-Fonte funcional: [BAL](../../C3-functional-specification/BAL.md).
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
+
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Largura disponível; conteúdo longo vira página/painel rolável com título e
+ações alcançáveis; nenhuma confirmação fora da tela.
+
+Foco inicial no título/resumo seguro; trap no diálogo; Escape/Voltar não
+decide e devolve foco ao acionador.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: bal/balReassign. Sem captura real ou aceite humano de
+interface futura nesta C.
+
+NOVO DRAWER: tornar autoria nova e alcance futuro verificáveis antes do
+comando.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-001;C-AC-008;C-AC-009;C-AC-010;C-AC-015;C-AC-051;C-AC-054;C-AC-056;C-AC-057;C-AC-074;C-AC-077;C-AC-086;C-AC-089;C-AC-104;C-NEW-AC-007;C-NEW-AC-011;C-NEW-AC-012;C-NEW-AC-015;C7-AC-003;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-016;C-FINAL-AC-024.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

@@ -1,140 +1,146 @@
-# Decisões humanas remanescentes
+# Gates remanescentes e escopo das decisões
 
-O pacote C7–C10 está completo como planejamento. As escolhas abaixo não foram
-preenchidas pela IA. Não são condição para abrir o Draft PR.
+P02 está **OWNER_APPROVED**. SCI-001–SCI-005 e ANY familiar não aguardam nova
+aprovação. [Política vinculante](SCIENCE_OWNER_REVIEW.md).
 
-<!-- c-table:start -->
+P03, P05, P07, P08, P09, P10, P13, P15, OPS-01 e PERF-01 **não impedem o
+início geral de D0 nem trabalhos independentes de D1**. Bloqueiam somente os
+ramos e homologações abaixo. Documentação completa não aprova o gate.
 
-- **Gate:** P02
+Abrir branch D exige integração prévia do PR 6 à master e autorização da
+missão D. Esta C não faz merge e não inicia D.
 
-  **Resposta necessária:** Modalidades/exclusão por SCI-ID, governança any/all
-  e vigência
+## P03 — OWNER_APPROVED_SCOPE_PENDING
 
-  **Recomendação técnica, sem aprovação:** Rever SCI-001–005 individualmente;
-  atos materiais sempre expressos
+Ramo: **D6 — Recuperação e liberação operacional**.
 
-  **Efeito do adiamento:** Bloqueia nova política de ciência, sem bloquear
-  restante do desenho
+Responsável define externamente fornecedores/custos; frequência, retenção,
+destino, titular/substituto e perda/parada aceitáveis ainda precisam ser
+fechados; 1h/4h não são promessa.
 
-- **Gate:** P03
+Prova/aceite: Pesquisa comercial externa pelo responsável com ChatGPT; ensaio
+isolado, objetos/configuração/DB, quarentena e recuperação comprovada.
 
-  **Resposta necessária:** Orçamento total, provedor/destino, frequência,
-  retenção, titular/substituto, perda/parada aceitáveis
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-  **Recomendação técnica, sem aprovação:** Modelo intermediário com cópia de
-  objetos e ensaio isolado
+## P05 — OWNER_APPROVED_SCOPE_PENDING
 
-  **Efeito do adiamento:** RPO 1h/RTO 4h não contratados; gate operacional D6
-  fechado
+Ramo: **D2/D4/D6 — Procedimentos excepcionais e responsabilidades**.
 
-- **Gate:** P05
+Nomear pessoas/substitutos e definir segunda conferência/canais legítimos por
+fato; regularização familiar e PDF posterior já aprovados.
 
-  **Resposta necessária:** Pessoas/substitutos, fatos que exigem segunda
-  conferência, canal seguro ao desligado
+Prova/aceite: Aceite humano do procedimento, autores distintos e nenhuma
+assinatura em nome de ausente.
 
-  **Recomendação técnica, sem aprovação:** Administração familiar por
-  paciente, suporte técnico separado
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-  **Efeito do adiamento:** Contingência real sem responsável não pode ser
-  liberada
+## P07 — OWNER_APPROVED_SCOPE_PENDING
 
-- **Gate:** P07
+Ramo: **D2 — Substituição segura de devolução por transferência**.
 
-  **Resposta necessária:** Aceitar equivalência de devolução depois da
-  regressão na D
+Objetivo de UI simples preferencialmente ENT aprovado; equivalência/regressão
+e aceite de retirada do caminho antigo permanecem gates.
 
-  **Recomendação técnica, sem aprovação:** Reutilizar ENT para fato físico;
-  manter UI antiga até cobertura
+Prova/aceite: Matriz de fatos, custódias, aceite pessoal e não duplicação de
+movimentos; preservar UI antiga até prova.
 
-  **Efeito do adiamento:** Não remover UI nem prometer unificação total
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-- **Gate:** P08
+## P08 — OWNER_APPROVED_SCOPE_PENDING
 
-  **Resposta necessária:** Classes/prazos/base de conservação, suspensão por
-  disputa e descarte técnico
+Ramo: **D3/D4/D6 — Retenção e exclusão**.
 
-  **Recomendação técnica, sem aprovação:** Matriz por finalidade com acesso
-  mínimo; revisão especializada aplicável
+Classes/finalidades, prazos, disputa e descarte precisam definição humana
+pertinente; nenhum TTL de 90/180 dias aprovado.
 
-  **Efeito do adiamento:** Sem expiração automática ou limpeza destrutiva
+Prova/aceite: Compatibilidade entre draft privado, arquivo pronto, documento
+oficial, backup e preservação obrigatória.
 
-- **Gate:** P09
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-  **Resposta necessária:** Perfil interoperável, identidade/cadeia de
-  certificado, serviço de chaves, TSA, custos
+## P09 — OWNER_APPROVED_SCOPE_PENDING
 
-  **Recomendação técnica, sem aprovação:** Avaliar PAdES B-T e cadeia
-  confiável; B-B somente se limite aceito
+Ramo: **D4 — Implementação e homologação da assinatura criptográfica**.
 
-  **Efeito do adiamento:** Assinatura incorporada continua obrigatória;
-  compra/ativação aguardam
+Assinatura incorporada do sistema é obrigatória;
+perfil/certificado/cadeia/chaves/TSA/custos e condições operacionais ainda a
+fechar externamente pelo responsável.
 
-- **Gate:** P10
+Prova/aceite: Pesquisa/contratação fora desta missão; prova de assinatura,
+cadeia e bytes finais no candidato; hash/QR não substituem assinatura.
 
-  **Resposta necessária:** Modelos/OS/browser, participantes, AT e impressora
-  reais
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-  **Recomendação técnica, sem aprovação:** Quatro classes aprovadas e versões
-  efetivas registradas
+## P10 — OWNER_APPROVED_SCOPE_PENDING
 
-  **Efeito do adiamento:** Homologação física/humana continua pendente
+Ramo: **D6 — Homologação física**.
 
-- **Gate:** P13
+Quatro classes de aparelho aprovadas; modelos/OS/navegadores, participantes,
+AT e impressão reais ainda a identificar.
 
-  **Resposta necessária:** Prazos por falha, severidade, dono/substituto e
-  teto de custo
+Prova/aceite: Aceite por tarefas reais no mesmo SHA; emulação e documentação
+não equivalem à homologação física.
 
-  **Recomendação técnica, sem aprovação:** Alertas de progresso com
-  escalonamento proporcional
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-  **Efeito do adiamento:** Não afirmar monitoramento 24h ou SLO inexistente
+## P13 — OWNER_APPROVED_SCOPE_PENDING
 
-- **Gate:** P15
+Ramo: **D5/D6 — Alertas e monitoramento**.
 
-  **Resposta necessária:** Download por proxy revalidado ou janela residual
-  TTL explicitamente aceita
+Segregação técnica global/suporte aprovada; limiares, severidade, prazos,
+titular/substituto/custos ainda a definir; pesquisa comercial externa.
 
-  **Recomendação técnica, sem aprovação:** Proxy para novo download protegido;
-  guardar limite de cópia já entregue
+Prova/aceite: Progresso/atraso observável, escalonamento testado e operação
+acordada; nenhum SLO ou atendimento 24h inventado.
 
-  **Efeito do adiamento:** Gate de arquivo revogado depende do transporte
-  escolhido
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-- **Gate:** OPS-01
+## P15 — OWNER_APPROVED_SCOPE_PENDING
 
-  **Resposta necessária:** Reter ou aposentar lembretes legados e política de
-  períodos perdidos
+Ramo: **D1/D4 — Revogação e transporte de arquivos**.
 
-  **Recomendação técnica, sem aprovação:** Separar mecanismo legado de BAL por
-  plantão; comparar 101+ e catch-up
+Revalidar comando após espera e barreira persistente aprovados; transporte de
+novo download e janela residual exigem desenho/aceite específicos.
 
-  **Efeito do adiamento:** D5 mantém gate por mecanismo, sem promover correção
-  BAL a prova global
+Prova/aceite: Negativas após revogação, incerteza de comando e limite de cópia
+já entregue; TTL/proxy não presumidos como aprovados.
 
-- **Gate:** PERF-01
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-  **Resposta necessária:** Orçamentos de latência/volume de dashboard, ledger
-  e snapshots
+## OPS-01 — PENDING_OWNER
 
-  **Recomendação técnica, sem aprovação:** Medir no destino autorizado antes
-  de escolher otimização
+Ramo: **D5/D6 — Mecanismos legados de agendamento**.
 
-  **Efeito do adiamento:** D-LATER sem prazo fictício e sem remoção de RLS
+Escolher retenção/aposentadoria e tratamento de períodos perdidos por
+mecanismo; correção BAL por plantão não prova todos os legados.
 
-- **Gate:** RELEASE-01
+Prova/aceite: Inventário de produtores/consumidores, 101+ regimes, catch-up e
+alternativa verificável antes de desativar.
 
-  **Resposta necessária:** Revisão do PR, CI do HEAD e autorização posterior
-  de merge
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
 
-  **Recomendação técnica, sem aprovação:** Merge commit para conservar
-  ancestralidade; conferir efeito Vercel
+## PERF-01 — PENDING_OWNER
 
-  **Efeito do adiamento:** Draft permanece aberto; não criar branch D
+Ramo: **D1/D-LATER — Desempenho e metas de aceitação**.
 
-<!-- c-table:end -->
+Medir candidato e aprovar metas de volume/latência por superfície; nenhuma
+meta ou prazo de serviço inventado.
 
-P01/P04/P06/P11/P12/P14 e direção visual já foram respondidas na medida
-expressa no [adendo](PRODUCT_DECISIONS_C7_ADDENDUM.md). Escolhas de
-fornecedor, TTL, nomes e limites não desfazem essas aprovações. Continuidade
-pode avançar como desenho condicional; operação real não recebe GO por
-documentação.
+Prova/aceite: Medição autorizada com RLS preservada; otimização não substitui
+correção funcional ou aceite de UX.
+
+Estado do gate: **NÃO APROVADO por este fechamento documental**.
+
+## Contratações e decisões efetivamente humanas
+
+Fornecedores, preços e condições comerciais P03/P09/P13 serão pesquisados
+externamente pelo responsável com ChatGPT. Não houve pesquisa, recomendação
+comercial ou contratação nesta missão. Não inventar valores, garantias ou
+prazos de serviço. Somente escolha ainda não tomada recebe PENDING_OWNER;
+objetivo aprovado com parâmetros pendentes conserva
+OWNER_APPROVED_SCOPE_PENDING.
+
+O17/O18 e ativação Meta/WhatsApp/Flows permanecem OWNER_DEFERRED. P01/P04/
+P06/P11/P12/P14, direção visual e P02 já estão decididos nos limites
+expressos.

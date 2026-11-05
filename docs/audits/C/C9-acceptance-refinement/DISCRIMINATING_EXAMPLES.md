@@ -23,7 +23,7 @@ análise/reconto; Sheila recebe nova atribuição e conta17. Read-back conserva
 Juliana/contagem1 e Sheila/contagem2; revisão1 não aprova2. Reprovar fila
 obrigatória universal e supervisor aprovando própria contagem no legado.
 
-## P02 por SCI-ID — C-NEW-AC-003 e C7-AC-012
+## P02 aprovada — C-NEW-AC-003 e C7-AC-012
 
 Fixture depende da tabela humana aprovada. Para SCI-001–005, testar modo
 permitido/proibido, elegível na emissão, vinculado depois e revogado.
@@ -116,3 +116,12 @@ No axe, botão sem nome reprova. Color-contrast incomplete sem violations gera
 pendência por regra/estado/superfície; não descartar nem converter em violação
 automática. AT/foco/reflow/tarefa humana têm aceite próprio. CI de outro SHA
 não fecha esse gate.
+
+## Contraprovas da ordem definitiva
+
+A cria draft, B expede: ciência de B mesmo com flag legada false; save não
+gera ciência. Um habilitado satisfaz família sem ciência dos demais. ENT-03
+não edita expedição; ESC-03 não edita fuso/notas da proposta; COM-03 não
+reescreve parcela ao validar; DOC-05 não permite escolher resultado. GET falho
+não é escrita incerta; readonly não pede corrigir fato. Casos C-FINAL-AC
+trazem dados, passos e read-back independentes.

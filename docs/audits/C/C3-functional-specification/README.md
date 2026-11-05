@@ -8,8 +8,7 @@ significam execução ou aprovação de política pendente.
 Começar por [atores e permissões](PERSONAS_PERMISSIONS_AND_ACTORS.md) e
 [estados e linguagem](UI_STATES_AND_MICROCOPY.md). Suas regras se aplicam a
 **cada tela, formulário, painel e diálogo** dos domínios abaixo; uma
-referência
-ao padrão não dispensa as diferenças explicitadas no domínio.
+referência ao padrão não dispensa as diferenças explicitadas no domínio.
 
 <!-- c-table:start -->
 
@@ -82,3 +81,11 @@ para mudar; novos limites/labels técnicos têm caráter
 `PROPOSED_TECHNICAL_DEFAULT`. Políticas humanas pendentes sempre apontam Pxx.
 O implementador deve fechar esse ponto antes de executar o ramo, mantendo o
 restante do plano utilizável.
+
+## Fechamento definitivo vigente
+
+P02 OWNER_APPROVED. Revisão individual das 66 fichas e 262 controles
+originais; catálogo atual de 274 controles/424 usos, 171 relações e 187 casos
+planejados. [Relatório C10](../C10-pr-handoff/PHASE_C_FINAL_PART2_REPORT.md) e
+[política de ciência](../C7-decision-closure/SCIENCE_OWNER_REVIEW.md). D NÃO
+INICIADA; gates específicos permanecem.

@@ -1,68 +1,117 @@
 # RAS-02 — Comparar edições concorrentes
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Titular em dois aparelhos. Banco/API revalidam capacidade,
-alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Conflito entre aparelhos, novo diálogo. Gatilho: navegar pela
-tarefa ou abrir o alvo contextual autorizado. Objetivo: Comparar versões e
-escolher edição com autoria; não sobrescrever silenciosamente.
+Save concorrente obsoleto entre duas edições privadas; nenhuma decisão
+material se funde automaticamente.
 
-## Composição e sequência
+Finalidade: Comparar edições concorrentes.
 
-Diálogo versões lado a lado desktop/empilhadas móvel; campos alterados,
-instantes e copiar manualmente.
+Mesmo titular no mesmo escopo; acesso e versões-base revalidados antes de
+salvar revisão.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Conflito entre aparelhos, novo diálogo.
 
-Quantidades/pessoas/decisões não se fundem automaticamente.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Versões, autores de sessão e instantes; nunca selecionar um lado como
+autorização para confirmar ato operacional.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-130-01 — Escolha de conflito
+
+**Modo/componente:** EXPLICIT_ACTION / COMPARISON_ACTIONS.
+
+**Quando/ator:** Escolher abrir versão do servidor ou revisar meus campos;
+novo save CAS ocorre no formulário.
+
+**Obrigatoriedade/inicial:** Sem concordância material inicial ou clique
+automático.
+
+**Máscara/apresentação:** Botão/ação com nome de consequência; sem campo
+textual de aceite. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Novo compare-and-swap; nenhuma fusão automática de decisão;
+Escolher abrir versão do servidor ou revisar meus campos; novo save CAS ocorre
+no formulário.
+
+**Ajuda/exemplo:** Comparar campos, autor e instantes.
+
+**Mensagem e condição:** “Esta ação não está disponível no estado atual.
+Consulte o resultado ou volte à tarefa; nenhuma confirmação será presumida.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Botão com verbo/alvo/efeito; confirmação por
+teclado/touch; foco retorna ao resumo, sem aria-invalid em texto de leitura.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Versão do servidor e minha edição lado a lado → diferenças por campo → copiar
+manualmente no formulário → nova revisão → save com CAS atual.
+
+Resumo ou comparação de versões com tipo/paciente/intenção e instantes; ações
+não destrutivas antes do descarte.
 
 Primária: **Salvar edição revisada**. Secundárias: Manter versão do servidor;
 Copiar meus campos; Voltar.
 
-Consequência: Novo CAS explícito; não última escrita vence. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Novo CAS explícito; não última escrita vence.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Edição revisada salva como rascunho. Nenhuma emissão,
+aprovação ou confirmação foi executada.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Não há conflito de edição ativo. Retorne ao formulário
+correspondente.”
 
-- **CTRL-130-01 — Escolha de conflito**. RADIO_OR_SELECT. Ordem 130.1; Se
-  edição concorrente. Máscara/autocomplete: Opções finitas com rótulo humano;
-  sem opção material preaceita; off. Dependência/validação: Novo
-  compare-and-swap; nenhuma fusão automática de decisão. Ajuda/exemplo:
-  Comparar campos, autor e instantes.. Erro: Revise escolha de conflito: Novo
-  compare-and-swap; nenhuma fusão automática de decisão..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-## Estado, teclado e ajuda
+## 19–20. Falhas, recuperação e continuidade
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-RAS-02` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `SEM_EQUIVALENTE_NO_HTML`; ausência de exemplo no HTML é declarada,
-sem novo mockup equivalente. B1: Nova superfície C3, sem equivalente B1.
+Conservar cópia da edição não salva até escolha; quantidade/pessoa/decisão
+nunca se mesclam por última escrita vence.
 
-Critérios C9 relacionados: C-AC-017, C-AC-032, C-AC-052, C-AC-070, C-AC-080,
-C-AC-107, C-AC-110, C-AC-116, C-NEW-AC-013, C-NEW-AC-014, C-NEW-AC-019,
-C7-AC-004. A associação é por domínio; cada caso preserva seu discriminante
-específico e não significa que todos os critérios foram executados nesta tela.
-Fonte funcional:
-[ATTACHMENTS_AND_DRAFTS](../../C3-functional-specification/ATTACHMENTS_AND_DRAFTS.md).
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
+
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
+
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Versões empilhadas por campo; cópia manual mantém valor legível; descarte não
+é ação primária preselecionada.
+
+Diferenças em texto, escolha por teclado e foco de retorno ao formulário; não
+expor JSON serializado como campo de edição.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: SEM_EQUIVALENTE_NO_HTML. Sem captura real ou aceite
+humano de interface futura nesta C.
+
+NOVO COMPARADOR: resolução manual por campo e nova revisão, sem merge de atos
+materiais.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-017;C-AC-032;C-AC-052;C-AC-070;C-AC-080;C-AC-107;C-AC-110;C-AC-116;C-NEW-AC-013;C-NEW-AC-014;C-NEW-AC-019;C7-AC-004;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-017.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

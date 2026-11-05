@@ -1,114 +1,280 @@
 # DOC-04 — Consultar referência mínima
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Público com identificador opaco. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /verificar/:id, atual a ampliar. Gatilho: navegar pela tarefa
-ou abrir o alvo contextual autorizado. Objetivo: Consultar registro mínimo e
-comparar exemplar selecionado com bytes finais.
+Consulta pública mínima por referência opaca; detalhe privado exige
+autenticação e autorização.
 
-## Composição e sequência
+Finalidade: Consultar referência mínima.
 
-Página só referência/integridade e limites; escolha de exemplar leva à
-comparação; detalhe privado requer login.
+Visitante só recebe referência mínima e limites do resultado; nenhum paciente,
+material, nome pessoal ou ID privado enumerável.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /verificar/:id, atual a ampliar.
 
-Não publicar nome/paciente/produto/IP nem enumerar por protocolo.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Identidade pública da emissão, quando permitida, e resultado.
+Protocolo/paciente privados ficam ocultos; não há edição do registro
+confiável.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-143-01 — Documento
+
+**Modo/componente:** HIDDEN / NO_USER_CONTROL.
+
+**Quando/ator:** Documento/paciente privado não integra consulta pública
+mínima.
+
+**Obrigatoriedade/inicial:** Não renderizar controle.
+
+**Máscara/apresentação:** NÃO APLICÁVEL. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Somente contrato interno, com validação no servidor; não expor
+segredo/UUID como decisão do usuário.
+
+**Ajuda/exemplo:** Protocolo físico importado tem origem própria.
+
+**Acessibilidade:** Não inserir campo escondido na ordem de foco, texto
+acessível ou mensagem para o usuário comum.
+
+### CTRL-143-02 — Tipo
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Tipo”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-143-03 — Protocolo
+
+**Modo/componente:** HIDDEN / NO_USER_CONTROL.
+
+**Quando/ator:** Protocolo privado não é publicado como mecanismo de
+enumeração.
+
+**Obrigatoriedade/inicial:** Não renderizar controle.
+
+**Máscara/apresentação:** NÃO APLICÁVEL. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Somente contrato interno, com validação no servidor; não expor
+segredo/UUID como decisão do usuário.
+
+**Ajuda/exemplo:** Protocolo físico importado tem origem própria.
+
+**Acessibilidade:** Não inserir campo escondido na ordem de foco, texto
+acessível ou mensagem para o usuário comum.
+
+### CTRL-144-01 — Versão da ficha
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Versão da
+ficha”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-144-02 — Revisão do renderizador
+
+**Modo/componente:** INTERNAL / NO_USER_CONTROL.
+
+**Quando/ator:** Revisão de renderizador só em detalhe técnico autorizado; sem
+implementação na jornada pública comum.
+
+**Obrigatoriedade/inicial:** Não renderizar controle.
+
+**Máscara/apresentação:** NÃO APLICÁVEL. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Somente contrato interno, com validação no servidor; não expor
+segredo/UUID como decisão do usuário.
+
+**Ajuda/exemplo:** “Versão 3, representação PDF rX.”
+
+**Acessibilidade:** Não inserir campo escondido na ordem de foco, texto
+acessível ou mensagem para o usuário comum.
+
+### CTRL-150-01 — Hash canônico
+
+**Modo/componente:** HIDDEN / NO_USER_CONTROL.
+
+**Quando/ator:** Hash lógico privado não deve revelar dados nem substituir
+comparação de exemplar.
+
+**Obrigatoriedade/inicial:** Não renderizar controle.
+
+**Máscara/apresentação:** NÃO APLICÁVEL. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Somente contrato interno, com validação no servidor; não expor
+segredo/UUID como decisão do usuário.
+
+**Ajuda/exemplo:** Não usar esse hash como digest do arquivo.
+
+**Acessibilidade:** Não inserir campo escondido na ordem de foco, texto
+acessível ou mensagem para o usuário comum.
+
+### CTRL-151-01 — Hash dos bytes finais
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Hash dos
+bytes finais”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-C7-005 — Identificador da emissão
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação
+“Identificador da emissão”. Atualize esta seção. O dado registrado não pode
+ser alterado aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Referência mínima → explicação do limite do QR → comparar exemplar →
+resultado; entrar para detalhe autorizado é alternativa explícita.
+
+Referência mínima, escolha de exemplar e resultados separados de
+bytes/assinatura/confiança; limites em texto junto ao resultado.
 
 Primária: **Comparar meu arquivo**. Secundárias: Entender resultado; Entrar
 para detalhe autorizado.
 
-Consequência: QR localiza registro, não prova bytes do arquivo apresentado.
-Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: QR localiza registro, não prova bytes do arquivo apresentado.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Referência localizada. Para verificar os bytes do seu
+exemplar, selecione o arquivo na comparação.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Não foi possível localizar uma referência verificável.
+Isso, isoladamente, não prova falsidade do arquivo.”
 
-- **CTRL-143-01 — Documento**. READ_ONLY_DESCRIPTION. Ordem 143.1; Sim,
-  leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Série por paciente/tipo, UUID e versão.
-  Ajuda/exemplo: Protocolo físico importado tem origem própria.. Erro: Revise
-  documento: Série por paciente/tipo, UUID e versão..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-143-02 — Tipo**. READ_ONLY_DESCRIPTION. Ordem 143.2; Sim, leitura.
-  Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Série por paciente/tipo, UUID e versão.
-  Ajuda/exemplo: Protocolo físico importado tem origem própria.. Erro: Revise
-  tipo: Série por paciente/tipo, UUID e versão..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-143-03 — Protocolo**. READ_ONLY_DESCRIPTION. Ordem 143.3; Sim,
-  leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Série por paciente/tipo, UUID e versão.
-  Ajuda/exemplo: Protocolo físico importado tem origem própria.. Erro: Revise
-  protocolo: Série por paciente/tipo, UUID e versão..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-144-01 — Versão da ficha**. READ_ONLY_DESCRIPTION. Ordem 144.1; Sim
-  em cada download. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Não substituir versão ausente pela atual.
-  Ajuda/exemplo: “Versão 3, representação PDF rX.”. Erro: Revise versão da
-  ficha: Não substituir versão ausente pela atual..
+Indisponibilidade do serviço não é arquivo adulterado. QR copiado só localiza
+registro; comparação de bytes precisa do exemplar apresentado.
 
-- **CTRL-144-02 — Revisão do renderizador**. READ_ONLY_DESCRIPTION. Ordem
-  144.2; Sim em cada download. Máscara/autocomplete: SEM_MASCARA;valor do
-  servidor; off. Dependência/validação: Não substituir versão ausente pela
-  atual. Ajuda/exemplo: “Versão 3, representação PDF rX.”. Erro: Revise
-  revisão do renderizador: Não substituir versão ausente pela atual..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-150-01 — Hash canônico**. READ_ONLY_DESCRIPTION. Ordem 150.1;
-  Leitura. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Identifica conteúdo lógico, não bytes PDF.
-  Ajuda/exemplo: Não usar esse hash como digest do arquivo.. Erro: Revise hash
-  canônico: Identifica conteúdo lógico, não bytes PDF..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-151-01 — Hash dos bytes finais**. READ_ONLY_DESCRIPTION. Ordem 151.1;
-  Sim para PDF emitido. Máscara/autocomplete: SEM_MASCARA;valor do servidor;
-  off. Dependência/validação: SHA-256 após todos os bytes finais; comparar no
-  cache/download. Ajuda/exemplo: QR sozinho não verifica o exemplar.. Erro:
-  Revise hash dos bytes finais: SHA-256 após todos os bytes finais; comparar
-  no cache/download..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-- **CTRL-C7-005 — Identificador da emissão**. READ_ONLY_DESCRIPTION. Ordem
-  C7.5; Conforme etapa; leitura de servidor ou escolha explícita; sem
-  confirmação material por default. Máscara/autocomplete: Conforme tipo;
-  string decimal exata/data local com fuso; identificador opaco só leitura;
-  off. Dependência/validação: ID opaco do exemplar emitido; distinto da versão
-  da ficha. Ajuda/exemplo: Emissão nº2 da versão3. Erro: Revise identificador
-  da emissão. ID opaco do exemplar emitido; distinto da versão da ficha.
+Uma coluna; nomes de arquivo quebram linha; instruções e resultados não
+dependem de QR/cor/hover.
 
-## Estado, teclado e ajuda
+Resultado calculado anunciado como status e headings; sem input de confiança,
+execução do PDF ou detalhes privados no nome acessível.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-DOC-04` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `docs/verifyPdf`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-005.
+Referência do protótipo: docs/verifyPdf. Sem captura real ou aceite humano de
+interface futura nesta C.
 
-Critérios C9 relacionados: C-AC-013, C-AC-015, C-AC-023, C-AC-034, C-AC-036,
-C-AC-046, C-AC-063, C-AC-071, C-AC-100, C-AC-101, C-AC-102, C-AC-103,
-C-AC-104, C-AC-105, C-AC-106, C-AC-107, C-AC-108, C-AC-109, C-AC-110,
-C-AC-111, C-AC-119, C-NEW-AC-017, C-NEW-AC-018, C-NEW-AC-019, C-NEW-AC-020,
-C-NEW-AC-023, C7-AC-002, C7-AC-011. A associação é por domínio; cada caso
-preserva seu discriminante específico e não significa que todos os critérios
-foram executados nesta tela. Fonte funcional:
-[DOCUMENTS_PDFS_AND_INTEGRITY](../../C3-functional-specification/DOCUMENTS_PDFS_AND_INTEGRITY.md).
+RECONSTRUIR minimização pública e textos de confiança; não reaproveitar
+detalhe privado como página pública.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-013;C-AC-015;C-AC-023;C-AC-034;C-AC-036;C-AC-046;C-AC-063;C-AC-071;C-AC-100;C-AC-101;C-AC-102;C-AC-103;C-AC-104;C-AC-105;C-AC-106;C-AC-107;C-AC-108;C-AC-109;C-AC-110;C-AC-111;C-AC-119;C-NEW-AC-017;C-NEW-AC-018;C-NEW-AC-019;C-NEW-AC-020;C-NEW-AC-023;C7-AC-002;C7-AC-011;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-018.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

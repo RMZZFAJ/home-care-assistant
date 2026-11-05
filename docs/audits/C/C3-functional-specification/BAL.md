@@ -52,135 +52,363 @@ reais.
 
 - **Campo:** Habilitar regime
 
-  **Tipo/origem:** Boolean, família/admin local
+  **Tipo/origem por tela e estado:** BAL-01 Habilitar regime: EDITABLE_SUBFORM
+  (SWITCH_WITH_LABEL); Configuração familiar autorizada; designado consulta
+  valor em leitura
 
-  **Obrigatório e default:** Sim na configuração, preserva atual
+  **Obrigatoriedade/default na preparação:** BAL-01 Habilitar regime: Sim na
+  configuração, preserva atual
 
-  **Validação/unidade:** Não habilitar por migration
+  **Validação/unidade:** BAL-01 Habilitar regime: Não habilitar por migration;
+  Configuração familiar autorizada; designado consulta valor em leitura
 
-  **Ajuda e exemplo:** “Processar BAL por plantão neste paciente.”
+  **Ajuda/exemplo:** BAL-01 Habilitar regime: “Processar BAL por plantão neste
+  paciente.”
 
 - **Campo:** Fuso/dia/tipo de plantão
 
-  **Tipo/origem:** Seleções configuradas
+  **Tipo/origem por tela e estado:** BAL-01 Fuso: EDITABLE_SUBFORM
+  (SEARCHABLE_TIMEZONE); Configuração de novo regime; consulta da obrigação
+  não edita fuso; BAL-01 Dia da semana: EDITABLE_SUBFORM (WEEKDAY_SELECT);
+  Configuração do regime; BAL-01 Tipo de plantão: EDITABLE_SUBFORM
+  (SHIFT_TYPE_SELECT); Configuração do regime
 
-  **Obrigatório e default:** Sim, sem inferência pelo navegador
+  **Obrigatoriedade/default na preparação:** BAL-01 Fuso: Sim, sem inferência
+  pelo navegador; BAL-01 Dia da semana: Sim, sem inferência pelo navegador;
+  BAL-01 Tipo de plantão: Sim, sem inferência pelo navegador
 
-  **Validação/unidade:** Fuso válido, weekday 0–6, tipo ativo, versão
+  **Validação/unidade:** BAL-01 Fuso: Fuso válido, weekday 0–6, tipo ativo,
+  versão; Configuração de novo regime; consulta da obrigação não edita fuso;
+  BAL-01 Dia da semana: Fuso válido, weekday 0–6, tipo ativo, versão;
+  Configuração do regime; BAL-01 Tipo de plantão: Fuso válido, weekday 0–6,
+  tipo ativo, versão; Configuração do regime
 
-  **Ajuda e exemplo:** Mostrar prazo local e intervalo com data de fim.
+  **Ajuda/exemplo:** BAL-01 Fuso: Mostrar prazo local e intervalo com data de
+  fim.; BAL-01 Dia da semana: Mostrar prazo local e intervalo com data de
+  fim.; BAL-01 Tipo de plantão: Mostrar prazo local e intervalo com data de
+  fim.
 
 - **Campo:** Início do regime
 
-  **Tipo/origem:** Data local
+  **Tipo/origem por tela e estado:** BAL-01 Início do regime: EDITABLE_SUBFORM
+  (DATE_INPUT); Configuração do regime
 
-  **Obrigatório e default:** Sim, escolha explícita
+  **Obrigatoriedade/default na preparação:** BAL-01 Início do regime: Sim,
+  escolha explícita
 
-  **Validação/unidade:** Sem gerar contagem física retroativa
+  **Validação/unidade:** BAL-01 Início do regime: Sem gerar contagem física
+  retroativa; Configuração do regime
 
-  **Ajuda e exemplo:** “A partir de 05/11/2026.”
+  **Ajuda/exemplo:** BAL-01 Início do regime: “A partir de 05/11/2026.”
 
 - **Campo:** Profissional preferido
 
-  **Tipo/origem:** Seleção opcional
+  **Tipo/origem por tela e estado:** BAL-01 Profissional preferido:
+  EDITABLE_SUBFORM (PERSON_COMBOBOX); Preferência de atribuição; nunca
+  comprovação de presença
 
-  **Obrigatório e default:** Não, política atual
+  **Obrigatoriedade/default na preparação:** BAL-01 Profissional preferido:
+  Não, política atual
 
-  **Validação/unidade:** Vínculo elegível; não garante presença
+  **Validação/unidade:** BAL-01 Profissional preferido: Vínculo elegível; não
+  garante presença; Preferência de atribuição; nunca comprovação de presença
 
-  **Ajuda e exemplo:** Ambiguidade pede designação, não escolha arbitrária.
+  **Ajuda/exemplo:** BAL-01 Profissional preferido: Ambiguidade pede
+  designação, não escolha arbitrária.
 
 - **Campo:** Material e unidade
 
-  **Tipo/origem:** Catálogo ativo, servidor
+  **Tipo/origem por tela e estado:** BAL-02 Material e unidade: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; BAL-03 Material e unidade: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Todos os exigidos, somente leitura
+  **Obrigatoriedade/default na preparação:** BAL-02 Material e unidade: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; BAL-03 Material e unidade:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Equipe, sem saldo familiar geral
+  **Validação/unidade:** BAL-02 Material e unidade: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; BAL-03 Material e unidade: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** Item que mudou desde rascunho exige revisão.
+  **Ajuda/exemplo:** BAL-02 Material e unidade: Identificação do item
+  registrado. A consulta não substitui o material ou reinterpreta sua
+  unidade.; BAL-03 Material e unidade: Identificação do item registrado. A
+  consulta não substitui o material ou reinterpreta sua unidade.
 
 - **Campo:** Quantidade contada
 
-  **Tipo/origem:** Decimal do contador
+  **Tipo/origem por tela e estado:** BAL-02 Quantidade contada: EDITABLE
+  (DECIMAL_TEXT_INPUT); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim por item, vazio
+  **Obrigatoriedade/default na preparação:** BAL-02 Quantidade contada: Sim
+  por item, vazio
 
-  **Validação/unidade:** Zero digitado válido; precisão da unidade e até seis
-  casas
+  **Validação/unidade:** BAL-02 Quantidade contada: Zero digitado válido;
+  precisão da unidade e até seis casas; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Conte agora: 0 ou 3 unidades.”
+  **Ajuda/exemplo:** BAL-02 Quantidade contada: “Conte agora: 0 ou 3
+  unidades.”
 
 - **Campo:** Referência de estoque
 
-  **Tipo/origem:** Revisão de ledger do servidor
+  **Tipo/origem por tela e estado:** BAL-03 Referência de estoque: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim, oculta na primeira etapa
+  **Obrigatoriedade/default na preparação:** BAL-03 Referência de estoque:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Snapshot imutável para comparar
+  **Validação/unidade:** BAL-03 Referência de estoque: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** Na revisão: contado 3 / referência 5 / diferença −2.
+  **Ajuda/exemplo:** BAL-03 Referência de estoque: Quantidade registrada para
+  a etapa indicada. Não é uma nova declaração de quantidade e não movimenta
+  material ao ser consultada.
 
 - **Campo:** Atribuição/janela/versão
 
-  **Tipo/origem:** Servidor
+  **Tipo/origem por tela e estado:** BAL-01 Atribuição: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; BAL-02 Atribuição: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-03 Atribuição: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; BAL-01 Início da
+  janela: READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no
+  processo legitimamente responsável; BAL-02 Início da janela: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; BAL-03 Início da janela: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-01 Fim da janela: READ_ONLY (TEXT_VALUE); Consulta do valor
+  de origem; mudanças só no processo legitimamente responsável; BAL-02 Fim da
+  janela: READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no
+  processo legitimamente responsável; BAL-03 Fim da janela: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; BAL-01 Versão da atribuição: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; BAL-02 Versão da atribuição: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; BAL-03 Versão da atribuição: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim quando regime ativo
+  **Obrigatoriedade/default na preparação:** BAL-01 Atribuição: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; BAL-02 Atribuição: Valor emitido, proposto
+  ou calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; BAL-03 Atribuição: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado;
+  BAL-01 Início da janela: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado; BAL-02
+  Início da janela: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado; BAL-03
+  Início da janela: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado; BAL-01
+  Fim da janela: Valor emitido, proposto ou calculado da fonte identificada;
+  ausência explicitamente informada, sem valor inventado; BAL-02 Fim da
+  janela: Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; BAL-03 Fim da janela: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; BAL-01 Versão da atribuição:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; BAL-02 Versão da atribuição:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; BAL-03 Versão da atribuição:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Pessoa, início/fim, assignment e ledger atuais
+  **Validação/unidade:** BAL-01 Atribuição: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-02 Atribuição: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-03 Atribuição: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-01 Início da janela: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-02 Início da janela: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-03 Início da janela: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-01 Fim da janela: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-02 Fim da janela: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-03 Fim da janela: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-01 Versão da atribuição: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-02 Versão da atribuição: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; BAL-03 Versão da atribuição: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** Sem expor UUID como instrução.
+  **Ajuda/exemplo:** BAL-01 Atribuição: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; BAL-02 Atribuição: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; BAL-03 Atribuição: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.; BAL-01 Início da janela: A
+  data pertence ao fato identificado. Data de registro e de emissão são
+  mostradas separadamente quando forem diferentes.; BAL-02 Início da janela: A
+  data pertence ao fato identificado. Data de registro e de emissão são
+  mostradas separadamente quando forem diferentes.; BAL-03 Início da janela: A
+  data pertence ao fato identificado. Data de registro e de emissão são
+  mostradas separadamente quando forem diferentes.; BAL-01 Fim da janela: A
+  data pertence ao fato identificado. Data de registro e de emissão são
+  mostradas separadamente quando forem diferentes.; BAL-02 Fim da janela: A
+  data pertence ao fato identificado. Data de registro e de emissão são
+  mostradas separadamente quando forem diferentes.; BAL-03 Fim da janela: A
+  data pertence ao fato identificado. Data de registro e de emissão são
+  mostradas separadamente quando forem diferentes.; BAL-01 Versão da
+  atribuição: Informação do registro indicado, somente para consulta nesta
+  etapa. Ausência de dado histórico permanece explicitamente identificada.;
+  BAL-02 Versão da atribuição: Informação do registro indicado, somente para
+  consulta nesta etapa. Ausência de dado histórico permanece explicitamente
+  identificada.; BAL-03 Versão da atribuição: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.
 
 - **Campo:** Observações
 
-  **Tipo/origem:** Texto do contador
+  **Tipo/origem por tela e estado:** BAL-02 Observações: EDITABLE (TEXTAREA);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; BAL-03 Observações: READ_ONLY
+  (TEXT_VALUE); Observações originais do contador; parecer do revisor tem
+  CTRL-C8-002 próprio
 
-  **Obrigatório e default:** Não, vazio
+  **Obrigatoriedade/default na preparação:** BAL-02 Observações: Não, vazio;
+  BAL-03 Observações: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Até 2000 na ficha
+  **Validação/unidade:** BAL-02 Observações: Até 2000 na ficha; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; BAL-03 Observações: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Observações originais do contador; parecer do revisor tem CTRL-C8-002
+  próprio
 
-  **Ajuda e exemplo:** Não inventar consumo para explicar divergência.
+  **Ajuda/exemplo:** BAL-02 Observações: Não inventar consumo para explicar
+  divergência.; BAL-03 Observações: Observação da pessoa que contou. O parecer
+  de revisão tem campo e autoria separados.
 
 - **Campo:** Grupo e revisão
 
-  **Tipo/origem:** Política vigente + decisão
+  **Tipo/origem por tela e estado:** BAL-03 Grupo e revisão: READ_ONLY
+  (REVIEW_STATUS_DESCRIPTION); Grupo/elegibilidade/autor da revisão resolvidos
+  pelo servidor; não digitados
 
-  **Obrigatório e default:** Sim se revisão obrigatória
+  **Obrigatoriedade/default na preparação:** BAL-03 Grupo e revisão: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Ator distinto do contador da versão, grupo elegível
+  **Validação/unidade:** BAL-03 Grupo e revisão: Revalidar acesso, referência
+  e estado na leitura/ação. Não solicitar ao usuário correção deste valor
+  nesta tela. Grupo/elegibilidade/autor da revisão resolvidos pelo servidor;
+  não digitados
 
-  **Ajuda e exemplo:** “Aprovar esta contagem da versão 3.”
+  **Ajuda/exemplo:** BAL-03 Grupo e revisão: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.
 
 - **Campo:** Destino do adiamento
 
-  **Tipo/origem:** Plantão elegível, seleção
+  **Tipo/origem por tela e estado:** BAL-05 Destino do adiamento:
+  EDITABLE_SUBFORM (TARGET_SELECTOR_OR_READ_ONLY_COMPARISON); Só SOLICITAR; ao
+  APROVAR/RECUSAR/ENCERRAR, destino da proposta é READ_ONLY
 
-  **Obrigatório e default:** Sim ao solicitar
+  **Obrigatoriedade/default na preparação:** BAL-05 Destino do adiamento: Sim
+  ao solicitar
 
-  **Validação/unidade:** Versão de alvo e prazo exibidos
+  **Validação/unidade:** BAL-05 Destino do adiamento: Versão de alvo e prazo
+  exibidos; Só SOLICITAR; ao APROVAR/RECUSAR/ENCERRAR, destino da proposta é
+  READ_ONLY
 
-  **Ajuda e exemplo:** Proposta pendente não altera obrigação.
+  **Ajuda/exemplo:** BAL-05 Destino do adiamento: Proposta pendente não altera
+  obrigação.
 
 - **Campo:** Substituta do reconto
 
-  **Tipo/origem:** Seleção por designação formal
+  **Tipo/origem por tela e estado:** BAL-04 Substituta do reconto: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim ao redesignar
+  **Obrigatoriedade/default na preparação:** BAL-04 Substituta do reconto: Sim
+  ao redesignar
 
-  **Validação/unidade:** Vínculo/capacidade/janela; registro do designador
+  **Validação/unidade:** BAL-04 Substituta do reconto:
+  Vínculo/capacidade/janela; registro do designador; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Sheila fará novo reconto; Juliana permanece autora da
-  contagem anterior.”
+  **Ajuda/exemplo:** BAL-04 Substituta do reconto: “Sheila fará novo reconto;
+  Juliana permanece autora da contagem anterior.”
 
 - **Campo:** Motivo da decisão
 
-  **Tipo/origem:** Texto do responsável
+  **Tipo/origem por tela e estado:** BAL-01 Motivo da decisão:
+  EDITABLE_SUBFORM (TEXTAREA); Somente comando autorizado de
+  configuração/adiamento; não aparece como nota na consulta; BAL-04 Motivo da
+  decisão: EDITABLE (TEXTAREA); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; BAL-05 Motivo da
+  decisão: EDITABLE (TEXTAREA); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim em adiamento/reconto/configuração
+  **Obrigatoriedade/default na preparação:** BAL-01 Motivo da decisão: Sim em
+  adiamento/reconto/configuração; BAL-04 Motivo da decisão: Sim em
+  adiamento/reconto/configuração; BAL-05 Motivo da decisão: Sim em
+  adiamento/reconto/configuração
 
-  **Validação/unidade:** 3–1000 caracteres
+  **Validação/unidade:** BAL-01 Motivo da decisão: 3–1000 caracteres; Somente
+  comando autorizado de configuração/adiamento; não aparece como nota na
+  consulta; BAL-04 Motivo da decisão: 3–1000 caracteres; Somente no subestado
+  de preparação autorizado indicado na ficha; resumo/decisão posterior é
+  leitura; BAL-05 Motivo da decisão: 3–1000 caracteres; Somente no subestado
+  de preparação autorizado indicado na ficha; resumo/decisão posterior é
+  leitura
 
-  **Ajuda e exemplo:** Explicar efeito e próxima pessoa.
+  **Ajuda/exemplo:** BAL-01 Motivo da decisão: Explicar efeito e próxima
+  pessoa.; BAL-04 Motivo da decisão: Explicar efeito e próxima pessoa.; BAL-05
+  Motivo da decisão: Explicar efeito e próxima pessoa.
+
+- **Campo:** Parecer da revisão
+
+  **Tipo/origem por tela e estado:** TEXTAREA;context by
+  CONTROL_SCREEN_CONTRACTS.csv
+
+  **Obrigatoriedade/default na preparação:** Somente em revisão legitimamente
+  iniciada; opcional e vazio; separado das notas do contador
+
+  **Validação/unidade:** Limite TO_BE de 2.000 caracteres, com contador; impor
+  o mesmo limite na UI/API/banco da revisão na D; nunca sobrescrever contagem
+  ou notas originais
+
+  **Ajuda/exemplo:** Registre sua informação de revisão em até 2.000
+  caracteres. As observações da contadora permanecem preservadas.
 
 <!-- c-table:end -->
 
@@ -250,3 +478,10 @@ não anuncia implementação. Contrato detalhado no
 [adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
 [blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
 [casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
+
+## Fechamento definitivo — tarefa, estado e política
+
+BAL-03 conserva valores/notas da contadora em leitura. Grupo, elegibilidade e
+ator vêm da autoridade; parecer próprio do revisor não sobrescreve notas.
+Revisão facultativa no primeiro uso. BAL-05 decide alvo/prazo congelados;
+mudar destino exige preparar outro pedido, sem aprovar versão diferente.

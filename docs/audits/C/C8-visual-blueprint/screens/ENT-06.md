@@ -1,87 +1,170 @@
 # ENT-06 — Encaminhar exceção e sucessão
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Admin local/família competente. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Sucessão/exceção administrativa, novo painel. Gatilho:
-navegar pela tarefa ou abrir o alvo contextual autorizado. Objetivo:
-Redesignar tarefa futura ou encerrar exceção sem simular aceite físico.
+Exceção documentada ou tarefa futura sem pessoa apta; não há confirmação
+pessoal por substituição.
 
-## Composição e sequência
+Finalidade: Encaminhar exceção e sucessão.
 
-Painel de fatos conhecidos/desconhecidos; pessoa revogada e tarefas futuras;
-motivo/prova e segunda conferência pertinente.
+Família/admin local com capacidade de regularizar ou redesignar; suporte
+apenas trata sua fronteira técnica.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Sucessão/exceção administrativa, novo painel.
 
-Histórico de Juliana permanece; Sheila não assina recebimento passado de
-Juliana.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Nome/autoria da pessoa original, aceites e fatos passados. Troca futura não
+altera quem recebeu no passado.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-032-01 — Justificativa de troca
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Se mudar destinatário fora da sugestão ou depois
+da preparação.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** 3–1000; versão/instante preservados; Somente no subestado de
+preparação autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Outro profissional receberá os materiais.”
+
+**Mensagem e condição:** “Confira justificativa de troca e o limite indicado.
+Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-042-01 — Motivo de exceção
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim ao encerrar administrativamente.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** Não admite caixa “recebi por outra pessoa”; Somente no
+subestado de preparação autorizado indicado na ficha; resumo/decisão posterior
+é leitura.
+
+**Ajuda/exemplo:** “Não foi possível obter a declaração pessoal.”
+
+**Mensagem e condição:** “Confira motivo de exceção e o limite indicado.
+Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-C7-017 — Motivo e base da regularização
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Motivo/base da regularização obrigatórios; pessoa
+e fato conhecidos ou desconhecidos explicitamente separados.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** Fato, motivo excepcional, autoridade, medidas, ressalvas e
+evidências; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Sem inventar declaração pessoal
+
+**Mensagem e condição:** “Confira motivo e base da regularização e o limite
+indicado. Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Fatos conhecidos/desconhecidos → atos anteriores em leitura → tarefa
+futura/autoridade → motivo/prova → encaminhamento e conferência proporcional.
+
+Seções de fato, pessoas, prova e conciliação com referências históricas ao
+lado; desconhecidos visíveis antes de concluir.
 
 Primária: **Registrar encaminhamento**. Secundárias: Revogar agora; Designar
 tarefa futura; Ver origem.
 
-Consequência: Encerramento administrativo não afirma aceite pessoal. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Encerramento administrativo não afirma aceite pessoal.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Encaminhamento registrado com sua autoria. Isso não
+declara recebimento em nome de outra pessoa.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhuma exceção foi selecionada. Abra a entrega ou tarefa
+que precisa de regularização.”
 
-- **CTRL-032-01 — Justificativa de troca**. TEXTAREA. Ordem 32.1; Se mudar
-  destinatário fora da sugestão ou depois da preparação. Máscara/autocomplete:
-  Sem máscara; contador e limite do contrato visíveis; quebra de linha/reflow;
-  off. Dependência/validação: 3–1000; versão/instante preservados.
-  Ajuda/exemplo: “Outro profissional receberá os materiais.”. Erro: Revise
-  justificativa de troca: 3–1000; versão/instante preservados..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-042-01 — Motivo de exceção**. TEXTAREA. Ordem 42.1; Sim ao encerrar
-  administrativamente. Máscara/autocomplete: Sem máscara; contador e limite do
-  contrato visíveis; quebra de linha/reflow; off. Dependência/validação: Não
-  admite caixa “recebi por outra pessoa”. Ajuda/exemplo: “Não foi possível
-  obter a declaração pessoal.”. Erro: Revise motivo de exceção: Não admite
-  caixa “recebi por outra pessoa”..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-C7-017 — Motivo e base da regularização**. TEXTAREA. Ordem C7.17;
-  Conforme etapa; leitura de servidor ou escolha explícita; sem confirmação
-  material por default. Máscara/autocomplete: Conforme tipo; string decimal
-  exata/data local com fuso; identificador opaco só leitura; off.
-  Dependência/validação: Fato, motivo excepcional, autoridade, medidas,
-  ressalvas e evidências. Ajuda/exemplo: Sem inventar declaração pessoal.
-  Erro: Revise motivo e base da regularização. Fato, motivo excepcional,
-  autoridade, medidas, ressalvas e evidências.
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-## Estado, teclado e ajuda
+Ausência de prova permanece desconhecida; manter pendência com próximo
+responsável. Revogação urgente não fica bloqueada pela regularização.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-ENT-06` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `staff/staffDetails`; ausência de exemplo no HTML é declarada, sem
-novo mockup equivalente. B1: Nova superfície C3, sem equivalente B1.
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-Critérios C9 relacionados: C-AC-010, C-AC-021, C-AC-028, C-AC-042, C-AC-043,
-C-AC-044, C-AC-048, C-AC-050, C-AC-074, C-AC-077, C-AC-079, C-AC-089,
-C-AC-096, C-AC-101, C-AC-103, C-AC-105, C-NEW-AC-006, C-NEW-AC-007,
-C-NEW-AC-009, C-NEW-AC-015, C-NEW-AC-016, C-NEW-AC-022, C-NEW-AC-028,
-C7-AC-002, C7-AC-010. A associação é por domínio; cada caso preserva seu
-discriminante específico e não significa que todos os critérios foram
-executados nesta tela. Fonte funcional:
-[ENT](../../C3-functional-specification/ENT.md).
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Uma coluna por ordem cronológica; datas/fuso próximos; prova com descrição e
+alternativa textual; resumo antes da decisão.
+
+Agrupar fatos conhecidos/desconhecidos; anexos têm estado próprio; revisão
+proporcional não solicita assinatura em nome de pessoa ausente.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: staff/staffDetails. Sem captura real ou aceite humano
+de interface futura nesta C.
+
+NOVO PAINEL: distinguir encerramento administrativo de recebimento pessoal e
+preservar a história.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-010;C-AC-021;C-AC-028;C-AC-042;C-AC-043;C-AC-044;C-AC-048;C-AC-050;C-AC-074;C-AC-077;C-AC-079;C-AC-089;C-AC-096;C-AC-101;C-AC-103;C-AC-105;C-NEW-AC-006;C-NEW-AC-007;C-NEW-AC-009;C-NEW-AC-015;C-NEW-AC-016;C-NEW-AC-022;C-NEW-AC-028;C7-AC-002;C7-AC-010;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

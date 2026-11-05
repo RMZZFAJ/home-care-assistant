@@ -1,7 +1,8 @@
 # Adendo decisório C7
 
-Fonte humana: kit recebido em 04/11/2026 e duas atualizações expressas na
-missão atual. Registro de futuro; não altera o comportamento AS_IS. O
+Fonte humana: kit e atualizações de 04/11/2026, complementados pela
+[ordem definitiva](../C10-pr-handoff/final-closure/OWNER_COMPLEMENT_ORDER.md).
+Registro de futuro; não altera o comportamento AS_IS. O
 [registro inicial](../../../decisions/PRODUCT_DECISIONS_MASTER.md) conserva
 seu texto, com este adendo como precedência explícita.
 
@@ -20,14 +21,15 @@ seu texto, com este adendo como precedência explícita.
 
 - **ID:** P02
 
-  **Status atual:** OWNER_APPROVED_SCOPE_PENDING
+  **Status atual:** OWNER_APPROVED
 
-  **Decisão humana e limite restante:** Objetivo de modalidades por tipo
-  aprovado; classificação individual não aprovada. Subestado
-  OWNER_REVIEW_REQUIRED. Cinco origens reais de ciência REQ não se tornam
-  cinco autorizações futuras.
+  **Decisão humana e limite restante:** SCI-001 mantida; SCI-002 dialogada
+  antes de abrir; SCI-003 comunicação sem ciência; SCI-004 futura expressa
+  condicionada à homologação; SCI-005 obrigatória, permanente e não
+  configurável. ANY familiar por pessoa habilitada; três modalidades por
+  obrigação elegível. Nenhuma escolha humana P02 pendente.
 
-  **Destino:** SCI-001–005; REQ-04; D2
+  **Destino:** [Política vinculante](SCIENCE_OWNER_REVIEW.md); REQ/ENT; D2.
 
 - **ID:** P03
 
@@ -171,9 +173,10 @@ seu texto, com este adendo como precedência explícita.
 
 Status terminam em `SCOPE_PENDING` quando o objetivo está aprovado e faltam
 parâmetros. Isso não reabre o objetivo nem torna a proposta técnica aprovada.
-O inventário P02 usa o subestado requerido pela Ordem Mestre. Os três estados
-de identidade são **informado**, **conferido pela família** e **validado por
-fonte externa**; nenhum equivale automaticamente ao seguinte.
+A ordem complementar encerra a classificação individual P02 e prevalece sobre
+o subestado anterior. Os três estados de identidade são **informado**,
+**conferido pela família** e **validado por fonte externa**; nenhum equivale
+automaticamente ao seguinte.
 
 ## O01, O10 e direção visual
 
@@ -191,12 +194,16 @@ História da ficha e história de emissões são relacionadas e diferentes.
 V01–V10 e a direção do
 [HTML recebido](../C8-visual-blueprint/prototype/home-care-prototipo.html)
 estão `OWNER_APPROVED` por manifestação expressa atual. A aprovação abrange
-composição/linguagem visual. Demonstrações não aprovam políticas P02,
-permissões ou funcionalidades. Ajustes de coerência estão na revisão C8.
+composição/linguagem visual. Demonstrações não concedem permissões nem
+implementam funcionalidades; P02 foi aprovada pela ordem humana. Ajustes de
+coerência estão na revisão C8.
 
-O17/O18 e ativação WhatsApp/Meta/Flows permanecem `OWNER_DEFERRED`. Retenção
-por classe, fornecedores, metas e futuros criadores empresa/supervisão ficam
-`PENDING_OWNER`. Não se cria permissão operacional global por interpretação.
+O17/O18 e ativação WhatsApp/Meta/Flows permanecem `OWNER_DEFERRED`. Objetivos
+P03/P05/P07/P08/P09/P10/P13/P15 conservam OWNER_APPROVED_SCOPE_PENDING;
+parâmetros/contratações não reabrem a decisão. Escolhas efetivamente não
+tomadas, como metas PERF-01 e governança OPS-01, permanecem PENDING_OWNER.
+Futuros criadores empresa/supervisão não foram aprovados neste escopo. Não se
+cria permissão operacional global por interpretação.
 
 ## BAL sem contradição com o estoque
 
@@ -216,3 +223,13 @@ recomendações C2 (P09-A primeiro, P12 com TTL, P07 ainda não escolhido e
 onboarding sem wizard) são histórico superado, não opções vigentes de D. Novas
 especificações seguem esta precedência; nenhuma autorização de contratação,
 operação remota ou início de D foi concedida.
+
+## Precedência definitiva e início futuro de D
+
+P02 está OWNER_APPROVED, conforme a política vinculante. Fornecedores, preços
+e contratação P03/P09/P13 serão pesquisados externamente pelo responsável com
+ChatGPT. Nenhuma pesquisa comercial foi feita nesta missão. Os dez gates da
+[matriz canônica](GATE_CLASSIFICATION.csv) não impedem o início geral de D0 ou
+trabalhos independentes D1, mas bloqueiam seus ramos e homologações.
+Documentação completa não aprova gates. Abrir branch D continua condicionado à
+integração prévia do PR 6 à master e à autorização da missão de D.

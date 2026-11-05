@@ -4,24 +4,36 @@ Referência editorial:04/11/2026, America/Sao_Paulo. **Produção NO-GO.** Esta 
 a entrada canônica de estado; contratos atuais ficam em current, decisões
 humanas em decisions e especificações futuras em audits/C.
 
-**C7–C10 concluídas como planejamento em 04/11/2026.**
-[Checkpoint e publicação](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121
-causas e 165 associações foram revistas individualmente. Os 149 aceites
-anteriores e 12 complementos formam 161 casos PLANNED_NOT_EXECUTED. Direção
-visual aprovada: 97 B1/66 C3, 66 fichas e 262 controles. P02 permanece
-OWNER_REVIEW_REQUIRED por cinco origens reais REQ. P09-B é mínimo obrigatório,
-P11 revisão facultativa, P12 um draft por criação/tipo e O01+ wizard global.
-Essas regras são TO_BE; nenhuma foi implementada por esta documentação. O kit
-temporário foi incorporado/removido, preservando sete Markdown exatos, HTML e
-oito PNG. Auditorias datadas A/B não mudaram. Draft PR não autoriza merge,
-cleanup de branches, publicação produtiva ou início de D.
+**C7–C10 concluídas e fechamento definitivo incorporado em 04/11/2026.**
+[Checkpoint](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121 causas e 165
+origens permanecem reconciliadas. P02 está OWNER_APPROVED: SCI-001 mantida,
+SCI-002 dialogada, SCI-003 comunicação, SCI-004 futura condicionada e SCI-005
+obrigatória/permanente/não configurável por ator efetivo habilitado; ANY
+familiar sem exigir todos.
+
+Revisão individual: 66 fichas, 262 controles originais e 171 relações.
+Catálogo atual: 274 controles/424 usos; 187 casos planejados (20 refinados
+entre os 161 anteriores e 26 novos), todos PLANNED_NOT_EXECUTED. Os 12
+controles adicionais cobrem lacunas de estado, login/MFA/unidade e ciência.
+Direção visual aprovada; nenhuma tela/política foi implementada por esta C.
+Código/configuração/testes permanecem idênticos ao SHA de entrada
+266c6541bd5d3268b7e08a839df601e823ec74b5; o reparo anterior de CI nesse SHA é
+distinto desta missão documental. Base de aplicação permanece a auditada.
+
+P03/P05/P07/P08/P09/P10/P13/P15/OPS-01/PERF-01 não impedem D0 geral/D1
+independente; ramos e homologações seguem gates específicos. Contratações
+P03/P09/P13 são pesquisa externa do responsável com ChatGPT. Abrir branch D
+exige integração prévia do PR6 à master e autorização posterior. Kit
+temporário continua removido; HTML/oito PNG e auditorias A/B preservados.
+Draft PR não autoriza merge, cleanup de branches ou produção.
 
 <!-- c-table:start -->
 
 - **Referência:** product_code_sha
 
-  **Estado e prova:** `37cb7f85e96e551d6419871f94dd950712e2565b`; comparação
-  de todos os arquivos não documentais contra baseline C0 no fechamento C.
+  **Estado e prova:** `37cb7f85e96e551d6419871f94dd950712e2565b`; base de
+  aplicação src/supabase preservada; suporte e testes do reparo CI foram
+  congelados em 266c654 e permanecem intactos nesta ordem complementar.
 
 - **Referência:** audit_input_sha
 

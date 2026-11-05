@@ -183,5 +183,5 @@ consumidores de listas são D3. Upload/transporte116 e avatar80 ficam em D4
 conforme gate/prioridade; não se espera D6 para definir contrato. C8 é direção
 visual aprovada, podendo reconstruir composições problemáticas na D com
 contratos preservados. D3 inclui wizard global e guia opcional; D6 recebe
-capturas reais/aceite. Matriz vigente:161 aceites planejados, nenhuma
+capturas reais/aceite. Matriz vigente:187 aceites planejados, nenhuma
 implementação em C.

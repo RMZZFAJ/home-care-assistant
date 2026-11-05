@@ -44,104 +44,187 @@ O05 e política de confirmação já existente, sem aguardar WhatsApp.
 
 - **Campo:** Tipo
 
-  **Tipo/origem:** Falta/consumo, seleção
+  **Tipo/origem por tela e estado:** CON-02 Tipo: EDITABLE (RADIO_GROUP);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim, escolha explícita
+  **Obrigatoriedade/default na preparação:** CON-02 Tipo: Sim, escolha
+  explícita
 
-  **Validação/unidade:** Falta nunca gera débito de consumo
+  **Validação/unidade:** CON-02 Tipo: Falta nunca gera débito de consumo;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Quero registrar uma informação para conferência.”
+  **Ajuda/exemplo:** CON-02 Tipo: “Quero registrar uma informação para
+  conferência.”
 
 - **Campo:** Custódia
 
-  **Tipo/origem:** FAMILY/CARE_TEAM, seleção autorizada
+  **Tipo/origem por tela e estado:** CON-02 Custódia: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim
+  **Obrigatoriedade/default na preparação:** CON-02 Custódia: Sim
 
-  **Validação/unidade:** Não permite consultar saldo familiar geral à equipe
+  **Validação/unidade:** CON-02 Custódia: Não permite consultar saldo familiar
+  geral à equipe; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Onde ocorreu?”
+  **Ajuda/exemplo:** CON-02 Custódia: “Onde ocorreu?”
 
 - **Campo:** Relato original
 
-  **Tipo/origem:** Texto do relator
+  **Tipo/origem por tela e estado:** CON-02 Relato original: EDITABLE
+  (TEXTAREA); Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim, vazio
+  **Obrigatoriedade/default na preparação:** CON-02 Relato original: Sim,
+  vazio
 
-  **Validação/unidade:** 3–2000 caracteres
+  **Validação/unidade:** CON-02 Relato original: 3–2000 caracteres; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura
 
-  **Ajuda e exemplo:** “Foi usada uma unidade do material X.”
+  **Ajuda/exemplo:** CON-02 Relato original: “Foi usada uma unidade do
+  material X.”
 
 - **Campo:** Material
 
-  **Tipo/origem:** Catálogo, opcional no relato livre
+  **Tipo/origem por tela e estado:** CON-02 Material: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; CON-03 Material:
+  EDITABLE (SEARCHABLE_COMBOBOX); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Obrigatório para confirmar consumo
+  **Obrigatoriedade/default na preparação:** CON-02 Material: Obrigatório para
+  confirmar consumo; CON-03 Material: Obrigatório para confirmar consumo
 
-  **Validação/unidade:** Mesmo paciente, elegibilidade e unidade
+  **Validação/unidade:** CON-02 Material: Mesmo paciente, elegibilidade e
+  unidade; Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; CON-03 Material: Mesmo paciente,
+  elegibilidade e unidade; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Não interpretar nome livre como correspondência certa.
+  **Ajuda/exemplo:** CON-02 Material: Não interpretar nome livre como
+  correspondência certa.; CON-03 Material: Não interpretar nome livre como
+  correspondência certa.
 
 - **Campo:** Quantidade
 
-  **Tipo/origem:** Decimal, usuário
+  **Tipo/origem por tela e estado:** CON-02 Quantidade: EDITABLE
+  (DECIMAL_TEXT_INPUT); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; CON-03 Quantidade: EDITABLE
+  (DECIMAL_TEXT_INPUT); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Obrigatória em linha estruturada de consumo
+  **Obrigatoriedade/default na preparação:** CON-02 Quantidade: Obrigatória em
+  linha estruturada de consumo; CON-03 Quantidade: Obrigatória em linha
+  estruturada de consumo
 
-  **Validação/unidade:** Positiva/exata, precisão vigente antes de coerção
+  **Validação/unidade:** CON-02 Quantidade: Positiva/exata, precisão vigente
+  antes de coerção; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; CON-03 Quantidade:
+  Positiva/exata, precisão vigente antes de coerção; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “1 unidade.”
+  **Ajuda/exemplo:** CON-02 Quantidade: “1 unidade.”; CON-03 Quantidade: “1
+  unidade.”
 
 - **Campo:** Complemento
 
-  **Tipo/origem:** Texto/linhas versionadas
+  **Tipo/origem por tela e estado:** CON-03 Complemento: EDITABLE (TEXTAREA);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim quando esclarecimento necessário
+  **Obrigatoriedade/default na preparação:** CON-03 Complemento: Sim quando
+  esclarecimento necessário
 
-  **Validação/unidade:** Não altera original; autor/instante próprios
+  **Validação/unidade:** CON-03 Complemento: Não altera original;
+  autor/instante próprios; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Esclarecimento: material X, 1 unidade na equipe.”
+  **Ajuda/exemplo:** CON-03 Complemento: “Esclarecimento: material X, 1
+  unidade na equipe.”
 
 - **Campo:** Referência do relato
 
-  **Tipo/origem:** Servidor
+  **Tipo/origem por tela e estado:** CON-03 Referência do relato: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; CON-04 Referência do relato: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim ao complementar/decidir
+  **Obrigatoriedade/default na preparação:** CON-03 Referência do relato:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; CON-04 Referência do relato:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Versão atual, paciente/custódia originais
+  **Validação/unidade:** CON-03 Referência do relato: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; CON-04 Referência do relato: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** ID nunca concede permissão.
+  **Ajuda/exemplo:** CON-03 Referência do relato: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; CON-04 Referência do relato:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.
 
 - **Campo:** Decisão
 
-  **Tipo/origem:** Confirmar/rejeitar explicitamente
+  **Tipo/origem por tela e estado:** CON-04 Decisão: EXPLICIT_ACTION
+  (DECISION_BUTTONS); Confirmar consumo ou rejeitar versão pendente; nenhum
+  valor NULL ou default
 
-  **Obrigatório e default:** Sim, sem NULL/default tácito
+  **Obrigatoriedade/default na preparação:** CON-04 Decisão: Sem concordância
+  material inicial ou clique automático
 
-  **Validação/unidade:** Mesmo resultado recupera; oposto conflita
+  **Validação/unidade:** CON-04 Decisão: Mesmo resultado recupera; oposto
+  conflita; Confirmar consumo ou rejeitar versão pendente; nenhum valor NULL
+  ou default
 
-  **Ajuda e exemplo:** “Confirmar consumo e descontar 1 unidade.”
+  **Ajuda/exemplo:** CON-04 Decisão: “Confirmar consumo e descontar 1
+  unidade.”
 
 - **Campo:** Motivo de rejeição/correção
 
-  **Tipo/origem:** Texto do responsável
+  **Tipo/origem por tela e estado:** CON-04 Motivo de rejeição/correção:
+  EDITABLE (TEXTAREA); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Condicional à rejeição/correção
+  **Obrigatoriedade/default na preparação:** CON-04 Motivo de
+  rejeição/correção: Condicional à rejeição/correção
 
-  **Validação/unidade:** Proposta 3–1000, histórico imutável
+  **Validação/unidade:** CON-04 Motivo de rejeição/correção: Proposta 3–1000,
+  histórico imutável; Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Não chamar rejeição de confirmação sem efeito.
+  **Ajuda/exemplo:** CON-04 Motivo de rejeição/correção: Não chamar rejeição
+  de confirmação sem efeito.
 
 - **Campo:** Filtros/referência
 
-  **Tipo/origem:** Estado, tipo, data, busca e cursor
+  **Tipo/origem por tela e estado:** CON-01 Buscar relato ou referência:
+  FILTER (SEARCH_INPUT); Apenas consulta no escopo permitido; não altera
+  documento, movimento ou autoridade
 
-  **Obrigatório e default:** Não
+  **Obrigatoriedade/default na preparação:** CON-01 Buscar relato ou
+  referência: Sem restrição adicional inicialmente, salvo filtro de tarefa
+  explicitamente indicado no link; vazio limpa filtro, não cria zero ou estado
+  material
 
-  **Validação/unidade:** Ordenação estável, referência antiga fora de 100
-  acessível
+  **Validação/unidade:** CON-01 Buscar relato ou referência: Tipo
+  Falta/Consumo e estado de complemento/decisão do relato; nunca transformar
+  busca em comando de consumo; datas em DD/MM/AAAA na apresentação e limites
+  de consulta validados; manter filtros ao voltar
 
-  **Ajuda e exemplo:** Contagem e lista usam mesmo conjunto autorizado.
+  **Ajuda/exemplo:** CON-01 Buscar relato ou referência: Busque relato
+  autorizado ou ajuste os filtros próprios de tipo/período. A referência
+  antiga abre detalhe mesmo fora da página recente.
 
 <!-- c-table:end -->
 

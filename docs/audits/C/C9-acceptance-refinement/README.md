@@ -1,21 +1,28 @@
-# C9 — critérios refinados e desenho de execução
+# C9 — aceites do fechamento definitivo
 
-**161 critérios/casos de design:** 149 anteriores revisados individualmente e
-12 complementos C7. Não são 161 testes escritos ou executados. Toda linha tem
-`execution_status=PLANNED_NOT_EXECUTED`; D continua não iniciada.
+**187 casos de design**: 161 IDs anteriores preservados, 20 desses casos
+refinados e 26 cenários discriminantes acrescentados. Todos
+PLANNED_NOT_EXECUTED; não são testes escritos/executados nesta missão.
 
-- [Matriz canônica de aceites](../C6-acceptance-handoff/ACCEPTANCE_CRITERIA_MASTER.csv).
+- [Matriz canônica](../C6-acceptance-handoff/ACCEPTANCE_CRITERIA_MASTER.csv).
 
-- [Casos completos](ACCEPTANCE_CASES.csv), com dados, atores, passos,
-  esperado/proibido, oráculo independente, efeitos, camadas e lotes.
+- [Casos completos](ACCEPTANCE_CASES.csv),
+  [gates](C9_GAP_AND_DECISION_MATRIX.csv) e
+  [alterações](FINAL_ACCEPTANCE_CHANGES.csv).
 
-- [Lacunas e decisões por caso](C9_GAP_AND_DECISION_MATRIX.csv).
+- [Estratégia](ACCEPTANCE_EXECUTION_BLUEPRINT.md) e
+  [contraprovas](DISCRIMINATING_EXAMPLES.md).
 
-- [Estratégia de execução](ACCEPTANCE_EXECUTION_BLUEPRINT.md) e
-  [exemplos discriminantes](DISCRIMINATING_EXAMPLES.md).
+P02 está OWNER_APPROVED sem classificação humana pendente. Trabalho técnico D2
+e homologação futura SCI-004 são condições distintas. Os dez gates são
+específicos e não impedem D0 geral/D1 independente; branch D só após integrar
+PR6 à master e autorizar D.
 
-Cada C-AC-001–121 conserva causa/fontes. C-NEW-AC-001–028 preserva grupos de
-finalidade. C7-AC-001–012 cobre credencial, regularização, BAL opcional, draft
-único, acesso, wizard, guia, alertas, backup, equivalência de devolução,
-emissão e preferência prospectiva. Execuções podem ser compartilhadas sem
-perder o critério individual. Teste só de HTTP200, tamanho ou ID não basta.
+C-FINAL-AC-001–011: ciência/ANY/expedição/versões/dialogada/tácita. 012–024:
+controles, estado, autoria, mensagens e relações. 025: 66 tarefas em
+responsividade/acessibilidade e pessoas P10. 026: gates/autoridade. Todos têm
+dados, passos e oráculo independente.
+
+DESIGN_READY indica especificação suficiente para o trabalho planejado, sem
+provar execução ou liberar produto. DESIGN_READY_SPECIFIC_GATE_PENDING mantém
+o ramo condicionado ao gate indicado; não bloqueia D0 geral/D1 independente.

@@ -1,93 +1,199 @@
 # ENT-04 — Informar divergência
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Recebedor designado. Banco/API revalidam capacidade, alvo
-e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Diálogo de divergência, atual a alterar. Gatilho: navegar
-pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Quantidade
-efetivamente recebida e ressalvas por linha; resumo antes da confirmação.
+Declaração pessoal de recebimento com diferença, antes de confirmar o resumo
+completo.
 
-## Composição e sequência
+Finalidade: Informar divergência.
 
-Diálogo por item com expedido somente leitura, aceito vazio e motivo/ressalva;
-resumo de todas as linhas.
+Somente recebedor designado vigente; não selecionar outra identidade como
+assinatura.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Diálogo de divergência, atual a alterar.
 
-Zero aceita nada; não apresentar divergência como consumo; foco no primeiro
-campo inválido.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Material, quantidade expedida/pendente e unidade. Linhas não marcadas aparecem
+explicitamente como aceitas integralmente no resumo final.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-035-01 — Linhas com divergência
+
+**Modo/componente:** EDITABLE / LINE_CHECKBOX_GROUP.
+
+**Quando/ator:** Selecionar apenas linhas da ENT exibida; nenhuma busca de
+produto novo.
+
+**Obrigatoriedade/inicial:** Não, lista vazia significa aceite integral após
+confirmação.
+
+**Máscara/apresentação:** Uma caixa por linha expedida, com
+material/unidade/quantidade; selecionada abre os campos próprios da
+divergência. Autocomplete: off.
+
+**Validação:** Revisão mostra também linhas não selecionadas; Selecionar
+apenas linhas da ENT exibida; nenhuma busca de produto novo.
+
+**Ajuda/exemplo:** Selecione as linhas com diferença. Antes de confirmar,
+confira também as linhas indicadas como recebidas integralmente.
+
+**Mensagem e condição:** “Escolha uma opção válida para linhas com divergência
+no escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-036-01 — Quantidade aceita
+
+**Modo/componente:** EDITABLE / DECIMAL_TEXT_INPUT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim nessas linhas, sem aceite implícito.
+
+**Máscara/apresentação:** Quantidade textual exata com unidade; vírgula/ponto,
+inputmode decimal e precisão explícita antes da coerção. Autocomplete: off.
+
+**Validação:** De 0 ao ainda expedido/pendente; precisão da unidade; Somente
+no subestado de preparação autorizado indicado na ficha; resumo/decisão
+posterior é leitura.
+
+**Ajuda/exemplo:** “Recebi 2 de 3 unidades.”
+
+**Mensagem e condição:** “Informe quantidade aceita na unidade indicada e com
+a precisão permitida. O campo precisa de correção antes de confirmar.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-037-01 — Problema
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Condicional à divergência; vazio, sem copiar
+ressalva de expedição.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** Problema da linha com diferença, até 500 caracteres;
+obrigatório quando o fluxo exigir explicação da divergência; Somente no
+subestado de preparação autorizado indicado na ficha; resumo/decisão posterior
+é leitura.
+
+**Ajuda/exemplo:** “Uma unidade não chegou”; não inferir consumo.
+
+**Mensagem e condição:** “Confira problema e o limite indicado. Corrija
+somente esta informação; os demais valores preenchidos foram preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-037-02 — Ressalva
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Opcional, salvo exigência específica do fato;
+vazio.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** Ressalva própria do recebedor, até 1000 caracteres; não
+substitui quantidade aceita; Somente no subestado de preparação autorizado
+indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Uma unidade não chegou”; não inferir consumo.
+
+**Mensagem e condição:** “Confira ressalva e o limite indicado. Corrija
+somente esta informação; os demais valores preenchidos foram preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Marcar linhas divergentes → expedido em leitura → aceito real vazio por linha
+marcada → problema/ressalva → revisar todas as linhas → confirmar.
+
+Resumo de custódias e recebedor antes das linhas; expedido e aceito em colunas
+identificadas; ação pessoal após todas as linhas.
 
 Primária: **Registrar meu recebimento com ressalva**. Secundárias: Voltar e
 conferir.
 
-Consequência: Aceito positivo credita, restante continua em
-trânsito/divergência. Mostrar objeto/quantidade/pessoa/versão antes de
-qualquer decisão material. Retorno/Voltar preserva edição e contexto; próximo
-destino é resultado do ato ou tarefa pertinente, nunca novo envio automático.
-Em resposta incerta consultar intenção antes de prosseguir.
+Efeito: Aceito positivo credita, restante continua em trânsito/divergência.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Recebimento com ressalva registrado. Só a quantidade
+aceita foi creditada; o restante continua pendente de solução.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhuma linha com diferença selecionada. Volte para
+confirmar o recebimento integral ou selecione a linha a conferir.”
 
-- **CTRL-035-01 — Linhas com divergência**. SEARCHABLE_COMBOBOX. Ordem 35.1;
-  Não, lista vazia significa aceite integral após confirmação.
-  Máscara/autocomplete: Busca por nome/alias autorizado; seleção por ID;
-  nenhum ID digitado como autorização; off. Dependência/validação: Revisão
-  mostra também linhas não selecionadas. Ajuda/exemplo: Não ocultar que as
-  demais serão aceitas.. Erro: Revise linhas com divergência: Revisão mostra
-  também linhas não selecionadas..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-036-01 — Quantidade aceita**. DECIMAL_TEXT_INPUT. Ordem 36.1; Sim
-  nessas linhas, sem aceite implícito. Máscara/autocomplete: Vírgula/ponto;
-  inputmode decimal; precisão antes da coerção; zero só onde permitido; off.
-  Dependência/validação: De 0 ao ainda expedido/pendente; precisão da unidade.
-  Ajuda/exemplo: “Recebi 2 de 3 unidades.”. Erro: Revise quantidade aceita: De
-  0 ao ainda expedido/pendente; precisão da unidade..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-037-01 — Problema**. TEXTAREA. Ordem 37.1; Motivo ao divergir; vazio
-  inicialmente. Máscara/autocomplete: Sem máscara; contador e limite do
-  contrato visíveis; quebra de linha/reflow; off. Dependência/validação:
-  Problema até 500, nota até 1000. Ajuda/exemplo: “Uma unidade não chegou”;
-  não inferir consumo.. Erro: Revise problema: Problema até 500, nota até
-  1000..
+Sem linhas e pendência expedida confiáveis, bloquear confirmação de
+divergência. Guardar edição permitida e consultar fonte; não preencher limite
+ou aceito por adivinhação.
 
-- **CTRL-037-02 — Ressalva**. TEXTAREA. Ordem 37.2; Motivo ao divergir; vazio
-  inicialmente. Máscara/autocomplete: Sem máscara; contador e limite do
-  contrato visíveis; quebra de linha/reflow; off. Dependência/validação:
-  Problema até 500, nota até 1000. Ajuda/exemplo: “Uma unidade não chegou”;
-  não inferir consumo.. Erro: Revise ressalva: Problema até 500, nota até
-  1000..
+Erro de quantidade aponta a linha editável, sem pedir alteração do expedido.
+Zero aceito não quita material; nunca preencher automaticamente o restante na
+linha divergente.
 
-## Estado, teclado e ajuda
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-ENT-04` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `ent/entDivergence`; ausência de exemplo no HTML é declarada, sem
-novo mockup equivalente. B1: OVL-021.
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-Critérios C9 relacionados: C-AC-010, C-AC-021, C-AC-028, C-AC-042, C-AC-043,
-C-AC-044, C-AC-048, C-AC-050, C-AC-074, C-AC-077, C-AC-079, C-AC-089,
-C-AC-096, C-AC-101, C-AC-103, C-AC-105, C-NEW-AC-006, C-NEW-AC-007,
-C-NEW-AC-009, C-NEW-AC-015, C-NEW-AC-016, C-NEW-AC-022, C-NEW-AC-028,
-C7-AC-002, C7-AC-010. A associação é por domínio; cada caso preserva seu
-discriminante específico e não significa que todos os critérios foram
-executados nesta tela. Fonte funcional:
-[ENT](../../C3-functional-specification/ENT.md).
+Cartões por material: expedido/unidade, aceito quando editável e restante
+calculado; não cortar quantidade no viewport como a tabela do exemplo móvel.
+
+Resumo integral anunciado antes da confirmação; erro foca quantidade
+aceita/motivo editável, nunca origem/destino/expedido em leitura.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: ent/entDivergence. Sem captura real ou aceite humano
+de interface futura nesta C.
+
+RECONSTRUIR editor por linha se busca de produto ou default de aceite permitir
+mudar a expedição.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-010;C-AC-021;C-AC-028;C-AC-042;C-AC-043;C-AC-044;C-AC-048;C-AC-050;C-AC-074;C-AC-077;C-AC-079;C-AC-089;C-AC-096;C-AC-101;C-AC-103;C-AC-105;C-NEW-AC-006;C-NEW-AC-007;C-NEW-AC-009;C-NEW-AC-015;C-NEW-AC-016;C-NEW-AC-022;C-NEW-AC-028;C7-AC-002;C7-AC-010;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-012;C-FINAL-AC-019.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

@@ -1,66 +1,92 @@
 # GUI-01 — Apresentação e ajuda por perfil
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Família/equipe primeiro; supervisão depois. Banco/API
-revalidam capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Guia documental por público, novo conteúdo. Gatilho: navegar
-pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Ajudar equipe,
-família e supervisão a cumprir tarefa; links às rotas atuais.
+Apresentação opcional por perfil e tarefa; reabrível pelo titular.
 
-## Composição e sequência
+Finalidade: Apresentação e ajuda por perfil.
 
-Guia curto por tarefa com etapas, texto acessível e capturas reais futuras;
-pular/voltar/retomar.
+Titular consulta seu guia; administração autorizada define mostrar no primeiro
+acesso, sem obrigar aceite material.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Guia documental por público, novo conteúdo.
 
-Admin configura primeiro acesso; titular reabre sempre; imagem de protótipo é
-referência só.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Conteúdo instrucional e progresso. Uma tela de guia não registra ciência de
+REQ ou concordância operacional.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+Não há campo de negócio digitável nesta tarefa; navegação/instrução seguem as
+ações abaixo.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Tarefa/perfil → passos curtos → captura futura rotulada e texto equivalente →
+próximo/voltar/pular → reabrir no perfil.
+
+Passos curtos com propósito, texto equivalente à imagem e navegação de
+progresso; ajuda reabrível.
 
 Primária: **Próximo passo**. Secundárias: Pular agora; Reabrir no perfil; Ler
 ajuda.
 
-Consequência: Guia não aprova ato material nem altera capacidade. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Guia não aprova ato material nem altera capacidade.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Etapa do guia concluída. Você pode reabrir a apresentação
+no perfil quando precisar.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhum guia específico disponível para esta tarefa.
+Consulte a ajuda textual correspondente.”
 
-Tela de orientação/consulta sem novo campo de dado. Links/botões têm nome,
-alvo e estado próprios; não adicionar formulário sem necessidade.
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-## Estado, teclado e ajuda
+## 19–20. Falhas, recuperação e continuidade
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-GUI-01` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `setup/onboarding`; ausência de exemplo no HTML é declarada, sem
-novo mockup equivalente. B1: SC-036.
+Captura indisponível conserva texto completo; pular não bloqueia tarefa nem
+altera capacidade. Não mostrar protótipo como captura do sistema implementado.
 
-Critérios C9 relacionados: C-AC-002, C-AC-003, C-AC-004, C-AC-006, C-AC-007,
-C-AC-008, C-AC-040, C-AC-062, C-AC-063, C-AC-112, C-AC-114, C-AC-115,
-C-AC-117, C-AC-118, C-AC-119, C-AC-120, C-AC-121, C-NEW-AC-026, C-NEW-AC-027,
-C7-AC-002, C7-AC-006, C7-AC-007, C7-AC-008, C7-AC-009. A associação é por
-domínio; cada caso preserva seu discriminante específico e não significa que
-todos os critérios foram executados nesta tela. Fonte funcional:
-[USER_GUIDES_AND_CONTINUITY](../../C3-functional-specification/USER_GUIDES_AND_CONTINUITY.md).
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
+
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
+
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Uma coluna, imagem contida com legenda e texto; Próximo/Voltar/Pular sem
+cobrir conteúdo.
+
+Headings e lista de passos sem leitura forçada; imagens têm descrição útil;
+pular não registra concordância material.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: setup/onboarding. Sem captura real ou aceite humano
+de interface futura nesta C.
+
+NOVO GUIA: capturas reais só após D no mesmo SHA e com revisão humana P10.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-002;C-AC-003;C-AC-004;C-AC-006;C-AC-007;C-AC-008;C-AC-040;C-AC-062;C-AC-063;C-AC-112;C-AC-114;C-AC-115;C-AC-117;C-AC-118;C-AC-119;C-AC-120;C-AC-121;C-NEW-AC-026;C-NEW-AC-027;C7-AC-002;C7-AC-006;C7-AC-007;C7-AC-008;C7-AC-009;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

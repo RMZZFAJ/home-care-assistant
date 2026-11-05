@@ -1,83 +1,174 @@
 # EST-03 — Consultar origem de movimento
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Leitor autorizado à custódia. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Histórico de movimentos, atual a alterar. Gatilho: navegar
-pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Filtros, origem
-autorizada, autor e antes/depois; recuperar item antigo.
+Consulta de movimentos paginados e abertura da origem exata, sem reexecutar
+atos.
 
-## Composição e sequência
+Finalidade: Consultar origem de movimento.
 
-Tabela/lista por data, autor, tipo, quantidade e referência; detalhe abre
-origem tipada com retorno ao filtro.
+Leitor autorizado à custódia e, separadamente, ao documento de origem; link
+não concede nova leitura.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Histórico de movimentos, atual a alterar.
 
-purchase_receipt não é documentId; restrição de origem é compreensível.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Quantidades, referências, nomes/unidades históricas. Filtros são os únicos
+campos de consulta editáveis.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-080-01 — Tipo ou origem do movimento
+
+**Modo/componente:** FILTER / FILTER_SELECT.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Opções do domínio consultado e Todas quando
+permitido; mudar filtro não é decisão material. Autocomplete: off.
+
+**Validação:** Filtro tipado da seção/tarefa, com valores permitidos e escopo
+autorizados; não aceitar um enum universal para processos distintos; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** “Movimentos de novembro; há páginas anteriores.”
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-080-02 — Data inicial
+
+**Modo/componente:** FILTER / DATE_INPUT.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Data DD/MM/AAAA na apresentação, sem conversão
+silenciosa de fuso; limites do período visíveis. Autocomplete: off.
+
+**Validação:** Filtro tipado da seção/tarefa, com valores permitidos e escopo
+autorizados; não aceitar um enum universal para processos distintos; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** “Movimentos de novembro; há páginas anteriores.”
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-080-03 — Data final
+
+**Modo/componente:** FILTER / DATE_INPUT.
+
+**Quando/ator:** Apenas consulta no escopo permitido; não altera documento,
+movimento ou autoridade.
+
+**Obrigatoriedade/inicial:** Sem restrição adicional inicialmente, salvo
+filtro de tarefa explicitamente indicado no link; vazio limpa filtro, não cria
+zero ou estado material.
+
+**Máscara/apresentação:** Data DD/MM/AAAA na apresentação, sem conversão
+silenciosa de fuso; limites do período visíveis. Autocomplete: off.
+
+**Validação:** Filtro tipado da seção/tarefa, com valores permitidos e escopo
+autorizados; não aceitar um enum universal para processos distintos; datas em
+DD/MM/AAAA na apresentação e limites de consulta validados; manter filtros ao
+voltar.
+
+**Ajuda/exemplo:** “Movimentos de novembro; há páginas anteriores.”
+
+**Mensagem e condição:** “Confira o filtro e o período indicados. A consulta
+pode ser atualizada sem alterar nenhum registro.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Filtro de tipo/data → movimentos com autor/quantidade/unidade → origem tipada
+→ detalhe → retorno aos mesmos filtros.
+
+Filtros por domínio e tabela/lista com tipo, instante, autor e origem; detalhe
+com retorno à mesma consulta.
 
 Primária: **Abrir origem autorizada**. Secundárias: Anterior/próxima página;
 Limpar filtro.
 
-Consequência: Link não concede acesso novo. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Link não concede acesso novo.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Origem aberta no acesso permitido. Nenhum movimento foi
+repetido.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhum movimento neste filtro. Consulte outro período ou
+limpe os filtros.”
 
-- **CTRL-080-01 — Estado do movimento**. RADIO_OR_SELECT. Ordem 80.1; Não,
-  defaults explícitos. Máscara/autocomplete: Opções finitas com rótulo humano;
-  sem opção material preaceita; off. Dependência/validação: Cursor estável, ID
-  antigo alcançável. Ajuda/exemplo: “Movimentos de novembro; há páginas
-  anteriores.”. Erro: Revise estado do movimento: Cursor estável, ID antigo
-  alcançável..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-080-02 — Data inicial**. DATE_INPUT. Ordem 80.2; Não, defaults
-  explícitos. Máscara/autocomplete: DD/MM/AAAA na apresentação; ISO no
-  transporte; não inferir fuso; off. Dependência/validação: Cursor estável, ID
-  antigo alcançável. Ajuda/exemplo: “Movimentos de novembro; há páginas
-  anteriores.”. Erro: Revise data inicial: Cursor estável, ID antigo
-  alcançável..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-080-03 — Data final**. DATE_INPUT. Ordem 80.3; Não, defaults
-  explícitos. Máscara/autocomplete: DD/MM/AAAA na apresentação; ISO no
-  transporte; não inferir fuso; off. Dependência/validação: Cursor estável, ID
-  antigo alcançável. Ajuda/exemplo: “Movimentos de novembro; há páginas
-  anteriores.”. Erro: Revise data final: Cursor estável, ID antigo
-  alcançável..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-## Estado, teclado e ajuda
+Origem restrita é explicada sem inventar outro documento. purchase_receipt
+abre parcela correspondente, não usa seu ID como documentId.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-EST-03` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `stock/docs`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-016, OVL-040.
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-Critérios C9 relacionados: C-AC-010, C-AC-021, C-AC-022, C-AC-045, C-AC-046,
-C-AC-053, C-AC-066, C-AC-068, C-AC-072, C-AC-074, C-AC-120, C-NEW-AC-008,
-C-NEW-AC-009, C-NEW-AC-015, C-NEW-AC-023, C-NEW-AC-025, C7-AC-010. A
-associação é por domínio; cada caso preserva seu discriminante específico e
-não significa que todos os critérios foram executados nesta tela. Fonte
-funcional:
-[STOCK_AND_CUSTODY](../../C3-functional-specification/STOCK_AND_CUSTODY.md).
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Cartões com rótulos completos; paginação e busca de referência fora dos
+recentes; nada depende de tooltip para interpretar origem.
+
+Tabela semântica ou lista equivalente; carregar mais não perde foco; total
+desconhecido não é anunciado como zero.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: stock/docs. Sem captura real ou aceite humano de
+interface futura nesta C.
+
+EVOLUIR navegação e paginação; reconstruir resolvedor tipado de origem em D.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-010;C-AC-021;C-AC-022;C-AC-045;C-AC-046;C-AC-053;C-AC-066;C-AC-068;C-AC-072;C-AC-074;C-AC-120;C-NEW-AC-008;C-NEW-AC-009;C-NEW-AC-015;C-NEW-AC-023;C-NEW-AC-025;C7-AC-010;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

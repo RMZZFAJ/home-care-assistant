@@ -157,8 +157,18 @@ ou promoção. Backup legível não autoriza restore sobre ambiente existente.
 
 As matrizes causais foram revisadas semanticamente, com domínios secundários
 explícitos. P06/P11/P12/P14 e garantia de comando P15 já foram respondidos;
-P02 por SCI-ID, retenção, fornecedores e parâmetros operacionais continuam
-delimitados em C7. P09-B é obrigatório, com identidade própria por emissão;
-não ativar núcleo só de hash como substituto. Toda evolução de schema usa
-migration incremental e preserva os 84 hashes históricos.
+P02 e SCI-001–SCI-005 estão OWNER_APPROVED. Retenção, fornecedores e
+parâmetros mantêm gates específicos, sem bloquear D0 geral ou D1 independente.
+P09-B é obrigatório, com identidade própria por emissão; não ativar núcleo só
+de hash como substituto. Toda evolução de schema usa migration incremental e
+preserva os 84 hashes históricos.
 [Adendo vigente](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).
+
+## Fechamento definitivo — tarefa, estado e política
+
+D separa material/eventos/emissão e evidência causal por expedição, com ANY
+familiar. Flags não desligam SCI-005; retirar created_by não retira
+capacidade/estado. Preservar enum/eventos e nomes históricos, sem chamar
+app_visible de diálogo ou inventar ciência na emissão para vinculado depois.
+Migração incremental/compatibilidade/testes continuam trabalho técnico da D,
+não escolha humana P02 em aberto.

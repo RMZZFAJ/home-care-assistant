@@ -1,37 +1,31 @@
-# C10 — fechamento e publicação documental
+# C10 — fechamento definitivo e revisão do Draft PR 6
 
-**C7–C10 concluídas como planejamento; D NÃO INICIADA; produção NO-GO.**
-Publicação autorizada: commit/push em `audit/phase-b` e Draft PR para
-`master`, sem merge nem limpeza de branches. O checkpoint registra a etapa de
-publicação e os checks efetivamente consultados.
+**P02 OWNER_APPROVED; C8 integralmente revista; 187 aceites planejados.** 66
+fichas/262 controles/171 relações originais examinados. Catálogo atual: 274
+controles, 424 usos por tela/estado; 20 casos refinados e 26 adicionados.
 
-- [Autoridade e atualizações humanas](OWNER_MANDATE.md).
+- [Relatório executivo definitivo](PHASE_C_FINAL_PART2_REPORT.md).
 
-- [Checkpoint](CHECKPOINT.md) e
-  [relatório final](PHASE_C_FINAL_PART2_REPORT.md).
+- [Checkpoint/publicação](CHECKPOINT.md) e
+  [validação](DOCUMENTARY_VALIDATION_REPORT.md).
 
-- [Handoff atualizado D](PHASE_D_HANDOFF_UPDATED.md) e
-  [gates humanos](OPEN_OWNER_GATES.md).
+- [Ordem complementar](final-closure/OWNER_COMPLEMENT_ORDER.md) e
+  [baseline exato](final-closure/evidence/BASELINE.json).
 
-- [Revisão do PR](PR_REVIEW_CHECKLIST.md),
-  [proveniência/branches](BRANCH_AND_PROVENANCE_REPORT.md) e
-  [validação documental](DOCUMENTARY_VALIDATION_REPORT.md).
+- [Política de ciência](../C7-decision-closure/SCIENCE_OWNER_REVIEW.md),
+  [gates remanescentes](OPEN_OWNER_GATES.md),
+  [C8](../C8-visual-blueprint/README.md) e
+  [aceites C9](../C9-acceptance-refinement/README.md).
 
-- [Manifesto de arquivos](evidence/MANIFEST.json),
-  [entrada original](evidence/INPUT_PROVENANCE.csv),
-  [movimentos do kit](evidence/KIT_RELOCATION.csv) e
-  [baseline](evidence/BASELINE.json).
+- [Entrada futura D](PHASE_D_HANDOFF_UPDATED.md) e
+  [revisão do PR](PR_REVIEW_CHECKLIST.md).
 
-Fontes Markdown/CSV C0–C6 anteriores e os sete Markdown recebidos estão em
-`inputs/`, gzip exato com hash/roundtrip verificável. HTML e oito PNG ficam em
-C8/prototype, sem alteração de bytes. Auditorias datadas A/B e suas provas não
-foram reemitidas. Scripts novos deste diretório produzem/verificam só
-documentação; não executam banco, fixtures, envio, deploy ou testes da D.
+Ordem inicial/validações intermediárias preservadas nos arquivos/inputs
+datados. A condição antiga P02 pendente foi superada expressamente; não
+repetir C0–C10 ou reconfirmar política. Não rodar geradores iniciais isolados
+sobre as matrizes atuais. Validador do fechamento definitivo é a entrada
+atual.
 
-## Publicação observada
-
-[Draft PR#6](https://github.com/RMZZFAJ/home-care-assistant/pull/6) aberto de
-audit/phase-b para master; conteúdo publicado por commit/push. Snapshot da CI
-em PR_PUBLICATION.json identifica seu próprio SHA; HEAD final e checks mais
-recentes são resolvidos no PR/Git, sem CI verde presumida. Sem merge, cleanup
-de branches, deploy deliberado ou início D.
+Sem implementação funcional, migration, operação remota, pesquisa comercial,
+deploy deliberado, merge ou início D. Branch D só após integrar PR6 à master e
+autorização posterior. Gates específicos não são aceitos por documentação.

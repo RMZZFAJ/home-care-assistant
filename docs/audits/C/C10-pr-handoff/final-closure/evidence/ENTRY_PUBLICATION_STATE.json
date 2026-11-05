@@ -1,0 +1,36 @@
+{
+  "mission": "FINAL_PHASE_C_COMPLEMENT",
+  "entry_sha": "266c6541bd5d3268b7e08a839df601e823ec74b5",
+  "observed_at_utc": "2026-11-05T00:05:35.033Z",
+  "github_actions": [
+    {
+      "id": 41898713738,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 50,
+      "jobs_url": "https://api.github.com/repos/RMZZFAJ/home-care-assistant/actions/runs/41898713738/jobs",
+      "logs_url": "https://api.github.com/repos/RMZZFAJ/home-care-assistant/actions/runs/41898713738/logs",
+      "workflow_id": 390315561
+    }
+  ],
+  "commit_statuses": [
+    {
+      "context": "Vercel",
+      "state": "success",
+      "target_url": "https://vercel.com/rmzzfajs-projects/home-care-assistant/D2d2A1CnYu83Yqv3aCxSMGdPsiAk"
+    }
+  ],
+  "pr": {
+    "url": "https://github.com/RMZZFAJ/home-care-assistant/pull/6",
+    "number": 6,
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "head": "audit/phase-b",
+    "head_sha": "266c6541bd5d3268b7e08a839df601e823ec74b5",
+    "base": "master",
+    "base_sha": "34dcb835c5c49068e0417f7306eb4e501aa868bc"
+  },
+  "limit": "Snapshot of entry SHA only. New commits require their own checks; no waiting for all jobs authorized."
+}

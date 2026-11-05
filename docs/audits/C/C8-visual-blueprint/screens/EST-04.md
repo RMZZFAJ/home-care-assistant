@@ -1,112 +1,269 @@
 # EST-04 — Transferir ou devolver material
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Iniciador e contraparte/recebedor competentes. Banco/API
-revalidam capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Transferência simples, novo painel. Gatilho: navegar pela
-tarefa ou abrir o alvo contextual autorizado. Objetivo: Selecionar
-origem/destino e pessoa; processo condicional P07 vinculado à ENT.
+Preparação de transferência física/devolução; concordância e aceite pessoal
+são etapas próprias.
 
-## Composição e sequência
+Finalidade: Transferir ou devolver material.
 
-Diálogo origem/destino, material/q, motivo e referência opcional; pessoas e
-consequências antes de solicitar.
+Iniciador autorizado à origem, contraparte legítima e recebedor elegível; P07
+condiciona substituição da UI antiga.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Transferência simples, novo painel.
 
-UI antiga só sai após equivalência; corrigir número sem movimento físico segue
-processo próprio.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Saldo de origem e efeitos previstos; nenhuma quantidade é creditada ao destino
+ao salvar solicitação.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-071-01 — Material
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim ao movimentar.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Ativo para nova operação normal; inativo tem caminho
+específico; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Unidade e precisão visíveis.
+
+**Mensagem e condição:** “Escolha uma opção válida para material no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-073-01 — Quantidade
+
+**Modo/componente:** EDITABLE / DECIMAL_TEXT_INPUT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim, vazio.
+
+**Máscara/apresentação:** Quantidade textual exata com unidade; vírgula/ponto,
+inputmode decimal e precisão explícita antes da coerção. Autocomplete: off.
+
+**Validação:** Positiva, finita, até 1 bilhão, até 6 casas e precisão do
+produto antes de coerção; Somente no subestado de preparação autorizado
+indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** 1,5 aceita apenas em unidade fracionável.
+
+**Mensagem e condição:** “Informe quantidade na unidade indicada e com a
+precisão permitida. O campo precisa de correção antes de confirmar.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-075-01 — Motivo
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** 3–1000 caracteres; Somente no subestado de preparação
+autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Entrada registrada em quantidade maior que a conferida.”
+
+**Mensagem e condição:** “Confira motivo e o limite indicado. Corrija somente
+esta informação; os demais valores preenchidos foram preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-078-01 — Origem
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim no novo painel.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Autorização, saldo e P07; Somente no subestado de preparação
+autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Sem edição direta das duas colunas de saldo.
+
+**Mensagem e condição:** “Escolha uma opção válida para origem no escopo desta
+tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-078-02 — Destino
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim no novo painel.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Autorização, saldo e P07; Somente no subestado de preparação
+autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Sem edição direta das duas colunas de saldo.
+
+**Mensagem e condição:** “Escolha uma opção válida para destino no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-079-01 — Contraparte
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim conforme P07.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Pessoa competente na contraparte; concordância não substitui
+aceite pessoal do recebedor real; Somente no subestado de preparação
+autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Identificar quem declara, valida e recebe.
+
+**Mensagem e condição:** “Escolha uma opção válida para contraparte no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-079-02 — Recebedor físico
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim conforme P07.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Contrassinatura distinta de aceite físico se pessoas
+diferentes; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Identificar quem declara, valida e recebe.
+
+**Mensagem e condição:** “Escolha uma opção válida para recebedor físico no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Origem/destino → material/unidade/quantidade → contraparte/recebedor → motivo
+→ resumo de custódias → solicitar/expedir conforme etapa.
+
+Campos da intenção em uma área e prévia de custódia/quantidade ao lado; motivo
+e referência antes da revisão final.
 
 Primária: **Solicitar transferência**. Secundárias: Voltar; Ver saldo da
 origem.
 
-Consequência: Solicitação não simula recebimento; usa ENT/custódia. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Solicitação não simula recebimento; usa ENT/custódia.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Transferência encaminhada para a próxima etapa indicada. O
+destino só recebe crédito após o aceite pessoal pertinente.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhuma transferência preparada. Escolha origem e destino
+distintos e um material físico.”
 
-- **CTRL-071-01 — Material**. SEARCHABLE_COMBOBOX. Ordem 71.1; Sim ao
-  movimentar. Máscara/autocomplete: Busca por nome/alias autorizado; seleção
-  por ID; nenhum ID digitado como autorização; off. Dependência/validação:
-  Ativo para nova operação normal; inativo tem caminho específico.
-  Ajuda/exemplo: Unidade e precisão visíveis.. Erro: Revise material: Ativo
-  para nova operação normal; inativo tem caminho específico..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-073-01 — Quantidade**. DECIMAL_TEXT_INPUT. Ordem 73.1; Sim, vazio.
-  Máscara/autocomplete: Vírgula/ponto; inputmode decimal; precisão antes da
-  coerção; zero só onde permitido; off. Dependência/validação: Positiva,
-  finita, até 1 bilhão, até 6 casas e precisão do produto antes de coerção.
-  Ajuda/exemplo: 1,5 aceita apenas em unidade fracionável.. Erro: Revise
-  quantidade: Positiva, finita, até 1 bilhão, até 6 casas e precisão do
-  produto antes de coerção..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-075-01 — Motivo**. TEXTAREA. Ordem 75.1; Sim. Máscara/autocomplete:
-  Sem máscara; contador e limite do contrato visíveis; quebra de linha/reflow;
-  off. Dependência/validação: 3–1000 caracteres. Ajuda/exemplo: “Entrada
-  registrada em quantidade maior que a conferida.”. Erro: Revise motivo:
-  3–1000 caracteres..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-078-01 — Origem**. SEARCHABLE_COMBOBOX. Ordem 78.1; Sim no novo
-  painel. Máscara/autocomplete: Busca por nome/alias autorizado; seleção por
-  ID; nenhum ID digitado como autorização; off. Dependência/validação:
-  Autorização, saldo e P07. Ajuda/exemplo: Sem edição direta das duas colunas
-  de saldo.. Erro: Revise origem: Autorização, saldo e P07..
+Falha mantém custódia atual; não criar compensação para simular transporte.
+Enquanto equivalência P07 não for provada, preservar caminho antigo
+autorizado.
 
-- **CTRL-078-02 — Destino**. SEARCHABLE_COMBOBOX. Ordem 78.2; Sim no novo
-  painel. Máscara/autocomplete: Busca por nome/alias autorizado; seleção por
-  ID; nenhum ID digitado como autorização; off. Dependência/validação:
-  Autorização, saldo e P07. Ajuda/exemplo: Sem edição direta das duas colunas
-  de saldo.. Erro: Revise destino: Autorização, saldo e P07..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-079-01 — Contraparte**. SEARCHABLE_COMBOBOX. Ordem 79.1; Sim conforme
-  P07. Máscara/autocomplete: Busca por nome/alias autorizado; seleção por ID;
-  nenhum ID digitado como autorização; off. Dependência/validação:
-  Contrassinatura distinta de aceite físico se pessoas diferentes.
-  Ajuda/exemplo: Identificar quem declara, valida e recebe.. Erro: Revise
-  contraparte: Contrassinatura distinta de aceite físico se pessoas
-  diferentes..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-079-02 — Recebedor físico**. SEARCHABLE_COMBOBOX. Ordem 79.2; Sim
-  conforme P07. Máscara/autocomplete: Busca por nome/alias autorizado; seleção
-  por ID; nenhum ID digitado como autorização; off. Dependência/validação:
-  Contrassinatura distinta de aceite físico se pessoas diferentes.
-  Ajuda/exemplo: Identificar quem declara, valida e recebe.. Erro: Revise
-  recebedor físico: Contrassinatura distinta de aceite físico se pessoas
-  diferentes..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-## Estado, teclado e ajuda
+Uma coluna com contexto e valores antes/depois próximos; unidade permanece
+visível com teclado aberto.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Resumo de erro aponta só inputs editáveis; confirmação anuncia origem/destino
+e efeito sem usar sinal negativo como rótulo.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-EST-04` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `stock/transfer`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-016.
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-Critérios C9 relacionados: C-AC-010, C-AC-021, C-AC-022, C-AC-045, C-AC-046,
-C-AC-053, C-AC-066, C-AC-068, C-AC-072, C-AC-074, C-AC-120, C-NEW-AC-008,
-C-NEW-AC-009, C-NEW-AC-015, C-NEW-AC-023, C-NEW-AC-025, C7-AC-010. A
-associação é por domínio; cada caso preserva seu discriminante específico e
-não significa que todos os critérios foram executados nesta tela. Fonte
-funcional:
-[STOCK_AND_CUSTODY](../../C3-functional-specification/STOCK_AND_CUSTODY.md).
+Referência do protótipo: stock/transfer. Sem captura real ou aceite humano de
+interface futura nesta C.
+
+NOVA UI CONDICIONADA: demonstrar equivalência de fatos e ledger antes de
+retirar devolução antiga.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-010;C-AC-021;C-AC-022;C-AC-045;C-AC-046;C-AC-053;C-AC-066;C-AC-068;C-AC-072;C-AC-074;C-AC-120;C-NEW-AC-008;C-NEW-AC-009;C-NEW-AC-015;C-NEW-AC-023;C-NEW-AC-025;C7-AC-010;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

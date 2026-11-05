@@ -52,108 +52,472 @@ TO_BE DEC-015/016/017/018, com composição `PROPOSED_TECHNICAL_DEFAULT` e P09.
 
 - **Campo:** Documento/tipo/protocolo
 
-  **Tipo/origem:** Registro do banco
+  **Tipo/origem por tela e estado:** DOC-01 Documento: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Documento: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; DOC-03 Documento:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-04 Documento: HIDDEN (NO_USER_CONTROL);
+  Documento/paciente privado não integra consulta pública mínima; DOC-01 Tipo:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-02 Tipo: READ_ONLY (TEXT_VALUE); Consulta do
+  valor de origem; mudanças só no processo legitimamente responsável; DOC-03
+  Tipo: READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no
+  processo legitimamente responsável; DOC-04 Tipo: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-01 Protocolo: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; DOC-02 Protocolo:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Protocolo: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-04 Protocolo: HIDDEN (NO_USER_CONTROL); Protocolo privado
+  não é publicado como mecanismo de enumeração
 
-  **Obrigatório e default:** Sim, leitura
+  **Obrigatoriedade/default na preparação:** DOC-01 Documento: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; DOC-02 Documento: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; DOC-03 Documento: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado;
+  DOC-04 Documento: Não renderizar controle; DOC-01 Tipo: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; DOC-02 Tipo: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; DOC-03 Tipo: Valor emitido, proposto ou calculado da fonte
+  identificada; ausência explicitamente informada, sem valor inventado; DOC-04
+  Tipo: Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-01 Protocolo: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-02 Protocolo: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Protocolo: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-04 Protocolo: Não
+  renderizar controle
 
-  **Validação/unidade:** Série por paciente/tipo, UUID e versão
+  **Validação/unidade:** DOC-01 Documento: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Documento: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Documento: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-04 Documento: Somente contrato interno, com validação no
+  servidor; não expor segredo/UUID como decisão do usuário; DOC-01 Tipo:
+  Revalidar acesso, referência e estado na leitura/ação. Não solicitar ao
+  usuário correção deste valor nesta tela. Consulta do valor de origem;
+  mudanças só no processo legitimamente responsável; DOC-02 Tipo: Revalidar
+  acesso, referência e estado na leitura/ação. Não solicitar ao usuário
+  correção deste valor nesta tela. Consulta do valor de origem; mudanças só no
+  processo legitimamente responsável; DOC-03 Tipo: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-04 Tipo: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-01 Protocolo: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Protocolo: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Protocolo: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-04 Protocolo: Somente contrato interno, com validação no
+  servidor; não expor segredo/UUID como decisão do usuário
 
-  **Ajuda e exemplo:** Protocolo físico importado tem origem própria.
+  **Ajuda/exemplo:** DOC-01 Documento: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; DOC-02 Documento: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; DOC-03 Documento: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.; DOC-04 Documento:
+  Protocolo físico importado tem origem própria.; DOC-01 Tipo: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.; DOC-02 Tipo: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.; DOC-03 Tipo: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.; DOC-04 Tipo: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.; DOC-01 Protocolo:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.; DOC-02 Protocolo:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.; DOC-03 Protocolo:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.; DOC-04 Protocolo:
+  Protocolo físico importado tem origem própria.
 
 - **Campo:** Versão documental/renderizador
 
-  **Tipo/origem:** Servidor
+  **Tipo/origem por tela e estado:** DOC-02 Versão da ficha: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Versão da ficha: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-04 Versão da ficha: READ_ONLY (TEXT_VALUE); Consulta do
+  valor de origem; mudanças só no processo legitimamente responsável; DOC-02
+  Revisão do renderizador: INTERNAL (NO_USER_CONTROL); Metadado de
+  representação para auditoria técnica; não é informação exigida à pessoa que
+  consulta a história; DOC-03 Revisão do renderizador: INTERNAL
+  (NO_USER_CONTROL); Metadado interno da emissão/cache; usuário escolhe versão
+  e exemplar, não implementação do renderizador; DOC-04 Revisão do
+  renderizador: INTERNAL (NO_USER_CONTROL); Revisão de renderizador só em
+  detalhe técnico autorizado; sem implementação na jornada pública comum
 
-  **Obrigatório e default:** Sim em cada download
+  **Obrigatoriedade/default na preparação:** DOC-02 Versão da ficha: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Versão da ficha: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-04 Versão da ficha: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-02 Revisão do
+  renderizador: Não renderizar controle; DOC-03 Revisão do renderizador: Não
+  renderizar controle; DOC-04 Revisão do renderizador: Não renderizar controle
 
-  **Validação/unidade:** Não substituir versão ausente pela atual
+  **Validação/unidade:** DOC-02 Versão da ficha: Revalidar acesso, referência
+  e estado na leitura/ação. Não solicitar ao usuário correção deste valor
+  nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Versão da ficha: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-04 Versão da ficha: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-02 Revisão do renderizador: Somente contrato
+  interno, com validação no servidor; não expor segredo/UUID como decisão do
+  usuário; DOC-03 Revisão do renderizador: Somente contrato interno, com
+  validação no servidor; não expor segredo/UUID como decisão do usuário;
+  DOC-04 Revisão do renderizador: Somente contrato interno, com validação no
+  servidor; não expor segredo/UUID como decisão do usuário
 
-  **Ajuda e exemplo:** “Versão 3, representação PDF rX.”
+  **Ajuda/exemplo:** DOC-02 Versão da ficha: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; DOC-03 Versão da ficha: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; DOC-04 Versão da ficha: Informação
+  do registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.; DOC-02 Revisão do
+  renderizador: “Versão 3, representação PDF rX.”; DOC-03 Revisão do
+  renderizador: “Versão 3, representação PDF rX.”; DOC-04 Revisão do
+  renderizador: “Versão 3, representação PDF rX.”
 
 - **Campo:** Data do fato/registro/emissão
 
-  **Tipo/origem:** Eventos/snapshot
+  **Tipo/origem por tela e estado:** DOC-02 Data do fato: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Data do fato: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Data do registro: READ_ONLY (TEXT_VALUE); Consulta do
+  valor de origem; mudanças só no processo legitimamente responsável; DOC-03
+  Data do registro: READ_ONLY (TEXT_VALUE); Consulta do valor de origem;
+  mudanças só no processo legitimamente responsável; DOC-02 Data da emissão:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Data da emissão: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Obrigatório e default:** Conhecidos; desconhecido explícito
+  **Obrigatoriedade/default na preparação:** DOC-02 Data do fato: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Data do fato: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-02 Data do registro:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Data do registro:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-02 Data da emissão: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Data da emissão: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Fuso/offset e rótulos próprios
+  **Validação/unidade:** DOC-02 Data do fato: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Data do fato: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Data do registro: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Data do registro: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Data da emissão: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Data da emissão: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** Criação de draft em D1 não é emissão em D2.
+  **Ajuda/exemplo:** DOC-02 Data do fato: A data pertence ao fato
+  identificado. Data de registro e de emissão são mostradas separadamente
+  quando forem diferentes.; DOC-03 Data do fato: A data pertence ao fato
+  identificado. Data de registro e de emissão são mostradas separadamente
+  quando forem diferentes.; DOC-02 Data do registro: A data pertence ao fato
+  identificado. Data de registro e de emissão são mostradas separadamente
+  quando forem diferentes.; DOC-03 Data do registro: A data pertence ao fato
+  identificado. Data de registro e de emissão são mostradas separadamente
+  quando forem diferentes.; DOC-02 Data da emissão: A data pertence ao fato
+  identificado. Data de registro e de emissão são mostradas separadamente
+  quando forem diferentes.; DOC-03 Data da emissão: A data pertence ao fato
+  identificado. Data de registro e de emissão são mostradas separadamente
+  quando forem diferentes.
 
 - **Campo:** Autor/revisor/recebedor
 
-  **Tipo/origem:** Snapshot do ato
+  **Tipo/origem por tela e estado:** DOC-02 Autor do fato: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Autor do fato: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Revisor: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; DOC-03 Revisor:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-02 Recebedor: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Recebedor: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável
 
-  **Obrigatório e default:** Conforme fato, leitura
+  **Obrigatoriedade/default na preparação:** DOC-02 Autor do fato: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Autor do fato: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-02 Revisor: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Revisor: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-02 Recebedor: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Recebedor: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Nome histórico e identidade; atual rotulado
-  separadamente
+  **Validação/unidade:** DOC-02 Autor do fato: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Autor do fato: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Revisor: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Revisor: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Recebedor: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Recebedor: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** Revogação/rename não muda autoria antiga.
+  **Ajuda/exemplo:** DOC-02 Autor do fato: Identifica a pessoa relacionada a
+  este ato; não permite transferir sua autoria para quem consulta.; DOC-03
+  Autor do fato: Identifica a pessoa relacionada a este ato; não permite
+  transferir sua autoria para quem consulta.; DOC-02 Revisor: Identifica a
+  pessoa relacionada a este ato; não permite transferir sua autoria para quem
+  consulta.; DOC-03 Revisor: Identifica a pessoa relacionada a este ato; não
+  permite transferir sua autoria para quem consulta.; DOC-02 Recebedor:
+  Identifica a pessoa relacionada a este ato; não permite transferir sua
+  autoria para quem consulta.; DOC-03 Recebedor: Identifica a pessoa
+  relacionada a este ato; não permite transferir sua autoria para quem
+  consulta.
 
 - **Campo:** Estado por linha/documento
 
-  **Tipo/origem:** Fatos versionados
+  **Tipo/origem por tela e estado:** DOC-02 Estado da linha: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Estado da linha: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Estado do documento: READ_ONLY (TEXT_VALUE); Consulta do
+  valor de origem; mudanças só no processo legitimamente responsável; DOC-03
+  Estado do documento: READ_ONLY (TEXT_VALUE); Consulta do valor de origem;
+  mudanças só no processo legitimamente responsável
 
-  **Obrigatório e default:** Sim quando aplicável
+  **Obrigatoriedade/default na preparação:** DOC-02 Estado da linha: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Estado da linha: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-02 Estado do documento:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Estado do documento:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Terminal não cai em “pendente” por fallback
+  **Validação/unidade:** DOC-02 Estado da linha: Revalidar acesso, referência
+  e estado na leitura/ação. Não solicitar ao usuário correção deste valor
+  nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Estado da linha: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-02 Estado do documento: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Estado do documento: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** Cancelada não orienta receber.
+  **Ajuda/exemplo:** DOC-02 Estado da linha: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; DOC-03 Estado da linha: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; DOC-02 Estado do documento:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.; DOC-03 Estado do
+  documento: Informação do registro indicado, somente para consulta nesta
+  etapa. Ausência de dado histórico permanece explicitamente identificada.
 
 - **Campo:** Motivo/ressalva/antes-depois
 
-  **Tipo/origem:** Evento preservado
+  **Tipo/origem por tela e estado:** DOC-02 Motivo: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Motivo: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; DOC-02 Ressalva:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-03 Ressalva: READ_ONLY (TEXT_VALUE); Consulta
+  do valor de origem; mudanças só no processo legitimamente responsável;
+  DOC-02 Antes e depois: READ_ONLY (TEXT_VALUE); Consulta do valor de origem;
+  mudanças só no processo legitimamente responsável; DOC-03 Antes e depois:
+  READ_ONLY (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Quando conhecido
+  **Obrigatoriedade/default na preparação:** DOC-02 Motivo: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; DOC-03 Motivo: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; DOC-02 Ressalva: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado;
+  DOC-03 Ressalva: Valor emitido, proposto ou calculado da fonte identificada;
+  ausência explicitamente informada, sem valor inventado; DOC-02 Antes e
+  depois: Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-03 Antes e depois: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Não reconstruir por cadastro atual
+  **Validação/unidade:** DOC-02 Motivo: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Motivo: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Ressalva: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Ressalva: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-02 Antes e depois: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-03 Antes e depois: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** Desconhecido não é preenchido com texto inventado.
+  **Ajuda/exemplo:** DOC-02 Motivo: Informação registrada no ato de origem.
+  Não pode ser reescrita nesta consulta ou decisão.; DOC-03 Motivo: Informação
+  registrada no ato de origem. Não pode ser reescrita nesta consulta ou
+  decisão.; DOC-02 Ressalva: Informação registrada no ato de origem. Não pode
+  ser reescrita nesta consulta ou decisão.; DOC-03 Ressalva: Informação
+  registrada no ato de origem. Não pode ser reescrita nesta consulta ou
+  decisão.; DOC-02 Antes e depois: Informação registrada no ato de origem. Não
+  pode ser reescrita nesta consulta ou decisão.; DOC-03 Antes e depois:
+  Informação registrada no ato de origem. Não pode ser reescrita nesta
+  consulta ou decisão.
 
 - **Campo:** Arquivo a verificar
 
-  **Tipo/origem:** Bytes selecionados pelo usuário
+  **Tipo/origem por tela e estado:** DOC-05 Arquivo a verificar: EDITABLE
+  (FILE_PICKER); Escolha de novo exemplar reinicia resultados; arquivo não é
+  executado nem retido por padrão
 
-  **Obrigatório e default:** Para comparar exemplar
+  **Obrigatoriedade/default na preparação:** DOC-05 Arquivo a verificar: Para
+  comparar exemplar
 
-  **Validação/unidade:** Limite explícito; hash sem executar conteúdo; não
-  conservar upload por padrão
+  **Validação/unidade:** DOC-05 Arquivo a verificar: Limite explícito; hash
+  sem executar conteúdo; não conservar upload por padrão; Escolha de novo
+  exemplar reinicia resultados; arquivo não é executado nem retido por padrão
 
-  **Ajuda e exemplo:** “Selecione o arquivo que deseja comparar.”
+  **Ajuda/exemplo:** DOC-05 Arquivo a verificar: “Selecione o arquivo que
+  deseja comparar.”
 
 - **Campo:** Hash canônico
 
-  **Tipo/origem:** Referência do banco
+  **Tipo/origem por tela e estado:** DOC-03 Hash canônico: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-04 Hash canônico: HIDDEN (NO_USER_CONTROL);
+  Hash lógico privado não deve revelar dados nem substituir comparação de
+  exemplar
 
-  **Obrigatório e default:** Leitura
+  **Obrigatoriedade/default na preparação:** DOC-03 Hash canônico: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-04 Hash canônico: Não
+  renderizar controle
 
-  **Validação/unidade:** Identifica conteúdo lógico, não bytes PDF
+  **Validação/unidade:** DOC-03 Hash canônico: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; DOC-04 Hash canônico: Somente contrato interno, com validação
+  no servidor; não expor segredo/UUID como decisão do usuário
 
-  **Ajuda e exemplo:** Não usar esse hash como digest do arquivo.
+  **Ajuda/exemplo:** DOC-03 Hash canônico: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; DOC-04 Hash canônico: Não usar esse hash como
+  digest do arquivo.
 
 - **Campo:** Hash dos bytes finais
 
-  **Tipo/origem:** Registro confiável de emissão
+  **Tipo/origem por tela e estado:** DOC-03 Hash dos bytes finais: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-04 Hash dos bytes finais: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim para PDF emitido
+  **Obrigatoriedade/default na preparação:** DOC-03 Hash dos bytes finais:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; DOC-04 Hash dos bytes finais:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** SHA-256 após todos os bytes finais; comparar no
-  cache/download
+  **Validação/unidade:** DOC-03 Hash dos bytes finais: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; DOC-04 Hash dos bytes finais: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** QR sozinho não verifica o exemplar.
+  **Ajuda/exemplo:** DOC-03 Hash dos bytes finais: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; DOC-04 Hash dos bytes finais:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.
 
 - **Campo:** Resultado da comparação
 
-  **Tipo/origem:** Comparação de bytes/digest
+  **Tipo/origem por tela e estado:** DOC-05 Resultado da comparação:
+  CALCULATED (CALCULATED_DESCRIPTION); Resultado derivado dos fatos/valores
+  apresentados; sem edição manual
 
-  **Obrigatório e default:** Após referência confiável
+  **Obrigatoriedade/default na preparação:** DOC-05 Resultado da comparação:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Coincide/diverge/sem referência/indisponível
-  distintos
+  **Validação/unidade:** DOC-05 Resultado da comparação: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Resultado derivado dos fatos/valores apresentados; sem
+  edição manual
 
-  **Ajuda e exemplo:** “Este arquivo coincide com a versão emitida
-  registrada.”
+  **Ajuda/exemplo:** DOC-05 Resultado da comparação: Resultado calculado a
+  partir dos fatos desta tarefa, apresentado para conferência. Ele não pode
+  ser digitado ou corrigido aqui.
 
 <!-- c-table:end -->
 
@@ -288,3 +652,11 @@ não anuncia implementação. Contrato detalhado no
 [adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
 [blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
 [casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
+
+## Fechamento definitivo — tarefa, estado e política
+
+Motivo, ressalva e antes/depois em DOC-02/03 são descrições/comparações em
+leitura. Falha pede atualizar seção, não corrigir fato histórico. DOC-05
+calcula bytes/assinatura/confiança separadamente; usuário não escolhe
+Coincide/Confiável. DOC-04 não publica protocolo privado/paciente/material.
+Reemissão sem mudança material não invalida ciência.

@@ -1,36 +1,28 @@
-# Revisão do Draft PR A–C
+# Checklist de revisão do Draft PR 6
 
-- Base master e head audit/phase-b; Draft verdadeiro, sem merge automático.
+- P02 OWNER_APPROVED, cinco origens e ANY; SCI-005 não opcional.
 
-- Último SHA publicado confere com HEAD/ref e checks consultados.
+- Ator de expedição efetivo versus created_by e autorização própria.
 
-- Diff total A–C contém documentação/apoio de auditoria; src, Supabase,
-  testes, scripts de produto, workflows e dependências funcionais preservados.
+- Conteúdo material REQ versus eventos/atendimento/ciência/emissão PDF.
 
-- .gitignore, .vscode/settings.json e requirements-audit.txt são mudanças
-  prévias explicadas; sem nova configuração de publicação ou segredo.
+- 66 fichas/262 controles/171 relações originais revistos; 274/424 atuais.
 
-- A/B e fontes brutas/hashes históricos preservados; matrizes vivas têm
-  arquivo exato antes da revisão e proveniência de cada mudança.
+- ENT-03/ESC-03 e demais estados em leitura/edição/cálculo corretos.
 
-- Quinze Pxx refletidos sem aprovação presumida; P02 por tipo em branco.
+- 4.205 fontes B1 exatas, sem substituição cega por linha.
 
-- 121 causas/165 origens reconciliadas,149 IDs de aceite preservados, 12
-  complementos;161 casos PLANNED_NOT_EXECUTED.
+- 161 IDs preservados, 20 refinados, 26 novos; 187 planejados, não executados.
 
-- 97 B1 e66 C3 com relações explícitas,66 fichas e262 controles; protótipo
-  aprovado como direção, sem copiar simulações para o app.
+- Dez gates específicos, sem impedir D0 geral/D1 independente.
 
-- Kit temporário ausente;16 entradas preservadas; HTML/oitoPNG idênticos.
+- Pesquisa comercial P03/P09/P13 externa pelo responsável; sem valores
+  inventados.
 
-- Markdown, links/anchors, IDs, hashes, referências e confidencialidade
-  validados proporcionalmente; nenhuma suíte funcional local repetida por
-  texto.
+- História A/B/C0, protótipo e baseline preservados; apenas docs/README
+  mudaram.
 
-- CI iniciada pela abertura do PR quando disponível; registrar cada check
-  iniciado/concluído/pendente e não tratar Vercel Preview Comments como CI.
+- Verificações do SHA final, PR ainda Draft; nenhum gate aprovado por
+  documento.
 
-- Antes de merge futuro: autorização, revisão e CI obrigatória do último SHA,
-  compatibilidade de schema/config e efeito da integração Vercel/master.
-
-- Sem branch cleanup, tag nova, deploy deliberado, banco remoto ou início D.
+- Sem merge, limpeza de branch, implantação deliberada ou início D.

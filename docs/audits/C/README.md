@@ -79,3 +79,10 @@ Decisões abertas são condições de implementação do ramo exato, não aprova
 presumida ou motivo para interromper o plano integral. C não homologa pessoa,
 aparelho/AT/impressão, restore ou provedor real. Baseline funcional
 preservado.
+
+## Fechamento definitivo de 04/11/2026
+
+P02 OWNER_APPROVED; 66 fichas/262 controles originais revistos, catálogo de
+274 controles/424 usos e 187 casos planejados.
+[Entrega vigente](C10-pr-handoff/README.md). D NÃO INICIADA; sem merge. Gates
+específicos não são aprovados por documento.

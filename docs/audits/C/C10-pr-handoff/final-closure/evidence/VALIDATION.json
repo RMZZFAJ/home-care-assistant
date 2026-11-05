@@ -1,0 +1,384 @@
+{
+  "date": "2026-11-04",
+  "timezone": "America/Sao_Paulo",
+  "mission": "FINAL_PHASE_C_COMPLEMENT",
+  "entry_sha": "266c6541bd5d3268b7e08a839df601e823ec74b5",
+  "passed": 62,
+  "failed": 0,
+  "checks": [
+    {
+      "check": "required_branch",
+      "passed": true,
+      "details": "audit/phase-b"
+    },
+    {
+      "check": "master_preserved",
+      "passed": true,
+      "details": "34dcb835c5c49068e0417f7306eb4e501aa868bc"
+    },
+    {
+      "check": "functional_support_tests_config_unchanged_from_entry",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "historical_A_B_C0_preserved",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "no_runtime_migration_test_ci_or_dependency_patch",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "temporary_kit_still_absent",
+      "passed": true,
+      "details": "Original input kit remains removed"
+    },
+    {
+      "check": "213_original_documents_roundtrip",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "owner_order_exact_bytes",
+      "passed": true,
+      "details": "7928d8302cb615baaf34d435586c443d3790dd11fc1a1113482f6285ebee1088"
+    },
+    {
+      "check": "earlier_87_input_archives_preserved",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "approved_html_and_8_png_exact",
+      "passed": true,
+      "details": "Approved prototype files unchanged"
+    },
+    {
+      "check": "121_causes_165_associations",
+      "passed": true,
+      "details": "No inflated/deleted product findings"
+    },
+    {
+      "check": "raw_source_rows_and_hashes",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "cause_impact_alignment",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "scheduler_DB006_distinct_REQ_DB002",
+      "passed": true,
+      "details": "Existing semantic corrections preserved"
+    },
+    {
+      "check": "P02_and_DEC002_OWNER_APPROVED",
+      "passed": true,
+      "details": "No repeated human approval required"
+    },
+    {
+      "check": "15_P_statuses_normalized",
+      "passed": true,
+      "details": {
+        "P01": "OWNER_APPROVED",
+        "P02": "OWNER_APPROVED",
+        "P03": "OWNER_APPROVED_SCOPE_PENDING",
+        "P04": "OWNER_APPROVED",
+        "P05": "OWNER_APPROVED_SCOPE_PENDING",
+        "P06": "OWNER_APPROVED",
+        "P07": "OWNER_APPROVED_SCOPE_PENDING",
+        "P08": "OWNER_APPROVED_SCOPE_PENDING",
+        "P09": "OWNER_APPROVED_SCOPE_PENDING",
+        "P10": "OWNER_APPROVED_SCOPE_PENDING",
+        "P11": "OWNER_APPROVED",
+        "P12": "OWNER_APPROVED",
+        "P13": "OWNER_APPROVED_SCOPE_PENDING",
+        "P14": "OWNER_APPROVED",
+        "P15": "OWNER_APPROVED_SCOPE_PENDING"
+      }
+    },
+    {
+      "check": "approved_objectives_keep_scope_pending",
+      "passed": true,
+      "details": "Parameters do not reopen approved objectives"
+    },
+    {
+      "check": "66_acts_5_approved_science_sources",
+      "passed": true,
+      "details": "Five individual owner answers populated"
+    },
+    {
+      "check": "AS_IS_science_enum_preserved",
+      "passed": true,
+      "details": "AS_IS modes remain evidence, not future policy"
+    },
+    {
+      "check": "SCI003_communication_only",
+      "passed": true,
+      "details": "WhatsApp read never satisfies science"
+    },
+    {
+      "check": "SCI005_mandatory_no_opt_out",
+      "passed": true,
+      "details": "No role or preference disables eligible dispatch science"
+    },
+    {
+      "check": "family_ANY_approved",
+      "passed": true,
+      "details": "No all-person requirement or invented individual events"
+    },
+    {
+      "check": "policy_covers_causal_actor_and_material_identity",
+      "passed": true,
+      "details": "Critical owner decisions present in canonical policy"
+    },
+    {
+      "check": "AS_IS_dispatch_and_REQ_mutation_analysis",
+      "passed": true,
+      "details": "Static proof and limitations explicit"
+    },
+    {
+      "check": "10_gates_not_general_D0_D1_blockers",
+      "passed": true,
+      "details": 10
+    },
+    {
+      "check": "gates_not_approved_by_documentation",
+      "passed": true,
+      "details": "Scope, proof and acceptance remain separate"
+    },
+    {
+      "check": "commercial_research_external_owner",
+      "passed": true,
+      "details": "No supplier/price research performed"
+    },
+    {
+      "check": "66_screens_individually_reviewed",
+      "passed": true,
+      "details": "Every screen has authored task/state/layout/recovery"
+    },
+    {
+      "check": "24_dimension_screen_records",
+      "passed": true,
+      "details": "Field-set columns may be empty only when task has no field of that mode"
+    },
+    {
+      "check": "262_original_controls_plus_12",
+      "passed": true,
+      "details": "Original IDs preserved; new gaps separately identified"
+    },
+    {
+      "check": "424_contextual_usage_contracts",
+      "passed": true,
+      "details": "Unique screen/control mode and explicit actor/state"
+    },
+    {
+      "check": "screen_catalog_usage_alignment",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "readonly_never_demands_user_correction",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "internal_hidden_not_exposed_as_controls",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "ENT03_immutable_dispatch_values",
+      "passed": true,
+      "details": "Origin/destination/material/dispatched/links/recipient in reading"
+    },
+    {
+      "check": "ENT03_explicit_receipt_action",
+      "passed": true,
+      "details": "No text-input confirmation"
+    },
+    {
+      "check": "ESC03_frozen_timezone_notes",
+      "passed": true,
+      "details": "Own decision reason distinct from proposal"
+    },
+    {
+      "check": "COM03_declaration_and_decision_separate",
+      "passed": true,
+      "details": "Quantity edited only on new arrival"
+    },
+    {
+      "check": "ENT05_prior_consumption_calculated",
+      "passed": true,
+      "details": "No repeated debit of prior fact"
+    },
+    {
+      "check": "BAL03_original_note_and_own_review",
+      "passed": true,
+      "details": "Original note never overwritten by reviewer"
+    },
+    {
+      "check": "draft_history_verification_not_editable",
+      "passed": true,
+      "details": "Summary, stage, history and calculated result have no editor"
+    },
+    {
+      "check": "correct_numeric_barcode_avatar_components",
+      "passed": true,
+      "details": "Representative negative controls for component classification"
+    },
+    {
+      "check": "login_MFA_unit_gaps_explicit",
+      "passed": true,
+      "details": "New controls typed with privacy and authority"
+    },
+    {
+      "check": "input_presentations_match_semantic_components",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "setup_summaries_open_legitimate_subflows",
+      "passed": true,
+      "details": "Configuration summaries are neither textarea nor direct setup editor"
+    },
+    {
+      "check": "97_B1_66_C3_relations_reconciled",
+      "passed": true,
+      "details": "Original 171 reviewed, 2 removals + 2 additions with trace"
+    },
+    {
+      "check": "spurious_relationships_removed",
+      "passed": true,
+      "details": "Global/self, password/push and cancel/science corrected"
+    },
+    {
+      "check": "BAL_editor_variants_covered",
+      "passed": true,
+      "details": "Configuration, recount and deferral variants"
+    },
+    {
+      "check": "4205_source_text_cells_exact",
+      "passed": true,
+      "details": "Source expressions/context preserved; proposals deliberately reviewed"
+    },
+    {
+      "check": "copy_ids_unique_and_review_complete",
+      "passed": true,
+      "details": 6479
+    },
+    {
+      "check": "read_error_not_field_error",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "no_line_based_replacement_algorithm",
+      "passed": true,
+      "details": "Literal/context boundary explicit"
+    },
+    {
+      "check": "161_ids_plus_26_cases",
+      "passed": true,
+      "details": "No criterion removed"
+    },
+    {
+      "check": "187_cases_discriminating_and_synchronized",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "P02_cases_not_human_blocked",
+      "passed": true,
+      "details": "Policy approved; technical work still planned"
+    },
+    {
+      "check": "20_refined_26_added_trace",
+      "passed": true,
+      "details": "46 documented case changes"
+    },
+    {
+      "check": "C3_and_control_source_anchors",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "final_deliverables_and_66_sheets",
+      "passed": true,
+      "details": "Concrete corrected specifications, not only an improvement report"
+    },
+    {
+      "check": "living_authored_markdown_links",
+      "passed": true,
+      "details": {
+        "checked": 511,
+        "errors": []
+      }
+    },
+    {
+      "check": "documentary_python_syntax",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "no_credential_patterns_in_authored_text",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "pinned_documentary_checks",
+      "passed": true,
+      "details": {
+        "date": "2026-11-04",
+        "timezone": "America/Sao_Paulo",
+        "node": "v24.22.0",
+        "npm": "11.21.1",
+        "scope": "DOCUMENTARY_ONLY_NO_FUNCTIONAL_SUITE_OR_DB",
+        "checks": [
+          {
+            "check": "markdown",
+            "command": [
+              "run",
+              "lint:markdown"
+            ],
+            "exit_code": 0
+          },
+          {
+            "check": "contracts",
+            "command": [
+              "run",
+              "check:contracts"
+            ],
+            "exit_code": 0
+          },
+          {
+            "check": "diff",
+            "command": [
+              "git",
+              "diff",
+              "HEAD",
+              "--check"
+            ],
+            "exit_code": 0
+          },
+          {
+            "check": "staged_diff",
+            "command": [
+              "git",
+              "diff",
+              "--cached",
+              "--check"
+            ],
+            "exit_code": 0
+          }
+        ]
+      }
+    }
+  ],
+  "limits": "Static documentary/semantic/source/reference review, not product tests, implementation, human/physical/provider/restore acceptance; no commercial research or remote mutation"
+}

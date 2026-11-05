@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-04",
+  "timezone": "America/Sao_Paulo",
+  "node": "v24.22.0",
+  "npm": "11.21.1",
+  "scope": "DOCUMENTARY_ONLY_NO_FUNCTIONAL_SUITE_OR_DB",
+  "checks": [
+    {
+      "check": "markdown",
+      "command": [
+        "run",
+        "lint:markdown"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "contracts",
+      "command": [
+        "run",
+        "check:contracts"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "diff",
+      "command": [
+        "git",
+        "diff",
+        "HEAD",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "staged_diff",
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

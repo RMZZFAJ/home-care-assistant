@@ -133,8 +133,19 @@ upgrade/configuração em C nem demonstra impacto em America/Sao_Paulo.
 
 As matrizes causais foram revisadas semanticamente, com domínios secundários
 explícitos. P06/P11/P12/P14 e garantia de comando P15 já foram respondidos;
-P02 por SCI-ID, retenção, fornecedores e parâmetros operacionais continuam
-delimitados em C7. P09-B é obrigatório, com identidade própria por emissão;
-não ativar núcleo só de hash como substituto. Toda evolução de schema usa
-migration incremental e preserva os 84 hashes históricos.
+P02 e SCI-001–SCI-005 estão OWNER_APPROVED. Retenção, fornecedores e
+parâmetros mantêm gates específicos, sem bloquear D0 geral ou D1 independente.
+P09-B é obrigatório, com identidade própria por emissão; não ativar núcleo só
+de hash como substituto. Toda evolução de schema usa migration incremental e
+preserva os 84 hashes históricos.
 [Adendo vigente](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).
+
+## Fechamento definitivo — tarefa, estado e política
+
+Administração familiar concede req.science/representação no próprio paciente;
+preferência pessoal não concede capacidade. SCI-005 não usa identidade do
+criador/recebedor para suprir expedidor sem autoridade. Revogado após espera
+não escreve ciência nova; evento válido anterior conserva vigência/autor.
+Decisão não admite alterar campos materiais da proposta congelada. Ausência de
+input no DOM não é guarda de servidor. QR/segredo MFA e endpoint/chaves push
+não entram em evidência pública/log/rascunho geral.

@@ -1,4 +1,12 @@
-# Autoridade da missão C7–C10
+# Autoridade inicial e precedência definitiva
+
+A missão inicial abaixo é histórica e foi executada. Sua condição P02 pendente
+foi superada pela [ordem definitiva](final-closure/OWNER_COMPLEMENT_ORDER.md).
+P02 agora OWNER_APPROVED, sem reconfirmação das escolhas respondidas.
+
+## História da missão inicial
+
+### Autoridade da missão C7–C10
 
 Recebida em 04/11/2026, America/Sao_Paulo, com duas atualizações expressas que
 prevalecem sobre a fonte abaixo:
@@ -17,9 +25,9 @@ em gzip exato, com hashes no manifesto de entrada. O arquivo07 citado no
 leia-primeiro não foi fornecido; a mensagem atual contém a interposição e
 autorização suficientes, sem inventar conteúdo ausente.
 
-## ORDEM MESTRA — FASE C, PARTE 2 · C7–C10
+#### ORDEM MESTRA — FASE C, PARTE 2 · C7–C10
 
-### HOME CARE ASSISTANT
+##### HOME CARE ASSISTANT
 
 FECHAMENTO DECISÓRIO, PROJETO VISUAL, CRITÉRIOS VERIFICÁVEIS E PR DE
 ENCERRAMENTO
@@ -29,7 +37,7 @@ ENCERRAMENTO
 B1–B8 e C0–C6 documentalmente concluídas; Fase D não iniciada; produto NO-GO
 até correções/homologação.
 
-#### I. AUTORIDADE E FONTES
+###### I. AUTORIDADE E FONTES
 
 1. Ler integralmente todos os arquivos deste pacote, inicialmente colocados em
    pasta/raiz de apoio do repositório: `01_DECISOES_APROVADAS_E_LIMITES.md`,
@@ -63,7 +71,7 @@ até correções/homologação.
    Toda proposta que extrapolar a direção do responsável será marcada
    `PENDING_OWNER`.
 
-#### II. META DE ENCERRAMENTO
+###### II. META DE ENCERRAMENTO
 
 Executar **C7, C8, C9 e C10 na mesma missão documental**, produzindo:
 
@@ -92,7 +100,7 @@ testes executáveis, Supabase/migrations, deploy, infraestrutura ou dados
 remotos.** Esta é a última etapa de investigação/planejamento. O próprio HTML
 fornecido é referência visual estática; não inserir no aplicativo em C.
 
-#### III. C7 — DECISÕES, INVENTÁRIO DE CIÊNCIA E COERÊNCIA CAUSAL
+###### III. C7 — DECISÕES, INVENTÁRIO DE CIÊNCIA E COERÊNCIA CAUSAL
 
 **C7.0 Reconhecer a fonte**: verificar todas as 15 pendências P01–P15 e cada
 resposta do responsável, normalizando status `OWNER_APPROVED`,
@@ -179,7 +187,7 @@ potencialmente incorreta ao domínio REQ. Diferenciar de `C-CAUSE-049`
 contagens e casos de divergência sem apagar evidências. Essa revisão deve
 preceder a C9.
 
-#### IV. C8 — BLUEPRINT VISUAL DEFINITIVO
+###### IV. C8 — BLUEPRINT VISUAL DEFINITIVO
 
 **C8.0** O HTML fornecido `home-care-prototipo.html` é *proposta elaborada
 fora do Codex*, não aprovação automática. **Não gastar tokens recriando
@@ -219,7 +227,7 @@ aprovado se o responsável não confirmou a direção do protótipo.** A C8 pode
 ser completa como proposta auditável, mas trava de implementação visual
 permanece até aprovação.
 
-#### V. C9 — TESTES E ACEITE ESPECIFICADOS
+###### V. C9 — TESTES E ACEITE ESPECIFICADOS
 
 **C9.1** Cruzar 149 aceites e 121 causas com os 165 achados e todas as
 decisões complementares; atualizar mapeamento depois do C7.
@@ -247,7 +255,7 @@ Atualizar lotes D0–D7 conforme dependências.
 etapa. Validação documental dirigida e estática é permitida; não executar
 cargas, migrations remotas, nem suites desproporcionais.
 
-#### VI. C10 — FECHAMENTO DOCUMENTAL E DRAFT PR
+###### VI. C10 — FECHAMENTO DOCUMENTAL E DRAFT PR
 
 **C10.1** Atualizar `docs/current/PROJECT_STATUS.md`, documentos C3/C4/C5/C6,
 `docs/decisions` e índices; distinguir diretrizes aprovadas e política P02
@@ -285,7 +293,7 @@ apagar branches não integradas. Nova branch D será criada a partir da master
 mesclada em missão posterior. Não usar `git push --delete` sem inventário e
 validação.
 
-#### VII. ENTREGÁVEIS MÍNIMOS
+###### VII. ENTREGÁVEIS MÍNIMOS
 
 Em `docs/audits/C/` criar subpastas `C7-decision-closure`,
 `C8-visual-blueprint`, `C9-acceptance-refinement`, `C10-pr-handoff` (adapte
@@ -315,7 +323,7 @@ da matriz de aceites e links, relatório de exemplos discriminantes.
 Evitar documentação repetida: arquivos complementares podem apontar aos
 canônicos desde que a cobertura permaneça integral.
 
-#### VIII. CRITÉRIOS DE ENCERRAMENTO
+###### VIII. CRITÉRIOS DE ENCERRAMENTO
 
 - 15 pendências P01–P15 refletidas corretamente (especialmente P02 ainda em
   classificação individual; P03 parâmetros não contratados; P09 assinatura B

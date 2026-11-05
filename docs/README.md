@@ -62,3 +62,10 @@ Guias UI mantidos por compatibilidade ficam em [ui-ux](ui-ux/README.md).
 contratos/amostras, não aprovação/publicação externa. Não há duas versões
 ativas concorrentes dos contratos principais. Dados fictícios e arquivos
 privados não são operação real.
+
+## Fechamento definitivo de 04/11/2026
+
+P02 OWNER_APPROVED; 66 fichas/262 controles originais revistos, catálogo de
+274 controles/424 usos e 187 casos planejados.
+[Entrega vigente](audits/C/C10-pr-handoff/README.md). D NÃO INICIADA; sem
+merge. Gates específicos não são aprovados por documento.

@@ -1,92 +1,216 @@
 # COM-01 — Solicitar aquisição
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Família/admin com capacidade. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /fichas/com, atual a alterar. Gatilho: navegar pela tarefa ou
-abrir o alvo contextual autorizado. Objetivo: Solicitar compra/doação;
-selecionar materiais e quantidades previstas; salvar/emitir.
+Rascunho de aquisição por compra ou doação; previsão anterior à emissão.
 
-## Composição e sequência
+Finalidade: Solicitar aquisição.
 
-Origem compra/doação no topo; busca, unidades/apresentação e previsto; revisão
-antes de emitir.
+Ator com capacidade de criar aquisição no paciente; origem e catálogo
+autorizados.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /fichas/com, atual a alterar.
 
-Título acompanha origem; sem campos financeiros obrigatórios.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Unidade/fator exibidos junto à quantidade; identidade da residência e autor.
+Não coletar recebimento ou validação nesta tela.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-014-01 — Origem
+
+**Modo/componente:** EDITABLE / RADIO_OR_SELECT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim, escolha explícita.
+
+**Máscara/apresentação:** Opções do domínio rotuladas; escolha material
+explícita, sem concordância presumida. Autocomplete: off.
+
+**Validação:** `purchase`/`donation`; título correspondente; Somente no
+subestado de preparação autorizado indicado na ficha; resumo/decisão posterior
+é leitura.
+
+**Ajuda/exemplo:** “Compra ou doação?”, sem chamar toda COM de compra.
+
+**Mensagem e condição:** “Escolha uma opção válida para origem no escopo desta
+tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-015-01 — Material
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Ao menos um, vazio.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Único por linha, até 1000; Somente no subestado de preparação
+autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Seleção manual e alias; sem produto implícito pelo scan.
+
+**Mensagem e condição:** “Escolha uma opção válida para material no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-016-01 — Previsto
+
+**Modo/componente:** EDITABLE / DECIMAL_TEXT_INPUT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim por linha, vazio.
+
+**Máscara/apresentação:** Quantidade textual exata com unidade; vírgula/ponto,
+inputmode decimal e precisão explícita antes da coerção. Autocomplete: off.
+
+**Validação:** Positivo, até 1 bilhão, até seis casas e precisão da unidade;
+Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Quantidade que pretende adquirir: 10 unidades.”
+
+**Mensagem e condição:** “Informe previsto na unidade indicada e com a
+precisão permitida. O campo precisa de correção antes de confirmar.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-017-01 — Apresentação
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Não, unidade base.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Conversão finita/exata, snapshot do fator/código; Somente no
+subestado de preparação autorizado indicado na ficha; resumo/decisão posterior
+é leitura.
+
+**Ajuda/exemplo:** “2 pacotes de 10 = 20 unidades.”
+
+**Mensagem e condição:** “Escolha uma opção válida para apresentação no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-024-01 — Observações
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Não, vazio.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** Até 2000 na ficha; até 1000 na aquisição; Somente no subestado
+de preparação autorizado indicado na ficha; resumo/decisão posterior é
+leitura.
+
+**Ajuda/exemplo:** Comprovante financeiro não é obrigatório.
+
+**Mensagem e condição:** “Confira observações e o limite indicado. Corrija
+somente esta informação; os demais valores preenchidos foram preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Compra/doação → materiais/unidade/apresentação → previsto por linha →
+observações → resumo antes da emissão.
+
+Conteúdo em até duas colunas: editor principal flexível e ajuda lateral de
+cerca de um terço; etapas no topo e resumo de itens antes do rodapé.
 
 Primária: **Revisar aquisição**. Secundárias: Salvar rascunho; Voltar.
 
-Consequência: Previsão não credita estoque. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Previsão não credita estoque.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Aquisição pronta para revisão. A previsão ainda não
+acrescenta material ao estoque.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Adicione ao menos um material à aquisição e informe a
+quantidade prevista.”
 
-- **CTRL-014-01 — Origem**. RADIO_OR_SELECT. Ordem 14.1; Sim, escolha
-  explícita. Máscara/autocomplete: Opções finitas com rótulo humano; sem opção
-  material preaceita; off. Dependência/validação: `purchase`/`donation`;
-  título correspondente. Ajuda/exemplo: “Compra ou doação?”, sem chamar toda
-  COM de compra.. Erro: Revise origem: `purchase`/`donation`; título
-  correspondente..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-015-01 — Material**. SEARCHABLE_COMBOBOX. Ordem 15.1; Ao menos um,
-  vazio. Máscara/autocomplete: Busca por nome/alias autorizado; seleção por
-  ID; nenhum ID digitado como autorização; off. Dependência/validação: Único
-  por linha, até 1000. Ajuda/exemplo: Seleção manual e alias; sem produto
-  implícito pelo scan.. Erro: Revise material: Único por linha, até 1000..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-016-01 — Previsto**. DECIMAL_TEXT_INPUT. Ordem 16.1; Sim por linha,
-  vazio. Máscara/autocomplete: Vírgula/ponto; inputmode decimal; precisão
-  antes da coerção; zero só onde permitido; off. Dependência/validação:
-  Positivo, até 1 bilhão, até seis casas e precisão da unidade. Ajuda/exemplo:
-  “Quantidade que pretende adquirir: 10 unidades.”. Erro: Revise previsto:
-  Positivo, até 1 bilhão, até seis casas e precisão da unidade..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-017-01 — Apresentação**. SEARCHABLE_COMBOBOX. Ordem 17.1; Não,
-  unidade base. Máscara/autocomplete: Busca por nome/alias autorizado; seleção
-  por ID; nenhum ID digitado como autorização; off. Dependência/validação:
-  Conversão finita/exata, snapshot do fator/código. Ajuda/exemplo: “2 pacotes
-  de 10 = 20 unidades.”. Erro: Revise apresentação: Conversão finita/exata,
-  snapshot do fator/código..
+Salvar rascunho é independente de emitir. Na falha de emissão, conservar a
+revisão; informar save confirmado sem afirmar entrada de estoque.
 
-- **CTRL-024-01 — Observações**. TEXTAREA. Ordem 24.1; Não, vazio.
-  Máscara/autocomplete: Sem máscara; contador e limite do contrato visíveis;
-  quebra de linha/reflow; off. Dependência/validação: Até 2000 na ficha; até
-  1000 na aquisição. Ajuda/exemplo: Comprovante financeiro não é obrigatório..
-  Erro: Revise observações: Até 2000 na ficha; até 1000 na aquisição..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-## Estado, teclado e ajuda
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-COM-01` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `com/newPurchase`; ausência de exemplo no HTML é declarada, sem
-novo mockup equivalente. B1: SC-010, OVL-019.
+Uma coluna; cada material vira cartão com nome/unidade antes da quantidade;
+contexto antes da ação. Não esconder quantidade em tabela horizontal.
 
-Critérios C9 relacionados: C-AC-015, C-AC-028, C-AC-035, C-AC-044, C-AC-058,
-C-AC-074, C-AC-077, C-AC-089, C-AC-109, C-NEW-AC-005, C-NEW-AC-022. A
-associação é por domínio; cada caso preserva seu discriminante específico e
-não significa que todos os critérios foram executados nesta tela. Fonte
-funcional: [COM](../../C3-functional-specification/COM.md).
+Inserir item move foco ao campo da nova linha; remover devolve à linha
+vizinha; etapas preservam valores e ordem de leitura.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: com/newPurchase. Sem captura real ou aceite humano de
+interface futura nesta C.
+
+EVOLUIR wizard por origem; reconstruir resumo se compra/doação tiverem rótulos
+ou efeitos misturados.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-015;C-AC-028;C-AC-035;C-AC-044;C-AC-058;C-AC-074;C-AC-077;C-AC-089;C-AC-109;C-NEW-AC-005;C-NEW-AC-022;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

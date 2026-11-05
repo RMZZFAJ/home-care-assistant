@@ -1,108 +1,273 @@
 # ESC-04 — Alterar ocorrência ou série
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Gestor/proponente competente. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Substituição/exceção/corte, atual a alterar. Gatilho: navegar
-pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Alterar um
-plantão, parte ou série com escopo explícito e histórico.
+Preparação de alteração de ocorrência, futuras ou série; decisão posterior
+separada quando exigida.
 
-## Composição e sequência
+Finalidade: Alterar ocorrência ou série.
 
-Escolha explícita Este plantão/Futuros/Série; lista do alcance, exceções e
-motivo; prévia do corte.
+Gestor/proponente no alcance autorizado; escolha explícita de escopo e motivo
+para mudanças críticas.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Substituição/exceção/corte, atual a alterar.
 
-Substituição sem mudar horário não desloca prazo BAL; efeito excepcional exige
-decisão própria.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Fatos passados e intervalos já ocorridos. Fuso publicado não é reinterpretação
+retroativa; mudança futura tem prévia própria.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-059-01 — Profissional
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim na série.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Sem impor presença; recusa conflito entre pacientes sem revelar
+outro; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Ana Exemplo.”
+
+**Mensagem e condição:** “Escolha uma opção válida para profissional no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-060-01 — Fuso
+
+**Modo/componente:** EDITABLE_SUBFORM / SEARCHABLE_TIMEZONE.
+
+**Quando/ator:** Somente alteração futura explicitamente autorizada, com
+prévia; instantes publicados não são reinterpretados.
+
+**Obrigatoriedade/inicial:** Sim, escolha configurada.
+
+**Máscara/apresentação:** Nome da zona IANA, por exemplo America/Sao_Paulo;
+offset do período quando relevante. Autocomplete: off.
+
+**Validação:** Não herdar silenciosamente fuso do aparelho; Somente alteração
+futura explicitamente autorizada, com prévia; instantes publicados não são
+reinterpretados.
+
+**Ajuda/exemplo:** Ex.: America/Sao_Paulo.
+
+**Mensagem e condição:** “Escolha o fuso de referência da tarefa. O fuso do
+aparelho não será adotado silenciosamente.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-066-01 — Data da exceção
+
+**Modo/componente:** EDITABLE / DATE_INPUT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Opcional, nenhuma.
+
+**Máscara/apresentação:** Data DD/MM/AAAA na apresentação, sem conversão
+silenciosa de fuso; limites do período visíveis. Autocomplete: off.
+
+**Validação:** Feriado não cancela sozinho; manter/substituir/cancelar
+escolhido; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Não inferir calendário externo sem configuração.
+
+**Mensagem e condição:** “Confira a data e o período desta tarefa. A data
+final deve respeitar o início e o alcance apresentados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-066-02 — Ação da exceção
+
+**Modo/componente:** EDITABLE / RADIO_OR_SELECT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Opcional, nenhuma.
+
+**Máscara/apresentação:** Opções do domínio rotuladas; escolha material
+explícita, sem concordância presumida. Autocomplete: off.
+
+**Validação:** Feriado não cancela sozinho; manter/substituir/cancelar
+escolhido; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Não inferir calendário externo sem configuração.
+
+**Mensagem e condição:** “Escolha uma opção válida para ação da exceção no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-067-01 — Escopo de alteração
+
+**Modo/componente:** EDITABLE / RADIO_OR_SELECT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim ao alterar.
+
+**Máscara/apresentação:** Opções do domínio rotuladas; escolha material
+explícita, sem concordância presumida. Autocomplete: off.
+
+**Validação:** Não afetar fatos passados; corte mostrado; Somente no subestado
+de preparação autorizado indicado na ficha; resumo/decisão posterior é
+leitura.
+
+**Ajuda/exemplo:** “Somente o plantão de 06/11.”
+
+**Mensagem e condição:** “Escolha uma opção válida para escopo de alteração no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-068-01 — Motivo do comando atual
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Motivo próprio de proposta/corte/decisão conforme
+estado; obrigatório em rejeição e mudanças que exigem motivo.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** 3–1000 caracteres quando exigido; nunca reescreve o motivo do
+proponente; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Substituição combinada antes do turno.”
+
+**Mensagem e condição:** “Confira motivo do comando atual e o limite indicado.
+Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-068-02 — Notas da programação
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Opcionais até 2000 na preparação; somente leitura
+ao decidir a proposta.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** Notas não são motivo de rejeição e não são editadas pelo
+aprovador; Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Substituição combinada antes do turno.”
+
+**Mensagem e condição:** “Confira notas da programação e o limite indicado.
+Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Plantão/série original → escopo → alteração de pessoa/horário ou exceção →
+corte e efeito BAL → revisar proposta.
+
+Formulário agrupado em pessoa/tipo, período/recorrência, exceções e prévia;
+antes/depois e impacto BAL ficam perto da confirmação.
 
 Primária: **Revisar alteração**. Secundárias: Cancelar ocorrência; Encerrar
 série; Voltar.
 
-Consequência: Altera só escopo escolhido e conserva passados. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Altera só escopo escolhido e conserva passados.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Alteração preparada para revisão. Plantões passados e
+exceções fora do alcance escolhido foram preservados.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhum plantão elegível no alcance escolhido. Revise o
+corte ou consulte a série original.”
 
-- **CTRL-059-01 — Profissional**. SEARCHABLE_COMBOBOX. Ordem 59.1; Sim na
-  série. Máscara/autocomplete: Busca por nome/alias autorizado; seleção por
-  ID; nenhum ID digitado como autorização; off. Dependência/validação: Sem
-  impor presença; recusa conflito entre pacientes sem revelar outro.
-  Ajuda/exemplo: “Ana Exemplo.”. Erro: Revise profissional: Sem impor
-  presença; recusa conflito entre pacientes sem revelar outro..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-060-01 — Fuso**. SEARCHABLE_TIMEZONE. Ordem 60.1; Sim, escolha
-  configurada. Máscara/autocomplete: Zona IANA configurada, exemplo
-  America/Sao_Paulo; off. Dependência/validação: Não herdar silenciosamente
-  fuso do aparelho. Ajuda/exemplo: Ex.: America/Sao_Paulo.. Erro: Revise fuso:
-  Não herdar silenciosamente fuso do aparelho..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-066-01 — Data da exceção**. DATE_INPUT. Ordem 66.1; Opcional,
-  nenhuma. Máscara/autocomplete: DD/MM/AAAA na apresentação; ISO no
-  transporte; não inferir fuso; off. Dependência/validação: Feriado não
-  cancela sozinho; manter/substituir/cancelar escolhido. Ajuda/exemplo: Não
-  inferir calendário externo sem configuração.. Erro: Revise data da exceção:
-  Feriado não cancela sozinho; manter/substituir/cancelar escolhido..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-066-02 — Ação da exceção**. RADIO_OR_SELECT. Ordem 66.2; Opcional,
-  nenhuma. Máscara/autocomplete: Opções finitas com rótulo humano; sem opção
-  material preaceita; off. Dependência/validação: Feriado não cancela sozinho;
-  manter/substituir/cancelar escolhido. Ajuda/exemplo: Não inferir calendário
-  externo sem configuração.. Erro: Revise ação da exceção: Feriado não cancela
-  sozinho; manter/substituir/cancelar escolhido..
+Troca sem mudança de horário conserva janela BAL; mudança de janela exige
+decisão pertinente. Incerto consulta mesma intenção antes de alterar escopo.
 
-- **CTRL-067-01 — Escopo de alteração**. RADIO_OR_SELECT. Ordem 67.1; Sim ao
-  alterar. Máscara/autocomplete: Opções finitas com rótulo humano; sem opção
-  material preaceita; off. Dependência/validação: Não afetar fatos passados;
-  corte mostrado. Ajuda/exemplo: “Somente o plantão de 06/11.”. Erro: Revise
-  escopo de alteração: Não afetar fatos passados; corte mostrado..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-068-01 — Motivo**. TEXTAREA. Ordem 68.1; Motivo em
-  decisão/troca/corte; notas opcionais. Máscara/autocomplete: Sem máscara;
-  contador e limite do contrato visíveis; quebra de linha/reflow; off.
-  Dependência/validação: Motivo 3–1000, notas até 2000. Ajuda/exemplo:
-  “Substituição combinada antes do turno.”. Erro: Revise motivo: Motivo
-  3–1000, notas até 2000..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-068-02 — Notas**. TEXTAREA. Ordem 68.2; Motivo em
-  decisão/troca/corte; notas opcionais. Máscara/autocomplete: Sem máscara;
-  contador e limite do contrato visíveis; quebra de linha/reflow; off.
-  Dependência/validação: Motivo 3–1000, notas até 2000. Ajuda/exemplo:
-  “Substituição combinada antes do turno.”. Erro: Revise notas: Motivo 3–1000,
-  notas até 2000..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-## Estado, teclado e ajuda
+Uma coluna e prévia em lista de ocorrências; início/fim com datas/+1 dia e
+fuso; resumo de datas de vários meses sempre reconsultável.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Calendário tem alternativa textual; horários ambíguos pedem escolha explícita;
+conflitos são descritos sem expor outro paciente.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-ESC-04` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `schedule`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-014, OVL-033.
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-Critérios C9 relacionados: C-AC-001, C-AC-009, C-AC-013, C-AC-039, C-AC-051,
-C-AC-057, C-AC-086, C-NEW-AC-011, C-NEW-AC-015, C-NEW-AC-021. A associação é
-por domínio; cada caso preserva seu discriminante específico e não significa
-que todos os critérios foram executados nesta tela. Fonte funcional:
-[SCHEDULES_AND_STAFFING](../../C3-functional-specification/SCHEDULES_AND_STAFFING.md).
+Referência do protótipo: schedule. Sem captura real ou aceite humano de
+interface futura nesta C.
+
+RECONSTRUIR alcance/corte se botões genéricos puderem alterar toda a série sem
+prévia.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-001;C-AC-009;C-AC-013;C-AC-039;C-AC-051;C-AC-057;C-AC-086;C-NEW-AC-011;C-NEW-AC-015;C-NEW-AC-021;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

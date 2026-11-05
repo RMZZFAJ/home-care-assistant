@@ -1,19 +1,17 @@
-# Validação documental C7–C10
+# Validação documental — fechamento definitivo
 
-27 verificações estruturais/de preservação passaram em 04/11/2026. Resultados
-completos em [validation-report.json](evidence/validation-report.json).
+62 verificações aprovadas; 0 falhas em 04/11/2026.
+[Resultados completos](final-closure/evidence/VALIDATION.json) e
+[recibos de comandos](final-closure/evidence/CHECKS.json).
 
-Cobertura:121 causas/165 origens,149 critérios preservados +12 novos, 161
-casos planejados,66 atos/cinco origens de ciência,97 B1/66 C3, 262 controles e
-todas as linhas do inventário textual B1. Arquivos originais foram verificados
-por roundtrip gzip; HTML/oitoPNG por bytes/hash. Produto e apoios existentes
-não mudaram; A/B/C0 preservados.
+Escopo: 66 fichas/262 controles/171 relações originais; catálogo 274/424,
+187 casos planejados e 4.205 fontes B1 exatas. Ordem e 213 documentos anteriores
+em gzip/hash, A/B/C0 e protótipo preservados. Nenhum código/configuração/teste
+ou migration alterado frente a 266c654. Links/âncoras, sintaxe, estados P02,
+gates e contraprovas estruturais são verificados separadamente.
 
-Markdown, contratos estáticos e diff check são comandos separados, com
-saída/estado em [checks.json](evidence/checks.json). O manifesto final exclui
-a si e é verificado depois de sua geração.
-
-Limites: oráculos/roteiros são design; não se executaram suíte funcional,
-banco, restore, envio, homologação humana/aparelho ou promoção produtiva. A
-verificação automática não transforma decisão pendente em aprovada nem prova
-por contagem a verdade de cada julgamento semântico.
+Manifesto é gerado depois deste relatório e conferido por execução somente
+leitura com --verify-manifest. Histórico anterior permanece arquivado.
+Não houve suíte funcional, banco, restore, envio, pesquisa comercial, deploy
+ou homologação humana/física/provedor. Sem merge ou início D. Linters e
+contagens não substituem a revisão semântica autoral nem aceite do produto.

@@ -1,132 +1,369 @@
 # BAL-01 — Organizar contagens por plantão
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Família/admin e designado na consulta. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /balancos, atual a alterar. Gatilho: navegar pela tarefa ou
-abrir o alvo contextual autorizado. Objetivo: Ver obrigação, prazo
-original/efetivo e responsável; configurar, adiar ou designar.
+Consulta de obrigações/atribuições; configuração e pedido de adiamento em
+painéis próprios.
 
-## Composição e sequência
+Finalidade: Organizar contagens por plantão.
 
-Obrigação, prazo original/efetivo e responsável; configuração em drawer com
-resumo dia/tipo/fuso.
+Designado consulta sua tarefa; configuração e decisão por capacidade familiar
+pertinente. Não converter revisão facultativa em fila obrigatória.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /balancos, atual a alterar.
 
-Revisão facultativa no primeiro uso; atraso histórico não desaparece na
-regularização.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Atribuição, janela, prazo vigente e histórico. Proposta pendente não muda
+prazo ou gera contagem.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-043-01 — Habilitar regime
+
+**Modo/componente:** EDITABLE_SUBFORM / SWITCH_WITH_LABEL.
+
+**Quando/ator:** Configuração familiar autorizada; designado consulta valor em
+leitura.
+
+**Obrigatoriedade/inicial:** Sim na configuração, preserva atual.
+
+**Máscara/apresentação:** Estado Ativado/Pausado com rótulo e consequência;
+mudar exige confirmação autorizada. Autocomplete: off.
+
+**Validação:** Não habilitar por migration; Configuração familiar autorizada;
+designado consulta valor em leitura.
+
+**Ajuda/exemplo:** “Processar BAL por plantão neste paciente.”
+
+**Mensagem e condição:** “Escolha uma opção válida para habilitar regime no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-044-01 — Fuso
+
+**Modo/componente:** EDITABLE_SUBFORM / SEARCHABLE_TIMEZONE.
+
+**Quando/ator:** Configuração de novo regime; consulta da obrigação não edita
+fuso.
+
+**Obrigatoriedade/inicial:** Sim, sem inferência pelo navegador.
+
+**Máscara/apresentação:** Nome da zona IANA, por exemplo America/Sao_Paulo;
+offset do período quando relevante. Autocomplete: off.
+
+**Validação:** Fuso válido, weekday 0–6, tipo ativo, versão; Configuração de
+novo regime; consulta da obrigação não edita fuso.
+
+**Ajuda/exemplo:** Mostrar prazo local e intervalo com data de fim.
+
+**Mensagem e condição:** “Escolha o fuso de referência da tarefa. O fuso do
+aparelho não será adotado silenciosamente.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-044-02 — Dia da semana
+
+**Modo/componente:** EDITABLE_SUBFORM / WEEKDAY_SELECT.
+
+**Quando/ator:** Configuração do regime.
+
+**Obrigatoriedade/inicial:** Sim, sem inferência pelo navegador.
+
+**Máscara/apresentação:** Seleção de dia da semana por nome; sem exigir número
+de enum interno. Autocomplete: off.
+
+**Validação:** Fuso válido, weekday 0–6, tipo ativo, versão; Configuração do
+regime.
+
+**Ajuda/exemplo:** Mostrar prazo local e intervalo com data de fim.
+
+**Mensagem e condição:** “Escolha uma opção válida para dia da semana no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-044-03 — Tipo de plantão
+
+**Modo/componente:** EDITABLE_SUBFORM / SHIFT_TYPE_SELECT.
+
+**Quando/ator:** Configuração do regime.
+
+**Obrigatoriedade/inicial:** Sim, sem inferência pelo navegador.
+
+**Máscara/apresentação:** Tipos de plantão autorizados com nome, início e
+duração; código interno não é rótulo. Autocomplete: off.
+
+**Validação:** Fuso válido, weekday 0–6, tipo ativo, versão; Configuração do
+regime.
+
+**Ajuda/exemplo:** Mostrar prazo local e intervalo com data de fim.
+
+**Mensagem e condição:** “Escolha uma opção válida para tipo de plantão no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-045-01 — Início do regime
+
+**Modo/componente:** EDITABLE_SUBFORM / DATE_INPUT.
+
+**Quando/ator:** Configuração do regime.
+
+**Obrigatoriedade/inicial:** Sim, escolha explícita.
+
+**Máscara/apresentação:** Data DD/MM/AAAA na apresentação, sem conversão
+silenciosa de fuso; limites do período visíveis. Autocomplete: off.
+
+**Validação:** Sem gerar contagem física retroativa; Configuração do regime.
+
+**Ajuda/exemplo:** “A partir de 05/11/2026.”
+
+**Mensagem e condição:** “Confira a data e o período desta tarefa. A data
+final deve respeitar o início e o alcance apresentados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-046-01 — Profissional preferido
+
+**Modo/componente:** EDITABLE_SUBFORM / PERSON_COMBOBOX.
+
+**Quando/ator:** Preferência de atribuição; nunca comprovação de presença.
+
+**Obrigatoriedade/inicial:** Não, política atual.
+
+**Máscara/apresentação:** Nome da pessoa e vínculo habilitado; escolha
+explícita sem atribuir consentimento ou ciência alheios. Autocomplete: off.
+
+**Validação:** Vínculo elegível; não garante presença; Preferência de
+atribuição; nunca comprovação de presença.
+
+**Ajuda/exemplo:** Ambiguidade pede designação, não escolha arbitrária.
+
+**Mensagem e condição:** “Escolha uma opção válida para profissional preferido
+no escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-050-01 — Atribuição
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Atribuição”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-050-02 — Início da janela
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Início da
+janela”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-050-03 — Fim da janela
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Fim da
+janela”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-050-04 — Versão da atribuição
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Versão da
+atribuição”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-055-01 — Motivo da decisão
+
+**Modo/componente:** EDITABLE_SUBFORM / TEXTAREA.
+
+**Quando/ator:** Somente comando autorizado de configuração/adiamento; não
+aparece como nota na consulta.
+
+**Obrigatoriedade/inicial:** Sim em adiamento/reconto/configuração.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** 3–1000 caracteres; Somente comando autorizado de
+configuração/adiamento; não aparece como nota na consulta.
+
+**Ajuda/exemplo:** Explicar efeito e próxima pessoa.
+
+**Mensagem e condição:** “Confira motivo da decisão e o limite indicado.
+Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Prazo original/efetivo → responsável e plantão → atraso/estado → contar, pedir
+adiamento ou abrir configuração autorizada.
+
+Filtros no topo, tarefas com identidade/próxima pessoa/estado e ação por
+linha; contadores identificam o conjunto consultado.
 
 Primária: **Revisar programação do BAL**. Secundárias: Solicitar adiamento;
 Atualizar; Ver histórico.
 
-Consequência: Configurar não faz contagem nem altera prazo por proposta
-pendente. Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão
-material. Retorno/Voltar preserva edição e contexto; próximo destino é
-resultado do ato ou tarefa pertinente, nunca novo envio automático. Em
-resposta incerta consultar intenção antes de prosseguir.
+Efeito: Configurar não faz contagem nem altera prazo por proposta pendente.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Programação registrada. Consulte a obrigação e o
+responsável; nenhuma contagem física foi criada.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Nenhuma obrigação neste período. Consulte a programação ou
+peça orientação à administração familiar.”
 
-- **CTRL-043-01 — Habilitar regime**. CHECKBOX_OR_SWITCH. Ordem 43.1; Sim na
-  configuração, preserva atual. Máscara/autocomplete: Sem máscara; rótulo
-  descreve efeito; vazio não equivale a concordância; off.
-  Dependência/validação: Não habilitar por migration. Ajuda/exemplo:
-  “Processar BAL por plantão neste paciente.”. Erro: Revise habilitar regime:
-  Não habilitar por migration..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-044-01 — Fuso**. SEARCHABLE_TIMEZONE. Ordem 44.1; Sim, sem inferência
-  pelo navegador. Máscara/autocomplete: Zona IANA configurada, exemplo
-  America/Sao_Paulo; off. Dependência/validação: Fuso válido, weekday 0–6,
-  tipo ativo, versão. Ajuda/exemplo: Mostrar prazo local e intervalo com data
-  de fim.. Erro: Revise fuso: Fuso válido, weekday 0–6, tipo ativo, versão..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-044-02 — Dia da semana**. RADIO_OR_SELECT. Ordem 44.2; Sim, sem
-  inferência pelo navegador. Máscara/autocomplete: Opções finitas com rótulo
-  humano; sem opção material preaceita; off. Dependência/validação: Fuso
-  válido, weekday 0–6, tipo ativo, versão. Ajuda/exemplo: Mostrar prazo local
-  e intervalo com data de fim.. Erro: Revise dia da semana: Fuso válido,
-  weekday 0–6, tipo ativo, versão..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-044-03 — Tipo de plantão**. RADIO_OR_SELECT. Ordem 44.3; Sim, sem
-  inferência pelo navegador. Máscara/autocomplete: Opções finitas com rótulo
-  humano; sem opção material preaceita; off. Dependência/validação: Fuso
-  válido, weekday 0–6, tipo ativo, versão. Ajuda/exemplo: Mostrar prazo local
-  e intervalo com data de fim.. Erro: Revise tipo de plantão: Fuso válido,
-  weekday 0–6, tipo ativo, versão..
+Falha de configuração preserva obrigações conhecidas. Pedido obsoleto pode ser
+encerrado sem apagar atraso ou aprovar alvo antigo.
 
-- **CTRL-045-01 — Início do regime**. DATE_INPUT. Ordem 45.1; Sim, escolha
-  explícita. Máscara/autocomplete: DD/MM/AAAA na apresentação; ISO no
-  transporte; não inferir fuso; off. Dependência/validação: Sem gerar contagem
-  física retroativa. Ajuda/exemplo: “A partir de 05/11/2026.”. Erro: Revise
-  início do regime: Sem gerar contagem física retroativa..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-046-01 — Profissional preferido**. SEARCHABLE_COMBOBOX. Ordem 46.1;
-  Não, política atual. Máscara/autocomplete: Busca por nome/alias autorizado;
-  seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Vínculo elegível; não garante presença.
-  Ajuda/exemplo: Ambiguidade pede designação, não escolha arbitrária.. Erro:
-  Revise profissional preferido: Vínculo elegível; não garante presença..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-050-01 — Atribuição**. READ_ONLY_DESCRIPTION. Ordem 50.1; Sim quando
-  regime ativo. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Pessoa, início/fim, assignment e ledger atuais.
-  Ajuda/exemplo: Sem expor UUID como instrução.. Erro: Revise atribuição:
-  Pessoa, início/fim, assignment e ledger atuais..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-- **CTRL-050-02 — Início da janela**. READ_ONLY_DESCRIPTION. Ordem 50.2; Sim
-  quando regime ativo. Máscara/autocomplete: SEM_MASCARA;valor do servidor;
-  off. Dependência/validação: Pessoa, início/fim, assignment e ledger atuais.
-  Ajuda/exemplo: Sem expor UUID como instrução.. Erro: Revise início da
-  janela: Pessoa, início/fim, assignment e ledger atuais..
+Cartões rotulados com alvo e próximo passo antes do botão; filtros podem
+recolher preservando resumo e foco; paginação alcançável.
 
-- **CTRL-050-03 — Fim da janela**. READ_ONLY_DESCRIPTION. Ordem 50.3; Sim
-  quando regime ativo. Máscara/autocomplete: SEM_MASCARA;valor do servidor;
-  off. Dependência/validação: Pessoa, início/fim, assignment e ledger atuais.
-  Ajuda/exemplo: Sem expor UUID como instrução.. Erro: Revise fim da janela:
-  Pessoa, início/fim, assignment e ledger atuais..
+Lista e número de resultados anunciados sem flood; atualização conserva item
+focado e não transforma carregamento em ausência.
 
-- **CTRL-050-04 — Versão da atribuição**. READ_ONLY_DESCRIPTION. Ordem 50.4;
-  Sim quando regime ativo. Máscara/autocomplete: SEM_MASCARA;valor do
-  servidor; off. Dependência/validação: Pessoa, início/fim, assignment e
-  ledger atuais. Ajuda/exemplo: Sem expor UUID como instrução.. Erro: Revise
-  versão da atribuição: Pessoa, início/fim, assignment e ledger atuais..
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-- **CTRL-055-01 — Motivo da decisão**. TEXTAREA. Ordem 55.1; Sim em
-  adiamento/reconto/configuração. Máscara/autocomplete: Sem máscara; contador
-  e limite do contrato visíveis; quebra de linha/reflow; off.
-  Dependência/validação: 3–1000 caracteres. Ajuda/exemplo: Explicar efeito e
-  próxima pessoa.. Erro: Revise motivo da decisão: 3–1000 caracteres..
+Referência do protótipo: bal. Sem captura real ou aceite humano de interface
+futura nesta C.
 
-## Estado, teclado e ajuda
+EVOLUIR consulta; separar drawers por comando para que designado não edite
+regime familiar.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+## Contratos e aceites relacionados
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-BAL-01` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `bal`; ausência de exemplo no HTML é declarada, sem novo mockup
-equivalente. B1: SC-015, OVL-013.
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
 
-Critérios C9 relacionados: C-AC-001, C-AC-008, C-AC-009, C-AC-010, C-AC-015,
-C-AC-051, C-AC-054, C-AC-056, C-AC-057, C-AC-074, C-AC-077, C-AC-086,
-C-AC-089, C-AC-104, C-NEW-AC-007, C-NEW-AC-011, C-NEW-AC-012, C-NEW-AC-015,
-C7-AC-003. A associação é por domínio; cada caso preserva seu discriminante
-específico e não significa que todos os critérios foram executados nesta tela.
-Fonte funcional: [BAL](../../C3-functional-specification/BAL.md).
+Aceites relacionados:
+C-AC-001;C-AC-008;C-AC-009;C-AC-010;C-AC-015;C-AC-051;C-AC-054;C-AC-056;C-AC-057;C-AC-074;C-AC-077;C-AC-086;C-AC-089;C-AC-104;C-NEW-AC-007;C-NEW-AC-011;C-NEW-AC-012;C-NEW-AC-015;C7-AC-003;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-024.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

@@ -51,169 +51,371 @@ TO_BE DEC-001/006/021/022/028, P01/P11/P15 e contratos atuais preservados.
 
 - **Campo:** E-mail de acesso
 
-  **Tipo/origem:** Texto do titular
+  **Tipo/origem por tela e estado:** ID-01 E-mail de acesso: EDITABLE
+  (EMAIL_INPUT); Login/solicitar recuperação; confirmar e-mail oficial
+  pertence ao Auth; ID-03 E-mail de acesso: READ_ONLY_WITH_ACCOUNT_SWITCH
+  (ACCOUNT_IDENTITY_DESCRIPTION); Na prévia/aceite é e-mail destinatário fixo;
+  login/cadastro ocorre em estado separado; ID-04 E-mail de acesso: EDITABLE
+  (EMAIL_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim no login/convite
+  **Obrigatoriedade/default na preparação:** ID-01 E-mail de acesso: Sim no
+  login/convite; ID-03 E-mail de acesso: Valor emitido, proposto ou calculado
+  da fonte identificada; ausência explicitamente informada, sem valor
+  inventado; ID-04 E-mail de acesso: Sim no login/convite
 
-  **Validação/unidade:** Formato, até 254; confirmação pelo Auth para aceite
+  **Validação/unidade:** ID-01 E-mail de acesso: Formato, até 254; confirmação
+  pelo Auth para aceite; Login/solicitar recuperação; confirmar e-mail oficial
+  pertence ao Auth; ID-03 E-mail de acesso: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Na prévia/aceite é e-mail destinatário fixo; login/cadastro ocorre em
+  estado separado; ID-04 E-mail de acesso: Formato, até 254; confirmação pelo
+  Auth para aceite; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “<pessoa.exemplo@dominio.test>”, fictício.
+  **Ajuda/exemplo:** ID-01 E-mail de acesso: “<pessoa.exemplo@dominio.test>”,
+  fictício.; ID-03 E-mail de acesso: Informação do registro indicado, somente
+  para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; ID-04 E-mail de acesso:
+  “<pessoa.exemplo@dominio.test>”, fictício.
 
 - **Campo:** Senha atual
 
-  **Tipo/origem:** Segredo do titular
+  **Tipo/origem por tela e estado:** ID-02 Senha atual: EDITABLE
+  (PASSWORD_WITH_REVEAL); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Só reautenticação aplicável
+  **Obrigatoriedade/default na preparação:** ID-02 Senha atual: Só
+  reautenticação da operação protegida; vazio; nunca em rascunho geral
 
-  **Validação/unidade:** Nunca logar/exportar; password manager permitido
+  **Validação/unidade:** ID-02 Senha atual: Nunca logar/exportar; password
+  manager permitido; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Não preencher por administrador.
+  **Ajuda/exemplo:** ID-02 Senha atual: Não preencher por administrador.
 
 - **Campo:** Nova senha
 
-  **Tipo/origem:** Segredo do titular
+  **Tipo/origem por tela e estado:** ID-01 Nova senha: EDITABLE_SUBFORM
+  (PASSWORD_NEW_WITH_REVEAL); Só DEFINIR_NOVA_SENHA por contexto Auth válido;
+  não aparece no login comum; ID-02 Nova senha: EDITABLE
+  (PASSWORD_WITH_REVEAL); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; ID-03 Nova senha:
+  EDITABLE (PASSWORD_WITH_REVEAL); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Só cadastro/troca
+  **Obrigatoriedade/default na preparação:** ID-01 Nova senha: Só
+  cadastro/recuperação/troca; vazio; não usado como senha do login; ID-02 Nova
+  senha: Só cadastro/recuperação/troca; vazio; não usado como senha do login;
+  ID-03 Nova senha: Só cadastro/recuperação/troca; vazio; não usado como senha
+  do login
 
-  **Validação/unidade:** Contrato atual: mínimo 12 caracteres e máximo 72
-  bytes UTF-8; ajuda consistente
+  **Validação/unidade:** ID-01 Nova senha: Nova senha: mínimo 12 caracteres e
+  máximo 72 bytes UTF-8 conforme contrato atual; gerenciador/colar permitidos;
+  Só DEFINIR_NOVA_SENHA por contexto Auth válido; não aparece no login comum;
+  ID-02 Nova senha: Nova senha: mínimo 12 caracteres e máximo 72 bytes UTF-8
+  conforme contrato atual; gerenciador/colar permitidos; Somente no subestado
+  de preparação autorizado indicado na ficha; resumo/decisão posterior é
+  leitura; ID-03 Nova senha: Nova senha: mínimo 12 caracteres e máximo 72
+  bytes UTF-8 conforme contrato atual; gerenciador/colar permitidos; Somente
+  no subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura
 
-  **Ajuda e exemplo:** Erro explica limite sem repetir valor.
+  **Ajuda/exemplo:** ID-01 Nova senha: Erro explica limite sem repetir valor.;
+  ID-02 Nova senha: Erro explica limite sem repetir valor.; ID-03 Nova senha:
+  Erro explica limite sem repetir valor.
 
 - **Campo:** Nome pessoal
 
-  **Tipo/origem:** Texto do titular
+  **Tipo/origem por tela e estado:** ID-02 Nome pessoal: EDITABLE
+  (TEXT_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim
+  **Obrigatoriedade/default na preparação:** ID-02 Nome pessoal: Sim
 
-  **Validação/unidade:** 2–160 caracteres
+  **Validação/unidade:** ID-02 Nome pessoal: 2–160 caracteres; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura
 
-  **Ajuda e exemplo:** Pessoa identificável; nome não concede capacidade.
+  **Ajuda/exemplo:** ID-02 Nome pessoal: Pessoa identificável; nome não
+  concede capacidade.
 
 - **Campo:** Registro/função profissional
 
-  **Tipo/origem:** Texto do titular
+  **Tipo/origem por tela e estado:** ID-02 Função profissional: EDITABLE
+  (TEXT_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; ID-02 Registro profissional:
+  EDITABLE (TEXT_INPUT); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** P01: função individual e registro quando
-  aplicável; conferência familiar registrada
+  **Obrigatoriedade/default na preparação:** ID-02 Função profissional: Função
+  individual; registro só quando aplicável à profissão P01; ID-02 Registro
+  profissional: Função individual; registro só quando aplicável à profissão
+  P01
 
-  **Validação/unidade:** Registro até 30 e categoria até 80 atuais; rótulo
-  informado/validado
+  **Validação/unidade:** ID-02 Função profissional: Função/categoria
+  profissional até 80 caracteres segundo contrato; registro só quando
+  aplicável; Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; ID-02 Registro profissional: Registro
+  profissional até 30 caracteres quando aplicável; cuidadora sem registro não
+  informa COREN fictício; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Não anunciar credencial verificada só porque
-  preenchida.
+  **Ajuda/exemplo:** ID-02 Função profissional: Informado, conferido pela
+  família e validado externamente são estados distintos; cuidadora sem
+  registro aplicável não fornece COREN fictício.; ID-02 Registro profissional:
+  Informado, conferido pela família e validado externamente são estados
+  distintos; cuidadora sem registro aplicável não fornece COREN fictício.
 
 - **Campo:** Foto/avatar
 
-  **Tipo/origem:** Arquivo próprio
+  **Tipo/origem por tela e estado:** ID-02 Foto/avatar: EDITABLE
+  (AVATAR_FILE_PICKER); Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Não
+  **Obrigatoriedade/default na preparação:** ID-02 Foto/avatar: Não
 
-  **Validação/unidade:** Transporte/sanitização e tentativa recuperável
+  **Validação/unidade:** ID-02 Foto/avatar: Transporte/sanitização e tentativa
+  recuperável; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Avatar não é prova de identidade legal.
+  **Ajuda/exemplo:** ID-02 Foto/avatar: Escolha uma imagem para o seu perfil.
+  Envio e atualização do perfil têm resultados próprios; não digite caminho ou
+  URL como prova de upload.
 
 - **Campo:** Telefone e código
 
-  **Tipo/origem:** E.164 + OTP Auth
+  **Tipo/origem por tela e estado:** ID-02 Telefone: EDITABLE (TEL_INPUT);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; ID-02 Código de confirmação: EDITABLE
+  (OTP_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Só se vincular canal
+  **Obrigatoriedade/default na preparação:** ID-02 Telefone: Só se vincular
+  canal; ID-02 Código de confirmação: Só se vincular canal
 
-  **Validação/unidade:** Telefone + e 7–15 dígitos; código de 6–8 dígitos
-  conforme atual; não usar metadata
+  **Validação/unidade:** ID-02 Telefone: Telefone no formato E.164, com
+  prefixo internacional e 7–15 dígitos; confirmação oficial separada; Somente
+  no subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; ID-02 Código de confirmação: Código no formato exigido
+  pela operação Auth corrente; mostrar prazo/erro do desafio sem registrar ou
+  exportar o código; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** A confirmação de telefone não é homologação SMS do
-  sistema.
+  **Ajuda/exemplo:** ID-02 Telefone: A confirmação de telefone não é
+  homologação SMS do sistema.; ID-02 Código de confirmação: A confirmação de
+  telefone não é homologação SMS do sistema.
 
 - **Campo:** E-mail/telefone novo
 
-  **Tipo/origem:** Informação do titular
+  **Tipo/origem por tela e estado:** ID-02 Novo e-mail: EDITABLE
+  (EMAIL_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; ID-02 Novo telefone: EDITABLE
+  (TEL_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Só alteração voluntária
+  **Obrigatoriedade/default na preparação:** ID-02 Novo e-mail: Só alteração
+  voluntária; ID-02 Novo telefone: Só alteração voluntária
 
-  **Validação/unidade:** Reautenticação recente, verificação oficial e retorno
-  por etapa
+  **Validação/unidade:** ID-02 Novo e-mail: Reautenticação recente,
+  verificação oficial e retorno por etapa; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura; ID-02 Novo
+  telefone: Reautenticação recente, verificação oficial e retorno por etapa;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Contato confirmado; vínculo interno ainda pendente” se
-  falhar segunda etapa.
+  **Ajuda/exemplo:** ID-02 Novo e-mail: “Contato confirmado; vínculo interno
+  ainda pendente” se falhar segunda etapa.; ID-02 Novo telefone: “Contato
+  confirmado; vínculo interno ainda pendente” se falhar segunda etapa.
 
 - **Campo:** Papel/vínculo
 
-  **Tipo/origem:** Seleção administrativa do paciente
+  **Tipo/origem por tela e estado:** ID-04 Papel: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; ID-04 Estado do
+  vínculo: EDITABLE (SEARCHABLE_COMBOBOX); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim ao convidar/editar
+  **Obrigatoriedade/default na preparação:** ID-04 Papel: Sim ao
+  convidar/editar; ID-04 Estado do vínculo: Sim ao convidar/editar
 
-  **Validação/unidade:** Pessoa-alvo fixa em edição; trocar pessoa é outra
-  ação explícita
+  **Validação/unidade:** ID-04 Papel: Pessoa-alvo fixa em edição; trocar
+  pessoa é outra ação explícita; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; ID-04 Estado do
+  vínculo: Pessoa-alvo fixa em edição; trocar pessoa é outra ação explícita;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Editar o vínculo de Ana”, sem substituir Bruno
-  silenciosamente.
+  **Ajuda/exemplo:** ID-04 Papel: “Editar o vínculo de Ana”, sem substituir
+  Bruno silenciosamente.; ID-04 Estado do vínculo: “Editar o vínculo de Ana”,
+  sem substituir Bruno silenciosamente.
 
 - **Campo:** Capacidades/overrides
 
-  **Tipo/origem:** Matriz autorizada local
+  **Tipo/origem por tela e estado:** ID-04 Capacidade: EDITABLE
+  (CAPABILITY_CHECKLIST); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; ID-04 Override:
+  EDITABLE (CAPABILITY_OVERRIDE_GROUP); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Conforme ação
+  **Obrigatoriedade/default na preparação:** ID-04 Capacidade: Conforme ação;
+  ID-04 Override: Conforme ação
 
-  **Validação/unidade:** Não retirar proteção de último admin ou identidade do
-  recebedor
+  **Validação/unidade:** ID-04 Capacidade: Não retirar proteção de último
+  admin ou identidade do recebedor; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura; ID-04
+  Override: Não retirar proteção de último admin ou identidade do recebedor;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Resumo antes/depois e próxima autoridade.
+  **Ajuda/exemplo:** ID-04 Capacidade: A administração familiar escolhe quem
+  pode declarar ciência pela família. Uma ciência válida satisfaz a obrigação;
+  não é preciso habilitar ou cobrar todos.; ID-04 Override: Exceção de
+  capacidade só no paciente e alvo autorizados; não permite desativar SCI-005
+  ou confirmar recebimento por outra pessoa.
 
 - **Campo:** Validade e emissor do convite
 
-  **Tipo/origem:** Servidor
+  **Tipo/origem por tela e estado:** ID-03 Validade do convite: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; ID-03 Emissor do convite: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Obrigatório e default:** Sim na prévia válida
+  **Obrigatoriedade/default na preparação:** ID-03 Validade do convite: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; ID-03 Emissor do convite:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Token hash, e-mail correto, revogação e prazo no
-  aceite
+  **Validação/unidade:** ID-03 Validade do convite: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; ID-03 Emissor do convite: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** Token inválido não revela nome do paciente.
+  **Ajuda/exemplo:** ID-03 Validade do convite: A data pertence ao fato
+  identificado. Data de registro e de emissão são mostradas separadamente
+  quando forem diferentes.; ID-03 Emissor do convite: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.
 
 - **Campo:** Nome curto
 
-  **Tipo/origem:** Campo opcional do paciente, onde existente
+  **Tipo/origem por tela e estado:** ID-04 Nome curto: EDITABLE (TEXT_INPUT);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Não
+  **Obrigatoriedade/default na preparação:** ID-04 Nome curto: Não
 
-  **Validação/unidade:** Omitir=manter; remover=ação explícita, não omissão de
-  vazio
+  **Validação/unidade:** ID-04 Nome curto: Omitir=manter; remover=ação
+  explícita, não omissão de vazio; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Confirmar resultado na reconsulta.
+  **Ajuda/exemplo:** ID-04 Nome curto: Confirmar resultado na reconsulta.
 
 - **Campo:** Preferências
 
-  **Tipo/origem:** Opções por tipo/canal
+  **Tipo/origem por tela e estado:** ID-02 Preferências: EDITABLE_SUBFORM
+  (SCOPED_PREFERENCE_GROUP); Preferências pessoais por obrigação elegível;
+  SCI-005 é invariável
 
-  **Obrigatório e default:** Próprio usuário, defaults sem opt-in implícito
+  **Obrigatoriedade/default na preparação:** ID-02 Preferências: Próprio
+  usuário, defaults sem opt-in implícito
 
-  **Validação/unidade:** Ciência P02; push por dispositivo; canal inexistente
-  não prometido
+  **Validação/unidade:** ID-02 Preferências: Ciência P02; push por
+  dispositivo; canal inexistente não prometido; Preferências pessoais por
+  obrigação elegível; SCI-005 é invariável
 
-  **Ajuda e exemplo:** Internas permanecem fonte de estado.
+  **Ajuda/exemplo:** ID-02 Preferências: Internas permanecem fonte de estado.
 
 - **Campo:** Motivo de revogação
 
-  **Tipo/origem:** Texto admin autorizado
+  **Tipo/origem por tela e estado:** ID-04 Motivo de revogação: EDITABLE
+  (TEXTAREA); Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Ao revogar
+  **Obrigatoriedade/default na preparação:** ID-04 Motivo de revogação: Ao
+  revogar
 
-  **Validação/unidade:** Proposta 3–1000, histórico preservado
+  **Validação/unidade:** ID-04 Motivo de revogação: Proposta 3–1000, histórico
+  preservado; Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Revogar agora mesmo com pendências.
+  **Ajuda/exemplo:** ID-04 Motivo de revogação: Revogar agora mesmo com
+  pendências.
 
 - **Campo:** Sessão/dispositivo
 
-  **Tipo/origem:** Lista segura de servidor
+  **Tipo/origem por tela e estado:** ID-02 Sessão: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ID-02 Descrição do aparelho: READ_ONLY (TEXT_VALUE); Consulta
+  do valor de origem; mudanças só no processo legitimamente responsável
 
-  **Obrigatório e default:** Identificação de sessão, sem token exposto
+  **Obrigatoriedade/default na preparação:** ID-02 Sessão: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; ID-02 Descrição do aparelho: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado
 
-  **Validação/unidade:** Encerrar outras sessões exige reautenticação; não
-  encerra indevidamente a atual
+  **Validação/unidade:** ID-02 Sessão: Revalidar acesso, referência e estado
+  na leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ID-02 Descrição do aparelho: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** Mostrar data e descrição aproximada, sem afirmar
-  identidade física do aparelho.
+  **Ajuda/exemplo:** ID-02 Sessão: Informação do registro indicado, somente
+  para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; ID-02 Descrição do aparelho: Informação do
+  registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.
+
+- **Campo:** Senha de acesso
+
+  **Tipo/origem por tela e estado:** PASSWORD_CURRENT_WITH_REVEAL;context by
+  CONTROL_SCREEN_CONTRACTS.csv
+
+  **Obrigatoriedade/default na preparação:** Login, vazia;
+  autocomplete=current-password; não persistir em rascunho
+
+  **Validação/unidade:** Credencial entregue ao Auth oficial; mostrar/ocultar
+  por botão acessível; permitir colar/gerenciador
+
+  **Ajuda/exemplo:** Digite sua senha de acesso. Se não lembrar, use Recuperar
+  acesso.
+
+- **Campo:** Código do autenticador
+
+  **Tipo/origem por tela e estado:** AUTHENTICATOR_CODE_INPUT;context by
+  CONTROL_SCREEN_CONTRACTS.csv
+
+  **Obrigatoriedade/default na preparação:** Só matrícula/desafio MFA do
+  titular; vazio; autocomplete=one-time-code
+
+  **Validação/unidade:** Seis dígitos conforme componente Auth atual;
+  inputmode=numeric, zeros preservados; Auth oficial decide desafio/prazo
+
+  **Ajuda/exemplo:** Digite o código atual do seu autenticador. Não é o código
+  de confirmação do telefone; nunca compartilhe o código com suporte.
+
+- **Campo:** Cadastro privado do autenticador
+
+  **Tipo/origem por tela e estado:** SENSITIVE_READ_ONLY;context by
+  CONTROL_SCREEN_CONTRACTS.csv
+
+  **Obrigatoriedade/default na preparação:** Somente matrícula MFA do titular
+  e enquanto o desafio correspondente estiver ativo
+
+  **Validação/unidade:** QR/segredo de matrícula são privados; não persistir
+  em rascunho, histórico geral, logs, capturas ou artefatos; cancelar
+  matrícula não remove outro fator
+
+  **Ajuda/exemplo:** Cadastre este QR no seu autenticador em ambiente privado.
+  Ele permite configurar o fator da sua conta; não o compartilhe.
 
 <!-- c-table:end -->
 
@@ -278,3 +480,15 @@ não anuncia implementação. Contrato detalhado no
 [adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
 [blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
 [casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
+
+## Fechamento definitivo — tarefa, estado e política
+
+Titular informa credencial; conferência familiar tem autor/instante
+automáticos e resultado próprio. Validado externamente exige fonte comprovada,
+nunca selo autoselecionado. Administração familiar concede capacidade de
+ciência no paciente; ANY não exige todos.
+
+Senha de login, nova senha, código de contato e TOTP são estados/controles
+distintos. Login usa current-password; criar/trocar usa new-password. TOTP
+atual tem seis dígitos e Auth oficial; QR de matrícula é privado, nunca
+rascunho/log/screenshot. Destinatário/papel do convite são leitura no aceite.

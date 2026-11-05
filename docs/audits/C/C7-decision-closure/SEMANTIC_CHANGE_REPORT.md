@@ -1,5 +1,9 @@
 # Resultado da revisão semântica
 
+> Relato intermediário preservado. Contagens/pendências referem-se ao
+> fechamento anterior. Estado atual no
+> [relatório definitivo C10](../C10-pr-handoff/PHASE_C_FINAL_PART2_REPORT.md).
+
 121 causas e 165 associações de origem foram lidas individualmente contra o
 achado/evidência, suas contraprovas e limites. Não houve nova reprodução
 funcional. IDs, agrupamentos e prioridades históricos foram preservados. As

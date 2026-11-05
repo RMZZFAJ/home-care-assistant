@@ -1,96 +1,228 @@
 # ADM-04 — Decidir proposta administrativa
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Outra identidade local competente. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Diálogo de proposta/override, atual a alterar. Gatilho:
-navegar pela tarefa ou abrir o alvo contextual autorizado. Objetivo:
-Antes/depois humano, objeto/pessoa, consequência, versão e aprovação distinta.
+Decisão de proposta congelada com tipo reconhecido; proponente e aprovador são
+identidades distintas quando exigido.
 
-## Composição e sequência
+Finalidade: Decidir proposta administrativa.
 
-Diálogo objeto/pessoa/antes/depois/alcance; motivo; fallback desconhecido não
-aprovável.
+Aprovador local competente; trocar perfil na mesma conta não cria segunda
+identidade.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Diálogo de proposta/override, atual a alterar.
 
-409 conserva diálogo e intenção; nunca JSON necessário para decisão.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Capacidade e política propostas são comparação tipada em leitura; não são
+comboboxes editáveis na aprovação.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-160-01 — Proposta
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Proposta”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-160-02 — Versão da proposta
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Versão da
+proposta”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-161-01 — Motivo da alteração/decisão
+
+**Modo/componente:** EDITABLE_SUBFORM / TEXTAREA.
+
+**Quando/ator:** Motivo da decisão é próprio; motivo e conteúdo originais
+permanecem em leitura.
+
+**Obrigatoriedade/inicial:** Quando ação crítica.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** 3–1000 onde contrato herdado; Motivo da decisão é próprio;
+motivo e conteúdo originais permanecem em leitura.
+
+**Ajuda/exemplo:** “Por que esta permissão precisa mudar?”
+
+**Mensagem e condição:** “Confira motivo da alteração/decisão e o limite
+indicado. Corrija somente esta informação; os demais valores preenchidos foram
+preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-162-01 — Capacidade proposta
+
+**Modo/componente:** READ_ONLY / CAPABILITY_COMPARISON.
+
+**Quando/ator:** Capacidade proposta congelada e antes/depois por
+pessoa/alcance.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Capacidade proposta
+congelada e antes/depois por pessoa/alcance.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Capacidade
+proposta”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-162-02 — Política proposta
+
+**Modo/componente:** READ_ONLY / POLICY_COMPARISON.
+
+**Quando/ator:** Política proposta tipada; nenhum JSON ou seletor para editar
+na aprovação.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Política proposta
+tipada; nenhum JSON ou seletor para editar na aprovação.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Política
+proposta”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Proponente/alvo → atual/proposto/alcance → consequências e dependências →
+motivo da decisão → aprovar ou rejeitar.
+
+Comparação Atual/Proposto lado a lado com mesmas linhas, autor/motivo/alcance
+acima e consequências antes das ações.
 
 Primária: **Aprovar proposta exibida**. Secundárias: Rejeitar com motivo;
 Voltar.
 
-Consequência: Mesmo ID/versão exibidos, sem autoaprovação por troca de perfil.
-Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Mesmo ID/versão exibidos, sem autoaprovação por troca de perfil.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Decisão registrada sobre os valores exibidos. Consulte o
+estado vigente após a decisão.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Não há proposta pendente elegível para esta decisão.”
 
-- **CTRL-160-01 — Proposta**. READ_ONLY_DESCRIPTION. Ordem 160.1; Sim ao
-  decidir. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Kind conhecido traduzido; desconhecido não aprovável.
-  Ajuda/exemplo: Valores atuais/propostos lado a lado.. Erro: Revise proposta:
-  Kind conhecido traduzido; desconhecido não aprovável..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-160-02 — Versão da proposta**. READ_ONLY_DESCRIPTION. Ordem 160.2;
-  Sim ao decidir. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Kind conhecido traduzido; desconhecido não aprovável.
-  Ajuda/exemplo: Valores atuais/propostos lado a lado.. Erro: Revise versão da
-  proposta: Kind conhecido traduzido; desconhecido não aprovável..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-161-01 — Motivo da alteração/decisão**. TEXTAREA. Ordem 161.1; Quando
-  ação crítica. Máscara/autocomplete: Sem máscara; contador e limite do
-  contrato visíveis; quebra de linha/reflow; off. Dependência/validação:
-  3–1000 onde contrato herdado. Ajuda/exemplo: “Por que esta permissão precisa
-  mudar?”. Erro: Revise motivo da alteração/decisão: 3–1000 onde contrato
-  herdado..
+Sem presenter conhecido, alvo/versão e valores atuais/propostos confiáveis,
+não aprovar. Mostrar indisponibilidade e encaminhamento seguro, sem JSON como
+substituto da decisão.
 
-- **CTRL-162-01 — Capacidade proposta**. SEARCHABLE_COMBOBOX. Ordem 162.1;
-  Conforme kind. Máscara/autocomplete: Busca por nome/alias autorizado;
-  seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Alvo local, segunda identidade, versão da política.
-  Ajuda/exemplo: Nunca pedir ao usuário ler JSON para aprovar.. Erro: Revise
-  capacidade proposta: Alvo local, segunda identidade, versão da política..
+409 conserva diálogo/intenção e mostra diferença; tipo desconhecido oferece
+encaminhamento, nunca botão de aprovação de JSON bruto.
 
-- **CTRL-162-02 — Política proposta**. SEARCHABLE_COMBOBOX. Ordem 162.2;
-  Conforme kind. Máscara/autocomplete: Busca por nome/alias autorizado;
-  seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Alvo local, segunda identidade, versão da política.
-  Ajuda/exemplo: Nunca pedir ao usuário ler JSON para aprovar.. Erro: Revise
-  política proposta: Alvo local, segunda identidade, versão da política..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-## Estado, teclado e ajuda
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-ADM-04` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `SEM_EQUIVALENTE_NO_HTML`; ausência de exemplo no HTML é declarada,
-sem novo mockup equivalente. B1: SC-032, OVL-004, OVL-006, OVL-009.
+Empilhar Atual e Proposto por atributo, preservando rótulos; motivo da decisão
+abaixo da comparação, ações sem sobreposição.
 
-Critérios C9 relacionados: C-AC-005, C-AC-011, C-AC-013, C-AC-014, C-AC-016,
-C-AC-018, C-AC-019, C-AC-020, C-AC-024, C-AC-026, C-AC-033, C-AC-037,
-C-AC-038, C-AC-059, C-AC-060, C-AC-061, C-AC-071, C-AC-075, C-AC-078,
-C-AC-079, C-AC-085, C-AC-095, C-AC-099, C-AC-121, C-NEW-AC-015, C-NEW-AC-016,
-C7-AC-005, C7-AC-006. A associação é por domínio; cada caso preserva seu
-discriminante específico e não significa que todos os critérios foram
-executados nesta tela. Fonte funcional:
-[ADMINISTRATIVE_OPERATIONS](../../C3-functional-specification/ADMINISTRATIVE_OPERATIONS.md).
+Cabeçalhos e diferenças em texto; não depender de cor; proposta em leitura não
+recebe validação de input; confirmação mantém a versão revista.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: SEM_EQUIVALENTE_NO_HTML. Sem captura real ou aceite
+humano de interface futura nesta C.
+
+RECONSTRUIR presenters para todos os tipos permitidos; impedir edição da
+proposta pelo aprovador.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-005;C-AC-011;C-AC-013;C-AC-014;C-AC-016;C-AC-018;C-AC-019;C-AC-020;C-AC-024;C-AC-026;C-AC-033;C-AC-037;C-AC-038;C-AC-059;C-AC-060;C-AC-061;C-AC-071;C-AC-075;C-AC-078;C-AC-079;C-AC-085;C-AC-095;C-AC-099;C-AC-121;C-NEW-AC-015;C-NEW-AC-016;C7-AC-005;C7-AC-006;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025;C-FINAL-AC-021;C-FINAL-AC-024.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

@@ -1,131 +1,360 @@
 # REQ-02 — Revisar requisição
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Autor da REQ. Banco/API revalidam capacidade, alvo e
-versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Revisão do wizard, atual a alterar. Gatilho: navegar pela
-tarefa ou abrir o alvo contextual autorizado. Objetivo: Conferir paciente,
-observações e ciência aplicável; Emitir requisição.
+Revisão do rascunho atual, antes de emitir; campos do conteúdo em leitura.
 
-## Composição e sequência
+Finalidade: Revisar requisição.
 
-Cabeçalho paciente/autor; cartões por item com observação/urgência; notas e
-resumo de emissão.
+Autor autenticado com capacidade de requisitar e contexto vigente. Emitir é
+comando separado do save.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Revisão do wizard, atual a alterar.
 
-Não imprimir quantidade a comprar como campo de pedido; campos da revisão são
-leitura e link Editar leva à etapa exata.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Todo o conteúdo material e a regra informativa de ciência. Editar leva à etapa
+de origem e exige nova revisão; não há inputs duplicados no resumo.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-001-01 — Paciente
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome da residência/paciente do contexto autorizado,
+sem UUID digitável. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Confira a residência desta tarefa. Trocar contexto é uma
+ação separada e exige acesso autorizado.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Paciente”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-002-01 — Materiais
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Materiais”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-003-01 — Estoque observado
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Quantidade decimal exata com unidade e precisão da
+origem, sem input. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Quantidade registrada para a etapa indicada. Não é uma nova
+declaração de quantidade e não movimenta material ao ser consultada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Estoque
+observado”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-004-01 — Não sei informar
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Não sei
+informar”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-005-01 — Urgente
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Urgente”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-006-01 — Justificativa de repetição
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação
+“Justificativa de repetição”. Atualize esta seção. O dado registrado não pode
+ser alterado aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-007-01 — Item extra
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Item extra”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-008-01 — Observação e urgência do item extra
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Observação e
+urgência do item extra”. Atualize esta seção. O dado registrado não pode ser
+alterado aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-009-01 — Observações gerais
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Estado de consulta/revisão da tarefa; não herdar edição do
+formulário de origem.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Estado de
+consulta/revisão da tarefa; não herdar edição do formulário de origem.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Observações
+gerais”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-013-01 — Versão e intenção
+
+**Modo/componente:** INTERNAL / NO_USER_CONTROL.
+
+**Quando/ator:** Dado de comando/transporte; nunca input ou identificador
+técnico exigido ao usuário.
+
+**Obrigatoriedade/inicial:** Não renderizar controle.
+
+**Máscara/apresentação:** NÃO APLICÁVEL. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Somente contrato interno, com validação no servidor; não expor
+segredo/UUID como decisão do usuário.
+
+**Ajuda/exemplo:** Não pedir UUID ao usuário.
+
+**Acessibilidade:** Não inserir campo escondido na ordem de foco, texto
+acessível ou mensagem para o usuário comum.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Paciente/autor → lista completa de materiais/extras → modos de observação e
+urgência → notas → consequência → Emitir requisição.
+
+Página de revisão com cabeçalho de identidade e seções de conteúdo; links
+Editar localizados junto à seção, primária após o resumo completo.
 
 Primária: **Emitir requisição**. Secundárias: Voltar e editar; Salvar
 rascunho.
 
-Consequência: Só emissão confirmada cria documento oficial; não compra.
-Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Só emissão confirmada cria documento oficial; não compra.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Requisição emitida. A família poderá avaliar a
+necessidade; nenhum material foi comprado ou movimentado.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “O preenchimento não está disponível para revisão. Volte aos
+materiais ou retome seu rascunho.”
 
-- **CTRL-001-01 — Paciente**. READ_ONLY_DESCRIPTION. Ordem 1.1; Sim, contexto
-  selecionado. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Revalidar vínculo na emissão. Ajuda/exemplo: “Você
-  está solicitando para Residência Exemplo.”. Erro: Revise paciente: Revalidar
-  vínculo na emissão..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-002-01 — Materiais**. SEARCHABLE_COMBOBOX. Ordem 2.1; Ao menos um
-  material ou extra; vazio. Máscara/autocomplete: Busca por nome/alias
-  autorizado; seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: IDs únicos, até 1000 linhas herdadas; alias busca.
-  Ajuda/exemplo: “Escolha os materiais de que precisa.”. Erro: Revise
-  materiais: IDs únicos, até 1000 linhas herdadas; alias busca..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-003-01 — Estoque observado**. DECIMAL_TEXT_INPUT. Ordem 3.1; Não,
-  vazio. Máscara/autocomplete: Vírgula/ponto; inputmode decimal; precisão
-  antes da coerção; zero só onde permitido; off. Dependência/validação:
-  0–100000, precisão da unidade até seis casas; valor original exato.
-  Ajuda/exemplo: “Quanto você contou agora? Ex.: 0 ou 1,5.”. Erro: Revise
-  estoque observado: 0–100000, precisão da unidade até seis casas; valor
-  original exato..
+Paciente, conteúdo selecionado e estado de edição precisam estar disponíveis
+para emitir. Save privado pode continuar parcial; indisponibilidade não emite
+REQ com dados presumidos.
 
-- **CTRL-004-01 — Não sei informar**. CHECKBOX_OR_SWITCH. Ordem 4.1; Não,
-  desmarcado. Máscara/autocomplete: Sem máscara; rótulo descreve efeito; vazio
-  não equivale a concordância; off. Dependência/validação: Exclusivo com valor
-  observado; não altera ledger. Ajuda/exemplo: “Use quando não puder contar.”.
-  Erro: Revise não sei informar: Exclusivo com valor observado; não altera
-  ledger..
+Resposta perdida consulta a mesma emissão. Confirmada, abre a REQ existente;
+incerta, conserva revisão e bloqueia nova emissão com outra chave.
 
-- **CTRL-005-01 — Urgente**. CHECKBOX_OR_SWITCH. Ordem 5.1; Sim como boolean,
-  false. Máscara/autocomplete: Sem máscara; rótulo descreve efeito; vazio não
-  equivale a concordância; off. Dependência/validação: Não inferir por saldo
-  mínimo. Ajuda/exemplo: “Precisa de atenção mais rápida.”. Erro: Revise
-  urgente: Não inferir por saldo mínimo..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-006-01 — Justificativa de repetição**. TEXTAREA. Ordem 6.1;
-  Condicional se necessidade anterior pendente; vazio. Máscara/autocomplete:
-  Sem máscara; contador e limite do contrato visíveis; quebra de linha/reflow;
-  off. Dependência/validação: 3–1000 caracteres, preserva vínculo anterior.
-  Ajuda/exemplo: “Ainda precisamos do material após atendimento parcial.”.
-  Erro: Revise justificativa de repetição: 3–1000 caracteres, preserva vínculo
-  anterior..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-007-01 — Item extra**. TEXT_INPUT. Ordem 7.1; Nome se extra
-  adicionado; vazio. Máscara/autocomplete: Sem máscara artificial; preservar
-  texto e limite do contrato; off. Dependência/validação: 1–200 caracteres,
-  até 20 extras, identidade própria. Ajuda/exemplo: “Material não encontrado
-  no catálogo.”. Erro: Revise item extra: 1–200 caracteres, até 20 extras,
-  identidade própria..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-- **CTRL-008-01 — Observação do extra**. TEXTAREA. Ordem 8.1; Conforme linha
-  extra. Máscara/autocomplete: Sem máscara; contador e limite do contrato
-  visíveis; quebra de linha/reflow; off. Dependência/validação: Zero
-  explícito/unknown/unfilled distintos. Ajuda/exemplo: Não criar produto
-  automaticamente.. Erro: Revise observação do extra: Zero
-  explícito/unknown/unfilled distintos..
+Cartões de leitura em uma coluna; unidade e modo observado junto ao valor;
+ação alcançável sem cobrir última linha ou teclado.
 
-- **CTRL-009-01 — Observações gerais**. TEXTAREA. Ordem 9.1; Não, lista vazia.
-  Máscara/autocomplete: Sem máscara; contador e limite do contrato visíveis;
-  quebra de linha/reflow; off. Dependência/validação: Até 50 entradas de
-  1–1000 caracteres. Ajuda/exemplo: “Embalagem encontrada aberta”, sem dado
-  clínico desnecessário.. Erro: Revise observações gerais: Até 50 entradas de
-  1–1000 caracteres..
+Links Editar retornam ao campo correto; ao voltar à revisão, foco no título da
+seção atual; resumo é texto sem aria-invalid.
 
-- **CTRL-013-01 — Versão e intenção**. READ_ONLY_DESCRIPTION. Ordem 13.1; Sim
-  na ação. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Conflito se conteúdo diverge ou versão muda.
-  Ajuda/exemplo: Não pedir UUID ao usuário.. Erro: Revise versão e intenção:
-  Conflito se conteúdo diverge ou versão muda..
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-## Estado, teclado e ajuda
+Referência do protótipo: req/reqReview. Sem captura real ou aceite humano de
+interface futura nesta C.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+RECONSTRUIR resumo se herdar controles de edição ou ocultar
+extras/observações; preservar contrato de emissão.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-REQ-02` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `req/reqReview`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-009.
+## Contratos e aceites relacionados
 
-Critérios C9 relacionados: C-AC-025, C-AC-026, C-AC-036, C-AC-041, C-AC-049,
-C-AC-073, C-AC-089, C-AC-105, C-NEW-AC-003, C-NEW-AC-004, C-NEW-AC-024,
-C-NEW-AC-028, C7-AC-012. A associação é por domínio; cada caso preserva seu
-discriminante específico e não significa que todos os critérios foram
-executados nesta tela. Fonte funcional:
-[REQ](../../C3-functional-specification/REQ.md).
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-025;C-AC-026;C-AC-036;C-AC-041;C-AC-049;C-AC-073;C-AC-089;C-AC-105;C-NEW-AC-003;C-NEW-AC-004;C-NEW-AC-024;C-NEW-AC-028;C7-AC-012;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

@@ -235,8 +235,42 @@ conciliar com identidade suficiente; canal desligado não é sucesso de entrega.
 
 As matrizes causais foram revisadas semanticamente, com domínios secundários
 explícitos. P06/P11/P12/P14 e garantia de comando P15 já foram respondidos;
-P02 por SCI-ID, retenção, fornecedores e parâmetros operacionais continuam
-delimitados em C7. P09-B é obrigatório, com identidade própria por emissão;
-não ativar núcleo só de hash como substituto. Toda evolução de schema usa
-migration incremental e preserva os 84 hashes históricos.
+P02 e SCI-001–SCI-005 estão OWNER_APPROVED. Retenção, fornecedores e
+parâmetros mantêm gates específicos, sem bloquear D0 geral ou D1 independente.
+P09-B é obrigatório, com identidade própria por emissão; não ativar núcleo só
+de hash como substituto. Toda evolução de schema usa migration incremental e
+preserva os 84 hashes históricos.
 [Adendo vigente](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).
+
+## Fechamento definitivo — tarefa, estado e política
+
+P02 OWNER_APPROVED: três modalidades informativas elegíveis, ANY familiar e
+SCI-005 invariável. Na expedição oficial, resolver ator da sessão/evento,
+nunca created_by/escala/nome/metadata; revalidar autoridade após locks.
+Configuração/preferência não suprime SCI-005 para expedidor familiar
+habilitado. Se evidência obrigatória não persistir, expedição elegível não
+conclui parcialmente. PDF/aviso podem processar depois com resultado honesto.
+Expedidor ENT legítimo sem representação familiar não ganha ciência; manter
+pendência familiar sem atribuir ato a terceiro.
+
+Persistir REQ/material, ENT/versão de expedição, ator/autoridade, origem,
+instante e causa estável. Deduplicar causa, não cada linha. Várias linhas da
+mesma REQ em uma ENT têm uma causa por REQ; expedições distintas conservam
+provas próprias e express anterior. Separar obrigação pessoal e evidência
+causal se a unicidade antiga REQ/pessoa não representar ambas sem perda.
+
+ANY agrega ciência válida de autorizado na origem. Sem habilitado é pendente;
+legado desobrigado não é evento pessoal nem Família ciente. Revogação não
+apaga evento legítimo e vínculo novo não retroage tácita. Versão técnica,
+conteúdo material e emissão PDF são identidades distintas. Projeção material
+exclui atendimento/ciência/vínculo posterior/renderer. Snapshot com lifecycle
+não é hash exclusivamente material. REQ não recebe editor para justificar
+versão; alteração material futura autorizada exige nova
+ciência/agregado/aviso, preservando M1.
+
+D evolui schema incrementalmente, preservando 84 migrations/eventos históricos
+e sem inventar backfill. app_visible antigo não se torna diálogo;
+whatsapp_read futuro é comunicação; all antigo recebe compatibilidade
+prospectiva sem exigir todos. SCI-004 continua gate externo sem ativação.
+Payload de decisão não recebe campos de leitura como parâmetros editáveis.
+Testar caminhos diretos Auth/RPC/RLS, não apenas DOM.

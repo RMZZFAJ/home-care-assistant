@@ -1,68 +1,94 @@
 # NOT-04 — Instalar e atualizar aplicativo
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Titular no aparelho. Banco/API revalidam capacidade, alvo
-e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: Orientação de instalação/atualização, nova. Gatilho: navegar
-pela tarefa ou abrir o alvo contextual autorizado. Objetivo: Instrução
-conforme capacidade real; atualização sem perder edição.
+Orientação de instalação/atualização segundo capacidade real do aparelho;
+nenhuma instalação é presumida.
 
-## Composição e sequência
+Finalidade: Instalar e atualizar aplicativo.
 
-Guia contextual por capacidade real; instrução de instalação e atualização
-preservando edição.
+Titular no aparelho; permissões só por gesto e sem alterar capacidade
+operacional.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: Orientação de instalação/atualização, nova.
 
-iPhone instalado/gesto/permissão específicos; não prometer push em qualquer
-aba.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Estado de suporte/instalação e instruções. Não mostrar botão que promete push
+em ambiente sem suporte comprovado.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+Não há campo de negócio digitável nesta tarefa; navegação/instrução seguem as
+ações abaixo.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Capacidade detectada → instrução aplicável → instalar ou continuar web →
+atualização somente após salvar edição e escolher recarregar.
+
+Passos curtos com propósito, texto equivalente à imagem e navegação de
+progresso; ajuda reabrível.
 
 Primária: **Ver como instalar**. Secundárias: Agora não; Atualizar após
 salvar; Abrir web.
 
-Consequência: Sem suporte mantém app web completo. Mostrar
-objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Sem suporte mantém app web completo.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Orientação apresentada. Confirme no aparelho o resultado
+da instalação ou continue pelo aplicativo web.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Instalação não disponível neste navegador. Continue usando
+o aplicativo web.”
 
-Tela de orientação/consulta sem novo campo de dado. Links/botões têm nome,
-alvo e estado próprios; não adicionar formulário sem necessidade.
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-## Estado, teclado e ajuda
+## 19–20. Falhas, recuperação e continuidade
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-NOT-04` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `SEM_EQUIVALENTE_NO_HTML`; ausência de exemplo no HTML é declarada,
-sem novo mockup equivalente. B1: Nova superfície C3, sem equivalente B1.
+Atualização não recarrega durante confirmação/rascunho não salvo; instrução de
+salvar/adiar mantém a tarefa acessível.
 
-Critérios C9 relacionados: C-AC-001, C-AC-003, C-AC-014, C-AC-020, C-AC-023,
-C-AC-049, C-AC-064, C-AC-073, C-AC-083, C-AC-084, C-AC-086, C-AC-087,
-C-AC-088, C-AC-089, C-AC-090, C-AC-091, C-AC-092, C-AC-093, C-AC-094,
-C-AC-095, C-AC-096, C-AC-097, C-AC-098, C-AC-099, C-AC-113, C-AC-115,
-C-NEW-AC-001, C-NEW-AC-002, C-NEW-AC-003, C-NEW-AC-026, C7-AC-008, C7-AC-012.
-A associação é por domínio; cada caso preserva seu discriminante específico e
-não significa que todos os critérios foram executados nesta tela. Fonte
-funcional:
-[PWA_PUSH_AND_NOTIFICATIONS](../../C3-functional-specification/PWA_PUSH_AND_NOTIFICATIONS.md).
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
+
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
+
+## 21–24. Móvel, acessibilidade, referência e negócio
+
+Uma coluna, imagem contida com legenda e texto; Próximo/Voltar/Pular sem
+cobrir conteúdo.
+
+Headings e lista de passos sem leitura forçada; imagens têm descrição útil;
+pular não registra concordância material.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: SEM_EQUIVALENTE_NO_HTML. Sem captura real ou aceite
+humano de interface futura nesta C.
+
+NOVO GUIA CONTEXTUAL: validar instruções nos aparelhos P10 em D6; a
+especificação não é prova física.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-001;C-AC-003;C-AC-014;C-AC-020;C-AC-023;C-AC-049;C-AC-064;C-AC-073;C-AC-083;C-AC-084;C-AC-086;C-AC-087;C-AC-088;C-AC-089;C-AC-090;C-AC-091;C-AC-092;C-AC-093;C-AC-094;C-AC-095;C-AC-096;C-AC-097;C-AC-098;C-AC-099;C-AC-113;C-AC-115;C-NEW-AC-001;C-NEW-AC-002;C-NEW-AC-003;C-NEW-AC-026;C7-AC-008;C7-AC-012;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

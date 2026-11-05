@@ -6,14 +6,24 @@
 [blueprint aprovado C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md)
 e [casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
 
-Matriz canônica neste diretório agora contém161 critérios de design: 121
-causas,28 grupos de finalidade e12 complementos. Relatórios/manifestos datados
-C6 continuam históricos, com suas contagens149 e provas da época. Não
-reexecutar geradores C1–C6 sobre as novas matrizes: alguns reconstruiriam
-propostas superadas. Validador vigente é o C10, documental e sem produto.
+Matriz canônica neste diretório agora contém187 critérios de design: 121
+causas,28 grupos de finalidade,12 complementos C7 e26 complementos
+definitivos. Relatórios/manifestos datados C6 continuam históricos, com suas
+contagens149 e provas da época. Não reexecutar geradores C1–C6 sobre as novas
+matrizes: alguns reconstruiriam propostas superadas. Validador vigente é o
+C10, documental e sem produto.
 
-P02 individual permanece humana; direção visual já aprovada. P09-B é mínimo
+P02 individual está OWNER_APPROVED; direção visual já aprovada. P09-B é mínimo
 obrigatório, P11 revisão facultativa, P12 um draft por criação/tipo e O01+
 wizard global. Implementação, banco remoto, homologação/deploy, merge e
 criação de branch D exigem missão posterior. Não usar histórico como
 permissão.
+
+## Gates por ramo e pré-condição da branch
+
+P03/P05/P07/P08/P09/P10/P13/P15/OPS-01/PERF-01 não impedem D0 geral/D1
+independente, mas seus ramos/homologações seguem condicionados pela
+[matriz canônica](../C7-decision-closure/GATE_CLASSIFICATION.csv).
+Contratações P03/P09/P13 são pesquisa externa do responsável. Documentação não
+aprova gate. Branch D somente após integrar PR6 à master e autorizar missão D.
+C8 tem 274 controles/424 usos e C9 187 casos planejados.

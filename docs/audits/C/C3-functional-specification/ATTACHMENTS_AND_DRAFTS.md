@@ -45,124 +45,263 @@ fidelidade e limite de transporte. TO_BE DEC-011/012/017, O13 e P08/P12/P15.
 
 - **Campo:** Arquivo
 
-  **Tipo/origem:** Seleção local do usuário
+  **Tipo/origem por tela e estado:** ARQ-01 Arquivo: EDITABLE (FILE_PICKER);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Ao anexar, vazio
+  **Obrigatoriedade/default na preparação:** ARQ-01 Arquivo: Ao anexar, vazio
 
-  **Validação/unidade:** Bytes/MIME/signature/limite de transporte coerentes;
-  não só extensão
+  **Validação/unidade:** ARQ-01 Arquivo: Bytes/MIME/signature/limite de
+  transporte coerentes; não só extensão; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Foto ou PDF do registro, sem senha.”
+  **Ajuda/exemplo:** ARQ-01 Arquivo: “Foto ou PDF do registro, sem senha.”
 
 - **Campo:** Descrição
 
-  **Tipo/origem:** Texto do autor
+  **Tipo/origem por tela e estado:** ARQ-01 Descrição: EDITABLE (TEXTAREA);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Opcional, vazio
+  **Obrigatoriedade/default na preparação:** ARQ-01 Descrição: Opcional, vazio
 
-  **Validação/unidade:** Limite explícito de contrato em D; não incluir dado
-  privado desnecessário
+  **Validação/unidade:** ARQ-01 Descrição: Limite explícito de contrato em D;
+  não incluir dado privado desnecessário; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Conferência da parcela de 2 unidades.”
+  **Ajuda/exemplo:** ARQ-01 Descrição: “Conferência da parcela de 2 unidades.”
 
 - **Campo:** Tentativa
 
-  **Tipo/origem:** Chave e fingerprint do servidor/cliente
+  **Tipo/origem por tela e estado:** ARQ-01 Tentativa: INTERNAL
+  (NO_USER_CONTROL); Dado de comando/transporte; nunca input ou identificador
+  técnico exigido ao usuário; ARQ-02 Tentativa: INTERNAL (NO_USER_CONTROL);
+  Dado de comando/transporte; nunca input ou identificador técnico exigido ao
+  usuário
 
-  **Obrigatório e default:** Sim no upload, ocultos
+  **Obrigatoriedade/default na preparação:** ARQ-01 Tentativa: Não renderizar
+  controle; ARQ-02 Tentativa: Não renderizar controle
 
-  **Validação/unidade:** Mesmo arquivo/conteúdo na mesma intenção
+  **Validação/unidade:** ARQ-01 Tentativa: Somente contrato interno, com
+  validação no servidor; não expor segredo/UUID como decisão do usuário;
+  ARQ-02 Tentativa: Somente contrato interno, com validação no servidor; não
+  expor segredo/UUID como decisão do usuário
 
-  **Ajuda e exemplo:** Campo de arquivo bloqueado enquanto resultado for
-  incerto.
+  **Ajuda/exemplo:** ARQ-01 Tentativa: Campo de arquivo bloqueado enquanto
+  resultado for incerto.; ARQ-02 Tentativa: Campo de arquivo bloqueado
+  enquanto resultado for incerto.
 
 - **Campo:** Estado da reserva
 
-  **Tipo/origem:** Servidor
+  **Tipo/origem por tela e estado:** ARQ-01 Estado da reserva: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; ARQ-02 Estado da reserva: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Obrigatório e default:** Somente leitura
+  **Obrigatoriedade/default na preparação:** ARQ-01 Estado da reserva: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; ARQ-02 Estado da reserva:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:**
-  Reservado/enviando/processando/ready/rejeitado/abandonado/expirado
+  **Validação/unidade:** ARQ-01 Estado da reserva: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; ARQ-02 Estado da reserva: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** Ready não equivale a validação humana da informação.
+  **Ajuda/exemplo:** ARQ-01 Estado da reserva: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; ARQ-02 Estado da reserva: Informação
+  do registro indicado, somente para consulta nesta etapa. Ausência de dado
+  histórico permanece explicitamente identificada.
 
 - **Campo:** Original/derivado
 
-  **Tipo/origem:** Hash, formato, transformação, servidor
+  **Tipo/origem por tela e estado:** ARQ-01 Original: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ARQ-01 Derivado: READ_ONLY (TEXT_VALUE); Consulta do valor de
+  origem; mudanças só no processo legitimamente responsável; ARQ-01
+  Transformação aplicada: READ_ONLY (TEXT_VALUE); Consulta do valor de origem;
+  mudanças só no processo legitimamente responsável
 
-  **Obrigatório e default:** Sim quando transformado
+  **Obrigatoriedade/default na preparação:** ARQ-01 Original: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; ARQ-01 Derivado: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado; ARQ-01 Transformação aplicada: Valor emitido, proposto ou
+  calculado da fonte identificada; ausência explicitamente informada, sem
+  valor inventado
 
-  **Validação/unidade:** Cadeia identifica perda/recusa e original restrito
-  conforme classe
+  **Validação/unidade:** ARQ-01 Original: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ARQ-01 Derivado: Revalidar acesso, referência e estado na
+  leitura/ação. Não solicitar ao usuário correção deste valor nesta tela.
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; ARQ-01 Transformação aplicada: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** “Derivado seguro; a ressalva foi preservada” só após
-  comprovação.
+  **Ajuda/exemplo:** ARQ-01 Original: Informação do registro indicado, somente
+  para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; ARQ-01 Derivado: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; ARQ-01 Transformação aplicada:
+  Informação do registro indicado, somente para consulta nesta etapa. Ausência
+  de dado histórico permanece explicitamente identificada.
 
 - **Campo:** Tipo/intenção do rascunho
 
-  **Tipo/origem:** Contexto do formulário
+  **Tipo/origem por tela e estado:** RAS-01 Tipo do rascunho: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; RAS-01 Alvo e intenção: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Obrigatório e default:** Sim, origem implícita visível em resumo
+  **Obrigatoriedade/default na preparação:** RAS-01 Tipo do rascunho: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; RAS-01 Alvo e intenção: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Usuário/paciente/tipo/target; não mistura REQ e
-  aprovação
+  **Validação/unidade:** RAS-01 Tipo do rascunho: Revalidar acesso, referência
+  e estado na leitura/ação. Não solicitar ao usuário correção deste valor
+  nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; RAS-01 Alvo e intenção: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** “Rascunho de nova ENT para Residência Exemplo.”
+  **Ajuda/exemplo:** RAS-01 Tipo do rascunho: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.; RAS-01 Alvo e intenção: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.
 
 - **Campo:** Conteúdo e etapa
 
-  **Tipo/origem:** Campos e passo atual
+  **Tipo/origem por tela e estado:** RAS-01 Conteúdo da edição: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; RAS-01 Etapa atual: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Obrigatório e default:** Automático após confirmação de save
+  **Obrigatoriedade/default na preparação:** RAS-01 Conteúdo da edição: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; RAS-01 Etapa atual: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Validação parcial não emite fato; esquema versionado
+  **Validação/unidade:** RAS-01 Conteúdo da edição: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; RAS-01 Etapa atual: Revalidar acesso, referência
+  e estado na leitura/ação. Não solicitar ao usuário correção deste valor
+  nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** Campos vazios ficam vazios.
+  **Ajuda/exemplo:** RAS-01 Conteúdo da edição: Confira o conteúdo salvo; para
+  alterá-lo, continue no formulário de origem.; RAS-01 Etapa atual: A etapa
+  mostra onde continuar o preenchimento; ela não é um texto para editar.
 
 - **Campo:** Base do documento/ledger/política
 
-  **Tipo/origem:** Servidor
+  **Tipo/origem por tela e estado:** RAS-01 Versão documental base: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; RAS-01 Revisão do ledger base: INTERNAL
+  (NO_USER_CONTROL); Dado de comando/transporte; nunca input ou identificador
+  técnico exigido ao usuário; RAS-01 Versão da política base: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim quando ação depende de fato
+  **Obrigatoriedade/default na preparação:** RAS-01 Versão documental base:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; RAS-01 Revisão do ledger
+  base: Não renderizar controle; RAS-01 Versão da política base: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Versões/assignment/contexto na retomada
+  **Validação/unidade:** RAS-01 Versão documental base: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável; RAS-01 Revisão do ledger base: Somente contrato
+  interno, com validação no servidor; não expor segredo/UUID como decisão do
+  usuário; RAS-01 Versão da política base: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** “A entrega mudou desde ontem. Revise antes de
-  continuar.”
+  **Ajuda/exemplo:** RAS-01 Versão documental base: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.; RAS-01 Revisão do ledger base: “A
+  entrega mudou desde ontem. Revise antes de continuar.”; RAS-01 Versão da
+  política base: Informação do registro indicado, somente para consulta nesta
+  etapa. Ausência de dado histórico permanece explicitamente identificada.
 
 - **Campo:** Último salvamento
 
-  **Tipo/origem:** Instante/versão confirmados
+  **Tipo/origem por tela e estado:** RAS-01 Salvo em: READ_ONLY (TEXT_VALUE);
+  Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; RAS-01 Revisão do rascunho: READ_ONLY (TEXT_VALUE); Consulta do
+  valor de origem; mudanças só no processo legitimamente responsável
 
-  **Obrigatório e default:** Somente leitura
+  **Obrigatoriedade/default na preparação:** RAS-01 Salvo em: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; RAS-01 Revisão do rascunho: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado
 
-  **Validação/unidade:** Não mostrar salvo se request falhou
+  **Validação/unidade:** RAS-01 Salvo em: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável; RAS-01 Revisão do rascunho: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Consulta do valor de origem; mudanças só no processo legitimamente
+  responsável
 
-  **Ajuda e exemplo:** “Salvo no servidor às 09:10; disponível em outro
-  aparelho.”
+  **Ajuda/exemplo:** RAS-01 Salvo em: A data pertence ao fato identificado.
+  Data de registro e de emissão são mostradas separadamente quando forem
+  diferentes.; RAS-01 Revisão do rascunho: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.
 
 - **Campo:** Escolha na retomada
 
-  **Tipo/origem:** Continuar/descartar rascunho
+  **Tipo/origem por tela e estado:** RAS-01 Escolha na retomada:
+  EXPLICIT_ACTION (RESUME_OR_DISCARD_BUTTONS); Continuar, descartar e começar
+  nova ou voltar; nenhuma destrutiva preselecionada
 
-  **Obrigatório e default:** Sim, sem descarte preselecionado
+  **Obrigatoriedade/default na preparação:** RAS-01 Escolha na retomada: Sem
+  concordância material inicial ou clique automático
 
-  **Validação/unidade:** Descartar não elimina documento emitido ou ato
-  confirmado
+  **Validação/unidade:** RAS-01 Escolha na retomada: Descartar não elimina
+  documento emitido ou ato confirmado; Continuar, descartar e começar nova ou
+  voltar; nenhuma destrutiva preselecionada
 
-  **Ajuda e exemplo:** “Descartar somente esta edição.”
+  **Ajuda/exemplo:** RAS-01 Escolha na retomada: Continuar rascunho ou
+  Descartar e começar nova; um por usuário/paciente/tipo de criação e por alvo
+  contextual P12.
 
 - **Campo:** Escolha de conflito
 
-  **Tipo/origem:** Versão A/B ou copiar alterações
+  **Tipo/origem por tela e estado:** RAS-02 Escolha de conflito:
+  EXPLICIT_ACTION (COMPARISON_ACTIONS); Escolher abrir versão do servidor ou
+  revisar meus campos; novo save CAS ocorre no formulário
 
-  **Obrigatório e default:** Se edição concorrente
+  **Obrigatoriedade/default na preparação:** RAS-02 Escolha de conflito: Sem
+  concordância material inicial ou clique automático
 
-  **Validação/unidade:** Novo compare-and-swap; nenhuma fusão automática de
-  decisão
+  **Validação/unidade:** RAS-02 Escolha de conflito: Novo compare-and-swap;
+  nenhuma fusão automática de decisão; Escolher abrir versão do servidor ou
+  revisar meus campos; novo save CAS ocorre no formulário
 
-  **Ajuda e exemplo:** Comparar campos, autor e instantes.
+  **Ajuda/exemplo:** RAS-02 Escolha de conflito: Comparar campos, autor e
+  instantes.
 
 <!-- c-table:end -->
 
@@ -239,3 +378,11 @@ não anuncia implementação. Contrato detalhado no
 [adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
 [blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
 [casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
+
+## Fechamento definitivo — tarefa, estado e política
+
+RAS-01 mostra conteúdo/etapa em resumo de leitura; continuar abre formulário
+de origem, sem editor de payload/etapa serializados. RAS-02 compara campos e
+exige revisão/save CAS sem fusão automática. ARQ-02 consulta arquivo/tentativa
+fixos; não troca bytes sob a mesma intenção. Save/reconexão não confirmam
+atos.

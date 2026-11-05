@@ -44,94 +44,249 @@ pendentes.
 
 - **Campo:** Fato físico e tipo
 
-  **Tipo/origem:** Seleção/texto do registro manual
+  **Tipo/origem por tela e estado:** GUI-03 Fato físico: EDITABLE (TEXTAREA);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; GUI-03 Tipo de processo: EDITABLE
+  (RADIO_OR_SELECT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim em contingência
+  **Obrigatoriedade/default na preparação:** GUI-03 Fato físico: Sim em
+  contingência; GUI-03 Tipo de processo: Sim em contingência
 
-  **Validação/unidade:** REQ/COM/ENT/BAL/consumo não intercambiáveis
+  **Validação/unidade:** GUI-03 Fato físico: REQ/COM/ENT/BAL/consumo não
+  intercambiáveis; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; GUI-03 Tipo de processo:
+  REQ/COM/ENT/BAL/consumo não intercambiáveis; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Recebimento parcial de entrega.”
+  **Ajuda/exemplo:** GUI-03 Fato físico: Descreva o fato físico conhecido, por
+  exemplo entrega de duas unidades. Diga o que permanece desconhecido sem
+  presumir confirmação alheia.; GUI-03 Tipo de processo: “Recebimento parcial
+  de entrega.”
 
 - **Campo:** Paciente e referência conhecida
 
-  **Tipo/origem:** Identidade legível
+  **Tipo/origem por tela e estado:** GUI-03 Paciente: READ_ONLY
+  (PATIENT_DESCRIPTION); Paciente do contexto autorizado; trocar contexto é
+  ação própria fora do dossiê; GUI-03 Referência conhecida: EDITABLE
+  (TEXT_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim quando conhecida
+  **Obrigatoriedade/default na preparação:** GUI-03 Paciente: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado; GUI-03 Referência conhecida: Sim quando
+  conhecida
 
-  **Validação/unidade:** Desconhecido declarado; não criar UUID fictício
+  **Validação/unidade:** GUI-03 Paciente: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Paciente do contexto autorizado; trocar contexto é ação própria fora
+  do dossiê; GUI-03 Referência conhecida: Desconhecido declarado; não criar
+  UUID fictício; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Protocolo do papel/documento relacionado.
+  **Ajuda/exemplo:** GUI-03 Paciente: Confira a residência desta tarefa.
+  Trocar contexto é uma ação separada e exige acesso autorizado.; GUI-03
+  Referência conhecida: Protocolo do papel/documento relacionado.
 
 - **Campo:** Data do fato
 
-  **Tipo/origem:** Data/hora/fuso declarados
+  **Tipo/origem por tela e estado:** GUI-03 Data do fato: EDITABLE
+  (DATE_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; GUI-03 Hora do fato: EDITABLE
+  (TIME_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; GUI-03 Fuso do fato: EDITABLE
+  (SEARCHABLE_TIMEZONE); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Conhecida ou desconhecido explícito
+  **Obrigatoriedade/default na preparação:** GUI-03 Data do fato: Conhecida ou
+  desconhecido explícito; GUI-03 Hora do fato: Conhecida ou desconhecido
+  explícito; GUI-03 Fuso do fato: Conhecida ou desconhecido explícito
 
-  **Validação/unidade:** Não substituir pela data de digitação
+  **Validação/unidade:** GUI-03 Data do fato: Não substituir pela data de
+  digitação; Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; GUI-03 Hora do fato: Não substituir pela
+  data de digitação; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; GUI-03 Fuso do fato: Não
+  substituir pela data de digitação; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Separar registro posterior de fato anterior.
+  **Ajuda/exemplo:** GUI-03 Data do fato: Separar registro posterior de fato
+  anterior.; GUI-03 Hora do fato: Separar registro posterior de fato
+  anterior.; GUI-03 Fuso do fato: Separar registro posterior de fato anterior.
 
 - **Campo:** Pessoa que realizou/recebeu
 
-  **Tipo/origem:** Nome/declaração do participante
+  **Tipo/origem por tela e estado:** GUI-03 Pessoa que realizou: EDITABLE
+  (PERSON_REFERENCE_WITH_UNKNOWN); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura; GUI-03
+  Pessoa que recebeu: EDITABLE (PERSON_REFERENCE_WITH_UNKNOWN); Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura
 
-  **Obrigatório e default:** Conforme fato
+  **Obrigatoriedade/default na preparação:** GUI-03 Pessoa que realizou:
+  Conforme fato; GUI-03 Pessoa que recebeu: Conforme fato
 
-  **Validação/unidade:** Não atribuir presença pelo escalado
+  **Validação/unidade:** GUI-03 Pessoa que realizou: Pessoa real do fato
+  quando conhecida; selecionar vínculo ou informar referência histórica, sem
+  transferir autoria digital; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; GUI-03 Pessoa que
+  recebeu: Recebedor efetivo quando conhecido; nome informado não equivale a
+  aceite pessoal no app; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Assinatura física tem origem própria.
+  **Ajuda/exemplo:** GUI-03 Pessoa que realizou: Assinatura física tem origem
+  própria.; GUI-03 Pessoa que recebeu: Assinatura física tem origem própria.
 
 - **Campo:** Material/unidade/quantidade/custódia
 
-  **Tipo/origem:** Dados observados
+  **Tipo/origem por tela e estado:** GUI-03 Material: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; GUI-03 Unidade:
+  READ_ONLY (UNIT_DESCRIPTION); Unidade do material selecionado; unidade
+  desconhecida é fato a esclarecer, não conversão livre; GUI-03 Quantidade
+  física: EDITABLE (DECIMAL_TEXT_INPUT); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura; GUI-03
+  Custódia: EDITABLE (CUSTODY_SELECT); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Quando movimento/conferência
+  **Obrigatoriedade/default na preparação:** GUI-03 Material: Quando
+  movimento/conferência; GUI-03 Unidade: Valor emitido, proposto ou calculado
+  da fonte identificada; ausência explicitamente informada, sem valor
+  inventado; GUI-03 Quantidade física: Quando movimento/conferência; GUI-03
+  Custódia: Quando movimento/conferência
 
-  **Validação/unidade:** Distinguir zero, desconhecido, expedição e aceite
+  **Validação/unidade:** GUI-03 Material: Distinguir zero, desconhecido,
+  expedição e aceite; Somente no subestado de preparação autorizado indicado
+  na ficha; resumo/decisão posterior é leitura; GUI-03 Unidade: Revalidar
+  acesso, referência e estado na leitura/ação. Não solicitar ao usuário
+  correção deste valor nesta tela. Unidade do material selecionado; unidade
+  desconhecida é fato a esclarecer, não conversão livre; GUI-03 Quantidade
+  física: Distinguir zero, desconhecido, expedição e aceite; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; GUI-03 Custódia: Custódia real permitida ao processo;
+  origem/destino e trânsito não são texto livre; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Não somar previsão ao saldo real.
+  **Ajuda/exemplo:** GUI-03 Material: Não somar previsão ao saldo real.;
+  GUI-03 Unidade: Identificação do item registrado. A consulta não substitui o
+  material ou reinterpreta sua unidade.; GUI-03 Quantidade física: Não somar
+  previsão ao saldo real.; GUI-03 Custódia: Não somar previsão ao saldo real.
 
 - **Campo:** Ressalva/evidência
 
-  **Tipo/origem:** Texto/foto/papel
+  **Tipo/origem por tela e estado:** GUI-03 Ressalva: EDITABLE (TEXTAREA);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; GUI-03 Evidência física: EDITABLE
+  (FILE_PICKER); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Quando relevante
+  **Obrigatoriedade/default na preparação:** GUI-03 Ressalva: Quando
+  relevante; GUI-03 Evidência física: Quando relevante
 
-  **Validação/unidade:** Preservar original/derivado e privacidade
+  **Validação/unidade:** GUI-03 Ressalva: Preservar original/derivado e
+  privacidade; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura; GUI-03 Evidência física:
+  Preservar original/derivado e privacidade; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** A foto não prova sozinha que o fato ocorreu.
+  **Ajuda/exemplo:** GUI-03 Ressalva: A foto não prova sozinha que o fato
+  ocorreu.; GUI-03 Evidência física: A foto não prova sozinha que o fato
+  ocorreu.
 
 - **Campo:** Conciliador e decisão
 
-  **Tipo/origem:** Ator autenticado autorizado
+  **Tipo/origem por tela e estado:** GUI-03 Conciliador: AUTO_FILLED
+  (ACTOR_DESCRIPTION); Conciliador é a sessão autenticada; não escolher outra
+  pessoa como autor digital; GUI-03 Decisão: EDITABLE (RADIO_OR_SELECT);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Ao retornar ao app
+  **Obrigatoriedade/default na preparação:** GUI-03 Conciliador: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; GUI-03 Decisão: Ao retornar
+  ao app
 
-  **Validação/unidade:** Dupla conferência conforme P05; chave do fato físico
+  **Validação/unidade:** GUI-03 Conciliador: Revalidar acesso, referência e
+  estado na leitura/ação. Não solicitar ao usuário correção deste valor nesta
+  tela. Conciliador é a sessão autenticada; não escolher outra pessoa como
+  autor digital; GUI-03 Decisão: Dupla conferência conforme P05; chave do fato
+  físico; Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Conciliador não se passa pelo recebedor.
+  **Ajuda/exemplo:** GUI-03 Conciliador: Identifica quem realizou o ato e
+  quando ele foi registrado. Não permite escolher outra pessoa como autora.;
+  GUI-03 Decisão: Conciliador não se passa pelo recebedor.
 
 - **Campo:** Incidente/correlação
 
-  **Tipo/origem:** Referência segura
+  **Tipo/origem por tela e estado:** GUI-04 Incidente/correlação: READ_ONLY
+  (TEXT_VALUE); Estado de consulta/revisão da tarefa; não herdar edição do
+  formulário de origem
 
-  **Obrigatório e default:** Em falha técnica
+  **Obrigatoriedade/default na preparação:** GUI-04 Incidente/correlação:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Sem senha, OTP, token ou payload de paciente no
-  chamado
+  **Validação/unidade:** GUI-04 Incidente/correlação: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Estado de consulta/revisão da tarefa; não herdar edição do
+  formulário de origem
 
-  **Ajuda e exemplo:** Suporte acessa só dados necessários.
+  **Ajuda/exemplo:** GUI-04 Incidente/correlação: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.
 
 - **Campo:** Dono/substituto e prazo
 
-  **Tipo/origem:** Pessoa/política
+  **Tipo/origem por tela e estado:** GUI-02 Titular: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; GUI-04 Titular:
+  READ_ONLY (RESPONSIBLE_DESCRIPTION); Titular designado previamente; consulta
+  do runbook não altera governança; GUI-02 Substituto: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura; GUI-04 Substituto:
+  READ_ONLY (RESPONSIBLE_DESCRIPTION); Substituto designado; sem nome fictício
+  ou herança de sessão; GUI-02 Prazo de resposta: EDITABLE (TEXT_INPUT);
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; GUI-04 Prazo de resposta: READ_ONLY
+  (SERVICE_TARGET_DESCRIPTION); Prazo aprovado ou A definir; não digitar SLA
+  durante incidente
 
-  **Obrigatório e default:** P05/P13, sem default fictício
+  **Obrigatoriedade/default na preparação:** GUI-02 Titular: P05/P13, sem
+  default fictício; GUI-04 Titular: Valor emitido, proposto ou calculado da
+  fonte identificada; ausência explicitamente informada, sem valor inventado;
+  GUI-02 Substituto: P05/P13, sem default fictício; GUI-04 Substituto: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado; GUI-02 Prazo de resposta:
+  P05/P13, sem default fictício; GUI-04 Prazo de resposta: Valor emitido,
+  proposto ou calculado da fonte identificada; ausência explicitamente
+  informada, sem valor inventado
 
-  **Validação/unidade:** Deve existir antes do uso real
+  **Validação/unidade:** GUI-02 Titular: Deve existir antes do uso real;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; GUI-04 Titular: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Titular designado previamente; consulta do runbook não
+  altera governança; GUI-02 Substituto: Deve existir antes do uso real;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura; GUI-04 Substituto: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Substituto designado; sem nome fictício ou herança de
+  sessão; GUI-02 Prazo de resposta: Deve existir antes do uso real; Somente no
+  subestado de preparação autorizado indicado na ficha; resumo/decisão
+  posterior é leitura; GUI-04 Prazo de resposta: Revalidar acesso, referência
+  e estado na leitura/ação. Não solicitar ao usuário correção deste valor
+  nesta tela. Prazo aprovado ou A definir; não digitar SLA durante incidente
 
-  **Ajuda e exemplo:** Não “monitorar depois” sem responsável.
+  **Ajuda/exemplo:** GUI-02 Titular: Não “monitorar depois” sem responsável.;
+  GUI-04 Titular: Identifica a pessoa relacionada a este ato; não permite
+  transferir sua autoria para quem consulta.; GUI-02 Substituto: Não
+  “monitorar depois” sem responsável.; GUI-04 Substituto: Identifica a pessoa
+  relacionada a este ato; não permite transferir sua autoria para quem
+  consulta.; GUI-02 Prazo de resposta: Não “monitorar depois” sem
+  responsável.; GUI-04 Prazo de resposta: Informação do registro indicado,
+  somente para consulta nesta etapa. Ausência de dado histórico permanece
+  explicitamente identificada.
 
 <!-- c-table:end -->
 

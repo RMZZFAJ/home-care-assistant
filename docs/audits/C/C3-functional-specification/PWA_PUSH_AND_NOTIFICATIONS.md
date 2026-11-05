@@ -52,129 +52,202 @@ sem trocar a fonte interna de estado.
 
 - **Campo:** Categoria
 
-  **Tipo/origem:** Informativa/apoio/essencial, política
+  **Tipo/origem por tela e estado:** NOT-03 Categoria: EDITABLE
+  (EVENT_CATEGORY_SELECT); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim por evento
+  **Obrigatoriedade/default na preparação:** NOT-03 Categoria: Sim por evento
 
-  **Validação/unidade:** Não elevar todo evento a essencial
+  **Validação/unidade:** NOT-03 Categoria: Não elevar todo evento a essencial;
+  Somente no subestado de preparação autorizado indicado na ficha;
+  resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Apoio: há uma conferência pendente.”
+  **Ajuda/exemplo:** NOT-03 Categoria: “Apoio: há uma conferência pendente.”
 
 - **Campo:** Tipo de obrigação
 
-  **Tipo/origem:** Enum por processo/documento
+  **Tipo/origem por tela e estado:** NOT-03 Tipo de obrigação: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim na regra
+  **Obrigatoriedade/default na preparação:** NOT-03 Tipo de obrigação: Sim na
+  regra
 
-  **Validação/unidade:** Matriz de eventos e ações autorizadas
+  **Validação/unidade:** NOT-03 Tipo de obrigação: Matriz de eventos e ações
+  autorizadas; Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Recebimento, decisão, prazo e informação têm
-  consequências diferentes.
+  **Ajuda/exemplo:** NOT-03 Tipo de obrigação: Recebimento, decisão, prazo e
+  informação têm consequências diferentes.
 
 - **Campo:** Destinatários
 
-  **Tipo/origem:** Grupos/pessoas autorizadas
+  **Tipo/origem por tela e estado:** NOT-03 Destinatários: EDITABLE
+  (SEARCHABLE_COMBOBOX); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Sim quando regra habilitada
+  **Obrigatoriedade/default na preparação:** NOT-03 Destinatários: Sim quando
+  regra habilitada
 
-  **Validação/unidade:** Revalidar vínculo/capacidade; sem autoridade por
-  telefone/escala isolados
+  **Validação/unidade:** NOT-03 Destinatários: Revalidar vínculo/capacidade;
+  sem autoridade por telefone/escala isolados; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Pessoa que deve conferir esta entrega.”
+  **Ajuda/exemplo:** NOT-03 Destinatários: “Pessoa que deve conferir esta
+  entrega.”
 
 - **Campo:** Canal interno
 
-  **Tipo/origem:** Política persistente
+  **Tipo/origem por tela e estado:** NOT-03 Canal interno: INTERNAL
+  (NO_USER_CONTROL); Dado de comando/transporte; nunca input ou identificador
+  técnico exigido ao usuário
 
-  **Obrigatório e default:** Mantido para estado operacional
+  **Obrigatoriedade/default na preparação:** NOT-03 Canal interno: Não
+  renderizar controle
 
-  **Validação/unidade:** Desligar push não elimina pendência interna
+  **Validação/unidade:** NOT-03 Canal interno: Somente contrato interno, com
+  validação no servidor; não expor segredo/UUID como decisão do usuário
 
-  **Ajuda e exemplo:** “Consulte suas pendências no aplicativo.”
+  **Ajuda/exemplo:** NOT-03 Canal interno: “Consulte suas pendências no
+  aplicativo.”
 
 - **Campo:** Ativar push neste aparelho
 
-  **Tipo/origem:** Opt-in explícito
+  **Tipo/origem por tela e estado:** NOT-02 Ativar push neste aparelho:
+  EDITABLE (PUSH_PERMISSION_ACTION); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Não, sem permissão presumida
+  **Obrigatoriedade/default na preparação:** NOT-02 Ativar push neste
+  aparelho: Sem permissão presumida; ação explícita por aparelho; negado não
+  gera pedidos repetidos
 
-  **Validação/unidade:** Após gesto do usuário, HTTPS e capacidade detectada
+  **Validação/unidade:** NOT-02 Ativar push neste aparelho: Após gesto do
+  usuário, HTTPS e capacidade detectada; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Avisos podem aparecer na tela bloqueada.”
+  **Ajuda/exemplo:** NOT-02 Ativar push neste aparelho: “Avisos podem aparecer
+  na tela bloqueada.”
 
 - **Campo:** Nome do aparelho
 
-  **Tipo/origem:** Texto opcional do titular
+  **Tipo/origem por tela e estado:** NOT-02 Nome do aparelho: EDITABLE
+  (TEXT_INPUT); Somente no subestado de preparação autorizado indicado na
+  ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Não, descrição segura
+  **Obrigatoriedade/default na preparação:** NOT-02 Nome do aparelho: Não,
+  descrição segura
 
-  **Validação/unidade:** Proposta 1–80; não provar identidade pelo user-agent
+  **Validação/unidade:** NOT-02 Nome do aparelho: Proposta 1–80; não provar
+  identidade pelo user-agent; Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Meu celular de trabalho.”
+  **Ajuda/exemplo:** NOT-02 Nome do aparelho: “Meu celular de trabalho.”
 
 - **Campo:** Inscrição e permissão
 
-  **Tipo/origem:** Endpoint/chaves do navegador, servidor
+  **Tipo/origem por tela e estado:** NOT-02 Inscrição e permissão: INTERNAL
+  (NO_USER_CONTROL); Endpoint/chave/token de inscrição nunca renderizados ao
+  usuário comum
 
-  **Obrigatório e default:** Somente técnico; privado
+  **Obrigatoriedade/default na preparação:** NOT-02 Inscrição e permissão: Não
+  renderizar controle
 
-  **Validação/unidade:** Escopo usuário/dispositivo; validar origem e destino;
-  sem log de endpoint
+  **Validação/unidade:** NOT-02 Inscrição e permissão: Somente contrato
+  interno, com validação no servidor; não expor segredo/UUID como decisão do
+  usuário
 
-  **Ajuda e exemplo:** Permitida/negada/indisponível/expirada são estados
-  diferentes.
+  **Ajuda/exemplo:** NOT-02 Inscrição e permissão:
+  Permitida/negada/indisponível/expirada são estados diferentes.
 
 - **Campo:** Conteúdo na tela bloqueada
 
-  **Tipo/origem:** Preferência mínima
+  **Tipo/origem por tela e estado:** NOT-02 Conteúdo na tela bloqueada:
+  EDITABLE (RADIO_OR_SELECT); Somente no subestado de preparação autorizado
+  indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** Default proposto genérico
+  **Obrigatoriedade/default na preparação:** NOT-02 Conteúdo na tela
+  bloqueada: Default proposto genérico
 
-  **Validação/unidade:** Sem nome do paciente/material/quantidade no push
-  inicial
+  **Validação/unidade:** NOT-02 Conteúdo na tela bloqueada: Sem nome do
+  paciente/material/quantidade no push inicial; Somente no subestado de
+  preparação autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** “Há uma atualização no Home Care Assistant.”
+  **Ajuda/exemplo:** NOT-02 Conteúdo na tela bloqueada: “Há uma atualização no
+  Home Care Assistant.”
 
 - **Campo:** Prazo/escalonamento
 
-  **Tipo/origem:** Política por evento
+  **Tipo/origem por tela e estado:** NOT-03 Prazo/escalonamento: EDITABLE
+  (DURATION_AND_ESCALATION_FIELDS); Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Obrigatório e default:** P13 define limites/donos
+  **Obrigatoriedade/default na preparação:** NOT-03 Prazo/escalonamento: Valor
+  previamente aprovado/configurado ou A definir; nenhum SLA/custo inventado
 
-  **Validação/unidade:** Sem SLO inventado; considerar fuso e responsabilidade
+  **Validação/unidade:** NOT-03 Prazo/escalonamento: Sem SLO inventado;
+  considerar fuso e responsabilidade; Somente no subestado de preparação
+  autorizado indicado na ficha; resumo/decisão posterior é leitura
 
-  **Ajuda e exemplo:** Aviso essencial não garante chegada no prazo.
+  **Ajuda/exemplo:** NOT-03 Prazo/escalonamento: Aviso essencial não garante
+  chegada no prazo.
 
 - **Campo:** Modalidade de ciência
 
-  **Tipo/origem:** Preferência por tipo
+  **Tipo/origem por tela e estado:** NOT-02 Modalidade de ciência:
+  EDITABLE_SUBFORM (SCOPED_SCIENCE_PREFERENCES); Manual/dialogada/tácita só
+  por obrigação elegível, com consentimento prospectivo; nenhuma opção desliga
+  SCI-005
 
-  **Obrigatório e default:** Conforme P02
+  **Obrigatoriedade/default na preparação:** NOT-02 Modalidade de ciência:
+  Manual/dialogada/tácita por obrigação elegível; tácita sem opt-in implícito;
+  SCI-005 fora das opções
 
-  **Validação/unidade:** Snapshot da escolha na emissão; nunca derivar de push
+  **Validação/unidade:** NOT-02 Modalidade de ciência: Preferência anterior
+  expressa e política permitem tácita; ANY familiar permanente; escolha
+  prospectiva com versão, nunca desativa SCI-005; Manual/dialogada/tácita só
+  por obrigação elegível, com consentimento prospectivo; nenhuma opção desliga
+  SCI-005
 
-  **Ajuda e exemplo:** Tocar aviso só abre destino autenticado.
+  **Ajuda/exemplo:** NOT-02 Modalidade de ciência: Tocar aviso só abre destino
+  autenticado.
 
 - **Campo:** Referência/tentativa
 
-  **Tipo/origem:** Servidor, leitura administrativa
+  **Tipo/origem por tela e estado:** NOT-05 Referência/tentativa: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Sim para conciliação
+  **Obrigatoriedade/default na preparação:** NOT-05 Referência/tentativa:
+  Valor emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Distinguir evento, job, tentativa, referência nula e
-  estado incerto
+  **Validação/unidade:** NOT-05 Referência/tentativa: Revalidar acesso,
+  referência e estado na leitura/ação. Não solicitar ao usuário correção deste
+  valor nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** Ausência de referência não prova que não houve envio.
+  **Ajuda/exemplo:** NOT-05 Referência/tentativa: Informação do registro
+  indicado, somente para consulta nesta etapa. Ausência de dado histórico
+  permanece explicitamente identificada.
 
 - **Campo:** Última consulta
 
-  **Tipo/origem:** Instante/revisão do servidor
+  **Tipo/origem por tela e estado:** NOT-01 Última consulta: READ_ONLY
+  (TEXT_VALUE); Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Obrigatório e default:** Leitura
+  **Obrigatoriedade/default na preparação:** NOT-01 Última consulta: Valor
+  emitido, proposto ou calculado da fonte identificada; ausência
+  explicitamente informada, sem valor inventado
 
-  **Validação/unidade:** Erro/offline não mantém “Você está em dia”
+  **Validação/unidade:** NOT-01 Última consulta: Revalidar acesso, referência
+  e estado na leitura/ação. Não solicitar ao usuário correção deste valor
+  nesta tela. Consulta do valor de origem; mudanças só no processo
+  legitimamente responsável
 
-  **Ajuda e exemplo:** “Última consulta às 09:10.”
+  **Ajuda/exemplo:** NOT-01 Última consulta: A data pertence ao fato
+  identificado. Data de registro e de emissão são mostradas separadamente
+  quando forem diferentes.
 
 <!-- c-table:end -->
 
@@ -317,3 +390,11 @@ não anuncia implementação. Contrato detalhado no
 [adendo C7](../C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
 [blueprint C8](../C8-visual-blueprint/VISUAL_BLUEPRINT_BY_SCREEN.md) e
 [casos C9](../C9-acceptance-refinement/ACCEPTANCE_CASES.csv).
+
+## Fechamento definitivo — tarefa, estado e política
+
+P02 está OWNER_APPROVED. Visto, push, envio, mensagem lida, abertura, ciência
+e recebimento são distintos. SCI-003 não satisfaz ciência; SCI-004 futura
+exige canal homologado. SCI-005 não aparece como opção desativável.
+Preferências manual/dialogada/tácita só por obrigação elegível, sem opt-in
+implícito. Tarefa interna não desaparece ao desligar push.

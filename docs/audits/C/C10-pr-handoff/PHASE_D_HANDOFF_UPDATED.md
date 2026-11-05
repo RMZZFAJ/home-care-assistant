@@ -14,9 +14,10 @@ auditorias; política final de repositório prevalece. Sem cleanup nesta C.
    casos. C3/C4/C5 continuam fontes de domínio/arquitetura/ordem refinadas.
    Current é AS_IS; aprovação não é implementação.
 
-3. Resolver somente gate humano que condiciona o trecho. P02 por SCI-ID
-   bloqueia nova política; P09-B já é mínimo, faltando certificado/custo; P11
-   é facultativo; P12 fixa unicidade; O01+ cria wizard global.
+3. Resolver somente gate humano que condiciona o trecho. P02 por SCI-ID está
+   OWNER_APPROVED e não tem classificação humana pendente; P09-B já é mínimo,
+   faltando certificado/custo; P11 é facultativo; P12 fixa unicidade; O01+
+   cria wizard global.
 
 4. Confirmar stack local home-care-assistant/API54321/DB54322 antes de testes
    mutáveis. Substituição local exige consentimento e backup verificável.
@@ -61,3 +62,12 @@ decisão expressa. Backup legível, preview READY e PDF com hash não dão GO.
 Ao concluir implementação e prova real, atualizar current com o que passou a
 existir. Conservar os snapshots, autores, documentos/bytes e referências de
 auditoria. Continuar NO-GO enquanto gate aplicável permanecer aberto.
+
+## Gates por ramo e pré-condição da branch
+
+P03/P05/P07/P08/P09/P10/P13/P15/OPS-01/PERF-01 não impedem D0 geral/D1
+independente, mas seus ramos/homologações seguem condicionados pela
+[matriz canônica](../C7-decision-closure/GATE_CLASSIFICATION.csv).
+Contratações P03/P09/P13 são pesquisa externa do responsável. Documentação não
+aprova gate. Branch D somente após integrar PR6 à master e autorizar missão D.
+C8 tem 274 controles/424 usos e C9 187 casos planejados.

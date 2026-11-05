@@ -29,9 +29,10 @@ verificador de exemplar são requisitos planejados; não são anunciados como
 implementados. Os dois P1 herdados continuam abertos até correção/regressão
 autorizada.
 
-O [fechamento C7–C10](docs/audits/C/C10-pr-handoff/README.md) registra 161
-casos de aceite planejados, direção visual aprovada e classificação individual
-P02 ainda humana. O Draft PR documental não autoriza merge ou D.
+O [fechamento definitivo C7–C10](docs/audits/C/C10-pr-handoff/README.md)
+registra P02 OWNER_APPROVED, 66 fichas e 262 controles originais revistos.
+Catálogo atual: 274 controles/424 usos; 187 aceites planejados. Draft PR 6
+permanece para revisão, sem merge ou início D.
 
 ## Desenvolvimento
 

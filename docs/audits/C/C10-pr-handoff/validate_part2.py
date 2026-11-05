@@ -215,4 +215,11 @@ def main():
     raise SystemExit(1 if failed else 0)
 
 
-if __name__=="__main__":main()
+if __name__=="__main__":
+    # The first closure proof is preserved in final-closure/inputs. The
+    # current complement has an explicit baseline and expanded contracts.
+    final_validator = OUT / "validate_final_closure.py"
+    if (OUT / "final-closure/evidence/BASELINE.json").exists():
+        import sys
+        raise SystemExit(subprocess.call([sys.executable,str(final_validator),*sys.argv[1:]],cwd=ROOT))
+    main()

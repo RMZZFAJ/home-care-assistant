@@ -1,98 +1,214 @@
 # NOT-03 — Definir regras de avisos
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Admin competente por paciente. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /configuracoes regras, atual a alterar. Gatilho: navegar pela
-tarefa ou abrir o alvo contextual autorizado. Objetivo: Política por tipo,
-categoria e destinatário; resumo de consequência.
+Regra administrativa de aviso por evento/categoria; proposta pendente não é
+configuração vigente.
 
-## Composição e sequência
+Finalidade: Definir regras de avisos.
 
-Matriz por evento/categoria/destinatário; drawer com efeito e resumo antes de
-salvar.
+Admin competente por paciente; destinatários precisam vínculo/capacidade e
+canal habilitado legitimamente.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /configuracoes regras, atual a alterar.
 
-Falhas técnicas só global/suporte; equipe recebe impacto/próxima ação.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Obrigação interna e regras obrigatórias de ciência. Prazo não contratado
+aparece a definir, sem número de SLA inventado.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-131-01 — Categoria
+
+**Modo/componente:** EDITABLE / EVENT_CATEGORY_SELECT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim por evento.
+
+**Máscara/apresentação:** Categorias humanas do catálogo de eventos e
+destinatários; canal não altera obrigação ou ciência. Autocomplete: off.
+
+**Validação:** Não elevar todo evento a essencial; Somente no subestado de
+preparação autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Apoio: há uma conferência pendente.”
+
+**Mensagem e condição:** “Escolha uma opção válida para categoria no escopo
+desta tarefa. Se a opção necessária não estiver disponível, volte ou procure a
+administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-132-01 — Tipo de obrigação
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim na regra.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Matriz de eventos e ações autorizadas; Somente no subestado de
+preparação autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Recebimento, decisão, prazo e informação têm consequências
+diferentes.
+
+**Mensagem e condição:** “Escolha uma opção válida para tipo de obrigação no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-133-01 — Destinatários
+
+**Modo/componente:** EDITABLE / SEARCHABLE_COMBOBOX.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim quando regra habilitada.
+
+**Máscara/apresentação:** Busca por nome/alias e seleção de resultado
+autorizado; nenhum identificador técnico digitado. Autocomplete: off.
+
+**Validação:** Revalidar vínculo/capacidade; sem autoridade por
+telefone/escala isolados; Somente no subestado de preparação autorizado
+indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Pessoa que deve conferir esta entrega.”
+
+**Mensagem e condição:** “Escolha uma opção válida para destinatários no
+escopo desta tarefa. Se a opção necessária não estiver disponível, volte ou
+procure a administração responsável.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-134-01 — Canal interno
+
+**Modo/componente:** INTERNAL / NO_USER_CONTROL.
+
+**Quando/ator:** Dado de comando/transporte; nunca input ou identificador
+técnico exigido ao usuário.
+
+**Obrigatoriedade/inicial:** Não renderizar controle.
+
+**Máscara/apresentação:** NÃO APLICÁVEL. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Somente contrato interno, com validação no servidor; não expor
+segredo/UUID como decisão do usuário.
+
+**Ajuda/exemplo:** “Consulte suas pendências no aplicativo.”
+
+**Acessibilidade:** Não inserir campo escondido na ordem de foco, texto
+acessível ou mensagem para o usuário comum.
+
+### CTRL-139-01 — Prazo/escalonamento
+
+**Modo/componente:** EDITABLE / DURATION_AND_ESCALATION_FIELDS.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Valor previamente aprovado/configurado ou A
+definir; nenhum SLA/custo inventado.
+
+**Máscara/apresentação:** Duração numérica com unidade, responsável e
+escalonamento em campos separados; valor não aprovado aparece A definir.
+Autocomplete: off.
+
+**Validação:** Sem SLO inventado; considerar fuso e responsabilidade; Somente
+no subestado de preparação autorizado indicado na ficha; resumo/decisão
+posterior é leitura.
+
+**Ajuda/exemplo:** Aviso essencial não garante chegada no prazo.
+
+**Mensagem e condição:** “Confira a duração e sua unidade. Um prazo ainda não
+aprovado permanece A definir; não substitua esse estado por um número
+presumido.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Evento/finalidade → destinatários/canal permitido → prazo configurado quando
+existente → impacto/antes-depois → salvar/propor.
+
+Regras agrupadas por finalidade, atual/proposta lado a lado e invariáveis em
+texto; editor tipado pelo tipo de regra.
 
 Primária: **Salvar regra exibida**. Secundárias: Comparar proposta; Voltar.
 
-Consequência: Regra não atribui ato físico nem autoridade de outro papel.
-Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão material.
-Retorno/Voltar preserva edição e contexto; próximo destino é resultado do ato
-ou tarefa pertinente, nunca novo envio automático. Em resposta incerta
-consultar intenção antes de prosseguir.
+Efeito: Regra não atribui ato físico nem autoridade de outro papel.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Regra registrada no estado apresentado. Proposta que
+aguarda aprovação ainda não substitui a regra vigente.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Selecione um evento para consultar sua regra. Ausência de
+canal externo não elimina a tarefa interna.”
 
-- **CTRL-131-01 — Categoria**. RADIO_OR_SELECT. Ordem 131.1; Sim por evento.
-  Máscara/autocomplete: Opções finitas com rótulo humano; sem opção material
-  preaceita; off. Dependência/validação: Não elevar todo evento a essencial.
-  Ajuda/exemplo: “Apoio: há uma conferência pendente.”. Erro: Revise
-  categoria: Não elevar todo evento a essencial..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-132-01 — Tipo de obrigação**. SEARCHABLE_COMBOBOX. Ordem 132.1; Sim
-  na regra. Máscara/autocomplete: Busca por nome/alias autorizado; seleção por
-  ID; nenhum ID digitado como autorização; off. Dependência/validação: Matriz
-  de eventos e ações autorizadas. Ajuda/exemplo: Recebimento, decisão, prazo e
-  informação têm consequências diferentes.. Erro: Revise tipo de obrigação:
-  Matriz de eventos e ações autorizadas..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-133-01 — Destinatários**. SEARCHABLE_COMBOBOX. Ordem 133.1; Sim
-  quando regra habilitada. Máscara/autocomplete: Busca por nome/alias
-  autorizado; seleção por ID; nenhum ID digitado como autorização; off.
-  Dependência/validação: Revalidar vínculo/capacidade; sem autoridade por
-  telefone/escala isolados. Ajuda/exemplo: “Pessoa que deve conferir esta
-  entrega.”. Erro: Revise destinatários: Revalidar vínculo/capacidade; sem
-  autoridade por telefone/escala isolados..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-134-01 — Canal interno**. RADIO_OR_SELECT. Ordem 134.1; Mantido para
-  estado operacional. Máscara/autocomplete: Opções finitas com rótulo humano;
-  sem opção material preaceita; off. Dependência/validação: Desligar push não
-  elimina pendência interna. Ajuda/exemplo: “Consulte suas pendências no
-  aplicativo.”. Erro: Revise canal interno: Desligar push não elimina
-  pendência interna..
+Tipo desconhecido não aprova JSON opaco. Falha mantém regra anterior e
+proposta distinta; Meta/Flows continuam postergados.
 
-- **CTRL-139-01 — Prazo/escalonamento**. TEXT_INPUT. Ordem 139.1; P13 define
-  limites/donos. Máscara/autocomplete: Sem máscara artificial; preservar texto
-  e limite do contrato; off. Dependência/validação: Sem SLO inventado;
-  considerar fuso e responsabilidade. Ajuda/exemplo: Aviso essencial não
-  garante chegada no prazo.. Erro: Revise prazo/escalonamento: Sem SLO
-  inventado; considerar fuso e responsabilidade..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-## Estado, teclado e ajuda
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-NOT-03` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `notify`; ausência de exemplo no HTML é declarada, sem novo mockup
-equivalente. B1: SC-025, SC-026, SC-033, OVL-007.
+Blocos de regra com antes/depois empilhados; não exigir leitura de JSON;
+resumo e próxima autoridade junto à ação.
 
-Critérios C9 relacionados: C-AC-001, C-AC-003, C-AC-014, C-AC-020, C-AC-023,
-C-AC-049, C-AC-064, C-AC-073, C-AC-083, C-AC-084, C-AC-086, C-AC-087,
-C-AC-088, C-AC-089, C-AC-090, C-AC-091, C-AC-092, C-AC-093, C-AC-094,
-C-AC-095, C-AC-096, C-AC-097, C-AC-098, C-AC-099, C-AC-113, C-AC-115,
-C-NEW-AC-001, C-NEW-AC-002, C-NEW-AC-003, C-NEW-AC-026, C7-AC-008, C7-AC-012.
-A associação é por domínio; cada caso preserva seu discriminante específico e
-não significa que todos os critérios foram executados nesta tela. Fonte
-funcional:
-[PWA_PUSH_AND_NOTIFICATIONS](../../C3-functional-specification/PWA_PUSH_AND_NOTIFICATIONS.md).
+Grupos e opções nomeados por obrigação; indisponível tem motivo; SCI-005 não
+possui input desabilitado que sugira futura opção de desligamento.
+
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
+
+Referência do protótipo: notify. Sem captura real ou aceite humano de
+interface futura nesta C.
+
+RECONSTRUIR matriz por finalidade se campos genéricos permitirem desligar
+obrigação ou autoridade familiar.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-001;C-AC-003;C-AC-014;C-AC-020;C-AC-023;C-AC-049;C-AC-064;C-AC-073;C-AC-083;C-AC-084;C-AC-086;C-AC-087;C-AC-088;C-AC-089;C-AC-090;C-AC-091;C-AC-092;C-AC-093;C-AC-094;C-AC-095;C-AC-096;C-AC-097;C-AC-098;C-AC-099;C-AC-113;C-AC-115;C-NEW-AC-001;C-NEW-AC-002;C-NEW-AC-003;C-NEW-AC-026;C7-AC-008;C7-AC-012;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.

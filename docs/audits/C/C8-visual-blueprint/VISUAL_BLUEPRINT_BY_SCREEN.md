@@ -1,45 +1,49 @@
-# Projeto visual por superfície
+# Especificação visual por tarefa e estado
 
-Direção visual aprovada pelo responsável em 04/11/2026. Especificação TO_BE; D
-NÃO INICIADA.
+Direção HTML/oito PNG aprovada, sem protótipo equivalente recriado.
+Especificação TO_BE; **D NÃO INICIADA**.
 
-97 superfícies B1 e 66 superfícies C3 têm granularidades diferentes. O
-cruzamento registra relações muitos-para-muitos e superfícies novas; não soma
-os denominadores. Todos os órfãos, redirects e demos têm destino e
-justificativa. As fichas abaixo cobrem controles, ações e estados de cada
-tela; overlays B1 herdam a ficha indicada e conservam seu papel/dialog/foco.
+66 fichas, 262 controles originais e 171 relações originais revistos. Catálogo
+atual: 274 controles, 424 usos contextuais, 171 relações reconciliadas.
 
-## Padrões vinculados às fichas
+## Precedência dos contratos
 
-Desktop ≥1200: navegação lateral de 250px, conteúdo máximo1350px, área de
-tarefa e ajuda em proporção aproximada1.65/0.95 quando útil. Tablet 651–1199:
-duas colunas somente com campos legíveis; rail compacto não pode depender de
-tooltip/hover para navegação. Móvel320–650: uma coluna, 16px de margem e
-atalhos inferiores Início/REQ/ENT/Estoque/Mais com safe area e todos os
-módulos autorizados em Mais. Help crítico vem antes da ação. Tabelas
-indispensáveis têm região de rolagem rotulada; totais, unidade e ação não
-ficam escondidos fora da viewport.
+Ficha define finalidade/ator/estado e os 24 pontos. Catálogo define identidade
+do controle; CONTROL_SCREEN_CONTRACTS resolve cada screen_id/control_id: modo,
+componente, condição, autoridade, default, validação, mensagem e foco.
+EDITABLE_SUBFORM só é editável no estado/ator indicado; fora dele é leitura ou
+oculto conforme a condição. Nunca herdar editor de criação na aprovação.
+READ_ONLY/CALCULATED/AUTO_FILLED são texto, não input disabled;
+INTERNAL/HIDDEN não entram no foco ou texto acessível.
 
-Tipografia do sistema, azul-petróleo e superfícies claras do HTML. Os pequenos
-textos decorativos do protótipo não são garantia de contraste ou legibilidade;
-D valida tamanho/contraste/reflow reais. Grid de 4/8px, intervalo16–24px entre
-grupos, campos com label/ajuda/erro próximos e alvos principais de 44px são
-objetivos de desenho, sujeitos ao ensaio de acesso; não usar cor como única
-distinção de seleção/sucesso.
+## Identidade aprovada e composição
 
-Loading tem skeleton/legenda e não afirma vazio. Atualizando conserva dado
-anterior com data. Empty só depois de consulta válida; erro oferece repetir
-leitura. Offline mostra frescor e não enfileira aceite; conflito conserva
-intenção/edição; uncertain congela comando e consulta mesma chave. Sucesso
-identifica efeito/quantidade/próximo responsável; P15 usa barreira persistente
-sem conteúdo protegido e mensagem de ação separada.
+Teal #146c78, texto #19333d e papel #f4f7f8; superfícies claras/bordas suaves,
+radius próximo de 14px e agrupamento 16–24px orientam o estilo. Desktop tem
+navegação/contexto persistentes; tarefa/consequência antes de ajuda
+secundária. Tipografia/contraste/reflow precisam de prova no candidato, sem
+reproduzir texto decorativo minúsculo como requisito acessível.
 
-Diálogo: título/describedby, foco inicial no título/resumo ou primeiro
-inválido; Tab contido, Escape/Voltar retornam ao acionador. Destrutiva exige
-escopo e confirmação sem default. Ícone decorativo aria-hidden; ação tem texto
-visível. Só fechar/ajuda/setas densas podem usar ícone com nome e tooltip
-acessível por foco, sem depender de hover. Mudança de filtro não abre modal.
-Leitor de tela anuncia status, não repete toda a página.
+Móvel segue a tarefa em uma coluna, com quantidades/unidades/ações
+alcançáveis. ENT usa cartões e não copia tabela que corta quantidade no
+exemplo móvel. ADM prioriza tarefas antes de pilha de métricas; Mês preserva
+intervalo/lista. Barra inferior/ações fixas não cobrem conteúdo, teclado ou
+foco.
+
+## Mensagens e estados
+
+Leitura falha atualiza seção; escrita incerta consulta mesma intenção;
+confirmado não regride; parcial identifica etapas reais. Vazio só depois de
+consulta válida. READ_ERROR não é FIELD_ERROR; output não pede Revise campo.
+Diálogo só para decisão/consentimento/descarte pertinentes.
+
+Catálogo mantém 4.205 fontes B1 exatas como histórico. Não são automaticamente
+copy futura. Substituição usa literal/contexto, nunca toda string na mesma
+linha. Expressão dinâmica usa presenter tipado; novas mensagens têm condição
+por tarefa/estado. Placeholders não expõem códigos/chaves e só usam fatos
+confirmados.
+
+## Fichas revistas
 
 - [REQ-01 — Selecionar materiais](screens/REQ-01.md).
 
@@ -172,3 +176,12 @@ Leitor de tela anuncia status, não repete toda a página.
 - [GUI-03 — Regularizar contingência](screens/GUI-03.md).
 
 - [GUI-04 — Recuperar serviço com segurança](screens/GUI-04.md).
+
+## Evidência e limites
+
+[24 dimensões](SCREEN_SEMANTIC_REVIEW.csv),
+[controles](CONTROL_SEMANTIC_REVIEW.csv),
+[relações](SURFACE_RELATION_SEMANTIC_REVIEW.csv) e
+[fontes de texto](MICROCOPY_SEMANTIC_REVIEW.csv). Revisão semântica e inspeção
+de referências não são implementação, aceite humano, WCAG certificada ou
+homologação física; P10 permanece D6.

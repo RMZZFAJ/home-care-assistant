@@ -1,104 +1,276 @@
 # BAL-02 — Contar materiais
 
-Estado: direção visual OWNER_APPROVED; especificação TO_BE, não implementada.
+Direção visual OWNER_APPROVED. Especificação TO_BE; nenhuma tela implementada
+nesta revisão. Ordem complementar definitiva prevalece sobre exemplos antigos.
 
-Perfil e permissão: Contador designado/legítimo. Banco/API revalidam
-capacidade, alvo e versão; menu/ID/escala não concedem autorização.
+## 1–3. Finalidade, autorização e estado
 
-Rota/superfície: /fichas/bal etapa 1, atual a alterar. Gatilho: navegar pela
-tarefa ou abrir o alvo contextual autorizado. Objetivo: Contar fisicamente
-equipe sem revelar referência antes da observação.
+Observação física privada → revisão da própria declaração → confirmação
+oficial; etapa inicial sem saldo de referência.
 
-## Composição e sequência
+Finalidade: Contar materiais.
 
-Etapa de observação sem saldo de referência; itens/unidade e campos vazios;
-resumo antes do ato.
+Contador designado/elegível à janela e versão corrente; autoria vem da sessão.
 
-Desktop: aplicar essa hierarquia no shell aprovado, tarefa primeiro e ajuda
-lateral quando útil. Tablet: preservar ordem de foco e duas colunas só se
-rótulos/valores couberem. Móvel: empilhar na mesma ordem; diálogo longo ocupa
-largura disponível e rola internamente, footer não cobre campo/teclado;
-resumo/ações continuam alcançáveis.
+AS_IS/rota: /fichas/bal etapa 1, atual a alterar.
 
-Não preencher referência como contagem, nem transformar diferença em consumo.
+## 4–14. Campos, modos de interação e validação
 
-## Ações e efeito
+Materiais/unidades e atribuição. Referência de estoque fica oculta na
+observação inicial; zero só nasce de digitação explícita.
+
+Cada ocorrência abaixo resolve o controle no estado desta tarefa. READ_ONLY é
+texto/comparação, não um input disabled. Subformulário só aparece quando sua
+condição/autoridade é satisfeita; consultar não abre edição automaticamente.
+
+### CTRL-047-01 — Material e unidade
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Nome completo e unidade da origem, com quebra de
+linha sem corte. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Identificação do item registrado. A consulta não substitui
+o material ou reinterpreta sua unidade.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Material e
+unidade”. Atualize esta seção. O dado registrado não pode ser alterado aqui.”
+— SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-048-01 — Quantidade contada
+
+**Modo/componente:** EDITABLE / DECIMAL_TEXT_INPUT.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Sim por item, vazio.
+
+**Máscara/apresentação:** Quantidade textual exata com unidade; vírgula/ponto,
+inputmode decimal e precisão explícita antes da coerção. Autocomplete: off.
+
+**Validação:** Zero digitado válido; precisão da unidade e até seis casas;
+Somente no subestado de preparação autorizado indicado na ficha;
+resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** “Conte agora: 0 ou 3 unidades.”
+
+**Mensagem e condição:** “Informe quantidade contada na unidade indicada e com
+a precisão permitida. O campo precisa de correção antes de confirmar.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+### CTRL-050-01 — Atribuição
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Atribuição”.
+Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-050-02 — Início da janela
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Início da
+janela”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-050-03 — Fim da janela
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Data/hora local com rótulo do fato e fuso;
+desconhecido explícito. Autocomplete: NÃO APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** A data pertence ao fato identificado. Data de registro e de
+emissão são mostradas separadamente quando forem diferentes.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Fim da
+janela”. Atualize esta seção. O dado registrado não pode ser alterado aqui.” —
+SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-050-04 — Versão da atribuição
+
+**Modo/componente:** READ_ONLY / TEXT_VALUE.
+
+**Quando/ator:** Consulta do valor de origem; mudanças só no processo
+legitimamente responsável.
+
+**Obrigatoriedade/inicial:** Valor emitido, proposto ou calculado da fonte
+identificada; ausência explicitamente informada, sem valor inventado.
+
+**Máscara/apresentação:** Descrição rotulada do registro específico, sem
+input, identificador de transporte ou valor inventado. Autocomplete: NÃO
+APLICÁVEL.
+
+**Validação:** Revalidar acesso, referência e estado na leitura/ação. Não
+solicitar ao usuário correção deste valor nesta tela. Consulta do valor de
+origem; mudanças só no processo legitimamente responsável.
+
+**Ajuda/exemplo:** Informação do registro indicado, somente para consulta
+nesta etapa. Ausência de dado histórico permanece explicitamente identificada.
+
+**Mensagem e condição:** “Não foi possível carregar a informação “Versão da
+atribuição”. Atualize esta seção. O dado registrado não pode ser alterado
+aqui.” — SECTION_READ_FAILED.
+
+**Acessibilidade:** Texto/lista/comparação sem aria-invalid de formulário;
+erro pertence à seção com ação Atualizar e foco preservado.
+
+### CTRL-051-01 — Observações
+
+**Modo/componente:** EDITABLE / TEXTAREA.
+
+**Quando/ator:** Somente no subestado de preparação autorizado indicado na
+ficha; resumo/decisão posterior é leitura.
+
+**Obrigatoriedade/inicial:** Não, vazio.
+
+**Máscara/apresentação:** Texto com quebras de linha; limite e contador do
+campo visíveis, sem máscara de seleção. Autocomplete: off.
+
+**Validação:** Até 2000 na ficha; Somente no subestado de preparação
+autorizado indicado na ficha; resumo/decisão posterior é leitura.
+
+**Ajuda/exemplo:** Não inventar consumo para explicar divergência.
+
+**Mensagem e condição:** “Confira observações e o limite indicado. Corrija
+somente esta informação; os demais valores preenchidos foram preservados.” —
+LOCAL_INVALID_BEFORE_COMMAND;SERVER_REJECTION_ONLY_WHEN_CONFIRMED;UNCERTAIN_USES_SCREEN_CONTRACT.
+
+**Acessibilidade:** Label visível, ajuda/erro associados, required antes do
+envio, aria-invalid só quando inválido; resumo leva ao input editável correto.
+
+## 15–18. Hierarquia, ações, consequências e mensagens
+
+Atribuição/janela → materiais/unidades → quantidades contadas vazias → notas →
+revisão → confirmar contagem e efeito BAL informado.
+
+Atribuição/janela no topo; materiais e campos de observação sem saldo de
+referência; revisão da contagem em etapa separada.
 
 Primária: **Revisar minha contagem**. Secundárias: Salvar rascunho; Voltar.
 
-Consequência: Autosave sem efeito; confirmação oficial explicita eventual
-ajuste BAL. Mostrar objeto/quantidade/pessoa/versão antes de qualquer decisão
-material. Retorno/Voltar preserva edição e contexto; próximo destino é
-resultado do ato ou tarefa pertinente, nunca novo envio automático. Em
-resposta incerta consultar intenção antes de prosseguir.
+Efeito: Autosave sem efeito; confirmação oficial explicita eventual ajuste
+BAL.
 
-## Controles em ordem de tarefa
+Sucesso/resultado: “Contagem registrada com sua autoria. O resultado informa
+se houve ajuste BAL ou revisão iniciada; autosave não aplica inventário.”
 
-Os IDs abaixo são canônicos no catálogo de controles. Campos compostos C3
-foram desdobrados; na revisão/detalhe aparecem em leitura, não novamente
-editáveis. Servidor é a origem de identidade/versões/estados.
+Vazio/inelegível: “Não há contagem elegível para esta pessoa/janela. Consulte
+a atribuição antes de iniciar.”
 
-- **CTRL-047-01 — Material e unidade**. READ_ONLY_DESCRIPTION. Ordem 47.1;
-  Todos os exigidos, somente leitura. Máscara/autocomplete: SEM_MASCARA;valor
-  do servidor; off. Dependência/validação: Equipe, sem saldo familiar geral.
-  Ajuda/exemplo: Item que mudou desde rascunho exige revisão.. Erro: Revise
-  material e unidade: Equipe, sem saldo familiar geral..
+Alertas de consulta/validação permanecem inline na seção. Diálogo somente para
+decisão/consentimento/descarte que o exige; nunca para cada filtro ou aviso.
 
-- **CTRL-048-01 — Quantidade contada**. DECIMAL_TEXT_INPUT. Ordem 48.1; Sim
-  por item, vazio. Máscara/autocomplete: Vírgula/ponto; inputmode decimal;
-  precisão antes da coerção; zero só onde permitido; off.
-  Dependência/validação: Zero digitado válido; precisão da unidade e até seis
-  casas. Ajuda/exemplo: “Conte agora: 0 ou 3 unidades.”. Erro: Revise
-  quantidade contada: Zero digitado válido; precisão da unidade e até seis
-  casas..
+## 19–20. Falhas, recuperação e continuidade
 
-- **CTRL-050-01 — Atribuição**. READ_ONLY_DESCRIPTION. Ordem 50.1; Sim quando
-  regime ativo. Máscara/autocomplete: SEM_MASCARA;valor do servidor; off.
-  Dependência/validação: Pessoa, início/fim, assignment e ledger atuais.
-  Ajuda/exemplo: Sem expor UUID como instrução.. Erro: Revise atribuição:
-  Pessoa, início/fim, assignment e ledger atuais..
+Informação indisponível não recebe valor inventado; bloquear somente ação que
+depende dela, preservando consultas e encaminhamentos autorizados.
 
-- **CTRL-050-02 — Início da janela**. READ_ONLY_DESCRIPTION. Ordem 50.2; Sim
-  quando regime ativo. Máscara/autocomplete: SEM_MASCARA;valor do servidor;
-  off. Dependência/validação: Pessoa, início/fim, assignment e ledger atuais.
-  Ajuda/exemplo: Sem expor UUID como instrução.. Erro: Revise início da
-  janela: Pessoa, início/fim, assignment e ledger atuais..
+Rascunho preservado ao mudar atribuição; não submeter no alvo anterior. Retry
+de contagem confirmada recupera o mesmo BAL mesmo após avançar a janela.
 
-- **CTRL-050-03 — Fim da janela**. READ_ONLY_DESCRIPTION. Ordem 50.3; Sim
-  quando regime ativo. Máscara/autocomplete: SEM_MASCARA;valor do servidor;
-  off. Dependência/validação: Pessoa, início/fim, assignment e ledger atuais.
-  Ajuda/exemplo: Sem expor UUID como instrução.. Erro: Revise fim da janela:
-  Pessoa, início/fim, assignment e ledger atuais..
+Leitura falha repete consulta da seção. Escrita incerta consulta a mesma
+intenção antes de novo comando. Recusa comprovada, confirmado, conflito e
+incerto têm resultados distintos; nenhuma mensagem presume que nada ocorreu.
 
-- **CTRL-050-04 — Versão da atribuição**. READ_ONLY_DESCRIPTION. Ordem 50.4;
-  Sim quando regime ativo. Máscara/autocomplete: SEM_MASCARA;valor do
-  servidor; off. Dependência/validação: Pessoa, início/fim, assignment e
-  ledger atuais. Ajuda/exemplo: Sem expor UUID como instrução.. Erro: Revise
-  versão da atribuição: Pessoa, início/fim, assignment e ledger atuais..
+Voltar conserva contexto/edição permitidos e devolve foco ao acionador. Depois
+de resultado confirmado, abrir o alvo/resultado existente, sem repetir o ato.
 
-- **CTRL-051-01 — Observações**. TEXTAREA. Ordem 51.1; Não, vazio.
-  Máscara/autocomplete: Sem máscara; contador e limite do contrato visíveis;
-  quebra de linha/reflow; off. Dependência/validação: Até 2000 na ficha.
-  Ajuda/exemplo: Não inventar consumo para explicar divergência.. Erro: Revise
-  observações: Até 2000 na ficha..
+## 21–24. Móvel, acessibilidade, referência e negócio
 
-## Estado, teclado e ajuda
+Cartões por material, unidade antes do input e teclado decimal; sequência
+previsível sem rolagem horizontal global.
 
-Herda os estados descritos no blueprint; em cada painel a falha é isolada.
-Skeleton não cria ausência; erro não elimina dado válido de outra seção. Foco
-vai ao primeiro inválido; sucesso anuncia efeito, Escape/Voltar restauram
-acionador. Combobox usa setas/Enter/Escape e label associado. Tooltip em botão
-Ajuda sobre [campo] é acessível por foco; regra necessária permanece inline.
-Sem informação só por cor, hover, gesto ou QR.
+Rótulo único por item; zero explícito é anunciado; referência não fica em
+texto visualmente oculto acessível ao leitor durante contagem cega.
 
-Ajuda contextual: guia da tarefa e perfil, reabrível pelo perfil. Captura real
-futura: `SHOT-BAL-02` no mesmo SHA de D, sem dados pessoais/segredos.
-Protótipo: `bal/balCount`; ausência de exemplo no HTML é declarada, sem novo
-mockup equivalente. B1: SC-012, SC-050, OVL-019.
+Identidade aprovada: teal/papel claro, tipografia hierárquica, bordas suaves,
+cards e barra de contexto. Prioridade da tarefa e regras de autorização
+governam o layout; exemplos do protótipo não são controles obrigatórios.
 
-Critérios C9 relacionados: C-AC-001, C-AC-008, C-AC-009, C-AC-010, C-AC-015,
-C-AC-051, C-AC-054, C-AC-056, C-AC-057, C-AC-074, C-AC-077, C-AC-086,
-C-AC-089, C-AC-104, C-NEW-AC-007, C-NEW-AC-011, C-NEW-AC-012, C-NEW-AC-015,
-C7-AC-003. A associação é por domínio; cada caso preserva seu discriminante
-específico e não significa que todos os critérios foram executados nesta tela.
-Fonte funcional: [BAL](../../C3-functional-specification/BAL.md).
+Referência do protótipo: bal/balCount. Sem captura real ou aceite humano de
+interface futura nesta C.
+
+RECONSTRUIR primeira etapa se exibir referência ou copiar saldo para a
+contagem.
+
+## Contratos e aceites relacionados
+
+[Catálogo de controles](../FORM_CONTROL_CATALOG.csv),
+[interação por tela/estado](../CONTROL_SCREEN_CONTRACTS.csv) e
+[microcopy canônica](../UI_COPY_AND_MICROCOPY_MASTER.csv).
+
+Aceites relacionados:
+C-AC-001;C-AC-008;C-AC-009;C-AC-010;C-AC-015;C-AC-051;C-AC-054;C-AC-056;C-AC-057;C-AC-074;C-AC-077;C-AC-086;C-AC-089;C-AC-104;C-NEW-AC-007;C-NEW-AC-011;C-NEW-AC-012;C-NEW-AC-015;C7-AC-003;C-FINAL-AC-022;C-FINAL-AC-023;C-FINAL-AC-025.
+Associação de domínio não significa execução em cada tela; a D seleciona
+cenário/estado conforme o caso. C-FINAL-AC-025 percorre as 66 fichas.
