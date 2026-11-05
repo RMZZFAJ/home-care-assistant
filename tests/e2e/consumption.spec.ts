@@ -28,6 +28,164 @@ async function login(
 }
 const detail = (page: Page) =>
   page.locator('section[aria-label="Detalhe do relato"]');
+
+test("consumo recupera a própria confirmação após perder escrita, mas nova decisão e perda de leitura continuam bloqueadas", async ({
+  page,
+}) => {
+  const f = await setup(),
+    id = await seedReport(f);
+  await login(page, f.patient, "adminA");
+  await page.goto("/consumo?ref=" + id);
+  await detail(page)
+    .getByRole("button", { name: "Conferir consumo", exact: true })
+    .click();
+  const decision = page.getByRole("dialog", {
+      name: "Revisar confirmação do consumo",
+      exact: true,
+    }),
+    attempts: Record<string, unknown>[] = [];
+  await page.route("**/api/consumption", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    attempts.push(route.request().postDataJSON());
+    if (attempts.length === 1) {
+      const result = await route.fetch();
+      expect(result.ok(), await result.text()).toBe(true);
+      sql(
+        `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'stock.family.manage',false);`,
+      );
+      await route.abort("failed");
+    } else await route.continue();
+  });
+  await decision
+    .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })
+    .click();
+  await expect(
+    decision.getByRole("button", { name: "Voltar sem decidir", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    decision.getByRole("button", { name: "Fechar diálogo", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    decision.getByRole("button", { name: "Recuperar decisão", exact: true }),
+  ).toBeEnabled();
+  const context = (await (await page.request.get("/api/context")).json()).data;
+  expect(
+    context.patients.find((p: { id: string }) => p.id === f.patient)
+      .capabilities["stock.family.manage"],
+  ).toBe(false);
+  await decision
+    .getByRole("button", { name: "Recuperar decisão", exact: true })
+    .click();
+  await expect(decision).toHaveCount(0);
+  expect(attempts).toHaveLength(2);
+  expect(attempts[0]).toEqual(attempts[1]);
+  await expect(
+    detail(page).getByText(
+      "Consumo confirmado: 1 unidade descontado da família.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  const before = sql(
+    `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`,
+  );
+  const result = await page.request.get("/api/consumption/" + id);
+  expect(result.ok()).toBe(true);
+  const data = (await result.json()).data;
+  expect(data.movements).toHaveLength(1);
+  expect(data.decision.actor_id).toBe(fixtures.adminA.id);
+  const fresh = await page.request.post("/api/consumption", {
+    data: { ...attempts[0], idempotencyKey: randomUUID() },
+  });
+  expect(fresh.status()).toBe(403);
+  expect(
+    sql(
+      `select count(*) from public.consumption_report_decisions where report_id=${sqlLiteral(id)};`,
+    ),
+  ).toBe("1");
+  expect(
+    sql(
+      `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`,
+    ),
+  ).toBe(before);
+  sql(
+    `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'stock.family.read',false);`,
+  );
+  expect(
+    (
+      await page.request.post("/api/consumption", { data: attempts[0] })
+    ).status(),
+  ).toBe(403);
+});
+test("consumo recupera complemento próprio já conferido por outra pessoa sem reabrir o relato ou repetir movimentos", async ({
+  page,
+}) => {
+  const f = await setup(),
+    id = await seedReport(f),
+    reviewer = await actor("global", f.patient);
+  await login(page, f.patient, "adminA");
+  await page.goto("/consumo?ref=" + id);
+  await detail(page)
+    .getByRole("button", { name: "Adicionar complemento", exact: true })
+    .click();
+  await page
+    .getByLabel("Esclarecimento do complemento", { exact: true })
+    .fill(
+      "Complemento próprio que permanece imutável após a conferência independente",
+    );
+  await page
+    .getByRole("button", { name: "Revisar complemento", exact: true })
+    .click();
+  const attempts: Record<string, unknown>[] = [];
+  await page.route("**/api/consumption", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    attempts.push(route.request().postDataJSON());
+    if (attempts.length === 1) {
+      const response = await route.fetch();
+      expect(response.ok(), await response.text()).toBe(true);
+      const saved = (await response.json()).data;
+      await rpc(reviewer, "decide_consumption_report", {
+        p_id: id,
+        p_accept: true,
+        p_reason: null,
+        p_version: saved.version,
+        p_key: randomUUID(),
+      });
+      sql(
+        `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'consumption.report',false);`,
+      );
+      await route.abort("failed");
+    } else await route.continue();
+  });
+  await page
+    .getByRole("button", {
+      name: "Salvar complemento sem desconto",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Recuperar tentativa", exact: true }),
+  ).toBeEnabled();
+  await page
+    .getByRole("button", { name: "Recuperar tentativa", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(attempts).toHaveLength(2);
+  expect(attempts[0]).toEqual(attempts[1]);
+  await expect(
+    detail(page).getByText(
+      /Complemento anterior recuperado\. Estado atual: confirmado\./,
+    ),
+  ).toBeVisible();
+  const response = await page.request.get("/api/consumption/" + id),
+    data = (await response.json()).data;
+  expect(data.status).toBe("confirmed");
+  expect(data.revisions).toHaveLength(1);
+  expect(data.revisions[0].actor_id).toBe(fixtures.adminA.id);
+  expect(data.decision.actor_id).toBe(fixtures.global.id);
+  expect(data.movements).toHaveLength(1);
+  expect(Number(data.movements[0].quantity)).toBe(1);
+});
+
 async function seedReport(
   f: Awaited<ReturnType<typeof setup>>,
   kind = "consumption",

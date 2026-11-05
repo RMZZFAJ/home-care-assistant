@@ -234,6 +234,13 @@ quantidade pede complemento. Inativo com saldo continua elegível na custódia;
 unidade e precisão são verificadas antes de confirmar. Correção posterior não
 edita relato/decisão/ledger originais e depende de compensação referenciada.
 
+Recuperação de consumo pela chave original do mesmo ator verifica leitura viva
+antes/depois do lock e compara a intenção imutável antes de exigir nova escrita.
+Somente o percurso que criará fato exige consumption.report, gestão familiar ou
+consumption.confirm conforme a custódia; verificações finais continuam presentes.
+Complemento já conferido pode retornar o estado vigente sem reabrir o relato,
+repetir movimento ou alterar autoria. Grants, RLS e assinaturas das RPCs permanecem.
+
 delivery_consumption_allocations referencia, por linha/pedido de ENT, parcelas
 de movimentos de consumo já confirmados. É append-only, com RLS de ent.read
 no documento pai e SELECT autenticado; clientes não escrevem diretamente.

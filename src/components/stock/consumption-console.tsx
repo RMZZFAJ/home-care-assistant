@@ -357,7 +357,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           onSaved={(id) => {
             setEditor(null);
             setMessage(
-              "Relato registrado, sem desconto. Abra a referência para acompanhar complemento e conferência.",
+              "Relato identificado. Consulte a referência para acompanhar complementos, conferência e movimentos registrados.",
             );
             setAttempt((value) => value + 1);
             open(id);

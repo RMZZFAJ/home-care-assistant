@@ -837,3 +837,43 @@ sem novo alerta. Replay limpo/legado e suítes completas do novo SHA ficam para
 a CI programada; não foram duplicados localmente. Preview de desligamento,
 P07, BAL e demais etapas D2 continuam abertas. Comunicação legítima externa,
 assinatura D4 e aceite humano/físico são gates distintos, sem conclusão D-A/GO.
+
+## D2.9 — recuperação de consumo após perda somente da escrita
+
+P05 publicado em 20601f55509fc708992066e2ea3d467561ea1c70. Consulta pontual da
+CI 42129515456: in_progress, sem conclusão presumida. Draft PR 7 preservado.
+
+Quatro contraprovas Auth reproduziram recusa indevida de recuperação após perda
+da capacidade de escrita: relato próprio, complemento próprio, decisão própria
+e RPC legada de v1. Migration 20261105233500 move a autorização de nova escrita
+para depois da comparação da chave do próprio ato. Leitura viva precede a
+consulta e é revalidada após o lock; mutações conservam os guards originais e
+suas revalidações finais. API exige o escopo de leitura e delega à RPC a distinção
+atômica entre recuperar a intenção e criar fato. Payloads, assinaturas e grants/RLS
+permanecem preservados.
+
+Cinco casos novos e onze casos existentes das funções afetadas passaram: mesma
+intenção, chave alterada, decisões concorrentes, complemento já conferido,
+RLS/privacidade, legacy e novas escritas recusadas sem capacidade. Nova negativa
+observou a espera real do paciente, revogou a leitura e não retornou resultado
+nem deixou efeitos adicionais. A repetição dos onze casos foi dirigida à
+mudança da ordem dos guards nas três mutações, sem repetir integração global.
+Três testes da fronteira API passaram. Nenhum reset foi realizado.
+
+O primeiro novo caso Chromium passou após corrigir sua sincronização: esperava
+controles desabilitados ainda durante busy, antes de a fixture revogar a escrita;
+agora aguarda a entrada explícita na recuperação. Com a capacidade perdida
+confirmada pelo contexto, recuperou a mesma chave; nova tentativa e perda de
+leitura retornaram 403. Movimento, decisão e autor únicos foram preservados.
+O segundo percurso também passou: recuperou complemento depois da decisão de
+outro administrador com vínculo local, sem reabrir relato nem repetir débito.
+A fixture inicial usava familiar sem gestão desse estoque e foi corretamente
+recusada; foi usada outra identidade já habilitada, sem conceder privilégios.
+Mensagem agora mostra o estado vigente do relato e a decisão real. Ambos os
+percursos conservam a chave e a autoria original; nenhuma regra foi relaxada.
+
+Lint dos fontes afetados, Markdown e tipos/build do runner passaram. Não houve
+mudança no renderer; PDFs anteriores não foram regenerados. Replay de 107
+migrations e suítes completas ficam para a CI do novo SHA. Compensações de
+consumo, transferência bilateral, preview de desligamento, BAL, catálogo e
+demais critérios D2 continuam em execução. Sem conclusão da missão, merge ou GO.

@@ -311,6 +311,13 @@ obsoleta retorna conflito. NULL não representa rejeição.
 A RPC antiga de dois argumentos confirma/recupera somente v1 sem complemento;
 não pode decidir uma estrutura nova sem versão explícita. Nova rejeição exige
 motivo na RPC versionada. Replays não fabricam motivos/autores históricos.
+Recuperar o próprio relato, complemento ou decisão pela chave original exige
+leitura viva da custódia, sem exigir novamente a capacidade da escrita concluída.
+API consulta o escopo de leitura e a RPC distingue atomicamente recuperação de
+novo comando; novas escritas mantêm papel/capacidade e revalidações após espera.
+Trocar conteúdo/versão da chave conflita. Complemento antigo pode ser recuperado
+depois de o relato ser conferido; a tela mostra o estado atual e a decisão real.
+Perda de leitura continua bloqueando o resultado, inclusive após espera no lock.
 Leituras, carregamento, erros e catálogo são independentes na tela. Conteúdo,
 versão e chave ficam congelados durante escrita incerta; atualização concorrente
 não troca a referência do formulário ou da revisão silenciosamente.

@@ -110,6 +110,16 @@ antes de a consulta P06 concluir. O avanço passou a aguardar essa fonte, e só
 o percurso afetado foi revalidado localmente, com sucesso. Vercel success desse
 SHA não substitui a falha anterior nem valida o próximo commit.
 
+Recuperação de consumo foi corrigida no incremento seguinte: a chave original
+do próprio ato confirmado pode retornar com leitura vigente após perda somente
+da escrita. Novos comandos continuam sujeitos à capacidade/papel e leitura
+perdida segue bloqueada. Quatro contraprovas reproduziram a recusa indevida
+antes da migration 107; cinco casos novos e onze casos existentes das funções
+afetadas passaram. CI de 20601f5/42129515456 estava in_progress na consulta
+pontual, sem resultado presumido. Dois percursos Chromium passaram: confirmação
+com escrita perdida e complemento recuperado depois da conferência de outra
+pessoa, sem reabrir relato nem duplicar débito. Evidências no checkpoint.
+
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não
 atesta os incrementos posteriores; CI e preview não são validação remota de

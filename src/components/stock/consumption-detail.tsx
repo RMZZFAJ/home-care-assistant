@@ -90,7 +90,9 @@ export function ConsumptionDetail({
     setError("");
     setMessage(
       action === "supplement"
-        ? "Complemento salvo, aguarda conferência. Nenhum desconto foi registrado."
+        ? result.replayed
+          ? `Complemento anterior recuperado. Estado atual: ${result.status === "reported" ? "aguardando conferência" : result.status === "confirmed" ? "confirmado" : "rejeitado"}. Consulte a decisão e os movimentos registrados; o complemento não foi repetido.`
+          : "Complemento salvo, aguarda conferência. Nenhum desconto foi registrado."
         : result.status === "rejected"
           ? "Relato rejeitado, sem desconto. Original e complementos foram preservados."
           : result.kind === "shortage"

@@ -89,8 +89,7 @@ export async function POST(request: Request) {
       await patientContext(
         auth,
         input.careRecipientId,
-        "consumption.report",
-        true,
+        input.location === "FAMILY" ? "stock.family.read" : "stock.team.read",
       );
       return NextResponse.json({
         id: await rpc(auth.client, "report_extraordinary_consumption", {
@@ -109,12 +108,7 @@ export async function POST(request: Request) {
     await patientContext(
       auth,
       report.care_recipient_id,
-      input.action === "supplement"
-        ? "consumption.report"
-        : report.location === "FAMILY"
-          ? "stock.family.manage"
-          : "consumption.confirm",
-      true,
+      report.location === "FAMILY" ? "stock.family.read" : "stock.team.read",
     );
     return NextResponse.json({
       data:
