@@ -52,6 +52,11 @@ test:migrations **recria os dados desse banco local**: primeiro com a cadeia
 completa e depois na versão 019 com fixtures legadas antes do upgrade.
 Guarde backup antes de autorizar a substituição de dados a preservar.
 Os helpers recusam hosts remotos e selecionam explicitamente o destino local.
+Fixtures pausam os jobs hca-operational-lifecycle/hca-notification-worker pela
+API cron.alter_job, após reset e upgrade inclusive. Isso evita que cron
+consuma a fila ou altere estado durante os controles. Registrar/reconciliar a
+situação anterior dos jobs ao encerrar a missão; não reativar destinos
+externos por consequência do teste.
 O vínculo administrativo do CLI com um projeto remoto não muda o destino
 da suíte. Nunca executar reset, fixtures ou E2E no remoto.
 

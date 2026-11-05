@@ -1,8 +1,10 @@
 # Documentação do Home Care Assistant
 
 **Estado atual:** [fonte por SHA](current/PROJECT_STATUS.md). Produção NO-GO;
-A e B1–B8 concluídas como diagnóstico; C é planejamento e organização; **D NÃO
-INICIADA**. Decisão aprovada não é funcionalidade implementada.
+A e B1–B8 concluídas como diagnóstico; C é planejamento e organização;
+**D-A EM EXECUÇÃO**, com
+[evidências por incremento](audits/D/D-A/CHECKPOINT.md).
+Decisão aprovada não é funcionalidade implementada.
 
 Entrada mais recente: [C7–C10](audits/C/C10-pr-handoff/README.md),
 [decisões vigentes](audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),

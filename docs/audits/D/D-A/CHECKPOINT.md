@@ -57,3 +57,35 @@ Não são prova do fluxo completo do produto, conformidade geral de
 acessibilidade, conteúdo do renderer ou aceite humano/físico.
 E2E do produto e gates completos de banco serão executados nos marcos
 funcionais seguintes; CI do incremento ainda não atestada.
+
+## D1.1 — progresso REQ e candidato inválido
+
+Migration incremental `20261105070428_phase_d1_requisition_scheduler_progress.sql`:
+terminais são excluídos antes dos limites; rotação privada distribui até
+100 candidatos entre até 25 pacientes. Falhas individuais revertem somente
+o candidato, conservam SQLSTATE/identidade/tentativas em tabela privada e
+mantêm a saúde como degradada por contagem de pendências. Retry técnico após
+uma hora; mudança da política permite reconsideração imediata. Esse intervalo
+é detalhe de recuperação, sem promessa de prazo operacional/SLO.
+
+Regressão nova falhou na base anterior pelo motivo esperado (25 pacientes
+terminais bloqueavam alvos) e passou após correção. Cobre também 100
+terminais no mesmo paciente, 26 pacientes elegíveis, limites, repetição,
+política malformada, reparo, rollback do cursor e ausência de estoque fictício.
+
+Instalação limpa e evolução desde 019 aprovadas, com Auth real, protocolo
+inicial REQ-0001 e preservação de protocolos/quantidades/FKs/saldos legados.
+16 regressões SQL e compatibilidade de search_path hospedado aprovadas.
+85 migrations atuais; os 84 hashes históricos permanecem íntegros.
+O primeiro replay parou na readiness porque exigia tabelas que service_role
+corretamente não lê; a correção exige a RPC allowlisted do serviço. Retomada
+da instalação recém-criada com --resume-clean, sem recriar dados novamente,
+e replay legado completo aprovados. Não houve redução de asserções.
+
+Fixtures pausam os dois jobs locais pelo cron.alter_job, inclusive após
+reset/upgrade; a situação inicial de ambos era ativa. Permanecem pausados
+durante as suítes, com reconciliação ao fechamento. 34 integrações completas
+aprovadas, incluindo workers HTTP independentes e escopo/RLS/Auth real.
+Contratos, lint, Markdown, tipos e 112 unitários aprovados. CI e E2E do
+produto ainda não atestados neste incremento. D1 integral e D2 permanecem
+em execução, sem fechamento antecipado pelos dois casos de scheduler.

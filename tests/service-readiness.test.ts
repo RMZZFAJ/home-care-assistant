@@ -6,6 +6,8 @@ describe("local Data API readiness", () => {
     for (const response of [new Response("Unavailable", { status: 503 }), new Response("<html>Starting</html>"), Response.json({}), Response.json({ swagger: "2.0", paths: {} })]) {
       expect(await dataApiIsReady(response)).toBe(false);
     }
-    expect(await dataApiIsReady(Response.json({ swagger: "2.0", paths: { "/products": {}, "/profiles": {} } }))).toBe(true);
+    expect(await dataApiIsReady(Response.json({ swagger: "2.0", paths: { "/products": {}, "/profiles": {} } }))).toBe(false);
+    expect(await dataApiIsReady(Response.json({ swagger: "2.0", paths: { "/rpc/run_operational_schedule": {} } }))).toBe(true);
+    expect(await dataApiIsReady(Response.json({ swagger: "2.0", paths: { "/products": {}, "/profiles": {} } }), ["/products", "/profiles"])).toBe(true);
   });
 });

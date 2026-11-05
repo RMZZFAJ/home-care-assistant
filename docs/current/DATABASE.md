@@ -166,6 +166,16 @@ e URL do worker ficam no Vault, configuradas pela RPC de serviço dedicada.
 
 ## Verificação
 
+D-A corrigiu o lote REQ na migration 20261105070428: terminais/históricos
+ficam fora da seleção antes dos limites, pacientes elegíveis recebem rotação
+e candidatos inválidos são isolados transacionalmente. Diagnóstico privado
+preserva documento, paciente, SQLSTATE, tentativas e estado de recuperação;
+scheduler_health informa quantidades de falhas e pendências sem payload.
+Cursor e efeitos confirmam/revertem juntos. As permissões da RPC externa
+continuam exclusivas do serviço; clientes não leem/escrevem cursor ou
+diagnósticos diretamente. Evidências e limites no
+[checkpoint D-A](../audits/D/D-A/CHECKPOINT.md).
+
 [TESTING.md](TESTING.md) descreve replay, SQL/RLS, integração HTTP
 concorrente,
 Auth real e E2E. Backups permanecem fora do Git. A matriz registra evidências
