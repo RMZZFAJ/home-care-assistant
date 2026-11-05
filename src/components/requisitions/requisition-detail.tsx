@@ -14,7 +14,8 @@ import {
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { formatBrazilDate } from "@/lib/receipt";
-import { formatQuantity } from "@/lib/quantity";
+import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
+import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 import { textRows } from "@/lib/text-rows";
 import { requisitionDocumentState } from "@/lib/documents/presentation";
 import { Attachments } from "@/components/documents/attachments";
@@ -67,6 +68,9 @@ type Detail = {
     custom_name: string | null;
     unit_snapshot: string;
     current_stock: string | null;
+    stock_observation?: StockObservation;
+    stock_observation_at?: string | null;
+    stock_observation_time_source?: StockObservationTimeSource;
     urgent: boolean;
     resolution?: { product_id: string } | null;
   }[];
@@ -305,13 +309,8 @@ export function RequisitionDocumentContent({
                   ) : null}
                 </div>
                 <p className="mt-2 text-xs text-(--muted)">
-                  {item.current_stock === null
-                    ? "Estoque desconhecido"
-                    : "Estoque observado na emissão: " +
-                      formatQuantity(
-                        String(item.current_stock),
-                        item.unit_snapshot,
-                      )}
+                  Estoque da equipe informado: {formatStockObservation(item.current_stock, item.stock_observation, item.unit_snapshot)}
+                  <span className="block text-xs text-(--muted)">{formatStockObservationTime(item.stock_observation_at, item.stock_observation_time_source)}</span>
                 </p>
                 <div className="mt-2 flex flex-wrap gap-3">
                   {line?.deliveries.map((delivery) => (

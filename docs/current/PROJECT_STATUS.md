@@ -15,9 +15,13 @@ da entrega integrada, sem renovar autorização por si próprias.
 
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
-convite, reemissão explícita, senha uniforme e invalidação de perfil seguem
-no incremento atual; evidências por camada e falhas intermediárias estão no
-checkpoint. O núcleo REQ/COM/ENT/BAL e P02 completos continuam em execução.
+convite, reemissão explícita, senha uniforme e invalidação de perfil foram
+publicadas em `001158b`, cuja CI passou. Observação REQ distingue zero,
+desconhecimento e ausência; preservação de modo/horário do rascunho e
+compatibilidade de intenções antigas foram verificadas localmente no incremento
+atual (92 migrations, 55 integrações e 12 E2E nos três projetos).
+Evidências por camada e falhas intermediárias estão no checkpoint.
+O núcleo REQ/COM/ENT/BAL e P02 completos continuam em execução.
 
 **C7–C10 concluídas e fechamento definitivo incorporado em 04/11/2026.**
 [Checkpoint](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121 causas e 165

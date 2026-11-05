@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ProductCategory, RequisitionReceipt } from "@/types/requisition";
+import type { ProductCategory, RequisitionReceipt, StockObservation, StockObservationTimeSource } from "@/types/requisition";
 import { ApiError, databaseError } from "@/lib/server/api";
 
 // Only snapshots from the original transaction are authoritative. Legacy rows
@@ -11,7 +11,7 @@ export async function loadReceipt(
   const { data, error } = await client
     .from("requisitions")
     .select(
-      "id,code,protocol,created_at,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body)",
+      "id,code,protocol,created_at,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,stock_observation,stock_observation_at,stock_observation_time_source,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -57,6 +57,9 @@ export async function loadReceipt(
             "higiene") as ProductCategory,
           unit: item.unit_snapshot ?? product?.unit ?? "unidade",
           currentStock: item.current_stock ?? null,
+          stockObservation: (item.stock_observation ?? "legacy_unclassified") as StockObservation,
+          stockObservationAt: item.stock_observation_at,
+          stockObservationTimeSource: item.stock_observation_time_source as StockObservationTimeSource,
           urgent: item.urgent,
         };
       }),
@@ -66,6 +69,9 @@ export async function loadReceipt(
         id: item.id,
         name: item.product_name_snapshot ?? item.custom_name ?? "Item extra",
         currentStock: item.current_stock ?? null,
+        stockObservation: (item.stock_observation ?? "legacy_unclassified") as StockObservation,
+        stockObservationAt: item.stock_observation_at,
+        stockObservationTimeSource: item.stock_observation_time_source as StockObservationTimeSource,
         urgent: item.urgent,
       })),
     observations: (data.requisition_observations ?? []).map(

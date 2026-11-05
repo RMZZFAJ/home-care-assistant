@@ -212,3 +212,75 @@ real de Tab para outro alvo acessível. 30 controles locais aprovados, incluindo
 main não focalizável e trap nessa alternativa; nenhum timeout/regra/retry
 reduzido. A CI anterior não atesta esta árvore; novo resultado será consultado
 após publicação. D1 e D2 integrais permanecem em execução, sem GO/merge.
+
+## D1.5 — observação REQ e instante preservado
+
+Migration 20261105145537 aplicada somente à stack local: observed (inclui zero
+explícito), unknown e unfilled são distintos em coluna, intenção canônica,
+API e controles. Valores anteriores/clientes sem classificação mantêm o valor
+como legacy_unclassified; nenhuma contagem antiga é declarada observada.
+Rascunho antigo conserva 0/7 e pede revisão explícita. Campo apagado vira NULL
+com unfilled; escolha desconhecido permanece unknown, nunca zero.
+
+Recuperação de intenção anterior conserva hash/JSON originais. Controle cria
+fixture SQL usando a função histórica imutável e sessão Auth realmente emitida;
+a recuperação seguinte acontece por HTTP autenticado. Isso não é prova HTTP
+da criação antiga. Tentar reinterpretar o zero legado como observed na mesma
+chave recebe conflito. Três integrações dirigidas aprovadas.
+
+Wizard/revisão/comprovante/histórico usam os mesmos rótulos; nenhum saldo é
+copiado para a observação. Nove E2E nos três projetos aprovados: editar/apagar,
+recuperar draft, resposta perdida/idempotência, ausência de efeito no ledger,
+revisão 320/390/1440 e regressão de associação de extra ao catálogo. Primeiro
+roteiro tentou saltar etapas futuras que a UI bloqueia; foi corrigido para
+Avançar/Revisar, sem alterar esse bloqueio.
+
+PDF acrescenta a observação somente quando o snapshot contém o novo campo;
+snapshots/arquivos antigos não são regravados. Um exemplar local de duas
+páginas foi extraído e renderizado com PDFium: três pares produto/valor
+confirmados e ambas as páginas inspecionadas, sem corte/sobreposição.
+Artefatos em output/pdf/phase-d, com SHA/data e sourceHead 001158b + árvore
+suja explicitados no manifesto. É evidência do fato novo, não certificação
+geral do renderer D4 nem assinatura D-B. 120 unitários, lint e tipos aprovados.
+As migrations 20261105145537 e 20261105153216 agora conservam também o
+horário registrado no dispositivo (client_draft), sem afirmá-lo como prova
+física ou relógio verificado. Sem horário do cliente, a nova emissão registra
+server_submission. Linhas anteriores continuam sem instante conhecido;
+nenhum backfill deduz horário de observação a partir da emissão.
+
+Recuperação de intenção sem modo e de intenção intermediária sem horário
+conserva JSON/hash e origem antigos. Extras com mesmo nome/modo diferente
+preservam a ordenação do contrato anterior na recuperação; remover só o campo
+de horário falha no controle, enquanto a projeção compatível recupera.
+Instantes iguais com fusos distintos são equivalentes; alterar o instante
+na mesma chave gera conflito. Decimal permitido 1.234567 permanece exato.
+
+Validação final: replay de 92 migrations, instalação limpa/evolução legada,
+16 SQL e search_path aprovados; os 84 hashes históricos estão preservados.
+55 integrações completas aprovadas; quatro integrações dirigidas repetidas
+após o ajuste de compatibilidade, incluindo ordem empatada e precisão exata.
+Contratos, lint, Markdown, tipos, 121 unitários e build aprovados.
+
+12 E2E nos três projetos aprovados: quatro linhas 0/7/unknown/unfilled,
+rascunho anterior, importação histórica e associação de extra por alias.
+O rascunho fictício do dia anterior permaneceu na mesma aba, dentro das
+24 horas atuais; não prova persistência em outro aparelho, que pertence a D3.
+Revisão em 320/390/768/1440, perda de resposta, mesma chave/documento e ledger
+inalterado foram verificados. Captura iOS 320 px inspecionada; AT/aparelho
+real e zoom humano permanecem evidências distintas.
+
+A paginação nova inicialmente deixou título separado dos campos e, no ajuste
+seguinte, uma página de pouco conteúdo. O bloco permanece unido e a trilha
+continua no espaço disponível quando esse bloco transborda. Um E2E Chromium
+adicional na versão final do renderer passou. PDF final de duas páginas,
+6ef7c134-6597-42da-853b-8d8b443e5fa9, SHA-256
+a575e54af0926caf2bc102523c80f795adf00b0a15edffe22f08fc85ecdd0739:
+quatro pares produto/valor/modo/horário confrontados com snapshot/banco,
+texto dentro dos limites e ambas as páginas renderizadas/inspecionadas.
+Manifesto time-verification em output/pdf/phase-d conserva SHA dos fontes
+testados; exemplares intermediários preservados. O primeiro oráculo de
+exibição comparava 0.0 do JSON com 0 formatado; foi corrigido sem mudar valor.
+Isso não certifica o renderer D4 inteiro nem assinatura D-B.
+
+CI de 001158b, run 42049385860, success; refere-se ao incremento anterior.
+Nova CI será observada após publicação. D1 integral, P02 e D2 seguem em execução.

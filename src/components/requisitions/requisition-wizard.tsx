@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { validQuantity } from "@/lib/quantity";
+import { restoreStockObservation, validStockObservation } from "@/lib/stock-observation";
 import type {
   RequisitionFormData,
   RequisitionLine,
@@ -92,7 +92,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
           Array.isArray(saved.form.extraItems) &&
           Array.isArray(saved.form.observations)
         ) {
-          setForm(saved.form);
+          setForm({ ...saved.form, lines: saved.form.lines.map(restoreStockObservation), extraItems: saved.form.extraItems.map(restoreStockObservation) });
           setMessage("Rascunho deste dispositivo recuperado.");
           if (saved.intent) {
             frozenRef.current = saved.intent;
@@ -169,6 +169,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
   const selected = (id: string) =>
     form.lines.find((line) => line.productId === id);
   function updateLine(item: Product, patch: Partial<RequisitionLine>) {
+    const declarationTime = new Date().toISOString();
     setForm((current) => {
       const existing = current.lines.find((line) => line.productId === item.id);
       return {
@@ -184,7 +185,9 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
                 productName: item.name,
                 category: item.category,
                 unit: item.unit,
-                currentStock: 0,
+                currentStock: null,
+                stockObservation: "unfilled",
+                stockObservationAt: declarationTime,
                 urgent: false,
                 ...patch,
               },
@@ -204,14 +207,13 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
       (line) => all || line.category === currentCategory,
     )) {
       if (
-        !validQuantity(
-          String(line.currentStock),
+        !validStockObservation(
+          line,
           products.find((item) => item.id === line.productId)
             ?.quantity_decimals ?? 0,
-          true,
         )
       )
-        errors[line.productId] = "Revise a quantidade e a precisão da unidade.";
+        errors[line.productId] = line.stockObservation === "legacy_unclassified" ? "Confirme como informar a observação recuperada do rascunho antigo." : "Revise a informação do estoque e a precisão da unidade.";
       if (
         itemContext.find((item) => item.productId === line.productId)?.pending
           .length &&
@@ -225,8 +227,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
       form.extraItems.some(
         (item) =>
           !item.name.trim() ||
-          !Number.isFinite(item.currentStock) ||
-          item.currentStock < 0,
+          !validStockObservation(item),
       )
     )
       errors.extras = "Preencha ou remova os itens extras incompletos.";
@@ -387,6 +388,8 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
                 adopt={(product, extra) => {
                   updateLine(product, {
                     currentStock: extra.currentStock,
+                    stockObservation: extra.stockObservation,
+                    stockObservationAt: extra.stockObservationAt,
                     urgent: extra.urgent,
                   });
                   setForm((current) => ({

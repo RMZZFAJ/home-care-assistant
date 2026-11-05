@@ -22,7 +22,7 @@ export async function GET(
     const { data, error } = await auth.client
       .from("requisitions")
       .select(
-        "id,code,protocol,care_recipient_id,status,created_at,updated_at,is_historical,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body,created_at),requisition_status_history(id,from_status,to_status,changed_by,changed_at,reason),requisition_notifications(id,recipient_group,recipient_label,channel,state,attempts,attempted_at)",
+        "id,code,protocol,care_recipient_id,status,created_at,updated_at,is_historical,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,stock_observation,stock_observation_at,stock_observation_time_source,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body,created_at),requisition_status_history(id,from_status,to_status,changed_by,changed_at,reason),requisition_notifications(id,recipient_group,recipient_label,channel,state,attempts,attempted_at)",
       )
       .eq("id", id)
       .maybeSingle();

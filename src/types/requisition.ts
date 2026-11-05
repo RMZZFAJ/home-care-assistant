@@ -1,4 +1,6 @@
 export type ProductCategory = "medicamentos" | "higiene" | "dieta";
+export type StockObservation = "observed" | "unknown" | "unfilled" | "legacy_unclassified";
+export type StockObservationTimeSource = "client_draft" | "server_submission" | "legacy_unknown";
 export type RequisitionStatus =
   | "draft"
   | "submitted"
@@ -26,7 +28,9 @@ export type RequisitionLine = {
   productName: string;
   category: ProductCategory;
   unit?: string;
-  currentStock: number;
+  currentStock: number | null;
+  stockObservation?: StockObservation;
+  stockObservationAt?: string | null;
   urgent: boolean;
   repeatReason?: string;
 };
@@ -34,7 +38,9 @@ export type RequisitionLine = {
 export type ExtraItem = {
   id: string;
   name: string;
-  currentStock: number;
+  currentStock: number | null;
+  stockObservation?: StockObservation;
+  stockObservationAt?: string | null;
   urgent: boolean;
 };
 
@@ -46,9 +52,11 @@ export type RequisitionFormData = {
 
 export type ReceiptLine = Omit<RequisitionLine, "currentStock"> & {
   currentStock: number | null;
+  stockObservationTimeSource?: StockObservationTimeSource;
 };
 export type ReceiptExtraItem = Omit<ExtraItem, "currentStock"> & {
   currentStock: number | null;
+  stockObservationTimeSource?: StockObservationTimeSource;
 };
 
 export type RequisitionReceipt = {

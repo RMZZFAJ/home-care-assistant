@@ -7,6 +7,8 @@ import { documentStatuses, type DocumentType } from "@/types/documents";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
+import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 
 type Person = {
   id?: string;
@@ -440,7 +442,7 @@ export async function renderDocumentPdf(
       [0.06, 0.47, 0.24, 0.23],
       snapshot.lines.map((item, i) => [
         String(i + 1).padStart(2, "0"),
-        name(item),
+        item.stock_observation ? name(item) + "\nEstoque da equipe: " + formatStockObservation(typeof item.current_stock === "string" || typeof item.current_stock === "number" ? item.current_stock : null, item.stock_observation as StockObservation, typeof item.unit_snapshot === "string" ? item.unit_snapshot : undefined) + (Object.hasOwn(item, "stock_observation_at") ? "\n" + formatStockObservationTime(typeof item.stock_observation_at === "string" ? item.stock_observation_at : null, item.stock_observation_time_source as StockObservationTimeSource) : "") : name(item),
         String(item.unit_snapshot ?? "Não informada"),
         item.urgent ? "URGENTE" : "Rotina",
       ]),
@@ -481,7 +483,13 @@ export async function renderDocumentPdf(
           : "Contagem física exclusiva da equipe. Ajustes aplicados ao ledger dependem da política e das aprovações registradas.",
     8,
   );
+  let continueRequisitionTrace = false;
   if (snapshot.type === "REQ") {
+    // Keep the heading with its two rows of status fields when observations
+    // and their declaration times push this block across a page boundary.
+    const materialPage = page;
+    ensure(160);
+    continueRequisitionTrace = page !== materialPage;
     section("Situação do atendimento");
     fields([
       ["Linhas atendidas", `${attended} de ${total}`],
@@ -495,7 +503,8 @@ export async function renderDocumentPdf(
       ["Próximo passo", requisitionNextStep(snapshot)],
     ]);
   }
-  nextPage();
+  if (continueRequisitionTrace) y -= 20;
+  else nextPage();
   text(
     snapshot.type === "REQ"
       ? "RASTREABILIDADE DA REQUISIÇÃO"

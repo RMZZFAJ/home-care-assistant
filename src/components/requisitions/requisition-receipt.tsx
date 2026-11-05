@@ -3,6 +3,7 @@ import Link from "next/link";
 import { buttonClass } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { formatBrazilDate } from "@/lib/receipt";
+import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
 import { DocumentActions } from "@/components/documents/document-actions";
 import type { RequisitionReceipt } from "@/types/requisition";
 import { Summary } from "./requisition-steps";
@@ -39,14 +40,15 @@ export function Receipt({ receipt }: { receipt: SavedReceipt }) {
         </p>
         <Summary
           title="Itens"
+          details={[...receipt.lines, ...receipt.extraItems].map(item => formatStockObservationTime(item.stockObservationAt, item.stockObservationTimeSource))}
           rows={[
             ...receipt.lines.map(
               (item) =>
-                `${item.productName} — estoque atual: ${item.currentStock ?? "desconhecido"}${item.urgent ? " (urgente)" : ""}`,
+                `${item.productName} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation, item.unit)}${item.urgent ? " (urgente)" : ""}`,
             ),
             ...receipt.extraItems.map(
               (item) =>
-                `${item.name} — estoque atual: ${item.currentStock ?? "desconhecido"}${item.urgent ? " (urgente)" : ""}`,
+                `${item.name} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation)}${item.urgent ? " (urgente)" : ""}`,
             ),
           ]}
         />

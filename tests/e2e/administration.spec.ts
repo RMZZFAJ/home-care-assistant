@@ -523,10 +523,10 @@ test.describe("administração integrada no ambiente local", () => {
       await page.request.get(`/api/requisitions/${after.data[0].id}`)
     ).json();
     expect(detail.receipt.lines).toMatchObject([
-      { productId: "fralda", currentStock: null },
+      { productId: "fralda", currentStock: null, stockObservation: "legacy_unclassified" },
     ]);
     expect(detail.receipt.extraItems).toMatchObject([
-      { name: customName, currentStock: null, urgent: true },
+      { name: customName, currentStock: null, urgent: true, stockObservation: "legacy_unclassified" },
     ]);
     expect(
       detail.data.requisition_items.find(
@@ -555,7 +555,7 @@ test.describe("administração integrada no ambiente local", () => {
         .filter({ hasText: new RegExp("^" + customName + "$") }),
     ).toBeVisible();
     await expect(
-      page.getByText("Estoque desconhecido", { exact: false }),
+      page.getByText("Não informado no registro legado", { exact: false }),
     ).toHaveCount(2);
     await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
     await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
@@ -638,7 +638,7 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("button", { name: /^Usar item do catálogo:/ }),
     ).toHaveCount(2);
-    await page.getByLabel("Estoque atual", { exact: true }).fill("3");
+    await page.getByLabel("Estoque observado com a equipe", { exact: false }).fill("3");
     await page
       .getByRole("checkbox", { name: "Reposição urgente", exact: true })
       .check();
@@ -654,7 +654,7 @@ test.describe("administração integrada no ambiente local", () => {
     for (let step = 0; step < 2; step++)
       await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
     await expect(
-      page.getByText("Gaze — estoque atual: 3 (urgente)", { exact: true }),
+      page.getByText("Gaze — estoque da equipe: 3 pacote (observado) (urgente)", { exact: true }),
     ).toBeVisible();
     const pending = page.waitForResponse(
       (response) =>

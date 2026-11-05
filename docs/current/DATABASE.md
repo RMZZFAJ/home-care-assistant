@@ -50,6 +50,14 @@ solicitada. document_request_links associa explicitamente linhas de COM/ENT
 requisition_item_resolutions identifica item extra no catálogo sem alterar
 a linha original. A decisão e seu motivo integram uma nova versão auditável.
 
+requisition_items distingue stock_observation (observed, unknown, unfilled ou
+legacy_unclassified) de current_stock. Unknown/unfilled exigem NULL; observed
+exige quantidade válida na precisão da unidade. Zero legado não é reclassificado.
+stock_observation_at e stock_observation_time_source distinguem declaração do
+rascunho pelo dispositivo, recebimento na emissão e instante legado desconhecido.
+Nenhuma data histórica é preenchida por inferência. A intenção canônica compara
+instantes normalizados; recuperação legada preserva JSON/hash originais.
+
 document_events contém snapshots confirmados, atores, vínculos, anexos,
 aprovações, hash anterior e SHA-256. Eventos são imutáveis para clientes.
 Hash não é assinatura assimétrica nem garantia contra administradores do

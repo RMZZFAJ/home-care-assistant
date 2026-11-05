@@ -90,16 +90,20 @@ export async function POST(request: Request) {
     const auth = await authenticate();
     await patientContext(auth, input.careRecipientId, "request", true);
     const lines = input.lines.map(
-      ({ productId, currentStock, urgent, repeatReason }) => ({
+      ({ productId, currentStock, stockObservation, stockObservationAt, urgent, repeatReason }) => ({
         productId,
         currentStock,
+        ...(stockObservation ? { stockObservation } : {}),
+        ...(stockObservationAt ? { stockObservationAt } : {}),
         urgent,
         ...(repeatReason ? { repeatReason } : {}),
       }),
     );
-    const extras = input.extraItems.map(({ name, currentStock, urgent }) => ({
+    const extras = input.extraItems.map(({ name, currentStock, stockObservation, stockObservationAt, urgent }) => ({
       customName: name,
       currentStock,
+      ...(stockObservation ? { stockObservation } : {}),
+      ...(stockObservationAt ? { stockObservationAt } : {}),
       urgent,
     }));
     const intent = {

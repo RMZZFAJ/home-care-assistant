@@ -138,6 +138,17 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 ## Documentos e quantidades
 
+REQ recebe currentStock como valor exato ou NULL e stockObservation como
+observed, unknown ou unfilled. Observed inclui zero explicitamente informado;
+os outros modos exigem NULL. Sem modo, um valor de cliente antigo permanece
+legacy_unclassified, sem afirmar que foi observado. Não há quantidade solicitada.
+stockObservationAt opcional é ISO 8601 com fuso e até seis casas de segundo:
+horário declarado pelo dispositivo, sem valor de autorização ou prova física.
+O servidor conserva esse instante e sua origem client_draft; na ausência,
+registra server_submission na emissão. Registros anteriores mantêm instante
+desconhecido. Retry da mesma chave conserva intenção/hash antigos, inclusive
+antes dos novos campos; reinterpretar modo ou instante recebe conflito.
+
 REQ contém lines com productId, currentStock, urgent e repeatReason opcional,
 extraItems e observations. Não aceita quantidade solicitada. Catálogo e
 snapshots são resolvidos no banco. A resposta confirma persistence e receipt;
