@@ -9,6 +9,7 @@ import {
   type PurchaseProgress,
   type PurchaseReceipt,
   type DeliveryCancellationContext,
+  type DeliveryRecipientSelection,
 } from "@/types/documents";
 import { receiptStates } from "@/lib/documents/purchase";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
@@ -641,6 +642,36 @@ export async function renderDocumentPdf(
         "Nenhuma ciência foi registrada até esta versão. Emissão, envio ou disponibilização do PDF não comprovam ciência.",
       );
   } else if (snapshot.type === "ENT") {
+    const selection = snapshot.workflow?.recipientSelection as
+      | DeliveryRecipientSelection
+      | undefined;
+    if (selection) {
+      ensure(135);
+      section("Indicação do recebedor");
+      text(
+        `${selection.recipientName} · ${selection.manual ? "Escolha manual" : "Sugestão da escala mantida"}`,
+        10,
+        true,
+      );
+      text(
+        `Indicado por ${selection.selectedName} · ${formatBrazilDate(selection.recordedAt)}`,
+        9,
+      );
+      if (selection.reason)
+        text("Justificativa da escolha: " + selection.reason, 9);
+      if (selection.suggestedId)
+        text(
+          "Pessoa sugerida pela escala: " +
+            (selection.shifts.find(
+              (shift) => shift.professionalId === selection.suggestedId,
+            )?.professionalName ?? "Referência preservada na indicação"),
+          9,
+        );
+      text(
+        "A indicação não comprova presença nem substitui o aceite pessoal do recebedor.",
+        8,
+      );
+    }
     section("Declaração do recebimento");
     text(
       snapshot.workflow?.acceptedAt

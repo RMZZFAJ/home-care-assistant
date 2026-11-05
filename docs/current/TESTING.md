@@ -29,6 +29,47 @@ O guard verifica migrations históricas e o contrato removido no código ativo.
 Testes unitários cobrem validação, redirects, limites, erros, snapshots e
 worker/provedor com transporte falso. Não utilizam credenciais reais.
 
+## Validação proporcional por incremento
+
+Os comandos gerais acima continuam na CI da PR. Não é necessário executá-los
+todos localmente a cada edição e repetir a mesma matriz após cada correção.
+Antes de publicar um conjunto coerente, selecionar a evidência que discrimina
+o defeito e percorre suas camadas afetadas. Localizar os consumidores do
+contrato alterado, inclusive fixtures/seletores existentes; escolher os casos
+afetados além dos novos, sem precisar duplicar a suíte inteira:
+
+| Mudança | Evidência local | CI geral |
+| --- | --- | --- |
+| Regra/contrato | Regressão, negativa e fronteira/API | Checks e unitários |
+| Banco/autorização | Preparo, Auth real, RLS e locks | Replay e integrações |
+| Fluxo visual | Tarefa, teclado/layout e efeito no banco | Navegadores |
+| Documento | Markdown, links e preservação | Checks documentais |
+
+Depois de uma falha, corrigir a causa e repetir seus casos afetados. Uma
+formatação, texto ou ajuste isolado não exige novo replay do banco ou repetição
+de todos os navegadores. Ampliar a rodada local quando existir uma dependência
+transversal, nova hipótese, falha comprovada ou indisponibilidade da CI
+necessária; registrar a justificativa. Não diminuir asserções ou desativar
+regras para economizar execução.
+
+Registrar comandos/casos realmente executados, falhas intermediárias e limites
+no checkpoint/matriz. Consultar a CI por SHA em pontos de entrega, sem polling
+contínuo. Check pendente, execução cancelada ou verde de um commit anterior
+não validam o novo SHA. A publicação progressiva pode continuar enquanto a CI
+trabalha; a conclusão depende da cobertura exigida com resultado próprio.
+
+Exemplos de seleção, conservando os guards do ambiente:
+
+```sh
+npm test -- tests/api/delivery-preparation-contract.test.ts
+node --test --test-name-pattern="P06 late product FK" tests/integration/delivery-preparation.test.mjs
+npm run e2e -- tests/e2e/delivery-preparation.spec.ts --project=chromium
+```
+
+Não alterar fontes durante E2E nem disputar as identidades/fixtures com outra
+suíte mutável. Replay local conserva as exigências de consentimento e backup
+abaixo; aproveitar o job efêmero de CI evita substituir dados locais novamente.
+
 ## Banco local de desenvolvimento
 
 No PowerShell deste workspace, use npm.cmd quando repassar flags após --,

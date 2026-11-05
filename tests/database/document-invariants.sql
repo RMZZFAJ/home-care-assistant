@@ -27,7 +27,7 @@ begin
  perform pg_temp.assert_true(not exists(select 1 from public.current_stock_balances where care_recipient_id=p and location='FAMILY'),'team cannot read general family stock');
  perform pg_temp.assert_true((public.stock_overview(p)->0->'family')='null'::jsonb,'family overview is masked');
  perform pg_temp.login('family');
- select jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from actors where name='professional'),'lines',jsonb_agg(jsonb_build_object('productId',i.product_id,'quantity','10','requisitionItemIds',jsonb_build_array(i.id)) order by i.product_id)) into payload from (select * from public.requisition_items where requisition_id=req.requisition_id order by product_id limit 5) i;
+ select jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',(select id from actors where name='professional'),'lines',jsonb_agg(jsonb_build_object('productId',i.product_id,'quantity','10','requisitionItemIds',jsonb_build_array(i.id)) order by i.product_id)) into payload from (select * from public.requisition_items where requisition_id=req.requisition_id order by product_id limit 5) i;
  d:=public.create_supply_document(p,'ENT',payload,gen_random_uuid(),false);
  perform pg_temp.assert_true(d->>'status'='pending_receipt' and (d->>'fullyCheckedLines')::integer=0,'issuing is not receiving');
  perform pg_temp.denied(format('select public.supply_document_command(%L,''receive'',''{"divergences":[]}'',gen_random_uuid(),%s)',d->>'id',d->>'version'),'issuer cannot accept');
@@ -46,7 +46,7 @@ begin
  d:=public.supply_document_command((d->>'id')::uuid,'resolve',jsonb_build_object('lineId',d->'lines'->0->>'id','quantity','4','resolution','missing','reason','Falta definitiva conciliada'),gen_random_uuid(),(d->>'version')::integer);
  perform pg_temp.assert_true(d->>'status'='confirmed' and d->>'fullyCheckedLines'='4','ENT can close with formal quantity reconciliation without pretending full receipt');
  perform pg_temp.login('family');
- select jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from actors where name='professional'),'lines',jsonb_agg(jsonb_build_object('productId',product_id,'quantity','10'))) into payload from public.care_recipient_products where care_recipient_id=p;
+ select jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',(select id from actors where name='professional'),'lines',jsonb_agg(jsonb_build_object('productId',product_id,'quantity','10'))) into payload from public.care_recipient_products where care_recipient_id=p;
  e:=public.create_supply_document(p,'ENT',payload,gen_random_uuid(),false);
  perform pg_temp.login('professional');
  f:=jsonb_build_object('divergences',jsonb_build_array(jsonb_build_object('lineId',e->'lines'->8->>'id','acceptedQuantity','0'),jsonb_build_object('lineId',e->'lines'->9->>'id','acceptedQuantity','0')));
@@ -77,7 +77,7 @@ begin
  b:=public.supply_document_command((b->>'id')::uuid,'approve','{"group":"family"}',gen_random_uuid(),(b->>'version')::integer);
  perform pg_temp.assert_true(b->>'status'='submitted','one review cannot stand for both groups');
  perform pg_temp.login('adminA');
- c:=public.create_supply_document(p,'ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId',first_product,'quantity','1'))),gen_random_uuid(),false);
+ c:=public.create_supply_document(p,'ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',(select id from actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId',first_product,'quantity','1'))),gen_random_uuid(),false);
  perform pg_temp.login('supervisor');
  perform pg_temp.denied(format('select public.supply_document_command(%L,''approve'',''{"group":"supervisor"}'',gen_random_uuid(),%s)',b->>'id',b->>'version'),'movement after BAL reference requires recount');
  perform pg_temp.login('professional');

@@ -69,6 +69,7 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
   assert.ifError(secondLines.error);
   const family = await actor("family", patient);
   const payload = {
+    recipientReason: "Escolha manual fictícia para este recebimento",
     source: "FAMILY",
     destination: "CARE_TEAM",
     recipientId: fixtures.professional.id,

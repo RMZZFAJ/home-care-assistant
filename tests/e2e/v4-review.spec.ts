@@ -404,6 +404,7 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         careRecipientId: patient,
         type: "ENT",
         payload: {
+          recipientReason: "Escolha manual fictícia para este recebimento",
           source: "FAMILY",
           destination: "CARE_TEAM",
           recipientId: fixtures().professional.id,

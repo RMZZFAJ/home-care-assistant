@@ -66,11 +66,27 @@ segredos de .env.local para documentação, CI, logs, traces ou navegador.
 ## Validação e conclusão
 
 Quando autorizado a implementar, usar Node e npm dos arquivos de versão.
-Rodar check:contracts, lint,
-lint:markdown, typecheck, test e build. Para mudanças de banco/autorização,
-rodar test:db:prepare, test:migrations e test:integration. Para fluxos visuais,
-rodar e2e pelo runner que verifica a stack local, nunca contra uma sessão
-ou origem desconhecida. O runner usa dados fictícios e desabilita envio externo.
+Escolher verificações locais pelo impacto do conjunto: regressão discriminante,
+contrato/API, tipos/lint dos fontes afetados e tarefa visual quando aplicável.
+Localizar os consumidores alterados, inclusive fixtures e seletores existentes,
+antes de escolher os casos; a suíte nova não substitui a compatibilidade deles.
+Após correção, repetir somente as verificações afetadas. Não duplicar a cada
+ajuste as suítes gerais já programadas na CI da PR: check:contracts, lint,
+lint:markdown, typecheck, test e build. A CI precisa validar o SHA publicado;
+resultado de um SHA anterior ou check pendente não vale como aprovação atual.
+
+Mudanças de banco/autorização exigem test:db:prepare e regressões locais com
+Auth real, incluindo negativas/concorrência pertinentes. Instalação limpa,
+evolução legada e integração completa continuam obrigatórias; aproveitar
+test:migrations e test:integration da CI quando já programados. Repetir a suíte
+completa localmente quando uma falha, mudança transversal ou hipótese concreta
+justificar, ou quando a CI necessária estiver indisponível. Registrar o motivo,
+sem reset adicional apenas para repetir evidência inalterada.
+
+Para fluxos visuais, rodar e2e dirigido pelo runner que verifica a stack local,
+nunca contra sessão ou origem desconhecida. O runner usa dados fictícios e
+desabilita envio externo. Manter fontes estáveis durante a execução; não rodar
+suítes mutáveis de banco em paralelo com E2E.
 
 Corrigir falhas e repetir verificações afetadas. Não excluir testes ou reduzir
 regras para obter verde. RLS precisa de identidades Auth reais; mocks não bastam.

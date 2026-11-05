@@ -1,5 +1,9 @@
 "use client";
 import { RelatedDocument } from "./related-document";
+import {
+  DeliveryRecipientField,
+  DeliveryRecipientReference,
+} from "./delivery-recipient";
 import type { Dispatch, SetStateAction } from "react";
 import {
   inputClass,
@@ -13,6 +17,7 @@ import type {
   CatalogProduct,
   PatientPerson,
   ItemContext,
+  DeliveryPreparation,
 } from "@/types/documents";
 export type WizardState = {
   quantities: Record<string, string>;
@@ -20,6 +25,7 @@ export type WizardState = {
   origin: "purchase" | "donation";
   source: "FAMILY" | "CARE_TEAM";
   recipientId: string;
+  recipientReason?: string;
   sharedNeedReasons?: Record<string, string>;
 };
 
@@ -37,6 +43,13 @@ export function SupplyWizardStep({
   requestOptions,
   requisitionId,
   scan,
+  recipientContext,
+  recipientComparison,
+  recipientError,
+  recipientLoading,
+  previousRecipient,
+  refreshRecipients,
+  adoptRecipients,
 }: {
   step: number;
   type: SupplyType;
@@ -51,19 +64,17 @@ export function SupplyWizardStep({
   requestOptions: ItemContext[];
   requisitionId: string | null;
   scan: (code: string) => Promise<void>;
+  recipientContext: DeliveryPreparation | null;
+  recipientComparison: DeliveryPreparation | null;
+  recipientError: string;
+  recipientLoading: boolean;
+  previousRecipient?: string | null;
+  refreshRecipients: () => void;
+  adoptRecipients: () => void;
 }) {
   const category = ["medicamentos", "higiene", "dieta"][step - 1];
   const selected = catalog.filter((product) =>
     Object.hasOwn(form.quantities, product.id),
-  );
-  const destination = form.source === "FAMILY" ? "CARE_TEAM" : "FAMILY";
-  const recipients = people.filter(
-    (person) =>
-      person.id !== context.userId &&
-      (person.role === "admin" ||
-        (destination === "FAMILY"
-          ? person.role === "family"
-          : ["professional", "supervisor"].includes(person.role))),
   );
   return (
     <>
@@ -117,29 +128,19 @@ export function SupplyWizardStep({
                   </option>
                 </select>
               </label>
-              <label className="text-sm font-semibold">
-                Destinatário designado
-                <select
-                  className={inputClass}
-                  value={form.recipientId}
-                  aria-invalid={Boolean(fieldErrors.recipientId)}
-                  onChange={(event) =>
-                    setForm({ ...form, recipientId: event.target.value })
-                  }
-                >
-                  <option value="">Selecione quem receberá</option>
-                  {recipients.map((person) => (
-                    <option key={person.id} value={person.id}>
-                      {person.name}
-                    </option>
-                  ))}
-                </select>
-                {fieldErrors.recipientId ? (
-                  <span className="ui-field-error">
-                    {fieldErrors.recipientId}
-                  </span>
-                ) : null}
-              </label>
+              <DeliveryRecipientField
+                key={form.source}
+                data={recipientContext}
+                comparison={recipientComparison}
+                error={recipientError}
+                loading={recipientLoading}
+                form={form}
+                setForm={setForm}
+                fieldErrors={fieldErrors}
+                previousRecipient={previousRecipient}
+                onRefresh={refreshRecipients}
+                onAdopt={adoptRecipients}
+              />
             </div>
           ) : null}
           {requisitionId ? (
@@ -372,8 +373,23 @@ export function SupplyWizardStep({
                   ? "Família → Equipe"
                   : "Equipe → Família"}{" "}
                 · Recebedor:{" "}
-                {people.find((person) => person.id === form.recipientId)?.name}
+                {recipientContext?.people.find(
+                  (person) => person.id === form.recipientId,
+                )?.name ??
+                  people.find((person) => person.id === form.recipientId)
+                    ?.name ??
+                  "Pessoa não disponível na referência atual"}
               </p>
+            ) : null}
+            {type === "ENT" && recipientContext ? (
+              <div className="mt-3 space-y-2">
+                <DeliveryRecipientReference data={recipientContext} />
+                {form.recipientReason ? (
+                  <p className="whitespace-pre-wrap">
+                    Justificativa da escolha: {form.recipientReason}
+                  </p>
+                ) : null}
+              </div>
             ) : null}
           </div>
           <ul className="divide-y divide-(--line)">

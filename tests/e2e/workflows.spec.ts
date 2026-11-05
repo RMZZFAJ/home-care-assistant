@@ -1,4 +1,5 @@
 import { selectContext } from "./auth-context";
+import { selectDeliveryRecipient } from "./delivery-recipient";
 import { openNavigation } from "./navigation";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
@@ -154,9 +155,7 @@ async function issueSupply(
       (requestId ? "&requisitionId=" + requestId : ""),
   );
   if (type === "ENT")
-    await page
-      .getByLabel("Destinatário designado", { exact: false })
-      .selectOption(fixtures().professional.id);
+    await selectDeliveryRecipient(page,"Teste professional","Pessoa indicada manualmente para receber estes materiais");
   if (type === "COM")
     await page.getByLabel("Forma de aquisição").selectOption("donation");
   await next(page);
@@ -377,6 +376,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     careRecipientId: patient,
     type: "ENT",
     payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures().professional.id,
@@ -395,6 +395,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     careRecipientId: patient,
     type: "ENT",
     payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures().professional.id,
@@ -815,9 +816,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     });
   });
   await page.goto("/fichas/ent?careRecipientId=" + patient);
-  await page
-    .getByLabel("Destinatário designado", { exact: false })
-    .selectOption(fixtures().professional.id);
+  await selectDeliveryRecipient(page,"Teste professional","Pessoa indicada manualmente para receber estes materiais");
   await page
     .getByText("Vincular requisições pendentes", { exact: true })
     .click();
@@ -959,6 +958,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
       careRecipientId: patient,
       type: "ENT",
       payload: {
+        recipientReason: "Escolha manual fictícia para este recebimento",
         source: "FAMILY",
         destination: "CARE_TEAM",
         recipientId: fixtures().professional.id,
@@ -1008,7 +1008,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await page
     .getByLabel("Motivo / justificativa")
     .fill("Devolução integral acordada com o recebedor");
-  await confirm(page);
+  await confirm(page,"Pedido de cancelamento registrado, sem estorno.");
   await expect(
     page.getByText("Cancelamento aguardando consentimento", { exact: true }),
   ).toBeVisible();
@@ -1031,7 +1031,11 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await page
     .getByLabel("Motivo / justificativa")
     .fill("Quatro unidades efetivamente devolvidas à família");
-  await confirm(page);
+  await expect(page.getByText("Consumo já confirmado disponível: 0 unidade",{exact:true})).toBeVisible();
+  await expect(page.locator('input[name$=":consumed"]')).toHaveCount(0);
+  const actualReturn=page.getByRole("textbox",{name:`Devolução física real · ${product.name} · unidade`,exact:true});
+  await expect(actualReturn).toHaveValue("");await actualReturn.fill("4");
+  await confirm(page,"Cancelamento consentido.");
   stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)
@@ -1060,6 +1064,7 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
       careRecipientId: patient,
       type: "ENT",
       payload: {
+        recipientReason: "Escolha manual fictícia para este recebimento",
         source: "FAMILY",
         destination: "CARE_TEAM",
         recipientId: fixtures().professional.id,

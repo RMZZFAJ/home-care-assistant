@@ -54,6 +54,7 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
     p_patient: f.patient,
     p_type: "ENT",
     p_payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures.professional.id,

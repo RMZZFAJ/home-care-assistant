@@ -252,6 +252,15 @@ Snapshots incluem a conciliação antes do hash canônico; histórico, aceite e
 débitos anteriores permanecem imutáveis. Regularização administrativa de
 desligados e transferência bilateral continuam incrementos distintos.
 
+P06 deriva sugestão das scheduled_shifts publicadas vigentes e pessoas
+vinculadas/ativas com ent.receive efetivo no destino. Múltiplas pessoas não
+produzem sugestão arbitrária; flags não transformam papel incompatível em
+recebedor elegível. A referência é calculada no banco, sem instante/nome ou
+snapshot autoritativos enviados pelo cliente. Cada indicação captura a escolha
+e o autor atuais no workflow antes do evento/hash, com histórico de preparações
+e expedição distintos. Revalidação final recusa perda de elegibilidade após
+espera no movimento. Dados/eventos antigos não recebem preenchimento retroativo.
+
 workspace_revisions e broadcasts privados invalidam leituras autorizadas, sem
 enviar snapshots clínicos. Perfis usam profiles.id para alcançar a própria
 pessoa, consumidores relacionados e administração global autorizada. Proponente

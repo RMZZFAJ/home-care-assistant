@@ -34,6 +34,16 @@ export const supplyPayload = z
     source: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     destination: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     recipientId: identifier.optional(),
+    recipientReason: z
+      .string()
+      .trim()
+      .max(1000)
+      .refine((value) => !value || value.length >= 3)
+      .optional(),
+    recipientReference: z
+      .string()
+      .regex(/^[0-9a-f]{64}$/)
+      .optional(),
     balanceAssignment: z
       .object({
         id: identifier,

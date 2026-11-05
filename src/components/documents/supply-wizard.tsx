@@ -29,6 +29,7 @@ import {
   type SupplyPayload,
   type SupplyType,
   type ItemContext,
+  type DeliveryPreparation,
 } from "@/types/documents";
 
 const steps = [
@@ -53,17 +54,29 @@ export function SupplyWizard({ type }: { type: SupplyType }) {
   return (
     <Workspace title={documentLabels[type]} compact>
       {(context) => {
-        if (!context.patient) return <Notice>Selecione um paciente para abrir uma ficha.</Notice>;
-        const wizard = <PatientSupplyWizard
+        if (!context.patient)
+          return <Notice>Selecione um paciente para abrir uma ficha.</Notice>;
+        const wizard = (
+          <PatientSupplyWizard
             key={context.patient.id + params.toString()}
             context={context}
             type={type}
             requisitionId={params.get("requisitionId")}
             documentId={params.get("documentId")}
             recount={params.get("recount") === "true"}
-          />;
+          />
+        );
         const requisitionId = params.get("requisitionId");
-        return requisitionId ? <RequisitionOpening key={context.patient.id + params.toString()} id={requisitionId}>{wizard}</RequisitionOpening> : wizard;
+        return requisitionId ? (
+          <RequisitionOpening
+            key={context.patient.id + params.toString()}
+            id={requisitionId}
+          >
+            {wizard}
+          </RequisitionOpening>
+        ) : (
+          wizard
+        );
       }}
     </Workspace>
   );
@@ -84,12 +97,22 @@ export function PatientSupplyWizard({
   const [step, setStep] = useState(0);
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
   const [people, setPeople] = useState<PatientPerson[]>([]);
+  const [recipientContext, setRecipientContext] =
+    useState<DeliveryPreparation | null>(null);
+  const recipientContextRef = useRef<DeliveryPreparation | null>(null);
+  const [recipientComparison, setRecipientComparison] =
+    useState<DeliveryPreparation | null>(null);
+  const [recipientError, setRecipientError] = useState("");
+  const [recipientPending, setRecipientPending] = useState(false);
+  const [recipientLoadedSource, setRecipientLoadedSource] = useState("");
+  const [recipientAttempt, setRecipientAttempt] = useState(0);
   const [form, setForm] = useState<WizardState>({
     quantities: {},
     notes: "",
     origin: "purchase",
     source: "FAMILY",
     recipientId: "",
+    recipientReason: "",
   });
   const [links, setLinks] = useState<Record<string, string[]>>({});
   const [requestOptions, setRequestOptions] = useState<ItemContext[]>([]);
@@ -128,9 +151,9 @@ export function PatientSupplyWizard({
     context,
     type === "BAL" ? "bal.count" : type.toLowerCase() + ".create",
   );
+  const patientId = context.patient!.id;
   useEffect(() => {
     const controller = new AbortController();
-    const patientId = context.patient!.id;
     Promise.all([
       api<{ data: CatalogProduct[] }>(
         "/api/catalog?careRecipientId=" + patientId,
@@ -152,7 +175,10 @@ export function PatientSupplyWizard({
     ])
       .then(async ([products, settings, source]) => {
         if (controller.signal.aborted) return;
-        if (source?.data.is_historical) throw new Error("Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.");
+        if (source?.data.is_historical)
+          throw new Error(
+            "Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.",
+          );
         setCatalog(products.data);
         setPeople(settings.directory);
         if (type !== "BAL" && canReadRequests) {
@@ -240,6 +266,7 @@ export function PatientSupplyWizard({
             origin: existing.payload.origin ?? "purchase",
             source: existing.payload.source ?? "FAMILY",
             recipientId: existing.recipient_id ?? "",
+            recipientReason: existing.payload.recipientReason ?? "",
             sharedNeedReasons: Object.fromEntries(
               existing.lines.map((line) => [
                 line.product_id,
@@ -290,7 +317,7 @@ export function PatientSupplyWizard({
       });
     return () => controller.abort();
   }, [
-    context.patient,
+    patientId,
     requisitionId,
     storageKey,
     type,
@@ -299,6 +326,61 @@ export function PatientSupplyWizard({
     recount,
     canReadRequests,
   ]);
+  useEffect(() => {
+    if (type !== "ENT" || loading || loadError || uncertain || saved) return;
+    const controller = new AbortController();
+    api<{ data: DeliveryPreparation }>(
+      "/api/documents/delivery-preparation?careRecipientId=" +
+        patientId +
+        "&source=" +
+        form.source,
+      undefined,
+      controller.signal,
+    )
+      .then(({ data }) => {
+        if (controller.signal.aborted) return;
+        if (recipientContextRef.current?.source === data.source) {
+          setRecipientComparison(data);
+        } else {
+          recipientContextRef.current = data;
+          setRecipientContext(data);
+          setRecipientComparison(null);
+          setForm((current) =>
+            current.recipientId
+              ? current
+              : { ...current, recipientId: data.suggestedId ?? "" },
+          );
+        }
+        setRecipientError("");
+        setRecipientPending(false);
+        setRecipientLoadedSource(data.source);
+      })
+      .catch((reason) => {
+        if (!controller.signal.aborted) {
+          setRecipientError(
+            reason instanceof Error
+              ? reason.message
+              : "Não foi possível consultar os recebedores. Atualize esta seção.",
+          );
+          setRecipientPending(false);
+          setRecipientLoadedSource(form.source);
+        }
+      });
+    return () => controller.abort();
+  }, [
+    type,
+    patientId,
+    form.source,
+    loading,
+    loadError,
+    uncertain,
+    saved,
+    recipientAttempt,
+  ]);
+  const recipientLoading =
+    recipientPending || recipientLoadedSource !== form.source;
+  const activeRecipientContext =
+    recipientContext?.source === form.source ? recipientContext : null;
   useEffect(() => {
     if (loading || loadError || saved || uncertain || busy) return;
     const timer = window.setTimeout(() => {
@@ -318,12 +400,50 @@ export function PatientSupplyWizard({
       }
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [form, links, editing, loading, loadError, saved, storageKey, uncertain, busy]);
+  }, [
+    form,
+    links,
+    editing,
+    loading,
+    loadError,
+    saved,
+    storageKey,
+    uncertain,
+    busy,
+  ]);
   function validate(all = false) {
     const errors: Record<string, string> = {};
     const category = ["medicamentos", "higiene", "dieta"][step - 1];
     if (type === "ENT" && (all || step === 0) && !form.recipientId)
       errors.recipientId = "Selecione quem receberá esta entrega.";
+    if (type === "ENT" && (all || step === 0)) {
+      if (recipientLoading || recipientError || !activeRecipientContext)
+        errors.recipientContext =
+          "Consulte as pessoas e a escala antes de continuar. Os demais campos foram preservados.";
+      else if (recipientComparison)
+        errors.recipientContext =
+          "Compare e adote explicitamente as referências atuais antes de continuar.";
+      else if (
+        !activeRecipientContext.people.some(
+          (person) => person.id === form.recipientId,
+        )
+      )
+        errors.recipientId =
+          "Escolha uma pessoa que continue elegível para receber nesta direção.";
+      if (
+        activeRecipientContext &&
+        !recipientError &&
+        !recipientLoading &&
+        !recipientComparison &&
+        form.recipientId &&
+        (form.recipientId !== activeRecipientContext?.suggestedId ||
+          (editing?.recipient_id &&
+            editing.recipient_id !== form.recipientId)) &&
+        (form.recipientReason?.trim().length ?? 0) < 3
+      )
+        errors.recipientReason =
+          "Explique a escolha manual ou troca do recebedor com 3 a 1000 caracteres.";
+    }
     const relevant = catalog.filter(
       (product) =>
         (all || product.category === category) &&
@@ -447,6 +567,8 @@ export function PatientSupplyWizard({
                 source: form.source,
                 destination: form.source === "FAMILY" ? "CARE_TEAM" : "FAMILY",
                 recipientId: form.recipientId,
+                recipientReason: form.recipientReason?.trim() || undefined,
+                recipientReference: activeRecipientContext!.referenceHash,
               }
             : {}),
       };
@@ -503,6 +625,15 @@ export function PatientSupplyWizard({
         reason instanceof ApiError &&
         [400, 403, 404, 409, 413, 422].includes(reason.status);
       if (known) frozenRef.current = null;
+      if (
+        type === "ENT" &&
+        reason instanceof ApiError &&
+        reason.status === 409
+      ) {
+        setRecipientPending(true);
+        setRecipientAttempt((value) => value + 1);
+        setStep(0);
+      }
       setUncertain(!known);
       setError(
         reason instanceof Error
@@ -607,69 +738,128 @@ export function PatientSupplyWizard({
     );
   return (
     <div className="mx-auto max-w-4xl">
-      {loadError ? <div className="space-y-3"><Notice error>{loadError}</Notice><button type="button" className={buttonClass} onClick={() => { setLoading(true); setLoadError(""); setAttempt(value => value + 1); }}>Recarregar dados</button><Link className={buttonClass} href={requisitionId ? "/historico/" + requisitionId : "/fichas"}>Voltar</Link></div> : <>
-      <StepNavigator
-        steps={steps}
-        active={step}
-        onChange={setStep}
-        disabled={busy || uncertain || loading}
-        label={"Etapas da " + type}
-      />
-      {message ? <Notice>{message}</Notice> : null}
-      {error ? (
-        <Notice error>
-          {error}
-          {loading ? null : (
-            <button
-              type="button"
-              className={buttonClass}
-              onClick={() => {
-                setLoading(true);
-                setAttempt((value) => value + 1);
-              }}
-            >
-              Recarregar dados
-            </button>
-          )}
-        </Notice>
-      ) : null}
-      {loading ? (
-        <Notice>Carregando catálogo e vínculos…</Notice>
+      {loadError ? (
+        <div className="space-y-3">
+          <Notice error>{loadError}</Notice>
+          <button
+            type="button"
+            className={buttonClass}
+            onClick={() => {
+              setLoading(true);
+              setLoadError("");
+              setAttempt((value) => value + 1);
+            }}
+          >
+            Recarregar dados
+          </button>
+          <Link
+            className={buttonClass}
+            href={requisitionId ? "/historico/" + requisitionId : "/fichas"}
+          >
+            Voltar
+          </Link>
+        </div>
       ) : (
-        <section className="ui-card">
-          <div className="mb-6">
-            <p className="eyebrow">
-              {type} · {context.patient?.display_name}
-            </p>
-            <h2 className="mt-2 text-xl font-semibold">{steps[step]}</h2>
-          </div>
-          <fieldset disabled={busy || uncertain} className="min-w-0 space-y-5">
-            <SupplyWizardStep
-              step={step}
-              type={type}
-              context={context}
-              form={form}
-              setForm={setForm}
-              fieldErrors={fieldErrors}
-              catalog={catalog}
-              people={people}
-              links={links}
-              setLinks={setLinks}
-              requestOptions={requestOptions}
-              requisitionId={requisitionId}
-              scan={scan}
-            />
-          </fieldset>
-          {uncertain ? (
-            <Notice>
-              A confirmação da gravação está pendente. Recupere a mesma
-              tentativa antes de iniciar outra.
+        <>
+          <StepNavigator
+            steps={steps}
+            active={step}
+            onChange={setStep}
+            disabled={busy || uncertain || loading}
+            label={"Etapas da " + type}
+          />
+          {message ? <Notice>{message}</Notice> : null}
+          {error ? (
+            <Notice error>
+              {error}
+              {loading ? null : (
+                <button
+                  type="button"
+                  className={buttonClass}
+                  onClick={() => {
+                    setLoading(true);
+                    setAttempt((value) => value + 1);
+                  }}
+                >
+                  Recarregar dados
+                </button>
+              )}
             </Notice>
           ) : null}
-          <WizardActions step={step} total={6} saving={busy} uncertain={uncertain} onBack={() => { setStep((value) => value - 1); setError(""); }} onDraft={() => void persist(true)} onNext={next} onFinish={() => void persist(false)} />
-        </section>
+          {loading ? (
+            <Notice>Carregando catálogo e vínculos…</Notice>
+          ) : (
+            <section className="ui-card">
+              <div className="mb-6">
+                <p className="eyebrow">
+                  {type} · {context.patient?.display_name}
+                </p>
+                <h2 className="mt-2 text-xl font-semibold">{steps[step]}</h2>
+              </div>
+              <fieldset
+                disabled={busy || uncertain}
+                className="min-w-0 space-y-5"
+              >
+                <SupplyWizardStep
+                  step={step}
+                  type={type}
+                  context={context}
+                  form={form}
+                  setForm={setForm}
+                  fieldErrors={fieldErrors}
+                  catalog={catalog}
+                  people={people}
+                  links={links}
+                  setLinks={setLinks}
+                  requestOptions={requestOptions}
+                  requisitionId={requisitionId}
+                  scan={scan}
+                  recipientContext={activeRecipientContext}
+                  recipientComparison={recipientComparison}
+                  recipientError={recipientError}
+                  recipientLoading={recipientLoading}
+                  previousRecipient={editing?.recipient_id}
+                  refreshRecipients={() => {
+                    setRecipientPending(true);
+                    setRecipientError("");
+                    setRecipientAttempt((value) => value + 1);
+                  }}
+                  adoptRecipients={() => {
+                    if (recipientComparison) {
+                      recipientContextRef.current = recipientComparison;
+                      setRecipientContext(recipientComparison);
+                      setRecipientComparison(null);
+                      setFieldErrors({});
+                      requestAnimationFrame(() =>
+                        document.getElementById("delivery-recipient")?.focus(),
+                      );
+                    }
+                  }}
+                />
+              </fieldset>
+              {uncertain ? (
+                <Notice>
+                  A confirmação da gravação está pendente. Recupere a mesma
+                  tentativa antes de iniciar outra.
+                </Notice>
+              ) : null}
+              <WizardActions
+                step={step}
+                total={6}
+                saving={busy}
+                uncertain={uncertain}
+                onBack={() => {
+                  setStep((value) => value - 1);
+                  setError("");
+                }}
+                onDraft={() => void persist(true)}
+                onNext={next}
+                onFinish={() => void persist(false)}
+              />
+            </section>
+          )}
+        </>
       )}
-      </>}
     </div>
   );
 }

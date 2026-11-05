@@ -228,6 +228,19 @@ Recuperação de decisão confirmada exige acesso vivo ao resultado, sem exigir
 novamente a capacidade de uma escrita já concluída. O PDF da nova versão
 preserva aceite, pedido, decisor, consumo referenciado e devolução efetiva.
 
+GET /api/documents/delivery-preparation recebe careRecipientId/source e exige
+ent.create vigente. Retorna pessoas elegíveis na direção de custódia, escala
+publicada no horário consultado, sugestão somente se inequívoca e referenceHash.
+Sem pessoa apta, a preparação fica pendente; não se presume recebedor.
+Em payload ENT, recipientReason registra escolha manual/troca e
+recipientReference vincula a referência consultada. Escolha fora da sugestão
+exige motivo de 3–1000 na expedição; trocar o destinatário do rascunho também
+exige motivo próprio. O banco revalida papéis/capacidades e referência na
+criação, revisão, submit e reassign, inclusive ao finalizar esperas tardias.
+workflow_data.recipientSelection preserva pessoa escolhida/sugerida, escala,
+motivo, indicador e instante; indicações anteriores permanecem no histórico.
+Indicação não é presença, assinatura ou recebimento pessoal.
+
 ## Relatos e consumo
 
 GET /api/consumption usa páginas de 20 por created_at/id, cursor beforeAt/

@@ -38,7 +38,7 @@ begin
  perform pg_temp.review_assert(not exists(select 1 from jsonb_array_elements(public.my_workspace()->'patients') x where x->>'id'='20000000-0000-4000-8000-000000000002'),'workspace does not expose another patient');
  perform pg_temp.review_login('adminA');
  perform public.family_stock_movement(p,'fralda',20,'inbound','Entrada para revisão operacional',gen_random_uuid());
- d:=public.create_supply_document(p,'ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from review_actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','10','requisitionItemIds',jsonb_build_array(i)))),gen_random_uuid(),false);
+ d:=public.create_supply_document(p,'ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',(select id from review_actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','10','requisitionItemIds',jsonb_build_array(i)))),gen_random_uuid(),false);
  perform pg_temp.review_assert((public.stock_transit(p)->0->'lines'->0->>'pending')::numeric=10,'transit is not confirmed stock');
  perform pg_temp.review_login('professional');
  d:=public.supply_document_command((d->>'id')::uuid,'receive',jsonb_build_object('divergences',jsonb_build_array(jsonb_build_object('lineId',d->'lines'->0->>'id','acceptedQuantity','6','problem','shortage')),'securityLevel','forged','providerId','forged'),gen_random_uuid(),(d->>'version')::integer);

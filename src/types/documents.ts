@@ -31,6 +31,8 @@ export type SupplyPayload = {
   source?: Custody;
   destination?: Custody;
   recipientId?: string;
+  recipientReason?: string;
+  recipientReference?: string;
   balanceAssignment?: {
     id: string;
     version: number;
@@ -50,6 +52,39 @@ export type SupplyPayload = {
     weeks: string[];
     kind: string;
   };
+};
+export type DeliveryPreparation = {
+  source: Custody;
+  destination: Custody;
+  people: { id: string; name: string; role: string }[];
+  shifts: {
+    id: string;
+    professionalId: string;
+    professionalName: string;
+    version: number;
+    startsAt: string;
+    endsAt: string;
+  }[];
+  suggestedId: string | null;
+  state: "suggested" | "ambiguous" | "no_schedule" | "no_eligible_recipient";
+  referenceHash: string;
+  checkedAt: string;
+};
+export type DeliveryRecipientSelection = {
+  recipientId: string;
+  recipientName: string;
+  recipientRole: string;
+  suggestedId: string | null;
+  suggestionState: DeliveryPreparation["state"];
+  shifts: DeliveryPreparation["shifts"];
+  referenceHash: string;
+  manual: boolean;
+  reason: string | null;
+  previousRecipientId: string | null;
+  selectedBy: string;
+  selectedName: string;
+  recordedAt: string;
+  official: boolean;
 };
 export type DocumentEvent = {
   id: string;
@@ -169,7 +204,10 @@ export type SupplyDocument = {
   updated_at: string;
   content_hash: string;
   payload: SupplyPayload;
-  workflow_data: Record<string, unknown>;
+  workflow_data: Record<string, unknown> & {
+    recipientSelection?: DeliveryRecipientSelection;
+    recipientSelectionHistory?: DeliveryRecipientSelection[];
+  };
   canonical_snapshot: Record<string, unknown>;
   lines: SupplyLine[];
   events: DocumentEvent[];

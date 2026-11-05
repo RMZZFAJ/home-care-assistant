@@ -1,5 +1,6 @@
 "use client";
 import { SettingsSection } from "@/components/forms/settings-section";
+import { DeliveryRecipientFacts } from "./delivery-recipient";
 import { documentPatientName } from "@/lib/documents/presentation";
 import { SupplyLineSummary } from "./supply-line-summary";
 
@@ -561,8 +562,10 @@ export function SupplyDocumentContent({
                     ? "Família → Equipe"
                     : "Equipe → Família"}{" "}
                   · Destinatário:{" "}
-                  {people.find((person) => person.id === data.recipient_id)
-                    ?.name ?? "Pessoa designada no documento"}
+                  {data.workflow_data.recipientSelection?.recipientName ??
+                    people.find((person) => person.id === data.recipient_id)
+                      ?.name ??
+                    "Pessoa designada no documento"}
                 </p>
                 <p className="text-xs text-(--muted)">
                   {data.status === "cancelled"
@@ -583,6 +586,30 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
+          {data.type === "ENT" && data.workflow_data.recipientSelection ? (
+            <section className="ui-card space-y-4">
+              <DeliveryRecipientFacts
+                selection={data.workflow_data.recipientSelection}
+              />
+              {data.workflow_data.recipientSelectionHistory?.length ? (
+                <details>
+                  <summary>Indicações anteriores preservadas</summary>
+                  <div className="mt-3 space-y-4">
+                    {data.workflow_data.recipientSelectionHistory.map(
+                      (selection) => (
+                        <DeliveryRecipientFacts
+                          key={
+                            selection.recordedAt + ":" + selection.recipientId
+                          }
+                          selection={selection}
+                        />
+                      ),
+                    )}
+                  </div>
+                </details>
+              ) : null}
+            </section>
+          ) : null}
           {data.type === "ENT" && data.deliveryCancellation ? (
             <DeliveryCancellationDetails
               context={data.deliveryCancellation}

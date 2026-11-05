@@ -80,6 +80,7 @@ describe("contratos operacionais exatos", () => {
         careRecipientId: id,
         type: "ENT",
         payload: {
+          recipientReason: "Escolha manual fictícia para este recebimento",
           source: "FAMILY",
           destination: "FAMILY",
           recipientId: id,

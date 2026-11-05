@@ -23,6 +23,10 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/stale delivery recipient reference/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "As pessoas elegíveis ou a sugestão da escala mudaram. Consulte e compare as referências atuais; sua escolha e justificativa foram preservadas.", 409);
+  if (/recipient selection reason required|invalid recipient selection reason/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Registre a justificativa própria da escolha manual ou troca de recebedor, com 3 a 1000 caracteres.", 400);
   if (/historical requisition is read only/i.test(message))
     throw new ApiError("VALIDATION_ERROR", "Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.", 400);
   if (/no purchase expectation remaining/i.test(message))

@@ -683,3 +683,64 @@ P06/P07; BAL, estoque/custódia/compensação, catálogo, profissionais e escala
 Recuperação de consumo após perda somente da capacidade de escrita e efeito de
 compensações futuras sobre as referências precisam ser tratados nos respectivos
 incrementos. Sem merge, GO, banco remoto ou homologação humana/física/provedor.
+
+## D2.6 — P06: preparação e indicação pessoal
+
+Cancelamento publicado em 648aac6a110675ac80681945f3e55f1c9443d530. Consulta
+pontual da CI 42115856829: in_progress, sem conclusão presumida.
+Na consulta de entrega seguinte, a execução concluiu com failure: banco
+(replay/integrações) e checks gerais Windows/Ubuntu passaram. Os cinco casos
+novos ENT passaram nos três navegadores. O teste operacional antigo ainda
+esperava mensagem genérica e o formulário anterior; foi atualizado mantendo
+saldo família/equipe e declarando a devolução real em campo vazio. iOS também
+registrou uma oscilação REQ: a fixture alterava sessionStorage com autosave
+ativo. Agora sai do formulário antes de preparar os horários do dia anterior;
+os asserts exatos dos quatro horários e a distância de 19h foram conservados.
+Somente esses dois percursos foram repetidos em WebKit: ambos passaram,
+conservando saldos 4/6→0/10 e os quatro horários exatos anteriores à emissão.
+
+A contraprova Auth de expedição manual sem motivo falhou antes: o comando
+era aceito. Migration 20261105215000 deriva pessoas elegíveis e sugestão da
+escala no banco, registra escolha/sugestão/indicador/instante/motivo e preserva
+indicações anteriores. Fonte consultada tem hash; alteração exige nova revisão.
+Sem pessoa apta conserva preparação/contingência. Flags de capacidade não
+substituem papel elegível nem a identidade pessoal do recebimento.
+
+Dez casos Auth passaram entre rodada e rechecks dirigidos. Três negativas
+iniciais encontraram P0001 no guard antigo; a classificação foi corrigida para
+42501, sem remover a negativa. A espera original de catálogo antecedia a
+captura da escolha; não foi contada como prova posterior. O caso final passou
+com espera observada na FK products da movimentação, depois da captura, e
+rejeição específica da referência após revogação, sem documento ou ledger
+parcial. Fixtures válidas antigas agora explicitam o motivo manual; o novo
+controle de ausência usa RPC direta sem suprir esse campo.
+Reassign também passou com preservação da indicação emitida e negativa após
+perda de ent.create; razão malformada/NULL/curta não virou fato autorizado.
+
+Onze testes da fronteira/contrato afetado e tipos passaram; o arquivo de dois
+testes API foi repetido apenas para o limite curto acrescentado. O SQL afetado
+document-invariants passou com rollback, sem reset. Lint encontrou uma chave
+de histórico com índice, corrigida e revalidada sem avisos.
+
+Quatro tarefas Chromium passaram: manual com motivo obrigatório e recuperação
+de resposta perdida; sugestão editável/terceiro impedido de aceitar; erro e
+fonte obsoleta com comparação/adoção explícita; contingência sem pessoa apta.
+A primeira rodada passou contingência e expôs uso incorreto do combobox pelo
+novo helper: preencher texto não abria as opções. Abertura por teclado e
+seleção explícita corrigiram o helper; só as três tarefas afetadas foram
+repetidas. Asserções de estoque, identidade e unicidade permaneceram.
+O formulário não recarrega automaticamente quando muda apenas a revisão do
+workspace, preservando edição durante atualização de outra sessão.
+
+Tarefa de resultado auditada a 320/390/768/1440 e captura de 320 px inspecionada.
+PDF 9b8c6d6e, v1, confrontado com snapshot/autores/estoque e hash registrado;
+duas páginas renderizadas por PDFium e inspecionadas, sem aceite presumido.
+SHA-256: 50df87562dad0b67713e65c858808b86acddacd27fc28bd7e6b0d294a698dd65.
+Manifesto local: output/pdf/phase-d/delivery-preparation-9b8c6d6e-d7f7-4772-b8ad-48a08fe670cc-v1-verification.json.
+Replay limpo/legado e suítes gerais ficam para a CI do incremento. P05/P07 e
+demais etapas do núcleo continuam abertas; sem conclusão D-A, merge ou GO.
+
+Orientação do responsável sobre custo/repetição foi incorporada ao AGENTS.md
+e TESTING.md: evidência local por impacto, repetição das falhas afetadas e
+suítes completas na CI do SHA publicado, sem polling ou verde presumido.
+Não há redução de asserções, guards de ambiente, Auth real ou gates finais.

@@ -68,7 +68,22 @@ passaram em rodadas dirigidas, além da fronteira API e do invariante SQL afetad
 PDFs pendente/final foram confrontados com eventos/ledger/hashes e inspecionados
 em todas as seis páginas; revisão encontrou e corrigiu estado de recebimento
 e quebra do bloco de integridade. Replay e suítes gerais ficam para a CI deste
-incremento. P05/P06/P07 e as demais etapas ENT continuam em execução.
+incremento. P05/P07 e as demais etapas ENT continuam em execução.
+
+Preparação P06 ganhou sugestão inequívoca da escala, escolha elegível editável,
+motivo manual/troca e histórico com autoria própria. Mudança da fonte exige
+comparar/adotar; sem pessoa apta mantém contingência. Dez casos Auth, quatro
+tarefas Chromium, contrato/API e SQL afetados passaram em rodadas dirigidas.
+PDF de indicação confrontado com snapshot/ledger/hash e inspecionado nas duas
+páginas. AGENTS/TESTING agora explicitam validação local por impacto e suítes
+gerais na CI de cada SHA, sem duplicação automática a cada ajuste. Essas provas
+não concluem P05/P07 nem homologação humana, física ou de provedor.
+
+CI 42115856829 de `648aac6`: replay/integrações e checks gerais aprovados;
+cinco casos novos ENT aprovados em todos os navegadores. Uma expectativa
+antiga do teste de cancelamento falhou nos três projetos e a retomada REQ
+teve oscilação iOS. Os dois consumidores afetados foram ajustados e passaram
+no recheck WebKit, sem repetir localmente as demais suítes já aprovadas.
 
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não

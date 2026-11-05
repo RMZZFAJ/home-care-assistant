@@ -40,7 +40,7 @@ begin
  perform public.supply_document_command((c->>'id')::uuid,'validate_receipt',b,k,1);
  perform pg_temp.assert_quantity((select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='FAMILY'),6,'receipt credit/idempotency');
  perform pg_temp.assume_context('family',p);
- d:=public.create_supply_document(p,'ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',t,'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','5','requisitionItemIds',jsonb_build_array(line_id)))),gen_random_uuid());
+ d:=public.create_supply_document(p,'ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',t,'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','5','requisitionItemIds',jsonb_build_array(line_id)))),gen_random_uuid());
  if (d->>'status') is distinct from 'pending_receipt' or (select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='FAMILY') is distinct from 1 or (select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='TRANSIT') is distinct from 5 then raise exception 'dispatch custody incorrect';end if;
  begin perform public.supply_document_command((d->>'id')::uuid,'receive','{"divergences":[]}',gen_random_uuid(),(d->>'version')::integer);raise exception 'issuer accepted delivery';exception when insufficient_privilege then null;end;
  perform pg_temp.assume_context('professional',p);

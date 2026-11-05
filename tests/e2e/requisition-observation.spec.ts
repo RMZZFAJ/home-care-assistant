@@ -72,7 +72,10 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
   const draftKey = "hca:v2:requisition:" + fixture.professional.id + ":" + f.patient;
   // Controlled previous-day fixture remains within the current tab's 24h
-  // retention. Cross-device/server draft persistence belongs to D3.
+  // retention. Leave the form before editing this fixture so its pending
+  // autosave cannot race the previous-day timestamps during slow navigation.
+  // Cross-device/server draft persistence belongs to D3.
+  await page.goto("/historico");
   const previousTimes = await page.evaluate(key => {
     const saved = JSON.parse(sessionStorage.getItem(key)!);
     for (const line of saved.form.lines) if (!line.stockObservationAt || !Number.isFinite(Date.parse(line.stockObservationAt))) throw new Error("The actual UI must record its declaration time");
@@ -81,7 +84,9 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     sessionStorage.setItem(key, JSON.stringify(saved));
     return Object.fromEntries(saved.form.lines.map((line: { productId: string; stockObservationAt: string }) => [line.productId, line.stockObservationAt]));
   }, draftKey);
-  await page.reload(); await hygiene(page);
+  await page.goto("/fichas/req");
+  await expect(page.getByText("Rascunho deste dispositivo recuperado.",{exact:true})).toBeVisible();
+  await hygiene(page);
   await expect(zero).toHaveValue("0");
   await expect(cards[1].getByLabel("Informação do estoque da equipe", { exact: true })).toHaveValue("unknown");
   await expect(cards[2].getByLabel("Informação do estoque da equipe", { exact: true })).toHaveValue("unfilled");

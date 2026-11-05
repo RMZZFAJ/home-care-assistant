@@ -131,6 +131,7 @@ async function delivery(patient, req, products, extras = {}, dispatcher = "famil
     p_type: "ENT",
     p_key: randomUUID(),
     p_payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures.professional.id,

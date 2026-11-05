@@ -21,7 +21,7 @@ const openings = (id: string) => Number(sql(`select count(*) from public.requisi
 
 test("falha nos dados da ficha bloqueia comandos e a retomada conserva o rascunho confirmado", async ({ page }) => {
   const f = await setup(), family = await actor("family", f.patient);
-  const draft = await rpc(family, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: true, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, lines: [{ productId: f.products[0], quantity: "7" }] } });
+  const draft = await rpc(family, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: true, p_payload: { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, lines: [{ productId: f.products[0], quantity: "7" }] } });
   const before = sql(`select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(draft.id)};`);
   const ledger = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   expect(JSON.parse(ledger)).toHaveLength(2);
