@@ -114,12 +114,12 @@ separadamente.
 
 ```sh
 npx playwright install chromium webkit
-npm run e 2e
+npm run e2e
 ```
 
 O runner injeta credenciais exclusivamente da stack local verificada,
 desabilita
-envio externo e gera build separado em .next-e 2e. Inicia servidor em 3100,
+envio externo e gera build separado em `.next-e2e`. Inicia servidor em 3100,
 sem reaproveitar processo desconhecido. Os projetos Chromium desktop, Pixel 7
 e WebKit/iPhone 13 usam dados fictícios. Relatórios não são versionados;
 traces ficam desabilitados para evitar registrar credenciais de Auth.
