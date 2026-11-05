@@ -31,6 +31,12 @@ worker/provedor com transporte falso. Não utilizam credenciais reais.
 
 ## Banco local de desenvolvimento
 
+No PowerShell deste workspace, use npm.cmd quando repassar flags após --,
+por exemplo `npm.cmd run test:migrations -- --replay-local --backup CAMINHO`.
+Isso preserva os argumentos para os guards; o shim npm.ps1 observado omitiu
+o separador nessa execução. A ausência de consentimento/backup continua
+rejeitando replay. Os demais sistemas usam o npm da versão fixada normalmente.
+
 Requisitos: Docker e Supabase CLI 2.121.0. O harness usa o projeto
 home-care-assistant neste repositório: API 54321, banco 54322 e Mailpit 54324.
 Esse é o mesmo banco utilizado no desenvolvimento. Não cria outro projeto.

@@ -32,7 +32,8 @@ export function prepareReportOutput(args = process.argv.slice(2), workspace = pr
     writeFileSync(target, content, { flag: overwrite ? "w" : "wx", mode: 0o600 });
   };
   const sourceSha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: workspace, encoding: "utf8" }).trim();
-  const metadata = { sourceSha, generatedAt: new Date().toISOString(), tool: basename(process.argv[1] ?? "report"), evidence: "CURRENT_RUN_NOT_HISTORICAL_ACCEPTANCE" };
+  const sourceTreeDirty = execFileSync("git", ["status", "--porcelain", "--untracked-files=normal"], { cwd: workspace, encoding: "utf8" }).trim().length > 0;
+  const metadata = { sourceSha, sourceTreeDirty, generatedAt: new Date().toISOString(), tool: basename(process.argv[1] ?? "report"), evidence: "CURRENT_RUN_NOT_HISTORICAL_ACCEPTANCE" };
   mkdirSync(output, { recursive: true });
   write("RUN_METADATA.json", `${JSON.stringify(metadata, null, 2)}\n`);
   return { directory: output, metadata, write };

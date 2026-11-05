@@ -4,7 +4,7 @@ import { Button, Checkbox, Field, Input, Select, Textarea } from "@fluentui/reac
 import type { ScheduleCommand } from "@/lib/validation/schedules";
 import type { ScheduleWorkspace, ScheduledShift, ShiftType } from "@/types/schedules";
 import { civilInstant, localMinute } from "@/lib/schedules/time";
-export type ScheduleEditor = { kind: "type"; type?: ShiftType } | { kind: "series" } | { kind: "shift"; shift: ScheduledShift } | { kind: "end" | "reject"; id: string; version: number } | { kind: "reject_change"; id: string };
+export type ScheduleEditor = { kind: "type"; type?: ShiftType } | { kind: "series" } | { kind: "shift"; shift: ScheduledShift } | { kind: "end" | "reject"; id: string; version: number } | { kind: "reject_change"; id: string; version: number };
 export function ScheduleForm({ editor, data, ownId, team, publishOwn = false, today, onReview }: { editor: ScheduleEditor; data: ScheduleWorkspace; ownId: string; team: boolean; publishOwn?: boolean; today: string; onReview: (command: ScheduleCommand, version?: number) => void }) {
   const [recurrence, setRecurrence] = useState("weekly"), [cycle, setCycle] = useState("12x36");
   const [shiftAction, setShiftAction] = useState("change");
@@ -15,7 +15,7 @@ export function ScheduleForm({ editor, data, ownId, team, publishOwn = false, to
     if (editor.kind === "series") onReview({ action: "series", body: { professionalId: value("person"), shiftTypeId: value("type"), timezone: value("zone"), recurrence: recurrence as "once" | "weekly" | "cycle", weekdays: form.getAll("day").map(Number), ...(recurrence === "cycle" ? { workHours: Number(cycle.split("x")[0]) as 12 | 24, restHours: Number(cycle.split("x")[1]) as 24 | 36 | 48 } : {}), anchorDate: value("from"), validUntil: recurrence === "once" ? value("from") : value("until"), notes: value("notes"), ...(value("reason") ? { reason: value("reason") } : {}) } });
     if (editor.kind === "end") onReview({ action: "end_series", body: { id: editor.id, fromDate: value("from"), reason: value("reason") } }, editor.version);
     if (editor.kind === "reject") onReview({ action: "reject", body: { id: editor.id, reason: value("reason") } }, editor.version);
-    if (editor.kind === "reject_change") onReview({ action: "decide_change", body: { id: editor.id, approve: false, reason: value("reason") } });
+    if (editor.kind === "reject_change") onReview({ action: "decide_change", body: { id: editor.id, approve: false, reason: value("reason") } }, editor.version);
     if (editor.kind === "shift") {
       if (shiftAction === "cancel") onReview({ action: "cancel", body: { id: editor.shift.id, reason: value("reason") } }, editor.shift.version);
       else {

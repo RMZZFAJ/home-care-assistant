@@ -3,7 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 // Synthetic harness controls only: no application, backend or Auth fixtures.
 export default defineConfig({
   testDir: ".", testMatch: "*.spec.ts", workers: 1, retries: 0,
-  expect: { timeout: 1500 }, use: { trace: "off" },
+  outputDir: "../../output/playwright/harness-results",
+  expect: { timeout: 1500 }, use: { trace: "off", screenshot: "only-on-failure" },
   reporter: "list",
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },

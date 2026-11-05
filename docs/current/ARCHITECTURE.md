@@ -85,9 +85,11 @@ para clientes. Assinatura Ed25519 e gestão de chaves ficam para o roadmap.
 REQ concluída com ciência obrigatória pendente conserva a exceção que exige
 arquivamento manual justificado, inclusive após ciência tardia. O contrato
 exige trabalho elegível e não trata importações históricas como
-pendências atuais; A DB-002/B3-001 demonstra que candidaturas terminais ainda
-podem bloquear o lote REQ. Isso permanece defeito aberto, separado do cursor
-BAL. Realtime privado transmite somente revisões por usuário;
+pendências atuais. A DB-002/B3-001 documenta o bloqueio histórico por terminais;
+D-A o corrigiu com filtro antes dos limites, rotação e isolamento de
+candidato inválido, separados do cursor BAL. Provas locais no
+[checkpoint D-A](../audits/D/D-A/CHECKPOINT.md). Realtime privado transmite
+somente revisões por usuário;
 reconexão e consulta periódica recuperam eventos perdidos, sem apagar
 rascunhos.
 

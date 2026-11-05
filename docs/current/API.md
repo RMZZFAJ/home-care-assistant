@@ -207,6 +207,17 @@ Toda escrita usa careRecipientId, idempotencyKey e expectedVersion quando o
 registro já existe. Sobreposição retorna SCHEDULE_OVERLAP sem revelar o outro
 paciente. Não há escrita direta em agenda ou operação de check-in.
 
+Proposta de alteração tem versão própria e snapshots antes/depois. Decisão
+envia expectedVersion da proposta exibida; motivo do decisor não substitui
+motivo/notas do proponente. close_obsolete encerra uma proposta desatualizada
+com motivo e preserva a agenda atual. Se uma aprovação encontrar o alvo
+obsoleto, o banco registra o encerramento e a API retorna conflito seguro.
+Série encerrada ou profissional desligado não podem ganhar novas ocorrências
+por aprovação. Administração autorizada pode cancelar tarefas futuras do
+desligado, com sua própria autoria. O readmodel apresenta efeito BAL e todas
+as ocorrências da série para revisão, sem dispensar a decisão familiar que
+altera sua janela.
+
 `/api/balances` consulta a atribuição, elegibilidade, obrigações, destinos e
 eventos. Comandos configuram o regime por paciente, solicitam/decidem
 adiamento,

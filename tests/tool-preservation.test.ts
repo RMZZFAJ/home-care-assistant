@@ -1,13 +1,19 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { prepareReportOutput } from "../scripts/report-output.mjs";
 
 const owned: string[] = [];
 function temporary() { const dir = mkdtempSync(join(tmpdir(), "hca-d0-sentinel-")); owned.push(dir); return dir; }
-afterEach(() => { for (const dir of owned.splice(0)) rmSync(dir, { recursive: true, force: true }); });
+afterEach(() => {
+  for (const dir of owned.splice(0)) {
+    const target = resolve(dir);
+    if (dirname(target) !== resolve(tmpdir()) || !basename(target).startsWith("hca-d0-sentinel-")) throw new Error("Refusing cleanup outside the owned sentinel directory.");
+    rmSync(target, { recursive: true, force: true });
+  }
+});
 
 describe("D0 tool boundaries", () => {
   it.each(["audit-catalogue", "build-traceability", "inventory-ui", "reconcile-database"])("%s refuses default historical writes before contacting any service", (name) => {
@@ -33,6 +39,7 @@ describe("D0 tool boundaries", () => {
     expect(() => output.write("sentinel.json", "replacement")).toThrow();
     expect(readFileSync(join(dir, "sentinel.json"), "utf8")).toBe("original");
     expect(output.metadata.sourceSha).toMatch(/^[a-f0-9]{40}$/);
+    expect(typeof output.metadata.sourceTreeDirty).toBe("boolean");
     expect(Number.isFinite(Date.parse(output.metadata.generatedAt))).toBe(true);
     expect(() => output.write("../escape", "no")).toThrow("cannot escape");
     expect(() => prepareReportOutput(["--output-dir", "docs/audits/C/unsafe", "--overwrite"])).toThrow("historical inputs are protected");

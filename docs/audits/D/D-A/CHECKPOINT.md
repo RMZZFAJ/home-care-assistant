@@ -89,3 +89,47 @@ aprovadas, incluindo workers HTTP independentes e escopo/RLS/Auth real.
 Contratos, lint, Markdown, tipos e 112 unitários aprovados. CI e E2E do
 produto ainda não atestados neste incremento. D1 integral e D2 permanecem
 em execução, sem fechamento antecipado pelos dois casos de scheduler.
+
+## D1.2 — decisões de escala verificadas localmente
+
+Implementação posterior a `743549a`. Migrations incrementais
+20261105072306 e 20261105074814:
+versão própria, snapshots antes/depois, proponente real, motivo separado da
+decisão, encerramento obsoleto e nomes capturados nos eventos futuros.
+Legado usa somente fatos recuperáveis dos eventos; nomes antigos ausentes
+não são preenchidos com o cadastro atual.
+
+Controle anterior reproduziu a publicação indevida de série encerrada. Dois
+outros controles reproduziram publicação para desligado e impossibilidade de
+cancelar seu plantão futuro. Após correção, seis integrações dirigidas
+aprovadas: recusa de série encerrada, versão/duas decisões concorrentes,
+obsolescência, desligamento/publicação, cancelamento com ator próprio e suíte
+anterior de escalas.
+
+UI apresenta pessoas, horários/fuso/notas, período completo e efeito BAL;
+conflito mantém a revisão visível e não aplica versão nova automaticamente.
+Semana/mês exibem o mesmo intervalo no celular e computador. Primeira rodada
+Chromium: quatro E2E aprovados; captura de 390 px inspecionada. Rodada ampliada:
+15 E2E aprovados nos três projetos, incluindo BAL vigente, rodapé de decisão
+integralmente visível e regressão de teclado. 24 controles sintéticos de
+harness aprovados. O
+[registro de foco](FOCUS_ORIGIN_CONTROL.json) preserva a falha inicial, a
+pré-condição incorreta do primeiro controle e o resultado final, sem redução
+de regra/asserção/timeout ou retry para obter verde.
+
+Instalação limpa, evolução legada, 16 SQL e compatibilidade de search_path
+aprovadas para 87 migrations. 40 integrações completas aprovadas; controle
+LF/CRLF reprova a mutação sem normalização e aceita ambas as fontes.
+Contratos (84 hashes preservados), lint, tipos, 115 unitários e build
+aprovados. Gates finais usam Node 24.22.0/npm 11.21.1. Rodadas anteriores
+usaram o npm 11.19.1 embutido na instalação do Node, corrigido antes desses
+gates; E2E anterior preserva essa distinção de lançador.
+
+Neste PowerShell, npm.cmd preserva o separador -- dos argumentos de replay;
+o shim npm.ps1 omitiu flags e o guard recusou a operação sem alterar dados.
+O replay completo foi executado corretamente pelo npm.cmd depois disso.
+
+CI conhecida da base publicada `743549a`: run 41986802256, concluída com
+success; contexto GitHub Vercel também success. Essa CI não atesta esta nova
+árvore. Não há homologação remota, humana ou física nem liberação definitiva.
+D1 integral e D2 permanecem em execução.

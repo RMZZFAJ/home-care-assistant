@@ -7,9 +7,9 @@ humanas em decisions e especificações futuras em audits/C.
 **D-A em execução autorizada (D0–D2).** PR 6 integrado à master `8ec979a`;
 branch única feat/phase-d-implementation e
 [Draft PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7).
-[Checkpoint e evidências](../audits/D/D-A/CHECKPOINT.md). D0 recebe as
-primeiras correções de instrumentos. D1/D2 ainda não concluídos; os P1
-continuam abertos até regressões funcionais. Sem merge, alteração remota de
+[Checkpoint e evidências](../audits/D/D-A/CHECKPOINT.md). Instrumentos D0 e
+os P1 de progresso REQ/decisão de escala receberam correção e regressões
+locais discriminantes. D1/D2 ainda não concluídos. Sem merge, alteração remota de
 banco ou liberação operacional. As referências de C abaixo são históricas
 da entrega integrada, sem renovar autorização por si próprias.
 
@@ -90,7 +90,8 @@ requisitos aprovados, vários sobre os mesmos processos; não são 149 defeitos
 novos. Existem 30 DEC, 20 oportunidades e 15 questões atualizadas pelas
 respostas C7 (P01–P12 originais e P13–P15 derivados). As pendências restantes
 estão no [registro atual](../audits/C/C7-decision-closure/OPEN_DECISIONS.md).
-Os dois P1 de decisão de escala e progresso REQ seguem abertos. O guard
+Os dois P1 de decisão de escala e progresso REQ estão corrigidos e verificados
+localmente, com limites no checkpoint D-A. O guard
 protege 84 migrations; contagens de suítes anteriores ficam nos pacotes
 datados e não são apresentadas como CI verde atual.
 

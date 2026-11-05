@@ -11,7 +11,8 @@ export const scheduleBody = z.discriminatedUnion("action", [
   z.object({ action: z.literal("end_series"), body: z.object({ id, fromDate: date, reason }).strict() }).strict(),
   z.object({ action: z.enum(["change", "propose_change"]), body: z.object({ id, ...person, reason, notes: z.string().max(2000).optional() }).strict() }).strict(),
   z.object({ action: z.literal("cancel"), body: z.object({ id, reason }).strict() }).strict(),
-  z.object({ action: z.literal("decide_change"), body: z.object({ id, approve: z.boolean(), reason }).strict() }).strict(),
+  z.object({ action: z.literal("decide_change"), body: z.object({ id, approve: z.boolean(), reason: reason.optional() }).strict().refine((value) => value.approve || Boolean(value.reason), "Informe o motivo da rejeição.") }).strict(),
+  z.object({ action: z.literal("close_obsolete"), body: z.object({ id, reason }).strict() }).strict(),
 ]);
-export const scheduleCommandSchema = z.object({ careRecipientId: id, command: scheduleBody, idempotencyKey: id, expectedVersion: z.number().int().positive().nullable().default(null) }).strict();
+export const scheduleCommandSchema = z.object({ careRecipientId: id, command: scheduleBody, idempotencyKey: id, expectedVersion: z.number().int().positive().nullable().default(null) }).strict().refine((value) => !["approve", "reject", "decide_change", "close_obsolete", "change", "cancel", "end_series", "propose_change"].includes(value.command.action) || value.expectedVersion !== null, { message: "Atualize a versão da programação antes de decidir.", path: ["expectedVersion"] });
 export type ScheduleCommand = z.infer<typeof scheduleBody>;

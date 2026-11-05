@@ -27,8 +27,9 @@ missão é NOT_VERIFIED; preview documental não é homologação do produto.
 
 PWA/push, modalidades futuras de ciência, rascunhos entre aparelhos e
 verificador de exemplar são requisitos planejados; não são anunciados como
-implementados. Os dois P1 herdados continuam abertos até correção/regressão
-autorizada.
+implementados. Os dois P1 herdados receberam correção e regressões locais
+discriminantes em D-A; D1 integral e D2 permanecem em execução. Isso não
+representa liberação operacional.
 
 O [fechamento definitivo C7–C10](docs/audits/C/C10-pr-handoff/README.md)
 registra P02 OWNER_APPROVED, 66 fichas e 262 controles originais revistos.
