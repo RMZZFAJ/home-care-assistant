@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:harness": "playwright test --config tests/harness/playwright.config.ts",
     "e2e": "node scripts/run-e2e.mjs",
     "test:db:prepare": "node scripts/prepare-test-database.mjs",
     "db:backup:local": "node scripts/backup-local-database.mjs",

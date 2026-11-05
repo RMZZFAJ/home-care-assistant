@@ -86,6 +86,16 @@ export function getTestEnvironment() {
   };
 }
 
+export async function dataApiIsReady(response) {
+  if (!response.ok) return false;
+  try {
+    const schema = await response.json();
+    return schema.swagger === "2.0" && Boolean(schema.paths?.["/products"] && schema.paths?.["/profiles"]);
+  } catch {
+    return false;
+  }
+}
+
 export async function waitForLocalDataApi() {
   const env = getTestEnvironment();
   for (let attempt = 0; attempt < 45; attempt++) {
@@ -97,7 +107,7 @@ export async function waitForLocalDataApi() {
         },
         signal: AbortSignal.timeout(2000),
       });
-      if (response.ok) return;
+      if (await dataApiIsReady(response)) return;
     } catch {
       /* Reset restarts the local REST schema cache. */
     }
@@ -109,7 +119,6 @@ export async function waitForLocalDataApi() {
 }
 
 export function assertLocalReplay() {
-  getTestEnvironment();
   const backupIndex = process.argv.indexOf("--backup");
   const backup = backupIndex >= 0 ? process.argv[backupIndex + 1] : undefined;
   if (!process.argv.includes("--replay-local") || !backup) {
@@ -117,6 +126,7 @@ export function assertLocalReplay() {
       "Local reset/replay requires explicit --replay-local --backup <verified backup file>. Ordinary prepare never resets data.",
     );
   }
+  getTestEnvironment();
   const file = resolve(backup);
   if (
     !existsSync(file) ||

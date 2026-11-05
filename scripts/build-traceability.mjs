@@ -1,6 +1,8 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { prepareReportOutput } from "./report-output.mjs";
 
-const root = "docs/audits/2026-10-20";
+const output = prepareReportOutput();
+const root = "docs/audits/_historical/2026-10-20";
 const evidence = JSON.parse(readFileSync(`${root}/verification.json`, "utf8"));
 const rows = [
   ["PRES-01","Preservar Git, alterações e dois commits locais","M3;M4.1;S1;A2","governance","PARCIALMENTE IMPLEMENTADO","P0","git status/log;check:contracts"],
@@ -195,9 +197,9 @@ for (const source of ["MISSION","SUPERPROMPT","AUDITORIA"]) {
   }
   if(current)clauses.push(current);
 }
-writeFileSync(`${root}/SOURCE_REQUIREMENTS.json`,JSON.stringify(clauses,null,2)+"\n");
-writeFileSync(`${root}/REQUIREMENTS.json`,JSON.stringify(matrix,null,2)+"\n");
+output.write("SOURCE_REQUIREMENTS.json",JSON.stringify(clauses,null,2)+"\n");
+output.write("REQUIREMENTS.json",JSON.stringify(matrix,null,2)+"\n");
 const columns=Object.keys(matrix[0]);
 const cell=(value)=>`"${String(value).replaceAll('"','""')}"`;
-writeFileSync(`${root}/REQUIREMENTS.csv`,[columns.join(","),...matrix.map(row=>columns.map(column=>cell(row[column])).join(","))].join("\n")+"\n");
+output.write("REQUIREMENTS.csv",[columns.join(","),...matrix.map(row=>columns.map(column=>cell(row[column])).join(","))].join("\n")+"\n");
 console.log(`${matrix.length} consolidated requirements and ${clauses.length} source sections retained with their complete criteria.`);

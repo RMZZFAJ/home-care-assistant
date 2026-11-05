@@ -1,0 +1,15 @@
+.git
+.vercel
+.temp
+.branches
+.private
+.venv
+node_modules
+.env*
+.next*
+test-results
+playwright-report
+output
+*.tsbuildinfo
+*.dump
+*.backup

@@ -1,5 +1,6 @@
-import {expect} from "@playwright/test";
+import {expect, test} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { accessibilityEvidence } from "../support/accessibility-results";
 export async function audit(page: import("@playwright/test").Page, label: string) {
   await expect(page).toHaveTitle("Home Care Assistant");
   if (label === "login") await expect(page.getByLabel("E-mail", { exact: true })).toBeEnabled();
@@ -23,6 +24,14 @@ export async function audit(page: import("@playwright/test").Page, label: string
   const result = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
+  const evidence = accessibilityEvidence(label, result);
+  await test.info().attach("axe-" + label.replaceAll(/[^a-z0-9-]/gi, "-"), {
+    body: JSON.stringify(evidence, null, 2), contentType: "application/json",
+  });
+  if (evidence.reviewRequired.length) test.info().annotations.push({
+    type: "accessibility-review-required",
+    description: label + ": " + evidence.reviewRequired.map((item) => item.rule).join(", "),
+  });
   expect(result.violations, label).toEqual([]);
   const size = await page.evaluate(() => ({
     width: document.documentElement.clientWidth,

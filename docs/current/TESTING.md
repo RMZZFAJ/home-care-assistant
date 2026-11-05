@@ -1,8 +1,11 @@
 # Testes e reprodução
 
 Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
-C não executou testes funcionais. B8 demonstra lacunas de oráculo PDF,
-NULL SQL, revisão axe e readiness do helper; verde parcial não homologa
+C não executou testes funcionais. D-A iniciou a correção dos instrumentos
+de B8: NULL SQL, revisão axe, readiness e proteção de ferramentas/exportação.
+O contrato de oráculo PDF foi criado em D0; integração ao renderer permanece
+em D4. Resultados por incremento no
+[checkpoint D-A](../audits/D/D-A/CHECKPOINT.md); verde parcial não homologa
 produto.
 Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
@@ -112,6 +115,18 @@ separadamente.
 
 ## Navegador
 
+`npm run test:harness` executa somente controles sintéticos, sem aplicação,
+banco ou fixtures, nos três projetos. Verifica navegação pronta, tardia e
+indisponível; não substitui E2E do produto. A CI executa esses controles antes
+do projeto E2E correspondente. O helper aguarda a variante real do shell,
+sem escolher o menu móvel durante a hidratação desktop.
+
+Axe mantém violações como falha e anexa JSON com incomplete por regra,
+superfície e estado, além de anotação de revisão pendente. Incomplete não é
+violação automática nem conformidade: exige revisão específica, separada de
+aceite humano de foco/reflow/AT. Asserções SQL compartilhadas têm controles
+que reprovam quantidade incorreta, NULL e linha ausente.
+
 ```sh
 npx playwright install chromium webkit
 npm run e2e
@@ -165,10 +180,17 @@ projetos. Não há exclusão de testes nem uso do Supabase remoto na suíte.
 scripts/verify-linux.sh roda dentro de container Node 24.22.0 com o
 repositório
 montado somente para leitura em /workspace. Copia código para área temporária,
-exclui .env, Git e caches, mas B8-M004 demonstra que a lista atual não exclui
-.private/.venv. Não executar essa exportação sobre workspace com conteúdo
-privado até correção autorizada D0. O objetivo é instalação limpa/lint/tipos/
-testes/build; a falha de fronteira de arquivo não foi corrigida nesta C.
+exclui .env, Git, caches, .private, .venv e arquivos de backup conforme
+scripts/verification-export.exclude. Teste de sentinelas usa a mesma lista,
+sem copiar conteúdo privado do workspace. O objetivo é instalação limpa,
+lint, tipos, testes e build; não equivale à homologação de produção.
+
+Ferramentas de relatório reutilizáveis exigem `--output-dir` explícito e
+registram SHA/data em RUN_METADATA.json. Saída no repositório usa output/ ou
+docs/audits/D/; destinos históricos são recusados. Arquivo existente só pode
+ser substituído com `--overwrite`. Verificador legado que cria fixtures
+exige `--replay-local --backup` antes de provisionar. A ferramenta combinada
+Meta está bloqueada até a separação inspect/submit e autorização D7.
 
 ## Documentação e auditorias datadas
 

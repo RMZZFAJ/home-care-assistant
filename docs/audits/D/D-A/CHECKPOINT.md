@@ -14,7 +14,8 @@ migration remota, envio externo ou liberação operacional definitiva.
   API 127.0.0.1:54321 e banco 127.0.0.1:54322.
 - Dados locais iniciais: 210 documentos, 81 REQ e 81 identidades Auth.
   Backup custom externo com manifesto/hash e TOC legível preservado;
-  não representa ensaio de restore. Replay aguarda consentimento explícito.
+  não representa ensaio de restore. Replay autorizado explicitamente pelo
+  responsável nesta missão, após apresentação do backup verificado.
 - Node 24.22.0 selecionado por processo; npm 11.21.1; CLI 2.121.0.
 
 ## Execução e evidências
@@ -33,5 +34,26 @@ Checks locais, CI, preview, aceite humano e aparelho/provedor real são
 evidências distintas. P03/P09/P13 permanecem pesquisa externa do responsável;
 outros gates condicionam apenas o ramo explicitamente dependente.
 
-Commits funcionais e evidências serão acrescentados conforme cada conjunto
-for implementado e verificado. Draft PR em preparação; sem merge.
+Draft PR [7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), aberto e
+em rascunho; sem merge. Commit inicial: `626a89a`.
+
+## D0 — primeiro incremento
+
+Readiness de navegação aguarda variante real; Data API exige schema válido.
+Exportação usa lista única de exclusões testada com sentinelas privadas.
+Relatórios exigem destino explícito, identificam SHA/data e recusam
+sobrescrita por padrão. Verificador legado exige consentimento/backup antes
+de seed; ferramenta Meta combinada permanece desabilitada até D7.
+Asserções de saldo positivo rejeitam linha ausente/NULL. Axe conserva
+violations como falha e publica incomplete por regra/superfície/estado para
+revisão. Contrato de fatos/geometria PDF distingue controle íntegro de branco;
+integração ao renderer permanece em D4.
+
+Validação local deste incremento: contratos (84 migrations preservadas),
+lint, tipos, 112 testes unitários e build aprovados. Controles dirigidos:
+14 unitários, 15 cenários sintéticos de navegação nos três projetos e SQL
+transacional NULL/ausência/valor incorreto/zero explícito aprovados.
+Não são prova do fluxo completo do produto, conformidade geral de
+acessibilidade, conteúdo do renderer ou aceite humano/físico.
+E2E do produto e gates completos de banco serão executados nos marcos
+funcionais seguintes; CI do incremento ainda não atestada.

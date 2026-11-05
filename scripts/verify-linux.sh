@@ -1,7 +1,8 @@
 #!/bin/sh
 set -eu
 mkdir -p /tmp/hca-verification
-tar -C /workspace --exclude=.git --exclude=.vercel --exclude=.temp --exclude=.branches --exclude=node_modules --exclude='.env*' --exclude='.next*' --exclude=test-results --exclude=playwright-report --exclude=output --exclude='*.tsbuildinfo' -cf - . | tar -C /tmp/hca-verification -xf -
+# One selection contract for verification and its synthetic sentinel test.
+tar -C /workspace -X /workspace/scripts/verification-export.exclude -cf - . | tar -C /tmp/hca-verification -xf -
 cd /tmp/hca-verification
 npm install --global npm@11.21.1 --no-audit --no-fund
 node --version

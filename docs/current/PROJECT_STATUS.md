@@ -1,8 +1,17 @@
 # Estado verificável do projeto
 
-Referência editorial:04/11/2026, America/Sao_Paulo. **Produção NO-GO.** Esta é
+Referência editorial:05/11/2026, America/Sao_Paulo. **Produção NO-GO.** Esta é
 a entrada canônica de estado; contratos atuais ficam em current, decisões
 humanas em decisions e especificações futuras em audits/C.
+
+**D-A em execução autorizada (D0–D2).** PR 6 integrado à master `8ec979a`;
+branch única feat/phase-d-implementation e
+[Draft PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7).
+[Checkpoint e evidências](../audits/D/D-A/CHECKPOINT.md). D0 recebe as
+primeiras correções de instrumentos. D1/D2 ainda não concluídos; os P1
+continuam abertos até regressões funcionais. Sem merge, alteração remota de
+banco ou liberação operacional. As referências de C abaixo são históricas
+da entrega integrada, sem renovar autorização por si próprias.
 
 **C7–C10 concluídas e fechamento definitivo incorporado em 04/11/2026.**
 [Checkpoint](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121 causas e 165
@@ -64,8 +73,8 @@ Draft PR não autoriza merge, cleanup de branches ou produção.
 
 - **Referência:** Fase D
 
-  **Estado e prova:** **NÃO INICIADA**; nenhuma correção
-  funcional/migration/ativação realizada em C.
+  **Estado e prova:** D-A **EM EXECUÇÃO**; checkpoint e Draft PR 7 acima.
+  Nenhuma correção funcional/migration/ativação foi realizada em C.
 
 <!-- c-table:end -->
 

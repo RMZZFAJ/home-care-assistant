@@ -211,6 +211,7 @@ async function runSqlRegressions(fixtureIdentities) {
     );
   }
   const regressionFiles = [
+    "harness-oracles.sql",
     "transactions.sql",
     "invitations-import-outbox.sql",
     "alerts-routing.sql",
@@ -234,6 +235,7 @@ async function runSqlRegressions(fixtureIdentities) {
     )
       continue;
     const content =
+      readFileSync("tests/database/assertions.sql", "utf8") +
       readFileSync("tests/database/assume-context.sql", "utf8") +
       readFileSync(`tests/database/${file}`, "utf8");
     const output = sql(
