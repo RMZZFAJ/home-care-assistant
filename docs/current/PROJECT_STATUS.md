@@ -13,6 +13,12 @@ locais discriminantes. D1/D2 ainda não concluídos. Sem merge, alteração remo
 banco ou liberação operacional. As referências de C abaixo são históricas
 da entrega integrada, sem renovar autorização por si próprias.
 
+Precisão sem arredondamento, referência compensatória e revogação direta de
+perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
+convite, reemissão explícita, senha uniforme e invalidação de perfil seguem
+no incremento atual; evidências por camada e falhas intermediárias estão no
+checkpoint. O núcleo REQ/COM/ENT/BAL e P02 completos continuam em execução.
+
 **C7–C10 concluídas e fechamento definitivo incorporado em 04/11/2026.**
 [Checkpoint](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121 causas e 165
 origens permanecem reconciliadas. P02 está OWNER_APPROVED: SCI-001 mantida,

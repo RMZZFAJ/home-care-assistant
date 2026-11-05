@@ -10,6 +10,7 @@ import {
   authenticate,
   databaseError,
   patientContext,
+  parseUuid,
   readJson,
   requireGlobal,
   rpc,
@@ -222,7 +223,7 @@ export async function GET(request: Request) {
     if (auth.isGlobalAdmin)
       return NextResponse.json({
         data: await rpc(auth.client, "global_patient_administration", {
-          p_patient: uuid.parse(params.get("careRecipientId")),
+          p_patient: parseUuid(params.get("careRecipientId")),
           p_section: section,
         }),
       });

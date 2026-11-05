@@ -235,6 +235,24 @@ ou ajustes. [Regras e experiência](../ui-ux/BALANCES.md).
 
 ## História e erros
 
+`POST /api/invitations/preview` recebe o token fora da URL de consulta.
+Token inválido, expirado ou revogado não revela dados do paciente. Paciente,
+função, emissor, destinatário e validade aparecem somente para a conta
+convidada, confirmada e com sessão Auth vigente; a prévia não cria vínculo.
+Aceitar/recusar revalida os fatos e não recebe paciente ou papel editáveis.
+Retry de aprovação já confirmada retorna recuperação explícita por reemissão;
+o administrador local pode rotacionar o link existente, sem novo convite.
+
+Nova senha usa mínimo de 12 caracteres e máximo de 72 bytes UTF-8 em cadastro,
+recuperação e perfil. Perfil/avatar e policies do bucket privado verificam
+sessão ainda existente. URLs/bytes anteriormente entregues conservam seus
+limites próprios de transporte, tratados separadamente em D4.
+
+Movimentação familiar valida precisão antes de gravar numeric(18,6).
+Correção exige referência a movimento do mesmo paciente/produto/custódia,
+em direção oposta. Entrada/retirada avulsa não recebe essa referência.
+Números e texto usam o mesmo limite de seis casas decimais, sem arredondamento.
+
 Importação preserva fatos conhecidos, identifica campos desconhecidos e
 exige revisão explícita. Protocolos físicos não geram fatos nem notificações
 retroativas. Histórico permanece acessível a vínculos autorizados após a

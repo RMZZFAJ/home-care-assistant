@@ -34,6 +34,7 @@ type PolicyData = {
     proposed: Record<string, unknown>;
     proposed_by: string;
     status: string;
+    resolution?: { invitationId?: string };
   }[];
 };
 const defaults: Record<string, unknown> = {
@@ -83,6 +84,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const savingRef = useRef(false);
   const currentVersionRef = useRef<number | null>(null);
   const [invitationUrl, setInvitationUrl] = useState("");
+  const [invitationRecovery, setInvitationRecovery] = useState<{ invitationId: string; notice: string } | null>(null);
   const [editingVersion, setEditingVersion] = useState<number | null>(null);
   useEffect(() => {
     const controller = new AbortController();
@@ -119,6 +121,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
       const result = await api<{
         data: { status: string };
         invitationUrl?: string;
+        invitationRecovery?: { invitationId: string; notice: string };
       }>("/api/patient-settings", {
         careRecipientId: patientId,
         kind,
@@ -131,6 +134,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
         ...(requestId ? { requestId, decision } : {}),
       });
       setInvitationUrl(result.invitationUrl ?? "");
+      setInvitationRecovery(result.invitationRecovery ?? null);
       setMessage(
         result.data.status === "awaiting_acceptance"
           ? "Aprovação registrada. O vínculo será criado somente após o aceite do destinatário."
@@ -176,6 +180,16 @@ function Policies({ context }: { context: WorkspaceContext }) {
       savingRef.current = false;
       setBusy(false);
     }
+  }
+  async function reissueInvitation(invitationId: string) {
+    if (savingRef.current) return;
+    savingRef.current = true; setBusy(true); setError("");
+    try {
+      const result = await api<{ invitationUrl: string }>("/api/admin", { action: "resendInvitation", careRecipientId: patientId, invitationId });
+      setInvitationUrl(result.invitationUrl); setInvitationRecovery(null);
+      setMessage("Convite reemitido. O link anterior foi invalidado; entregue este novo link somente ao destinatário aprovado.");
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível reemitir o convite."); }
+    finally { savingRef.current = false; setBusy(false); }
   }
   function saveSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -229,6 +243,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
       </p>
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
+      {invitationRecovery ? <Notice>{invitationRecovery.notice}{context.activeContext?.mode === "patient" && context.patient?.role === "admin" ? <button className={buttonClass} disabled={busy} onClick={() => void reissueInvitation(invitationRecovery.invitationId)}>Reemitir convite e invalidar link anterior</button> : <p>Um administrador local deve reemitir o convite.</p>}</Notice> : null}
       {invitationUrl ? (
         <Notice>
           Entregue este convite apenas ao destinatário aprovado.
@@ -321,10 +336,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
                     {JSON.stringify(change.proposed, null, 2)}
                   </pre>
                   {change.status === "awaiting_acceptance" ? (
-                    <p className="text-sm">
+                    <div className="space-y-3"><p className="text-sm">
                       Aguardando aceite do destinatário. Ainda não concede
                       vínculo.
-                    </p>
+                    </p>{change.resolution?.invitationId && context.activeContext?.mode === "patient" && context.patient?.role === "admin" ? <button className={buttonClass} disabled={busy} onClick={() => void reissueInvitation(change.resolution!.invitationId!)}>Reemitir convite e invalidar link anterior</button> : null}</div>
                   ) : change.proposed_by !== context.userId &&
                     context.activeContext?.mode === "patient" &&
                     context.patient?.role === "admin" ? (

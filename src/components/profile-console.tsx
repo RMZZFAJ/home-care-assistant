@@ -14,6 +14,9 @@ import { ContactSettings } from "./auth/contact-settings";
 import { MfaSettings } from "./auth/mfa-settings";
 import Image from "next/image";
 import { formatBrazilDate } from "@/lib/receipt";
+import { NewPasswordField } from "./auth/new-password-field";
+import { newPasswordSchema } from "@/lib/validation/password";
+import { useLiveRevision } from "@/lib/use-live-revision";
 type Profile = {
   full_name: string;
   professional_registration: string | null;
@@ -57,6 +60,7 @@ function ProfileContent() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const liveRevision = useLiveRevision();
   useEffect(() => {
     const controller = new AbortController();
     api<{ data: Profile; sessions: Session[]; memberships: Membership[] }>(
@@ -73,7 +77,7 @@ function ProfileContent() {
         if (!controller.signal.aborted) setError(reason.message);
       });
     return () => controller.abort();
-  }, [attempt]);
+  }, [attempt, liveRevision]);
   async function save(
     event: FormEvent<HTMLFormElement>,
     action: "update" | "password" | "avatar",
@@ -81,6 +85,10 @@ function ProfileContent() {
     event.preventDefault();
     const element = event.currentTarget;
     const form = new FormData(element);
+    if (action === "password") {
+      const parsed = newPasswordSchema.safeParse(form.get("password"));
+      if (!parsed.success) { setError(parsed.error.issues[0].message); return; }
+    }
     setBusy(true);
     setError("");
     setMessage("");
@@ -331,21 +339,7 @@ function ProfileContent() {
                     autoComplete="current-password"
                   />
                 </label>
-                <label className="block text-sm font-semibold">
-                  Nova senha
-                  <input
-                    className={inputClass}
-                    name="password"
-                    type="password"
-                    minLength={12}
-                    maxLength={256}
-                    required
-                    autoComplete="new-password"
-                  />
-                  <span className="text-xs text-(--muted)">
-                    Use pelo menos 12 caracteres.
-                  </span>
-                </label>
+                <NewPasswordField className={inputClass} disabled={busy} />
                 <button className={primaryClass} disabled={busy}>
                   Alterar senha
                 </button>

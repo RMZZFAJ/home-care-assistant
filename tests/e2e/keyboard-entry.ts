@@ -2,11 +2,15 @@ import { expect, type Page } from "@playwright/test";
 
 export async function assertKeyboardEntry(page: Page, label: string) {
   // BODY focus does not reset the browser's sequential navigation origin.
-  // Start from the real skip link/landmark, then require a keyboard move into
+  // Start from an existing skip link, focusable landmark or first form control,
+  // then require a keyboard move into
   // a different accessible element. Never accept merely focusing the origin.
   await page.bringToFront();
   const skip = page.getByRole("link", { name: "Ir para o conteúdo", exact: true });
-  const origin = await skip.count() ? skip : page.getByRole("main");
+  const main = page.getByRole("main");
+  const origin = await skip.count() ? skip : await main.evaluate(element => element.hasAttribute("tabindex")) ? main : main
+    .locator('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([data-tabster-dummy])')
+    .filter({ visible: true }).first();
   await origin.focus();
   await expect(origin).toBeFocused();
   const element = await origin.elementHandle();

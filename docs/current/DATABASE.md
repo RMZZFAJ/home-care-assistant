@@ -160,7 +160,14 @@ versão, prazo e uso único. flow_submissions e consumption_reports preservam
 sugestões pendentes até revisão e confirmação autorizada.
 
 workspace_revisions e broadcasts privados invalidam leituras autorizadas, sem
-enviar snapshots clínicos. pg_cron agenda ciclo documental e worker;
+enviar snapshots clínicos. Perfis usam profiles.id para alcançar a própria
+pessoa, consumidores relacionados e administração global autorizada. Proponente
+global sem vínculo recebe sua própria invalidação. Cada transação incrementa
+uma vez a revisão por usuário afetado e emite a revisão final em trigger
+deferred; rollback não envia broadcast nem deixa fila. Uma atualização sem
+mudança não produz invalidação. O polling de revisão continua como recuperação
+de mensagens perdidas, sem substituir a autorização das consultas.
+pg_cron agenda ciclo documental e worker;
 credencial
 e URL do worker ficam no Vault, configuradas pela RPC de serviço dedicada.
 

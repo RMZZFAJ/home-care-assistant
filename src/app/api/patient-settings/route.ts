@@ -108,7 +108,7 @@ export async function POST(request: Request) {
       p_version: input.expectedVersion,
       p_request_id: input.requestId ?? null,
       p_decision: input.decision ?? null,
-    })) as { status: string; resolution?: { invitationHash?: string } };
+    })) as { status: string; resolution?: { invitationHash?: string; invitationId?: string } };
     const invitationUrl =
       data.status === "awaiting_acceptance" &&
       data.resolution?.invitationHash === invitationHash &&
@@ -117,8 +117,9 @@ export async function POST(request: Request) {
         : null;
     if (invitationUrl) invitationUrl.hash = "token=" + invitationToken;
     return NextResponse.json({
-      data,
+      data: { ...data, ...(data.resolution ? { resolution: { ...data.resolution, invitationHash: undefined } } : {}) },
       ...(invitationUrl ? { invitationUrl: invitationUrl.toString() } : {}),
+      ...(!invitationUrl && data.status === "awaiting_acceptance" && data.resolution?.invitationId ? { invitationRecovery: { invitationId: data.resolution.invitationId, action: "reissue", notice: "A aprovação já foi registrada. Para recuperar o acesso ao link, reemita o convite; o link anterior deixará de funcionar." } } : {}),
     });
   });
 }

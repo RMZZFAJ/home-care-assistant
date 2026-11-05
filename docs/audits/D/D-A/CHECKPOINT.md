@@ -161,3 +161,54 @@ pois a view com autorização retorna vazio para SQL sem identidade.
 88 migrations atuais; replay limpo/legado e E2E desta árvore ainda pendentes.
 CI do SHA anterior 50d843e estava em execução na última consulta (41995412154).
 D1/D2 seguem em execução; autorização de replay já concedida permanece válida.
+
+## D1.4 — convite, senha e consumidores de perfil
+
+Migrations 20261105084951 e 20261105143259. Token de convite sem conta correta
+revela somente estado mínimo; a conta confirmada vê paciente, função, emissor,
+e-mail e validade em leitura antes de decidir. Expirado/revogado/recusado/já
+aceito têm estados próprios. Aceite não recebe paciente/papel editáveis e
+revalida Auth após espera. Reabrir link na mesma rota refaz a prévia; o E2E
+inicial encontrou a mensagem anterior preservada e a correção foi retestada.
+
+Retry da aprovação recupera o resultado e oferece reemissão explícita quando
+o segredo original já não está na resposta. O administrador local rotaciona
+o convite existente; teste HTTP/UI verifica convite único, link antigo
+inválido e nenhum vínculo antes do aceite. UUID malformado no ramo global
+agora recebe 400 VALIDATION_ERROR, não retryable, com correlação segura.
+
+Cadastro, recuperação e perfil usam o mesmo campo de nova senha: mínimo 12
+caracteres, máximo 72 bytes UTF-8, ajuda, colagem/gerenciador permitidos e
+mostrar/ocultar. Nenhuma senha real foi modificada. A jornada anterior de
+cadastro/recuperação usa somente contas fictícias e e-mail local.
+
+Perfis agora invalidam a própria pessoa e consumidores autorizados; proponente
+global sem vínculo recebe sua própria revisão. SQL e Realtime reais verificam
+avanço e ausência de dados privados no broadcast, além de terceiro sem relação.
+E2E verifica o nome atualizado no shell após edição em outra sessão.
+
+As primeiras rodadas completas terminaram 49/50 e 48/50: prontidão Realtime
+ficou sem mensagens em todos os canais. Controles isolados passaram; aguardar
+explicitamente o token não resolveu. Logs do provedor local mostraram
+UnableToBroadcastChanges: too_many_requests. A migration adicional coalesce
+por transação/usuário e emite a revisão final por trigger deferred; update sem
+mudança não invalida. Contraprova anterior emitiu três avisos onde se esperava
+um; após correção há um, rollback emite zero e a fila privada fica vazia.
+Revisão persistida/polling recuperam aviso perdido; não se promete ausência
+de limites do provedor em qualquer volume.
+
+Replay limpo e legado, 16 SQL e search_path aprovados para 90 migrations.
+51 integrações completas aprovadas após a correção. 117 unitários, contratos,
+lint e tipos aprovados. 18 E2E anteriores nos três projetos aprovados; captura
+390 px iOS inspecionada. Nova rodada: **36 E2E aprovados**, incluindo
+acessibilidade, capacidades de seis perfis, identidade e onboarding nos três
+projetos após a coalescência e o ajuste de harness abaixo; sem retries locais.
+
+CI do commit 6e7b627, run 41997444516: banco e validações Windows/Linux
+aprovados, três browsers reprovados no mesmo helper de teclado. O main público
+do login não possui tabindex; focá-lo não estabelece origem. O helper agora
+usa link/landmark focalizável ou primeiro controle existente e exige movimento
+real de Tab para outro alvo acessível. 30 controles locais aprovados, incluindo
+main não focalizável e trap nessa alternativa; nenhum timeout/regra/retry
+reduzido. A CI anterior não atesta esta árvore; novo resultado será consultado
+após publicação. D1 e D2 integrais permanecem em execução, sem GO/merge.
