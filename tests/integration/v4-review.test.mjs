@@ -744,7 +744,7 @@ test("V4 review: external queue rejects app-only events and holds unapproved tem
   const draft = await rpc(family, "create_supply_document", {
     p_patient: patient,
     p_type: "COM",
-    p_payload: { lines: [{ productId: products[0], quantity: "1" }] },
+    p_payload: { origin:"purchase", lines: [{ productId: products[0], quantity: "1" }] },
     p_key: randomUUID(),
     p_draft: true,
   });

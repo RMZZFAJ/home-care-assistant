@@ -261,6 +261,13 @@ e o autor atuais no workflow antes do evento/hash, com histórico de preparaçõ
 e expedição distintos. Revalidação final recusa perda de elegibilidade após
 espera no movimento. Dados/eventos antigos não recebem preenchimento retroativo.
 
+Nova emissão COM valida origin purchase/donation no create e no submit. O
+helper privado valida somente o corpo, sem acesso ou execução por clientes.
+Origem ausente/inválida recusa transacionalmente emissão/protocolo/evento;
+rascunho desconhecido permanece válido para preparação e exige escolha antes
+de emitir. Não há UPDATE de origem em documento/evento histórico nem crédito
+de estoque por definir a origem ou emitir a aquisição.
+
 workspace_revisions e broadcasts privados invalidam leituras autorizadas, sem
 enviar snapshots clínicos. Perfis usam profiles.id para alcançar a própria
 pessoa, consumidores relacionados e administração global autorizada. Proponente

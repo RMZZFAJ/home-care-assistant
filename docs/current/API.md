@@ -187,7 +187,10 @@ REQ histórica é somente consulta: novos vínculos COM/ENT, inclusive rascunhos
 são recusados. Vínculos/fatos anteriores permanecem preservados. Falha ao
 carregar dados da ficha bloqueia edição e autosave até recarregar com sucesso.
 
-COM aceita origin purchase ou donation. ENT exige source e destination
+COM emitida exige origin purchase ou donation explícita. Rascunho pode
+conservar origem desconhecida; submit exige escolha válida. Eventos antigos
+não são preenchidos retroativamente e a leitura histórica permanece neutra.
+ENT exige source e destination
 FAMILY/CARE_TEAM distintos e recipientId autorizado. BAL registra todos os
 produtos ativos da equipe e sua referência. Campos financeiros não são
 obrigatórios e não existe ficha de abastecimento externo.

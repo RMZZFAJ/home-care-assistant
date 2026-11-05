@@ -227,7 +227,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       await post(family, "/api/documents", {
         careRecipientId: patient,
         type: "COM",
-        payload: { lines: [{ productId: product, quantity: "1" }] },
+        payload: { origin:"purchase", lines: [{ productId: product, quantity: "1" }] },
         idempotencyKey: randomUUID(),
         draft: false,
       })

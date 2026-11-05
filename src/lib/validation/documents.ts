@@ -64,6 +64,12 @@ export const createSupplySchema = z
   })
   .strict()
   .superRefine((value, ctx) => {
+    if (value.type === "COM" && !value.draft && !value.payload.origin)
+      ctx.addIssue({
+        code: "custom",
+        path: ["payload", "origin"],
+        message: "Escolha compra ou doação antes de emitir a ficha.",
+      });
     if (value.type !== "BAL" && value.payload.balanceAssignment)
       ctx.addIssue({
         code: "custom",

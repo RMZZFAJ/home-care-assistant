@@ -744,3 +744,31 @@ Orientação do responsável sobre custo/repetição foi incorporada ao AGENTS.m
 e TESTING.md: evidência local por impacto, repetição das falhas afetadas e
 suítes completas na CI do SHA publicado, sem polling ou verde presumido.
 Não há redução de asserções, guards de ambiente, Auth real ou gates finais.
+
+## D2.7 — COM: origem explícita na preparação e emissão
+
+P06/política proporcional publicados em a79eddac4fa20d97ff5822d431bcaa29080a4856.
+Sua CI ainda não foi consultada. A contraprova Auth de COM emitida sem origem
+reproduziu aceitação indevida antes da migration 20261105223000. Novo helper
+privado, sem execução por clientes, valida purchase/donation antes de emissão
+e submit; rascunho pode preservar origem desconhecida, sem backfill histórico.
+
+Formulário novo começa em branco, erro foca a escolha e revisão mostra a
+origem em leitura. Doação possui mensagem/título correspondentes. Rascunho do
+servidor sem origem não recebe compra presumida; quantidades permanecem para
+revisão. Foram localizados os consumidores existentes: três fixtures de COM
+agora explicitam purchase, e a negativa de quantidade zero também, para não
+virar falso positivo por outro erro de origem.
+
+Três casos Auth passaram: ausência/malformado sem efeito parcial, compra e
+doação exatas com recuperação de emissão e draft desconhecido que só emite
+depois da revisão explícita. Original do primeiro evento permanece desconhecido.
+Doze unitários de contrato/fronteira e duas tarefas Chromium passaram, incluindo
+zero crédito de estoque, foco e retomada do draft. Auditoria visual da tarefa a
+320/390/768/1440 e captura de resultado a 320 px inspecionada. Renderer não foi
+alterado; seus exemplares anteriores não foram gerados novamente sem hipótese.
+Replay limpo/legado e demais suítes ficam para a CI do novo SHA.
+
+Permanecem ENT/P05/P07, BAL e revisão facultativa/reconto, estoque/custódia/
+compensações, catálogo/apresentações, profissionais/desligamento e escala.
+Sem conclusão D-A, merge, alteração de banco remoto ou homologação final.

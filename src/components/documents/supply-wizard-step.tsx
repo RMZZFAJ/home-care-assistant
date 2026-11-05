@@ -22,7 +22,7 @@ import type {
 export type WizardState = {
   quantities: Record<string, string>;
   notes: string;
-  origin: "purchase" | "donation";
+  origin: "" | "purchase" | "donation";
   source: "FAMILY" | "CARE_TEAM";
   recipientId: string;
   recipientReason?: string;
@@ -93,18 +93,35 @@ export function SupplyWizardStep({
               <select
                 className={inputClass}
                 value={form.origin}
+                required
+                aria-invalid={Boolean(fieldErrors.origin)}
+                aria-describedby={
+                  fieldErrors.origin
+                    ? "purchase-origin-hint purchase-origin-error"
+                    : "purchase-origin-hint"
+                }
                 onChange={(event) =>
                   setForm({
                     ...form,
-                    origin: event.target.value as "purchase" | "donation",
+                    origin: event.target.value as WizardState["origin"],
                   })
                 }
               >
+                <option value="">Escolha compra ou doação</option>
                 <option value="purchase">Compra pela família</option>
                 <option value="donation">
                   Doação / incorporação sem pagamento
                 </option>
               </select>
+              <span id="purchase-origin-hint" className="hca-field-hint">
+                Escolha a origem deste ato. Previsão e emissão ainda não
+                incorporam material ao estoque.
+              </span>
+              {fieldErrors.origin ? (
+                <span id="purchase-origin-error" className="ui-field-error">
+                  {fieldErrors.origin}
+                </span>
+              ) : null}
             </label>
           ) : null}
           {type === "ENT" ? (
@@ -367,6 +384,16 @@ export function SupplyWizardStep({
             <p className="mt-1 text-xs text-(--muted)">
               Responsável: {context.fullName}
             </p>
+            {type === "COM" ? (
+              <p className="mt-2">
+                Forma de aquisição:{" "}
+                {form.origin === "donation"
+                  ? "Doação"
+                  : form.origin === "purchase"
+                    ? "Compra pela família"
+                    : "Não informada"}
+              </p>
+            ) : null}
             {type === "ENT" ? (
               <p className="mt-2">
                 {form.source === "FAMILY"

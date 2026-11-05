@@ -55,7 +55,7 @@ describe("contratos operacionais exatos", () => {
       createSupplySchema.safeParse({
         careRecipientId: id,
         type: "COM",
-        payload: { lines: [{ productId: "p", quantity: "0" }] },
+        payload: { origin:"purchase", lines: [{ productId: "p", quantity: "0" }] },
         idempotencyKey: id,
       }).success,
     ).toBe(false);

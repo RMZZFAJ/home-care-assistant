@@ -85,6 +85,14 @@ antiga do teste de cancelamento falhou nos três projetos e a retomada REQ
 teve oscilação iOS. Os dois consumidores afetados foram ajustados e passaram
 no recheck WebKit, sem repetir localmente as demais suítes já aprovadas.
 
+Origem COM agora começa em branco, exige escolha explícita compra/doação e
+permanece em leitura na revisão. Migration 105 recusa emissão/submit sem origem
+válida, preservando rascunhos desconhecidos e eventos antigos. Três casos Auth,
+doze testes de fronteira/contrato e duas tarefas Chromium passaram; emissão
+não creditou estoque. Fixtures de negativas antigas foram atualizadas para
+continuarem discriminando quantidade zero e permissão negada. CI geral do
+novo SHA permanece necessária; D-A continua em execução.
+
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não
 atesta os incrementos posteriores; CI e preview não são validação remota de

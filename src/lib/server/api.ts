@@ -23,6 +23,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/purchase origin required/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Escolha compra ou doação antes de emitir esta ficha. A origem histórica não informada continua preservada.", 400);
   if (/stale delivery recipient reference/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "As pessoas elegíveis ou a sugestão da escala mudaram. Consulte e compare as referências atuais; sua escolha e justificativa foram preservadas.", 409);
   if (/recipient selection reason required|invalid recipient selection reason/i.test(message))

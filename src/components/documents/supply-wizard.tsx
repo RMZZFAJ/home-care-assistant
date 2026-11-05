@@ -109,7 +109,7 @@ export function PatientSupplyWizard({
   const [form, setForm] = useState<WizardState>({
     quantities: {},
     notes: "",
-    origin: "purchase",
+    origin: "",
     source: "FAMILY",
     recipientId: "",
     recipientReason: "",
@@ -263,7 +263,7 @@ export function PatientSupplyWizard({
               ]),
             ),
             notes: existing.payload.notes ?? "",
-            origin: existing.payload.origin ?? "purchase",
+            origin: existing.payload.origin ?? "",
             source: existing.payload.source ?? "FAMILY",
             recipientId: existing.recipient_id ?? "",
             recipientReason: existing.payload.recipientReason ?? "",
@@ -413,6 +413,12 @@ export function PatientSupplyWizard({
   ]);
   function validate(all = false) {
     const errors: Record<string, string> = {};
+    if (
+      type === "COM" &&
+      (all || step === 0) &&
+      !["purchase", "donation"].includes(form.origin)
+    )
+      errors.origin = "Escolha se este ato é uma compra ou uma doação.";
     const category = ["medicamentos", "higiene", "dieta"][step - 1];
     if (type === "ENT" && (all || step === 0) && !form.recipientId)
       errors.recipientId = "Selecione quem receberá esta entrega.";
@@ -561,7 +567,9 @@ export function PatientSupplyWizard({
         lines,
         notes: form.notes,
         ...(type === "COM"
-          ? { origin: form.origin }
+          ? form.origin
+            ? { origin: form.origin }
+            : {}
           : type === "ENT"
             ? {
                 source: form.source,
@@ -707,7 +715,9 @@ export function PatientSupplyWizard({
             : type === "ENT"
               ? "Entrega registrada. O recebimento depende da confirmação do destinatário designado."
               : type === "COM"
-                ? "Compra registrada. Acompanhe a aprovação, aquisição e validação do recebimento."
+                ? saved.payload.origin === "donation"
+                  ? "Doação registrada. Acompanhe as parcelas e a validação da chegada."
+                  : "Compra registrada. Acompanhe a aprovação, aquisição e validação do recebimento."
                 : saved.status === "approved"
                   ? "Balanço concluído e estoque reconciliado."
                   : "Balanço registrado e aguardando as revisões configuradas."}

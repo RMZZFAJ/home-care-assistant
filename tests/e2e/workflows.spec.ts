@@ -442,7 +442,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
         data: {
           careRecipientId: patient,
           type: "COM",
-          payload: { lines: [{ productId: products[0].id, quantity: "1" }] },
+          payload: { origin:"purchase", lines: [{ productId: products[0].id, quantity: "1" }] },
           idempotencyKey: randomUUID(),
           draft: false,
         },
