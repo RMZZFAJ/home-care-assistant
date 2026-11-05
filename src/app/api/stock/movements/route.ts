@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import {
   api,
   ApiError,
@@ -10,21 +9,8 @@ import {
   readJson,
   rpc,
   saoPauloDateBoundary,
-  uuid,
 } from "@/lib/server/api";
-import { exactQuantity } from "@/lib/validation/documents";
-
-const schema = z
-  .object({
-    careRecipientId: uuid,
-    productId: z.string().trim().min(1).max(120),
-    quantity: exactQuantity,
-    action: z.enum(["inbound", "outbound", "correction_in", "correction_out"]),
-    reason: z.string().trim().min(3).max(1000),
-    idempotencyKey: uuid,
-    referenceId: uuid.optional(),
-  })
-  .strict();
+import { familyStockMovementSchema } from "@/lib/validation/stock";
 export async function GET(request: Request) {
   return api("stock.list", async () => {
     const auth = await authenticate();
@@ -60,7 +46,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   return api("stock.family.write", async () => {
-    const input = await readJson(request, schema);
+    const input = await readJson(request, familyStockMovementSchema);
     const auth = await authenticate();
     await patientContext(
       auth,

@@ -133,3 +133,31 @@ CI conhecida da base publicada `743549a`: run 41986802256, concluída com
 success; contexto GitHub Vercel também success. Essa CI não atesta esta nova
 árvore. Não há homologação remota, humana ou física nem liberação definitiva.
 D1 integral e D2 permanecem em execução.
+
+## D1.3 — precisão, compensação e sessão encerrada
+
+Migration incremental 20261105084122 valida numeric sem typmod antes da
+gravação numeric(18,6), com precisão da unidade e limite de quantidade.
+Número e texto usam a mesma precisão sem arredondamento; zeros finais não
+alteram o valor. Correção exige movimento original do mesmo paciente,
+produto e custódia, em direção oposta. Entrada/retirada avulsa não recebe
+referência de compensação. Histórico e saldos derivam do ledger preservado.
+
+Perfil e avatar exigem sessão Auth ainda existente, inclusive na RPC direta
+e nas policies do bucket privado. A operação global de identidade não exige
+contexto de paciente. Revalidação após locks acrescentada aos fluxos REQ,
+criação/revisão de documentos, ciência, arquivo e consumo indicados na migration.
+Não equivale a invalidar bytes/URLs já entregues, cujo transporte pertence a D4.
+
+Controles negativos reproduziram quantidade arredondada, correção sem origem
+e escrita de perfil com sessão encerrada. Após correção: sete integrações
+dirigidas aprovadas, incluindo Storage real e barreiras com lock observado
+para REQ/estoque: revogar sessão ou trocar contexto enquanto aguardam impede
+efeitos. Primeiro controle de imagem usou MIME não permitido e foi corrigido
+para JPEG antes de avaliar a hipótese; o oráculo de saldo usa ledger direto,
+pois a view com autorização retorna vazio para SQL sem identidade.
+
+47 integrações completas, lint, tipos e 117 unitários aprovados.
+88 migrations atuais; replay limpo/legado e E2E desta árvore ainda pendentes.
+CI do SHA anterior 50d843e estava em execução na última consulta (41995412154).
+D1/D2 seguem em execução; autorização de replay já concedida permanece válida.

@@ -11,14 +11,31 @@ import { decryptFlow } from "@/lib/notifications/flows";
 import { parseConsumptionMessage } from "@/lib/notifications/consumption-parser";
 import {
   createSupplySchema,
+  exactQuantity,
   supplyCommandSchema,
 } from "@/lib/validation/documents";
 import { quantity, validQuantity } from "@/lib/quantity";
+import { familyStockMovementSchema } from "@/lib/validation/stock";
 import { MetaWhatsAppProvider } from "@/lib/notifications/provider";
 import { renderDocumentPdf } from "@/lib/server/document-pdf";
 import { PDFDocument } from "pdf-lib";
 const id = "20000000-0000-4000-8000-000000000001";
 describe("contratos operacionais exatos", () => {
+  it("aplica a mesma precisão a números e texto sem arredondamento implícito", () => {
+    for (const value of [1.0000004, "1.0000004", 0.0000001, "0.0000001", Number.NaN, Number.POSITIVE_INFINITY, null, -1, "-1"])
+      expect(exactQuantity.safeParse(value).success, String(value)).toBe(false);
+    for (const [numeric, text, result] of [[0, "0", "0"], [0.000001, "0.000001", "0.000001"], [1, "1.0000000", "1"], [1.25, "1,25", "1.25"], [1_000_000_000, "1000000000", "1000000000"]] as const) {
+      expect(exactQuantity.parse(numeric)).toBe(result);
+      expect(exactQuantity.parse(text)).toBe(result);
+    }
+  });
+  it("exige referência somente na correção compensatória", () => {
+    const base = { careRecipientId: id, productId: "p", quantity: "1", reason: "Motivo do controle", idempotencyKey: id };
+    expect(familyStockMovementSchema.safeParse({ ...base, action: "correction_in" }).success).toBe(false);
+    expect(familyStockMovementSchema.safeParse({ ...base, action: "inbound", referenceId: id }).success).toBe(false);
+    expect(familyStockMovementSchema.safeParse({ ...base, action: "correction_in", referenceId: id }).success).toBe(true);
+    expect(familyStockMovementSchema.safeParse({ ...base, action: "inbound", quantity: "0" }).success).toBe(false);
+  });
   it("normaliza quantidades decimais também no corpo de comandos", () => {
     const parsed = supplyCommandSchema.parse({
       action: "receive",

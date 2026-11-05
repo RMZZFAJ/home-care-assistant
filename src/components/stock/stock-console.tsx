@@ -276,7 +276,7 @@ function PatientStock({
                   aria-label="Operação"
                   className={inputClass}
                   value={operation}
-                  onChange={(event) => setOperation(event.target.value)}
+                  onChange={(event) => { setOperation(event.target.value); setReferenceId(""); }}
                 >
                   <option value="inbound">Entrada avulsa</option>
                   <option value="outbound">Retirada</option>
@@ -330,7 +330,7 @@ function PatientStock({
                     required
                     value={referenceId}
                     onChange={(event) => { setReferenceId(event.target.value); const original = movements.find((row) => row.id === event.target.value); if (original) setMovementProductId(original.product_id); }}
-                  ><option value="">Selecione uma movimentação do histórico</option>{movements.filter((row) => row.reference_type === "family_manual" && (!movementProductId || row.product_id === movementProductId) && (row.source_location === "FAMILY" || row.destination_location === "FAMILY")).map((row) => <option key={row.id} value={row.id}>{name(row.product_id)} · {formatBrazilDate(row.created_at)} · {formatQuantity(row.quantity)} · {row.source_location === "FAMILY" ? "Retirada" : "Entrada"}</option>)}</select>
+                  ><option value="">Selecione uma movimentação do histórico</option>{movements.filter((row) => row.reference_type === "family_manual" && (!movementProductId || row.product_id === movementProductId) && (operation === "correction_in" ? row.source_location === "FAMILY" && !row.destination_location : row.destination_location === "FAMILY" && !row.source_location)).map((row) => <option key={row.id} value={row.id}>{name(row.product_id)} · {formatBrazilDate(row.created_at)} · {formatQuantity(row.quantity)} · {row.source_location === "FAMILY" ? "Retirada" : "Entrada"}</option>)}</select>
                 </label>
               ) : null}
               <label className="text-sm font-semibold sm:col-span-2">
