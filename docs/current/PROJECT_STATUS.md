@@ -54,6 +54,10 @@ proporcionais, incluindo resposta perdida, atualização de outra sessão e
 revogação durante esperas reais. Tipos, lint dirigido e o build do runner
 passaram. Replay completo e suítes gerais do novo SHA serão executados pela
 CI programada; não foram duplicados localmente nem declarados aprovados.
+Na CI de 74f5848, checks gerais, replay e integrações passaram; cada browser
+passou 63 casos e falhou no teste Flow que ainda usava o fluxo anterior da
+tela. O teste foi atualizado e passou em execução local dirigida; a CI do
+reparo precisa de resultado próprio.
 
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não

@@ -1123,17 +1123,23 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(5);
   await expect(
-    page.getByText("Consumo · Equipe · Aguardando confirmação", {
+    page.getByText("Consumo · Equipe · Aguardando conferência", {
       exact: true,
     }),
   ).toBeVisible();
+  const reports = (await (await get(page, "/api/consumption?careRecipientId=" + patient)).json()).data;
+  expect(reports).toHaveLength(1);
+  const report = reports[0];
+  expect(report).toMatchObject({ kind: "consumption", location: "CARE_TEAM", status: "reported", version: 1 });
   await logout(page);
   await login(page, "adminA");
-  await page.goto("/consumo?careRecipientId=" + patient);
+  await page.goto("/consumo?careRecipientId=" + patient + "&ref=" + report.id);
   await page
-    .getByRole("button", { name: "Confirmar relato e movimento", exact: true })
+    .getByRole("button", { name: "Conferir consumo", exact: true })
     .click();
-  await page.getByRole("dialog").getByRole("button", { name: "Confirmar consumo", exact: true }).click();
+  const decision = page.getByRole("dialog", { name: "Revisar confirmação do consumo", exact: true });
+  await expect(decision.locator("input,textarea,select")).toHaveCount(0);
+  await decision.getByRole("button", { name: "Confirmar consumo e descontar", exact: true }).click();
   await expect(
     page.getByText("Consumo · Equipe · Confirmado", { exact: true }),
   ).toBeVisible();

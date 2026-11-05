@@ -595,3 +595,13 @@ não foram repetidos localmente nem presumidos aprovados. D-A permanece aberta.
 
 Consulta pontual de e866981: CI 42100271575 concluída com success e status
 Vercel success. Isso valida o incremento COM publicado, não o novo consumo.
+
+Consumo publicado em 74f5848ff0a94aecdd8ef25bbac68e6269621997. CI
+42106623894 passou checks gerais Windows/Ubuntu, replay limpo/legado e
+integrações completas. Cada projeto de browser teve 63 E2E aprovados e uma
+falha no teste Flow antigo, que ainda procurava texto/botão da interface
+anterior. Os quatro casos novos de consumo passaram nos três projetos.
+O fluxo Flow foi atualizado para abrir o relato e revisar sua versão em
+leitura, conservando as provas de saldo 5 antes da decisão e 3 depois.
+O caso afetado passou localmente, com os asserts de saldo 5→3 e decisão em
+leitura. CI geral não foi reexecutada localmente nem declarada aprovada.
