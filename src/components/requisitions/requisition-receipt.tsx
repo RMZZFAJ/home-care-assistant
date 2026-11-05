@@ -7,6 +7,7 @@ import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-
 import { DocumentActions } from "@/components/documents/document-actions";
 import type { RequisitionReceipt } from "@/types/requisition";
 import { Summary } from "./requisition-steps";
+import { RequisitionOpening } from "./requisition-opening";
 
 export type SavedReceipt = RequisitionReceipt & {
   id?: string;
@@ -14,6 +15,10 @@ export type SavedReceipt = RequisitionReceipt & {
 };
 
 export function Receipt({ receipt }: { receipt: SavedReceipt }) {
+  const id = receipt.requisitionId ?? receipt.id;
+  return id ? <><p className="text-sm">Requisição registrada · {receipt.protocol}</p><RequisitionOpening id={id}><ReceiptContent receipt={receipt} /></RequisitionOpening></> : <ReceiptContent receipt={receipt} />;
+}
+function ReceiptContent({ receipt }: { receipt: SavedReceipt }) {
   return (
     <div className="p-3 sm:p-5">
       <section className="mx-auto max-w-3xl rounded-2xl border border-(--line) bg-white p-5 shadow-sm sm:p-10">

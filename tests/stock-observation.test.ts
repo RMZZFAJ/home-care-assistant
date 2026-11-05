@@ -13,6 +13,9 @@ describe("observação de estoque REQ", () => {
     expect(validStockObservation({ currentStock: 1.0000004, stockObservation: "observed" }, 6)).toBe(false);
     expect(validStockObservation({ currentStock: 1.234567, stockObservation: "observed" }, 6)).toBe(true);
     expect(validStockObservation({ currentStock: 1.5, stockObservation: "observed" }, 0)).toBe(false);
+    expect(validStockObservation({ currentStock: "1.0000000000000001", stockObservation: "observed" }, 6)).toBe(false);
+    expect(validStockObservation({ currentStock: "1.0000000", stockObservation: "observed" }, 0)).toBe(true);
+    expect(validStockObservation({ currentStock: "1,25", stockObservation: "observed" }, 6)).toBe(true);
   });
   it("recupera valores de rascunho antigo para revisão, sem inventar uma observação", () => {
     for (const amount of [0, 7]) {
@@ -22,6 +25,7 @@ describe("observação de estoque REQ", () => {
     }
     expect(restoreStockObservation({ currentStock: null })).toEqual({ currentStock: null, stockObservation: "unfilled" });
     expect(restoreStockObservation({ currentStock: null, stockObservation: "unknown" as const }).stockObservation).toBe("unknown");
+    expect(restoreStockObservation({ currentStock: "1,25", stockObservation: "observed" as const }).currentStock).toBe("1,25");
   });
   it("conserva o instante antigo e distingue sua origem do recebimento no servidor", () => {
     const at = "2026-11-04T18:12:30.000Z";

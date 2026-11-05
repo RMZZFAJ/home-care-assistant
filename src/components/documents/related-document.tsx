@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { Dialog } from "@/components/ui/primitives";
 import { api, Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
+import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
+import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
+import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 
 export function RelatedDocument({
   id,
@@ -24,7 +27,7 @@ export function RelatedDocument({
         {label}
       </button>
       <Dialog open={open} title={label} onClose={() => setOpen(false)}>
-        {open ? <RelatedContent id={id} type={type} /> : null}
+        {open ? type === "REQ" ? <RequisitionOpening id={id} withinDialog onCancel={() => setOpen(false)}><RelatedContent id={id} type={type} /></RequisitionOpening> : <RelatedContent id={id} type={type} /> : null}
       </Dialog>
     </>
   );
@@ -72,6 +75,7 @@ function RelatedContent({ id, type }: { id: string; type: string }) {
                 "Produto",
             )}
             {line.urgent ? " · Urgente" : ""}
+            {type === "REQ" ? <><p>Estoque da equipe: {formatStockObservation(typeof line.current_stock === "number" || typeof line.current_stock === "string" ? line.current_stock : null, line.stock_observation as StockObservation, typeof line.unit_snapshot === "string" ? line.unit_snapshot : undefined)}</p><p className="text-xs text-(--muted)">{formatStockObservationTime(typeof line.stock_observation_at === "string" ? line.stock_observation_at : null, line.stock_observation_time_source as StockObservationTimeSource)}</p></> : null}
             {line.quantity !== undefined
               ? " · Expedido/proposto " + String(line.quantity)
               : ""}

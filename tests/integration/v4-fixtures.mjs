@@ -124,8 +124,8 @@ async function issue(patient, products) {
   assert.ifError(lines.error);
   return { id: row.requisition_id, lines: lines.data };
 }
-async function delivery(patient, req, products, extras = {}) {
-  const family = await actor("family", patient);
+async function delivery(patient, req, products, extras = {}, dispatcher = "family") {
+  const family = await actor(dispatcher, patient);
   return rpc(family, "create_supply_document", {
     p_patient: patient,
     p_type: "ENT",

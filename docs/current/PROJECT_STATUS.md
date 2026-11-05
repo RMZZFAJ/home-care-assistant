@@ -18,10 +18,20 @@ perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram
 publicadas em `001158b`, cuja CI passou. Observação REQ distingue zero,
 desconhecimento e ausência; preservação de modo/horário do rascunho e
-compatibilidade de intenções antigas foram verificadas localmente no incremento
-atual (92 migrations, 55 integrações e 12 E2E nos três projetos).
-Evidências por camada e falhas intermediárias estão no checkpoint.
-O núcleo REQ/COM/ENT/BAL e P02 completos continuam em execução.
+compatibilidade de intenções antigas foram publicadas em `d7cfa44`.
+O incremento seguinte implementa identidade material imutável, ANY familiar,
+SCI-005 invariável por expedidor efetivo, diálogo prévio, preferência própria
+versionada e tácita prospectiva. WhatsApp permanece comunicação e SCI-004
+desativada. Precisão do token JSON, vínculo histórico somente leitura e
+revogação durante o trigger tácito receberam contraprovas e correções.
+96 migrations em instalação limpa/evolução legada, 16 SQL, 69 integrações e
+127 unitários e 30 E2E dos três projetos passaram localmente. Contratos,
+lint, Markdown, tipos e build aprovados.
+PDFs de observação e diálogo confrontados com banco/snapshot e inspecionados.
+A trilha independente de abertura observável ainda falta; P02 e o núcleo
+REQ/COM/ENT/BAL completos continuam em execução. Evidências por camada e
+falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não
+atesta estes incrementos posteriores.
 
 **C7–C10 concluídas e fechamento definitivo incorporado em 04/11/2026.**
 [Checkpoint](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121 causas e 165

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { unstable_rethrow } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { quantity } from "@/lib/quantity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { appOrigins } from "@/lib/server/app-origin";
 import { errorCatalog, type ErrorCode } from "@/lib/server/error-catalog";
@@ -22,6 +23,14 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/historical requisition is read only/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.", 400);
+  if (/stale preference version/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Sua preferência mudou em outra sessão. Recarregue o estado antes de confirmar uma nova alteração.", 409);
+  if (/science preference or authority changed/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Sua preferência ou habilitação mudou. Consulte novamente a referência antes de confirmar ciência.", 409);
+  if (/stale document material/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A referência do conteúdo desta requisição não confere. Reabra a requisição antes de confirmar ciência.", 409);
   if (/balance requires family deferral before schedule period change/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "Este plantão tem um BAL designado. Registre a decisão familiar no acompanhamento do balanço antes de alterar o período ou cancelar o plantão.",409);
   if (/distinct balance reviewer/i.test(message))
@@ -244,8 +253,18 @@ export async function readJson<T>(
   const body = await boundedText(request, maxBytes);
   let json: unknown;
   try {
-    json = JSON.parse(body);
-  } catch {
+    json = JSON.parse(body, (_key, value, ...details: unknown[]) => {
+      if (typeof value === "number") {
+        const source = (details[0] as { source?: string } | undefined)?.source;
+        // Node is pinned to 24. Compare the wire token before a rounded Number
+        // can pass a schema or become an authoritative decimal quantity.
+        if (!source || !Number.isFinite(value) || !quantity(source).eq(quantity(value)))
+          throw new ApiError("VALIDATION_ERROR", "Um número enviado perde precisão. Revise o valor informado.");
+      }
+      return value;
+    });
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
     throw new ApiError("INVALID_JSON", "JSON inválido.");
   }
   const parsed = schema.safeParse(json);

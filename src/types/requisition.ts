@@ -28,7 +28,7 @@ export type RequisitionLine = {
   productName: string;
   category: ProductCategory;
   unit?: string;
-  currentStock: number | null;
+  currentStock: string | number | null;
   stockObservation?: StockObservation;
   stockObservationAt?: string | null;
   urgent: boolean;
@@ -38,7 +38,7 @@ export type RequisitionLine = {
 export type ExtraItem = {
   id: string;
   name: string;
-  currentStock: number | null;
+  currentStock: string | number | null;
   stockObservation?: StockObservation;
   stockObservationAt?: string | null;
   urgent: boolean;

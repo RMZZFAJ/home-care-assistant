@@ -153,14 +153,16 @@ test("V4 review: collective science and dashboard archive filters match authorit
     const { patient, admin, products } = await setup(),
       family = await actor("family", patient);
     await policy(admin, patient, {
-      scienceByDispatch: false,
+      scienceByDispatch: true,
       scienceRequired: mode !== "disabled",
-      scienceRequirement: mode === "all" ? "all" : "any",
+      scienceRequirement: "any",
       scienceRoles: [],
       scienceUsers:
         mode === "unassigned" ? [] : [fixtures.adminA.id, fixtures.family.id],
     });
     const req = await issue(patient, [products[0]]);
+    // A persisted legacy ALL remains historical; its effective rule is ANY.
+    if (mode === "all") sql(`update public.requisition_lifecycle set policy=policy||'{"scienceRequirement":"all"}'::jsonb where requisition_id=${sqlLiteral(req.id)};`);
     assert.equal(
       (await rpc(family, "operational_tasks", { p_patient: patient }))
         .sciencePending,
@@ -171,7 +173,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
       assert.equal(
         (await rpc(admin, "operational_tasks", { p_patient: patient }))
           .sciencePending,
-        mode === "all" ? 1 : 0,
+        0,
       );
       assert.equal(
         (
@@ -181,7 +183,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
             p_status: "science_required",
           })
         ).total,
-        mode === "all" ? 1 : 0,
+        0,
       );
       if (mode === "all") {
         assert.equal(
@@ -190,7 +192,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
               sqlLiteral(req.id) +
               " and recipient_user_id=" +
               sqlLiteral(fixtures.family.id) +
-              " and event_key='req.science_recorded' and channel='internal'",
+              " and event_key='req.science_satisfied' and channel='internal'",
           ),
           "1",
         );
@@ -198,11 +200,13 @@ test("V4 review: collective science and dashboard archive filters match authorit
           sql(
             "select count(*) from public.requisition_notifications where document_id=" +
               sqlLiteral(req.id) +
-              " and event_key='req.science_recorded' and channel='whatsapp'",
+              " and event_key='req.science_satisfied' and channel='whatsapp'",
           ),
           "0",
         );
+        assert.equal((await rpc(admin, "requisition_progress", { p_id: req.id })).personalScience, false);
         await acknowledge(admin, req.id);
+        assert.equal((await rpc(admin, "requisition_progress", { p_id: req.id })).personalScience, true);
       }
       assert.equal(
         (await rpc(admin, "operational_tasks", { p_patient: patient }))
@@ -224,7 +228,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
     family = await actor("family", patient),
     pro = await actor("professional", patient);
   await policy(admin, patient, {
-    scienceByDispatch: false,
+    scienceByDispatch: true,
     scienceRoles: ["family"],
     scienceUsers: [],
     archiveDays: 7,
@@ -234,7 +238,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
     const req = await issue(patient, [product]);
     ids.push(req.id);
     if (index === 0) await acknowledge(family, req.id);
-    const ent = await delivery(patient, req, [product]);
+    const ent = await delivery(patient, req, [product], {}, "adminA");
     await rpc(pro, "supply_document_command", {
       p_id: ent.id,
       p_action: "receive",

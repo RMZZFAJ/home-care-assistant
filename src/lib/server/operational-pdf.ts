@@ -25,12 +25,15 @@ export type DocumentSnapshot = {
   version: number;
   status: string;
   createdAt?: string;
+  materialIdentity?: string;
+  materialIdentitySource?: string;
   actors?: { issuer?: Person; recipient?: Person; patient?: Person };
   lines: Record<string, unknown>[];
   payload: Record<string, unknown>;
   workflow?: Record<string, unknown>;
   attachments?: { filename: string; sha256: string }[];
   sciencePolicy?: {
+    familyAware?: boolean;
     science_satisfied_at?: string;
     policy?: Record<string, unknown>;
     manual_archive_required?: boolean;
@@ -287,6 +290,7 @@ export async function renderDocumentPdf(
   }[snapshot.type];
   text(title, snapshot.type === "ENT" ? 17 : 19, true);
   y -= 6;
+  const familyAware = snapshot.sciencePolicy?.familyAware ?? Boolean(snapshot.sciencePolicy?.science_satisfied_at);
   const statusText = snapshot.isHistorical
     ? "Registro histórico · ciência original não comprovada"
     : snapshot.type === "REQ" && snapshot.status !== "cancelled"
@@ -294,7 +298,7 @@ export async function renderDocumentPdf(
         ? "Arquivada"
         : snapshot.sciencePolicy?.completed_at
           ? "Atendimento concluído"
-          : snapshot.sciencePolicy?.science_satisfied_at
+          : familyAware
             ? "Aguardando atendimento"
             : "Ciência e atendimento pendentes"
       : (documentStatuses[snapshot.status] ?? snapshot.status);
@@ -324,8 +328,8 @@ export async function renderDocumentPdf(
           ],
           [String(attended), "ITENS ATENDIDOS"],
           [
-            snapshot.sciencePolicy?.science_satisfied_at
-              ? "REGISTRADA"
+            familyAware
+              ? "FAMÍLIA CIENTE"
               : "PENDENTE",
             "CIÊNCIA FAMILIAR",
           ],
@@ -496,8 +500,8 @@ export async function renderDocumentPdf(
       ["Linhas pendentes", String(total - attended)],
       [
         "Ciência familiar",
-        snapshot.sciencePolicy?.science_satisfied_at
-          ? formatBrazilDate(snapshot.sciencePolicy.science_satisfied_at)
+        familyAware
+          ? "Família ciente" + (snapshot.sciencePolicy?.science_satisfied_at ? " · " + formatBrazilDate(snapshot.sciencePolicy.science_satisfied_at) : "")
           : "Pendente nesta versão",
       ],
       ["Próximo passo", requisitionNextStep(snapshot)],
@@ -524,6 +528,8 @@ export async function renderDocumentPdf(
           event.actor_name,
           {
             express: "Expressa no aplicativo",
+            dialog: "Diálogo: confirmação antes de abrir",
+            tacit: "Tácita: preferência anterior à emissão",
             app_visible: "Automática: conteúdo exibido",
             whatsapp_read: "Automática: leitura WhatsApp",
             whatsapp_confirm: "WhatsApp: confirmação verificada",
@@ -605,6 +611,7 @@ export async function renderDocumentPdf(
     ["Versão", String(snapshot.version)],
     ["ID técnico", snapshot.id],
     ["Hash do conteúdo canônico", hash],
+    ...(snapshot.materialIdentity ? [["Identidade material REQ", snapshot.materialIdentity], ["Origem da referência material", snapshot.materialIdentitySource === "legacy_projection" ? "Projeção dos dados legados preservados" : snapshot.materialIdentitySource === "historical_import" ? "Dados conhecidos na importação histórica" : "Conteúdo da emissão no sistema"]] as [string, unknown][] : []),
   ]);
   y -= 11;
   text(

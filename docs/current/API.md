@@ -64,7 +64,17 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 - **Rota:** /api/requisitions/:id/science
 
-  **Contrato:** Ciência com modalidade e versão esperada
+  **Contrato:** Ciência expressa ou dialogada com versão e identidade material
+
+- **Rota:** /api/requisitions/:id/opening
+
+  **Contrato:** Prévia mínima autorizada, preferência pessoal e necessidade de
+  diálogo; sem linhas ou ciência por consulta
+
+- **Rota:** /api/profile/science
+
+  **Contrato:** GET da preferência própria; POST versionado e idempotente,
+  com consentimento expresso para diálogo/tácita
 
 - **Rota:** /api/requisitions/:id/archive
 
@@ -155,11 +165,18 @@ snapshots são resolvidos no banco. A resposta confirma persistence e receipt;
 RECEIPT_PENDING preserva o ID e a chave se a leitura posterior falhar.
 
 COM, ENT e BAL usam type, payload.lines, idempotencyKey e draft.
-O contrato requer quantidades exatas e limitadas à precisão da unidade; a
-validação atual aceita string ou number e B4-001 prova arredondamento indevido
-no braço number. Não apresentar o requisito de exatidão como garantia integral
-já corrigida. Linhas podem conter
+Quantidades são exatas e limitadas à precisão da unidade. O parser compara o
+token numérico JSON com o valor decodificado antes da validação: arredondamento,
+underflow e inteiros inseguros são recusados. Strings decimais seguem a mesma
+validação exata no servidor e no banco. O campo de observação conserva texto
+e vírgula decimal durante edição/retomada. B4-001 permanece evidência histórica;
+a regressão atual reproduz o token 1.0000000000000001 que antes virava 1.
+Linhas podem conter
 requisitionItemIds explícitos do mesmo produto e paciente.
+
+REQ histórica é somente consulta: novos vínculos COM/ENT, inclusive rascunhos,
+são recusados. Vínculos/fatos anteriores permanecem preservados. Falha ao
+carregar dados da ficha bloqueia edição e autosave até recarregar com sucesso.
 
 COM aceita origin purchase ou donation. ENT exige source e destination
 FAMILY/CARE_TEAM distintos e recipientId autorizado. BAL registra todos os
@@ -263,6 +280,40 @@ Movimentação familiar valida precisão antes de gravar numeric(18,6).
 Correção exige referência a movimento do mesmo paciente/produto/custódia,
 em direção oposta. Entrada/retirada avulsa não recebe essa referência.
 Números e texto usam o mesmo limite de seis casas decimais, sem arredondamento.
+
+## Ciência REQ — P02
+
+SCI-001 é o ato manual expresso. SCI-002 registra confirmação antes de abrir,
+somente com preferência pessoal expressa e permissão administrativa capturada
+na emissão. Cabeçalho, scroll, GET, download e leitura de WhatsApp não registram
+nova ciência. SCI-003 é comunicação; SCI-004 continua desativada, aguardando
+homologação externa futura. Nenhuma mensagem real foi enviada nos testes.
+
+SCI-005 é invariável: expedição oficial de ENT vinculada por representante
+familiar habilitado registra o expedidor efetivo, REQ/material, ENT/versão e
+instante na mesma transação. Flags legadas false não a desativam. Rascunho,
+edição, erro e rollback não registram esse ato. Expedidor autorizado sem
+representação familiar conserva sua autoria física, sem ciência familiar.
+
+Uma ciência familiar válida satisfaz o agregado ANY; a interface distingue
+Família ciente, Minha ciência e pendência de designação. Desobrigação antiga
+não fabrica ciência e revogação posterior não apaga fatos válidos. Versões
+técnicas, identidade material e hash/identidade do PDF são conceitos separados.
+Novo PDF ou atendimento não invalida ciência do mesmo material emitido.
+
+Preferência própria usa manual/dialog/tacit, expectedVersion, idempotencyKey
+e consent. Sem registro, manual é o padrão, sem backfill de opt-in por flags
+antigas. Tácita só atua em nova emissão com elegibilidade, permissão e
+preferência anteriores; conserva regra, versão, consentimento e autoria do
+sistema. Mudança posterior não retroage. Retry da chave antiga recupera seu
+resultado sem restaurar preferência já substituída. Falha/conflito conserva
+edição e exige consulta explícita. A alternativa manual permanece acessível.
+
+O diálogo usa referência material, não exige que a versão técnica continue
+igual depois de um evento. Confirmação salva seguida de falha do conteúdo é
+informada como tal; recuperar não duplica ciência. A trilha independente de
+aberturas observáveis ainda precisa ser implementada; prévia e ciência não
+constituem prova de abertura, atenção ou leitura integral.
 
 Importação preserva fatos conhecidos, identifica campos desconhecidos e
 exige revisão explícita. Protocolos físicos não geram fatos nem notificações

@@ -17,6 +17,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { NewPasswordField } from "./auth/new-password-field";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { SciencePreferenceSettings } from "./profile/science-preference";
 type Profile = {
   full_name: string;
   professional_registration: string | null;
@@ -122,9 +123,9 @@ function ProfileContent() {
                   internal: form.has("internal"),
                   whatsapp: form.has("whatsapp"),
                   email: form.has("email"),
-                  scienceExpress: form.has("scienceExpress"),
-                  scienceWhatsApp: form.has("scienceWhatsApp"),
-                  scienceAutomatic: form.has("scienceAutomatic"),
+                  scienceExpress: profile?.notification_preferences.scienceExpress ?? true,
+                  scienceWhatsApp: profile?.notification_preferences.scienceWhatsApp ?? false,
+                  scienceAutomatic: profile?.notification_preferences.scienceAutomatic ?? false,
                 },
               },
         );
@@ -236,54 +237,6 @@ function ProfileContent() {
                     Canais externos dependem de configuração e validação do
                     contato. Preferências não concedem permissões.
                   </p>
-                  <fieldset className="mt-5 space-y-2">
-                    <legend className="font-semibold">
-                      Ciência das requisições
-                    </legend>
-                    {[
-                      [
-                        "scienceExpress",
-                        "Expressa no aplicativo",
-                        "Você confirma após consultar o documento; a ação fica atribuída à sua sessão.",
-                      ],
-                      [
-                        "scienceWhatsApp",
-                        "Simplificada pelo WhatsApp",
-                        "Permite confirmar com seu telefone verificado e desafio de uso único, quando a política do paciente permitir.",
-                      ],
-                      [
-                        "scienceAutomatic",
-                        "Automática por eventos autorizados",
-                        "Conteúdo efetivamente exibido ou leitura correlacionada no WhatsApp pode registrar ciência automática. Não equivale a confirmação expressa.",
-                      ],
-                    ].map(([key, label, description]) => (
-                      <label
-                        key={key}
-                        className="block rounded-lg border border-(--line) p-3"
-                      >
-                        <span className="flex min-h-11 items-center gap-3">
-                          <input
-                            name={key}
-                            type="checkbox"
-                            defaultChecked={
-                              profile.notification_preferences[key] ??
-                              key === "scienceExpress"
-                            }
-                          />
-                          {label}
-                        </span>
-                        <span className="block text-xs font-normal text-(--muted)">
-                          {description}
-                        </span>
-                      </label>
-                    ))}
-                    <p className="text-xs text-(--muted)">
-                      A política do paciente também deve autorizar o modo.
-                      Expedição só registra ciência quando você é entregador e
-                      responsável autorizado; a evidência identifica essa
-                      origem.
-                    </p>
-                  </fieldset>
                 </div>
               </fieldset>
               <button className={primaryClass} disabled={busy}>
@@ -291,6 +244,7 @@ function ProfileContent() {
               </button>
             </form>
           </SettingsSection>
+          <SciencePreferenceSettings />
           <SettingsSection title="Foto de perfil" summary="Imagem utilizada na identificação da sua conta">
             
             {profile.avatar ? (

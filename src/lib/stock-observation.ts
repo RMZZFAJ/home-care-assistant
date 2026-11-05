@@ -1,4 +1,4 @@
-import { formatQuantity, validQuantity } from "./quantity";
+import { formatQuantity, quantity, validQuantity } from "./quantity";
 import { formatBrazilDate } from "./receipt";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 
@@ -14,11 +14,15 @@ export function formatStockObservation(value: string | number | null | undefined
   return value == null ? "Não informado no registro legado" : formatQuantity(value, unit) + " · observação legada sem classificação";
 }
 
-export function validStockObservation(line: { currentStock: number | null; stockObservation?: StockObservation }, decimals = 6) {
+export function validStockObservation(line: { currentStock: string | number | null; stockObservation?: StockObservation }, decimals = 6) {
   if (line.stockObservation === "unknown" || line.stockObservation === "unfilled") return line.currentStock === null;
-  return line.stockObservation === "observed" && line.currentStock !== null && line.currentStock <= 100000 && validQuantity(String(line.currentStock), decimals, true);
+  if (line.stockObservation !== "observed" || line.currentStock === null) return false;
+  const raw = String(line.currentStock);
+  if (raw.length > 64 || !/^\d+(?:[.,]\d+)?$/.test(raw)) return false;
+  return quantity(raw).lte(100000) && validQuantity(quantity(raw).toFixed(), decimals, true);
 }
 
-export function restoreStockObservation<T extends { currentStock: number | null; stockObservation?: StockObservation }>(line: T) {
-  return { ...line, currentStock: Number.isFinite(line.currentStock) ? line.currentStock : null, stockObservation: line.stockObservation ?? (line.currentStock == null ? "unfilled" as const : "legacy_unclassified" as const) };
+export function restoreStockObservation<T extends { currentStock: string | number | null; stockObservation?: StockObservation }>(line: T) {
+  const value = typeof line.currentStock === "string" || typeof line.currentStock === "number" && Number.isFinite(line.currentStock) ? line.currentStock : null;
+  return { ...line, currentStock: value, stockObservation: line.stockObservation ?? (value == null ? "unfilled" as const : "legacy_unclassified" as const) };
 }

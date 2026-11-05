@@ -284,3 +284,81 @@ Isso não certifica o renderer D4 inteiro nem assinatura D-B.
 
 CI de 001158b, run 42049385860, success; refere-se ao incremento anterior.
 Nova CI será observada após publicação. D1 integral, P02 e D2 seguem em execução.
+
+## D2.1 — P02, identidade material e causas adicionais
+
+Migrations 20261105160654, 20261105162705, 20261105170825 e
+20261105175151 aplicadas somente à stack local. Material REQ emitido passa a
+ter identidade SHA-256 protegida; origem distingue emissão, importação e
+projeção dos fatos legados. Eventos pessoais anteriores permanecem intactos.
+Compatibilidade ALL passa a ANY por evento técnico de sistema, sem inventar
+ciência. Versão técnica/arquivo PDF não substitui identidade material.
+
+SCI-005 registra o expedidor familiar efetivo, mesmo se outra pessoa criou o
+draft e flags legadas forem false. Expedições distintas conservam causas
+próprias ao lado da ciência expressa anterior; replay/linhas compartilhadas
+não duplicam ciência causal ou movimentação. Não representante legitimamente
+autorizado pode expedir sem fabricar Família ciente. Rascunho, edição, falha
+e rollback deixam zero SCI-005; ciência não é recebimento nem consumo.
+
+Preferência própria append-only manual/dialog/tacit exige consentimento
+expresso para as duas últimas, versão e chave de intenção. RLS só permite a
+própria leitura com Auth vigente, sem exigir contexto de paciente para essa
+escolha pessoal. Flags antigas não viram opt-in. Tácita exige habilitação,
+permissão e preferência anteriores à nova emissão; conserva versões/instantes
+e autoria do sistema. Alteração ou capacidade posterior não retroage.
+
+Diálogo usa prévia mínima antes de montar conteúdo; cancelar não produz ato.
+Resposta perdida recupera uma ciência e falha posterior na consulta é
+informada sem inventar abertura. Preferência tem revisão somente leitura,
+recuperação da mesma chave e atualização de outra sessão não substitui edição.
+SCI-003 permanece comunicação; novos desafios SCI-004 ficam desativados.
+Acesso observável independente continua pendente no próximo incremento;
+nenhum GET, PDF ou confirmação equivale a atenção/leitura integral.
+
+Contraprovas adicionais e correções necessárias ao núcleo:
+
+- RPC aceitava nova ENT ligada a REQ histórica, com zero ciência: agora novos
+  vínculos COM/ENT, inclusive drafts, são recusados; história/ledger anteriores
+  preservados. Falha dos dados da ficha bloqueia edição/autosave até retomar.
+- JSON 1.0000000000000001 virava 1 antes do schema. Parser verifica token
+  original com decimal exato e recusa arredondamento/underflow/inteiro inseguro.
+  Observação conserva texto/vírgula em edição e draft; banco exige precisão.
+- Trigger tácito acrescentou espera depois da última validação do criador.
+  Controle com lock observado e sessão encerrada retornava sucesso, REQ=1 e
+  SCI=1; após revalidar no fim da emissão, retorna 42501, REQ=0 e SCI=0.
+  Hipótese semelhante em política administrativa já retornava 42501 sem
+  efeito; ficou como regressão, sem patch especulativo.
+
+Controle da migration de permissões inicialmente encontrou âncora incorreta;
+foi revertido integralmente e ajustado à função efetiva antes da aplicação.
+Tipos detectaram duas referências antigas após renomeação de refs; corrigidas.
+Primeiro teste pessoal usava helper que exigia paciente indevidamente: passou
+a autenticar sem contexto, comprovando o contrato próprio. Um seletor de teste
+foi ajustado ao nome acessível do combobox. Outro oráculo consultava coluna
+inexistente do ledger: passou a comparar o ledger completo do paciente, com
+baseline positivo. Nenhum teste/regra/timeout reduzido.
+
+Validação: replay de 96 migrations limpo/legado, 16 SQL e search_path aprovados;
+84 hashes históricos preservados. 69 integrações completas e 127 unitários
+aprovados; contratos, lint, Markdown, tipos e build passaram. 30 E2E nos três
+projetos aprovados, sem retries locais; captura iOS de 320 px inspecionada.
+Upgrade controlado de ALL preservou eventos pessoais e snapshots
+anteriores; prova local em p02-upgrade-proof.json, sem homologação remota.
+
+PDFs locais finais de duas páginas, extraídos e renderizados com PDFium; todas
+as páginas inspecionadas, sem corte/sobreposição. Observação: 6693a4f9, SHA-256
+171855273a72460026d88e4fd43a889562e5e70eaf8e0a43bf8b2365be0e3273,
+quatro pares produto/valor/modo/horário confrontados com banco/snapshot.
+Diálogo: dca2388c, SHA-256
+4519b75ba57f8deacf94a0a21559e22965ea06752a5da1b4f438ff613848562a,
+ator/origem/ANY/material confrontados com banco/snapshot. Manifestações locais
+em output/pdf/phase-d conservam hashes dos fontes testados e HEAD d7cfa44 com
+árvore suja. Hash material quebra visualmente em duas linhas: o oráculo remove
+somente espaços para comparar seus 64 caracteres. Sem certificação D4 geral,
+assinatura, provedor, pessoa/AT ou aparelho real.
+
+Push de d7cfa44 foi confirmado no ref remoto, mas a leitura da PR ainda exibia
+001158b; não apareceu CI para o novo SHA na consulta. A aprovação de 001158b
+não cobre estes fontes. Publicação/consulta final serão registradas por SHA.
+D-A permanece parcial, sem GO, merge, banco remoto ou início de D-B/D-C.

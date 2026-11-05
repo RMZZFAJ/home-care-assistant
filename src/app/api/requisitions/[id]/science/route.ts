@@ -11,10 +11,11 @@ export async function POST(
       request,
       z
         .object({
-          mode: z.enum(["express", "app_visible"]),
-          expectedVersion: z.number().int().positive(),
+          mode: z.enum(["express", "dialog"]),
+          expectedVersion: z.number().int().positive().max(2147483647),
+          materialIdentity: z.string().regex(/^[0-9a-f]{64}$/).optional(),
         })
-        .strict(),
+        .strict().refine(value => value.mode === "express" || Boolean(value.materialIdentity), { path: ["materialIdentity"], message: "Reabra a prévia desta requisição." }),
     );
     const auth = await authenticate();
     return NextResponse.json({
@@ -22,6 +23,7 @@ export async function POST(
         p_id: parseUuid((await context.params).id),
         p_mode: input.mode,
         p_version: input.expectedVersion,
+        ...(input.materialIdentity ? { p_material_identity: input.materialIdentity } : {}),
       }),
     });
   });

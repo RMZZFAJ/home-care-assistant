@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
 import { fixtureFile, sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { setup, rpc } from "../integration/v4-fixtures.mjs";
@@ -21,6 +22,27 @@ async function hygiene(page: Page) { await next(page); await next(page); await e
 async function review(page: Page) { for (let step = 0; step < 4; step++) await next(page); await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible(); }
 const card = (page: Page, name: string) => page.locator("article").filter({ has: page.getByRole("checkbox", { name: new RegExp("^" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) }) });
 const count = (patient: string) => sql(`select count(*) from public.requisitions where care_recipient_id=${sqlLiteral(patient)};`);
+
+test("observação REQ mantém texto decimal exato, recusa arredondamento e retoma vírgula decimal sem convertê-la em zero", async ({ page }) => {
+  const f = await setup();
+  const fluid = await rpc(f.admin, "admin_upsert_recipient_product", { p_care_recipient_id: f.patient, p_product_id: null, p_name: "Líquido fictício da observação exata", p_category: "higiene", p_unit: "mL", p_aliases: [], p_is_active: true });
+  await rpc(f.admin, "configure_catalogue_unit", { p_patient: f.patient, p_product: fluid.product_id, p_unit: "mL", p_decimals: 6, p_barcode: null, p_presentation: null, p_base_quantity: null });
+  const ledger = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
+  await login(page, f.patient); await hygiene(page);
+  const row = card(page, "Líquido fictício da observação exata"); await row.getByRole("checkbox").first().check();
+  const input = row.getByLabel("Estoque observado com a equipe", { exact: false });
+  await input.fill("1.0000000000000001"); await expect(input).toHaveValue("1.0000000000000001"); await next(page);
+  await expect(input).toHaveAttribute("aria-invalid", "true"); await expect(page.getByRole("heading", { name: "Higiene", exact: true })).toBeVisible();
+  const raw = JSON.stringify({ careRecipientId: f.patient, idempotencyKey: randomUUID(), lines: [{ productId: fluid.product_id, currentStock: "NUMERIC_TOKEN", stockObservation: "observed", urgent: false }], extraItems: [], observations: [] }).replace('"NUMERIC_TOKEN"', "1.0000000000000001");
+  const rejected = await page.request.post("/api/requisitions", { headers: { "content-type": "application/json" }, data: raw });
+  expect(rejected.status()).toBe(400); expect(await rejected.json()).toMatchObject({ code: "VALIDATION_ERROR" }); expect(count(f.patient)).toBe("0");
+  await input.fill("1,25"); await page.getByRole("button", { name: "Salvar rascunho", exact: true }).click(); await expect(page.getByText("Rascunho salvo neste dispositivo.", { exact: true })).toBeVisible();
+  await page.reload(); await hygiene(page); await expect(input).toHaveValue("1,25"); await review(page);
+  await expect(page.getByText("1,25 mL (observado)", { exact: false })).toBeVisible(); await page.getByRole("button", { name: "Concluir requisição", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Comprovante oficial", exact: true })).toBeVisible();
+  expect(sql(`select current_stock::text from public.requisition_items where care_recipient_id=${sqlLiteral(f.patient)} and product_id=${sqlLiteral(fluid.product_id)};`)).toBe("1.250000");
+  expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(ledger);
+});
 
 test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar no dia seguinte e recuperar resposta perdida", async ({ page }, info) => {
   test.setTimeout(150_000);

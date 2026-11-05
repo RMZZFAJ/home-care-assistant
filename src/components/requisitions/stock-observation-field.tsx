@@ -5,8 +5,8 @@ import type { StockObservation } from "@/types/requisition";
 import { formatStockObservationTime } from "@/lib/stock-observation";
 
 export function StockObservationField({ value, mode, at, decimals = 6, unit, error, onChange }: {
-  value: number | null; mode?: StockObservation; at?: string | null; decimals?: number; unit?: string; error?: string;
-  onChange: (change: { currentStock: number | null; stockObservation: StockObservation; stockObservationAt: string }) => void;
+  value: string | number | null; mode?: StockObservation; at?: string | null; decimals?: number; unit?: string; error?: string;
+  onChange: (change: { currentStock: string | number | null; stockObservation: StockObservation; stockObservationAt: string }) => void;
 }) {
   const id = useId(), selected = mode ?? (value == null ? "unfilled" : "legacy_unclassified");
   const description = id + "-help" + (error ? " " + id + "-error" : "");
@@ -18,10 +18,10 @@ export function StockObservationField({ value, mode, at, decimals = 6, unit, err
       <option value="unfilled">Não informado</option><option value="unknown">Não sei informar</option><option value="observed">Observei e vou informar</option>
     </select>
     <label className="block text-sm font-semibold" htmlFor={id + "-quantity"}>Estoque observado com a equipe{unit ? " · " + unit : ""}</label>
-    <input id={id + "-quantity"} className={inputClass} type="number" inputMode={decimals ? "decimal" : "numeric"} min="0" max="100000" step={10 ** -decimals}
+    <input id={id + "-quantity"} className={inputClass} type="text" inputMode={decimals ? "decimal" : "numeric"} maxLength={64}
       value={value == null || Number.isNaN(value) ? "" : value} disabled={selected === "unknown"} aria-describedby={description} aria-invalid={error && selected !== "legacy_unclassified" ? true : undefined}
-      onChange={event => onChange({ ...(event.target.value === "" ? { currentStock: null, stockObservation: "unfilled" as const } : { currentStock: event.target.valueAsNumber, stockObservation: "observed" as const }), stockObservationAt: new Date().toISOString() })} />
-    <p id={id + "-help"} className="text-xs text-(--muted)">Vazio significa não informado. Digite 0 somente se observou zero; o saldo calculado não preenche esta observação.</p>
+      onChange={event => onChange({ ...(event.target.value === "" ? { currentStock: null, stockObservation: "unfilled" as const } : { currentStock: event.target.value, stockObservation: "observed" as const }), stockObservationAt: new Date().toISOString() })} />
+    <p id={id + "-help"} className="text-xs text-(--muted)">Vazio significa não informado. Digite 0 somente se observou zero; o saldo calculado não preenche esta observação. Faixa: 0 a 100000. {decimals ? `Até ${decimals} casas decimais.` : "Somente unidades inteiras."}</p>
     <p className="text-xs text-(--muted)">{formatStockObservationTime(at)}</p>
     {error ? <p id={id + "-error"} className="ui-field-error">{error}</p> : null}
   </div>;

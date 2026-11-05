@@ -66,7 +66,7 @@ async function setup(page: Page) {
   return { patient, product };
 }
 
-test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e compartilhamento do arquivo", async ({
+test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e compartilhamento do arquivo", async ({
   page,
   browser,
 }) => {
@@ -79,7 +79,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
   await post(page, "/api/patient-settings", {
     careRecipientId: patient,
     kind: "settings",
-    change: { scienceAutomatic: true, scienceByDispatch: false },
+    change: { scienceDialog: true },
     idempotencyKey: randomUUID(),
     expectedVersion: settings.version,
   });
@@ -123,15 +123,13 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
     });
     await login(family, "family", patient);
     await family.goto("/perfil?careRecipientId=" + patient);
-    await family.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
-    await family
-      .getByRole("checkbox", { name: /Automática por eventos autorizados/ })
-      .check();
-    await family
-      .getByRole("button", { name: "Salvar perfil", exact: true })
-      .click();
+    await family.getByRole("button", { name: "Ciência das requisições", exact: true }).click();
+    await family.getByRole("combobox", { name: "Modalidade pessoal", exact: true }).selectOption("dialog");
+    await family.getByRole("checkbox", { name: "Confirmo expressamente esta preferência pessoal.", exact: true }).check();
+    await family.getByRole("button", { name: "Revisar preferência", exact: true }).click();
+    await family.getByRole("dialog", { name: "Revisar preferência de ciência", exact: true }).getByRole("button", { name: "Confirmar preferência", exact: true }).click();
     await expect(
-      family.getByText("Perfil atualizado.", { exact: true }),
+      family.getByText("Preferência salva.", { exact: false }),
     ).toBeVisible();
     await family.goto("/historico?careRecipientId=" + patient);
     await login(pro, "professional", patient);
@@ -174,8 +172,9 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
     );
     await justification.fill("Necessidade revisada após consulta contextual");
     await family.getByRole("link").filter({ hasText: receipt.code }).click();
+    await family.getByRole("dialog", { name: "Ciência antes de abrir a requisição", exact: true }).getByRole("button", { name: "Confirmar ciência e abrir", exact: true }).click();
     await expect(
-      family.getByText("Automática · conteúdo exibido", { exact: false }),
+      family.getByText("Confirmação em diálogo antes de abrir", { exact: false }),
     ).toBeVisible({ timeout: 15000 });
     await expect(justification).toHaveValue(
       "Necessidade revisada após consulta contextual",
@@ -188,7 +187,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
     ).toBeChecked();
     await pro.goto("/historico/" + receipt.requisitionId);
     await expect(
-      pro.getByText("Automática · conteúdo exibido", { exact: false }),
+      pro.getByText("Confirmação em diálogo antes de abrir", { exact: false }),
     ).toBeVisible();
     await expect(
       pro.getByRole("listitem").filter({ hasText: "Material V4 visual" }),

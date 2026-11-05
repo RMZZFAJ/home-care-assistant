@@ -1,5 +1,6 @@
 "use client";
 import { DocumentActions } from "./document-actions";
+import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -40,6 +41,7 @@ const steps = [
 ];
 type SourceRequest = {
   care_recipient_id: string;
+  is_historical?: boolean;
   requisition_items: {
     id: string;
     product_id: string | null;
@@ -50,20 +52,19 @@ export function SupplyWizard({ type }: { type: SupplyType }) {
   const params = useSearchParams();
   return (
     <Workspace title={documentLabels[type]} compact>
-      {(context) =>
-        context.patient ? (
-          <PatientSupplyWizard
+      {(context) => {
+        if (!context.patient) return <Notice>Selecione um paciente para abrir uma ficha.</Notice>;
+        const wizard = <PatientSupplyWizard
             key={context.patient.id + params.toString()}
             context={context}
             type={type}
             requisitionId={params.get("requisitionId")}
             documentId={params.get("documentId")}
             recount={params.get("recount") === "true"}
-          />
-        ) : (
-          <Notice>Selecione um paciente para abrir uma ficha.</Notice>
-        )
-      }
+          />;
+        const requisitionId = params.get("requisitionId");
+        return requisitionId ? <RequisitionOpening key={context.patient.id + params.toString()} id={requisitionId}>{wizard}</RequisitionOpening> : wizard;
+      }}
     </Workspace>
   );
 }
@@ -94,6 +95,7 @@ export function PatientSupplyWizard({
   const [requestOptions, setRequestOptions] = useState<ItemContext[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -150,6 +152,7 @@ export function PatientSupplyWizard({
     ])
       .then(async ([products, settings, source]) => {
         if (controller.signal.aborted) return;
+        if (source?.data.is_historical) throw new Error("Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.");
         setCatalog(products.data);
         setPeople(settings.directory);
         if (type !== "BAL" && canReadRequests) {
@@ -278,7 +281,7 @@ export function PatientSupplyWizard({
       .catch((reason) => {
         if (!controller.signal.aborted) {
           setLoading(false);
-          setError(
+          setLoadError(
             reason instanceof Error
               ? reason.message
               : "Não foi possível carregar o formulário.",
@@ -297,7 +300,7 @@ export function PatientSupplyWizard({
     canReadRequests,
   ]);
   useEffect(() => {
-    if (loading || saved || uncertain || busy) return;
+    if (loading || loadError || saved || uncertain || busy) return;
     const timer = window.setTimeout(() => {
       if (frozenRef.current) return;
       try {
@@ -315,7 +318,7 @@ export function PatientSupplyWizard({
       }
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [form, links, editing, loading, saved, storageKey, uncertain, busy]);
+  }, [form, links, editing, loading, loadError, saved, storageKey, uncertain, busy]);
   function validate(all = false) {
     const errors: Record<string, string> = {};
     const category = ["medicamentos", "higiene", "dieta"][step - 1];
@@ -604,6 +607,7 @@ export function PatientSupplyWizard({
     );
   return (
     <div className="mx-auto max-w-4xl">
+      {loadError ? <div className="space-y-3"><Notice error>{loadError}</Notice><button type="button" className={buttonClass} onClick={() => { setLoading(true); setLoadError(""); setAttempt(value => value + 1); }}>Recarregar dados</button><Link className={buttonClass} href={requisitionId ? "/historico/" + requisitionId : "/fichas"}>Voltar</Link></div> : <>
       <StepNavigator
         steps={steps}
         active={step}
@@ -665,6 +669,7 @@ export function PatientSupplyWizard({
           <WizardActions step={step} total={6} saving={busy} uncertain={uncertain} onBack={() => { setStep((value) => value - 1); setError(""); }} onDraft={() => void persist(true)} onNext={next} onFinish={() => void persist(false)} />
         </section>
       )}
+      </>}
     </div>
   );
 }

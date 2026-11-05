@@ -203,14 +203,17 @@ function Policies({ context }: { context: WorkspaceContext }) {
       "shareWaitSeconds",
     ])
       change[key] = form.get(key) === "" ? null : Number(form.get(key));
-    for (const key of ["balReview", "balRequirement", "scienceRequirement"])
+    for (const key of ["balReview", "balRequirement"])
       change[key] = form.get(key);
+    change.scienceRequirement = "any";
+    change.scienceByDispatch = true;
+    change.scienceAutomatic = data?.data.settings.scienceAutomatic ?? false;
+    change.scienceWhatsApp = data?.data.settings.scienceWhatsApp ?? false;
     for (const key of [
       "whatsappSimpleAcceptance",
       "scienceRequired",
-      "scienceByDispatch",
-      "scienceAutomatic",
-      "scienceWhatsApp",
+      "scienceDialog",
+      "scienceTacit",
     ])
       change[key] = form.has(key);
     change.balApprovers = form.getAll("balApprovers");

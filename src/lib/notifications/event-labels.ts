@@ -31,6 +31,7 @@ const labels: Record<string, string> = {
   "req.registered_author": "Requisição encaminhada para ciência familiar",
   "req.science_recorded": "Ciência individual registrada",
   "req.science_satisfied": "Ciência familiar exigida satisfeita",
+  "req.science_requirement_changed": "Critério familiar atualizado para uma pessoa habilitada",
   "req.completed": "Requisição atendida operacionalmente",
   "req.fulfillment_updated": "Atendimento atualizado pelas entregas vinculadas",
   "req.reopened": "Atendimento reaberto por pendência",

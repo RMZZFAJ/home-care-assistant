@@ -1,10 +1,9 @@
 "use client";
 import Link from "next/link";
 import { SettingsSection } from "@/components/forms/settings-section";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   api,
-  ApiError,
   buttonClass,
   can,
   inputClass,
@@ -34,13 +33,17 @@ import {
 
 type Progress = {
   version: number;
+  materialIdentity: string;
+  familyAware: boolean;
+  personalScience: boolean;
+  designationPending: boolean;
   scienceSatisfied: boolean;
   eligible: boolean;
   completedAt: string | null;
   manualArchiveRequired: boolean;
   archivedAt: string | null;
   archiveReason: string | null;
-  policy: { scienceAutomatic?: boolean } | null;
+  policy: { scienceRequired?: boolean } | null;
   preferences: Record<string, boolean>;
   events: TimelineEvent[];
   science: {
@@ -89,9 +92,11 @@ type Detail = {
 };
 const modes: Record<string, string> = {
   express: "Expressa no aplicativo",
-  app_visible: "Automática · conteúdo exibido",
-  whatsapp_read: "Automática · leitura correlacionada no WhatsApp",
-  whatsapp_confirm: "Simplificada · WhatsApp verificado",
+  dialog: "Confirmação em diálogo antes de abrir",
+  tacit: "Tácita por preferência anterior à emissão",
+  app_visible: "Ciência automática legada · conteúdo exibido",
+  whatsapp_read: "Ciência legada · leitura correlacionada no WhatsApp",
+  whatsapp_confirm: "Ciência legada · WhatsApp verificado",
   dispatch: "Por expedição autorizada",
 };
 
@@ -110,9 +115,6 @@ export function RequisitionDocumentContent({
   const [busy, setBusy] = useState(false);
   const [reason, setReason] = useState("");
   const [review, setReview] = useState<"archive" | "cancel" | null>(null);
-  const visibleRef = useRef<HTMLDivElement>(null);
-  const automaticRef = useRef(false);
-  const automaticAttemptsRef = useRef(0);
   useEffect(() => {
     const controller = new AbortController();
     void api<{ data: Detail }>(
@@ -131,54 +133,6 @@ export function RequisitionDocumentContent({
       });
     return () => controller.abort();
   }, [id, attempt, revision]);
-  useEffect(() => {
-    if (
-      !data ||
-      data.is_historical ||
-      automaticRef.current ||
-      data.progress.science.some((row) => row.user_id === context.userId) ||
-      !data.progress.eligible ||
-      !data.progress.preferences.scienceAutomatic ||
-      !data.progress.policy?.scienceAutomatic ||
-      !visibleRef.current
-    )
-      return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          document.hidden ||
-          !entries.some((entry) => entry.isIntersecting) ||
-          automaticRef.current
-        )
-          return;
-        automaticRef.current = true;
-        automaticAttemptsRef.current += 1;
-        void api(`/api/requisitions/${id}/science`, {
-          mode: "app_visible",
-          expectedVersion: data.progress.version,
-        })
-          .then(() => {
-            setMessage(
-              "Ciência automática registrada após exibição do conteúdo.",
-            );
-            setAttempt((value) => value + 1);
-          })
-          .catch((cause) => {
-            if (
-              cause instanceof ApiError &&
-              cause.status === 409 &&
-              automaticAttemptsRef.current < 3
-            ) {
-              automaticRef.current = false;
-              setAttempt((value) => value + 1);
-            } else setError(cause.message);
-          });
-      },
-      { threshold: 0.5 },
-    );
-    observer.observe(visibleRef.current);
-    return () => observer.disconnect();
-  }, [data, id, context.userId]);
   async function action(operation: "science" | "archive" | "cancel") {
     if (!data) return;
     setBusy(true);
@@ -187,7 +141,7 @@ export function RequisitionDocumentContent({
       await api(
         `/api/requisitions/${id}/${operation === "cancel" ? "status" : operation}`,
         operation === "science"
-          ? { mode: "express", expectedVersion: data.progress.version }
+          ? { mode: "express", expectedVersion: data.progress.version, materialIdentity: data.progress.materialIdentity }
           : operation === "cancel"
             ? { status: "cancelled", reason }
             : { reason },
@@ -214,9 +168,7 @@ export function RequisitionDocumentContent({
   }
   if (!data)
     return (
-      <Notice error={Boolean(error)}>
-        {error || "Carregando requisição…"}
-      </Notice>
+      <div className="space-y-3"><Notice error={Boolean(error)}>{error || "Carregando requisição…"}</Notice>{error ? <button type="button" className={buttonClass} onClick={() => setAttempt(value => value + 1)}>Tentar carregar requisição</button> : null}</div>
     );
   const { fulfillment: f, progress: p } = data;
   const documentState = requisitionDocumentState({ historical: data.is_historical, status: data.status, archivedAt: p.archivedAt, completedAt: p.completedAt, scienceSatisfied: p.scienceSatisfied, fulfilled: f.fulfilled });
@@ -227,7 +179,7 @@ export function RequisitionDocumentContent({
       </Link>
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      <DocumentHeader id={id} type="REQ" code={data.code ?? data.protocol} protocol={data.protocol} status={documentState} version={p.version} createdAt={data.created_at} dateLabel={data.is_historical && !data.created_at ? "Data original desconhecida" : undefined} observedRef={visibleRef} patientName={data.recipient_name_snapshot ?? context.patient?.display_name}>
+      <DocumentHeader id={id} type="REQ" code={data.code ?? data.protocol} protocol={data.protocol} status={documentState} version={p.version} createdAt={data.created_at} dateLabel={data.is_historical && !data.created_at ? "Data original desconhecida" : undefined} patientName={data.recipient_name_snapshot ?? context.patient?.display_name}>
         <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
           <span>
             Solicitante:{" "}
@@ -256,9 +208,9 @@ export function RequisitionDocumentContent({
             <strong>
               {data.is_historical
                 ? "Não comprovada no original"
-                : p.scienceSatisfied
-                  ? "Exigência satisfeita"
-                  : "Pendente"}
+                : p.familyAware
+                  ? "Família ciente"
+                  : p.designationPending ? "Pendente de designação" : "Ciência não registrada"}
             </strong>
             <p className="text-xs">Independente do recebimento</p>
           </div>
@@ -352,10 +304,12 @@ export function RequisitionDocumentContent({
         <p className="mt-2 text-sm">
           {data.is_historical
             ? "A ciência original não foi comprovada. Nenhuma confirmação foi inferida na importação."
-            : p.scienceSatisfied
-              ? "Ciência exigida satisfeita. As evidências abaixo identificam a origem de cada registro."
+            : p.familyAware
+              ? "Família ciente por uma pessoa habilitada. Cada pessoa mantém seu próprio registro."
+              : p.policy?.scienceRequired === false ? "A exigência foi dispensada pela regra desta requisição. Isso não registra ciência em nome de ninguém."
               : "A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente."}
         </p>
+        {!data.is_historical ? <p className="mt-2 text-sm">Minha ciência: {p.personalScience ? "registrada" : p.eligible ? "pendente" : "sem habilitação neste paciente"}.</p> : null}
         <ul className="mt-3 space-y-2">
           {p.science.map((row) => (
             <li
@@ -374,8 +328,7 @@ export function RequisitionDocumentContent({
         p.eligible &&
         !p.archivedAt &&
         data.status !== "cancelled" &&
-        !p.science.some((row) => row.user_id === context.userId) &&
-        p.preferences.scienceExpress !== false ? (
+        !p.science.some(row => row.user_id === context.userId && row.mode === "express") ? (
           <button
             type="button"
             className={primaryClass + " mt-4"}

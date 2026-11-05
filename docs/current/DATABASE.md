@@ -142,12 +142,33 @@ administrador ativo sob revogações concorrentes. O selo privado transacional
 autoriza somente o vínculo inicial explícito ou aceite de convite válido.
 
 requisition_lifecycle conserva política, prazo, conclusão, exceção de ciência
-pendente e arquivamento. requisition_science_events registra ator, modalidade
-e
-evidência imutável. Atendimento aceito altera uma nova versão documental;
-hashes
-e PDFs anteriores permanecem intactos. Importações não inventam ciência ou
-data.
+pendente e arquivamento. requisition_science_events registra ator, modalidade,
+material, autoridade e evidência imutável. A unicidade causal permite preservar
+ato expresso e expedições distintas da mesma pessoa; retry não duplica o fato.
+SCI-005 usa o ator do evento oficial de expedição, não o criador do rascunho,
+e integra a mesma transação física. Desativação por flags legadas é recusada.
+ANY é distinto de dispensa da obrigação e de ciência pessoal; ausência de
+representante habilitado não equivale a Família ciente.
+
+requisitions.material_identity sela o conteúdo original com SHA-256. Origem e
+instante distinguem emissão atual, importação histórica e projeção legada de
+dados preservados; não se inventa instante físico antigo. Header, intenção,
+linhas e observações emitidos são protegidos; resolução de extra acrescenta
+vínculo separado. Atendimento/eventos alteram versão técnica, preservando
+material e ciência. Hashes e PDFs anteriores permanecem intactos.
+
+requisition_science_preferences conserva escolhas próprias append-only por
+tipo/versão/chave, consentimento e texto versionado. RLS exige proprietário e
+Auth vigente; clientes não escrevem diretamente. A RPC bloqueia o perfil,
+revalida sessão após espera e recusa versão obsoleta/conteúdo conflitante.
+Sem escolha, manual é a projeção padrão. Tácita exige opt-in/elegibilidade
+anteriores à emissão e conserva autoria de sistema; novas permissões ou
+escolhas não criam ciência retroativa. Flags antigas não viram consentimento.
+
+Compatibilidade ALL passa a ANY por evento técnico do sistema; eventos pessoais
+e snapshots anteriores permanecem intactos. Importações não inventam ciência
+ou data e novos vínculos operacionais a REQ histórica são recusados. A abertura
+observável independente ainda não tem trilha implementada neste incremento.
 
 my_workspace retorna pacientes e capacidades em uma chamada autorizada.
 Browser metadata, IDs e seleção local não concedem acesso. RLS, grants
