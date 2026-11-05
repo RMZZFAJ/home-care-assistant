@@ -1,0 +1,92 @@
+{
+  "records": [
+    {
+      "file": "evidence/MASTER_ORDER.txt",
+      "archive": "evidence/MASTER_ORDER.txt.raw-ca5a588dcf99.gz",
+      "originalSha256": "ca5a588dcf998f09ec95c9a2c20282c58ccd054cb7f1fb78c81e5db7aa1a71a5",
+      "originalBytes": 51166,
+      "normalizedSha256": "c9db75d4884d5eedd93713c8be5a5aaee5869dd6a0efb1c9a365634415bcb574",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/build-current.log",
+      "archive": "evidence/build-current.log.raw-ec054e4a57b2.gz",
+      "originalSha256": "ec054e4a57b281ddb3217b5d3b278fa35c7f6b9cad7fce85a6e06167b0e638f4",
+      "originalBytes": 2473,
+      "normalizedSha256": "0a80a0f3c249a155c99277e937172c77f59473faa7c41eb903cd3ba10ab366d1",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/local-app.log",
+      "archive": "evidence/local-app.log.raw-65059afeb04f.gz",
+      "originalSha256": "65059afeb04f7a3c43dc29dc0b6cbf4fc9bb5eee24d2b1cc2c02038b708e8928",
+      "originalBytes": 3216,
+      "normalizedSha256": "9629fa1d7495b9706fc5f71b33e5cf074dc3d8e3a213bc1556b2840db0f2c17c",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/build-current.log",
+      "archive": "evidence/build-current.log.raw-0a80a0f3c249.gz",
+      "originalSha256": "0a80a0f3c249a155c99277e937172c77f59473faa7c41eb903cd3ba10ab366d1",
+      "originalBytes": 2467,
+      "normalizedSha256": "979ef8b88f8500a64cebec3a52b9eb7732585775e24d7c346ee9a85b1b3e9009",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/lint-attempt-1.log",
+      "archive": "evidence/lint-attempt-1.log.raw-b8c1021f6998.gz",
+      "originalSha256": "b8c1021f6998812097f24a069fedd5108d3e5e0c7742dc54ea58d90bdee32d94",
+      "originalBytes": 3159,
+      "normalizedSha256": "376a387c8182a051bfc0ddd78c6af6b6e270413339119c726961cb10d579eae6",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/lint-attempt-2.log",
+      "archive": "evidence/lint-attempt-2.log.raw-3d6396aed223.gz",
+      "originalSha256": "3d6396aed2239db6e64420ff3442d90fa7832274a37f8055b570f73d37f05934",
+      "originalBytes": 44,
+      "normalizedSha256": "1a17a97fe85faf4a67731ecabe528cb0e976791f8d6c282d5aa1d1b8dbc7589a",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/lint-attempt-3.log",
+      "archive": "evidence/lint-attempt-3.log.raw-edd76d8a48b1.gz",
+      "originalSha256": "edd76d8a48b172346ffac85bb0a74f57503de3b8db65d4d48974007bf550b795",
+      "originalBytes": 280,
+      "normalizedSha256": "58c7e739146fc74dff0a4e7f89d33df1c85e80c6dd98d40ed7d3642cae55ce2d",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/lint-current.log",
+      "archive": "evidence/lint-current.log.raw-3d6396aed223.gz",
+      "originalSha256": "3d6396aed2239db6e64420ff3442d90fa7832274a37f8055b570f73d37f05934",
+      "originalBytes": 44,
+      "normalizedSha256": "1a17a97fe85faf4a67731ecabe528cb0e976791f8d6c282d5aa1d1b8dbc7589a",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/test-current.log",
+      "archive": "evidence/test-current.log.raw-ee8bc4b56bf3.gz",
+      "originalSha256": "ee8bc4b56bf31e15a8fdda649b1f268022881e05d73c22fbaecad600d40c447a",
+      "originalBytes": 259,
+      "normalizedSha256": "6b39ee73a72ec02837f170d0a93e9cb653fcae2142c0189964fa9ed42b4a6d8f",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/typecheck-current.log",
+      "archive": "evidence/typecheck-current.log.raw-f3ce5d236fa8.gz",
+      "originalSha256": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+      "originalBytes": 55,
+      "normalizedSha256": "bd197d5499e7b560227c037dac7a8ca8f5b51e904fe939df0e31bffc150cacd5",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    },
+    {
+      "file": "evidence/lint-current.log",
+      "archive": "evidence/lint-current.log.raw-3d6396aed223.gz",
+      "originalSha256": "3d6396aed2239db6e64420ff3442d90fa7832274a37f8055b570f73d37f05934",
+      "originalBytes": 44,
+      "normalizedSha256": "1a17a97fe85faf4a67731ecabe528cb0e976791f8d6c282d5aa1d1b8dbc7589a",
+      "normalization": "CRLF to LF and trailing space removal in readable committed copy; original gzip bytes retained"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "recordedAt": "2026-10-30T07:01:27.167Z",
+  "category": "HTTP_REAL_AUTH_AND_PERSISTENCE_READBACK",
+  "results": [
+    {
+      "id": "B43-01",
+      "input": "string seven decimals",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Rejected by readJson before business RPC",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-02",
+      "input": "null",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Rejected by readJson before business RPC",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-03",
+      "input": "NaN text",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Rejected by readJson before business RPC",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-04",
+      "input": "Infinity text",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Rejected by readJson before business RPC",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-05",
+      "input": "negative",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Rejected by readJson before business RPC",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-06",
+      "input": "above maximum",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Rejected by readJson before business RPC",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-07",
+      "input": "scientific text",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Rejected by readJson before business RPC",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-08",
+      "input": "missing",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Rejected by readJson before business RPC",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-09",
+      "input": "number 1.1 for integer unit",
+      "status": 400,
+      "code": null,
+      "persisted": false,
+      "proof": "Database unit precision rejects ordinary fractional quantity",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-10",
+      "input": {
+        "type": "JSON number",
+        "quantity": 1.0000001
+      },
+      "status": 201,
+      "communicated": "confirmed",
+      "persisted": {
+        "id": "ca3bcf76-a7fc-4a84-8bbf-62db6aa0a882",
+        "quantity": "1.000000",
+        "destination": "FAMILY"
+      },
+      "finding": "Number arm lacks six-decimal restriction; transform passes 1.0000001, numeric(18,6) rounds before unit check",
+      "counterproof": "Same textual decimal rejected in B43-01; 1.1 rejected in B43-09",
+      "limits": "Tiny synthetic inbound only; no production data or negative ledger",
+      "attempt": "Assertions 01-09 and HTTP201 completed in first attempt; only read-back resumed after correcting non-existent audit SQL column. No repeated movement."
+    },
+    {
+      "id": "B43-11",
+      "input": "unknown field",
+      "status": 400,
+      "code": "VALIDATION_ERROR",
+      "limits": "No direct SQL null decision retest; B3-017 remains below API guard"
+    },
+    {
+      "id": "B43-12",
+      "input": "null confirmation",
+      "status": 400,
+      "code": "VALIDATION_ERROR",
+      "limits": "No direct SQL null decision retest; B3-017 remains below API guard"
+    },
+    {
+      "id": "B43-13",
+      "input": "wrong content type",
+      "status": 415,
+      "code": "JSON_REQUIRED"
+    },
+    {
+      "id": "B43-14",
+      "input": "invalid JSON",
+      "status": 400,
+      "code": "INVALID_JSON"
+    },
+    {
+      "id": "B43-15",
+      "input": "cross-site",
+      "status": 403,
+      "code": "INVALID_ORIGIN"
+    },
+    {
+      "id": "B43-16",
+      "input": "oversized body",
+      "status": 413,
+      "code": "PAYLOAD_TOO_LARGE"
+    }
+  ]
+}

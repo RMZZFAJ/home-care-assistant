@@ -1,0 +1,50 @@
+{
+  "originalSources": [
+    {
+      "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.csv",
+      "rows": 32,
+      "sha256_lf": "1b0eec8ffff634c6a190fe5b0ec69dd75083bede7953532a01dce182ed30a989"
+    },
+    {
+      "file": "docs/audits/2026-10-28-phase-b1-interface/12_FINDINGS_MASTER.csv",
+      "rows": 35,
+      "sha256_lf": "eefc19f804b02c4b146c6afe01139772f206d3f99c0a98bfb24cfca9515d1348"
+    },
+    {
+      "file": "docs/audits/2026-10-29-phase-b2-processes/13_FINDINGS_MASTER.csv",
+      "rows": 17,
+      "sha256_lf": "7e7e21fbc55d5c12939f0062654a80cf53d35ed26dbd275a2d9c5549f65cc1f7"
+    },
+    {
+      "file": "docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.csv",
+      "rows": 25,
+      "sha256_lf": "905676ec825d518598343c0c05a7a8685701e152739238e39cc6887e7c21b400"
+    },
+    {
+      "file": "docs/audits/2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.csv",
+      "rows": 13,
+      "sha256_lf": "266b9039ddeb02cf61cea1bc2c7d4c63f81d7a774d5d120b8c907f831fa819ac"
+    },
+    {
+      "file": "docs/audits/2026-10-30-phase-b5-integrations/14_FINDINGS_MASTER.csv",
+      "rows": 14,
+      "sha256_lf": "58eac55ffccdf0e51959af2838f5fbd7faa186af230b0e70e36fdbfedea6e83c"
+    },
+    {
+      "file": "docs/audits/2026-10-30-phase-b6-documents/14_FINDINGS_MASTER.csv",
+      "rows": 13,
+      "sha256_lf": "ff33ba5688027cfd0da35aaf33eb61c01d858e4fe8ff6b8a89c7b7de4f9af54e"
+    },
+    {
+      "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/14_FINDINGS_MASTER.csv",
+      "rows": 7,
+      "sha256_lf": "4ce4234819689d44bfb626b7f5975068c75484354fbda9086292d35fc497d3bb"
+    }
+  ],
+  "originalFindings": 156,
+  "regressionFamilies": 119,
+  "representedOriginalIds": 156,
+  "missingOriginalIds": [],
+  "verifiedAliasLinks": 37,
+  "limits": "Families group only documented revalidations. Different mechanisms remain separate. B1-UX-007 and UX-006 contain broader observations; related admin pagination/navigation have their own primary rows. No Phase C prioritization or implementation was performed."
+}

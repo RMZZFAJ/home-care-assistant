@@ -1,0 +1,22 @@
+{
+  "recordedAt": "2026-10-30T06:57:53.078Z",
+  "tag": "B4-e482de19",
+  "actors": [
+    "admin",
+    "family",
+    "professional",
+    "outsider"
+  ],
+  "newPatients": [
+    "4fe07a94-cd1c-460f-958f-bbebae54fb46",
+    "0e712d76-eb3c-49bd-88d0-9d0b259cb53a"
+  ],
+  "newProducts": [
+    "patient-00ecf9f7-d68a-44ca-b28b-11024a5dd3e7",
+    "patient-670d9c0b-1b9e-467e-b660-b7ba2b9b916c"
+  ],
+  "externalSending": false,
+  "reset": false,
+  "existingObjectsReplaced": false,
+  "limits": "Official Auth; new profiles bootstrapped by scoped INSERT; authorized creation/invitation RPCs. Existing global synthetic fixture only logs in."
+}

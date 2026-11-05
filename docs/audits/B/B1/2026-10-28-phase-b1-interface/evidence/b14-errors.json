@@ -1,0 +1,191 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T03:54:28.193Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T03:54:33.054Z",
+      "role": "adminA",
+      "label": "consumption-401",
+      "path": "/consumo",
+      "width": 390,
+      "state": "ERROR_BLOCKED",
+      "note": "Injected GET only. No mutation sent. Does not prove actual server uses this status/code.",
+      "file": "b14-errors-adminA-consumption-401.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nFalha fictícia B1 401 Referência: B1-INJECTED-401\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - alert: \"Falha fictícia B1 401 Referência: B1-INJECTED-401\"\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:54:34.324Z",
+      "role": "adminA",
+      "label": "consumption-403",
+      "path": "/consumo",
+      "width": 390,
+      "state": "ERROR_BLOCKED",
+      "note": "Injected GET only. No mutation sent. Does not prove actual server uses this status/code.",
+      "file": "b14-errors-adminA-consumption-403.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nFalha fictícia B1 403 Referência: B1-INJECTED-403\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - alert: \"Falha fictícia B1 403 Referência: B1-INJECTED-403\"\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:54:35.504Z",
+      "role": "adminA",
+      "label": "consumption-404",
+      "path": "/consumo",
+      "width": 390,
+      "state": "ERROR_RECOVERABLE",
+      "note": "Injected GET only. No mutation sent. Does not prove actual server uses this status/code.",
+      "file": "b14-errors-adminA-consumption-404.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nFalha fictícia B1 404 Referência: B1-INJECTED-404\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - alert: \"Falha fictícia B1 404 Referência: B1-INJECTED-404\"\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:54:36.936Z",
+      "role": "adminA",
+      "label": "consumption-409",
+      "path": "/consumo",
+      "width": 390,
+      "state": "ERROR_RECOVERABLE",
+      "note": "Injected GET only. No mutation sent. Does not prove actual server uses this status/code.",
+      "file": "b14-errors-adminA-consumption-409.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nFalha fictícia B1 409 Referência: B1-INJECTED-409\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - alert: \"Falha fictícia B1 409 Referência: B1-INJECTED-409\"\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:54:38.204Z",
+      "role": "adminA",
+      "label": "consumption-422",
+      "path": "/consumo",
+      "width": 390,
+      "state": "ERROR_RECOVERABLE",
+      "note": "Injected GET only. No mutation sent. Does not prove actual server uses this status/code.",
+      "file": "b14-errors-adminA-consumption-422.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nFalha fictícia B1 422 Referência: B1-INJECTED-422\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - alert: \"Falha fictícia B1 422 Referência: B1-INJECTED-422\"\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:54:39.488Z",
+      "role": "adminA",
+      "label": "consumption-429",
+      "path": "/consumo",
+      "width": 390,
+      "state": "ERROR_RECOVERABLE",
+      "note": "Injected GET only. No mutation sent. Does not prove actual server uses this status/code.",
+      "file": "b14-errors-adminA-consumption-429.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nFalha fictícia B1 429 Referência: B1-INJECTED-429\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - alert: \"Falha fictícia B1 429 Referência: B1-INJECTED-429\"\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:54:40.763Z",
+      "role": "adminA",
+      "label": "consumption-500",
+      "path": "/consumo",
+      "width": 390,
+      "state": "ERROR_RECOVERABLE",
+      "note": "Injected GET only. No mutation sent. Does not prove actual server uses this status/code.",
+      "file": "b14-errors-adminA-consumption-500.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nFalha fictícia B1 500 Referência: B1-INJECTED-500\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - alert: \"Falha fictícia B1 500 Referência: B1-INJECTED-500\"\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T03:54:48.755Z",
+      "role": "adminA",
+      "label": "attachment-lost-response",
+      "path": "/documentos/174bf9ba-72f4-4aad-ac79-91b8bbaa434c",
+      "width": 390,
+      "state": "UNKNOWN_RESULT",
+      "note": "First upload returned HTTP400 before response abort. Does not prove persisted attachment; follow-up with explicit MIME is separate.",
+      "file": "b14-errors-adminA-attachment-lost-response.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nAcompanhamento da ficha\n← Histórico\nAtualizar\nENT\n\nENTREGA / ENTRADA\n\nENT-0001\nAguardando recebimento\n\n29/10/2026, 00:18 · Versão 1\n\nPaciente: Homologação fictícia V4 9482191c\n\n0/2 linhas integralmente conferidas\n\nFamília → Equipe · Destinatário: Teste professional\n\nQuantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal.\n\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo. Consulte os estados individuais dos avisos abaixo.\n\nProtocolo e identificação\nPróxima ação\nAlterar destinatário\nSolicitar cancelamento\nProdutos e quantidades\nMaterial fictício V4 0\nExpedido\n10 unidade\nAceito\n0\nAguardando conferência\n10\nConciliado\n0\n\nAguardando conferência\n\n1 linha(s) REQ explicitamente vinculada(s).\n\nMaterial fictício V4 1\nExpedido\n2 unidade\nAceito\n0\nAguardando conferência\n2\nConciliado\n0\n\nAguardando conferência\n\n1 linha(s) REQ explicitamente vinculada(s).\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação\n\nAtualizar anexos\n\nFotos e PDFs ficam vinculados à operação. Até 10 arquivos de 10 MB. A foto da ficha física permanece disponível como alternativa ao formulário digital.\n\nFailed to fetch\n\nNenhum anexo registrado.\n\nAdicionar foto ou PDF\nEnviar anexo\nNotificações da ficha\nAtualizar envios\n\nO documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n\nResponsável · Teste global · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nResponsável · Teste adminA · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nFamília · Teste family · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nEquipe de cuidado · Teste professional · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nVersões e integridade\n\n1 versão(ões) · SHA-256 por evento",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Acompanhamento da ficha\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - button \"Atualizar\"\n  - text: ENT\n  - paragraph: Entrega / Entrada\n  - heading \"ENT-0001\" [level=2]\n  - text: Aguardando recebimento\n  - paragraph: 29/10/2026, 00:18 · Versão 1\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - paragraph: 0/2 linhas integralmente conferidas\n  - paragraph: \"Família → Equipe · Destinatário: Teste professional\"\n  - paragraph: Quantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal.\n  - link \"Baixar PDF\":\n    - /url: /api/documents/174bf9ba-72f4-4aad-ac79-91b8bbaa434c/pdf?version=1\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo. Consulte os estados individuais dos avisos abaixo.\n  - group: Protocolo e identificação\n  - heading \"Próxima ação\" [level=2]\n  - button \"Alterar destinatário\"\n  - button \"Solicitar cancelamento\"\n  - heading \"Produtos e quantidades\" [level=2]\n  - article:\n    - heading \"Material fictício V4 0\" [level=3]\n    - term: Expedido\n    - definition: 10 unidade\n    - term: Aceito\n    - definition: \"0\"\n    - term: Aguardando conferência\n    - definition: \"10\"\n    - term: Conciliado\n    - definition: \"0\"\n    - paragraph: Aguardando conferência\n    - paragraph: 1 linha(s) REQ explicitamente vinculada(s).\n  - article:\n    - heading \"Material fictício V4 1\" [level=3]\n    - term: Expedido\n    - definition: 2 unidade\n    - term: Aceito\n    - definition: \"0\"\n    - term: Aguardando conferência\n    - definition: \"2\"\n    - term: Conciliado\n    - definition: \"0\"\n    - paragraph: Aguardando conferência\n    - paragraph: 1 linha(s) REQ explicitamente vinculada(s).\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\" [expanded]\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação\n    - button \"Atualizar anexos\"\n    - paragraph: Fotos e PDFs ficam vinculados à operação. Até 10 arquivos de 10 MB. A foto da ficha física permanece disponível como alternativa ao formulário digital.\n    - alert: Failed to fetch\n    - list\n    - paragraph: Nenhum anexo registrado.\n    - text: Adicionar foto ou PDF\n    - button \"Adicionar foto ou PDF\"\n    - button \"Enviar anexo\"\n  - region \"Notificações da ficha\":\n    - heading \"Notificações da ficha\" [level=2]\n    - button \"Atualizar envios\"\n    - paragraph: O documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n    - list:\n      - listitem:\n        - paragraph: Responsável · Teste global · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Responsável · Teste adminA · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Família · Teste family · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Equipe de cuidado · Teste professional · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n  - region \"Versões e integridade\":\n    - heading \"Versões e integridade\" [level=2]:\n      - button \"Versões e integridade\"\n    - paragraph: 1 versão(ões) · SHA-256 por evento",
+      "visualInspected": false
+    }
+  ],
+  "failures": [
+    {
+      "label": "invalid-json",
+      "error": "locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:\n    1) <div role=\"alert\" class=\"ui-notice ui-notice-error\">O serviço não retornou uma resposta válida. Tente…</div> aka getByText('O serviço não retornou uma')\n    2) <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div> aka locator('[id=\"__next-route-announcer__\"]')\n\nCall log:\n\u001b[2m  - waiting for getByRole('alert') to be visible\u001b[22m\n"
+    },
+    {
+      "label": "offline-read",
+      "error": "locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:\n    1) <div role=\"alert\" class=\"ui-notice ui-notice-error\">Não foi possível confirmar a resposta. Recupere a…</div> aka getByText('Não foi possível confirmar a')\n    2) <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div> aka locator('[id=\"__next-route-announcer__\"]')\n\nCall log:\n\u001b[2m  - waiting for getByRole('alert') to be visible\u001b[22m\n"
+    },
+    {
+      "label": "profile-error",
+      "error": "locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:\n    1) <div role=\"alert\" class=\"ui-notice ui-notice-error\">Falha fictícia B1 500 Referência: B1-INJECTED-500</div> aka getByText('Falha fictícia B1 500 Referê')\n    2) <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div> aka locator('[id=\"__next-route-announcer__\"]')\n\nCall log:\n\u001b[2m  - waiting for getByRole('alert') to be visible\u001b[22m\n"
+    },
+    {
+      "label": "critical-permission-409",
+      "error": "locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:\n    1) <div role=\"alert\" class=\"ui-notice ui-notice-error\">A configuração mudou em outra sessão. Dados recar…</div> aka getByText('A configuração mudou em outra')\n    2) <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div> aka locator('[id=\"__next-route-announcer__\"]')\n\nCall log:\n\u001b[2m  - waiting for getByRole('alert') to be visible\u001b[22m\n"
+    }
+  ],
+  "observations": [
+    {
+      "scenario": "real-schema-validation",
+      "status": 400,
+      "code": "VALIDATION_ERROR",
+      "error": "Too big: expected string to have <=1000 characters",
+      "correlationId": "51890037-70f2-43e7-815a-3df17f70f049",
+      "certainty": "Rejected by schema before submit_requisition; no document issued"
+    },
+    {
+      "scenario": "attachment-lost-response",
+      "actualServerStatus": 400,
+      "fileEnabled": true,
+      "button": 1,
+      "persistedFiles": [],
+      "certainty": "UNKNOWN",
+      "replacementFileNotSubmitted": true
+    }
+  ],
+  "finishedAt": "2026-10-29T03:54:50.536Z",
+  "reviewCorrection": "First upload returned400, not201. No persistence proved in this attempt. Use b14-recovery.json for accepted201 and read-back. Four alert selector failures repeated with main scope."
+}

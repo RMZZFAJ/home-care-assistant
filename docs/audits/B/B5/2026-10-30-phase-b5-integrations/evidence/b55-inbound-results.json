@@ -1,0 +1,19 @@
+{
+  "recordedAt": "2026-10-30T11:23:51.198Z",
+  "method": "Local SQL service context with official synthetic Auth actor/confirmed fictitious phone. New patient/membership/report fixtures rolled back; Auth actor/profile persist for inspection. No SMS/Meta.",
+  "scenarios": {
+    "B55-S01": {
+      "inboundSaved": false,
+      "reportsSaved": 0,
+      "needsAuthenticatedSelection": true
+    },
+    "B55-S02": {
+      "duplicate": true,
+      "ledgerRows": 0,
+      "reportsSaved": 1,
+      "pendingConfirmation": true
+    }
+  },
+  "rollback": true,
+  "externalCalls": 0
+}

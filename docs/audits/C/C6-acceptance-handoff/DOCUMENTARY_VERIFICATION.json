@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "scope": "Documentation integrity only; no functional suite or external mutations",
+  "node": "v24.22.0",
+  "markdownlint": {
+    "files": 429,
+    "issues": 0,
+    "evidence": "markdownlint-final.txt",
+    "configuration": "Existing repository rules unchanged"
+  },
+  "git_diff_check": {
+    "command": [
+      "git",
+      "-c",
+      "diff.renameLimit=5000",
+      "-c",
+      "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout_bytes": 0,
+    "stderr_bytes": 0,
+    "evidence": "git-diff-check.txt",
+    "interpretation": "CRLF recognized as end-of-line, while blank-at-eol, blank-at-eof and space-before-tab remain checked; no repository or Git configuration modified"
+  },
+  "default_diff_check_diagnostic": {
+    "result": "CRLF bytes were interpreted as trailing whitespace with default Git whitespace handling",
+    "flagged_lines": 13225,
+    "affected_files": 32,
+    "verified_crlf_only_lines": 13225,
+    "original_diagnostic_sha256": "92b1b5bbf5db9f9a071f67ced36192b5624161872b366891090424cc3ecb9c2c",
+    "storage": "Repetitive generated diagnostic summarized here; final check stdout stored separately; original source files and C0 snapshot untouched"
+  },
+  "staged_blob_preservation": {
+    "evidence": "git-index-preservation.json",
+    "immutable_historical_files": 1588,
+    "non_documentary_files": 394,
+    "errors": 0
+  },
+  "no_manual_execution": [
+    "build",
+    "typecheck",
+    "unit",
+    "integration",
+    "E2E",
+    "historic replay",
+    "database checks",
+    "provider messaging"
+  ],
+  "remote_publication": "Final commit and remote ref will be verified independently after commit; no self-referential SHA is embedded"
+}

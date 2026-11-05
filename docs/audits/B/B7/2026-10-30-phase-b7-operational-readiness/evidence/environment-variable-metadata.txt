@@ -1,0 +1,82 @@
+[
+  {
+    "name": "META_FLOWS_ENABLED",
+    "type": "Config",
+    "environment": "Production"
+  },
+  {
+    "name": "NOTIFICATIONS_EXTERNAL_ENABLED",
+    "type": "Config",
+    "environment": "Production"
+  },
+  {
+    "name": "NOTIFICATIONS_WORKER_SECRET",
+    "type": "Secret",
+    "environment": "Production"
+  },
+  {
+    "name": "SUPABASE_SERVICE_ROLE_KEY",
+    "type": "Secret",
+    "environment": "Production"
+  },
+  {
+    "name": "META_FLOWS_ENABLED",
+    "type": "Config",
+    "environment": "Preview"
+  },
+  {
+    "name": "NOTIFICATIONS_EXTERNAL_ENABLED",
+    "type": "Config",
+    "environment": "Preview"
+  },
+  {
+    "name": "NOTIFICATIONS_WORKER_SECRET",
+    "type": "Secret",
+    "environment": "Preview"
+  },
+  {
+    "name": "SUPABASE_SERVICE_ROLE_KEY",
+    "type": "Secret",
+    "environment": "Preview"
+  },
+  {
+    "name": "NEXT_PUBLIC_APP_URL",
+    "type": "Config",
+    "environment": "Preview"
+  },
+  {
+    "name": "NEXT_PUBLIC_APP_URL",
+    "type": "Config",
+    "environment": "Production"
+  },
+  {
+    "name": "CARE_RECIPIENT_ID",
+    "type": "Config",
+    "environment": "Preview"
+  },
+  {
+    "name": "CARE_RECIPIENT_ID",
+    "type": "Config",
+    "environment": "Production"
+  },
+  {
+    "name": "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    "type": "Config",
+    "environment": "Preview"
+  },
+  {
+    "name": "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    "type": "Config",
+    "environment": "Production"
+  },
+  {
+    "name": "NEXT_PUBLIC_SUPABASE_URL",
+    "type": "Config",
+    "environment": "Preview"
+  },
+  {
+    "name": "NEXT_PUBLIC_SUPABASE_URL",
+    "type": "Config",
+    "environment": "Production"
+  }
+]

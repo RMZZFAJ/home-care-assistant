@@ -1,0 +1,2 @@
+# Preserve the documentary manifest's bytes independently of checkout settings.
+* -text

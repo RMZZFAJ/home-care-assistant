@@ -1,0 +1,190 @@
+- generic [ref=f2e1]:
+  - generic [ref=f2e2]:
+    - generic [ref=f2e3]:
+      - link "Ir para o conteúdo" [ref=f2e4] [cursor=pointer]:
+        - /url: "#workspace-content"
+      - banner [ref=f2e5]:
+        - button "Recolher navegação" [expanded] [ref=f2e33] [cursor=pointer]
+        - link "Home Care Assistant — início" [ref=f2e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f2e11]: HC
+          - strong [ref=f2e12]:
+            - text: Home Care Assistant
+            - generic [ref=f2e13]: Operação assistencial
+        - combobox "Pessoa assistida" [ref=f2e35] [cursor=pointer]:
+          - option "Selecione um paciente" [disabled]
+          - option "Residência fictícia B2-20261029-f7eece2c" [selected]
+          - option "Residência fictícia B2-20261029-f7eece2c segundo contexto de escala"
+        - button "Notificações, 52 não lidas" [ref=f2e37] [cursor=pointer]:
+          - generic [ref=f2e40]: 9+
+        - button "Menu do usuário" [ref=f2e16] [cursor=pointer]:
+          - img "Pessoa fictícia B2 professional" [ref=f2e41]:
+            - generic [ref=f2e42]: P
+          - generic [ref=f2e43]:
+            - strong [ref=f2e44]: Pessoa fictícia B2 professional
+            - generic [ref=f2e45]: Profissional
+      - complementary [ref=f2e46]:
+        - navigation "Navegação principal" [ref=f2e47]:
+          - group [ref=f2e48]:
+            - heading "Seu plantão" [level=2] [ref=f2e50] [cursor=pointer]
+            - link "Início" [ref=f2e53] [cursor=pointer]:
+              - /url: /
+            - link "Histórico" [ref=f2e57] [cursor=pointer]:
+              - /url: /historico
+            - link "Entregas" [ref=f2e61] [cursor=pointer]:
+              - /url: /entregas
+            - link "Estoque" [ref=f2e65] [cursor=pointer]:
+              - /url: /estoque?custody=CARE_TEAM
+            - link "Mais" [ref=f2e69] [cursor=pointer]:
+              - /url: /mais
+          - group [ref=f2e73]:
+            - heading "Ações rápidas" [level=2] [ref=f2e75] [cursor=pointer]
+      - main [ref=f2e24]:
+        - generic [ref=f2e25]:
+          - generic [ref=f2e26]:
+            - paragraph [ref=f2e27]: Residência fictícia B2-20261029-f7eece2c
+            - heading "Acompanhamento da ficha" [level=1] [ref=f2e28]
+          - generic [ref=f2e78]: Profissional
+        - generic [ref=f2e80]:
+          - generic [ref=f2e81]:
+            - link "← Histórico" [ref=f2e82] [cursor=pointer]:
+              - /url: /historico
+            - button "Atualizar" [ref=f2e83] [cursor=pointer]
+          - generic [ref=f2e84]:
+            - generic [ref=f2e85]:
+              - generic [ref=f2e86]: ENT
+              - generic [ref=f2e87]:
+                - paragraph [ref=f2e88]: Entrega / Entrada
+                - heading "ENT-0004" [level=2] [ref=f2e89]
+              - generic [ref=f2e90]: Cancelamento aguardando consentimento
+            - paragraph [ref=f2e91]: 29/10/2026, 07:08 · Versão 3
+            - paragraph [ref=f2e92]: "Paciente: Residência fictícia B2-20261029-f7eece2c"
+            - generic [ref=f2e93]:
+              - paragraph [ref=f2e94]: 1/1 linhas integralmente conferidas
+              - paragraph [ref=f2e95]: "Família → Equipe · Destinatário: Pessoa fictícia B2 professional"
+              - paragraph [ref=f2e96]: Quantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal.
+            - generic [ref=f2e97]:
+              - generic [ref=f2e98]:
+                - generic [ref=f2e99]:
+                  - link "Baixar PDF" [ref=f2e100] [cursor=pointer]:
+                    - /url: /api/documents/db146b8e-0102-4e63-87aa-1a461370cc0b/pdf?version=3
+                  - button "Compartilhar PDF" [ref=f2e101] [cursor=pointer]
+                - status [ref=f2e102]: Documento salvo. Os avisos continuam sendo processados; consulte o acompanhamento.
+              - group [ref=f2e103]:
+                - generic "Protocolo e identificação" [ref=f2e104] [cursor=pointer]
+          - generic [ref=f2e105]:
+            - heading "Próxima ação" [level=2] [ref=f2e106]
+            - button "Consentir e reconciliar cancelamento" [active] [ref=f2e108] [cursor=pointer]
+            - generic [ref=f2e213]:
+              - status [ref=f2e214]: A soma devolvida e consumida deve corresponder ao aceite de cada produto. Registre o consumo real antes de usar esta opção.
+              - group "Material fictício B2 2 · aceito 2" [ref=f2e215]:
+                - generic [ref=f2e217]:
+                  - text: Devolução real
+                  - spinbutton "Devolução real" [ref=f2e218]: "2"
+                - generic [ref=f2e219]:
+                  - text: Consumo já confirmado
+                  - spinbutton "Consumo já confirmado" [ref=f2e220]: "0"
+              - generic [ref=f2e221]:
+                - text: Motivo / justificativa
+                - textbox "Motivo / justificativa" [ref=f2e222]
+              - generic [ref=f2e223]:
+                - button "Fechar ação" [ref=f2e224] [cursor=pointer]
+                - button "Revisar operação" [ref=f2e225] [cursor=pointer]
+          - generic [ref=f2e109]:
+            - heading "Produtos e quantidades" [level=2] [ref=f2e110]
+            - article [ref=f2e112]:
+              - heading "Material fictício B2 2" [level=3] [ref=f2e113]
+              - generic [ref=f2e114]:
+                - generic [ref=f2e115]:
+                  - term [ref=f2e116]: Expedido
+                  - definition [ref=f2e117]: 2 unidade
+                - generic [ref=f2e118]:
+                  - term [ref=f2e119]: Aceito
+                  - definition [ref=f2e120]: "2"
+                - generic [ref=f2e121]:
+                  - term [ref=f2e122]: Quantidade pendente
+                  - definition [ref=f2e123]: "0"
+                - generic [ref=f2e124]:
+                  - term [ref=f2e125]: Conciliado
+                  - definition [ref=f2e126]: "0"
+              - paragraph [ref=f2e127]: Linha integralmente conferida
+          - region [ref=f2e128]:
+            - heading [level=2] [ref=f2e129]:
+              - button "Anexos e ficha física" [ref=f2e130] [cursor=pointer]
+            - paragraph [ref=f2e134]: 0 arquivo(s) · foto e PDF vinculados à operação
+          - region "Notificações da ficha" [ref=f2e135]:
+            - generic [ref=f2e136]:
+              - heading "Notificações da ficha" [level=2] [ref=f2e137]
+              - button "Atualizar envios" [ref=f2e138] [cursor=pointer]
+            - paragraph [ref=f2e139]: O documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.
+            - list [ref=f2e140]:
+              - listitem [ref=f2e141]:
+                - paragraph [ref=f2e142]: Responsável · Pessoa fictícia B2 admin · Aplicativo
+                - paragraph [ref=f2e143]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e144]: 29/10/2026, 07:09
+              - listitem [ref=f2e145]:
+                - paragraph [ref=f2e146]: Família · Pessoa fictícia B2 family · Aplicativo
+                - paragraph [ref=f2e147]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e148]: 29/10/2026, 07:09
+              - listitem [ref=f2e149]:
+                - paragraph [ref=f2e150]: Equipe de cuidado · Pessoa fictícia B2 professional · Aplicativo
+                - paragraph [ref=f2e151]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e152]: 29/10/2026, 07:09
+              - listitem [ref=f2e153]:
+                - paragraph [ref=f2e154]: Responsável · Pessoa fictícia B2 admin2 · Aplicativo
+                - paragraph [ref=f2e155]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e156]: 29/10/2026, 07:09
+              - listitem [ref=f2e157]:
+                - paragraph [ref=f2e158]: Responsável · Pessoa fictícia B2 admin · Aplicativo
+                - paragraph [ref=f2e159]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e160]: 29/10/2026, 07:09
+              - listitem [ref=f2e161]:
+                - paragraph [ref=f2e162]: Família · Pessoa fictícia B2 family · Aplicativo
+                - paragraph [ref=f2e163]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e164]: 29/10/2026, 07:09
+              - listitem [ref=f2e165]:
+                - paragraph [ref=f2e166]: Equipe de cuidado · Pessoa fictícia B2 professional · Aplicativo
+                - paragraph [ref=f2e167]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e168]: 29/10/2026, 07:09
+              - listitem [ref=f2e169]:
+                - paragraph [ref=f2e170]: Supervisão · Pessoa fictícia B2 supervisor · Aplicativo
+                - paragraph [ref=f2e171]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e172]: 29/10/2026, 07:09
+              - listitem [ref=f2e173]:
+                - paragraph [ref=f2e174]: Equipe de cuidado · Pessoa fictícia B2 replacement · Aplicativo
+                - paragraph [ref=f2e175]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e176]: 29/10/2026, 07:09
+              - listitem [ref=f2e177]:
+                - paragraph [ref=f2e178]: Responsável · Pessoa fictícia B2 admin2 · Aplicativo
+                - paragraph [ref=f2e179]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e180]: 29/10/2026, 07:09
+              - listitem [ref=f2e181]:
+                - paragraph [ref=f2e182]: Responsável · Pessoa fictícia B2 admin · Aplicativo
+                - paragraph [ref=f2e183]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e184]: 29/10/2026, 07:09
+              - listitem [ref=f2e185]:
+                - paragraph [ref=f2e186]: Família · Pessoa fictícia B2 family · Aplicativo
+                - paragraph [ref=f2e187]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e188]: 29/10/2026, 07:09
+              - listitem [ref=f2e189]:
+                - paragraph [ref=f2e190]: Equipe de cuidado · Pessoa fictícia B2 professional · Aplicativo
+                - paragraph [ref=f2e191]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e192]: 29/10/2026, 07:09
+              - listitem [ref=f2e193]:
+                - paragraph [ref=f2e194]: Supervisão · Pessoa fictícia B2 supervisor · Aplicativo
+                - paragraph [ref=f2e195]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e196]: 29/10/2026, 07:09
+              - listitem [ref=f2e197]:
+                - paragraph [ref=f2e198]: Equipe de cuidado · Pessoa fictícia B2 replacement · Aplicativo
+                - paragraph [ref=f2e199]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e200]: 29/10/2026, 07:09
+              - listitem [ref=f2e201]:
+                - paragraph [ref=f2e202]: Responsável · Pessoa fictícia B2 admin2 · Aplicativo
+                - paragraph [ref=f2e203]: Disponível no aplicativo · 1 tentativa(s)
+                - paragraph [ref=f2e204]: 29/10/2026, 07:09
+          - region [ref=f2e205]:
+            - heading [level=2] [ref=f2e206]:
+              - button "Versões e integridade" [ref=f2e207] [cursor=pointer]
+            - paragraph [ref=f2e211]: 3 versão(ões) · SHA-256 por evento
+    - status [ref=f2e30]: Atualização ao vivo conectada
+  - alert [ref=f2e31]

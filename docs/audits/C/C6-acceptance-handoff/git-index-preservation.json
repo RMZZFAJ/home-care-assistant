@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "baseline_commit": "227f26ca695a3d01512a854f4b19f2639b91ba87",
+  "authority": "Original Git blobs compared with staged index blobs; no working-tree-only assumption",
+  "historical_immutable_blobs_checked": 1588,
+  "non_documentary_blobs_checked": 394,
+  "historical_blob_errors": [],
+  "non_documentary_blob_errors": [],
+  "forbidden_staged_paths": [],
+  "product_tests_run": false
+}

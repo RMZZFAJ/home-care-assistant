@@ -1,0 +1,51 @@
+/* Read-only audit collector. No credential values, row payloads, or remote SQL. */
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { getTestEnvironment, sql } from '../../../../scripts/test-environment.mjs';
+
+assert.equal(process.versions.node, '24.22.0');
+const git = (...args) => execFileSync('git', args, { encoding: 'utf8', windowsHide: true }).trim();
+assert.equal(git('branch', '--show-current'), 'audit/phase-b');
+getTestEnvironment();
+const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+const read = query => JSON.parse(sql(`begin read only; set local statement_timeout='15s'; select coalesce(jsonb_agg(x),'[]') from (${query}) x; rollback;`));
+const save = (name, data) => writeFileSync(new URL(name, import.meta.url), JSON.stringify(data, null, 2) + '\n');
+const tables = read("select schemaname,tablename from pg_tables where schemaname in('public','private','auth','storage') order by 1,2");
+const unions = tables.map(({schemaname:s,tablename:t}) => {
+  assert.match(s, /^[a-z_][a-z_0-9]*$/); assert.match(t, /^[a-z_][a-z_0-9]*$/);
+  return `select '${s}.${t}' relation,count(*) rows,md5(coalesce(string_agg(h,'' order by h),'')) content_md5 from(select md5(to_jsonb(t)::text) h from ${s}.${t} t)x`;
+});
+const rowAggregates = read(unions.join(' union all '));
+const paths = git('ls-files').split('\n').filter(p => !p.startsWith('docs/') && p !== 'README.md');
+const sources = paths.map(path => ({ path, sha256: digest(readFileSync(path)) }));
+const isolation = read("select exists(select 1 from vault.secrets where name='hca_worker_url') worker_url_configured,exists(select 1 from vault.secrets where name='hca_worker_bearer') worker_bearer_configured,(select count(*) from net.http_request_queue) network_queue_count")[0];
+assert.equal(isolation.worker_url_configured, false);
+assert.equal(isolation.worker_bearer_configured, false);
+assert.equal(Number(isolation.network_queue_count), 0);
+const routines = read("select n.nspname schema,p.proname name,pg_get_function_identity_arguments(p.oid) signature,md5(pg_get_functiondef(p.oid)) md5 from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in('public','private') and p.prokind in('f','p') order by 1,2,3");
+const prior = JSON.parse(readFileSync('docs/audits/2026-10-29-phase-b3-database/evidence/catalog.json','utf8')).routines;
+const drift = routines.filter(r => !prior.some(p => p.schema===r.schema && p.name===r.name && p.signature===r.signature && createHash('md5').update(p.definition).digest('hex')===r.md5));
+assert.equal(drift.length,0);
+const env = readFileSync('.env.local','utf8');
+const envValue = name => env.match(new RegExp(`^${name}=(.*)$`,'m'))?.[1]?.trim()?.replace(/^['"]|['"]$/g,'');
+const configuration = {localSupabase:envValue('NEXT_PUBLIC_SUPABASE_URL')==='http://127.0.0.1:54321',externalEnabled:envValue('NOTIFICATIONS_EXTERNAL_ENABLED')==='true',flowsEnabled:envValue('META_FLOWS_ENABLED')==='true',names:[...env.matchAll(/^([A-Z][A-Z0-9_]*)=/gm)].map(x=>x[1]).sort()};
+assert.equal(configuration.localSupabase,true);
+assert.equal(configuration.externalEnabled,false); assert.equal(configuration.flowsEnabled,false);
+const mode = process.argv.includes('--final') ? 'final' : 'baseline';
+const data = {recordedAt:new Date().toISOString(),clientDate:'2026-10-30',timezone:'America/Sao_Paulo',node:process.versions.node,branch:git('branch','--show-current'),head:git('rev-parse','HEAD'),master:git('rev-parse','master'),originPhaseB:git('rev-parse','origin/audit/phase-b'),initialTree:'clean before package creation',functionalSha:'37cb7f85e96e551d6419871f94dd950712e2565b',functionalDiff:git('diff','--name-only','37cb7f85e96e551d6419871f94dd950712e2565b','HEAD','--','src','supabase','tests','scripts','package.json','package-lock.json','proxy.ts','next.config.ts'),protectedFiles:sources.length,localGuardPassed:true,isolation,configuration,routineCount:routines.length,routineDriftFromB3:drift,migrations:read('select count(*) total,max(version) latest from supabase_migrations.schema_migrations')[0],migrationFiles:readdirSync('supabase/migrations').filter(x=>x.endsWith('.sql')).length,jobs:read('select jobid,jobname,schedule,active,md5(command) command_md5 from cron.job order by 1'),storage:read('select bucket_id,count(*) objects from storage.objects group by 1 order by 1'),rowAggregates,orderSha256:digest(readFileSync('C:/Users/renat/.codex/attachments/2113b1fe-99cc-44f0-8b6e-addc8a5cf6ed/pasted-text-1.txt')),limits:'Read-only local metadata and content hashes; preexisting cron remains active. No login, provider send, remote SQL, backup creation or restore.'};
+assert.equal(data.functionalDiff,'');
+save(`${mode}.json`,data);
+if(mode==='baseline') save('protected-source-hashes.json',sources);
+if(mode==='final') {
+ const before=JSON.parse(readFileSync(new URL('baseline.json',import.meta.url),'utf8'));
+ const protectedSources=JSON.parse(readFileSync(new URL('protected-source-hashes.json',import.meta.url),'utf8'));
+ const changedFiles=protectedSources.filter(x=>digest(readFileSync(x.path))!==x.sha256).map(x=>x.path);
+ const changedTables=before.rowAggregates.filter(x=>!rowAggregates.some(y=>x.relation===y.relation&&x.rows===y.rows&&x.content_md5===y.content_md5));
+ const expectedBackground=['private.scheduler_health','private.bal_scheduler_progress'];
+ const unexpectedTableChanges=changedTables.filter(x=>!expectedBackground.includes(x.relation));
+ const result={recordedAt:new Date().toISOString(),changedFiles,changedTables,expectedBackgroundRelations:expectedBackground,unexpectedTableChanges,masterPreserved:data.master===before.master,routinesPreserved:drift.length===0,allTrackedProductFilesPreserved:changedFiles.length===0,allObservedRowsPreserved:changedTables.length===0,businessAuthStorageRowsPreserved:unexpectedTableChanges.length===0,remoteMutations:0,productMutations:0,limits:'Existing cron updates private scheduler health/cursor during read-only audit. These two relations are reported, not silently excluded from the original comparison. No B7 mutations were executed.'};
+ save('preservation.json',result); assert.equal(changedFiles.length,0); assert.equal(result.masterPreserved,true);assert.equal(unexpectedTableChanges.length,0,'Unexpected row changes require investigation');
+ console.log(JSON.stringify(result,null,2));
+} else console.log(JSON.stringify({...data,rowAggregates:undefined},null,2));

@@ -1,0 +1,150 @@
+{
+  "group": "B3.8s",
+  "startedAt": "2026-10-30T01:21:24.835Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B38-09",
+      "purpose": "Criar BAL simultaneamente recupera resultado depois de a atribuição fechar",
+      "recordedAt": "2026-10-30T01:22:09.835Z",
+      "observed": {
+        "barrier": {
+          "requests": 2,
+          "waiters": 2
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "1123af73-f815-4112-a05f-b4e2e0db8a27",
+            "version": 1,
+            "state": "submitted",
+            "code": "BAL-0001",
+            "message": null
+          },
+          {
+            "status": 200,
+            "id": "1123af73-f815-4112-a05f-b4e2e0db8a27",
+            "version": 1,
+            "state": "submitted",
+            "code": "BAL-0001",
+            "message": null
+          }
+        ],
+        "documents": "1",
+        "recovered": {
+          "status": 200,
+          "id": "1123af73-f815-4112-a05f-b4e2e0db8a27",
+          "version": 1,
+          "state": "submitted",
+          "code": "BAL-0001",
+          "message": null
+        },
+        "assignmentStatus": "counted"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-10",
+      "purpose": "Revisão de draft BAL e submissão usam barreira antes da recuperação",
+      "recordedAt": "2026-10-30T01:22:12.559Z",
+      "observed": {
+        "revisionWaiters": 2,
+        "revisionResponses": [
+          {
+            "status": 200,
+            "id": "bdf51ab1-4580-4c9c-ad0d-7482bbbd0bf7",
+            "version": 2,
+            "state": "draft",
+            "code": null,
+            "message": null
+          },
+          {
+            "status": 200,
+            "id": "bdf51ab1-4580-4c9c-ad0d-7482bbbd0bf7",
+            "version": 2,
+            "state": "draft",
+            "code": null,
+            "message": null
+          }
+        ],
+        "submitWaiters": 2,
+        "submitResponses": [
+          {
+            "status": 200,
+            "id": "bdf51ab1-4580-4c9c-ad0d-7482bbbd0bf7",
+            "version": 3,
+            "state": "submitted",
+            "code": "BAL-0001",
+            "message": null
+          },
+          {
+            "status": 200,
+            "id": "bdf51ab1-4580-4c9c-ad0d-7482bbbd0bf7",
+            "version": 3,
+            "state": "submitted",
+            "code": "BAL-0001",
+            "message": null
+          }
+        ],
+        "events": "3",
+        "assignmentClosed": "counted"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B38-11",
+      "purpose": "Revogações concorrentes preservam último administrador local",
+      "recordedAt": "2026-10-30T01:22:18.590Z",
+      "observed": {
+        "barrier": {
+          "requests": 2,
+          "waiters": 2
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "a0178477-7df0-4509-ad18-d8dabd058c6c",
+            "version": null,
+            "state": "revoked",
+            "code": null,
+            "message": null
+          },
+          {
+            "status": 400,
+            "id": null,
+            "version": null,
+            "state": null,
+            "code": "23514",
+            "message": "last patient administrator must remain active"
+          }
+        ],
+        "activeAfterRace": 1,
+        "originalSyntheticAdminsRestored": true,
+        "limits": "Only newly created B3 local admins; no existing/global account revoked"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [
+    {
+      "id": "B38-09",
+      "purpose": "Criar BAL simultaneamente recupera resultado depois de a atribuição fechar",
+      "recordedAt": "2026-10-30T01:21:24.842Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "configure_patient_access: stale policy version",
+        "sqlstate": "PT409"
+      }
+    }
+  ],
+  "finishedAt": "2026-10-30T01:22:20.543Z"
+}

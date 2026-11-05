@@ -1,0 +1,95 @@
+
+> home-care-assistant@0.1.0 build
+> next build
+
+▲ Next.js 16.4.2 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 141ms
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.3s
+  Running TypeScript ...
+  Finished TypeScript in 4.6s ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/56) ...
+  Generating static pages using 11 workers (14/56)
+  Generating static pages using 11 workers (28/56)
+  Generating static pages using 11 workers (42/56)
+✓ Generating static pages using 11 workers (56/56) in 1135ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /admin
+├ ƒ /api/admin
+├ ƒ /api/admin/notifications
+├ ƒ /api/attachments
+├ ƒ /api/balances
+├ ƒ /api/catalog
+├ ƒ /api/catalog/presentations
+├ ƒ /api/consumption
+├ ƒ /api/context
+├ ƒ /api/dashboard
+├ ƒ /api/deliveries
+├ ƒ /api/demonstracao/[id]/pdf
+├ ƒ /api/documents
+├ ƒ /api/documents/[id]
+├ ƒ /api/documents/[id]/notifications
+├ ƒ /api/documents/[id]/pdf
+├ ƒ /api/documents/[id]/revise
+├ ƒ /api/invitations/accept
+├ ƒ /api/invitations/register
+├ ƒ /api/notification-rules
+├ ƒ /api/notifications
+├ ƒ /api/notifications/webhook
+├ ƒ /api/notifications/worker
+├ ƒ /api/patient-settings
+├ ƒ /api/profile
+├ ƒ /api/requisitions
+├ ƒ /api/requisitions/[id]
+├ ƒ /api/requisitions/[id]/archive
+├ ƒ /api/requisitions/[id]/resolve
+├ ƒ /api/requisitions/[id]/science
+├ ƒ /api/requisitions/[id]/status
+├ ƒ /api/requisitions/item-context
+├ ƒ /api/schedules
+├ ƒ /api/stock/balances
+├ ƒ /api/stock/inventory
+├ ƒ /api/stock/movements
+├ ƒ /api/sync
+├ ƒ /api/units
+├ ƒ /api/whatsapp/flows
+├ ƒ /api/whatsapp/flows/session
+├ ƒ /api/whatsapp/flows/submissions
+├ ƒ /auth/callback
+├ ƒ /balancos
+├ ƒ /configuracoes
+├ ƒ /consumo
+├ ○ /convites/aceitar
+├ ƒ /documentos/[id]
+├ ƒ /entregas
+├ ƒ /escalas
+├ ƒ /estoque
+├ ƒ /fichas
+├ ƒ /fichas/[id]
+├ ƒ /fichas/bal
+├ ƒ /fichas/com
+├ ƒ /fichas/ent
+├ ƒ /fichas/req
+├ ƒ /historico
+├ ƒ /historico/[id]
+├ ○ /inventarios
+├ ○ /login
+├ ƒ /mais
+├ ƒ /notificacoes
+├ ƒ /perfil
+├ ○ /recuperar-senha
+├ ƒ /unidades
+└ ƒ /verificar/[id]
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand

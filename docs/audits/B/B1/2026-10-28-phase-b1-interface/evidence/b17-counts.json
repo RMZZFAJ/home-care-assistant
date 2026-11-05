@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-29T04:25:24.095Z",
+  "fieldCallsites": 213,
+  "primitiveDefinitions": 3,
+  "unresolvedLabels": [],
+  "limits": "One callsite per input schema including custom admin Field/Check/RoleSelect; primitive definitions separated. Every dynamic variant/value not claimed rendered."
+}

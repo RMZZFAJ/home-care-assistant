@@ -1,0 +1,695 @@
+"branch_id","file","line","code","message","origin","context","method"
+"ERB-001","src/app/api/admin/notifications/route.ts","90","NOT_FOUND","Notificação não encontrada.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Notificação não encontrada."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-002","src/app/api/admin/notifications/route.ts","92","RECONCILIATION_REQUIRED","Confira o resultado no provedor. Uma nova tentativa de resultado incerto pode duplicar a mensagem e exige confirmação explícita.","SERVER_API_ERROR","throw new ApiError(
+        ""RECONCILIATION_REQUIRED"",
+        ""Confira o resultado no provedor. Uma nova tentativa de resultado incerto pode duplicar a mensagem e exige confirmação explícita."",
+        409,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-003","src/app/api/admin/route.ts","307","VALIDATION_ERROR","Seção administrativa inválida.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Seção administrativa inválida."");","AST + directed semantic review; not every branch executed"
+"ERB-004","src/app/api/admin/route.ts","506","VALIDATION_ERROR","O limite crítico deve ser menor ou igual ao limite baixo.","SERVER_API_ERROR","throw new ApiError(
+            ""VALIDATION_ERROR"",
+            ""O limite crítico deve ser menor ou igual ao limite baixo."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-005","src/app/api/admin/route.ts","544","NOT_FOUND","Convite não encontrado.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Convite não encontrado."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-006","src/app/api/admin/route.ts","584","NOT_FOUND","Convite não encontrado.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Convite não encontrado."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-007","src/app/api/attachments/route.ts","23","VALIDATION_ERROR","Documento ou movimentação inválido.","SERVER_API_ERROR","throw new ApiError(
+        ""VALIDATION_ERROR"",
+        ""Documento ou movimentação inválido."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-008","src/app/api/attachments/route.ts","70","VALIDATION_ERROR","Chave do envio inválida.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Chave do envio inválida."");","AST + directed semantic review; not every branch executed"
+"ERB-009","src/app/api/attachments/route.ts","82","VALIDATION_ERROR","Vínculo do anexo inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Vínculo do anexo inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-010","src/app/api/attachments/route.ts","109","IDEMPOTENCY_CONFLICT","A tentativa já contém outro arquivo.","SERVER_API_ERROR","throw new ApiError(
+        ""IDEMPOTENCY_CONFLICT"",
+        ""A tentativa já contém outro arquivo."",
+        409,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-011","src/app/api/attachments/route.ts","125","PERSISTENCE_UNCONFIRMED","Não foi possível confirmar o envio do anexo. Recupere a mesma tentativa.","SERVER_API_ERROR","throw new ApiError(
+          ""PERSISTENCE_UNCONFIRMED"",
+          ""Não foi possível confirmar o envio do anexo. Recupere a mesma tentativa."",
+          503,
+          true,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-012","src/app/api/attachments/route.ts","136","IDEMPOTENCY_CONFLICT","O arquivo já registrado não corresponde a esta tentativa.","SERVER_API_ERROR","throw new ApiError(
+          ""IDEMPOTENCY_CONFLICT"",
+          ""O arquivo já registrado não corresponde a esta tentativa."",
+          409,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-013","src/app/api/catalog/presentations/route.ts","28","VALIDATION_ERROR","Código de barras inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Código de barras inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-014","src/app/api/deliveries/route.ts","12","VALIDATION_ERROR","Revise os filtros de entrega.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Revise os filtros de entrega."");","AST + directed semantic review; not every branch executed"
+"ERB-015","src/app/api/documents/[id]/notifications/route.ts","11","VALIDATION_ERROR","Identificador inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Identificador inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-016","src/app/api/documents/[id]/pdf/route.ts","11","VALIDATION_ERROR","Identificador inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Identificador inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-017","src/app/api/documents/[id]/pdf/route.ts","14","VALIDATION_ERROR","Versão inválida.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Versão inválida."");","AST + directed semantic review; not every branch executed"
+"ERB-018","src/app/api/documents/[id]/revise/route.ts","29","VALIDATION_ERROR","Identificador inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Identificador inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-019","src/app/api/documents/route.ts","28","VALIDATION_ERROR","Revise os filtros de documento.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Revise os filtros de documento."");","AST + directed semantic review; not every branch executed"
+"ERB-020","src/app/api/invitations/register/route.ts","25","NOT_CONFIGURED","Serviço de acesso indisponível.","SERVER_API_ERROR","throw new ApiError(
+        ""NOT_CONFIGURED"",
+        ""Serviço de acesso indisponível."",
+        503,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-021","src/app/api/invitations/register/route.ts","38","INVITATION_INVALID","Convite inválido, expirado ou sem autorização para este e-mail.","SERVER_API_ERROR","throw new ApiError(
+        ""INVITATION_INVALID"",
+        ""Convite inválido, expirado ou sem autorização para este e-mail."",
+        403,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-022","src/app/api/invitations/register/route.ts","57","AUTH_UNAVAILABLE","Não foi possível concluir o cadastro. Tente novamente.","SERVER_API_ERROR","throw new ApiError(
+        ""AUTH_UNAVAILABLE"",
+        ""Não foi possível concluir o cadastro. Tente novamente."",
+        503,
+        true,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-023","src/app/api/notifications/webhook/route.ts","24","FORBIDDEN","Verificação inválida.","SERVER_API_ERROR","throw new ApiError(""FORBIDDEN"", ""Verificação inválida."", 403);","AST + directed semantic review; not every branch executed"
+"ERB-024","src/app/api/notifications/webhook/route.ts","27","VALIDATION_ERROR","Desafio inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Desafio inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-025","src/app/api/notifications/webhook/route.ts","43","FORBIDDEN","Assinatura inválida.","SERVER_API_ERROR","throw new ApiError(""FORBIDDEN"", ""Assinatura inválida."", 403);","AST + directed semantic review; not every branch executed"
+"ERB-026","src/app/api/notifications/webhook/route.ts","48","INVALID_JSON","Evento inválido.","SERVER_API_ERROR","throw new ApiError(""INVALID_JSON"", ""Evento inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-027","src/app/api/notifications/webhook/route.ts","57","FORBIDDEN","Conta de mensagens não autorizada.","SERVER_API_ERROR","throw new ApiError(
+        ""FORBIDDEN"",
+        ""Conta de mensagens não autorizada."",
+        403,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-028","src/app/api/notifications/webhook/route.ts","63","VALIDATION_ERROR","Evento inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Evento inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-029","src/app/api/notifications/worker/route.ts","18","FORBIDDEN","Processamento não autorizado.","SERVER_API_ERROR","throw new ApiError(""FORBIDDEN"", ""Processamento não autorizado."", 403);","AST + directed semantic review; not every branch executed"
+"ERB-030","src/app/api/profile/route.ts","131","PERSISTENCE_UNCONFIRMED","Não foi possível confirmar a foto.","SERVER_API_ERROR","throw new ApiError(
+          ""PERSISTENCE_UNCONFIRMED"",
+          ""Não foi possível confirmar a foto."",
+          503,
+          true,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-031","src/app/api/profile/route.ts","154","FORBIDDEN","Confirme seu acesso antes de alterar a senha.","SERVER_API_ERROR","throw new ApiError(
+          ""FORBIDDEN"",
+          ""Confirme seu acesso antes de alterar a senha."",
+          403,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-032","src/app/api/profile/route.ts","164","FORBIDDEN","Senha atual inválida. Entre novamente se necessário.","SERVER_API_ERROR","throw new ApiError(
+          ""FORBIDDEN"",
+          ""Senha atual inválida. Entre novamente se necessário."",
+          403,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-033","src/app/api/profile/route.ts","173","VALIDATION_ERROR","Não foi possível alterar a senha. Confira os critérios da conta.","SERVER_API_ERROR","throw new ApiError(
+          ""VALIDATION_ERROR"",
+          ""Não foi possível alterar a senha. Confira os critérios da conta."",
+        );","AST + directed semantic review; not every branch executed"
+"ERB-034","src/app/api/profile/route.ts","181","FORBIDDEN","Entre novamente para alterar contatos ou métodos de login.","SERVER_API_ERROR","throw new ApiError(
+          ""FORBIDDEN"",
+          ""Entre novamente para alterar contatos ou métodos de login."",
+          403,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-035","src/app/api/profile/route.ts","197","VALIDATION_ERROR","Não foi possível iniciar a alteração de e-mail.","SERVER_API_ERROR","throw new ApiError(
+            ""VALIDATION_ERROR"",
+            ""Não foi possível iniciar a alteração de e-mail."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-036","src/app/api/profile/route.ts","207","NOT_CONFIGURED","A verificação por SMS depende de provedor habilitado no Supabase Auth.","SERVER_API_ERROR","throw new ApiError(
+            ""NOT_CONFIGURED"",
+            ""A verificação por SMS depende de provedor habilitado no Supabase Auth."",
+            503,
+          );","AST + directed semantic review; not every branch executed"
+"ERB-037","src/app/api/profile/route.ts","220","VALIDATION_ERROR","Código de verificação inválido ou expirado.","SERVER_API_ERROR","throw new ApiError(
+            ""VALIDATION_ERROR"",
+            ""Código de verificação inválido ou expirado."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-038","src/app/api/profile/route.ts","228","FORBIDDEN","Entre novamente para encerrar as outras sessões.","SERVER_API_ERROR","throw new ApiError(
+          ""FORBIDDEN"",
+          ""Entre novamente para encerrar as outras sessões."",
+          403,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-039","src/app/api/profile/route.ts","235","PERSISTENCE_UNCONFIRMED","Não foi possível confirmar o encerramento das sessões.","SERVER_API_ERROR","throw new ApiError(
+          ""PERSISTENCE_UNCONFIRMED"",
+          ""Não foi possível confirmar o encerramento das sessões."",
+          503,
+          true,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-040","src/app/api/requisitions/[id]/archive/route.ts","31","NOT_FOUND","Requisição não encontrada.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Requisição não encontrada."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-041","src/app/api/requisitions/[id]/resolve/route.ts","29","VALIDATION_ERROR","Identificador inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Identificador inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-042","src/app/api/requisitions/[id]/resolve/route.ts","39","NOT_FOUND","Item não encontrado.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Item não encontrado."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-043","src/app/api/requisitions/[id]/route.ts","21","VALIDATION_ERROR","Identificador inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Identificador inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-044","src/app/api/requisitions/[id]/route.ts","31","NOT_FOUND","Requisição não encontrada.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Requisição não encontrada."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-045","src/app/api/requisitions/[id]/status/route.ts","29","VALIDATION_ERROR","Identificador inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Identificador inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-046","src/app/api/requisitions/[id]/status/route.ts","37","NOT_FOUND","Requisição não encontrada.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Requisição não encontrada."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-047","src/app/api/requisitions/route.ts","38","VALIDATION_ERROR","Informe um protocolo válido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Informe um protocolo válido."");","AST + directed semantic review; not every branch executed"
+"ERB-048","src/app/api/requisitions/route.ts","54","VALIDATION_ERROR","Status inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Status inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-049","src/app/api/requisitions/route.ts","62","INVALID_DATE","O início deve ser anterior ao fim do período.","SERVER_API_ERROR","throw new ApiError(
+        ""INVALID_DATE"",
+        ""O início deve ser anterior ao fim do período."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-050","src/app/api/requisitions/route.ts","127","PERSISTENCE_UNCONFIRMED","Não foi possível confirmar o resultado. Repita o envio com a mesma chave.","SERVER_API_ERROR","throw new ApiError(
+        ""PERSISTENCE_UNCONFIRMED"",
+        ""Não foi possível confirmar o resultado. Repita o envio com a mesma chave."",
+        503,
+        true,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-051","src/app/api/schedules/route.ts","10","INVALID_OPERATION","Selecione um período válido.","SERVER_API_ERROR","throw new ApiError(""INVALID_OPERATION"", ""Selecione um período válido."", 400);","AST + directed semantic review; not every branch executed"
+"ERB-052","src/app/api/stock/inventory/route.ts","27","VALIDATION_ERROR","Identificador inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Identificador inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-053","src/app/api/stock/inventory/route.ts","56","INVALID_OPERATION","Este fluxo de inventário foi substituído pela ficha BAL da equipe. Use os controles de estoque familiar para ajustes administrativos.","SERVER_API_ERROR","throw new ApiError(
+      ""INVALID_OPERATION"",
+      ""Este fluxo de inventário foi substituído pela ficha BAL da equipe. Use os controles de estoque familiar para ajustes administrativos."",
+      410,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-054","src/app/api/stock/movements/route.ts","37","INVALID_DATE","Período inválido.","SERVER_API_ERROR","throw new ApiError(""INVALID_DATE"", ""Período inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-055","src/app/api/whatsapp/flows/route.ts","11","NOT_CONFIGURED","Flows aguardando configuração do provedor.","SERVER_API_ERROR","throw new ApiError(
+        ""NOT_CONFIGURED"",
+        ""Flows aguardando configuração do provedor."",
+        503,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-056","src/app/api/whatsapp/flows/route.ts","24","FORBIDDEN","Evento inválido.","SERVER_API_ERROR","throw new ApiError(""FORBIDDEN"", ""Evento inválido."", 403);","AST + directed semantic review; not every branch executed"
+"ERB-057","src/app/api/whatsapp/flows/route.ts","33","VALIDATION_ERROR","Não foi possível validar o conteúdo criptografado.","SERVER_API_ERROR","throw new ApiError(
+        ""VALIDATION_ERROR"",
+        ""Não foi possível validar o conteúdo criptografado."",
+        421,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-058","src/app/api/whatsapp/flows/route.ts","41","VALIDATION_ERROR","Dados de Flow inválidos.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Dados de Flow inválidos."");","AST + directed semantic review; not every branch executed"
+"ERB-059","src/app/api/whatsapp/flows/route.ts","45","FORBIDDEN","Abra uma sessão autenticada para iniciar o Flow.","SERVER_API_ERROR","throw new ApiError(
+          ""FORBIDDEN"",
+          ""Abra uma sessão autenticada para iniciar o Flow."",
+          403,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-060","src/app/api/whatsapp/flows/session/route.ts","21","NOT_CONFIGURED","Flows aguardando configuração do provedor.","SERVER_API_ERROR","throw new ApiError(
+        ""NOT_CONFIGURED"",
+        ""Flows aguardando configuração do provedor."",
+        503,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-061","src/components/admin/accept-invitation.tsx","47","CLIENT_accept-invitation_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível aceitar o convite.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível aceitar o convite."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-062","src/components/admin/accept-invitation.tsx","74","CLIENT_accept-invitation_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível concluir o cadastro.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível concluir o cadastro."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-063","src/components/admin/admin-console.tsx","146","CLIENT_admin-console_tsx","reason instanceof Error
+                ? reason.message
+                : ""Não foi possível carregar a seção.""","UI_ERROR_BRANCH","setError(
+              reason instanceof Error
+                ? reason.message
+                : ""Não foi possível carregar a seção."",
+            );","AST + directed semantic review; not every branch executed"
+"ERB-064","src/components/admin/admin-console.tsx","202","CLIENT_admin-console_tsx","reason instanceof Error ? reason.message : ""Não foi possível salvar.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error ? reason.message : ""Não foi possível salvar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-065","src/components/admin/admin-console.tsx","482","CLIENT_admin-console_tsx","reason instanceof Error
+                        ? reason.message
+                        : ""JSON inválido.""","UI_ERROR_BRANCH","setError(
+                      reason instanceof Error
+                        ? reason.message
+                        : ""JSON inválido."",
+                    );","AST + directed semantic review; not every branch executed"
+"ERB-066","src/components/admin/admin-console.tsx","507","CLIENT_admin-console_tsx","Lote JSON inválido.","UI_ERROR_BRANCH","setError(""Lote JSON inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-067","src/components/admin/notification-matrix.tsx","63","CLIENT_notification-matrix_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-068","src/components/admin/notification-matrix.tsx","136","CLIENT_notification-matrix_tsx","Não foi possível confirmar a configuração. Recarregue a matriz antes de continuar.","UI_ERROR_BRANCH","setError(
+        ""Não foi possível confirmar a configuração. Recarregue a matriz antes de continuar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-069","src/components/admin/policy-console.tsx","104","CLIENT_policy-console_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-070","src/components/admin/policy-console.tsx","156","CLIENT_policy-console_tsx","reason instanceof ApiError && reason.status === 409
+          ? ""A configuração mudou em outra sessão. Dados recarregados; revise e reaplique sua alteração.""
+          : reason instanceof Error
+            ? reason.message
+            : ""Não foi possível salvar.""","UI_ERROR_BRANCH","setError(
+        reason instanceof ApiError && reason.status === 409
+          ? ""A configuração mudou em outra sessão. Dados recarregados; revise e reaplique sua alteração.""
+          : reason instanceof Error
+            ? reason.message
+            : ""Não foi possível salvar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-071","src/components/auth/contact-settings.tsx","54","CLIENT_contact-settings_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-072","src/components/auth/contact-settings.tsx","167","CLIENT_contact-settings_tsx","reason instanceof Error
+                    ? reason.message
+                    : ""Não foi possível vincular.""","UI_ERROR_BRANCH","setError(
+                  reason instanceof Error
+                    ? reason.message
+                    : ""Não foi possível vincular."",
+                );","AST + directed semantic review; not every branch executed"
+"ERB-073","src/components/auth/login-form.tsx","28","CLIENT_login-form_tsx","O Supabase não está configurado neste ambiente.","UI_ERROR_BRANCH","setError(""O Supabase não está configurado neste ambiente."");","AST + directed semantic review; not every branch executed"
+"ERB-074","src/components/auth/login-form.tsx","39","CLIENT_login-form_tsx","isAuthRetryableFetchError(signInError) ||
+            (signInError.status ?? 0) >= 500
+            ? ""Não foi possível conectar. Tente novamente.""
+            : signInError.status === 429
+              ? ""Muitas tentativas de acesso. Aguarde e tente novamente.""
+              : ""E-mail ou senha inválidos.""","UI_ERROR_BRANCH","setError(
+          isAuthRetryableFetchError(signInError) ||
+            (signInError.status ?? 0) >= 500
+            ? ""Não foi possível conectar. Tente novamente.""
+            : signInError.status === 429
+              ? ""Muitas tentativas de acesso. Aguarde e tente novamente.""
+              : ""E-mail ou senha inválidos."",
+        );","AST + directed semantic review; not every branch executed"
+"ERB-075","src/components/auth/login-form.tsx","70","CLIENT_login-form_tsx","Não foi possível conectar. Tente novamente.","UI_ERROR_BRANCH","setError(""Não foi possível conectar. Tente novamente."");","AST + directed semantic review; not every branch executed"
+"ERB-076","src/components/auth/login-form.tsx","80","CLIENT_login-form_tsx","Informe seu e-mail para receber o link de recuperação.","UI_ERROR_BRANCH","setError(""Informe seu e-mail para receber o link de recuperação."");","AST + directed semantic review; not every branch executed"
+"ERB-077","src/components/auth/login-form.tsx","85","CLIENT_login-form_tsx","O Supabase não está configurado neste ambiente.","UI_ERROR_BRANCH","setError(""O Supabase não está configurado neste ambiente."");","AST + directed semantic review; not every branch executed"
+"ERB-078","src/components/auth/login-form.tsx","95","CLIENT_login-form_tsx","Não foi possível iniciar a recuperação. Verifique o e-mail ou procure um administrador.","UI_ERROR_BRANCH","setError(
+          ""Não foi possível iniciar a recuperação. Verifique o e-mail ou procure um administrador."",
+        );","AST + directed semantic review; not every branch executed"
+"ERB-079","src/components/auth/login-form.tsx","104","CLIENT_login-form_tsx","Não foi possível conectar. Tente novamente.","UI_ERROR_BRANCH","setError(""Não foi possível conectar. Tente novamente."");","AST + directed semantic review; not every branch executed"
+"ERB-080","src/components/auth/login-form.tsx","115","CLIENT_login-form_tsx","O Supabase não está configurado neste ambiente.","UI_ERROR_BRANCH","setError(""O Supabase não está configurado neste ambiente."");","AST + directed semantic review; not every branch executed"
+"ERB-081","src/components/auth/login-form.tsx","127","CLIENT_login-form_tsx","Não foi possível iniciar o login com Google. Verifique se o provedor está habilitado.","UI_ERROR_BRANCH","setError(
+          ""Não foi possível iniciar o login com Google. Verifique se o provedor está habilitado."",
+        );","AST + directed semantic review; not every branch executed"
+"ERB-082","src/components/auth/login-form.tsx","133","CLIENT_login-form_tsx","Não foi possível conectar ao provedor. Tente novamente.","UI_ERROR_BRANCH","setError(""Não foi possível conectar ao provedor. Tente novamente."");","AST + directed semantic review; not every branch executed"
+"ERB-083","src/components/auth/logout-button.tsx","19","CLIENT_logout-button_tsx","Não foi possível encerrar a sessão neste ambiente.","UI_ERROR_BRANCH","setError(""Não foi possível encerrar a sessão neste ambiente."");","AST + directed semantic review; not every branch executed"
+"ERB-084","src/components/auth/logout-button.tsx","24","CLIENT_logout-button_tsx","Não foi possível encerrar a sessão. Tente novamente.","UI_ERROR_BRANCH","setError(""Não foi possível encerrar a sessão. Tente novamente."");","AST + directed semantic review; not every branch executed"
+"ERB-085","src/components/auth/logout-button.tsx","30","CLIENT_logout-button_tsx","Não foi possível conectar para encerrar a sessão. Tente novamente.","UI_ERROR_BRANCH","setError(""Não foi possível conectar para encerrar a sessão. Tente novamente."");","AST + directed semantic review; not every branch executed"
+"ERB-086","src/components/auth/mfa-settings.tsx","39","CLIENT_mfa-settings_tsx","Não foi possível consultar a autenticação em duas etapas.","UI_ERROR_BRANCH","setError(
+              ""Não foi possível consultar a autenticação em duas etapas."",
+            );","AST + directed semantic review; not every branch executed"
+"ERB-087","src/components/auth/mfa-settings.tsx","55","CLIENT_mfa-settings_tsx","Não foi possível consultar seu autenticador.","UI_ERROR_BRANCH","setError(""Não foi possível consultar seu autenticador."");","AST + directed semantic review; not every branch executed"
+"ERB-088","src/components/auth/mfa-settings.tsx","85","CLIENT_mfa-settings_tsx","cause instanceof Error ? cause.message : ""Falha ao iniciar TOTP.""","UI_ERROR_BRANCH","setError(
+        cause instanceof Error ? cause.message : ""Falha ao iniciar TOTP."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-089","src/components/auth/mfa-settings.tsx","117","CLIENT_mfa-settings_tsx","cause instanceof Error ? cause.message : ""Não foi possível verificar.""","UI_ERROR_BRANCH","setError(
+        cause instanceof Error ? cause.message : ""Não foi possível verificar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-090","src/components/auth/mfa-settings.tsx","131","CLIENT_mfa-settings_tsx","Confirme primeiro o código da sessão para remover este fator.","UI_ERROR_BRANCH","setError(""Confirme primeiro o código da sessão para remover este fator."");","AST + directed semantic review; not every branch executed"
+"ERB-091","src/components/auth/password-recovery-form.tsx","22","CLIENT_password-recovery-form_tsx","validation.error.issues[0].message","UI_ERROR_BRANCH","setError(validation.error.issues[0].message);","AST + directed semantic review; not every branch executed"
+"ERB-092","src/components/auth/password-recovery-form.tsx","26","CLIENT_password-recovery-form_tsx","Use pelo menos 12 caracteres e confirme a mesma senha.","UI_ERROR_BRANCH","setError(""Use pelo menos 12 caracteres e confirme a mesma senha."");","AST + directed semantic review; not every branch executed"
+"ERB-093","src/components/auth/password-recovery-form.tsx","52","CLIENT_password-recovery-form_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível conectar. Tente novamente.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível conectar. Tente novamente."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-094","src/components/balances/balance-console.tsx","28","CLIENT_balance-console_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-095","src/components/balances/balance-console.tsx","37","CLIENT_balance-console_tsx","reason instanceof Error ? reason.message : ""Não foi possível concluir.""","UI_ERROR_BRANCH","setError(reason instanceof Error ? reason.message : ""Não foi possível concluir."");","AST + directed semantic review; not every branch executed"
+"ERB-096","src/components/balances/balance-count-wizard.tsx","69","CLIENT_balance-count-wizard_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-097","src/components/balances/balance-count-wizard.tsx","79","CLIENT_balance-count-wizard_tsx","Confira os campos destacados.","UI_ERROR_BRANCH","setError(""Confira os campos destacados."");","AST + directed semantic review; not every branch executed"
+"ERB-098","src/components/balances/balance-count-wizard.tsx","97","CLIENT_balance-count-wizard_tsx","(reason as Error).message","UI_ERROR_BRANCH","setError((reason as Error).message);","AST + directed semantic review; not every branch executed"
+"ERB-099","src/components/balances/balance-count-wizard.tsx","103","CLIENT_balance-count-wizard_tsx","A contagem exige o plantão ativo e a profissional designada.","UI_ERROR_BRANCH","setError(""A contagem exige o plantão ativo e a profissional designada."");","AST + directed semantic review; not every branch executed"
+"ERB-100","src/components/balances/balance-count-wizard.tsx","117","CLIENT_balance-count-wizard_tsx","(reason as Error).message","UI_ERROR_BRANCH","setError((reason as Error).message);","AST + directed semantic review; not every branch executed"
+"ERB-101","src/components/balances/use-balance-workspace.ts","14","CLIENT_use-balance-workspace_ts","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-102","src/components/catalog/barcode-scanner.tsx","38","CLIENT_barcode-scanner_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível identificar o código.""","UI_ERROR_BRANCH","(reason) =>
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível identificar o código."",
+      )","AST + directed semantic review; not every branch executed"
+"ERB-103","src/components/catalog/barcode-scanner.tsx","107","CLIENT_barcode-scanner_tsx","reason instanceof DOMException && reason.name === ""NotAllowedError""
+              ? ""Acesso à câmera negado. Você pode permitir nas configurações ou digitar o código.""
+              : reason instanceof Error
+                ? reason.message
+                : ""Não foi possível abrir a câmera.""","UI_ERROR_BRANCH","setError(
+            reason instanceof DOMException && reason.name === ""NotAllowedError""
+              ? ""Acesso à câmera negado. Você pode permitir nas configurações ou digitar o código.""
+              : reason instanceof Error
+                ? reason.message
+                : ""Não foi possível abrir a câmera."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-104","src/components/catalog/barcode-scanner.tsx","127","CLIENT_barcode-scanner_tsx","Use uma imagem de até 10 MiB.","UI_ERROR_BRANCH","setError(""Use uma imagem de até 10 MiB."");","AST + directed semantic review; not every branch executed"
+"ERB-105","src/components/catalog/barcode-scanner.tsx","140","CLIENT_barcode-scanner_tsx","Não foi possível ler a imagem. Aproxime o código ou use a entrada manual.","UI_ERROR_BRANCH","setError(
+        ""Não foi possível ler a imagem. Aproxime o código ou use a entrada manual."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-106","src/components/catalog/unit-console.tsx","64","CLIENT_unit-console_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-107","src/components/catalog/unit-console.tsx","77","CLIENT_unit-console_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível configurar.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível configurar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-108","src/components/dashboard.tsx","24","CLIENT_dashboard_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-109","src/components/documents/attachments.tsx","59","CLIENT_attachments_tsx","reason instanceof Error
+              ? reason.message
+              : ""Não foi possível consultar anexos.""","UI_ERROR_BRANCH","setError(
+            reason instanceof Error
+              ? reason.message
+              : ""Não foi possível consultar anexos."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-110","src/components/documents/attachments.tsx","75","CLIENT_attachments_tsx","Selecione um arquivo de até 10 MB.","UI_ERROR_BRANCH","setError(""Selecione um arquivo de até 10 MB."");","AST + directed semantic review; not every branch executed"
+"ERB-111","src/components/documents/attachments.tsx","108","CLIENT_attachments_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível enviar o anexo.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível enviar o anexo."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-112","src/components/documents/delivery-inbox.tsx","27","CLIENT_delivery-inbox_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-113","src/components/documents/document-actions.tsx","75","CLIENT_document-actions_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-114","src/components/documents/document-actions.tsx","103","CLIENT_document-actions_tsx","Não foi possível compartilhar o arquivo. Baixe o PDF e anexe manualmente.","UI_ERROR_BRANCH","setError(
+          ""Não foi possível compartilhar o arquivo. Baixe o PDF e anexe manualmente."",
+        );","AST + directed semantic review; not every branch executed"
+"ERB-115","src/components/documents/document-history.tsx","153","CLIENT_document-history_tsx","reason instanceof Error
+                ? reason.message
+                : ""Não foi possível consultar o histórico.""","UI_ERROR_BRANCH","setError(
+              reason instanceof Error
+                ? reason.message
+                : ""Não foi possível consultar o histórico."",
+            );","AST + directed semantic review; not every branch executed"
+"ERB-116","src/components/documents/related-document.tsx","46","CLIENT_related-document_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-117","src/components/documents/supply-command-editor.tsx","170","CLIENT_supply-command-editor_tsx","reason instanceof Error ? reason.message : ""Revise os campos.""","UI_ERROR_BRANCH","setError(reason instanceof Error ? reason.message : ""Revise os campos."");","AST + directed semantic review; not every branch executed"
+"ERB-118","src/components/documents/supply-detail.tsx","91","CLIENT_supply-detail_tsx","reason instanceof Error
+              ? reason.message
+              : ""Não foi possível carregar a ficha.""","UI_ERROR_BRANCH","setError(
+            reason instanceof Error
+              ? reason.message
+              : ""Não foi possível carregar a ficha."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-119","src/components/documents/supply-detail.tsx","136","CLIENT_supply-detail_tsx","reason instanceof Error
+          ? reason.message
+          : ""O resultado precisa ser confirmado.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""O resultado precisa ser confirmado."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-120","src/components/documents/supply-wizard.tsx","281","CLIENT_supply-wizard_tsx","reason instanceof Error
+              ? reason.message
+              : ""Não foi possível carregar o formulário.""","UI_ERROR_BRANCH","setError(
+            reason instanceof Error
+              ? reason.message
+              : ""Não foi possível carregar o formulário."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-121","src/components/documents/supply-wizard.tsx","356","CLIENT_supply-wizard_tsx","Confira os campos destacados.","UI_ERROR_BRANCH","setError(""Confira os campos destacados."");","AST + directed semantic review; not every branch executed"
+"ERB-122","src/components/documents/supply-wizard.tsx","393","CLIENT_supply-wizard_tsx","reason instanceof Error
+            ? reason.message
+            : ""Não foi possível abrir a referência da contagem.""","UI_ERROR_BRANCH","setError(
+          reason instanceof Error
+            ? reason.message
+            : ""Não foi possível abrir a referência da contagem."",
+        );","AST + directed semantic review; not every branch executed"
+"ERB-123","src/components/documents/supply-wizard.tsx","418","CLIENT_supply-wizard_tsx","Não foi possível salvar o rascunho neste dispositivo.","UI_ERROR_BRANCH","setError(""Não foi possível salvar o rascunho neste dispositivo."");","AST + directed semantic review; not every branch executed"
+"ERB-124","src/components/documents/supply-wizard.tsx","504","CLIENT_supply-wizard_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar a gravação.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar a gravação."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-125","src/components/documents/supply-wizard.tsx","526","CLIENT_supply-wizard_tsx","Código desconhecido. Associe uma apresentação no catálogo ou selecione o produto manualmente. Nenhum item foi criado.","UI_ERROR_BRANCH","setError(
+        ""Código desconhecido. Associe uma apresentação no catálogo ou selecione o produto manualmente. Nenhum item foi criado."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-126","src/components/layout/workspace-context.tsx","75","CLIENT_workspace-context_tsx","reason instanceof Error ? reason.message : ""Não foi possível validar seu acesso.""","UI_ERROR_BRANCH","setError(reason instanceof Error ? reason.message : ""Não foi possível validar seu acesso."");","AST + directed semantic review; not every branch executed"
+"ERB-127","src/components/layout/workspace-context.tsx","119","CLIENT_workspace-context_tsx","reason instanceof Error ? reason.message : ""Não foi possível selecionar o perfil.""","UI_ERROR_BRANCH","setError(reason instanceof Error ? reason.message : ""Não foi possível selecionar o perfil."");","AST + directed semantic review; not every branch executed"
+"ERB-128","src/components/notifications/document-delivery-status.tsx","40","CLIENT_document-delivery-status_tsx","reason instanceof Error
+              ? reason.message
+              : ""Não foi possível consultar os envios.""","UI_ERROR_BRANCH","setError(
+            reason instanceof Error
+              ? reason.message
+              : ""Não foi possível consultar os envios."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-129","src/components/notifications/notification-bell.tsx","55","CLIENT_notification-bell_tsx","Não foi possível atualizar as notificações.","UI_ERROR_BRANCH","setError(""Não foi possível atualizar as notificações."");","AST + directed semantic review; not every branch executed"
+"ERB-130","src/components/notifications/notification-bell.tsx","141","CLIENT_notification-bell_tsx","Não foi possível marcar a notificação como lida.","UI_ERROR_BRANCH","() =>
+                          setError(
+                            ""Não foi possível marcar a notificação como lida."",
+                          )","AST + directed semantic review; not every branch executed"
+"ERB-131","src/components/notifications/notification-center.tsx","67","CLIENT_notification-center_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-132","src/components/notifications/notification-center.tsx","148","CLIENT_notification-center_tsx","reason instanceof Error
+                          ? reason.message
+                          : ""Não foi possível marcar.""","UI_ERROR_BRANCH","setError(
+                        reason instanceof Error
+                          ? reason.message
+                          : ""Não foi possível marcar."",
+                      );","AST + directed semantic review; not every branch executed"
+"ERB-133","src/components/profile-console.tsx","73","CLIENT_profile-console_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-134","src/components/profile-console.tsx","130","CLIENT_profile-console_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível atualizar.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível atualizar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-135","src/components/profile-console.tsx","436","CLIENT_profile-console_tsx","reason instanceof Error
+                      ? reason.message
+                      : ""Não foi possível confirmar.""","UI_ERROR_BRANCH","setError(
+                    reason instanceof Error
+                      ? reason.message
+                      : ""Não foi possível confirmar."",
+                  );","AST + directed semantic review; not every branch executed"
+"ERB-136","src/components/requisitions/requisition-detail.tsx","126","CLIENT_requisition-detail_tsx","cause.message","UI_ERROR_BRANCH","setError(cause.message);","AST + directed semantic review; not every branch executed"
+"ERB-137","src/components/requisitions/requisition-detail.tsx","170","CLIENT_requisition-detail_tsx","cause.message","UI_ERROR_BRANCH","setError(cause.message);","AST + directed semantic review; not every branch executed"
+"ERB-138","src/components/requisitions/requisition-detail.tsx","204","CLIENT_requisition-detail_tsx","cause instanceof Error ? cause.message : ""Não foi possível concluir.""","UI_ERROR_BRANCH","setError(
+        cause instanceof Error ? cause.message : ""Não foi possível concluir."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-139","src/components/requisitions/requisition-history.tsx","28","CLIENT_requisition-history_tsx","reason instanceof Error ? reason.message : ""Não foi possível carregar o histórico.""","UI_ERROR_BRANCH","setError(reason instanceof Error ? reason.message : ""Não foi possível carregar o histórico."");","AST + directed semantic review; not every branch executed"
+"ERB-140","src/components/requisitions/requisition-history.tsx","32","CLIENT_requisition-history_tsx","A data inicial precisa ser anterior ou igual à final.","UI_ERROR_BRANCH","setError(""A data inicial precisa ser anterior ou igual à final."");","AST + directed semantic review; not every branch executed"
+"ERB-141","src/components/requisitions/requisition-wizard.tsx","244","CLIENT_requisition-wizard_tsx","Object.values(errors)[0] ?? ""Aguarde o catálogo e confira seu acesso.""","UI_ERROR_BRANCH","setError(
+        Object.values(errors)[0] ?? ""Aguarde o catálogo e confira seu acesso."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-142","src/components/requisitions/requisition-wizard.tsx","316","CLIENT_requisition-wizard_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível registrar.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível registrar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-143","src/components/requisitions/requisition-wizard.tsx","424","CLIENT_requisition-wizard_tsx","O armazenamento deste dispositivo está indisponível.","UI_ERROR_BRANCH","setError(""O armazenamento deste dispositivo está indisponível."");","AST + directed semantic review; not every branch executed"
+"ERB-144","src/components/requisitions/resolve-extra-item.tsx","46","CLIENT_resolve-extra-item_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-145","src/components/requisitions/resolve-extra-item.tsx","83","CLIENT_resolve-extra-item_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar a associação.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar a associação."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-146","src/components/schedules/schedule-console.tsx","32","CLIENT_schedule-console_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-147","src/components/schedules/schedule-console.tsx","42","CLIENT_schedule-console_tsx","reason instanceof Error ? reason.message : ""Não foi possível gravar.""","UI_ERROR_BRANCH","setError(reason instanceof Error ? reason.message : ""Não foi possível gravar."");","AST + directed semantic review; not every branch executed"
+"ERB-148","src/components/stock/consumption-console.tsx","73","CLIENT_consumption-console_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-149","src/components/stock/consumption-console.tsx","99","CLIENT_consumption-console_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-150","src/components/stock/flow-reviews.tsx","60","CLIENT_flow-reviews_tsx","reason.message","UI_ERROR_BRANCH","setError(reason.message);","AST + directed semantic review; not every branch executed"
+"ERB-151","src/components/stock/flow-reviews.tsx","100","CLIENT_flow-reviews_tsx","reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar a revisão.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error
+          ? reason.message
+          : ""Não foi possível confirmar a revisão."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-152","src/components/stock/inventory-console.tsx","30","CLIENT_inventory-console_tsx","reason instanceof Error ? reason.message : ""Não foi possível carregar os inventários.""","UI_ERROR_BRANCH","setError(reason instanceof Error ? reason.message : ""Não foi possível carregar os inventários."");","AST + directed semantic review; not every branch executed"
+"ERB-153","src/components/stock/inventory-console.tsx","36","CLIENT_inventory-console_tsx","reason instanceof Error ? reason.message : ""Não foi possível atualizar o inventário.""","UI_ERROR_BRANCH","setError(reason instanceof Error ? reason.message : ""Não foi possível atualizar o inventário."");","AST + directed semantic review; not every branch executed"
+"ERB-154","src/components/stock/inventory-console.tsx","39","CLIENT_inventory-console_tsx","Informe uma contagem inteira não negativa.","UI_ERROR_BRANCH","setError(""Informe uma contagem inteira não negativa."");","AST + directed semantic review; not every branch executed"
+"ERB-155","src/components/stock/stock-console.tsx","126","CLIENT_stock-console_tsx","reason instanceof Error
+              ? reason.message
+              : ""Não foi possível consultar o estoque.""","UI_ERROR_BRANCH","setError(
+            reason instanceof Error
+              ? reason.message
+              : ""Não foi possível consultar o estoque."",
+          );","AST + directed semantic review; not every branch executed"
+"ERB-156","src/components/stock/stock-console.tsx","188","CLIENT_stock-console_tsx","reason instanceof Error ? reason.message : ""Resultado não confirmado.""","UI_ERROR_BRANCH","setError(
+        reason instanceof Error ? reason.message : ""Resultado não confirmado."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-157","src/lib/notifications/worker.ts","112","NOTIFICATION_RESULT_UNCONFIRMED","Parte do processamento não pôde ser confirmada. Consulte os estados persistidos antes de tentar novamente.","SERVER_API_ERROR","throw new ApiError(
+      ""NOTIFICATION_RESULT_UNCONFIRMED"",
+      ""Parte do processamento não pôde ser confirmada. Consulte os estados persistidos antes de tentar novamente."",
+      503,
+      true,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-158","src/lib/server/api.ts","26","VERSION_CONFLICT","Este plantão tem um BAL designado. Registre a decisão familiar no acompanhamento do balanço antes de alterar o período ou cancelar o plantão.","SERVER_API_ERROR","throw new ApiError(""VERSION_CONFLICT"", ""Este plantão tem um BAL designado. Registre a decisão familiar no acompanhamento do balanço antes de alterar o período ou cancelar o plantão."",409);","AST + directed semantic review; not every branch executed"
+"ERB-159","src/lib/server/api.ts","28","FORBIDDEN","A revisão precisa ser realizada por outra pessoa autorizada, distinta de quem fez a contagem.","SERVER_API_ERROR","throw new ApiError(""FORBIDDEN"",""A revisão precisa ser realizada por outra pessoa autorizada, distinta de quem fez a contagem."",403);","AST + directed semantic review; not every branch executed"
+"ERB-160","src/lib/server/api.ts","30","SCHEDULE_OVERLAP","Este profissional já possui um plantão nesse período. Revise os horários.","SERVER_API_ERROR","throw new ApiError(""SCHEDULE_OVERLAP"", ""Este profissional já possui um plantão nesse período. Revise os horários."", 409);","AST + directed semantic review; not every branch executed"
+"ERB-161","src/lib/server/api.ts","32","DUPLICATE_REVIEW_REQUIRED","Há uma requisição pendente deste produto. Confira a anterior e justifique a reiteração.","SERVER_API_ERROR","throw new ApiError(
+      ""DUPLICATE_REVIEW_REQUIRED"",
+      ""Há uma requisição pendente deste produto. Confira a anterior e justifique a reiteração."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-162","src/lib/server/api.ts","40","VERSION_CONFLICT","O registro mudou ou precisa de outro administrador. Atualize o acompanhamento.","SERVER_API_ERROR","throw new ApiError(
+      ""VERSION_CONFLICT"",
+      ""O registro mudou ou precisa de outro administrador. Atualize o acompanhamento."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-163","src/lib/server/api.ts","46","LAST_GLOBAL_ADMIN","Mantenha ao menos um administrador global ativo.","SERVER_API_ERROR","throw new ApiError(
+      ""LAST_GLOBAL_ADMIN"",
+      ""Mantenha ao menos um administrador global ativo."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-164","src/lib/server/api.ts","52","IDEMPOTENCY_CONFLICT","A chave já foi utilizada com outro conteúdo. Inicie uma nova operação.","SERVER_API_ERROR","throw new ApiError(
+      ""IDEMPOTENCY_CONFLICT"",
+      ""A chave já foi utilizada com outro conteúdo. Inicie uma nova operação."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-165","src/lib/server/api.ts","62","INVENTORY_CONFLICT","O estoque mudou após a referência. Faça uma nova contagem antes de aprovar.","SERVER_API_ERROR","throw new ApiError(
+      ""INVENTORY_CONFLICT"",
+      ""O estoque mudou após a referência. Faça uma nova contagem antes de aprovar."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-166","src/lib/server/api.ts","68","INSUFFICIENT_STOCK","O estoque disponível é insuficiente.","SERVER_API_ERROR","throw new ApiError(
+      ""INSUFFICIENT_STOCK"",
+      ""O estoque disponível é insuficiente."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-167","src/lib/server/api.ts","79","FORBIDDEN","Você não tem autorização para esta operação.","SERVER_API_ERROR","throw new ApiError(
+      ""FORBIDDEN"",
+      ""Você não tem autorização para esta operação."",
+      403,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-168","src/lib/server/api.ts","85","NOT_FOUND","Registro não encontrado.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Registro não encontrado."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-169","src/lib/server/api.ts","87","INVITATION_INVALID","O convite é inválido, expirou ou foi revogado.","SERVER_API_ERROR","throw new ApiError(
+      ""INVITATION_INVALID"",
+      ""O convite é inválido, expirou ou foi revogado."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-170","src/lib/server/api.ts","93","AMBIGUOUS_PRODUCT","O nome ou apelido já identifica outro produto deste paciente.","SERVER_API_ERROR","throw new ApiError(
+      ""AMBIGUOUS_PRODUCT"",
+      ""O nome ou apelido já identifica outro produto deste paciente."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-171","src/lib/server/api.ts","99","DUPLICATE","Este registro já existe.","SERVER_API_ERROR","throw new ApiError(""DUPLICATE"", ""Este registro já existe."", 409);","AST + directed semantic review; not every branch executed"
+"ERB-172","src/lib/server/api.ts","105","INVALID_OPERATION","A operação não é compatível com o estado atual. Revise os dados e as permissões.","SERVER_API_ERROR","throw new ApiError(
+      ""INVALID_OPERATION"",
+      ""A operação não é compatível com o estado atual. Revise os dados e as permissões."",
+      400,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-173","src/lib/server/api.ts","110","DATABASE_UNAVAILABLE","Não foi possível concluir a operação. Tente novamente.","SERVER_API_ERROR","throw new ApiError(
+    ""DATABASE_UNAVAILABLE"",
+    ""Não foi possível concluir a operação. Tente novamente."",
+    503,
+    true,
+  );","AST + directed semantic review; not every branch executed"
+"ERB-174","src/lib/server/api.ts","133","INTERNAL_ERROR","Não foi possível concluir a operação.","SERVER_API_ERROR","error instanceof ApiError
+        ? error
+        : new ApiError(
+            ""INTERNAL_ERROR"",
+            ""Não foi possível concluir a operação."",
+            500,
+            true,
+          )","AST + directed semantic review; not every branch executed"
+"ERB-175","src/lib/server/api.ts","173","INVALID_ORIGIN","Origem da operação não autorizada.","SERVER_API_ERROR","throw new ApiError(
+      ""INVALID_ORIGIN"",
+      ""Origem da operação não autorizada."",
+      403,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-176","src/lib/server/api.ts","188","INVALID_ORIGIN","Origem da operação não autorizada.","SERVER_API_ERROR","throw new ApiError(
+        ""INVALID_ORIGIN"",
+        ""Origem da operação não autorizada."",
+        403,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-177","src/lib/server/api.ts","202","JSON_REQUIRED","Envie os dados em formato JSON.","SERVER_API_ERROR","throw new ApiError(""JSON_REQUIRED"", ""Envie os dados em formato JSON."", 415);","AST + directed semantic review; not every branch executed"
+"ERB-178","src/lib/server/api.ts","208","PAYLOAD_TOO_LARGE","Dados acima do limite permitido.","SERVER_API_ERROR","throw new ApiError(
+      ""PAYLOAD_TOO_LARGE"",
+      ""Dados acima do limite permitido."",
+      413,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-179","src/lib/server/api.ts","224","PAYLOAD_TOO_LARGE","Dados acima do limite permitido.","SERVER_API_ERROR","throw new ApiError(
+          ""PAYLOAD_TOO_LARGE"",
+          ""Dados acima do limite permitido."",
+          413,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-180","src/lib/server/api.ts","249","INVALID_JSON","JSON inválido.","SERVER_API_ERROR","throw new ApiError(""INVALID_JSON"", ""JSON inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-181","src/lib/server/api.ts","253","VALIDATION_ERROR","parsed.error.issues[0]?.message ?? ""Dados inválidos.""","SERVER_API_ERROR","throw new ApiError(
+      ""VALIDATION_ERROR"",
+      parsed.error.issues[0]?.message ?? ""Dados inválidos."",
+    );","AST + directed semantic review; not every branch executed"
+"ERB-182","src/lib/server/api.ts","269","NOT_CONFIGURED","Supabase não está configurado.","SERVER_API_ERROR","throw new ApiError(""NOT_CONFIGURED"", ""Supabase não está configurado."", 503);","AST + directed semantic review; not every branch executed"
+"ERB-183","src/lib/server/api.ts","275","SESSION_EXPIRED","Sua sessão expirou. Entre novamente.","SERVER_API_ERROR","throw new ApiError(
+      ""SESSION_EXPIRED"",
+      ""Sua sessão expirou. Entre novamente."",
+      401,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-184","src/lib/server/api.ts","291","FORBIDDEN","Seu acesso foi revogado ou ainda não foi ativado.","SERVER_API_ERROR","throw new ApiError(
+      ""FORBIDDEN"",
+      ""Seu acesso foi revogado ou ainda não foi ativado."",
+      403,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-185","src/lib/server/api.ts","297","SESSION_EXPIRED","Sua sessão foi encerrada. Entre novamente.","SERVER_API_ERROR","throw new ApiError(
+      ""SESSION_EXPIRED"",
+      ""Sua sessão foi encerrada. Entre novamente."",
+      401,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-186","src/lib/server/api.ts","316","FORBIDDEN","A operação exige administração global.","SERVER_API_ERROR","throw new ApiError(
+      ""FORBIDDEN"",
+      ""A operação exige administração global."",
+      403,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-187","src/lib/server/api.ts","327","VALIDATION_ERROR","Identificador inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Identificador inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-188","src/lib/server/api.ts","337","PATIENT_REQUIRED","Selecione um paciente válido.","SERVER_API_ERROR","throw new ApiError(""PATIENT_REQUIRED"", ""Selecione um paciente válido."");","AST + directed semantic review; not every branch executed"
+"ERB-189","src/lib/server/api.ts","345","NOT_FOUND","Paciente não encontrado ou acesso não autorizado.","SERVER_API_ERROR","throw new ApiError(
+      ""NOT_FOUND"",
+      ""Paciente não encontrado ou acesso não autorizado."",
+      404,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-190","src/lib/server/api.ts","361","FORBIDDEN","Você não tem acesso ativo a este paciente.","SERVER_API_ERROR","throw new ApiError(
+        ""FORBIDDEN"",
+        ""Você não tem acesso ativo a este paciente."",
+        403,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-191","src/lib/server/api.ts","373","CONTEXT_REQUIRED","Selecione seu vínculo com este paciente em Mudar perfil.","SERVER_API_ERROR","throw new ApiError(
+      ""CONTEXT_REQUIRED"",
+      ""Selecione seu vínculo com este paciente em Mudar perfil."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-192","src/lib/server/api.ts","397","FORBIDDEN","Você não tem autorização para esta operação.","SERVER_API_ERROR","throw new ApiError(
+      ""FORBIDDEN"",
+      ""Você não tem autorização para esta operação."",
+      403,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-193","src/lib/server/api.ts","403","PATIENT_INACTIVE","O paciente está inativo. O histórico permanece disponível.","SERVER_API_ERROR","throw new ApiError(
+      ""PATIENT_INACTIVE"",
+      ""O paciente está inativo. O histórico permanece disponível."",
+      409,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-194","src/lib/server/api.ts","441","INVALID_DATE","Informe uma data válida.","SERVER_API_ERROR","throw new ApiError(""INVALID_DATE"", ""Informe uma data válida."");","AST + directed semantic review; not every branch executed"
+"ERB-195","src/lib/server/api.ts","447","INVALID_DATE","Informe uma data válida.","SERVER_API_ERROR","throw new ApiError(""INVALID_DATE"", ""Informe uma data válida."");","AST + directed semantic review; not every branch executed"
+"ERB-196","src/lib/server/document-pdf.ts","20","VALIDATION_ERROR","Emita o documento antes de gerar o comprovante.","SERVER_API_ERROR","throw new ApiError(
+      ""VALIDATION_ERROR"",
+      ""Emita o documento antes de gerar o comprovante."",
+    );","AST + directed semantic review; not every branch executed"
+"ERB-197","src/lib/server/document-pdf.ts","48","PERSISTENCE_UNCONFIRMED","Não foi possível recuperar o PDF registrado.","SERVER_API_ERROR","throw new ApiError(
+        ""PERSISTENCE_UNCONFIRMED"",
+        ""Não foi possível recuperar o PDF registrado."",
+        503,
+        true,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-198","src/lib/server/document-pdf.ts","57","NOT_FOUND","Não há arquivo original registrado para esta versão.","SERVER_API_ERROR","throw new ApiError(
+      ""NOT_FOUND"",
+      ""Não há arquivo original registrado para esta versão."",
+      404,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-199","src/lib/server/document-pdf.ts","69","NOT_FOUND","Versão não encontrada.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Versão não encontrada."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-200","src/lib/server/document-pdf.ts","89","PERSISTENCE_UNCONFIRMED","Não foi possível confirmar o armazenamento do PDF.","SERVER_API_ERROR","throw new ApiError(
+        ""PERSISTENCE_UNCONFIRMED"",
+        ""Não foi possível confirmar o armazenamento do PDF."",
+        503,
+        true,
+      );","AST + directed semantic review; not every branch executed"
+"ERB-201","src/lib/server/document-pdf.ts","100","PERSISTENCE_UNCONFIRMED","PDF aguardando confirmação.","SERVER_API_ERROR","throw new ApiError(
+      ""PERSISTENCE_UNCONFIRMED"",
+      ""PDF aguardando confirmação."",
+      503,
+      true,
+    );","AST + directed semantic review; not every branch executed"
+"ERB-202","src/lib/server/files.ts","48","PAYLOAD_TOO_LARGE","O anexo deve ter até 10 MB.","SERVER_API_ERROR","throw new ApiError(""PAYLOAD_TOO_LARGE"", ""O anexo deve ter até 10 MB."", 413);","AST + directed semantic review; not every branch executed"
+"ERB-203","src/lib/server/files.ts","50","VALIDATION_ERROR","Selecione um arquivo.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Selecione um arquivo."");","AST + directed semantic review; not every branch executed"
+"ERB-204","src/lib/server/files.ts","60","PAYLOAD_TOO_LARGE","O anexo deve ter até 10 MB.","SERVER_API_ERROR","throw new ApiError(
+          ""PAYLOAD_TOO_LARGE"",
+          ""O anexo deve ter até 10 MB."",
+          413,
+        );","AST + directed semantic review; not every branch executed"
+"ERB-205","src/lib/server/files.ts","76","VALIDATION_ERROR","Arquivo inválido.","SERVER_API_ERROR","throw new ApiError(""VALIDATION_ERROR"", ""Arquivo inválido."");","AST + directed semantic review; not every branch executed"
+"ERB-206","src/lib/server/files.ts","80","VALIDATION_ERROR","Selecione um arquivo de até 10 MB.","SERVER_API_ERROR","throw new ApiError(
+      ""VALIDATION_ERROR"",
+      ""Selecione um arquivo de até 10 MB."",
+    );","AST + directed semantic review; not every branch executed"
+"ERB-207","src/lib/server/files.ts","101","VALIDATION_ERROR","Envie um PDF sem scripts ou arquivos incorporados.","SERVER_API_ERROR","throw new ApiError(
+        ""VALIDATION_ERROR"",
+        ""Envie um PDF sem scripts ou arquivos incorporados."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-208","src/lib/server/files.ts","122","VALIDATION_ERROR","PDF inválido, protegido ou acima de 100 páginas.","SERVER_API_ERROR","throw new ApiError(
+        ""VALIDATION_ERROR"",
+        ""PDF inválido, protegido ou acima de 100 páginas."",
+      );","AST + directed semantic review; not every branch executed"
+"ERB-209","src/lib/server/files.ts","129","VALIDATION_ERROR","Use imagem JPEG, PNG, WebP ou PDF.","SERVER_API_ERROR","throw new ApiError(
+      ""VALIDATION_ERROR"",
+      ""Use imagem JPEG, PNG, WebP ou PDF."",
+    );","AST + directed semantic review; not every branch executed"
+"ERB-210","src/lib/server/files.ts","156","VALIDATION_ERROR","Imagem inválida ou acima do limite de resolução.","SERVER_API_ERROR","throw new ApiError(
+      ""VALIDATION_ERROR"",
+      ""Imagem inválida ou acima do limite de resolução."",
+    );","AST + directed semantic review; not every branch executed"
+"ERB-211","src/lib/server/receipts.ts","20","NOT_FOUND","Comprovante não encontrado.","SERVER_API_ERROR","throw new ApiError(""NOT_FOUND"", ""Comprovante não encontrado."", 404);","AST + directed semantic review; not every branch executed"
+"ERB-212","src/lib/server/service-client.ts","9","WORKER_NOT_CONFIGURED","O processamento externo ainda não foi configurado.","SERVER_API_ERROR","throw new ApiError(
+      ""WORKER_NOT_CONFIGURED"",
+      ""O processamento externo ainda não foi configurado."",
+      503,
+    );","AST + directed semantic review; not every branch executed"

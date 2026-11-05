@@ -1,5 +1,10 @@
 # Mapa das telas
 
+Guia da base funcional auditada e de seus contratos requeridos. Os desvios
+A/B e as mudanças futuras C não foram corrigidos por este documento.
+Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
+[projeto C3](../audits/C/C3-functional-specification/README.md).
+
 ## Trabalho e documentos
 
 - `/`: decisões gerenciais, tarefas pessoais ou supervisão por contexto.

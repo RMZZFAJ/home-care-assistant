@@ -1,0 +1,29 @@
+{
+  "recordedAt": "2026-10-30T22:34:26.686Z",
+  "changedFiles": [],
+  "changedTables": [
+    {
+      "rows": 1,
+      "relation": "private.scheduler_health",
+      "content_md5": "597eed5183a57f7d6c82dfd2d4cba477"
+    },
+    {
+      "rows": 1,
+      "relation": "private.bal_scheduler_progress",
+      "content_md5": "4c1036dd3348a6ccc80ebcb02ce7f6f9"
+    }
+  ],
+  "expectedBackgroundRelations": [
+    "private.scheduler_health",
+    "private.bal_scheduler_progress"
+  ],
+  "unexpectedTableChanges": [],
+  "masterPreserved": true,
+  "routinesPreserved": true,
+  "allTrackedProductFilesPreserved": true,
+  "allObservedRowsPreserved": false,
+  "businessAuthStorageRowsPreserved": true,
+  "remoteMutations": 0,
+  "productMutations": 0,
+  "limits": "Existing cron updates private scheduler health/cursor during read-only audit. These two relations are reported, not silently excluded from the original comparison. No B7 mutations were executed."
+}

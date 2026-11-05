@@ -1,0 +1,44 @@
+{
+  "commandScope": "BEGIN READ ONLY; constant VALUES and SELECT; ROLLBACK",
+  "origin": "http://127.0.0.1:54321",
+  "observations": [
+    {
+      "id": "SQL-01",
+      "status": "disputed",
+      "checked": 0,
+      "balance": 3,
+      "current_condition": false,
+      "current_guard_rejects": false,
+      "strict_guard_rejects": false
+    },
+    {
+      "id": "SQL-02",
+      "status": "disputed",
+      "checked": 0,
+      "balance": 2,
+      "current_condition": true,
+      "current_guard_rejects": true,
+      "strict_guard_rejects": true
+    },
+    {
+      "id": "SQL-03",
+      "status": "disputed",
+      "checked": 0,
+      "balance": null,
+      "current_condition": null,
+      "current_guard_rejects": false,
+      "strict_guard_rejects": true
+    },
+    {
+      "id": "SQL-04",
+      "status": "incorrect",
+      "checked": 0,
+      "balance": null,
+      "current_condition": true,
+      "current_guard_rejects": true,
+      "strict_guard_rejects": true
+    }
+  ],
+  "currentGuardSource": "tests/database/supply-workflows.sql:50 (partial receipt guard)",
+  "limitation": "The isolated predicate admits a missing positive balance; this does not establish that the entire SQL suite would pass every missing-ledger mutation."
+}

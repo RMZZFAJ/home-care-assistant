@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-30T06:06:31.872Z",
+  "inventory": 1098,
+  "coverage": 306,
+  "runtimeGrades": {
+    "STATIC_REVIEW_WITH_EXPLICIT_RUNTIME_LIMITS": 134,
+    "DML_DENIAL_EXECUTED;OTHER_STATES_NOT_EXHAUSTIVE": 62,
+    "AUTH_VISIBILITY_AND_SELECT_PLAN_SAMPLED": 1,
+    "ROLLBACK_GAPS_EXPECTED;NOT_ALL_SEQUENCE_BEHAVIOR": 2,
+    "INTERNAL_CONTRACT_RECONSTRUCTION;NOT_STANDALONE_AUTH_CASE": 62,
+    "DIRECT_LOCAL_CONTRACT_CASES;NOT_ALL_BRANCHES": 34,
+    "ROLLBACK_SQL_CONTRACT_WITH_ROLE_CONTEXT;NOT_HTTP_AUTH_PROOF": 7,
+    "EXTENSION_METADATA_ONLY": 4
+  },
+  "invariants": 35,
+  "migrations": 84,
+  "limits": "Coverage grades are methods, not green test totals. No remaining placeholder status; NOT_VERIFIED limitations retained."
+}

@@ -1,0 +1,14 @@
+
+> home-care-assistant@0.1.0 lint
+> eslint
+
+
+C:\Users\renat\Projetos_Dev\home-care-assistant\docs\audits\2026-10-29-phase-b2-processes\evidence\b28-probe.mjs
+   1:9    error  'readFileSync' is defined but never used  no-unused-vars
+  48:34   error  'FormData' is not defined                 no-undef
+  48:147  error  'Blob' is not defined                     no-undef
+
+C:\Users\renat\Projetos_Dev\home-care-assistant\docs\audits\2026-10-29-phase-b2-processes\evidence\http-harness.mjs
+  10:53  error  'FormData' is not defined  no-undef
+
+✖ 4 problems (4 errors, 0 warnings)

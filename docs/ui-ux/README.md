@@ -1,56 +1,21 @@
-# Evolução da experiência Fluent 2
+# Guias da fundação de interface
 
-## Escopo aprovado
+Guias AS_IS/normativos da base funcional auditada; desvios A/B permanecem
+registrados. O [estado por SHA](../current/PROJECT_STATUS.md) é a fonte atual.
+O [projeto C3](../audits/C/C3-functional-specification/README.md) descreve como
+deverá funcionar; não foi implementado nesta reorganização.
 
-Refatoração integral da apresentação da V4, preservando contratos, capacidades,
-contexto explícito, dados e transações. Uma aplicação oferece experiência
-gerencial para família/administração e operacional para equipe/supervisão.
+- [Fundação visual](DESIGN_SYSTEM.md), [componentes](COMPONENTS.md),
+  [arquitetura de informação](INFORMATION_ARCHITECTURE.md) e [mapa](SCREEN_MAP.md).
+- [Escalas existentes](SCHEDULES.md) e [BAL existente](BALANCES.md), com
+  exceções delimitadas nas auditorias e evolução planejada em C.
+- [Inventário gerado datado](INVENTORY.md) e inventory.json permanecem no
+  endereço consumido por ferramenta; não são censo reexecutado em C.
+- [Execução histórica](../archive/ui-ux/EXECUTION.md),
+  [matriz histórica](../archive/ui-ux/ACCEPTANCE.md) e protótipos/capturas
+  arquivados não constituem aceite atual de aparelho ou participante.
 
-As referências aprovadas estão em references. Elas são demonstrações com dados
-fictícios: não representam autorização, estado de comunicação ou regras reais.
-O inventário inclui páginas, componentes indiretos, dependências e estados
-identificáveis no código. Gere-o com `node scripts/inventory-ui.mjs`.
-
-## Decisões consolidadas
-
-- Fluent UI React v9, tema claro e azul empresarial; identidade própria.
-- Gerência completa também no celular; operação com cinco destinos:
-  Início, Histórico, Entregas, Estoque e Mais.
-- Contexto selecionado explicitamente no servidor; troca no menu do usuário.
-- Listas primeiro, edição contextual, matrizes compactas e campos progressivos.
-- REQ conserva etapas e não contém quantidade solicitada.
-- Visualizador compartilhado preserva links e versões documentais existentes.
-- Escalas persistentes: semanais, avulsas, 12×36, 24×48 e 24×24, sem check-in.
-- Administração de escala, execução de BAL e aprovação familiar são distintas.
-- BAL começa no plantão designado; atraso transfere a mesma obrigação.
-- Uma contagem atual regulariza pendências anteriores sem inventar contagens
-  físicas passadas nem apagar atrasos.
-- Adiamento de equipe ou supervisão exige aprovação familiar; proposta pendente
-  não suspende prazo, responsabilidade ou alertas.
-- Processamento automático novo é habilitado por paciente, primeiro na
-  homologação. Migrations não habilitam processamento para todos os pacientes.
-- Remoto recebe somente evolução incremental após backup e validação local.
-  Preservar usuários, vínculos, produtos, documentos, estoques e demais dados.
-  Não realizar reset de banco.
-
-## Arquitetura de apresentação
-
-A fundação reúne tema/tokens, provider SSR, controles Fluent e padrões de
-layout, campos, listas, painéis e feedback. Componentes de domínio consomem
-essa biblioteca; regras de autorização e estoque continuam no servidor.
-
-O shell gerencial possui cabeçalho compacto e navegação lateral agrupada,
-recolhível no desktop e em drawer no celular. O shell operacional prioriza
-tarefas e usa navegação inferior. Supervisão acompanha a equipe sem assumir
-ações destinadas a outra identidade.
-
-Documentos mostram ação contextual, itens, relações, anexos, comunicações e
-histórico, revelando detalhes progressivamente. Aceite, ciência, atendimento,
-conferência, conciliação, aprovação e comunicação mantêm significados próprios.
-
-## Execução e evidências
-
-Consulte EXECUTION.md para o andamento por bloco e INVENTORY.md para a cobertura
-da interface. Resultados anteriores da V4 não substituem a validação desta
-evolução. Integrações externas só serão declaradas verificadas com evidência
-real do provedor.
+Fluent, paciente, capacidades e fatos separados são preservados. Não executar
+inventory-ui ou probes históricos para atualizar resultados sem destino/base
+e guardas D0: B8-M002 registrou risco de sobrescrita. Nenhum guia concede
+autorização de banco, envio, deploy ou merge.

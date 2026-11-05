@@ -1,0 +1,89 @@
+HCA
+HOME CARE ASSISTANT
+GESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL
+MATERIAL
+ACEITO
+CONCILIADO
+SITUAÇÃO
+Material fictício 33 B6 com descrição longa para
+controlar continuidade de tabelas, acentos e linhas
+1
+0
+Aguardando conferência
+Material fictício 34 B6 com descrição longa para
+controlar continuidade de tabelas, acentos e linhas
+1
+0
+Divergência aberta
+LINHA DO TEMPO OPERACIONAL
+DATA/HORA
+RESPONSÁVEL
+EVENTO
+30/10/2026, 11:00
+Pessoa fictícia B6 0
+Recebimento conferido · v1
+30/10/2026, 11:00
+Pessoa fictícia B6 1
+Divergência conciliada · v2
+30/10/2026, 11:00
+Pessoa fictícia B6 2
+Recebimento conferido · v3
+30/10/2026, 11:00
+Pessoa fictícia B6 3
+Divergência conciliada · v4
+30/10/2026, 11:00
+Pessoa fictícia B6 4
+Recebimento conferido · v5
+30/10/2026, 11:00
+Pessoa fictícia B6 5
+Divergência conciliada · v6
+30/10/2026, 11:00
+Pessoa fictícia B6 6
+Recebimento conferido · v7
+30/10/2026, 11:00
+Pessoa fictícia B6 7
+Divergência conciliada · v8
+30/10/2026, 11:00
+Pessoa fictícia B6 8
+Recebimento conferido · v9
+30/10/2026, 11:00
+Pessoa fictícia B6 9
+Divergência conciliada · v10
+30/10/2026, 11:00
+Pessoa fictícia B6 10
+Recebimento conferido · v11
+30/10/2026, 11:00
+Pessoa fictícia B6 11
+Divergência conciliada · v12
+30/10/2026, 11:00
+Pessoa fictícia B6 12
+Recebimento conferido · v13
+30/10/2026, 11:00
+Pessoa fictícia B6 13
+Divergência conciliada · v14
+30/10/2026, 11:00
+Pessoa fictícia B6 14
+Recebimento conferido · v15
+30/10/2026, 11:00
+Pessoa fictícia B6 15
+Divergência conciliada · v16
+30/10/2026, 11:00
+Pessoa fictícia B6 16
+Recebimento conferido · v17
+30/10/2026, 11:00
+Pessoa fictícia B6 17
+Divergência conciliada · v18
+30/10/2026, 11:00
+Pessoa fictícia B6 18
+Recebimento conferido · v19
+30/10/2026, 11:00
+Pessoa fictícia B6 19
+Divergência conciliada · v20
+30/10/2026, 11:00
+Pessoa fictícia B6 20
+Recebimento conferido · v21
+30/10/2026, 11:00
+Pessoa fictícia B6 21
+Divergência conciliada · v22
+ENT-0001 · v48 · Conteúdo autorizado
+Página 6 de 8

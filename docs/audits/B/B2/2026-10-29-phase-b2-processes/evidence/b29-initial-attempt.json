@@ -1,0 +1,26 @@
+{
+  "group": "B2.9",
+  "startedAt": "2026-10-29T23:09:50.707Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B29-01",
+      "purpose": "Cancelar ENT reabre REQ arquivada e conserva motivo anterior e PDF antigo",
+      "recordedAt": "2026-10-29T23:09:50.909Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'Família conferiu a ciência tardia e encerrou a necessidade fictícia sem apagar a exceção'\n",
+        "sqlstate": null
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ]
+}

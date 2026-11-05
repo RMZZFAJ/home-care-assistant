@@ -1,5 +1,9 @@
 {
     "markdown.validate.enabled": true,
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+    "tailwindCSS.includeLanguages": {
+        "markdown": "plaintext"
+    },
     "powershell.enableProfileLoading": false,
     "powershell.powerShellAdditionalExePaths": {
         "PowerShell 7": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"

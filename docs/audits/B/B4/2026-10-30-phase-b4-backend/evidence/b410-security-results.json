@@ -1,0 +1,51 @@
+{
+  "recordedAt": "2026-10-30T07:24:52.719Z",
+  "category": "LOCAL_HTTP_AND_BUILT_ASSET_READ_ONLY",
+  "results": [
+    {
+      "id": "B410-01",
+      "contract": "Forwarded host does not authorize hostile Origin",
+      "status": 403,
+      "code": "INVALID_ORIGIN"
+    },
+    {
+      "id": "B410-02",
+      "contract": "No credentialed cross-origin CORS grant",
+      "status": 204,
+      "allow": "GET, HEAD, OPTIONS, POST",
+      "accessControlAllowOrigin": null
+    },
+    {
+      "id": "B410-03",
+      "contract": "Missing PKCE code and hostile return target cannot redirect externally",
+      "status": 307,
+      "destination": "/login",
+      "noStore": "private, no-store"
+    },
+    {
+      "id": "B410-04",
+      "contract": "Private data explicitly noncacheable;headers observed locally only",
+      "status": 200,
+      "cacheControl": "no-store",
+      "csp": null,
+      "frameOptions": null,
+      "limits": "Missing local headers do not prove platform configuration or an exploit. No remote test."
+    },
+    {
+      "id": "B410-05",
+      "contract": "Public verification returns page without session",
+      "status": 200,
+      "limits": "Page source and SQL return only integrity boolean;no private identity exported;HTML text body not persisted"
+    },
+    {
+      "id": "B410-06",
+      "contract": "Local privileged key is not in browser build;real env files untracked",
+      "assetsScanned": 46,
+      "serviceKeyMatches": 0,
+      "trackedEnvironmentFiles": [
+        ".env.example"
+      ],
+      "limits": "Exact local key search,not proof that no secret ever existed in repository history or remote deployment"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-29T08:24:12.976Z",
+  "product_sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "source_coverage": 231,
+  "source_files": 222,
+  "full_semantic": 174,
+  "texts": 4205,
+  "dynamicAttributes": 54,
+  "literalCandidates": 12343,
+  "ui": 112,
+  "e2eSources": 15,
+  "rootUnitSources": 6,
+  "assets": 9
+}

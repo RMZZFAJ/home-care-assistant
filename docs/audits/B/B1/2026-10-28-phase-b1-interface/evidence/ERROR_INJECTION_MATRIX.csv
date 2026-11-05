@@ -1,0 +1,42 @@
+"scenario","method","state","evidence","status","limits"
+"consumption-401","Injected GET only. No mutation sent. Does not prove actual server uses this status/code.","ERROR_BLOCKED","evidence/b14-errors-adminA-consumption-401.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"consumption-403","Injected GET only. No mutation sent. Does not prove actual server uses this status/code.","ERROR_BLOCKED","evidence/b14-errors-adminA-consumption-403.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"consumption-404","Injected GET only. No mutation sent. Does not prove actual server uses this status/code.","ERROR_RECOVERABLE","evidence/b14-errors-adminA-consumption-404.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"consumption-409","Injected GET only. No mutation sent. Does not prove actual server uses this status/code.","ERROR_RECOVERABLE","evidence/b14-errors-adminA-consumption-409.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"consumption-422","Injected GET only. No mutation sent. Does not prove actual server uses this status/code.","ERROR_RECOVERABLE","evidence/b14-errors-adminA-consumption-422.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"consumption-429","Injected GET only. No mutation sent. Does not prove actual server uses this status/code.","ERROR_RECOVERABLE","evidence/b14-errors-adminA-consumption-429.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"consumption-500","Injected GET only. No mutation sent. Does not prove actual server uses this status/code.","ERROR_RECOVERABLE","evidence/b14-errors-adminA-consumption-500.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"attachment-lost-response","First upload returned HTTP400 before response abort. Does not prove persisted attachment; follow-up with explicit MIME is separate.","UNKNOWN_RESULT","evidence/b14-errors-adminA-attachment-lost-response.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"invalid-json","Probe attempt","HARNESS_FAILURE","evidence/b14-errors.json","INCOMPLETE_ATTEMPT","locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+    1) <div role=""alert"" class=""ui-notice ui-notice-error"">O serviço não retornou uma resposta válida. Tente…</div> aka getByText('O serviço não retornou uma')
+    2) <div role=""alert"" aria-live=""assertive"" id=""__next-route-announcer__""></div> aka locator('[id=""__next-route-announcer__""]')
+
+Call log:
+[2m  - waiting for getByRole('alert') to be visible[22m
+"
+"offline-read","Probe attempt","HARNESS_FAILURE","evidence/b14-errors.json","INCOMPLETE_ATTEMPT","locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+    1) <div role=""alert"" class=""ui-notice ui-notice-error"">Não foi possível confirmar a resposta. Recupere a…</div> aka getByText('Não foi possível confirmar a')
+    2) <div role=""alert"" aria-live=""assertive"" id=""__next-route-announcer__""></div> aka locator('[id=""__next-route-announcer__""]')
+
+Call log:
+[2m  - waiting for getByRole('alert') to be visible[22m
+"
+"profile-error","Probe attempt","HARNESS_FAILURE","evidence/b14-errors.json","INCOMPLETE_ATTEMPT","locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+    1) <div role=""alert"" class=""ui-notice ui-notice-error"">Falha fictícia B1 500 Referência: B1-INJECTED-500</div> aka getByText('Falha fictícia B1 500 Referê')
+    2) <div role=""alert"" aria-live=""assertive"" id=""__next-route-announcer__""></div> aka locator('[id=""__next-route-announcer__""]')
+
+Call log:
+[2m  - waiting for getByRole('alert') to be visible[22m
+"
+"critical-permission-409","Probe attempt","HARNESS_FAILURE","evidence/b14-errors.json","INCOMPLETE_ATTEMPT","locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+    1) <div role=""alert"" class=""ui-notice ui-notice-error"">A configuração mudou em outra sessão. Dados recar…</div> aka getByText('A configuração mudou em outra')
+    2) <div role=""alert"" aria-live=""assertive"" id=""__next-route-announcer__""></div> aka locator('[id=""__next-route-announcer__""]')
+
+Call log:
+[2m  - waiting for getByRole('alert') to be visible[22m
+"
+"invalid-json","Controlled local read/error scenario","ERROR_RECOVERABLE","evidence/b14-recovery-adminA-invalid-json.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"network-abort","Controlled local read/error scenario","OFFLINE","evidence/b14-recovery-adminA-network-abort.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"profile-error","Controlled local read/error scenario","ERROR_RECOVERABLE","evidence/b14-recovery-adminA-profile-error.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"permission-409","Controlled local read/error scenario","ERROR_RECOVERABLE","evidence/b14-recovery-adminA-permission-409.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."
+"attachment-lost","Read accepted.status before classifying proof. Only explicit synthetic PNG uploaded; no file replacement or second attempt.","UNKNOWN_RESULT","evidence/b14-recovery-adminA-attachment-lost.png","EXECUTED_CAPTURED","Visual inspection per sheets; injected HTTP is not proof server emitted it."

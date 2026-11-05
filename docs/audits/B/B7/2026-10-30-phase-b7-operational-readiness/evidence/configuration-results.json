@@ -1,0 +1,56 @@
+{
+  "recordedAt": "2026-10-30T22:02:45.799Z",
+  "method": "Real handler/provider configuration with mocked authorized data adapter; no sends",
+  "networkCalls": 0,
+  "cases": [
+    {
+      "id": "CFG-01",
+      "case": "complete configuration",
+      "status": 200,
+      "advertised": true,
+      "providerConfigurationAccepted": true
+    },
+    {
+      "id": "CFG-02",
+      "case": "disabled feature",
+      "status": 200,
+      "advertised": false,
+      "providerConfigurationAccepted": false
+    },
+    {
+      "id": "CFG-03",
+      "case": "missing token",
+      "status": 200,
+      "advertised": false,
+      "providerConfigurationAccepted": false
+    },
+    {
+      "id": "CFG-04",
+      "case": "missing Graph version",
+      "status": 200,
+      "advertised": true,
+      "providerConfigurationAccepted": false
+    },
+    {
+      "id": "CFG-05",
+      "case": "malformed Graph version",
+      "status": 200,
+      "advertised": true,
+      "providerConfigurationAccepted": false
+    },
+    {
+      "id": "CFG-06",
+      "case": "malformed asset identity",
+      "status": 200,
+      "advertised": true,
+      "providerConfigurationAccepted": false
+    },
+    {
+      "id": "CFG-07",
+      "case": "malformed language",
+      "status": 200,
+      "advertised": true,
+      "providerConfigurationAccepted": false
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "group": "B3.9",
+  "startedAt": "2026-10-30T01:28:55.966Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Local PostgreSQL transactions; NEW synthetic SQL fixtures; service-role context simulation; full rollback. Not HTTP/Auth permission validation.",
+  "scenarios": [
+    {
+      "id": "B39-01",
+      "purpose": "25 pacientes cancelados bloqueiam outro paciente por execuções sucessivas: DB-002",
+      "recordedAt": "2026-10-30T01:29:12.787Z",
+      "observed": {
+        "runs": [
+          {
+            "run": 1,
+            "scheduler": {
+              "archived": 0,
+              "reminders": 0,
+              "balanceAssignments": 0,
+              "scheduledReminders": 0,
+              "balancePatientsProcessed": 24
+            },
+            "targetReminderEvents": 0
+          },
+          {
+            "run": 2,
+            "scheduler": {
+              "archived": 0,
+              "reminders": 0,
+              "balanceAssignments": 0,
+              "scheduledReminders": 0,
+              "balancePatientsProcessed": 24
+            },
+            "targetReminderEvents": 0
+          },
+          {
+            "run": 3,
+            "scheduler": {
+              "archived": 0,
+              "reminders": 0,
+              "balanceAssignments": 0,
+              "scheduledReminders": 0,
+              "balancePatientsProcessed": 24
+            },
+            "targetReminderEvents": 0
+          }
+        ],
+        "control": "Only NEW cancelled fixture candidates moved out of due selection; entire transaction rolled back",
+        "controlScheduler": {
+          "archived": 0,
+          "reminders": 1,
+          "balanceAssignments": 0,
+          "scheduledReminders": 0,
+          "balancePatientsProcessed": 24
+        },
+        "targetAfterControl": 1
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B39-02",
+      "purpose": "Um paciente com100 canceladas também esgota o limite interno e bloqueia trabalho elegível",
+      "recordedAt": "2026-10-30T01:29:13.074Z",
+      "observed": {
+        "runs": [
+          {
+            "run": 1,
+            "eligibleEvents": 0
+          },
+          {
+            "run": 2,
+            "eligibleEvents": 0
+          },
+          {
+            "run": 3,
+            "eligibleEvents": 0
+          }
+        ],
+        "scope": "Inner100 limit; one synthetic patient; rollback",
+        "afterControl": 1
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B39-03",
+      "purpose": "Lembretes legados sem cursor ficam presos no mesmo lote100: DB-006 agora reproduzido",
+      "recordedAt": "2026-10-30T01:29:13.336Z",
+      "observed": {
+        "runs": [
+          {
+            "run": 1,
+            "targetReminders": 0
+          },
+          {
+            "run": 2,
+            "targetReminders": 0
+          },
+          {
+            "run": 3,
+            "targetReminders": 0
+          }
+        ],
+        "control": "Only NEW empty settings removed from qualifying fixture selection; rollback",
+        "afterControl": 1
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B39-04",
+      "purpose": "BAL rotativo alcança101 regimes e repetição não duplica obrigações",
+      "recordedAt": "2026-10-30T01:29:13.505Z",
+      "observed": {
+        "scope": "101 NEW regimes in rollback; no scheduled professional/presence fabricated",
+        "afterFirst": 84,
+        "afterThird": 101,
+        "afterSecond": 101,
+        "cursorPreservedAfterFailure": true,
+        "eventsPreservedAfterFailure": true
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [
+    {
+      "id": "B39-01",
+      "purpose": "25 pacientes cancelados bloqueiam outro paciente por execuções sucessivas: DB-002",
+      "recordedAt": "2026-10-30T01:28:55.967Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Local SQL failed: ERROR:  new row for relation \"requisitions\" violates check constraint \"requisitions_protocol_format_check\"\nDETAIL:  Failing row contains (0d7a0b2d-4d81-444b-b4b3-30aa8287dc5a, REQ-20000101-0d7a0b2d4d81444bb4b330aa8287dc5a, 456c501e-873c-4120-a2f2-bb8f39143416, d09204cf-3dc5-44e3-858b-0deda4f7f4da, cancelled, 200de694-4a5e-4d85-b005-a45dc6ab3b65, 2026-10-30 01:28:56.108953+00, 2026-10-30 01:28:56.108953+00, null, null, f, null, null, null, null).\nCONTEXT:  SQL statement \"insert into public.requisitions(id,protocol,care_recipient_id,created_by,status,idempotency_key,is_historical) values(rid,'REQ-20000101-'||replace(rid::text,'-',''),p,'456c501e-873c-4120-a2f2-bb8f39143416','cancelled',gen_random_uuid(),false)\"\nPL/pgSQL function inline_code_block line 5 at SQL statement",
+        "sqlstate": null
+      }
+    }
+  ],
+  "finishedAt": "2026-10-30T01:30:48.143Z"
+}

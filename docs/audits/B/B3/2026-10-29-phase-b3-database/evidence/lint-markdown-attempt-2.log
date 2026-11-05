@@ -1,0 +1,17 @@
+
+> home-care-assistant@0.1.0 lint:markdown
+> markdownlint-cli2 "README.md" "AGENTS.md" "docs/**/*.md"
+
+markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)
+Finding: README.md AGENTS.md docs/**/*.md
+Linting: 262 files
+Summary: 9 issues in 7 files
+docs/audits/2026-10-29-phase-b3-database/12_ADVERSARIAL_INTEGRITY_AND_RECOVERY.md:137 error MD012/no-multiple-blanks Multiple consecutive blank lines [Expected: 1; Actual: 2]
+docs/audits/2026-10-29-phase-b3-database/13_NEW_DATABASE_RISKS_AND_STRUCTURAL_GAPS.md:45 error MD012/no-multiple-blanks Multiple consecutive blank lines [Expected: 1; Actual: 2]
+docs/audits/2026-10-29-phase-b3-database/13_NEW_DATABASE_RISKS_AND_STRUCTURAL_GAPS.md:101 error MD012/no-multiple-blanks Multiple consecutive blank lines [Expected: 1; Actual: 2]
+docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.md:2134 error MD012/no-multiple-blanks Multiple consecutive blank lines [Expected: 1; Actual: 2]
+docs/audits/2026-10-29-phase-b3-database/15_ACCEPTANCE_AND_REGRESSION_MATRIX.md:681 error MD012/no-multiple-blanks Multiple consecutive blank lines [Expected: 1; Actual: 2]
+docs/audits/2026-10-29-phase-b3-database/16_CROSS_GROUP_DEPENDENCIES.md:60 error MD012/no-multiple-blanks Multiple consecutive blank lines [Expected: 1; Actual: 2]
+docs/audits/2026-10-29-phase-b3-database/17_GROUP_B3_EXECUTIVE_ASSESSMENT.md:88:73 error MD026/no-trailing-punctuation Trailing punctuation in heading [Punctuation: '.']
+docs/audits/2026-10-29-phase-b3-database/17_GROUP_B3_EXECUTIVE_ASSESSMENT.md:128:61 error MD026/no-trailing-punctuation Trailing punctuation in heading [Punctuation: '.']
+docs/audits/2026-10-29-phase-b3-database/18_PHASE_C_DECISION_HANDOFF.md:67 error MD012/no-multiple-blanks Multiple consecutive blank lines [Expected: 1; Actual: 2]

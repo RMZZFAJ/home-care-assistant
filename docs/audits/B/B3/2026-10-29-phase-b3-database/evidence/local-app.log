@@ -1,0 +1,102 @@
+▲ Next.js 16.4.2 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 104ms
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.0s
+  Running TypeScript ...
+  Finished TypeScript in 4.2s ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/56) ...
+  Generating static pages using 11 workers (14/56)
+  Generating static pages using 11 workers (28/56)
+  Generating static pages using 11 workers (42/56)
+✓ Generating static pages using 11 workers (56/56) in 538ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /admin
+├ ƒ /api/admin
+├ ƒ /api/admin/notifications
+├ ƒ /api/attachments
+├ ƒ /api/balances
+├ ƒ /api/catalog
+├ ƒ /api/catalog/presentations
+├ ƒ /api/consumption
+├ ƒ /api/context
+├ ƒ /api/dashboard
+├ ƒ /api/deliveries
+├ ƒ /api/demonstracao/[id]/pdf
+├ ƒ /api/documents
+├ ƒ /api/documents/[id]
+├ ƒ /api/documents/[id]/notifications
+├ ƒ /api/documents/[id]/pdf
+├ ƒ /api/documents/[id]/revise
+├ ƒ /api/invitations/accept
+├ ƒ /api/invitations/register
+├ ƒ /api/notification-rules
+├ ƒ /api/notifications
+├ ƒ /api/notifications/webhook
+├ ƒ /api/notifications/worker
+├ ƒ /api/patient-settings
+├ ƒ /api/profile
+├ ƒ /api/requisitions
+├ ƒ /api/requisitions/[id]
+├ ƒ /api/requisitions/[id]/archive
+├ ƒ /api/requisitions/[id]/resolve
+├ ƒ /api/requisitions/[id]/science
+├ ƒ /api/requisitions/[id]/status
+├ ƒ /api/requisitions/item-context
+├ ƒ /api/schedules
+├ ƒ /api/stock/balances
+├ ƒ /api/stock/inventory
+├ ƒ /api/stock/movements
+├ ƒ /api/sync
+├ ƒ /api/units
+├ ƒ /api/whatsapp/flows
+├ ƒ /api/whatsapp/flows/session
+├ ƒ /api/whatsapp/flows/submissions
+├ ƒ /auth/callback
+├ ƒ /balancos
+├ ƒ /configuracoes
+├ ƒ /consumo
+├ ○ /convites/aceitar
+├ ƒ /documentos/[id]
+├ ƒ /entregas
+├ ƒ /escalas
+├ ƒ /estoque
+├ ƒ /fichas
+├ ƒ /fichas/[id]
+├ ƒ /fichas/bal
+├ ƒ /fichas/com
+├ ƒ /fichas/ent
+├ ƒ /fichas/req
+├ ƒ /historico
+├ ƒ /historico/[id]
+├ ○ /inventarios
+├ ○ /login
+├ ƒ /mais
+├ ƒ /notificacoes
+├ ƒ /perfil
+├ ○ /recuperar-senha
+├ ƒ /unidades
+└ ƒ /verificar/[id]
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+▲ Next.js 16.4.2
+- Local:         http://127.0.0.1:3100
+- Network:       http://127.0.0.1:3100
+✓ Ready in 149ms
+✓ Running next.config.ts took 35ms
+{"level":"error","operation":"attachments.upload","code":"IDEMPOTENCY_CONFLICT","correlationId":"4529f3a1-0ddd-4edd-8684-3c7103eb9f45"}
+{"level":"error","operation":"attachments.upload","code":"VALIDATION_ERROR","correlationId":"0a3d59c8-524b-4800-9ccc-eddf5ee3cf1a"}
+{"level":"error","operation":"attachments.read","code":"NOT_FOUND","correlationId":"e59a4f61-92e6-459e-8c0d-ce76708a7076"}
+{"level":"error","operation":"attachments.read","code":"NOT_FOUND","correlationId":"8e53fdfc-54fc-4e3f-9f51-29bacd8b6459"}
+{"level":"error","operation":"profile.read","code":"SESSION_EXPIRED","correlationId":"769176a3-d2a0-4a8c-b206-5b3bbd67b127"}

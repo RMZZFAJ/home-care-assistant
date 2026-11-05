@@ -1,0 +1,22 @@
+/* Read-only security probes; refused mutations only, no load/fuzz/remote attack. */
+import assert from 'node:assert/strict';
+import { readdirSync,readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { state,http,select,record,env } from './http-local.mjs';
+await select('admin');const results=[];
+const refused=await http('admin','/api/stock/movements',{method:'POST',body:{},headers:{origin:'https://attacker.example','x-forwarded-host':'127.0.0.1:3100',host:'127.0.0.1:3100'}});assert.equal(refused.status,403);assert.equal(refused.data.code,'INVALID_ORIGIN');
+results.push({id:'B410-01',contract:'Forwarded host does not authorize hostile Origin',status:refused.status,code:refused.data.code});
+const preflight=await http(null,'/api/context',{method:'OPTIONS',headers:{origin:'https://attacker.example','access-control-request-method':'POST'}});assert.equal(preflight.headers['access-control-allow-origin'],null);
+results.push({id:'B410-02',contract:'No credentialed cross-origin CORS grant',status:preflight.status,allow:preflight.headers.allow,accessControlAllowOrigin:preflight.headers['access-control-allow-origin']});
+const callback=await http(null,'/auth/callback?next='+encodeURIComponent('//attacker.example/path'),{headers:{'x-forwarded-host':'attacker.example'}});assert([302,303,307].includes(callback.status));assert.equal(new URL(callback.headers.location).origin,'http://127.0.0.1:3100');
+results.push({id:'B410-03',contract:'Missing PKCE code and hostile return target cannot redirect externally',status:callback.status,destination:new URL(callback.headers.location).pathname,noStore:callback.headers['cache-control']});
+const privateRead=await http('admin','/api/profile');assert.equal(privateRead.status,200);assert.equal(privateRead.headers['cache-control'],'no-store');
+results.push({id:'B410-04',contract:'Private data explicitly noncacheable;headers observed locally only',status:privateRead.status,cacheControl:privateRead.headers['cache-control'],csp:privateRead.headers['content-security-policy'],frameOptions:privateRead.headers['x-frame-options'],limits:'Missing local headers do not prove platform configuration or an exploit. No remote test.'});
+const verify=await http(null,'/verificar/'+state.objects.requisition+'?version=1&hash='+'0'.repeat(64));assert.equal(verify.status,200);
+results.push({id:'B410-05',contract:'Public verification returns page without session',status:verify.status,limits:'Page source and SQL return only integrity boolean;no private identity exported;HTML text body not persisted'});
+const list=path=>readdirSync(path,{withFileTypes:true}).flatMap(e=>e.isDirectory()?list(path+'/'+e.name):[path+'/'+e.name]);
+const assets=list('.next-e2e/static').filter(p=>/\.(js|json|map)$/.test(p));
+const matches=assets.filter(p=>readFileSync(p).includes(env.serviceKey));assert.equal(matches.length,0);
+const envFiles=execFileSync('git',['ls-files','.env*'],{encoding:'utf8',windowsHide:true}).trim().split('\n').filter(Boolean);assert(envFiles.every(p=>p==='.env.example'));
+results.push({id:'B410-06',contract:'Local privileged key is not in browser build;real env files untracked',assetsScanned:assets.length,serviceKeyMatches:matches.length,trackedEnvironmentFiles:envFiles,limits:'Exact local key search,not proof that no secret ever existed in repository history or remote deployment'});
+record('b410-security-results.json',{recordedAt:new Date().toISOString(),category:'LOCAL_HTTP_AND_BUILT_ASSET_READ_ONLY',results});console.log(JSON.stringify({scenarios:results.length,privilegedKeyMatches:0,remoteAttacks:false}));

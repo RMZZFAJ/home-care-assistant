@@ -1,0 +1,86 @@
+[
+  {
+    "mode": "baseline",
+    "file": "bal-plantao-semanas.pdf",
+    "pages": 2,
+    "text_chars": 2308
+  },
+  {
+    "mode": "baseline",
+    "file": "bal.pdf",
+    "pages": 2,
+    "text_chars": 1903
+  },
+  {
+    "mode": "baseline",
+    "file": "com.pdf",
+    "pages": 2,
+    "text_chars": 1903
+  },
+  {
+    "mode": "baseline",
+    "file": "ent-confirmed.pdf",
+    "pages": 2,
+    "text_chars": 2326
+  },
+  {
+    "mode": "baseline",
+    "file": "ent-pending.pdf",
+    "pages": 2,
+    "text_chars": 2319
+  },
+  {
+    "mode": "baseline",
+    "file": "req-issued.pdf",
+    "pages": 2,
+    "text_chars": 2122
+  },
+  {
+    "mode": "baseline",
+    "file": "req-science.pdf",
+    "pages": 2,
+    "text_chars": 2140
+  },
+  {
+    "mode": "blank-text",
+    "file": "bal-plantao-semanas.pdf",
+    "pages": 2,
+    "text_chars": 0
+  },
+  {
+    "mode": "blank-text",
+    "file": "bal.pdf",
+    "pages": 2,
+    "text_chars": 0
+  },
+  {
+    "mode": "blank-text",
+    "file": "com.pdf",
+    "pages": 2,
+    "text_chars": 0
+  },
+  {
+    "mode": "blank-text",
+    "file": "ent-confirmed.pdf",
+    "pages": 2,
+    "text_chars": 0
+  },
+  {
+    "mode": "blank-text",
+    "file": "ent-pending.pdf",
+    "pages": 2,
+    "text_chars": 0
+  },
+  {
+    "mode": "blank-text",
+    "file": "req-issued.pdf",
+    "pages": 2,
+    "text_chars": 0
+  },
+  {
+    "mode": "blank-text",
+    "file": "req-science.pdf",
+    "pages": 2,
+    "text_chars": 0
+  }
+]

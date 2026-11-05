@@ -21,8 +21,11 @@ the tree clean.
 
 Home Care Assistant usa App Router, React, TypeScript e Supabase Auth/PostgreSQL.
 O paciente é a unidade operacional. Leia README e os documentos de arquitetura,
-banco, segurança, APIs e testes antes de ampliar fluxos. Consulte a auditoria
-datada e seu checkpoint para retomar trabalho sem recriar funções existentes.
+banco, segurança, APIs e testes antes de ampliar fluxos. Consulte docs/README.md,
+docs/current/PROJECT_STATUS.md, a auditoria datada
+e seu checkpoint para retomar sem recriar funções existentes. Decisões em
+docs/decisions e planos C descrevem futuro, não comportamento implementado.
+Autorização corrente vem da missão vigente; relatos históricos não a renovam.
 
 ## Convenções verificáveis
 
@@ -41,7 +44,8 @@ datada e seu checkpoint para retomar trabalho sem recriar funções existentes.
 
 ## Preservação e ambientes
 
-Não alterar migrations históricas; check:contracts verifica as primeiras 19.
+Não alterar migrations históricas; o manifesto de check:contracts protege as
+84 migrations do baseline atual. Conferir a contagem no manifesto ao evoluir.
 Usar novas migrations incrementais e testar instalação limpa e evolução legada.
 Não modificar banco remoto, Auth remoto, infraestrutura, commits ou publicação
 sem autorização expressa correspondente. Preservar alterações e commits locais.
@@ -61,7 +65,8 @@ segredos de .env.local para documentação, CI, logs, traces ou navegador.
 
 ## Validação e conclusão
 
-Usar Node e npm dos arquivos de versão. Rodar check:contracts, lint,
+Quando autorizado a implementar, usar Node e npm dos arquivos de versão.
+Rodar check:contracts, lint,
 lint:markdown, typecheck, test e build. Para mudanças de banco/autorização,
 rodar test:db:prepare, test:migrations e test:integration. Para fluxos visuais,
 rodar e2e pelo runner que verifica a stack local, nunca contra uma sessão
@@ -72,3 +77,7 @@ regras para obter verde. RLS precisa de identidades Auth reais; mocks não basta
 Registrar evidências, limitações e estado final na matriz. Interface, API, banco
 e permissões precisam funcionar conjuntamente antes de concluir uma feature.
 Manter instruções permanentes separadas de incidentes e estados transitórios.
+
+Para mudanças exclusivamente documentais, validar Markdown, links, referências
+e preservação proporcionalmente. Não repetir suítes funcionais sem mudança de
+contrato ou hipótese nova. Auditoria/plano não autorizam corrigir produto.

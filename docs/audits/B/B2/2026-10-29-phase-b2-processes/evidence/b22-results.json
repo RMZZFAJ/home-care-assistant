@@ -1,0 +1,491 @@
+{
+  "group": "B2.2",
+  "startedAt": "2026-10-29T10:03:53.577Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B22-01",
+      "purpose": "REQ normal; emissão não altera estoque e retry recupera mesmo ID",
+      "recordedAt": "2026-10-29T10:03:53.980Z",
+      "observed": {
+        "id": "f737a673-2f8b-43d1-bb07-cb5e967ef0f4",
+        "before": {
+          "FAMILY": "0",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 0
+        },
+        "after": {
+          "FAMILY": "0",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 0
+        },
+        "eventCount": 1,
+        "retrySameId": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-02",
+      "purpose": "REQ repetida sem justificativa recusada; com justificativa persiste",
+      "recordedAt": "2026-10-29T10:03:54.791Z",
+      "observed": {
+        "refused": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "submit_requisition: duplicate review required"
+        },
+        "justifiedId": "4e203d59-d271-4372-8c49-b42321d9e6e1",
+        "stock": {
+          "FAMILY": "0",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 0
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-03",
+      "purpose": "Extra correspondente ao catálogo recusado e extra desconhecido preservado",
+      "recordedAt": "2026-10-29T10:03:55.123Z",
+      "observed": {
+        "refused": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "submit_requisition: custom item matches patient catalogue"
+        },
+        "extraId": "70ef74c8-6633-4739-b358-eece8f48f7e5",
+        "preservedText": "Material adicional fictício não catalogado B2",
+        "canonicalProduct": null
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-04",
+      "purpose": "COM familiar vinculada: aprovação é anterior à aquisição e não atende REQ",
+      "recordedAt": "2026-10-29T10:03:55.313Z",
+      "observed": {
+        "document": {
+          "id": "7d5aece7-2e12-4096-9645-a0b6c0f35c6d",
+          "lines": [
+            {
+              "id": "5a35c548-2c8a-45e6-99a0-c5e8fefb4d25",
+              "accepted": "0.000000",
+              "approved": "10.000000",
+              "metadata": {},
+              "quantity": "10.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 2,
+          "number": 1,
+          "status": "approved",
+          "version": 2,
+          "receipts": []
+        },
+        "fulfillment": {
+          "lines": [
+            {
+              "id": "6953bc9c-47a5-4246-bb42-7f700f9fe523",
+              "attended": false,
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "deliveries": []
+            }
+          ],
+          "total": 1,
+          "fulfilled": 0
+        },
+        "stock": {
+          "FAMILY": "0",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 0
+        },
+        "readOnlyRefusal": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: required permission: com.read"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-05",
+      "purpose": "Compra parcial e receipt pendente não creditam até validação",
+      "recordedAt": "2026-10-29T10:03:56.024Z",
+      "observed": {
+        "pending": {
+          "id": "7d5aece7-2e12-4096-9645-a0b6c0f35c6d",
+          "lines": [
+            {
+              "id": "5a35c548-2c8a-45e6-99a0-c5e8fefb4d25",
+              "accepted": "0.000000",
+              "approved": "10.000000",
+              "metadata": {},
+              "quantity": "10.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "3.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 4,
+          "number": 1,
+          "status": "purchasing",
+          "version": 4,
+          "receipts": [
+            {
+              "id": "5123e3d7-c163-434d-9079-fe1ec175387e",
+              "lines": [
+                {
+                  "lineId": "5a35c548-2c8a-45e6-99a0-c5e8fefb4d25",
+                  "quantity": "3"
+                }
+              ],
+              "state": "pending"
+            }
+          ]
+        },
+        "stockBefore": {
+          "FAMILY": "0",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 0
+        },
+        "stockAfter": {
+          "FAMILY": "0",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 0
+        },
+        "pendingReceiptsReserveQuantity": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: receipt exceeds purchased quantity"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-06",
+      "purpose": "Validação parcial mantém aquisição restante possível; hipótese de encerramento prematuro refutada",
+      "recordedAt": "2026-10-29T10:03:57.070Z",
+      "observed": {
+        "afterFirst": {
+          "id": "7d5aece7-2e12-4096-9645-a0b6c0f35c6d",
+          "lines": [
+            {
+              "id": "5a35c548-2c8a-45e6-99a0-c5e8fefb4d25",
+              "accepted": "3.000000",
+              "approved": "10.000000",
+              "metadata": {},
+              "quantity": "10.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "3.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 5,
+          "number": 1,
+          "status": "partially_received",
+          "version": 5,
+          "receipts": [
+            {
+              "id": "5123e3d7-c163-434d-9079-fe1ec175387e",
+              "lines": [
+                {
+                  "lineId": "5a35c548-2c8a-45e6-99a0-c5e8fefb4d25",
+                  "quantity": "3"
+                }
+              ],
+              "state": "approved"
+            }
+          ]
+        },
+        "stockFirst": {
+          "FAMILY": "3.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "retryDidNotDuplicate": true,
+        "final": {
+          "id": "7d5aece7-2e12-4096-9645-a0b6c0f35c6d",
+          "lines": [
+            {
+              "id": "5a35c548-2c8a-45e6-99a0-c5e8fefb4d25",
+              "accepted": "10.000000",
+              "approved": "10.000000",
+              "metadata": {},
+              "quantity": "10.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "10.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 7,
+          "number": 1,
+          "status": "received",
+          "version": 7,
+          "receipts": [
+            {
+              "id": "5123e3d7-c163-434d-9079-fe1ec175387e",
+              "lines": [
+                {
+                  "lineId": "5a35c548-2c8a-45e6-99a0-c5e8fefb4d25",
+                  "quantity": "3"
+                }
+              ],
+              "state": "approved"
+            },
+            {
+              "id": "d712d83c-7d49-4c64-b7cf-2444f6236947",
+              "lines": [
+                {
+                  "lineId": "5a35c548-2c8a-45e6-99a0-c5e8fefb4d25",
+                  "quantity": "7"
+                }
+              ],
+              "state": "approved"
+            }
+          ]
+        },
+        "stock": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        },
+        "fulfillment": {
+          "lines": [
+            {
+              "id": "6953bc9c-47a5-4246-bb42-7f700f9fe523",
+              "attended": false,
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "deliveries": []
+            }
+          ],
+          "total": 1,
+          "fulfilled": 0
+        },
+        "notValidator": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: required permission: com.read"
+        },
+        "discardedHypothesis": "Receber tudo o que foi comprado parcialmente não encerra o saldo aprovado ainda não adquirido"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-07",
+      "purpose": "Doação administrativa percorre aquisição/recebimento sem campos financeiros",
+      "recordedAt": "2026-10-29T10:03:58.695Z",
+      "observed": {
+        "origin": "donation",
+        "adminCreationAutoApproved": true,
+        "final": {
+          "id": "a6d0d373-be84-4100-a118-40b83e051b1b",
+          "lines": [
+            {
+              "id": "7f545111-e5e4-4ed1-af50-755ad29e3cf2",
+              "accepted": "5.000000",
+              "approved": "5.000000",
+              "metadata": {},
+              "quantity": "5.000000",
+              "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+              "purchased": "5.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 3,
+          "number": 2,
+          "status": "received",
+          "version": 3,
+          "receipts": [
+            {
+              "id": "1e89cfde-cdd5-4b02-9578-9466ef7635ef",
+              "lines": [
+                {
+                  "lineId": "7f545111-e5e4-4ed1-af50-755ad29e3cf2",
+                  "quantity": "5"
+                }
+              ],
+              "state": "approved"
+            }
+          ]
+        },
+        "stock": {
+          "FAMILY": "5.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "financialFieldsRequired": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-08",
+      "purpose": "Recebimento rejeitado não credita; registro corrigido pode ser confirmado",
+      "recordedAt": "2026-10-29T10:03:59.302Z",
+      "observed": {
+        "final": {
+          "id": "e921a59c-2989-4bf8-8045-63f8b4c8da61",
+          "lines": [
+            {
+              "id": "134ea66b-76c1-4cf1-acc5-61d16b074e4c",
+              "accepted": "4.000000",
+              "approved": "4.000000",
+              "metadata": {},
+              "quantity": "4.000000",
+              "productId": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+              "purchased": "4.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 5,
+          "number": 3,
+          "status": "received",
+          "version": 5,
+          "receipts": [
+            {
+              "id": "ae584aae-f4a6-4da2-962e-49d42e280c0d",
+              "lines": [
+                {
+                  "lineId": "134ea66b-76c1-4cf1-acc5-61d16b074e4c",
+                  "quantity": "4"
+                }
+              ],
+              "state": "rejected"
+            },
+            {
+              "id": "f3d5afa3-5cfb-4651-9f47-024ac268c270",
+              "lines": [
+                {
+                  "lineId": "134ea66b-76c1-4cf1-acc5-61d16b074e4c",
+                  "quantity": "4"
+                }
+              ],
+              "state": "approved"
+            }
+          ]
+        },
+        "stock": {
+          "FAMILY": "4.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "originalReceiptPreserved": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-09",
+      "purpose": "Aquisição parcial abandonada conserva saldo pendente sem comando de desistência",
+      "recordedAt": "2026-10-29T10:04:00.565Z",
+      "observed": {
+        "cancellation": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: reconciliation required before cancellation"
+        },
+        "persisted": {
+          "id": "7c9ec97f-35ee-4fa2-8d62-acef9a50d033",
+          "lines": [
+            {
+              "id": "fe561185-7aaa-4b3d-ac49-633955a375c6",
+              "accepted": "2.000000",
+              "approved": "10.000000",
+              "metadata": {},
+              "quantity": "10.000000",
+              "productId": "patient-676e1298-ba65-476c-9e2c-d89fb2268885",
+              "purchased": "2.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 3,
+          "number": 4,
+          "status": "partially_received",
+          "version": 3,
+          "receipts": [
+            {
+              "id": "57c9aec0-370f-4049-988e-6e39d892a4c1",
+              "lines": [
+                {
+                  "lineId": "fe561185-7aaa-4b3d-ac49-633955a375c6",
+                  "quantity": "2"
+                }
+              ],
+              "state": "approved"
+            }
+          ]
+        },
+        "remainingApprovedNotAcquired": "8",
+        "missingCapability": "Encerrar/desistir do saldo restante sem inventar compra, recebimento, devolução ou estoque"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B22-10",
+      "purpose": "Draft servidor não expede material nem consome número; cancelamento anterior à aquisição permitido",
+      "recordedAt": "2026-10-29T10:04:01.216Z",
+      "observed": {
+        "final": {
+          "id": "55236c4f-2e41-49f5-b421-55fb66e62daf",
+          "lines": [
+            {
+              "id": "3f4b2f05-132a-4038-9411-0ac7500a0169",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {},
+              "quantity": "1.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 2,
+          "number": null,
+          "status": "cancelled",
+          "version": 2,
+          "receipts": []
+        },
+        "terminalRefusal": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: document is terminal"
+        },
+        "stock": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        }
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "finishedAt": "2026-10-29T10:04:01.940Z"
+}

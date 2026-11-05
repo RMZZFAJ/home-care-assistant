@@ -1,0 +1,65 @@
+[
+  {
+    "capture": "b18-accessibility-adminA-skip-link.png",
+    "sheet": "b18-accessibility-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-accessibility-adminA-dirty-drawer.png",
+    "sheet": "b18-accessibility-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-accessibility-adminA-matrix-keyboard.png",
+    "sheet": "b18-accessibility-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-accessibility-adminA-month-selected-day-rendered.png",
+    "sheet": "b18-accessibility-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-accessibility-adminA-long-text-reflow320.png",
+    "sheet": "b18-accessibility-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-accessibility-adminA-review-bottom320.png",
+    "sheet": "b18-accessibility-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-accessibility-adminA-text-size-stress.png",
+    "sheet": "b18-accessibility-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-accessibility-adminA-forced-colors-emulated.png",
+    "sheet": "b18-accessibility-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-accessibility-adminA-decision-dialog1440.png",
+    "sheet": "b18-accessibility-sheet-02.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  }
+]

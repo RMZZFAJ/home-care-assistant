@@ -1,0 +1,168 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:01:48.376Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:01:52.728Z",
+      "role": "adminA",
+      "label": "consumption-pending",
+      "path": "/consumo",
+      "width": 390,
+      "state": "LOADING",
+      "note": "Both GETs deliberately held; any absence/configuration statement is not confirmed.",
+      "file": "b15-states-adminA-consumption-pending.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:01:53.435Z",
+      "role": "adminA",
+      "label": "consumption-empty-confirmed",
+      "path": "/consumo",
+      "width": 390,
+      "state": "EMPTY_CONFIRMED",
+      "note": "Real local GET200 after release; no reports in new B1 fixture.",
+      "file": "b15-states-adminA-consumption-empty-confirmed.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nNenhum relato registrado.",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list\n  - paragraph: Nenhum relato registrado.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:01:54.118Z",
+      "role": "adminA",
+      "label": "bell-pending",
+      "path": "/",
+      "width": 390,
+      "state": "LOADING",
+      "note": "Bell query held, not empty confirmed.",
+      "file": "b15-states-adminA-bell-pending.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Notificações\n0 novas\n\nVocê está em dia. As próximas atualizações aparecerão aqui.\n\nConsultar histórico completo",
+      "snapshot": "- region \"Notificações recentes\":\n  - heading \"Notificações\" [level=2]\n  - text: 0 novas\n  - paragraph: Você está em dia. As próximas atualizações aparecerão aqui.\n  - link \"Consultar histórico completo\":\n    - /url: /notificacoes",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:01:54.207Z",
+      "role": "adminA",
+      "label": "bell-error",
+      "path": "/",
+      "width": 390,
+      "state": "ERROR_RECOVERABLE",
+      "note": "",
+      "file": "b15-states-adminA-bell-error.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Notificações\n0 novas\n\nNão foi possível atualizar as notificações.\n\nVocê está em dia. As próximas atualizações aparecerão aqui.\n\nConsultar histórico completo",
+      "snapshot": "- region \"Notificações recentes\":\n  - heading \"Notificações\" [level=2]\n  - text: 0 novas\n  - alert: Não foi possível atualizar as notificações.\n  - paragraph: Você está em dia. As próximas atualizações aparecerão aqui.\n  - link \"Consultar histórico completo\":\n    - /url: /notificacoes",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:01:55.553Z",
+      "role": "adminA",
+      "label": "stock-history-failed",
+      "path": "/estoque?custody=FAMILY",
+      "width": 390,
+      "state": "PARTIAL",
+      "note": "Stock balances still real200; history-only500. Promise.all prevents committing valid overview.",
+      "file": "b15-states-adminA-stock-history-failed.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nGestão dos estoques\nHistórico sintético indisponível\nSaldos e previsões\nAtualizar\nBuscar produto\nCustódia\nTodas autorizadas\nFamília\nEquipe\nMateriais em trânsito\n\nSaldo confirmado está disponível na custódia. Trânsito e compras pendentes são previsões e dependem de recebimento válido. Somente a ENT aceita atende as linhas REQ.\n\nNenhum produto encontrado\n\nConsulte o catálogo ou ajuste a busca.\n\nMovimentar estoque familiar\nHistórico auditável\nFiltrar\nSem movimentações neste filtro",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Gestão dos estoques\" [level=1]\n  - alert: Histórico sintético indisponível\n  - heading \"Saldos e previsões\" [level=2]\n  - button \"Atualizar\"\n  - text: Buscar produto\n  - textbox \"Buscar produto\"\n  - text: Custódia\n  - combobox \"Custódia\":\n    - option \"Todas autorizadas\"\n    - option \"Família\" [selected]\n    - option \"Equipe\"\n    - option \"Materiais em trânsito\"\n  - paragraph: Saldo confirmado está disponível na custódia. Trânsito e compras pendentes são previsões e dependem de recebimento válido. Somente a ENT aceita atende as linhas REQ.\n  - heading \"Nenhum produto encontrado\" [level=2]\n  - paragraph: Consulte o catálogo ou ajuste a busca.\n  - button \"Movimentar estoque familiar\"\n  - heading \"Histórico auditável\" [level=2]\n  - button \"Filtrar\"\n  - list\n  - heading \"Sem movimentações neste filtro\" [level=2]",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:01:57.152Z",
+      "role": "adminA",
+      "label": "deadline-after-completed",
+      "path": "/documentos/b8fc5ff1-826e-4acf-ab70-8c7b9950feb5",
+      "width": 390,
+      "state": "DELIVERY_PENDING",
+      "note": "UI regressed to processing without new pending rows; state label describes displayed text, not provider outcome.",
+      "file": "b15-states-adminA-deadline-after-completed.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRequisição e acompanhamento\n← Histórico\nREQ\n\nREQUISIÇÃO\n\nREQ-0001\nAguardando atendimento\n\n29/10/2026, 00:18 · Versão 3\n\nPaciente: Homologação fictícia V4 9482191c\n\nSolicitante: Teste professional\n\nAtendimento\n\n0/2 itens atendidos\n\nAguardando ENT aceita\n\nCiência familiar\n\nExigência satisfeita\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo. Os avisos continuam sendo processados; consulte o acompanhamento.\n\nProtocolo e identificação\nMateriais requisitados\n\nUma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n\nMaterial fictício V4 0\nPendente\nUrgente\n\nEstoque observado na emissão: 0 unidade\n\nENT-0001 · aceito 0.000000\nMaterial fictício V4 1\nPendente\nUrgente\n\nEstoque observado na emissão: 0 unidade\n\nENT-0001 · aceito 0.000000\nAbrir COM vinculada\nExpedir ENT vinculada\nCiência e responsáveis\n\nCiência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n\nTeste family\n\nPor expedição autorizada · 29/10/2026, 00:18\n\nLi a requisição e confirmo minha ciência\nLinha do tempo\n\n3 evento(s) registrados\n\nCancelar requisição\nAvisos e acompanhamento\n\n8 aviso(s) · estados do aplicativo e do provedor são independentes\n\nObservações\n\nSem observações.\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Requisição e acompanhamento\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - text: REQ\n  - paragraph: Requisição\n  - heading \"REQ-0001\" [level=2]\n  - text: Aguardando atendimento\n  - paragraph: 29/10/2026, 00:18 · Versão 3\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - paragraph: \"Solicitante: Teste professional\"\n  - paragraph: Atendimento\n  - strong: 0/2 itens atendidos\n  - paragraph: Aguardando ENT aceita\n  - paragraph: Ciência familiar\n  - strong: Exigência satisfeita\n  - paragraph: Independente do recebimento\n  - paragraph: Documento\n  - strong: Em atendimento\n  - link \"Baixar PDF\":\n    - /url: /api/documents/b8fc5ff1-826e-4acf-ab70-8c7b9950feb5/pdf?version=3\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo. Os avisos continuam sendo processados; consulte o acompanhamento.\n  - group: Protocolo e identificação\n  - heading \"Materiais requisitados\" [level=2]\n  - paragraph: Uma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n  - list:\n    - listitem:\n      - strong: Material fictício V4 0\n      - text: Pendente Urgente\n      - paragraph: \"Estoque observado na emissão: 0 unidade\"\n      - button \"ENT-0001 · aceito 0.000000\"\n    - listitem:\n      - strong: Material fictício V4 1\n      - text: Pendente Urgente\n      - paragraph: \"Estoque observado na emissão: 0 unidade\"\n      - button \"ENT-0001 · aceito 0.000000\"\n  - link \"Abrir COM vinculada\":\n    - /url: /fichas/com?requisitionId=b8fc5ff1-826e-4acf-ab70-8c7b9950feb5\n  - link \"Expedir ENT vinculada\":\n    - /url: /fichas/ent?requisitionId=b8fc5ff1-826e-4acf-ab70-8c7b9950feb5\n  - heading \"Ciência e responsáveis\" [level=2]\n  - paragraph: Ciência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n  - list:\n    - listitem:\n      - strong: Teste family\n      - paragraph: Por expedição autorizada · 29/10/2026, 00:18\n  - button \"Li a requisição e confirmo minha ciência\"\n  - region \"Linha do tempo\":\n    - heading \"Linha do tempo\" [level=2]:\n      - button \"Linha do tempo\"\n    - paragraph: 3 evento(s) registrados\n  - button \"Cancelar requisição\"\n  - region \"Avisos e acompanhamento\":\n    - heading \"Avisos e acompanhamento\" [level=2]:\n      - button \"Avisos e acompanhamento\"\n    - paragraph: 8 aviso(s) · estados do aplicativo e do provedor são independentes\n  - heading \"Observações\" [level=2]\n  - paragraph: Sem observações.\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:02:13.403Z",
+      "role": "professional",
+      "label": "offline-cached-dashboard",
+      "path": "/",
+      "width": 390,
+      "state": "OFFLINE",
+      "note": "Whole browser context offline after load; data still displayed. No live mutation or remote send.",
+      "file": "b15-states-professional-offline-cached-dashboard.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nVisão geral\nOlá, Teste.\n\nSuas próximas tarefas no cuidado de Homologação fictícia V4 9482191c.\n\nPrecisa da sua atenção\nPrioridades\nENT-0001 · Conferir materiais\nEntrega destinada a você; aguardando conferência.\nAções rápidas\nNova requisição\nRegistrar ocorrência\nMovimentações recentes\nVer histórico\nENT\nENT-0001\nEntrega / Entrada · 29/10/2026, 00:18\nAguardando recebimento\n0/2 conferidas\nREQ\nREQ-0001\nRequisição · 29/10/2026, 00:18\nAguardando atendimento\n0/2 itens atendidos",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Visão geral\" [level=1]\n  - heading \"Olá, Teste.\" [level=2]\n  - paragraph: Suas próximas tarefas no cuidado de Homologação fictícia V4 9482191c.\n  - region \"Precisa da sua atenção\":\n    - heading \"Precisa da sua atenção\" [level=2]\n    - text: Prioridades\n    - link \"ENT-0001 · Conferir materiais Entrega destinada a você; aguardando conferência.\":\n      - /url: /fichas/174bf9ba-72f4-4aad-ac79-91b8bbaa434c\n      - strong: ENT-0001 · Conferir materiais\n      - text: Entrega destinada a você; aguardando conferência.\n  - heading \"Ações rápidas\" [level=2]\n  - link \"Nova requisição\":\n    - /url: /fichas/req\n    - strong: Nova requisição\n  - link \"Registrar ocorrência\":\n    - /url: /consumo\n    - strong: Registrar ocorrência\n  - heading \"Movimentações recentes\" [level=2]\n  - link \"Ver histórico\":\n    - /url: /historico\n  - link \"ENT ENT-0001 Entrega / Entrada · 29/10/2026, 00:18 Aguardando recebimento 0/2 conferidas\":\n    - /url: /documentos/174bf9ba-72f4-4aad-ac79-91b8bbaa434c\n    - text: ENT\n    - strong: ENT-0001\n    - text: Entrega / Entrada · 29/10/2026, 00:18 Aguardando recebimento 0/2 conferidas\n  - link \"REQ REQ-0001 Requisição · 29/10/2026, 00:18 Aguardando atendimento 0/2 itens atendidos\":\n    - /url: /documentos/b8fc5ff1-826e-4acf-ab70-8c7b9950feb5\n    - text: REQ\n    - strong: REQ-0001\n    - text: Requisição · 29/10/2026, 00:18 Aguardando atendimento 0/2 itens atendidos",
+      "visualInspected": false
+    }
+  ],
+  "failures": [
+    {
+      "label": "delivery-filter-refresh",
+      "error": "locator.selectOption: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Situação', { exact: true })\u001b[22m\n"
+    }
+  ],
+  "observations": [
+    {
+      "request": "/api/consumption",
+      "status": 200,
+      "stage": "Released held read"
+    },
+    {
+      "request": "/api/whatsapp/flows/submissions",
+      "status": 200,
+      "stage": "Released held read"
+    },
+    {
+      "scenario": "deadline",
+      "before": "Documento salvo. Consulte os estados individuais dos avisos abaixo.",
+      "after": "Documento salvo. Os avisos continuam sendo processados; consulte o acompanhamento.",
+      "clock": "Browser virtual +11000ms; not wall-clock latency",
+      "query": "Injected200/data[]"
+    },
+    {
+      "scenario": "offline",
+      "read": "network request failed",
+      "online": false,
+      "liveState": [
+        "Atualização ao vivo conectada"
+      ]
+    }
+  ],
+  "finishedAt": "2026-10-29T04:02:15.131Z"
+}

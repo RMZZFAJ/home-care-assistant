@@ -1,0 +1,62 @@
+{
+  "group": "B3.10s",
+  "startedAt": "2026-10-30T01:40:20.271Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Local Auth/Storage/RPC with independent metadata reads; no browser or remote. Missing-byte case is an explicitly privileged fixture, not normal API path.",
+  "scenarios": [
+    {
+      "id": "B310-08",
+      "purpose": "Revogar entre reserva e upload/finalização recusa nova gravação de evidência",
+      "recordedAt": "2026-10-30T01:40:20.472Z",
+      "observed": {
+        "id": "1f53a29c-a284-4a98-9550-84bbc60398c7",
+        "uploadDenied": true,
+        "finalizeDenied": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "finalize_attachment: evidence permission revoked"
+        },
+        "state": "quarantine"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B310-09",
+      "purpose": "Finalizador confia no servidor; ready de banco não certifica bytes Storage",
+      "recordedAt": "2026-10-30T01:40:21.167Z",
+      "observed": {
+        "id": "a0abd7d0-517f-4113-884d-810a0d72b914",
+        "metadataState": "ready",
+        "objects": 0,
+        "apiStatus": 200,
+        "urlAvailable": false,
+        "classification": "Cross-service reconciliation limitation under privileged missing-object fixture; normal upload API checks bytes before finalize"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B310-10",
+      "purpose": "Sessão encerrada no app versus política independente de avatar no Storage",
+      "recordedAt": "2026-10-30T01:40:21.554Z",
+      "observed": {
+        "sessionStillValidInApp": false,
+        "uploadAcceptedAfterLogout": true,
+        "storageCode": null,
+        "newSyntheticObjects": 1,
+        "scope": "Own avatar prefix only; JWT still within expiry; no patient evidence/cross-user access demonstrated",
+        "hypothesis": "CONFIRMED_OWN_AVATAR_SESSION_REVOCATION_GAP"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T01:40:22.212Z"
+}

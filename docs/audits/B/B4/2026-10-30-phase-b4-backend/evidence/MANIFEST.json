@@ -1,0 +1,421 @@
+{
+  "recordedAt": "2026-10-30T10:51:58.154Z",
+  "format": "SHA256_OF_GIT_INDEX_BYTES",
+  "scope": [
+    "docs/audits/2026-10-30-phase-b4-backend",
+    "docs/audits/phase-b/README.md"
+  ],
+  "selfExcluded": true,
+  "entries": [
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/00_BASELINE_SCOPE_AND_METHOD.md",
+      "bytes": 2782,
+      "sha256": "2d20eb481b83a8161b723bd1ad66768b355cc25516501305582993a25225ee61"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/01_ARCHITECTURE_AND_REQUEST_FLOW.md",
+      "bytes": 3837,
+      "sha256": "e7e3e9937f38e224ddb1f3c4ecc2ead54211a59f01519a7070e15569b667abff"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/01_BACKEND_API_INVENTORY.csv",
+      "bytes": 61229,
+      "sha256": "e69c77bcade3d0c2c4fab88a2c0b34202ce9101f2e6ea41a7b50ddb6014e42f6"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/01_BACKEND_COVERAGE.csv",
+      "bytes": 88924,
+      "sha256": "47b77ef6f4cc583a49212ce085f62c9a4af51c82eaa14461cd459ef31a904281"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/02_AUTHORIZATION_HTTP_MATRIX.csv",
+      "bytes": 40414,
+      "sha256": "35cb76d648d41f74a18f6fac77340942b9a4f25916ea77bb5e6edb289fb6f64d"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/02_AUTH_CONTEXT_AND_CAPABILITIES.md",
+      "bytes": 3950,
+      "sha256": "bf57bd45cea03e9f53da1108f5b34869a52bb337a03a22ddaaa7aabec9b1458d"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/03_INPUT_VALIDATION_AND_DATA_CONTRACTS.md",
+      "bytes": 5416,
+      "sha256": "e5595bfe1e66876135a0db4a8414e87bd53e9f83ddd3fc5a12e8ca3a953ccdea"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/04_COMMANDS_IDEMPOTENCY_AND_RECOVERY.md",
+      "bytes": 6153,
+      "sha256": "57ee981aa21cd7c96732ba99a7d13fa2e1aa740e8db2872205a968650f2e94e8"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/05_READ_APIS_PAGINATION_AND_FRESHNESS.md",
+      "bytes": 5793,
+      "sha256": "1bda8e78780f29ef9e1b40308c68ec81f6188c552f48c78f6b77a5f1f2b5b740"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/06_HTTP_ERRORS_AND_FAILURE_RECOVERY.md",
+      "bytes": 4935,
+      "sha256": "8ace4407b09fdd40b04f7ecb54764b8985dd68c2a938554fc610c04a628a8f8a"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/07_DOCUMENTS_PDF_ATTACHMENTS_SERVICES.md",
+      "bytes": 4818,
+      "sha256": "5095fc583e4500dfe019e4bc0320b8963a0ca90fa0337efa0e5d7dd44a4510a1"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/08_ADMINISTRATION_IDENTITY_AND_SETTINGS.md",
+      "bytes": 4583,
+      "sha256": "c31830b363ea6bce16322f3c4286cc66637810b55a170c98cebe05ce707ed21e"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/09_WORKERS_WEBHOOKS_AND_INTEGRATION_BOUNDARIES.md",
+      "bytes": 5372,
+      "sha256": "445f9dbc01f4abbac524058c5d0da70226a8dae1aaafce98a7942916201467de"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/10_APPLICATION_SECURITY_AND_PRIVACY.md",
+      "bytes": 6113,
+      "sha256": "adff1b6ea1a2a4f50f71a8b184a141189342cfbdd87d89d825648bff77f4d2d8"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/11_ARCHITECTURE_OBSERVABILITY_AND_RESILIENCE.md",
+      "bytes": 5807,
+      "sha256": "e27927af524ffb59b163015721eb0958156629cabf36ee5cacbdb44ae43e771f"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/12_CROSS_LAYER_ADVERSARIAL_SCENARIOS.md",
+      "bytes": 6210,
+      "sha256": "c904ce1a33a94ff76fca6acef6a07c31e595fd6da3cd4a1d168981e7bab67826"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/13_NEW_BACKEND_GAPS_AND_OPPORTUNITIES.md",
+      "bytes": 3927,
+      "sha256": "708f5ff72dd9f1fe73c1b9030c820b82fef86d8af8d160e2ce19c212a8c45e48"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.csv",
+      "bytes": 27524,
+      "sha256": "266b9039ddeb02cf61cea1bc2c7d4c63f81d7a774d5d120b8c907f831fa819ac"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.md",
+      "bytes": 29999,
+      "sha256": "5bdbba65dec651d7a394539d8e77ad257b86f1fbad991af414c38f96d3d84f14"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/15_ACCEPTANCE_AND_REGRESSION_CRITERIA.md",
+      "bytes": 5885,
+      "sha256": "36d7fc5bf94335780177525e556268a6d1faf302dad3c80787fee5f969adf6ff"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/16_CROSS_GROUP_DEPENDENCIES.md",
+      "bytes": 4509,
+      "sha256": "8e2e4700b31ce13a9748cb3e86e894a4c1bf4c2ab9bad2c721bb6f366148e204"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/17_GROUP_B4_EXECUTIVE_ASSESSMENT.md",
+      "bytes": 7660,
+      "sha256": "c5df5182a7f0e5fa51a8203a43194e7c5d359eca6d4456ad02ee914254d546d8"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/18_PHASE_C_DECISION_HANDOFF.md",
+      "bytes": 5645,
+      "sha256": "5107dd9011b40d07d2dd056468fb7e522e19e208e49d2d9f39bccc147df4385d"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/CHECKPOINT.md",
+      "bytes": 8142,
+      "sha256": "387b6287a921c9e6bf203afa4371c47d7f62f61921c7087c69c741a4da6b5615"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/README.md",
+      "bytes": 4293,
+      "sha256": "a61f98bb26c2ab81909d94d88145cf7e8566f9b3f49458ba07c0526a662811b3"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/ATTEMPTS.md",
+      "bytes": 1917,
+      "sha256": "16705e877222a5d28d21d92051d8ecc2932ebcc08de72553a7852dc9a3fced19"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/MASTER_ORDER.txt",
+      "bytes": 44828,
+      "sha256": "9d340c46ae2e4f998f636bd31ca708cb6196c155b3dec7b4f8c3bd7eec6d6a1f"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/SCENARIOS.csv",
+      "bytes": 23730,
+      "sha256": "ca41b7de854f97ccd81561958b31f268f1d3620673f63de78fb64bf185b04e83"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/architecture-results.json",
+      "bytes": 618,
+      "sha256": "543979c8c9ebe4d72ab8918992d0f012defd67a8c432d63ade57d6c374536bd9"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/architecture.mjs",
+      "bytes": 3140,
+      "sha256": "fc4a85a984dcaa176bafe26e26329225264586e15e745b2ffaf8f853ca18f182"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b410-security-results.json",
+      "bytes": 1654,
+      "sha256": "3cb13b4d7c12fc3dc95c23f5ff810a569078869fdfe1d523c73a48585151332b"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b410-security.mjs",
+      "bytes": 3608,
+      "sha256": "f52fc23291dbdf83953421602e24d0b3653366fb663c9b9151eae2c3a46ed89c"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b411-dashboard-results.json",
+      "bytes": 1008,
+      "sha256": "1e85963029cc7fce2d51b61607cc888794e20c2484f349325fb7d6b401b0619c"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b411-dashboard.test.ts",
+      "bytes": 2119,
+      "sha256": "8bed6e4d04db7272044f0f0773893842dd0a8206c2a0f376915d2b5ec813c41c"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b412-create-state-results.json",
+      "bytes": 915,
+      "sha256": "f051835d5bb1363cffc751eb1e061017138c375a2d032b7063a0c52615dda636"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b412-create-state.mjs",
+      "bytes": 2388,
+      "sha256": "916e9f3b410e798ddc4a35a2e80b30714a1ee69fca0ce2ab92c1905c13c64c3a"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b412-freshness-results.json",
+      "bytes": 1097,
+      "sha256": "b44b34fb0a546d51d26bc38fb64d71fccf76d7a3eda9c3a5f8b3df502294c558"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b412-freshness.mjs",
+      "bytes": 4158,
+      "sha256": "fa03332706d43117991c8473b5809a0dfe4e516392561d271d23f5df051ffacc"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b42-auth-results.json",
+      "bytes": 5055,
+      "sha256": "7aad73e3aae3a2e8b5c43260b3963de21211a82198a016c3b7834ede8334423b"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b42-auth.mjs",
+      "bytes": 3226,
+      "sha256": "2a93c17c1cea735d0cc6ccea9149d203effa945c81cc1a2b49e464c64a6f24e9"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b43-input-results.json",
+      "bytes": 5095,
+      "sha256": "8a6d790f4fbdbbcb13472706223863bdb735425abe537353eddb6fcda5151d1d"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b43-input.mjs",
+      "bytes": 4702,
+      "sha256": "ccea43e9dac5c674a2b3984e509d7f0a285c89531cfa89ff4736e7ce36990a09"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b44-command-results.json",
+      "bytes": 3233,
+      "sha256": "ef18c1a29a27867997bd623a7096065ca7fc25aa3efaa59cb742cfae204bddc0"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b44-commands.mjs",
+      "bytes": 8308,
+      "sha256": "e011c44a2973f50ddb2738550cc1fccfe838b765d688f4b1b43053159be7cbd2"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b45-read-results.json",
+      "bytes": 2630,
+      "sha256": "3cbe166c70e5bf77e3289e6d30fc4f15fc1c2b727409175b207a26b2168ff7cc"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b45-reads.mjs",
+      "bytes": 3862,
+      "sha256": "a31b423e11e24dc740f84027ae5083a6d93115b5fcf47bc81db0e6610975b4a7"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b46-errors-results.json",
+      "bytes": 3106,
+      "sha256": "7fd7c007a59bd7e3eebb08a01e70bd66b848b69089be55f096852ae16562a6d0"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b46-errors.test.ts",
+      "bytes": 3727,
+      "sha256": "17e3a1944aab950b337e4a8f2b4c75e56bd0d1b55cd0a0188bca948c9e9e0c18"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b46-flow-counterproof-results.json",
+      "bytes": 3241,
+      "sha256": "c7e34f68ef39abe933b4d9c49254a8c3f6ce92939f710eb5fa45d92dc60d4ac3"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b47-pdf-results.json",
+      "bytes": 1064,
+      "sha256": "375bc4a17c257103410779ae58549d8f52be80696e0ec2849319d778e5bbf012"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b47-pdf.mjs",
+      "bytes": 2411,
+      "sha256": "f3db561b79a4857bd03d6eed75afe44fcaad3742f101416f6ff274b5c9191740"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b47-services-results.json",
+      "bytes": 1610,
+      "sha256": "8440d2c7fda7200133ab4b87690fe32b733d433b82f52fa05a584378b1e3752c"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b47-services.test.ts",
+      "bytes": 3714,
+      "sha256": "55b356222fb5360a797b292d2f7826bcda201c9735193605403101498f1fc72d"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b48-admin-results.json",
+      "bytes": 1660,
+      "sha256": "9d2e4dc27df9afba353ef4b793534df9b469ff67567e92c61378d74dbc55514b"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b48-admin.mjs",
+      "bytes": 3395,
+      "sha256": "24205ce7923f1d9ff0481b9032ade7dc285d906a7e1e3eeddc8d7dc36e167340"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b49-integration-results.json",
+      "bytes": 2367,
+      "sha256": "69dfeb656002e1ef06814e61bdf7f1e7b17ac4594997b94bbc1c6c1de82a53e1"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b49-webhook.test.ts",
+      "bytes": 2611,
+      "sha256": "d1ea0618c7a8fa3d2db9ee970e2f94a3f0f53ee4f60533f6d128780c8461b13c"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/b49-worker.test.ts",
+      "bytes": 1865,
+      "sha256": "0c14f921d1ec33309091b21e5cd76797db3d22fc75fd9636578cfb88bfb0f901"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/background-progress-results.json",
+      "bytes": 6756,
+      "sha256": "3a114cd39b7e286d5ae4e07c0e3fa2d9d69b57dda5aa94574f166a640abf7e99"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/background-progress.mjs",
+      "bytes": 4685,
+      "sha256": "ff83020bccfb0df0ba264dc45f8a6408a63fdbdc33d43f31cd1cf093f8dbbe69"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/backup-proof.json",
+      "bytes": 520,
+      "sha256": "b36f49b2cd4d08be7f19c7b93670573ba9051a130fb7a8d01a4104c3178b9c97"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/baseline.json",
+      "bytes": 1765,
+      "sha256": "e75b9f7095a58626b8310bf7efd78bdae6d02a5e2fada34320d8a64f44611edb"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/baseline.mjs",
+      "bytes": 3801,
+      "sha256": "c4fc2fc6e9568bfa695484d8363f609976304906fe0c2b598f0ef6eb49a67de2"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/build-findings.mjs",
+      "bytes": 33714,
+      "sha256": "de5ae1ff43c8016f1fcc2742f4fa78b99f6b7be05209a31960e72b13764f1f68"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/build-index.mjs",
+      "bytes": 8259,
+      "sha256": "a6b7ff512d4f1f5788491f4beab7ca60e782b1c3ee9420d45b51a562626345ab"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/coverage-reconciliation.json",
+      "bytes": 633,
+      "sha256": "67c3cc3c5199091aa5e2c0905ec3f6153afbbef336457643135977b39e133c29"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/format-docs.mjs",
+      "bytes": 2210,
+      "sha256": "0417b840f7ee1489f72dab9cc88efd73bf6fee45eb79c1ce19604e253d2ca7cc"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/http-local.mjs",
+      "bytes": 6712,
+      "sha256": "9eabf659c3812d2ae6506b38caf888b1e71d285d6fa4f929dfc349d5f99b472b"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/inventory.mjs",
+      "bytes": 7515,
+      "sha256": "80ec44290b7d7216b0dbcf37bf56443756523daa7d86676a9dafe3ceac2fb750"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/local-server.json",
+      "bytes": 352,
+      "sha256": "30e4fe5f44398e3f2027565059a7574ceb2e91e81ff4903b74b32854e6d646a5"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/original-row-hashes.json",
+      "bytes": 584900,
+      "sha256": "e29ede5464ba1420fe0d57de7cbbc6d14b0c2ea97e4c41c7073c5f5020140419"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/package-validation.json",
+      "bytes": 7564,
+      "sha256": "8a4a24b10847a7421fde19c0b7ad0c4ab4365e5489a31a290e9071f7b464e23a"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/preservation-results.json",
+      "bytes": 11200,
+      "sha256": "f66e5eba95803af88f3dbdcee58fd7c7edccf0675f57282a79bb8327a8bb783f"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/preservation.mjs",
+      "bytes": 3093,
+      "sha256": "ad1b5fcd0e68ba7b5b310dc1cae1c3bd48bd70155af9f8a6e8998d994dff2d36"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+      "bytes": 57739,
+      "sha256": "a1bde0c80fe5ac565db31545ac98f66bdbb7e51505d8c2ccf7880893c78ba8b6"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/source-surface-index.json",
+      "bytes": 12266,
+      "sha256": "bf69cf538befabfce5641893038907631d505624e4d45db82c042afa25bfa2d2"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/start-local.mjs",
+      "bytes": 1407,
+      "sha256": "87c5855fca9fd22f9283f2f377215fefcb2b54f0890b7b0e2034a7ad782c5c80"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/synthetic-setup.json",
+      "bytes": 631,
+      "sha256": "db9d0965240bcd192f395bf8ed9a16db03e8da1deae3557f5a21ae47a94d197d"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/tsconfig.audit.json",
+      "bytes": 140,
+      "sha256": "ca171251cffd174c5c0c1259760a1e3e8ecb4766d5ac9c0666053a31a0744d7f"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/validate-package.mjs",
+      "bytes": 9955,
+      "sha256": "4bf2bf31c57cb19a112177e1fe53419f221b4d6108eece53f8efab08095f7c5a"
+    },
+    {
+      "path": "docs/audits/2026-10-30-phase-b4-backend/evidence/vitest.config.ts",
+      "bytes": 386,
+      "sha256": "14fb411a1ff2c3c84c49a3971cd2664846309fc917f39e4ac2c56333718811af"
+    },
+    {
+      "path": "docs/audits/phase-b/README.md",
+      "bytes": 3645,
+      "sha256": "ea5a08b672af45144419301bb935aaa87fcf1f691f818558a64a98c9240e894d"
+    }
+  ]
+}

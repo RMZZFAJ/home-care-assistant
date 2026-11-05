@@ -1,0 +1,46 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T08:11:47.583Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T08:11:52.332Z",
+      "role": "supervisor",
+      "label": "balance-ready",
+      "path": "/balancos",
+      "width": 390,
+      "state": "READY",
+      "note": "Ready headings awaited. No review/count command. Original b18-journeys supervisor image was access validation only.",
+      "file": "b18-ready-supervisor-balance-ready.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "PACIENTE FICTÍCIO A\n\nBalanços e plantões\nProgramação do balanço\nProcessamento desativado\n\nO novo regime ainda não foi ativado neste paciente.\n\nNova contagem\nConsultar escala\nHistórico de fichas BAL\nResponsabilidade atual\n\nNão há contagem pendente neste momento. A próxima obrigação será disponibilizada no plantão programado.\n\nObrigações por semana\n\nNenhuma obrigação criada pelo novo regime.\n\nAtribuições e atrasos históricos\nEventos auditáveis",
+      "snapshot": "- main:\n  - paragraph: Paciente fictício A\n  - heading \"Balanços e plantões\" [level=1]\n  - heading \"Programação do balanço\" [level=2]\n  - text: Processamento desativado\n  - paragraph: O novo regime ainda não foi ativado neste paciente.\n  - link \"Nova contagem\":\n    - /url: /fichas/bal\n  - link \"Consultar escala\":\n    - /url: /escalas\n  - link \"Histórico de fichas BAL\":\n    - /url: /historico?type=BAL\n  - heading \"Responsabilidade atual\" [level=2]\n  - paragraph: Não há contagem pendente neste momento. A próxima obrigação será disponibilizada no plantão programado.\n  - heading \"Obrigações por semana\" [level=2]\n  - paragraph: Nenhuma obrigação criada pelo novo regime.\n  - group: Atribuições e atrasos históricos\n  - group: Eventos auditáveis",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:11:55.793Z",
+      "role": "family",
+      "label": "science-requery-ready",
+      "path": "/historico/8a768d24-75ce-4f53-b190-3ab6dc97db1f",
+      "width": 390,
+      "state": "READY",
+      "note": "Reconsult after science already persisted; no new science command. Earlier success screenshot was before refresh completed.",
+      "file": "b18-ready-family-science-requery-ready.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRequisição e acompanhamento\n← Histórico\nREQ\n\nREQUISIÇÃO\n\nREQ-0002\nAguardando atendimento\n\n29/10/2026, 01:30 · Versão 3\n\nPaciente: Homologação fictícia V4 9482191c\n\nSolicitante: Teste professional\n\nAtendimento\n\n0/1 itens atendidos\n\nAguardando ENT aceita\n\nCiência familiar\n\nExigência satisfeita\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo. Consulte os estados individuais dos avisos abaixo.\n\nProtocolo e identificação\nMateriais requisitados\n\nUma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n\nMaterial excepcional sintético B1\nPendente\n\nEstoque observado na emissão: 0\n\nAbrir COM vinculada\nExpedir ENT vinculada\nCiência e responsáveis\n\nCiência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n\nTeste family\n\nExpressa no aplicativo · 29/10/2026, 01:30\n\nLinha do tempo\n\n3 evento(s) registrados\n\nAvisos e acompanhamento\n\n11 aviso(s) · estados do aplicativo e do provedor são independentes\n\nObservações\n\nProva de jornada: material ausente, sem dado clínico.\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Requisição e acompanhamento\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - text: REQ\n  - paragraph: Requisição\n  - heading \"REQ-0002\" [level=2]\n  - text: Aguardando atendimento\n  - paragraph: 29/10/2026, 01:30 · Versão 3\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - paragraph: \"Solicitante: Teste professional\"\n  - paragraph: Atendimento\n  - strong: 0/1 itens atendidos\n  - paragraph: Aguardando ENT aceita\n  - paragraph: Ciência familiar\n  - strong: Exigência satisfeita\n  - paragraph: Independente do recebimento\n  - paragraph: Documento\n  - strong: Em atendimento\n  - link \"Baixar PDF\":\n    - /url: /api/documents/8a768d24-75ce-4f53-b190-3ab6dc97db1f/pdf?version=3\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo. Consulte os estados individuais dos avisos abaixo.\n  - group: Protocolo e identificação\n  - heading \"Materiais requisitados\" [level=2]\n  - paragraph: Uma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n  - list:\n    - listitem:\n      - strong: Material excepcional sintético B1\n      - text: Pendente\n      - paragraph: \"Estoque observado na emissão: 0\"\n  - link \"Abrir COM vinculada\":\n    - /url: /fichas/com?requisitionId=8a768d24-75ce-4f53-b190-3ab6dc97db1f\n  - link \"Expedir ENT vinculada\":\n    - /url: /fichas/ent?requisitionId=8a768d24-75ce-4f53-b190-3ab6dc97db1f\n  - heading \"Ciência e responsáveis\" [level=2]\n  - paragraph: Ciência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n  - list:\n    - listitem:\n      - strong: Teste family\n      - paragraph: Expressa no aplicativo · 29/10/2026, 01:30\n  - region \"Linha do tempo\":\n    - heading \"Linha do tempo\" [level=2]:\n      - button \"Linha do tempo\"\n    - paragraph: 3 evento(s) registrados\n  - region \"Avisos e acompanhamento\":\n    - heading \"Avisos e acompanhamento\" [level=2]:\n      - button \"Avisos e acompanhamento\"\n    - paragraph: 11 aviso(s) · estados do aplicativo e do provedor são independentes\n  - heading \"Observações\" [level=2]\n  - paragraph: \"Prova de jornada: material ausente, sem dado clínico.\"\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "finishedAt": "2026-10-29T08:11:56.690Z"
+}

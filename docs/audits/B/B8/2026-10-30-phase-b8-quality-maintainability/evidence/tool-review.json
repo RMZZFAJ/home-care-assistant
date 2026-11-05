@@ -1,0 +1,5297 @@
+[
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/assemble-audit.mjs",
+    "lines": 50,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 38,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 39,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 48,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/check-local-final-state.mjs",
+    "lines": 24,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/finalize-records.py",
+    "lines": 72,
+    "anchors": [
+      {
+        "line": 7,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 30,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 37,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 42,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 50,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 54,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/format-audit-markdown.py",
+    "lines": 53,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 51,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/format_ui_records.py",
+    "lines": 20,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/format_ui_reports.py",
+    "lines": 31,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/inspect-artifacts.mjs",
+    "lines": 20,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/inspect-current-pdf.py",
+    "lines": 17,
+    "anchors": [
+      {
+        "line": 12,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/inspect-pdf.py",
+    "lines": 23,
+    "anchors": [
+      {
+        "line": 8,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 21,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/run-check.mjs",
+    "lines": 37,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 31,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 32,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/run-database-probe.mjs",
+    "lines": 15,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/ui-runtime-ready.mjs",
+    "lines": 51,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/ui-runtime.mjs",
+    "lines": 133,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 16,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 108,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/ui_coverage.py",
+    "lines": 73,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 44,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 70,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/ui_finalize.py",
+    "lines": 94,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 35,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 67,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 76,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 83,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 91,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-25-production-readiness/evidence/validate-audit.py",
+    "lines": 184,
+    "anchors": [
+      {
+        "line": 10,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 14,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 19,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 181,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/accessibility-followup.mjs",
+    "lines": 14,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/accessibility-probe.mjs",
+    "lines": 24,
+    "anchors": [
+      {
+        "line": 9,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/audit-lib.cjs",
+    "lines": 11,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/bal-ready.mjs",
+    "lines": 16,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/browser-harness.mjs",
+    "lines": 34,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-b11.cjs",
+    "lines": 44,
+    "anchors": [
+      {
+        "line": 7,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 14,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 42,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-b12.cjs",
+    "lines": 45,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-b13.cjs",
+    "lines": 53,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-b14.cjs",
+    "lines": 16,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-b15.cjs",
+    "lines": 25,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-b16.cjs",
+    "lines": 44,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-b17.cjs",
+    "lines": 13,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-findings.cjs",
+    "lines": 43,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/complete-source-and-text.cjs",
+    "lines": 26,
+    "anchors": [
+      {
+        "line": 21,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/contact-sheets.cjs",
+    "lines": 22,
+    "anchors": [
+      {
+        "line": 20,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/create-b1-fixture.mjs",
+    "lines": 16,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/error-followup.mjs",
+    "lines": 12,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/error-probe.mjs",
+    "lines": 18,
+    "anchors": [
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/extract-sources.cjs",
+    "lines": 44,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 41,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 42,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/feedback-consumption-followup.mjs",
+    "lines": 8,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/feedback-probe.mjs",
+    "lines": 18,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 16,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/finalize-b11.cjs",
+    "lines": 56,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/findings-data.cjs",
+    "lines": 40,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/finish-notes.cjs",
+    "lines": 15,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/format-audit-docs.cjs",
+    "lines": 21,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/forms-followup.mjs",
+    "lines": 11,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/forms-probe.mjs",
+    "lines": 13,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/inspect-pdfs.py",
+    "lines": 20,
+    "anchors": [
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/journeys-probe.mjs",
+    "lines": 18,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/journeys-ready.mjs",
+    "lines": 11,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/make-sheets.cjs",
+    "lines": 4,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/overlays-followup.mjs",
+    "lines": 10,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/polish-authored-text.cjs",
+    "lines": 8,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/reconcile-final.cjs",
+    "lines": 68,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/reconcile-finding-origins.cjs",
+    "lines": 23,
+    "anchors": [
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/remaining-overlays.mjs",
+    "lines": 22,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/review-ledger.cjs",
+    "lines": 4,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/run-checks.mjs",
+    "lines": 13,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/runtime-followup.mjs",
+    "lines": 26,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 14,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/runtime-supplement.mjs",
+    "lines": 34,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/runtime-sweep.mjs",
+    "lines": 71,
+    "anchors": [
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 20,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/states-followup.mjs",
+    "lines": 8,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/states-probe.mjs",
+    "lines": 17,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surfaces.cjs",
+    "lines": 57,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/text-probe.mjs",
+    "lines": 9,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/validate-package.cjs",
+    "lines": 21,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "process"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/visual-drawer-followup.mjs",
+    "lines": 6,
+    "anchors": [
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/visual-probe.mjs",
+    "lines": 22,
+    "anchors": [
+      {
+        "line": 12,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 17,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/write-closure.cjs",
+    "lines": 63,
+    "anchors": [
+      {
+        "line": 13,
+        "kinds": [
+          "historical_output"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b22-probe.mjs",
+    "lines": 109,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b23-probe.mjs",
+    "lines": 90,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b24-probe.mjs",
+    "lines": 70,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b25-probe.mjs",
+    "lines": 120,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b25-supplement.mjs",
+    "lines": 33,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b26-probe.mjs",
+    "lines": 96,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b27-probe.mjs",
+    "lines": 73,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b28-probe.mjs",
+    "lines": 63,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 41,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/b29-probe.mjs",
+    "lines": 68,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/browser-auth.mjs",
+    "lines": 12,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/build-exceptions.py",
+    "lines": 227,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/build-findings.py",
+    "lines": 368,
+    "anchors": [
+      {
+        "line": 295,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 327,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 364,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/build-inventory.mjs",
+    "lines": 103,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 94,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 96,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 101,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/build-opportunities.py",
+    "lines": 293,
+    "anchors": [
+      {
+        "line": 291,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/build-transitions.mjs",
+    "lines": 96,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/format-audit.py",
+    "lines": 88,
+    "anchors": [
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 86,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/http-harness.mjs",
+    "lines": 15,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/inspect-local.mjs",
+    "lines": 38,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 19,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 32,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 33,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 35,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/inspect-pdfs.py",
+    "lines": 28,
+    "anchors": [
+      {
+        "line": 16,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 24,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/isolation-check.mjs",
+    "lines": 8,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 2,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/local-harness.mjs",
+    "lines": 156,
+    "anchors": [
+      {
+        "line": 8,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 21,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 90,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 145,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 146,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 149,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/normalize-artifacts.py",
+    "lines": 25,
+    "anchors": [
+      {
+        "line": 19,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/reconcile-coverage.py",
+    "lines": 233,
+    "anchors": [
+      {
+        "line": 224,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 225,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/record-presentation.py",
+    "lines": 22,
+    "anchors": [
+      {
+        "line": 18,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/run-checks.mjs",
+    "lines": 22,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 20,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/run-e2e-evidence.mjs",
+    "lines": 17,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/validate-package.py",
+    "lines": 133,
+    "anchors": [
+      {
+        "line": 7,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 32,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 110,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 121,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 130,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/verify-manifest.py",
+    "lines": 34,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 16,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 20,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "process"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/verify-secrets.mjs",
+    "lines": 26,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 23,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/analyze-chain.mjs",
+    "lines": 14,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b310-probe.mjs",
+    "lines": 40,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b310-supplement.mjs",
+    "lines": 22,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b311-plans.mjs",
+    "lines": 43,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 42,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b311-probe.mjs",
+    "lines": 53,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b312-history.mjs",
+    "lines": 45,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b312-probe.mjs",
+    "lines": 54,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b312-recovery.mjs",
+    "lines": 30,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b312-volume.mjs",
+    "lines": 21,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b33-invited.mjs",
+    "lines": 11,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b33-probe.mjs",
+    "lines": 66,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b33-supplement.mjs",
+    "lines": 26,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 23,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 24,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b34-probe.mjs",
+    "lines": 25,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b35-probe.mjs",
+    "lines": 49,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b36-probe.mjs",
+    "lines": 43,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b37-cutoff-bal.mjs",
+    "lines": 9,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b37-overlap.mjs",
+    "lines": 11,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b37-probe.mjs",
+    "lines": 69,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b38-bal-and-admin.mjs",
+    "lines": 32,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b38-cancel.mjs",
+    "lines": 10,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b38-probe.mjs",
+    "lines": 34,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b39-leases.mjs",
+    "lines": 41,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/b39-progress.mjs",
+    "lines": 53,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/build-catalog.mjs",
+    "lines": 33,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 31,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/build-matrices.mjs",
+    "lines": 46,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/concurrency-harness.mjs",
+    "lines": 29,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/cross-layer-matrix.mjs",
+    "lines": 30,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/csv.mjs",
+    "lines": 5,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/domain-matrices.mjs",
+    "lines": 57,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/final-evidence-matrices.mjs",
+    "lines": 29,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 28,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/final-preservation.mjs",
+    "lines": 11,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/finding-register.mjs",
+    "lines": 46,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 40,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 43,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 44,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/finish-artifacts.mjs",
+    "lines": 19,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 17,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/http-client.mjs",
+    "lines": 20,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/inspect.mjs",
+    "lines": 45,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 36,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 38,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 41,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 43,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/local-harness.mjs",
+    "lines": 156,
+    "anchors": [
+      {
+        "line": 8,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 21,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 90,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 145,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 146,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 149,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/manifest.mjs",
+    "lines": 13,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/preservation-explain.mjs",
+    "lines": 31,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 20,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 30,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/preservation.mjs",
+    "lines": 13,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/query-matrix.mjs",
+    "lines": 31,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 30,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/reconcile-matrices.mjs",
+    "lines": 34,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 33,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/rpc-contracts.mjs",
+    "lines": 9,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/run-checks.mjs",
+    "lines": 24,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/scenario-matrices.mjs",
+    "lines": 22,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/start-local-server.mjs",
+    "lines": 18,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-29-phase-b3-database/evidence/validate-package.mjs",
+    "lines": 36,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 34,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/architecture.mjs",
+    "lines": 31,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 30,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b410-security.mjs",
+    "lines": 23,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 20,
+        "kinds": [
+          "process"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b412-create-state.mjs",
+    "lines": 15,
+    "anchors": [
+      {
+        "line": 9,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b412-freshness.mjs",
+    "lines": 34,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b42-auth.mjs",
+    "lines": 33,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b43-input.mjs",
+    "lines": 35,
+    "anchors": [
+      {
+        "line": 16,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 21,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b44-commands.mjs",
+    "lines": 48,
+    "anchors": [
+      {
+        "line": 15,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 24,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 36,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b45-reads.mjs",
+    "lines": 31,
+    "anchors": [
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b47-pdf.mjs",
+    "lines": 18,
+    "anchors": [
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b48-admin.mjs",
+    "lines": 24,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/background-progress.mjs",
+    "lines": 40,
+    "anchors": [
+      {
+        "line": 5,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 16,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 31,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 37,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 39,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/baseline.mjs",
+    "lines": 29,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/build-findings.mjs",
+    "lines": 43,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 41,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/build-index.mjs",
+    "lines": 40,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 39,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/format-docs.mjs",
+    "lines": 29,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 26,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/http-local.mjs",
+    "lines": 76,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 17,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/inventory.mjs",
+    "lines": 48,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 14,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 46,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/preservation.mjs",
+    "lines": 23,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 14,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 19,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/start-local.mjs",
+    "lines": 15,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/validate-package.mjs",
+    "lines": 70,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 55,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 64,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 69,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b510-callback-attempts.mjs",
+    "lines": 33,
+    "anchors": [
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 32,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b53-queue.mjs",
+    "lines": 52,
+    "anchors": [
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 51,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b55-inbound.mjs",
+    "lines": 27,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 26,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b56-interactions.mjs",
+    "lines": 35,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 34,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b57-flow.mjs",
+    "lines": 39,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 38,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-after.js",
+    "lines": 13,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-before.js",
+    "lines": 12,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-capture.mjs",
+    "lines": 13,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process",
+          "historical_output"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-setup.mjs",
+    "lines": 36,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 14,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 24,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 31,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 33,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-switch-capture.mjs",
+    "lines": 17,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process",
+          "historical_output"
+        ]
+      },
+      {
+        "line": 14,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 16,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-switch.js",
+    "lines": 19,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/background-progress.mjs",
+    "lines": 41,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 16,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 24,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 28,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 35,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 40,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/baseline.mjs",
+    "lines": 45,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/local-actor.mjs",
+    "lines": 34,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/preservation.mjs",
+    "lines": 45,
+    "anchors": [
+      {
+        "line": 5,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 24,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 30,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 38,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 41,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 44,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/start-local.mjs",
+    "lines": 18,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 16,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/validate-package.mjs",
+    "lines": 63,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 49,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 51,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 58,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 60,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/assemble.py",
+    "lines": 123,
+    "anchors": [
+      {
+        "line": 13,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 117,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b612-legacy-context.mjs",
+    "lines": 9,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b612-receipts.mjs",
+    "lines": 45,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 43,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b62-provenance.mjs",
+    "lines": 52,
+    "anchors": [
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 50,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b63-integrity.mjs",
+    "lines": 21,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 20,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b66-catalog.mjs",
+    "lines": 27,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 26,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b67-storage-read.mjs",
+    "lines": 14,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b68-source.py",
+    "lines": 22,
+    "anchors": [
+      {
+        "line": 21,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/b69-qr.mjs",
+    "lines": 23,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/backup.mjs",
+    "lines": 8,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/baseline.mjs",
+    "lines": 48,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/consolidate.py",
+    "lines": 435,
+    "anchors": [
+      {
+        "line": 56,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 431,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 432,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/field-matrix.py",
+    "lines": 129,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/findings.py",
+    "lines": 285,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/format-docs.py",
+    "lines": 66,
+    "anchors": [
+      {
+        "line": 64,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/inspect-pdf.py",
+    "lines": 43,
+    "anchors": [
+      {
+        "line": 19,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 30,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 39,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/local-actors.mjs",
+    "lines": 39,
+    "anchors": [
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 27,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/preservation.mjs",
+    "lines": 45,
+    "anchors": [
+      {
+        "line": 5,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 24,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 30,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 38,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 41,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 44,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/validate-package.py",
+    "lines": 176,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 37,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 103,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 107,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 152,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 171,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 173,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/assemble-evidence.mjs",
+    "lines": 56,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 49,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 55,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/assemble-findings.mjs",
+    "lines": 21,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 19,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/backup-inventory.mjs",
+    "lines": 36,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 17,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 34,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/ci-metadata.mjs",
+    "lines": 29,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 24,
+        "kinds": [
+          "process"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/collect-baseline.mjs",
+    "lines": 52,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 14,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/format-documents.py",
+    "lines": 94,
+    "anchors": [
+      {
+        "line": 92,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/observability-metadata.mjs",
+    "lines": 14,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "process",
+          "remote_candidate"
+        ]
+      },
+      {
+        "line": 13,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/remote-metadata.mjs",
+    "lines": 31,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 9,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/schema-metadata.mjs",
+    "lines": 24,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "process",
+          "remote_candidate"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 20,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/security-metadata.mjs",
+    "lines": 33,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 27,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 30,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 32,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/validate-package.py",
+    "lines": 244,
+    "anchors": [
+      {
+        "line": 8,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 165,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 167,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 201,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 227,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 238,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/phase-b/evidence/fix-markdown-literals.cjs",
+    "lines": 18,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 16,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "docs/audits/phase-b/evidence/verify-maintenance.mjs",
+    "lines": 11,
+    "anchors": [
+      {
+        "line": 4,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/audit-catalogue.mjs",
+    "lines": 117,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 17,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 18,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 94,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 95,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/backup-local-database.mjs",
+    "lines": 42,
+    "anchors": [
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 17,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 34,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/build-flow-contracts.mjs",
+    "lines": 247,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 240,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/build-meta-catalog.mjs",
+    "lines": 164,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 145,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 150,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/build-traceability.mjs",
+    "lines": 204,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 90,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 198,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 199,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 202,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/check-contracts.mjs",
+    "lines": 21,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/clean-test-database.mjs",
+    "lines": 13,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "process",
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/e2e-environment.mjs",
+    "lines": 29,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/inventory-ui.mjs",
+    "lines": 60,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 44,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 58,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/meta-templates.mjs",
+    "lines": 162,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "remote_candidate"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/prepare-test-database.mjs",
+    "lines": 47,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 15,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 32,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 35,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 36,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 43,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/reconcile-database.mjs",
+    "lines": 77,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 3,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 8,
+        "kinds": [
+          "historical_output"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "process",
+          "remote_candidate"
+        ]
+      },
+      {
+        "line": 12,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 59,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/run-e2e.mjs",
+    "lines": 10,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "process"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/seed-test-fixtures.mjs",
+    "lines": 142,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 4,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 22,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 68,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 131,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/start-e2e-server.mjs",
+    "lines": 14,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 11,
+        "kinds": [
+          "process"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/supabase-project.mjs",
+    "lines": 72,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "remote_candidate"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 48,
+        "kinds": [
+          "write",
+          "remote_candidate"
+        ]
+      },
+      {
+        "line": 54,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/test-constants.mjs",
+    "lines": 21,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "write"
+        ]
+      },
+      {
+        "line": 10,
+        "kinds": [
+          "write"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/test-environment.mjs",
+    "lines": 174,
+    "anchors": [
+      {
+        "line": 1,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 25,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 31,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 53,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 58,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 90,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 111,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 112,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 148,
+        "kinds": [
+          "process"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/test-migrations.mjs",
+    "lines": 248,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 6,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 7,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 20,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 21,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 23,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 27,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 29,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 51,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 114,
+        "kinds": [
+          "process"
+        ]
+      },
+      {
+        "line": 116,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 198,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/verify-evolution-database.mjs",
+    "lines": 25,
+    "anchors": [
+      {
+        "line": 2,
+        "kinds": [
+          "guard"
+        ]
+      },
+      {
+        "line": 5,
+        "kinds": [
+          "guard"
+        ]
+      }
+    ],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  },
+  {
+    "file": "scripts/verify-linux.sh",
+    "lines": 30,
+    "anchors": [],
+    "interpretation": "Discovery flags require source review; not proof that a script is unsafe or was executed"
+  }
+]

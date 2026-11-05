@@ -1,0 +1,568 @@
+[
+  {
+    "name": "@fluentui/react-components",
+    "version": "9.74.11",
+    "kind": "runtime",
+    "references": [
+      "next.config.ts",
+      "src/components/admin/admin-fields.tsx",
+      "src/components/admin/administration-navigation.tsx",
+      "src/components/admin/catalogue-management.tsx",
+      "src/components/admin/global-accounts.tsx",
+      "src/components/admin/membership-management.tsx",
+      "src/components/admin/notification-matrix.tsx",
+      "src/components/admin/permission-matrix.tsx",
+      "src/components/admin/policy-console.tsx",
+      "src/components/admin/policy-rules.tsx",
+      "src/components/app-shell.tsx",
+      "src/components/auth/login-form.tsx",
+      "src/components/auth/logout-button.tsx",
+      "src/components/balances/balance-console.tsx",
+      "src/components/balances/balance-count-fields.tsx",
+      "src/components/balances/balance-count-wizard.tsx",
+      "src/components/balances/balance-forms.tsx",
+      "src/components/catalog/unit-console.tsx",
+      "src/components/dashboard.tsx",
+      "src/components/dashboard/dashboard-summary.tsx",
+      "src/components/dashboard/task-list.tsx",
+      "src/components/documents/delivery-inbox.tsx",
+      "src/components/forms/record-drawer.tsx",
+      "src/components/forms/settings-section.tsx",
+      "src/components/forms/wizard-actions.tsx",
+      "src/components/layout/workspace-shell.tsx",
+      "src/components/notifications/notification-center.tsx",
+      "src/components/schedules/schedule-console.tsx",
+      "src/components/schedules/schedule-forms.tsx",
+      "src/components/stock/consumption-console.tsx",
+      "src/components/stock/stock-console.tsx",
+      "src/components/stock/stock-overview.tsx",
+      "src/components/ui/primitives.tsx",
+      "src/theme/providers.tsx"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@fluentui/react-icons",
+    "version": "2.0.344",
+    "kind": "runtime",
+    "references": [
+      "next.config.ts",
+      "src/components/ui/primitives.tsx"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@pdf-lib/fontkit",
+    "version": "1.1.1",
+    "kind": "runtime",
+    "references": [
+      "src/lib/server/operational-pdf.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@supabase/ssr",
+    "version": "0.12.7",
+    "kind": "runtime",
+    "references": [
+      "proxy.ts",
+      "src/lib/supabase/client.ts",
+      "src/lib/supabase/server.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@supabase/supabase-js",
+    "version": "2.118.0",
+    "kind": "runtime",
+    "references": [
+      "scripts/seed-test-fixtures.mjs",
+      "scripts/test-migrations.mjs",
+      "src/app/verificar/[id]/page.tsx",
+      "src/components/auth/login-form.tsx",
+      "src/lib/notifications/document-notification.ts",
+      "src/lib/notifications/worker.ts",
+      "src/lib/server/api.ts",
+      "src/lib/server/document-pdf.ts",
+      "src/lib/server/receipts.ts",
+      "src/lib/server/service-client.ts",
+      "tests/api/guards.test.ts",
+      "tests/api/worker.test.ts",
+      "tests/integration/database.test.mjs",
+      "tests/integration/schedules.test.mjs",
+      "tests/integration/shift-fixtures.mjs",
+      "tests/integration/v4-fixtures.mjs",
+      "tests/integration/v4-review.test.mjs",
+      "tests/integration/v4-workflows.test.mjs",
+      "tests/template-registry.test.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@zxing/browser",
+    "version": "0.2.1",
+    "kind": "runtime",
+    "references": [
+      "src/components/catalog/barcode-scanner.tsx"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "decimal.js",
+    "version": "10.6.0",
+    "kind": "runtime",
+    "references": [
+      "src/lib/quantity.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "next",
+    "version": "16.4.2",
+    "kind": "runtime",
+    "references": [
+      "eslint.config.mjs",
+      "next.config.ts",
+      "proxy.ts",
+      "scripts/build-flow-contracts.mjs",
+      "scripts/start-e2e-server.mjs",
+      "src/app/api/admin/notifications/route.ts",
+      "src/app/api/admin/route.ts",
+      "src/app/api/attachments/route.ts",
+      "src/app/api/balances/route.ts",
+      "src/app/api/catalog/presentations/route.ts",
+      "src/app/api/catalog/route.ts",
+      "src/app/api/consumption/route.ts",
+      "src/app/api/context/route.ts",
+      "src/app/api/dashboard/route.ts",
+      "src/app/api/deliveries/route.ts",
+      "src/app/api/documents/[id]/notifications/route.ts",
+      "src/app/api/documents/[id]/revise/route.ts",
+      "src/app/api/documents/[id]/route.ts",
+      "src/app/api/documents/route.ts",
+      "src/app/api/invitations/accept/route.ts",
+      "src/app/api/invitations/register/route.ts",
+      "src/app/api/notification-rules/route.ts",
+      "src/app/api/notifications/route.ts",
+      "src/app/api/notifications/webhook/route.ts",
+      "src/app/api/notifications/worker/route.ts",
+      "src/app/api/patient-settings/route.ts",
+      "src/app/api/profile/route.ts",
+      "src/app/api/requisitions/[id]/archive/route.ts",
+      "src/app/api/requisitions/[id]/resolve/route.ts",
+      "src/app/api/requisitions/[id]/route.ts",
+      "src/app/api/requisitions/[id]/science/route.ts",
+      "src/app/api/requisitions/[id]/status/route.ts",
+      "src/app/api/requisitions/item-context/route.ts",
+      "src/app/api/requisitions/route.ts",
+      "src/app/api/schedules/route.ts",
+      "src/app/api/stock/balances/route.ts",
+      "src/app/api/stock/inventory/route.ts",
+      "src/app/api/stock/movements/route.ts",
+      "src/app/api/sync/route.ts",
+      "src/app/api/units/route.ts",
+      "src/app/api/whatsapp/flows/session/route.ts",
+      "src/app/api/whatsapp/flows/submissions/route.ts",
+      "src/app/auth/callback/route.ts",
+      "src/app/inventarios/page.tsx",
+      "src/app/layout.tsx",
+      "src/components/admin/accept-invitation.tsx",
+      "src/components/admin/admin-console.tsx",
+      "src/components/admin/administration-navigation.tsx",
+      "src/components/admin/permission-matrix.tsx",
+      "src/components/admin/policy-console.tsx",
+      "src/components/app-shell.tsx",
+      "src/components/auth/contact-settings.tsx",
+      "src/components/auth/login-form.tsx",
+      "src/components/auth/logout-button.tsx",
+      "src/components/auth/mfa-settings.tsx",
+      "src/components/auth/password-recovery-form.tsx",
+      "src/components/authenticated-page.tsx",
+      "src/components/balances/balance-console.tsx",
+      "src/components/balances/balance-count-wizard.tsx",
+      "src/components/dashboard/dashboard-summary.tsx",
+      "src/components/dashboard/global-dashboard.tsx",
+      "src/components/dashboard/management-dashboard.tsx",
+      "src/components/dashboard/metric-card.tsx",
+      "src/components/dashboard/operations-dashboard.tsx",
+      "src/components/dashboard/task-list.tsx",
+      "src/components/documents/document-actions.tsx",
+      "src/components/documents/document-history.tsx",
+      "src/components/documents/forms-hub.tsx",
+      "src/components/documents/supply-detail.tsx",
+      "src/components/documents/supply-wizard.tsx",
+      "src/components/layout/workspace-context.tsx",
+      "src/components/layout/workspace-shell.tsx",
+      "src/components/navigation/more-actions.tsx",
+      "src/components/navigation/workspace-navigation.tsx",
+      "src/components/notifications/notification-bell.tsx",
+      "src/components/notifications/notification-center.tsx",
+      "src/components/profile-console.tsx",
+      "src/components/requisitions/requisition-detail.tsx",
+      "src/components/requisitions/requisition-history.tsx",
+      "src/components/requisitions/requisition-receipt.tsx",
+      "src/components/requisitions/requisition-steps.tsx",
+      "src/components/stock/consumption-console.tsx",
+      "src/components/stock/stock-console.tsx",
+      "src/components/stock/transit-stock.tsx",
+      "src/lib/notifications/flows.ts",
+      "src/lib/server/api.ts",
+      "src/lib/server/app-origin.ts",
+      "src/lib/server/operational-pdf.ts",
+      "src/lib/supabase/server.ts",
+      "src/theme/providers.tsx",
+      "src/types/dashboard.ts",
+      "tests/document-pdf.test.ts",
+      "tests/e2e/workflows.spec.ts",
+      "tests/integration/database.test.mjs",
+      "tests/integration/v4-review.test.mjs",
+      "tests/integration/v4-workflows.test.mjs",
+      "tsconfig.json"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "pdf-lib",
+    "version": "1.17.1",
+    "kind": "runtime",
+    "references": [
+      "src/lib/server/files.ts",
+      "src/lib/server/operational-pdf.ts",
+      "tests/document-pdf.test.ts",
+      "tests/files.test.ts",
+      "tests/operational-contracts.test.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "qrcode",
+    "version": "1.5.4",
+    "kind": "runtime",
+    "references": [
+      "src/lib/server/operational-pdf.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "react",
+    "version": "19.3.1",
+    "kind": "runtime",
+    "references": [
+      "eslint.config.mjs",
+      "next.config.ts",
+      "src/app/documentos/[id]/page.tsx",
+      "src/app/fichas/[id]/page.tsx",
+      "src/app/historico/[id]/page.tsx",
+      "src/app/layout.tsx",
+      "src/app/login/page.tsx",
+      "src/app/verificar/[id]/page.tsx",
+      "src/components/admin/accept-invitation.tsx",
+      "src/components/admin/admin-console.tsx",
+      "src/components/admin/admin-fields.tsx",
+      "src/components/admin/administration-navigation.tsx",
+      "src/components/admin/alert-settings.tsx",
+      "src/components/admin/catalogue-management.tsx",
+      "src/components/admin/global-accounts.tsx",
+      "src/components/admin/membership-management.tsx",
+      "src/components/admin/notification-matrix.tsx",
+      "src/components/admin/notification-settings.tsx",
+      "src/components/admin/patient-registration.tsx",
+      "src/components/admin/permission-matrix.tsx",
+      "src/components/admin/policy-console.tsx",
+      "src/components/admin/policy-rules.tsx",
+      "src/components/app-shell.tsx",
+      "src/components/auth/contact-settings.tsx",
+      "src/components/auth/login-form.tsx",
+      "src/components/auth/logout-button.tsx",
+      "src/components/auth/mfa-settings.tsx",
+      "src/components/auth/password-recovery-form.tsx",
+      "src/components/authenticated-page.tsx",
+      "src/components/balances/balance-console.tsx",
+      "src/components/balances/balance-count-fields.tsx",
+      "src/components/balances/balance-count-wizard.tsx",
+      "src/components/balances/balance-forms.tsx",
+      "src/components/balances/use-balance-workspace.ts",
+      "src/components/catalog/barcode-scanner.tsx",
+      "src/components/catalog/unit-console.tsx",
+      "src/components/dashboard.tsx",
+      "src/components/dashboard/dashboard-summary.tsx",
+      "src/components/dashboard/task-list.tsx",
+      "src/components/documents/attachments.tsx",
+      "src/components/documents/delivery-inbox.tsx",
+      "src/components/documents/document-actions.tsx",
+      "src/components/documents/document-header.tsx",
+      "src/components/documents/document-history.tsx",
+      "src/components/documents/related-document.tsx",
+      "src/components/documents/supply-command-editor.tsx",
+      "src/components/documents/supply-detail.tsx",
+      "src/components/documents/supply-wizard-step.tsx",
+      "src/components/documents/supply-wizard.tsx",
+      "src/components/forms/record-drawer.tsx",
+      "src/components/forms/settings-section.tsx",
+      "src/components/forms/wizard-actions.tsx",
+      "src/components/layout/workspace-context.tsx",
+      "src/components/layout/workspace-shell.tsx",
+      "src/components/live-session.tsx",
+      "src/components/notifications/document-delivery-status.tsx",
+      "src/components/notifications/notification-bell.tsx",
+      "src/components/notifications/notification-center.tsx",
+      "src/components/profile-console.tsx",
+      "src/components/requisitions/requisition-detail.tsx",
+      "src/components/requisitions/requisition-history.tsx",
+      "src/components/requisitions/requisition-steps.tsx",
+      "src/components/requisitions/requisition-wizard.tsx",
+      "src/components/requisitions/resolve-extra-item.tsx",
+      "src/components/schedules/schedule-console.tsx",
+      "src/components/schedules/schedule-forms.tsx",
+      "src/components/stock/consumption-console.tsx",
+      "src/components/stock/flow-reviews.tsx",
+      "src/components/stock/inventory-console.tsx",
+      "src/components/stock/stock-console.tsx",
+      "src/components/stock/stock-overview.tsx",
+      "src/components/ui/primitives.tsx",
+      "src/components/workspace-sync.tsx",
+      "src/components/workspace.tsx",
+      "src/lib/use-client-ready.ts",
+      "src/lib/use-live-revision.ts",
+      "src/theme/providers.tsx",
+      "tsconfig.json"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "react-dom",
+    "version": "19.3.1",
+    "kind": "runtime",
+    "references": [],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "sharp",
+    "version": "0.35.5",
+    "kind": "runtime",
+    "references": [
+      "src/lib/server/files.ts",
+      "tests/e2e/personal-workspace.spec.ts",
+      "tests/e2e/workflows.spec.ts",
+      "tests/files.test.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "zod",
+    "version": "4.6.7",
+    "kind": "runtime",
+    "references": [
+      "src/app/api/admin/notifications/route.ts",
+      "src/app/api/admin/route.ts",
+      "src/app/api/catalog/presentations/route.ts",
+      "src/app/api/catalog/route.ts",
+      "src/app/api/consumption/route.ts",
+      "src/app/api/context/route.ts",
+      "src/app/api/documents/[id]/revise/route.ts",
+      "src/app/api/invitations/accept/route.ts",
+      "src/app/api/invitations/register/route.ts",
+      "src/app/api/notifications/route.ts",
+      "src/app/api/patient-settings/route.ts",
+      "src/app/api/profile/route.ts",
+      "src/app/api/requisitions/[id]/archive/route.ts",
+      "src/app/api/requisitions/[id]/resolve/route.ts",
+      "src/app/api/requisitions/[id]/science/route.ts",
+      "src/app/api/requisitions/[id]/status/route.ts",
+      "src/app/api/schedules/route.ts",
+      "src/app/api/stock/movements/route.ts",
+      "src/app/api/units/route.ts",
+      "src/app/api/whatsapp/flows/session/route.ts",
+      "src/app/api/whatsapp/flows/submissions/route.ts",
+      "src/app/verificar/[id]/page.tsx",
+      "src/lib/notifications/flows.ts",
+      "src/lib/notifications/provider.ts",
+      "src/lib/notifications/webhook.ts",
+      "src/lib/server/api.ts",
+      "src/lib/validation/balances.ts",
+      "src/lib/validation/documents.ts",
+      "src/lib/validation/password.ts",
+      "src/lib/validation/requisition.ts",
+      "src/lib/validation/schedules.ts",
+      "tests/api/guards.test.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@axe-core/playwright",
+    "version": "4.14.0",
+    "kind": "development",
+    "references": [
+      "tests/e2e/accessibility-audit.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@eslint-react/eslint-plugin",
+    "version": "5.28.3",
+    "kind": "development",
+    "references": [
+      "eslint.config.mjs"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@eslint/js",
+    "version": "10.0.1",
+    "kind": "development",
+    "references": [
+      "eslint.config.mjs"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@next/eslint-plugin-next",
+    "version": "16.4.2",
+    "kind": "development",
+    "references": [
+      "eslint.config.mjs"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@playwright/test",
+    "version": "1.64.1",
+    "kind": "development",
+    "references": [
+      "playwright.config.ts",
+      "scripts/run-e2e.mjs",
+      "tests/e2e/accessibility-audit.ts",
+      "tests/e2e/accessibility.spec.ts",
+      "tests/e2e/administration.spec.ts",
+      "tests/e2e/auth-context.ts",
+      "tests/e2e/balance-shifts.spec.ts",
+      "tests/e2e/fluent-experience.spec.ts",
+      "tests/e2e/login.spec.ts",
+      "tests/e2e/navigation.ts",
+      "tests/e2e/onboarding.spec.ts",
+      "tests/e2e/personal-workspace.spec.ts",
+      "tests/e2e/schedules.spec.ts",
+      "tests/e2e/v4-review.spec.ts",
+      "tests/e2e/v4.spec.ts",
+      "tests/e2e/workflows.spec.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@tailwindcss/turbopack",
+    "version": "4.3.3",
+    "kind": "development",
+    "references": [
+      "next.config.ts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@types/node",
+    "version": "24.19.2",
+    "kind": "development",
+    "references": [],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@types/qrcode",
+    "version": "1.5.6",
+    "kind": "development",
+    "references": [],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@types/react",
+    "version": "19.3.0",
+    "kind": "development",
+    "references": [],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "@types/react-dom",
+    "version": "19.3.0",
+    "kind": "development",
+    "references": [],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "eslint",
+    "version": "10.13.0",
+    "kind": "development",
+    "references": [
+      "eslint.config.mjs"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "eslint-plugin-react-hooks",
+    "version": "7.1.1",
+    "kind": "development",
+    "references": [
+      "eslint.config.mjs"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "markdownlint-cli2",
+    "version": "0.24.0",
+    "kind": "development",
+    "references": [],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "tailwindcss",
+    "version": "4.3.3",
+    "kind": "development",
+    "references": [
+      "next.config.ts",
+      "src/app/globals.css"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "typescript",
+    "version": "6.0.3",
+    "kind": "development",
+    "references": [
+      "eslint.config.mjs",
+      "scripts/inventory-ui.mjs"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "typescript-eslint",
+    "version": "8.72.0",
+    "kind": "development",
+    "references": [
+      "eslint.config.mjs"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  },
+  {
+    "name": "vitest",
+    "version": "5.0.5",
+    "kind": "development",
+    "references": [
+      "tests/api/guards.test.ts",
+      "tests/api/notifications.test.ts",
+      "tests/api/requisition-contract.test.ts",
+      "tests/api/requisition-persistence.test.ts",
+      "tests/api/worker.test.ts",
+      "tests/app-origin.test.ts",
+      "tests/auth.test.ts",
+      "tests/catalog-match.test.ts",
+      "tests/document-pdf.test.ts",
+      "tests/e2e-environment.test.ts",
+      "tests/files.test.ts",
+      "tests/operational-contracts.test.ts",
+      "tests/password.test.ts",
+      "tests/requisition.test.ts",
+      "tests/schedule-time.test.ts",
+      "tests/supabase-project.test.ts",
+      "tests/template-registry.test.ts",
+      "vitest.config.mts"
+    ],
+    "caveat": "Negative lexical matches do not prove lack of implicit TypeScript, compiler, script-bin or peer consumption"
+  }
+]

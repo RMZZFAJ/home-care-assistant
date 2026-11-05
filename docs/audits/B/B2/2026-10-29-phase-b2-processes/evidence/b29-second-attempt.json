@@ -1,0 +1,103 @@
+{
+  "group": "B2.9",
+  "startedAt": "2026-10-29T23:09:50.707Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B29-01",
+      "purpose": "Cancelar ENT reabre REQ arquivada e conserva motivo anterior e PDF antigo",
+      "recordedAt": "2026-10-29T23:10:19.175Z",
+      "observed": {
+        "before": {
+          "archivedAt": "2026-10-29T23:02:45.28868+00:00",
+          "archiveReason": "Família conferiu a ciência tardia e encerrou a necessidade fictícia sem apagar a exceção"
+        },
+        "reopened": {
+          "completedAt": null,
+          "archivedAt": null,
+          "manualArchiveRequired": true
+        },
+        "reopeningEvent": {
+          "total": 1,
+          "fulfilled": 1,
+          "operationalIssue": true,
+          "previousArchivedAt": "2026-10-29T23:02:45.28868+00:00",
+          "previousArchiveReason": "Família conferiu a ciência tardia e encerrou a necessidade fictícia sem apagar a exceção"
+        },
+        "beforeReturn": {
+          "FAMILY": "4.000000",
+          "TRANSIT": "1.000000",
+          "CARE_TEAM": "4.000000",
+          "movements": 14
+        },
+        "afterReturn": {
+          "FAMILY": "5.000000",
+          "TRANSIT": "1.000000",
+          "CARE_TEAM": "3.000000",
+          "movements": 15
+        },
+        "delivery": {
+          "id": "a3621d04-1319-4ffa-b936-7c7f02e45ace",
+          "lines": [
+            {
+              "id": "0f70ddf4-60db-4f02-aa9d-da0ef800159e",
+              "accepted": "1.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {},
+                "issueOpen": false
+              },
+              "quantity": "1.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 4,
+          "number": 11,
+          "status": "cancelled",
+          "version": 4,
+          "receipts": []
+        },
+        "final": {
+          "fulfilled": 0,
+          "completedAt": null
+        },
+        "historicalPdfHashPreserved": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B29-02",
+      "purpose": "Duas pessoas aprovam a mesma COM com tela antiga;somente uma decisão persiste",
+      "recordedAt": "2026-10-29T23:10:20.454Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   400,\n+   403\n-   200,\n-   409\n  ]\n",
+        "sqlstate": null
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [
+    {
+      "id": "B29-01",
+      "purpose": "Cancelar ENT reabre REQ arquivada e conserva motivo anterior e PDF antigo",
+      "recordedAt": "2026-10-29T23:09:50.909Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'Família conferiu a ciência tardia e encerrou a necessidade fictícia sem apagar a exceção'\n",
+        "sqlstate": null
+      }
+    }
+  ]
+}

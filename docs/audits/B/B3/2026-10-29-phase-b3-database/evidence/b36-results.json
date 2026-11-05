@@ -1,0 +1,284 @@
+{
+  "group": "B3.6",
+  "startedAt": "2026-10-30T01:08:14.221Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B36-01",
+      "purpose": "Falha na última linha ENT desfaz documento, movimentos e série anteriores da transação",
+      "recordedAt": "2026-10-30T01:08:14.549Z",
+      "observed": {
+        "before": {
+          "p0": {
+            "FAMILY": "8.000000",
+            "TRANSIT": "0.000000",
+            "CARE_TEAM": "0.000000",
+            "movements": 8
+          },
+          "p3": {
+            "FAMILY": "0",
+            "TRANSIT": "0",
+            "CARE_TEAM": "0",
+            "movements": 0
+          },
+          "series": "2"
+        },
+        "result": {
+          "rejected": true,
+          "sqlstate": "23514",
+          "message": "create_supply_document: insufficient stock"
+        },
+        "afterSeries": "2",
+        "documentsForFailedKey": "0",
+        "limits": "movement_revision sequence can have gaps after rollback; no persisted movement"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B36-02",
+      "purpose": "REQ, ciência, ENT e conclusão são estados independentes com eventos canônicos",
+      "recordedAt": "2026-10-30T01:08:15.675Z",
+      "observed": {
+        "req": "4754c25f-d0dd-43c1-89ea-74832c29fb13",
+        "delivery": "5476bd0f-d79a-4b5a-badf-fa904c7d6571",
+        "start": {
+          "manual": false,
+          "science": false,
+          "archived": false,
+          "completed": false
+        },
+        "dispatched": {
+          "manual": false,
+          "science": true,
+          "archived": false,
+          "completed": false
+        },
+        "received": {
+          "manual": false,
+          "science": true,
+          "archived": false,
+          "completed": true
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B36-03",
+      "purpose": "Arquivo manual e reabertura preservam a versão anterior",
+      "recordedAt": "2026-10-30T01:08:16.843Z",
+      "observed": {
+        "before": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 10
+        },
+        "after": {
+          "FAMILY": "8.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "0.000000",
+          "movements": 11
+        },
+        "reopened": {
+          "manual": true,
+          "science": true,
+          "archived": false,
+          "completed": false
+        },
+        "firstHashPreserved": true,
+        "history": [
+          {
+            "action": "req.issued",
+            "version": 1,
+            "previousArchivePresent": false
+          },
+          {
+            "action": "req.science_satisfied",
+            "version": 2,
+            "previousArchivePresent": false
+          },
+          {
+            "action": "req.fulfillment_updated",
+            "version": 3,
+            "previousArchivePresent": false
+          },
+          {
+            "action": "req.completed",
+            "version": 4,
+            "previousArchivePresent": false
+          },
+          {
+            "action": "req.archived.manual",
+            "version": 5,
+            "previousArchivePresent": false
+          },
+          {
+            "action": "req.reopened",
+            "version": 6,
+            "previousArchivePresent": true
+          },
+          {
+            "action": "req.fulfillment_updated",
+            "version": 7,
+            "previousArchivePresent": false
+          }
+        ]
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B36-04",
+      "purpose": "Hashes de corpo e encadeamento conferem independentemente do retorno RPC",
+      "recordedAt": "2026-10-30T01:08:18.394Z",
+      "observed": {
+        "events": 7,
+        "chainMismatch": 0,
+        "bodyHashMismatch": 0,
+        "validHistoricalHash": true,
+        "wrongHash": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B36-05",
+      "purpose": "ENT com consumo real confirmado falha42702 sem efeitos parciais: DB-001/B2-004",
+      "recordedAt": "2026-10-30T01:08:18.543Z",
+      "observed": {
+        "document": "b3991226-dd15-45a5-bc41-b2bac0f86f34",
+        "report": "3d25ca38-01d9-4c88-90ce-8d4dd437c3b1",
+        "before": {
+          "FAMILY": "3.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 6
+        },
+        "after": {
+          "FAMILY": "3.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 6
+        },
+        "result": {
+          "rejected": true,
+          "sqlstate": "42702",
+          "message": "supply_document_command: column reference \"e.body\" is ambiguous"
+        },
+        "versionUnchanged": true,
+        "noArtificialWorkaround": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B36-06",
+      "purpose": "Cancelado não volta a receber; versão antiga não aplica alteração",
+      "recordedAt": "2026-10-30T01:08:20.154Z",
+      "observed": {
+        "terminal": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: document is terminal"
+        },
+        "stale": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: stale document version"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B36-07",
+      "purpose": "COM não adquirida remanescente não tem desistência terminal: B2-001",
+      "recordedAt": "2026-10-30T01:08:20.985Z",
+      "observed": {
+        "before": {
+          "id": "7fa0494c-d07b-4e92-9b5a-64cc845ea2e7",
+          "lines": [
+            {
+              "id": "350f13a5-e5e7-4bb9-8369-cba229a5f196",
+              "accepted": "2.000000",
+              "approved": "10.000000",
+              "metadata": {},
+              "quantity": "10.000000",
+              "productId": "patient-8b032ee6-54a7-4df2-9948-8a515ba24e54",
+              "purchased": "2.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 4,
+          "number": 3,
+          "status": "partially_received",
+          "version": 4,
+          "receipts": [
+            {
+              "id": "06e30849-cf39-47f1-9bed-54787e6faf70",
+              "lines": [
+                {
+                  "lineId": "350f13a5-e5e7-4bb9-8369-cba229a5f196",
+                  "quantity": "2"
+                }
+              ],
+              "state": "approved"
+            }
+          ]
+        },
+        "result": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: reconciliation required before cancellation"
+        },
+        "stock": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B36-08",
+      "purpose": "IDs de outro paciente e links de REQ cancelada não são aceitos",
+      "recordedAt": "2026-10-30T01:08:22.576Z",
+      "observed": {
+        "closed": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "create_supply_document: invalid requisition line link"
+        },
+        "foreign": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "operational_document: document not found"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B36-09",
+      "purpose": "Revisão indevida de emitido e campos de segurança do cliente não mudam fato histórico",
+      "recordedAt": "2026-10-30T01:08:22.858Z",
+      "observed": {
+        "result": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "revise_supply_document: only drafts or pending BAL may be revised"
+        },
+        "receiptSecurityLevelAuthoredByDatabase": "authenticated_session"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T01:08:23.346Z"
+}

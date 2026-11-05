@@ -1,0 +1,261 @@
+{
+  "recordedAt": "2026-10-30T10:45:24.759Z",
+  "archiveHashVerified": true,
+  "originalDocuments": 208,
+  "originalDocumentIdsMissing": 0,
+  "originalLifecycle": 77,
+  "originalLifecycleIdsMissing": 0,
+  "changedHeaders": [
+    {
+      "id": "47309788-11c5-44b7-bcd8-9f049f6b4024",
+      "initialVersion": 5,
+      "finalVersion": 6,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "679e8843-884e-4047-be60-f9e3a2318a67",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "a1ca7c16-7fcf-401d-884a-622f3590a304",
+      "initialVersion": 7,
+      "finalVersion": 8,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "1309dc2f-d652-4d58-916a-eda7c3e38e23",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "e7e98346-244c-48ea-8671-5f4146574a02",
+      "initialVersion": 5,
+      "finalVersion": 6,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "1ce8223b-bbd3-4ddf-be48-b7a3bb4e9816",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "36867ef0-b01b-4aaa-935a-9df98c88cb23",
+      "initialVersion": 7,
+      "finalVersion": 8,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "3232fcd3-fa4b-46d4-ae6e-1397e10c3e02",
+      "initialVersion": 1,
+      "finalVersion": 2,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "4f72e94f-9cf1-4cd1-bcf1-c5a1f84a6b19",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "ee0a3bc8-b052-4c5e-8efe-bbda98c17c38",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "16d9bddd-9675-4f1c-b7de-7bc7981c5b51",
+      "initialVersion": 5,
+      "finalVersion": 6,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "0e3a309d-7615-4110-8dea-d8dd8e561a41",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "5374fef3-4f96-4c3b-9bcc-4162d3611b06",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "d65b46dc-5105-4d46-b356-1fcbb6484507",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "58e0b0a7-4ac9-447e-9f51-adb01b4c6fa4",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "16d0f6f0-d085-4333-b43f-5ff9e3c0bea1",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "19393d81-bf89-46fb-9011-5a0600801620",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "f379a603-9815-4f84-a2fe-ccece7d8b65d",
+      "initialVersion": 4,
+      "finalVersion": 5,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    },
+    {
+      "id": "f43743f4-fe45-422f-bf87-05b88de54b36",
+      "initialVersion": 7,
+      "finalVersion": 8,
+      "addedEvents": 1,
+      "actions": [
+        "req.reminder"
+      ],
+      "allActorsSystem": true,
+      "hashChainContinuous": true,
+      "statusUnchanged": true,
+      "patientUnchanged": true
+    }
+  ],
+  "allAddedActionsSystemReminders": true,
+  "noOriginalDocumentStatusPatientOrTypeChanged": true,
+  "method": "Decode only two COPY tables from private backup in memory;compare IDs/versions/status/scope and event hash chain by read-only SELECT. No restore executed.",
+  "limits": "62-table multiset hash comparison is in preservation-results.json. This reconciliation explains the two changed tables;it does not certify an operational restore."
+}

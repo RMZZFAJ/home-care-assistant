@@ -1,0 +1,211 @@
+{
+  "date": "2026-11-04",
+  "timezone": "America/Sao_Paulo",
+  "scope": "DOCUMENTARY_ONLY;NO_PRODUCT_TESTS_OR_DB_OPERATIONS",
+  "checks": [
+    {
+      "check": "branch",
+      "passed": true,
+      "details": "audit/phase-b"
+    },
+    {
+      "check": "no_product_or_support_mutation_this_mission",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "historical_A_B_C0_bytes_preserved",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "functional_baseline_unchanged",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "master_ref_preserved",
+      "passed": true,
+      "details": "34dcb835c5c49068e0417f7306eb4e501aa868bc"
+    },
+    {
+      "check": "temporary_kit_absent",
+      "passed": true,
+      "details": "Root input directory removed after exact preservation"
+    },
+    {
+      "check": "exact_original_archives_roundtrip",
+      "passed": true,
+      "details": {
+        "inputs": 87,
+        "errors": []
+      }
+    },
+    {
+      "check": "all_16_owner_inputs_preserved",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "121_individual_semantic_reviews",
+      "passed": true,
+      "details": "Structural reconciliation of individually authored source/evidence judgments; not an automatic proof of semantic truth"
+    },
+    {
+      "check": "165_source_associations",
+      "passed": true,
+      "details": "Original IDs/primary causes retained; secondary manifestations explicit"
+    },
+    {
+      "check": "original_source_rows_and_hashes",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "cause_impact_semantic_alignment",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "DB006_distinct_from_DB002",
+      "passed": true,
+      "details": {
+        "001": "DB-006",
+        "049": "B3-001;DB-002"
+      }
+    },
+    {
+      "check": "149_prior_criteria_plus_12",
+      "passed": true,
+      "details": "121 causes +28 purpose groups +12 complements; no deleted IDs"
+    },
+    {
+      "check": "161_cases_have_discriminating_design",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "complete_science_enum_and_owner_gate",
+      "passed": true,
+      "details": "Five actual REQ origins; no individual modality approval invented"
+    },
+    {
+      "check": "15_owner_responses_normalized",
+      "passed": true,
+      "details": {
+        "P01": "OWNER_APPROVED",
+        "P02": "OWNER_APPROVED_SCOPE_PENDING",
+        "P03": "OWNER_APPROVED_SCOPE_PENDING",
+        "P04": "OWNER_APPROVED",
+        "P05": "OWNER_APPROVED_SCOPE_PENDING",
+        "P06": "OWNER_APPROVED",
+        "P07": "OWNER_APPROVED_SCOPE_PENDING",
+        "P08": "OWNER_APPROVED_SCOPE_PENDING",
+        "P09": "OWNER_APPROVED_SCOPE_PENDING",
+        "P10": "OWNER_APPROVED_SCOPE_PENDING",
+        "P11": "OWNER_APPROVED",
+        "P12": "OWNER_APPROVED",
+        "P13": "OWNER_APPROVED_SCOPE_PENDING",
+        "P14": "OWNER_APPROVED",
+        "P15": "OWNER_APPROVED_SCOPE_PENDING"
+      }
+    },
+    {
+      "check": "97_B1_66_C3_many_to_many",
+      "passed": true,
+      "details": {
+        "edges": 171,
+        "b1": 97,
+        "c3": 66
+      }
+    },
+    {
+      "check": "174_field_groups_262_controls",
+      "passed": true,
+      "details": "Composite fields decomposed and20 C7 additions"
+    },
+    {
+      "check": "all_66_screen_sheets",
+      "passed": true,
+      "details": 66
+    },
+    {
+      "check": "all_4205_source_text_rows_preserved",
+      "passed": true,
+      "details": {
+        "source_rows": 4205,
+        "total_copy_rows": 5915,
+        "text_newlines": "LF normalized; original B1 bytes preserved"
+      }
+    },
+    {
+      "check": "C3_and_science_source_anchors",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "authored_markdown_links",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "no_secret_patterns_in_documentary_outputs",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "documentary_command_receipts",
+      "passed": true,
+      "details": {
+        "date": "2026-11-04",
+        "timezone": "America/Sao_Paulo",
+        "node": "v24.22.0",
+        "npm": "11.21.1",
+        "scope": "STATIC_DOCUMENTARY;NO_UNIT_BUILD_E2E_DB_OR_REMOTE_TESTS",
+        "checks": [
+          {
+            "name": "markdownlint",
+            "command": "npm run lint:markdown",
+            "exit_code": 0,
+            "status": "PASS",
+            "output": "docs/audits/C/C10-pr-handoff/evidence/markdownlint.txt"
+          },
+          {
+            "name": "contracts_static",
+            "command": "npm run check:contracts",
+            "exit_code": 0,
+            "status": "PASS",
+            "output": "docs/audits/C/C10-pr-handoff/evidence/contracts_static.txt"
+          },
+          {
+            "name": "git_diff_check",
+            "command": "git diff HEAD --check",
+            "exit_code": 0,
+            "status": "PASS",
+            "output": "docs/audits/C/C10-pr-handoff/evidence/git_diff_check.txt"
+          },
+          {
+            "name": "git_staged_diff_check",
+            "command": "git diff --cached --check",
+            "exit_code": 0,
+            "status": "PASS",
+            "output": "docs/audits/C/C10-pr-handoff/evidence/git_staged_diff_check.txt"
+          }
+        ]
+      }
+    },
+    {
+      "check": "documentary_helper_syntax",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "all_master_order_minimum_deliverables",
+      "passed": true,
+      "details": []
+    }
+  ],
+  "passed": 27,
+  "failed": 0,
+  "limitations": "Counts/links/hashes validate structural coverage and preservation. Semantic judgments are authored source reviews, not runtime/human/physical/provider/restore acceptance."
+}

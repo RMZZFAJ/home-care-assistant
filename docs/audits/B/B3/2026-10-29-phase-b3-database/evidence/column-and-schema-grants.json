@@ -1,0 +1,3906 @@
+{
+  "columnGrants": [
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "accepted_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "accepted_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "accepted_quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "acknowledged_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "audit_events",
+      "column": "action",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "action",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "action",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "action",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "activated_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "product_presentations",
+      "column": "active",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "audit_events",
+      "column": "actor_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_approvals",
+      "column": "actor_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "actor_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "actor_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "actor_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "actor_name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_science_events",
+      "column": "actor_name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "actual_count_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "after_state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "alert_event_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "aliases",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "products",
+      "column": "aliases",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "anchor_date",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "meta_template_versions",
+      "column": "approval",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "approved_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "approved_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "approved_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "approved_quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "archive_reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "archived_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "archived_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "assignment_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "assignment_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "assignment_version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "attempted_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "attempts",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "authority_context",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "avatar_path",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "bal_event_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "current_stock_balances",
+      "column": "balance",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "balance",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "product_presentations",
+      "column": "barcode",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "product_presentations",
+      "column": "base_quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "base_version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "before_state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "body",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "body",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "body",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_observations",
+      "column": "body",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "patient_settings",
+      "column": "bootstrap_closed",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "bytes",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "can_count_stock",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_memberships",
+      "column": "can_count_stock",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "can_manage_stock",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_memberships",
+      "column": "can_manage_stock",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "canonical_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_overrides",
+      "column": "capability",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycles",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_overrides",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_memberships",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "current_stock_balances",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_series",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "measurement_units",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "patient_settings",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "product_presentations",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_item_resolutions",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_science_events",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_rules",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "category",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "products",
+      "column": "category",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "category_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "category_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_status_history",
+      "column": "changed_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_status_history",
+      "column": "changed_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "channel",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "channel",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "channels",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "meta_template_versions",
+      "column": "checked_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_definitions",
+      "column": "code",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "measurement_units",
+      "column": "code",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "code",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "code",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "completed_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "confirmed_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "confirmed_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "confirmed_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "consumption_report_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "content_hash",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "content_hash",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "cooldown_minutes",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "count_document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_approvals",
+      "column": "count_version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycles",
+      "column": "counted_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "counted_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "counted_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "counted_quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "audit_events",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_approvals",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycles",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_memberships",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipients",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdf_renders",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdfs",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "inbound_messages",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "product_presentations",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_item_resolutions",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_observations",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_science_events",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "created_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "created_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_observations",
+      "column": "created_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "created_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "created_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "created_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_definitions",
+      "column": "critical",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_rules",
+      "column": "critical_threshold",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "current_stock",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "custom_name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "cycle_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "cycle_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "cycle_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "cycle_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "decided_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "decided_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "decided_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "decided_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "measurement_units",
+      "column": "decimals",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "decision_reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "decision_reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_definitions",
+      "column": "default_roles",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "meta_template_versions",
+      "column": "definition",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "delivered_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "description",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "designated_professional_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "destination",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "destination",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "destination_location",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "details",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "measurement_units",
+      "column": "dimension",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipients",
+      "column": "display_name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "document_event_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_approvals",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycles",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdf_renders",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdfs",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "document_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_request_links",
+      "column": "document_line_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "document_version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "duration_minutes",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "effective_due",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "eligible_users",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "email",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "enabled",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_overrides",
+      "column": "enabled",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "ended_on",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "ends_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "ends_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "ends_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "audit_events",
+      "column": "entity_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "audit_events",
+      "column": "entity_type",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "event",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "event_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "event_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_science_events",
+      "column": "evidence",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "expected_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "expected_quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "expires_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "expires_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "extraordinary_confirmed",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "filename",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_status_history",
+      "column": "from_status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "fulfillment_state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "full_name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "fully_checked",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "global_scope",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "audit_events",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycles",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_overrides",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_memberships",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipients",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdfs",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "measurement_units",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "product_presentations",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "products",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_item_resolutions",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_observations",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_science_events",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_status_history",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_rules",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "idempotency_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "idempotency_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "idempotency_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "idempotency_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_item_resolutions",
+      "column": "idempotency_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "idempotency_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "idempotency_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "include_pdf",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "include_pdf",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "include_team_alerts",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "inventory_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "invited_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "is_active",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipients",
+      "column": "is_active",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "products",
+      "column": "is_active",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "is_active",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "is_counted",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipients",
+      "column": "is_development",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "is_enabled",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_rules",
+      "column": "is_enabled",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "is_exception",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "is_historical",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "justification",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "justification",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "kind",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "kind",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "kind",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "inbound_messages",
+      "column": "kind",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "kind",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "meta_template_versions",
+      "column": "language",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "last_error",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_series",
+      "column": "last_number",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "lease_expires_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "leased_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "lines",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "lines",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "location",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "current_stock_balances",
+      "column": "location",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "location",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_rules",
+      "column": "location",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "location",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_rules",
+      "column": "low_threshold",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "manual_archive_required",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "audit_events",
+      "column": "metadata",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "metadata",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "mime_type",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "missed_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "missed_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "mode",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_science_events",
+      "column": "mode",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "movement_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "movement_revision",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "movement_type",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "measurement_units",
+      "column": "name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "meta_template_versions",
+      "column": "name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "product_presentations",
+      "column": "name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "products",
+      "column": "name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "name_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "next_attempt_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "next_reminder_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "notes",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "notes",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "notification_preferences",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "number",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "object_path",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdf_renders",
+      "column": "object_path",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdfs",
+      "column": "object_path",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "observed_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "original_due",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "original_start",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "original_starts_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "products",
+      "column": "owner_care_recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "payload",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "payload_hash",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "payload_hash",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "performed_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "period",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "verified_phones",
+      "column": "phone",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "phone",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "inbound_messages",
+      "column": "phone_hash",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "policy",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "current_stock_balances",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "product_presentations",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_item_resolutions",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_rules",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "product_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "product_name_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "professional_category",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "professional_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "professional_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "professional_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "professional_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "professional_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "professional_registration",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "professional_state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "proposed",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "proposed_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "proposed_professional_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "protocol",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "protocol",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "protocol_number",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "inbound_messages",
+      "column": "provider_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "meta_template_versions",
+      "column": "provider_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "provider_reference",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "purchased_quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "quantity_decimals",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "quiet_end",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "quiet_start",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "read_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycle_events",
+      "column": "reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_item_resolutions",
+      "column": "reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_status_history",
+      "column": "reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "recipient_group",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "recipient_group",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "recipient_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "recipient_label",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "recipient_name_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "recipient_notification_settings",
+      "column": "recipient_user_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "recipient_user_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "reconciled_quantity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "recurrence",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "reference_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "reference_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventory_items",
+      "column": "reference_movement_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "reference_type",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "regime_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "regularized_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "reminder_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "reminders",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdf_renders",
+      "column": "renderer",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "replaces_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "report_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "reported_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "request_intent",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "requested_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "requester_name_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "requisition_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "requisition_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "requisition_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_observations",
+      "column": "requisition_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_science_events",
+      "column": "requisition_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_status_history",
+      "column": "requisition_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_request_links",
+      "column": "requisition_item_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_item_resolutions",
+      "column": "requisition_item_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "resolution",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "resolved_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_item_resolutions",
+      "column": "resolved_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "rest_hours",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_approvals",
+      "column": "review_group",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "review_reason",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "reviewed_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "role",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_memberships",
+      "column": "role",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "role",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_lifecycle",
+      "column": "science_satisfied_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "seen_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "series_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "series_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "session_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "patient_settings",
+      "column": "settings",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "severity",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "sha256",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdf_renders",
+      "column": "sha256",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdfs",
+      "column": "sha256",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "shift_event_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "shift_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "shift_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_events",
+      "column": "shift_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "shift_type_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "shift_type_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "shift_type_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "shift_version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "shift_version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "silent",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "snapshot_source",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "sort_order",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_movements",
+      "column": "source_location",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "starts_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "starts_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "starts_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "starts_local",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "starts_on",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_cycles",
+      "column": "state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_alert_events",
+      "column": "state",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "access_change_requests",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_memberships",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "consumption_reports",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "inbound_messages",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "profiles",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_change_requests",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "stock_inventories",
+      "column": "status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_overrides",
+      "column": "subject_role",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "notification_event_rules",
+      "column": "subject_role",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "capability_overrides",
+      "column": "subject_user",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "submitted_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "target_shift_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "target_shift_version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_deferrals",
+      "column": "target_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "template_name",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "template_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_notifications",
+      "column": "template_version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "timezone",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "timezone",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "timezone",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_status_history",
+      "column": "to_status",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_invitations",
+      "column": "token_hash",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "token_hash",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_series",
+      "column": "type",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "type",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "unit",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "products",
+      "column": "unit",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_lines",
+      "column": "unit_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "unit_snapshot",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "updated_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_products",
+      "column": "updated_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "updated_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "patient_settings",
+      "column": "updated_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisitions",
+      "column": "updated_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "updated_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "upload_key",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "attachments",
+      "column": "uploaded_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_items",
+      "column": "urgent",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "whatsapp_challenges",
+      "column": "used_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "care_recipient_memberships",
+      "column": "user_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "flow_submissions",
+      "column": "user_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_reminders",
+      "column": "user_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "requisition_science_events",
+      "column": "user_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "verified_phones",
+      "column": "user_id",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "valid_until",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "validated_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "purchase_receipts",
+      "column": "validated_by",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "verified_phones",
+      "column": "verified_at",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_assignments",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_events",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdf_renders",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "document_pdfs",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "meta_template_versions",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "patient_settings",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "scheduled_shifts",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_types",
+      "column": "version",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_obligations",
+      "column": "week_start",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "bal_regimes",
+      "column": "weekday",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "weekdays",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "shift_series",
+      "column": "work_hours",
+      "schema": "public",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "operational_documents",
+      "column": "workflow_data",
+      "schema": "public",
+      "privilege": "SELECT"
+    }
+  ],
+  "schemaGrants": [
+    {
+      "role": "authenticated",
+      "usage": true,
+      "create": false,
+      "schema": "public"
+    },
+    {
+      "role": "authenticated",
+      "usage": true,
+      "create": false,
+      "schema": "private"
+    },
+    {
+      "role": "anon",
+      "usage": true,
+      "create": false,
+      "schema": "public"
+    },
+    {
+      "role": "anon",
+      "usage": false,
+      "create": false,
+      "schema": "private"
+    },
+    {
+      "role": "service_role",
+      "usage": true,
+      "create": false,
+      "schema": "public"
+    },
+    {
+      "role": "service_role",
+      "usage": false,
+      "create": false,
+      "schema": "private"
+    }
+  ]
+}

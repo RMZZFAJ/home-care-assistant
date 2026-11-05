@@ -1,0 +1,4003 @@
+[
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "names": [
+      "RequisitionHistory"
+    ],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-20/SOURCE_REQUIREMENTS.json",
+        "line": 3193
+      },
+      {
+        "file": "docs/audits/2026-10-21/CHANGED_FILES.md",
+        "line": 138
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3153
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3165
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3169
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/PRODUCT_GAPS_AND_CONFIGURATION.md",
+        "line": 182
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/REPOSITORY_HYGIENE_AND_DOCUMENTATION.md",
+        "line": 37
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 622
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 627
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 633
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/orphan-history.md",
+        "line": 5
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/orphan-history.md",
+        "line": 58
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3335
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3342
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3349
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3356
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3363
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3370
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3377
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3384
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3391
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3398
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 3405
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 16817
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 18862
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 16807
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 18852
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 3731
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48714
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48722
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48730
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48738
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48746
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48754
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48762
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48770
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48778
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48786
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48794
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48802
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48810
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48818
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48825
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48833
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48841
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48849
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48857
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48865
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48873
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48881
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48889
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48897
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48905
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48912
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48920
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48928
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48935
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48943
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48950
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48958
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48965
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48973
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48981
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48988
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 48996
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49004
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49012
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49019
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49027
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49034
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49041
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49049
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49056
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49063
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49071
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49078
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49086
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49094
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49102
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49110
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49118
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49126
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49133
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49141
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49149
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49157
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49165
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49173
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49181
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49188
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49196
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49204
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49212
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49220
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49228
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49235
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49243
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49250
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49257
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49264
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49272
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 49280
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107464
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107476
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107487
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107499
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107511
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107521
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107531
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107541
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107552
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126208
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126217
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126226
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126233
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126242
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126252
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126261
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126273
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126282
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126293
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126302
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126312
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126321
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126333
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126342
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126354
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126364
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126373
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126380
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126389
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126399
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126408
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126417
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126426
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126435
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126445
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126455
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126462
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126471
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126480
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126489
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126498
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126507
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126517
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126528
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 126537
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 4135
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 680
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1395
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1400
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surfaces.cjs",
+        "line": 53
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 659
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 647
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 731
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 731
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 731
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 731
+      },
+      {
+        "file": "docs/ui-ux/INVENTORY.md",
+        "line": 943
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 1629
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 1639
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "names": [
+      "InventoryConsole"
+    ],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-21/CHANGED_FILES.md",
+        "line": 140
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3153
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3166
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3170
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/PRODUCT_GAPS_AND_CONFIGURATION.md",
+        "line": 182
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/REPOSITORY_HYGIENE_AND_DOCUMENTATION.md",
+        "line": 37
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 622
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 628
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 634
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/legacy-inventory.md",
+        "line": 57
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/orphan-inventory.md",
+        "line": 5
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/orphan-inventory.md",
+        "line": 74
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4189
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4196
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4203
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4210
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4217
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4224
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4231
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4238
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4245
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4252
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4259
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4266
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4273
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4280
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4287
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4294
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4301
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 4308
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 16862
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 18867
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 16852
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 18857
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 4069
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55615
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55623
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55631
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55639
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55647
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55655
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55663
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55671
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55679
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55687
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55695
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55702
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55710
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55718
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55726
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55734
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55742
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55750
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55758
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55766
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55774
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55782
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55790
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55798
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55806
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55814
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55822
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55830
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55838
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55846
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55854
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55862
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55870
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55878
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55886
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55894
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55902
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55910
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55918
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55926
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55934
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55942
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55950
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55958
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55966
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55974
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55981
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55989
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 55997
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56005
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56013
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56020
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56027
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56035
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56042
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56050
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56057
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56065
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56073
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56081
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56089
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56097
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56104
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56112
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56120
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56127
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56135
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56142
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56150
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56157
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56165
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56172
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56180
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56187
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56195
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56203
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56210
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56217
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56224
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56232
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56239
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56247
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56255
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56263
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56270
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56278
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56285
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56292
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56299
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56307
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56314
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56322
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56330
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56338
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56346
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56353
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56361
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56368
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56376
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56383
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56391
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56399
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56407
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56415
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56422
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56430
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56438
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56446
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56454
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56462
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56470
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56477
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56485
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56493
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56501
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56509
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56516
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56524
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56532
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56540
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56548
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56555
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56563
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56571
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56578
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56586
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56594
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56602
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56610
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56617
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56625
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56632
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56640
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56648
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56656
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56664
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56672
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56679
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56687
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56695
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56703
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56710
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56718
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56726
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56734
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56742
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56750
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56758
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56766
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56774
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56781
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56789
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56797
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56804
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56812
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56820
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56827
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56835
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56842
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56850
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56858
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56865
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56873
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56881
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56889
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56897
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56905
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56912
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56920
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56928
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56935
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56942
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56949
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 56956
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108901
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108911
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108921
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108932
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108943
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108954
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108969
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108981
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 108992
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 109003
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 109014
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 109025
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 109035
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 109049
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 109060
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 109071
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 109082
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130212
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130221
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130230
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130237
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130246
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130255
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130264
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130273
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130282
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130289
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130298
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130308
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130315
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130324
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130333
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130343
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130352
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130362
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130371
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130380
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130391
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130400
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130409
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130418
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130429
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130438
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130448
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130457
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130467
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130476
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130483
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130492
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130501
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130512
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130521
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130530
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130540
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130549
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130558
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130568
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130577
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130592
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130601
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130613
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130624
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130633
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130642
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130651
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130662
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130671
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130680
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130689
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130700
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130711
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130721
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130730
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130740
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130749
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130758
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130767
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130781
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130792
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130801
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130812
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130822
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130833
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130840
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 130851
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 4500
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 588
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 694
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1306
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1409
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1414
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surfaces.cjs",
+        "line": 46
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surfaces.cjs",
+        "line": 54
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 695
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 683
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 767
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 767
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 767
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 767
+      },
+      {
+        "file": "docs/ui-ux/INVENTORY.md",
+        "line": 1055
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 1815
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 1823
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "src/components/requisitions/print-button.tsx",
+    "names": [
+      "PrintButton"
+    ],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-21/CHANGED_FILES.md",
+        "line": 136
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3153
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3167
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3171
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/PRODUCT_GAPS_AND_CONFIGURATION.md",
+        "line": 182
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/REPOSITORY_HYGIENE_AND_DOCUMENTATION.md",
+        "line": 37
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 622
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 629
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 635
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/orphan-print.md",
+        "line": 5
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/orphan-print.md",
+        "line": 25
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 16807
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 18872
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 16797
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 18862
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 3648
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 47314
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 47322
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 47330
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 47338
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 107342
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 125585
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 4046
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 708
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1423
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1428
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surfaces.cjs",
+        "line": 55
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 651
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 639
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 723
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 723
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 723
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 723
+      },
+      {
+        "file": "docs/ui-ux/INVENTORY.md",
+        "line": 918
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 1586
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 1590
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "names": [
+      "AppWorkspace"
+    ],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/JOURNEYS_AND_INFORMATION_ARCHITECTURE.md",
+        "line": 16
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 815
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 822
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 829
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 836
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 843
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 850
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 857
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 864
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 16567
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 16557
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/findings-canonical.json",
+        "line": 885
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 2072
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24881
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24889
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24897
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24905
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24913
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24921
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24929
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24937
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24945
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24953
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24961
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24969
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24977
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24985
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 24993
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25001
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25009
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25017
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25025
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25032
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25040
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25048
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25056
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25064
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25071
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25079
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25086
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25094
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25102
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25110
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25117
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25125
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25132
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25140
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25148
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25156
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25163
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25170
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25177
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25184
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25192
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25199
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25206
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25214
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25221
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25229
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25237
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25244
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25252
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25260
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25268
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 25276
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 43035
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 43037
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 104716
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 104725
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 104734
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 104743
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 104753
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115220
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115231
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115240
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115247
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115256
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115263
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115272
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115282
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115291
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115302
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115309
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115316
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115325
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115334
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115343
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115353
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115360
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115369
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115379
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115388
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115395
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115402
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115411
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115421
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115432
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115441
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115448
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115458
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115465
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115474
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 115484
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 123983
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 2326
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 459
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 447
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/architecture-results.json",
+        "line": 9
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 531
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/08_INTERNAL_NOTIFICATIONS_REALTIME_AND_FRESHNESS.md",
+        "line": 41
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/08_INTERNAL_NOTIFICATIONS_REALTIME_AND_FRESHNESS.md",
+        "line": 64
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-switch-capture.mjs",
+        "line": 10
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 531
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 531
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 531
+      },
+      {
+        "file": "docs/ui-ux/INFORMATION_ARCHITECTURE.md",
+        "line": 9
+      },
+      {
+        "file": "docs/ui-ux/INVENTORY.md",
+        "line": 403
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 694
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 706
+      },
+      {
+        "file": "src/app/design-system.css",
+        "line": 5
+      },
+      {
+        "file": "src/components/layout/workspace-shell.tsx",
+        "line": 70
+      },
+      {
+        "file": "src/components/workspace.tsx",
+        "line": 30
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "src/types/operations.ts",
+    "names": [
+      "PatientPermissions",
+      "PatientContext",
+      "OperationError"
+    ],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-20/REQUIREMENTS.json",
+        "line": 535
+      },
+      {
+        "file": "docs/audits/2026-10-21/CHANGED_FILES.md",
+        "line": 40
+      },
+      {
+        "file": "docs/audits/2026-10-21/CHANGED_FILES.md",
+        "line": 157
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/artifact-structure.json",
+        "line": 2265
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/artifact-structure.json",
+        "line": 2271
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/artifact-structure.json",
+        "line": 2381
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/artifact-structure.json",
+        "line": 2399
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/dashboard.md",
+        "line": 31
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 1774
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/DYNAMIC_TEXT_EXPRESSIONS.json",
+        "line": 1781
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 16662
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 17122
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 16652
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 17112
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/build-b13.cjs",
+        "line": 5
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/complete-source-and-text.cjs",
+        "line": 7
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/findings-canonical.json",
+        "line": 885
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 1937
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 2610
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 2738
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 3357
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 4994
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33428
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33436
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33444
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33452
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33460
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33467
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33475
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33482
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33490
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33498
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33506
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33514
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33522
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33530
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33538
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33546
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33554
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33562
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33570
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33578
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33586
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33593
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33601
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33609
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33617
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33625
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33633
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33640
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33648
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33656
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33664
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33672
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33679
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33687
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33695
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33703
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33710
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33718
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33726
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33734
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 33742
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 43035
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 43037
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 43043
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 43045
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 43053
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 105966
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 105977
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 105988
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 105999
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119614
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119623
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119632
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119639
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119646
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119653
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119663
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119672
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119681
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119693
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119705
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119712
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119721
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119728
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119737
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119748
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119757
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119764
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119775
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119784
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119791
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119802
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119811
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119818
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119829
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119838
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119845
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 119854
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 123983
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 2176
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 2906
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 3049
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 3728
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 5581
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 728
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 535
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 903
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 983
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 1007
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/09_SCHEDULERS_JOBS_AND_MULTIPATIENT_PROGRESS.md",
+        "line": 5
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/build-catalog.mjs",
+        "line": 29
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/catalog.json",
+        "line": 22557
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/catalog.json",
+        "line": 22565
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/catalog.json",
+        "line": 25415
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/catalog.json",
+        "line": 30436
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/catalog.json",
+        "line": 30466
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/manifest.mjs",
+        "line": 1
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 738
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 936
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 992
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 1006
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 1062
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 1090
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 1146
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 1468
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 1608
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 2000
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 2322
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 2392
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 2406
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 2616
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 2812
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-function-drift.json",
+        "line": 3319
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1163
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1171
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1179
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1187
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1195
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1203
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1211
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1219
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1227
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1235
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1243
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1251
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1259
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1267
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1275
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1283
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1291
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1299
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1307
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1315
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1323
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1331
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1339
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1347
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1355
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1363
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1371
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1379
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1387
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1395
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1403
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1411
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1419
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1427
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 1435
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2035
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2043
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2051
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2059
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2067
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2075
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2083
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2091
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2099
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2107
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2115
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2123
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2131
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2139
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2147
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2155
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2163
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2171
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2179
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2187
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2195
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2203
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2211
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2219
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2227
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2235
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2243
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2251
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2259
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2267
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 2275
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 6200
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 6208
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 6216
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/migration-statements.json",
+        "line": 6688
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/query-matrix.mjs",
+        "line": 24
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 523
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 891
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 979
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 1003
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b48-admin-results.json",
+        "line": 7
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/b48-admin.mjs",
+        "line": 14
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 607
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 975
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 1063
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 1087
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/02_SCHEDULERS_CRON_AND_PROGRESS.md",
+        "line": 5
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 607
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 975
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 1063
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 1087
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 607
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 975
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 1063
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 1087
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 607
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 975
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 1063
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 1087
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/schema-metadata.json",
+        "line": 376
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/schema-metadata.json",
+        "line": 2234
+      },
+      {
+        "file": "docs/ui-ux/INVENTORY.md",
+        "line": 558
+      },
+      {
+        "file": "docs/ui-ux/INVENTORY.md",
+        "line": 603
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 965
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 1058
+      },
+      {
+        "file": "scripts/build-traceability.mjs",
+        "line": 136
+      },
+      {
+        "file": "scripts/historical-migrations.json",
+        "line": 17
+      },
+      {
+        "file": "scripts/historical-migrations.json",
+        "line": 23
+      },
+      {
+        "file": "src/components/admin/patient-registration.tsx",
+        "line": 7
+      },
+      {
+        "file": "src/components/admin/patient-registration.tsx",
+        "line": 17
+      },
+      {
+        "file": "src/components/dashboard.tsx",
+        "line": 9
+      },
+      {
+        "file": "src/components/layout/workspace-context.tsx",
+        "line": 6
+      },
+      {
+        "file": "src/components/layout/workspace-context.tsx",
+        "line": 18
+      },
+      {
+        "file": "src/components/layout/workspace-shell.tsx",
+        "line": 70
+      },
+      {
+        "file": "src/components/workspace.tsx",
+        "line": 4
+      },
+      {
+        "file": "src/theme/tokens.css",
+        "line": 134
+      },
+      {
+        "file": "src/theme/tokens.css",
+        "line": 136
+      },
+      {
+        "file": "src/theme/tokens.css",
+        "line": 152
+      },
+      {
+        "file": "src/types/workspace.ts",
+        "line": 1
+      },
+      {
+        "file": "src/types/workspace.ts",
+        "line": 24
+      },
+      {
+        "file": "src/types/workspace.ts",
+        "line": 25
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "public/file.svg",
+    "names": [],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 17242
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 17232
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 63
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 63
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 63
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 63
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "public/globe.svg",
+    "names": [],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 17247
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 17237
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 79
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 79
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 79
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 79
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "public/next.svg",
+    "names": [],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 17262
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 17252
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 83
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 83
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 83
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 83
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "public/vercel.svg",
+    "names": [],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 17257
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 17247
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 87
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 87
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 87
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 87
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "public/window.svg",
+    "names": [],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 17252
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 17242
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 91
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 91
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 91
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 91
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  },
+  {
+    "file": "src/app/inventarios/page.tsx",
+    "names": [],
+    "references": [
+      {
+        "file": "docs/audits/2026-10-21/CHANGED_FILES.md",
+        "line": 125
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3157
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3163
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3167
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3171
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.md",
+        "line": 3173
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/JOURNEYS_AND_INFORMATION_ARCHITECTURE.md",
+        "line": 143
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/PRODUCT_GAPS_AND_CONFIGURATION.md",
+        "line": 187
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/REPOSITORY_HYGIENE_AND_DOCUMENTATION.md",
+        "line": 35
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 623
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 625
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 630
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 636
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/evidence/findings-ui.json",
+        "line": 639
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/inputs/04_CONTEXTO_HISTORICO_CONVERSA.md",
+        "line": 889
+      },
+      {
+        "file": "docs/audits/2026-10-25-production-readiness/inputs/04_CONTEXTO_HISTORICO_CONVERSA.md",
+        "line": 987
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/legacy-inventory.md",
+        "line": 3
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/legacy-inventory.md",
+        "line": 5
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/legacy-inventory.md",
+        "line": 19
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/02_SCREEN_BY_SCREEN/orphan-inventory.md",
+        "line": 88
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 16442
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_ATTEMPT_1.json",
+        "line": 18717
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 16432
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/INTEGRITY_REPORT.json",
+        "line": 18707
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/reconcile-final.cjs",
+        "line": 33
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/runtime-sweep.json",
+        "line": 2668
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/runtime-sweep.mjs",
+        "line": 52
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 1410
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 14180
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81589
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81597
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81605
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81613
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81621
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81627
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81629
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81637
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81645
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81653
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81661
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81669
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81677
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81685
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81693
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81701
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81709
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81717
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-index.json",
+        "line": 81725
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/source-semantic-review.json",
+        "line": 1589
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 580
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 582
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 697
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1296
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1297
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surface-map.json",
+        "line": 1302
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surfaces.cjs",
+        "line": 46
+      },
+      {
+        "file": "docs/audits/2026-10-28-phase-b1-interface/evidence/surfaces.cjs",
+        "line": 54
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b2-processes/evidence/source-hashes.json",
+        "line": 359
+      },
+      {
+        "file": "docs/audits/2026-10-29-phase-b3-database/evidence/source-hashes.json",
+        "line": 347
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b4-backend/evidence/protected-source-hashes.json",
+        "line": 431
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b5-integrations/evidence/protected-source-hashes.json",
+        "line": 431
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b6-documents/evidence/protected-source-hashes.json",
+        "line": 431
+      },
+      {
+        "file": "docs/audits/2026-10-30-phase-b7-operational-readiness/evidence/protected-source-hashes.json",
+        "line": 431
+      },
+      {
+        "file": "docs/ui-ux/INVENTORY.md",
+        "line": 166
+      },
+      {
+        "file": "docs/ui-ux/inventory.json",
+        "line": 251
+      },
+      {
+        "file": "src/lib/safe-return-path.ts",
+        "line": 22
+      },
+      {
+        "file": "tests/auth.test.ts",
+        "line": 8
+      }
+    ],
+    "caveat": "Tracked lexical references and AST import graph; no access-log or external-bookmark census"
+  }
+]

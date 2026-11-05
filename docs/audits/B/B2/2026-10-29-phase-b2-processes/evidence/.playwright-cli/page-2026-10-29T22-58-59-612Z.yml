@@ -1,0 +1,64 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - link "Ir para o conteúdo" [ref=f1e5] [cursor=pointer]:
+        - /url: "#workspace-content"
+      - banner [ref=f1e6]:
+        - button "Recolher navegação" [expanded] [ref=f1e7] [cursor=pointer]
+        - link "Home Care Assistant — início" [ref=f1e11] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f1e12]: HC
+          - strong [ref=f1e13]:
+            - text: Home Care Assistant
+            - generic [ref=f1e14]: Operação assistencial
+        - combobox "Pessoa assistida" [ref=f1e49] [cursor=pointer]:
+          - option "Selecione um paciente" [disabled]
+          - option "Residência fictícia B2-20261029-f7eece2c" [selected]
+          - option "Residência fictícia B2-20261029-f7eece2c segundo contexto de escala"
+        - button "Notificações, 52 não lidas" [ref=f1e51] [cursor=pointer]:
+          - generic [ref=f1e54]: 9+
+        - button "Menu do usuário" [ref=f1e17] [cursor=pointer]:
+          - img "Pessoa fictícia B2 professional" [ref=f1e55]:
+            - generic [ref=f1e56]: P
+          - generic [ref=f1e57]:
+            - strong [ref=f1e58]: Pessoa fictícia B2 professional
+            - generic [ref=f1e59]: Profissional
+      - complementary [ref=f1e24]:
+        - navigation "Navegação principal" [ref=f1e25]:
+          - group [ref=f1e60]:
+            - heading "Seu plantão" [level=2] [ref=f1e62] [cursor=pointer]
+            - link "Início" [ref=f1e65] [cursor=pointer]:
+              - /url: /
+            - link "Histórico" [ref=f1e69] [cursor=pointer]:
+              - /url: /historico
+            - link "Entregas" [ref=f1e73] [cursor=pointer]:
+              - /url: /entregas
+            - link "Estoque" [ref=f1e77] [cursor=pointer]:
+              - /url: /estoque?custody=CARE_TEAM
+            - link "Mais" [ref=f1e81] [cursor=pointer]:
+              - /url: /mais
+          - group [ref=f1e85]:
+            - heading "Ações rápidas" [level=2] [ref=f1e87] [cursor=pointer]
+      - main [ref=f1e90]:
+        - generic [ref=f1e91]:
+          - generic [ref=f1e92]:
+            - paragraph [ref=f1e93]: Residência fictícia B2-20261029-f7eece2c
+            - heading "Entregas e recebimentos" [level=1] [ref=f1e94]
+          - generic [ref=f1e95]: Profissional
+        - generic [ref=f1e96]:
+          - paragraph [ref=f1e97]: Conferências e recebimentos. Somente o destinatário autorizado pode confirmar os materiais.
+          - generic [ref=f1e98]:
+            - combobox "Responsável pelas entregas" [ref=f1e100] [cursor=pointer]:
+              - option "Destinadas a mim" [selected]
+              - option "Histórico autorizado da equipe"
+            - combobox "Situação das entregas" [ref=f1e102] [cursor=pointer]:
+              - option "Aguardando conferência"
+              - option "Com divergência"
+              - option "Concluídas"
+              - option "Canceladas"
+              - option "Todas" [selected]
+          - generic [ref=f1e103]:
+            - heading "Nenhuma entrega nesta seleção" [level=2] [ref=f1e107]
+            - paragraph [ref=f1e108]: Novas entregas aparecerão aqui quando forem expedidas.
+    - status [ref=f1e45]: Atualização ao vivo conectada
+  - alert [ref=f1e46]

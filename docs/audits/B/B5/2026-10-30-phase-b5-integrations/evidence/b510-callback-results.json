@@ -1,0 +1,22 @@
+{
+  "recordedAt": "2026-10-30T11:43:20.475Z",
+  "method": "Current local SQL; retry with actual Auth claims; callback with simulated service. Four checkpoints in one new rollback fixture; no real provider sequence or send claimed.",
+  "scenarios": {
+    "B510-S01": {
+      "state": "pending",
+      "referenceRetained": true
+    },
+    "B510-S02": {
+      "newCompletionRefused": true,
+      "oldCallbackEndedNewLease": true
+    },
+    "B510-S03": {
+      "newCallbackIgnored": true
+    },
+    "B510-S04": {
+      "cleanOpaqueCorrelationWorks": true
+    }
+  },
+  "rollback": true,
+  "externalSending": false
+}

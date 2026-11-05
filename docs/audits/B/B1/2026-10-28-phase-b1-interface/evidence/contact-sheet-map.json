@@ -1,0 +1,674 @@
+[
+  {
+    "capture": "b11-public-login-390.png",
+    "sheet": "contact-01.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-public-recovery-390.png",
+    "sheet": "contact-01.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-public-invite-missing-390.png",
+    "sheet": "contact-01.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-public-verify-invalid-390.png",
+    "sheet": "contact-01.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-public-not-found-390.png",
+    "sheet": "contact-01.png",
+    "region": "top 908/908 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-dashboard-390.png",
+    "sheet": "contact-01.png",
+    "region": "top 1030/1807 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-history-390.png",
+    "sheet": "contact-02.png",
+    "region": "top 1030/1077 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-forms-390.png",
+    "sheet": "contact-02.png",
+    "region": "top 1030/1254 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-req-390.png",
+    "sheet": "contact-02.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-com-390.png",
+    "sheet": "contact-02.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-ent-390.png",
+    "sheet": "contact-02.png",
+    "region": "top 861/861 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-bal-count-390.png",
+    "sheet": "contact-02.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-deliveries-390.png",
+    "sheet": "contact-03.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-schedules-390.png",
+    "sheet": "contact-03.png",
+    "region": "top 962/962 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-balances-390.png",
+    "sheet": "contact-03.png",
+    "region": "top 909/909 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-stock-family-390.png",
+    "sheet": "contact-03.png",
+    "region": "top 1030/4801 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-stock-team-390.png",
+    "sheet": "contact-03.png",
+    "region": "top 1030/3881 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-stock-transit-390.png",
+    "sheet": "contact-03.png",
+    "region": "top 1030/1401 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-consumption-390.png",
+    "sheet": "contact-04.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-admin-patient-390.png",
+    "sheet": "contact-04.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-admin-memberships-390.png",
+    "sheet": "contact-04.png",
+    "region": "top 1030/1965 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-admin-catalog-390.png",
+    "sheet": "contact-04.png",
+    "region": "top 1030/1793 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-admin-audit-390.png",
+    "sheet": "contact-04.png",
+    "region": "top 1030/11385 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-policy-390.png",
+    "sheet": "contact-04.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-units-390.png",
+    "sheet": "contact-05.png",
+    "region": "top 1030/1106 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-profile-390.png",
+    "sheet": "contact-05.png",
+    "region": "top 1030/1055 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-notifications-390.png",
+    "sheet": "contact-05.png",
+    "region": "top 1030/3722 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-more-390.png",
+    "sheet": "contact-05.png",
+    "region": "top 928/928 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-legacy-inventory-390.png",
+    "sheet": "contact-05.png",
+    "region": "top 1030/1156 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-dashboard-320.png",
+    "sheet": "contact-05.png",
+    "region": "top 1030/1967 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-dashboard-768.png",
+    "sheet": "contact-06.png",
+    "region": "top 1393/1393 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-dashboard-1440.png",
+    "sheet": "contact-06.png",
+    "region": "top 1273/1273 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-dashboard-1920.png",
+    "sheet": "contact-06.png",
+    "region": "top 1273/1273 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-adminA-document-ENT-390.png",
+    "sheet": "contact-06.png",
+    "region": "top 1030/2398 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-adminA-document-REQ-390.png",
+    "sheet": "contact-06.png",
+    "region": "top 1030/1954 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-professional-dashboard-390.png",
+    "sheet": "contact-06.png",
+    "region": "top 1030/1316 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-professional-dashboard-320.png",
+    "sheet": "contact-07.png",
+    "region": "top 1030/1461 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-professional-dashboard-768.png",
+    "sheet": "contact-07.png",
+    "region": "top 1261/1261 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-professional-dashboard-1440.png",
+    "sheet": "contact-07.png",
+    "region": "top 1261/1261 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-professional-dashboard-1920.png",
+    "sheet": "contact-07.png",
+    "region": "top 1261/1261 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-professional-req-390.png",
+    "sheet": "contact-07.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-professional-bal-count-390.png",
+    "sheet": "contact-07.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-professional-deliveries-390.png",
+    "sheet": "contact-08.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-professional-more-390.png",
+    "sheet": "contact-08.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supervisor-dashboard-390.png",
+    "sheet": "contact-08.png",
+    "region": "top 1030/1455 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-family-dashboard-390.png",
+    "sheet": "contact-08.png",
+    "region": "top 1030/1807 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-reader-dashboard-390.png",
+    "sheet": "contact-08.png",
+    "region": "top 1030/1490 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-reader-req-denied-390.png",
+    "sheet": "contact-08.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-global-dashboard-390.png",
+    "sheet": "contact-09.png",
+    "region": "top 1030/8964 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-global-global-accounts-1440.png",
+    "sheet": "contact-09.png",
+    "region": "top 3235/3235 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-global-global-patients-1440.png",
+    "sheet": "contact-09.png",
+    "region": "top 1000/1000 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-admin-overview.png",
+    "sheet": "contact-09.png",
+    "region": "top 1030/1601 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-admin-invitations.png",
+    "sheet": "contact-09.png",
+    "region": "top 1030/1221 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-admin-alerts.png",
+    "sheet": "contact-09.png",
+    "region": "top 881/881 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-admin-recipients.png",
+    "sheet": "contact-10.png",
+    "region": "top 965/965 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-admin-queue.png",
+    "sheet": "contact-10.png",
+    "region": "top 1030/2649 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-admin-import.png",
+    "sheet": "contact-10.png",
+    "region": "top 945/945 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-policy-permissions.png",
+    "sheet": "contact-10.png",
+    "region": "top 1030/1219 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-policy-notifications.png",
+    "sheet": "contact-10.png",
+    "region": "top 1030/1187 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-policy-people.png",
+    "sheet": "contact-10.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-profile-menu.png",
+    "sheet": "contact-11.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-context-menu.png",
+    "sheet": "contact-11.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-notification-bell.png",
+    "sheet": "contact-11.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-catalog-new.png",
+    "sheet": "contact-11.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-catalog-model.png",
+    "sheet": "contact-11.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-membership-new.png",
+    "sheet": "contact-11.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-unit-new.png",
+    "sheet": "contact-12.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-presentation.png",
+    "sheet": "contact-12.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-schedule-type.png",
+    "sheet": "contact-12.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-schedule-series.png",
+    "sheet": "contact-12.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-bal-configure.png",
+    "sheet": "contact-12.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-stock-movement.png",
+    "sheet": "contact-12.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-occurrence-new.png",
+    "sheet": "contact-13.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-profile-0.png",
+    "sheet": "contact-13.png",
+    "region": "top 1030/2109 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-profile-1.png",
+    "sheet": "contact-13.png",
+    "region": "top 1030/1201 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-profile-2.png",
+    "sheet": "contact-13.png",
+    "region": "top 1030/1323 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-profile-3.png",
+    "sheet": "contact-13.png",
+    "region": "top 1030/1199 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-profile-4.png",
+    "sheet": "contact-13.png",
+    "region": "top 1030/1659 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-profile-5.png",
+    "sheet": "contact-14.png",
+    "region": "top 1030/12581 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-profile-6.png",
+    "sheet": "contact-14.png",
+    "region": "top 1030/2405 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-req-step-1.png",
+    "sheet": "contact-14.png",
+    "region": "top 1030/1525 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-req-step-2.png",
+    "sheet": "contact-14.png",
+    "region": "top 1030/2089 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-req-step-3.png",
+    "sheet": "contact-14.png",
+    "region": "top 961/961 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-req-step-4.png",
+    "sheet": "contact-14.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-req-step-5.png",
+    "sheet": "contact-15.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-req-step-6.png",
+    "sheet": "contact-15.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-com-products.png",
+    "sheet": "contact-15.png",
+    "region": "top 1030/1587 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-stock-details.png",
+    "sheet": "contact-15.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-policy-messages.png",
+    "sheet": "contact-15.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-document-req-isolated.png",
+    "sheet": "contact-15.png",
+    "region": "top 1030/2203 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-document-com.png",
+    "sheet": "contact-16.png",
+    "region": "top 1030/1910 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-document-ent-pending.png",
+    "sheet": "contact-16.png",
+    "region": "top 1030/2270 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-shiftWorker-scheduled-bal-count.png",
+    "sheet": "contact-16.png",
+    "region": "top 1030/1118 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-shiftWorker-scheduled-bal-review.png",
+    "sheet": "contact-16.png",
+    "region": "top 1030/1118 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-supplement-adminA-scale-prior-review-390.png",
+    "sheet": "contact-16.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-supplement-adminA-scale-prior-review-1440.png",
+    "sheet": "contact-16.png",
+    "region": "top 1000/1000 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-adminA-com-purchase-editor.png",
+    "sheet": "contact-17.png",
+    "region": "top 1030/2207 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-followup-adminA-com-purchase-review.png",
+    "sheet": "contact-17.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-adminA-movement-review.png",
+    "sheet": "contact-17.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-adminA-bal-config-review.png",
+    "sheet": "contact-17.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-adminA-legacy-req.png",
+    "sheet": "contact-17.png",
+    "region": "top 1030/2203 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-followup-adminA-legacy-ent.png",
+    "sheet": "contact-17.png",
+    "region": "top 1030/2270 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-followup-professional-ent-divergence-editor.png",
+    "sheet": "contact-18.png",
+    "region": "top 1030/2909 source pixels",
+    "full": false
+  },
+  {
+    "capture": "b11-followup-professional-ent-divergence-review.png",
+    "sheet": "contact-18.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-public-invite-token-present.png",
+    "sheet": "contact-18.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-public-callback-invalid.png",
+    "sheet": "contact-18.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-public-demo-1.png",
+    "sheet": "contact-18.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-public-demo-2.png",
+    "sheet": "contact-18.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-public-demo-3.png",
+    "sheet": "contact-19.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-public-demo-4.png",
+    "sheet": "contact-19.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-public-demo-5.png",
+    "sheet": "contact-19.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  },
+  {
+    "capture": "b11-followup-public-demo-6.png",
+    "sheet": "contact-19.png",
+    "region": "top 844/844 source pixels",
+    "full": true
+  }
+]

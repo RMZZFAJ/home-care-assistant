@@ -1,0 +1,41 @@
+{
+  "recordedAt": "2026-10-30T06:13:12.435Z",
+  "passed": false,
+  "mode": "--staged",
+  "preflight": true,
+  "mandatoryFiles": 35,
+  "artifacts": 399,
+  "inventoryObjects": 1098,
+  "coverageObjects": 306,
+  "invariants": 35,
+  "migrations": 84,
+  "authorizationRows": 1522,
+  "routines": 232,
+  "scenarios": 94,
+  "findings": 25,
+  "findingFields": 32,
+  "priorities": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 19,
+    "P3": 5
+  },
+  "linksChecked": 91,
+  "syntaxChecked": 46,
+  "secretPatternHits": 0,
+  "preservation": "No original row missing;7 versioned existing-cron advances separately proved;other20-table snapshot hashes preserved",
+  "manifest": {
+    "passed": false,
+    "mode": "--staged",
+    "entries": 0,
+    "limits": "Skipped only in preflight"
+  },
+  "errors": [
+    "Broken link docs\\audits\\2026-10-29-phase-b3-database\\README.md -> evidence/MANIFEST.sha256",
+    "Broken link docs\\audits\\2026-10-29-phase-b3-database\\README.md -> evidence/PACKAGE_INTEGRITY.md"
+  ],
+  "limitations": [
+    "No B3 full migration replay,restore,remote/human/device/provider proof.",
+    "EXECUTED and matrix rows do not mean complete function/security certification."
+  ]
+}

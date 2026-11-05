@@ -1,0 +1,49 @@
+{
+  "recordedAt": "2026-10-30T11:07:19.859Z",
+  "clientDate": "2026-10-30",
+  "timezone": "America/Sao_Paulo",
+  "node": "24.22.0",
+  "branch": "audit/phase-b",
+  "head": "a21cea055dc2ba858b261924ee6dd7781112b2bf",
+  "master": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "originPhaseB": "a21cea055dc2ba858b261924ee6dd7781112b2bf",
+  "initialTree": "clean before creating this package",
+  "functionalSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "functionalDiff": "",
+  "protectedFiles": 395,
+  "routineCount": 232,
+  "routineDriftFromB3": [],
+  "guardPassed": true,
+  "project": "home-care-assistant",
+  "api": "127.0.0.1:54321",
+  "database": "127.0.0.1:54322",
+  "container": "supabase_db_home-care-assistant",
+  "isolation": {
+    "network_queue_count": 0,
+    "worker_url_configured": false,
+    "worker_bearer_configured": false
+  },
+  "config": {
+    "localSupabase": true,
+    "externalFlag": "absent",
+    "flowsFlag": "absent"
+  },
+  "jobs": [
+    {
+      "jobid": 1,
+      "active": true,
+      "jobname": "hca-operational-lifecycle",
+      "schedule": "* * * * *",
+      "command_md5": "5a33e5ef0362151ddfc0607103df74c8"
+    },
+    {
+      "jobid": 2,
+      "active": true,
+      "jobname": "hca-notification-worker",
+      "schedule": "* * * * *",
+      "command_md5": "65d379dadb2a1db193fbb892a9d765b4"
+    }
+  ],
+  "orderSha256": "e138b10321274d8a28168b0937ea08270ad181d1eb03ab71c0edfc530883e052",
+  "limits": "Local read-only guard and hashes. Existing cron remains active. No remote database or provider queried. Network in controlled probes will be replaced, not merely disabled by absent credentials."
+}

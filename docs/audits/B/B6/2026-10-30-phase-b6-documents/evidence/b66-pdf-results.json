@@ -1,0 +1,1711 @@
+{
+  "recordedAt": "2026-10-30T15:47:54.559Z",
+  "method": "Real renderer4/pdf-lib;all fictional snapshots;no HTTP/Storage;not E2E",
+  "cases": [
+    {
+      "id": "PV01",
+      "purpose": "REQ parcial;estoque observado7;extra;ciência independente",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "REQ",
+        "code": "REQ-0001",
+        "protocol": "REQ-20261030-B6000000-B6000001-1-12345678",
+        "version": 3,
+        "status": "submitted",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "req-a",
+            "product_name_snapshot": "Gaze fictícia B6",
+            "unit_snapshot": "pacote",
+            "current_stock": 7,
+            "urgent": true
+          },
+          {
+            "id": "req-b",
+            "custom_name": "Item extra fictício B6",
+            "current_stock": null,
+            "urgent": false
+          }
+        ],
+        "payload": {
+          "notes": "Dados exclusivamente fictícios para auditoria B6."
+        },
+        "history": [
+          {
+            "action": "req.issued",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T10:00:00-03:00",
+            "version": 2
+          },
+          {
+            "action": "req.receive",
+            "actorName": "Recebedora fictícia B6",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 3
+          }
+        ],
+        "sciencePolicy": {
+          "science_satisfied_at": "2026-10-29T12:00:00Z"
+        },
+        "scienceEvents": [
+          {
+            "actor_name": "Familiar fictício B6",
+            "mode": "express",
+            "created_at": "2026-10-29T12:00:00Z"
+          }
+        ],
+        "fulfillmentLines": [
+          {
+            "id": "req-a",
+            "attended": true
+          },
+          {
+            "id": "req-b",
+            "attended": false
+          }
+        ]
+      },
+      "syntheticHash": "799c032aad9e42b5797cb8acb714b38235159382a981da67cbd01907ffd22d84",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "0c21afc5e923e3f5f402c3e16345e80eb582fb01e6021474490907597d6402ce",
+      "pages": 2,
+      "bytes": 26545,
+      "sourceUnchanged": true,
+      "omittedMarkers": []
+    },
+    {
+      "id": "PV02",
+      "purpose": "COM doação parcial;proposto10/aprovado8/adquirido3/validado2",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "COM",
+        "code": "COM-0001",
+        "protocol": "COM-20261030-B6000000-B6000001-1-12345678",
+        "version": 3,
+        "status": "partially_received",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "b6000000-0000-4000-8000-000000000004",
+            "product_id": "b6000000-0000-4000-8000-000000000004",
+            "name_snapshot": "Material fictício B6",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "2",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false,
+              "expectedQuantity": "10"
+            }
+          }
+        ],
+        "payload": {
+          "notes": "Doação fictícia; não é documento fiscal.",
+          "origin": "donation"
+        },
+        "history": [
+          {
+            "action": "com.issued",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T10:00:00-03:00",
+            "version": 2
+          },
+          {
+            "action": "com.receive",
+            "actorName": "Recebedora fictícia B6",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 3
+          }
+        ],
+        "workflow": {
+          "pendingReceipt": "RECIBO_PENDENTE_B6"
+        },
+        "event": {
+          "receiptId": "RECIBO_PENDENTE_B6",
+          "reason": "RESSALVA_COMPRA_B6"
+        }
+      },
+      "syntheticHash": "638bfd4c4a551bb346d0f7a3612636cdcf4b623ad0566734581752bb42893f70",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "fbca82c9312feda0e1ffc2ab0d92bed0645e3326c3c7c2d1ac0c83384b2357aa",
+      "pages": 2,
+      "bytes": 25744,
+      "sourceUnchanged": true,
+      "omittedMarkers": [
+        "RECIBO_PENDENTE_B6",
+        "RESSALVA_COMPRA_B6"
+      ]
+    },
+    {
+      "id": "PV03",
+      "purpose": "ENT com avaria;data criação anterior à emissão;ressalva persistida",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "ENT",
+        "code": "ENT-0001",
+        "protocol": "ENT-20261030-B6000000-B6000001-1-12345678",
+        "version": 3,
+        "status": "disputed",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "ent-a",
+            "product_id": "ent-a",
+            "name_snapshot": "Material fictício B6",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "6",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true,
+              "receipt": {
+                "acceptedQuantity": "6",
+                "problem": "CAIXA_AVARIADA_B6",
+                "notes": "RESSALVA_ENT_B6_NAO_USAR"
+              }
+            }
+          }
+        ],
+        "payload": {
+          "notes": "Dados exclusivamente fictícios para auditoria B6.",
+          "source": "FAMILY",
+          "destination": "CARE_TEAM"
+        },
+        "history": [
+          {
+            "action": "ent.issued",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T10:00:00-03:00",
+            "version": 2
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Recebedora fictícia B6",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 3
+          }
+        ],
+        "workflow": {
+          "acceptedBy": "b6000000-0000-4000-8000-000000000003",
+          "acceptedAt": "2026-10-30T14:00:00Z"
+        }
+      },
+      "syntheticHash": "592107c53146a1863873007617d12d0f1dd1682bb18804732dd86f878b311f38",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "a5a033160c58a81b58f3dbefb54f9da7c12c3a942bb95a7673e8dad6324049b7",
+      "pages": 2,
+      "bytes": 26043,
+      "sourceUnchanged": true,
+      "omittedMarkers": [
+        "CAIXA_AVARIADA_B6",
+        "RESSALVA_ENT_B6_NAO_USAR"
+      ]
+    },
+    {
+      "id": "PV04",
+      "purpose": "ENT cancelada antes do aceite;card e declaração ainda pedem conferência",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "ENT",
+        "code": "ENT-0001",
+        "protocol": "ENT-20261030-B6000000-B6000001-1-12345678",
+        "version": 3,
+        "status": "cancelled",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "ent-a",
+            "product_id": "ent-a",
+            "name_snapshot": "Material fictício B6",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "0",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          }
+        ],
+        "payload": {
+          "notes": "Dados exclusivamente fictícios para auditoria B6.",
+          "source": "FAMILY",
+          "destination": "CARE_TEAM"
+        },
+        "history": [
+          {
+            "action": "ent.issued",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T10:00:00-03:00",
+            "version": 2
+          },
+          {
+            "action": "ent.cancel",
+            "actorName": "Emissora fictícia B6",
+            "version": 3,
+            "createdAt": "2026-10-30T15:00:00Z"
+          }
+        ],
+        "workflow": {},
+        "event": {
+          "reason": "MOTIVO_CANCELAMENTO_B6"
+        }
+      },
+      "syntheticHash": "82678e5262eda08c2fe1e28097f59b597247c2f01b26a1a7df8b2a41836c8cf4",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "567b4f2cb49fedc62b415b18ce09286f7dac4d73aa4833811c5e5c08a62d2ca2",
+      "pages": 2,
+      "bytes": 26419,
+      "sourceUnchanged": true,
+      "omittedMarkers": [
+        "MOTIVO_CANCELAMENTO_B6"
+      ]
+    },
+    {
+      "id": "PV05",
+      "purpose": "BAL reconto;contador diferente do revisor;fuso Manaus e4 semanas",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "BAL",
+        "code": "BAL-0001",
+        "protocol": "BAL-20261030-B6000000-B6000001-1-12345678",
+        "version": 5,
+        "status": "approved",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "bal-a",
+            "product_id": "bal-a",
+            "name_snapshot": "Material fictício B6",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "8",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "0",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "expectedQuantity": "10"
+            }
+          }
+        ],
+        "payload": {
+          "notes": "Dados exclusivamente fictícios para auditoria B6.",
+          "balanceContext": {
+            "cycleId": "b6000000-0000-4000-8000-000000000005",
+            "professionalName": "Contadora fictícia B6",
+            "shiftType": "Diurno fictício B6",
+            "startsAt": "2026-10-30T06:00:00-04:00",
+            "endsAt": "2026-10-30T18:00:00-04:00",
+            "countedAt": "2026-10-30T12:00:00-04:00",
+            "timezone": "America/Manaus",
+            "weeks": [
+              "2026-10-05",
+              "2026-10-12",
+              "2026-10-19",
+              "2026-10-26"
+            ],
+            "kind": "recount"
+          }
+        },
+        "history": [
+          {
+            "action": "bal.issued",
+            "actorName": "Contadora fictícia B6",
+            "createdAt": "2026-10-29T16:00:00Z",
+            "version": 1
+          },
+          {
+            "action": "bal.approve",
+            "actorName": "Revisora familiar fictícia B6",
+            "createdAt": "2026-10-29T17:00:00Z",
+            "version": 2
+          },
+          {
+            "action": "bal.recount",
+            "actorName": "Contadora fictícia B6",
+            "createdAt": "2026-10-30T16:00:00Z",
+            "version": 3
+          },
+          {
+            "action": "bal.approve",
+            "actorName": "Revisora familiar fictícia B6",
+            "createdAt": "2026-10-30T17:00:00Z",
+            "version": 4
+          },
+          {
+            "action": "bal.approve",
+            "actorName": "Revisora supervisora fictícia B6",
+            "createdAt": "2026-10-30T17:05:00Z",
+            "version": 5
+          }
+        ],
+        "workflow": {
+          "countVersion": 2,
+          "referenceRevision": "11",
+          "reviewPolicy": {
+            "balRequirement": "all",
+            "balApprovers": [
+              "family",
+              "supervisor"
+            ]
+          },
+          "appliedAt": "2026-10-30T17:00:00Z"
+        },
+        "approvals": [
+          {
+            "actor_id": "b6000000-0000-4000-8000-000000000006",
+            "review_group": "family",
+            "count_version": 1
+          },
+          {
+            "actor_id": "b6000000-0000-4000-8000-000000000007",
+            "review_group": "family",
+            "count_version": 2
+          },
+          {
+            "actor_id": "b6000000-0000-4000-8000-000000000008",
+            "review_group": "supervisor",
+            "count_version": 2
+          }
+        ]
+      },
+      "syntheticHash": "152d307314cb13ac5b722e1d1ed3379617e810c6eb063063b880235b57964c31",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "f5d86020271c92d9ba708ff3549d7ce3e4a7c488a4f98022a506b871d96554c9",
+      "pages": 2,
+      "bytes": 27672,
+      "sourceUnchanged": true,
+      "omittedMarkers": []
+    },
+    {
+      "id": "PV06",
+      "purpose": "Legacy helper:fonte sem data;nome original diferente do cadastro;zero linhas controlado",
+      "source": {
+        "id": "7090a953-53f5-4012-93e3-b03793f7d584",
+        "code": "HC-20261030-7090A953",
+        "type": "REQ",
+        "event": {
+          "source": "preserved_history"
+        },
+        "lines": [],
+        "action": "req.legacy_imported",
+        "actors": {
+          "issuer": null,
+          "patient": {
+            "id": "50d8bf32-e8c9-479d-a244-a135d00bcf04",
+            "name": "Paciente fictício B6 renomeado"
+          },
+          "recipient": null
+        },
+        "status": "submitted",
+        "history": [
+          {
+            "action": "req.legacy_imported",
+            "version": 1,
+            "actorName": "Recebedora fictícia B6 renomeada",
+            "createdAt": "2026-10-30T14:10:03.392376+00:00"
+          }
+        ],
+        "payload": {
+          "intent": {
+            "observations": []
+          },
+          "patientName": "Paciente fictício B6 no papel",
+          "requesterName": "Autora original fictícia do papel B6",
+          "sourceCreatedAt": null,
+          "legacyReconstructed": true
+        },
+        "version": 1,
+        "protocol": "HC-20261030-7090A953",
+        "workflow": {
+          "legacyReconstructed": true
+        },
+        "actorName": "Recebedora fictícia B6 renomeada",
+        "approvals": [],
+        "authority": null,
+        "createdAt": "2026-10-30T14:10:03.392376+00:00",
+        "createdBy": null,
+        "attachments": [],
+        "recipientId": null,
+        "isHistorical": true,
+        "previousHash": "",
+        "requestLinks": [],
+        "schemaVersion": 2,
+        "scienceEvents": [],
+        "sciencePolicy": null,
+        "careRecipientId": "50d8bf32-e8c9-479d-a244-a135d00bcf04",
+        "itemResolutions": [],
+        "fulfillmentLines": []
+      },
+      "syntheticHash": "2ffdc6e396f94b8a46acb90e82d06af8220ba68090ee334698d9e8dfb7dab61e",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "04b48af944f03a05a69a5dbd7f77d44e27d2cdb481b6dbc37b76db0e6628807f",
+      "pages": 2,
+      "bytes": 25987,
+      "sourceUnchanged": true,
+      "omittedMarkers": []
+    },
+    {
+      "id": "PV07",
+      "purpose": "35linhas;48eventos;notas1800;anexo;paginação longa",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "ENT",
+        "code": "ENT-0001",
+        "protocol": "ENT-20261030-B6000000-B6000001-1-12345678",
+        "version": 48,
+        "status": "disputed",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "long-0",
+            "product_id": "long-0",
+            "name_snapshot": "Material fictício 00 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-1",
+            "product_id": "long-1",
+            "name_snapshot": "Material fictício 01 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-2",
+            "product_id": "long-2",
+            "name_snapshot": "Material fictício 02 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-3",
+            "product_id": "long-3",
+            "name_snapshot": "Material fictício 03 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-4",
+            "product_id": "long-4",
+            "name_snapshot": "Material fictício 04 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-5",
+            "product_id": "long-5",
+            "name_snapshot": "Material fictício 05 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-6",
+            "product_id": "long-6",
+            "name_snapshot": "Material fictício 06 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-7",
+            "product_id": "long-7",
+            "name_snapshot": "Material fictício 07 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-8",
+            "product_id": "long-8",
+            "name_snapshot": "Material fictício 08 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-9",
+            "product_id": "long-9",
+            "name_snapshot": "Material fictício 09 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-10",
+            "product_id": "long-10",
+            "name_snapshot": "Material fictício 10 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-11",
+            "product_id": "long-11",
+            "name_snapshot": "Material fictício 11 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-12",
+            "product_id": "long-12",
+            "name_snapshot": "Material fictício 12 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-13",
+            "product_id": "long-13",
+            "name_snapshot": "Material fictício 13 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-14",
+            "product_id": "long-14",
+            "name_snapshot": "Material fictício 14 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-15",
+            "product_id": "long-15",
+            "name_snapshot": "Material fictício 15 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-16",
+            "product_id": "long-16",
+            "name_snapshot": "Material fictício 16 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-17",
+            "product_id": "long-17",
+            "name_snapshot": "Material fictício 17 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-18",
+            "product_id": "long-18",
+            "name_snapshot": "Material fictício 18 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-19",
+            "product_id": "long-19",
+            "name_snapshot": "Material fictício 19 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-20",
+            "product_id": "long-20",
+            "name_snapshot": "Material fictício 20 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-21",
+            "product_id": "long-21",
+            "name_snapshot": "Material fictício 21 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-22",
+            "product_id": "long-22",
+            "name_snapshot": "Material fictício 22 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-23",
+            "product_id": "long-23",
+            "name_snapshot": "Material fictício 23 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-24",
+            "product_id": "long-24",
+            "name_snapshot": "Material fictício 24 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-25",
+            "product_id": "long-25",
+            "name_snapshot": "Material fictício 25 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-26",
+            "product_id": "long-26",
+            "name_snapshot": "Material fictício 26 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-27",
+            "product_id": "long-27",
+            "name_snapshot": "Material fictício 27 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-28",
+            "product_id": "long-28",
+            "name_snapshot": "Material fictício 28 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-29",
+            "product_id": "long-29",
+            "name_snapshot": "Material fictício 29 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-30",
+            "product_id": "long-30",
+            "name_snapshot": "Material fictício 30 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-31",
+            "product_id": "long-31",
+            "name_snapshot": "Material fictício 31 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-32",
+            "product_id": "long-32",
+            "name_snapshot": "Material fictício 32 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          },
+          {
+            "id": "long-33",
+            "product_id": "long-33",
+            "name_snapshot": "Material fictício 33 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false
+            }
+          },
+          {
+            "id": "long-34",
+            "product_id": "long-34",
+            "name_snapshot": "Material fictício 34 B6 com descrição longa para controlar continuidade de tabelas, acentos e linhas",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "1",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": true
+            }
+          }
+        ],
+        "payload": {
+          "notes": "Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. Observação sintética extensa e legível B6. ",
+          "source": "FAMILY",
+          "destination": "CARE_TEAM"
+        },
+        "history": [
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 0",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 1
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 1",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 2
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 2",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 3
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 3",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 4
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 4",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 5
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 5",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 6
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 6",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 7
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 7",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 8
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 8",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 9
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 9",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 10
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 10",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 11
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 11",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 12
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 12",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 13
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 13",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 14
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 14",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 15
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 15",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 16
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 16",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 17
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 17",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 18
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 18",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 19
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 19",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 20
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 20",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 21
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 21",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 22
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 22",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 23
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 23",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 24
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 24",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 25
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 25",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 26
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 26",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 27
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 27",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 28
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 28",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 29
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 29",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 30
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 30",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 31
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 31",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 32
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 32",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 33
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 33",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 34
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 34",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 35
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 35",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 36
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 36",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 37
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 37",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 38
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 38",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 39
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 39",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 40
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 40",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 41
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 41",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 42
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 42",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 43
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 43",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 44
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 44",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 45
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 45",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 46
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Pessoa fictícia B6 46",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 47
+          },
+          {
+            "action": "ent.resolve",
+            "actorName": "Pessoa fictícia B6 47",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 48
+          }
+        ],
+        "attachments": [
+          {
+            "filename": "ficha-fisica-ficticia-B6.pdf",
+            "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        ]
+      },
+      "syntheticHash": "a85b765d5aa80730e051c57a104b5fa0d3a0473c4ae3279f7912fe272da98117",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "d17e8fdd3fe602d7bb119d13c34665046a594445866513aaa160b99da4f6fadf",
+      "pages": 8,
+      "bytes": 44777,
+      "sourceUnchanged": true,
+      "omittedMarkers": []
+    },
+    {
+      "id": "PV08",
+      "purpose": "Token sem espaço157;nota sem espaços;decimal6;registro profissional ausente",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "COM",
+        "code": "COM-0001",
+        "protocol": "COM-20261030-B6000000-B6000001-1-12345678",
+        "version": 3,
+        "status": "approved",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "token",
+            "product_id": "token",
+            "name_snapshot": "PALAVRAWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "0.123456",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "2",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false,
+              "expectedQuantity": "10"
+            }
+          }
+        ],
+        "payload": {
+          "notes": "Çãõ áéíóú — 0,123456; QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"
+        },
+        "history": [
+          {
+            "action": "com.issued",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T10:00:00-03:00",
+            "version": 2
+          },
+          {
+            "action": "com.receive",
+            "actorName": "Recebedora fictícia B6",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 3
+          }
+        ]
+      },
+      "syntheticHash": "b62ce354bd215e23d7aca85b842a2476a4dc6bde7cae1175c3df15ffe15a4e9d",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "687f1168e3748bfbebfdf78e5f2db3d1e4384e01bcd66992f634d63feaec2c78",
+      "pages": 2,
+      "bytes": 26775,
+      "sourceUnchanged": true,
+      "omittedMarkers": []
+    },
+    {
+      "id": "PV09",
+      "purpose": "Nome160 com78parágrafos;contrato catálogo aceita LF interno",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "ENT",
+        "code": "ENT-0001",
+        "protocol": "ENT-20261030-B6000000-B6000001-1-12345678",
+        "version": 3,
+        "status": "pending_receipt",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "oversized",
+            "product_id": "oversized",
+            "name_snapshot": "M\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nFIM_B6",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "3",
+            "accepted_quantity": "0",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false,
+              "expectedQuantity": "10"
+            }
+          }
+        ],
+        "payload": {
+          "source": "FAMILY",
+          "destination": "CARE_TEAM"
+        },
+        "history": [
+          {
+            "action": "ent.issued",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T10:00:00-03:00",
+            "version": 2
+          },
+          {
+            "action": "ent.receive",
+            "actorName": "Recebedora fictícia B6",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 3
+          }
+        ]
+      },
+      "syntheticHash": "365d2551c6c7a78a922efb6758aeab23e1202b1a6d1e3a77b94595cddc4f25ee",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "76977d836a948772733b41e1ed40f9517994d542e6c880ea8e56482dc7add1c1",
+      "pages": 6,
+      "bytes": 32378,
+      "sourceUnchanged": true,
+      "omittedMarkers": []
+    },
+    {
+      "id": "PV10",
+      "purpose": "COM cancelado sem aquisição/aplicação;card EM ANDAMENTO",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "COM",
+        "code": "COM-0001",
+        "protocol": "COM-20261030-B6000000-B6000001-1-12345678",
+        "version": 3,
+        "status": "cancelled",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "b6000000-0000-4000-8000-000000000004",
+            "product_id": "b6000000-0000-4000-8000-000000000004",
+            "name_snapshot": "Material fictício B6",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "0",
+            "accepted_quantity": "0",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false,
+              "expectedQuantity": "10"
+            }
+          }
+        ],
+        "payload": {
+          "notes": "Dados exclusivamente fictícios para auditoria B6."
+        },
+        "history": [
+          {
+            "action": "com.issued",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T13:00:00Z",
+            "version": 2
+          },
+          {
+            "action": "com.cancel",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 3
+          }
+        ],
+        "workflow": {
+          "reviewPolicy": {
+            "balReview": "required"
+          }
+        }
+      },
+      "syntheticHash": "137c7a2f87f1919adba6569815f0d1a56c1e8b0e6941d8a33384a600c8d180e6",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "fbca59cc4b98fb12268cc2b560dba26f0de1b821c6001973f601554a81d418dc",
+      "pages": 2,
+      "bytes": 25896,
+      "sourceUnchanged": true,
+      "omittedMarkers": []
+    },
+    {
+      "id": "PV11",
+      "purpose": "BAL cancelado sem aquisição/aplicação;card EM ANDAMENTO",
+      "source": {
+        "id": "b6000000-0000-4000-8000-000000000001",
+        "type": "BAL",
+        "code": "BAL-0001",
+        "protocol": "BAL-20261030-B6000000-B6000001-1-12345678",
+        "version": 3,
+        "status": "cancelled",
+        "createdAt": "2026-10-27T23:30:00-03:00",
+        "actors": {
+          "issuer": {
+            "id": "b6000000-0000-4000-8000-000000000002",
+            "name": "Emissora fictícia B6"
+          },
+          "recipient": {
+            "id": "b6000000-0000-4000-8000-000000000003",
+            "name": "Recebedora fictícia B6"
+          },
+          "patient": {
+            "name": "Paciente fictício B6"
+          }
+        },
+        "lines": [
+          {
+            "id": "b6000000-0000-4000-8000-000000000004",
+            "product_id": "b6000000-0000-4000-8000-000000000004",
+            "name_snapshot": "Material fictício B6",
+            "unit_snapshot": "unidade",
+            "category_snapshot": "higiene",
+            "quantity": "10",
+            "approved_quantity": "8",
+            "purchased_quantity": "0",
+            "accepted_quantity": "0",
+            "reconciled_quantity": "0",
+            "fully_checked": false,
+            "metadata": {
+              "issueOpen": false,
+              "expectedQuantity": "10"
+            }
+          }
+        ],
+        "payload": {
+          "notes": "Dados exclusivamente fictícios para auditoria B6."
+        },
+        "history": [
+          {
+            "action": "bal.issued",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T13:00:00Z",
+            "version": 2
+          },
+          {
+            "action": "bal.cancel",
+            "actorName": "Emissora fictícia B6",
+            "createdAt": "2026-10-30T14:00:00Z",
+            "version": 3
+          }
+        ],
+        "workflow": {
+          "reviewPolicy": {
+            "balReview": "required"
+          }
+        }
+      },
+      "syntheticHash": "a04f481929592b62a692e1bfce3813ea1fd3256b5483a044cb2fda43d4836576",
+      "hashMethod": "SHA256(JSON.stringify fixture);NOT persisted PostgreSQL canonical hash;QR target is not queried",
+      "pdfSha256": "b9351e98604b0a8de2dc56e98b5572aa5a6f77da40b530cc141369df3a6b63dc",
+      "pages": 2,
+      "bytes": 25767,
+      "sourceUnchanged": true,
+      "omittedMarkers": []
+    }
+  ]
+}

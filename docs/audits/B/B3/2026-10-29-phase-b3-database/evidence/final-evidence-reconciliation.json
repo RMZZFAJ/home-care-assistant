@@ -1,0 +1,9 @@
+{
+  "recordedAt": "2026-10-30T05:54:32.533Z",
+  "authorizationRows": 1522,
+  "additionalRuntimeRows": 16,
+  "findings": 25,
+  "manifestations": 41,
+  "uniqueScenarios": 94,
+  "projectionIsNotNewTests": true
+}

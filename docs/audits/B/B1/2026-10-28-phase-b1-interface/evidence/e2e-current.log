@@ -1,0 +1,53 @@
+[WebServer] (node:16928) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:33628) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:9256) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:29264) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:32184) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:10644) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:29584) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:17616) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:37288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:37112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:15824) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:22088) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:27428) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:32336) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:35884) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:28472) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:37152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"bcd00658-1374-49aa-be8a-651276a2f9a2"}
+  ok 1 [chromium] › tests\e2e\balance-shifts.spec.ts:41:5 › BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real (17.3s)
+  ok 2 [chromium] › tests\e2e\login.spec.ts:9:5 › exibe a tela de login (280ms)
+[WebServer] {"level":"error","operation":"invitation.accept","code":"SESSION_EXPIRED","correlationId":"1da72876-b477-467e-8dc3-222d2c2feaf5"}
+[WebServer] {"level":"error","operation":"workspace.sync","code":"FORBIDDEN","correlationId":"7ab55691-4c73-413b-b9cd-e78443f0c71a"}
+  ok 3 [chromium] › tests\e2e\onboarding.spec.ts:47:5 › convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha (6.4s)
+(node:37620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] {"level":"error","operation":"documents.create","code":"FORBIDDEN","correlationId":"15acbb8f-f8e3-46af-bc82-f4c6cade4a34"}
+  ok 4 [mobile] › tests\e2e\balance-shifts.spec.ts:41:5 › BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real (13.7s)
+  ok 5 [mobile] › tests\e2e\login.spec.ts:9:5 › exibe a tela de login (348ms)
+[WebServer] {"level":"error","operation":"invitation.accept","code":"SESSION_EXPIRED","correlationId":"00035450-a6de-41a5-a0a3-0ed036e05153"}
+[WebServer] {"level":"error","operation":"workspace.sync","code":"FORBIDDEN","correlationId":"30e9786b-8c4b-4643-91d1-af09b17bc2f4"}
+  ok 6 [mobile] › tests\e2e\onboarding.spec.ts:47:5 › convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha (5.9s)
+
+  6 passed (1.1m)

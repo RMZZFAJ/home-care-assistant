@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-29T04:14:02.124Z",
+  "controls": 342,
+  "businessVariants": 131,
+  "domains": 17,
+  "limits": "Every statically discovered callsite accounted; only representative synthetic final commands executed."
+}

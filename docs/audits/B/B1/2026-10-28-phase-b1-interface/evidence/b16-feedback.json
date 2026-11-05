@@ -1,0 +1,370 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:08:23.434Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:08:28.938Z",
+      "role": "adminA",
+      "label": "com-unknown",
+      "path": "/documentos/e0fb069b-a55b-4a62-8a90-f215fc82522d",
+      "width": 390,
+      "state": "UNKNOWN_RESULT",
+      "note": "Actual write before lost response. Review and key preserved; no provider send.",
+      "file": "b16-feedback-adminA-com-unknown.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 710
+      },
+      "text": "Revisar operação definitiva\n\nMaterial fictício V4 0: 5 unidade\nMaterial fictício V4 1: 5 unidade\n\nEsta operação será registrada na versão documental e na auditoria.\n\nVoltar à edição\nRecuperar tentativa",
+      "snapshot": "- dialog \"Revisar operação definitiva\":\n  - heading \"Revisar operação definitiva\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph: \"Material fictício V4 0: 5 unidade Material fictício V4 1: 5 unidade\"\n  - paragraph: Esta operação será registrada na versão documental e na auditoria.\n  - button \"Voltar à edição\" [disabled]\n  - button \"Recuperar tentativa\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:08:29.355Z",
+      "role": "adminA",
+      "label": "com-persisted",
+      "path": "/documentos/e0fb069b-a55b-4a62-8a90-f215fc82522d",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "",
+      "file": "b16-feedback-adminA-com-persisted.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nAcompanhamento da ficha\n← Histórico\nAtualizar\nOperação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.\nCOM\n\nCOMPRA DE INSUMOS\n\nCOM-0001\nCompra efetivada\n\n29/10/2026, 00:18 · Versão 2\n\nPaciente: Homologação fictícia V4 9482191c\n\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo · 3 aviso(s) aguardando resultado.\n\nProtocolo e identificação\nPróxima ação\nConfirmar recebimento\nProdutos e quantidades\nMaterial fictício V4 0\nProposto\n5 unidade\nAprovado\n5\nAdquirido\n5\nRecebido / validado\n0\nMaterial fictício V4 1\nProposto\n5 unidade\nAprovado\n5\nAdquirido\n5\nRecebido / validado\n0\n\nAuditoria B1: doação inteiramente fictícia, sem contato externo\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação\n\nNotificações da ficha\nAtualizar envios\n\nO documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n\nResponsável · Teste global · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nResponsável · Teste adminA · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nFamília · Teste family · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nResponsável · Teste global · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nResponsável · Teste adminA · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nFamília · Teste family · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nVersões e integridade\n\n2 versão(ões) · SHA-256 por evento",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Acompanhamento da ficha\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - button \"Atualizar\"\n  - status: Operação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.\n  - text: COM\n  - paragraph: Compra de insumos\n  - heading \"COM-0001\" [level=2]\n  - text: Compra efetivada\n  - paragraph: 29/10/2026, 00:18 · Versão 2\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - link \"Baixar PDF\":\n    - /url: /api/documents/e0fb069b-a55b-4a62-8a90-f215fc82522d/pdf?version=2\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo · 3 aviso(s) aguardando resultado.\n  - group: Protocolo e identificação\n  - heading \"Próxima ação\" [level=2]\n  - button \"Confirmar recebimento\"\n  - heading \"Produtos e quantidades\" [level=2]\n  - article:\n    - heading \"Material fictício V4 0\" [level=3]\n    - term: Proposto\n    - definition: 5 unidade\n    - term: Aprovado\n    - definition: \"5\"\n    - term: Adquirido\n    - definition: \"5\"\n    - term: Recebido / validado\n    - definition: \"0\"\n  - article:\n    - heading \"Material fictício V4 1\" [level=3]\n    - term: Proposto\n    - definition: 5 unidade\n    - term: Aprovado\n    - definition: \"5\"\n    - term: Adquirido\n    - definition: \"5\"\n    - term: Recebido / validado\n    - definition: \"0\"\n  - paragraph: \"Auditoria B1: doação inteiramente fictícia, sem contato externo\"\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação\n  - region \"Notificações da ficha\":\n    - heading \"Notificações da ficha\" [level=2]\n    - button \"Atualizar envios\"\n    - paragraph: O documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n    - list:\n      - listitem:\n        - paragraph: Responsável · Teste global · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Responsável · Teste adminA · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Família · Teste family · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Responsável · Teste global · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Responsável · Teste adminA · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Família · Teste family · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n  - region \"Versões e integridade\":\n    - heading \"Versões e integridade\" [level=2]:\n      - button \"Versões e integridade\"\n    - paragraph: 2 versão(ões) · SHA-256 por evento",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:08:33.270Z",
+      "role": "professional",
+      "label": "ent-confirm-review",
+      "path": "/documentos/174bf9ba-72f4-4aad-ac79-91b8bbaa434c",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b16-feedback-professional-ent-confirm-review.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 656
+      },
+      "text": "Revisar operação definitiva\n\nConfirmar o recebimento integral de todas as linhas e incorporar as quantidades ao estoque do destino.\n\nEsta operação será registrada na versão documental e na auditoria.\n\nVoltar à edição\nConfirmar operação",
+      "snapshot": "- dialog \"Revisar operação definitiva\":\n  - heading \"Revisar operação definitiva\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph: Confirmar o recebimento integral de todas as linhas e incorporar as quantidades ao estoque do destino.\n  - paragraph: Esta operação será registrada na versão documental e na auditoria.\n  - button \"Voltar à edição\"\n  - button \"Confirmar operação\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:08:33.728Z",
+      "role": "professional",
+      "label": "ent-received",
+      "path": "/documentos/174bf9ba-72f4-4aad-ac79-91b8bbaa434c",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "",
+      "file": "b16-feedback-professional-ent-received.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nAcompanhamento da ficha\n← Histórico\nAtualizar\nConsultando documento persistido…\nOperação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.\nENT\n\nENTREGA / ENTRADA\n\nENT-0001\nConfirmado\n\n29/10/2026, 00:18 · Versão 3\n\nPaciente: Homologação fictícia V4 9482191c\n\n2/2 linhas integralmente conferidas\n\nFamília → Equipe · Destinatário: Teste professional\n\nQuantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal.\n\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo · 5 aviso(s) aguardando resultado.\n\nProtocolo e identificação\nProdutos e quantidades\nMaterial fictício V4 0\nExpedido\n10 unidade\nAceito\n10\nQuantidade pendente\n0\nConciliado\n0\n\nLinha integralmente conferida\n\n1 linha(s) REQ explicitamente vinculada(s).\n\nMaterial fictício V4 1\nExpedido\n2 unidade\nAceito\n2\nQuantidade pendente\n0\nConciliado\n0\n\nLinha integralmente conferida\n\n1 linha(s) REQ explicitamente vinculada(s).\n\nAnexos e ficha física\n\n1 arquivo(s) · foto e PDF vinculados à operação\n\nNotificações da ficha\nAtualizar envios\n\nO documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n\nResponsável · Teste global · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nResponsável · Teste adminA · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nFamília · Teste family · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nEquipe de cuidado · Teste professional · Aplicativo\n\nDisponível no aplicativo · 1 tentativa(s)\n\n29/10/2026, 00:19\n\nResponsável · Teste global · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nResponsável · Teste adminA · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nFamília · Teste family · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nEquipe de cuidado · Teste professional · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nEquipe de cuidado · Profissional fictício de plantão · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nVersões e integridade\n\n3 versão(ões) · SHA-256 por evento",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Acompanhamento da ficha\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - button \"Atualizar\" [disabled]\n  - status: Consultando documento persistido…\n  - status: Operação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.\n  - text: ENT\n  - paragraph: Entrega / Entrada\n  - heading \"ENT-0001\" [level=2]\n  - text: Confirmado\n  - paragraph: 29/10/2026, 00:18 · Versão 3\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - paragraph: 2/2 linhas integralmente conferidas\n  - paragraph: \"Família → Equipe · Destinatário: Teste professional\"\n  - paragraph: Quantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal.\n  - link \"Baixar PDF\":\n    - /url: /api/documents/174bf9ba-72f4-4aad-ac79-91b8bbaa434c/pdf?version=3\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo · 5 aviso(s) aguardando resultado.\n  - group: Protocolo e identificação\n  - heading \"Produtos e quantidades\" [level=2]\n  - article:\n    - heading \"Material fictício V4 0\" [level=3]\n    - term: Expedido\n    - definition: 10 unidade\n    - term: Aceito\n    - definition: \"10\"\n    - term: Quantidade pendente\n    - definition: \"0\"\n    - term: Conciliado\n    - definition: \"0\"\n    - paragraph: Linha integralmente conferida\n    - paragraph: 1 linha(s) REQ explicitamente vinculada(s).\n  - article:\n    - heading \"Material fictício V4 1\" [level=3]\n    - term: Expedido\n    - definition: 2 unidade\n    - term: Aceito\n    - definition: \"2\"\n    - term: Quantidade pendente\n    - definition: \"0\"\n    - term: Conciliado\n    - definition: \"0\"\n    - paragraph: Linha integralmente conferida\n    - paragraph: 1 linha(s) REQ explicitamente vinculada(s).\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 1 arquivo(s) · foto e PDF vinculados à operação\n  - region \"Notificações da ficha\":\n    - heading \"Notificações da ficha\" [level=2]\n    - button \"Atualizar envios\"\n    - paragraph: O documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n    - list:\n      - listitem:\n        - paragraph: Responsável · Teste global · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Responsável · Teste adminA · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Família · Teste family · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Equipe de cuidado · Teste professional · Aplicativo\n        - paragraph: Disponível no aplicativo · 1 tentativa(s)\n        - paragraph: 29/10/2026, 00:19\n      - listitem:\n        - paragraph: Responsável · Teste global · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Responsável · Teste adminA · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Família · Teste family · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Equipe de cuidado · Teste professional · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Equipe de cuidado · Profissional fictício de plantão · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n  - region \"Versões e integridade\":\n    - heading \"Versões e integridade\" [level=2]:\n      - button \"Versões e integridade\"\n    - paragraph: 3 versão(ões) · SHA-256 por evento",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:08:35.818Z",
+      "role": "adminA",
+      "label": "req-after-ent",
+      "path": "/documentos/b8fc5ff1-826e-4acf-ab70-8c7b9950feb5",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "REQ attendance changes through linked accepted ENT, independent of science.",
+      "file": "b16-feedback-adminA-req-after-ent.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRequisição e acompanhamento\n← Histórico\nREQ\n\nREQUISIÇÃO\n\nREQ-0001\nAtendimento concluído\n\n29/10/2026, 00:18 · Versão 4\n\nPaciente: Homologação fictícia V4 9482191c\n\nSolicitante: Teste professional\n\nAtendimento\n\n2/2 itens atendidos\n\nCompleto\n\nCiência familiar\n\nExigência satisfeita\n\nIndependente do recebimento\n\nDocumento\n\nConcluído operacionalmente\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo · 5 aviso(s) aguardando resultado.\n\nProtocolo e identificação\nMateriais requisitados\n\nUma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n\nMaterial fictício V4 0\nAtendido\nUrgente\n\nEstoque observado na emissão: 0 unidade\n\nENT-0001 · aceito 10.000000\nMaterial fictício V4 1\nAtendido\nUrgente\n\nEstoque observado na emissão: 0 unidade\n\nENT-0001 · aceito 2.000000\nAbrir COM vinculada\nExpedir ENT vinculada\nCiência e responsáveis\n\nCiência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n\nTeste family\n\nPor expedição autorizada · 29/10/2026, 00:18\n\nLi a requisição e confirmo minha ciênciaRevisar arquivamento manual\nLinha do tempo\n\n4 evento(s) registrados\n\nCancelar requisição\nAvisos e acompanhamento\n\n13 aviso(s) · estados do aplicativo e do provedor são independentes\n\nObservações\n\nSem observações.\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Requisição e acompanhamento\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - text: REQ\n  - paragraph: Requisição\n  - heading \"REQ-0001\" [level=2]\n  - text: Atendimento concluído\n  - paragraph: 29/10/2026, 00:18 · Versão 4\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - paragraph: \"Solicitante: Teste professional\"\n  - paragraph: Atendimento\n  - strong: 2/2 itens atendidos\n  - paragraph: Completo\n  - paragraph: Ciência familiar\n  - strong: Exigência satisfeita\n  - paragraph: Independente do recebimento\n  - paragraph: Documento\n  - strong: Concluído operacionalmente\n  - link \"Baixar PDF\":\n    - /url: /api/documents/b8fc5ff1-826e-4acf-ab70-8c7b9950feb5/pdf?version=4\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo · 5 aviso(s) aguardando resultado.\n  - group: Protocolo e identificação\n  - heading \"Materiais requisitados\" [level=2]\n  - paragraph: Uma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n  - list:\n    - listitem:\n      - strong: Material fictício V4 0\n      - text: Atendido Urgente\n      - paragraph: \"Estoque observado na emissão: 0 unidade\"\n      - button \"ENT-0001 · aceito 10.000000\"\n    - listitem:\n      - strong: Material fictício V4 1\n      - text: Atendido Urgente\n      - paragraph: \"Estoque observado na emissão: 0 unidade\"\n      - button \"ENT-0001 · aceito 2.000000\"\n  - link \"Abrir COM vinculada\":\n    - /url: /fichas/com?requisitionId=b8fc5ff1-826e-4acf-ab70-8c7b9950feb5\n  - link \"Expedir ENT vinculada\":\n    - /url: /fichas/ent?requisitionId=b8fc5ff1-826e-4acf-ab70-8c7b9950feb5\n  - heading \"Ciência e responsáveis\" [level=2]\n  - paragraph: Ciência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n  - list:\n    - listitem:\n      - strong: Teste family\n      - paragraph: Por expedição autorizada · 29/10/2026, 00:18\n  - button \"Li a requisição e confirmo minha ciência\"\n  - button \"Revisar arquivamento manual\"\n  - region \"Linha do tempo\":\n    - heading \"Linha do tempo\" [level=2]:\n      - button \"Linha do tempo\"\n    - paragraph: 4 evento(s) registrados\n  - button \"Cancelar requisição\"\n  - region \"Avisos e acompanhamento\":\n    - heading \"Avisos e acompanhamento\" [level=2]:\n      - button \"Avisos e acompanhamento\"\n    - paragraph: 13 aviso(s) · estados do aplicativo e do provedor são independentes\n  - heading \"Observações\" [level=2]\n  - paragraph: Sem observações.\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:08:51.804Z",
+      "role": "shiftWorker",
+      "label": "bal-review-after-receipt",
+      "path": "/fichas/bal",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b16-feedback-shiftWorker-bal-review-after-receipt.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Balanço semanal\nHomologação fictícia V4 9482191c\n\nProfissional fictício de plantão · Plantão diário fictício\n\n29/10/2026, 00:00 → 30/10/2026, 00:00\nEtapa 2 de 2\nRevisão\nContagem\n2\nRevisão\nRevisão da contagem\n\nConfira as quantidades físicas e as diferenças. A revisão seguirá a política do paciente.\n\nMaterial fictício V4 0\n\nQuantidade física: 10 unidade\n\nReferência: 10 unidade\n\nSem diferença\n\nMaterial fictício V4 1\n\nQuantidade física: 2 unidade\n\nReferência: 2 unidade\n\nSem diferença\n\nVoltar\nSalvar rascunho\nConfirmar contagem",
+      "snapshot": "- main:\n  - heading \"Balanço semanal\" [level=1]\n  - strong: Homologação fictícia V4 9482191c\n  - paragraph: Profissional fictício de plantão · Plantão diário fictício\n  - text: 29/10/2026, 00:00 → 30/10/2026, 00:00\n  - navigation \"Etapas da ficha\":\n    - text: Etapa 2 de 2\n    - strong: Revisão\n    - list \"Barra de etapas; use as setas do teclado para rolar\":\n      - listitem:\n        - button \"Contagem\"\n      - listitem:\n        - button \"2 Revisão\"\n  - group:\n    - heading \"Revisão da contagem\" [level=2]\n    - paragraph: Confira as quantidades físicas e as diferenças. A revisão seguirá a política do paciente.\n    - article:\n      - strong: Material fictício V4 0\n      - paragraph: \"Quantidade física: 10 unidade\"\n      - text: \"Referência: 10 unidade\"\n      - paragraph: Sem diferença\n    - article:\n      - strong: Material fictício V4 1\n      - paragraph: \"Quantidade física: 2 unidade\"\n      - text: \"Referência: 2 unidade\"\n      - paragraph: Sem diferença\n  - button \"Voltar\"\n  - button \"Salvar rascunho\"\n  - button \"Confirmar contagem\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:08:52.091Z",
+      "role": "shiftWorker",
+      "label": "bal-count-persisted",
+      "path": "/fichas/bal",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "",
+      "file": "b16-feedback-shiftWorker-bal-count-persisted.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Balanço semanal\nContagem registrada conforme a política de revisão do paciente.\nBAL-0001\n\n29/10/2026, 01:08 · 2 itens · 0 diferenças · responsável: Profissional fictício de plantão\n\nAbrir ficha BAL\nBaixar PDF\nCompartilhar PDF\n\nPreparando PDF; acompanhamento inicial dos avisos por até 10 segundos.\n\nNotificações da ficha\nAtualizar envios\n\nO documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n\nConsultando notificações…",
+      "snapshot": "- main:\n  - heading \"Balanço semanal\" [level=1]\n  - status: Contagem registrada conforme a política de revisão do paciente.\n  - heading \"BAL-0001\" [level=2]\n  - paragraph: \"29/10/2026, 01:08 · 2 itens · 0 diferenças · responsável: Profissional fictício de plantão\"\n  - link \"Abrir ficha BAL\":\n    - /url: /documentos/4ea0b69e-03e3-4b51-b938-bbee7becd325\n  - link \"Baixar PDF\":\n    - /url: /api/documents/4ea0b69e-03e3-4b51-b938-bbee7becd325/pdf?version=1\n  - button \"Compartilhar PDF\" [disabled]\n  - status: Preparando PDF; acompanhamento inicial dos avisos por até 10 segundos.\n  - region \"Notificações da ficha\":\n    - heading \"Notificações da ficha\" [level=2]\n    - button \"Atualizar envios\"\n    - paragraph: O documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n    - status: Consultando notificações…",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:08:55.650Z",
+      "role": "family",
+      "label": "bal-final",
+      "path": "/documentos/4ea0b69e-03e3-4b51-b938-bbee7becd325",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "",
+      "file": "b16-feedback-family-bal-final.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nAcompanhamento da ficha\n← Histórico\nAtualizar\nBAL\n\nBALANÇO SEMANAL\n\nBAL-0001\nAprovado\n\n29/10/2026, 01:08 · Versão 1\n\nPaciente: Homologação fictícia V4 9482191c\n\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo · 5 aviso(s) aguardando resultado.\n\nProtocolo e identificação\nPlantão e contagem física\nProfissional fictício de plantão · Plantão diário fictício\n\n29/10/2026, 00:00 → 30/10/2026, 00:00\n\nContagem atual: 29/10/2026, 01:08\n\nSemanas vinculadas: 26/10/2026\n\nSemanas anteriores são regularizadas pela contagem atual, preservando seus prazos e atrasos históricos.\n\nAcompanhar plantão, revisão e reconto\nProdutos e quantidades\nMaterial fictício V4 0\nContado\n10 unidade\nSaldo na referência\n10\nRecebido / validado\n10\nMaterial fictício V4 1\nContado\n2 unidade\nSaldo na referência\n2\nRecebido / validado\n2\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação\n\nNotificações da ficha\nAtualizar envios\n\nO documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n\nResponsável · Teste global · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nResponsável · Teste adminA · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nFamília · Teste family · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nEquipe de cuidado · Teste professional · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nEquipe de cuidado · Profissional fictício de plantão · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nVersões e integridade\n\n1 versão(ões) · SHA-256 por evento",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Acompanhamento da ficha\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - button \"Atualizar\"\n  - text: BAL\n  - paragraph: Balanço semanal\n  - heading \"BAL-0001\" [level=2]\n  - text: Aprovado\n  - paragraph: 29/10/2026, 01:08 · Versão 1\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - link \"Baixar PDF\":\n    - /url: /api/documents/4ea0b69e-03e3-4b51-b938-bbee7becd325/pdf?version=1\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo · 5 aviso(s) aguardando resultado.\n  - group: Protocolo e identificação\n  - heading \"Plantão e contagem física\" [level=2]\n  - strong: Profissional fictício de plantão · Plantão diário fictício\n  - paragraph: 29/10/2026, 00:00 → 30/10/2026, 00:00\n  - paragraph: \"Contagem atual: 29/10/2026, 01:08\"\n  - paragraph: \"Semanas vinculadas: 26/10/2026\"\n  - paragraph: Semanas anteriores são regularizadas pela contagem atual, preservando seus prazos e atrasos históricos.\n  - link \"Acompanhar plantão, revisão e reconto\":\n    - /url: /balancos\n  - heading \"Produtos e quantidades\" [level=2]\n  - article:\n    - heading \"Material fictício V4 0\" [level=3]\n    - term: Contado\n    - definition: 10 unidade\n    - term: Saldo na referência\n    - definition: \"10\"\n    - term: Recebido / validado\n    - definition: \"10\"\n  - article:\n    - heading \"Material fictício V4 1\" [level=3]\n    - term: Contado\n    - definition: 2 unidade\n    - term: Saldo na referência\n    - definition: \"2\"\n    - term: Recebido / validado\n    - definition: \"2\"\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação\n  - region \"Notificações da ficha\":\n    - heading \"Notificações da ficha\" [level=2]\n    - button \"Atualizar envios\"\n    - paragraph: O documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n    - list:\n      - listitem:\n        - paragraph: Responsável · Teste global · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Responsável · Teste adminA · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Família · Teste family · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Equipe de cuidado · Teste professional · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Equipe de cuidado · Profissional fictício de plantão · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n  - region \"Versões e integridade\":\n    - heading \"Versões e integridade\" [level=2]:\n      - button \"Versões e integridade\"\n    - paragraph: 1 versão(ões) · SHA-256 por evento",
+      "visualInspected": false
+    }
+  ],
+  "failures": [
+    {
+      "label": "consumption-report-confirm",
+      "error": "locator.selectOption: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog').getByLabel('Custódia', { exact: true })\u001b[22m\n"
+    }
+  ],
+  "mutations": [
+    {
+      "command": "com.purchase",
+      "first": {
+        "status": 200,
+        "payloadSha256": "dc968c261975e616e1be6a0d894895079d5942728c02c71ee7fb5121d143a279",
+        "state": "purchased",
+        "version": 2
+      },
+      "context": "Forwarded real local command, response aborted. No new key generated by probe."
+    },
+    {
+      "command": "ent.receive",
+      "status": 200,
+      "divergences": [],
+      "recipient": "designated fixture professional"
+    },
+    {
+      "command": "BAL count",
+      "status": 201,
+      "state": "approved",
+      "id": "4ea0b69e-03e3-4b51-b938-bbee7becd325"
+    }
+  ],
+  "observations": [
+    {
+      "label": "before",
+      "status": 200,
+      "balances": [
+        {
+          "id": "patient-5b51329f-9731-4270-b9d9-f0ccad0a393f",
+          "family": "20.000000",
+          "team": "0"
+        },
+        {
+          "id": "patient-25b79387-94e9-4a7b-8dd8-c604ba42a9c6",
+          "family": "28.000000",
+          "team": "0"
+        }
+      ]
+    },
+    {
+      "label": "com-recovery-payload",
+      "first": "dc968c261975e616e1be6a0d894895079d5942728c02c71ee7fb5121d143a279",
+      "repeated": "dc968c261975e616e1be6a0d894895079d5942728c02c71ee7fb5121d143a279",
+      "same": true
+    },
+    {
+      "label": "COM read-back after same-key recovery",
+      "id": "e0fb069b-a55b-4a62-8a90-f215fc82522d",
+      "status": 200,
+      "state": "purchased",
+      "version": 2,
+      "lines": [
+        {
+          "id": "d18e848a-6d93-414e-a7d0-6e7af3c46cd0",
+          "quantity": 5,
+          "purchased": 5,
+          "accepted": 0,
+          "checked": false
+        },
+        {
+          "id": "8ff96400-f107-4185-a7f6-ef3a59ecb4a0",
+          "quantity": 5,
+          "purchased": 5,
+          "accepted": 0,
+          "checked": false
+        }
+      ],
+      "events": [
+        {
+          "action": "com.issued",
+          "version": 1
+        },
+        {
+          "action": "com.purchase",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "label": "after acquisition, no confirmed receipt",
+      "status": 200,
+      "balances": [
+        {
+          "id": "patient-5b51329f-9731-4270-b9d9-f0ccad0a393f",
+          "family": "20.000000",
+          "team": "0"
+        },
+        {
+          "id": "patient-25b79387-94e9-4a7b-8dd8-c604ba42a9c6",
+          "family": "28.000000",
+          "team": "0"
+        }
+      ]
+    },
+    {
+      "label": "ENT read-back",
+      "id": "174bf9ba-72f4-4aad-ac79-91b8bbaa434c",
+      "status": 200,
+      "state": "confirmed",
+      "version": 3,
+      "lines": [
+        {
+          "id": "e743469d-766b-411e-bda0-7c9e4abcc466",
+          "quantity": 10,
+          "purchased": 0,
+          "accepted": 10,
+          "checked": true
+        },
+        {
+          "id": "c1425f71-7129-4309-b117-939f2a5107a3",
+          "quantity": 2,
+          "purchased": 0,
+          "accepted": 2,
+          "checked": true
+        }
+      ],
+      "events": [
+        {
+          "action": "ent.issued",
+          "version": 1
+        },
+        {
+          "action": "attachment.bound",
+          "version": 2
+        },
+        {
+          "action": "ent.receive",
+          "version": 3
+        }
+      ]
+    },
+    {
+      "label": "after ENT receipt",
+      "status": 200,
+      "balances": [
+        {
+          "id": "patient-5b51329f-9731-4270-b9d9-f0ccad0a393f",
+          "family": "20.000000",
+          "team": "10.000000"
+        },
+        {
+          "id": "patient-25b79387-94e9-4a7b-8dd8-c604ba42a9c6",
+          "family": "28.000000",
+          "team": "2.000000"
+        }
+      ]
+    },
+    {
+      "label": "BAL final read-back",
+      "id": "4ea0b69e-03e3-4b51-b938-bbee7becd325",
+      "status": 200,
+      "state": "approved",
+      "version": 1,
+      "lines": [
+        {
+          "id": "7b2e2d43-5c7f-43cb-9bea-f47a7e404cd8",
+          "quantity": 10,
+          "purchased": 0,
+          "accepted": 10,
+          "checked": true
+        },
+        {
+          "id": "ff260eb7-bf7a-4516-8f09-610dfc0853f7",
+          "quantity": 2,
+          "purchased": 0,
+          "accepted": 2,
+          "checked": true
+        }
+      ],
+      "events": [
+        {
+          "action": "bal.issued",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "label": "BAL notification states",
+      "rows": [
+        {
+          "state": "pending",
+          "channel": "internal"
+        },
+        {
+          "state": "pending",
+          "channel": "internal"
+        },
+        {
+          "state": "pending",
+          "channel": "internal"
+        },
+        {
+          "state": "pending",
+          "channel": "internal"
+        },
+        {
+          "state": "pending",
+          "channel": "internal"
+        }
+      ],
+      "externalSending": false
+    }
+  ],
+  "bal": "4ea0b69e-03e3-4b51-b938-bbee7becd325",
+  "balPdf": {
+    "file": "current-BAL.pdf",
+    "bytes": 27353,
+    "sha256": "cc98b3e0891e86e835bd6124bbe1414a8978716c0281f21f1f4952b0bb74bbe4"
+  },
+  "finishedAt": "2026-10-29T04:08:57.463Z"
+}

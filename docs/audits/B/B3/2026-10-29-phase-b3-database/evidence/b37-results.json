@@ -1,0 +1,225 @@
+{
+  "group": "B3.7",
+  "startedAt": "2026-10-30T01:11:47.323Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B37-01",
+      "purpose": "Regime BAL anterior permite autorrevisão por supervisor: B2-009",
+      "recordedAt": "2026-10-30T01:11:49.336Z",
+      "observed": {
+        "document": "3d4d3062-4853-4e43-a6db-23febd4faf17",
+        "counterAndReviewer": "caabdc28-0055-4526-be0e-3ebffce70867",
+        "status": "approved",
+        "scope": "legacy without balanceContext"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B37-02",
+      "purpose": "Reconto separa versões de aprovação e invalida referência de estoque alterada",
+      "recordedAt": "2026-10-30T01:11:50.097Z",
+      "observed": {
+        "document": "55323960-c301-4db8-bf71-fcda6e395d88",
+        "stale": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: inventory conflict: reference changed; recount"
+        },
+        "approvals": [
+          {
+            "group": "family",
+            "countVersion": 1
+          },
+          {
+            "group": "family",
+            "countVersion": 2
+          },
+          {
+            "group": "supervisor",
+            "countVersion": 2
+          }
+        ],
+        "oldApprovalDidNotApproveNewCount": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B37-03",
+      "purpose": "Proposta encerrada depois aprovada republica além do corte: DB-003/B2-013",
+      "recordedAt": "2026-10-30T01:11:51.966Z",
+      "observed": {
+        "series": "fd8b8d7a-66ab-45ba-9a63-c3125088a72b",
+        "endedOn": "2026-11-20",
+        "before": [
+          {
+            "id": "571f5316-fb6d-411e-8c8d-ecdd8dbf3492",
+            "status": "proposed",
+            "ends_at": "2026-11-19T10:00:00+00:00",
+            "version": 1,
+            "starts_at": "2026-11-18T22:00:00+00:00",
+            "professional_id": "add8d46a-ea8f-4b5a-a982-2af17b88c897"
+          },
+          {
+            "id": "424dfbae-9bd7-4e64-a3c1-0875d707d4d7",
+            "status": "cancelled",
+            "ends_at": "2026-11-21T10:00:00+00:00",
+            "version": 2,
+            "starts_at": "2026-11-20T22:00:00+00:00",
+            "professional_id": "add8d46a-ea8f-4b5a-a982-2af17b88c897"
+          },
+          {
+            "id": "ae4f4432-8403-41ac-93d3-0e8f5c16f7a4",
+            "status": "cancelled",
+            "ends_at": "2026-11-23T10:00:00+00:00",
+            "version": 2,
+            "starts_at": "2026-11-22T22:00:00+00:00",
+            "professional_id": "add8d46a-ea8f-4b5a-a982-2af17b88c897"
+          }
+        ],
+        "after": [
+          {
+            "id": "571f5316-fb6d-411e-8c8d-ecdd8dbf3492",
+            "status": "published",
+            "ends_at": "2026-11-19T10:00:00+00:00",
+            "version": 2,
+            "starts_at": "2026-11-18T22:00:00+00:00",
+            "professional_id": "add8d46a-ea8f-4b5a-a982-2af17b88c897"
+          },
+          {
+            "id": "424dfbae-9bd7-4e64-a3c1-0875d707d4d7",
+            "status": "published",
+            "ends_at": "2026-11-21T10:00:00+00:00",
+            "version": 3,
+            "starts_at": "2026-11-20T22:00:00+00:00",
+            "professional_id": "add8d46a-ea8f-4b5a-a982-2af17b88c897"
+          },
+          {
+            "id": "ae4f4432-8403-41ac-93d3-0e8f5c16f7a4",
+            "status": "published",
+            "ends_at": "2026-11-23T10:00:00+00:00",
+            "version": 3,
+            "starts_at": "2026-11-22T22:00:00+00:00",
+            "professional_id": "add8d46a-ea8f-4b5a-a982-2af17b88c897"
+          }
+        ],
+        "presenceProven": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B37-04",
+      "purpose": "Ativação exige plantão real e designa somente a pessoa da janela",
+      "recordedAt": "2026-10-30T01:11:52.426Z",
+      "observed": {
+        "assignment": {
+          "id": "5ee9f0ff-a63a-4daf-863d-57ea188846a4",
+          "kind": "scheduled",
+          "status": "active",
+          "ends_at": "2026-10-30T03:00:00+00:00",
+          "version": 1,
+          "cycle_id": "47307533-b71c-4e1a-8331-74406cd2f7ff",
+          "shift_id": "f82ca1b6-213d-4921-bd10-b5e23d8da3e3",
+          "missed_at": null,
+          "starts_at": "2026-10-29T03:00:00+00:00",
+          "created_at": "2026-10-30T01:11:52.466708+00:00",
+          "shift_version": 1,
+          "professional_id": "42a60e78-c3be-4bb6-b5d1-e4bf835f4340",
+          "care_recipient_id": "c66ba6d5-190c-484f-b0f5-96c7af197e57"
+        },
+        "notDesignated": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "create_supply_document: balance shift authorization required"
+        },
+        "adminAvailable": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B37-05",
+      "purpose": "Destino de adiamento alterado permanece pending e rejeição falha: B2-012",
+      "recordedAt": "2026-10-30T01:11:52.681Z",
+      "observed": {
+        "requestId": "81d83b80-95f1-4596-8bd4-066b24ae8a44",
+        "status": "pending",
+        "result": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "balance_command: stale document target shift"
+        },
+        "sourceAssignmentStillActive": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B37-06",
+      "purpose": "Contagem atual regulariza semanas antigas sem apagar atraso: fixture transacional explícita",
+      "recordedAt": "2026-10-30T01:11:52.762Z",
+      "observed": {
+        "counted": 1,
+        "regularized": 3,
+        "latePreserved": 3,
+        "sameActualCount": 1,
+        "rolledBack": true,
+        "method": "Three NEW historical obligations in a rollback-only synthetic fixture; real Auth session/claims. Does not prove retroactive activation through API."
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B37-07",
+      "purpose": "Regime agendado recusa autorrevisão e mudança de prazo sem decisão familiar",
+      "recordedAt": "2026-10-30T01:11:53.156Z",
+      "observed": {
+        "document": "f75b8ea8-ba69-4c34-a5ea-e8c1ddaf1721",
+        "selfReview": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: distinct balance reviewer required"
+        },
+        "shiftDeadlineGuard": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "schedule_command: balance requires family deferral before schedule period change"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B37-08",
+      "purpose": "Substituição no reconto counted deixa sem sucessor: B2-014; revisor recupera",
+      "recordedAt": "2026-10-30T01:11:53.499Z",
+      "observed": {
+        "noAutomaticSuccessor": true,
+        "manualRecovery": true,
+        "creator": "42a60e78-c3be-4bb6-b5d1-e4bf835f4340",
+        "actualCounter": "3a265603-4364-4464-8f82-b44395bbcb2d"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B37-09",
+      "purpose": "Revisor é distinto de quem efetivamente recontou, sem exigir trocar autor histórico",
+      "recordedAt": "2026-10-30T01:11:54.428Z",
+      "observed": {
+        "document": "f75b8ea8-ba69-4c34-a5ea-e8c1ddaf1721",
+        "status": "approved",
+        "originalCreator": "42a60e78-c3be-4bb6-b5d1-e4bf835f4340",
+        "actualCounter": "3a265603-4364-4464-8f82-b44395bbcb2d",
+        "originalCreatorMayReviewDifferentActualCounter": true
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T01:11:55.005Z"
+}

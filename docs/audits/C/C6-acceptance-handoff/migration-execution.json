@@ -1,0 +1,11 @@
+{
+  "mode": "RECOVERED_INTERRUPTED_APPLY",
+  "baseline_files": 1932,
+  "git_moves": 32,
+  "editorial_files": 73,
+  "link_edits": 194,
+  "preexisting_unresolved_links": 0,
+  "raw_evidence_rewrites": 0,
+  "deletions": 0,
+  "recovery": "Original index nested into existing B; contents moved to intended B after per-file original and generated-destination hash checks"
+}

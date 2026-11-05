@@ -1,0 +1,27 @@
+{
+  "group": "B3.8s",
+  "startedAt": "2026-10-30T01:21:24.835Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B38-09",
+      "purpose": "Criar BAL simultaneamente recupera resultado depois de a atribuição fechar",
+      "recordedAt": "2026-10-30T01:21:24.842Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "configure_patient_access: stale policy version",
+        "sqlstate": "PT409"
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": []
+}

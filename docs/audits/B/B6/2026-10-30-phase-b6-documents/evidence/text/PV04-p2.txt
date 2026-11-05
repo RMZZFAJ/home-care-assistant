@@ -1,0 +1,44 @@
+HCA
+HOME CARE ASSISTANT
+GESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL
+CONFERÊNCIA E AUDITORIA
+ENT-0001 · Versão documental 3
+DECLARAÇÃO DO RECEBIMENTO
+Este comprovante foi emitido antes do aceite. A pessoa designada deve conferir os itens e informar quantidades
+efetivamente recebidas. Nenhum aceite é presumido.
+MATERIAL
+ACEITO
+CONCILIADO
+SITUAÇÃO
+Material fictício B6
+0
+0
+Aguardando conferência
+LINHA DO TEMPO OPERACIONAL
+DATA/HORA
+RESPONSÁVEL
+EVENTO
+30/10/2026, 10:00
+Emissora fictícia B6
+Materiais expedidos · v2
+30/10/2026, 12:00
+Emissora fictícia B6
+Cancelamento registrado · v3
+IDENTIFICAÇÃO E INTEGRIDADE
+DOCUMENTO
+ENT-0001
+VERSÃO
+3
+ID TÉCNICO
+b6000000-0000-4000-8000-000000000001
+HASH DO CONTEÚDO CANÔNICO
+82678e5262eda08c2fe1e28097f59b597247c2f01b26a
+1a7df8b2a41836c8cf4
+O SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por
+administradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado
+separadamente.
+Verificação de integridade
+O QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso
+autorizado.
+ENT-0001 · v3 · Conteúdo autorizado
+Página 2 de 2

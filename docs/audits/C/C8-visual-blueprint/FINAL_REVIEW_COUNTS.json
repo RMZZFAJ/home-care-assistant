@@ -1,0 +1,15 @@
+{
+  "original_screens_reviewed": 66,
+  "original_controls_reviewed": 262,
+  "additional_controls": 12,
+  "current_controls": 274,
+  "control_screen_contracts": 424,
+  "original_surface_relations_reviewed": 171,
+  "current_surface_relations": 171,
+  "source_B1_copy_rows_reviewed_preserved": 4205,
+  "source_copy_proposals_corrected": 150,
+  "component_types_corrected": 58,
+  "current_copy_rows": 6479,
+  "prototype": "HTML_AND_8_PNG_PRESERVED;APPROVED_DIRECTION;NOT_RECREATED",
+  "evidence_class": "STATIC_SEMANTIC_AND_REFERENCE_IMAGE_REVIEW;NO_PRODUCT_IMPLEMENTATION_OR_HUMAN_ACCEPTANCE"
+}

@@ -1,0 +1,62 @@
+{
+  "group": "B3.8c",
+  "startedAt": "2026-10-30T01:23:18.493Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B38-12",
+      "purpose": "Cancelar e aceitar simultaneamente conservam custódias em uma ordem válida",
+      "recordedAt": "2026-10-30T01:23:18.494Z",
+      "observed": {
+        "barrier": {
+          "requests": 2,
+          "waiters": 2
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "708fdacb-6b19-4ad4-b3a8-5c26cf01daa3",
+            "version": 2,
+            "state": "confirmed",
+            "code": "ENT-0006",
+            "message": null
+          },
+          {
+            "status": 400,
+            "id": null,
+            "version": null,
+            "state": null,
+            "code": "P0001",
+            "message": "stale document version"
+          }
+        ],
+        "before": {
+          "FAMILY": "1.000000",
+          "TRANSIT": "1.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 8
+        },
+        "after": {
+          "FAMILY": "1.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 9
+        },
+        "documentState": "confirmed",
+        "oneCommandRejectedByExpectedVersion": true
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T01:23:20.748Z"
+}

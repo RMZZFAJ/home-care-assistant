@@ -1,0 +1,158 @@
+{
+  "group": "B3.10",
+  "startedAt": "2026-10-30T01:37:30.652Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Real local Next API/SSR cookies, authenticated RPC/Storage and independent DB/hash/byte read-back. Signed URLs remain only in memory; no browser rendering or provider.",
+  "scenarios": [
+    {
+      "id": "B310-01",
+      "purpose": "API sanitiza imagem, persiste bytes privados e vincula versão com hash independente",
+      "recordedAt": "2026-10-30T01:37:30.988Z",
+      "observed": {
+        "id": "6844bddb-64b7-40b5-a734-039835b505e1",
+        "document": "da6947f8-9fe2-43b9-a1b7-486dba5f4f82",
+        "state": "ready",
+        "bytes": 270,
+        "mime": "image/jpeg",
+        "hashMatchesBytes": true,
+        "format": "jpeg",
+        "exifRemoved": true,
+        "version": 2,
+        "noUrlExported": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B310-02",
+      "purpose": "Repetição após resposta ignorada recupera mesmo anexo sem duplicar versão; outro conteúdo conflita",
+      "recordedAt": "2026-10-30T01:37:32.113Z",
+      "observed": {
+        "recoveredId": "6844bddb-64b7-40b5-a734-039835b505e1",
+        "versionUnchanged": true,
+        "differentContentStatus": 409,
+        "code": "IDEMPOTENCY_CONFLICT",
+        "physicalNetworkFailureInjected": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B310-03",
+      "purpose": "Quem lê COM não ganha autoria de upload; quem não lê COM não recebe bytes",
+      "recordedAt": "2026-10-30T01:37:32.673Z",
+      "observed": {
+        "readerReservation": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "reserve_attachment: required permission: com.read"
+        },
+        "professionalDownloadDenied": true,
+        "otherPatientDownloadDenied": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B310-04",
+      "purpose": "Arquivo inválido é rejeitado antes de reservar; upload arbitrário sem reserva não persiste",
+      "recordedAt": "2026-10-30T01:37:33.015Z",
+      "observed": {
+        "invalidFileStatus": 400,
+        "code": "VALIDATION_ERROR",
+        "reservationsUnchanged": true,
+        "unreservedUploadDenied": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B310-05",
+      "purpose": "Dez reservas abandonadas esgotam limite; concorrência pela última vaga é serializada",
+      "recordedAt": "2026-10-30T01:37:33.455Z",
+      "observed": {
+        "document": "06ae1a54-6013-4a4b-b1c8-a24a99e68cce",
+        "barrier": {
+          "requests": 2,
+          "waiters": 2,
+          "prefix": "attachments:"
+        },
+        "responses": [
+          {
+            "status": 200,
+            "id": "cddf51b2-95bd-4521-8f53-3ee58be00fa5",
+            "version": null,
+            "state": null,
+            "code": null,
+            "message": null
+          },
+          {
+            "status": 400,
+            "id": null,
+            "version": null,
+            "state": null,
+            "code": "P0001",
+            "message": "attachment limit reached"
+          }
+        ],
+        "ready": 0,
+        "objects": 0,
+        "reservations": 10,
+        "relation": "DB-004/B2-016; no cleanup/expiration performed"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B310-06",
+      "purpose": "URL assinada já emitida continua válida por seu prazo após revogar vínculo",
+      "recordedAt": "2026-10-30T01:38:15.583Z",
+      "observed": {
+        "attachmentId": "808b92e8-f627-484e-8fd3-0b5a41f09786",
+        "newApiRequestStatus": 404,
+        "previouslyIssuedSignedUrlStatus": 200,
+        "configuredTtlSeconds": 120,
+        "noSignedUrlTokenOrCookieExported": true,
+        "scope": "Previously issued bearer URL within TTL only; not persistent membership bypass"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B310-07",
+      "purpose": "PDF histórico tem bytes/cache próprios e verificação canônica separada",
+      "recordedAt": "2026-10-30T01:38:16.400Z",
+      "observed": {
+        "document": "4754c25f-d0dd-43c1-89ea-74832c29fb13",
+        "version": 1,
+        "bytes": 26165,
+        "pdfByteHash": "c936c85611b5f1fe2d7bdd215d031655d24914d012869a3a70698326576cd70e",
+        "repeatedBytesIdentical": true,
+        "renders": [
+          {
+            "version": 1,
+            "renderer": 4,
+            "byteHashMatches": true
+          }
+        ],
+        "limits": "No layout/print/device acceptance; hash of bytes differs in purpose from canonical hash"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [
+    {
+      "id": "B310-06",
+      "purpose": "URL assinada já emitida continua válida por seu prazo após revogar vínculo",
+      "recordedAt": "2026-10-30T01:37:35.276Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Expected values to be strictly equal:\n\n404 !== 403\n",
+        "sqlstate": null
+      }
+    }
+  ],
+  "finishedAt": "2026-10-30T01:38:17.011Z"
+}

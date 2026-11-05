@@ -1,0 +1,140 @@
+{
+  "recordedAt": "2026-10-30T21:30:27.141012+00:00",
+  "clientDate": "2026-10-30",
+  "status": "PASS",
+  "node": "24.22.0",
+  "requiredDeliverables": 25,
+  "inventoryObjects": 17,
+  "inventoryFields": 22,
+  "fieldRows": 71,
+  "findings": 13,
+  "findingFields": 33,
+  "P2": 11,
+  "P3": 2,
+  "newCauses": 9,
+  "newManifestations": 2,
+  "priorRiskDeepened": 1,
+  "revalidation": 1,
+  "newScenarios": 23,
+  "priorScenarioReferences": 12,
+  "scenarioRows": 35,
+  "priorFindingRecords": 18,
+  "primaryPdfs": 11,
+  "primaryPages": 32,
+  "primaryVisualPages": 20,
+  "grayscaleVisualPages": 1,
+  "attachmentPdfs": 4,
+  "attachmentVisualPages": 4,
+  "methods": {
+    "ADAPTADOR_CONTROLADO": 1,
+    "QR_OFFLINE": 1,
+    "RASTER_CINZA_VISUAL": 1,
+    "READ_ONLY": 3,
+    "RENDER_TEXTO_VISUAL": 11,
+    "SANITIZADOR_VISUAL": 1,
+    "SQL_LOCAL_ROLLBACK": 5
+  },
+  "evidenceReferencesChecked": 110,
+  "sourceAnchorsChecked": 26,
+  "localLinksChecked": 55,
+  "secretMatches": 0,
+  "protectedSourcesUnchanged": 395,
+  "sqlRoutinesUnchanged": 232,
+  "publicOriginalRows": "all baseline multiset hashes present;no replacements/deletions",
+  "priorAuthStable": 78,
+  "newSyntheticAuthAccounts": 2,
+  "checks": [
+    {
+      "name": "Syntax b612-legacy-context.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax b612-receipts.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax b62-provenance.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax b63-integrity.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax b66-catalog.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax b67-storage-read.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax b69-qr.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax backup.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax baseline.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax local-actors.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "Syntax preservation.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "B6 and phase-B Markdown",
+      "exitCode": 0,
+      "output": "markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)\nFinding: docs/audits/2026-10-30-phase-b6-documents/**/*.md docs/audits/phase-b/README.md\nLinting: 23 files\nSummary: 0 issues in 0 files"
+    },
+    {
+      "name": "Audit JS/TS ESLint",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "priorTypecheck": {
+    "command": "Node24.22.0 node_modules/typescript/bin/tsc -p evidence/tsconfig.audit.json --noEmit",
+    "status": "PASS during B6.8;TS/imports unchanged since;not repeated for Markdown"
+  },
+  "methodsCaveat": "23 new logical points are not23 E2E;12 references were not rerun;PDF fixture hashes use JSON.stringify,not persisted canonical hash",
+  "notRun": [
+    "global build",
+    "global typecheck",
+    "global unit",
+    "full E2E",
+    "migration replay",
+    "remote tests",
+    "physical printing",
+    "human acceptance",
+    "full restore"
+  ],
+  "sessionEffects": {
+    "externalSend": false,
+    "remoteDatabaseChange": false,
+    "productChange": false,
+    "historicalPdfReplacement": false,
+    "deploy": false,
+    "PR": false,
+    "merge": false,
+    "scope": "Session actions;not independent remote-state certification"
+  },
+  "manifestPolicy": "Excludes itself and ignored __pycache__;includes final package-validation.json;all SHA256 verified"
+}

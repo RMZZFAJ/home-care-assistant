@@ -1,103 +1,63 @@
 # Home Care Assistant
 
-Gestão operacional de Home Care com Next.js, React, TypeScript e Supabase.
-O paciente é a unidade de administração, catálogo e autorização. O sistema
-não prescreve, diagnostica ou toma decisões clínicas.
+Gestão operacional por paciente com Next.js, React, TypeScript e Supabase.
+REQ, COM, ENT e BAL distinguem necessidade, aquisição, entrega, contagem,
+ciência e estoque por movimentos. O sistema não prescreve ou decide conduta
+clínica.
+
+## Estado e documentação
+
+**Produção NO-GO.** A e B1–B8 estão encerradas como diagnóstico; C concluiu o
+planejamento documental C0–C10. **D NÃO INICIADA.** Base funcional auditada:
+`37cb7f85e96e551d6419871f94dd950712e2565b`. O estado de deploy produtivo nesta
+missão é NOT_VERIFIED; preview documental não é homologação do produto.
+
+- [Portal por público](docs/README.md).
+
+- [Estado por fonte e SHA](docs/current/PROJECT_STATUS.md).
+
+- [Contratos implementados e desvios conhecidos](docs/current/README.md).
+
+- [Decisões humanas](docs/decisions/README.md) e
+  [projeto C](docs/audits/C/README.md).
+
+- [Auditorias preservadas](docs/audits/README.md) e
+  [plano D](docs/audits/D/README.md).
+
+PWA/push, modalidades futuras de ciência, rascunhos entre aparelhos e
+verificador de exemplar são requisitos planejados; não são anunciados como
+implementados. Os dois P1 herdados continuam abertos até correção/regressão
+autorizada.
+
+O [fechamento definitivo C7–C10](docs/audits/C/C10-pr-handoff/README.md)
+registra P02 OWNER_APPROVED, 66 fichas e 262 controles originais revistos.
+Catálogo atual: 274 controles/424 usos; 187 aceites planejados. Draft PR 6
+permanece para revisão, sem merge ou início D.
 
 ## Desenvolvimento
 
-Use Node **24.22.0** e npm **11.21.1**, conforme os arquivos de versão.
-As dependências têm versões exatas e lockfile versionado. TypeScript 6 e
-ESLint 10 foram escolhidos pela compatibilidade do conjunto de ferramentas.
+Use Node 24.22.0 e npm 11.21.1 dos arquivos de versão; lockfile e versões
+exatas.
 
 ```sh
 npm ci
-```
-
-Copie `.env.example` para `.env.local` e configure a URL e chave pública do
-Supabase local: `http://127.0.0.1:54321`. Nunca use a chave de serviço como
-variável pública. O projeto local `home-care-assistant` é o ambiente de
-desenvolvimento e testes. Não é necessário criar uma segunda stack.
-O cadastro operacional exige migrations aplicadas e vínculos autorizados.
-
-```sh
-npm run test:db:prepare
-```
-
-Esse preparo inicia/verifica o projeto local e aplica migrations locais.
-Leia [Testes](docs/TESTING.md) antes de recriar dados ou carregar fixtures.
-
-```sh
 npm run dev
 ```
 
-## Operação
+Configure o ambiente local conforme `.env.example`, sem chave de serviço no
+browser. A stack de desenvolvimento/testes é home-care-assistant, API
+127.0.0.1:54321 e DB em 127.0.0.1:54322. Não criar outra stack para a suíte.
+Antes de preparo, fixtures ou replay, ler [Testes](docs/current/TESTING.md):
+esses comandos podem aplicar migrations ou substituir dados e exigem as
+guardas, consentimento e backup pertinentes. Nunca executar testes mutáveis no
+remoto.
 
-Selecione o paciente no cabeçalho e use o menu recolhível: Visão geral,
-Fichas (REQ, COM, ENT, BAL), Histórico, Estoque e Administração.
-Um administrador de paciente gerencia somente
-aquele contexto. Administração global gerencia a plataforma e propõe mudanças
-locais; competências operacionais exigem vínculo e contexto explícitos.
-Convites permitem cadastro pessoal e aceite; revogar um vínculo não bloqueia
-a conta em outros pacientes. Novos pacientes iniciam com catálogo vazio e
-podem adotar modelos explicitamente.
+## Validação e autorização
 
-O catálogo contém apenas insumos sob responsabilidade familiar. COM aceita
-compra ou doação; recebimento validado abastece a família. ENT transfere entre
-família e equipe, com trânsito e aceite do destinatário. REQ não tem quantidade
-solicitada: atendimento por linha depende de ENT vinculada e aceite positivo.
-BAL conta apenas o estoque da equipe, conforme a política de revisão.
-O regime por plantão é habilitado por paciente: escalas reais determinam a
-janela e o responsável, e adiamento exige decisão familiar. A contagem atual
-pode regularizar semanas anteriores sem apagar atrasos nem simular contagens.
-Consulte [Escalas](docs/ui-ux/SCHEDULES.md) e [Balanços](docs/ui-ux/BALANCES.md).
-
-O administrador movimenta e corrige o estoque familiar diretamente, com
-ledger e anexos. Cada ficha tem UUID, sequência independente por paciente/tipo,
-protocolo, snapshots e SHA-256. Assinatura assimétrica é possibilidade futura.
-Leia [Operação](docs/OPERATIONS.md) e o [estado atual](docs/evolution/EXECUTION.md).
-
-## Validação
-
-```sh
-npm run check:contracts
-npm run lint
-npm run lint:markdown
-npm run typecheck
-npm test
-npm run build
-npm run test:db:prepare
-npm run db:backup:local
-npm run test:migrations -- --replay-local --backup CAMINHO_DO_BACKUP
-npm run test:integration
-npm run e2e
-```
-
-As etapas de banco e navegador usam exclusivamente o projeto local verificado.
-O replay de migrations recria dados locais e exige a opção de consentimento
-documentada em [Testes](docs/TESTING.md). Substitua CAMINHO_DO_BACKUP pelo caminho
-real impresso pelo helper de backup. Nunca execute a suíte no remoto.
-
-A auditoria atual validou a cadeia 35 limpa/legada, seis suítes SQL, seis testes
-HTTP/Auth e 69 unitários. O CI publicado aprovou Windows/Linux e os 32 casos E2E
-em rodada única. Consulte o [PR #1][consolidation-pr] para integração e checks.
-Consulte o [relatório](docs/audits/2026-10-21/FINAL_REPORT.md) para o escopo de
-Windows/Linux, preservação dos dados e homologações externas pendentes.
-
-## Documentação
-
-- [Arquitetura](docs/ARCHITECTURE.md): módulos e fluxos reais.
-- [Banco](docs/DATABASE.md): catálogo, migrations e integridade.
-- [Segurança](docs/SECURITY.md): matriz de autorização e LGPD.
-- [Operação](docs/OPERATIONS.md): jornadas administrativas e operacionais.
-- [APIs](docs/API.md): contratos e erros.
-- [Implantação](docs/DEPLOYMENT.md): configuração e aplicação revisada.
-- [Notificações e IA](docs/WHATSAPP_AI.md): integração e limites externos.
-- [Auditoria](docs/AUDIT.md): evidências, rastreabilidade e pendências.
-
-A [continuação de 21/10](docs/audits/2026-10-21/README.md) registra a autorização
-para atualizar os bancos local/remoto e publicar o trabalho em blocos lógicos,
-com PR e merge condicionados às verificações. Consulte o
-[estado verificável](docs/PROJECT_STATUS.md) antes de assumir implantação.
-
-[consolidation-pr]: https://github.com/RMZZFAJ/home-care-assistant/pull/1
+Mudança funcional autorizada usa os gates de contratos, lint, Markdown, tipos,
+unitários/build e, conforme contrato, banco/Auth/E2E pelo runner local. Os
+comandos e marcos estão no guia de testes; não há afirmação de CI verde atual
+baseada em PR antigo. Nesta C, verificações são documentais e de preservação;
+não se repetem suítes funcionais por alteração editorial. Deploy, migrations
+remotas, envio, PR e merge dependem de autorização específica, nunca de relato
+histórico.

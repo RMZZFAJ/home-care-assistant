@@ -1,5 +1,10 @@
 # Escalas de plantão
 
+Guia da base funcional auditada e de seus contratos requeridos. Os desvios
+A/B e as mudanças futuras C não foram corrigidos por este documento.
+Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
+[projeto C3](../audits/C/C3-functional-specification/README.md).
+
 A agenda representa a programação prevista, sem controle de presença.
 Tipos, séries, ocorrências, propostas e eventos são persistentes por paciente.
 Séries têm validade explícita de até 366 dias e são materializadas integralmente,

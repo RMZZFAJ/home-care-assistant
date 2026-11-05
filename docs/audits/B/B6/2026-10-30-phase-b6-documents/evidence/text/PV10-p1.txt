@@ -1,0 +1,40 @@
+HCA
+HOME CARE ASSISTANT
+GESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL
+COMPRA DE INSUMOS DA FAMÍLIA
+COM-0001 · 27/10/2026, 23:30 · Cancelado
+1
+ITENS REGISTRADOS
+3
+VERSÃO
+COM
+OPERAÇÃO
+EM ANDAMENTO
+SITUAÇÃO
+IDENTIFICAÇÃO E RESPONSÁVEIS
+PACIENTE
+Paciente fictício B6
+RESPONSÁVEL
+Emissora fictícia B6
+NÚMERO DO DOCUMENTO
+COM-0001
+PROTOCOLO
+COM-20261030-B6000000-B6000001-1-12345678
+REGISTRO PROFISSIONAL
+Não informado
+SITUAÇÃO
+Cancelado
+RELAÇÃO DOS MATERIAIS DECLARADOS
+Nº
+MATERIAL
+PROPOSTO
+UNIDADE
+01
+Material fictício B6
+10
+unidade
+Observação: Dados exclusivamente fictícios para auditoria B6.
+Aquisição e recebimento abastecem o estoque familiar após validação. Doações não exigem comprovante de pagamento. Somente
+ENT recebida pode atender a equipe.
+COM-0001 · v3 · Conteúdo autorizado
+Página 1 de 2

@@ -1,0 +1,484 @@
+{
+  "group": "B3.3",
+  "startedAt": "2026-10-30T00:57:47.526Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B33-01",
+      "purpose": "Dois pacientes e profissional compartilhado, com contexto explícito",
+      "recordedAt": "2026-10-30T00:57:47.545Z",
+      "observed": {
+        "twoPatients": true,
+        "sharedMemberships": 2,
+        "crossContextDenied": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "stock_overview: stock permission required"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-02",
+      "purpose": "Matriz de papéis reais e capacidades, sem metadata autoritativa",
+      "recordedAt": "2026-10-30T00:57:48.965Z",
+      "observed": [
+        {
+          "actor": "admin",
+          "patient": "A",
+          "visible": 1,
+          "capabilities": {
+            "bal.read": true,
+            "com.read": true,
+            "ent.read": true,
+            "req.read": true,
+            "bal.count": true,
+            "audit.read": true,
+            "com.create": true,
+            "ent.cancel": true,
+            "ent.create": true,
+            "req.create": true,
+            "req.review": true,
+            "com.approve": true,
+            "com.receive": true,
+            "ent.receive": true,
+            "req.archive": true,
+            "req.science": true,
+            "com.purchase": true,
+            "com.validate": true,
+            "access.manage": true,
+            "catalog.manage": true,
+            "stock.team.read": true,
+            "req.family_stock": true,
+            "schedule.propose": false,
+            "bal.defer.approve": true,
+            "bal.defer.request": false,
+            "schedule.read.own": false,
+            "stock.family.read": true,
+            "bal.approve.family": true,
+            "consumption.report": true,
+            "schedule.read.team": true,
+            "bal.schedule.manage": true,
+            "consumption.confirm": true,
+            "schedule.manage.own": false,
+            "stock.family.manage": true,
+            "notifications.manage": true,
+            "schedule.manage.team": true,
+            "schedule.types.manage": true,
+            "bal.approve.supervisor": false
+          }
+        },
+        {
+          "actor": "family",
+          "patient": "A",
+          "visible": 1,
+          "capabilities": {
+            "bal.read": true,
+            "com.read": true,
+            "ent.read": true,
+            "req.read": true,
+            "bal.count": false,
+            "audit.read": false,
+            "com.create": true,
+            "ent.cancel": false,
+            "ent.create": true,
+            "req.create": false,
+            "req.review": false,
+            "com.approve": false,
+            "com.receive": true,
+            "ent.receive": true,
+            "req.archive": false,
+            "req.science": true,
+            "com.purchase": true,
+            "com.validate": false,
+            "access.manage": false,
+            "catalog.manage": false,
+            "stock.team.read": true,
+            "req.family_stock": false,
+            "schedule.propose": false,
+            "bal.defer.approve": true,
+            "bal.defer.request": false,
+            "schedule.read.own": false,
+            "stock.family.read": true,
+            "bal.approve.family": true,
+            "consumption.report": true,
+            "schedule.read.team": true,
+            "bal.schedule.manage": true,
+            "consumption.confirm": false,
+            "schedule.manage.own": false,
+            "stock.family.manage": false,
+            "notifications.manage": false,
+            "schedule.manage.team": true,
+            "schedule.types.manage": true,
+            "bal.approve.supervisor": false
+          }
+        },
+        {
+          "actor": "supervisor",
+          "patient": "A",
+          "visible": 1,
+          "capabilities": {
+            "bal.read": true,
+            "com.read": false,
+            "ent.read": true,
+            "req.read": true,
+            "bal.count": true,
+            "audit.read": false,
+            "com.create": false,
+            "ent.cancel": false,
+            "ent.create": false,
+            "req.create": true,
+            "req.review": true,
+            "com.approve": false,
+            "com.receive": false,
+            "ent.receive": true,
+            "req.archive": false,
+            "req.science": false,
+            "com.purchase": false,
+            "com.validate": false,
+            "access.manage": false,
+            "catalog.manage": false,
+            "stock.team.read": true,
+            "req.family_stock": true,
+            "schedule.propose": true,
+            "bal.defer.approve": false,
+            "bal.defer.request": true,
+            "schedule.read.own": true,
+            "stock.family.read": false,
+            "bal.approve.family": false,
+            "consumption.report": true,
+            "schedule.read.team": true,
+            "bal.schedule.manage": false,
+            "consumption.confirm": true,
+            "schedule.manage.own": false,
+            "stock.family.manage": false,
+            "notifications.manage": false,
+            "schedule.manage.team": true,
+            "schedule.types.manage": true,
+            "bal.approve.supervisor": true
+          }
+        },
+        {
+          "actor": "professional",
+          "patient": "A",
+          "visible": 1,
+          "capabilities": {
+            "bal.read": true,
+            "com.read": false,
+            "ent.read": true,
+            "req.read": true,
+            "bal.count": true,
+            "audit.read": false,
+            "com.create": false,
+            "ent.cancel": false,
+            "ent.create": false,
+            "req.create": true,
+            "req.review": false,
+            "com.approve": false,
+            "com.receive": false,
+            "ent.receive": true,
+            "req.archive": false,
+            "req.science": false,
+            "com.purchase": false,
+            "com.validate": false,
+            "access.manage": false,
+            "catalog.manage": false,
+            "stock.team.read": true,
+            "req.family_stock": true,
+            "schedule.propose": true,
+            "bal.defer.approve": false,
+            "bal.defer.request": true,
+            "schedule.read.own": true,
+            "stock.family.read": false,
+            "bal.approve.family": false,
+            "consumption.report": true,
+            "schedule.read.team": false,
+            "bal.schedule.manage": false,
+            "consumption.confirm": false,
+            "schedule.manage.own": false,
+            "stock.family.manage": false,
+            "notifications.manage": false,
+            "schedule.manage.team": false,
+            "schedule.types.manage": false,
+            "bal.approve.supervisor": false
+          }
+        },
+        {
+          "actor": "reader",
+          "patient": "A",
+          "visible": 1,
+          "capabilities": {
+            "bal.read": true,
+            "com.read": false,
+            "ent.read": true,
+            "req.read": true,
+            "bal.count": false,
+            "audit.read": false,
+            "com.create": false,
+            "ent.cancel": false,
+            "ent.create": false,
+            "req.create": false,
+            "req.review": false,
+            "com.approve": false,
+            "com.receive": false,
+            "ent.receive": false,
+            "req.archive": false,
+            "req.science": false,
+            "com.purchase": false,
+            "com.validate": false,
+            "access.manage": false,
+            "catalog.manage": false,
+            "stock.team.read": true,
+            "req.family_stock": false,
+            "schedule.propose": false,
+            "bal.defer.approve": false,
+            "bal.defer.request": false,
+            "schedule.read.own": false,
+            "stock.family.read": false,
+            "bal.approve.family": false,
+            "consumption.report": false,
+            "schedule.read.team": true,
+            "bal.schedule.manage": false,
+            "consumption.confirm": false,
+            "schedule.manage.own": false,
+            "stock.family.manage": false,
+            "notifications.manage": false,
+            "schedule.manage.team": false,
+            "schedule.types.manage": false,
+            "bal.approve.supervisor": false
+          }
+        },
+        {
+          "actor": "shared",
+          "patient": "A",
+          "visible": 1,
+          "capabilities": {
+            "bal.read": true,
+            "com.read": false,
+            "ent.read": true,
+            "req.read": true,
+            "bal.count": true,
+            "audit.read": false,
+            "com.create": false,
+            "ent.cancel": false,
+            "ent.create": false,
+            "req.create": true,
+            "req.review": false,
+            "com.approve": false,
+            "com.receive": false,
+            "ent.receive": true,
+            "req.archive": false,
+            "req.science": false,
+            "com.purchase": false,
+            "com.validate": false,
+            "access.manage": false,
+            "catalog.manage": false,
+            "stock.team.read": true,
+            "req.family_stock": true,
+            "schedule.propose": true,
+            "bal.defer.approve": false,
+            "bal.defer.request": true,
+            "schedule.read.own": true,
+            "stock.family.read": false,
+            "bal.approve.family": false,
+            "consumption.report": true,
+            "schedule.read.team": false,
+            "bal.schedule.manage": false,
+            "consumption.confirm": false,
+            "schedule.manage.own": false,
+            "stock.family.manage": false,
+            "notifications.manage": false,
+            "schedule.manage.team": false,
+            "schedule.types.manage": false,
+            "bal.approve.supervisor": false
+          }
+        }
+      ],
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-03",
+      "purpose": "Cada papel sem vínculo com B não lê REQ/documento/estoque de B",
+      "recordedAt": "2026-10-30T00:57:49.499Z",
+      "observed": {
+        "foreignReadAuthorized": true,
+        "denials": [
+          {
+            "actor": "admin",
+            "tableRows": 0,
+            "rpc": {
+              "rejected": true,
+              "sqlstate": "42501",
+              "message": "stock_overview: stock permission required"
+            }
+          },
+          {
+            "actor": "family",
+            "tableRows": 0,
+            "rpc": {
+              "rejected": true,
+              "sqlstate": "42501",
+              "message": "stock_overview: stock permission required"
+            }
+          },
+          {
+            "actor": "supervisor",
+            "tableRows": 0,
+            "rpc": {
+              "rejected": true,
+              "sqlstate": "42501",
+              "message": "stock_overview: stock permission required"
+            }
+          },
+          {
+            "actor": "professional",
+            "tableRows": 0,
+            "rpc": {
+              "rejected": true,
+              "sqlstate": "42501",
+              "message": "stock_overview: stock permission required"
+            }
+          },
+          {
+            "actor": "reader",
+            "tableRows": 0,
+            "rpc": {
+              "rejected": true,
+              "sqlstate": "42501",
+              "message": "stock_overview: stock permission required"
+            }
+          }
+        ]
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-04",
+      "purpose": "Escalada por metadata controlável e DML direto é recusada",
+      "recordedAt": "2026-10-30T00:57:49.652Z",
+      "observed": {
+        "metadataUpdated": true,
+        "databaseProfile": "professional:false",
+        "operationalDenied": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "family_stock_movement: required permission: stock.family.manage"
+        },
+        "directUpdateDenied": "42501"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-05",
+      "purpose": "Anon só alcança os dois contratos deliberadamente mínimos",
+      "recordedAt": "2026-10-30T00:57:49.885Z",
+      "observed": {
+        "tableDenied": "42501",
+        "verify": false,
+        "invalidInvitationAllowed": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-06",
+      "purpose": "Leitor e profissional não recebem autoridade de administração",
+      "recordedAt": "2026-10-30T00:57:49.928Z",
+      "observed": [
+        {
+          "actor": "reader",
+          "result": {
+            "rejected": true,
+            "sqlstate": "42501",
+            "message": "admin_upsert_recipient_product: catalogue admin authorization required"
+          }
+        },
+        {
+          "actor": "professional",
+          "result": {
+            "rejected": true,
+            "sqlstate": "42501",
+            "message": "admin_upsert_recipient_product: catalogue admin authorization required"
+          }
+        },
+        {
+          "actor": "family",
+          "result": {
+            "rejected": true,
+            "sqlstate": "42501",
+            "message": "admin_upsert_recipient_product: catalogue admin authorization required"
+          }
+        }
+      ],
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-07",
+      "purpose": "Revogação local vale para token já emitido e preserva outro paciente",
+      "recordedAt": "2026-10-30T00:57:49.993Z",
+      "observed": {
+        "oldTokenRowsA": 0,
+        "oldTokenDeniedA": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "stock_overview: stock permission required"
+        },
+        "otherPatientAuthorized": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-08",
+      "purpose": "JWT ainda criptograficamente válido não restaura sessão encerrada",
+      "recordedAt": "2026-10-30T00:57:50.063Z",
+      "observed": {
+        "previousTokenSessionValid": false,
+        "workspaceDenied": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "my_workspace: active Auth session required"
+        },
+        "noTokenExported": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-09",
+      "purpose": "Global sem vínculo não opera sobre residência B3",
+      "recordedAt": "2026-10-30T00:57:50.590Z",
+      "observed": {
+        "operational": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "stock_overview: stock permission required"
+        },
+        "selectContext": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "select_active_context: active patient membership required"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B33-10",
+      "purpose": "Cliente service_role sem grant não altera ledger ou paciente",
+      "recordedAt": "2026-10-30T00:57:50.709Z",
+      "observed": {
+        "ledger": "42501",
+        "patient": "42501"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T00:57:50.738Z"
+}

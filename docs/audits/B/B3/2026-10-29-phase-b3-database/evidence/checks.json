@@ -1,0 +1,137 @@
+{
+  "node": "24.22.0",
+  "npm": "11.21.1",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "checks": [
+    {
+      "command": "npm run check:contracts",
+      "startedAt": "2026-10-30T05:35:22.219Z",
+      "finishedAt": "2026-10-30T05:35:24.923Z",
+      "exitCode": 0,
+      "log": "check-contracts-current.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint",
+      "startedAt": "2026-10-30T05:35:24.924Z",
+      "finishedAt": "2026-10-30T05:35:46.507Z",
+      "exitCode": 1,
+      "log": "lint-attempt-1.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint",
+      "startedAt": "2026-10-30T05:37:33.141Z",
+      "finishedAt": "2026-10-30T05:37:45.936Z",
+      "exitCode": 0,
+      "log": "lint-attempt-2.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run typecheck",
+      "startedAt": "2026-10-30T05:37:45.937Z",
+      "finishedAt": "2026-10-30T05:37:48.249Z",
+      "exitCode": 0,
+      "log": "typecheck-current.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run test",
+      "startedAt": "2026-10-30T05:37:48.250Z",
+      "finishedAt": "2026-10-30T05:37:51.607Z",
+      "exitCode": 0,
+      "log": "test-current.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "https://care.example"
+    },
+    {
+      "command": "npm run build",
+      "startedAt": "2026-10-30T05:37:51.608Z",
+      "finishedAt": "2026-10-30T05:38:02.992Z",
+      "exitCode": 0,
+      "log": "build-current.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint:markdown",
+      "startedAt": "2026-10-30T06:06:43.978Z",
+      "finishedAt": "2026-10-30T06:06:47.817Z",
+      "exitCode": 1,
+      "log": "lint-markdown-attempt-1.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint",
+      "startedAt": "2026-10-30T06:06:47.819Z",
+      "finishedAt": "2026-10-30T06:07:08.339Z",
+      "exitCode": 1,
+      "log": "lint-attempt-3.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint:markdown",
+      "startedAt": "2026-10-30T06:11:27.747Z",
+      "finishedAt": "2026-10-30T06:11:30.067Z",
+      "exitCode": 1,
+      "log": "lint-markdown-attempt-2.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint",
+      "startedAt": "2026-10-30T06:11:30.070Z",
+      "finishedAt": "2026-10-30T06:11:46.070Z",
+      "exitCode": 0,
+      "log": "lint-attempt-4.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint:markdown",
+      "startedAt": "2026-10-30T06:13:07.262Z",
+      "finishedAt": "2026-10-30T06:13:09.706Z",
+      "exitCode": 0,
+      "log": "lint-markdown-attempt-3.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint",
+      "startedAt": "2026-10-30T06:19:54.695Z",
+      "finishedAt": "2026-10-30T06:20:14.269Z",
+      "exitCode": 0,
+      "log": "lint-current.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    },
+    {
+      "command": "npm run lint:markdown",
+      "startedAt": "2026-10-30T06:20:14.275Z",
+      "finishedAt": "2026-10-30T06:20:16.637Z",
+      "exitCode": 0,
+      "log": "lint-markdown-current.log",
+      "externalSending": false,
+      "localBackend": "127.0.0.1:54321",
+      "appOrigin": "http://127.0.0.1:3100"
+    }
+  ]
+}

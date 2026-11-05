@@ -1,0 +1,25 @@
+{
+  "recordedAt": "2026-10-30T07:31:42.199Z",
+  "category": "REAL_BROWSER_LOCAL_HTTP_AUTH_AND_REVISION",
+  "results": [
+    {
+      "id": "B412-01",
+      "contract": "Confirmed invalidation should reload consumption read model without changing permissions or patient",
+      "backendRevisionAdvanced": true,
+      "reportId": "1f8f0faf-f609-4950-9497-53994e8b5bd0",
+      "afterSignal": {
+        "additionalContextReads": 2,
+        "additionalConsumptionReads": 0,
+        "newReportVisible": 0
+      },
+      "afterFullReload": {
+        "newReportVisible": true,
+        "consumptionReads": 2
+      },
+      "externalRequestsBlocked": 0,
+      "cause": "WorkspaceProvider reuses equal patient row;Reports effect depends on context.patient and attempt;no useLiveRevision",
+      "counterproof": "Manual page reload fetches and displays the persisted report;backend revision did advance",
+      "limits": "One Chromium local diagnostic with explicit hca:data-changed injection;not proof of provider/Reatime event delivery or human acceptance. No screenshot/trace/cookies exported."
+    }
+  ]
+}

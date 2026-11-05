@@ -1,0 +1,1847 @@
+# ORDEM MESTRE — FASE B3
+## AUDITORIA ESPECIALIZADA DE BANCO DE DADOS, AUTORIZAÇÃO, INTEGRIDADE, CONSISTÊNCIA TRANSACIONAL E CONFIABILIDADE OPERACIONAL
+
+**Projeto:** Home Care Assistant
+**Repositório:** `RMZZFAJ/home-care-assistant`
+**Branch única da Fase B:** `audit/phase-b`
+**Natureza da execução:** investigação especializada, sem implementação
+**Modelo destinatário:** Codex Sol
+**Etapa autorizada:** B3.0 a B3.12, seguida de consolidação documental
+
+---
+
+# I. INSTAURAÇÃO E FINALIDADE
+
+Você está autorizado a executar integralmente o **Grupo B3 — Banco de Dados, Segurança e Integridade Transacional**, pertencente à Fase B do projeto Home Care Assistant.
+
+A metodologia de desenvolvimento estabelecida pelo responsável é:
+
+**FASE A — Auditoria holística**
+
+**FASE B — Auditorias especializadas**
+
+**FASE C — Consolidação, análise de alternativas e decisões**
+
+**FASE D — Implementação das mudanças aprovadas**
+
+A Fase A foi concluída.
+
+O Grupo B1 — Interface, Experiência Humana e Interação — foi concluído.
+
+O Grupo B2 — Processos, Jornadas Operacionais e Funcionalidades — foi concluído.
+
+**Esta autorização abrange exclusivamente o Grupo B3.**
+
+Sua missão é realizar uma auditoria profundamente técnica, abrangente, crítica, adversarial e verificável da camada de dados do Home Care Assistant.
+
+O objetivo não é apenas descobrir erros de SQL.
+
+É determinar se a estrutura de persistência e suas operações oferecem garantias suficientes de:
+
+1. Integridade dos dados.
+2. Isolamento entre pacientes e residências.
+3. Autorização efetiva.
+4. Consistência das regras de negócio.
+5. Atomicidade das operações.
+6. Rastreabilidade e preservação histórica.
+7. Tratamento de concorrência.
+8. Idempotência.
+9. Recuperação após falhas.
+10. Evolução segura do esquema.
+11. Confiabilidade das tarefas automáticas.
+12. Eficiência e escalabilidade proporcionais.
+13. Compatibilidade entre banco, backend e aplicação.
+14. Continuidade operacional.
+15. Proteção contra estados contraditórios ou impossíveis.
+
+A auditoria deverá investigar tanto as garantias existentes quanto as garantias que estão ausentes, incompletas, inconsistentes ou implementadas na camada errada.
+
+**Não confunda funcionamento aparente com integridade demonstrada.**
+
+Uma operação poderá apresentar sucesso na interface e ainda produzir um resultado incorreto.
+
+Poderá também retornar erro, mas ter persistido corretamente.
+
+Uma autorização poderá ser respeitada pela interface e desrespeitada por uma função de banco.
+
+Uma transação poderá preservar atomicidade, mas impedir indefinidamente a conclusão de um processo legítimo.
+
+Uma função poderá funcionar isoladamente e falhar quando executada simultaneamente por duas pessoas.
+
+Uma automação poderá registrar execução bem-sucedida sem processar todas as tarefas elegíveis.
+
+Essas distinções deverão orientar toda a investigação.
+
+---
+
+# II. AUTORIDADE, REPOSITÓRIO E PRESERVAÇÃO
+
+## II.1. Branch obrigatória
+
+Trabalhe exclusivamente na branch:
+
+`audit/phase-b`
+
+**Não crie branches adicionais.**
+
+Não abra pull requests.
+
+Não realize merge.
+
+Não modifique a `master`.
+
+Não execute rebase, force push, reset destrutivo ou operações de limpeza que comprometam o histórico existente.
+
+O último estado conhecido, que deverá ser verificado novamente, é:
+
+**HEAD da Fase B:**
+
+`896590e9c3020d4759d22fb9df730c446249d133`
+
+**Master:**
+
+`34dcb835c5c49068e0417f7306eb4e501aa868bc`
+
+**Base funcional das auditorias anteriores:**
+
+`37cb7f85e96e551d6419871f94dd950712e2565b`
+
+Essas referências não devem ser presumidas como atuais sem verificação.
+
+Confira:
+
+- Branch ativa.
+- HEAD.
+- Working tree.
+- Arquivos modificados.
+- Commits posteriores.
+- Estado das migrations.
+- Ambiente local.
+- Diferenças entre o produto funcional e os commits documentais.
+
+Preserve integralmente os resultados anteriores.
+
+## II.2. Localização da B3
+
+Organize toda a investigação em:
+
+`docs/audits/2026-10-29-phase-b3-database/`
+
+Atualize o índice geral:
+
+`docs/audits/phase-b/README.md`
+
+Somente documentos, evidências e ferramentas auxiliares da auditoria poderão ser adicionados ou modificados.
+
+Scripts auxiliares de reprodução deverão permanecer dentro da pasta B3.
+
+Não modifique arquivos funcionais do sistema para executar ou facilitar a investigação.
+
+## II.3. Commits
+
+Registre checkpoints persistentes.
+
+Ao final, realize commit exclusivamente documental na branch `audit/phase-b`.
+
+Publique o commit na mesma branch remota, desde que a validação de preservação esteja aprovada.
+
+Não abra PR.
+
+Não realize merge.
+
+Não altere a branch principal.
+
+Se houver alterações preexistentes não relacionadas, preserve-as e não as inclua no commit.
+
+---
+
+# III. LIMITES ABSOLUTOS DA AUTORIZAÇÃO
+
+Esta fase é exclusivamente investigativa.
+
+**É proibido:**
+
+- Implementar correções.
+- Editar migrations históricas.
+- Criar migrations corretivas no produto.
+- Modificar políticas RLS.
+- Alterar grants.
+- Alterar funções de produção.
+- Alterar triggers.
+- Alterar tabelas, índices ou constraints do produto.
+- Alterar configurações remotas.
+- Executar deploy.
+- Aplicar migrations no ambiente remoto.
+- Fazer reset do banco existente.
+- Executar seed substitutiva.
+- Limpar dados anteriores.
+- Excluir pacientes, usuários, documentos ou movimentos reais.
+- Executar testes mutáveis contra produção.
+- Enviar mensagens reais.
+- Modificar buckets remotos.
+- Expor credenciais ou dados sensíveis.
+- Executar operações destrutivas apenas para obter evidências.
+
+A investigação deverá dar preferência a consultas de metadados, leitura estática, inspeção dos contratos e testes locais controlados.
+
+## III.1. Segurança dos testes
+
+Antes de qualquer teste capaz de modificar dados, confirme:
+
+1. Identidade do projeto.
+2. Identidade do banco.
+3. Ambiente de execução.
+4. Host e portas.
+5. Containers.
+6. Branch.
+7. Estado dos serviços.
+8. Existência de dados anteriores.
+9. Isolamento em relação ao remoto.
+10. Possibilidade de recuperar o ambiente.
+
+A configuração local historicamente utilizada possui:
+
+- API Supabase: `127.0.0.1:54321`
+- PostgreSQL: `127.0.0.1:54322`
+- Projeto: `home-care-assistant`
+
+Essas informações são referências históricas, não autorização para confiar automaticamente no destino.
+
+Utilize os mecanismos de proteção do próprio repositório.
+
+Quando necessário, crie dados sintéticos novos e identificáveis, sem substituir os existentes.
+
+Utilize transações com rollback para ensaios apropriados.
+
+Entretanto, **não presuma que um rollback desfaça efeitos externos**, como chamadas HTTP, mensagens ou alterações em serviços externos.
+
+Se não for possível garantir isolamento e ausência de efeitos externos, não execute o cenário mutável.
+
+Registre `NOT_VERIFIED` e explique a limitação.
+
+## III.2. Migrations e instalação limpa
+
+A investigação deverá avaliar a cadeia completa de migrations.
+
+Caso seja necessário testar uma instalação limpa ou evolução histórica, utilize somente ambiente descartável, inequivocamente isolado e seguro, sem acesso a dados reais ou serviços externos.
+
+Não recrie ou substitua a stack existente apenas por conveniência.
+
+Se não houver condições seguras para um replay, faça análise estática e registre a execução como pendente.
+
+Nunca execute reset ou replay destrutivo na base operacional existente.
+
+## III.3. Privacidade
+
+O repositório foi anteriormente identificado como público.
+
+Nenhum artefato poderá conter:
+
+- Senhas.
+- Chaves secretas.
+- Tokens.
+- Cookies de sessão.
+- JWTs reutilizáveis.
+- Dumps contendo dados identificáveis.
+- Informações médicas de pacientes reais.
+- Dados pessoais identificáveis.
+- URLs assinadas ativas.
+- Segredos de integração.
+- Conteúdo privado de configurações locais.
+
+Não reproduza nos relatórios os dados pessoais eventualmente presentes nos documentos históricos.
+
+Use exclusivamente identidades e dados sintéticos.
+
+---
+
+# IV. DOCUMENTAÇÃO OBRIGATÓRIA DE REFERÊNCIA
+
+Antes de iniciar os subgrupos, leia e compreenda as instruções do projeto, incluindo `AGENTS.md`.
+
+Consulte a documentação da Fase A:
+
+`docs/audits/2026-10-25-production-readiness/`
+
+Especialmente:
+
+- `README.md`
+- `EXECUTIVE_READINESS.md`
+- `DATABASE_AUTH_SECURITY.md`
+- `DATABASE_RESET_SEED_AND_GO_LIVE.md`
+- `ARCHITECTURE_AND_BACKEND.md`
+- `AUTOMATION_INTEGRATIONS_RELIABILITY.md`
+- `FINDINGS_MASTER.md`
+- `HOMOLOGATION_AND_ACCEPTANCE.md`
+- `PHASE_B_HANDOFF.md`
+
+Consulte a documentação da Fase B1:
+
+`docs/audits/2026-10-28-phase-b1-interface/`
+
+Especialmente:
+
+- Relatório executivo.
+- Achados consolidados.
+- Erros e recuperação.
+- Estados de carregamento.
+- Dependências com outros grupos.
+- Critérios futuros de aceitação.
+
+Consulte a documentação da Fase B2:
+
+`docs/audits/2026-10-29-phase-b2-processes/`
+
+Especialmente:
+
+- `README.md`
+- `CHECKPOINT.md`
+- `01_PROCESS_INVENTORY.csv`
+- `02_PROCESS_TRANSITIONS.csv`
+- `10_CROSS_PROCESS_EXCEPTIONS.md`
+- `13_FINDINGS_MASTER.md`
+- `14_ACCEPTANCE_SCENARIOS.md`
+- `15_CROSS_GROUP_DEPENDENCIES.md`
+- `16_GROUP_B2_EXECUTIVE_ASSESSMENT.md`
+- `17_PHASE_C_DECISION_HANDOFF.md`
+
+Utilize também os contratos SQL documentais e os resultados dos cenários locais da B2.
+
+## IV.1. Interpretação das auditorias anteriores
+
+Os resultados anteriores são referências obrigatórias, mas não substituem uma investigação independente.
+
+A Fase A identificou 84 migrations e uma estrutura com tabelas públicas e privadas.
+
+Esses números devem ser novamente verificados no estado atual.
+
+A Fase A executou anteriormente regressões SQL e integrações.
+
+A B2 executou 81 cenários locais.
+
+**Não considere esses testes suficientes para aprovar automaticamente os contratos de banco.**
+
+Não apresente as conclusões anteriores como novos achados da B3.
+
+Procure causas adicionais, outras manifestações, exceções não exercitadas e problemas ainda desconhecidos.
+
+---
+
+# V. METODOLOGIA GERAL
+
+A auditoria deverá seguir uma abordagem de múltiplas camadas.
+
+## V.1. Reconstrução da autoridade real
+
+Para cada operação relevante, identifique:
+
+**Interface → API → validação → sessão/autorização → RPC ou consulta → funções e triggers → tabelas → efeitos persistidos → histórico → retorno ao usuário.**
+
+Determine em qual camada cada garantia está implementada.
+
+Verifique se a regra é:
+
+- Apenas visual.
+- Validada no backend.
+- Imposta pelo banco.
+- Imposta em múltiplas camadas.
+- Inexistente.
+- Parcial.
+- Dependente de determinada configuração.
+- Inconsistente entre caminhos equivalentes.
+
+Uma verificação presente no formulário não é equivalente a uma restrição efetiva no banco.
+
+## V.2. Inspeção semântica
+
+Não utilize somente buscas textuais por palavras-chave.
+
+Leia integralmente as definições relevantes.
+
+Examine:
+
+- Condições.
+- Ramos.
+- Loops.
+- Tratamento de exceções.
+- Locks.
+- Ordem das operações.
+- Transações.
+- Constraints.
+- Triggers.
+- Dependências.
+- Valores padrão.
+- Estados terminais.
+- Casos nulos.
+- Operações concorrentes.
+
+Verifique o comportamento do contrato vigente, e não apenas o conteúdo de uma migration antiga.
+
+## V.3. Prova dinâmica
+
+Quando seguro, realize testes locais com:
+
+- Identidades Auth reais do ambiente de teste.
+- Pacientes fictícios distintos.
+- Perfis com capacidades diferentes.
+- Dados sintéticos.
+- Operações pela API.
+- Operações por RPC autorizadas.
+- Verificação independente da persistência.
+
+Compare o resultado apresentado ao usuário com o estado efetivo do banco.
+
+## V.4. Testes negativos
+
+Procure operações que devem ser recusadas.
+
+Exemplos:
+
+- Usuário sem vínculo tenta acessar outro paciente.
+- Profissional tenta executar ação administrativa.
+- Administrador global tenta operar sem vínculo local.
+- Contador tenta aprovar sua própria contagem quando a política exige independência.
+- Documento é alterado com versão antiga.
+- Correção compensatória é enviada sem referência.
+- Operação tenta afetar estoque pertencente a outra custódia.
+- Transição tenta reabrir estado terminal indevidamente.
+
+Esses testes devem verificar a proteção efetiva, não apenas a ausência de botão.
+
+## V.5. Concorrência
+
+Examine o comportamento de operações simultâneas.
+
+Duas operações individualmente válidas podem ser incompatíveis quando executadas juntas.
+
+Investigue:
+
+- Locks.
+- Ordem de aquisição dos locks.
+- Deadlocks.
+- Controle de versões.
+- Idempotência.
+- Duplicação de eventos.
+- Atualizações perdidas.
+- Leitura de estado obsoleto.
+- Transações parcialmente concluídas.
+- Repetição após timeout.
+- Resposta perdida depois de commit.
+
+## V.6. Contraditório
+
+Para cada conclusão relevante:
+
+1. Formule uma hipótese inicial.
+2. Procure evidências que possam refutá-la.
+3. Examine caminhos alternativos.
+4. Considere migrations posteriores.
+5. Verifique controles compensatórios.
+6. Teste a hipótese quando seguro.
+7. Restrinja a conclusão ao comportamento demonstrado.
+
+Não classifique como vulnerabilidade uma função pública que foi deliberadamente projetada para acesso público limitado e possui controles efetivos.
+
+Não classifique como falha de RLS uma tabela sem RLS que não possui privilégios de acesso para os papéis expostos, sem examinar outras rotas de acesso.
+
+Não generalize um defeito de um regime operacional para todos os regimes sem evidência.
+
+---
+
+# VI. B3.0 — RECONHECIMENTO E BASELINE
+
+Antes dos subgrupos, execute o reconhecimento.
+
+Registre:
+
+- Estado do Git.
+- SHA funcional.
+- Migrations existentes.
+- Versão local do PostgreSQL.
+- Versão do Supabase CLI.
+- Configuração local relevante.
+- Schemas existentes.
+- Extensões.
+- Tabelas.
+- Views.
+- Materialized views, se existentes.
+- Funções.
+- Procedures.
+- Triggers.
+- Policies.
+- Roles.
+- Grants.
+- Índices.
+- Constraints.
+- Jobs.
+- Buckets e políticas pertinentes.
+- Ambiente de autenticação.
+- Testes e ferramentas existentes.
+
+Identifique diferenças entre:
+
+**Código versionado.**
+
+**Esquema reconstruído pelas migrations.**
+
+**Estado efetivamente instalado no banco local.**
+
+**Configurações externas, quando somente documentadas.**
+
+Não presuma que esses quatro elementos sejam idênticos.
+
+Crie o baseline documental da B3.
+
+---
+
+# VII. SUBGRUPOS OBRIGATÓRIOS
+
+Execute B3.1 a B3.12 sequencialmente.
+
+Cada subgrupo deve terminar com documentação preenchida, evidências e checkpoint.
+
+## B3.1 — INVENTÁRIO INTEGRAL DO MODELO DE DADOS
+
+Reconstrua a estrutura completa do banco.
+
+Examine todas as tabelas relevantes, incluindo schemas públicos e privados.
+
+Para cada objeto, documente:
+
+- Nome.
+- Schema.
+- Finalidade.
+- Proprietário.
+- Colunas.
+- Tipos.
+- Valores padrão.
+- Nullable.
+- Chaves primárias.
+- Chaves estrangeiras.
+- Constraints.
+- Índices.
+- Triggers.
+- Políticas.
+- Dependências.
+- Consumidores.
+- Relações com outros objetos.
+- Dados ou processos que representa.
+
+Procure:
+
+- Relações sem garantia necessária.
+- Referências que admitem inconsistência.
+- Campos redundantes.
+- Estados incompatíveis.
+- Identificadores sem escopo.
+- Duplicações desnecessárias.
+- Dependências circulares.
+- Identidades ambíguas.
+- Constraints que não representam integralmente o domínio.
+
+Reconstrua as relações entre:
+
+- Pacientes.
+- Perfis.
+- Vínculos.
+- Capacidades.
+- Catálogos.
+- Requisições.
+- Compras.
+- Entregas.
+- Estoques.
+- Movimentações.
+- Consumo.
+- Balanços.
+- Escalas.
+- Anexos.
+- Notificações.
+- Histórico.
+
+**Entrega:** inventário canônico de objetos, relações, invariantes e dependências.
+
+---
+
+## B3.2 — MIGRATIONS, EVOLUÇÃO E DRIFT
+
+Examine integralmente a cadeia de migrations.
+
+Diferencie:
+
+- Definições históricas.
+- Alterações posteriores.
+- Objetos substituídos.
+- Objetos revogados.
+- Contratos ainda ativos.
+- Compatibilidade com dados legados.
+
+Verifique:
+
+1. Ordem das migrations.
+2. Dependências.
+3. Reprodutibilidade.
+4. Idempotência onde aplicável.
+5. Evolução de schemas.
+6. Preservação de dados.
+7. Preservação de referências históricas.
+8. Migração de permissões.
+9. Revogação de acessos antigos.
+10. Atualização de funções e triggers.
+11. Compatibilidade com registros anteriores.
+12. Diferenças entre instalação limpa e evolução histórica.
+13. Existência de objetos obsoletos ainda acessíveis.
+14. Alterações silenciosas de semântica.
+15. Incompatibilidades de versão.
+16. Potenciais operações não transacionais.
+17. Dependências de extensões.
+18. Uso de `search_path`.
+19. Ausência de garantias em migrações posteriores.
+20. Possibilidade de drift entre código e banco instalado.
+
+Não classifique um problema histórico como atual sem verificar se foi corrigido posteriormente.
+
+Se houver condições seguras, execute replay em ambiente totalmente isolado.
+
+Caso contrário, documente as verificações estáticas e o limite da prova.
+
+**Entrega:** linha histórica de alterações, contratos finais e riscos de evolução.
+
+---
+
+## B3.3 — RLS, GRANTS, ISOLAMENTO E AUTORIZAÇÃO
+
+Execute uma investigação especializada de segurança de acesso aos dados.
+
+Examine:
+
+- RLS.
+- Policies.
+- Roles.
+- Grants.
+- Privilégios herdados.
+- Privilégios padrão.
+- `PUBLIC`.
+- `anon`.
+- `authenticated`.
+- `service_role`.
+- Roles internas.
+- Owners.
+- Views.
+- Funções privilegiadas.
+- Schemas expostos.
+- Schemas privados.
+- Claims.
+- Sessões.
+- Capacidades por paciente.
+
+Reconstrua a matriz completa:
+
+**Identidade × paciente × vínculo × capacidade × objeto × operação.**
+
+Inclua:
+
+- Usuário não autenticado.
+- Familiar.
+- Administrador local.
+- Administrador global.
+- Supervisor.
+- Profissional.
+- Leitor.
+- Usuário convidado.
+- Usuário desligado.
+- Usuário com vários vínculos.
+
+Verifique operações:
+
+`SELECT`, `INSERT`, `UPDATE`, `DELETE` e `EXECUTE`, quando pertinentes.
+
+Investigue especialmente:
+
+- Acesso cruzado entre pacientes.
+- Alteração de registros de outro paciente.
+- Tentativa de associar identificadores de pacientes diferentes.
+- Escalada de privilégios.
+- Mudanças de vínculo.
+- Revogação de acesso.
+- Sessões antigas.
+- Autorizações derivadas de claims desatualizadas.
+- Uso de metadata controlável pelo usuário.
+- Bypass por views.
+- UPDATE sem condições suficientes de leitura e validação.
+- Políticas que autorizam mais do que o domínio permite.
+- Funções acessíveis diretamente fora da interface.
+
+Diferencie permissões globais das locais.
+
+**Um administrador global não deve receber automaticamente autoridade operacional sobre todos os pacientes.**
+
+Não assuma que a ausência de RLS isoladamente representa exposição.
+
+Considere o conjunto efetivo de grants, policies e caminhos de execução.
+
+**Entrega:** matriz de autorização efetiva, testes negativos e análise de isolamento multipaciente.
+
+---
+
+## B3.4 — FUNÇÕES RPC, SECURITY DEFINER E CONTRATOS PRIVILEGIADOS
+
+Examine todas as funções que representem superfícies relevantes de operação ou autoridade.
+
+Priorize:
+
+- RPCs expostas.
+- Funções `SECURITY DEFINER`.
+- Funções internas utilizadas por operações privilegiadas.
+- Funções de autorização.
+- Funções de estoque.
+- Funções documentais.
+- Funções de escala e BAL.
+- Funções chamadas por workers.
+- Funções acionadas indiretamente por triggers.
+
+Para cada função relevante, registre:
+
+- Finalidade.
+- Assinatura.
+- Schema.
+- Proprietário.
+- Privilégios de execução.
+- Tipo de segurança.
+- `search_path`.
+- Parâmetros.
+- Validações.
+- Contexto Auth.
+- Capacidade exigida.
+- Locks.
+- Efeitos.
+- Eventos.
+- Tratamento de exceção.
+- Contrato de retorno.
+- Chamadores.
+- Possibilidades de repetição.
+- Condições de erro.
+
+Procure:
+
+- Acesso concedido a papéis indevidos.
+- Autoridade assumida por parâmetro do cliente.
+- Identidade derivada de informação manipulável.
+- Referências entre pacientes sem validação.
+- `SECURITY DEFINER` com privilégios superiores aos necessários.
+- Execução pública não intencional.
+- `search_path` inseguro.
+- Dependência de nomes não qualificados.
+- Tratamento de erros excessivamente genérico.
+- Falha silenciosa.
+- Retorno de sucesso sem operação efetiva.
+- Divergência entre backend e função.
+
+Os resultados B2-005, B2-009 e B2-011 devem orientar testes dirigidos, mas não limitar a cobertura.
+
+**Entrega:** catálogo das RPCs, contratos de autoridade, superfícies privilegiadas e inconsistências demonstradas.
+
+---
+
+## B3.5 — LEDGER, ESTOQUE E INTEGRIDADE QUANTITATIVA
+
+Audite profundamente a persistência dos estoques.
+
+Considere as custódias efetivamente existentes, incluindo:
+
+- FAMILY.
+- CARE_TEAM.
+- TRANSIT.
+
+Reconstrua os efeitos de:
+
+- Estoque inicial.
+- Compra.
+- Doação.
+- Recebimento.
+- Expedição.
+- Aceite.
+- Devolução.
+- Consumo confirmado.
+- Balanço.
+- Ajuste.
+- Correção.
+- Cancelamento.
+- Compensação.
+
+Verifique:
+
+1. Conservação das quantidades.
+2. Unidade base.
+3. Precisão decimal.
+4. Conversões.
+5. Arredondamentos.
+6. Valores negativos.
+7. Duplicações.
+8. Referências de origem.
+9. Imutabilidade de movimentos.
+10. Estornos e compensações.
+11. Custódias corretas.
+12. Concorrência.
+13. Idempotência.
+14. Fatos históricos posteriores.
+15. Produtos inativos.
+16. Estoques sem identidade operacional.
+17. Compatibilidade com registros legados.
+
+Analise formalmente os invariantes.
+
+Exemplo:
+
+Uma entrega física não pode ser contabilizada simultaneamente em duas custódias como disponibilidade independente.
+
+Outro exemplo:
+
+A repetição da mesma confirmação não pode criar um segundo débito.
+
+Não proponha reconstruir saldos diretamente pela interface.
+
+Não altere o ledger para reproduzir artificialmente uma correção bem-sucedida.
+
+Investigue em profundidade o B2-005, sobre correção sem referência, e o B2-004, relacionado ao cancelamento com consumo confirmado.
+
+**Entrega:** modelo de conservação de estoque, invariantes, testes quantitativos e falhas demonstradas.
+
+---
+
+## B3.6 — DOCUMENTOS, ESTADOS E INTEGRIDADE DO CICLO DE VIDA
+
+Audite os contratos persistidos de:
+
+- REQ.
+- COM.
+- ENT.
+- BAL.
+- Ciência.
+- Arquivamento.
+- Cancelamento.
+- Revisão.
+- Correção.
+- Histórico.
+
+Reconstrua as máquinas de estado efetivas.
+
+Para cada transição:
+
+- Estado anterior.
+- Operação.
+- Autoridade.
+- Condições.
+- Estado posterior.
+- Mudanças documentais.
+- Mudanças quantitativas.
+- Eventos.
+- Versões.
+- Possibilidade de repetição.
+- Recuperação.
+
+Identifique transições:
+
+- Permitidas.
+- Proibidas.
+- Condicionais.
+- Ausentes.
+- Contraditórias.
+- Parcialmente implementadas.
+
+Investigue:
+
+- Documentos encerrados posteriormente modificados.
+- Cancelamentos concorrentes.
+- Aprovações após revogação.
+- Documentos vinculados a outros já cancelados.
+- Reaberturas legítimas.
+- Referências históricas.
+- Versionamento.
+- Integridade dos snapshots.
+- Hashes documentais.
+- Associações entre pacientes.
+- Alterações de estado sem evento correspondente.
+
+Preserve as distinções:
+
+**REQ não possui quantidade solicitada como ordem de compra.**
+
+**COM não equivale a ENT.**
+
+**Expedição não equivale a aceite.**
+
+**Ciência não equivale a recebimento.**
+
+**Relato de consumo não equivale a débito confirmado.**
+
+**Balanço não equivale automaticamente a consumo.**
+
+Não proponha fusões que eliminem essas diferenças.
+
+**Entrega:** máquina de estados documental, invariantes e interdependências.
+
+---
+
+## B3.7 — ESCALAS, PLANTÕES, BALANÇOS E RESPONSABILIDADES
+
+Examine a estrutura de persistência das escalas.
+
+Inclua:
+
+- Séries.
+- Recorrências.
+- Ocorrências.
+- Propostas.
+- Aprovações.
+- Rejeições.
+- Encerramentos.
+- Substituições.
+- Sobreposições.
+- Fusos horários.
+- Responsáveis.
+- Atribuições BAL.
+- Recontagens.
+- Adiamentos.
+- Revisões.
+
+Investigue especialmente:
+
+**DB-003/B2-013:** aprovação posterior capaz de republicar plantões além do encerramento da série.
+
+**B2-009:** aprovação da própria contagem em regime anterior.
+
+**B2-012:** adiamento obsoleto que permanece pendente.
+
+**B2-014:** reconto que perde a pessoa executora após substituição.
+
+Verifique o comportamento dos contratos após:
+
+- Mudança de escala.
+- Encerramento de série.
+- Substituição de profissional.
+- Alteração de atribuição.
+- Atualização concorrente.
+- Reconto.
+- Mudança de regime BAL.
+- Revogação de vínculo.
+
+A alteração de uma escala não deve fabricar presença efetiva.
+
+A revisão deve respeitar a identidade do contador quando for exigida independência.
+
+Uma aprovação anterior não pode ser herdada automaticamente por uma nova versão de contagem.
+
+**Entrega:** auditoria dos contratos de escala/BAL e suas consequências transacionais.
+
+---
+
+## B3.8 — CONCORRÊNCIA, LOCKS, IDEMPOTÊNCIA E RECUPERAÇÃO
+
+Execute uma investigação transversal das operações concorrentes.
+
+Reconstrua:
+
+- Chaves de idempotência.
+- Identidade de tentativa.
+- Controle otimista de versão.
+- Locks de linhas.
+- Locks consultivos, se existentes.
+- Ordem dos locks.
+- Tratamento de deadlocks.
+- Repetição de comandos.
+- Erros de conflito.
+- Timeouts.
+- Retentativas.
+- Recuperação por consulta.
+- Resultados de commit desconhecidos.
+
+Examine especialmente operações de:
+
+- COM.
+- ENT.
+- Estoque.
+- Consumo.
+- BAL.
+- Escala.
+- Administração.
+- Convites.
+- Anexos.
+- Aprovações.
+- Cancelamentos.
+
+Diferencie:
+
+**Repetição da mesma intenção.**
+
+**Nova intenção com o mesmo conteúdo.**
+
+**Intenção contrária a uma decisão anterior.**
+
+**Resposta perdida após commit.**
+
+**Falha anterior ao commit.**
+
+Essas situações não podem receber tratamento indistinto.
+
+Procure condições de corrida em que dois usuários conseguem produzir estados incompatíveis.
+
+Registre tanto as falhas quanto os mecanismos que efetivamente impedem duplicação.
+
+**Entrega:** matriz de concorrência, resultados de repetição e garantias de recuperação.
+
+---
+
+## B3.9 — SCHEDULERS, JOBS, LEMBRETES E PROGRESSO MULTIPACIENTE
+
+Este subgrupo deverá receber atenção especial devido ao achado **DB-002, P1**.
+
+Reconstrua integralmente a execução das automações relevantes.
+
+Examine:
+
+- Agendamento.
+- Cron.
+- Workers.
+- Seleção de candidatos.
+- Ordenação.
+- Lotes.
+- Limites.
+- Locks.
+- Leases.
+- Repetição.
+- Expiração.
+- Recuperação.
+- Estados terminais.
+- Backlogs.
+- Tentativas.
+- Eventos.
+- Outbox.
+- Interações com outros processos.
+
+### Investigação obrigatória do DB-002
+
+A Fase A reproduziu um cenário em que 25 requisições canceladas antigas impediam uma requisição elegível de outro paciente de avançar no processamento.
+
+A B3 deverá aprofundar:
+
+- Seleção de candidatos.
+- Remoção de estados terminais.
+- Progresso entre lotes.
+- Justiça da seleção entre pacientes.
+- Repetição de tarefas.
+- Backlog.
+- Múltiplos documentos por paciente.
+- Interação entre REQ, ENT, arquivamento e BAL.
+- Concorrência entre scheduler e operações humanas.
+
+Não se limite a reproduzir novamente o mesmo cenário.
+
+Procure padrões semelhantes em outros jobs.
+
+Verifique se um conjunto de registros inválidos, antigos, bloqueados ou já concluídos pode impedir indefinidamente o processamento de registros legítimos.
+
+Investigue também:
+
+- Falha intermediária.
+- Reprocessamento.
+- Worker interrompido.
+- Lease expirado.
+- Mensagem atrasada.
+- Resultado duplicado.
+- Evento persistido sem notificação.
+- Notificação sem confirmação de entrega.
+
+Não confunda registro no outbox com entrega externa efetiva.
+
+Não envie mensagens reais.
+
+**Entrega:** mapa de processamento assíncrono, garantia de progresso, cenários adversariais e limites de operação multipaciente.
+
+---
+
+## B3.10 — STORAGE, ANEXOS E INTEGRIDADE ENTRE SERVIÇOS
+
+Examine os contratos de persistência de anexos e arquivos.
+
+Inclua:
+
+- Reservas.
+- Quarentena.
+- Upload.
+- Validação.
+- Metadados.
+- Confirmação.
+- Associação documental.
+- Limites.
+- Tentativas.
+- Expiração.
+- Exclusão autorizada.
+- Recuperação.
+- Integridade de conteúdo.
+- Buckets.
+- Políticas.
+- URLs assinadas.
+
+Investigue o **DB-004/B2-016**:
+
+Reservas abandonadas podem consumir o limite de anexos sem arquivos efetivamente concluídos.
+
+Verifique:
+
+- Contagem do limite.
+- Ciclo de vida da reserva.
+- Recuperação por chave.
+- Identidade do arquivo.
+- Preservação de arquivos concluídos.
+- Tentativas simultâneas.
+- Arquivos órfãos.
+- Metadados órfãos.
+- Associação a documentos cancelados.
+- Isolamento entre pacientes.
+- Autorização de leitura.
+- Autorização de gravação.
+- Retenção e privacidade.
+
+Examine também a resposta perdida após gravação identificada na B1.
+
+**Não execute limpeza de reservas como correção.**
+
+Não apague objetos existentes.
+
+Não modifique buckets remotos.
+
+A auditoria deve diferenciar integridade do banco, metadados e bytes efetivamente armazenados.
+
+**Entrega:** modelo de consistência dos anexos, autorizações, recuperação e riscos de retenção.
+
+---
+
+## B3.11 — READ MODELS, CONSULTAS, HISTÓRICO, ÍNDICES E DESEMPENHO
+
+Examine as consultas que sustentam a utilização operacional.
+
+Inclua:
+
+- Saldos.
+- Histórico de movimentos.
+- Pendências.
+- Relatos de consumo.
+- Documentos.
+- Dashboard.
+- Notificações.
+- Administração.
+- Escalas.
+- Balanços.
+- Auditoria.
+- Catálogo.
+
+Investigue:
+
+- Completude.
+- Filtros.
+- Ordenação.
+- Paginação.
+- Cursores.
+- Referências diretas.
+- Isolamento por paciente.
+- Consistência temporal.
+- Atualização de dados derivados.
+- Invalidação de consultas.
+- Consultas parciais.
+- Dependências entre consultas.
+- Escopo das contagens.
+- Divergências entre contador e lista.
+
+Examine **B2-017/BE-001**, no qual pendências antigas deixam de aparecer após o limite dos registros recentes.
+
+Investigue **DB-007**, relacionado à atualização do contexto ou autoridade percebida pelos consumidores.
+
+Não interprete uma lista vazia como prova de ausência de registros sem conferir se a consulta falhou ou aplicou limitações.
+
+### Desempenho
+
+Examine:
+
+- Índices.
+- Cardinalidade.
+- Planos de execução.
+- Filtros por paciente.
+- Ordenações.
+- Joins.
+- Funções custosas.
+- Consultas repetitivas.
+- Locks prolongados.
+- Crescimento do histórico.
+- Paginação.
+- Potencial de contenção.
+- Consultas multipaciente.
+
+Utilize `EXPLAIN` e ferramentas adequadas sem provocar mutações indevidas.
+
+Use `EXPLAIN ANALYZE` somente quando a operação e o ambiente forem comprovadamente seguros, sem efeitos colaterais externos ou risco aos dados existentes.
+
+Não proponha novos índices indiscriminadamente.
+
+Toda recomendação de desempenho deverá possuir hipótese mensurável, evidência proporcional, custo e risco de manutenção.
+
+Não invente métricas ou ganhos percentuais.
+
+**Entrega:** diagnóstico de consultas, completude, frescor e gargalos demonstrados ou sustentados.
+
+---
+
+## B3.12 — INVESTIGAÇÃO ADVERSARIAL TRANSVERSAL E CONSOLIDAÇÃO TÉCNICA
+
+Este subgrupo será a segunda grande passagem de auditoria.
+
+Sua finalidade é encontrar problemas que uma inspeção por domínio pode deixar passar.
+
+Construa cenários que combinem múltiplas camadas.
+
+Exemplos:
+
+1. Profissional perde vínculo durante operação de estoque.
+2. Duas pessoas aprovam versões diferentes.
+3. Paciente é alterado entre leitura e gravação.
+4. Documento é cancelado enquanto um job está processando seu estado.
+5. Uma reserva de anexo é abandonada durante falha de conexão.
+6. Uma série de plantões é encerrada enquanto há proposta pendente.
+7. Um balanço depende de profissional substituído.
+8. Uma operação de consumo é confirmada enquanto outra tenta rejeitá-la.
+9. Uma entrega parcialmente recebida sofre cancelamento.
+10. Um registro antigo precisa ser recuperado depois de milhares de eventos.
+11. Uma conta mantém sessão válida após alteração de suas capacidades.
+12. Dois pacientes compartilham um profissional, mas não dados operacionais.
+13. Um erro de backend ocorre depois de commit.
+14. Um worker processa repetidamente trabalho terminal.
+15. Uma migração modifica função da qual dependem grants anteriores.
+
+Procure:
+
+- Inconsistências transacionais.
+- Dependências de ordem.
+- Violações de isolamento.
+- Falhas de autorização.
+- Estados impossíveis.
+- Falhas silenciosas.
+- Resultados contraditórios.
+- Duplicações.
+- Falta de progresso.
+- Dados órfãos.
+- Referências inválidas.
+- Problemas de evolução.
+- Fragilidades de recuperação.
+
+### Investigação de recuperação
+
+Examine também a capacidade de reconstruir os dados e relações essenciais.
+
+Considere:
+
+- Esquema.
+- Auth.
+- Storage.
+- Jobs.
+- Configurações.
+- Referências.
+- Movimentos.
+- Histórico.
+- Documentos.
+
+Diferencie backup válido de restauração integral comprovada.
+
+A questão OPS-001 permanece aberta.
+
+Não execute restauração sobre o ambiente existente.
+
+Caso exista destino isolado, descartável e autorizado, poderá realizar ensaio proporcional, respeitando todas as proteções anteriores.
+
+Caso contrário, limite-se ao inventário técnico das dependências e registre a necessidade de teste futuro.
+
+**Entrega:** matriz adversarial, questões novas, contraprovas e avaliação das garantias transversais.
+
+---
+
+# VIII. INVESTIGAÇÃO DE NECESSIDADES AINDA NÃO IDENTIFICADAS
+
+A B3 não deverá se limitar a localizar falhas.
+
+Investigue também se faltam mecanismos estruturais importantes.
+
+Examine, por exemplo:
+
+- Constraints adicionais justificáveis.
+- Garantias de exclusividade.
+- Restrições temporais.
+- Integridade de versões.
+- Política de retenção.
+- Reconciliação de referências.
+- Tratamento de objetos órfãos.
+- Progressão de filas.
+- Limites de operações.
+- Controle de tentativas.
+- Auditoria de ações privilegiadas.
+- Recuperação de processos interrompidos.
+- Observabilidade de jobs.
+- Detecção de inconsistências.
+- Validação de dados legados.
+- Alertas operacionais.
+- Procedimentos seguros de manutenção.
+
+Entretanto:
+
+**Não recomende automaticamente criar tabelas, triggers, índices ou funções adicionais.**
+
+Antes de propor um mecanismo novo, verifique:
+
+1. Se já existe solução equivalente.
+2. Se o problema ocorre de fato.
+3. Se pode ser resolvido com o contrato atual.
+4. Se a mudança aumentará a complexidade.
+5. Se introduzirá novos riscos.
+6. Se exigirá migração de dados.
+7. Se comprometerá compatibilidade histórica.
+8. Se poderá ser testada.
+9. Se é necessária para o primeiro uso.
+10. Se pertence a uma etapa posterior de evolução.
+
+Diferencie:
+
+- Defeito confirmado.
+- Risco sustentado.
+- Lacuna estrutural.
+- Oportunidade de melhoria.
+- Hipótese.
+- Questão de governança.
+- Questão de produto.
+- Limitação de teste.
+
+---
+
+# IX. PRIORIZAÇÃO E CLASSIFICAÇÃO
+
+Não atribua prioridades pelo número de arquivos afetados.
+
+Considere:
+
+- Possibilidade de violação de acesso.
+- Integridade dos dados.
+- Impacto sobre estoque.
+- Impacto sobre processos assistenciais.
+- Reversibilidade.
+- Persistência da falha.
+- Capacidade de recuperação.
+- Abrangência multipaciente.
+- Frequência demonstrada ou plausível.
+- Dependência para funcionamento essencial.
+- Existência de controles compensatórios.
+
+Use a classificação:
+
+**P0 — Crítico:** comprometimento grave demonstrado, como exposição efetiva de dados sensíveis, autorização indevida grave ou corrupção relevante sem recuperação adequada.
+
+**P1 — Bloqueador:** impede o uso confiável de capacidade essencial ou representa falha grave que precisa ser resolvida antes da liberação do escopo afetado.
+
+**P2 — Relevante:** defeito ou lacuna com consequência operacional concreta que exige correção planejada.
+
+**P3 — Melhoria:** oportunidade proporcional, risco menor ou aperfeiçoamento não bloqueador.
+
+A prioridade deve ser acompanhada de justificativa.
+
+Uma vulnerabilidade hipotética não deverá ser apresentada como exploração confirmada.
+
+Uma falha reproduzida apenas em condição específica não deverá ser generalizada para todos os pacientes.
+
+Por outro lado, **não reduza a gravidade de uma falha estrutural apenas porque a interface atual dificulta alcançá-la**.
+
+A autoridade real do banco deverá ser considerada.
+
+---
+
+# X. MATRIZES DE COBERTURA OBRIGATÓRIAS
+
+Produza matrizes que permitam verificar a profundidade da investigação.
+
+## X.1. Objetos
+
+Objeto de banco × domínio × função × autorização × teste × resultado.
+
+## X.2. Autorizações
+
+Papel × vínculo × paciente × operação × resultado esperado × resultado observado.
+
+## X.3. Operações transacionais
+
+Comando × estado inicial × estado final × efeitos × rollback × repetição × concorrência.
+
+## X.4. Documentos
+
+Tipo documental × transição × autorização × persistência × evento × consequência.
+
+## X.5. Estoque
+
+Operação × custódia de origem × custódia de destino × quantidade × evento × conservação.
+
+## X.6. Migrations
+
+Migration × objetos alterados × dependências × estado final × compatibilidade × validação.
+
+## X.7. Jobs
+
+Job × seleção × lote × estado terminal × repetição × progresso × backlog × observabilidade.
+
+## X.8. Evidências
+
+Hipótese × método × cenário × resultado × limitação × confiança.
+
+Não confunda quantidade de linhas de matriz com quantidade de testes executados.
+
+Uma função examinada estaticamente não deve ser marcada como integralmente validada.
+
+---
+
+# XI. DOCUMENTAÇÃO E ENTREGÁVEIS OBRIGATÓRIOS
+
+Crie a pasta:
+
+`docs/audits/2026-10-29-phase-b3-database/`
+
+## XI.1. Controle e baseline
+
+`README.md`
+
+`CHECKPOINT.md`
+
+`00_BASELINE_SCOPE_AND_METHOD.md`
+
+`00_ENVIRONMENT_AND_PRESERVATION.md`
+
+## XI.2. Inventário e estrutura
+
+`01_DATABASE_OBJECT_INVENTORY.csv`
+
+`01_DATABASE_COVERAGE.csv`
+
+`01_SCHEMA_DEPENDENCY_MAP.md`
+
+`01_DATA_INVARIANTS_CATALOG.csv`
+
+## XI.3. Migrations
+
+`02_MIGRATIONS_AND_DRIFT_AUDIT.md`
+
+`02_MIGRATION_HISTORY_MATRIX.csv`
+
+## XI.4. Autorização
+
+`03_RLS_GRANTS_AND_TENANT_ISOLATION.md`
+
+`03_AUTHORIZATION_MATRIX.csv`
+
+`04_PRIVILEGED_FUNCTIONS_AND_RPC_AUDIT.md`
+
+`04_RPC_SECURITY_AND_CALLERS.csv`
+
+## XI.5. Integridade de domínio
+
+`05_LEDGER_STOCK_AND_QUANTITY_INTEGRITY.md`
+
+`05_STOCK_INVARIANTS_MATRIX.csv`
+
+`06_DOCUMENT_LIFECYCLE_AND_STATE_INTEGRITY.md`
+
+`06_DOCUMENT_TRANSITIONS_MATRIX.csv`
+
+`07_SCHEDULE_BALANCE_AND_ASSIGNMENT_INTEGRITY.md`
+
+## XI.6. Concorrência e infraestrutura de dados
+
+`08_CONCURRENCY_IDEMPOTENCY_AND_TRANSACTIONS.md`
+
+`08_CONCURRENCY_SCENARIOS.csv`
+
+`09_SCHEDULERS_JOBS_AND_MULTIPATIENT_PROGRESS.md`
+
+`09_JOBS_PROGRESS_MATRIX.csv`
+
+`10_STORAGE_ATTACHMENTS_AND_RETENTION.md`
+
+`11_QUERIES_READ_MODELS_AND_PERFORMANCE.md`
+
+`11_QUERY_COVERAGE_AND_PERFORMANCE.csv`
+
+## XI.7. Investigação transversal
+
+`12_ADVERSARIAL_INTEGRITY_AND_RECOVERY.md`
+
+`12_CROSS_LAYER_SCENARIOS.csv`
+
+`13_NEW_DATABASE_RISKS_AND_STRUCTURAL_GAPS.md`
+
+## XI.8. Consolidação
+
+`14_FINDINGS_MASTER.csv`
+
+`14_FINDINGS_MASTER.md`
+
+`15_ACCEPTANCE_AND_REGRESSION_MATRIX.md`
+
+`16_CROSS_GROUP_DEPENDENCIES.md`
+
+`17_GROUP_B3_EXECUTIVE_ASSESSMENT.md`
+
+`18_PHASE_C_DECISION_HANDOFF.md`
+
+## XI.9. Evidências
+
+Crie:
+
+`evidence/`
+
+Inclua, quando pertinentes:
+
+- Índice dos cenários.
+- Registros das consultas.
+- Metadados do banco.
+- Definições SQL sanitizadas.
+- Resultados de testes.
+- Logs.
+- Resultados de concorrência.
+- Matrizes de grants.
+- Comparações de migrations.
+- Resultados de verificações.
+- Manifestações dos achados.
+- Histórico das tentativas.
+- Checkpoints individuais.
+- Manifesto SHA-256.
+- Relatório de integridade do pacote.
+
+Documente os scripts de reprodução.
+
+Indique claramente quais scripts são somente leitura e quais podem modificar dados sintéticos.
+
+Não execute indiscriminadamente todos os reprodutores em uma retomada.
+
+---
+
+# XII. ESTRUTURA DO REGISTRO MESTRE DE ACHADOS
+
+Cada achado deverá conter, no mínimo:
+
+1. ID.
+2. Título.
+3. Domínio.
+4. Prioridade.
+5. Natureza.
+6. Estado.
+7. Confiança.
+8. Objeto afetado.
+9. Processo afetado.
+10. Contrato esperado.
+11. Comportamento observado.
+12. Causa sustentada.
+13. Evidência.
+14. Cenário reproduzido.
+15. Resultado persistido.
+16. Abrangência.
+17. Limitações.
+18. Contraprovas.
+19. Consequência operacional.
+20. Consequência de integridade.
+21. Consequência de autorização.
+22. Relação com A/B1/B2.
+23. Alternativas de correção futura.
+24. Riscos da correção.
+25. Dados legados potencialmente afetados.
+26. Dependências.
+27. Critérios de aceitação.
+28. Regressões obrigatórias.
+29. Decisões de produto necessárias.
+30. Situação de validação humana ou externa, quando aplicável.
+
+Não duplique um achado apenas porque ele aparece em diversas funções.
+
+Por outro lado, não reúna causas independentes sob um título genérico.
+
+Mantenha uma matriz de manifestações por objeto e operação.
+
+---
+
+# XIII. TESTES DE ACEITAÇÃO FUTUROS
+
+Para cada achado, descreva critérios que possam orientar a implementação posterior.
+
+Os critérios deverão contemplar:
+
+- Pré-condições.
+- Identidade.
+- Autorização.
+- Estado inicial.
+- Operação.
+- Resultado esperado.
+- Efeitos persistidos.
+- Eventos.
+- Histórico.
+- Concorrência.
+- Repetição.
+- Falha.
+- Recuperação.
+- Comportamentos proibidos.
+- Compatibilidade.
+- Testes de regressão.
+
+Inclua explicitamente o que uma correção **não poderá destruir**.
+
+Exemplos:
+
+Uma correção de cancelamento ENT não poderá inventar consumo.
+
+Uma correção de ledger não poderá alterar silenciosamente movimentos históricos.
+
+Uma correção de permissões não poderá impedir operações legitimamente autorizadas.
+
+Uma correção do scheduler não poderá gerar lembretes duplicados.
+
+Uma correção de aprovação de escala não poderá republicar ocorrências encerradas.
+
+Uma correção de anexos não poderá eliminar arquivos prontos ou reservas ainda válidas.
+
+Uma correção de BAL não poderá permitir que uma nova contagem herde aprovação de versão anterior.
+
+Esses testes serão propostas para execução futura.
+
+**Não implemente correções ou novos testes funcionais permanentes nesta fase.**
+
+---
+
+# XIV. VERIFICAÇÕES E CRITÉRIOS DE ENCERRAMENTO
+
+Antes de concluir:
+
+1. Verifique a cobertura dos objetos relevantes.
+2. Reconcilie inventários e matrizes.
+3. Confirme que os subgrupos B3.1–B3.12 foram executados.
+4. Verifique a origem de todos os achados.
+5. Confirme que os testes possuem evidência.
+6. Preserve tentativas inválidas e seus motivos.
+7. Diferencie execução de análise estática.
+8. Reconcilie os achados das fases anteriores.
+9. Confirme que nenhuma migration funcional foi modificada.
+10. Confirme que nenhum arquivo funcional foi alterado.
+11. Confirme que a `master` permanece intacta.
+12. Confirme que não houve alteração remota.
+13. Confirme que não houve vazamento de credenciais.
+14. Confira o manifesto dos artefatos.
+15. Execute verificações locais seguras pertinentes.
+16. Registre testes não realizados.
+17. Produza o relatório executivo.
+18. Atualize o índice geral da Fase B.
+19. Realize commit exclusivamente documental.
+20. Preserve a branch `audit/phase-b`.
+
+Se executar as verificações oficiais do repositório, registre separadamente os respectivos resultados.
+
+Não altere testes ou configurações para produzir artificialmente um resultado verde.
+
+A falha de CI anteriormente conhecida deve continuar identificada até que sua correção seja efetivamente autorizada e comprovada.
+
+A B3 não estará concluída se os documentos finais contiverem apenas inventários sem avaliação substantiva.
+
+---
+
+# XV. RELATÓRIO EXECUTIVO PARA O RESPONSÁVEL
+
+O responsável pelo produto não possui formação técnica em programação.
+
+Portanto, o relatório executivo deverá traduzir resultados técnicos em consequências concretas.
+
+Não apresente apenas nomes de funções, tabelas e códigos SQL.
+
+Para cada descoberta importante, explique:
+
+**O que deveria acontecer?**
+
+**O que acontece atualmente?**
+
+**Em qual situação?**
+
+**Quem é afetado?**
+
+**O que pode dar errado?**
+
+**Foi reproduzido ou é apenas um risco?**
+
+**O banco protege adequadamente os dados?**
+
+**Qual decisão será necessária?**
+
+**Qual mudança futura poderá resolver o problema?**
+
+**Quais comportamentos corretos deverão ser preservados?**
+
+O relatório deverá oferecer uma visão abrangente da confiabilidade da camada de dados, mas não poderá afirmar que o sistema está seguro ou pronto para produção apenas porque determinados testes passaram.
+
+Produza também uma seção específica:
+
+**“O que o Home Care Assistant já faz corretamente e não deve ser perdido durante as correções.”**
+
+Outra seção deverá apresentar:
+
+**“As descobertas que não haviam sido identificadas nas Fases A, B1 e B2.”**
+
+E outra:
+
+**“O que ainda precisa ser comprovado antes da operação real.”**
+
+---
+
+# XVI. TRANSFERÊNCIA PARA A FASE C
+
+A B3 deverá organizar suas conclusões para decisões futuras.
+
+Separe:
+
+- Correções obrigatórias.
+- Bloqueadores de produção.
+- Riscos de integridade.
+- Riscos de autorização.
+- Lacunas de domínio.
+- Melhorias proporcionais.
+- Questões de arquitetura.
+- Questões de operação.
+- Necessidades de validação.
+- Decisões do responsável.
+
+Indique dependências entre achados.
+
+Exemplo:
+
+Uma correção de cancelamento ENT pode depender da definição do tratamento de consumo anterior, sem que isso autorize alterar o significado do consumo.
+
+Outro exemplo:
+
+Uma melhoria de consulta antiga pode depender de paginação e índices, mas não necessariamente de uma nova central de notificações.
+
+A transferência deverá permitir montar posteriormente um plano de implementação sequencial, minimizando retrabalho e regressões.
+
+**A Fase C não deverá ser executada agora.**
+
+---
+
+# XVII. CHECKPOINTS E CONTINUIDADE
+
+Execute nesta ordem:
+
+**B3.0 — Reconhecimento.**
+
+**B3.1 — Modelo de dados.**
+
+**B3.2 — Migrations.**
+
+**B3.3 — RLS e autorização.**
+
+**B3.4 — RPCs privilegiadas.**
+
+**B3.5 — Ledger e estoques.**
+
+**B3.6 — Documentos e estados.**
+
+**B3.7 — Escalas e BAL.**
+
+**B3.8 — Concorrência e idempotência.**
+
+**B3.9 — Jobs e progresso multipaciente.**
+
+**B3.10 — Storage e anexos.**
+
+**B3.11 — Consultas, histórico e desempenho.**
+
+**B3.12 — Investigação adversarial transversal.**
+
+**Consolidação final.**
+
+Após cada subgrupo:
+
+- Atualize `CHECKPOINT.md`.
+- Registre achados.
+- Registre evidências.
+- Registre limitações.
+- Registre hipóteses refutadas.
+- Registre contraprovas.
+- Indique o próximo passo.
+
+Se ocorrer compactação do contexto, utilize os documentos persistidos para continuar.
+
+Se houver interrupção por limite de uso, preserve o estado exato da investigação e documente como retomar, sem reiniciar trabalhos concluídos desnecessariamente.
+
+Não declare um subgrupo concluído sem evidência suficiente.
+
+---
+
+# XVIII. CRITÉRIO FINAL DE QUALIDADE
+
+A auditoria será considerada bem-sucedida somente quando permitir responder, com evidências e limites explícitos:
+
+**O banco de dados realmente protege o que o sistema promete proteger?**
+
+**As autorizações são verificadas na camada adequada?**
+
+**Os dados de um paciente permanecem isolados dos demais?**
+
+**As operações de estoque preservam quantidades e origens?**
+
+**Os documentos mantêm estados coerentes durante mudanças e cancelamentos?**
+
+**As operações simultâneas são tratadas corretamente?**
+
+**Uma resposta perdida pode ser recuperada sem duplicação?**
+
+**Os jobs conseguem progredir mesmo diante de registros antigos ou inválidos?**
+
+**Os dados históricos permanecem íntegros e recuperáveis?**
+
+**As migrations podem sustentar a evolução do sistema sem comprometer registros anteriores?**
+
+**As consultas apresentam informações completas e compatíveis com o estado real?**
+
+**Quais garantias estão ausentes, incompletas ou implementadas na camada errada?**
+
+**Quais defeitos ainda não haviam sido identificados?**
+
+**Quais decisões precisarão ser tomadas antes da implementação?**
+
+**O que precisa ser corrigido antes da operação real?**
+
+A profundidade da investigação deve ser demonstrada pela qualidade das provas, pela identificação das causas e pela precisão das conclusões — não pela quantidade de páginas produzidas.
+
+---
+
+# XIX. DETERMINAÇÃO FINAL
+
+Execute integralmente a Fase B3.
+
+Investigue de forma independente, sistemática, adversarial e proporcional.
+
+Não se limite aos problemas já identificados.
+
+Não suavize conclusões tecnicamente demonstradas.
+
+Não invente falhas ou riscos para aumentar a quantidade de achados.
+
+Não modifique o produto.
+
+Não aplique correções.
+
+Não altere o banco remoto.
+
+Preserve o ambiente e os dados existentes.
+
+Consolide todos os resultados em documentação rastreável, com critérios futuros de aceitação e transferência para a Fase C.
+
+**Não avance para B4.**
+
+**Não inicie a Fase C.**
+
+**Não execute a Fase D.**
+
+**Inicie pela verificação do repositório, pela leitura das auditorias anteriores e pelo reconhecimento B3.0.**

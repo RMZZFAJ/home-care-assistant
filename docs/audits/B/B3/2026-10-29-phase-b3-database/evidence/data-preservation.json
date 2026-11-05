@@ -1,0 +1,126 @@
+{
+  "recordedAt": "2026-10-30T05:46:18.594Z",
+  "method": "Private per-original-row hashes; no payload export. New rows excluded.",
+  "results": [
+    {
+      "table": "profiles",
+      "originalRows": 53,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "care_recipients",
+      "originalRows": 125,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "care_recipient_memberships",
+      "originalRows": 650,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "care_recipient_products",
+      "originalRows": 322,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "products",
+      "originalRows": 254,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "requisitions",
+      "originalRows": 77,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "requisition_items",
+      "originalRows": 149,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "requisition_observations",
+      "originalRows": 11,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "operational_documents",
+      "originalRows": 184,
+      "missing": 0,
+      "changed": 7
+    },
+    {
+      "table": "document_lines",
+      "originalRows": 236,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "document_events",
+      "originalRows": 648,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "stock_movements",
+      "originalRows": 587,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "attachments",
+      "originalRows": 19,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "document_pdfs",
+      "originalRows": 0,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "document_pdf_renders",
+      "originalRows": 197,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "purchase_receipts",
+      "originalRows": 12,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "bal_approvals",
+      "originalRows": 6,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "shift_series",
+      "originalRows": 31,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "scheduled_shifts",
+      "originalRows": 109,
+      "missing": 0,
+      "changed": 0
+    },
+    {
+      "table": "bal_obligations",
+      "originalRows": 23,
+      "missing": 0,
+      "changed": 0
+    }
+  ]
+}

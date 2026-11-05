@@ -1,0 +1,115 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:10:01.448Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:10:07.236Z",
+      "role": "adminA",
+      "label": "report-registered",
+      "path": "/consumo",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "",
+      "file": "b16-consumption-adminA-report-registered.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nOperação confirmada. Relatos só alteram o estoque após confirmação autorizada.\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nConsumo · Família · Aguardando confirmação\n\nRelato sintético B1 para verificar feedback e histórico.\n\nMaterial fictício V4 0 · 1\n\n29/10/2026, 01:10\n\nConfirmar relato e movimento\nRejeitar relato",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - status: Operação confirmada. Relatos só alteram o estoque após confirmação autorizada.\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list:\n    - listitem:\n      - paragraph: Consumo · Família · Aguardando confirmação\n      - paragraph: Relato sintético B1 para verificar feedback e histórico.\n      - list:\n        - listitem: Material fictício V4 0 · 1\n      - paragraph: 29/10/2026, 01:10\n      - button \"Confirmar relato e movimento\"\n      - button \"Rejeitar relato\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:10:07.765Z",
+      "role": "adminA",
+      "label": "report-review",
+      "path": "/consumo",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b16-consumption-adminA-report-review.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Revisar confirmação do relato\n\nRelato sintético B1 para verificar feedback e histórico.\n\nMaterial fictício V4 0 · 1\n\nA confirmação registra o consumo na custódia indicada. O relato e o movimento permanecem auditáveis.\n\nVoltar\nConfirmar consumo",
+      "snapshot": "- dialog \"Revisar confirmação do relato\":\n  - heading \"Revisar confirmação do relato\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph: Relato sintético B1 para verificar feedback e histórico.\n  - list:\n    - listitem: Material fictício V4 0 · 1\n  - paragraph: A confirmação registra o consumo na custódia indicada. O relato e o movimento permanecem auditáveis.\n  - button \"Voltar\"\n  - button \"Confirmar consumo\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:10:08.170Z",
+      "role": "adminA",
+      "label": "consumption-confirmed",
+      "path": "/consumo",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "",
+      "file": "b16-consumption-adminA-consumption-confirmed.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nFaltas e consumo extraordinário\nOperação confirmada. Relatos só alteram o estoque após confirmação autorizada.\nRegistrar ocorrência\nRelatos recebidos por Flow\n\nO canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n\nNenhuma sugestão pendente de confirmação.\n\nRelatos registrados\n\nConsumo · Família · Confirmado\n\nRelato sintético B1 para verificar feedback e histórico.\n\nMaterial fictício V4 0 · 1\n\n29/10/2026, 01:10",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Faltas e consumo extraordinário\" [level=1]\n  - status: Operação confirmada. Relatos só alteram o estoque após confirmação autorizada.\n  - button \"Registrar ocorrência\"\n  - heading \"Relatos recebidos por Flow\" [level=2]\n  - paragraph: O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\n  - list\n  - paragraph: Nenhuma sugestão pendente de confirmação.\n  - heading \"Relatos registrados\" [level=2]\n  - list:\n    - listitem:\n      - paragraph: Consumo · Família · Confirmado\n      - paragraph: Relato sintético B1 para verificar feedback e histórico.\n      - list:\n        - listitem: Material fictício V4 0 · 1\n      - paragraph: 29/10/2026, 01:10",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "label": "before",
+      "balances": [
+        {
+          "id": "patient-5b51329f-9731-4270-b9d9-f0ccad0a393f",
+          "family": "20.000000",
+          "team": "10.000000"
+        },
+        {
+          "id": "patient-25b79387-94e9-4a7b-8dd8-c604ba42a9c6",
+          "family": "28.000000",
+          "team": "2.000000"
+        }
+      ]
+    },
+    {
+      "label": "after report no debit",
+      "balances": [
+        {
+          "id": "patient-5b51329f-9731-4270-b9d9-f0ccad0a393f",
+          "family": "20.000000",
+          "team": "10.000000"
+        },
+        {
+          "id": "patient-25b79387-94e9-4a7b-8dd8-c604ba42a9c6",
+          "family": "28.000000",
+          "team": "2.000000"
+        }
+      ]
+    },
+    {
+      "label": "after confirm debit1",
+      "balances": [
+        {
+          "id": "patient-5b51329f-9731-4270-b9d9-f0ccad0a393f",
+          "family": "19.000000",
+          "team": "10.000000"
+        },
+        {
+          "id": "patient-25b79387-94e9-4a7b-8dd8-c604ba42a9c6",
+          "family": "28.000000",
+          "team": "2.000000"
+        }
+      ]
+    }
+  ],
+  "mutations": [
+    "consumption.report FAMILY1",
+    "consumption.confirm accept true"
+  ],
+  "finishedAt": "2026-10-29T04:10:09.191Z"
+}

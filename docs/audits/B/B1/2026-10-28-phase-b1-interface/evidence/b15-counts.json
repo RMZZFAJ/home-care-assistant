@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-29T04:06:02.508Z",
+  "queries": 81,
+  "surfaces": 97,
+  "stateRows": 948,
+  "taxonomy": [
+    "INITIAL",
+    "LOADING",
+    "REFRESHING",
+    "READY",
+    "EMPTY_CONFIRMED",
+    "PARTIAL",
+    "ERROR_RECOVERABLE",
+    "ERROR_BLOCKED",
+    "SUBMITTING",
+    "PERSISTED",
+    "DELIVERY_PENDING",
+    "UNKNOWN_RESULT",
+    "OFFLINE",
+    "STALE_CONTEXT",
+    "NO_PERMISSION"
+  ],
+  "exclusion": "Unconsumed files have one excluded record, no fictional behavioral execution"
+}

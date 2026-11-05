@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-10-30T23:19:44.410Z",
+  "runs": [
+    {
+      "conclusion": "failure",
+      "databaseId": 40656069166,
+      "headBranch": "master",
+      "headSha": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+      "status": "completed",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40656069166"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40241890885,
+      "headBranch": "master",
+      "headSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+      "status": "completed",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40241890885"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40240543318,
+      "headBranch": "codex/fluent-ui-escalas-bal",
+      "headSha": "abc5951dcc1dec336eb475fd7fbc7ee03ab85d4a",
+      "status": "completed",
+      "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/40240543318"
+    }
+  ],
+  "scope": "Read-only metadata; no CI triggered"
+}

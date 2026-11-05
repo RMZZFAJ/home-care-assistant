@@ -1,0 +1,11 @@
+markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)
+Finding: README.md AGENTS.md docs/audits/C/**/*.md docs/current/*.md docs/decisions/*.md docs/README.md docs/audits/README.md docs/audits/A/README.md docs/audits/B/README.md docs/audits/D/README.md docs/audits/_historical/README.md docs/archive/README.md docs/runbooks/README.md docs/meta/README.md
+Linting: 71 files
+Attempted: 384 fixes in 20 files
+Summary: 6 issues in 5 files
+AGENTS.md:24:81 error MD013/line-length Line length [Expected: 80; Actual: 132]
+docs/audits/C/C0-baseline/mandate/PHASE_C_MASTER_ORDER.md:311:81 error MD013/line-length Line length [Expected: 80; Actual: 98]
+docs/audits/C/C0-baseline/mandate/PHASE_C_MASTER_ORDER.md:390:81 error MD013/line-length Line length [Expected: 80; Actual: 91]
+docs/audits/C/C0-baseline/mandate/PHASE_C_SUBPHASES.md:22:81 error MD013/line-length Line length [Expected: 80; Actual: 88]
+docs/audits/C/C6-acceptance-handoff/SOURCE_OF_TRUTH_INDEX.md:82:81 error MD013/line-length Line length [Expected: 80; Actual: 145]
+docs/decisions/PRODUCT_DECISIONS_MASTER.md:19 error MD001/heading-increment Heading levels should only increment by one level at a time [Expected: h2; Actual: h3]

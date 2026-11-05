@@ -1,0 +1,47 @@
+HCA
+HOME CARE ASSISTANT
+GESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL
+CONFERÊNCIA E AUDITORIA
+COM-0001 · Versão documental 3
+AQUISIÇÃO E VALIDAÇÃO
+MATERIAL
+APROVADO
+ADQUIRIDO
+VALIDADO
+PALAVRAWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWW
+8
+3
+2
+LINHA DO TEMPO OPERACIONAL
+DATA/HORA
+RESPONSÁVEL
+EVENTO
+30/10/2026, 10:00
+Emissora fictícia B6
+Compra registrada · v2
+30/10/2026, 11:00
+Recebedora fictícia B6
+Recebimento informado · v3
+IDENTIFICAÇÃO E INTEGRIDADE
+DOCUMENTO
+COM-0001
+VERSÃO
+3
+ID TÉCNICO
+b6000000-0000-4000-8000-000000000001
+HASH DO CONTEÚDO CANÔNICO
+b62ce354bd215e23d7aca85b842a2476a4dc6bde7cae
+1175c3df15ffe15a4e9d
+O SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por
+administradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado
+separadamente.
+Verificação de integridade
+O QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso
+autorizado.
+COM-0001 · v3 · Conteúdo autorizado
+Página 2 de 2

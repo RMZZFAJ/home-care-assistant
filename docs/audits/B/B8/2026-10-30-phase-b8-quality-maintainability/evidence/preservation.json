@@ -1,0 +1,11 @@
+{
+  "observedAt": "2026-10-30T23:43:18.531Z",
+  "protectedCount": 394,
+  "changed": [],
+  "branch": "audit/phase-b",
+  "master": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "functionalDiff": "",
+  "preexistingAuditToolingDiff": "requirements-audit.txt",
+  "auditRequirementsUnchangedSinceBaseline": true,
+  "dataOperations": "Only four constant VALUES/SELECT cases in READ ONLY transaction; no business-row query, DML, fixture, reset, restore, external message or mutable remote API executed by B8 instruments."
+}

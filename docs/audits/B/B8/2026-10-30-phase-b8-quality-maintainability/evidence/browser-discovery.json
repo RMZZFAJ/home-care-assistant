@@ -1,0 +1,725 @@
+{
+  "command": "Playwright test --list --reporter=json; no server/globalSetup/test execution",
+  "cases": [
+    {
+      "file": "accessibility.spec.ts",
+      "line": 13,
+      "title": "login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos",
+      "project": "chromium"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil adminA",
+      "project": "chromium"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil family",
+      "project": "chromium"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil supervisor",
+      "project": "chromium"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil professional",
+      "project": "chromium"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil reader",
+      "project": "chromium"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 13,
+      "title": "login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos",
+      "project": "mobile"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil adminA",
+      "project": "mobile"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil family",
+      "project": "mobile"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil supervisor",
+      "project": "mobile"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil professional",
+      "project": "mobile"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil reader",
+      "project": "mobile"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 13,
+      "title": "login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos",
+      "project": "ios"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil adminA",
+      "project": "ios"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil family",
+      "project": "ios"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil supervisor",
+      "project": "ios"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil professional",
+      "project": "ios"
+    },
+    {
+      "file": "accessibility.spec.ts",
+      "line": 99,
+      "title": "menu e capacidades efetivas do perfil reader",
+      "project": "ios"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 96,
+      "title": "catálogo edita nomes alternativos e inativa preservando a identidade",
+      "project": "chromium"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 159,
+      "title": "administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente",
+      "project": "chromium"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 259,
+      "title": "convite é criado, reemitido e revogado pela interface",
+      "project": "chromium"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 325,
+      "title": "seletores administrativos salvam destinatário e limites por produto e custódia",
+      "project": "chromium"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 427,
+      "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+      "project": "chromium"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 582,
+      "title": "sugestões por alias e grafia ambígua só associam o produto após escolha explícita",
+      "project": "chromium"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 96,
+      "title": "catálogo edita nomes alternativos e inativa preservando a identidade",
+      "project": "mobile"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 159,
+      "title": "administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente",
+      "project": "mobile"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 259,
+      "title": "convite é criado, reemitido e revogado pela interface",
+      "project": "mobile"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 325,
+      "title": "seletores administrativos salvam destinatário e limites por produto e custódia",
+      "project": "mobile"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 427,
+      "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+      "project": "mobile"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 582,
+      "title": "sugestões por alias e grafia ambígua só associam o produto após escolha explícita",
+      "project": "mobile"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 96,
+      "title": "catálogo edita nomes alternativos e inativa preservando a identidade",
+      "project": "ios"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 159,
+      "title": "administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente",
+      "project": "ios"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 259,
+      "title": "convite é criado, reemitido e revogado pela interface",
+      "project": "ios"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 325,
+      "title": "seletores administrativos salvam destinatário e limites por produto e custódia",
+      "project": "ios"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 427,
+      "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+      "project": "ios"
+    },
+    {
+      "file": "administration.spec.ts",
+      "line": 582,
+      "title": "sugestões por alias e grafia ambígua só associam o produto após escolha explícita",
+      "project": "ios"
+    },
+    {
+      "file": "balance-shifts.spec.ts",
+      "line": 41,
+      "title": "BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real",
+      "project": "chromium"
+    },
+    {
+      "file": "balance-shifts.spec.ts",
+      "line": 107,
+      "title": "supervisão solicita adiamento, família decide e o prazo só muda após a aprovação",
+      "project": "chromium"
+    },
+    {
+      "file": "balance-shifts.spec.ts",
+      "line": 41,
+      "title": "BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real",
+      "project": "mobile"
+    },
+    {
+      "file": "balance-shifts.spec.ts",
+      "line": 107,
+      "title": "supervisão solicita adiamento, família decide e o prazo só muda após a aprovação",
+      "project": "mobile"
+    },
+    {
+      "file": "balance-shifts.spec.ts",
+      "line": 41,
+      "title": "BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real",
+      "project": "ios"
+    },
+    {
+      "file": "balance-shifts.spec.ts",
+      "line": 107,
+      "title": "supervisão solicita adiamento, família decide e o prazo só muda após a aprovação",
+      "project": "ios"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 36,
+      "title": "gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda",
+      "project": "chromium"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 69,
+      "title": "documentos comuns, histórico com URL e estoque têm apresentação real em desktop e mobile",
+      "project": "chromium"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 130,
+      "title": "operação móvel oferece cinco destinos e caixa de entregas autorizada",
+      "project": "chromium"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 147,
+      "title": "dashboards apresentam tarefas reais por perfil e preservam a custódia autorizada",
+      "project": "chromium"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 174,
+      "title": "administração usa listas, painéis de edição e confirmação crítica sem perder o contexto",
+      "project": "chromium"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 222,
+      "title": "ocorrências e notificações preservam saldos e distinguem estados no aplicativo",
+      "project": "chromium"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 36,
+      "title": "gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda",
+      "project": "mobile"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 69,
+      "title": "documentos comuns, histórico com URL e estoque têm apresentação real em desktop e mobile",
+      "project": "mobile"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 130,
+      "title": "operação móvel oferece cinco destinos e caixa de entregas autorizada",
+      "project": "mobile"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 147,
+      "title": "dashboards apresentam tarefas reais por perfil e preservam a custódia autorizada",
+      "project": "mobile"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 174,
+      "title": "administração usa listas, painéis de edição e confirmação crítica sem perder o contexto",
+      "project": "mobile"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 222,
+      "title": "ocorrências e notificações preservam saldos e distinguem estados no aplicativo",
+      "project": "mobile"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 36,
+      "title": "gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda",
+      "project": "ios"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 69,
+      "title": "documentos comuns, histórico com URL e estoque têm apresentação real em desktop e mobile",
+      "project": "ios"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 130,
+      "title": "operação móvel oferece cinco destinos e caixa de entregas autorizada",
+      "project": "ios"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 147,
+      "title": "dashboards apresentam tarefas reais por perfil e preservam a custódia autorizada",
+      "project": "ios"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 174,
+      "title": "administração usa listas, painéis de edição e confirmação crítica sem perder o contexto",
+      "project": "ios"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 222,
+      "title": "ocorrências e notificações preservam saldos e distinguem estados no aplicativo",
+      "project": "ios"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 28,
+      "title": "estilos do streaming permanecem no head sem cópias no corpo",
+      "project": "chromium"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 28,
+      "title": "estilos do streaming permanecem no head sem cópias no corpo",
+      "project": "mobile"
+    },
+    {
+      "file": "fluent-experience.spec.ts",
+      "line": 28,
+      "title": "estilos do streaming permanecem no head sem cópias no corpo",
+      "project": "ios"
+    },
+    {
+      "file": "login.spec.ts",
+      "line": 9,
+      "title": "exibe a tela de login",
+      "project": "chromium"
+    },
+    {
+      "file": "login.spec.ts",
+      "line": 16,
+      "title": "login apresenta falha de credencial e de rede e permite recuperar a sessão",
+      "project": "chromium"
+    },
+    {
+      "file": "login.spec.ts",
+      "line": 9,
+      "title": "exibe a tela de login",
+      "project": "mobile"
+    },
+    {
+      "file": "login.spec.ts",
+      "line": 16,
+      "title": "login apresenta falha de credencial e de rede e permite recuperar a sessão",
+      "project": "mobile"
+    },
+    {
+      "file": "login.spec.ts",
+      "line": 9,
+      "title": "exibe a tela de login",
+      "project": "ios"
+    },
+    {
+      "file": "login.spec.ts",
+      "line": 16,
+      "title": "login apresenta falha de credencial e de rede e permite recuperar a sessão",
+      "project": "ios"
+    },
+    {
+      "file": "onboarding.spec.ts",
+      "line": 47,
+      "title": "convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha",
+      "project": "chromium"
+    },
+    {
+      "file": "onboarding.spec.ts",
+      "line": 47,
+      "title": "convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha",
+      "project": "mobile"
+    },
+    {
+      "file": "onboarding.spec.ts",
+      "line": 47,
+      "title": "convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha",
+      "project": "ios"
+    },
+    {
+      "file": "personal-workspace.spec.ts",
+      "line": 8,
+      "title": "perfil pessoal salva registro e foto privada e notificações distinguem ciência",
+      "project": "chromium"
+    },
+    {
+      "file": "personal-workspace.spec.ts",
+      "line": 8,
+      "title": "perfil pessoal salva registro e foto privada e notificações distinguem ciência",
+      "project": "mobile"
+    },
+    {
+      "file": "personal-workspace.spec.ts",
+      "line": 8,
+      "title": "perfil pessoal salva registro e foto privada e notificações distinguem ciência",
+      "project": "ios"
+    },
+    {
+      "file": "schedules.spec.ts",
+      "line": 9,
+      "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+      "project": "chromium"
+    },
+    {
+      "file": "schedules.spec.ts",
+      "line": 9,
+      "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+      "project": "mobile"
+    },
+    {
+      "file": "schedules.spec.ts",
+      "line": 9,
+      "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+      "project": "ios"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 69,
+      "title": "V4 review: matriz reconcilia horários, intervalo, versões e falhas sem sobrescrever alterações",
+      "project": "chromium"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 214,
+      "title": "V4 review: sino filtra silenciosas antes da página e ficha acompanha estado posterior ao vivo",
+      "project": "chromium"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 359,
+      "title": "V4 review: cartão de arquivamento abre exatamente as conclusões contadas",
+      "project": "chromium"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 69,
+      "title": "V4 review: matriz reconcilia horários, intervalo, versões e falhas sem sobrescrever alterações",
+      "project": "mobile"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 214,
+      "title": "V4 review: sino filtra silenciosas antes da página e ficha acompanha estado posterior ao vivo",
+      "project": "mobile"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 359,
+      "title": "V4 review: cartão de arquivamento abre exatamente as conclusões contadas",
+      "project": "mobile"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 69,
+      "title": "V4 review: matriz reconcilia horários, intervalo, versões e falhas sem sobrescrever alterações",
+      "project": "ios"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 214,
+      "title": "V4 review: sino filtra silenciosas antes da página e ficha acompanha estado posterior ao vivo",
+      "project": "ios"
+    },
+    {
+      "file": "v4-review.spec.ts",
+      "line": 359,
+      "title": "V4 review: cartão de arquivamento abre exatamente as conclusões contadas",
+      "project": "ios"
+    },
+    {
+      "file": "v4.spec.ts",
+      "line": 69,
+      "title": "V4: dois usuários ao vivo, duplicidade contextual, ciência automática e compartilhamento do arquivo",
+      "project": "chromium"
+    },
+    {
+      "file": "v4.spec.ts",
+      "line": 260,
+      "title": "V4: matrizes móveis, múltiplos canais no contrato visual e proposta global aprovada localmente",
+      "project": "chromium"
+    },
+    {
+      "file": "v4.spec.ts",
+      "line": 69,
+      "title": "V4: dois usuários ao vivo, duplicidade contextual, ciência automática e compartilhamento do arquivo",
+      "project": "mobile"
+    },
+    {
+      "file": "v4.spec.ts",
+      "line": 260,
+      "title": "V4: matrizes móveis, múltiplos canais no contrato visual e proposta global aprovada localmente",
+      "project": "mobile"
+    },
+    {
+      "file": "v4.spec.ts",
+      "line": 69,
+      "title": "V4: dois usuários ao vivo, duplicidade contextual, ciência automática e compartilhamento do arquivo",
+      "project": "ios"
+    },
+    {
+      "file": "v4.spec.ts",
+      "line": 260,
+      "title": "V4: matrizes móveis, múltiplos canais no contrato visual e proposta global aprovada localmente",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 188,
+      "title": "REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 342,
+      "title": "dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 476,
+      "title": "resposta perdida e recarga recuperam a mesma REQ e seu protocolo",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 518,
+      "title": "histórico filtra código e período e conserva o documento de paciente renomeado e inativo",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 574,
+      "title": "estoque familiar: revisão, paginação, filtro e correção compensatória auditável",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 642,
+      "title": "BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 721,
+      "title": "item extra identificado, múltiplas REQ, scanner e trânsito até o aceite",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 941,
+      "title": "alteração de destinatário e cancelamento bilateral preservam os saldos reais",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 1042,
+      "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+      "project": "chromium"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 188,
+      "title": "REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 342,
+      "title": "dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 476,
+      "title": "resposta perdida e recarga recuperam a mesma REQ e seu protocolo",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 518,
+      "title": "histórico filtra código e período e conserva o documento de paciente renomeado e inativo",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 574,
+      "title": "estoque familiar: revisão, paginação, filtro e correção compensatória auditável",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 642,
+      "title": "BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 721,
+      "title": "item extra identificado, múltiplas REQ, scanner e trânsito até o aceite",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 941,
+      "title": "alteração de destinatário e cancelamento bilateral preservam os saldos reais",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 1042,
+      "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+      "project": "mobile"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 188,
+      "title": "REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 342,
+      "title": "dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 476,
+      "title": "resposta perdida e recarga recuperam a mesma REQ e seu protocolo",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 518,
+      "title": "histórico filtra código e período e conserva o documento de paciente renomeado e inativo",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 574,
+      "title": "estoque familiar: revisão, paginação, filtro e correção compensatória auditável",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 642,
+      "title": "BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 721,
+      "title": "item extra identificado, múltiplas REQ, scanner e trânsito até o aceite",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 941,
+      "title": "alteração de destinatário e cancelamento bilateral preservam os saldos reais",
+      "project": "ios"
+    },
+    {
+      "file": "workflows.spec.ts",
+      "line": 1042,
+      "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+      "project": "ios"
+    }
+  ]
+}

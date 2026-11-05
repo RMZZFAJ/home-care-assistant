@@ -1,0 +1,5 @@
+/* AUDIT ONLY. Corrects probe's navigation assumption; no save. */
+/* global getComputedStyle */
+import {harness} from './browser-harness.mjs';
+const h=await harness('b12-drawer');
+try{const p=await h.login('adminA');await p.setViewportSize({width:320,height:844});await p.goto('/admin?section=catalog',{waitUntil:'networkidle'});await p.getByRole('button',{name:'Novo item',exact:true}).click();await p.getByRole('dialog').waitFor();await h.capture(p,'adminA','catalog-320');h.result.geometry=await p.getByRole('dialog').evaluate(d=>({width:d.getBoundingClientRect().width,height:d.getBoundingClientRect().height,scrollWidth:d.scrollWidth,clientWidth:d.clientWidth,buttons:[...d.querySelectorAll('button')].map(b=>({name:b.innerText||b.getAttribute('aria-label'),height:b.getBoundingClientRect().height})),fields:[...d.querySelectorAll('input,select,textarea')].map(e=>({name:e.getAttribute('name'),width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height,size:getComputedStyle(e).fontSize}))}));h.save();}finally{await h.finish();}

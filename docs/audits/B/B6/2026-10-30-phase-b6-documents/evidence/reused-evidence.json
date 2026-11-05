@@ -1,0 +1,299 @@
+[
+  {
+    "id": "BE-007",
+    "source": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.csv",
+    "sha256": "1b0eec8ffff634c6a190fe5b0ec69dd75083bede7953532a01dce182ed30a989",
+    "record": {
+      "id": "BE-007",
+      "title": "PDF da REQ omite o estoque observado que aparece na ficha",
+      "priority": "P3",
+      "nature": "PRODUCT_OPPORTUNITY",
+      "observed": "A tabela REQ contém Nº, material, apresentação e prioridade; não há consumo de current_stock no renderizador. A tela mostra Estoque observado na emissão com a quantidade e unidade.",
+      "evidence": "src/lib/server/operational-pdf.ts:437-447; src/components/requisitions/requisition-detail.tsx:308-313; supabase/migrations/20261022085111_operational_completion_and_authenticated_reviews.sql:298; src/lib/server/document-pdf.ts:67-78"
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "OPS-001",
+    "source": "docs/audits/2026-10-25-production-readiness/FINDINGS_MASTER.csv",
+    "sha256": "1b0eec8ffff634c6a190fe5b0ec69dd75083bede7953532a01dce182ed30a989",
+    "record": {
+      "id": "OPS-001",
+      "title": "Recuperação integral do ambiente de produção ainda precisa de aceite atual",
+      "priority": "P2",
+      "nature": "EXTERNAL_DEPENDENCY",
+      "observed": "Documentos distinguem dumps sequenciais e ausência de bytesStorage/ensaio remoto; FaseA não executou recuperação do ambiente remoto.",
+      "evidence": "docs/evolution/EXECUTION.md:184; docs/evolution/EXECUTION.md:301; docs/OPERATIONS.md; DATABASE_RESET_SEED_AND_GO_LIVE.md"
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B1-ERR-001",
+    "source": "docs/audits/2026-10-28-phase-b1-interface/12_FINDINGS_MASTER.csv",
+    "sha256": "eefc19f804b02c4b146c6afe01139772f206d3f99c0a98bfb24cfca9515d1348",
+    "record": {
+      "id": "B1-ERR-001",
+      "title": "Anexo com resposta perdida deixa arquivo editável apesar de persistência confirmada",
+      "priority": "P2",
+      "nature": "DEFECT_CONFIRMED",
+      "observed": "POST local retornou201 ao interceptor após commit e foi abortado ao cliente; GET encontrou arquivo ready328bytes. UI permite mudar arquivo. A primeira tentativa400 por MIME não persistiu e foi separada.",
+      "evidence": "evidence/b14-recovery.json;evidence/b14-recovery-adminA-attachment-lost.png"
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B1-UX-006",
+    "source": "docs/audits/2026-10-28-phase-b1-interface/12_FINDINGS_MASTER.csv",
+    "sha256": "eefc19f804b02c4b146c6afe01139772f206d3f99c0a98bfb24cfca9515d1348",
+    "record": {
+      "id": "B1-UX-006",
+      "title": "Histórico tem versões e integridade, mas exige tradução manual de mudanças de negócio",
+      "priority": "P3",
+      "nature": "PRODUCT_OPPORTUNITY",
+      "observed": "Detalhes documentais apresentam trilha real; tarefa quem mudou o quê ainda depende de interpretar eventos/valores.",
+      "evidence": "evidence/b11-supplement.json;evidence/b16-feedback.json"
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B1-A11Y-001",
+    "source": "docs/audits/2026-10-28-phase-b1-interface/12_FINDINGS_MASTER.csv",
+    "sha256": "eefc19f804b02c4b146c6afe01139772f206d3f99c0a98bfb24cfca9515d1348",
+    "record": {
+      "id": "B1-A11Y-001",
+      "title": "PDFs não expõem idioma e estrutura de tags no arquivo examinado",
+      "priority": "P2",
+      "nature": "RISK_SUPPORTED",
+      "observed": "InspeçãoPyMuPDF em8páginas confirmou ausência destas entradas. Extração de texto funciona; ordem/leitura em leitor de tela não foi verificada.",
+      "evidence": "evidence/pdf-inspection.json;evidence/current-REQ.pdf;evidence/current-COM.pdf;evidence/current-ENT.pdf;evidence/current-BAL.pdf"
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B2-004",
+    "source": "docs/audits/2026-10-29-phase-b2-processes/13_FINDINGS_MASTER.csv",
+    "sha256": "7e7e21fbc55d5c12939f0062654a80cf53d35ed26dbd275a2d9c5549f65cc1f7",
+    "record": {
+      "id": "B2-004",
+      "title": "ENT com consumo confirmado continua sem conseguir concluir cancelamento",
+      "priority": "P2",
+      "nature": "DEFEITO",
+      "current_behavior": "Aceitar2,confirmar consumo1 e consentir devolução1/consumo1 falha42702 por e.body ambíguo;nenhum efeito parcial persiste",
+      "probable_cause": "Referência SQL ambígua no ramo de consumo positivo impede atravessar conciliação",
+      "evidence": "evidence/b23-results.json",
+      "limits": "Atomicidade correta;subhipótese de vinculação temporal do consumo ficou atrás do erro e não foi comprovada;sem contorno artificial",
+      "relation_A_B1": "A DB-001;mesma causa reexecutada com cadeia física e consequência operacional"
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B2-008",
+    "source": "docs/audits/2026-10-29-phase-b2-processes/13_FINDINGS_MASTER.csv",
+    "sha256": "7e7e21fbc55d5c12939f0062654a80cf53d35ed26dbd275a2d9c5549f65cc1f7",
+    "record": {
+      "id": "B2-008",
+      "title": "Histórico de estoque não conduz igualmente às origens de recibo,BAL e consumo",
+      "priority": "P3",
+      "nature": "OPORTUNIDADE",
+      "current_behavior": "Movimentos têm reference_type/id de purchase_receipt,bal,consumption;ação de navegação do consumidor favorece reference_type=document",
+      "probable_cause": "Renderização de referência trata documento genérico sem resolver todos os tipos de origem",
+      "evidence": "evidence/b24-results.json;evidence/b26-results.json",
+      "limits": "Não perda de referências nem falha de persistência;interação de todos os links não foi automatizada nesta B2",
+      "relation_A_B1": "Relaciona B1-UX-006/A UX-009;novo recorte de navegação por origem do ledger"
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B2-011",
+    "source": "docs/audits/2026-10-29-phase-b2-processes/13_FINDINGS_MASTER.csv",
+    "sha256": "7e7e21fbc55d5c12939f0062654a80cf53d35ed26dbd275a2d9c5549f65cc1f7",
+    "record": {
+      "id": "B2-011",
+      "title": "Decisão oposta de consumo recebe sucesso sem ser aplicada",
+      "priority": "P2",
+      "nature": "DEFEITO",
+      "current_behavior": "Depois de confirmed,rejeição por outro admin retornaHTTP200/data:null e mantém confirmed;mesma decisão repetida também retorna sem nova saída",
+      "probable_cause": "confirm_extraordinary_consumption retorna sem resultado/erro para todo estado diferente de reported,sem comparar decisão;UIinterpreta sucesso",
+      "evidence": "evidence/b25-results.json;evidence/b29-results.json",
+      "limits": "Nenhum débito duplicado ou estorno;corrida simultânea oposta é risco não reproduzido aqui;prova sequencial suficiente para resposta contraditória",
+      "relation_A_B1": "Nenhuma causa equivalente identificada nos32A/35B1"
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B3-002",
+    "source": "docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.csv",
+    "sha256": "905676ec825d518598343c0c05a7a8685701e152739238e39cc6887e7c21b400",
+    "record": {
+      "id": "B3-002",
+      "title": "Cancelamento ENT com consumo real confirmado falha no SQL de reconciliação",
+      "priority": "P2",
+      "nature": "DEFECT_CONFIRMED",
+      "observed": "Caminho de consumedQuantity positivo retorna42702 por alias e ambíguo.",
+      "cause": "Variável/alias e no ramo de soma de eventos impede resolver referência SQL.",
+      "evidence": "evidence/b36-results.json#B36-05;06_DOCUMENT_LIFECYCLE_AND_STATE_INTEGRITY.md",
+      "counterproof": "Cancelamento/devolução sem consumo e rollback da última linha conservam custódias.",
+      "limits": "Defeito no ramo de consumo positivo; cancelamentos sem esse ramo funcionaram.",
+      "relation": "A DB-001;B2-004;mesma causa revalidada."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B3-004",
+    "source": "docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.csv",
+    "sha256": "905676ec825d518598343c0c05a7a8685701e152739238e39cc6887e7c21b400",
+    "record": {
+      "id": "B3-004",
+      "title": "Reservas abandonadas ocupam permanentemente a capacidade de anexos",
+      "priority": "P2",
+      "nature": "DEFECT_CONFIRMED",
+      "observed": "Dez quarantine sem objeto esgotam o limite; concorrência pela última vaga concede somente uma.",
+      "cause": "Contagem inclui reservas sem expiração/abandono e sem percurso de recuperação de capacidade.",
+      "evidence": "evidence/b310-results.json#B310-05;10_STORAGE_ATTACHMENTS_AND_RETENTION.md",
+      "counterproof": "Cap10 é serializado; mesma chave recupera anexo e outro conteúdo conflita.",
+      "limits": "Reserva explícita sem bytes; não injetou queda física de conexão.",
+      "relation": "A DB-004;B2-016;B1-ERR-001 recuperação visual permanece separada."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B3-005",
+    "source": "docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.csv",
+    "sha256": "905676ec825d518598343c0c05a7a8685701e152739238e39cc6887e7c21b400",
+    "record": {
+      "id": "B3-005",
+      "title": "Correção compensatória aceita movimento sem referência ao fato corrigido",
+      "priority": "P2",
+      "nature": "DEFECT_CONFIRMED",
+      "observed": "correction_in sem referência foi aceita; referência de outro produto foi recusada.",
+      "cause": "Validação de referência é condicional à presença, sem obrigatoriedade para ação compensatória.",
+      "evidence": "evidence/b35-results.json#B35-11",
+      "counterproof": "Ledger direto fechado,referência incompatível recusada,unidade histórica imutável.",
+      "limits": "Operação autorizada no estoque familiar; não demonstra edição direta de saldo.",
+      "relation": "B2-005;não é correção implementada nesta fase."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B3-014",
+    "source": "docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.csv",
+    "sha256": "905676ec825d518598343c0c05a7a8685701e152739238e39cc6887e7c21b400",
+    "record": {
+      "id": "B3-014",
+      "title": "Restauração operacional conjunta ainda não foi comprovada",
+      "priority": "P2",
+      "nature": "VALIDATION_GAP",
+      "observed": "Dump privado legível e hash idêntico;Auth e metadados Storage presentes;nenhum restore completo.",
+      "cause": "Sem ensaio em destino isolado autorizado com bytes/configuração e validação operacional conjunta.",
+      "evidence": "evidence/b312-recovery.json;12_ADVERSARIAL_INTEGRITY_AND_RECOVERY.md",
+      "counterproof": "Backup possui Auth/users,documentos e contexto;hashes/bytes locais testados em outros cenários.",
+      "limits": "Ausência de prova não é falha de restore reproduzida;destino existente não pode ser substituído.",
+      "relation": "A OPS-001 continua aberto;B3 amplia inventário de dependências."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B3-015",
+    "source": "docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.csv",
+    "sha256": "905676ec825d518598343c0c05a7a8685701e152739238e39cc6887e7c21b400",
+    "record": {
+      "id": "B3-015",
+      "title": "Snapshots acumulam quadraticamente resumos do histórico",
+      "priority": "P3",
+      "nature": "RISK_SUPPORTED_MEASURED_STRUCTURE",
+      "observed": "1000 eventos acumularam500500 entradas resumidas e71.056.717 bytes de corpos em texto;versão1 e todos digests válidos.",
+      "cause": "Cada evento inclui resumo de todos os anteriores,sem copiar recursivamente corpos completos.",
+      "evidence": "evidence/b312h-results.json#B312-06;evidence/b312v-results.json#B312-09",
+      "counterproof": "Compressão reduziu soma pg_column_size a3.194.326 bytes;antigo permaneceu acessível e verificável.",
+      "limits": "COM sintética,um membro,sem linhas;6,361s é preparo/medição, não latência de usuário nem tamanho completo do banco.",
+      "relation": "A DB-005;B3 acrescenta medição100/500/1000;não é achado novo."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B3-022",
+    "source": "docs/audits/2026-10-29-phase-b3-database/14_FINDINGS_MASTER.csv",
+    "sha256": "905676ec825d518598343c0c05a7a8685701e152739238e39cc6887e7c21b400",
+    "record": {
+      "id": "B3-022",
+      "title": "URL de arquivo já emitida continua válida durante TTL após revogar vínculo",
+      "priority": "P3",
+      "nature": "GOVERNANCE_BOUNDARY_CONFIRMED",
+      "observed": "Nova API404 após revogação;URL anteriormente emitida retornou200 dentro do prazo.",
+      "cause": "URL assinada é credencial temporária independente da consulta de membership em cada download.",
+      "evidence": "evidence/b310-results.json#B310-06",
+      "counterproof": "Novas autorizações/URLs foram negadas;usuário era autorizado quando recebeu o link.",
+      "limits": "Expiração depois120s não foi testada;sem exposição a terceiro ou acesso permanente demonstrado.",
+      "relation": "Nova observação B3;requer política de revogação,sem classificar comportamento padrão como invasão."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B4-004",
+    "source": "docs/audits/2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.csv",
+    "sha256": "266b9039ddeb02cf61cea1bc2c7d4c63f81d7a774d5d120b8c907f831fa819ac",
+    "record": {
+      "id": "B4-004",
+      "title": "Revisar e submeter omite revisão já confirmada quando a submissão falha",
+      "priority": "P2",
+      "nature": "Falha de contrato",
+      "observed": "HTTP409 INSUFFICIENT_STOCK sem persistence;draft ficou versão nova com quantidade2 em lugar de1.",
+      "cause": "Duas RPCs confirmam separadamente;exceção da segunda usa envelope de erro genérico que perde o resultado da primeira.",
+      "evidence": "evidence/b44-command-results.json#B44-05",
+      "counterproof": "Mesmas chaves não duplicam revisão;draft pode ser recuperado e emissão insuficiente é corretamente recusada.",
+      "limits": "Uma ENT sintética;COM/BAL não foram induzidos a toda falha de segunda etapa.",
+      "relation": "A arquitetura já observava duas transações;B4 comprova efeito e falta de contrato parcial;B1-ERR-002 relacionado."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B4-007",
+    "source": "docs/audits/2026-10-30-phase-b4-backend/14_FINDINGS_MASTER.csv",
+    "sha256": "266b9039ddeb02cf61cea1bc2c7d4c63f81d7a774d5d120b8c907f831fa819ac",
+    "record": {
+      "id": "B4-007",
+      "title": "Upload de avatar não tem retomada após falha na associação",
+      "priority": "P3",
+      "nature": "Risco sustentado",
+      "observed": "Upload simulado aceitou;set_my_avatar falhou403;retry escreveu outro caminho UUID.",
+      "cause": "Identidade só no servidor e pipeline upload→RPC sem reserva/consulta de tentativa ou compensação.",
+      "evidence": "evidence/b47-services-results.json#B47-07",
+      "counterproof": "Associação no retry pode funcionar;imagem saneada e acesso privado permanecem.",
+      "limits": "Sem falha de Storage real ou ensaio de retenção;P3,sem bloqueador comprovado.",
+      "relation": "B3-021 trata autorização direta de avatar;B1 anexo trata UX;causa de retomada avatar é distinta."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B5-004",
+    "source": "docs/audits/2026-10-30-phase-b5-integrations/14_FINDINGS_MASTER.csv",
+    "sha256": "58eac55ffccdf0e51959af2838f5fbd7faa186af230b0e70e36fdbfedea6e83c",
+    "record": {
+      "id": "B5-004",
+      "title": "Representação genérica também confunde conclusão REQ, COM parcial e cancelamento ENT",
+      "priority": "P2",
+      "nature": "Falha de comunicação;manifestação anterior ampliada",
+      "observed": "REQ concluída usou data anterior de ciência; COM parcial escolheu pedido de validação; ENT já cancelled usou revisão/manifestação de cancelamento. Leitura estática adicional: req.reminder só por ciência pode anunciar materiais pendentes com zero linhas; occurrence.received atribui autoria a confirmador que não criou o relato. Não foram novas execuções ou envios.",
+      "cause": "Seleção/valores genéricos por evento/status não distinguem fato operacional, origem do ato e data pertinente.",
+      "evidence": "evidence/b54-content-cases.json#B54-C01; evidence/b54-content-cases.json#B54-C02; evidence/b54-content-cases.json#B54-C03; 04_WHATSAPP_OUTBOUND_TEMPLATES_AND_MEDIA.md",
+      "counterproof": "ENT integral exibiu 1 de 1 e filename versionado correto; evento/PDF selecionado não virou versão atual silenciosamente."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  },
+  {
+    "id": "B5-005",
+    "source": "docs/audits/2026-10-30-phase-b5-integrations/14_FINDINGS_MASTER.csv",
+    "sha256": "58eac55ffccdf0e51959af2838f5fbd7faa186af230b0e70e36fdbfedea6e83c",
+    "record": {
+      "id": "B5-005",
+      "title": "Minimização anunciada não é garantida pelo conteúdo externo preparado",
+      "priority": "P2",
+      "nature": "Questão de governança e privacidade sustentada",
+      "observed": "nome_paciente aceita nome completo; SQL tem fallback ao nome do paciente; alerta inclui produto/saldo; documentação anuncia omissão de nome/dados clínicos.",
+      "cause": "Texto de governança diverge do contrato de templates e fallback; short name é opcional, sem gate de conteúdo mínimo.",
+      "evidence": "evidence/b54-content-cases.json#B54-C05;11_PRIVACY_OBSERVABILITY_AND_CAPACITY.md",
+      "counterproof": "Paciente pode configurar nome curto; destinatário/telefone/opt-in são revalidados; logs não incluem payload."
+    },
+    "applicability": "Produto37cb7f85 e 232 rotinas B3 conferidos no baseline B6;prova reaproveitada sem reexecutar"
+  }
+]

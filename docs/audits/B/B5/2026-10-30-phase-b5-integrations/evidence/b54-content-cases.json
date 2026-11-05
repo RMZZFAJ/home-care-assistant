@@ -1,0 +1,36 @@
+{
+  "B54-C01": {
+    "event": "req.completed",
+    "observed": "21/10/2026, 08:00",
+    "expectedEvent": "30/10/2026, 10:00"
+  },
+  "B54-C02": {
+    "event": "com.receive",
+    "status": "partially_received",
+    "template": "hca_com_validar_recebimento_v3",
+    "limit": "SQL receipt validation behavior reviewed separately; simulated payload, no COM persisted here"
+  },
+  "B54-C03": {
+    "event": "ent.cancel",
+    "status": "cancelled",
+    "template": "hca_ent_cancelamento_v3"
+  },
+  "B54-C04": {
+    "checked": "1 de 1",
+    "pdfFilename": "ENT-B5-v3-r4.pdf",
+    "limit": "Renderer controlled; no PDF layout claim"
+  },
+  "B54-C05": {
+    "patientParameterAccepted": true,
+    "limit": "Synthetic value; SQL fallback to patient snapshot/current name established by static contract, no real personal data used"
+  },
+  "B54-C06": {
+    "externalEvents": 25,
+    "variants": 34,
+    "catalogTemplates": 27,
+    "unmapped": [
+      "hca_req_nova_familia_v3",
+      "hca_req_confirmacao_autor_v3"
+    ]
+  }
+}

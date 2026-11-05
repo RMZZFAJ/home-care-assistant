@@ -1,0 +1,4804 @@
+[
+  {
+    "file": "src/app/layout.tsx",
+    "line": 24,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/app/verificar/[id]/page.tsx",
+    "line": 52,
+    "kind": "DYNAMIC_VALUE",
+    "value": "!available\r\n          ? \"Verificação temporariamente indisponível.\"\r\n          : verified\r\n            ? \"Hash e versão correspondem ao conteúdo registrado.\"\r\n            : \"Não foi encontrada correspondência para este hash e versão.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/accept-invitation.tsx",
+    "line": 93,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/accept-invitation.tsx",
+    "line": 94,
+    "kind": "DYNAMIC_VALUE",
+    "value": "notice",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/accept-invitation.tsx",
+    "line": 125,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy ? \"Confirmando…\" : \"Aceitar convite com minha conta\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/accept-invitation.tsx",
+    "line": 175,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy ? \"Registrando…\" : \"Criar minha conta\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 228,
+    "kind": "DYNAMIC_VALUE",
+    "value": "globalMode\r\n          ? \"Administração global e por paciente.\"\r\n          : \"Todas as alterações desta área se limitam ao paciente selecionado.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 237,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 243,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 262,
+    "kind": "DYNAMIC_VALUE",
+    "value": "labels[section].toLowerCase()",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 319,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"email\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 321,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"status\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 322,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.expires_at\r\n                        ? formatBrazilDate(text(row, \"expires_at\"))\r\n                        : \"conforme configuração\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 395,
+    "kind": "DYNAMIC_VALUE",
+    "value": "page",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 395,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(notificationTotal / 20)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 423,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"action\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 425,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.created_at\r\n                      ? formatBrazilDate(text(row, \"created_at\"))\r\n                      : \"Data não informada\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 428,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"entity_type\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 431,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"actor_id\") || \"Sistema\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 432,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"entity_id\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-console.tsx",
+    "line": 516,
+    "kind": "DYNAMIC_VALUE",
+    "value": "JSON.stringify(report, null, 2)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/admin-fields.tsx",
+    "line": 62,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/administration-navigation.tsx",
+    "line": 27,
+    "kind": "DYNAMIC_VALUE",
+    "value": "allowed.find((area) => area.section === section)?.title ?? \"Área indisponível\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/administration-navigation.tsx",
+    "line": 27,
+    "kind": "DYNAMIC_VALUE",
+    "value": "area.title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/administration-navigation.tsx",
+    "line": 28,
+    "kind": "DYNAMIC_VALUE",
+    "value": "group",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/administration-navigation.tsx",
+    "line": 28,
+    "kind": "DYNAMIC_VALUE",
+    "value": "area.title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/administration-navigation.tsx",
+    "line": 28,
+    "kind": "DYNAMIC_VALUE",
+    "value": "area.description",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/alert-settings.tsx",
+    "line": 43,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(product, \"name\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/alert-settings.tsx",
+    "line": 88,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(\r\n              products.find((product) => product.id === row.product_id) ?? row,\r\n              \"name\",\r\n            ) || text(row, \"product_id\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/alert-settings.tsx",
+    "line": 92,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"location\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/alert-settings.tsx",
+    "line": 92,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"low_threshold\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/alert-settings.tsx",
+    "line": 93,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"critical_threshold\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/alert-settings.tsx",
+    "line": 94,
+    "kind": "DYNAMIC_VALUE",
+    "value": "bool(row, \"is_enabled\") ? \"habilitada\" : \"desabilitada\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "rows.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "filtered.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 22,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"name\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 22,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"category\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 22,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"unit\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 22,
+    "kind": "DYNAMIC_VALUE",
+    "value": "active(row) ? \"Ativo\" : \"Inativo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "page",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(filtered.length / 15)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 26,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"name\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/catalogue-management.tsx",
+    "line": 26,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"unit\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"full_name\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "bool(row, \"global_scope\") ? \"Privilégio global\" : \"Sem privilégio global\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(row, \"role\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.status === \"active\" ? \"Ativa\" : \"Revogada\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 16,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 16,
+    "kind": "DYNAMIC_VALUE",
+    "value": "role",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 17,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(review.fullName)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 17,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(review.role)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 17,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review.status === \"active\" ? \"Ativa\" : \"Revogada\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 17,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review.globalScope ? \"Habilitado\" : \"Desabilitado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/global-accounts.tsx",
+    "line": 17,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 19,
+    "kind": "DYNAMIC_VALUE",
+    "value": "filtered.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "name(row)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "roles[text(row, \"role\") as keyof typeof roles] ?? text(row, \"role\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.status === \"revoked\" ? \"Revogado\" : \"Ativo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.status === \"revoked\" ? \"Reativar\" : \"Revogar\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 22,
+    "kind": "DYNAMIC_VALUE",
+    "value": "text(person, \"full_name\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 24,
+    "kind": "DYNAMIC_VALUE",
+    "value": "change ? name(change) : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/membership-management.tsx",
+    "line": 24,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-matrix.tsx",
+    "line": 70,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error || \"Carregando matriz de notificações…\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-matrix.tsx",
+    "line": 147,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-matrix.tsx",
+    "line": 149,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-matrix.tsx",
+    "line": 150,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-matrix.tsx",
+    "line": 150,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentEventLabel(event)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-matrix.tsx",
+    "line": 153,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error || configurationError",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-matrix.tsx",
+    "line": 221,
+    "kind": "DYNAMIC_VALUE",
+    "value": "index ? \"Fim\" : \"Início\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-matrix.tsx",
+    "line": 241,
+    "kind": "DYNAMIC_VALUE",
+    "value": "hour",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 11,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(member.full_name)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 11,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(members.find((member) => member.user_id === row.recipient_user_id)?.full_name ?? \"Conta autorizada\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 11,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(row.recipient_group)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 11,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(row.channel)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 11,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(row.destination ?? \"Interno\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 11,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.is_enabled ? \"Habilitado\" : \"Desabilitado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(row.recipient_label ?? row.recipient_group ?? \"Destinatário\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(row.channel)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(row.state)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(row.attempts ?? 0)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.attempted_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/notification-settings.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.last_error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/patient-registration.tsx",
+    "line": 97,
+    "kind": "DYNAMIC_VALUE",
+    "value": "creating || !patient?.id ? \"Criar paciente\" : \"Salvar paciente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/patient-registration.tsx",
+    "line": 101,
+    "kind": "DYNAMIC_VALUE",
+    "value": "creating ? \"Editar atual\" : \"Novo paciente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 24,
+    "kind": "DYNAMIC_VALUE",
+    "value": "groups[code] ?? code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 24,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "capabilityLabels[def.code] ?? def.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "groups[def.code.split(\".\")[0]] ?? \"Operação\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "def.critical ? \" · Crítica\" : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 32,
+    "kind": "DYNAMIC_VALUE",
+    "value": "!eligible?\"Restrito\":enabled === null ? \"Herdar\" : enabled ? \"Permitir\" : \"Restringir\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 32,
+    "kind": "DYNAMIC_VALUE",
+    "value": "describe(value === \"inherit\" ? null : value === \"true\", inherited)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "confirmation.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "confirmation.before",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/permission-matrix.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "confirmation.after",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 218,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error || \"Carregando configurações…\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 225,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.activeContext?.mode === \"global\"\r\n          ? \"Atuação global: mudanças neste paciente geram propostas para aprovação local.\"\r\n          : \"Atuação local: alterações autorizadas são aplicadas imediatamente.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 228,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.data.version",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 230,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 231,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 244,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 286,
+    "kind": "DYNAMIC_VALUE",
+    "value": "person.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 296,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 319,
+    "kind": "DYNAMIC_VALUE",
+    "value": "change.kind",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-console.tsx",
+    "line": 321,
+    "kind": "DYNAMIC_VALUE",
+    "value": "JSON.stringify(change.proposed, null, 2)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-rules.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "group.title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-rules.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "summary(group.code)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-rules.tsx",
+    "line": 26,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-rules.tsx",
+    "line": 26,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/policy-rules.tsx",
+    "line": 29,
+    "kind": "DYNAMIC_VALUE",
+    "value": "day",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/reminder-settings.tsx",
+    "line": 43,
+    "kind": "DYNAMIC_VALUE",
+    "value": "person.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/reminder-settings.tsx",
+    "line": 64,
+    "kind": "DYNAMIC_VALUE",
+    "value": "hour",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/reminder-settings.tsx",
+    "line": 84,
+    "kind": "DYNAMIC_VALUE",
+    "value": "day",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/admin/reminder-settings.tsx",
+    "line": 105,
+    "kind": "DYNAMIC_VALUE",
+    "value": "person.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "value?.patient?.display_name ?? \"Home Care Assistant\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "line": 22,
+    "kind": "DYNAMIC_VALUE",
+    "value": "value.activeContext.mode === \"global\" ? \"Administração global\" : roleLabels[value.patient?.role ?? \"\"]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "line": 29,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.documentContext.displayName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "patient.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "roleLabels[patient.role] ?? patient.role",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/app-shell.tsx",
+    "line": 38,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children(value)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/contact-settings.tsx",
+    "line": 71,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/contact-settings.tsx",
+    "line": 72,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/contact-settings.tsx",
+    "line": 94,
+    "kind": "DYNAMIC_VALUE",
+    "value": "phone ?? \"Não confirmado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/contact-settings.tsx",
+    "line": 140,
+    "kind": "DYNAMIC_VALUE",
+    "value": "providers.includes(\"google\")\r\n            ? \"Vinculado à mesma conta\"\r\n            : \"Não vinculado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/login-form.tsx",
+    "line": 144,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/login-form.tsx",
+    "line": 145,
+    "kind": "DYNAMIC_VALUE",
+    "value": "notice",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/login-form.tsx",
+    "line": 146,
+    "kind": "DYNAMIC_VALUE",
+    "value": "loading ? \"Entrando...\" : \"Entrar\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/logout-button.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "loading ? \"Saindo...\" : \"Sair\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/logout-button.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/mfa-settings.tsx",
+    "line": 148,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/mfa-settings.tsx",
+    "line": 149,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/mfa-settings.tsx",
+    "line": 217,
+    "kind": "DYNAMIC_VALUE",
+    "value": "qr ? \"Cancelar cadastro do fator\" : \"Remover este autenticador\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/password-recovery-form.tsx",
+    "line": 104,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/auth/password-recovery-form.tsx",
+    "line": 111,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy ? \"Atualizando...\" : \"Salvar nova senha\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/authenticated-page.tsx",
+    "line": 17,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 40,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 41,
+    "kind": "DYNAMIC_VALUE",
+    "value": "loadError",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 45,
+    "kind": "DYNAMIC_VALUE",
+    "value": "loadError",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 45,
+    "kind": "DYNAMIC_VALUE",
+    "value": "!editor && !review ? feedback : null",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 45,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 46,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.enabled ? \"Ativa neste paciente\" : \"Processamento desativado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "weekDays[data.regime.weekday]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.types.find(t => t.id === data.regime?.shift_type_id)?.name ?? \"Plantão configurado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.regime.timezone",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "current?.professional_name ?? \"Profissional designado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "current?.type_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(a.starts_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(a.ends_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 51,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.eligibility.available ? \"Contagem disponível para você durante este plantão.\" : new Date(a.starts_at).getTime() > now ? \"Contagem agendada; aguarde o início do plantão.\" : a.professional_id !== context.userId ? \"A contagem é exclusiva da pessoa designada.\" : \"O prazo ou a atribuição mudou. Aguarde a atualização formal.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 52,
+    "kind": "DYNAMIC_VALUE",
+    "value": "approve ? \"Adiar com decisão familiar\" : \"Solicitar adiamento\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 53,
+    "kind": "DYNAMIC_VALUE",
+    "value": "d.status === \"pending\" ? \"Aguardando decisão familiar\" : d.status === \"approved\" ? \"Adiamento autorizado\" : d.status === \"rejected\" ? \"Solicitação rejeitada\" : \"Solicitação superada pela atualização da atribuição\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 53,
+    "kind": "DYNAMIC_VALUE",
+    "value": "d.reason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 53,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(d.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 54,
+    "kind": "DYNAMIC_VALUE",
+    "value": "o.week_start.split(\"-\").reverse().join(\"/\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 54,
+    "kind": "DYNAMIC_VALUE",
+    "value": "o.state === \"regularized\" ? \"Regularizada por contagem atual posterior\" : o.state === \"counted\" ? \"Contagem física registrada\" : \"Pendente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 54,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(o.original_due)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 54,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(o.effective_due)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 54,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(o.missed_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 54,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(o.actual_count_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 55,
+    "kind": "DYNAMIC_VALUE",
+    "value": "d.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 56,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.professional_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 56,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(s.starts_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 56,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(s.ends_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 56,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.status === \"missed\" ? \"Não realizado no prazo\" : s.status === \"deferred\" ? \"Adiado por decisão familiar\" : s.status === \"invalidated\" ? \"Escala alterada; atribuição preservada no histórico\" : s.status === \"counted\" ? \"Contagem registrada\" : \"Designado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 57,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(event.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 57,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentEventLabel(event.action)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 57,
+    "kind": "DYNAMIC_VALUE",
+    "value": "event.reason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 58,
+    "kind": "DYNAMIC_VALUE",
+    "value": "!review ? feedback : null",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 59,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review.command.action === \"configure\" ? `Processamento ${review.command.body.enabled ? \"ativado\" : \"pausado\"} somente para ${patient.display_name}, a partir de ${review.command.body.startsOn}.` : review.command.action === \"request_deferral\" ? \"A solicitação será encaminhada à família. O prazo atual continua válido.\" : \"A decisão será registrada com seu responsável e justificativa.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 59,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review.command.body.reason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 59,
+    "kind": "DYNAMIC_VALUE",
+    "value": "feedback",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-console.tsx",
+    "line": 59,
+    "kind": "DYNAMIC_VALUE",
+    "value": "uncertain ? \"Recuperar confirmação\" : \"Confirmar decisão\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-fields.tsx",
+    "line": 9,
+    "kind": "DYNAMIC_VALUE",
+    "value": "p.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-fields.tsx",
+    "line": 9,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(counts[p.id], p.unit)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-fields.tsx",
+    "line": 9,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(reference[p.id] ?? \"0\", p.unit)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-fields.tsx",
+    "line": 9,
+    "kind": "DYNAMIC_VALUE",
+    "value": "delta.isZero() ? \"Sem diferença\" : \"Diferença: \" + formatQuantity(delta.toFixed(), p.unit)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 30,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatZonedDate(data.eligibility.assignment?.starts_at??null,data.regime.timezone)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatZonedDate(data.eligibility.assignment?.ends_at??null,data.regime.timezone)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 128,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saved.status===\"submitted\"?\"Contagem enviada para revisão. A aprovação ainda está pendente.\":\"Contagem registrada conforme a política de revisão do paciente.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 128,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saved.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 128,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(saved.updated_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 128,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saved.lines.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 128,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saved.lines.filter(l=>!quantity(l.quantity).eq(String(l.metadata.expectedQuantity??\"0\"))).length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 128,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saved.payload.balanceContext?.professionalName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 130,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 130,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(balance.eligibility.assignment?.starts_at??null)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 130,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(balance.eligibility.assignment?.ends_at??null)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 132,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 132,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 133,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.patient!.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 133,
+    "kind": "DYNAMIC_VALUE",
+    "value": "balance.assignments.find(a=>a.id===assignment?.id)?.professional_name??\"Profissional designado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 133,
+    "kind": "DYNAMIC_VALUE",
+    "value": "balance.assignments.find(a=>a.id===assignment?.id)?.type_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 133,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(assignment?.starts_at??null)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 133,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(assignment?.ends_at??null)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 138,
+    "kind": "DYNAMIC_VALUE",
+    "value": "progress",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 138,
+    "kind": "DYNAMIC_VALUE",
+    "value": "products.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-count-wizard.tsx",
+    "line": 138,
+    "kind": "DYNAMIC_VALUE",
+    "value": "notes",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 28,
+    "kind": "DYNAMIC_VALUE",
+    "value": "d",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 29,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 29,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.starts_local.slice(0, 5)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 29,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.duration_minutes / 60",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 30,
+    "kind": "DYNAMIC_VALUE",
+    "value": "p.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 31,
+    "kind": "DYNAMIC_VALUE",
+    "value": "z",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(a?.starts_at ?? null)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(a?.ends_at ?? null)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 34,
+    "kind": "DYNAMIC_VALUE",
+    "value": "editor.deferral.reason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 34,
+    "kind": "DYNAMIC_VALUE",
+    "value": "editor.deferral.target_snapshot.professional_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 34,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(editor.deferral.target_snapshot.starts_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 34,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(editor.deferral.target_snapshot.ends_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 34,
+    "kind": "DYNAMIC_VALUE",
+    "value": "editor.approve ? \"A aprovação substitui a atribuição atual e preserva seu histórico.\" : \"A rejeição mantém a atribuição e o prazo atuais.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "editor.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 37,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.professional_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 37,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.type_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 37,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(s.starts_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/balances/balance-forms.tsx",
+    "line": 37,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(s.ends_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/barcode-scanner.tsx",
+    "line": 159,
+    "kind": "DYNAMIC_VALUE",
+    "value": "active ? \"Encerrar câmera\" : \"Ler código de barras\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/barcode-scanner.tsx",
+    "line": 221,
+    "kind": "DYNAMIC_VALUE",
+    "value": "lastRead",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/barcode-scanner.tsx",
+    "line": 224,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 89,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 90,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 94,
+    "kind": "DYNAMIC_VALUE",
+    "value": "unit.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 94,
+    "kind": "DYNAMIC_VALUE",
+    "value": "unit.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 94,
+    "kind": "DYNAMIC_VALUE",
+    "value": "unit.decimals",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 94,
+    "kind": "DYNAMIC_VALUE",
+    "value": "unit.care_recipient_id ? \"Paciente\" : \"Global\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 97,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 172,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 187,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/catalog/unit-console.tsx",
+    "line": 229,
+    "kind": "DYNAMIC_VALUE",
+    "value": "unit.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard.tsx",
+    "line": 27,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.active?\"Plantão previsto para agora\":\"Próximo plantão previsto\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.shift_types?.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.professionalName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "stamp(s.starts_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "stamp(s.ends_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "request.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "request.fulfillment.fulfilled",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "request.fulfillment.total",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.custody === \"FAMILY\" ? \"Família\" : \"Equipe\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(item.confirmed)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/dashboard-summary.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(item.minimum)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/global-dashboard.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.patients.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/global-dashboard.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "patient.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/global-dashboard.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "patient.is_active === false ? \"Inativo · histórico preservado\" : \"Cadastro ativo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/management-dashboard.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.patient?.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/metric-card.tsx",
+    "line": 5,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/metric-card.tsx",
+    "line": 5,
+    "kind": "DYNAMIC_VALUE",
+    "value": "value",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/operations-dashboard.tsx",
+    "line": 14,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.fullName.split(\" \")[0]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/operations-dashboard.tsx",
+    "line": 14,
+    "kind": "DYNAMIC_VALUE",
+    "value": "supervisor ? \"Acompanhe a equipe e as situações que precisam de supervisão.\" : \"Suas próximas tarefas no cuidado de \" + context.patient?.display_name + \".\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/task-list.tsx",
+    "line": 10,
+    "kind": "DYNAMIC_VALUE",
+    "value": "title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/task-list.tsx",
+    "line": 10,
+    "kind": "DYNAMIC_VALUE",
+    "value": "tasks.length ? \"Prioridades\" : \"Em dia\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/task-list.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "task.title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/dashboard/task-list.tsx",
+    "line": 13,
+    "kind": "DYNAMIC_VALUE",
+    "value": "task.description",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/attachments.tsx",
+    "line": 133,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/attachments.tsx",
+    "line": 152,
+    "kind": "DYNAMIC_VALUE",
+    "value": "file.filename",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/attachments.tsx",
+    "line": 155,
+    "kind": "DYNAMIC_VALUE",
+    "value": "file.filename",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/attachments.tsx",
+    "line": 158,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(file.bytes / 1024)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/attachments.tsx",
+    "line": 159,
+    "kind": "DYNAMIC_VALUE",
+    "value": "file.state === \"ready\"\r\n                ? \"Validado\"\r\n                : file.state === \"rejected\"\r\n                  ? \"Rejeitado\"\r\n                  : \"Validação pendente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/attachments.tsx",
+    "line": 170,
+    "kind": "DYNAMIC_VALUE",
+    "value": "file.sha256",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/attachments.tsx",
+    "line": 194,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy\r\n              ? \"Validando e enviando…\"\r\n              : uncertain\r\n                ? \"Recuperar envio do anexo\"\r\n                : \"Enviar anexo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/delivery-inbox.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/delivery-inbox.tsx",
+    "line": 36,
+    "kind": "DYNAMIC_VALUE",
+    "value": "page",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/delivery-inbox.tsx",
+    "line": 36,
+    "kind": "DYNAMIC_VALUE",
+    "value": "total",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/demo-document.tsx",
+    "line": 11,
+    "kind": "DYNAMIC_VALUE",
+    "value": "doc.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/demo-document.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(line.name_snapshot)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/demo-document.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(line.unit_snapshot)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-actions.tsx",
+    "line": 129,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-actions.tsx",
+    "line": 131,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentLabels[type]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "dateLabel ?? formatBrazilDate(createdAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "version",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "patientName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "protocol ?? \"Rascunho ainda não emitido\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-header.tsx",
+    "line": 12,
+    "kind": "DYNAMIC_VALUE",
+    "value": "id",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 46,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.type",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.code ?? \"Rascunho\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentLabels[row.type]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 57,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.fulfillment.fulfilled",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 57,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.fulfillment.total",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 61,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.document_lines.filter((line) => line.fully_checked).length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 62,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.document_lines.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 178,
+    "kind": "DYNAMIC_VALUE",
+    "value": "total",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 191,
+    "kind": "DYNAMIC_VALUE",
+    "value": "active.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 232,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 232,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 250,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 312,
+    "kind": "DYNAMIC_VALUE",
+    "value": "key === \"type\"\r\n                  ? \"Ficha\"\r\n                  : key === \"status\"\r\n                    ? \"Situação\"\r\n                    : key === \"search\"\r\n                      ? \"Busca\"\r\n                      : key === \"from\"\r\n                        ? \"De\"\r\n                        : \"Até\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 321,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentStatuses[value] ?? value",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 329,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 370,
+    "kind": "DYNAMIC_VALUE",
+    "value": "page",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-history.tsx",
+    "line": 370,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(total / 20)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-timeline.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentEventLabel(event.action)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-timeline.tsx",
+    "line": 26,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(event.createdAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-timeline.tsx",
+    "line": 27,
+    "kind": "DYNAMIC_VALUE",
+    "value": "event.actorName ||\r\n                  (event.actorId\r\n                    ? \"Pessoa identificada no registro\"\r\n                    : \"Sistema\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-timeline.tsx",
+    "line": 31,
+    "kind": "DYNAMIC_VALUE",
+    "value": "event.version ? \" · versão \" + event.version : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/document-viewer.tsx",
+    "line": 11,
+    "kind": "DYNAMIC_VALUE",
+    "value": "loading ? \"Identificando documento autorizado…\" : \"Documento não encontrado ou indisponível neste contexto.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/forms-hub.tsx",
+    "line": 31,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/forms-hub.tsx",
+    "line": 36,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentLabels[type]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/forms-hub.tsx",
+    "line": 39,
+    "kind": "DYNAMIC_VALUE",
+    "value": "descriptions[type]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/related-document.tsx",
+    "line": 24,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/related-document.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/related-document.tsx",
+    "line": 59,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(data.code ?? data.protocol)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/related-document.tsx",
+    "line": 60,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(String(data.created_at))",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/related-document.tsx",
+    "line": 68,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(\r\n              line.product_name_snapshot ??\r\n                line.name_snapshot ??\r\n                line.custom_name ??\r\n                \"Produto\",\r\n            )",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/related-document.tsx",
+    "line": 74,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.urgent ? \" · Urgente\" : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/related-document.tsx",
+    "line": 75,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.quantity !== undefined\r\n              ? \" · Expedido/proposto \" + String(line.quantity)\r\n              : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/related-document.tsx",
+    "line": 78,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.accepted_quantity !== undefined\r\n              ? \" · Aceito \" + String(line.accepted_quantity)\r\n              : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 212,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.name_snapshot",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 212,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.unit_snapshot",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 225,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(remaining)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 249,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.name_snapshot",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 250,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(line.quantity, line.unit_snapshot)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 289,
+    "kind": "DYNAMIC_VALUE",
+    "value": "receipt.lines.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 290,
+    "kind": "DYNAMIC_VALUE",
+    "value": "new Date(receipt.created_at).toLocaleString(\"pt-BR\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 309,
+    "kind": "DYNAMIC_VALUE",
+    "value": "person.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 330,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.name_snapshot",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 375,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.name_snapshot",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 376,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(line.accepted_quantity)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 408,
+    "kind": "DYNAMIC_VALUE",
+    "value": "action === \"divergence\"\r\n            ? \"Observações da divergência\"\r\n            : \"Motivo / justificativa\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-command-editor.tsx",
+    "line": 423,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 248,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 249,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 268,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.fullyCheckedLines",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 268,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.totalLines",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 272,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.payload.source === \"FAMILY\"\r\n                    ? \"Família → Equipe\"\r\n                    : \"Equipe → Família\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 276,
+    "kind": "DYNAMIC_VALUE",
+    "value": "people.find((person) => person.id === data.recipient_id)\r\n                    ?.name ?? \"Pessoa designada no documento\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 297,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.payload.balanceContext.professionalName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 297,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.payload.balanceContext.shiftType",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 297,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(data.payload.balanceContext.startsAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 297,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(data.payload.balanceContext.endsAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 297,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(data.payload.balanceContext.countedAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 297,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.payload.balanceContext.weeks.map(week=>week.split(\"-\").reverse().join(\"/\")).join(\", \")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 340,
+    "kind": "DYNAMIC_VALUE",
+    "value": "actionLabels[item]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 380,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.payload.notes",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 406,
+    "kind": "DYNAMIC_VALUE",
+    "value": "event.version",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 406,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentEventLabel(event.action)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 409,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(event.createdAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 410,
+    "kind": "DYNAMIC_VALUE",
+    "value": "people.find((person) => person.id === event.actorId)\r\n                      ?.name ?? \"Responsável registrado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 418,
+    "kind": "DYNAMIC_VALUE",
+    "value": "event.hash",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 435,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review?.summary",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-detail.tsx",
+    "line": 453,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy\r\n              ? \"Confirmando…\"\r\n              : uncertain\r\n                ? \"Recuperar tentativa\"\r\n                : \"Confirmar operação\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 15,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.name_snapshot",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 19,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type === \"BAL\"\r\n              ? \"Contado\"\r\n              : type === \"ENT\"\r\n                ? \"Expedido\"\r\n                : \"Proposto\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 26,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(line.quantity, line.unit_snapshot)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 33,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(line.approved_quantity)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 37,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(line.purchased_quantity)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 45,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(line.accepted_quantity)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.metadata.issueOpen\r\n                  ? \"Em divergência\"\r\n                  : status === \"pending_receipt\"\r\n                    ? \"Aguardando conferência\"\r\n                    : \"Quantidade pendente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 57,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(\r\n                  quantity(line.quantity)\r\n                    .minus(line.accepted_quantity)\r\n                    .minus(line.reconciled_quantity)\r\n                    .toFixed(),\r\n                )",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 70,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(String(line.metadata.expectedQuantity ?? \"0\"))",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 75,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type === \"ENT\" ? \"Conciliado\" : \"Recebido / validado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 77,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(\r\n              type === \"ENT\"\r\n                ? line.reconciled_quantity\r\n                : line.accepted_quantity,\r\n            )",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 87,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.fully_checked\r\n            ? \"Linha integralmente conferida\"\r\n            : line.metadata.issueOpen\r\n              ? \"Divergência aberta\"\r\n              : status === \"confirmed\"\r\n                ? \"Linha conciliada com diferença\"\r\n                : status === \"cancelled\"\r\n                  ? \"Expedição cancelada e compensada\"\r\n                  : \"Aguardando conferência\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-line-summary.tsx",
+    "line": 100,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.requisitionItemIds.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 73,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type === \"COM\"\r\n              ? \"Solicite os itens necessários à família. Compra ou doação entram pela mesma ficha, sem comprovante de pagamento obrigatório.\"\r\n              : type === \"ENT\"\r\n                ? \"Selecione as custódias e a pessoa que confirmará o recebimento. A expedição deixa os materiais em trânsito.\"\r\n                : \"Conte todos os produtos sob responsabilidade familiar que estão com a equipe. Materiais de terceiros ficam fora deste controle.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 133,
+    "kind": "DYNAMIC_VALUE",
+    "value": "person.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 139,
+    "kind": "DYNAMIC_VALUE",
+    "value": "fieldErrors.recipientId",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 171,
+    "kind": "DYNAMIC_VALUE",
+    "value": "catalog.find(\r\n                            (product) => product.id === option.productId,\r\n                          )?.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 213,
+    "kind": "DYNAMIC_VALUE",
+    "value": "request.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 247,
+    "kind": "DYNAMIC_VALUE",
+    "value": "fieldErrors[option.productId + \":shared\"]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 295,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 298,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 299,
+    "kind": "DYNAMIC_VALUE",
+    "value": "links[product.id]?.length\r\n                            ? \" · Vinculado à REQ\"\r\n                            : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 307,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type === \"BAL\"\r\n                          ? \"Contagem física\"\r\n                          : type === \"COM\"\r\n                            ? \"Quantidade a adquirir\"\r\n                            : \"Quantidade expedida\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 330,
+    "kind": "DYNAMIC_VALUE",
+    "value": "fieldErrors[product.id]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 365,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.patient?.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 367,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.fullName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 371,
+    "kind": "DYNAMIC_VALUE",
+    "value": "form.source === \"FAMILY\"\r\n                  ? \"Família → Equipe\"\r\n                  : \"Equipe → Família\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 375,
+    "kind": "DYNAMIC_VALUE",
+    "value": "people.find((person) => person.id === form.recipientId)?.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 385,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 387,
+    "kind": "DYNAMIC_VALUE",
+    "value": "form.quantities[product.id]\r\n                    ? formatQuantity(form.quantities[product.id], product.unit)\r\n                    : \"Quantidade pendente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 395,
+    "kind": "DYNAMIC_VALUE",
+    "value": "form.notes",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard-step.tsx",
+    "line": 398,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type === \"ENT\"\r\n              ? \"Ao concluir, as quantidades serão expedidas e aguardarão recebimento. Confira origem, destinatário e materiais.\"\r\n              : type === \"BAL\"\r\n                ? \"Ao concluir, os ajustes seguirão a política de aprovação do paciente. Confira todas as contagens.\"\r\n                : \"A aprovação dos itens e o recebimento serão acompanhados nesta ficha. Nenhum pagamento é necessário para registrar uma doação.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard.tsx",
+    "line": 565,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saved.code ?? \"Rascunho salvo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard.tsx",
+    "line": 568,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saved.protocol",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard.tsx",
+    "line": 571,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saved.status === \"draft\"\r\n            ? \"A ficha está salva como rascunho e ainda não foi expedida.\"\r\n            : type === \"ENT\"\r\n              ? \"Entrega registrada. O recebimento depende da confirmação do destinatário designado.\"\r\n              : type === \"COM\"\r\n                ? \"Compra registrada. Acompanhe a aprovação, aquisição e validação do recebimento.\"\r\n                : saved.status === \"approved\"\r\n                  ? \"Balanço concluído e estoque reconciliado.\"\r\n                  : \"Balanço registrado e aguardando as revisões configuradas.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard.tsx",
+    "line": 614,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard.tsx",
+    "line": 617,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard.tsx",
+    "line": 638,
+    "kind": "DYNAMIC_VALUE",
+    "value": "type",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard.tsx",
+    "line": 638,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.patient?.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/documents/supply-wizard.tsx",
+    "line": 640,
+    "kind": "DYNAMIC_VALUE",
+    "value": "steps[step]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/forms/record-drawer.tsx",
+    "line": 17,
+    "kind": "DYNAMIC_VALUE",
+    "value": "title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/forms/record-drawer.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/forms/settings-section.tsx",
+    "line": 14,
+    "kind": "DYNAMIC_VALUE",
+    "value": "title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/forms/settings-section.tsx",
+    "line": 16,
+    "kind": "DYNAMIC_VALUE",
+    "value": "summary",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/forms/settings-section.tsx",
+    "line": 17,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/forms/wizard-actions.tsx",
+    "line": 9,
+    "kind": "DYNAMIC_VALUE",
+    "value": "step === total - 2 ? \"Revisar\" : \"Avançar\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/forms/wizard-actions.tsx",
+    "line": 9,
+    "kind": "DYNAMIC_VALUE",
+    "value": "saving ? \"Registrando…\" : uncertain ? \"Recuperar esta tentativa\" : finishLabel",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-context.tsx",
+    "line": 134,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 39,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data?.fullName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 39,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data?.activeContext?.mode === \"global\" ? \"Administração global\" : roleLabels[value?.patient?.role ?? \"\"]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "patient.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "roleLabels[patient.role] ?? patient.role",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 74,
+    "kind": "DYNAMIC_VALUE",
+    "value": "operational ? \"Operação assistencial\" : \"Gestão do cuidado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 77,
+    "kind": "DYNAMIC_VALUE",
+    "value": "patient.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 77,
+    "kind": "DYNAMIC_VALUE",
+    "value": "patient.is_active === false ? \" (inativo)\" : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 82,
+    "kind": "DYNAMIC_VALUE",
+    "value": "navigation",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 85,
+    "kind": "DYNAMIC_VALUE",
+    "value": "navigation",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/layout/workspace-shell.tsx",
+    "line": 87,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/navigation/more-actions.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "action.label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/navigation/more-actions.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "action.description",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/navigation/workspace-navigation.tsx",
+    "line": 68,
+    "kind": "DYNAMIC_VALUE",
+    "value": "group.label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/navigation/workspace-navigation.tsx",
+    "line": 70,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/navigation/workspace-navigation.tsx",
+    "line": 77,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/document-delivery-status.tsx",
+    "line": 74,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/document-delivery-status.tsx",
+    "line": 87,
+    "kind": "DYNAMIC_VALUE",
+    "value": "recipientGroupLabels[row.recipient_group] ?? \"Responsável\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/document-delivery-status.tsx",
+    "line": 88,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.recipient_label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/document-delivery-status.tsx",
+    "line": 89,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.channel === \"internal\"\r\n                  ? \"Aplicativo\"\r\n                  : row.channel === \"whatsapp\"\r\n                    ? \"WhatsApp\"\r\n                    : \"E-mail\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/document-delivery-status.tsx",
+    "line": 96,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.channel === \"internal\"\r\n                  ? \"Disponível no aplicativo\"\r\n                  : (deliveryLabels[row.state] ??\r\n                    \"Aguardando atualização\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/document-delivery-status.tsx",
+    "line": 100,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.attempts",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/document-delivery-status.tsx",
+    "line": 104,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.attempted_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/document-delivery-status.tsx",
+    "line": 109,
+    "kind": "DYNAMIC_VALUE",
+    "value": "deliveryErrorLabels[row.error_code] ??\r\n                    deliveryErrorLabels.PROCESSING_FAILED",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-bell.tsx",
+    "line": 99,
+    "kind": "DYNAMIC_VALUE",
+    "value": "unread > 9 ? \"9+\" : unread",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-bell.tsx",
+    "line": 110,
+    "kind": "DYNAMIC_VALUE",
+    "value": "unread",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-bell.tsx",
+    "line": 112,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-bell.tsx",
+    "line": 148,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.operational_documents?.code ??\r\n                        \"Atualização do paciente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-bell.tsx",
+    "line": 152,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentEventLabel(\r\n                        row.document_events?.action ?? row.event_key,\r\n                      )",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-bell.tsx",
+    "line": 156,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-center.tsx",
+    "line": 98,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-center.tsx",
+    "line": 116,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.operational_documents?.code ?? \"Atualização operacional\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-center.tsx",
+    "line": 120,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentEventLabel(row.event_key ?? row.document_events?.action)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-center.tsx",
+    "line": 123,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-center.tsx",
+    "line": 124,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.channel === \"internal\"\r\n                ? \"Disponível no aplicativo\"\r\n                : (row.channel === \"whatsapp\" ? \"WhatsApp\" : \"E-mail\") +\r\n                  \" · \" +\r\n                  (deliveryLabels[row.state] ?? \"Aguardando atualização\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-center.tsx",
+    "line": 188,
+    "kind": "DYNAMIC_VALUE",
+    "value": "page",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/notifications/notification-center.tsx",
+    "line": 188,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(total / 20)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 141,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 142,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 149,
+    "kind": "DYNAMIC_VALUE",
+    "value": "profile.email",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 200,
+    "kind": "DYNAMIC_VALUE",
+    "value": "state",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 224,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 265,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 268,
+    "kind": "DYNAMIC_VALUE",
+    "value": "description",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 375,
+    "kind": "DYNAMIC_VALUE",
+    "value": "membership.care_recipients?.display_name ??\r\n                      \"Paciente com acesso indisponível\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 379,
+    "kind": "DYNAMIC_VALUE",
+    "value": "{\r\n                      admin: \"Administrador do paciente\",\r\n                      family: \"Familiar\",\r\n                      supervisor: \"Supervisor\",\r\n                      professional: \"Profissional da equipe\",\r\n                      reader: \"Leitor\",\r\n                    }[membership.role] ?? membership.role",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 387,
+    "kind": "DYNAMIC_VALUE",
+    "value": "membership.status === \"active\"\r\n                      ? \"Vínculo ativo\"\r\n                      : \"Vínculo revogado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 390,
+    "kind": "DYNAMIC_VALUE",
+    "value": "membership.care_recipients?.is_active\r\n                      ? \"\"\r\n                      : \" · Paciente inativo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 413,
+    "kind": "DYNAMIC_VALUE",
+    "value": "session.current ? \"Esta sessão\" : \"Outra sessão\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 416,
+    "kind": "DYNAMIC_VALUE",
+    "value": "session.userAgent || \"Dispositivo não identificado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/profile-console.tsx",
+    "line": 419,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(session.createdAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 214,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error || \"Carregando requisição…\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 224,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 225,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 230,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.requester_name_snapshot ??\r\n              (data.is_historical\r\n                ? \"Solicitante desconhecido\"\r\n                : \"Solicitante registrado\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 240,
+    "kind": "DYNAMIC_VALUE",
+    "value": "f.fulfilled",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 240,
+    "kind": "DYNAMIC_VALUE",
+    "value": "f.total",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 243,
+    "kind": "DYNAMIC_VALUE",
+    "value": "f.total > 0 && f.fulfilled === f.total\r\n                ? \"Completo\"\r\n                : f.fulfilled\r\n                  ? \"Parcial\"\r\n                  : \"Aguardando ENT aceita\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 253,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.is_historical\r\n                ? \"Não comprovada no original\"\r\n                : p.scienceSatisfied\r\n                  ? \"Exigência satisfeita\"\r\n                  : \"Pendente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 264,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.is_historical\r\n                ? \"Registro histórico\"\r\n                : p.archivedAt\r\n                  ? \"Arquivado\"\r\n                  : data.status === \"cancelled\"\r\n                    ? \"Cancelado\"\r\n                    : p.completedAt\r\n                      ? \"Concluído operacionalmente\"\r\n                      : \"Em atendimento\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 293,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.product_name_snapshot ?? item.custom_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 301,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line?.attended ? \"Atendido\" : \"Pendente\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 308,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.current_stock === null\r\n                    ? \"Estoque desconhecido\"\r\n                    : \"Estoque observado na emissão: \" +\r\n                      formatQuantity(\r\n                        String(item.current_stock),\r\n                        item.unit_snapshot,\r\n                      )",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 354,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.is_historical\r\n            ? \"A ciência original não foi comprovada. Nenhuma confirmação foi inferida na importação.\"\r\n            : p.scienceSatisfied\r\n              ? \"Ciência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\"\r\n              : \"A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 366,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.actor_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 368,
+    "kind": "DYNAMIC_VALUE",
+    "value": "modes[row.mode] ?? row.mode",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 369,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 410,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(p.archivedAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 410,
+    "kind": "DYNAMIC_VALUE",
+    "value": "p.archiveReason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 449,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.code ?? data.protocol",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 449,
+    "kind": "DYNAMIC_VALUE",
+    "value": "f.fulfilled",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 449,
+    "kind": "DYNAMIC_VALUE",
+    "value": "f.total",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 451,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review === \"cancel\"\r\n              ? \"O cancelamento preserva todos os eventos. Entregas vinculadas precisam estar formalmente resolvidas.\"\r\n              : \"O arquivamento mantém as ciências registradas e eventuais ciências pendentes, sem criar confirmação.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 468,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy\r\n              ? \"Registrando…\"\r\n              : review === \"cancel\"\r\n                ? \"Confirmar cancelamento\"\r\n                : \"Confirmar arquivamento\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 486,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.recipient_label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 486,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.channel",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 487,
+    "kind": "DYNAMIC_VALUE",
+    "value": "deliveryLabels[row.state] ?? row.state",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-detail.tsx",
+    "line": 501,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.value",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 34,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 40,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 42,
+    "kind": "DYNAMIC_VALUE",
+    "value": "rows.total",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 42,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.protocol",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 42,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.recipient_name_snapshot ?? row.receipt_snapshot?.recipientName ?? displayName(row.care_recipients)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 42,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.requester_name_snapshot ?? row.receipt_snapshot?.requesterName ?? displayName(row.profiles)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 42,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.is_historical && !row.created_at ? \"Registro histórico · data original desconhecida\" : row.created_at ? formatBrazilDate(row.created_at) : \"Data desconhecida\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 42,
+    "kind": "DYNAMIC_VALUE",
+    "value": "(row.status ? statusLabels[row.status] : null) ?? row.status ?? \"Desconhecido\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 42,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.notifications.length ? Array.from(new Set(row.notifications.map((notification) => notification.state))).map((state) => `${deliveryLabels[state] ?? state}: ${row.notifications.filter((notification) => notification.state === state).length}`).join(\" · \") : \"Nenhuma configurada\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 43,
+    "kind": "DYNAMIC_VALUE",
+    "value": "rows.page",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-history.tsx",
+    "line": 43,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(rows.total / rows.pageSize)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-receipt.tsx",
+    "line": 26,
+    "kind": "DYNAMIC_VALUE",
+    "value": "receipt.protocol",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-receipt.tsx",
+    "line": 31,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(receipt.createdAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-receipt.tsx",
+    "line": 36,
+    "kind": "DYNAMIC_VALUE",
+    "value": "receipt.requesterName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-receipt.tsx",
+    "line": 38,
+    "kind": "DYNAMIC_VALUE",
+    "value": "receipt.recipientName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "requesterName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 91,
+    "kind": "DYNAMIC_VALUE",
+    "value": "duplicate?.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 107,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(pending.createdAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 176,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 178,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 185,
+    "kind": "DYNAMIC_VALUE",
+    "value": "info?.familyStock === null || !info\r\n                    ? \"consulta indisponível\"\r\n                    : formatQuantity(info.familyStock, item.unit)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 219,
+    "kind": "DYNAMIC_VALUE",
+    "value": "errors[item.id]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 261,
+    "kind": "DYNAMIC_VALUE",
+    "value": "errors[item.id + \":repeat\"]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 361,
+    "kind": "DYNAMIC_VALUE",
+    "value": "index + 1",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 384,
+    "kind": "DYNAMIC_VALUE",
+    "value": "classificationLabels[result.classification]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 393,
+    "kind": "DYNAMIC_VALUE",
+    "value": "candidate.product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 394,
+    "kind": "DYNAMIC_VALUE",
+    "value": "candidate.product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 396,
+    "kind": "DYNAMIC_VALUE",
+    "value": "candidateLabels[candidate.kind]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 397,
+    "kind": "DYNAMIC_VALUE",
+    "value": "candidate.kind === \"alias\"\r\n                        ? `: ${candidate.matchedName}`\r\n                        : \"\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 405,
+    "kind": "DYNAMIC_VALUE",
+    "value": "result.candidates.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 496,
+    "kind": "DYNAMIC_VALUE",
+    "value": "requesterName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 498,
+    "kind": "DYNAMIC_VALUE",
+    "value": "recipientName",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 524,
+    "kind": "DYNAMIC_VALUE",
+    "value": "title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-steps.tsx",
+    "line": 528,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.value",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-wizard.tsx",
+    "line": 341,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-wizard.tsx",
+    "line": 344,
+    "kind": "DYNAMIC_VALUE",
+    "value": "catalogError",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-wizard.tsx",
+    "line": 360,
+    "kind": "DYNAMIC_VALUE",
+    "value": "context.patient!.display_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-wizard.tsx",
+    "line": 361,
+    "kind": "DYNAMIC_VALUE",
+    "value": "steps[step]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/requisition-wizard.tsx",
+    "line": 417,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 100,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 113,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 129,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 129,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 153,
+    "kind": "DYNAMIC_VALUE",
+    "value": "uncertain ? \"Recuperar associação\" : \"Revisar associação\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 181,
+    "kind": "DYNAMIC_VALUE",
+    "value": "items.find((item) => item.id === review?.itemId)?.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 182,
+    "kind": "DYNAMIC_VALUE",
+    "value": "products.find((product) => product.id === review?.productId)?.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 184,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review?.reason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 198,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy\r\n              ? \"Confirmando…\"\r\n              : uncertain\r\n                ? \"Recuperar associação\"\r\n                : \"Confirmar associação\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/requisitions/resolve-extra-item.tsx",
+    "line": 205,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 46,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.type_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 46,
+    "kind": "DYNAMIC_VALUE",
+    "value": "stateLabels[s.status]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 46,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.professional_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 46,
+    "kind": "DYNAMIC_VALUE",
+    "value": "stamp(s.starts_at, s.timezone)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 46,
+    "kind": "DYNAMIC_VALUE",
+    "value": "stamp(s.ends_at, s.timezone)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 46,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.notes",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "team || publishOwn ? \"Alterar plantão\" : \"Propor alteração\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 52,
+    "kind": "DYNAMIC_VALUE",
+    "value": "!editor && !review ? errors : null",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 52,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 55,
+    "kind": "DYNAMIC_VALUE",
+    "value": "p.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 56,
+    "kind": "DYNAMIC_VALUE",
+    "value": "v",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 59,
+    "kind": "DYNAMIC_VALUE",
+    "value": "new Intl.DateTimeFormat(\"pt-BR\", { timeZone: \"UTC\", weekday: \"short\", day: \"2-digit\", month: \"2-digit\" }).format(new Date(date + \"T12:00:00Z\"))",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 59,
+    "kind": "DYNAMIC_VALUE",
+    "value": "visible.filter(s => new Intl.DateTimeFormat(\"sv-SE\", { timeZone: s.timezone }).format(new Date(s.starts_at)) === date).map(renderShift)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 60,
+    "kind": "DYNAMIC_VALUE",
+    "value": "day.split(\"-\").reverse().join(\"/\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 60,
+    "kind": "DYNAMIC_VALUE",
+    "value": "visible.filter(s => new Intl.DateTimeFormat(\"sv-SE\", { timeZone: s.timezone }).format(new Date(s.starts_at)) === day).map(renderShift)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 61,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.professionals.find(p => p.id === s.professional_id)?.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 61,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.anchor_date",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 61,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.valid_until",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 61,
+    "kind": "DYNAMIC_VALUE",
+    "value": "c.reason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 62,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 62,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.starts_local.slice(0, 5)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 62,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.duration_minutes / 60",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 62,
+    "kind": "DYNAMIC_VALUE",
+    "value": "data.professionals.find(p => p.id === s.professional_id)?.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 62,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.anchor_date",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 62,
+    "kind": "DYNAMIC_VALUE",
+    "value": "s.valid_until",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 63,
+    "kind": "DYNAMIC_VALUE",
+    "value": "stamp(event.created_at, \"America/Sao_Paulo\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 63,
+    "kind": "DYNAMIC_VALUE",
+    "value": "event.action",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 63,
+    "kind": "DYNAMIC_VALUE",
+    "value": "event.reason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 65,
+    "kind": "DYNAMIC_VALUE",
+    "value": "!review ? errors : null",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 66,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review.command.action === \"series\" ? `${review.command.body.anchorDate} a ${review.command.body.validUntil} · ${review.command.body.recurrence}` : \"Revise o período, o profissional e o efeito da alteração.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 66,
+    "kind": "DYNAMIC_VALUE",
+    "value": "errors",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-console.tsx",
+    "line": 66,
+    "kind": "DYNAMIC_VALUE",
+    "value": "uncertain ? \"Recuperar confirmação\" : \"Confirmar gravação\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 35,
+    "kind": "DYNAMIC_VALUE",
+    "value": "p.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 36,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 36,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.starts_local.slice(0, 5)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 36,
+    "kind": "DYNAMIC_VALUE",
+    "value": "t.duration_minutes / 60",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 39,
+    "kind": "DYNAMIC_VALUE",
+    "value": "c",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 42,
+    "kind": "DYNAMIC_VALUE",
+    "value": "z",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "editor.shift.type_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "editor.shift.professional_name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 50,
+    "kind": "DYNAMIC_VALUE",
+    "value": "p.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/schedules/schedule-forms.tsx",
+    "line": 53,
+    "kind": "DYNAMIC_VALUE",
+    "value": "editor.shift.timezone",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 111,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 112,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 116,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 195,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 199,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 223,
+    "kind": "DYNAMIC_VALUE",
+    "value": "uncertain ? \"Recuperar relato\" : \"Registrar para conferência\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 241,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.kind === \"shortage\" ? \"Falta\" : \"Consumo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 242,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.location === \"FAMILY\" ? \"Família\" : \"Equipe\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 243,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.status === \"reported\"\r\n                  ? \"Aguardando confirmação\"\r\n                  : row.status === \"confirmed\"\r\n                    ? \"Confirmado\"\r\n                    : \"Rejeitado\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 249,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.body",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 253,
+    "kind": "DYNAMIC_VALUE",
+    "value": "products.find((product) => product.id === line.productId)\r\n                      ?.name ?? \"Produto\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 255,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.quantity",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 260,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 295,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review.row.body",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 295,
+    "kind": "DYNAMIC_VALUE",
+    "value": "products.find((product) => product.id === line.productId)?.name ?? \"Produto\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 295,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.quantity",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 295,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review.accept ? \"A confirmação registra o consumo na custódia indicada. O relato e o movimento permanecem auditáveis.\" : \"A rejeição preserva o relato sem movimentar o estoque.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 295,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/consumption-console.tsx",
+    "line": 295,
+    "kind": "DYNAMIC_VALUE",
+    "value": "uncertain ? \"Recuperar confirmação\" : review.accept ? \"Confirmar consumo\" : \"Confirmar rejeição\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 113,
+    "kind": "DYNAMIC_VALUE",
+    "value": "configured\r\n          ? \"Confira os dados recebidos no WhatsApp antes de registrá-los no aplicativo.\"\r\n          : \"O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 117,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 133,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.body.text ?? \"Relato recebido para revisão\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 135,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 213,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 216,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 245,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review?.text",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 247,
+    "kind": "DYNAMIC_VALUE",
+    "value": "review?.lines.length ?? 0",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 263,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy\r\n              ? \"Registrando…\"\r\n              : uncertain\r\n                ? \"Recuperar revisão\"\r\n                : \"Confirmar relato conferido\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/flow-reviews.tsx",
+    "line": 270,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 43,
+    "kind": "DYNAMIC_VALUE",
+    "value": "lastApproved ? `Última contagem aprovada: ${formatBrazilDate(lastApproved.approved_at ?? lastApproved.counted_at)} (${custody[lastApproved.location]}).` : \"Nenhuma contagem aprovada neste paciente.\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 45,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 45,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(item.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "custody[item.location]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 47,
+    "kind": "DYNAMIC_VALUE",
+    "value": "labels[item.status] ?? item.status",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "custody[selected.location]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "labels[selected.status] ?? selected.status",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(selected.reference_at ?? selected.counted_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "selected.id",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 48,
+    "kind": "DYNAMIC_VALUE",
+    "value": "selected.review_reason",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 49,
+    "kind": "DYNAMIC_VALUE",
+    "value": "productName(item.product_id)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 49,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.expected_quantity ?? \"Não registrada\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 49,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.is_counted === false ? \"Pendente\" : item.counted_quantity",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 49,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.is_counted === false || item.expected_quantity == null ? \"Pendente\" : item.counted_quantity - item.expected_quantity",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 49,
+    "kind": "DYNAMIC_VALUE",
+    "value": "item.justification",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 55,
+    "kind": "DYNAMIC_VALUE",
+    "value": "page",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/inventory-console.tsx",
+    "line": 55,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(total/20)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 206,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 207,
+    "kind": "DYNAMIC_VALUE",
+    "value": "message",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 267,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 306,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 306,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 333,
+    "kind": "DYNAMIC_VALUE",
+    "value": "name(row.product_id)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 333,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(row.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 333,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(row.quantity)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 333,
+    "kind": "DYNAMIC_VALUE",
+    "value": "row.source_location === \"FAMILY\" ? \"Retirada\" : \"Entrada\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 354,
+    "kind": "DYNAMIC_VALUE",
+    "value": "savedMovement",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 403,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 436,
+    "kind": "DYNAMIC_VALUE",
+    "value": "name(movement.product_id)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 437,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(movement.quantity)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 440,
+    "kind": "DYNAMIC_VALUE",
+    "value": "movement.source_location\r\n                  ? locationLabels[movement.source_location]\r\n                  : \"Entrada\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 444,
+    "kind": "DYNAMIC_VALUE",
+    "value": "movement.destination_location\r\n                  ? locationLabels[movement.destination_location]\r\n                  : \"Retirada / consumo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 448,
+    "kind": "DYNAMIC_VALUE",
+    "value": "movement.justification",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 450,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(movement.created_at)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 465,
+    "kind": "DYNAMIC_VALUE",
+    "value": "movement.id",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 487,
+    "kind": "DYNAMIC_VALUE",
+    "value": "page",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 487,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(total / 20)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 506,
+    "kind": "DYNAMIC_VALUE",
+    "value": "name(String(review?.productId))",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 508,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(review?.quantity ?? \"\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 510,
+    "kind": "DYNAMIC_VALUE",
+    "value": "String(review?.reason ?? \"\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 515,
+    "kind": "DYNAMIC_VALUE",
+    "value": "error",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-console.tsx",
+    "line": 529,
+    "kind": "DYNAMIC_VALUE",
+    "value": "busy\r\n              ? \"Confirmando…\"\r\n              : uncertain\r\n                ? \"Recuperar tentativa\"\r\n                : \"Confirmar\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.active ? \"\" : \" · Inativo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "labels[key]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(stock.confirmed)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(stock.incoming)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(projection(stock))",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 20,
+    "kind": "DYNAMIC_VALUE",
+    "value": "stock.minimum === null ? \"—\" : formatQuantity(stock.minimum)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "labels[key]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "product.active ? \"\" : \" · Inativo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(stock.confirmed)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(stock.incoming)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 21,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(projection(stock))",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 22,
+    "kind": "DYNAMIC_VALUE",
+    "value": "currentPage",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 22,
+    "kind": "DYNAMIC_VALUE",
+    "value": "Math.ceil(rows.length / 15)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "selected.product.unit",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(selected.stock.confirmed)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(selected.stock.incoming)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(selected.stock.purchasePending)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(projection(selected.stock))",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "selected.stock.minimum === null ? \"Não definido\" : formatQuantity(selected.stock.minimum)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(metrics.find((item) => item.productId === selected.product.productId && item.location === selected.custody)?.quantity ?? \"0\")",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/stock-overview.tsx",
+    "line": 23,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(selected.product.disputed)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/transit-stock.tsx",
+    "line": 55,
+    "kind": "DYNAMIC_VALUE",
+    "value": "doc.code",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/transit-stock.tsx",
+    "line": 60,
+    "kind": "DYNAMIC_VALUE",
+    "value": "doc.source === \"FAMILY\" ? \"Família → Equipe\" : \"Equipe → Família\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/transit-stock.tsx",
+    "line": 61,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatBrazilDate(doc.createdAt)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/transit-stock.tsx",
+    "line": 69,
+    "kind": "DYNAMIC_VALUE",
+    "value": "line.name",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/transit-stock.tsx",
+    "line": 83,
+    "kind": "DYNAMIC_VALUE",
+    "value": "label",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/stock/transit-stock.tsx",
+    "line": 85,
+    "kind": "DYNAMIC_VALUE",
+    "value": "formatQuantity(value, line.unit)",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 67,
+    "kind": "DYNAMIC_VALUE",
+    "value": "documentStatuses[status] ?? status",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 85,
+    "kind": "DYNAMIC_VALUE",
+    "value": "title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 86,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 87,
+    "kind": "DYNAMIC_VALUE",
+    "value": "action",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 125,
+    "kind": "DYNAMIC_VALUE",
+    "value": "active + 1",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 125,
+    "kind": "DYNAMIC_VALUE",
+    "value": "steps.length",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 127,
+    "kind": "DYNAMIC_VALUE",
+    "value": "steps[active]",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 150,
+    "kind": "DYNAMIC_VALUE",
+    "value": "step",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 174,
+    "kind": "DYNAMIC_VALUE",
+    "value": "title",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/ui/primitives.tsx",
+    "line": 176,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/workspace-sync.tsx",
+    "line": 112,
+    "kind": "DYNAMIC_VALUE",
+    "value": "connected\r\n        ? \"Atualização ao vivo conectada\"\r\n        : \"Reconectando atualização ao vivo\"",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/components/workspace.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  },
+  {
+    "file": "src/theme/providers.tsx",
+    "line": 25,
+    "kind": "DYNAMIC_VALUE",
+    "value": "renderToStyleElements(renderer)",
+    "context": "JsxFragment"
+  },
+  {
+    "file": "src/theme/providers.tsx",
+    "line": 31,
+    "kind": "DYNAMIC_VALUE",
+    "value": "children",
+    "context": "JsxElement"
+  }
+]

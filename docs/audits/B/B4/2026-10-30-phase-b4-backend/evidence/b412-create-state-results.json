@@ -1,0 +1,25 @@
+{
+  "recordedAt": "2026-10-30T07:32:52.532Z",
+  "category": "HTTP_REAL_AUTH_AND_PERSISTENCE_READBACK",
+  "results": [
+    {
+      "id": "B412-02",
+      "contract": "Create patient must honor inactive intent or reject unsupported field explicitly",
+      "requestedActive": false,
+      "createStatus": 200,
+      "communicatedActive": true,
+      "initiallyPersisted": {
+        "isActive": true,
+        "isDevelopment": true,
+        "administratorActive": true
+      },
+      "counterproof": {
+        "localUpdateStatus": 200,
+        "finalPersistedActive": false,
+        "initialAdministratorPreserved": true
+      },
+      "cause": "Creation adapter accepts isActive but calls create_patient_with_administrator without it;RPC passes hardcoded true",
+      "limits": "One new synthetic development patient;no unauthorized user gained access;not a global-to-local bypass. Existing update works."
+    }
+  ]
+}

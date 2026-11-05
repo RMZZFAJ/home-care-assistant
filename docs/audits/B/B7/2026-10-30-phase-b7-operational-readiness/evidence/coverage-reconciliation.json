@@ -1,0 +1,16 @@
+{
+  "recordedAt": "2026-10-30T22:30:29.358Z",
+  "subgroups": 13,
+  "dependencies": 17,
+  "recoveryComponents": 20,
+  "readinessDomains": 14,
+  "incidents": 15,
+  "acceptanceCriteria": 22,
+  "scenarios": 31,
+  "controlledLocal": 10,
+  "metadataOrStatic": 11,
+  "integratedDesktop": 10,
+  "priorProofs": 16,
+  "sourceAnchors": 46,
+  "protectedSourcesEqualB6": 395
+}

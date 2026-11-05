@@ -1,0 +1,33 @@
+{
+  "requiredDeliverables": 25,
+  "inventoryObjects": 17,
+  "inventoryFields": 22,
+  "fieldRows": 71,
+  "findings": 13,
+  "findingFields": 33,
+  "P2": 11,
+  "P3": 2,
+  "newCauses": 9,
+  "newManifestations": 2,
+  "priorRiskDeepened": 1,
+  "revalidation": 1,
+  "newScenarios": 23,
+  "priorScenarioReferences": 12,
+  "scenarioRows": 35,
+  "priorFindingRecords": 18,
+  "primaryPdfs": 11,
+  "primaryPages": 32,
+  "primaryVisualPages": 20,
+  "grayscaleVisualPages": 1,
+  "attachmentPdfs": 4,
+  "attachmentVisualPages": 4,
+  "methods": {
+    "ADAPTADOR_CONTROLADO": 1,
+    "QR_OFFLINE": 1,
+    "RASTER_CINZA_VISUAL": 1,
+    "READ_ONLY": 3,
+    "RENDER_TEXTO_VISUAL": 11,
+    "SANITIZADOR_VISUAL": 1,
+    "SQL_LOCAL_ROLLBACK": 5
+  }
+}

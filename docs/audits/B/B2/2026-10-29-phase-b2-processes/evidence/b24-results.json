@@ -1,0 +1,377 @@
+{
+  "group": "B2.4",
+  "startedAt": "2026-10-29T10:12:47.875Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B24-01",
+      "purpose": "Estoque inicial avulso tem movimento próprio e correção referenciada não apaga original",
+      "recordedAt": "2026-10-29T10:12:48.081Z",
+      "observed": {
+        "product": "patient-45f61a6e-8295-44c2-9765-1dc2063dbd1b",
+        "stock": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        },
+        "movements": [
+          {
+            "id": "0d275964-7d21-412b-b85d-0b8e9f6dd317",
+            "quantity": "10.125000",
+            "referenceId": null,
+            "referenceType": "family_manual"
+          },
+          {
+            "id": "a680658c-6c83-4608-8bb4-a0d8d315087f",
+            "quantity": "0.125000",
+            "referenceId": "0d275964-7d21-412b-b85d-0b8e9f6dd317",
+            "referenceType": "family_manual"
+          }
+        ]
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B24-02",
+      "purpose": "Precisão além da unidade e saída maior que saldo são recusadas sem arredondamento",
+      "recordedAt": "2026-10-29T10:12:48.580Z",
+      "observed": {
+        "precision": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "family_stock_movement: incompatible product precision"
+        },
+        "negative": {
+          "rejected": true,
+          "sqlstate": "23514",
+          "message": "family_stock_movement: insufficient stock"
+        },
+        "before": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        },
+        "after": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B24-03",
+      "purpose": "Correção sem referência é aceita na RPC apesar do contrato operacional exigir original",
+      "recordedAt": "2026-10-29T10:12:49.007Z",
+      "observed": {
+        "before": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        },
+        "after": {
+          "FAMILY": "11.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 3
+        },
+        "row": {
+          "id": "e11b6b65-a397-4397-a782-c1acd1617b11",
+          "quantity": "1.000000",
+          "referenceId": null,
+          "referenceType": "family_manual"
+        },
+        "contractGap": "API schema optional referenceId and RPC conditional validation; UI required is the only mandatory reference guard"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B24-04",
+      "purpose": "Unidade/precisão com história protegidas também por trigger; hipótese de bypass refutada",
+      "recordedAt": "2026-10-29T10:12:49.579Z",
+      "observed": {
+        "stockGuard": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "configure_catalogue_unit: unit with operational history is immutable"
+        },
+        "draftGuard": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "configure_catalogue_unit: unit with operational history is immutable"
+        },
+        "draftId": "b31d6f58-946e-435c-a7fd-1e086068ec37",
+        "discardedHypothesis": "configure_catalogue_unit has a narrower local check, but guard_catalogue_unit also protects REQ/document line history"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B24-05",
+      "purpose": "Apresentação converte para base mas COM não conserva embalagem/código original",
+      "recordedAt": "2026-10-29T10:12:49.623Z",
+      "observed": {
+        "lookupBefore": [
+          {
+            "product_id": "patient-801fd317-315b-4aa6-9735-113debdcb16a",
+            "barcode": "7890000000029",
+            "name": "Pacote fictício com dez unidades",
+            "base_quantity": 10
+          }
+        ],
+        "documentId": "c7107e1f-c333-4735-a551-4f68010faa1d",
+        "persisted": {
+          "id": "c7107e1f-c333-4735-a551-4f68010faa1d",
+          "lines": [
+            {
+              "id": "abc0cfe3-20cf-4a0b-af61-e09ad5cd1c04",
+              "accepted": "0.000000",
+              "approved": "20.000000",
+              "metadata": {},
+              "quantity": "20.000000",
+              "productId": "patient-801fd317-315b-4aa6-9735-113debdcb16a",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 1,
+          "number": 5,
+          "status": "approved",
+          "version": 1,
+          "receipts": []
+        },
+        "lineUnit": "unidade",
+        "lineMetadata": {},
+        "hasOriginalPresentationField": false,
+        "methodLimit": "Diagnostic payload uses20base units; source scan() demonstrates accumulation and emitted payload has no presentation provenance. No camera or browser scan executed."
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B24-06",
+      "purpose": "Inativação com saldo preserva ledger e consulta,mas exclui material de novos fluxos",
+      "recordedAt": "2026-10-29T10:12:49.829Z",
+      "observed": {
+        "overview": {
+          "name": "Material fictício B2 retirado do catálogo",
+          "team": {
+            "minimum": null,
+            "incoming": "0",
+            "confirmed": "4.000000"
+          },
+          "unit": "unidade",
+          "active": false,
+          "family": {
+            "minimum": null,
+            "incoming": "0",
+            "confirmed": "4.000000",
+            "purchasePending": "0"
+          },
+          "decimals": 0,
+          "disputed": "0",
+          "productId": "patient-8ee5c488-c6b5-494f-b632-cb0a72521d8a"
+        },
+        "consumption": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "report_extraordinary_consumption: invalid structured consumption"
+        },
+        "includeInBal": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "create_supply_document: invalid patient catalogue product"
+        },
+        "stock": {
+          "FAMILY": "4.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "4.000000",
+          "movements": 3
+        },
+        "recovery": "Reativação administrativa preservou estoque;nenhum consumo ou ajuste foi inventado",
+        "limits": "Inativo continua visível no estoque; não foi alegado desaparecimento de saldo"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B24-07",
+      "purpose": "Leitura de equipe não expõe saldo geral familiar e histórico pagina sem salto nesta amostra",
+      "recordedAt": "2026-10-29T10:12:50.372Z",
+      "observed": {
+        "familyMasked": true,
+        "total": 19,
+        "pageOne": [
+          {
+            "id": "e2c88bd2-d9fd-4f8f-b330-fa229125f312",
+            "quantity": "4.000000",
+            "created_at": "2026-10-29T10:12:50.01345+00:00",
+            "product_id": "patient-8ee5c488-c6b5-494f-b632-cb0a72521d8a",
+            "performed_by": "1be98412-e7d0-4616-959c-0d150aac79bc",
+            "reference_id": "549b1868-64a7-48dc-be70-c21357c70fd9",
+            "justification": "Aceite ENT",
+            "movement_type": "outbound",
+            "reference_type": "document",
+            "source_location": "TRANSIT",
+            "destination_location": "CARE_TEAM",
+            "source_balance_after": 0,
+            "source_balance_before": 4,
+            "destination_balance_after": 4,
+            "destination_balance_before": 0
+          },
+          {
+            "id": "da9a175c-2798-4b05-ac88-1786cceb89cf",
+            "quantity": "4.000000",
+            "created_at": "2026-10-29T10:12:49.855602+00:00",
+            "product_id": "patient-8ee5c488-c6b5-494f-b632-cb0a72521d8a",
+            "performed_by": "9d379482-398d-4e98-882c-1156b20add06",
+            "reference_id": "549b1868-64a7-48dc-be70-c21357c70fd9",
+            "justification": "Expedição ENT",
+            "movement_type": "outbound",
+            "reference_type": "document",
+            "source_location": "FAMILY",
+            "destination_location": "TRANSIT",
+            "source_balance_after": null,
+            "source_balance_before": null,
+            "destination_balance_after": 4,
+            "destination_balance_before": 0
+          }
+        ],
+        "pageTwo": [
+          {
+            "id": "d57f7e86-b845-444b-b278-35d4497fde98",
+            "quantity": "1.000000",
+            "created_at": "2026-10-29T10:08:17.859134+00:00",
+            "product_id": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+            "performed_by": "1be98412-e7d0-4616-959c-0d150aac79bc",
+            "reference_id": "817bd7c0-9c87-40f1-a7aa-3c99521ddc95",
+            "justification": "Recebimento complementar ENT",
+            "movement_type": "outbound",
+            "reference_type": "document",
+            "source_location": "TRANSIT",
+            "destination_location": "CARE_TEAM",
+            "source_balance_after": 0,
+            "source_balance_before": 1,
+            "destination_balance_after": 2,
+            "destination_balance_before": 1
+          },
+          {
+            "id": "f4d81f79-60fb-4788-86b7-9ea8ed83c72b",
+            "quantity": "1.000000",
+            "created_at": "2026-10-29T10:08:17.545048+00:00",
+            "product_id": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+            "performed_by": "1be98412-e7d0-4616-959c-0d150aac79bc",
+            "reference_id": "817bd7c0-9c87-40f1-a7aa-3c99521ddc95",
+            "justification": "Aceite ENT",
+            "movement_type": "outbound",
+            "reference_type": "document",
+            "source_location": "TRANSIT",
+            "destination_location": "CARE_TEAM",
+            "source_balance_after": 1,
+            "source_balance_before": 2,
+            "destination_balance_after": 1,
+            "destination_balance_before": 0
+          }
+        ],
+        "limits": "Two stable pages in synthetic sample; not a concurrent pagination proof"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B24-08",
+      "purpose": "Retirada manual não é contada como consumo confirmado na métrica",
+      "recordedAt": "2026-10-29T10:12:50.399Z",
+      "observed": {
+        "before": [
+          {
+            "days": 2,
+            "location": "CARE_TEAM",
+            "quantity": "1.000000",
+            "movements": 1,
+            "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+            "averagePerDay": "0.99930603747397640528"
+          }
+        ],
+        "after": [
+          {
+            "days": 2,
+            "location": "CARE_TEAM",
+            "quantity": "1.000000",
+            "movements": 1,
+            "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+            "averagePerDay": "0.99930603747397640528"
+          }
+        ],
+        "stock": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 4
+        },
+        "meaning": "Métrica usa somente reference_type=consumption;BAL e retirada avulsa não equivalem a uso confirmado"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B24-09",
+      "purpose": "Trânsito cancelamento pendente pode conter zero físico;remanescentes COM não são saldo",
+      "recordedAt": "2026-10-29T10:12:50.570Z",
+      "observed": {
+        "transitTarget": {
+          "id": "db146b8e-0102-4e63-87aa-1a461370cc0b",
+          "code": "ENT-0004",
+          "lines": [
+            {
+              "name": "Material fictício B2 2",
+              "unit": "unidade",
+              "pending": "0.000000",
+              "accepted": "2.000000",
+              "disputed": false,
+              "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+              "dispatched": "2.000000",
+              "reconciled": "0.000000"
+            }
+          ],
+          "source": "FAMILY",
+          "status": "cancellation_pending",
+          "createdAt": "2026-10-29T10:08:14.671978+00:00",
+          "destination": "CARE_TEAM",
+          "recipientId": "1be98412-e7d0-4616-959c-0d150aac79bc"
+        },
+        "abandonedAcquisition": {
+          "name": "Material fictício B2 4",
+          "team": {
+            "minimum": null,
+            "incoming": "0",
+            "confirmed": "0"
+          },
+          "unit": "unidade",
+          "active": true,
+          "family": {
+            "minimum": null,
+            "incoming": "0",
+            "confirmed": "2.000000",
+            "purchasePending": "8.000000"
+          },
+          "decimals": 0,
+          "disputed": "0",
+          "productId": "patient-676e1298-ba65-476c-9e2c-d89fb2268885"
+        },
+        "interpretation": "Pendência documental de cancelamento não implica quantidade física em trânsito;previsão8 não é disponível2"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "finishedAt": "2026-10-29T10:12:50.589Z"
+}

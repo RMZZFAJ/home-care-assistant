@@ -1,0 +1,47 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T08:33:41.526Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T08:33:46.201Z",
+      "role": "adminA",
+      "label": "membership-revoke-review",
+      "path": "/admin?section=memberships",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-overlay-followup-adminA-membership-revoke-review.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Revogar vínculo\n\nConfirmar a alteração do vínculo de Profissional fictício de plantão neste paciente?\n\nA mudança será auditada e as permissões serão reavaliadas nas próximas operações.\n\nVoltar\nConfirmar alteração",
+      "snapshot": "- dialog \"Revogar vínculo\":\n  - heading \"Revogar vínculo\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph:\n    - text: Confirmar a alteração do vínculo de\n    - strong: Profissional fictício de plantão\n    - text: neste paciente?\n  - paragraph: A mudança será auditada e as permissões serão reavaliadas nas próximas operações.\n  - button \"Voltar\"\n  - button \"Confirmar alteração\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:33:47.857Z",
+      "role": "adminA",
+      "label": "duplicate-review",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "READY",
+      "note": "Click opens review without setting checkbox; first attempt check() wrongly required it to become checked. GET injected, no REQ emitted.",
+      "file": "b18-overlay-followup-adminA-duplicate-review.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Este produto já está em uma requisição pendente\n\nConfira a necessidade anterior antes de reiterar Material fictício V4 0. A nova linha não substitui o pedido anterior.\n\nREQ-0002\n\n29/10/2026, 05:33 · Aguardando atendimento\n\nJustificativa da nova requisição\nNão incluir o item\nManter nova requisição",
+      "snapshot": "- dialog \"Este produto já está em uma requisição pendente\":\n  - heading \"Este produto já está em uma requisição pendente\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph: Confira a necessidade anterior antes de reiterar Material fictício V4 0. A nova linha não substitui o pedido anterior.\n  - list:\n    - listitem:\n      - button \"REQ-0002\"\n      - paragraph: 29/10/2026, 05:33 · Aguardando atendimento\n  - text: Justificativa da nova requisição\n  - textbox \"Justificativa da nova requisição\"\n  - button \"Não incluir o item\"\n  - button \"Manter nova requisição\" [disabled]",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "blockedBusinessWrites": [],
+  "finishedAt": "2026-10-29T08:33:48.561Z"
+}

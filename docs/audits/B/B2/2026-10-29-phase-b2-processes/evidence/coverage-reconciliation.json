@@ -1,0 +1,20 @@
+{
+  "processes": 66,
+  "domains": 12,
+  "with_directed_local_cases": 57,
+  "static_only_processes": [
+    "P-ACC-10",
+    "P-STK-06",
+    "P-STK-07",
+    "P-OCC-03",
+    "P-SCH-06",
+    "P-DOC-05",
+    "P-NTF-02",
+    "P-NTF-03",
+    "P-NTF-04"
+  ],
+  "transitions": 102,
+  "executed_transition_samples": 89,
+  "unique_directed_cases": 81,
+  "limits": "Counts of coverage records,not full combinatorial coverage or human/provider acceptance"
+}

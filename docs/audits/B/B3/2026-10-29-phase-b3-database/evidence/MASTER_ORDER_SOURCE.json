@@ -1,0 +1,8 @@
+{
+  "providedAttachment": true,
+  "originalSha256": "ca5a588dcf998f09ec95c9a2c20282c58ccd054cb7f1fb78c81e5db7aa1a71a5",
+  "originalBytes": 51166,
+  "rawArchive": "evidence/MASTER_ORDER.txt.raw-ca5a588dcf99.gz",
+  "readableCopy": "evidence/MASTER_ORDER.txt",
+  "normalization": "Readable copy may normalize line endings/trailing whitespace; gzip retains exact attachment bytes"
+}

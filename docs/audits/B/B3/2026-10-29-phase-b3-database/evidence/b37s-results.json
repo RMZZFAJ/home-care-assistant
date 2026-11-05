@@ -1,0 +1,35 @@
+{
+  "group": "B3.7s",
+  "startedAt": "2026-10-30T01:13:26.640Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B37-10",
+      "purpose": "Exclusão entre pacientes é atômica, mensagem mínima e fronteira adjacente permitida",
+      "recordedAt": "2026-10-30T01:13:26.774Z",
+      "observed": {
+        "overlap": {
+          "rejected": true,
+          "sqlstate": "23P01",
+          "message": "schedule_command: schedule overlap"
+        },
+        "seriesCountUnchangedOnFailure": true,
+        "adjacentPublished": true,
+        "foreignRows": 0,
+        "scope": "Same real synthetic professional in two patients; exclusion crosses tenant scope without exposing detail"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T01:13:27.769Z"
+}

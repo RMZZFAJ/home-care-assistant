@@ -1,0 +1,11 @@
+{
+  "createdAt": "2026-10-30T06:52:05.676Z",
+  "projectId": "home-care-assistant",
+  "container": "supabase_db_home-care-assistant",
+  "bytes": 6298120,
+  "sha256": "5642bcbe4d60fb6f29893cd086a744c8889bbe5a4a990e7bf4f4641715a654b9",
+  "archiveListVerified": true,
+  "location": "LOCALAPPDATA/home-care-assistant/backups; outside Git",
+  "method": "scripts/backup-local-database.mjs; pg_dump custom; pg_restore --list; SHA-256",
+  "limits": "Archive readability, not a restore exercise. No restore or reset performed."
+}

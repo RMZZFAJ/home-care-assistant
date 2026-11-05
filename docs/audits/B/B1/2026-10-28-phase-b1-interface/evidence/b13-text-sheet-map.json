@@ -1,0 +1,23 @@
+[
+  {
+    "capture": "b13-text-adminA-filter-science_required.png",
+    "sheet": "b13-text-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b13-text-adminA-filter-archive_pending.png",
+    "sheet": "b13-text-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b13-text-adminA-proposal-json.png",
+    "sheet": "b13-text-sheet-01.png",
+    "region": "top 908 of 908px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  }
+]

@@ -1,0 +1,170 @@
+{
+  "recordedAt": "2026-10-30T11:48:46.184Z",
+  "triggers": [
+    {
+      "name": "close_admin_bootstrap",
+      "enabled": "O",
+      "routine": "private.close_admin_bootstrap",
+      "definition": "CREATE TRIGGER close_admin_bootstrap AFTER INSERT OR UPDATE ON public.care_recipient_memberships FOR EACH ROW EXECUTE FUNCTION private.close_admin_bootstrap()",
+      "table_name": "care_recipient_memberships"
+    },
+    {
+      "name": "invalidate_revoked_membership_invitations",
+      "enabled": "O",
+      "routine": "public.invalidate_revoked_membership_invitations",
+      "definition": "CREATE TRIGGER invalidate_revoked_membership_invitations AFTER UPDATE OF status ON public.care_recipient_memberships FOR EACH ROW EXECUTE FUNCTION invalidate_revoked_membership_invitations()",
+      "table_name": "care_recipient_memberships"
+    },
+    {
+      "name": "membership_elevation",
+      "enabled": "O",
+      "routine": "private.guard_membership_elevation",
+      "definition": "CREATE TRIGGER membership_elevation BEFORE INSERT OR UPDATE ON public.care_recipient_memberships FOR EACH ROW EXECUTE FUNCTION private.guard_membership_elevation()",
+      "table_name": "care_recipient_memberships"
+    },
+    {
+      "name": "normalize_membership_capabilities",
+      "enabled": "O",
+      "routine": "public.normalize_local_capabilities",
+      "definition": "CREATE TRIGGER normalize_membership_capabilities BEFORE INSERT OR UPDATE ON public.care_recipient_memberships FOR EACH ROW EXECUTE FUNCTION normalize_local_capabilities()",
+      "table_name": "care_recipient_memberships"
+    },
+    {
+      "name": "v4_workspace_invalidation",
+      "enabled": "O",
+      "routine": "private.invalidate_workspace",
+      "definition": "CREATE TRIGGER v4_workspace_invalidation AFTER INSERT OR DELETE OR UPDATE ON public.care_recipient_memberships FOR EACH ROW EXECUTE FUNCTION private.invalidate_workspace()",
+      "table_name": "care_recipient_memberships"
+    },
+    {
+      "name": "v4_report_notice",
+      "enabled": "O",
+      "routine": "private.report_notice",
+      "definition": "CREATE TRIGGER v4_report_notice AFTER INSERT ON public.consumption_reports FOR EACH ROW EXECUTE FUNCTION private.report_notice()",
+      "table_name": "consumption_reports"
+    },
+    {
+      "name": "document_event_notifications",
+      "enabled": "O",
+      "routine": "private.enqueue_document_event",
+      "definition": "CREATE TRIGGER document_event_notifications AFTER INSERT ON public.document_events FOR EACH ROW EXECUTE FUNCTION private.enqueue_document_event()",
+      "table_name": "document_events"
+    },
+    {
+      "name": "immutable_document_event",
+      "enabled": "O",
+      "routine": "private.immutable_event",
+      "definition": "CREATE TRIGGER immutable_document_event BEFORE DELETE OR UPDATE ON public.document_events FOR EACH ROW EXECUTE FUNCTION private.immutable_event()",
+      "table_name": "document_events"
+    },
+    {
+      "name": "v4_delivery_progress",
+      "enabled": "O",
+      "routine": "private.delivery_science_and_progress",
+      "definition": "CREATE TRIGGER v4_delivery_progress AFTER INSERT ON public.document_events FOR EACH ROW EXECUTE FUNCTION private.delivery_science_and_progress()",
+      "table_name": "document_events"
+    },
+    {
+      "name": "v4_science_snapshot",
+      "enabled": "O",
+      "routine": "private.science_snapshot",
+      "definition": "CREATE TRIGGER v4_science_snapshot BEFORE INSERT ON public.document_events FOR EACH ROW EXECUTE FUNCTION private.science_snapshot()",
+      "table_name": "document_events"
+    },
+    {
+      "name": "v4_workspace_invalidation",
+      "enabled": "O",
+      "routine": "private.invalidate_workspace",
+      "definition": "CREATE TRIGGER v4_workspace_invalidation AFTER INSERT OR DELETE OR UPDATE ON public.document_events FOR EACH ROW EXECUTE FUNCTION private.invalidate_workspace()",
+      "table_name": "document_events"
+    },
+    {
+      "name": "v4_workspace_invalidation",
+      "enabled": "O",
+      "routine": "private.invalidate_workspace",
+      "definition": "CREATE TRIGGER v4_workspace_invalidation AFTER INSERT OR UPDATE ON public.flow_submissions FOR EACH ROW EXECUTE FUNCTION private.invalidate_workspace()",
+      "table_name": "flow_submissions"
+    },
+    {
+      "name": "release_template_holds",
+      "enabled": "O",
+      "routine": "private.release_template_holds",
+      "definition": "CREATE TRIGGER release_template_holds AFTER UPDATE OF approval ON public.meta_template_versions FOR EACH ROW EXECUTE FUNCTION private.release_template_holds()",
+      "table_name": "meta_template_versions"
+    },
+    {
+      "name": "notification_external_contract",
+      "enabled": "O",
+      "routine": "private.guard_notification_event_contract",
+      "definition": "CREATE TRIGGER notification_external_contract BEFORE INSERT OR UPDATE ON public.notification_event_rules FOR EACH ROW EXECUTE FUNCTION private.guard_notification_event_contract()",
+      "table_name": "notification_event_rules"
+    },
+    {
+      "name": "release_pdf_configuration_holds",
+      "enabled": "O",
+      "routine": "private.release_pdf_configuration_holds",
+      "definition": "CREATE TRIGGER release_pdf_configuration_holds AFTER INSERT OR UPDATE OF include_pdf ON public.notification_event_rules FOR EACH ROW EXECUTE FUNCTION private.release_pdf_configuration_holds()",
+      "table_name": "notification_event_rules"
+    },
+    {
+      "name": "invalidate_revoked_profile_notifications",
+      "enabled": "O",
+      "routine": "public.invalidate_revoked_profile_notifications",
+      "definition": "CREATE TRIGGER invalidate_revoked_profile_notifications AFTER UPDATE OF status ON public.profiles FOR EACH ROW EXECUTE FUNCTION invalidate_revoked_profile_notifications()",
+      "table_name": "profiles"
+    },
+    {
+      "name": "protect_last_global_admin",
+      "enabled": "O",
+      "routine": "public.protect_last_global_admin",
+      "definition": "CREATE TRIGGER protect_last_global_admin AFTER INSERT OR DELETE OR UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION protect_last_global_admin()",
+      "table_name": "profiles"
+    },
+    {
+      "name": "v4_workspace_invalidation",
+      "enabled": "O",
+      "routine": "private.invalidate_workspace",
+      "definition": "CREATE TRIGGER v4_workspace_invalidation AFTER UPDATE OF full_name, notification_preferences, status, role, global_scope ON public.profiles FOR EACH ROW EXECUTE FUNCTION private.invalidate_workspace()",
+      "table_name": "profiles"
+    },
+    {
+      "name": "notification_external_contract",
+      "enabled": "O",
+      "routine": "private.guard_notification_event_contract",
+      "definition": "CREATE TRIGGER notification_external_contract BEFORE INSERT ON public.requisition_notifications FOR EACH ROW EXECUTE FUNCTION private.guard_notification_event_contract()",
+      "table_name": "requisition_notifications"
+    },
+    {
+      "name": "v4_workspace_invalidation",
+      "enabled": "O",
+      "routine": "private.invalidate_workspace",
+      "definition": "CREATE TRIGGER v4_workspace_invalidation AFTER INSERT OR DELETE OR UPDATE ON public.requisition_notifications FOR EACH ROW EXECUTE FUNCTION private.invalidate_workspace()",
+      "table_name": "requisition_notifications"
+    },
+    {
+      "name": "immutable_requisition_identity",
+      "enabled": "O",
+      "routine": "public.protect_requisition_identity",
+      "definition": "CREATE TRIGGER immutable_requisition_identity BEFORE UPDATE ON public.requisitions FOR EACH ROW EXECUTE FUNCTION protect_requisition_identity()",
+      "table_name": "requisitions"
+    },
+    {
+      "name": "protect_requisition_historical_origin",
+      "enabled": "O",
+      "routine": "public.protect_requisition_historical_origin",
+      "definition": "CREATE TRIGGER protect_requisition_historical_origin BEFORE UPDATE OF is_historical ON public.requisitions FOR EACH ROW EXECUTE FUNCTION protect_requisition_historical_origin()",
+      "table_name": "requisitions"
+    },
+    {
+      "name": "requisition_status_transition_trigger",
+      "enabled": "O",
+      "routine": "public.record_requisition_status_transition",
+      "definition": "CREATE TRIGGER requisition_status_transition_trigger AFTER UPDATE OF status ON public.requisitions FOR EACH ROW EXECUTE FUNCTION record_requisition_status_transition()",
+      "table_name": "requisitions"
+    }
+  ],
+  "externalEventsInSource": 25,
+  "sqlSupportMissing": [],
+  "supportDefinitionSha256": "c02ef55690e2a955c94f9b1d5696a360715048a437d68a7015048994925da85d",
+  "limits": "Current read-only trigger topology; routine definitions already verified identical to B3. No old trigger assumed active solely from a migration."
+}

@@ -1,0 +1,46 @@
+{
+  "recordedAt": "2026-10-30T12:10:58.054Z",
+  "method": "Targeted read-only current state plus verified backup decoded in memory; no data restored and no provider called",
+  "results": [
+    {
+      "documentIdSha256": "971f434380d1c7f13ab10f97836c61a6bdacb1cf37eaaaa7ba8c66fe44e93851",
+      "stableDocumentFieldsPreserved": [
+        "id",
+        "care_recipient_id",
+        "type",
+        "status",
+        "created_by",
+        "recipient_id",
+        "created_at",
+        "code",
+        "protocol",
+        "number",
+        "idempotency_key",
+        "payload",
+        "workflow_data"
+      ],
+      "stableLifecycleFieldsPreserved": [
+        "requisition_id",
+        "care_recipient_id",
+        "policy",
+        "eligible_users",
+        "science_satisfied_at",
+        "completed_at",
+        "archived_at",
+        "manual_archive_required",
+        "archive_reason"
+      ],
+      "versionIncrement": 1,
+      "reminderIncrement": 1,
+      "newActions": [
+        "req.reminder"
+      ],
+      "systemActor": true,
+      "authorityMode": "system",
+      "hashChainValid": true,
+      "nextReminderMatchesPolicy": true,
+      "classification": "Progress consistent with pre-existing minute cron; no auditor probe writes original IDs. No original row deleted or restored."
+    }
+  ],
+  "limits": "Only the original-hash differences at preservation snapshot reconciled. Login timestamps excluded from Auth comparison. Cron remains active."
+}

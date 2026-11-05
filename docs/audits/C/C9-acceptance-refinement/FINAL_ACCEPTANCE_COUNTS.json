@@ -1,0 +1,8 @@
+{
+  "existing_ids_preserved": 161,
+  "existing_cases_refined": 20,
+  "additional_cases": 26,
+  "total_cases": 187,
+  "all_execution_status": "PLANNED_NOT_EXECUTED",
+  "p02_human_gate": "CLOSED_OWNER_APPROVED;TECHNICAL_IMPLEMENTATION_REMAINS"
+}

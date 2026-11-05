@@ -1,0 +1,83 @@
+{
+  "recordedAt": "2026-10-30T00:57:47.525Z",
+  "tag": "B3-20261029-d051db30",
+  "patientId": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "productIds": [
+    "patient-c568e207-221a-4ca8-a865-81f50079b6db",
+    "patient-4ff7294b-be29-44d1-a12d-bff6e8337491",
+    "patient-e3a1cfbe-6e29-466e-89b6-7562fc6b9f9b",
+    "patient-8b032ee6-54a7-4df2-9948-8a515ba24e54"
+  ],
+  "actors": [
+    {
+      "name": "admin",
+      "id": "456c501e-873c-4120-a2f2-bb8f39143416"
+    },
+    {
+      "name": "family",
+      "id": "1436ea9c-e07a-4ccb-8c0f-efbd467fd020"
+    },
+    {
+      "name": "professional",
+      "id": "add8d46a-ea8f-4b5a-a982-2af17b88c897"
+    },
+    {
+      "name": "supervisor",
+      "id": "caabdc28-0055-4526-be0e-3ebffce70867"
+    },
+    {
+      "name": "reader",
+      "id": "49541130-c50a-41b0-9a2d-815cc02903dc"
+    },
+    {
+      "name": "replacement",
+      "id": "3a265603-4364-4464-8f82-b44395bbcb2d"
+    },
+    {
+      "name": "admin2",
+      "id": "b89d3533-be4e-44d8-8c6d-de269a7117f9"
+    }
+  ],
+  "bootstrap": [
+    {
+      "role": "family",
+      "invitationAccepted": true,
+      "membershipActive": true,
+      "via": "official Auth and authorized invitation RPCs"
+    },
+    {
+      "role": "professional",
+      "invitationAccepted": true,
+      "membershipActive": true,
+      "via": "official Auth and authorized invitation RPCs"
+    },
+    {
+      "role": "supervisor",
+      "invitationAccepted": true,
+      "membershipActive": true,
+      "via": "official Auth and authorized invitation RPCs"
+    },
+    {
+      "role": "reader",
+      "invitationAccepted": true,
+      "membershipActive": true,
+      "via": "official Auth and authorized invitation RPCs"
+    },
+    {
+      "role": "professional",
+      "invitationAccepted": true,
+      "membershipActive": true,
+      "via": "official Auth and authorized invitation RPCs"
+    },
+    {
+      "role": "admin",
+      "invitationAccepted": true,
+      "membershipActive": true,
+      "via": "official Auth and authorized invitation RPCs"
+    }
+  ],
+  "externalSending": false,
+  "realAccountsChanged": false,
+  "existingDataReplaced": false,
+  "limits": "Setup only; no human onboarding or provider validation. Seven newly issued identities and one new development patient; existing global test identity only authenticated."
+}

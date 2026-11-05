@@ -1,0 +1,65 @@
+[
+  {
+    "capture": "b18-overlays-adminA-administration-menu.png",
+    "sheet": "b18-overlays-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-overlays-adminA-permission-menu.png",
+    "sheet": "b18-overlays-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-overlays-adminA-permission-critical-review.png",
+    "sheet": "b18-overlays-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-overlays-adminA-policy-rule-editor.png",
+    "sheet": "b18-overlays-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-overlays-adminA-notification-rule-editor.png",
+    "sheet": "b18-overlays-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-overlays-adminA-req-cancel-review.png",
+    "sheet": "b18-overlays-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-overlays-adminA-extra-association-review.png",
+    "sheet": "b18-overlays-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-overlays-global-global-account-editor.png",
+    "sheet": "b18-overlays-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b18-overlays-global-global-account-review.png",
+    "sheet": "b18-overlays-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  }
+]

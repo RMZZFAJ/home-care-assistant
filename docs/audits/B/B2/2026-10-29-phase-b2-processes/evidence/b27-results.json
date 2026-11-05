@@ -1,0 +1,335 @@
+{
+  "group": "B2.7",
+  "startedAt": "2026-10-29T22:53:58.040Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B27-01",
+      "purpose": "Identidade global e papel local são fatos separados;admin local não altera perfil global",
+      "recordedAt": "2026-10-29T22:53:58.527Z",
+      "observed": {
+        "row": {
+          "localRole": "admin",
+          "globalRole": "professional",
+          "membership": "active",
+          "globalScope": false
+        },
+        "globalProfileMutationRefused": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "admin_set_profile: admin authorization required"
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B27-02",
+      "purpose": "Convite:conta errada recusada;reemissão invalida token antigo;aceito não é revogado pelo convite",
+      "recordedAt": "2026-10-29T22:53:58.675Z",
+      "observed": {
+        "invitationId": "e47424fd-0ac6-4a2c-94d0-f423e4fcfbd0",
+        "wrongAccount": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "accept_invitation: invalid invitation"
+        },
+        "oldToken": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "accept_invitation: invalid invitation"
+        },
+        "acceptedRole": "reader",
+        "revokeAcceptedRefused": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "revoke_invitation: accepted invitation cannot be revoked; revoke the membership"
+        },
+        "secretsExported": false
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B27-03",
+      "purpose": "Expiração real curta e revogação impedem aceite sem alterar vínculo já existente",
+      "recordedAt": "2026-10-29T22:53:58.730Z",
+      "observed": {
+        "expiredInvitationId": "c88a2b02-ca39-4e34-a086-60eac3ba743a",
+        "expired": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "accept_invitation: invalid or expired invitation"
+        },
+        "revokedInvitationId": "5b74c859-2351-4521-9cc1-fe61f5c678d0",
+        "revokedAcceptance": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "accept_invitation: invalid or expired invitation"
+        },
+        "method": "New synthetic invitation;actual1.6second wait;no backdated existing record"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B27-04",
+      "purpose": "Autoridade do emissor é revalidada;último administrador permanece protegido",
+      "recordedAt": "2026-10-29T22:54:00.377Z",
+      "observed": {
+        "invitationId": "0e248cb7-92f9-4df4-aa9a-b8c4b904e96a",
+        "issuerRevokedAcceptance": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "accept_invitation: invalid or expired invitation"
+        },
+        "lastAdminRefusal": {
+          "rejected": true,
+          "sqlstate": "23514",
+          "message": "admin_set_membership_status: last patient administrator must remain active"
+        },
+        "secondSyntheticAdminRestored": true,
+        "existingReplacementRoleUnchanged": "professional"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B27-05",
+      "purpose": "Preparar responsabilidades pendentes antes do desligamento:uma entrega sem aceite e outra parcial",
+      "recordedAt": "2026-10-29T22:54:00.585Z",
+      "observed": {
+        "pending": {
+          "id": "e9323f35-e76e-443d-89f7-db142b0de7f0",
+          "lines": [
+            {
+              "id": "180083c3-816d-47a5-853b-e65541dee0d8",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {},
+              "quantity": "1.000000",
+              "productId": "patient-676e1298-ba65-476c-9e2c-d89fb2268885",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 1,
+          "number": 9,
+          "status": "pending_receipt",
+          "version": 1,
+          "receipts": []
+        },
+        "partial": {
+          "id": "e4f2478c-d5e7-4a1c-a06f-619a431c1e49",
+          "lines": [
+            {
+              "id": "393bc7ec-4f5a-40d3-b2b4-e909b6166f9f",
+              "accepted": "1.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {
+                  "lineId": "393bc7ec-4f5a-40d3-b2b4-e909b6166f9f",
+                  "problem": "Um material fictício ainda não foi conferido",
+                  "acceptedQuantity": "1"
+                },
+                "issueOpen": true
+              },
+              "quantity": "2.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 2,
+          "number": 10,
+          "status": "disputed",
+          "version": 2,
+          "receipts": []
+        },
+        "stock": {
+          "FAMILY": "5.000000",
+          "TRANSIT": "1.000000",
+          "CARE_TEAM": "3.000000",
+          "movements": 12
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B27-06",
+      "purpose": "Revogação local retira autoridade imediatamente,conservando outro paciente e história",
+      "recordedAt": "2026-10-29T22:54:01.523Z",
+      "observed": {
+        "receiveAfterRevocation": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: required permission: ent.read"
+        },
+        "otherContextStillWorks": true,
+        "history": {
+          "id": "e4f2478c-d5e7-4a1c-a06f-619a431c1e49",
+          "lines": [
+            {
+              "id": "393bc7ec-4f5a-40d3-b2b4-e909b6166f9f",
+              "accepted": "1.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {
+                  "lineId": "393bc7ec-4f5a-40d3-b2b4-e909b6166f9f",
+                  "problem": "Um material fictício ainda não foi conferido",
+                  "acceptedQuantity": "1"
+                },
+                "issueOpen": true
+              },
+              "quantity": "2.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 2,
+          "number": 10,
+          "status": "disputed",
+          "version": 2,
+          "receipts": []
+        },
+        "revokedExcludedFromActiveDirectory": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B27-07",
+      "purpose": "Entrega sem aceite pode ser reatribuída;parcial não possui sucessão equivalente",
+      "recordedAt": "2026-10-29T22:54:01.898Z",
+      "observed": {
+        "pendingRecovered": {
+          "id": "e9323f35-e76e-443d-89f7-db142b0de7f0",
+          "lines": [
+            {
+              "id": "180083c3-816d-47a5-853b-e65541dee0d8",
+              "accepted": "1.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {},
+                "issueOpen": false
+              },
+              "quantity": "1.000000",
+              "productId": "patient-676e1298-ba65-476c-9e2c-d89fb2268885",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 3,
+          "number": 9,
+          "status": "confirmed",
+          "version": 3,
+          "receipts": []
+        },
+        "partialBlocked": {
+          "id": "e4f2478c-d5e7-4a1c-a06f-619a431c1e49",
+          "lines": [
+            {
+              "id": "393bc7ec-4f5a-40d3-b2b4-e909b6166f9f",
+              "accepted": "1.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {
+                  "lineId": "393bc7ec-4f5a-40d3-b2b4-e909b6166f9f",
+                  "problem": "Um material fictício ainda não foi conferido",
+                  "acceptedQuantity": "1"
+                },
+                "issueOpen": true
+              },
+              "quantity": "2.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 3,
+          "number": 10,
+          "status": "cancellation_pending",
+          "version": 3,
+          "receipts": []
+        },
+        "reassign": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: reassignment not authorized"
+        },
+        "receive": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: only designated recipient may accept"
+        },
+        "consent": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: original recipient consent required"
+        },
+        "noArtificialReturnOrConsumption": true,
+        "recoveryGap": "Immediate revocation is correct;successor workflow for previously accepted material is missing"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B27-08",
+      "purpose": "Convite aceito antigo não reativa vínculo revogado;reativação exige administrador",
+      "recordedAt": "2026-10-29T22:54:35.260Z",
+      "observed": {
+        "acceptedInviteReplayRefused": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "accept_invitation: membership revoked"
+        },
+        "restoredByExplicitAdmin": true,
+        "scope": "Retained-token scenario represented via hash from synthetic fixture;not discovery of a token by an outsider"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B27-09",
+      "purpose": "Administração global propõe mudança e não executa operação local sem vínculo",
+      "recordedAt": "2026-10-29T22:54:35.449Z",
+      "observed": {
+        "localOperationRefused": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "create_supply_document: required permission: ent.create"
+        },
+        "proposalId": "c77869fe-52f0-421f-b433-282dbbb036ea",
+        "globalSelfApprovalRefused": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "configure_patient_access: local administrator required"
+        },
+        "localDecision": "applied",
+        "scope": "Only synthetic patient setting changed;global identity/privileges preserved"
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [
+    {
+      "id": "B27-08",
+      "purpose": "Convite aceito antigo não reativa vínculo revogado;reativação exige administrador",
+      "recordedAt": "2026-10-29T22:54:03.261Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "accept_invitation: membership revoked",
+        "sqlstate": "42501"
+      }
+    }
+  ],
+  "finishedAt": "2026-10-29T22:54:35.742Z"
+}

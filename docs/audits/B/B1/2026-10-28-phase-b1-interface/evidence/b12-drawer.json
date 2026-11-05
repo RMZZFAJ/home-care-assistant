@@ -1,0 +1,88 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T03:42:46.737Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T03:42:52.131Z",
+      "role": "adminA",
+      "label": "catalog-320",
+      "path": "/admin?section=catalog",
+      "width": 320,
+      "state": "READY",
+      "note": "",
+      "file": "b12-drawer-adminA-catalog-320.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Adicionar item exclusivo deste paciente\nNome\nCategoria\nMedicamentos\nHigiene\nDieta\nUnidade\nNomes alternativos, separados por vírgula\nDescrição operacional\nOrdem\nItem ativo\n\nA unidade de itens com histórico é preservada. Para outra unidade, cadastre um novo item.\n\nSalvar item",
+      "snapshot": "- dialog \"Adicionar item exclusivo deste paciente\":\n  - heading \"Adicionar item exclusivo deste paciente\" [level=2]\n  - button \"Fechar edição\"\n  - group:\n    - text: Nome\n    - textbox \"Nome\"\n    - text: Categoria\n    - combobox \"Categoria\":\n      - option \"Medicamentos\" [selected]\n      - option \"Higiene\"\n      - option \"Dieta\"\n    - text: Unidade\n    - textbox \"Unidade\": unidade\n    - text: Nomes alternativos, separados por vírgula\n    - textbox \"Nomes alternativos, separados por vírgula\"\n    - text: Descrição operacional\n    - textbox \"Descrição operacional\"\n    - text: Ordem\n    - spinbutton \"Ordem\": \"0\"\n    - checkbox \"Item ativo\" [checked]\n    - text: Item ativo\n    - paragraph: A unidade de itens com histórico é preservada. Para outra unidade, cadastre um novo item.\n    - button \"Salvar item\"",
+      "visualInspected": false
+    }
+  ],
+  "failures": [],
+  "geometry": {
+    "width": 320,
+    "height": 844,
+    "scrollWidth": 319,
+    "clientWidth": 319,
+    "buttons": [
+      {
+        "name": "Fechar edição",
+        "height": 44
+      },
+      {
+        "name": "Salvar item",
+        "height": 44
+      }
+    ],
+    "fields": [
+      {
+        "name": "name",
+        "width": 269,
+        "height": 42,
+        "size": "16px"
+      },
+      {
+        "name": "category",
+        "width": 271,
+        "height": 44,
+        "size": "16px"
+      },
+      {
+        "name": "unit",
+        "width": 269,
+        "height": 42,
+        "size": "16px"
+      },
+      {
+        "name": "aliases",
+        "width": 269,
+        "height": 42,
+        "size": "16px"
+      },
+      {
+        "name": "description",
+        "width": 269,
+        "height": 42,
+        "size": "16px"
+      },
+      {
+        "name": "sortOrder",
+        "width": 269,
+        "height": 42,
+        "size": "16px"
+      },
+      {
+        "name": "isActive",
+        "width": 20,
+        "height": 20,
+        "size": "14px"
+      }
+    ]
+  },
+  "finishedAt": "2026-10-29T03:42:52.741Z"
+}

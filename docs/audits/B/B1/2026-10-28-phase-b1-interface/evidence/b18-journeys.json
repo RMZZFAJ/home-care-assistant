@@ -1,0 +1,313 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T04:30:08.541Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T04:30:13.291Z",
+      "role": "professional",
+      "label": "req-issued",
+      "path": "/fichas/req",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "",
+      "file": "b18-journeys-professional-req-issued.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Requisição de insumos\n\nREQUISIÇÃO REGISTRADA\n\nComprovante oficial\n\nProtocolo\n\nREQ-20261029-BEE824B9-E6368E99-2-4A9EB690\n\nData e hora\n\n29/10/2026, 01:30\n\nSolicitante: Teste professional\nPessoa assistida: Homologação fictícia V4 9482191c\n\nItens\nMaterial excepcional sintético B1 — estoque atual: 0\nObservações\nProva de jornada: material ausente, sem dado clínico.\nNotificações da ficha\nAtualizar envios\n\nO documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n\nResponsável · Teste global · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nResponsável · Teste adminA · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nFamília · Teste family · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nEquipe de cuidado · Teste professional · Aplicativo\n\nDisponível no aplicativo · 0 tentativa(s)\n\nImprimir / salvar como PDF\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo · 4 aviso(s) aguardando resultado.\n\nConsultar registro e notificações\nNova requisição\n\nCiência familiar ainda depende dos registros próprios. O PDF de emissão identifica essa pendência.",
+      "snapshot": "- main:\n  - heading \"Requisição de insumos\" [level=1]\n  - paragraph: Requisição registrada\n  - heading \"Comprovante oficial\" [level=1]\n  - paragraph: Protocolo\n  - paragraph: REQ-20261029-BEE824B9-E6368E99-2-4A9EB690\n  - paragraph: Data e hora\n  - paragraph: 29/10/2026, 01:30\n  - paragraph:\n    - text: \"Solicitante:\"\n    - strong: Teste professional\n    - text: \"Pessoa assistida:\"\n    - strong: Homologação fictícia V4 9482191c\n  - heading \"Itens\" [level=3]\n  - list:\n    - listitem: \"Material excepcional sintético B1 — estoque atual: 0\"\n  - heading \"Observações\" [level=3]\n  - list:\n    - listitem: \"Prova de jornada: material ausente, sem dado clínico.\"\n  - region \"Notificações da ficha\":\n    - heading \"Notificações da ficha\" [level=2]\n    - button \"Atualizar envios\"\n    - paragraph: O documento já está salvo. Envio ao provedor, entrega, leitura e ciência no aplicativo são estados independentes.\n    - list:\n      - listitem:\n        - paragraph: Responsável · Teste global · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Responsável · Teste adminA · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Família · Teste family · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n      - listitem:\n        - paragraph: Equipe de cuidado · Teste professional · Aplicativo\n        - paragraph: Disponível no aplicativo · 0 tentativa(s)\n  - button \"Imprimir / salvar como PDF\"\n  - link \"Baixar PDF\":\n    - /url: /api/documents/8a768d24-75ce-4f53-b190-3ab6dc97db1f/pdf\n  - button \"Compartilhar PDF\" [disabled]\n  - status: Documento salvo · 4 aviso(s) aguardando resultado.\n  - link \"Consultar registro e notificações\":\n    - /url: /historico/8a768d24-75ce-4f53-b190-3ab6dc97db1f\n  - link \"Nova requisição\":\n    - /url: /fichas/req\n  - paragraph: Ciência familiar ainda depende dos registros próprios. O PDF de emissão identifica essa pendência.",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:30:14.169Z",
+      "role": "professional",
+      "label": "req-requery",
+      "path": "/historico/8a768d24-75ce-4f53-b190-3ab6dc97db1f",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-journeys-professional-req-requery.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRequisição e acompanhamento\n← Histórico\nREQ\n\nREQUISIÇÃO\n\nREQ-0002\nCiência familiar pendente\n\n29/10/2026, 01:30 · Versão 1\n\nPaciente: Homologação fictícia V4 9482191c\n\nSolicitante: Teste professional\n\nAtendimento\n\n0/1 itens atendidos\n\nAguardando ENT aceita\n\nCiência familiar\n\nPendente\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo · 4 aviso(s) aguardando resultado.\n\nProtocolo e identificação\nMateriais requisitados\n\nUma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n\nMaterial excepcional sintético B1\nPendente\n\nEstoque observado na emissão: 0\n\nCiência e responsáveis\n\nA ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente.\n\nLinha do tempo\n\n1 evento(s) registrados\n\nAvisos e acompanhamento\n\n4 aviso(s) · estados do aplicativo e do provedor são independentes\n\nObservações\n\nProva de jornada: material ausente, sem dado clínico.\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Requisição e acompanhamento\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - text: REQ\n  - paragraph: Requisição\n  - heading \"REQ-0002\" [level=2]\n  - text: Ciência familiar pendente\n  - paragraph: 29/10/2026, 01:30 · Versão 1\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - paragraph: \"Solicitante: Teste professional\"\n  - paragraph: Atendimento\n  - strong: 0/1 itens atendidos\n  - paragraph: Aguardando ENT aceita\n  - paragraph: Ciência familiar\n  - strong: Pendente\n  - paragraph: Independente do recebimento\n  - paragraph: Documento\n  - strong: Em atendimento\n  - link \"Baixar PDF\":\n    - /url: /api/documents/8a768d24-75ce-4f53-b190-3ab6dc97db1f/pdf?version=1\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo · 4 aviso(s) aguardando resultado.\n  - group: Protocolo e identificação\n  - heading \"Materiais requisitados\" [level=2]\n  - paragraph: Uma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n  - list:\n    - listitem:\n      - strong: Material excepcional sintético B1\n      - text: Pendente\n      - paragraph: \"Estoque observado na emissão: 0\"\n  - heading \"Ciência e responsáveis\" [level=2]\n  - paragraph: A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente.\n  - list\n  - region \"Linha do tempo\":\n    - heading \"Linha do tempo\" [level=2]:\n      - button \"Linha do tempo\"\n    - paragraph: 1 evento(s) registrados\n  - region \"Avisos e acompanhamento\":\n    - heading \"Avisos e acompanhamento\" [level=2]:\n      - button \"Avisos e acompanhamento\"\n    - paragraph: 4 aviso(s) · estados do aplicativo e do provedor são independentes\n  - heading \"Observações\" [level=2]\n  - paragraph: \"Prova de jornada: material ausente, sem dado clínico.\"\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:30:17.893Z",
+      "role": "family",
+      "label": "science-and-fulfillment",
+      "path": "/historico/8a768d24-75ce-4f53-b190-3ab6dc97db1f",
+      "width": 390,
+      "state": "PERSISTED",
+      "note": "",
+      "file": "b18-journeys-family-science-and-fulfillment.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRequisição e acompanhamento\n← Histórico\nCiência expressa registrada com sua identidade.\nREQ\n\nREQUISIÇÃO\n\nREQ-0002\nCiência familiar pendente\n\n29/10/2026, 01:30 · Versão 1\n\nPaciente: Homologação fictícia V4 9482191c\n\nSolicitante: Teste professional\n\nAtendimento\n\n0/1 itens atendidos\n\nAguardando ENT aceita\n\nCiência familiar\n\nPendente\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo · 4 aviso(s) aguardando resultado.\n\nProtocolo e identificação\nMateriais requisitados\n\nUma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n\nMaterial excepcional sintético B1\nPendente\n\nEstoque observado na emissão: 0\n\nAbrir COM vinculada\nExpedir ENT vinculada\nCiência e responsáveis\n\nA ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente.\n\nLi a requisição e confirmo minha ciência\nLinha do tempo\n\n1 evento(s) registrados\n\nAvisos e acompanhamento\n\n4 aviso(s) · estados do aplicativo e do provedor são independentes\n\nObservações\n\nProva de jornada: material ausente, sem dado clínico.\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Requisição e acompanhamento\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - status: Ciência expressa registrada com sua identidade.\n  - text: REQ\n  - paragraph: Requisição\n  - heading \"REQ-0002\" [level=2]\n  - text: Ciência familiar pendente\n  - paragraph: 29/10/2026, 01:30 · Versão 1\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - paragraph: \"Solicitante: Teste professional\"\n  - paragraph: Atendimento\n  - strong: 0/1 itens atendidos\n  - paragraph: Aguardando ENT aceita\n  - paragraph: Ciência familiar\n  - strong: Pendente\n  - paragraph: Independente do recebimento\n  - paragraph: Documento\n  - strong: Em atendimento\n  - link \"Baixar PDF\":\n    - /url: /api/documents/8a768d24-75ce-4f53-b190-3ab6dc97db1f/pdf?version=1\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo · 4 aviso(s) aguardando resultado.\n  - group: Protocolo e identificação\n  - heading \"Materiais requisitados\" [level=2]\n  - paragraph: Uma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n  - list:\n    - listitem:\n      - strong: Material excepcional sintético B1\n      - text: Pendente\n      - paragraph: \"Estoque observado na emissão: 0\"\n  - link \"Abrir COM vinculada\":\n    - /url: /fichas/com?requisitionId=8a768d24-75ce-4f53-b190-3ab6dc97db1f\n  - link \"Expedir ENT vinculada\":\n    - /url: /fichas/ent?requisitionId=8a768d24-75ce-4f53-b190-3ab6dc97db1f\n  - heading \"Ciência e responsáveis\" [level=2]\n  - paragraph: A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente.\n  - list\n  - button \"Li a requisição e confirmo minha ciência\"\n  - region \"Linha do tempo\":\n    - heading \"Linha do tempo\" [level=2]:\n      - button \"Linha do tempo\"\n    - paragraph: 1 evento(s) registrados\n  - region \"Avisos e acompanhamento\":\n    - heading \"Avisos e acompanhamento\" [level=2]:\n      - button \"Avisos e acompanhamento\"\n    - paragraph: 4 aviso(s) · estados do aplicativo e do provedor são independentes\n  - heading \"Observações\" [level=2]\n  - paragraph: \"Prova de jornada: material ausente, sem dado clínico.\"\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação",
+      "visualInspected": false,
+      "reviewCorrection": "Science POST200/read-back succeeded, but screenshot still has previous pending header during refresh. Ready requery is b18-ready-family-science-requery-ready.png.",
+      "reviewedState": "REFRESHING_AFTER_PERSISTED"
+    },
+    {
+      "at": "2026-10-29T04:30:19.732Z",
+      "role": "supervisor",
+      "label": "balance-workspace",
+      "path": "/balancos",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-journeys-supervisor-balance-workspace.png",
+      "fullPage": true,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "PACIENTE FICTÍCIO A\n\nBalanços e plantões\nCarregando balanços",
+      "snapshot": "- main:\n  - paragraph: Paciente fictício A\n  - heading \"Balanços e plantões\" [level=1]\n  - progressbar \"Carregando balanços\"",
+      "visualInspected": false,
+      "reviewCorrection": "Captured access validation only. Does not prove ready BAL workspace; use b18-ready-supervisor-balance-ready.png.",
+      "reviewedState": "LOADING"
+    },
+    {
+      "at": "2026-10-29T04:30:40.583Z",
+      "role": "global",
+      "label": "global-identities",
+      "path": "/admin?section=profiles",
+      "width": 390,
+      "state": "READY",
+      "note": "All account names and identifying edit labels masked; text export limited to heading. Read-only.",
+      "file": "b18-journeys-global-global-identities.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Identidades globais",
+      "snapshot": "- heading \"Identidades globais\" [level=2]",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T04:30:43.383Z",
+      "role": "reader",
+      "label": "authorized-read",
+      "path": "/documentos/8a768d24-75ce-4f53-b190-3ab6dc97db1f",
+      "width": 390,
+      "state": "READY",
+      "note": "Real valid-shaped mutation denied403 before submit RPC; no request issued by reader.",
+      "file": "b18-journeys-reader-authorized-read.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "HOMOLOGAÇÃO FICTÍCIA V4 9482191C\n\nRequisição e acompanhamento\n← Histórico\nREQ\n\nREQUISIÇÃO\n\nREQ-0002\nAguardando atendimento\n\n29/10/2026, 01:30 · Versão 2\n\nPaciente: Homologação fictícia V4 9482191c\n\nSolicitante: Teste professional\n\nAtendimento\n\n0/1 itens atendidos\n\nAguardando ENT aceita\n\nCiência familiar\n\nExigência satisfeita\n\nIndependente do recebimento\n\nDocumento\n\nEm atendimento\nBaixar PDF\nCompartilhar PDF\n\nDocumento salvo · 8 aviso(s) aguardando resultado.\n\nProtocolo e identificação\nMateriais requisitados\n\nUma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n\nMaterial excepcional sintético B1\nPendente\n\nEstoque observado na emissão: 0\n\nCiência e responsáveis\n\nCiência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n\nTeste family\n\nExpressa no aplicativo · 29/10/2026, 01:30\n\nLinha do tempo\n\n2 evento(s) registrados\n\nAvisos e acompanhamento\n\n8 aviso(s) · estados do aplicativo e do provedor são independentes\n\nObservações\n\nProva de jornada: material ausente, sem dado clínico.\n\nAnexos e ficha física\n\n0 arquivo(s) · foto e PDF vinculados à operação",
+      "snapshot": "- main:\n  - paragraph: Homologação fictícia V4 9482191c\n  - heading \"Requisição e acompanhamento\" [level=1]\n  - link \"← Histórico\":\n    - /url: /historico\n  - text: REQ\n  - paragraph: Requisição\n  - heading \"REQ-0002\" [level=2]\n  - text: Aguardando atendimento\n  - paragraph: 29/10/2026, 01:30 · Versão 2\n  - paragraph: \"Paciente: Homologação fictícia V4 9482191c\"\n  - paragraph: \"Solicitante: Teste professional\"\n  - paragraph: Atendimento\n  - strong: 0/1 itens atendidos\n  - paragraph: Aguardando ENT aceita\n  - paragraph: Ciência familiar\n  - strong: Exigência satisfeita\n  - paragraph: Independente do recebimento\n  - paragraph: Documento\n  - strong: Em atendimento\n  - link \"Baixar PDF\":\n    - /url: /api/documents/8a768d24-75ce-4f53-b190-3ab6dc97db1f/pdf?version=2\n  - button \"Compartilhar PDF\"\n  - status: Documento salvo · 8 aviso(s) aguardando resultado.\n  - group: Protocolo e identificação\n  - heading \"Materiais requisitados\" [level=2]\n  - paragraph: Uma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ.\n  - list:\n    - listitem:\n      - strong: Material excepcional sintético B1\n      - text: Pendente\n      - paragraph: \"Estoque observado na emissão: 0\"\n  - heading \"Ciência e responsáveis\" [level=2]\n  - paragraph: Ciência exigida satisfeita. As evidências abaixo identificam a origem de cada registro.\n  - list:\n    - listitem:\n      - strong: Teste family\n      - paragraph: Expressa no aplicativo · 29/10/2026, 01:30\n  - region \"Linha do tempo\":\n    - heading \"Linha do tempo\" [level=2]:\n      - button \"Linha do tempo\"\n    - paragraph: 2 evento(s) registrados\n  - region \"Avisos e acompanhamento\":\n    - heading \"Avisos e acompanhamento\" [level=2]:\n      - button \"Avisos e acompanhamento\"\n    - paragraph: 8 aviso(s) · estados do aplicativo e do provedor são independentes\n  - heading \"Observações\" [level=2]\n  - paragraph: \"Prova de jornada: material ausente, sem dado clínico.\"\n  - region \"Anexos e ficha física\":\n    - heading \"Anexos e ficha física\" [level=2]:\n      - button \"Anexos e ficha física\"\n    - paragraph: 0 arquivo(s) · foto e PDF vinculados à operação",
+      "visualInspected": false
+    }
+  ],
+  "failures": [
+    {
+      "label": "local-admin-task",
+      "error": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Aprovar alteração', exact: true }) to be visible\u001b[22m\n"
+    }
+  ],
+  "journeys": [
+    {
+      "persona": "professional",
+      "task": "Necessidade excepcional → REQ → registro",
+      "interactions": [
+        {
+          "kind": "click",
+          "label": "Ação rápida Nova requisição"
+        },
+        {
+          "kind": "click",
+          "label": "Próxima etapa"
+        },
+        {
+          "kind": "click",
+          "label": "Próxima etapa"
+        },
+        {
+          "kind": "click",
+          "label": "Próxima etapa"
+        },
+        {
+          "kind": "click",
+          "label": "Próxima etapa"
+        },
+        {
+          "kind": "click",
+          "label": "Incluir exceção"
+        },
+        {
+          "kind": "field_fill",
+          "label": "Nome do extra",
+          "characters": 33
+        },
+        {
+          "kind": "field_fill",
+          "label": "Estoque observado explicitamente zero",
+          "characters": 1
+        },
+        {
+          "kind": "click",
+          "label": "Próxima etapa"
+        },
+        {
+          "kind": "click",
+          "label": "Incluir observação"
+        },
+        {
+          "kind": "field_fill",
+          "label": "Contexto operacional",
+          "characters": 53
+        },
+        {
+          "kind": "click",
+          "label": "Próxima etapa"
+        },
+        {
+          "kind": "click",
+          "label": "Concluir REQ"
+        },
+        {
+          "kind": "click",
+          "label": "Consultar registro"
+        }
+      ],
+      "environment": "390x844 synthetic fixture",
+      "result": "REQ persisted; stock unaffected by request; next family science and authorized supply remain"
+    },
+    {
+      "persona": "family",
+      "task": "Identificar requisição → ciência → distinguir atendimento",
+      "interactions": [
+        {
+          "kind": "click",
+          "label": "Abrir REQ pelo painel"
+        },
+        {
+          "kind": "click",
+          "label": "Ciência expressa"
+        }
+      ],
+      "result": {
+        "scienceSatisfied": true,
+        "science": [
+          {
+            "mode": "express",
+            "created_at": "2026-10-29T04:30:17.536735+00:00"
+          }
+        ],
+        "fulfillment": {
+          "lines": [
+            {
+              "id": "2b6cd6a1-7bc9-45cc-a5e2-27506f24a99a",
+              "attended": false,
+              "productId": null,
+              "deliveries": []
+            }
+          ],
+          "total": 1,
+          "fulfilled": 0
+        }
+      }
+    },
+    {
+      "persona": "supervisor",
+      "task": "Mais → balanços → informação de responsabilidade",
+      "interactions": [
+        {
+          "kind": "click",
+          "label": "Mais na barra do plantão"
+        },
+        {
+          "kind": "click",
+          "label": "Balanços e plantões"
+        }
+      ],
+      "patient": "Canonical synthetic A, actual supervisor membership",
+      "result": "Authorized consultation; no formal review/count executed by supervisor."
+    },
+    {
+      "persona": "adminA",
+      "task": "Escala → proposta pontual → revisão informada",
+      "interactions": [
+        {
+          "kind": "click",
+          "label": "Escalas na navegação desktop"
+        }
+      ]
+    },
+    {
+      "persona": "global",
+      "task": "Escolher atuação global → identidades globais",
+      "interactions": [
+        {
+          "kind": "click",
+          "label": "Menu pessoal"
+        },
+        {
+          "kind": "click",
+          "label": "Mudar perfil"
+        },
+        {
+          "kind": "click",
+          "label": "Contexto global"
+        }
+      ],
+      "result": {
+        "mode": "global",
+        "globalAdministrationAllowed": true,
+        "meaning": "Global context distinct from patient membership; no privilege changed"
+      }
+    },
+    {
+      "persona": "reader",
+      "task": "Histórico → documento → ausência de comando e recusa da API",
+      "interactions": [
+        {
+          "kind": "click",
+          "label": "Abrir REQ no histórico"
+        }
+      ],
+      "result": {
+        "status": 403,
+        "code": "FORBIDDEN",
+        "expected": 403,
+        "createButtons": 0
+      }
+    }
+  ],
+  "mutations": [
+    {
+      "action": "REQ UI submit",
+      "status": 201,
+      "id": "8a768d24-75ce-4f53-b190-3ab6dc97db1f"
+    },
+    {
+      "action": "science express",
+      "status": 200,
+      "id": "8a768d24-75ce-4f53-b190-3ab6dc97db1f"
+    }
+  ],
+  "issued": {
+    "id": "8a768d24-75ce-4f53-b190-3ab6dc97db1f",
+    "code": "REQ-0002",
+    "protocol": "REQ-20261029-BEE824B9-E6368E99-2-4A9EB690"
+  },
+  "finishedAt": "2026-10-29T04:30:45.096Z"
+}

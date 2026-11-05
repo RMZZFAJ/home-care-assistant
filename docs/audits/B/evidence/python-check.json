@@ -1,0 +1,8 @@
+{
+  "python": "3.13.12",
+  "scriptsParsed": 10,
+  "PyMuPDF": "2.0",
+  "fonttools": "4.68.0",
+  "imports": "PASS",
+  "execution": "AST only; historical scripts not executed"
+}

@@ -1,0 +1,598 @@
+{
+  "group": "B2.3",
+  "startedAt": "2026-10-29T10:08:07.187Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B2-20261029-f7eece2c",
+  "patient": "cdf49f73-d89f-4824-bf43-9f87d87d85c9",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B23-01",
+      "purpose": "Expedir quatro unidades para duas REQs da mesma necessidade não duplica crédito físico",
+      "recordedAt": "2026-10-29T10:08:07.555Z",
+      "observed": {
+        "before": {
+          "FAMILY": "10.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 2
+        },
+        "after": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "4.000000",
+          "CARE_TEAM": "0",
+          "movements": 3
+        },
+        "document": {
+          "id": "4743e493-01d9-41dc-b1b8-5945810dfe8b",
+          "lines": [
+            {
+              "id": "5953a89e-c240-4199-9ab2-29382ca5b37f",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "sharedNeedReason": "Mesma necessidade fictícia revisada em duas requisições"
+              },
+              "quantity": "4.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 1,
+          "number": 1,
+          "status": "pending_receipt",
+          "version": 1,
+          "receipts": []
+        },
+        "linkedRequests": 2
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-02",
+      "purpose": "Somente o destinatário designado pode aceitar, mesmo com acesso ao paciente",
+      "recordedAt": "2026-10-29T10:08:08.073Z",
+      "observed": {
+        "wrong": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: only designated recipient may accept"
+        },
+        "before": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "4.000000",
+          "CARE_TEAM": "0",
+          "movements": 3
+        },
+        "after": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "4.000000",
+          "CARE_TEAM": "0",
+          "movements": 3
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-03",
+      "purpose": "Aceite parcial positivo credita dois, conserva dois em trânsito e recupera mesma tentativa",
+      "recordedAt": "2026-10-29T10:08:08.649Z",
+      "observed": {
+        "before": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "4.000000",
+          "CARE_TEAM": "0",
+          "movements": 3
+        },
+        "after": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "2.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 4
+        },
+        "document": {
+          "id": "4743e493-01d9-41dc-b1b8-5945810dfe8b",
+          "lines": [
+            {
+              "id": "5953a89e-c240-4199-9ab2-29382ca5b37f",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {
+                  "notes": "Auditoria local",
+                  "lineId": "5953a89e-c240-4199-9ab2-29382ca5b37f",
+                  "problem": "Faltam duas unidades na conferência fictícia",
+                  "acceptedQuantity": "2"
+                },
+                "issueOpen": true,
+                "sharedNeedReason": "Mesma necessidade fictícia revisada em duas requisições"
+              },
+              "quantity": "4.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 2,
+          "number": 1,
+          "status": "disputed",
+          "version": 2,
+          "receipts": []
+        },
+        "fulfillment": {
+          "lines": [
+            {
+              "id": "6953bc9c-47a5-4246-bb42-7f700f9fe523",
+              "attended": true,
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "deliveries": [
+                {
+                  "id": "4743e493-01d9-41dc-b1b8-5945810dfe8b",
+                  "code": "ENT-0001",
+                  "status": "disputed",
+                  "acceptedQuantity": "2.000000"
+                }
+              ]
+            }
+          ],
+          "total": 1,
+          "fulfilled": 1
+        },
+        "lifecycle": {
+          "completed": false,
+          "fulfillment": [
+            {
+              "itemId": "6953bc9c-47a5-4246-bb42-7f700f9fe523",
+              "lineId": "5953a89e-c240-4199-9ab2-29382ca5b37f",
+              "status": "disputed",
+              "accepted": "2.000000",
+              "issueOpen": true,
+              "deliveryId": "4743e493-01d9-41dc-b1b8-5945810dfe8b",
+              "reconciled": "0.000000"
+            }
+          ]
+        },
+        "positiveLineAttendedButOperationalCompletionBlocked": true,
+        "retryNoDuplicate": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-04",
+      "purpose": "REQ com ENT vinculada não pode ser cancelada durante divergência",
+      "recordedAt": "2026-10-29T10:08:09.677Z",
+      "observed": {
+        "refused": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "transition_requisition_status: resolve linked deliveries before cancellation"
+        },
+        "delivery": {
+          "id": "4743e493-01d9-41dc-b1b8-5945810dfe8b",
+          "lines": [
+            {
+              "id": "5953a89e-c240-4199-9ab2-29382ca5b37f",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {
+                  "notes": "Auditoria local",
+                  "lineId": "5953a89e-c240-4199-9ab2-29382ca5b37f",
+                  "problem": "Faltam duas unidades na conferência fictícia",
+                  "acceptedQuantity": "2"
+                },
+                "issueOpen": true,
+                "sharedNeedReason": "Mesma necessidade fictícia revisada em duas requisições"
+              },
+              "quantity": "4.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 2,
+          "number": 1,
+          "status": "disputed",
+          "version": 2,
+          "receipts": []
+        },
+        "stock": {
+          "FAMILY": "6.000000",
+          "TRANSIT": "2.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 4
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-05",
+      "purpose": "Conciliação returned/missing encerra divergência sem fingir conferência integral",
+      "recordedAt": "2026-10-29T10:08:09.974Z",
+      "observed": {
+        "afterReturn": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "1.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 5
+        },
+        "afterLoss": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 6
+        },
+        "final": {
+          "id": "4743e493-01d9-41dc-b1b8-5945810dfe8b",
+          "lines": [
+            {
+              "id": "5953a89e-c240-4199-9ab2-29382ca5b37f",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {
+                  "notes": "Auditoria local",
+                  "lineId": "5953a89e-c240-4199-9ab2-29382ca5b37f",
+                  "problem": "Faltam duas unidades na conferência fictícia",
+                  "acceptedQuantity": "2"
+                },
+                "issueOpen": false,
+                "sharedNeedReason": "Mesma necessidade fictícia revisada em duas requisições"
+              },
+              "quantity": "4.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "2.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 4,
+          "number": 1,
+          "status": "confirmed",
+          "version": 4,
+          "receipts": []
+        },
+        "secondRequest": {
+          "lines": [
+            {
+              "id": "ca4cfd39-05d5-4032-8468-8ed659ce328a",
+              "attended": true,
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "deliveries": [
+                {
+                  "id": "4743e493-01d9-41dc-b1b8-5945810dfe8b",
+                  "code": "ENT-0001",
+                  "status": "confirmed",
+                  "acceptedQuantity": "2.000000"
+                }
+              ]
+            }
+          ],
+          "total": 1,
+          "fulfilled": 1
+        },
+        "lifecycle": {
+          "completed": true,
+          "manualArchive": false
+        },
+        "physicalAcceptedAcrossSharedNeed": "2, not 4"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-06",
+      "purpose": "Reatribuição antes do aceite invalida autoridade anterior; cancelar devolve trânsito",
+      "recordedAt": "2026-10-29T10:08:11.392Z",
+      "observed": {
+        "old": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: only designated recipient may accept"
+        },
+        "final": {
+          "id": "16b18e19-fd11-423a-9344-e77a179db637",
+          "lines": [
+            {
+              "id": "2983c23b-9c2c-4698-9eff-926ab3448ef1",
+              "accepted": "0.000000",
+              "approved": "0.000000",
+              "metadata": {},
+              "quantity": "1.000000",
+              "productId": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": false
+            }
+          ],
+          "events": 3,
+          "number": 2,
+          "status": "cancelled",
+          "version": 3,
+          "receipts": []
+        },
+        "before": {
+          "FAMILY": "4.000000",
+          "TRANSIT": "0",
+          "CARE_TEAM": "0",
+          "movements": 1
+        },
+        "after": {
+          "FAMILY": "4.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "0",
+          "movements": 3
+        }
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-07",
+      "purpose": "Cancelamento posterior ao aceite sem consumo exige consentimento e devolução real",
+      "recordedAt": "2026-10-29T10:08:13.065Z",
+      "observed": {
+        "before": {
+          "FAMILY": "4.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "0",
+          "movements": 3
+        },
+        "after": {
+          "FAMILY": "4.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "0.000000",
+          "movements": 6
+        },
+        "final": {
+          "id": "d2260f9e-00a9-473d-9de9-487a3ddc513a",
+          "lines": [
+            {
+              "id": "605894ee-abca-4f51-b2cf-ce5106026860",
+              "accepted": "1.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {},
+                "issueOpen": false
+              },
+              "quantity": "1.000000",
+              "productId": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 4,
+          "number": 3,
+          "status": "cancelled",
+          "version": 4,
+          "receipts": []
+        },
+        "wrong": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "supply_document_command: original recipient consent required"
+        },
+        "originalAcceptedQuantityPreserved": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-08",
+      "purpose": "Solicitação de cancelamento não oferece recusa/retirada formal nem fila específica de consentimento",
+      "recordedAt": "2026-10-29T10:08:14.667Z",
+      "observed": {
+        "refusal": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: invalid operation for document state"
+        },
+        "persisted": {
+          "id": "db146b8e-0102-4e63-87aa-1a461370cc0b",
+          "lines": [
+            {
+              "id": "07e64f73-40ff-4ef2-9273-bf7a49f33873",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {},
+                "issueOpen": false
+              },
+              "quantity": "2.000000",
+              "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 3,
+          "number": 4,
+          "status": "cancellation_pending",
+          "version": 3,
+          "receipts": []
+        },
+        "defaultPendingInboxContainsTarget": false,
+        "allAuthorizedQueryContainsTarget": true,
+        "source": "delivery-inbox.tsx options; /api/deliveries status allowlist; dashboard pending_receipt queries",
+        "limits": "RPC/query plus static consumer; no browser task rendering in this scenario"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-09",
+      "purpose": "DB-001 reexecutado: consumo confirmado impede conciliação por42702 e não altera ledger",
+      "recordedAt": "2026-10-29T10:08:15.491Z",
+      "observed": {
+        "result": {
+          "rejected": true,
+          "sqlstate": "42702",
+          "message": "supply_document_command: column reference \"e.body\" is ambiguous"
+        },
+        "before": {
+          "FAMILY": "3.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 4
+        },
+        "after": {
+          "FAMILY": "3.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 4
+        },
+        "documentBefore": {
+          "id": "db146b8e-0102-4e63-87aa-1a461370cc0b",
+          "lines": [
+            {
+              "id": "07e64f73-40ff-4ef2-9273-bf7a49f33873",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {},
+                "issueOpen": false
+              },
+              "quantity": "2.000000",
+              "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 3,
+          "number": 4,
+          "status": "cancellation_pending",
+          "version": 3,
+          "receipts": []
+        },
+        "documentAfter": {
+          "id": "db146b8e-0102-4e63-87aa-1a461370cc0b",
+          "lines": [
+            {
+              "id": "07e64f73-40ff-4ef2-9273-bf7a49f33873",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {},
+                "issueOpen": false
+              },
+              "quantity": "2.000000",
+              "productId": "patient-d3faff03-4d79-42dd-8255-a076de5e8f82",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 3,
+          "number": 4,
+          "status": "cancellation_pending",
+          "version": 3,
+          "receipts": []
+        },
+        "consumptionReport": "874d8324-3240-4a10-beb6-c77cc2386d3e",
+        "noArtificialWorkaround": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-10",
+      "purpose": "Retorno CARE_TEAM→FAMILY usa ENT distinta e aceite familiar",
+      "recordedAt": "2026-10-29T10:08:16.625Z",
+      "observed": {
+        "before": {
+          "FAMILY": "7.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 6
+        },
+        "after": {
+          "FAMILY": "8.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "1.000000",
+          "movements": 8
+        },
+        "document": {
+          "id": "6dd4b241-7cb7-4cab-b650-0a9daa807127",
+          "lines": [
+            {
+              "id": "db7ccc40-62b4-4e42-b2e3-c14530c442d7",
+              "accepted": "1.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {},
+                "issueOpen": false
+              },
+              "quantity": "1.000000",
+              "productId": "patient-6926ff85-2794-4a5b-bc37-69d988279cf7",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 2,
+          "number": 5,
+          "status": "confirmed",
+          "version": 2,
+          "receipts": []
+        },
+        "originalDeliveryNotRewritten": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B23-11",
+      "purpose": "Entrega complementar resolve received e stale version não duplica aceites",
+      "recordedAt": "2026-10-29T10:08:17.350Z",
+      "observed": {
+        "stale": {
+          "rejected": true,
+          "sqlstate": "P0001",
+          "message": "supply_document_command: stale document version"
+        },
+        "final": {
+          "id": "817bd7c0-9c87-40f1-a7aa-3c99521ddc95",
+          "lines": [
+            {
+              "id": "07b81cbe-1e37-447d-872b-e8de3d5b5a34",
+              "accepted": "2.000000",
+              "approved": "0.000000",
+              "metadata": {
+                "receipt": {
+                  "lineId": "07b81cbe-1e37-447d-872b-e8de3d5b5a34",
+                  "problem": "Uma unidade fictícia chegará depois",
+                  "acceptedQuantity": "1"
+                },
+                "issueOpen": false
+              },
+              "quantity": "2.000000",
+              "productId": "patient-34239a17-edd7-4871-8c2f-65f0ccbe1097",
+              "purchased": "0.000000",
+              "reconciled": "0.000000",
+              "fullyChecked": true
+            }
+          ],
+          "events": 3,
+          "number": 6,
+          "status": "confirmed",
+          "version": 3,
+          "receipts": []
+        },
+        "stock": {
+          "FAMILY": "2.000000",
+          "TRANSIT": "0.000000",
+          "CARE_TEAM": "2.000000",
+          "movements": 9
+        }
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "finishedAt": "2026-10-29T10:08:18.670Z"
+}

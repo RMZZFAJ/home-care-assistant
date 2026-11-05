@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-30T11:17:31.545Z",
+  "method": "Local PostgreSQL, new owner-created synthetic fixture rows, rollback. Real B4 Auth session for retry; simulated SQL service context for completion. No Meta delivery.",
+  "scenarios": {
+    "B53-S01": {
+      "state": "pending",
+      "heldInfinity": true,
+      "templateStillUnbound": true,
+      "retryRefusedAsNotRetryable": true
+    },
+    "B53-S02": {
+      "knownTemplateReleased": true
+    },
+    "B53-S03": {
+      "state": "uncertain",
+      "noProviderReference": true
+    }
+  },
+  "rollback": true,
+  "externalCalls": 0
+}

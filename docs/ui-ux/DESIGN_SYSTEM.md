@@ -1,5 +1,10 @@
 # Design system Fluent 2
 
+Guia da base funcional auditada e de seus contratos requeridos. Os desvios
+A/B e as mudanças futuras C não foram corrigidos por este documento.
+Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
+[projeto C3](../audits/C/C3-functional-specification/README.md).
+
 ## Fundação
 
 Fluent UI React v9 e ícones oficiais são dependências exatas. O tema claro

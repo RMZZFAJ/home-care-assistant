@@ -1,0 +1,356 @@
+{
+  "scenario": "B612-S01",
+  "recordedAt": "2026-10-30T16:00:39.263Z",
+  "method": "Real COM create/purchase/receive/reject/validate RPC;synthetic local Auth;all new rows in rollback;no PDF rerender needed for unchanged projection",
+  "data": {
+    "document": {
+      "id": "df1ac877-052e-4f13-beb1-9d89ea303fa7",
+      "code": "COM-0001",
+      "type": "COM",
+      "lines": [
+        {
+          "id": "de2c40e0-7800-46b5-baa3-96fd9db4101b",
+          "metadata": {},
+          "quantity": 10,
+          "product_id": "patient-707eac25-c5d0-4c58-b1ea-1d6cb413b0c2",
+          "document_id": "df1ac877-052e-4f13-beb1-9d89ea303fa7",
+          "fully_checked": false,
+          "name_snapshot": "Material fictício B6 receipts",
+          "unit_snapshot": "unidade",
+          "accepted_quantity": 1,
+          "approved_quantity": 10,
+          "care_recipient_id": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb",
+          "category_snapshot": "higiene",
+          "purchased_quantity": 3,
+          "requisitionItemIds": [],
+          "reconciled_quantity": 0
+        }
+      ],
+      "events": [
+        {
+          "id": "a5193ba3-7d3b-4031-a72b-69315dde8654",
+          "hash": "4a7dfe0b3257b3fab8f85f3de8e982a855b48cfe45645627bf87704f7f87dbed",
+          "action": "com.issued",
+          "actorId": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+          "version": 1,
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        },
+        {
+          "id": "6a894eb8-23e6-4ee5-aeba-99aa2b56ad86",
+          "hash": "c47da25ca2c7b40343a5750be8c7e944e5655067f7feacbc9749f60b8c9c0441",
+          "action": "com.purchase",
+          "actorId": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+          "version": 2,
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        },
+        {
+          "id": "293dc540-1e85-4cd1-8caf-5a002a9060c6",
+          "hash": "62cfc7e0c4bb09d7bbe2c888466f350ec4764b1f8862c81424f243d1c3d39ced",
+          "action": "com.receive",
+          "actorId": "d3707d4c-e91b-4abe-ac91-e32fe0fbffce",
+          "version": 3,
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        },
+        {
+          "id": "0a9affe1-3c8b-4939-8049-34a1a149c9ba",
+          "hash": "a0c11c5ba094977e5865ac7a59ad01816b85addf4b511ce91d04318bb9d668d7",
+          "action": "com.receive",
+          "actorId": "d3707d4c-e91b-4abe-ac91-e32fe0fbffce",
+          "version": 4,
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        },
+        {
+          "id": "6800992d-ad41-41be-8969-bc1f6daf3b83",
+          "hash": "a290550eff7c184e6c3802b3563ee35c0f7a43038fff704b9326b9afa3f14948",
+          "action": "com.reject_receipt",
+          "actorId": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+          "version": 5,
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        },
+        {
+          "id": "2e1f345b-8aa5-46a4-be31-d065467b5d6a",
+          "hash": "27dc5afc9f9e2a02869163cbc07bad72cb04606f10ddae6179e4e9762f4a815c",
+          "action": "com.validate_receipt",
+          "actorId": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+          "version": 6,
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        }
+      ],
+      "number": 1,
+      "status": "partially_received",
+      "payload": {
+        "lines": [
+          {
+            "quantity": "10",
+            "productId": "patient-707eac25-c5d0-4c58-b1ea-1d6cb413b0c2"
+          }
+        ],
+        "origin": "purchase"
+      },
+      "version": 6,
+      "protocol": "COM-20261030-3E20BA5F-7E6ED680-1-A344A4C4",
+      "receipts": [
+        {
+          "id": "7259b163-b5c8-4482-aa3c-f9a7daae4121",
+          "lines": [
+            {
+              "lineId": "de2c40e0-7800-46b5-baa3-96fd9db4101b",
+              "quantity": "1"
+            }
+          ],
+          "state": "rejected",
+          "reason": "RESSALVA_REJEICAO_FICTICIA_B6",
+          "created_at": "2026-10-30T16:00:39.071305+00:00",
+          "document_id": "df1ac877-052e-4f13-beb1-9d89ea303fa7",
+          "submitted_by": "d3707d4c-e91b-4abe-ac91-e32fe0fbffce",
+          "validated_at": "2026-10-30T16:00:39.071305+00:00",
+          "validated_by": "7e6ed680-59fe-4e9a-8239-ff3e64f71779"
+        },
+        {
+          "id": "7d6bacc4-6520-4ab4-991f-320b67b9874c",
+          "lines": [
+            {
+              "lineId": "de2c40e0-7800-46b5-baa3-96fd9db4101b",
+              "quantity": "1"
+            }
+          ],
+          "state": "approved",
+          "reason": null,
+          "created_at": "2026-10-30T16:00:39.071305+00:00",
+          "document_id": "df1ac877-052e-4f13-beb1-9d89ea303fa7",
+          "submitted_by": "d3707d4c-e91b-4abe-ac91-e32fe0fbffce",
+          "validated_at": "2026-10-30T16:00:39.071305+00:00",
+          "validated_by": "7e6ed680-59fe-4e9a-8239-ff3e64f71779"
+        }
+      ],
+      "approvals": [],
+      "created_at": "2026-10-30T16:00:39.071305+00:00",
+      "created_by": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+      "totalLines": 1,
+      "updated_at": "2026-10-30T16:00:39.071305+00:00",
+      "content_hash": "27dc5afc9f9e2a02869163cbc07bad72cb04606f10ddae6179e4e9762f4a815c",
+      "recipient_id": null,
+      "workflow_data": {},
+      "idempotency_key": "d8e595cc-e6b5-44ee-8d06-587972808f40",
+      "care_recipient_id": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb",
+      "fullyCheckedLines": 0,
+      "canonical_snapshot": {
+        "id": "df1ac877-052e-4f13-beb1-9d89ea303fa7",
+        "code": "COM-0001",
+        "type": "COM",
+        "event": {
+          "receiptId": "7d6bacc4-6520-4ab4-991f-320b67b9874c"
+        },
+        "lines": [
+          {
+            "id": "de2c40e0-7800-46b5-baa3-96fd9db4101b",
+            "metadata": {},
+            "quantity": 10,
+            "product_id": "patient-707eac25-c5d0-4c58-b1ea-1d6cb413b0c2",
+            "document_id": "df1ac877-052e-4f13-beb1-9d89ea303fa7",
+            "fully_checked": false,
+            "name_snapshot": "Material fictício B6 receipts",
+            "unit_snapshot": "unidade",
+            "accepted_quantity": 1,
+            "approved_quantity": 10,
+            "care_recipient_id": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb",
+            "category_snapshot": "higiene",
+            "purchased_quantity": 3,
+            "reconciled_quantity": 0
+          }
+        ],
+        "action": "com.validate_receipt",
+        "actors": {
+          "issuer": {
+            "id": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+            "name": "Administrador fictício B6 receipts",
+            "state": null,
+            "category": null,
+            "registration": null
+          },
+          "patient": {
+            "id": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb",
+            "name": "Paciente fictício B6 receipts"
+          },
+          "recipient": null
+        },
+        "status": "partially_received",
+        "history": [
+          {
+            "action": "com.issued",
+            "version": 1,
+            "actorName": "Administrador fictício B6 receipts",
+            "createdAt": "2026-10-30T16:00:39.071305+00:00"
+          },
+          {
+            "action": "com.purchase",
+            "version": 2,
+            "actorName": "Administrador fictício B6 receipts",
+            "createdAt": "2026-10-30T16:00:39.071305+00:00"
+          },
+          {
+            "action": "com.receive",
+            "version": 3,
+            "actorName": "Familiar fictício B6 receipts",
+            "createdAt": "2026-10-30T16:00:39.071305+00:00"
+          },
+          {
+            "action": "com.receive",
+            "version": 4,
+            "actorName": "Familiar fictício B6 receipts",
+            "createdAt": "2026-10-30T16:00:39.071305+00:00"
+          },
+          {
+            "action": "com.reject_receipt",
+            "version": 5,
+            "actorName": "Administrador fictício B6 receipts",
+            "createdAt": "2026-10-30T16:00:39.071305+00:00"
+          },
+          {
+            "action": "com.validate_receipt",
+            "version": 6,
+            "actorName": "Administrador fictício B6 receipts",
+            "createdAt": "2026-10-30T16:00:39.071305+00:00"
+          }
+        ],
+        "payload": {
+          "lines": [
+            {
+              "quantity": "10",
+              "productId": "patient-707eac25-c5d0-4c58-b1ea-1d6cb413b0c2"
+            }
+          ],
+          "origin": "purchase"
+        },
+        "version": 6,
+        "protocol": "COM-20261030-3E20BA5F-7E6ED680-1-A344A4C4",
+        "workflow": {},
+        "actorName": "Administrador fictício B6 receipts",
+        "approvals": [],
+        "authority": {
+          "mode": "patient",
+          "revision": 2,
+          "updated_at": "2026-10-30T16:00:39.071305+00:00",
+          "care_recipient_id": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb"
+        },
+        "createdAt": "2026-10-30T16:00:39.071305+00:00",
+        "createdBy": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+        "attachments": [],
+        "recipientId": null,
+        "previousHash": "a290550eff7c184e6c3802b3563ee35c0f7a43038fff704b9326b9afa3f14948",
+        "requestLinks": [],
+        "schemaVersion": 2,
+        "careRecipientId": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb",
+        "itemResolutions": []
+      }
+    },
+    "pendingBody": {
+      "id": "df1ac877-052e-4f13-beb1-9d89ea303fa7",
+      "code": "COM-0001",
+      "type": "COM",
+      "event": {
+        "lines": [
+          {
+            "lineId": "de2c40e0-7800-46b5-baa3-96fd9db4101b",
+            "quantity": "1"
+          }
+        ]
+      },
+      "lines": [
+        {
+          "id": "de2c40e0-7800-46b5-baa3-96fd9db4101b",
+          "metadata": {},
+          "quantity": 10,
+          "product_id": "patient-707eac25-c5d0-4c58-b1ea-1d6cb413b0c2",
+          "document_id": "df1ac877-052e-4f13-beb1-9d89ea303fa7",
+          "fully_checked": false,
+          "name_snapshot": "Material fictício B6 receipts",
+          "unit_snapshot": "unidade",
+          "accepted_quantity": 0,
+          "approved_quantity": 10,
+          "care_recipient_id": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb",
+          "category_snapshot": "higiene",
+          "purchased_quantity": 3,
+          "reconciled_quantity": 0
+        }
+      ],
+      "action": "com.receive",
+      "actors": {
+        "issuer": {
+          "id": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+          "name": "Administrador fictício B6 receipts",
+          "state": null,
+          "category": null,
+          "registration": null
+        },
+        "patient": {
+          "id": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb",
+          "name": "Paciente fictício B6 receipts"
+        },
+        "recipient": null
+      },
+      "status": "purchasing",
+      "history": [
+        {
+          "action": "com.issued",
+          "version": 1,
+          "actorName": "Administrador fictício B6 receipts",
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        },
+        {
+          "action": "com.purchase",
+          "version": 2,
+          "actorName": "Administrador fictício B6 receipts",
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        },
+        {
+          "action": "com.receive",
+          "version": 3,
+          "actorName": "Familiar fictício B6 receipts",
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        },
+        {
+          "action": "com.receive",
+          "version": 4,
+          "actorName": "Familiar fictício B6 receipts",
+          "createdAt": "2026-10-30T16:00:39.071305+00:00"
+        }
+      ],
+      "payload": {
+        "lines": [
+          {
+            "quantity": "10",
+            "productId": "patient-707eac25-c5d0-4c58-b1ea-1d6cb413b0c2"
+          }
+        ],
+        "origin": "purchase"
+      },
+      "version": 4,
+      "protocol": "COM-20261030-3E20BA5F-7E6ED680-1-A344A4C4",
+      "workflow": {},
+      "actorName": "Familiar fictício B6 receipts",
+      "approvals": [],
+      "authority": {
+        "mode": "patient",
+        "revision": 1,
+        "updated_at": "2026-10-30T16:00:39.071305+00:00",
+        "care_recipient_id": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb"
+      },
+      "createdAt": "2026-10-30T16:00:39.071305+00:00",
+      "createdBy": "7e6ed680-59fe-4e9a-8239-ff3e64f71779",
+      "attachments": [],
+      "recipientId": null,
+      "previousHash": "62cfc7e0c4bb09d7bbe2c888466f350ec4764b1f8862c81424f243d1c3d39ced",
+      "requestLinks": [],
+      "schemaVersion": 2,
+      "careRecipientId": "3e20ba5f-b076-499a-bb69-d4e4f0e284bb",
+      "itemResolutions": []
+    },
+    "finalAccepted": 1,
+    "oneRejectedOneApproved": true,
+    "twoIndependentReceipts": true,
+    "pendingReceiptsNotInSnapshot": true,
+    "rejectionReasonInHistoricalEvent": true,
+    "receiveEventsWithoutReceiptIdentity": true
+  }
+}

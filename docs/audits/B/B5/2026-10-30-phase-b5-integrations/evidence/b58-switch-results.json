@@ -1,0 +1,13 @@
+{
+  "recordedAt": "2026-10-30T11:38:33.266Z",
+  "id": "B58-U02",
+  "hypothesis": "Old Flow review selection survives a patient switch",
+  "outcome": "REFUTED",
+  "oldReviewText": false,
+  "newPatientEmpty": true,
+  "currentPatient": "Residência fictícia B5 atualização 2",
+  "readbackStatus": "pending_confirmation",
+  "method": "Actual browser context switch followed by read-only DOM and SQL inspection",
+  "instrumentation": "Initial capture expected stale=true and failed assertion because stale=false; it did not save initial RPC response. No HTTP status is claimed. No rerun of mutation or scenario.",
+  "externalSending": false
+}

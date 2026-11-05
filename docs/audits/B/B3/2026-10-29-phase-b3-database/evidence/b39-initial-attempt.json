@@ -1,0 +1,27 @@
+{
+  "group": "B3.9",
+  "startedAt": "2026-10-30T01:28:55.966Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B39-01",
+      "purpose": "25 pacientes cancelados bloqueiam outro paciente por execuções sucessivas: DB-002",
+      "recordedAt": "2026-10-30T01:28:55.967Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Local SQL failed: ERROR:  new row for relation \"requisitions\" violates check constraint \"requisitions_protocol_format_check\"\nDETAIL:  Failing row contains (0d7a0b2d-4d81-444b-b4b3-30aa8287dc5a, REQ-20000101-0d7a0b2d4d81444bb4b330aa8287dc5a, 456c501e-873c-4120-a2f2-bb8f39143416, d09204cf-3dc5-44e3-858b-0deda4f7f4da, cancelled, 200de694-4a5e-4d85-b005-a45dc6ab3b65, 2026-10-30 01:28:56.108953+00, 2026-10-30 01:28:56.108953+00, null, null, f, null, null, null, null).\nCONTEXT:  SQL statement \"insert into public.requisitions(id,protocol,care_recipient_id,created_by,status,idempotency_key,is_historical) values(rid,'REQ-20000101-'||replace(rid::text,'-',''),p,'456c501e-873c-4120-a2f2-bb8f39143416','cancelled',gen_random_uuid(),false)\"\nPL/pgSQL function inline_code_block line 5 at SQL statement",
+        "sqlstate": null
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": []
+}

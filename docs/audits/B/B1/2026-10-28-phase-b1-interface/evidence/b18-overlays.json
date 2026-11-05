@@ -1,0 +1,182 @@
+{
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "startedAt": "2026-10-29T08:31:43.607Z",
+  "origin": "http://127.0.0.1:3100",
+  "externalSending": false,
+  "cases": [
+    {
+      "at": "2026-10-29T08:31:52.101Z",
+      "role": "adminA",
+      "label": "administration-menu",
+      "path": "/admin?section=catalog",
+      "width": 390,
+      "state": "READY",
+      "note": "Menu opened, no destination command.",
+      "file": "b18-overlays-adminA-administration-menu.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Paciente\nPessoas e vínculos\nConvites\nCatálogo\nAlertas de estoque\nDestinatários\nFila de notificações\nAuditoria\nImportação histórica",
+      "snapshot": "- menu \"Outras áreas\":\n  - menuitem \"Paciente\"\n  - menuitem \"Pessoas e vínculos\"\n  - menuitem \"Convites\"\n  - menuitem \"Catálogo\"\n  - menuitem \"Alertas de estoque\"\n  - menuitem \"Destinatários\"\n  - menuitem \"Fila de notificações\"\n  - menuitem \"Auditoria\"\n  - menuitem \"Importação histórica\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:32:07.387Z",
+      "role": "adminA",
+      "label": "permission-menu",
+      "path": "/configuracoes?area=permissions",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-overlays-adminA-permission-menu.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Herdar · permitido\nPermitir\nRestringir",
+      "snapshot": "- menu \"Revisar BAL pelo grupo familiar · Familiar · Herdar · permitido\":\n  - menuitemradio \"Herdar · permitido\" [checked]\n  - menuitemradio \"Permitir\"\n  - menuitemradio \"Restringir\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:32:07.810Z",
+      "role": "adminA",
+      "label": "permission-critical-review",
+      "path": "/configuracoes?area=permissions",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-overlays-adminA-permission-critical-review.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Confirmar alteração crítica\n\nRevisar BAL pelo grupo familiar · Familiar\n\nAtual\nHerdar · permitido\nProposta\nRestringir\n\nA mudança vale neste paciente e será auditada. Na atuação global, depende de aprovação local distinta.\n\nVoltar\nConfirmar permissão",
+      "snapshot": "- dialog \"Confirmar alteração crítica\":\n  - heading \"Confirmar alteração crítica\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph:\n    - strong: Revisar BAL pelo grupo familiar · Familiar\n  - term: Atual\n  - definition: Herdar · permitido\n  - term: Proposta\n  - definition: Restringir\n  - paragraph: A mudança vale neste paciente e será auditada. Na atuação global, depende de aprovação local distinta.\n  - button \"Voltar\"\n  - button \"Confirmar permissão\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:32:10.387Z",
+      "role": "adminA",
+      "label": "policy-rule-editor",
+      "path": "/configuracoes?area=rules",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-overlays-adminA-policy-rule-editor.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Ciência da requisição\nExigir ciência familiar da REQ\nRegistrar ciência do entregador autorizado na expedição\nPermitir ciência automática com consentimento pessoal\nPermitir ciência simplificada pelo WhatsApp com consentimento pessoal\nFunções responsáveis pela ciência\nAdministrador do paciente\nFamiliar\nSupervisor\nProfissional\nExigência de ciência\nUma pessoa autorizada\nTodas as pessoas responsáveis\nRegistrar política",
+      "snapshot": "- dialog \"Ciência da requisição\":\n  - heading \"Ciência da requisição\" [level=2]\n  - button \"Fechar edição\"\n  - group:\n    - checkbox \"Exigir ciência familiar da REQ\" [checked]\n    - text: Exigir ciência familiar da REQ\n    - checkbox \"Registrar ciência do entregador autorizado na expedição\" [checked]\n    - text: Registrar ciência do entregador autorizado na expedição\n    - checkbox \"Permitir ciência automática com consentimento pessoal\"\n    - text: Permitir ciência automática com consentimento pessoal\n    - checkbox \"Permitir ciência simplificada pelo WhatsApp com consentimento pessoal\"\n    - text: Permitir ciência simplificada pelo WhatsApp com consentimento pessoal\n    - group \"Funções responsáveis pela ciência\":\n      - text: Funções responsáveis pela ciência\n      - checkbox \"Administrador do paciente\" [checked]\n      - text: Administrador do paciente\n      - checkbox \"Familiar\" [checked]\n      - text: Familiar\n      - checkbox \"Supervisor\"\n      - text: Supervisor\n      - checkbox \"Profissional\"\n      - text: Profissional\n    - text: Exigência de ciência\n    - combobox \"Exigência de ciência\":\n      - option \"Uma pessoa autorizada\" [selected]\n      - option \"Todas as pessoas responsáveis\"\n    - button \"Registrar política\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:32:12.248Z",
+      "role": "adminA",
+      "label": "notification-rule-editor",
+      "path": "/configuracoes?area=notifications",
+      "width": 390,
+      "state": "READY",
+      "note": "Fields persist immediately if changed; none changed.",
+      "file": "b18-overlays-adminA-notification-rule-editor.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Prazo da obrigação semanal ultrapassado · Administrador do paciente\n\nCada alteração é salva e confirmada pelo servidor.\n\nComportamento\nConforme preferências pessoais\nObrigatório no aplicativo\nSilencioso no aplicativo\nIncluir PDF compatível\nIntervalo mínimo (min)\n\nSilêncio externo (hora de Brasília). Avisos no aplicativo continuam disponíveis.\n\nInício\nNão configurado\n0:00\n1:00\n2:00\n3:00\n4:00\n5:00\n6:00\n7:00\n8:00\n9:00\n10:00\n11:00\n12:00\n13:00\n14:00\n15:00\n16:00\n17:00\n18:00\n19:00\n20:00\n21:00\n22:00\n23:00\nFim\nNão configurado\n0:00\n1:00\n2:00\n3:00\n4:00\n5:00\n6:00\n7:00\n8:00\n9:00\n10:00\n11:00\n12:00\n13:00\n14:00\n15:00\n16:00\n17:00\n18:00\n19:00\n20:00\n21:00\n22:00\n23:00",
+      "snapshot": "- dialog \"Prazo da obrigação semanal ultrapassado · Administrador do paciente\":\n  - heading \"Prazo da obrigação semanal ultrapassado · Administrador do paciente\" [level=2]\n  - button \"Fechar edição\"\n  - group:\n    - paragraph: Cada alteração é salva e confirmada pelo servidor.\n    - text: Comportamento\n    - combobox \"Comportamento\":\n      - option \"Conforme preferências pessoais\" [selected]\n      - option \"Obrigatório no aplicativo\"\n      - option \"Silencioso no aplicativo\"\n    - checkbox \"Incluir PDF compatível\" [checked]\n    - text: Incluir PDF compatível Intervalo mínimo (min)\n    - spinbutton \"Intervalo mínimo (min)\": \"0\"\n    - paragraph: Silêncio externo (hora de Brasília). Avisos no aplicativo continuam disponíveis.\n    - text: Início\n    - combobox \"Início\":\n      - option \"Não configurado\" [selected]\n      - option \"0:00\"\n      - option \"1:00\"\n      - option \"2:00\"\n      - option \"3:00\"\n      - option \"4:00\"\n      - option \"5:00\"\n      - option \"6:00\"\n      - option \"7:00\"\n      - option \"8:00\"\n      - option \"9:00\"\n      - option \"10:00\"\n      - option \"11:00\"\n      - option \"12:00\"\n      - option \"13:00\"\n      - option \"14:00\"\n      - option \"15:00\"\n      - option \"16:00\"\n      - option \"17:00\"\n      - option \"18:00\"\n      - option \"19:00\"\n      - option \"20:00\"\n      - option \"21:00\"\n      - option \"22:00\"\n      - option \"23:00\"\n    - text: Fim\n    - combobox \"Fim\":\n      - option \"Não configurado\" [selected]\n      - option \"0:00\"\n      - option \"1:00\"\n      - option \"2:00\"\n      - option \"3:00\"\n      - option \"4:00\"\n      - option \"5:00\"\n      - option \"6:00\"\n      - option \"7:00\"\n      - option \"8:00\"\n      - option \"9:00\"\n      - option \"10:00\"\n      - option \"11:00\"\n      - option \"12:00\"\n      - option \"13:00\"\n      - option \"14:00\"\n      - option \"15:00\"\n      - option \"16:00\"\n      - option \"17:00\"\n      - option \"18:00\"\n      - option \"19:00\"\n      - option \"20:00\"\n      - option \"21:00\"\n      - option \"22:00\"\n      - option \"23:00\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:32:16.007Z",
+      "role": "adminA",
+      "label": "req-cancel-review",
+      "path": "/historico/8a768d24-75ce-4f53-b190-3ab6dc97db1f",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-overlays-adminA-req-cancel-review.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 1192
+      },
+      "text": "Revisar cancelamento da REQ\n\nREQ-0002 · 0/1 itens atendidos. O cancelamento preserva todos os eventos. Entregas vinculadas precisam estar formalmente resolvidas.\n\nJustificativa\nConfirmar cancelamento",
+      "snapshot": "- dialog \"Revisar cancelamento da REQ\":\n  - heading \"Revisar cancelamento da REQ\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph: REQ-0002 · 0/1 itens atendidos. O cancelamento preserva todos os eventos. Entregas vinculadas precisam estar formalmente resolvidas.\n  - text: Justificativa\n  - textbox \"Justificativa\"\n  - button \"Confirmar cancelamento\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:32:19.061Z",
+      "role": "adminA",
+      "label": "extra-association-review",
+      "path": "/historico/8a768d24-75ce-4f53-b190-3ab6dc97db1f",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-overlays-adminA-extra-association-review.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 1820
+      },
+      "text": "Confirmar identificação do item\n\nMaterial excepcional sintético B1 → Material fictício V4 0\n\nExemplo fictício de revisão; nenhuma associação aplicada.\n\nVoltar\nConfirmar associação",
+      "snapshot": "- dialog \"Confirmar identificação do item\":\n  - heading \"Confirmar identificação do item\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph: Material excepcional sintético B1 → Material fictício V4 0\n  - paragraph: Exemplo fictício de revisão; nenhuma associação aplicada.\n  - button \"Voltar\"\n  - button \"Confirmar associação\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:32:25.809Z",
+      "role": "global",
+      "label": "global-account-editor",
+      "path": "/admin?section=profiles",
+      "width": 390,
+      "state": "READY",
+      "note": "",
+      "file": "b18-overlays-global-global-account-editor.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Editar conta global\nNome da conta\nPapel global\nadmin\nsupervisor\nprofessional\nreader\nConta ativa\nPrivilégio global\n\nO último administrador global ativo permanece protegido pelo banco.\n\nRevisar alteração",
+      "snapshot": "- dialog \"Editar conta global\":\n  - heading \"Editar conta global\" [level=2]\n  - button \"Fechar edição\"\n  - group:\n    - text: Nome da conta\n    - textbox \"Nome da conta\": Teste professional\n    - text: Papel global\n    - combobox \"Papel global\":\n      - option \"admin\"\n      - option \"supervisor\"\n      - option \"professional\" [selected]\n      - option \"reader\"\n    - checkbox \"Conta ativa\" [checked]\n    - text: Conta ativa\n    - checkbox \"Privilégio global\"\n    - text: Privilégio global\n    - paragraph: O último administrador global ativo permanece protegido pelo banco.\n    - button \"Revisar alteração\"",
+      "visualInspected": false
+    },
+    {
+      "at": "2026-10-29T08:32:26.155Z",
+      "role": "global",
+      "label": "global-account-review",
+      "path": "/admin?section=profiles",
+      "width": 390,
+      "state": "READY",
+      "note": "Unchanged fictional account values; final confirmation not clicked.",
+      "file": "b18-overlays-global-global-account-review.png",
+      "fullPage": false,
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "text": "Revisar conta global\n\nTeste professional\n\nPapel global\nprofessional\nConta\nAtiva\nPrivilégio global\nDesabilitado\nVoltar\nConfirmar conta global",
+      "snapshot": "- dialog \"Revisar conta global\":\n  - heading \"Revisar conta global\" [level=2]\n  - button \"Fechar diálogo\"\n  - paragraph:\n    - strong: Teste professional\n  - term: Papel global\n  - definition: professional\n  - term: Conta\n  - definition: Ativa\n  - term: Privilégio global\n  - definition: Desabilitado\n  - button \"Voltar\"\n  - button \"Confirmar conta global\"",
+      "visualInspected": false
+    }
+  ],
+  "failures": [
+    {
+      "label": "membership-revoke-review",
+      "error": "locator.click: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^Revogar vínculo / }).first()\u001b[22m\n"
+    },
+    {
+      "label": "duplicate-review-injected-read",
+      "error": "locator.check: Clicking the checkbox did not change its state\nCall log:\n\u001b[2m  - waiting for getByRole('checkbox').first()\u001b[22m\n\u001b[2m    - locator resolved to <input type=\"checkbox\"/>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - performing click action\u001b[22m\n\u001b[2m    - click action done\u001b[22m\n\u001b[2m    - waiting for scheduled navigations to finish\u001b[22m\n\u001b[2m    - navigations have finished\u001b[22m\n"
+    }
+  ],
+  "blockedBusinessWrites": [],
+  "finishedAt": "2026-10-29T08:32:27.997Z"
+}

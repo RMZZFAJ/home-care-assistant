@@ -1,0 +1,91 @@
+{
+  "recordedAt": "2026-10-30T05:19:44.718Z",
+  "method": "Read-only owner aggregate integrity/metadata. Not an exposed-role access test or full restore.",
+  "checks": [
+    {
+      "name": "ledger_missing_patient",
+      "violations": 1
+    },
+    {
+      "name": "ledger_missing_patient_catalogue",
+      "violations": 1
+    },
+    {
+      "name": "document_line_parent_patient_mismatch",
+      "violations": 0
+    },
+    {
+      "name": "document_event_parent_patient_mismatch",
+      "violations": 0
+    },
+    {
+      "name": "attachment_document_patient_mismatch",
+      "violations": 0
+    },
+    {
+      "name": "notification_document_patient_mismatch",
+      "violations": 0
+    },
+    {
+      "name": "ready_attachment_without_storage_metadata",
+      "violations": 1
+    },
+    {
+      "name": "unvalidated_constraints",
+      "violations": 0
+    }
+  ],
+  "hashes": [
+    {
+      "events": 720,
+      "snapshot_schema": "2",
+      "digest_mismatches": 0
+    }
+  ],
+  "infrastructure": {
+    "auth_users": 73,
+    "active_jobs": 2,
+    "auth_sessions": 210,
+    "storage_objects": 215,
+    "outgoing_http_queue": 0,
+    "worker_url_configured": false,
+    "worker_bearer_configured": false
+  },
+  "functionPreservation": {
+    "baseline": 232,
+    "current": 232,
+    "changed": 0,
+    "missing": 0
+  },
+  "counterproofs": {
+    "unscopedLedgerRows": 1,
+    "allPresentUnchangedBeforeB3": true,
+    "allMatchDeliberatelyPreservedMigrationFixture": true,
+    "source": "scripts/test-migrations.mjs:157 explicitly requires this preserved unscoped legacy movement; current trigger rejects new null-patient movements; view excludes it intentionally",
+    "readyMissingObject": "The one missing-byte attachment is the explicitly privileged NEW B310-09 fixture; not an observed normal API orphan",
+    "interpretation": "Raw anomaly counts require domain interpretation; neither nonzero count alone is a new corruption finding"
+  },
+  "backup": {
+    "file": "private local-20261030T004802919Z.dump outside Git",
+    "bytes": 5869080,
+    "sha256": "28d6127b0e75086d40ab25471dadd0f0440edd2b42d7a37acb8d6ea6fe444ef4",
+    "listReadable": true,
+    "authUsersData": true,
+    "storageMetadataData": true,
+    "publicDocumentData": true,
+    "privateAuthorityData": true,
+    "vaultObjectsRepresented": true,
+    "restorePerformed": false,
+    "limits": "Readable dump/index and matching hash do not prove restore. Bucket bytes, platform/JWT/encryption configuration and external-provider state require separate recovery inventory."
+  },
+  "oldAttemptReadback": [
+    {
+      "id": "b4d6f1ee-01d8-4782-a710-7358bdfca49c",
+      "status": "rejected"
+    },
+    {
+      "id": "3a26d663-4e68-4766-a5fa-a8ec00323771",
+      "status": "confirmed"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "recordedAt": "2026-10-30T06:52:06.659Z",
+  "clientDate": "2026-10-30",
+  "timezone": "America/Sao_Paulo",
+  "node": "24.22.0",
+  "branch": "audit/phase-b",
+  "head": "315399dc5c19cacc9d9cc3c609174498608f4af0",
+  "master": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "originPhaseB": "315399dc5c19cacc9d9cc3c609174498608f4af0",
+  "initialStatus": "?? docs/audits/2026-10-30-phase-b4-backend/",
+  "functionalSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "functionalDiff": "",
+  "protectedFiles": 395,
+  "guardPassed": true,
+  "project": "home-care-assistant",
+  "api": "127.0.0.1:54321",
+  "database": "127.0.0.1:54322",
+  "container": "supabase_db_home-care-assistant",
+  "isolation": {
+    "network_queue_count": 0,
+    "worker_url_configured": false,
+    "worker_bearer_configured": false
+  },
+  "routineCount": 232,
+  "routineDriftFromB3": [],
+  "buildId": "8xF171P-bhRJp_Vkn43C0",
+  "jobs": [
+    {
+      "jobid": 1,
+      "active": true,
+      "jobname": "hca-operational-lifecycle",
+      "schedule": "* * * * *",
+      "command_md5": "5a33e5ef0362151ddfc0607103df74c8"
+    },
+    {
+      "jobid": 2,
+      "active": true,
+      "jobname": "hca-notification-worker",
+      "schedule": "* * * * *",
+      "command_md5": "65d379dadb2a1db193fbb892a9d765b4"
+    }
+  ],
+  "limits": "Local metadata and hashes only. Initial status includes this newly created B4 package. Remote not queried. No mutation.",
+  "masterOrderProvenance": {
+    "originalAttachmentSha256": "f1b8de5b0222ce77c58308c6095ef6ef7946ed5f1c49cdcc66f462d3540e0ea0",
+    "normalization": "UTF-8 LF; six trailing Markdown hard-break spaces removed from header lines; wording unchanged",
+    "committedCopySha256": "9d340c46ae2e4f998f636bd31ca708cb6196c155b3dec7b4f8c3bd7eec6d6a1f"
+  }
+}

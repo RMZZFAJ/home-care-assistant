@@ -1,0 +1,30 @@
+{
+  "recordedAt": "2026-10-29T09:52:45.668Z",
+  "clientDate": "2026-10-29",
+  "timezone": "America/Sao_Paulo",
+  "node": "24.22.0",
+  "npm": "11.21.1",
+  "branch": "audit/phase-b",
+  "head": "73bedcbc09f9edba8c8869b60ea84950cddc82fc",
+  "master": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "productDiff": "",
+  "project": "home-care-assistant",
+  "databaseContainer": "supabase_db_home-care-assistant",
+  "api": "http://127.0.0.1:54321",
+  "db": "127.0.0.1:54322",
+  "guardPassed": true,
+  "mutation": false,
+  "data": {
+    "migrations": 84,
+    "publicTables": 62,
+    "authUsers": 44,
+    "patients": 117,
+    "documents": 140,
+    "stockMovements": 529,
+    "sessions": 82,
+    "database": "postgres",
+    "serverVersion": "17.11"
+  },
+  "limits": "Aggregate metadata only; no identities or private row content exported; no production or human validation."
+}

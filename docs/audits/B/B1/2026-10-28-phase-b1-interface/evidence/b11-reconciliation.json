@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-29T03:40:24.792Z",
+  "base": 51,
+  "overlays": 40,
+  "demoVariants": 6,
+  "total": 97,
+  "coverageRows": 142,
+  "uiSources": 112,
+  "reviewedSources": 140,
+  "partialSources": 3,
+  "captures": 113,
+  "pdfPagesInspected": 6,
+  "limitations": "All UI read. Runtime representative; each unrendered branch explicit. 19 contact sheets inspected only mapped top regions. No human users."
+}

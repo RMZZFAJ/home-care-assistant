@@ -1,0 +1,105 @@
+{
+  "group": "B3.4",
+  "startedAt": "2026-10-30T01:02:17.470Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Authenticated RPC and independent persisted SQL read-back; no browser unless explicitly stated",
+  "scenarios": [
+    {
+      "id": "B34-01",
+      "purpose": "Helpers históricos não são entrypoints públicos alternativos",
+      "recordedAt": "2026-10-30T01:02:17.821Z",
+      "observed": [
+        {
+          "name": "audited_legacy_supply_command",
+          "result": {
+            "rejected": true,
+            "sqlstate": "42501",
+            "message": "audited_legacy_supply_command: permission denied for function audited_legacy_supply_command"
+          }
+        },
+        {
+          "name": "fluent_pre_shift_command",
+          "result": {
+            "rejected": true,
+            "sqlstate": "42501",
+            "message": "fluent_pre_shift_command: permission denied for function fluent_pre_shift_command"
+          }
+        },
+        {
+          "name": "v3_revise_supply_document",
+          "result": {
+            "rejected": true,
+            "sqlstate": "42501",
+            "message": "v3_revise_supply_document: permission denied for function v3_revise_supply_document"
+          }
+        }
+      ],
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B34-02",
+      "purpose": "Chamador autenticado não usa finalizador de serviço nem configura worker",
+      "recordedAt": "2026-10-30T01:02:17.839Z",
+      "observed": {
+        "finalize": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "finalize_attachment: permission denied for function finalize_attachment"
+        },
+        "configure": {
+          "rejected": true,
+          "sqlstate": "42501",
+          "message": "configure_worker_schedule: permission denied for function configure_worker_schedule"
+        },
+        "noConfigurationWritten": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B34-03",
+      "purpose": "Serviço não usa RPC de operação local como usuário arbitrário",
+      "recordedAt": "2026-10-30T01:02:17.851Z",
+      "observed": {
+        "rejected": true,
+        "sqlstate": "42501",
+        "message": "family_stock_movement: permission denied for function family_stock_movement"
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B34-04",
+      "purpose": "Decisão oposta após confirmação retorna sucesso sem aplicar: B2-011",
+      "recordedAt": "2026-10-30T01:02:17.858Z",
+      "observed": {
+        "id": "e7459d99-45e7-498a-91f6-488078cf63a7",
+        "firstDecision": "confirmed",
+        "oppositeResponse": null,
+        "after": "confirmed",
+        "noLedgerEffect": true
+      },
+      "execution": "EXECUTED"
+    },
+    {
+      "id": "B34-05",
+      "purpose": "Decisão nula de consumo é tratada como rejeição na RPC direta",
+      "recordedAt": "2026-10-30T01:02:18.310Z",
+      "observed": {
+        "id": "3f84e021-e744-4b87-9d1d-bac97a834a68",
+        "response": null,
+        "after": "rejected",
+        "apiBooleanSchemaIsCompensatingControl": true
+      },
+      "execution": "EXECUTED"
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": [],
+  "finishedAt": "2026-10-30T01:02:18.464Z"
+}

@@ -6,7 +6,11 @@ import hooks from "eslint-plugin-react-hooks";
 import next from "@next/eslint-plugin-next";
 
 const eslintConfig = defineConfig([
-  globalIgnores([".next/**", ".next-e2e/**", "out/**", "build/**", "next-env.d.ts", "playwright-report/**", "test-results/**", "output/**"]),
+  globalIgnores([
+    ".next/**", ".next-e2e/**", "out/**", "build/**", "next-env.d.ts",
+    "playwright-report/**", "test-results/**", "output/**",
+    ".private/**", ".venv/**", "docs/audits/**",
+  ]),
   {
     files: ["**/*.{js,mjs,ts,tsx,mts}"],
     languageOptions: { globals: Object.fromEntries(["process", "console", "Buffer", "URL", "URLSearchParams", "Request", "Response", "Headers", "fetch", "AbortController", "AbortSignal", "setTimeout", "clearTimeout", "crypto", "TextEncoder", "TextDecoder"].map((name) => [name, "readonly"])) },

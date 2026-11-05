@@ -1,0 +1,139 @@
+{
+  "at": "2026-10-29T04:10:12.311687+00:00",
+  "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "tool": "PyMuPDF",
+  "documents": [
+    {
+      "file": "current-BAL.pdf",
+      "sha256": "cc98b3e0891e86e835bd6124bbe1414a8978716c0281f21f1f4952b0bb74bbe4",
+      "bytes": 27353,
+      "page_count": 2,
+      "structure_tree": "null",
+      "language": [
+        "null",
+        "null"
+      ],
+      "pages": [
+        {
+          "page": 1,
+          "image": "current-BAL-page-1.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nBALANÇO DO ESTOQUE DA EQUIPE\nBAL-0001 · 29/10/2026, 01:08 · Aprovado\n2\nITENS REGISTRADOS\n1\nVERSÃO\nBAL\nOPERAÇÃO\nCONCLUÍDO\nSITUAÇÃO\nIDENTIFICAÇÃO E RESPONSÁVEIS\nPACIENTE\nHomologação fictícia V4 9482191c\nRESPONSÁVEL\nProfissional fictício de plantão\nNÚMERO DO DOCUMENTO\nBAL-0001\nPROTOCOLO\nBAL-20261029-BEE824B9-29901A9C-1-6AA8D65A\nREGISTRO PROFISSIONAL\nNão informado\nSITUAÇÃO\nAprovado\nPLANTÃO E OBRIGAÇÕES DO BALANÇO\nProfissional da contagem: Profissional fictício de plantão · Plantão: Plantão diário fictício\nPlantão: 29/10/2026, 00:00 até 30/10/2026, 00:00 · America/Sao_Paulo\nContagem efetiva atual: 29/10/2026, 01:08\nSemanas vinculadas: 26/10/2026\nA contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no\nhistórico.\nRELAÇÃO DOS MATERIAIS DECLARADOS\nNº\nMATERIAL\nCONTADO\nUNIDADE\n01\nMaterial fictício V4 1\n2\nunidade\n02\nMaterial fictício V4 0\n10\nunidade\nContagem física exclusiva da equipe. Ajustes aplicados ao ledger dependem da política e das aprovações registradas.\nBAL-0001 · v1 · Conteúdo autorizado\nPágina 1 de 2\n",
+          "size_points": [
+            595.280029296875,
+            841.8900146484375
+          ],
+          "visual_inspected": false
+        },
+        {
+          "page": 2,
+          "image": "current-BAL-page-2.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nCONFERÊNCIA E AUDITORIA\nBAL-0001 · Versão documental 1\nREFERÊNCIA E RECONCILIAÇÃO\nMATERIAL\nREFERÊNCIA\nCONTADO\nMaterial fictício V4 1\n2\n2\nMaterial fictício V4 0\n10\n10\nLINHA DO TEMPO OPERACIONAL\nDATA/HORA\nRESPONSÁVEL\nEVENTO\n29/10/2026, 01:08\nProfissional fictício de\nplantão\nBalanço registrado · v1\nIDENTIFICAÇÃO E INTEGRIDADE\nDOCUMENTO\nBAL-0001\nVERSÃO\n1\nID TÉCNICO\n4ea0b69e-03e3-4b51-b938-bbee7becd325\nHASH DO CONTEÚDO CANÔNICO\n9a49e5d4bf694bd2636f3036b52c0ad066c3dc9b575e1\n78eba64db718e7521ae\nO SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por\nadministradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado\nseparadamente.\nVerificação de integridade\nO QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso\nautorizado.\nBAL-0001 · v1 · Conteúdo autorizado\nPágina 2 de 2\n",
+          "size_points": [
+            595.280029296875,
+            841.8900146484375
+          ],
+          "visual_inspected": false
+        }
+      ]
+    },
+    {
+      "file": "current-COM.pdf",
+      "sha256": "4d7ed36ebcfa9658b035c1aee2e681ecb0018c696922a364ed6339fd9e2ad2a3",
+      "bytes": 25812,
+      "page_count": 2,
+      "structure_tree": "null",
+      "language": [
+        "null",
+        "null"
+      ],
+      "pages": [
+        {
+          "page": 1,
+          "image": "current-COM-page-1.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nCOMPRA DE INSUMOS DA FAMÍLIA\nCOM-0001 · 29/10/2026, 00:18 · Aprovado\n2\nITENS REGISTRADOS\n1\nVERSÃO\nCOM\nOPERAÇÃO\nEM ANDAMENTO\nSITUAÇÃO\nIDENTIFICAÇÃO E RESPONSÁVEIS\nPACIENTE\nHomologação fictícia V4 9482191c\nRESPONSÁVEL\nTeste adminA\nNÚMERO DO DOCUMENTO\nCOM-0001\nPROTOCOLO\nCOM-20261029-BEE824B9-E15A2416-1-E42FFB6C\nREGISTRO PROFISSIONAL\nNão informado\nSITUAÇÃO\nAprovado\nRELAÇÃO DOS MATERIAIS DECLARADOS\nNº\nMATERIAL\nPROPOSTO\nUNIDADE\n01\nMaterial fictício V4 1\n5\nunidade\n02\nMaterial fictício V4 0\n5\nunidade\nObservação: Auditoria B1: doação inteiramente fictícia, sem contato externo\nAquisição e recebimento abastecem o estoque familiar após validação. Doações não exigem comprovante de pagamento. Somente\nENT recebida pode atender a equipe.\nCOM-0001 · v1 · Conteúdo autorizado\nPágina 1 de 2\n",
+          "size_points": [
+            595.280029296875,
+            841.8900146484375
+          ],
+          "visual_inspected": false
+        },
+        {
+          "page": 2,
+          "image": "current-COM-page-2.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nCONFERÊNCIA E AUDITORIA\nCOM-0001 · Versão documental 1\nAQUISIÇÃO E VALIDAÇÃO\nMATERIAL\nAPROVADO\nADQUIRIDO\nVALIDADO\nMaterial fictício V4 1\n5\n0\n0\nMaterial fictício V4 0\n5\n0\n0\nLINHA DO TEMPO OPERACIONAL\nDATA/HORA\nRESPONSÁVEL\nEVENTO\n29/10/2026, 00:18\nTeste adminA\nCompra registrada · v1\nIDENTIFICAÇÃO E INTEGRIDADE\nDOCUMENTO\nCOM-0001\nVERSÃO\n1\nID TÉCNICO\ne0fb069b-a55b-4a62-8a90-f215fc82522d\nHASH DO CONTEÚDO CANÔNICO\n581297db8dcf97159786266f75162c1e1f6fc7d57459ce\nf4b5ac7d00e9571e7a\nO SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por\nadministradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado\nseparadamente.\nVerificação de integridade\nO QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso\nautorizado.\nCOM-0001 · v1 · Conteúdo autorizado\nPágina 2 de 2\n",
+          "size_points": [
+            595.280029296875,
+            841.8900146484375
+          ],
+          "visual_inspected": false
+        }
+      ]
+    },
+    {
+      "file": "current-ENT.pdf",
+      "sha256": "70a3ee8dda66d0a431067ed2f0c01a2f27b1be960d52da674713d4dfb21051fc",
+      "bytes": 26539,
+      "page_count": 2,
+      "structure_tree": "null",
+      "language": [
+        "null",
+        "null"
+      ],
+      "pages": [
+        {
+          "page": 1,
+          "image": "current-ENT-page-1.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nCOMPROVANTE DE ENTREGA DE MATERIAIS\nENT-0001 · 29/10/2026, 00:18 · Aguardando recebimento\n2\nITENS DECLARADOS\n0\nCONFERIDOS INTEGRALMENTE\n0\nDIVERGÊNCIAS\nPENDENTE\nRECEBIMENTO\nIDENTIFICAÇÃO DA ENTREGA\nPACIENTE\nHomologação fictícia V4 9482191c\nRESPONSÁVEL\nTeste family\nNÚMERO DO DOCUMENTO\nENT-0001\nPROTOCOLO\nENT-20261029-BEE824B9-33568061-1-53E14D77\nORIGEM\nEstoque da família\nDESTINO\nEstoque da equipe\nRECEBEDOR DESIGNADO\nTeste professional\nEMISSÃO\n29/10/2026, 00:18\nRELAÇÃO DOS MATERIAIS DECLARADOS\nNº\nMATERIAL\nEXPEDIDO\nUNIDADE\n01\nMaterial fictício V4 1\n2\nunidade\n02\nMaterial fictício V4 0\n10\nunidade\nA expedição não comprova recebimento. Apenas quantidades efetivamente aceitas entram no saldo confirmado do destino; diferenças\npermanecem registradas até resolução formal.\nENT-0001 · v1 · Conteúdo autorizado\nPágina 1 de 2\n",
+          "size_points": [
+            595.280029296875,
+            841.8900146484375
+          ],
+          "visual_inspected": false
+        },
+        {
+          "page": 2,
+          "image": "current-ENT-page-2.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nCONFERÊNCIA E AUDITORIA\nENT-0001 · Versão documental 1\nDECLARAÇÃO DO RECEBIMENTO\nEste comprovante foi emitido antes do aceite. A pessoa designada deve conferir os itens e informar quantidades\nefetivamente recebidas. Nenhum aceite é presumido.\nMATERIAL\nACEITO\nCONCILIADO\nSITUAÇÃO\nMaterial fictício V4 1\n0\n0\nAguardando conferência\nMaterial fictício V4 0\n0\n0\nAguardando conferência\nLINHA DO TEMPO OPERACIONAL\nDATA/HORA\nRESPONSÁVEL\nEVENTO\n29/10/2026, 00:18\nTeste family\nMateriais expedidos · v1\nIDENTIFICAÇÃO E INTEGRIDADE\nDOCUMENTO\nENT-0001\nVERSÃO\n1\nID TÉCNICO\n174bf9ba-72f4-4aad-ac79-91b8bbaa434c\nHASH DO CONTEÚDO CANÔNICO\nbad4ed1621ab6d6e9e09dc01b90e5d1e675b25eee021\n7cdd898d6c8c9b6f8a3b\nO SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por\nadministradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado\nseparadamente.\nVerificação de integridade\nO QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso\nautorizado.\nENT-0001 · v1 · Conteúdo autorizado\nPágina 2 de 2\n",
+          "size_points": [
+            595.280029296875,
+            841.8900146484375
+          ],
+          "visual_inspected": false
+        }
+      ]
+    },
+    {
+      "file": "current-REQ.pdf",
+      "sha256": "a98d28dfd6cbe70b257f8ab3c3b137c814067bd672566c16e319e739b6e3d9e8",
+      "bytes": 26684,
+      "page_count": 2,
+      "structure_tree": "null",
+      "language": [
+        "null",
+        "null"
+      ],
+      "pages": [
+        {
+          "page": 1,
+          "image": "current-REQ-page-1.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nREQUISIÇÃO DE MATERIAIS\nREQ-0001 · 29/10/2026, 00:18 · Aguardando atendimento\n2\nITENS SOLICITADOS\n2\nURGENTES\n0\nITENS ATENDIDOS\nREGISTRADA\nCIÊNCIA FAMILIAR\nIDENTIFICAÇÃO E RESPONSÁVEIS\nPACIENTE\nHomologação fictícia V4 9482191c\nSOLICITADO POR\nTeste professional\nNÚMERO DO DOCUMENTO\nREQ-0001\nPROTOCOLO\nREQ-20261029-BEE824B9-E6368E99-1-67D70B12\nREGISTRO PROFISSIONAL\nREG-TESTE/SP\nSITUAÇÃO\nAguardando atendimento\nMATERIAIS SOLICITADOS\nNº\nMATERIAL\nAPRESENTAÇÃO\nPRIORIDADE\n01\nMaterial fictício V4 1\nunidade\nURGENTE\n02\nMaterial fictício V4 0\nunidade\nURGENTE\nEsta requisição não informa quantidades solicitadas. O atendimento é acompanhado por item após aceite positivo em ENT\nexplicitamente vinculada. A ciência familiar possui registro independente.\nSITUAÇÃO DO ATENDIMENTO\nLINHAS ATENDIDAS\n0 de 2\nLINHAS PENDENTES\n2\nCIÊNCIA FAMILIAR\n29/10/2026, 00:18\nPRÓXIMO PASSO\nProvidenciar ENT e conferir recebimento\nREQ-0001 · v3 · Conteúdo autorizado\nPágina 1 de 2\n",
+          "size_points": [
+            595.280029296875,
+            841.8900146484375
+          ],
+          "visual_inspected": false
+        },
+        {
+          "page": 2,
+          "image": "current-REQ-page-2.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nRASTREABILIDADE DA REQUISIÇÃO\nREQ-0001 · Versão documental 3\nCIÊNCIA FAMILIAR\nRESPONSÁVEL\nORIGEM\nDATA\nTeste family\nExpedição autorizada\n29/10/2026, 00:18\nLINHA DO TEMPO OPERACIONAL\nDATA/HORA\nRESPONSÁVEL\nEVENTO\n29/10/2026, 00:18\nTeste professional\nRequisição emitida · v1\n29/10/2026, 00:18\nTeste family\nCiência familiar exigida satisfeita · v2\n29/10/2026, 00:18\nTeste family\nAtendimento atualizado pelas entregas vinculadas · v3\nIDENTIFICAÇÃO E INTEGRIDADE\nDOCUMENTO\nREQ-0001\nVERSÃO\n3\nID TÉCNICO\nb8fc5ff1-826e-4acf-ab70-8c7b9950feb5\nHASH DO CONTEÚDO CANÔNICO\neb20791e0d3fd188501b4a333c04eae856aa78e8b478\neca7b66cde8f3e4a1e3c\nO SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por\nadministradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado\nseparadamente.\nVerificação de integridade\nO QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso\nautorizado.\nREQ-0001 · v3 · Conteúdo autorizado\nPágina 2 de 2\n",
+          "size_points": [
+            595.280029296875,
+            841.8900146484375
+          ],
+          "visual_inspected": false
+        }
+      ]
+    }
+  ]
+}

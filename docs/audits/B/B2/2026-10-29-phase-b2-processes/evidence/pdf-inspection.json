@@ -1,0 +1,52 @@
+{
+  "method": "PyMuPDF read and rasterize only; synthetic PDFs from local product",
+  "items": [
+    {
+      "file": "b28-req-v1.pdf",
+      "sha256": "64af3bbed52b831ffd521990e306b867819a963ab3d38c9be04cdb618ce9a670",
+      "version": 1,
+      "pages": [
+        {
+          "page": 1,
+          "image": "b28-req-v1-page-1.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nREQUISIÇÃO DE MATERIAIS\nREQ-0004 · 29/10/2026, 20:02 · Ciência e atendimento pendentes\n1\nITENS SOLICITADOS\n1\nURGENTES\n0\nITENS ATENDIDOS\nPENDENTE\nCIÊNCIA FAMILIAR\nIDENTIFICAÇÃO E RESPONSÁVEIS\nPACIENTE\nResidência fictícia B2-20261029-f7eece2c\nSOLICITADO POR\nPessoa fictícia B2 professional\nNÚMERO DO DOCUMENTO\nREQ-0004\nPROTOCOLO\nREQ-20261029-CDF49F73-1BE98412-4-96F6233D\nREGISTRO PROFISSIONAL\nNão informado\nSITUAÇÃO\nCiência e atendimento pendentes\nMATERIAIS SOLICITADOS\nNº\nMATERIAL\nAPRESENTAÇÃO\nPRIORIDADE\n01\nMaterial fictício B2 1\nunidade\nURGENTE\nObservação: Necessidade fictícia para auditar documento,ciência e continuidade\nEsta requisição não informa quantidades solicitadas. O atendimento é acompanhado por item após aceite positivo em ENT\nexplicitamente vinculada. A ciência familiar possui registro independente.\nSITUAÇÃO DO ATENDIMENTO\nLINHAS ATENDIDAS\n0 de 1\nLINHAS PENDENTES\n1\nCIÊNCIA FAMILIAR\nPendente nesta versão\nPRÓXIMO PASSO\nProvidenciar ENT e conferir recebimento\nREQ-0004 · v1 · Conteúdo autorizado\nPágina 1 de 2\n",
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "visualInspection": "INSPECTED: legible synthetic content, no clipped text observed; sample only"
+        },
+        {
+          "page": 2,
+          "image": "b28-req-v1-page-2.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nRASTREABILIDADE DA REQUISIÇÃO\nREQ-0004 · Versão documental 1\nCIÊNCIA FAMILIAR\nNenhuma ciência foi registrada até esta versão. Emissão, envio ou disponibilização do PDF não comprovam ciência.\nLINHA DO TEMPO OPERACIONAL\nDATA/HORA\nRESPONSÁVEL\nEVENTO\n29/10/2026, 20:02\nPessoa fictícia B2\nprofessional\nRequisição emitida · v1\nIDENTIFICAÇÃO E INTEGRIDADE\nDOCUMENTO\nREQ-0004\nVERSÃO\n1\nID TÉCNICO\n5ea971d3-756d-4428-b516-b099718ea058\nHASH DO CONTEÚDO CANÔNICO\n4ee5e584cfc339caa99c0526f33b48b67e0f58af02df026\n86ba6e743931b3e35\nO SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por\nadministradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado\nseparadamente.\nVerificação de integridade\nO QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso\nautorizado.\nREQ-0004 · v1 · Conteúdo autorizado\nPágina 2 de 2\n",
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "visualInspection": "INSPECTED: legible synthetic content, no clipped text observed; sample only"
+        }
+      ]
+    },
+    {
+      "file": "b28-req-v5.pdf",
+      "sha256": "4fa03c8da1165171dad1e7e53a685e6d9ee58c60d354cfc964462fb76f89c3d4",
+      "version": 5,
+      "pages": [
+        {
+          "page": 1,
+          "image": "b28-req-v5-page-1.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nREQUISIÇÃO DE MATERIAIS\nREQ-0004 · 29/10/2026, 20:02 · Arquivada\n1\nITENS SOLICITADOS\n1\nURGENTES\n1\nITENS ATENDIDOS\nREGISTRADA\nCIÊNCIA FAMILIAR\nIDENTIFICAÇÃO E RESPONSÁVEIS\nPACIENTE\nResidência fictícia B2-20261029-f7eece2c\nSOLICITADO POR\nPessoa fictícia B2 professional\nNÚMERO DO DOCUMENTO\nREQ-0004\nPROTOCOLO\nREQ-20261029-CDF49F73-1BE98412-4-96F6233D\nREGISTRO PROFISSIONAL\nNão informado\nSITUAÇÃO\nArquivada\nMATERIAIS SOLICITADOS\nNº\nMATERIAL\nAPRESENTAÇÃO\nPRIORIDADE\n01\nMaterial fictício B2 1\nunidade\nURGENTE\nObservação: Necessidade fictícia para auditar documento,ciência e continuidade\nEsta requisição não informa quantidades solicitadas. O atendimento é acompanhado por item após aceite positivo em ENT\nexplicitamente vinculada. A ciência familiar possui registro independente.\nSITUAÇÃO DO ATENDIMENTO\nLINHAS ATENDIDAS\n1 de 1\nLINHAS PENDENTES\n0\nCIÊNCIA FAMILIAR\n29/10/2026, 20:02\nPRÓXIMO PASSO\nDocumento arquivado\nREQ-0004 · v5 · Conteúdo autorizado\nPágina 1 de 2\n",
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "visualInspection": "INSPECTED: legible synthetic content, no clipped text observed; sample only"
+        },
+        {
+          "page": 2,
+          "image": "b28-req-v5-page-2.png",
+          "text": "HCA\nHOME CARE ASSISTANT\nGESTÃO DE INSUMOS / COMPROVANTE OPERACIONAL\nRASTREABILIDADE DA REQUISIÇÃO\nREQ-0004 · Versão documental 5\nCIÊNCIA FAMILIAR\nRESPONSÁVEL\nORIGEM\nDATA\nPessoa fictícia B2 family\nExpressa no aplicativo\n29/10/2026, 20:02\nLINHA DO TEMPO OPERACIONAL\nDATA/HORA\nRESPONSÁVEL\nEVENTO\n29/10/2026, 20:02\nPessoa fictícia B2\nprofessional\nRequisição emitida · v1\n29/10/2026, 20:02\nPessoa fictícia B2 admin\nAtendimento atualizado pelas entregas vinculadas · v2\n29/10/2026, 20:02\nPessoa fictícia B2\nprofessional\nRequisição atendida operacionalmente · v3\n29/10/2026, 20:02\nPessoa fictícia B2 family\nCiência familiar exigida satisfeita · v4\n29/10/2026, 20:02\nPessoa fictícia B2 admin\nArquivamento manual justificado · v5\nIDENTIFICAÇÃO E INTEGRIDADE\nDOCUMENTO\nREQ-0004\nVERSÃO\n5\nID TÉCNICO\n5ea971d3-756d-4428-b516-b099718ea058\nHASH DO CONTEÚDO CANÔNICO\n0a6963e0ac801685a93458d8858e7e791a2aa40843c26\nae8b90828369fce8a72\nO SHA-256 permite comparar o conteúdo canônico registrado. Não é assinatura digital nem garantia absoluta contra alteração por\nadministradores do banco. Versões e eventos confirmados preservam o histórico operacional. O hash do arquivo PDF é registrado\nseparadamente.\nVerificação de integridade\nO QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso\nautorizado.\nREQ-0004 · v5 · Conteúdo autorizado\nPágina 2 de 2\n",
+          "width": 595.280029296875,
+          "height": 841.8900146484375,
+          "visualInspection": "INSPECTED: legible synthetic content, no clipped text observed; sample only"
+        }
+      ]
+    }
+  ],
+  "visualInspectedAt": "2026-10-29T23:08:41.437Z"
+}

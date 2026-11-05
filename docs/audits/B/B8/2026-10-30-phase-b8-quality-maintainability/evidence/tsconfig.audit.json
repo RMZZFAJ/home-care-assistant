@@ -1,0 +1,14 @@
+{
+  "extends": "../../../../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": []
+  },
+  "include": [
+    "vitest.oracles.mts",
+    "no-network.ts",
+    "playwright.probes.ts",
+    "quality.probe.spec.ts"
+  ],
+  "exclude": ["../../../../node_modules"]
+}

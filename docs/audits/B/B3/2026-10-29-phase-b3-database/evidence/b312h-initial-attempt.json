@@ -1,0 +1,27 @@
+{
+  "group": "B3.12h",
+  "startedAt": "2026-10-30T05:15:15.710Z",
+  "productSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "environment": "verified local home-care-assistant; loopback 54321/54322",
+  "fixture": "B3-20261029-d051db30",
+  "patient": "7d39e2fb-4731-46b3-8478-793cbf14df40",
+  "method": "Second-pass rollback history fixture with live Auth session claims; anonymous limited verification HTTP; rollback job contract with simulated service role. No provider proof.",
+  "scenarios": [
+    {
+      "id": "B312-06",
+      "purpose": "Duzentas versões preservam hash antigo mas acumulam20100 entradas resumidas",
+      "recordedAt": "2026-10-30T05:15:15.983Z",
+      "execution": "HARNESS_OR_UNEXPECTED_FAILURE",
+      "error": {
+        "message": "Local SQL failed: ERROR:  local administrator required\nCONTEXT:  PL/pgSQL function private.guard_membership_elevation() line 6 at RAISE",
+        "sqlstate": null
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic local data only",
+    "Not production, provider or human validation",
+    "No reset, migration or existing data replacement"
+  ],
+  "previousAttempts": []
+}

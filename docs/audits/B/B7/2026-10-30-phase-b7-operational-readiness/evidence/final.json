@@ -1,0 +1,613 @@
+{
+  "recordedAt": "2026-10-30T22:34:25.953Z",
+  "clientDate": "2026-10-30",
+  "timezone": "America/Sao_Paulo",
+  "node": "24.22.0",
+  "branch": "audit/phase-b",
+  "head": "378298ac4df887df95a92d27cf360700a97dfeed",
+  "master": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+  "originPhaseB": "378298ac4df887df95a92d27cf360700a97dfeed",
+  "initialTree": "clean before package creation",
+  "functionalSha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+  "functionalDiff": "",
+  "protectedFiles": 395,
+  "localGuardPassed": true,
+  "isolation": {
+    "network_queue_count": 0,
+    "worker_url_configured": false,
+    "worker_bearer_configured": false
+  },
+  "configuration": {
+    "localSupabase": true,
+    "externalEnabled": false,
+    "flowsEnabled": false,
+    "names": [
+      "CARE_RECIPIENT_ID",
+      "NEXT_PUBLIC_APP_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "VERCEL_OIDC_TOKEN"
+    ]
+  },
+  "routineCount": 232,
+  "routineDriftFromB3": [],
+  "migrations": {
+    "total": 84,
+    "latest": "20261025214537"
+  },
+  "migrationFiles": 84,
+  "jobs": [
+    {
+      "jobid": 1,
+      "active": true,
+      "jobname": "hca-operational-lifecycle",
+      "schedule": "* * * * *",
+      "command_md5": "5a33e5ef0362151ddfc0607103df74c8"
+    },
+    {
+      "jobid": 2,
+      "active": true,
+      "jobname": "hca-notification-worker",
+      "schedule": "* * * * *",
+      "command_md5": "65d379dadb2a1db193fbb892a9d765b4"
+    }
+  ],
+  "storage": [
+    {
+      "objects": 199,
+      "bucket_id": "document-receipts"
+    },
+    {
+      "objects": 12,
+      "bucket_id": "patient-evidence"
+    },
+    {
+      "objects": 5,
+      "bucket_id": "profile-avatars"
+    }
+  ],
+  "rowAggregates": [
+    {
+      "rows": 0,
+      "relation": "private.membership_authority",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 1,
+      "relation": "private.scheduler_health",
+      "content_md5": "30b279156f31a587799c2df5c3b56da9"
+    },
+    {
+      "rows": 1,
+      "relation": "private.bal_scheduler_progress",
+      "content_md5": "890e743b3d680f704067e9578da9058c"
+    },
+    {
+      "rows": 8,
+      "relation": "public.notification_event_rules",
+      "content_md5": "3fd499355f02cf88867d09a8a96e87bb"
+    },
+    {
+      "rows": 24,
+      "relation": "public.bal_cycles",
+      "content_md5": "e8373f3a6065eb5f95a3b5c49adf09dd"
+    },
+    {
+      "rows": 24,
+      "relation": "public.bal_regimes",
+      "content_md5": "ca9279decbd30d871b907d149201517e"
+    },
+    {
+      "rows": 35,
+      "relation": "public.shift_types",
+      "content_md5": "53e616035e9a8398119ba45ebf3fafdb"
+    },
+    {
+      "rows": 85,
+      "relation": "public.document_request_links",
+      "content_md5": "60f049f00d724052c9b520936aebcf04"
+    },
+    {
+      "rows": 62,
+      "relation": "public.care_recipient_invitations",
+      "content_md5": "83d0fd90715e927e01e7fbfd76a5baaa"
+    },
+    {
+      "rows": 1,
+      "relation": "public.requisition_status_history",
+      "content_md5": "02c2cb3bc4f99cbd8b3fb77859814a0d"
+    },
+    {
+      "rows": 62,
+      "relation": "public.bal_assignments",
+      "content_md5": "6b1bba37ea399042d42aef772b1319e6"
+    },
+    {
+      "rows": 82,
+      "relation": "auth.schema_migrations",
+      "content_md5": "7def01dcf385b28a0b3a2a5f01825c29"
+    },
+    {
+      "rows": 74,
+      "relation": "storage.migrations",
+      "content_md5": "c1141247d5c6982622d1d09245e4cc05"
+    },
+    {
+      "rows": 78,
+      "relation": "public.profiles",
+      "content_md5": "ba5aa363b711aa5062ddde68d5027b36"
+    },
+    {
+      "rows": 80,
+      "relation": "auth.users",
+      "content_md5": "75cd9cf4f5fc7cd88438d7791f6c8832"
+    },
+    {
+      "rows": 135,
+      "relation": "public.care_recipients",
+      "content_md5": "e176acf34869071d92dc2e9118372f67"
+    },
+    {
+      "rows": 26,
+      "relation": "public.bal_obligations",
+      "content_md5": "f130f4ad72a057c6a1248427a86f5d09"
+    },
+    {
+      "rows": 119,
+      "relation": "public.scheduled_shifts",
+      "content_md5": "ffe64b8fef8bd0f7a9049a2df4871890"
+    },
+    {
+      "rows": 140,
+      "relation": "public.document_series",
+      "content_md5": "323cc8713dd7bc93a4f9afbaabc097ff"
+    },
+    {
+      "rows": 128,
+      "relation": "public.patient_settings",
+      "content_md5": "b297e063b58c9ed759e3127a123ede2d"
+    },
+    {
+      "rows": 217,
+      "relation": "private.authority_sessions",
+      "content_md5": "c18dc11cd21afc2dfa36559ad852ec8a"
+    },
+    {
+      "rows": 78,
+      "relation": "public.requisition_lifecycle",
+      "content_md5": "310f22faff8100943ae277862ce904b3"
+    },
+    {
+      "rows": 81,
+      "relation": "public.requisitions",
+      "content_md5": "d29aa74abfea8e257d5ebc46e19db4c4"
+    },
+    {
+      "rows": 252,
+      "relation": "auth.sessions",
+      "content_md5": "05fe54388c6ed26bb79ce865ae3070bc"
+    },
+    {
+      "rows": 252,
+      "relation": "auth.mfa_amr_claims",
+      "content_md5": "16fd40c1870cbc2befcd809731a70d61"
+    },
+    {
+      "rows": 98,
+      "relation": "public.shift_events",
+      "content_md5": "536a9d3b21c1f69fc05476a7a28ab4ba"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.custom_oauth_providers",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 153,
+      "relation": "public.requisition_items",
+      "content_md5": "914ea304077821fb46a3ffc59fd33381"
+    },
+    {
+      "rows": 98,
+      "relation": "private.schedule_commands",
+      "content_md5": "33b4e1cba7c8f774f15932981fb292f2"
+    },
+    {
+      "rows": 146,
+      "relation": "public.access_change_requests",
+      "content_md5": "6b00d12c4ad95a583cab05cb42546ddc"
+    },
+    {
+      "rows": 252,
+      "relation": "auth.refresh_tokens",
+      "content_md5": "c85abcde4a46332238512d4e0477861b"
+    },
+    {
+      "rows": 199,
+      "relation": "public.document_pdf_renders",
+      "content_md5": "b3a7e35b01eb0f188c5b58561b728d15"
+    },
+    {
+      "rows": 75,
+      "relation": "private.workspace_revisions",
+      "content_md5": "1347c66090c870effc0888f2a23dbfd1"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.flow_state",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.oauth_authorizations",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 219,
+      "relation": "public.consumption_reports",
+      "content_md5": "a90f8c747bd0a62d77a323f9661a2da9"
+    },
+    {
+      "rows": 258,
+      "relation": "public.document_lines",
+      "content_md5": "a67e0f43b0ad2ca0e6a930f31f9d349d"
+    },
+    {
+      "rows": 36,
+      "relation": "public.shift_series",
+      "content_md5": "6b7e3c8b60a7069d32705b30508bee30"
+    },
+    {
+      "rows": 34,
+      "relation": "public.attachments",
+      "content_md5": "357b342311e9567bbecb5ffcba3dbaf7"
+    },
+    {
+      "rows": 0,
+      "relation": "storage.s3_multipart_uploads",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 11,
+      "relation": "public.bal_deferrals",
+      "content_md5": "637838e564cc89b0abf0b2edfdc22705"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.oauth_clients",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "storage.iceberg_tables",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 3,
+      "relation": "storage.buckets",
+      "content_md5": "d676b396705b953243b9cf9648295475"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.webauthn_credentials",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.mfa_factors",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 266,
+      "relation": "public.products",
+      "content_md5": "f25a2eb4a1219654eaee6295635d3bb5"
+    },
+    {
+      "rows": 0,
+      "relation": "storage.s3_multipart_uploads_parts",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 4,
+      "relation": "public.shift_change_requests",
+      "content_md5": "83618383fbf8ebf061d8c278daca67dc"
+    },
+    {
+      "rows": 8,
+      "relation": "public.flow_sessions",
+      "content_md5": "d232ca8f94ef6e4115976bd28af52208"
+    },
+    {
+      "rows": 232,
+      "relation": "public.bal_cycle_events",
+      "content_md5": "a08e9f09badaf3020b59f8f448d365fe"
+    },
+    {
+      "rows": 0,
+      "relation": "storage.vector_indexes",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.saml_providers",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 3,
+      "relation": "public.stock_alert_events",
+      "content_md5": "261ae93d160a801725df8b57eb4b0d4a"
+    },
+    {
+      "rows": 0,
+      "relation": "public.stock_inventories",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 216,
+      "relation": "storage.objects",
+      "content_md5": "3accd036143508d1b0f2b184d5d387c2"
+    },
+    {
+      "rows": 83,
+      "relation": "auth.identities",
+      "content_md5": "7dbe028f0f9cad4d6a9f76325f2c028a"
+    },
+    {
+      "rows": 336,
+      "relation": "public.care_recipient_products",
+      "content_md5": "855c3687488f723564b39f0c5d3f1c6c"
+    },
+    {
+      "rows": 14,
+      "relation": "public.purchase_receipts",
+      "content_md5": "f13b81e4721938fd3939653a74011d8f"
+    },
+    {
+      "rows": 27,
+      "relation": "public.meta_template_versions",
+      "content_md5": "d13f2c9c5f3c7b876eb25abcbe4e38bc"
+    },
+    {
+      "rows": 48,
+      "relation": "public.requisition_science_events",
+      "content_md5": "f1e157834fb990b45f3cd4f54c2545ff"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.scim_users",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 7,
+      "relation": "public.flow_submissions",
+      "content_md5": "d109a50574bc4a75ebedf911861cb6c8"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.saml_relay_states",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 1,
+      "relation": "public.science_challenges",
+      "content_md5": "8491a3d15883b16524b228e1b9dcfe71"
+    },
+    {
+      "rows": 5,
+      "relation": "public.recipient_notification_settings",
+      "content_md5": "9e29c226cec8e513d9edf5a335558381"
+    },
+    {
+      "rows": 5,
+      "relation": "public.product_presentations",
+      "content_md5": "b1e81712c0c2faaff798858ac985698b"
+    },
+    {
+      "rows": 3,
+      "relation": "public.requisition_item_resolutions",
+      "content_md5": "e37d513c86f76a87eb2a9f12e25b6d08"
+    },
+    {
+      "rows": 0,
+      "relation": "storage.iceberg_namespaces",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "public.stock_inventory_items",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.mfa_challenges",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "public.whatsapp_challenges",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 3,
+      "relation": "public.stock_alert_rules",
+      "content_md5": "6bee9a4882e4169497151e8923f574f7"
+    },
+    {
+      "rows": 1,
+      "relation": "public.inbound_messages",
+      "content_md5": "21052b12b236b73f8c911f85495e4dd7"
+    },
+    {
+      "rows": 10,
+      "relation": "public.measurement_units",
+      "content_md5": "bdd51e805b5f1c1b83c54bc6c9f25158"
+    },
+    {
+      "rows": 0,
+      "relation": "public.reminder_challenges",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.scim_tokens",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.one_time_tokens",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 3,
+      "relation": "public.requisition_import_batches",
+      "content_md5": "acf30f0bce486b7d68e2926b7b83249e"
+    },
+    {
+      "rows": 5,
+      "relation": "public.capability_overrides",
+      "content_md5": "598087e0bca1fbe9d76a6d75b31b184f"
+    },
+    {
+      "rows": 54,
+      "relation": "private.bal_commands",
+      "content_md5": "51b66d1690d5d0f396177fd6aa17ae35"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.webauthn_challenges",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "storage.buckets_analytics",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "public.document_pdfs",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.oauth_consents",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 3,
+      "relation": "public.historical_requisition_imports",
+      "content_md5": "1b2376df468eaaddd58a1f03e25d7eab"
+    },
+    {
+      "rows": 11,
+      "relation": "public.requisition_observations",
+      "content_md5": "1008cf9dbb1d182c5b215c7dba39d574"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.oauth_client_states",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.sso_domains",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.mfa_recovery_codes",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.instances",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 692,
+      "relation": "public.care_recipient_memberships",
+      "content_md5": "338125d629812d60ad5438e5863f03c9"
+    },
+    {
+      "rows": 12,
+      "relation": "public.bal_approvals",
+      "content_md5": "30d89ac5cba20269cac3f4417e08846e"
+    },
+    {
+      "rows": 0,
+      "relation": "private.worker_authority",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.mfa_recovery_code_sets",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 620,
+      "relation": "public.stock_movements",
+      "content_md5": "efbb21cf3319fe26e13ac3579701f5fa"
+    },
+    {
+      "rows": 38,
+      "relation": "public.capability_definitions",
+      "content_md5": "b803639dcdbe9620be45b78f2b979532"
+    },
+    {
+      "rows": 0,
+      "relation": "auth.sso_providers",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 0,
+      "relation": "private.membership_invitation_intents",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 2,
+      "relation": "public.verified_phones",
+      "content_md5": "2d7b46a28dab30d502bd013ea3733585"
+    },
+    {
+      "rows": 0,
+      "relation": "storage.buckets_vectors",
+      "content_md5": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    {
+      "rows": 961,
+      "relation": "auth.audit_log_entries",
+      "content_md5": "22c2f7cd1a13058123c28964b42c6cd2"
+    },
+    {
+      "rows": 1383,
+      "relation": "public.operational_reminders",
+      "content_md5": "a7483d1584f392329b769df4733b0c58"
+    },
+    {
+      "rows": 5117,
+      "relation": "public.requisition_notifications",
+      "content_md5": "7014fc143f862fcfd0affa595bc673e6"
+    },
+    {
+      "rows": 210,
+      "relation": "public.operational_documents",
+      "content_md5": "99fa6707ed49cfa6759ea39fec86eec2"
+    },
+    {
+      "rows": 2917,
+      "relation": "public.audit_events",
+      "content_md5": "103f7d892de90d8536fd5b3b92779440"
+    },
+    {
+      "rows": 1,
+      "relation": "public.global_admin_guard",
+      "content_md5": "5bca7a4d24e2b3d702d44e4a214ccb0e"
+    },
+    {
+      "rows": 764,
+      "relation": "public.document_events",
+      "content_md5": "b9ae727bf2da86d0f4eea1e79e37c839"
+    }
+  ],
+  "orderSha256": "9ec3f1afd2d2ca739436de81ccd4b6c671b56b6957be1f49c5fa367642733cb4",
+  "limits": "Read-only local metadata and content hashes; preexisting cron remains active. No login, provider send, remote SQL, backup creation or restore."
+}

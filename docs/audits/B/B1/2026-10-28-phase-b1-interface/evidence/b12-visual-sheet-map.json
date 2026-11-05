@@ -1,0 +1,177 @@
+[
+  {
+    "capture": "b12-visual-adminA-dashboard-320.png",
+    "sheet": "b12-visual-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-dashboard-390.png",
+    "sheet": "b12-visual-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-dashboard-768.png",
+    "sheet": "b12-visual-sheet-01.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-dashboard-1440.png",
+    "sheet": "b12-visual-sheet-01.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-dashboard-1920.png",
+    "sheet": "b12-visual-sheet-01.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-req-320.png",
+    "sheet": "b12-visual-sheet-01.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-req-390.png",
+    "sheet": "b12-visual-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-req-768.png",
+    "sheet": "b12-visual-sheet-02.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-req-1440.png",
+    "sheet": "b12-visual-sheet-02.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-req-1920.png",
+    "sheet": "b12-visual-sheet-02.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-com-390.png",
+    "sheet": "b12-visual-sheet-02.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-com-1440.png",
+    "sheet": "b12-visual-sheet-02.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-stock-390.png",
+    "sheet": "b12-visual-sheet-03.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-stock-1440.png",
+    "sheet": "b12-visual-sheet-03.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-permissions-320.png",
+    "sheet": "b12-visual-sheet-03.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-permissions-390.png",
+    "sheet": "b12-visual-sheet-03.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-permissions-1440.png",
+    "sheet": "b12-visual-sheet-03.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-units-390.png",
+    "sheet": "b12-visual-sheet-03.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-units-1440.png",
+    "sheet": "b12-visual-sheet-04.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-profile-390.png",
+    "sheet": "b12-visual-sheet-04.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-profile-1440.png",
+    "sheet": "b12-visual-sheet-04.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-schedule-390.png",
+    "sheet": "b12-visual-sheet-04.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-schedule-1440.png",
+    "sheet": "b12-visual-sheet-04.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-history-390.png",
+    "sheet": "b12-visual-sheet-04.png",
+    "region": "top 844 of 844px; scaled to 360x650",
+    "full": true,
+    "inspected": false
+  },
+  {
+    "capture": "b12-visual-adminA-history-1440.png",
+    "sheet": "b12-visual-sheet-05.png",
+    "region": "top 950 of 1000px; scaled to 360x650",
+    "full": false,
+    "inspected": false
+  }
+]

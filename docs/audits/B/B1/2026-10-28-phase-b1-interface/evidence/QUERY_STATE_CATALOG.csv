@@ -1,0 +1,532 @@
+"query_id","file","line","call","kind","state_initializers","effect_triggers","current_initial","failure_or_refresh","recommended_phrase","recovery_cta","static","runtime","unknown"
+"QUERY-001","src/components/admin/accept-invitation.tsx","41","api(""/api/invitations/accept"", { token, decision })","MUTATION_OR_COMMAND","[token, setToken] = null;[ready, setReady] = false;[busy, setBusy] = false;[accepted, setAccepted] = false;[declined, setDeclined] = false;[error, setError] = """";[notice, setNotice] = """"","[]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-002","src/components/admin/accept-invitation.tsx","63","api<{ notice: string }>(
+        ""/api/invitations/register"",
+        {
+          token,
+          email: form.get(""email""),
+          password: form.get(""password""),
+          fullName: form.get(""fullName""),
+        },
+      )","MUTATION_OR_COMMAND","[token, setToken] = null;[ready, setReady] = false;[busy, setBusy] = false;[accepted, setAccepted] = false;[declined, setDeclined] = false;[error, setError] = """";[notice, setNotice] = """"","[]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-003","src/components/admin/admin-console.tsx","104","api<{ data: Row[]; total?: number }>(
+          section === ""notifications""
+            ? `/api/admin/notifications?careRecipientId=${patientId}&page=${page}&pageSize=20`
+            : `/api/admin?${query}`,
+          undefined,
+          signal,
+        )","READ_OR_QUERY","[rows, setRows] = [];[templates, setTemplates] = [];[directory, setDirectory] = [];[catalog, setCatalog] = [];[editing, setEditing] = null;[page, setPage] = 1;[notificationTotal, setNotificationTotal] = 0;[loading, setLoading] = ![""patient"", ""import"", ""overview""].includes(section);[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[invitationUrl, setInvitationUrl] = """";[report, setReport] = null;[importText, setImportText] = """";[importReviewed, setImportReviewed] = false","[load]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-004","src/components/admin/admin-console.tsx","112","api<{ data: Row[] }>(
+              `/api/admin?section=products&careRecipientId=${patientId}`,
+              undefined,
+              signal,
+            )","READ_OR_QUERY","[rows, setRows] = [];[templates, setTemplates] = [];[directory, setDirectory] = [];[catalog, setCatalog] = [];[editing, setEditing] = null;[page, setPage] = 1;[notificationTotal, setNotificationTotal] = 0;[loading, setLoading] = ![""patient"", ""import"", ""overview""].includes(section);[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[invitationUrl, setInvitationUrl] = """";[report, setReport] = null;[importText, setImportText] = """";[importReviewed, setImportReviewed] = false","[load]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-005","src/components/admin/admin-console.tsx","119","api<{ data: Row[] }>(
+              section === ""memberships"" && globalMode
+                ? ""/api/admin?section=profiles""
+                : `/api/admin?section=memberships&careRecipientId=${patientId}`,
+              undefined,
+              signal,
+            )","READ_OR_QUERY","[rows, setRows] = [];[templates, setTemplates] = [];[directory, setDirectory] = [];[catalog, setCatalog] = [];[editing, setEditing] = null;[page, setPage] = 1;[notificationTotal, setNotificationTotal] = 0;[loading, setLoading] = ![""patient"", ""import"", ""overview""].includes(section);[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[invitationUrl, setInvitationUrl] = """";[report, setReport] = null;[importText, setImportText] = """";[importReviewed, setImportReviewed] = false","[load]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-006","src/components/admin/admin-console.tsx","128","api<{ data: Row[] }>(
+              `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,
+              undefined,
+              signal,
+            )","READ_OR_QUERY","[rows, setRows] = [];[templates, setTemplates] = [];[directory, setDirectory] = [];[catalog, setCatalog] = [];[editing, setEditing] = null;[page, setPage] = 1;[notificationTotal, setNotificationTotal] = 0;[loading, setLoading] = ![""patient"", ""import"", ""overview""].includes(section);[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[invitationUrl, setInvitationUrl] = """";[report, setReport] = null;[importText, setImportText] = """";[importReviewed, setImportReviewed] = false","[load]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-007","src/components/admin/admin-console.tsx","182","api<{
+        data?: unknown;
+        invitationUrl?: string;
+        pendingApproval?: boolean;
+      }>(isNotification ? ""/api/admin/notifications"" : ""/api/admin"", {
+        ...(scoped ? { careRecipientId: patientId } : {}),
+        ...payload,
+      })","MUTATION_OR_COMMAND","[rows, setRows] = [];[templates, setTemplates] = [];[directory, setDirectory] = [];[catalog, setCatalog] = [];[editing, setEditing] = null;[page, setPage] = 1;[notificationTotal, setNotificationTotal] = 0;[loading, setLoading] = ![""patient"", ""import"", ""overview""].includes(section);[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[invitationUrl, setInvitationUrl] = """";[report, setReport] = null;[importText, setImportText] = """";[importReviewed, setImportReviewed] = false","[load]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-008","src/components/admin/notification-matrix.tsx","51","api<Data>(
+      ""/api/notification-rules?careRecipientId="" + patientId,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[search, setSearch] = """";[roleFilter, setRoleFilter] = """";[editor, setEditor] = null;[data, setData] = null;[error, setError] = """";[pending, setPending] = false","[patientId, version]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-009","src/components/admin/notification-matrix.tsx","131","api<Data>(
+        ""/api/notification-rules?careRecipientId="" + patientId,
+      )","READ_OR_QUERY","[search, setSearch] = """";[roleFilter, setRoleFilter] = """";[editor, setEditor] = null;[data, setData] = null;[error, setError] = """";[pending, setPending] = false","[patientId, version]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-010","src/components/admin/policy-console.tsx","89","api<PolicyData>(
+      ""/api/patient-settings?careRecipientId="" + patientId,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[data, setData] = null;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[invitationUrl, setInvitationUrl] = """";[editingVersion, setEditingVersion] = null","[patientId, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-011","src/components/admin/policy-console.tsx","119","api<{
+        data: { status: string };
+        invitationUrl?: string;
+      }>(""/api/patient-settings"", {
+        careRecipientId: patientId,
+        kind,
+        change,
+        idempotencyKey: crypto.randomUUID(),
+        expectedVersion:
+          kind === ""settings""
+            ? (editingVersion ?? data.data.version)
+            : (currentVersionRef.current ?? data.data.version),
+        ...(requestId ? { requestId, decision } : {}),
+      })","MUTATION_OR_COMMAND","[data, setData] = null;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[invitationUrl, setInvitationUrl] = """";[editingVersion, setEditingVersion] = null","[patientId, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-012","src/components/admin/policy-console.tsx","141","api<PolicyData>(
+        ""/api/patient-settings?careRecipientId="" + patientId,
+      )","READ_OR_QUERY","[data, setData] = null;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[invitationUrl, setInvitationUrl] = """";[editingVersion, setEditingVersion] = null","[patientId, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-013","src/components/admin/policy-console.tsx","164","api<PolicyData>(
+          ""/api/patient-settings?careRecipientId="" + patientId,
+        )","READ_OR_QUERY","[data, setData] = null;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[invitationUrl, setInvitationUrl] = """";[editingVersion, setEditingVersion] = null","[patientId, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-014","src/components/auth/contact-settings.tsx","36","api(""/api/profile"", {
+        action,
+        ...(action === ""email""
+          ? { email: form.get(""email"") }
+          : {
+              phone: number,
+              ...(action === ""verifyPhone"" ? { token: form.get(""token"") } : {}),
+            }),
+      })","MUTATION_OR_COMMAND","[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[number, setNumber] = phone ?? """"","","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-015","src/components/auth/contact-settings.tsx","152","api(""/api/profile"", { action: ""prepareLink"" })","MUTATION_OR_COMMAND","[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[number, setNumber] = phone ?? """"","","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-016","src/components/balances/balance-console.tsx","28","api<{ data: DocumentSummary[] }>(""/api/documents?"" + new URLSearchParams({ careRecipientId: patient.id, type: ""BAL"", status: ""submitted"", pageSize: ""20"" }), undefined, controller.signal)","READ_OR_QUERY","[editor, setEditor] = null;[opener, setOpener] = null;[review, setReview] = null;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[uncertain, setUncertain] = false;[documents, setDocuments] = [];[now] = () => Date.now()","[patient.id, data?.events.length]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-017","src/components/balances/balance-console.tsx","36","api(""/api/balances"", pendingRef.current)","MUTATION_OR_COMMAND","[editor, setEditor] = null;[opener, setOpener] = null;[review, setReview] = null;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[uncertain, setUncertain] = false;[documents, setDocuments] = [];[now] = () => Date.now()","[patient.id, data?.events.length]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-018","src/components/balances/balance-count-wizard.tsx","50","api<{data: CatalogProduct[]}>(""/api/catalog?careRecipientId="" + context.patient!.id,undefined,controller.signal)","READ_OR_QUERY","[recoverable,setRecoverable] = false;[initial] = balance;[products, setProducts] = [];[counts,setCounts] = {};[notes,setNotes] = """";[step,setStep] = 0;[fieldErrors,setFieldErrors] = {};[reference,setReference] = {};[editing,setEditing] = null;[saved,setSaved] = null;[loading,setLoading] = true;[busy,setBusy] = false;[uncertain,setUncertain] = false;[error,setError] = """";[message,setMessage] = """";[attempt,setAttempt] = 0;[referenceRevision,setReferenceRevision] = initial.referenceRevision;[assignment,setAssignment] = initial.eligibility.assignment;[needsRecount,setNeedsRecount] = false","[context.userId,context.patient,documentId];[context.patient,documentId,storageKey,attempt];[loading,saved,storageKey,assignment?.id,referenceRevision,counts,notes]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-019","src/components/balances/balance-count-wizard.tsx","51","api<{data: BalanceWorkspace}>(""/api/balances?careRecipientId="" + context.patient!.id,undefined,controller.signal)","READ_OR_QUERY","[recoverable,setRecoverable] = false;[initial] = balance;[products, setProducts] = [];[counts,setCounts] = {};[notes,setNotes] = """";[step,setStep] = 0;[fieldErrors,setFieldErrors] = {};[reference,setReference] = {};[editing,setEditing] = null;[saved,setSaved] = null;[loading,setLoading] = true;[busy,setBusy] = false;[uncertain,setUncertain] = false;[error,setError] = """";[message,setMessage] = """";[attempt,setAttempt] = 0;[referenceRevision,setReferenceRevision] = initial.referenceRevision;[assignment,setAssignment] = initial.eligibility.assignment;[needsRecount,setNeedsRecount] = false","[context.userId,context.patient,documentId];[context.patient,documentId,storageKey,attempt];[loading,saved,storageKey,assignment?.id,referenceRevision,counts,notes]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-020","src/components/balances/balance-count-wizard.tsx","54","api<{data: SupplyDocument}>(""/api/documents/"" + id,undefined,controller.signal)","READ_OR_QUERY","[recoverable,setRecoverable] = false;[initial] = balance;[products, setProducts] = [];[counts,setCounts] = {};[notes,setNotes] = """";[step,setStep] = 0;[fieldErrors,setFieldErrors] = {};[reference,setReference] = {};[editing,setEditing] = null;[saved,setSaved] = null;[loading,setLoading] = true;[busy,setBusy] = false;[uncertain,setUncertain] = false;[error,setError] = """";[message,setMessage] = """";[attempt,setAttempt] = 0;[referenceRevision,setReferenceRevision] = initial.referenceRevision;[assignment,setAssignment] = initial.eligibility.assignment;[needsRecount,setNeedsRecount] = false","[context.userId,context.patient,documentId];[context.patient,documentId,storageKey,attempt];[loading,saved,storageKey,assignment?.id,referenceRevision,counts,notes]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-021","src/components/balances/balance-count-wizard.tsx","93","api<{overview:ProductStock[]}>(""/api/stock/balances?careRecipientId=""+context.patient!.id)","READ_OR_QUERY","[recoverable,setRecoverable] = false;[initial] = balance;[products, setProducts] = [];[counts,setCounts] = {};[notes,setNotes] = """";[step,setStep] = 0;[fieldErrors,setFieldErrors] = {};[reference,setReference] = {};[editing,setEditing] = null;[saved,setSaved] = null;[loading,setLoading] = true;[busy,setBusy] = false;[uncertain,setUncertain] = false;[error,setError] = """";[message,setMessage] = """";[attempt,setAttempt] = 0;[referenceRevision,setReferenceRevision] = initial.referenceRevision;[assignment,setAssignment] = initial.eligibility.assignment;[needsRecount,setNeedsRecount] = false","[context.userId,context.patient,documentId];[context.patient,documentId,storageKey,attempt];[loading,saved,storageKey,assignment?.id,referenceRevision,counts,notes]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-022","src/components/balances/balance-count-wizard.tsx","93","api<{data:BalanceWorkspace}>(""/api/balances?careRecipientId=""+context.patient!.id)","READ_OR_QUERY","[recoverable,setRecoverable] = false;[initial] = balance;[products, setProducts] = [];[counts,setCounts] = {};[notes,setNotes] = """";[step,setStep] = 0;[fieldErrors,setFieldErrors] = {};[reference,setReference] = {};[editing,setEditing] = null;[saved,setSaved] = null;[loading,setLoading] = true;[busy,setBusy] = false;[uncertain,setUncertain] = false;[error,setError] = """";[message,setMessage] = """";[attempt,setAttempt] = 0;[referenceRevision,setReferenceRevision] = initial.referenceRevision;[assignment,setAssignment] = initial.eligibility.assignment;[needsRecount,setNeedsRecount] = false","[context.userId,context.patient,documentId];[context.patient,documentId,storageKey,attempt];[loading,saved,storageKey,assignment?.id,referenceRevision,counts,notes]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-023","src/components/balances/balance-count-wizard.tsx","111","api<{data:SupplyDocument}>(intent.url,intent.body)","MUTATION_OR_COMMAND","[recoverable,setRecoverable] = false;[initial] = balance;[products, setProducts] = [];[counts,setCounts] = {};[notes,setNotes] = """";[step,setStep] = 0;[fieldErrors,setFieldErrors] = {};[reference,setReference] = {};[editing,setEditing] = null;[saved,setSaved] = null;[loading,setLoading] = true;[busy,setBusy] = false;[uncertain,setUncertain] = false;[error,setError] = """";[message,setMessage] = """";[attempt,setAttempt] = 0;[referenceRevision,setReferenceRevision] = initial.referenceRevision;[assignment,setAssignment] = initial.eligibility.assignment;[needsRecount,setNeedsRecount] = false","[context.userId,context.patient,documentId];[context.patient,documentId,storageKey,attempt];[loading,saved,storageKey,assignment?.id,referenceRevision,counts,notes]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-024","src/components/balances/balance-count-wizard.tsx","121","api<{data:{product_id:string;name:string;base_quantity:string}[]}>(""/api/catalog/presentations?careRecipientId=""+context.patient!.id+""&barcode=""+encodeURIComponent(code))","READ_OR_QUERY","[recoverable,setRecoverable] = false;[initial] = balance;[products, setProducts] = [];[counts,setCounts] = {};[notes,setNotes] = """";[step,setStep] = 0;[fieldErrors,setFieldErrors] = {};[reference,setReference] = {};[editing,setEditing] = null;[saved,setSaved] = null;[loading,setLoading] = true;[busy,setBusy] = false;[uncertain,setUncertain] = false;[error,setError] = """";[message,setMessage] = """";[attempt,setAttempt] = 0;[referenceRevision,setReferenceRevision] = initial.referenceRevision;[assignment,setAssignment] = initial.eligibility.assignment;[needsRecount,setNeedsRecount] = false","[context.userId,context.patient,documentId];[context.patient,documentId,storageKey,attempt];[loading,saved,storageKey,assignment?.id,referenceRevision,counts,notes]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-025","src/components/balances/use-balance-workspace.ts","12","api<{ data: BalanceWorkspace }>(""/api/balances?careRecipientId="" + patientId, undefined, controller.signal)","READ_OR_QUERY","[data, setData] = null;[error, setError] = """";[attempt, setAttempt] = 0;[hasBeenEligible,setHasBeenEligible] = false","[patientId, live, attempt];[]","workspace read, periodic polling, blind count then reference review","Reference changes need review; now captured once can age eligibility copy","Consultando programação e referência do balanço…","Atualizar acompanhamento","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-026","src/components/catalog/unit-console.tsx","48","api<{ data: Unit[] }>(""/api/units"", undefined, controller.signal)","READ_OR_QUERY","[search, setSearch] = """";[loaded, setLoaded] = false;[editor, setEditor] = null;[units, setUnits] = [];[products, setProducts] = [];[selected, setSelected] = """";[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false","[context.patient, attempt, globalMode]","loaded=false; query combined with catalog","Error removes loading but no initial retry; no-match checks total units instead of filtered","Nenhuma unidade corresponde à busca.","Limpar busca / Atualizar unidades","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-027","src/components/catalog/unit-console.tsx","50","api<{ data: CatalogProduct[] }>(
+            ""/api/catalog?careRecipientId="" + context.patient.id,
+            undefined,
+            controller.signal,
+          )","READ_OR_QUERY","[search, setSearch] = """";[loaded, setLoaded] = false;[editor, setEditor] = null;[units, setUnits] = [];[products, setProducts] = [];[selected, setSelected] = """";[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false","[context.patient, attempt, globalMode]","loaded=false; query combined with catalog","Error removes loading but no initial retry; no-match checks total units instead of filtered","Nenhuma unidade corresponde à busca.","Limpar busca / Atualizar unidades","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-028","src/components/catalog/unit-console.tsx","72","api(url, payload)","MUTATION_OR_COMMAND","[search, setSearch] = """";[loaded, setLoaded] = false;[editor, setEditor] = null;[units, setUnits] = [];[products, setProducts] = [];[selected, setSelected] = """";[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false","[context.patient, attempt, globalMode]","loaded=false; query combined with catalog","Error removes loading but no initial retry; no-match checks total units instead of filtered","Nenhuma unidade corresponde à busca.","Limpar busca / Atualizar unidades","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-029","src/components/dashboard.tsx","22","api<{ data: DashboardData }>(""/api/dashboard?careRecipientId="" + context.patient!.id, undefined, controller.signal)","READ_OR_QUERY","[data, setData] = null;[error, setError] = """";[attempt, setAttempt] = 0","[context.patient, attempt, revision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-030","src/components/documents/attachments.tsx","48","api<{ data: Attachment[] }>(
+      ""/api/attachments?"" + query,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[files, setFiles] = [];[error, setError] = """";[busy, setBusy] = false;[loading, setLoading] = true;[attempt, setAttempt] = 0;[uncertain, setUncertain] = false","[query, attempt]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-031","src/components/documents/attachments.tsx","88","fetch(""/api/attachments"", {
+        method: ""POST"",
+        body: form,
+      })","MUTATION_OR_COMMAND","[files, setFiles] = [];[error, setError] = """";[busy, setBusy] = false;[loading, setLoading] = true;[attempt, setAttempt] = 0;[uncertain, setUncertain] = false","[query, attempt]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-032","src/components/documents/delivery-inbox.tsx","25","api<{ data: DocumentSummary[]; total: number }>(""/api/deliveries?"" + params, undefined, controller.signal)","READ_OR_QUERY","[scope, setScope] = context.patient?.role === ""professional"" ? ""own"" : ""team"";[status, setStatus] = ""pending_receipt"";[page, setPage] = 1;[rows, setRows] = [];[total, setTotal] = 0;[loading, setLoading] = true;[error, setError] = """";[attempt, setAttempt] = 0","[context.patient, scope, status, page, revision, attempt]","loading=true initially; no setLoading on filter change","Old rows remain under new scope/status; retry after error exists","Atualizando entregas para esta seleção…","Atualizar entregas","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-033","src/components/documents/document-actions.tsx","35","fetch(
+        `/api/documents/${id}/pdf${version ? ""?version="" + version : """"}`,
+        { cache: ""no-store"", signal: controller.signal },
+      )","READ_OR_QUERY","[prepared, setPrepared] = null;[message, setMessage] = ""Preparando PDF; acompanhamento inicial dos avisos por até 10 segundos."";[error, setError] = """"","[id, code, version]","preparing; deadline10s; shared AbortController","Known completed tracking overwritten by timeout; PDF and notification deadlines coupled","Acompanhamento inicial concluído. Consulte o estado atual dos avisos.","Atualizar avisos / Preparar PDF novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-034","src/components/documents/document-actions.tsx","50","fetch(`/api/documents/${id}/notifications`, {
+          cache: ""no-store"",
+          signal: controller.signal,
+        })","READ_OR_QUERY","[prepared, setPrepared] = null;[message, setMessage] = ""Preparando PDF; acompanhamento inicial dos avisos por até 10 segundos."";[error, setError] = """"","[id, code, version]","preparing; deadline10s; shared AbortController","Known completed tracking overwritten by timeout; PDF and notification deadlines coupled","Acompanhamento inicial concluído. Consulte o estado atual dos avisos.","Atualizar avisos / Preparar PDF novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-035","src/components/documents/document-history.tsx","140","api<{ data: DocumentSummary[]; total: number }>(
+      ""/api/documents?"" + query,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[draft, setDraft] = initial;[showFilters, setShowFilters] = Object.values(initial).some(Boolean);[rows, setRows] = [];[total, setTotal] = 0;[loading, setLoading] = true;[error, setError] = """";[attempt, setAttempt] = 0","[context.patient, filters, page, attempt, liveRevision]","loading=true; filters explicitly setLoading","Existing good model: error/retry, confirmed empty, pagination; count initially0","Consultando fichas para estes filtros…","Tentar novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-036","src/components/documents/related-document.tsx","37","api<{ data: Record<string, unknown> }>(
+      (type === ""REQ"" ? ""/api/requisitions/"" : ""/api/documents/"") + id,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[open, setOpen] = false;[data, setData] = null;[error, setError] = """"","[id, type]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-037","src/components/documents/supply-detail.tsx","66","api<{ data: SupplyDocument }>(
+      ""/api/documents/"" + id,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[data, setData] = null;[people, setPeople] = [];[loading, setLoading] = true;[busy, setBusy] = false;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[action, setAction] = null;[review, setReview] = null;[uncertain, setUncertain] = false","[action, review, uncertain];[id, patientId, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-038","src/components/documents/supply-detail.tsx","80","api<{ directory: PatientPerson[] }>(
+            ""/api/patient-settings?careRecipientId="" +
+              result.data.care_recipient_id,
+            undefined,
+            controller.signal,
+          )","READ_OR_QUERY","[data, setData] = null;[people, setPeople] = [];[loading, setLoading] = true;[busy, setBusy] = false;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[action, setAction] = null;[review, setReview] = null;[uncertain, setUncertain] = false","[action, review, uncertain];[id, patientId, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-039","src/components/documents/supply-detail.tsx","115","api<{ data: SupplyDocument }>(
+        ""/api/documents/"" + id,
+        pendingRef.current,
+      )","MUTATION_OR_COMMAND","[data, setData] = null;[people, setPeople] = [];[loading, setLoading] = true;[busy, setBusy] = false;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[action, setAction] = null;[review, setReview] = null;[uncertain, setUncertain] = false","[action, review, uncertain];[id, patientId, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-040","src/components/documents/supply-wizard.tsx","133","api<{ data: CatalogProduct[] }>(
+        ""/api/catalog?careRecipientId="" + patientId,
+        undefined,
+        controller.signal,
+      )","READ_OR_QUERY","[step, setStep] = 0;[catalog, setCatalog] = [];[people, setPeople] = [];[form, setForm] = {
+    quantities: {},
+    notes: """",
+    origin: ""purchase"",
+    source: ""FAMILY"",
+    recipientId: """",
+  };[links, setLinks] = {};[requestOptions, setRequestOptions] = [];[fieldErrors, setFieldErrors] = {};[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[editing, setEditing] = null;[saved, setSaved] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[
+    context.patient,
+    requisitionId,
+    storageKey,
+    type,
+    attempt,
+    documentId,
+    recount,
+    canReadRequests,
+  ];[form, links, editing, loading, saved, storageKey, uncertain, busy]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-041","src/components/documents/supply-wizard.tsx","138","api<{ directory: PatientPerson[] }>(
+        ""/api/patient-settings?careRecipientId="" + patientId,
+        undefined,
+        controller.signal,
+      )","READ_OR_QUERY","[step, setStep] = 0;[catalog, setCatalog] = [];[people, setPeople] = [];[form, setForm] = {
+    quantities: {},
+    notes: """",
+    origin: ""purchase"",
+    source: ""FAMILY"",
+    recipientId: """",
+  };[links, setLinks] = {};[requestOptions, setRequestOptions] = [];[fieldErrors, setFieldErrors] = {};[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[editing, setEditing] = null;[saved, setSaved] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[
+    context.patient,
+    requisitionId,
+    storageKey,
+    type,
+    attempt,
+    documentId,
+    recount,
+    canReadRequests,
+  ];[form, links, editing, loading, saved, storageKey, uncertain, busy]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-042","src/components/documents/supply-wizard.tsx","144","api<{ data: SourceRequest }>(
+            ""/api/requisitions/"" + requisitionId,
+            undefined,
+            controller.signal,
+          )","READ_OR_QUERY","[step, setStep] = 0;[catalog, setCatalog] = [];[people, setPeople] = [];[form, setForm] = {
+    quantities: {},
+    notes: """",
+    origin: ""purchase"",
+    source: ""FAMILY"",
+    recipientId: """",
+  };[links, setLinks] = {};[requestOptions, setRequestOptions] = [];[fieldErrors, setFieldErrors] = {};[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[editing, setEditing] = null;[saved, setSaved] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[
+    context.patient,
+    requisitionId,
+    storageKey,
+    type,
+    attempt,
+    documentId,
+    recount,
+    canReadRequests,
+  ];[form, links, editing, loading, saved, storageKey, uncertain, busy]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-043","src/components/documents/supply-wizard.tsx","156","api<{ data: ItemContext[] }>(
+            ""/api/requisitions/item-context?careRecipientId="" +
+              patientId +
+              ""&productIds="" +
+              products.data
+                .map((product) => encodeURIComponent(product.id))
+                .join("",""),
+            undefined,
+            controller.signal,
+          )","READ_OR_QUERY","[step, setStep] = 0;[catalog, setCatalog] = [];[people, setPeople] = [];[form, setForm] = {
+    quantities: {},
+    notes: """",
+    origin: ""purchase"",
+    source: ""FAMILY"",
+    recipientId: """",
+  };[links, setLinks] = {};[requestOptions, setRequestOptions] = [];[fieldErrors, setFieldErrors] = {};[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[editing, setEditing] = null;[saved, setSaved] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[
+    context.patient,
+    requisitionId,
+    storageKey,
+    type,
+    attempt,
+    documentId,
+    recount,
+    canReadRequests,
+  ];[form, links, editing, loading, saved, storageKey, uncertain, busy]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-044","src/components/documents/supply-wizard.tsx","204","api<{ data: SupplyDocument }>(
+              ""/api/documents/"" + (documentId ?? recoveredId),
+              undefined,
+              controller.signal,
+            )","READ_OR_QUERY","[step, setStep] = 0;[catalog, setCatalog] = [];[people, setPeople] = [];[form, setForm] = {
+    quantities: {},
+    notes: """",
+    origin: ""purchase"",
+    source: ""FAMILY"",
+    recipientId: """",
+  };[links, setLinks] = {};[requestOptions, setRequestOptions] = [];[fieldErrors, setFieldErrors] = {};[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[editing, setEditing] = null;[saved, setSaved] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[
+    context.patient,
+    requisitionId,
+    storageKey,
+    type,
+    attempt,
+    documentId,
+    recount,
+    canReadRequests,
+  ];[form, links, editing, loading, saved, storageKey, uncertain, busy]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-045","src/components/documents/supply-wizard.tsx","378","api<{ data: SupplyDocument }>(""/api/documents"", {
+          careRecipientId: context.patient!.id,
+          type: ""BAL"",
+          payload: {
+            lines: catalog.map((product) => ({
+              productId: product.id,
+              quantity: ""0"",
+            })),
+            notes: """",
+          },
+          idempotencyKey,
+          draft: true,
+        })","MUTATION_OR_COMMAND","[step, setStep] = 0;[catalog, setCatalog] = [];[people, setPeople] = [];[form, setForm] = {
+    quantities: {},
+    notes: """",
+    origin: ""purchase"",
+    source: ""FAMILY"",
+    recipientId: """",
+  };[links, setLinks] = {};[requestOptions, setRequestOptions] = [];[fieldErrors, setFieldErrors] = {};[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[editing, setEditing] = null;[saved, setSaved] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[
+    context.patient,
+    requisitionId,
+    storageKey,
+    type,
+    attempt,
+    documentId,
+    recount,
+    canReadRequests,
+  ];[form, links, editing, loading, saved, storageKey, uncertain, busy]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-046","src/components/documents/supply-wizard.tsx","475","api<{ data: SupplyDocument }>(
+        editing ? ""/api/documents/"" + editing.id + ""/revise"" : ""/api/documents"",
+        editing
+          ? {
+              payload: frozenRef.current.payload,
+              idempotencyKey: frozenRef.current.key,
+              submissionKey: frozenRef.current.submissionKey,
+              expectedVersion: frozenRef.current.expectedVersion,
+              recount,
+              submit: !frozenRef.current.draft,
+            }
+          : {
+              careRecipientId: context.patient!.id,
+              type,
+              payload: frozenRef.current.payload,
+              idempotencyKey: frozenRef.current.key,
+              draft: frozenRef.current.draft,
+            },
+      )","MUTATION_OR_COMMAND","[step, setStep] = 0;[catalog, setCatalog] = [];[people, setPeople] = [];[form, setForm] = {
+    quantities: {},
+    notes: """",
+    origin: ""purchase"",
+    source: ""FAMILY"",
+    recipientId: """",
+  };[links, setLinks] = {};[requestOptions, setRequestOptions] = [];[fieldErrors, setFieldErrors] = {};[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[editing, setEditing] = null;[saved, setSaved] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[
+    context.patient,
+    requisitionId,
+    storageKey,
+    type,
+    attempt,
+    documentId,
+    recount,
+    canReadRequests,
+  ];[form, links, editing, loading, saved, storageKey, uncertain, busy]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-047","src/components/documents/supply-wizard.tsx","516","api<{
+      data: { product_id: string; name: string; base_quantity: string }[];
+    }>(
+      ""/api/catalog/presentations?careRecipientId="" +
+        context.patient!.id +
+        ""&barcode="" +
+        encodeURIComponent(code),
+    )","READ_OR_QUERY","[step, setStep] = 0;[catalog, setCatalog] = [];[people, setPeople] = [];[form, setForm] = {
+    quantities: {},
+    notes: """",
+    origin: ""purchase"",
+    source: ""FAMILY"",
+    recipientId: """",
+  };[links, setLinks] = {};[requestOptions, setRequestOptions] = [];[fieldErrors, setFieldErrors] = {};[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[editing, setEditing] = null;[saved, setSaved] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[
+    context.patient,
+    requisitionId,
+    storageKey,
+    type,
+    attempt,
+    documentId,
+    recount,
+    canReadRequests,
+  ];[form, links, editing, loading, saved, storageKey, uncertain, busy]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-048","src/components/layout/workspace-context.tsx","59","api<{ data: ContextData }>(""/api/context"" + (documentId ? ""?documentId="" + documentId : """"), undefined, signal)","READ_OR_QUERY","[data, setData] = null;[patientId, setPatientId] = """";[loading, setLoading] = true;[selecting, setSelecting] = false;[error, setError] = """"","[load, publicPage, pathname];[load, publicPage]","bootstrap/context read with Suspense and error states","Select context before protected task; source not a proof of all races","Carregando seu espaço de cuidado…","Escolher contexto / Entrar","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-049","src/components/layout/workspace-context.tsx","105","api(""/api/context"", { careRecipientId: id })","MUTATION_OR_COMMAND","[data, setData] = null;[patientId, setPatientId] = """";[loading, setLoading] = true;[selecting, setSelecting] = false;[error, setError] = """"","[load, publicPage, pathname];[load, publicPage]","bootstrap/context read with Suspense and error states","Select context before protected task; source not a proof of all races","Carregando seu espaço de cuidado…","Escolher contexto / Entrar","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-050","src/components/notifications/document-delivery-status.tsx","30","api<{ data: DeliveryStatus[] }>(
+          ""/api/documents/"" + id + ""/notifications"",
+          undefined,
+          controller.signal,
+        )","READ_OR_QUERY","[rows, setRows] = null;[error, setError] = """";[attempt, setAttempt] = 0","[id, version, attempt, revision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-051","src/components/notifications/notification-bell.tsx","41","api<{ data: InboxNotification[]; unreadCount: number }>(
+          ""/api/notifications?surface=bell"" +
+            (patientId ? ""&careRecipientId="" + patientId : """"),
+          undefined,
+          controller.signal,
+        )","READ_OR_QUERY","[open, setOpen] = false;[rows, setRows] = [];[unread, setUnread] = 0;[error, setError] = """"","[patientId, liveRevision];[open]","rows=[]; unread=0; no read loading","Você está em dia before response and with error; no manual retry inside bell","Consultando suas notificações…","Consultar novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-052","src/components/notifications/notification-bell.tsx","128","api(""/api/notifications"", { id: row.id })","MUTATION_OR_COMMAND","[open, setOpen] = false;[rows, setRows] = [];[unread, setUnread] = 0;[error, setError] = """"","[patientId, liveRevision];[open]","rows=[]; unread=0; no read loading","Você está em dia before response and with error; no manual retry inside bell","Consultando suas notificações…","Consultar novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-053","src/components/notifications/notification-center.tsx","48","api<{ data: Notification[]; total: number }>(
+      ""/api/notifications?"" +
+        new URLSearchParams({
+          ...(patientId ? { careRecipientId: patientId } : {}),
+          page: String(page),
+          pageSize: ""20"",
+          unread: String(unread),
+        }),
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[rows, setRows] = [];[total, setTotal] = 0;[page, setPage] = 1;[loading, setLoading] = true;[error, setError] = """";[attempt, setAttempt] = 0;[unread, setUnread] = false","[patientId, page, unread, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-054","src/components/notifications/notification-center.tsx","145","api(""/api/notifications"", { id: row.id })","MUTATION_OR_COMMAND","[rows, setRows] = [];[total, setTotal] = 0;[page, setPage] = 1;[loading, setLoading] = true;[error, setError] = """";[attempt, setAttempt] = 0;[unread, setUnread] = false","[patientId, page, unread, attempt, liveRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-055","src/components/profile-console.tsx","62","api<{ data: Profile; sessions: Session[]; memberships: Membership[] }>(
+      ""/api/profile"",
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[profile, setProfile] = null;[memberships, setMemberships] = [];[sessions, setSessions] = [];[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[attempt, setAttempt] = 0","[attempt]","profile=null until success","Error leaves Carregando perfil alongside failure; initial retry missing","Não foi possível carregar seu perfil. Seus dados não foram alterados.","Consultar perfil novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-056","src/components/profile-console.tsx","89","fetch(""/api/profile"", {
+          method: ""POST"",
+          body: form,
+        })","MUTATION_OR_COMMAND","[profile, setProfile] = null;[memberships, setMemberships] = [];[sessions, setSessions] = [];[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[attempt, setAttempt] = 0","[attempt]","profile=null until success","Error leaves Carregando perfil alongside failure; initial retry missing","Não foi possível carregar seu perfil. Seus dados não foram alterados.","Consultar perfil novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-057","src/components/profile-console.tsx","99","api(
+          ""/api/profile"",
+          action === ""password""
+            ? {
+                action,
+                currentPassword: form.get(""currentPassword""),
+                password: form.get(""password""),
+              }
+            : {
+                action,
+                name: form.get(""name""),
+                registration: form.get(""registration""),
+                state: form.get(""state"") || null,
+                category: form.get(""category""),
+                preferences: {
+                  internal: form.has(""internal""),
+                  whatsapp: form.has(""whatsapp""),
+                  email: form.has(""email""),
+                  scienceExpress: form.has(""scienceExpress""),
+                  scienceWhatsApp: form.has(""scienceWhatsApp""),
+                  scienceAutomatic: form.has(""scienceAutomatic""),
+                },
+              },
+        )","MUTATION_OR_COMMAND","[profile, setProfile] = null;[memberships, setMemberships] = [];[sessions, setSessions] = [];[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[attempt, setAttempt] = 0","[attempt]","profile=null until success","Error leaves Carregando perfil alongside failure; initial retry missing","Não foi possível carregar seu perfil. Seus dados não foram alterados.","Consultar perfil novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-058","src/components/profile-console.tsx","430","api(""/api/profile"", { action: ""signoutOthers"" })","MUTATION_OR_COMMAND","[profile, setProfile] = null;[memberships, setMemberships] = [];[sessions, setSessions] = [];[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[attempt, setAttempt] = 0","[attempt]","profile=null until success","Error leaves Carregando perfil alongside failure; initial retry missing","Não foi possível carregar seu perfil. Seus dados não foram alterados.","Consultar perfil novamente","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-059","src/components/requisitions/requisition-detail.tsx","114","api<{ data: Detail }>(
+      `/api/requisitions/${id}`,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[data, setData] = null;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[reason, setReason] = """";[review, setReview] = null","[id, attempt, revision];[data, id, context.userId]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-060","src/components/requisitions/requisition-detail.tsx","152","api(`/api/requisitions/${id}/science`, {
+          mode: ""app_visible"",
+          expectedVersion: data.progress.version,
+        })","MUTATION_OR_COMMAND","[data, setData] = null;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[reason, setReason] = """";[review, setReview] = null","[id, attempt, revision];[data, id, context.userId]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-061","src/components/requisitions/requisition-detail.tsx","183","api(
+        `/api/requisitions/${id}/${operation === ""cancel"" ? ""status"" : operation}`,
+        operation === ""science""
+          ? { mode: ""express"", expectedVersion: data.progress.version }
+          : operation === ""cancel""
+            ? { status: ""cancelled"", reason }
+            : { reason },
+        undefined,
+        operation === ""cancel"" ? ""PATCH"" : ""POST"",
+      )","MUTATION_OR_COMMAND","[data, setData] = null;[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[reason, setReason] = """";[review, setReview] = null","[id, attempt, revision];[data, id, context.userId]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-062","src/components/requisitions/requisition-history.tsx","28","api<HistoryResponse>(`/api/requisitions?${params}`,undefined,controller.signal)","READ_OR_QUERY","[rows, setRows] = null;[draft, setDraft] = emptyFilter;[filter, setFilter] = emptyFilter;[page, setPage] = 1;[attempt, setAttempt] = 0;[loading, setLoading] = true;[error, setError] = """"","[page,filter,context.patient,attempt]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-063","src/components/requisitions/requisition-wizard.tsx","111","api<{ data: Product[] }>(
+      ""/api/catalog?careRecipientId="" + context.patient!.id,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[step, setStep] = 0;[form, setForm] = {
+    lines: [],
+    extraItems: [],
+    observations: [],
+  };[receipt, setReceipt] = null;[error, setError] = """";[message, setMessage] = """";[saving, setSaving] = false;[fieldErrors, setFieldErrors] = {};[uncertain, setUncertain] = false;[products, setProducts] = [];[itemContext, setItemContext] = [];[loadingCatalog, setLoadingCatalog] = true;[catalogError, setCatalogError] = """";[catalogAttempt, setCatalogAttempt] = 0","[storageKey, context.patient];[context.patient, catalogAttempt];[form, loadingCatalog, receipt, saving, storageKey, uncertain]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-064","src/components/requisitions/requisition-wizard.tsx","120","api<{ data: ItemContext[] }>(
+          ""/api/requisitions/item-context?careRecipientId="" +
+            context.patient!.id +
+            ""&productIds="" +
+            items.map((item) => encodeURIComponent(item.id)).join("",""),
+          undefined,
+          controller.signal,
+        )","READ_OR_QUERY","[step, setStep] = 0;[form, setForm] = {
+    lines: [],
+    extraItems: [],
+    observations: [],
+  };[receipt, setReceipt] = null;[error, setError] = """";[message, setMessage] = """";[saving, setSaving] = false;[fieldErrors, setFieldErrors] = {};[uncertain, setUncertain] = false;[products, setProducts] = [];[itemContext, setItemContext] = [];[loadingCatalog, setLoadingCatalog] = true;[catalogError, setCatalogError] = """";[catalogAttempt, setCatalogAttempt] = 0","[storageKey, context.patient];[context.patient, catalogAttempt];[form, loadingCatalog, receipt, saving, storageKey, uncertain]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-065","src/components/requisitions/requisition-wizard.tsx","288","api<{ receipt: SavedReceipt }>(
+        ""/api/requisitions"",
+        frozenRef.current,
+      )","MUTATION_OR_COMMAND","[step, setStep] = 0;[form, setForm] = {
+    lines: [],
+    extraItems: [],
+    observations: [],
+  };[receipt, setReceipt] = null;[error, setError] = """";[message, setMessage] = """";[saving, setSaving] = false;[fieldErrors, setFieldErrors] = {};[uncertain, setUncertain] = false;[products, setProducts] = [];[itemContext, setItemContext] = [];[loadingCatalog, setLoadingCatalog] = true;[catalogError, setCatalogError] = """";[catalogAttempt, setCatalogAttempt] = 0","[storageKey, context.patient];[context.patient, catalogAttempt];[form, loadingCatalog, receipt, saving, storageKey, uncertain]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-066","src/components/requisitions/resolve-extra-item.tsx","39","api<{ data: CatalogProduct[] }>(
+      ""/api/catalog?careRecipientId="" + patientId,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[products, setProducts] = [];[error, setError] = """";[busy, setBusy] = false;[review, setReview] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[patientId, attempt]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-067","src/components/requisitions/resolve-extra-item.tsx","66","api(
+        ""/api/requisitions/"" + requestId + ""/resolve"",
+        pendingRef.current,
+      )","MUTATION_OR_COMMAND","[products, setProducts] = [];[error, setError] = """";[busy, setBusy] = false;[review, setReview] = null;[uncertain, setUncertain] = false;[attempt, setAttempt] = 0","[patientId, attempt]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-068","src/components/schedules/schedule-console.tsx","30","api<{ data: ScheduleWorkspace }>(""/api/schedules?"" + new URLSearchParams({ careRecipientId: patient.id, from: rangeStart, until: rangeEnd }), undefined, controller.signal)","READ_OR_QUERY","[day, setDay] = today;[mode, setMode] = ""week"";[person, setPerson] = """";[status, setStatus] = """";[attempt, setAttempt] = 0;[data, setData] = null;[error, setError] = """";[message, setMessage] = """";[loading, setLoading] = true;[busy, setBusy] = false;[uncertain, setUncertain] = false;[editor, setEditor] = null;[review, setReview] = null;[opener, setOpener] = null","[patient.id, rangeStart, rangeEnd, live, attempt]","workspace read + local view filters","Actual mobile view differs from selected month/week; version conflicts require new review","Atualizando programação de plantões…","Atualizar escala","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-069","src/components/schedules/schedule-console.tsx","41","api(""/api/schedules"", pendingRef.current)","MUTATION_OR_COMMAND","[day, setDay] = today;[mode, setMode] = ""week"";[person, setPerson] = """";[status, setStatus] = """";[attempt, setAttempt] = 0;[data, setData] = null;[error, setError] = """";[message, setMessage] = """";[loading, setLoading] = true;[busy, setBusy] = false;[uncertain, setUncertain] = false;[editor, setEditor] = null;[review, setReview] = null;[opener, setOpener] = null","[patient.id, rangeStart, rangeEnd, live, attempt]","workspace read + local view filters","Actual mobile view differs from selected month/week; version conflicts require new review","Atualizando programação de plantões…","Atualizar escala","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-070","src/components/stock/consumption-console.tsx","57","api<{ data: Report[] }>(
+        ""/api/consumption?careRecipientId="" + context.patient!.id,
+        undefined,
+        controller.signal,
+      )","READ_OR_QUERY","[editor, setEditor] = null;[review, setReview] = null;[rows, setRows] = [];[products, setProducts] = [];[lines, setLines] = {};[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[uncertain, setUncertain] = false","[context.patient, attempt]","rows=[]; no independent read loading","Promise.all reports/catalog; no partial commit; error does not suppress empty","Consultar relatos…","Atualizar relatos","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-071","src/components/stock/consumption-console.tsx","62","api<{ data: CatalogProduct[] }>(
+        ""/api/catalog?careRecipientId="" + context.patient!.id,
+        undefined,
+        controller.signal,
+      )","READ_OR_QUERY","[editor, setEditor] = null;[review, setReview] = null;[rows, setRows] = [];[products, setProducts] = [];[lines, setLines] = {};[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[uncertain, setUncertain] = false","[context.patient, attempt]","rows=[]; no independent read loading","Promise.all reports/catalog; no partial commit; error does not suppress empty","Consultar relatos…","Atualizar relatos","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-072","src/components/stock/consumption-console.tsx","82","api(""/api/consumption"", pendingRef.current)","MUTATION_OR_COMMAND","[editor, setEditor] = null;[review, setReview] = null;[rows, setRows] = [];[products, setProducts] = [];[lines, setLines] = {};[attempt, setAttempt] = 0;[error, setError] = """";[message, setMessage] = """";[busy, setBusy] = false;[uncertain, setUncertain] = false","[context.patient, attempt]","rows=[]; no independent read loading","Promise.all reports/catalog; no partial commit; error does not suppress empty","Consultar relatos…","Atualizar relatos","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-073","src/components/stock/flow-reviews.tsx","47","api<{ data: Submission[]; configured: boolean }>(
+      ""/api/whatsapp/flows/submissions?careRecipientId="" + patientId,
+      undefined,
+      controller.signal,
+    )","READ_OR_QUERY","[rows, setRows] = [];[configured, setConfigured] = false;[attempt, setAttempt] = 0;[selected, setSelected] = null;[review, setReview] = null;[error, setError] = """";[busy, setBusy] = false;[uncertain, setUncertain] = false","[patientId, attempt]","rows=[]; configured=false before response","Unknown configuration treated as false; empty before successful GET","Consultando relatos e disponibilidade do canal…","Atualizar sugestões","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-074","src/components/stock/flow-reviews.tsx","86","api(""/api/whatsapp/flows/submissions"", pendingRef.current)","MUTATION_OR_COMMAND","[rows, setRows] = [];[configured, setConfigured] = false;[attempt, setAttempt] = 0;[selected, setSelected] = null;[review, setReview] = null;[error, setError] = """";[busy, setBusy] = false;[uncertain, setUncertain] = false","[patientId, attempt]","rows=[]; configured=false before response","Unknown configuration treated as false; empty before successful GET","Consultando relatos e disponibilidade do canal…","Atualizar sugestões","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-075","src/components/stock/inventory-console.tsx","30","api<{data:Inventory[];total:number;lastApproved:Pick<Inventory,""id""|""location""|""counted_at""|""approved_at"">|null}>(`/api/stock/inventory?careRecipientId=${context.patient!.id}&page=${page}&pageSize=20`,undefined,controller.signal)","READ_OR_QUERY","[rows,setRows] = [];[products,setProducts] = [];[page,setPage] = 1;[total,setTotal] = 0;[lastApproved,setLastApproved] = null;[selectedId,setSelectedId] = """";[loading,setLoading] = true;[busy,setBusy] = false;[attempt,setAttempt] = 0;[error,setError] = """";[message,setMessage] = """"","[context.patient,attempt,page]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-076","src/components/stock/inventory-console.tsx","30","api<{data:Product[]}>(`/api/catalog?careRecipientId=${context.patient!.id}&includeInactive=true`,undefined,controller.signal)","READ_OR_QUERY","[rows,setRows] = [];[products,setProducts] = [];[page,setPage] = 1;[total,setTotal] = 0;[lastApproved,setLastApproved] = null;[selectedId,setSelectedId] = """";[loading,setLoading] = true;[busy,setBusy] = false;[attempt,setAttempt] = 0;[error,setError] = """";[message,setMessage] = """"","[context.patient,attempt,page]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-077","src/components/stock/inventory-console.tsx","35","api<{data:Inventory}>(""/api/stock/inventory"",{...(payload.action === ""create"" ? { careRecipientId:context.patient!.id } : {}),...payload})","MUTATION_OR_COMMAND","[rows,setRows] = [];[products,setProducts] = [];[page,setPage] = 1;[total,setTotal] = 0;[lastApproved,setLastApproved] = null;[selectedId,setSelectedId] = """";[loading,setLoading] = true;[busy,setBusy] = false;[attempt,setAttempt] = 0;[error,setError] = """";[message,setMessage] = """"","[context.patient,attempt,page]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-078","src/components/stock/stock-console.tsx","88","api<{
+        overview: ProductStock[];
+        transit: TransitDocument[];
+        metrics: typeof metrics;
+      }>(
+        ""/api/stock/balances?careRecipientId="" +
+          patient +
+          ""&custody="" +
+          custody,
+        undefined,
+        controller.signal,
+      )","READ_OR_QUERY","[transit, setTransit] = [];[metrics, setMetrics] = [];[products, setProducts] = [];[movements, setMovements] = [];[total, setTotal] = 0;[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[attempt, setAttempt] = 0;[page, setPage] = 1;[search, setSearch] = """";[custody, setCustody] = initialCustody;[showFilters, setShowFilters] = false;[filters, setFilters] = { productId: """", from: """", to: """" };[operation, setOperation] = ""inbound"";[movementEditor, setMovementEditor] = null;[movementProductId, setMovementProductId] = """";[referenceId, setReferenceId] = """";[review, setReview] = null;[uncertain, setUncertain] = false;[savedMovement, setSavedMovement] = null","[
+    context.patient,
+    page,
+    custody,
+    filters,
+    attempt,
+    hasStock,
+    liveRevision,
+  ]","loading=true; set true only manual refresh","Promise.all overview/history; dependent changes do not label old data","Atualizando saldos; dados anteriores até concluir a consulta.","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-079","src/components/stock/stock-console.tsx","101","api<{ data: Movement[]; total: number }>(
+            ""/api/stock/movements?"" +
+              new URLSearchParams({
+                careRecipientId: patient,
+                page: String(page),
+                location: custody,
+                ...filters,
+              }),
+            undefined,
+            controller.signal,
+          )","READ_OR_QUERY","[transit, setTransit] = [];[metrics, setMetrics] = [];[products, setProducts] = [];[movements, setMovements] = [];[total, setTotal] = 0;[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[attempt, setAttempt] = 0;[page, setPage] = 1;[search, setSearch] = """";[custody, setCustody] = initialCustody;[showFilters, setShowFilters] = false;[filters, setFilters] = { productId: """", from: """", to: """" };[operation, setOperation] = ""inbound"";[movementEditor, setMovementEditor] = null;[movementProductId, setMovementProductId] = """";[referenceId, setReferenceId] = """";[review, setReview] = null;[uncertain, setUncertain] = false;[savedMovement, setSavedMovement] = null","[
+    context.patient,
+    page,
+    custody,
+    filters,
+    attempt,
+    hasStock,
+    liveRevision,
+  ]","loading=true; set true only manual refresh","Promise.all overview/history; dependent changes do not label old data","Atualizando saldos; dados anteriores até concluir a consulta.","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-080","src/components/stock/stock-console.tsx","166","api<{ id: string }>(
+        ""/api/stock/movements"",
+        frozenRef.current,
+      )","MUTATION_OR_COMMAND","[transit, setTransit] = [];[metrics, setMetrics] = [];[products, setProducts] = [];[movements, setMovements] = [];[total, setTotal] = 0;[loading, setLoading] = true;[busy, setBusy] = false;[error, setError] = """";[message, setMessage] = """";[attempt, setAttempt] = 0;[page, setPage] = 1;[search, setSearch] = """";[custody, setCustody] = initialCustody;[showFilters, setShowFilters] = false;[filters, setFilters] = { productId: """", from: """", to: """" };[operation, setOperation] = ""inbound"";[movementEditor, setMovementEditor] = null;[movementProductId, setMovementProductId] = """";[referenceId, setReferenceId] = """";[review, setReview] = null;[uncertain, setUncertain] = false;[savedMovement, setSavedMovement] = null","[
+    context.patient,
+    page,
+    custody,
+    filters,
+    attempt,
+    hasStock,
+    liveRevision,
+  ]","loading=true; set true only manual refresh","Promise.all overview/history; dependent changes do not label old data","Atualizando saldos; dados anteriores até concluir a consulta.","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"
+"QUERY-081","src/components/workspace-sync.tsx","34","fetch(""/api/sync"", {
+          cache: ""no-store"",
+          signal: controller.signal,
+        })","READ_OR_QUERY","[connected, setConnected] = false","[userId, contextRevision]","See exact source state declarations in query catalog","Consumer-specific initial/error/submit branches; no runtime approval inferred","Consultando informações desta tarefa…","Atualizar consulta","REVIEWED_STATIC","Only named scenario, not each call","Timing, every response combination and human assistive technology not exhaustively executed"

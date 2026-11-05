@@ -1,0 +1,22 @@
+{
+  "recordedAt": "2026-10-29T23:00:25.004Z",
+  "project": "home-care-assistant",
+  "externalApplicationSending": false,
+  "metaFlows": false,
+  "cronJobs": [
+    {
+      "name": "hca-operational-lifecycle",
+      "active": true,
+      "schedule": "* * * * *"
+    },
+    {
+      "name": "hca-notification-worker",
+      "active": true,
+      "schedule": "* * * * *"
+    }
+  ],
+  "networkQueueCount": 0,
+  "workerUrlConfigured": false,
+  "workerBearerConfigured": false,
+  "limits": "No decrypted value exported;read-only presence check. Internal delivery is performed by local SQL cron. No cron/Vault configuration changed."
+}

@@ -1,0 +1,10 @@
+{
+  "recordedAt": "2026-10-30T11:16:42.922Z",
+  "project": "home-care-assistant",
+  "container": "supabase_db_home-care-assistant",
+  "bytes": 6389718,
+  "sha256": "3a8e3fc237fcb0cf3513326f986bdb4ab9fb90f7ce2445da29b95407c265bce9",
+  "archiveListVerified": true,
+  "privateLocation": "LOCALAPPDATA/home-care-assistant/backups",
+  "scope": "Backup only; no restore/reset. TOC verification is not a full restore test."
+}

@@ -1,0 +1,249 @@
+{
+  "recordedAt": "2026-10-30T21:57:38.791Z",
+  "method": "GET-only authenticated metadata; response fields explicitly selected; no env values or runtime logs",
+  "githubIdentity": {
+    "login": "RMZZFAJ",
+    "id": 269253994
+  },
+  "limitations": [
+    "GitHub connector required link_id; CLI fallback",
+    "Vercel connector UNAUTHORIZED; CLI fallback"
+  ],
+  "repository": {
+    "name": "RMZZFAJ/home-care-assistant",
+    "private": false,
+    "defaultBranch": "master",
+    "archived": false,
+    "permissions": {
+      "admin": true,
+      "maintain": true,
+      "push": true,
+      "triage": true,
+      "pull": true
+    }
+  },
+  "master": {
+    "name": "master",
+    "sha": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+    "protected": false
+  },
+  "audit/phase-b": {
+    "name": "audit/phase-b",
+    "sha": "378298ac4df887df95a92d27cf360700a97dfeed",
+    "protected": false
+  },
+  "vercelIdentity": {
+    "username": "rmzzfaj"
+  },
+  "vercelProject": {
+    "id": "prj_GwdwNVay81iZ7ltM4Tg5IIXFLGPv",
+    "name": "home-care-assistant",
+    "accountId": "team_X3JshR4ahuzIk95k6JMAYhq2",
+    "framework": "nextjs",
+    "nodeVersion": "24.x",
+    "rootDirectory": null,
+    "buildCommand": null,
+    "installCommand": null,
+    "gitRepository": {
+      "type": "github",
+      "org": "RMZZFAJ",
+      "repo": "home-care-assistant",
+      "productionBranch": "master",
+      "deployHooksCount": 0
+    },
+    "gitProviderOptions": {
+      "createDeployments": "disabled",
+      "disableRepositoryDispatchEvents": true
+    },
+    "gitForkProtection": true,
+    "ssoProtection": {
+      "deploymentType": "all_except_custom_domains"
+    },
+    "passwordProtectionConfigured": false,
+    "resourceConfig": {
+      "fluid": true,
+      "functionDefaultRegions": [
+        "iad1"
+      ],
+      "buildMachineType": "basic",
+      "buildMachineSelection": "fixed"
+    },
+    "crons": {
+      "enabledAt": 1792473123280,
+      "disabledAt": null,
+      "updatedAt": 1793175682443,
+      "deploymentId": "dpl_EMwXxHgxdVrpQqU8UUVzpVZo1DJZ",
+      "definitions": []
+    },
+    "latestDeployments": [
+      {
+        "id": "dpl_5YWPQgQXEfbUdUzMfAeMc3KAYf2t",
+        "url": "home-care-assistant-8j9z02yc2-rmzzfajs-projects.vercel.app",
+        "readyState": "READY",
+        "target": null,
+        "createdAt": 1793395878925,
+        "sha": "378298ac4df887df95a92d27cf360700a97dfeed",
+        "branch": "audit/phase-b"
+      },
+      {
+        "id": "dpl_DjPQjdPUATao8qiUxSx1QjqqJhE1",
+        "url": "home-care-assistant-3ju63eiyd-rmzzfajs-projects.vercel.app",
+        "readyState": "READY",
+        "target": null,
+        "createdAt": 1793395379662,
+        "sha": "0112528178841a91c0192a8524891b72a5733657",
+        "branch": "audit/phase-b"
+      }
+    ],
+    "keys": [
+      "accountId",
+      "creator",
+      "alias",
+      "speedInsights",
+      "autoAssignCustomDomains",
+      "autoAssignCustomDomainsUpdatedBy",
+      "buildCommand",
+      "createdAt",
+      "crons",
+      "deploymentExpiration",
+      "devCommand",
+      "directoryListing",
+      "framework",
+      "gitForkProtection",
+      "gitLFS",
+      "id",
+      "installCommand",
+      "lastRollbackTarget",
+      "lastAliasRequest",
+      "name",
+      "nodeVersion",
+      "outputDirectory",
+      "sandbox",
+      "productionDeploymentsFastLane",
+      "defaultResourceConfig",
+      "resourceConfig",
+      "rootDirectory",
+      "serverlessFunctionRegion",
+      "sourceFilesOutsideRootDirectory",
+      "enableAffectedProjectsDeployments",
+      "ssoProtection",
+      "updatedAt",
+      "live",
+      "enableExternalRewriteCaching",
+      "gitComments",
+      "gitProviderOptions",
+      "webAnalytics",
+      "hasDeployments",
+      "link",
+      "latestDeployments",
+      "targets",
+      "protectionBypass",
+      "features",
+      "protectedSourcemaps",
+      "avatar",
+      "avatarDarkMode"
+    ]
+  },
+  "deployments": [
+    {
+      "id": "dpl_5YWPQgQXEfbUdUzMfAeMc3KAYf2t",
+      "url": "home-care-assistant-8j9z02yc2-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": null,
+      "created": 1793395878925,
+      "sha": "378298ac4df887df95a92d27cf360700a97dfeed",
+      "branch": "audit/phase-b",
+      "source": "git"
+    },
+    {
+      "id": "dpl_DjPQjdPUATao8qiUxSx1QjqqJhE1",
+      "url": "home-care-assistant-3ju63eiyd-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": null,
+      "created": 1793395379662,
+      "sha": "0112528178841a91c0192a8524891b72a5733657",
+      "branch": "audit/phase-b",
+      "source": "git"
+    },
+    {
+      "id": "dpl_AXvWDFLs8eFWo9h1bfjW4c3XZs6U",
+      "url": "home-care-assistant-iwmu7ojh9-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": null,
+      "created": 1793363450514,
+      "sha": "69048034dc2532ffbe5d1dbca7dbd041c1f4be16",
+      "branch": "audit/phase-b",
+      "source": "git"
+    },
+    {
+      "id": "dpl_8hTTWARewKPzXYsgGn2uSJuWZdp4",
+      "url": "home-care-assistant-b4d4fsd40-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": null,
+      "created": 1793357583624,
+      "sha": "a21cea055dc2ba858b261924ee6dd7781112b2bf",
+      "branch": "audit/phase-b",
+      "source": "git"
+    },
+    {
+      "id": "dpl_6vdoryPf915cqT1qQyis44sZWVfU",
+      "url": "home-care-assistant-j5wwsklnz-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": null,
+      "created": 1793341726639,
+      "sha": "315399dc5c19cacc9d9cc3c609174498608f4af0",
+      "branch": "audit/phase-b",
+      "source": "git"
+    },
+    {
+      "id": "dpl_DWv3PdRzuQBDjB6P7uzVzoezPfds",
+      "url": "home-care-assistant-bv7b1mk1t-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": null,
+      "created": 1793318530697,
+      "sha": "896590e9c3020d4759d22fb9df730c446249d133",
+      "branch": "audit/phase-b",
+      "source": "git"
+    },
+    {
+      "id": "dpl_TkEe1DTYzsjibT5t9czQRpL1fZMn",
+      "url": "home-care-assistant-2u27jq8hj-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": null,
+      "created": 1793266006133,
+      "sha": "73bedcbc09f9edba8c8869b60ea84950cddc82fc",
+      "branch": "audit/phase-b",
+      "source": "git"
+    },
+    {
+      "id": "dpl_GQiSxDsq5M53L4FvG2xzak4pcqb8",
+      "url": "home-care-assistant-iq9vmjw0i-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": null,
+      "created": 1793249593231,
+      "sha": "d52d4d7cf1c6dedf3791b87d5b91a987fdeca388",
+      "branch": "audit/phase-b1-human-interface-2026-10-28",
+      "source": "git"
+    },
+    {
+      "id": "dpl_EMwXxHgxdVrpQqU8UUVzpVZo1DJZ",
+      "url": "home-care-assistant-icum53c6k-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": "production",
+      "created": 1793175624906,
+      "sha": "34dcb835c5c49068e0417f7306eb4e501aa868bc",
+      "branch": "master",
+      "source": "git"
+    },
+    {
+      "id": "dpl_42jNN8986iu8meu8BgeH6f1UAj3W",
+      "url": "home-care-assistant-im00cl9fm-rmzzfajs-projects.vercel.app",
+      "state": "READY",
+      "target": "production",
+      "created": 1792968503991,
+      "sha": "37cb7f85e96e551d6419871f94dd950712e2565b",
+      "branch": "master",
+      "source": "git"
+    }
+  ]
+}
