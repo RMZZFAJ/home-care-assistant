@@ -3,13 +3,25 @@ import path from "node:path";
 import { PDFDocument, rgb, degrees, type PDFFont } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import QRCode from "qrcode";
-import { documentStatuses, type DocumentType, type PurchaseProgress, type PurchaseReceipt } from "@/types/documents";
+import {
+  documentStatuses,
+  type DocumentType,
+  type PurchaseProgress,
+  type PurchaseReceipt,
+  type DeliveryCancellationContext,
+} from "@/types/documents";
 import { receiptStates } from "@/lib/documents/purchase";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
-import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
-import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
+import {
+  formatStockObservation,
+  formatStockObservationTime,
+} from "@/lib/stock-observation";
+import type {
+  StockObservation,
+  StockObservationTimeSource,
+} from "@/types/requisition";
 
 type Person = {
   id?: string;
@@ -30,6 +42,7 @@ export type DocumentSnapshot = {
   materialIdentitySource?: string;
   purchaseProgress?: PurchaseProgress;
   purchaseReceipts?: PurchaseReceipt[];
+  deliveryCancellation?: DeliveryCancellationContext | null;
   actors?: { issuer?: Person; recipient?: Person; patient?: Person };
   lines: Record<string, unknown>[];
   payload: Record<string, unknown>;
@@ -287,14 +300,26 @@ export async function renderDocumentPdf(
   }
   const title = {
     REQ: "REQUISIÇÃO DE MATERIAIS",
-    COM: snapshot.payload.origin === "donation" ? "DOAÇÃO DE INSUMOS À FAMÍLIA" : snapshot.payload.origin === "purchase" ? "COMPRA DE INSUMOS DA FAMÍLIA" : "COMPRA OU DOAÇÃO DE INSUMOS",
+    COM:
+      snapshot.payload.origin === "donation"
+        ? "DOAÇÃO DE INSUMOS À FAMÍLIA"
+        : snapshot.payload.origin === "purchase"
+          ? "COMPRA DE INSUMOS DA FAMÍLIA"
+          : "COMPRA OU DOAÇÃO DE INSUMOS",
     ENT: "COMPROVANTE DE ENTREGA DE MATERIAIS",
     BAL: "BALANÇO DO ESTOQUE DA EQUIPE",
   }[snapshot.type];
   text(title, snapshot.type === "ENT" ? 17 : 19, true);
   y -= 6;
-  const familyAware = snapshot.sciencePolicy?.familyAware ?? Boolean(snapshot.sciencePolicy?.science_satisfied_at);
-  const purchaseOrigin = snapshot.type === "COM" && (snapshot.payload.origin === "purchase" || snapshot.payload.origin === "donation") ? snapshot.payload.origin : undefined;
+  const familyAware =
+    snapshot.sciencePolicy?.familyAware ??
+    Boolean(snapshot.sciencePolicy?.science_satisfied_at);
+  const purchaseOrigin =
+    snapshot.type === "COM" &&
+    (snapshot.payload.origin === "purchase" ||
+      snapshot.payload.origin === "donation")
+      ? snapshot.payload.origin
+      : undefined;
   const statusText = snapshot.isHistorical
     ? "Registro histórico · ciência original não comprovada"
     : snapshot.type === "REQ" && snapshot.status !== "cancelled"
@@ -305,7 +330,11 @@ export async function renderDocumentPdf(
           : familyAware
             ? "Aguardando atendimento"
             : "Ciência e atendimento pendentes"
-      : (documentStatuses[snapshot.type === "COM" ? snapshot.purchaseProgress?.state ?? snapshot.status : snapshot.status] ?? snapshot.status);
+      : (documentStatuses[
+          snapshot.type === "COM"
+            ? (snapshot.purchaseProgress?.state ?? snapshot.status)
+            : snapshot.status
+        ] ?? snapshot.status);
   text(
     `${snapshot.code} · ${formatBrazilDate(snapshot.createdAt ?? null)} · ${statusText}`,
     9,
@@ -331,12 +360,7 @@ export async function renderDocumentPdf(
             "URGENTES",
           ],
           [String(attended), "ITENS ATENDIDOS"],
-          [
-            familyAware
-              ? "FAMÍLIA CIENTE"
-              : "PENDENTE",
-            "CIÊNCIA FAMILIAR",
-          ],
+          [familyAware ? "FAMÍLIA CIENTE" : "PENDENTE", "CIÊNCIA FAMILIAR"],
         ]
       : snapshot.type === "ENT"
         ? [
@@ -344,7 +368,13 @@ export async function renderDocumentPdf(
             [String(checked), "CONFERIDOS INTEGRALMENTE"],
             [String(issues), "DIVERGÊNCIAS"],
             [
-              snapshot.status === "confirmed" ? "CONCLUÍDO" : "PENDENTE",
+              snapshot.workflow?.acceptedAt
+                ? "REGISTRADO"
+                : snapshot.status === "cancelled"
+                  ? "ENCERRADO"
+                  : snapshot.status === "confirmed"
+                    ? "CONCLUÍDO"
+                    : "PENDENTE",
               "RECEBIMENTO",
             ],
           ]
@@ -424,18 +454,56 @@ export async function renderDocumentPdf(
           ["Situação", statusText],
         ] as [string, unknown][])),
   ]);
-  const balanceContext = snapshot.type === "BAL" ? snapshot.payload.balanceContext as Record<string,unknown> | undefined : undefined;
+  const balanceContext =
+    snapshot.type === "BAL"
+      ? (snapshot.payload.balanceContext as Record<string, unknown> | undefined)
+      : undefined;
   if (balanceContext) {
     section("Plantão e obrigações do balanço");
-    const zone=String(balanceContext.timezone??"America/Sao_Paulo");
-    const stamp=(value:unknown)=>typeof value==="string"?new Intl.DateTimeFormat("pt-BR",{timeZone:zone,dateStyle:"short",timeStyle:"short"}).format(new Date(value)):"Registrado na ficha";
-    text("Profissional da contagem: "+String(balanceContext.professionalName)+" · Plantão: "+String(balanceContext.shiftType),9,true);
-    text("Plantão: "+stamp(balanceContext.startsAt)+" até "+stamp(balanceContext.endsAt)+" · "+zone,9);
-    text("Contagem efetiva atual: "+stamp(balanceContext.countedAt),9);
-    if (Array.isArray(balanceContext.weeks)) text("Semanas vinculadas: "+balanceContext.weeks.map(week=>String(week).split("-").reverse().join("/")).join(", "));
-    text("A contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no histórico.",8);
+    const zone = String(balanceContext.timezone ?? "America/Sao_Paulo");
+    const stamp = (value: unknown) =>
+      typeof value === "string"
+        ? new Intl.DateTimeFormat("pt-BR", {
+            timeZone: zone,
+            dateStyle: "short",
+            timeStyle: "short",
+          }).format(new Date(value))
+        : "Registrado na ficha";
+    text(
+      "Profissional da contagem: " +
+        String(balanceContext.professionalName) +
+        " · Plantão: " +
+        String(balanceContext.shiftType),
+      9,
+      true,
+    );
+    text(
+      "Plantão: " +
+        stamp(balanceContext.startsAt) +
+        " até " +
+        stamp(balanceContext.endsAt) +
+        " · " +
+        zone,
+      9,
+    );
+    text("Contagem efetiva atual: " + stamp(balanceContext.countedAt), 9);
+    if (Array.isArray(balanceContext.weeks))
+      text(
+        "Semanas vinculadas: " +
+          balanceContext.weeks
+            .map((week) => String(week).split("-").reverse().join("/"))
+            .join(", "),
+      );
+    text(
+      "A contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no histórico.",
+      8,
+    );
   }
-  section(snapshot.type === "REQ" ? "Materiais solicitados" : "Relação dos materiais declarados");
+  section(
+    snapshot.type === "REQ"
+      ? "Materiais solicitados"
+      : "Relação dos materiais declarados",
+  );
   const name = (item: Record<string, unknown>) =>
     String(
       item.name_snapshot ??
@@ -450,7 +518,29 @@ export async function renderDocumentPdf(
       [0.06, 0.47, 0.24, 0.23],
       snapshot.lines.map((item, i) => [
         String(i + 1).padStart(2, "0"),
-        item.stock_observation ? name(item) + "\nEstoque da equipe: " + formatStockObservation(typeof item.current_stock === "string" || typeof item.current_stock === "number" ? item.current_stock : null, item.stock_observation as StockObservation, typeof item.unit_snapshot === "string" ? item.unit_snapshot : undefined) + (Object.hasOwn(item, "stock_observation_at") ? "\n" + formatStockObservationTime(typeof item.stock_observation_at === "string" ? item.stock_observation_at : null, item.stock_observation_time_source as StockObservationTimeSource) : "") : name(item),
+        item.stock_observation
+          ? name(item) +
+            "\nEstoque da equipe: " +
+            formatStockObservation(
+              typeof item.current_stock === "string" ||
+                typeof item.current_stock === "number"
+                ? item.current_stock
+                : null,
+              item.stock_observation as StockObservation,
+              typeof item.unit_snapshot === "string"
+                ? item.unit_snapshot
+                : undefined,
+            ) +
+            (Object.hasOwn(item, "stock_observation_at")
+              ? "\n" +
+                formatStockObservationTime(
+                  typeof item.stock_observation_at === "string"
+                    ? item.stock_observation_at
+                    : null,
+                  item.stock_observation_time_source as StockObservationTimeSource,
+                )
+              : "")
+          : name(item),
         String(item.unit_snapshot ?? "Não informada"),
         item.urgent ? "URGENTE" : "Rotina",
       ]),
@@ -505,7 +595,11 @@ export async function renderDocumentPdf(
       [
         "Ciência familiar",
         familyAware
-          ? "Família ciente" + (snapshot.sciencePolicy?.science_satisfied_at ? " · " + formatBrazilDate(snapshot.sciencePolicy.science_satisfied_at) : "")
+          ? "Família ciente" +
+            (snapshot.sciencePolicy?.science_satisfied_at
+              ? " · " +
+                formatBrazilDate(snapshot.sciencePolicy.science_satisfied_at)
+              : "")
           : "Pendente nesta versão",
       ],
       ["Próximo passo", requisitionNextStep(snapshot)],
@@ -570,39 +664,182 @@ export async function renderDocumentPdf(
               : "Aguardando conferência",
       ]),
     );
+    if (snapshot.deliveryCancellation) {
+      const cancellation = snapshot.deliveryCancellation,
+        request = cancellation.request;
+      ensure(140);
+      section("Pedido de cancelamento e decisão");
+      const labels = {
+        pending: "Aguardando decisão do recebedor",
+        consented: "Consentido e conciliado",
+        refused: "Recusado pelo recebedor",
+        withdrawn: "Retirado pelo solicitante",
+      };
+      text(labels[request.status], 10, true);
+      text(
+        `Pedido de ${request.requestedName ?? "nome não preservado"} · ${formatBrazilDate(request.requestedAt)}`,
+        9,
+      );
+      text("Motivo original: " + request.reason, 9);
+      if (request.outcome) {
+        text(
+          `Decisão de ${request.outcome.actorName ?? "nome não preservado"} · ${formatBrazilDate(request.outcome.recordedAt)}`,
+          9,
+        );
+        text("Justificativa da decisão: " + request.outcome.reason, 9);
+      }
+      if (request.status === "pending") {
+        text(
+          "Pedido pendente não estorna material. Devolução real e consumo já confirmado dependem da conciliação pessoal do recebedor.",
+          9,
+        );
+        if (!cancellation.sourceReady)
+          text(
+            "Referências de consumo indisponíveis neste exemplar. Isso não declara consumo zero.",
+            9,
+          );
+        if (cancellation.lines.length)
+          table(
+            ["MATERIAL", "ACEITO", "CONSUMO DISPONÍVEL", "EM TRÂNSITO"],
+            [0.4, 0.18, 0.24, 0.18],
+            cancellation.lines.map((line) => [
+              line.name,
+              formatQuantity(line.acceptedQuantity, line.unit),
+              formatQuantity(line.availableConsumedQuantity, line.unit),
+              formatQuantity(line.unresolvedTransit, line.unit),
+            ]),
+          );
+      } else if (request.status === "consented") {
+        text(
+          "Devoluções físicas declaradas nesta decisão foram registradas. O consumo anterior foi referenciado, sem novo débito.",
+          9,
+        );
+        table(
+          ["MATERIAL", "ACEITO", "DEVOLVIDO", "CONSUMO REFERENCIADO"],
+          [0.4, 0.18, 0.18, 0.24],
+          cancellation.lines.map((line) => [
+            line.name,
+            formatQuantity(line.acceptedQuantity, line.unit),
+            formatQuantity(line.returnQuantity, line.unit),
+            formatQuantity(line.consumedQuantity, line.unit),
+          ]),
+        );
+        for (const line of cancellation.lines)
+          for (const reference of line.consumptionReferences) {
+            ensure(42);
+            text(
+              `${line.name} · ${formatQuantity(reference.quantity, line.unit)} de consumo confirmado em ${formatBrazilDate(reference.recordedAt)}`,
+              9,
+            );
+            text("Relato de origem: " + reference.reportId, 8);
+            text("Movimento de consumo: " + reference.movementId, 8);
+          }
+      } else
+        text(
+          "Esta recusa ou retirada preservou os fatos de recebimento e não movimentou estoque.",
+          9,
+        );
+      for (const previous of cancellation.history) {
+        ensure(100);
+        section("Pedido anterior preservado");
+        text(
+          `${labels[previous.status]} · pedido de ${previous.requestedName ?? "nome não preservado"} · ${formatBrazilDate(previous.requestedAt)}`,
+          9,
+        );
+        text("Motivo: " + previous.reason, 9);
+        if (previous.outcome)
+          text(
+            `Decisão de ${previous.outcome.actorName ?? "nome não preservado"}: ${previous.outcome.reason}`,
+            9,
+          );
+      }
+    }
   } else if (snapshot.type === "COM") {
     section("Aquisição e validação");
     table(
-      snapshot.purchaseProgress ? ["MATERIAL", "PREVISTO", "APROVADO", "ADQUIRIDO", "VALIDADO", "DISPENSADO"] : ["MATERIAL", "APROVADO", "ADQUIRIDO", "VALIDADO"],
-      snapshot.purchaseProgress ? [0.35, 0.13, 0.13, 0.13, 0.13, 0.13] : [0.46, 0.18, 0.18, 0.18],
+      snapshot.purchaseProgress
+        ? [
+            "MATERIAL",
+            "PREVISTO",
+            "APROVADO",
+            "ADQUIRIDO",
+            "VALIDADO",
+            "DISPENSADO",
+          ]
+        : ["MATERIAL", "APROVADO", "ADQUIRIDO", "VALIDADO"],
+      snapshot.purchaseProgress
+        ? [0.35, 0.13, 0.13, 0.13, 0.13, 0.13]
+        : [0.46, 0.18, 0.18, 0.18],
       snapshot.lines.map((item) => [
         name(item),
-        ...(snapshot.purchaseProgress ? [formatQuantity(String(item.quantity ?? 0))] : []),
+        ...(snapshot.purchaseProgress
+          ? [formatQuantity(String(item.quantity ?? 0))]
+          : []),
         formatQuantity(String(item.approved_quantity ?? 0)),
         formatQuantity(String(item.purchased_quantity ?? 0)),
         formatQuantity(String(item.accepted_quantity ?? 0)),
-        ...(snapshot.purchaseProgress ? [formatQuantity(String(item.waived_quantity ?? 0))] : []),
+        ...(snapshot.purchaseProgress
+          ? [formatQuantity(String(item.waived_quantity ?? 0))]
+          : []),
       ]),
     );
     if (snapshot.purchaseProgress) {
       const progress = snapshot.purchaseProgress;
-      table(["MATERIAL", "EM CONFERÊNCIA", "SEM CHEGADA VÁLIDA", "POR ADQUIRIR"], [0.4, 0.2, 0.2, 0.2], progress.lines.map(line => [line.name, formatQuantity(line.pendingValidationQuantity, line.unit), formatQuantity(line.unarrivedQuantity, line.unit), formatQuantity(line.remainingExpectation, line.unit)]));
+      table(
+        ["MATERIAL", "EM CONFERÊNCIA", "SEM CHEGADA VÁLIDA", "POR ADQUIRIR"],
+        [0.4, 0.2, 0.2, 0.2],
+        progress.lines.map((line) => [
+          line.name,
+          formatQuantity(line.pendingValidationQuantity, line.unit),
+          formatQuantity(line.unarrivedQuantity, line.unit),
+          formatQuantity(line.remainingExpectation, line.unit),
+        ]),
+      );
       if (progress.closure) {
-        ensure(80); section("Encerramento da expectativa");
-        text(`${progress.closure.actorName ?? "Nome não preservado"} · ${formatBrazilDate(progress.closure.recordedAt)}`, 9);
+        ensure(80);
+        section("Encerramento da expectativa");
+        text(
+          `${progress.closure.actorName ?? "Nome não preservado"} · ${formatBrazilDate(progress.closure.recordedAt)}`,
+          9,
+        );
         text("Motivo: " + progress.closure.reason, 9);
-        text(progress.physicalPending ? "Expectativa não adquirida encerrada. Parcelas em conferência ou aquisição sem chegada válida continuam pendentes. Não é conclusão física." : "Expectativa encerrada com quantidade inferior. A parte dispensada não foi recebida e não gerou entrada ou baixa de estoque.", 9);
+        text(
+          progress.physicalPending
+            ? "Expectativa não adquirida encerrada. Parcelas em conferência ou aquisição sem chegada válida continuam pendentes. Não é conclusão física."
+            : "Expectativa encerrada com quantidade inferior. A parte dispensada não foi recebida e não gerou entrada ou baixa de estoque.",
+          9,
+        );
       }
     }
-    for (const [index, receipt] of (snapshot.purchaseReceipts ?? []).entries()) {
-      ensure(100); section(`Parcela ${index + 1} · ${receiptStates[receipt.state] ?? receipt.state}`);
-      text(`Informada por ${receipt.submitted_name ?? "Autor histórico não preservado"} · ${formatBrazilDate(receipt.created_at)}`, 9);
+    for (const [index, receipt] of (
+      snapshot.purchaseReceipts ?? []
+    ).entries()) {
+      ensure(100);
+      section(
+        `Parcela ${index + 1} · ${receiptStates[receipt.state] ?? receipt.state}`,
+      );
+      text(
+        `Informada por ${receipt.submitted_name ?? "Autor histórico não preservado"} · ${formatBrazilDate(receipt.created_at)}`,
+        9,
+      );
       text("Identificador da parcela: " + receipt.id, 8);
-      table(["MATERIAL", "DECLARADO NESTA PARCELA", "UNIDADE"], [0.5, 0.3, 0.2], receipt.lines.map(item => {
-        const line = snapshot.lines.find(line => line.id === item.lineId);
-        return [line ? name(line) : "Material identificado na parcela", formatQuantity(item.quantity), String(line?.unit_snapshot ?? "Não preservada")];
-      }));
-      if (receipt.validated_at) text(`${receipt.state === "rejected" ? "Rejeitada" : "Validada"} por ${receipt.validated_name ?? "Nome histórico não preservado"} · ${formatBrazilDate(receipt.validated_at)}`, 9);
+      table(
+        ["MATERIAL", "DECLARADO NESTA PARCELA", "UNIDADE"],
+        [0.5, 0.3, 0.2],
+        receipt.lines.map((item) => {
+          const line = snapshot.lines.find((line) => line.id === item.lineId);
+          return [
+            line ? name(line) : "Material identificado na parcela",
+            formatQuantity(item.quantity),
+            String(line?.unit_snapshot ?? "Não preservada"),
+          ];
+        }),
+      );
+      if (receipt.validated_at)
+        text(
+          `${receipt.state === "rejected" ? "Rejeitada" : "Validada"} por ${receipt.validated_name ?? "Nome histórico não preservado"} · ${formatBrazilDate(receipt.validated_at)}`,
+          9,
+        );
       if (receipt.reason) text("Motivo: " + receipt.reason, 9);
     }
   } else {
@@ -632,14 +869,30 @@ export async function renderDocumentPdf(
       `${documentEventLabel(event.action, purchaseOrigin)} · v${event.version}`,
     ]),
   );
-  if (snapshot.type === "COM" && snapshot.purchaseProgress) ensure(300);
+  if (
+    (snapshot.type === "COM" && snapshot.purchaseProgress) ||
+    (snapshot.type === "ENT" && snapshot.deliveryCancellation)
+  )
+    ensure(300);
   section("Identificação e integridade");
   fields([
     ["Documento", snapshot.code],
     ["Versão", String(snapshot.version)],
     ["ID técnico", snapshot.id],
     ["Hash do conteúdo canônico", hash],
-    ...(snapshot.materialIdentity ? [["Identidade material REQ", snapshot.materialIdentity], ["Origem da referência material", snapshot.materialIdentitySource === "legacy_projection" ? "Projeção dos dados legados preservados" : snapshot.materialIdentitySource === "historical_import" ? "Dados conhecidos na importação histórica" : "Conteúdo da emissão no sistema"]] as [string, unknown][] : []),
+    ...(snapshot.materialIdentity
+      ? ([
+          ["Identidade material REQ", snapshot.materialIdentity],
+          [
+            "Origem da referência material",
+            snapshot.materialIdentitySource === "legacy_projection"
+              ? "Projeção dos dados legados preservados"
+              : snapshot.materialIdentitySource === "historical_import"
+                ? "Dados conhecidos na importação histórica"
+                : "Conteúdo da emissão no sistema",
+          ],
+        ] as [string, unknown][])
+      : []),
   ]);
   y -= 11;
   text(

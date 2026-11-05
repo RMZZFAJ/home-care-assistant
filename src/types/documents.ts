@@ -31,8 +31,25 @@ export type SupplyPayload = {
   source?: Custody;
   destination?: Custody;
   recipientId?: string;
-  balanceAssignment?: { id: string; version: number; referenceRevision: string };
-  balanceContext?: { cycleId: string; assignmentId: string; professionalId: string; professionalName: string; shiftId: string; shiftType: string; startsAt: string; endsAt: string; timezone: string; countedAt: string; weeks: string[]; kind: string };
+  balanceAssignment?: {
+    id: string;
+    version: number;
+    referenceRevision: string;
+  };
+  balanceContext?: {
+    cycleId: string;
+    assignmentId: string;
+    professionalId: string;
+    professionalName: string;
+    shiftId: string;
+    shiftType: string;
+    startsAt: string;
+    endsAt: string;
+    timezone: string;
+    countedAt: string;
+    weeks: string[];
+    kind: string;
+  };
 };
 export type DocumentEvent = {
   id: string;
@@ -56,17 +73,86 @@ export type PurchaseReceipt = {
   reason?: string | null;
 };
 export type PurchaseProgressLine = {
-  lineId: string; name: string; unit: string;
-  plannedQuantity: string | number; approvedQuantity: string | number;
-  purchasedQuantity: string | number; validatedQuantity: string | number;
-  pendingValidationQuantity: string | number; unarrivedQuantity: string | number;
-  waivedQuantity: string | number; waivableQuantity: string | number;
+  lineId: string;
+  name: string;
+  unit: string;
+  plannedQuantity: string | number;
+  approvedQuantity: string | number;
+  purchasedQuantity: string | number;
+  validatedQuantity: string | number;
+  pendingValidationQuantity: string | number;
+  unarrivedQuantity: string | number;
+  waivedQuantity: string | number;
+  waivableQuantity: string | number;
   remainingExpectation: string | number;
 };
 export type PurchaseProgress = {
-  state: string; expectationClosed: boolean; expectationPending: boolean;
-  physicalPending: boolean; validationPending: boolean; lines: PurchaseProgressLine[];
-  closure: { actorId: string; actorName: string | null; recordedAt: string; reason: string; referenceVersion: number } | null;
+  state: string;
+  expectationClosed: boolean;
+  expectationPending: boolean;
+  physicalPending: boolean;
+  validationPending: boolean;
+  lines: PurchaseProgressLine[];
+  closure: {
+    actorId: string;
+    actorName: string | null;
+    recordedAt: string;
+    reason: string;
+    referenceVersion: number;
+  } | null;
+};
+export type DeliveryConsumptionReference = {
+  movementId: string;
+  reportId: string;
+  recordedAt: string;
+  quantity: string;
+};
+export type DeliveryCancellationLine = {
+  lineId: string;
+  productId: string;
+  name: string;
+  unit: string;
+  acceptedQuantity: string;
+  availableConsumedQuantity?: string;
+  minimumReturnQuantity?: string;
+  quantityDecimals?: number;
+  unresolvedTransit?: string;
+  sourceReady?: boolean;
+  returnQuantity?: string;
+  consumedQuantity?: string;
+  consumptionReferences: DeliveryConsumptionReference[];
+  returnMovementIds?: string[];
+};
+export type DeliveryCancellationRequest = {
+  id: string;
+  source: "server_record" | "legacy_event";
+  sourceEventId?: string;
+  requestedBy: string | null;
+  requestedName: string | null;
+  requestedAt: string;
+  requestedVersion: number;
+  previousStatus: string | null;
+  reason: string;
+  status: "pending" | "consented" | "refused" | "withdrawn";
+  outcome?: {
+    action: string;
+    actorId: string;
+    actorName: string | null;
+    recordedAt: string;
+    reason: string;
+    version: number;
+    lines: DeliveryCancellationLine[];
+  };
+};
+export type DeliveryCancellationContext = {
+  request: DeliveryCancellationRequest;
+  history: DeliveryCancellationRequest[];
+  lines: DeliveryCancellationLine[];
+  sourceReady: boolean;
+  sourceAccess?: boolean;
+  unresolvedTransit?: string;
+  referenceHash: string | null;
+  referenceVersion?: number;
 };
 export type SupplyDocument = {
   id: string;
@@ -89,6 +175,14 @@ export type SupplyDocument = {
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];
   purchaseProgress?: PurchaseProgress;
+  deliveryCancellation?: DeliveryCancellationContext | null;
+  commandOutcome?: {
+    state: "committed" | "recovered";
+    action: string;
+    eventId?: string;
+    version: number;
+    requestId: string | null;
+  };
   approvals: {
     review_group: string;
     actor_id: string;
@@ -141,8 +235,10 @@ export const documentStatuses: Record<string, string> = {
   purchased: "Compra efetivada",
   partially_received: "Recebimento parcial",
   closed_below_quantity: "Encerrada com quantidade inferior",
-  closed_pending_validation: "Expectativa encerrada · parcelas aguardam conferência",
-  closed_pending_arrival: "Expectativa encerrada · aquisição aguarda chegada válida",
+  closed_pending_validation:
+    "Expectativa encerrada · parcelas aguardam conferência",
+  closed_pending_arrival:
+    "Expectativa encerrada · aquisição aguarda chegada válida",
   pending_validation: "Parcela aguardando conferência",
   received: "Recebido",
   pending_receipt: "Aguardando recebimento",

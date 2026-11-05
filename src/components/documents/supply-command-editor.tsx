@@ -11,9 +11,13 @@ import {
 } from "@/components/workspace";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
 import type { PatientPerson, SupplyDocument } from "@/types/documents";
-import { acquisitionRemaining, arrivalRemaining } from "@/lib/documents/purchase";
+import {
+  acquisitionRemaining,
+  arrivalRemaining,
+} from "@/lib/documents/purchase";
 import { formatBrazilDate } from "@/lib/receipt";
 import { PurchaseReceiptContent } from "./purchase-details";
+import { DeliveryConsumptionReferences } from "./delivery-cancellation";
 
 export type DocumentAction =
   | "submit"
@@ -29,7 +33,9 @@ export type DocumentAction =
   | "approve_family"
   | "approve_supervisor"
   | "cancel"
-  | "consent_cancel";
+  | "consent_cancel"
+  | "refuse_cancellation"
+  | "withdraw_cancellation";
 export function CommandEditor({
   action,
   data,
@@ -38,6 +44,7 @@ export function CommandEditor({
   onCancel,
   onReview,
   formRef,
+  reviewDisabled = false,
 }: {
   action: DocumentAction;
   data: SupplyDocument;
@@ -46,12 +53,18 @@ export function CommandEditor({
   onCancel: () => void;
   onReview: (action: string, body: unknown, summary: string) => void;
   formRef?: Ref<HTMLFormElement>;
+  reviewDisabled?: boolean;
 }) {
   const [error, setError] = useState("");
   const instanceId = useId();
   const [reasonText, setReasonText] = useState("");
-  const [receiptId, setReceiptId] = useState(data.receipts.find(receipt => receipt.state === "pending")?.id ?? "");
-  const selectedReceipt = data.receipts.find(receipt => receipt.id === receiptId && receipt.state === "pending");
+  const [returns, setReturns] = useState<Record<string, string>>({});
+  const [receiptId, setReceiptId] = useState(
+    data.receipts.find((receipt) => receipt.state === "pending")?.id ?? "",
+  );
+  const selectedReceipt = data.receipts.find(
+    (receipt) => receipt.id === receiptId && receipt.state === "pending",
+  );
   const [divergent, setDivergent] = useState<string[]>([]);
   const [selectedLine, setSelectedLine] = useState(
     data.lines.find((line) => line.metadata.issueOpen)?.id ?? "",
@@ -89,8 +102,17 @@ export function CommandEditor({
             if (!value && action !== "approve") return [];
             if (!validQuantity(value, 6, true))
               throw new Error("Confira a quantidade de " + line.name_snapshot);
-            const limit = action === "approve" ? quantity(line.quantity) : action === "purchase" ? acquisitionRemaining(line) : arrivalRemaining(line, data);
-            if (quantity(value).gt(limit)) throw new Error("A quantidade supera o limite deste ato para " + line.name_snapshot);
+            const limit =
+              action === "approve"
+                ? quantity(line.quantity)
+                : action === "purchase"
+                  ? acquisitionRemaining(line)
+                  : arrivalRemaining(line, data);
+            if (quantity(value).gt(limit))
+              throw new Error(
+                "A quantidade supera o limite deste ato para " +
+                  line.name_snapshot,
+              );
             return [{ lineId: line.id, quantity: quantity(value).toFixed() }];
           })
           .filter(
@@ -112,7 +134,11 @@ export function CommandEditor({
             );
           })
           .join("\n");
-        if (action === "receive" && data.type === "COM") summary += context.patient?.role === "admin" && can(context, "com.validate") ? "\nEsta chegada será validada imediatamente pela sua permissão administrativa, com entrada das quantidades declaradas no estoque familiar." : "\nRegistrar esta chegada para conferência, sem entrada no estoque até a validação autorizada.";
+        if (action === "receive" && data.type === "COM")
+          summary +=
+            context.patient?.role === "admin" && can(context, "com.validate")
+              ? "\nEsta chegada será validada imediatamente pela sua permissão administrativa, com entrada das quantidades declaradas no estoque familiar."
+              : "\nRegistrar esta chegada para conferência, sem entrada no estoque até a validação autorizada.";
       } else if (action === "receive" || action === "divergence") {
         command = "receive";
         if (action === "divergence" && !divergent.length)
@@ -134,7 +160,8 @@ export function CommandEditor({
             ? "Confirmar o recebimento integral de todas as linhas e incorporar as quantidades ao estoque do destino."
             : "Aceitar integralmente as linhas não marcadas. Nas linhas selecionadas, incorporar imediatamente apenas a quantidade informada e abrir divergência para resolução.";
       } else if (action === "validate_receipt" || action === "reject_receipt") {
-        if (!selectedReceipt) throw new Error("Selecione uma parcela pendente para conferir.");
+        if (!selectedReceipt)
+          throw new Error("Selecione uma parcela pendente para conferir.");
         body = {
           receiptId: selectedReceipt.id,
           ...(action === "reject_receipt" ? { reason } : {}),
@@ -144,15 +171,44 @@ export function CommandEditor({
             ? "Validar este recebimento e incorporar suas quantidades ao estoque familiar."
             : "Rejeitar o recebimento indicado, sem entrada no estoque. Motivo: " +
               reason;
-        summary += "\nParcela informada por " + (selectedReceipt.submitted_name ?? "autor histórico não preservado") + " em " + formatBrazilDate(selectedReceipt.created_at) + ".\n" + selectedReceipt.lines.map(item => {
-          const line = data.lines.find(line => line.id === item.lineId);
-          return (line?.name_snapshot ?? "Material registrado") + ": " + formatQuantity(item.quantity, line?.unit_snapshot);
-        }).join("\n");
+        summary +=
+          "\nParcela informada por " +
+          (selectedReceipt.submitted_name ?? "autor histórico não preservado") +
+          " em " +
+          formatBrazilDate(selectedReceipt.created_at) +
+          ".\n" +
+          selectedReceipt.lines
+            .map((item) => {
+              const line = data.lines.find((line) => line.id === item.lineId);
+              return (
+                (line?.name_snapshot ?? "Material registrado") +
+                ": " +
+                formatQuantity(item.quantity, line?.unit_snapshot)
+              );
+            })
+            .join("\n");
       } else if (action === "close_expectation") {
-        if (!data.purchaseProgress?.expectationPending || data.purchaseProgress.expectationClosed) throw new Error("Não existe expectativa restante elegível para encerrar nesta versão.");
-        if (form.get("confirmed") !== "on") throw new Error("Confirme expressamente o resumo antes de encerrar a expectativa.");
+        if (
+          !data.purchaseProgress?.expectationPending ||
+          data.purchaseProgress.expectationClosed
+        )
+          throw new Error(
+            "Não existe expectativa restante elegível para encerrar nesta versão.",
+          );
+        if (form.get("confirmed") !== "on")
+          throw new Error(
+            "Confirme expressamente o resumo antes de encerrar a expectativa.",
+          );
         body = { reason, confirmed: true };
-        summary = data.purchaseProgress.lines.map(line => `${line.name}: aprovado ${formatQuantity(line.approvedQuantity, line.unit)}; adquirido ${formatQuantity(line.purchasedQuantity, line.unit)}; validado ${formatQuantity(line.validatedQuantity, line.unit)}; em conferência ${formatQuantity(line.pendingValidationQuantity, line.unit)}; não será adquirido ${formatQuantity(line.waivableQuantity, line.unit)}.`).join("\n") + "\n\nDispensar somente a expectativa não adquirida, sem entrada ou baixa de material. Parcelas pendentes continuam exigindo conferência.\nMotivo: " + reason;
+        summary =
+          data.purchaseProgress.lines
+            .map(
+              (line) =>
+                `${line.name}: aprovado ${formatQuantity(line.approvedQuantity, line.unit)}; adquirido ${formatQuantity(line.purchasedQuantity, line.unit)}; validado ${formatQuantity(line.validatedQuantity, line.unit)}; em conferência ${formatQuantity(line.pendingValidationQuantity, line.unit)}; não será adquirido ${formatQuantity(line.waivableQuantity, line.unit)}.`,
+            )
+            .join("\n") +
+          "\n\nDispensar somente a expectativa não adquirida, sem entrada ou baixa de material. Parcelas pendentes continuam exigindo conferência.\nMotivo: " +
+          reason;
       } else if (action === "reassign") {
         body = { recipientId: form.get("recipientId"), reason };
         summary =
@@ -177,17 +233,70 @@ export function CommandEditor({
         summary =
           "Registrar cancelamento. Caso já exista aceite na ENT, o documento aguardará o consentimento autenticado do recebedor e a conciliação dos materiais. Motivo: " +
           reason;
+      } else if (
+        action === "refuse_cancellation" ||
+        action === "withdraw_cancellation"
+      ) {
+        const request = data.deliveryCancellation?.request;
+        if (!request || request.status !== "pending")
+          throw new Error(
+            "Não existe pedido de cancelamento vigente para esta ação. Atualize a ficha.",
+          );
+        body = { reason, requestId: request.id };
+        summary = `${action === "refuse_cancellation" ? "Recusar" : "Retirar meu"} pedido de cancelamento de ${request.requestedName ?? "nome não preservado"}, ${formatBrazilDate(request.requestedAt)}. Motivo original: ${request.reason}\nJustificativa desta decisão: ${reason}\nA ficha retorna à conferência vigente; esta decisão não movimenta estoque.`;
       } else if (action === "consent_cancel") {
+        const reference = data.deliveryCancellation;
+        if (
+          !reference?.sourceReady ||
+          !reference.referenceHash ||
+          reference.request.status !== "pending"
+        )
+          throw new Error(
+            "Atualize as referências da conciliação. Os dados de origem não podem ser editados aqui.",
+          );
+        if (quantity(reference.unresolvedTransit ?? "0").gt(0))
+          throw new Error(
+            "Concilie a situação real do material em trânsito antes de consentir.",
+          );
+        const returned = data.lines.map((line) => {
+          const source = reference.lines.find(
+              (item) => item.lineId === line.id,
+            ),
+            raw = quantity(line.accepted_quantity).isZero()
+              ? "0"
+              : (returns[line.id] ?? "");
+          if (
+            !source ||
+            !validQuantity(raw, source.quantityDecimals ?? 6, true) ||
+            quantity(raw).gt(line.accepted_quantity) ||
+            quantity(raw).lt(source.minimumReturnQuantity ?? "0")
+          ) {
+            (
+              event.currentTarget.elements.namedItem(
+                line.id + ":return",
+              ) as HTMLInputElement | null
+            )?.focus();
+            throw new Error(
+              "Confira a devolução real e o consumo já confirmado disponível para a linha indicada.",
+            );
+          }
+          return { lineId: line.id, returnQuantity: quantity(raw).toFixed() };
+        });
         body = {
           reason,
-          lines: data.lines.map((line) => ({
-            lineId: line.id,
-            returnQuantity: String(form.get(line.id + ":return") ?? "0"),
-            consumedQuantity: String(form.get(line.id + ":consumed") ?? "0"),
-          })),
+          requestId: reference.request.id,
+          referenceHash: reference.referenceHash,
+          lines: returned,
         };
         summary =
-          "Consentir com o cancelamento e registrar as devoluções reais informadas. Consumo só pode ser conciliado se já registrado e confirmado no ledger.";
+          `Consentir com o pedido de ${reference.request.requestedName ?? "nome não preservado"}, ${formatBrazilDate(reference.request.requestedAt)}. Motivo original: ${reference.request.reason}\n` +
+          returned
+            .map((item) => {
+              const line = data.lines.find((line) => line.id === item.lineId)!;
+              return `${line.name_snapshot}: devolução real ${formatQuantity(item.returnQuantity, line.unit_snapshot)}; consumo já confirmado referenciado ${formatQuantity(quantity(line.accepted_quantity).minus(item.returnQuantity).toFixed(), line.unit_snapshot)}.`;
+            })
+            .join("\n") +
+          `\nJustificativa da conciliação: ${reason}\nSomente a devolução real movimenta estoque. O consumo anterior é referenciado uma vez, sem novo desconto.`;
       }
       onReview(command, body, summary);
     } catch (reason) {
@@ -203,6 +312,8 @@ export function CommandEditor({
     "resolve",
     "cancel",
     "consent_cancel",
+    "refuse_cancellation",
+    "withdraw_cancellation",
   ].includes(action);
   const recipientRole =
     data.payload.destination === "FAMILY"
@@ -230,8 +341,12 @@ export function CommandEditor({
                   ? acquisitionRemaining(line).toFixed()
                   : arrivalRemaining(line, data).toFixed();
             return (
-              <div key={line.id} className="space-y-1"><label htmlFor={instanceId + line.id} className="block text-sm font-semibold">
-                {line.name_snapshot} · {line.unit_snapshot}
+              <div key={line.id} className="space-y-1">
+                <label
+                  htmlFor={instanceId + line.id}
+                  className="block text-sm font-semibold"
+                >
+                  {line.name_snapshot} · {line.unit_snapshot}
                 </label>
                 <input
                   id={instanceId + line.id}
@@ -244,7 +359,18 @@ export function CommandEditor({
                   required={action === "approve"}
                   aria-describedby={instanceId + line.id + "-help"}
                 />
-                <p id={instanceId + line.id + "-help"} className="text-xs text-(--muted)">Limite deste ato: {formatQuantity(remaining, line.unit_snapshot)}. {action === "receive" ? "Informe somente o que chegou nesta parcela. Deixe vazio se não chegou." : action === "purchase" ? "Informe somente o adquirido agora. Deixe vazio para as outras linhas." : "Aprovar não registra aquisição ou entrada no estoque."}</p>
+                <p
+                  id={instanceId + line.id + "-help"}
+                  className="text-xs text-(--muted)"
+                >
+                  Limite deste ato:{" "}
+                  {formatQuantity(remaining, line.unit_snapshot)}.{" "}
+                  {action === "receive"
+                    ? "Informe somente o que chegou nesta parcela. Deixe vazio se não chegou."
+                    : action === "purchase"
+                      ? "Informe somente o adquirido agora. Deixe vazio para as outras linhas."
+                      : "Aprovar não registra aquisição ou entrada no estoque."}
+                </p>
               </div>
             );
           })
@@ -300,21 +426,95 @@ export function CommandEditor({
           ))
         : null}
       {["validate_receipt", "reject_receipt"].includes(action) ? (
-        <div className="space-y-3"><label className="block text-sm font-semibold">
-          Recebimento pendente
-          <select className={inputClass} name="receiptId" required value={receiptId} onChange={event => setReceiptId(event.target.value)}>
-            {data.receipts
-              .filter((receipt) => receipt.state === "pending")
-              .map((receipt) => (
-                <option key={receipt.id} value={receipt.id}>
-                  {receipt.lines.length} produto(s) ·{" "}
-                  {new Date(receipt.created_at).toLocaleString("pt-BR")}
-                </option>
-              ))}
-          </select>
-        </label>{selectedReceipt ? <section className="space-y-2"><h3 className="font-semibold">Parcela selecionada</h3><PurchaseReceiptContent receipt={selectedReceipt} lines={data.lines} /></section> : <Notice error>Não há parcela pendente disponível para esta decisão.</Notice>}</div>
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold">
+            Recebimento pendente
+            <select
+              className={inputClass}
+              name="receiptId"
+              required
+              value={receiptId}
+              onChange={(event) => setReceiptId(event.target.value)}
+            >
+              {data.receipts
+                .filter((receipt) => receipt.state === "pending")
+                .map((receipt) => (
+                  <option key={receipt.id} value={receipt.id}>
+                    {receipt.lines.length} produto(s) ·{" "}
+                    {new Date(receipt.created_at).toLocaleString("pt-BR")}
+                  </option>
+                ))}
+            </select>
+          </label>
+          {selectedReceipt ? (
+            <section className="space-y-2">
+              <h3 className="font-semibold">Parcela selecionada</h3>
+              <PurchaseReceiptContent
+                receipt={selectedReceipt}
+                lines={data.lines}
+              />
+            </section>
+          ) : (
+            <Notice error>
+              Não há parcela pendente disponível para esta decisão.
+            </Notice>
+          )}
+        </div>
       ) : null}
-      {action === "close_expectation" ? <section className="space-y-3"><h3 className="font-semibold">Expectativa que não será adquirida</h3>{data.purchaseProgress?.lines.map(line => <article key={line.lineId} className="rounded-xl border border-(--line) p-4 text-sm"><strong>{line.name}</strong><dl className="mt-2 grid grid-cols-2 gap-3"><div><dt>Aprovado</dt><dd>{formatQuantity(line.approvedQuantity, line.unit)}</dd></div><div><dt>Adquirido</dt><dd>{formatQuantity(line.purchasedQuantity, line.unit)}</dd></div><div><dt>Validado</dt><dd>{formatQuantity(line.validatedQuantity, line.unit)}</dd></div><div><dt>Em conferência</dt><dd>{formatQuantity(line.pendingValidationQuantity, line.unit)}</dd></div><div><dt>Não será adquirido</dt><dd className="font-semibold">{formatQuantity(line.waivableQuantity, line.unit)}</dd></div></dl></article>)}<Notice>Encerrar não recebe materiais nem altera o estoque. Aquisições já registradas e parcelas pendentes continuam exigindo chegada e conferência.</Notice><label className="flex items-start gap-2 text-sm"><input key={data.version} type="checkbox" name="confirmed" required />Conferi o resumo e confirmo dispensar somente a expectativa não adquirida.</label></section> : null}
+      {action === "close_expectation" ? (
+        <section className="space-y-3">
+          <h3 className="font-semibold">Expectativa que não será adquirida</h3>
+          {data.purchaseProgress?.lines.map((line) => (
+            <article
+              key={line.lineId}
+              className="rounded-xl border border-(--line) p-4 text-sm"
+            >
+              <strong>{line.name}</strong>
+              <dl className="mt-2 grid grid-cols-2 gap-3">
+                <div>
+                  <dt>Aprovado</dt>
+                  <dd>{formatQuantity(line.approvedQuantity, line.unit)}</dd>
+                </div>
+                <div>
+                  <dt>Adquirido</dt>
+                  <dd>{formatQuantity(line.purchasedQuantity, line.unit)}</dd>
+                </div>
+                <div>
+                  <dt>Validado</dt>
+                  <dd>{formatQuantity(line.validatedQuantity, line.unit)}</dd>
+                </div>
+                <div>
+                  <dt>Em conferência</dt>
+                  <dd>
+                    {formatQuantity(line.pendingValidationQuantity, line.unit)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Não será adquirido</dt>
+                  <dd className="font-semibold">
+                    {formatQuantity(line.waivableQuantity, line.unit)}
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+          <Notice>
+            Encerrar não recebe materiais nem altera o estoque. Aquisições já
+            registradas e parcelas pendentes continuam exigindo chegada e
+            conferência.
+          </Notice>
+          <label className="flex items-start gap-2 text-sm">
+            <input
+              key={data.version}
+              type="checkbox"
+              name="confirmed"
+              required
+            />
+            Conferi o resumo e confirmo dispensar somente a expectativa não
+            adquirida.
+          </label>
+        </section>
+      ) : null}
       {action === "reassign" ? (
         <label className="block text-sm font-semibold">
           Novo destinatário
@@ -372,21 +572,38 @@ export function CommandEditor({
             Quantidade conciliada neste ato
             <input
               className={inputClass}
-              type="number"
+              type="text"
               name="quantity"
               inputMode="decimal"
-              min="0"
-              step="any"
+              autoComplete="off"
               required
             />
           </label>
         </>
       ) : null}
+      {[
+        "consent_cancel",
+        "refuse_cancellation",
+        "withdraw_cancellation",
+      ].includes(action) && data.deliveryCancellation ? (
+        <section className="space-y-2">
+          <h3 className="font-semibold">Pedido original em leitura</h3>
+          <p>
+            {data.deliveryCancellation.request.requestedName ??
+              "Nome não preservado"}{" "}
+            · {formatBrazilDate(data.deliveryCancellation.request.requestedAt)}
+          </p>
+          <p className="whitespace-pre-wrap">
+            {data.deliveryCancellation.request.reason}
+          </p>
+        </section>
+      ) : null}
       {action === "consent_cancel" ? (
         <>
           <Notice>
-            A soma devolvida e consumida deve corresponder ao aceite de cada
-            produto. Registre o consumo real antes de usar esta opção.
+            Informe somente as devoluções físicas reais. A parte do aceite que
+            não será devolvida precisa de consumo já confirmado nas referências
+            abaixo; esta conciliação não registra um novo consumo.
           </Notice>
           {data.lines.map((line) => (
             <fieldset
@@ -397,39 +614,93 @@ export function CommandEditor({
                 {line.name_snapshot} · aceito{" "}
                 {formatQuantity(line.accepted_quantity)}
               </legend>
-              <label className="text-sm">
-                Devolução real
-                <input
-                  name={line.id + ":return"}
-                  className={inputClass}
-                  type="number"
-                  min="0"
-                  step="any"
-                  defaultValue={line.accepted_quantity}
-                  required
-                />
-              </label>
-              <label className="text-sm">
-                Consumo já confirmado
-                <input
-                  name={line.id + ":consumed"}
-                  className={inputClass}
-                  type="number"
-                  min="0"
-                  step="any"
-                  defaultValue="0"
-                  required
-                />
-              </label>
+              <div>
+                <p>
+                  Consumo já confirmado disponível:{" "}
+                  {formatQuantity(
+                    data.deliveryCancellation?.lines.find(
+                      (item) => item.lineId === line.id,
+                    )?.availableConsumedQuantity,
+                    line.unit_snapshot,
+                  )}
+                </p>
+                {data.deliveryCancellation?.lines.find(
+                  (item) => item.lineId === line.id,
+                ) ? (
+                  <DeliveryConsumptionReferences
+                    line={
+                      data.deliveryCancellation.lines.find(
+                        (item) => item.lineId === line.id,
+                      )!
+                    }
+                  />
+                ) : null}
+              </div>
+              {quantity(line.accepted_quantity).gt(0) ? (
+                <label className="text-sm">
+                  Devolução física real · {line.name_snapshot} ·{" "}
+                  {line.unit_snapshot}
+                  <input
+                    name={line.id + ":return"}
+                    className={inputClass}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    aria-describedby={instanceId + line.id + "-return-help"}
+                    value={returns[line.id] ?? ""}
+                    onChange={(event) =>
+                      setReturns((values) => ({
+                        ...values,
+                        [line.id]: event.target.value,
+                      }))
+                    }
+                    required
+                  />
+                </label>
+              ) : (
+                <p>
+                  Sem quantidade aceita nesta linha: devolução e consumo
+                  conciliados são zero.
+                </p>
+              )}
+              <p
+                id={instanceId + line.id + "-return-help"}
+                className="hca-field-hint"
+              >
+                Informe a devolução em {line.unit_snapshot}, com até{" "}
+                {data.deliveryCancellation?.lines.find(
+                  (item) => item.lineId === line.id,
+                )?.quantityDecimals ?? 6}{" "}
+                casas decimais. Aceita vírgula ou ponto.
+              </p>
+              <p className="text-sm">
+                Parcela do aceite a conciliar com consumo confirmado:{" "}
+                {quantity(line.accepted_quantity).isZero()
+                  ? formatQuantity("0", line.unit_snapshot)
+                  : returns[line.id] !== undefined &&
+                      validQuantity(returns[line.id], 6, true) &&
+                      quantity(returns[line.id]).lte(line.accepted_quantity)
+                    ? formatQuantity(
+                        quantity(line.accepted_quantity)
+                          .minus(quantity(returns[line.id]))
+                          .toFixed(),
+                        line.unit_snapshot,
+                      )
+                    : "Aguardando declaração da devolução real"}
+              </p>
             </fieldset>
           ))}
         </>
       ) : null}
       {needsReason ? (
         <label className="block text-sm font-semibold">
-          {action === "divergence"
-            ? "Observações da divergência"
-            : "Motivo / justificativa"}
+          {action === "refuse_cancellation"
+            ? "Motivo da recusa"
+            : action === "withdraw_cancellation"
+              ? "Motivo da retirada"
+              : action === "divergence"
+                ? "Observações da divergência"
+                : "Motivo / justificativa"}
           <textarea
             className={inputClass}
             name="reason"
@@ -447,7 +718,11 @@ export function CommandEditor({
         <button className={buttonClass} type="button" onClick={onCancel}>
           Fechar ação
         </button>
-        <button className={primaryClass} type="submit">
+        <button
+          className={primaryClass}
+          type="submit"
+          disabled={reviewDisabled}
+        >
           Revisar operação
         </button>
       </div>

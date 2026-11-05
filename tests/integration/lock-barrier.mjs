@@ -39,7 +39,7 @@ export async function whileAdvisoryWaits(lockName, send, whileWaiting) {
 // These existing rows expose later waits after the patient's advisory lock.
 export async function whileRowWaits(target, id, requestName, send, whileWaiting) {
   getTestEnvironment();
-  const table = { catalogue: "public.care_recipient_products", purchase_receipts: "public.purchase_receipts", consumption_reports: "public.consumption_reports" }[target];
+  const table = { catalogue: "public.care_recipient_products", purchase_receipts: "public.purchase_receipts", consumption_reports: "public.consumption_reports", stock_movements:"public.stock_movements" }[target];
   assert.ok(table && ["create_supply_document", "supply_document_command", "decide_consumption_report", "supplement_consumption_report"].includes(requestName));
   const holder = spawn("docker", ["exec", "-i", testContainer, "psql", "-U", "postgres", "-d", "postgres", "-X", "-qAt", "-v", "ON_ERROR_STOP=1"], { stdio: ["pipe", "pipe", "pipe"] });
   const closed = new Promise(resolve => holder.once("close", resolve));

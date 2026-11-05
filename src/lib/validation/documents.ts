@@ -4,12 +4,18 @@ import { quantity } from "@/lib/quantity";
 const identifier = z.string().uuid();
 export const exactQuantity = z
   .union([
-    z.string().max(64).regex(/^\d+(?:[.,]\d+)?$/),
+    z
+      .string()
+      .max(64)
+      .regex(/^\d+(?:[.,]\d+)?$/),
     z.number().finite().min(0).max(1_000_000_000),
   ])
   .transform((value) => quantity(value).toFixed())
   .refine(
-    (value) => quantity(value).gte(0) && quantity(value).lte(1_000_000_000) && quantity(value).decimalPlaces() <= 6,
+    (value) =>
+      quantity(value).gte(0) &&
+      quantity(value).lte(1_000_000_000) &&
+      quantity(value).decimalPlaces() <= 6,
     "Informe uma quantidade válida com até seis casas decimais.",
   );
 const line = z
@@ -28,7 +34,14 @@ export const supplyPayload = z
     source: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     destination: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     recipientId: identifier.optional(),
-    balanceAssignment: z.object({ id: identifier, version: z.number().int().positive(), referenceRevision: z.string().regex(/^\d+$/).max(20) }).strict().optional(),
+    balanceAssignment: z
+      .object({
+        id: identifier,
+        version: z.number().int().positive(),
+        referenceRevision: z.string().regex(/^\d+$/).max(20),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 export const createSupplySchema = z
@@ -42,7 +55,11 @@ export const createSupplySchema = z
   .strict()
   .superRefine((value, ctx) => {
     if (value.type !== "BAL" && value.payload.balanceAssignment)
-      ctx.addIssue({ code: "custom", path: ["payload", "balanceAssignment"], message: "A atribuição de contagem pertence somente ao BAL." });
+      ctx.addIssue({
+        code: "custom",
+        path: ["payload", "balanceAssignment"],
+        message: "A atribuição de contagem pertence somente ao BAL.",
+      });
     if (
       new Set(value.payload.lines.map((item) => item.productId)).size !==
       value.payload.lines.length
@@ -93,6 +110,8 @@ export const supplyCommandSchema = z
       "resolve",
       "cancel",
       "consent_cancel",
+      "refuse_cancellation",
+      "withdraw_cancellation",
     ]),
     idempotencyKey: identifier,
     expectedVersion: z.number().int().positive(),
@@ -130,7 +149,9 @@ export const supplyCommandSchema = z
       ]),
       validate_receipt: z.object({ receiptId: identifier }).strict(),
       reject_receipt: z.object({ receiptId: identifier, reason }).strict(),
-      close_expectation: z.object({ reason, confirmed: z.literal(true) }).strict(),
+      close_expectation: z
+        .object({ reason, confirmed: z.literal(true) })
+        .strict(),
       reassign: z.object({ recipientId: identifier, reason }).strict(),
       resolve: z
         .object({
@@ -141,16 +162,21 @@ export const supplyCommandSchema = z
         })
         .strict(),
       cancel: z.object({ reason }).strict(),
+      refuse_cancellation: z.object({ reason, requestId: identifier }).strict(),
+      withdraw_cancellation: z
+        .object({ reason, requestId: identifier })
+        .strict(),
       consent_cancel: z
         .object({
           reason,
+          requestId: identifier,
+          referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
           lines: z
             .array(
               z
                 .object({
                   lineId: identifier,
                   returnQuantity: exactQuantity,
-                  consumedQuantity: exactQuantity,
                 })
                 .strict(),
             )

@@ -605,3 +605,81 @@ O fluxo Flow foi atualizado para abrir o relato e revisar sua versão em
 leitura, conservando as provas de saldo 5 antes da decisão e 3 depois.
 O caso afetado passou localmente, com os asserts de saldo 5→3 e decisão em
 leitura. CI geral não foi reexecutada localmente nem declarada aprovada.
+
+## D2.5 — ENT: cancelamento, consumo e decisões pessoais em implementação
+
+Reparo Flow publicado em 7c22f54f868fdf3da24bb167e947213022335cc5; PR 7
+continua Draft. Consulta pontual da CI 42111139110: concluída com success.
+O incremento abaixo não conclui o lote ENT ou a D-A.
+
+Primeiro ensaio usou familiar sem ent.cancel; corrigida a fixture para o
+administrador autorizado antes de aceitar a contraprova. Regressão então
+reproduziu 42702 em e.body, com rollback do ledger. Migration 20261105204958
+corrige só o alias SQL. O caso positivo 2 aceitos/1 consumido/1 devolvido passou;
+a contraprova seguinte confirmou defeito temporal independente: cancelamento
+anterior era subtraído da janela de consumo da ENT nova e a conciliação válida
+era recusada. Não se atribui débito duplicado ao alias como causa presumida.
+
+Migration 20261105205707 cria referências append-only ao consumo já confirmado,
+pedido com identidade/autor/instante/motivo e recusa/retirada pessoais. Consumo
+a conciliar é calculado de aceite menos devolução real, nunca input debitável.
+Fonte disponível é restrita a paciente/produto/custódia e após aceite efetivo;
+uma referência não pode ser reutilizada por outra conciliação. Referências
+históricas sem vínculo individual recebem reserva virtual dentro da janela
+original, sem preencher o passado com IDs ou autoria inventados. Evidência
+histórica insuficiente bloqueia conciliação automática, sem virar zero.
+
+Pedidos e decisões não apagam recebimento. Retirada é do solicitante e recusa/
+consentimento são do recebedor original. Acesso global não substitui identidade
+pessoal. Material ainda em trânsito exige conciliação real; resolver divergência
+durante a espera preserva o pedido e sua versão. Recusa/retirada reavaliam os
+fatos atuais para retomar a conferência. Retry confirmado requer acesso vivo ao
+resultado, sem exigir elegibilidade de uma escrita nova já encerrada.
+
+Quatorze integrações dirigidas Auth passaram: duas contraprovas originais,
+recusa/retirada, corrida de pedidos, oposição, replay com capacidade removida,
+mudança de fonte sem mudar versão documental, não reutilização de consumo,
+trânsito parcial, precisão, corpo forjado, grants e duas revogações após espera
+real (paciente e FK tardia do movimento). Fixture legada usa motor retido em
+contexto controlado, explicitamente separado das provas Auth RPC novas; nenhum
+grant foi relaxado para fazê-la. Histórico do evento antigo foi comparado.
+
+Identidades desconhecidas também usam comparação NULL-safe. Um ensaio local de
+aplicação da função falhou por encoding da saída Python e foi revertido pela
+transação; a aplicação seguinte usou texto Unicode do PowerShell. A regressão
+específica NULL e a repetição afetada passaram, totalizando 15 casos únicos.
+O 16º caso dirigido também passou: 3 aceitos/1 consumido/1 devolvido não podem
+apagar uma unidade sem fato; o comando rejeita sem efeito e conciliação completa
+com retorno real de 2 referencia só o consumo anterior de 1.
+
+Cinco casos Chromium passaram em rodadas dirigidas: pedido e consentimento com
+resposta perdida, recusa concorrente/retirada, fonte alterada sem nova versão,
+trânsito real durante pedido e fonte inicialmente indisponível. Revisão usa
+consumo em leitura e motivo próprio; conflito exige comparar/adotar, conserva
+edição e reposiciona foco. Outro contexto observa a decisão. O primeiro caso
+expôs crash Decimal com vírgula; normalização corrigida e só esse caso repetido.
+Os outros três da primeira rodada não foram repetidos. Atualização da seção
+durante edição também consulta/compara, sem trocar silenciosamente a fonte.
+
+Cinco testes da fronteira API, SQL document-invariants, tipos e lint dirigido
+passaram. Advisor local: exit 0, apenas WARN histórico de unaccent no public.
+Guard de contratos preserva as 84 migrations históricas. Replay limpo/legado e
+suítes completas não foram duplicados; são responsabilidade da CI do novo SHA.
+
+Capturas de revisão/resultado foram inspecionadas a 320 px; tarefa auditada
+também a 390/768/1440. PDFs reais do cenário fictício foram confrontados com
+snapshots imutáveis, autores, débitos/retorno e hashes registrados. A primeira
+conferência detectou estado de recebimento incorreto e bloco de integridade
+quebrado; corrigidos e repetido somente o caso gerador. Todas as seis páginas
+dos novos exemplares 2d9b53f5, versões 3/4, foram renderizadas e inspecionadas.
+SHA-256: ccccc83cf35c97156c1a292d3b2211f1d019aea68c4a075bc5b822d51357fc1e
+e bd4f99c558ea1f188888348d8d0c3e413f543bbd06ec9a37d8cf64433edc866f.
+Manifesto local: output/pdf/phase-d/delivery-cancellation-2d9b53f5-9b6b-4f32-9679-476f68419a57-verification.json.
+PDFium, dados fictícios e análise de layout não equivalem a impressão, pessoa,
+aparelho físico, provedor, assinatura ou aprovação geral D4.
+
+Permanecem no núcleo executável: origem COM explícita; demais etapas ENT/P05/
+P06/P07; BAL, estoque/custódia/compensação, catálogo, profissionais e escala.
+Recuperação de consumo após perda somente da capacidade de escrita e efeito de
+compensações futuras sobre as referências precisam ser tratados nos respectivos
+incrementos. Sem merge, GO, banco remoto ou homologação humana/física/provedor.

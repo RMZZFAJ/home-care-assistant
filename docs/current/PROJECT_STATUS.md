@@ -56,8 +56,19 @@ passaram. Replay completo e suítes gerais do novo SHA serão executados pela
 CI programada; não foram duplicados localmente nem declarados aprovados.
 Na CI de 74f5848, checks gerais, replay e integrações passaram; cada browser
 passou 63 casos e falhou no teste Flow que ainda usava o fluxo anterior da
-tela. O teste foi atualizado e passou em execução local dirigida; a CI do
-reparo precisa de resultado próprio.
+tela. O teste foi atualizado e passou em execução local dirigida. CI
+42111139110 de `7c22f54` terminou com success na consulta pontual.
+
+Cancelamento ENT após aceite agora tem pedido, recusa/retirada pessoais e
+conciliação com consumo anterior em leitura, sem segundo débito. Alias SQL e
+defeito temporal foram reproduzidos separadamente e corrigidos nas migrations
+102–103. Referências não são reutilizadas, trânsito precisa de resolução real
+e decisões preservam autoria. Dezesseis integrações Auth e cinco tarefas Chromium
+passaram em rodadas dirigidas, além da fronteira API e do invariante SQL afetado.
+PDFs pendente/final foram confrontados com eventos/ledger/hashes e inspecionados
+em todas as seis páginas; revisão encontrou e corrigiu estado de recebimento
+e quebra do bloco de integridade. Replay e suítes gerais ficam para a CI deste
+incremento. P05/P06/P07 e as demais etapas ENT continuam em execução.
 
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não

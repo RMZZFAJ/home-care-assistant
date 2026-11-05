@@ -59,7 +59,7 @@ begin
  perform pg_temp.login('adminA');
  d:=public.supply_document_command((d->>'id')::uuid,'cancel','{"reason":"Entrega anterior será cancelada com devolução real"}',gen_random_uuid(),(d->>'version')::integer);
  perform pg_temp.assert_true(d->>'status'='cancellation_pending','admin request waits for original recipient consent');
- select jsonb_build_object('reason','Devolvi o material aceito','lines',jsonb_agg(jsonb_build_object('lineId',value->>'id','returnQuantity',value->>'accepted_quantity','consumedQuantity','0'))) into f from jsonb_array_elements(d->'lines');
+ select jsonb_build_object('reason','Devolvi o material aceito','requestId',d->'deliveryCancellation'->'request'->>'id','referenceHash',d->'deliveryCancellation'->>'referenceHash','lines',jsonb_agg(jsonb_build_object('lineId',value->>'id','returnQuantity',value->>'accepted_quantity'))) into f from jsonb_array_elements(d->'lines');
  perform pg_temp.login('supervisor');
  perform pg_temp.denied(format('select public.supply_document_command(%L,''consent_cancel'',%L,gen_random_uuid(),%s)',d->>'id',f,d->>'version'),'another team professional cannot consent');
  perform pg_temp.login('professional');

@@ -204,6 +204,30 @@ Não é um estado administrativo nem a soma de quantidades requisitadas.
 fullyCheckedLines da ENT não inclui linhas parcialmente aceitas, mesmo
 quando sua diferença já foi conciliada.
 
+## ENT — pedido de cancelamento e conciliação
+
+Após aceite, cancel cria pedido identificado pelo banco e não movimenta
+estoque. O recebedor original decide consent_cancel/refuse_cancellation;
+withdraw_cancellation pertence ao solicitante. Cada decisão envia requestId,
+motivo próprio, expectedVersion e idempotencyKey. Nenhum administrador assume
+o ato pessoal de outra identidade. Autor/motivo/instante originais são leitura.
+
+consent_cancel recebe referenceHash e lines com lineId/returnQuantity. Consumo
+é calculado dos aceites e devoluções reais, com referência a débitos anteriores
+confirmados da mesma custódia; não é input editável nem um novo desconto.
+Quantidade aceita sem devolução ou consumo comprovado impede encerramento.
+Trânsito pendente exige resolução física antes de consentir; essa resolução
+conserva o pedido vigente e atualiza sua versão. Refuse/withdraw preservam
+recebimentos e não escrevem ledger, retomando a situação dos fatos atuais.
+
+deliveryCancellation apresenta pedido, histórico, fontes e resultado. Falta
+de acesso/referência histórica não significa consumo zero. referenceHash é
+revalidado sob lock, inclusive se a versão documental não mudou. Conflito exige
+consulta/comparação e adoção explícita; valores e motivo próprios permanecem.
+Recuperação de decisão confirmada exige acesso vivo ao resultado, sem exigir
+novamente a capacidade de uma escrita já concluída. O PDF da nova versão
+preserva aceite, pedido, decisor, consumo referenciado e devolução efetiva.
+
 ## Relatos e consumo
 
 GET /api/consumption usa páginas de 20 por created_at/id, cursor beforeAt/

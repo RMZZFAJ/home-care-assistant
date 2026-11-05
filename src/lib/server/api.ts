@@ -27,6 +27,16 @@ export function databaseError(
     throw new ApiError("VALIDATION_ERROR", "Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.", 400);
   if (/no purchase expectation remaining/i.test(message))
     throw new ApiError("VALIDATION_ERROR", "Não existe expectativa não adquirida elegível para encerrar nesta versão. Materiais já adquiridos continuam sujeitos à chegada e conferência.", 400);
+  if (/delivery cancellation decision conflict/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Este pedido já mudou ou recebeu outra decisão. Consulte o pedido e seu resultado antes de continuar.", 409);
+  if (/stale delivery consumption reference|delivery unit reference changed/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "As referências da conciliação mudaram. Consulte a situação atual e revise as devoluções preservadas antes de confirmar.", 409);
+  if (/delivery consumption reference unavailable/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Não foi possível comprovar as referências de consumo desta conciliação. Atualize a seção; o dado de origem não pode ser corrigido neste formulário.", 400);
+  if (/delivery transit requires reconciliation/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Ainda há material em trânsito sem conciliação. Registre sua situação real antes de concluir o cancelamento.", 400);
+  if (/confirmed delivery consumption insufficient/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "A parte que não será devolvida precisa de consumo já confirmado e disponível para conciliação. Confira as devoluções reais e os relatos vinculados.", 400);
   if (/consumption decision conflict/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "Outro responsável já decidiu esta versão. Consulte o relato e a decisão registrada antes de continuar.", 409);
   if (/stale consumption report/i.test(message))

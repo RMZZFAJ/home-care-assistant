@@ -234,6 +234,24 @@ quantidade pede complemento. Inativo com saldo continua elegível na custódia;
 unidade e precisão são verificadas antes de confirmar. Correção posterior não
 edita relato/decisão/ledger originais e depende de compensação referenciada.
 
+delivery_consumption_allocations referencia, por linha/pedido de ENT, parcelas
+de movimentos de consumo já confirmados. É append-only, com RLS de ent.read
+no documento pai e SELECT autenticado; clientes não escrevem diretamente.
+Funções privadas não têm execução pública. O contexto limita fontes por
+paciente/produto/custódia e aceite efetivo; alocações impedem reutilização.
+Eventos legados sem IDs de fonte conservam o corpo original e reservam suas
+quantidades virtualmente dentro da janela histórica comprovada. Ausência de
+prova bloqueia automatismo, sem backfill de nomes, identidades ou movimentos.
+
+Pedido de cancelamento e decisões guardam atores/instantes/motivos próprios.
+Comparações de identidade são NULL-safe. Consentimento exige referência/versão
+vigentes, precisão e conciliação completa; somente a devolução real acrescenta
+movimento. Recusa e retirada não movem estoque. Locks e verificações finais
+de sessão/capacidade cobrem espera de paciente e FK tardia do movimento.
+Snapshots incluem a conciliação antes do hash canônico; histórico, aceite e
+débitos anteriores permanecem imutáveis. Regularização administrativa de
+desligados e transferência bilateral continuam incrementos distintos.
+
 workspace_revisions e broadcasts privados invalidam leituras autorizadas, sem
 enviar snapshots clínicos. Perfis usam profiles.id para alcançar a própria
 pessoa, consumidores relacionados e administração global autorizada. Proponente

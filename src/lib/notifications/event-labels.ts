@@ -55,6 +55,8 @@ const labels: Record<string, string> = {
   "ent.reassign": "Destinatário atualizado",
   "ent.cancel": "Cancelamento registrado",
   "ent.consent_cancel": "Cancelamento consentido",
+  "ent.refuse_cancellation": "Pedido de cancelamento recusado pelo recebedor",
+  "ent.withdraw_cancellation": "Pedido de cancelamento retirado pelo solicitante",
   "bal.issued": "Balanço registrado",
   "bal.recount": "Nova contagem registrada",
   "bal.approve": "Revisão do balanço registrada",
