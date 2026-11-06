@@ -1197,3 +1197,68 @@ registro são as verificações adicionais pertinentes. A nova CI continuará
 responsável por validar o SHA publicado nos três projetos e no replay de 112 migrations.
 Emulação WebKit não constitui teste em aparelho iOS físico ou homologação P10.
 Reconto/sucessão C057 e demais critérios D2 seguem em execução; sem merge/GO.
+
+## D2.17 — sucessão do reconto agendado e recuperação da responsabilidade
+
+Base publicada 2b18b1b2901ccc9a7ffeb5c0899397e3bbb92671, branch única e Draft
+PR 7 preservados. A correção Markdown desse SHA não autoriza tratar sua CI
+pendente como aprovada. Dois cenários Auth novos falharam antes da migration
+20261106031520: ciclo counted perdeu a atribuição executável após substituição
+no mesmo intervalo; contador indisponível deixou fila falsamente vazia.
+
+A migration incremental transfere somente o reconto para a substituta elegível
+do mesmo plantão, sem mudar janela, material ou contagem anterior. Sem pessoa
+elegível ou com prazo encerrado, mantém pendência explícita de designação.
+Leitura bal_recount_context exige bal.read; workspace informa total/recorte das
+100 pendências mais antigas. Histórico paginado e detalhe abrem os demais BAL.
+Designação exige família/supervisão nativa habilitada, versão documental, hash
+da referência e versão exata do destino. Locks stock→bal→documento/ciclo→plantão,
+recuperação da própria intenção com leitura viva e revalidação tardia preservam
+isolamento e rollback. Helpers privados e leitura pública têm grants estreitos.
+O resultado congela contador anterior, pessoa/janela designados, motivo e autor
+da decisão; não registra contagem física. Evento recount_recorded distingue o
+novo ato de outra satisfação das semanas anteriores.
+
+Oito cenários Auth reais distintos passaram entre rodada e recheck: sucessão
+Juliana→Sheila, recuperação da pendência, campos forjados/versões/int32/hash,
+isolamento, replay próprio após perda de escrita, recusa após perda de leitura,
+concorrência de dois designadores e três esperas observadas bal/perfil, incluindo
+perda tardia de bal.count do destino. Sete passaram na rodada ampliada; o caso
+de recuperação usava destino filtrado após a revogação e falhou no fixture.
+Corrigido para a versão real já capturada do plantão, esse caso e o consumidor
+Auth existente de semanas atrasadas/reconto passaram. O novo evento de conclusão
+foi integrado e o percurso completo de sucessão passou novamente. Uma tentativa
+extra de reaplicar somente esse patch foi recusada pelo guard, pois a primeira
+extração local já o incluía; definição viva confirmada, sem reset ou duplicação.
+
+Sheila não herdou autoria de Juliana nem preencheu contagem em nome dela.
+Só a designada contou; created_by, eventos/hashes anteriores, parecer da contagem
+um e datas originais de cumprimento/atraso permaneceram idênticos. Parecer antigo
+da família não aprovou a contagem dois: supervisão e família revisaram novamente.
+Entrega pessoal anterior de cinco unidades deu referência física legítima;
+contagem nova de uma gerou um único ajuste BAL de quatro, sem consumo inventado.
+Quatro fronteiras API passaram, incluindo ausência/coerção de versão, autoria
+forjada, UUID inválido, UTF-16 e classificação do conflito para comparação.
+
+Duas tarefas Chromium passaram de primeira no runner da stack local: designação
+com resposta perdida e recuperação após perda da escrita, substituição, contagem
+pessoal vazia, revisão e PDF; pendência sem contador, falha da consulta após
+conflito real de versão, motivo/foco preservados, comparação Camila/Márcia,
+adoção explícita e nova confirmação. Revisão é somente leitura; fechamento
+retorna ao título estável. Axe/overflow 320/390/768/1440 e captura de 320 px
+inspecionada. Relatório e logs locais bal-recount-* preservam as tentativas.
+
+PDF bal-recount-7c201aa0-cd96-40e0-9caa-ac2b5b124b49-v5.pdf:
+SHA-256 8bfb836c37b91cee81dfd27cfaa15a4cc7fd4137d12e7ce1811bff0a5a246cd8.
+Três páginas renderizadas por PDFium e inspecionadas; nomes/observações de ambas
+as contagens, linhas antigas, três pareceres próprios, hash e histórico confrontados
+com snapshot/renderer/ledger. Continuação do parecer familiar na terceira página
+legível, sem corte. Fonte, leitura independente e manifestos locais adjacentes.
+
+Lint pertinente, tipos/build do runner e Markdown dos documentos afetados
+compõem a validação proporcional. Advisor all mantém exatamente os doze WARN
+anteriores, onze initplan e unaccent/public, sem achado novo. 113 migrations;
+instalação limpa/legada e suítes gerais do SHA publicado ficam na CI. C057 tem
+prova local no BAL agendado submetido. Reconto facultativo após conciliação,
+legado sem ciclo, demais famílias C068, P07 e critérios D2 restantes continuam
+em execução. Sem zoom400%/humano/AT/aparelho/provedor ou liberação operacional.

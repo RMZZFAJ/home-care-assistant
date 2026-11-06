@@ -6,7 +6,7 @@ import type { BalanceDeferral, BalanceWorkspace } from "@/types/balances";
 import { formatZonedDate } from "@/lib/schedules/time";
 import { DeferralFacts } from "./balance-deferral-facts";
 export const weekDays = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-export type BalanceEditor = { kind: "configure" } | { kind: "defer"; family: boolean } | { kind: "decide"; deferral: BalanceDeferral; approve: boolean } | { kind: "assign"; cycleId: string; allowDeferral: boolean } | { kind: "recount"; documentId: string; version: number; code: string };
+export type BalanceEditor = { kind: "configure" } | { kind: "defer"; family: boolean } | { kind: "decide"; deferral: BalanceDeferral; approve: boolean } | { kind: "assign"; cycleId: string; allowDeferral: boolean };
 export function BalanceForm({ editor, data: liveData, onReview, onReload, focusReasonRevision=0 }: { editor: BalanceEditor; data: BalanceWorkspace; onReview: (command: BalanceCommand, version?: number) => void; onReload: () => void; focusReasonRevision?: number }) {
   const formRef=useRef<HTMLFormElement>(null);
   useEffect(()=>{if(editor.kind==="decide"&&focusReasonRevision>0)formRef.current?.querySelector<HTMLTextAreaElement>('textarea[name="reason"]')?.focus();},[editor.kind,focusReasonRevision]);
@@ -21,7 +21,6 @@ export function BalanceForm({ editor, data: liveData, onReview, onReload, focusR
     if (editor.kind === "defer" && a) onReview({ action: editor.family ? "defer" : "request_deferral", body: { assignmentId: a.id, targetShiftId: value("target"), reason: value("reason") } }, a.version);
     if (editor.kind === "decide") onReview({ action: "decide_deferral", body: { id: editor.deferral.id, approve: editor.approve, reason: value("reason") } });
     if (editor.kind === "assign") onReview({ action: "assign", body: { cycleId: editor.cycleId, targetShiftId: value("target"), reason: value("reason") } });
-    if (editor.kind === "recount") onReview({ action: "assign_recount", body: { documentId: editor.documentId, targetShiftId: value("target"), reason: value("reason") } }, editor.version);
   }
   const currentDeadline=editor.kind==="assign"?Math.min(...data.obligations.filter(o=>o.cycle_id===editor.cycleId&&o.state==="pending"&&Date.parse(o.effective_due)>now).map(o=>Date.parse(o.effective_due))):Infinity;
   const targets = data.targets.filter(s => (editor.kind !== "defer" || !a || new Date(s.starts_at) >= new Date(a.ends_at)) && (editor.kind!=="assign"||editor.allowDeferral||Date.parse(s.ends_at)<=currentDeadline));
@@ -37,10 +36,9 @@ export function BalanceForm({ editor, data: liveData, onReview, onReload, focusR
       <Field label="Vigente a partir de"><Input name="from" type="date" defaultValue={regime?.starts_on ?? today} required /></Field></> : null}
     {editor.kind === "defer" ? <><p>Plantão atual: {formatBrazilDate(a?.starts_at ?? null)} até {formatBrazilDate(a?.ends_at ?? null)}.</p>{!editor.family ? <p className="ui-notice">O adiamento depende de aprovação familiar. A pendência e o prazo originais continuam válidos até a decisão.</p> : <p>A decisão familiar registra um adiamento autorizado, separado de atraso.</p>}</> : null}
     {editor.kind === "decide" ? <><DeferralFacts deferral={{...editor.deferral,decisionContext:currentDecision?.decisionContext??editor.deferral.decisionContext}} timezone={regime?.timezone}/><p>{editor.approve ? "A aprovação exige o mesmo alvo ainda elegível e a atribuição vigente." : "A recusa encerra somente este pedido; preserva atribuição, prazo original e prazo vigente."}</p><Button type="button" onClick={onReload}>Consultar situação atual do pedido</Button>{currentDecision?.status!==editor.deferral.status?<p>A situação atual do pedido mudou para {currentDecision?.status==="approved"?"aprovado":currentDecision?.status==="rejected"?"rejeitado":"superado ou indisponível"}. Seu motivo foi preservado; não se presume uma nova decisão.</p>:null}</> : null}
-    {editor.kind === "recount" ? <p>Nova contagem da {editor.code}. A versão anterior e as revisões anteriores serão preservadas.</p> : null}
     {editor.kind === "assign" ? <><p>Escolha explicitamente um plantão elegível para resolver a pendência sem responsável.</p>{editor.allowDeferral?<p>Escolher um período além do prazo vigente registra também sua decisão familiar de adiamento, preservando os atrasos já ocorridos.</p>:<p>Sua permissão permite atribuir dentro do prazo vigente; adiamento exige capacidade familiar própria.</p>}</> : null}
-    {["defer", "assign", "recount"].includes(editor.kind) ? <Field label="Plantão de destino"><Select name="target" required disabled={!targets.length}>{targets.map(s => <option key={s.id} value={s.id}>{s.professional_name} · {s.type_name} · {formatBrazilDate(s.starts_at)} → {formatBrazilDate(s.ends_at)}</option>)}</Select>{!targets.length ? <small>Cadastre um próximo plantão elegível na escala.</small> : null}</Field> : null}
+    {["defer", "assign"].includes(editor.kind) ? <Field label="Plantão de destino"><Select name="target" required disabled={!targets.length}>{targets.map(s => <option key={s.id} value={s.id}>{s.professional_name} · {s.type_name} · {formatBrazilDate(s.starts_at)} → {formatBrazilDate(s.ends_at)}</option>)}</Select>{!targets.length ? <small>Cadastre um próximo plantão elegível na escala.</small> : null}</Field> : null}
     <Field label="Justificativa"><Textarea name="reason" required minLength={3} maxLength={1000} /></Field>
-    <Button appearance="primary" type="submit" disabled={!decisionAvailable||(["defer", "assign", "recount"].includes(editor.kind) && !targets.length)}>Revisar decisão</Button>
+    <Button appearance="primary" type="submit" disabled={!decisionAvailable||(["defer", "assign"].includes(editor.kind) && !targets.length)}>Revisar decisão</Button>
   </form>;
 }

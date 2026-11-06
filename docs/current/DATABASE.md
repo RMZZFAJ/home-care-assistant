@@ -200,6 +200,21 @@ da atribuição após esperas. RLS/grants anteriores permanecem; helpers privado
 não recebem EXECUTE de clientes. balance_workspace fornece decisionContext,
 distinguindo destino proposto e situação atual, sem substituir a proposta.
 
+Em ciclo contado com reconto pendente, substituição elegível no mesmo plantão
+transfere somente a responsabilidade do reconto, preservando a janela e a
+contagem anterior. Atribuição invalidada ou vencida sem substituto deixa uma
+pendência de nova designação. bal_recount_context e bal_recount_recovery
+projetam essa situação sem escrever ou escolher profissional automaticamente.
+assign_balance_recount usa locks stock→bal→documento/ciclo→plantão, versões
+documental/do destino, referência vinculada ao ator e recuperação da própria
+chave antes de exigir nova autorização de escrita. Revalida decisor e contador
+após efeitos tardios; helpers privados não são executáveis por clientes.
+Somente o profissional designado registra a nova contagem. created_by, eventos,
+pareceres e datas de satisfação das obrigações anteriores permanecem íntegros.
+O evento recount_recorded distingue o novo ato físico de outra regularização
+das semanas antigas. Este incremento cobre BAL agendado ainda submetido;
+conciliação já aplicada e ciclos legados sem escala permanecem separados.
+
 ## Identidade, capacidades e integrações
 
 Supabase Auth é a autoridade de identidade. profiles guarda dados pessoais e

@@ -5,7 +5,7 @@ export const balanceCommandSchema = z.object({ careRecipientId: id, idempotencyK
   z.object({ action: z.literal("refresh"), body: z.object({}).strict() }).strict(),
   z.object({ action: z.enum(["request_deferral", "defer"]), body: z.object({ assignmentId: id, targetShiftId: id, reason }).strict() }).strict(),
   z.object({ action: z.literal("decide_deferral"), body: z.object({ id, approve: z.boolean(), reason }).strict() }).strict(),
-  z.object({ action: z.literal("assign_recount"), body: z.object({ documentId: id, targetShiftId: id, reason }).strict() }).strict(),
+  z.object({ action: z.literal("assign_recount"), body: z.object({ documentId: id, targetShiftId: id, targetShiftVersion: z.number().int().positive().max(2147483647), referenceHash: z.string().regex(/^[0-9a-f]{64}$/), reason }).strict() }).strict(),
   z.object({ action: z.literal("assign"), body: z.object({ cycleId: id, targetShiftId: id, reason }).strict() }).strict(),
 ]) }).strict();
 export type BalanceCommand = z.infer<typeof balanceCommandSchema>["command"];

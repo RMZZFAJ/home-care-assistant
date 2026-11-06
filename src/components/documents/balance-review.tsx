@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { recountHref } from "@/components/balances/balance-recount-assignment";
 import { Button } from "@fluentui/react-components";
 import { api, ApiError, inputClass, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
@@ -239,6 +241,7 @@ export function BalanceReview({
       </h2>
       {message ? <Notice>{message}</Notice> : null}
       <CountFacts data={data} />
+      {data.balanceRecount?.canAssign ? <Link href={recountHref(data.balanceRecount.patientId,data.id)} className="ui-button ui-button-secondary" prefetch={false}>Designar reconto</Link> : data.balanceRecount?.requiresDesignation ? <Notice>O reconto aguarda nova designação da família ou supervisão habilitada no acompanhamento de balanços.</Notice> : null}
       <Notice>
         {["cancelled", "rejected"].includes(data.status)
           ? "Balanço encerrado: pareceres e observações permanecem em leitura."

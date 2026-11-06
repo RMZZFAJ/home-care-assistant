@@ -1,6 +1,6 @@
 # Estado verificável do projeto
 
-Referência editorial:05/11/2026, America/Sao_Paulo. **Produção NO-GO.** Esta é
+Referência editorial:06/11/2026, America/Sao_Paulo. **Produção NO-GO.** Esta é
 a entrada canônica de estado; contratos atuais ficam em current, decisões
 humanas em decisions e especificações futuras em audits/C.
 
@@ -58,6 +58,17 @@ Os dois foram reproduzidos e passaram localmente após iniciar a seleção por
 clique visível, preservando as asserções materiais. Correção restrita ao teste;
 não equivale à aprovação da CI posterior nem a aparelho físico. CI de f9fdb8a
 estava in_progress na consulta pontual; sem polling ou verde presumido.
+
+Reconto de BAL agendado ainda submetido agora conserva a responsabilidade
+executável na substituição do mesmo plantão. Sem pessoa elegível, apresenta
+pendência de nova designação. A interface congela contagem/destino, conserva
+justificativa no conflito e exige adoção explícita da referência atual. Oito
+casos Auth, quatro fronteiras API, duas tarefas Chromium e o consumidor Auth
+agendado passaram. PDF de três páginas preserva Juliana na contagem um, Sheila
+na dois e os três pareceres próprios; eventos e datas da obrigação preservados,
+com um único ajuste BAL de quatro unidades. 113 migrations; replay e matriz
+geral do novo SHA na CI. Reconto após conciliação já aplicada e legado sem ciclo
+seguem no próximo incremento, sem encerrar D2, merge ou GO.
 
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de

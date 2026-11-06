@@ -92,7 +92,9 @@ test("scheduler retains missed shifts and regularizes previous weeks with only o
   assert.equal(final.obligations.filter(o => o.state === "regularized" && o.regularized_by === doc.id && o.missed_at).length, 2);
   assert.equal(final.obligations.filter(o => o.state === "counted" && o.count_document_id === doc.id).length, 1);
   assert.ok(final.obligations.every(o => new Date(o.actual_count_at).toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10)));
-  await balanceCommand(admin, patient, "assign_recount", { documentId: doc.id, targetShiftId: a.shift_id, reason: "Nova conferência física autorizada" }, doc.version);
+  const recountSource = await rpc(admin, "balance_recount_context", {p_id: doc.id});
+  const recountTarget = pending.targets.find(row => row.id === a.shift_id);
+  await balanceCommand(admin, patient, "assign_recount", { documentId: doc.id, targetShiftId: a.shift_id, targetShiftVersion: recountTarget.version, referenceHash: recountSource.referenceHash, reason: "Nova conferência física autorizada" }, doc.version);
   const recountState = await workspace(pro.client, patient), recount = recountState.eligibility.assignment;
   const recounted = await rpc(pro.client, "revise_supply_document", { p_id: doc.id, p_key: randomUUID(), p_version: doc.version, p_recount: true, p_payload: { lines: products.map(productId => ({ productId, quantity: "0" })), balanceAssignment: { id: recount.id, version: recount.version, referenceRevision: recountState.referenceRevision } } });
   assert.ok(recounted.version > doc.version);

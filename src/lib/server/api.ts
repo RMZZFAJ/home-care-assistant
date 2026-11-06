@@ -23,6 +23,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/stale recount assignment reference|stale recount target shift|another recount assignment is active/i.test(message))
+    throw new ApiError("VERSION_CONFLICT","A contagem ou o plantão do reconto mudou. Compare a referência atual e revise a pessoa e o período antes de confirmar. Sua justificativa foi preservada.",409);
   if (/obsolete balance deferral|balance deferral already decided/i.test(message))
     throw new ApiError("VERSION_CONFLICT","O pedido ou o plantão proposto mudou. O destino permanece congelado; uma aprovação antiga não pode substituí-lo. Confira a situação atual e preserve sua justificativa.",409);
   if (/stale balance review|balance review group unavailable/i.test(message))

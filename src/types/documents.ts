@@ -354,6 +354,7 @@ export type SupplyDocument = {
   receipts: PurchaseReceipt[];
   purchaseProgress?: PurchaseProgress;
   balanceReview?: BalanceReviewContext;
+  balanceRecount?: import("./balances").BalanceRecountContext;
   deliveryCancellation?: DeliveryCancellationContext | null;
   deliveryRegularization?: DeliveryRegularizationContext | null;
   commandOutcome?: {

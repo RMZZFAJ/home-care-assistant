@@ -81,6 +81,25 @@ Perda de resposta mantém conteúdo/chave congelados até recuperar o próprio a
 Pareceres anteriores identificam autor, grupo, contagem e versão revisada;
 consulta histórica não reaplica estoque. O PDF conserva essas distinções.
 
+No BAL agendado ainda em revisão, família ou supervisão habilitada abre
+Designar reconto pelo detalhe ou pelo acompanhamento. Contador efetivo e
+observações anteriores ficam em leitura. A pessoa escolhe explicitamente um
+plantão real pela busca e registra justificativa própria. A conferência mostra
+pessoa, período e motivo antes da confirmação; a designação não conta material.
+Resposta incerta congela a intenção e permite recuperar o mesmo ato.
+Conflito conserva motivo e escolha. A consulta compara a contagem e o mesmo
+plantão antes/depois, e a adoção explícita exige nova conferência antes de enviar.
+O comprovante conserva quem designou e a responsabilidade naquele ato;
+Consultar acompanhamento atual distingue eventuais mudanças posteriores.
+
+Substituição no mesmo intervalo conserva uma única atribuição executável de
+reconto. A nova profissional começa com quantidades e observações vazias e
+registra sua própria contagem. Sem profissional elegível, o acompanhamento
+mostra a pendência de designação, em vez de um vazio falso. A lista informa
+total e recorte das 100 mais antigas; outros BAL continuam acessíveis pelo
+histórico paginado e pelo detalhe. Reconto não altera o cumprimento ou o atraso
+original das semanas, nem torna parecer antigo uma revisão da contagem nova.
+
 ## Processamento e validação
 
 O worker operacional existente processa somente os regimes habilitados, com

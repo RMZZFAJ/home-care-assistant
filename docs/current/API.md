@@ -498,6 +498,19 @@ documental é produzido pelo banco; não é aceito como autoridade do cliente.
 Recuperar uma tentativa confirmada reutiliza a chave e não duplica documento
 ou ajustes. [Regras e experiência](../ui-ux/BALANCES.md).
 
+`GET /api/balances/recount?documentId=...` consulta a contagem efetiva,
+observações originais, atribuição e destinos reais elegíveis, com bal.read
+revalidado pelo banco. Para BAL agendado ainda submetido, assign_recount exige
+documentId, targetShiftId, targetShiftVersion, referenceHash e justificativa
+própria de 3 a 1.000 unidades UTF-16, mais expectedVersion documental.
+Pessoa, autoria e janela são resolvidas no banco. Referência ou alvo obsoletos
+retornam VERSION_CONFLICT para comparação e adoção explícita na interface.
+Mesma intenção/chave recupera a designação confirmada com leitura viva, mesmo
+após perda apenas da capacidade de designar. O resultado congela o ato original;
+não comprova uma contagem física nem substitui a consulta da atribuição atual.
+balance_workspace inclui recountRecovery com total e até 100 pendências antigas;
+o histórico paginado e o detalhe permitem abrir os demais registros.
+
 ## História e erros
 
 `POST /api/invitations/preview` recebe o token fora da URL de consulta.
