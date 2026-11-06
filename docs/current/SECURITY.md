@@ -186,3 +186,11 @@ também depois de espera. Revogar a sessão e expirar seu prazo durante uma
 transação são contraprovas distintas: ambas devem recusar a escrita e reverter
 efeitos. Três regressões com Auth real cobrem o prazo em rascunho, REQ e estoque
 familiar; não usam token forjado nem inferem expiração só de um sleep.
+
+A referência de contagem consulta somente o paciente selecionado com bal.read
+vivo, como a referência dos BAL já emitidos. EXECUTE da nova RPC é exclusivo
+de authenticated. A confirmação sem plantão revalida leitura após o mutex e
+compara a revisão de ledger antes de criar documento. Recuperação da própria
+chave permanece sujeita às comparações canônicas nativas. Campos privados
+saem da tela ao perder leitura; capacidades de escrita continuam separadas da
+recuperação de comando já confirmado. Logout limpa as cópias hca da sessão.

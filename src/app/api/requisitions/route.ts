@@ -90,7 +90,25 @@ export async function POST(request: Request) {
     const auth = await authenticate();
     // Live read also allows recovery of this actor's committed key. New
     // issuance and all post-wait authorization remain enforced by the RPC.
-    await patientContext(auth, input.careRecipientId);
+    const patient = await patientContext(auth, input.careRecipientId);
+    if (patient.is_active === false) {
+      // Historical own-key recovery remains possible with live read. A fresh
+      // issuance retains the established inactive-patient conflict contract.
+      const existing = await auth.client
+        .from("requisitions")
+        .select("id")
+        .eq("care_recipient_id", patient.id)
+        .eq("created_by", auth.userId)
+        .eq("idempotency_key", input.idempotencyKey)
+        .maybeSingle();
+      if (existing.error) databaseError(existing.error);
+      if (!existing.data)
+        throw new ApiError(
+          "PATIENT_INACTIVE",
+          "O paciente está inativo. O histórico permanece disponível.",
+          409,
+        );
+    }
     const lines = input.lines.map(
       ({
         productId,

@@ -40,6 +40,37 @@ function request(body: unknown, origin = "https://care.example") {
   });
 }
 describe("private typed REQ/BAL draft boundary", () => {
+  it("keeps the private legacy BAL ledger reference separate from purchases and scheduled assignments", () => {
+    const base = {
+      careRecipientId: patient,
+      type: "BAL",
+      payload: {
+        lines: [{ productId: "material", quantity: "0" }],
+        balanceReferenceRevision: "12",
+      },
+      idempotencyKey: key,
+      draft: false,
+    };
+    expect(createSupplySchema.safeParse(base).success).toBe(true);
+    expect(createSupplySchema.safeParse({ ...base, type: "COM" }).success).toBe(
+      false,
+    );
+    expect(
+      createSupplySchema.safeParse({
+        ...base,
+        payload: { ...base.payload, balanceReferenceRevision: "yesterday" },
+      }).success,
+    ).toBe(false);
+    expect(
+      createSupplySchema.safeParse({
+        ...base,
+        payload: {
+          ...base.payload,
+          balanceAssignment: { id: key, version: 1, referenceRevision: "12" },
+        },
+      }).success,
+    ).toBe(false);
+  });
   it("preserves incomplete values privately while the issuance contract still rejects them", () => {
     const result = creationDraftCommandSchema.parse(save);
     expect(result.action).toBe("save");

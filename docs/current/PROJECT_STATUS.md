@@ -199,12 +199,29 @@ Auth distintos passaram entre rodadas, cinco fronteiras API e o consumidor
 anterior de comprovante passaram; tipos dirigidos e lint pertinentes passaram.
 Dez saves não alteram documentos/protocolo/ledger; CAS5→6→7 preserva edição;
 descarte conserva documento e arquivo ready real. Confirmação disputa o mesmo
-lock e consome uma única vez. A interface de retomada está em execução; C17 não
-está concluído. Uma contraprova descobriu prazo Auth congelado por now durante
+lock e consome uma única vez. Naquele incremento a interface ainda estava em
+execução. Uma contraprova
+descobriu prazo Auth congelado por now durante
 espera: helper compartilhado usa relógio real; três casos Auth passaram após
 a correção.119 migrations locais, sem reset; replay/suítes gerais na CI.
 CI42274035931 de5fd3f53 estava in_progress e563aaf2 foi cancelled na consulta
 pontual. Nenhum desses estados valida o novo incremento.
+
+D2.30 concluiu o mínimo visual C17 para REQ/BAL: retomada própria entre
+aparelhos, datas preservadas, edição incompleta, comparação5→6→7 e descarte
+confirmado recuperável. Nova entrada BAL não cria ficha; revisão de estoque
+é lida sem efeitos e conferida após o lock na confirmação. Alvo documental e
+abertura antiga pendente conservam a história e a mesma intenção. Nove casos
+Chromium distintos passaram entre rodada/recheck, incluindo os consumidores
+anteriores de observação REQ, COM por apresentações e paciente inativo; quatro
+larguras, axe e capturas locais. Três casos Auth da referência BAL e três
+fronteiras API novas passaram.120 migrations locais,84 históricas preservadas,
+mesmas12 advertências do advisor e nenhum reset adicional. A CI de7a78eae
+passou nas validações gerais e no banco/replay119; navegadores tinham falhas
+na consulta pontual, incluindo a recusa de paciente inativo do SHA anterior.
+O caso afetado passou localmente com409 para chave nova e recuperação da
+emissão própria anterior. A CI do próximo SHA ainda precisa validá-lo; demais
+critérios D-A seguem em execução, sem merge, produção ou operação remota.
 
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de

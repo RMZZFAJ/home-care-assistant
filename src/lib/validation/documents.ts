@@ -78,6 +78,7 @@ export const supplyPayload = z
       })
       .strict()
       .optional(),
+    balanceReferenceRevision: z.string().regex(/^\d+$/).max(20).optional(),
   })
   .strict();
 export const createSupplySchema = z
@@ -91,6 +92,16 @@ export const createSupplySchema = z
   })
   .strict()
   .superRefine((value, ctx) => {
+    if (
+      value.payload.balanceReferenceRevision !== undefined &&
+      (value.type !== "BAL" || value.payload.balanceAssignment)
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["payload", "balanceReferenceRevision"],
+        message:
+          "A referência sem plantão pertence somente à contagem BAL sem atribuição.",
+      });
     if (value.draftCommit && (value.type !== "BAL" || value.draft))
       ctx.addIssue({
         code: "custom",

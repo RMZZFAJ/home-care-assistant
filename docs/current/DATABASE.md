@@ -506,7 +506,13 @@ confirmação. commit_creation_draft compõe os motores nativos REQ/BAL e regist
 o ID real consumido na mesma transação. Rascunho documental BAL legado pode
 ser alvo explícito: sua história é preservada; no controle nativo, ainda não
 possuía protocolo antes da conclusão. A base nova também conserva campos
-incompletos que não podem ser enviados como contagem oficial. UI em execução.
+incompletos que não podem ser enviados como contagem oficial. A UI usa esse
+objeto para salvar e retomar REQ/BAL. Na criação BAL, avançar a identificação
+não gera mais draft documental. balance_count_reference retorna revisão e
+quantidades da equipe no mesmo snapshot autorizado; balanceReferenceRevision
+é revalidada após o mutex de estoque ao criar BAL sem regime. O conflito
+explícito PT409 preserva a contagem e exige nova conferência. Aberturas antigas
+já iniciadas e alvos documentais legados conservam seu caminho e história.
 
 A dependência D1 private.auth_session usa clock_timestamp e volatilidade real
 para prazos not_after. now congelava o início da transação e permitia comando

@@ -4,7 +4,7 @@ import { RequisitionOpening } from "@/components/requisitions/requisition-openin
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type SetStateAction } from "react";
 import {
   api,
   ApiError,
@@ -16,6 +16,14 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
+import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import {
+  CreationDraftPanel,
+  BalanceObservationTimes,
+} from "@/components/forms/creation-draft-panel";
+import type { BalanceCountReference } from "@/types/balances";
+import { BalanceReviewRows } from "@/components/balances/balance-count-fields";
+import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { SupplyWizardStep, type WizardState } from "./supply-wizard-step";
@@ -136,6 +144,7 @@ export function PatientSupplyWizard({
     draft: boolean;
     submissionKey: string;
     expectedVersion?: number;
+    draftCommit?: { id: string; revision: number };
   } | null>(null);
   const storageKey =
     "hca:v2:draft:" +
@@ -161,6 +170,103 @@ export function PatientSupplyWizard({
       ? `/api/catalog/presentations?careRecipientId=${patientId}`
       : null,
   );
+  const [legacyReference, setLegacyReference] =
+    useState<BalanceCountReference | null>(null);
+  const [staleLegacyReference, setStaleLegacyReference] = useState(false);
+  const [draftMaterials, setDraftMaterials] = useState<
+    BalanceDraftContent["materials"]
+  >([]);
+  const balanceContent: BalanceDraftContent = {
+    counts: form.quantities,
+    observationTimes: form.observationTimes ?? {},
+    notes: form.notes,
+    materials: [
+      ...catalog.map((product) => ({
+        id: product.id,
+        name: product.name,
+        unit: product.unit,
+        quantityDecimals: product.quantity_decimals ?? 0,
+      })),
+      ...draftMaterials.filter(
+        (material) => !catalog.some((product) => product.id === material.id),
+      ),
+    ],
+    context: {
+      mode: "legacy",
+      documentId: editing?.id ?? null,
+      documentVersion: editing?.version ?? null,
+      assignmentId: null,
+      assignmentVersion: null,
+      referenceRevision: legacyReference?.revision ?? null,
+    },
+  };
+  const privateDraft = useCreationDraft({
+    userId: context.userId,
+    patientId,
+    kind: type === "BAL" ? "BAL" : null,
+    targetDocumentId: editing?.id ?? documentId,
+    enabled:
+      type === "BAL" && !loading && !loadError && can(context, "bal.read"),
+    onResume: (draft) => {
+      const content = draft.content;
+      if (!content || !("counts" in content)) return false;
+      if (
+        content.context.mode !== "legacy" ||
+        content.context.documentId !== (editing?.id ?? null) ||
+        content.context.documentVersion !== (editing?.version ?? null) ||
+        content.context.referenceRevision !==
+          (legacyReference?.revision ?? null)
+      ) {
+        setError(
+          "O contexto deste balanço mudou. Preserve os dados do rascunho para comparar ou descarte somente o preenchimento privado antes de começar outra contagem.",
+        );
+        return false;
+      }
+      setForm((current) => ({
+        ...current,
+        quantities: content.counts,
+        observationTimes: content.observationTimes,
+        notes: content.notes,
+      }));
+      setDraftMaterials(content.materials);
+      setStep(0);
+      setError("");
+      setFieldErrors({});
+      return true;
+    },
+    onDiscard: () => {
+      setForm((current) => ({
+        ...current,
+        quantities: Object.fromEntries(
+          catalog.map((product) => [product.id, ""]),
+        ),
+        observationTimes: {},
+        notes: "",
+      }));
+      setDraftMaterials([]);
+      setStep(0);
+      setError("");
+      setFieldErrors({});
+      sessionStorage.removeItem(storageKey);
+    },
+  });
+  const missingBalanceMaterials =
+    type === "BAL"
+      ? Object.keys(form.quantities).filter(
+          (id) => !catalog.some((product) => product.id === id),
+        )
+      : [];
+  function updateForm(value: SetStateAction<WizardState>) {
+    setForm((current) => {
+      const next = typeof value === "function" ? value(current) : value;
+      if (type !== "BAL") return next;
+      const times = { ...current.observationTimes, ...next.observationTimes };
+      for (const [id, quantity] of Object.entries(next.quantities))
+        if (quantity !== current.quantities[id])
+          times[id] = new Date().toISOString();
+      return { ...next, observationTimes: times };
+    });
+  }
   useEffect(() => {
     const controller = new AbortController();
     Promise.all([
@@ -181,14 +287,23 @@ export function PatientSupplyWizard({
             controller.signal,
           )
         : Promise.resolve(null),
+      type === "BAL"
+        ? api<{ data: BalanceCountReference }>(
+            `/api/balances?careRecipientId=${patientId}&reference=true`,
+            undefined,
+            controller.signal,
+          )
+        : Promise.resolve(null),
     ])
-      .then(async ([products, settings, source]) => {
+      .then(async ([products, settings, source, stockReference]) => {
         if (controller.signal.aborted) return;
         if (source?.data.is_historical)
           throw new Error(
             "Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.",
           );
         setCatalog(products.data);
+        setLegacyReference(stockReference?.data ?? null);
+        setStaleLegacyReference(false);
         setPeople(settings.directory);
         if (type !== "BAL" && canReadRequests) {
           const options = await api<{ data: ItemContext[] }>(
@@ -516,21 +631,24 @@ export function PatientSupplyWizard({
   }
   async function next() {
     if (!validate()) return;
-    if (type === "BAL" && step === 0 && !editing) {
+    // Retain recovery of an old, already-started documentary opening. New
+    // entry never creates this key or an operational draft.
+    if (
+      type === "BAL" &&
+      step === 0 &&
+      !editing &&
+      sessionStorage.getItem(storageKey + ":start")
+    ) {
       setBusy(true);
       try {
         const key = storageKey + ":start";
-        let idempotencyKey = sessionStorage.getItem(key);
-        if (!idempotencyKey) {
-          idempotencyKey = crypto.randomUUID();
-          sessionStorage.setItem(key, idempotencyKey);
-        }
+        const idempotencyKey = sessionStorage.getItem(key);
         const result = await api<{ data: SupplyDocument }>("/api/documents", {
           careRecipientId: context.patient!.id,
           type: "BAL",
           payload: {
-            lines: catalog.map((product) => ({
-              productId: product.id,
+            lines: Object.keys(form.quantities).map((productId) => ({
+              productId,
               quantity: "0",
             })),
             notes: "",
@@ -550,10 +668,53 @@ export function PatientSupplyWizard({
         setBusy(false);
       }
     }
+    if (type === "BAL" && step === 4) {
+      setBusy(true);
+      try {
+        const current = (
+          await api<{ data: BalanceCountReference }>(
+            `/api/balances?careRecipientId=${patientId}&reference=true`,
+          )
+        ).data;
+        if (!legacyReference || current.revision !== legacyReference.revision) {
+          setStaleLegacyReference(true);
+          setError(
+            "O estoque mudou desde o início da contagem. Preserve os valores para conferir e inicie uma nova conferência antes de concluir.",
+          );
+          return;
+        }
+      } catch (reason) {
+        setError((reason as Error).message);
+        return;
+      } finally {
+        setBusy(false);
+      }
+    }
     setStep((current) => Math.min(steps.length - 1, current + 1));
   }
   async function persist(draft: boolean) {
+    if (type === "BAL" && draft && !frozenRef.current) {
+      await privateDraft.save(balanceContent);
+      return;
+    }
+    if (
+      !frozenRef.current &&
+      (privateDraft.blocked || missingBalanceMaterials.length)
+    )
+      return;
     if (!frozenRef.current) {
+      if (type === "BAL" && (staleLegacyReference || !legacyReference)) return;
+      if (
+        type === "BAL" &&
+        !editing &&
+        sessionStorage.getItem(storageKey + ":start")
+      ) {
+        setError(
+          "Recupere a abertura anterior na etapa de identificação antes de concluir esta contagem.",
+        );
+        setStep(0);
+        return;
+      }
       if (!validate(true)) {
         if (draft) {
           try {
@@ -601,6 +762,9 @@ export function PatientSupplyWizard({
       const payload: SupplyPayload = {
         lines,
         notes: form.notes,
+        ...(type === "BAL"
+          ? { balanceReferenceRevision: legacyReference!.revision }
+          : {}),
         ...(type === "COM"
           ? form.origin
             ? { origin: form.origin }
@@ -621,6 +785,9 @@ export function PatientSupplyWizard({
         submissionKey: crypto.randomUUID(),
         draft,
         expectedVersion: editing?.version,
+        ...(type === "BAL" && privateDraft.draftCommit
+          ? { draftCommit: privateDraft.draftCommit }
+          : {}),
       };
     }
     setBusy(true);
@@ -649,6 +816,9 @@ export function PatientSupplyWizard({
               submissionKey: frozenRef.current.submissionKey,
               expectedVersion: frozenRef.current.expectedVersion,
               recount,
+              ...(frozenRef.current.draftCommit
+                ? { draftCommit: frozenRef.current.draftCommit }
+                : {}),
               submit: !frozenRef.current.draft,
             }
           : {
@@ -657,6 +827,9 @@ export function PatientSupplyWizard({
               payload: frozenRef.current.payload,
               idempotencyKey: frozenRef.current.key,
               draft: frozenRef.current.draft,
+              ...(frozenRef.current.draftCommit
+                ? { draftCommit: frozenRef.current.draftCommit }
+                : {}),
             },
       );
       setSaved(result.data);
@@ -668,6 +841,19 @@ export function PatientSupplyWizard({
         reason instanceof ApiError &&
         [400, 403, 404, 409, 413, 422].includes(reason.status);
       if (known) frozenRef.current = null;
+      if (
+        type === "BAL" &&
+        reason instanceof ApiError &&
+        reason.code === "INVENTORY_CONFLICT"
+      )
+        setStaleLegacyReference(true);
+      if (
+        reason instanceof ApiError &&
+        reason.code === "DRAFT_VERSION_CONFLICT"
+      ) {
+        await privateDraft.reportConflict();
+        setStep(0);
+      }
       if (
         type === "ENT" &&
         reason instanceof ApiError &&
@@ -769,7 +955,15 @@ export function PatientSupplyWizard({
         ["medicamentos", "higiene", "dieta"].indexOf(product.category) + 1,
       );
   }
-  if (!allowed)
+  if (privateDraft.readDenied)
+    return (
+      <Notice error>
+        Seu acesso ao rascunho foi encerrado. Selecione um vínculo autorizado.
+      </Notice>
+    );
+  if (type === "BAL" && !can(context, "bal.read"))
+    return <Notice>Seu acesso ao balanço foi encerrado.</Notice>;
+  if (!allowed && !uncertain && !privateDraft.active)
     return (
       <Notice>
         Seu vínculo não permite emitir esta ficha. Consulte as fichas
@@ -824,7 +1018,81 @@ export function PatientSupplyWizard({
       </section>
     );
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-4xl min-w-0 space-y-5">
+      {type === "BAL" ? (
+        <CreationDraftPanel
+          draft={privateDraft}
+          current={balanceContent}
+          patientName={context.patient!.display_name}
+          disabled={busy || uncertain || loading}
+        />
+      ) : null}
+      {type === "BAL" && staleLegacyReference ? (
+        <Notice error>
+          Esta contagem conserva uma referência de estoque anterior.
+          {!editing ? (
+            <button
+              className={buttonClass}
+              disabled={busy || uncertain || privateDraft.blocked}
+              onClick={async () => {
+                setBusy(true);
+                try {
+                  const result = await api<{ data: BalanceCountReference }>(
+                    `/api/balances?careRecipientId=${patientId}&reference=true`,
+                  );
+                  setLegacyReference(result.data);
+                  setForm((current) => ({
+                    ...current,
+                    quantities: Object.fromEntries(
+                      catalog.map((p) => [p.id, ""]),
+                    ),
+                    observationTimes: {},
+                  }));
+                  setStaleLegacyReference(false);
+                  setStep(0);
+                  setError("");
+                } catch (reason) {
+                  setError((reason as Error).message);
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              Iniciar nova conferência e limpar as quantidades
+            </button>
+          ) : (
+            <Link className={buttonClass} href={"/documentos/" + editing.id}>
+              Consultar referência da ficha e solicitar reconto
+            </Link>
+          )}
+        </Notice>
+      ) : null}
+      {missingBalanceMaterials.length ? (
+        <Notice error>
+          Há materiais fora do catálogo ativo. Confira os valores preservados
+          antes de removê-los.
+          {missingBalanceMaterials.map((id) => (
+            <div key={id}>
+              {draftMaterials.find((material) => material.id === id)?.name ??
+                "Material indisponível"}
+              : {form.quantities[id]}
+              <button
+                className={buttonClass}
+                disabled={busy || uncertain || privateDraft.blocked || !allowed}
+                onClick={() =>
+                  setForm((current) => {
+                    const next = { ...current.quantities };
+                    delete next[id];
+                    return { ...current, quantities: next };
+                  })
+                }
+              >
+                Remover material indisponível
+              </button>
+            </div>
+          ))}
+        </Notice>
+      ) : null}
       {loadError ? (
         <div className="space-y-3">
           <Notice error>{loadError}</Notice>
@@ -852,7 +1120,7 @@ export function PatientSupplyWizard({
             steps={steps}
             active={step}
             onChange={setStep}
-            disabled={busy || uncertain || loading}
+            disabled={busy || uncertain || loading || privateDraft.blocked}
             label={"Etapas da " + type}
           />
           {message ? <Notice>{message}</Notice> : null}
@@ -884,7 +1152,7 @@ export function PatientSupplyWizard({
                 <h2 className="mt-2 text-xl font-semibold">{steps[step]}</h2>
               </div>
               <fieldset
-                disabled={busy || uncertain}
+                disabled={busy || uncertain || privateDraft.blocked || !allowed}
                 className="min-w-0 space-y-5"
               >
                 <SupplyWizardStep
@@ -892,7 +1160,7 @@ export function PatientSupplyWizard({
                   type={type}
                   context={context}
                   form={form}
-                  setForm={setForm}
+                  setForm={updateForm}
                   fieldErrors={fieldErrors}
                   catalog={catalog}
                   people={people}
@@ -928,6 +1196,16 @@ export function PatientSupplyWizard({
                   }}
                 />
               </fieldset>
+              {type === "BAL" && step === 5 ? (
+                <>
+                  <BalanceReviewRows
+                    products={catalog}
+                    counts={form.quantities}
+                    reference={legacyReference?.quantities ?? {}}
+                  />
+                  <BalanceObservationTimes content={balanceContent} />
+                </>
+              ) : null}
               {uncertain ? (
                 <Notice>
                   A confirmação da gravação está pendente. Recupere a mesma
@@ -937,9 +1215,18 @@ export function PatientSupplyWizard({
               <WizardActions
                 step={step}
                 total={6}
-                saving={busy}
+                saving={
+                  busy ||
+                  privateDraft.busy ||
+                  (privateDraft.blocked && !uncertain) ||
+                  (!allowed && !uncertain)
+                }
                 uncertain={uncertain}
-                blocked={type === "ENT" && step === 0 && recipientLoading}
+                blocked={
+                  staleLegacyReference ||
+                  missingBalanceMaterials.length > 0 ||
+                  (type === "ENT" && step === 0 && recipientLoading)
+                }
                 onBack={() => {
                   setStep((value) => value - 1);
                   setError("");

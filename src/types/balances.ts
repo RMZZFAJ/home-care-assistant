@@ -1,5 +1,6 @@
 import type { ScheduledShift, ShiftType } from "./schedules";
 import type { BalanceCounter, SupplyPayload } from "./documents";
+export type BalanceCountReference = { revision: string; quantities: Record<string, string> };
 export type BalanceRecountContext = {
   documentId: string; patientId: string; code: string; documentVersion: number; status: string;
   counter: BalanceCounter; countVersion: number | null; notes: string;

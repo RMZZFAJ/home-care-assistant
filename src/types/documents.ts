@@ -36,6 +36,7 @@ export type SupplyPayload = {
   recipientId?: string;
   recipientReason?: string;
   recipientReference?: string;
+  balanceReferenceRevision?: string;
   balanceAssignment?: {
     id: string;
     version: number;
@@ -393,7 +394,12 @@ export type CatalogProduct = {
   aliases?: string[];
   quantity_decimals?: number;
   active?: boolean;
-  successor?: { id: string; name: string; unit: string; active: boolean } | null;
+  successor?: {
+    id: string;
+    name: string;
+    unit: string;
+    active: boolean;
+  } | null;
   selectionPredecessors?: { id: string; name: string; unit: string }[];
 };
 export const documentLabels: Record<DocumentType, string> = {

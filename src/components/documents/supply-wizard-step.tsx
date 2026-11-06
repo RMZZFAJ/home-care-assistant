@@ -32,6 +32,7 @@ import type {
 export type WizardState = {
   quantities: Record<string, string>;
   notes: string;
+  observationTimes?: Record<string, string | null>;
   origin: "" | "purchase" | "donation";
   source: "FAMILY" | "CARE_TEAM";
   recipientId: string;
@@ -369,7 +370,8 @@ export function SupplyWizardStep({
           ) : null}
           <div className="space-y-3">
             {visibleProducts.map((product) => {
-              const checked = Object.hasOwn(form.quantities, product.id);
+              const checked =
+                type === "BAL" || Object.hasOwn(form.quantities, product.id);
               return (
                 <div
                   className={
@@ -443,7 +445,7 @@ export function SupplyWizardStep({
                       <input
                         className={inputClass}
                         inputMode="decimal"
-                        value={form.quantities[product.id]}
+                        value={form.quantities[product.id] ?? ""}
                         aria-label={"Quantidade — " + product.name}
                         aria-invalid={Boolean(fieldErrors[product.id])}
                         onChange={(event) =>

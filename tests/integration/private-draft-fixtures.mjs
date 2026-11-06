@@ -24,6 +24,7 @@ export async function privateDraftFixture() {
   const f = await setup();
   return { ...f, pro: await draftDevice(f.patient) };
 }
+/** @returns {import("../../src/lib/validation/creation-drafts").RequisitionDraftContent} */
 export const reqContent = (f) => ({
   lines: [
     {
@@ -40,6 +41,7 @@ export const reqContent = (f) => ({
   extraItems: [],
   observations: ["Preenchimento privado de ontem"],
 });
+/** @returns {import("../../src/lib/validation/creation-drafts").BalanceDraftContent} */
 export const balContent = (f) => ({
   counts: { [f.products[0]]: "" },
   observationTimes: { [f.products[0]]: null },
@@ -59,6 +61,14 @@ export const balContent = (f) => ({
     referenceRevision: null,
   },
 });
+/**
+ * @param {any} f
+ * @param {string} [kind]
+ * @param {import("../../src/types/creation-drafts").CreationDraftContent} [content]
+ * @param {string|null} [id]
+ * @param {number|null} [revision]
+ * @param {string|null} [target]
+ */
 export const savePacket = (
   f,
   kind = "REQ",

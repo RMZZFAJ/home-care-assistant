@@ -256,3 +256,17 @@ Para C/editorial, validar Markdown, links, matrizes e hashes. Não executar
 probes históricos para atualizar relatórios: podem alterar fixtures ou
 sobrescrever evidência. Caminhos anteriores ficam no mapa de relocação;
 scripts datados exigem adaptação/guardas antes de reutilizar em D0.
+
+## Rascunhos privados REQ/BAL
+
+A suíte Auth private-drafts cobre save parcial, privacidade, CAS, descarte e
+consumo nativo; private-bal-reference cobre snapshot de ledger sem efeito,
+conflito após espera e perda real de sessão. session-deadline observa expiração
+Auth durante locks. Execute somente o arquivo/caso afetado após preparo local.
+O runner scripts/run-e2e.mjs com tests/e2e/private-creation-drafts.spec.ts cobre
+dois aparelhos, conflito5/6/7, respostas perdidas de save/descarte, arquivo
+ready preservado, BAL legado e reconto. Os consumidores anteriores em
+requisition-observation.spec.ts, presentation-provenance.spec.ts e
+workflows.spec.ts mantêm os contratos de observação, conversão e histórico.
+Replay limpo/legado e suites gerais permanecem nos jobs da CI por SHA;
+novos casos dirigidos não exigem repetir localmente suites gerais inalteradas.

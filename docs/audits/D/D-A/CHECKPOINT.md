@@ -1961,3 +1961,74 @@ CI42274035931/5fd3f53 estava in_progress e563aaf2 foi cancelled na consulta
 pontual. D-A continua em execução, sem merge, alteração remota ou homologação
 humana/AT/aparelho/provedor. Formulários e tarefa visual C17 são o próximo
 consumidor, não evidência já concluída.
+
+## D2.30 — retomada privada REQ/BAL e referência sem ficha antecipada
+
+C-FINAL-AC-017 passou localmente nas camadas DB/Auth/API/browser. A UI oferece
+Continuar rascunho e descarte explícito com resumo somente leitura por domínio,
+paciente/tipo/revisão/instante/fuso. Campos incompletos permanecem editáveis no
+formulário próprio. Datas observadas não são renovadas pela retomada. Duas
+sessões5→6 preservam texto B, consulta503 impede adoção cega e escolha explícita
+permite salvar7. Save/descarte sem resposta mantêm chave/pacote; a confirmação
+de descarte é recuperável dentro do mesmo drawer, sem liberar outra intenção.
+Resultado consumido aponta ao documento real; reconhecimento técnico libera
+slot sem criar SCI. Perda de leitura retira o conteúdo protegido do fluxo.
+
+A primeira tarefa BAL mostrou que next na identificação ainda criava draft
+operacional legado. Isso mudou o alvo do save e deixou o slot de criação para
+trás: o teste esperava2 e recebeu uma nova revisão1. Corrigido o consumidor,
+sem mudar essa asserção. Nova entrada apenas lê balance_count_reference;
+revision/quantidades vêm do mesmo snapshot. Migration120 protege a referência
+opcional BAL sem atribuição após o mutex stock, preservando wrapper/signatura,
+recuperação de chave existente e caminho programado. A revisão mostra físico,
+referência e diferença; mudança do ledger exige nova conferência, conservando
+os valores anteriores até ação explícita. Abertura antiga já iniciada conserva
+sua chave e pode recuperar a ficha original; alvos legados continuam tipados e
+mantêm história. Não se retirou UI P07 nem se apagou documento para migrar draft.
+
+Três casos Auth distintos da referência passaram entre rodadas: read sem
+objeto/evento/ledger e negativa/grants, estoque obsoleto após espera observada
+sem efeito parcial, controle positivo/recuperação da mesma chave após movimento
+posterior e sessão real removida depois do lock42501/rollback. O primeiro
+oráculo confundiu3.000000 com3: Decimal exato corrige apenas representação.
+O novo guard usava40001 e o transporte retornou timeout na contraprova local;
+o conflito desse contrato agora é PT409 explícito. Só o caso afetado foi
+repetido e passou, preservando a exigência de espera observada e rollback.
+Não foi atribuída uma causa de infraestrutura sem prova. Preparo aplicou120
+sem reset; o refinamento não publicado alterou somente esse novo guard.
+
+A rodada Chromium inicial teve4pass/3fail em7casos. COM por apresentações,
+reconto BAL em outro aparelho com perda de resposta e escrita, decimal REQ e
+adaptação local antiga passaram. Conflito REQ320 e revisão768 transbordaram:
+a grade recém-adicionada elevava o mínimo intrínseco do StepNavigator e botões
+longos. Contêiner de largura limitada, fluxo vertical e quebra de texto
+resolveram as causas; nomes/valores e asserções foram preservados. O save BAL
+que revelou a abertura antecipada foi o terceiro caso corrigido.
+
+Recheck executou somente esses3casos, abertura BAL antiga ainda não exercitada
+e o consumidor inativo que falhou na CI.5pass. São9cenários Chromium distintos
+entre rodadas, com4larguras320/390/768/1440, axe/overflow, conflito em leitura,
+drawer de descarte sem textarea, reconto e revisão legado em leitura. Três
+capturas320 foram inspecionadas. Descarte incerto recusou fechar/confirmar outra
+intenção e recuperou o mesmo pacote; SHA do objeto ready e ficha original não
+mudaram. BAL permaneceu separado e só criou/consumiu o documento ao concluir.
+Arquivo e finalização de scanner continuam fictícios/local-controlados.
+
+CI5fd3f53/42274035931: banco e validações gerais Windows/Ubuntu success;
+três projetos browser falharam na expectativa409 da nova REQ de inativo,
+recebendo403. API agora distingue a chave própria já emitida de chave nova
+após leitura viva. Novo conflito é PATIENT_INACTIVE409; recuperação mantém
+comparação canônica no RPC. Dois testes API e o caso browser confirmam ambos
+os ramos. Uma fronteira API adicional separa referência BAL legado de COM e
+atribuição programada. Sem redução das expectativas existentes.
+
+Lint dos fontes afetados e tipos dirigidos passaram; runners fizeram o build
+necessário à tarefa visual. Advisor manteve as mesmas12 chaves WARN;84 hashes
+históricos normalizados continuam idênticos,120 migrations. Replay completo,
+clean/upgrade e suites gerais continuam na CI do SHA publicado. Logs
+private-drafts-chromium-first/recheck, private-bal-reference-auth/recheck/conflict,
+private-drafts-new-api e capturas em output preservam tentativas e resultados.
+CI7a78eae/42282278280: database e validações gerais Windows/Ubuntu success;
+Chromium/mobile failure e iOS in_progress na consulta pontual. Esse estado não
+valida o próximo SHA. D-A continua em execução, sem merge, alteração remota,
+homologação humana/AT/aparelho ou pesquisa de provedor.

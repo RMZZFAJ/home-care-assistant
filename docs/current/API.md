@@ -701,5 +701,14 @@ draftCommit opcional em POST /api/requisitions e na criação/revisão BAL cont�
 id/revision do rascunho. A confirmação e o consumo do preenchimento são uma
 transação; disputa com descarte decide uma única vez. COM/ENT não aceitam essa
 referência. Um resultado consumido pode ser reconhecido sem alterar o documento.
-As APIs estão implementadas; integração da retomada aos formulários segue em
-execução. A API por si só não fecha C-FINAL-AC-017 nem a persistência geral D3.
+Os formulários REQ/BAL oferecem retomada explícita, resumo tipado, comparação
+CAS e descarte confirmado. Salvamento e descarte incertos recuperam a mesma
+chave; recuperação consulta eventual revisão posterior ou ficha consumida.
+Abertura BAL nova consulta GET /api/balances com reference=true: revisão e
+quantidades do ledger são retornadas no mesmo snapshot sem criar ficha.
+O payload BAL sem atribuição pode informar balanceReferenceRevision; a criação
+confere essa referência após o lock de estoque. Caminhos anteriores continuam
+aceitos; uma abertura documental antiga pendente conserva sua chave original.
+REQ de paciente inativo retorna PATIENT_INACTIVE/409 para chave nova; a chave
+própria já emitida segue para recuperação canônica sob leitura viva. Esse
+mínimo não implementa persistência geral COM/ENT nem amplia a fase para D3.
