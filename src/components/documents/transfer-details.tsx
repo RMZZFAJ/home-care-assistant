@@ -21,7 +21,7 @@ const actionLabels = {
 function TransferFactsDisplay({ facts }: { facts: TransferFacts }) {
   const declaration = facts.declaration;
   return (
-    <div className="space-y-3 break-words text-sm">
+    <div className="space-y-3 wrap-break-word text-sm">
       <p>
         <strong>
           {custodyName(declaration.source)} →{" "}

@@ -45,5 +45,32 @@ export async function audit(page: import("@playwright/test").Page, label: string
     width: document.documentElement.clientWidth,
     content: document.documentElement.scrollWidth,
   }));
+  if (size.content > size.width) {
+    const overflow = await page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>("body *"))
+        .filter((element) => {
+          const box = element.getBoundingClientRect();
+          return (
+            box.width > 0 &&
+            (box.left < 0 || box.right > document.documentElement.clientWidth)
+          );
+        })
+        .map((element) => ({
+          tag: element.tagName,
+          class: element.className,
+          label: element.getAttribute("aria-label"),
+          width: element.getBoundingClientRect().width,
+          left: element.getBoundingClientRect().left,
+          right: element.getBoundingClientRect().right,
+          overflow: getComputedStyle(element).overflowX,
+        })),
+    );
+    await test
+      .info()
+      .attach("horizontal-overflow-" + label.replaceAll(/[^a-z0-9-]/gi, "-"), {
+        body: JSON.stringify({ ...size, elements: overflow }, null, 2),
+        contentType: "application/json",
+      });
+  }
   expect(size.content, label + " overflow").toBeLessThanOrEqual(size.width);
 }

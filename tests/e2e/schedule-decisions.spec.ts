@@ -124,6 +124,7 @@ test("decisão de escala mostra antes/depois completos e aplica a versão aprese
     ])
       await expect(dialog).toContainText(fact);
     await expect(dialog.locator("input,select")).toHaveCount(0);
+    await audit(page, "D1 schedule decision " + width);
     expect(
       await page.evaluate(
         () =>
@@ -134,7 +135,6 @@ test("decisão de escala mostra antes/depois completos e aplica a versão aprese
     await expect(
       dialog.getByRole("button", { name: "Aprovar proposta", exact: true }),
     ).toBeInViewport({ ratio: 1 });
-    await audit(page, "D1 schedule decision " + width);
   }
   mkdirSync("output/playwright/phase-d", { recursive: true });
   await page.screenshot({

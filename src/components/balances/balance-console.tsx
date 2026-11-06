@@ -32,8 +32,12 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
   const reviewHeadingRef = useRef<HTMLHeadingElement>(null), editorFormRef = useRef<HTMLDivElement>(null), wasReviewRef = useRef(false);
   useEffect(() => {
     if (review) { wasReviewRef.current = true; reviewHeadingRef.current?.focus(); }
-    else if (wasReviewRef.current) { wasReviewRef.current = false; editorFormRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus(); }
-  }, [review]);
+    else if (wasReviewRef.current) {
+      wasReviewRef.current = false;
+      const target = editor?.kind === "decide" && focusReasonRevision > 0 ? 'textarea[name="reason"]' : 'button[type="submit"]';
+      editorFormRef.current?.querySelector<HTMLElement>(target)?.focus();
+    }
+  }, [review, editor?.kind, focusReasonRevision]);
   const [now] = useState(() => Date.now());
   const formatBrazilDate=(value:string|null)=>formatZonedDate(value,data?.regime?.timezone);
   const family = ["family", "admin"].includes(patient.role), approve = family && can(context, "bal.defer.approve"), configure = family && can(context, "bal.schedule.manage");
@@ -85,7 +89,7 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
         <p>{review.command.action === "configure" ? `Processamento ${review.command.body.enabled ? "ativado" : "pausado"} somente para ${patient.display_name}, a partir de ${review.command.body.startsOn}.` : review.command.action === "request_deferral" ? "A solicitação será encaminhada à família. O prazo atual continua válido." : review.command.action === "decide_deferral" ? review.command.body.approve ? "Aprovar somente o destino congelado, se ainda elegível. A alteração do prazo será explícita e auditável." : "Rejeitar este pedido com motivo próprio, sem alterar atribuição, prazo ou estoque." : "A decisão será registrada com seu responsável e justificativa."}</p>
         {review.command.action === "configure" ? <BalanceConfigurationFacts command={review.command} data={review.reference ?? data}/> : null}
         {review.command.action === "decide_deferral" && editor.kind === "decide" ? <DeferralFacts deferral={editor.deferral} timezone={data.regime?.timezone}/> : null}
-        {"reason" in review.command.body ? <div><h3 className="font-semibold">Sua justificativa</h3><p className="whitespace-pre-wrap break-words">{review.command.body.reason}</p></div> : null}
+        {"reason" in review.command.body ? <div><h3 className="font-semibold">Sua justificativa</h3><p className="whitespace-pre-wrap wrap-break-word">{review.command.body.reason}</p></div> : null}
         <div className="hca-toolbar">
           <Button disabled={busy || uncertain} onClick={() => setReview(null)}>Voltar</Button>
           <Button appearance="primary" disabled={busy} onClick={() => void send()}>{uncertain ? "Recuperar confirmação" : "Confirmar decisão"}</Button>

@@ -187,7 +187,7 @@ documentais também exigem expectedVersion para detectar concorrência.
 
   **Contrato:** Relatos, complementos e decisões versionados; páginas e filtros
 
-- **Rota:** /api/consumption/[id]
+- **Rota:** `/api/consumption/[id]`
 
   **Contrato:** Original, complementos, decisão e movimentos no escopo autorizado
 
@@ -421,7 +421,7 @@ consulta mantém a última lista identificada como anterior, sem vazio falso.
 
 GET /api/consumption usa páginas de 20 por created_at/id, cursor beforeAt/
 beforeId e filtros q (texto original), kind, status, from e to. Datas seguem
-America/Sao_Paulo. A referência abre GET /api/consumption/[id] mesmo fora da
+America/Sao_Paulo. A referência abre GET `/api/consumption/[id]` mesmo fora da
 página recente; filtros não comandam movimentos.
 
 POST action=report conserva texto e linhas originais, autor e nome capturado

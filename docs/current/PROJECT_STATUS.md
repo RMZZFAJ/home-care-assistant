@@ -51,10 +51,19 @@ familiar5→4 e configuração BAL sexta/noturno/fuso coincidiram com banco/ledg
 Tipos/lint dirigidos, quatro larguras e axe aprovados; sem homologação humana.
 
 121 migrations incrementais no candidato;84 migrations históricas protegidas.
-CI8ac2b7a/42293608729 tinha replay/banco e validações Windows/Ubuntu success;
-três browsers estavam in_progress na consulta pontual. Isso não aprova o SHA
-seguinte; os resultados atuais pertencem à CI publicada. Nenhuma suíte geral
-foi repetida localmente neste conjunto sem hipótese discriminante.
+CI7b7c97a/42297092802 concluiu banco/replay121 e validações Windows/Ubuntu
+com success, mas teve falhas de foco BAL, largura WebKit e clique mobile.
+Essas regressões foram corrigidas: oito casos dirigidos passaram entre
+rodadas nos três projetos, incluindo comparação/justificativa preservada,
+quatro larguras e clique sem force. A CI do SHA seguinte continua necessária;
+resultado anterior ou pending não é aprovação. Nenhuma suíte geral local foi
+repetida para este reparo. O Vercel7b7 estava success; SonarCloud permanece
+check externo separado, sem resultado aprovado presumido.
+
+Os35 avisos de editor fornecidos foram corrigidos:25 referências Markdown
+com serviço instalado25→0 e10 aliases Tailwind com CSS equivalente. Prosa,
+decisões e regras de diagnóstico preservadas; detalhes e hashes constam do
+[registro de reparos](../audits/D/D-A/EDITOR_DIAGNOSTICS_REPAIRS.json).
 
 Stack local home-care-assistant/API54321/DB54322 verificada. Após os testes,
 os dois jobs cron originalmente ativos foram restaurados para active.

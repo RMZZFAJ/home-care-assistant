@@ -2190,3 +2190,54 @@ paused para active. Stack/API54321/DB54322 verificados; backup externo original
 permanece preservado, sem promessa de restore testado. A consolidação técnica
 local D0–D2 está concluída; publicação/CI são registradas no fechamento, com
 produção NO-GO e gates humanos/externos preservados.
+
+## D2.33 — regressões da CI e35 diagnósticos do editor
+
+Base7b7c97a. CI42297092802 confirmou banco/replay121 e validações
+Windows/Ubuntu aprovados. Chromium teve129/130; mobile128/130; WebKit126/130.
+Os logs identificaram foco após conflito BAL nos três projetos, largura na
+agenda/revisão WebKit e interceptação do clique em Tipos e programações no
+mobile. Vercel7b7 estava success. SonarCloud é check externo, reportado pelo
+[resultado próprio](https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=7),
+sem declaração de correção desse provedor nesta rodada.
+
+O retorno genérico da revisão BAL focava submit depois do efeito que focava a
+justificativa do conflito. Agora o retorno distingue conflito da volta normal,
+preservando o campo e seu conteúdo. Agenda ganhou coluna minmax(0,1fr), limites
+nos filtros nativos e quebra das linhas de tipos/séries. Contraprova WebKit
+local mediu415px em viewport320; corrigida a opção longa do select, o calendário
+e a exceção passaram. A revisão ainda mediu339px: um botão de Editar tipo no
+conteúdo de details ultrapassava a linha. A quebra dessa linha removeu o
+transbordamento e o clique mobile passou sem force ou mudança do seletor.
+
+O coletor de acessibilidade agora anexa geometria quando detecta overflow;
+todas as regras e asserções continuam ativas. A revisão chama o audit antes
+da asserção genérica de largura para registrar a causa quando houver falha.
+Oito casos dirigidos distintos passaram entre rodadas nos três projetos:
+três WebKit na primeira correção e cinco na seleção final, incluindo BAL
+normal, conflito nos dois Chromium, revisão WebKit e clique mobile. Nenhuma
+suíte funcional geral foi repetida. Uma invocação test-list selecionou zero
+por usar caminhos relativos ao repositório; foi rejeitada como evidência.
+A lista corrigida foi conferida com --list: cinco testes em quatro arquivos,
+e o runner seguinte executou os cinco e passou. Fontes funcionais estáveis
+nos runners; sem suíte mutável de banco em paralelo.
+
+Os35 diagnósticos fornecidos foram reproduzidos por fonte:25 referências
+Markdown e10 classes Tailwind. O serviço Markdown instalado do VS Code
+reproduziu12+10+1+2 e retornou zero nos quatro arquivos corrigidos; controle
+positivo detecta referência ausente e negativo aceita literal. Escapes e código
+inline preservam integralmente prosa/decisões. Três placeholders equivalentes
+quebrados entre linhas receberam o mesmo escape. As10 substituições por
+wrap-break-word geram exatamente overflow-wrap:break-word no compilador
+Tailwind instalado. Nenhuma regra/configuração de diagnóstico foi desabilitada.
+[Registro estruturado](EDITOR_DIAGNOSTICS_REPAIRS.json) guarda a normalização,
+hashes antes/depois e controles. Manifestos históricos não foram regravados;
+os reparos notacionais posteriores têm proveniência própria nesta D-A.
+
+Lint/tipos pertinentes, Markdown e controles de referência passaram. Capturas
+da revisão WebKit e da exceção mobile foram inspecionadas. Logs ci-repair-*
+e editor-* ficam em output. Stack home-care-assistant/API54321/DB54322 foi
+verificada; os dois jobs locais foram pausados somente para as tarefas e
+restaurados aos valores originais active após os runners. Sem reset,
+migration nova, alteração remota, merge ou homologação humana/física.
+A CI do próximo SHA continua necessária; resultado anterior não a aprova.

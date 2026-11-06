@@ -34,7 +34,7 @@ function IdentityCard({
 }) {
   return (
     <section
-      className="ui-card min-w-0 space-y-3 break-words"
+      className="ui-card min-w-0 space-y-3 wrap-break-word"
       aria-label={label}
     >
       <h3>{label}</h3>

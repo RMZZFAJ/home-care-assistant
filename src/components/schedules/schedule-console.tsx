@@ -461,7 +461,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
     </div>
   ) : null;
   return (
-    <div className="hca-form-stack">
+    <div className="hca-form-stack hca-schedule-agenda">
       <div className="hca-command-bar">
         {team || publishOwn || can(context, "schedule.propose") ? (
           <Button

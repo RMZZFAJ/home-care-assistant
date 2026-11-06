@@ -301,3 +301,8 @@ Rechecks repetem somente falhas/caminhos afetados. Checkpoint preserva as
 falhas de fixture/oráculo e a correção real de foco; não se reduz axe, grants,
 RLS ou asserção material para obter verde. Clean/legado e suítes gerais ficam
 na CI por SHA. Testes locais não atestam AT/aparelho/provedor/restore.
+
+O audit anexa geometria dos elementos quando há transbordamento horizontal;
+asserções de largura e axe permanecem obrigatórias. Para seleção pontual por
+--test-list, os caminhos são relativos a tests/e2e; conferir --list e exigir a
+contagem esperada antes de executar. Saída0 com zero casos não é evidência.

@@ -40,7 +40,7 @@ export function SupplyLineSummary({
     <article className="rounded-xl border border-(--line) p-4">
       <h3 className="font-semibold">{line.name_snapshot}</h3>
       {readPresentationConversions(line.presentation_conversions).map((row) => (
-        <p key={row.id} className="mt-2 break-words text-sm">
+        <p key={row.id} className="mt-2 wrap-break-word text-sm">
           {presentationCaption(row)}
         </p>
       ))}

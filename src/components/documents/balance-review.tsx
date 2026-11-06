@@ -39,7 +39,7 @@ function CountFacts({ data }: { data: SupplyDocument }) {
       <p>Versão documental: {data.version}</p>
       <div>
         <h4 className="font-semibold">Observações originais de quem contou</h4>
-        <p className="whitespace-pre-wrap break-words">
+        <p className="whitespace-pre-wrap wrap-break-word">
           {context.notes || "Nenhuma observação registrada."}
         </p>
       </div>
@@ -308,7 +308,7 @@ export function BalanceReview({
                 ? " · Histórico de contagem anterior"
                 : ""}
             </p>
-            <p className="whitespace-pre-wrap break-words">
+            <p className="whitespace-pre-wrap wrap-break-word">
               {row.comment || "Parecer sem comentário adicional."}
             </p>
             <p>
@@ -318,7 +318,7 @@ export function BalanceReview({
             </p>
             <details>
               <summary>Contagem e observações revisadas</summary>
-              <p className="whitespace-pre-wrap break-words">
+              <p className="whitespace-pre-wrap wrap-break-word">
                 {row.reviewed_snapshot.notes ||
                   "Nenhuma observação registrada."}
               </p>
@@ -418,7 +418,7 @@ export function BalanceReview({
             {reviewing ? (
               <div className="space-y-3">
                 <h3 className="font-semibold">Parecer a registrar</h3>
-                <p className="whitespace-pre-wrap break-words text-sm">
+                <p className="whitespace-pre-wrap wrap-break-word text-sm">
                   {comment || "Sem comentário adicional."}
                 </p>
                 <div className="hca-toolbar">

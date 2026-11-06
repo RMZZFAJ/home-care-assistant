@@ -577,7 +577,7 @@ export function SupplyWizardStep({
                 >
                   {product.name}
                   {form.presentationSelections?.[product.id]?.map((row) => (
-                    <small className="mt-2 block break-words" key={row.id}>
+                    <small className="mt-2 block wrap-break-word" key={row.id}>
                       {presentationCaption(row)}
                     </small>
                   ))}

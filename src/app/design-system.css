@@ -63,3 +63,12 @@ button:disabled { cursor:not-allowed; opacity:.45; }
 .hca-schedule-form select { min-width:0; width:100%; }
 
 .hca-record-drawer .hca-date-grid button { padding:4px; white-space:nowrap; overflow-wrap:normal; font-variant-numeric:tabular-nums; }
+
+/* Native selects must not impose their longest option on the agenda grid. */
+.hca-schedule-agenda { grid-template-columns:minmax(0,1fr); }
+.hca-schedule-agenda>* { min-width:0; max-width:100%; }
+.hca-schedule-agenda .hca-toolbar :where(.fui-Field,.fui-Input,.fui-Select) { min-width:0; max-width:100%; }
+.hca-schedule-agenda .hca-toolbar :where(input,select) { min-width:0; max-width:100%; }
+
+.hca-schedule-agenda .hca-record { flex-wrap:wrap; }
+.hca-schedule-agenda .hca-record>:where(strong,span) { min-width:0; max-width:100%; overflow-wrap:anywhere; }

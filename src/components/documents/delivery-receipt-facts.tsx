@@ -30,7 +30,7 @@ export function DeliveryDispatchFacts({ data }: { data: SupplyDocument }) {
         {data.linkedRequisitions?.map((req) => (
           <p key={req.id}>
             <Link
-              className="underline break-words"
+              className="underline wrap-break-word"
               href={"/historico/" + req.id}
             >
               {req.code} · {req.protocol}
