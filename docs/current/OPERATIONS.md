@@ -149,6 +149,13 @@ adiamento, que só altera prazo e responsabilidade após decisão familiar.
 Troca de horário de um plantão com BAL vigente exige essa decisão antes de
 alterar a agenda. Substituição no mesmo período conserva a janela.
 
+A decisão de adiamento mostra destino, versão e período da proposta em leitura,
+separados do plantão atual. Se o alvo mudou, não é possível aprovar outra versão
+silenciosamente; a família pode recusar o pedido pendente com motivo próprio.
+Outro destino exige outro pedido. A recusa preserva prazos e responsabilidade;
+nome e motivo do decisor permanecem na consulta. Conflito conserva a justificativa.
+Em resposta perdida, recupere a mesma confirmação antes de iniciar outra.
+
 Contagem física e revisão são etapas distintas. Na revisão, referência e
 diferenças ficam visíveis. Uma mudança no estoque exige nova conferência; uma
 resposta perdida oferece recuperação da mesma tentativa. Semanas anteriores

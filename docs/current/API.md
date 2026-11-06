@@ -482,6 +482,15 @@ da gestão de escala. Não se pode deslocar ou cancelar uma janela de BAL
 vigente
 por uma simples alteração de agenda.
 
+decide_deferral recebe somente id do pedido, approve booleano e motivo próprio
+de 3 a 1.000 unidades UTF-16. Destino e autoria não são campos editáveis.
+decisionContext informa se a mesma proposta ainda pode ser aprovada ou recusada,
+com referência do prazo original e situação atual do plantão. Alvo/atribuição
+obsoletos bloqueiam aprovação com VERSION_CONFLICT, mas permitem recusar o
+pedido pendente. Aprovação válida muda somente o prazo efetivo; recusa não
+altera prazos, atribuição ou estoque. Retry com mesma intenção recupera a decisão
+confirmada, com bal.read vivo mesmo após perda só de bal.defer.approve.
+
 No regime ativado, payload BAL inclui balanceAssignment com id, version e
 referenceRevision capturados na leitura. O servidor revalida identidade,
 janela, vínculo e versão do ledger em criação, edição e submissão. Contexto

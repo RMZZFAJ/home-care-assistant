@@ -63,6 +63,13 @@ rollback juntos. Recuperar um ato próprio já confirmado não exige renovar a
 capacidade de escrita, mas exige leitura viva do paciente. RLS e grants de
 balance_reviews não oferecem edição ou exclusão direta, nem ao service_role.
 
+Decidir pedido pendente de adiamento exige bal.defer.approve e autoridade
+familiar efetiva. Recusar alvo obsoleto não exige que ele continue aprovável;
+aprovar exige a mesma versão/destino e pessoa ainda elegível. O comando
+revalida o decisor após esperas e, na aprovação, a capacidade de contar do
+destino antes de confirmar. Proposta e autoria não vêm de campos editáveis.
+Recuperação própria usa leitura viva, enquanto nova decisão exige escrita.
+
 ## Banco, APIs e objetos privados
 
 RLS, grants explícitos/defaults e SECURITY DEFINER são revisados em conjunto.

@@ -40,6 +40,15 @@ como atraso. Troca de horário ou cancelamento de plantão com BAL vigente exige
 a decisão familiar antes da alteração. Uma substituição no mesmo período pode
 transferir a atribuição sem deslocar a janela. Versões antigas ficam auditáveis.
 
+Na decisão de um adiamento, destino, prazo e versão propostos permanecem em
+leitura nas duas etapas. Situação atual do plantão é uma comparação separada;
+um alvo obsoleto não pode ser aprovado, mas a recusa do pedido pendente permanece
+disponível com justificativa própria. A recusa não muda prazo, atribuição ou
+estoque. Conflito preserva a justificativa, e nova consulta não troca o destino.
+Resultado incerto mantém corpo/chave congelados. Após confirmação ou fechamento,
+o foco retorna a um controle válido ou ao título estável quando o acionador
+desapareceu/perdeu elegibilidade. A consulta conserva nome e motivo do decisor.
+
 Uma contagem física atual pode regularizar semanas anteriores. Elas registram
 o documento e a data real de regularização, sem receber uma contagem retroativa
 fictícia. Atrasos anteriores não são apagados. Um reconto é uma atribuição formal

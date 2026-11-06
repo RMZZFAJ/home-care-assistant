@@ -1,5 +1,5 @@
 import { z } from "zod";
-const id = z.uuid(), reason = z.string().trim().min(3).max(1000);
+const id = z.uuid(), reason = z.string().trim().min(3).refine(value=>value.length<=1000,"A justificativa permite até 1.000 caracteres.");
 export const balanceCommandSchema = z.object({ careRecipientId: id, idempotencyKey: id, expectedVersion: z.number().int().positive().nullable().default(null), command: z.discriminatedUnion("action", [
   z.object({ action: z.literal("configure"), body: z.object({ enabled: z.boolean(), timezone: z.string().min(1).max(80), weekday: z.number().int().min(0).max(6), shiftTypeId: id, professionalId: id.nullable().optional(), startsOn: z.iso.date(), reason }).strict() }).strict(),
   z.object({ action: z.literal("refresh"), body: z.object({}).strict() }).strict(),

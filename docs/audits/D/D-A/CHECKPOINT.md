@@ -1109,3 +1109,63 @@ limpa/legada, suítes gerais e matriz dos browsers ficam para a CI do novo SHA.
 C054 tem evidência local; C7-AC-003 permanece parcial porque reconto facultativo
 de ciclo já conciliado/sucessão futura ainda não foram concluídos. C056/C057,
 P07 e demais critérios continuam em execução. Sem merge, alteração remota ou GO.
+
+## D2.15 — decisão de adiamento obsoleto sem alterar o prazo
+
+Revisão BAL publicada em 5535c5562fee1f9355693fbcc8a217564f684acf. Draft PR 7
+permaneceu aberto e Draft. CI 42148205279 desse SHA estava queued na consulta
+pontual; não foi acompanhada por polling nem presumida aprovada.
+
+Contraprova Auth demonstrou que cancelar legitimamente o plantão futuro
+impedia tanto aprovar quanto recusar o pedido pendente: stale document target
+shift. A primeira fixture tentou deslocar em uma hora uma ocorrência diária
+de 24h e encontrou sobreposição, sem validar C056; substituída por cancelamento
+oficial do alvo futuro, a falha de recusa foi reproduzida pelo motivo específico.
+Outra contraprova registrou approve NULL como rejeição. As evidências anteriores
+permanecem preservadas; não foram corrigidas retroativamente na base fictícia.
+
+Migration 20261106021316 acrescenta decision_snapshot e comando privado dedicado
+a decide_deferral. Booleano/motivo próprios são obrigatórios, sem destino ou
+ator editáveis. Aprovação exige exatamente alvo/versão congelados e atribuição
+vigente; recusa não depende de alvo antigo ainda aprovável e não toca atribuição,
+prazos ou ledger. Snapshot registra decisor/nome, motivo, proposta e fontes
+observadas. Registros sem captura anterior continuam explicitamente sem nome
+preservado. Lock bal→pedido→atribuição, leitura viva na recuperação e
+revalidação final do decisor e da pessoa designada protegem a confirmação.
+
+Nove casos Auth passaram em uma rodada após aplicação incremental sem reset:
+recusa obsoleta/única, controle de aprovação válida, NULL, corpo/motivo inválidos,
+recuperação própria após perda só de escrita, duas esperas observadas com perda
+da autorização familiar, perda tardia de bal.count do destino e disputa de
+aprovação/recusa. Outro paciente e solicitante não decidiram. Prazos originais,
+ledger e rollback foram comparados por leitura independente. Dois consumidores
+Auth existentes de adiamento/scheduler e SQL balance-shift-authority passaram.
+Três fronteiras API passaram, incluindo 500 emojis aceitos/501 recusados e
+conflito sem instrução indevida de reconto de estoque.
+
+BAL-05 mostra proposta/destino/prazo/versão em leitura e situação atual separada.
+Alvo alterado desabilita aprovação e mantém recusa legítima. Motivo próprio
+permanece durante falha de leitura/conflito; corpo/chave incertos ficam congelados.
+O primeiro percurso de recusa/recuperação e o consumidor existente passaram,
+mas o retorno do conflito deixou o drawer fora da árvore acessível. Trava de
+fechamento isolada não resolveu. Diagnóstico temporário sem payload confirmou
+editor/ação corretos e estado preservado; foi removido dos fontes. Edição e
+revisão agora usam etapas da mesma superfície, com o formulário mantido montado.
+
+Três tarefas Chromium distintas passaram entre rodadas/rechecks. A mudança da
+composição exigiu escopar a asserção do motivo à região de conferência, pois o
+textarea preservado e oculto tinha o mesmo texto. Não foi removida a exigência
+de leitura, unicidade, foco ou preservação. A rodada final passou os dois casos
+novos com campo/foco após conflito, ausência de inputs na revisão, recusa única
+recuperada após revogar escrita, descarte explícito e foco no título quando o
+acionador perdeu elegibilidade. O consumidor existente passou com a superfície
+única. Axe/overflow nas quatro larguras e na conferência; captura 320 px
+bal-deferral-2b46075f...-chromium.png inspecionada. Read-back antes/depois no
+manifesto local bal-deferral-2b46075f...-browser.json, sem apagar histórico.
+
+Lint pertinente e tipos/build do runner passaram. Advisor all manteve os doze
+WARN anteriores (onze initplan e unaccent/public), sem achado novo. 112 migrations;
+replay limpo/legado e suítes gerais do novo SHA continuam na CI. C056 tem prova
+local; sucessão/reconto facultativo C057/C7-AC-003, P07 e demais critérios seguem
+em execução. A via de adiamento imediato e demais famílias de comando ainda
+participarão da matriz final C068. Sem merge, alteração remota ou GO.

@@ -189,6 +189,17 @@ e à API. A conciliação recusa referência NULL por comparação IS DISTINCT F
 e registra appliedRevision/appliedBy. Parecer facultativo posterior, inclusive
 sobre referência histórica, nunca reaplica estoque nem valida o saldo atual.
 
+decide_deferral trata aprovação e recusa separadamente. Aprovar exige a
+atribuição vigente e exatamente a versão/destino congelados do plantão ainda
+elegível. Recusar pode encerrar pedido pendente cujo alvo ou atribuição foi
+superado, sem editar atribuições, prazos ou ledger. approve NULL não é decisão.
+bal_deferrals.decision_snapshot preserva ator/nome, motivo próprio, proposta,
+referências observadas e efeito. O comando usa lock bal→pedido→atribuição,
+recupera a própria intenção com leitura viva e revalida decisor e destinatário
+da atribuição após esperas. RLS/grants anteriores permanecem; helpers privados
+não recebem EXECUTE de clientes. balance_workspace fornece decisionContext,
+distinguindo destino proposto e situação atual, sem substituir a proposta.
+
 ## Identidade, capacidades e integrações
 
 Supabase Auth é a autoridade de identidade. profiles guarda dados pessoais e

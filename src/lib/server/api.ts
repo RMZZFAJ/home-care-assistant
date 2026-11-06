@@ -23,6 +23,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/obsolete balance deferral|balance deferral already decided/i.test(message))
+    throw new ApiError("VERSION_CONFLICT","O pedido ou o plantão proposto mudou. O destino permanece congelado; uma aprovação antiga não pode substituí-lo. Confira a situação atual e preserve sua justificativa.",409);
   if (/stale balance review|balance review group unavailable/i.test(message))
     throw new ApiError("VERSION_CONFLICT","A contagem, a revisão ou sua referência mudou. Compare o estado atual; seu parecer foi preservado.",409);
   if (/balance count attribution unavailable/i.test(message))

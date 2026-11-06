@@ -40,7 +40,7 @@ export async function whileAdvisoryWaits(lockName, send, whileWaiting) {
 export async function whileRowWaits(target, id, requestName, send, whileWaiting) {
   getTestEnvironment();
   const table = { catalogue: "public.care_recipient_products", products: "public.products", purchase_receipts: "public.purchase_receipts", consumption_reports: "public.consumption_reports", stock_movements:"public.stock_movements", product_presentations: "public.product_presentations",profiles:"public.profiles" }[target];
-  assert.ok(table && ["create_supply_document", "supply_document_command", "decide_consumption_report", "supplement_consumption_report", "configure_catalogue_unit", "admin_upsert_recipient_product", "catalogue_presentation_command"].includes(requestName));
+  assert.ok(table && ["create_supply_document", "supply_document_command", "decide_consumption_report", "supplement_consumption_report", "configure_catalogue_unit", "admin_upsert_recipient_product", "catalogue_presentation_command", "balance_command"].includes(requestName));
   const holder = spawn("docker", ["exec", "-i", testContainer, "psql", "-U", "postgres", "-d", "postgres", "-X", "-qAt", "-v", "ON_ERROR_STOP=1"], { stdio: ["pipe", "pipe", "pipe"] });
   const closed = new Promise(resolve => holder.once("close", resolve));
   const ready = new Promise((resolve, reject) => {

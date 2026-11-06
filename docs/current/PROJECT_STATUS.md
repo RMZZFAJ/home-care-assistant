@@ -43,6 +43,14 @@ de 2.000 unidades confrontados com snapshot, hash do renderer e ledger e
 inspecionados. 111 migrations; replay/CI geral do novo SHA ainda necessários.
 Sucessão e reconto facultativo após conciliação permanecem em execução.
 
+Pedidos de adiamento obsoletos agora podem ser recusados com motivo próprio,
+sem mover prazo, atribuição ou estoque; approve NULL é recusado. Aprovação
+continua vinculada à versão/destino originais. Nove casos Auth, três fronteiras
+API, consumidores Auth/SQL e três tarefas Chromium distintas passaram entre
+rodadas/rechecks. Revisão e edição usam uma superfície, conservando texto/foco
+no conflito e a intenção incerta até recuperação. 112 migrations; CI/replay do
+novo SHA continuam necessários. D-A e os demais critérios seguem em execução.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram
