@@ -40,6 +40,21 @@ export async function GET(
         data.requisition_items.map((item) => item.id),
       );
     if (resolutionError) databaseError(resolutionError);
+    const {
+      data: remainingNeeds,
+      error: remainingError,
+      count: remainingNeedTotal,
+    } = await auth.client
+      .from("requisitions")
+      .select("id,code,protocol,created_at,remaining_need_reason", {
+        count: "exact",
+      })
+      .eq("source_requisition_id", id)
+      .eq("care_recipient_id", data.care_recipient_id)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .limit(20);
+    if (remainingError) databaseError(remainingError);
     const [notifications, fulfillment, progress] = await Promise.all([
       rpc(auth.client, "document_delivery_status", { p_document: id }),
       rpc(auth.client, "requisition_fulfillment", { p_requisition: id }),
@@ -48,6 +63,9 @@ export async function GET(
     return NextResponse.json({
       data: {
         ...data,
+        sourceRequisition: receipt.sourceRequisition,
+        remainingNeeds: remainingNeeds ?? [],
+        remainingNeedTotal: remainingNeedTotal ?? 0,
         requisition_items: data.requisition_items.map((item) => ({
           ...item,
           resolution:

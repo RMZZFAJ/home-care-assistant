@@ -34,6 +34,7 @@ const labels: Record<string, string> = {
   "occurrence.received": "Ocorrência recebida para revisão",
   "bal.reminder": "Lembrete de balanço da equipe",
   "shift.reminder": "Comunicação de materiais do período",
+  "req.remaining_need_declared": "Nova necessidade vinculada declarada",
   "req.issued": "Requisição emitida",
   "req.registered_author": "Requisição encaminhada para ciência familiar",
   "req.science_recorded": "Ciência individual registrada",

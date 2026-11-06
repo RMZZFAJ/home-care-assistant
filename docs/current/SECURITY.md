@@ -63,6 +63,15 @@ rollback juntos. Recuperar um ato próprio já confirmado não exige renovar a
 capacidade de escrita, mas exige leitura viva do paciente. RLS e grants de
 balance_reviews não oferecem edição ou exclusão direta, nem ao service_role.
 
+Emissão REQ, inclusive necessidade remanescente, mantém req.create no núcleo
+transacional e revalida após os locks e a escrita. A API exige leitura viva
+para também recuperar a chave já confirmada após perda só da escrita. Outra
+chave exige novamente capacidade de emitir; trocar conteúdo conflita. Origem
+estrangeira/histórica não autoriza novo vínculo operacional. Sessão revogada
+durante espera tardia de perfil reverte emissão e evento causal da origem.
+O núcleo privado não tem EXECUTE para clientes; a nova RPC pública tem grant
+somente authenticated. RLS e grants das tabelas existentes permanecem.
+
 Decidir pedido pendente de adiamento exige bal.defer.approve e autoridade
 familiar efetiva. Recusar alvo obsoleto não exige que ele continue aprovável;
 aprovar exige a mesma versão/destino e pessoa ainda elegível. O comando

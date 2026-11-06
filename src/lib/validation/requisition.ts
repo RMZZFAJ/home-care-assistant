@@ -1,15 +1,36 @@
 import { z } from "zod";
 import { exactQuantity } from "./documents";
 
-const quantity = exactQuantity.transform(Number).pipe(z.number().max(100000, "Quantidade acima do limite permitido."));
+const quantity = exactQuantity
+  .transform(Number)
+  .pipe(z.number().max(100000, "Quantidade acima do limite permitido."));
 const observation = {
   currentStock: quantity.nullable().default(null),
   stockObservation: z.enum(["observed", "unknown", "unfilled"]).optional(),
-  stockObservationAt: z.string().datetime({ offset: true }).regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})$/).max(40).nullable().optional(),
+  stockObservationAt: z
+    .string()
+    .datetime({ offset: true })
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})$/,
+    )
+    .max(40)
+    .nullable()
+    .optional(),
 };
-function coherentObservation(value: { currentStock: number | null; stockObservation?: string }, ctx: z.RefinementCtx) {
-  if (value.stockObservation && (value.stockObservation === "observed") !== (value.currentStock !== null))
-    ctx.addIssue({ code: "custom", path: ["currentStock"], message: "Informe o valor observado, ou escolha desconhecido/não informado sem quantidade." });
+function coherentObservation(
+  value: { currentStock: number | null; stockObservation?: string },
+  ctx: z.RefinementCtx,
+) {
+  if (
+    value.stockObservation &&
+    (value.stockObservation === "observed") !== (value.currentStock !== null)
+  )
+    ctx.addIssue({
+      code: "custom",
+      path: ["currentStock"],
+      message:
+        "Informe o valor observado, ou escolha desconhecido/não informado sem quantidade.",
+    });
 }
 export const requisitionLineSchema = z
   .object({
@@ -21,7 +42,8 @@ export const requisitionLineSchema = z
     urgent: z.boolean(),
     repeatReason: z.string().trim().min(3).max(1000).optional(),
   })
-  .strict().superRefine(coherentObservation);
+  .strict()
+  .superRefine(coherentObservation);
 
 export const extraItemSchema = z
   .object({
@@ -30,7 +52,8 @@ export const extraItemSchema = z
     ...observation,
     urgent: z.boolean(),
   })
-  .strict().superRefine(coherentObservation);
+  .strict()
+  .superRefine(coherentObservation);
 
 export const requisitionInputSchema = z
   .object({
@@ -43,6 +66,22 @@ export const requisitionInputSchema = z
       )
       .max(50),
     idempotencyKey: z.string().uuid(),
+    remainingNeed: z
+      .object({
+        requisitionId: z.string().uuid(),
+        version: z.number().int().positive().max(2147483647),
+        reason: z
+          .string()
+          .trim()
+          .min(3)
+          .max(1000)
+          .refine(
+            (value) => [...value].length >= 3 && value.length <= 1000,
+            "Informe ao menos três caracteres no motivo.",
+          ),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
   .refine((value) => value.lines.length > 0 || value.extraItems.length > 0, {

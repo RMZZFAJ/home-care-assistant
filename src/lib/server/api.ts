@@ -23,6 +23,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/stale remaining need source/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A requisição de origem mudou. Consulte e compare a referência atual antes de confirmar a nova necessidade. Sua seleção e seu motivo foram preservados.", 409);
   if (/stale transfer preparation|stale transfer version|transfer decision already settled|transfer already dispatched or closed|transfer agreement required before dispatch|transfer not dispatched/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "A transferência ou suas referências mudaram. Compare a situação atual antes de preparar outra confirmação. Sua justificativa foi preservada.", 409);
   if (/bilateral transfer recipient is frozen/i.test(message))

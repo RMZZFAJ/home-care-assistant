@@ -23,14 +23,14 @@ const body = {
   observations: [],
   idempotencyKey: "30000000-0000-4000-8000-000000000001",
 };
-function request() {
+function request(payload: unknown = body) {
   return new Request("https://care.example/api/requisitions", {
     method: "POST",
     headers: {
       "content-type": "application/json",
       origin: "https://care.example",
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
   });
 }
 function fixture(
@@ -127,6 +127,42 @@ beforeEach(() => {
   fixture();
 });
 describe("requisition persistence response", () => {
+  it("sends an explicit reviewed source and own reason without trusting catalogue labels or source snapshots", async () => {
+    const { rpc } = fixture();
+    const source = {
+      requisitionId: "50000000-0000-4000-8000-000000000001",
+      version: 3,
+      reason: "O material entregue não encerrou a necessidade",
+    };
+    const response = await POST(request({ ...body, remainingNeed: source }));
+    expect(response.status).toBe(201);
+    const args = rpc.mock.calls.find(
+      ([name]) => name === "submit_remaining_requisition",
+    )?.[1] as Record<string, unknown>;
+    expect(args).toMatchObject({
+      p_source: source.requisitionId,
+      p_source_version: 3,
+      p_reason: source.reason,
+      p_idempotency_key: body.idempotencyKey,
+    });
+    expect(args.p_lines).toEqual([
+      { productId: "product", currentStock: 4, urgent: false },
+    ]);
+    expect(rpc.mock.calls.some(([name]) => name === "submit_requisition")).toBe(
+      false,
+    );
+    for (const remainingNeed of [
+      { ...source, version: null },
+      { ...source, reason: "😀😀" },
+      { ...source, reason: "😀".repeat(501) },
+      { ...source, actorId: "forged" },
+      { ...source, protocol: "forged" },
+      { ...source, requestedQuantity: 3 },
+    ]) {
+      const invalid = await POST(request({ ...body, remainingNeed }));
+      expect(invalid.status).toBe(400);
+    }
+  });
   it("uses persisted original snapshots and excludes client catalogue labels from the transaction", async () => {
     const { rpc } = fixture();
     const response = await POST(request());

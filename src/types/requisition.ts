@@ -1,6 +1,13 @@
 export type ProductCategory = "medicamentos" | "higiene" | "dieta";
-export type StockObservation = "observed" | "unknown" | "unfilled" | "legacy_unclassified";
-export type StockObservationTimeSource = "client_draft" | "server_submission" | "legacy_unknown";
+export type StockObservation =
+  | "observed"
+  | "unknown"
+  | "unfilled"
+  | "legacy_unclassified";
+export type StockObservationTimeSource =
+  | "client_draft"
+  | "server_submission"
+  | "legacy_unknown";
 export type RequisitionStatus =
   | "draft"
   | "submitted"
@@ -49,6 +56,7 @@ export type RequisitionFormData = {
   lines: RequisitionLine[];
   extraItems: ExtraItem[];
   observations: string[];
+  remainingNeed?: { requisitionId: string; version: number; reason: string };
 };
 
 export type ReceiptLine = Omit<RequisitionLine, "currentStock"> & {
@@ -71,4 +79,11 @@ export type RequisitionReceipt = {
   recipientName: string;
   createdAt: string | null;
   legacyReconstructed?: boolean;
+  sourceRequisition?: {
+    id: string;
+    code: string | null;
+    protocol: string;
+    version: number;
+    reason: string;
+  } | null;
 };

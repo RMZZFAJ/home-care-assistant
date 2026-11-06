@@ -1834,3 +1834,70 @@ tela de resultado restrita. Logs catalogue-recovery-before/after e
 catalogue-delegated-recovery, relatórios HTML e artefato CI preservados em output.
 117 migrations, sem reset ou mutação remota. Nova CI própria ainda necessária;
 D-A continua em execução, sem merge ou liberação operacional.
+
+## D2.28 — nova necessidade remanescente vinculada à REQ original
+
+C-NEW-AC-028 recebeu banco, API, formulário, confirmação, histórico e PDF.
+A nova REQ tem identidade/protocolo, ciência e atendimento próprios; motivo,
+origem e versão entram na intenção e no primeiro snapshot. Observação e seleção
+são novas, sem copiar contagem anterior ou inserir quantidade solicitada.
+FK composta assegura paciente; a proteção material existente inclui os novos
+campos. A assinatura antiga submit_requisition foi conservada sobre o núcleo
+privado comum. Recuperação própria exige leitura viva e não renova escrita.
+
+Chave/paciente/origem são serializados. Um evento causal na origem registra o
+novo vínculo e avança sua versão técnica, sem reabrir terminal ou repetir
+crédito/ciência. Duas chaves novas da mesma referência competem: uma emite,
+outra conflita. O evento causal usa chave própria gerada pelo banco, pois a
+unicidade nativa de document_events é por ator/chave, inclusive entre documentos.
+Chave de emissão recuperada não gera outro evento. A UI mostra origem/motivo em
+leitura na revisão/comprovante; conflito conserva campos e exige comparação e
+adoção explícita, também depois de erro503. Intenção incerta continua recuperável
+após perda só da escrita; nova emissão permanece bloqueada sem req.create.
+
+Preparo incremental verificou home-care-assistant/API54321/DB54322 e registrou
+20261106181435:118 migrations, sem reset. A primeira tentativa não havia aplicado
+a migration: o corpo extraído não tinha terminador SQL; o script omitia a saída
+padrão da CLI ao falhar. Terminador corrigido e diagnóstico de migration up
+preservado, mantendo start/status sem saída de credenciais. Refinamentos locais
+da migration ainda não publicada substituíram somente seu novo núcleo.
+As84 migrations históricas foram preservadas; replay limpo/legado fica na CI.
+
+Oito casos Auth passaram: nova REQ após ENT aceita parcialmente; mesma chave
+concorrente e duas novas chaves; recuperação após perda só de escrita e negativas
+de conteúdo/contexto/vínculo; referência/motivo/Unicode/campo forjado; revogação
+após espera real do lock do paciente; sessão Auth encerrada em espera tardia de
+perfil, com rollback de emissão/evento causal. Ledger, aceites, vínculos ENT,
+ciência/material original e eventos anteriores foram confrontados separadamente.
+Dois casos adicionais verificam origem concluída sem reabertura e fontes reais
+estrangeira/histórica recusadas. O controle terminal inicial ainda tinha uma
+diferença ENT aberta; conclusão ausente era correta. O controle positivo usa
+aceites pessoais integrais e a apuração nativa do ciclo, sem forjar status.
+Outra fixture reestabeleceu o contexto selecionado depois de criar o paciente
+estrangeiro: actor reutiliza seu cliente Auth, preservando a identidade real.
+Quatro consumidores Auth antigos de observação, modo/horário legados e hash
+passaram. Nove casos API distintos passaram entre rodada/recheck, incluindo
+forja e limite Unicode; Zod mede code points, então o máximo UTF-16 é explícito.
+Um unitário do renderer da nova origem passou, sem repetir a suíte PDF geral.
+
+Dois percursos Chromium novos e o consumidor anterior de observação decimal
+passaram entre rodada/recheck. O primeiro conserva PDF antigo byte a byte e
+recupera emissão única com a mesma chave após perda de req.create. O segundo
+conflita, enfrenta consulta503, conserva zero/motivo e adota explicitamente a
+nova referência. A primeira falha visual era associação do label após remontar
+textarea já preenchida: valor/foco estavam presentes. Label/id em elementos
+separados corrigiram a associação; só esse caso e o consumidor ainda não rodado
+foram executados no recheck. Primeiras fixtures também corrigiram o nome de RPC
+para operational_document; falhas de preparação/fixture não contam como aceite.
+
+Axe/overflow320/390/768/1440 e revisão somente leitura passaram. Captura320 foi
+inspecionada. PDF real f5650446/v1: duas páginas confrontadas com snapshot, código
+da origem/versão4, motivo, zero observado, hash canônico e SHA do renderer4;
+ambas inspecionadas. Origem avançou4→5, mantendo o PDF anterior idêntico e todos
+os fatos físicos. Lint pertinente passou após remover import não usado; tipos e
+build passaram pelos runners. Advisor permanece nas mesmas12 chaves WARN.
+Logs remaining-need-*, artefatos/canônicos/relatórios preservados em output.
+
+CI42268778746/563aaf2 estava in_progress na consulta pontual;6fcf85c foi cancelled.
+Nenhum desses estados valida o novo SHA. D-A e demais critérios continuam em
+execução, sem merge, humano/AT/aparelho/provedor real ou alteração remota.

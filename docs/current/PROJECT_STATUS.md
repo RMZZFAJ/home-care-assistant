@@ -181,6 +181,19 @@ adicional de gestor delegado passaram. Mesma chave recupera; chave nova sem
 permissão e vínculo revogado são recusados. PDF/ledger preservados. Nenhum
 grant, API ou migration mudou; a CI do novo SHA continua necessária.
 
+Necessidade remanescente agora emite nova REQ explicitamente vinculada à origem,
+com motivo próprio, materiais novamente selecionados e observação atual. Origem
+conserva material, ciência, aceites e PDFs anteriores; um evento causal avança
+sua versão técnica, sem movimento de estoque. Oito casos Auth e quatro
+consumidores antigos passaram; nove fronteiras API distintas passaram entre
+rodada/recheck. Dois percursos Chromium novos e o consumidor decimal anterior
+passaram. Conflito preserva campos e exige adoção explícita; resposta perdida
+recupera a mesma chave após perda só da escrita. PDF real de duas páginas foi
+confrontado com fatos/hashes/renderer e inspecionado.118 migrations, mesmas doze
+advertências locais; replay limpo/legado e integração completa na CI do novo SHA.
+CI42268778746 de563aaf2 estava in_progress na consulta pontual. D-A continua
+em execução, sem merge ou operação remota.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

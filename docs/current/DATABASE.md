@@ -262,6 +262,19 @@ linhas e observações emitidos são protegidos; resolução de extra acrescenta
 vínculo separado. Atendimento/eventos alteram versão técnica, preservando
 material e ciência. Hashes e PDFs anteriores permanecem intactos.
 
+source_requisition_id, source_requisition_version e remaining_need_reason
+identificam uma nova REQ remanescente. FK composta garante o mesmo paciente;
+campos são nulos no legado e entram na proteção material existente. A intenção
+e o primeiro snapshot capturam a referência antes da emissão, sem inserir
+quantidade solicitada. submit_remaining_requisition usa o mesmo núcleo privado
+da RPC anterior, cuja assinatura foi preservada. Chave própria e paciente são
+serializados; a origem é bloqueada e sua versão revalidada. Um evento causal
+req.remaining_need_declared avança somente a versão técnica da origem, com
+chave própria gerada pelo banco; uma segunda confirmação concorrente da mesma
+referência recebe conflito. Não reabre estado terminal, repete ciência, muda
+material original ou gera movimento físico. Retry confirmado retorna antes de
+criar outro documento/evento e continua exigindo leitura da sessão viva.
+
 requisition_science_preferences conserva escolhas próprias append-only por
 tipo/versão/chave, consentimento e texto versionado. RLS exige proprietário e
 Auth vigente; clientes não escrevem diretamente. A RPC bloqueia o perfil,

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { RemainingNeedReference } from "./remaining-need-reference";
 import {
   restoreStockObservation,
   validStockObservation,
@@ -39,11 +41,16 @@ const steps = [
   "Revisão",
 ];
 export function RequisitionWizard() {
+  const sourceId = useSearchParams().get("sourceRequisitionId");
   return (
     <Workspace title="Requisição de insumos" compact>
       {(context) =>
         context.patient ? (
-          <PatientRequisition context={context} />
+          <PatientRequisition
+            key={context.patient.id + ":" + (sourceId ?? "new")}
+            context={context}
+            sourceId={sourceId}
+          />
         ) : (
           <Notice>Selecione um paciente para iniciar.</Notice>
         )
@@ -51,7 +58,15 @@ export function RequisitionWizard() {
     </Workspace>
   );
 }
-function PatientRequisition({ context }: { context: WorkspaceContext }) {
+function PatientRequisition({
+  context,
+  sourceId,
+}: {
+  context: WorkspaceContext;
+  sourceId: string | null;
+}) {
+  const [sourceReady, setSourceReady] = useState(!sourceId);
+  const [sourceAttempt, setSourceAttempt] = useState(0);
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<RequisitionFormData>({
     lines: [],
@@ -71,7 +86,11 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
   const [catalogError, setCatalogError] = useState("");
   const [catalogAttempt, setCatalogAttempt] = useState(0);
   const storageKey =
-    "hca:v2:requisition:" + context.userId + ":" + context.patient!.id;
+    "hca:v2:requisition:" +
+    context.userId +
+    ":" +
+    context.patient!.id +
+    (sourceId ? ":remaining:" + sourceId : "");
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
@@ -207,6 +226,17 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
   }
   function validate(all = false) {
     const errors: Record<string, string> = {};
+    if (sourceId && (all || step === 0)) {
+      if (!sourceReady || form.remainingNeed?.requisitionId !== sourceId)
+        errors.remainingSource =
+          "Consulte e escolha a referência da requisição de origem.";
+      else if (
+        [...form.remainingNeed.reason.trim()].length < 3 ||
+        form.remainingNeed.reason.trim().length > 1000
+      )
+        errors.remainingNeed =
+          "Informe o motivo da necessidade remanescente, entre3 e1000 caracteres.";
+    }
     for (const line of form.lines.filter(
       (line) => all || line.category === currentCategory,
     )) {
@@ -306,8 +336,17 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
       const rejected =
         reason instanceof ApiError &&
         ([400, 403, 404, 413, 422].includes(reason.status) ||
+          reason.code === "VERSION_CONFLICT" ||
           reason.code === "DUPLICATE_REVIEW_REQUIRED");
       if (rejected) {
+        if (
+          reason instanceof ApiError &&
+          reason.code === "VERSION_CONFLICT" &&
+          sourceId
+        ) {
+          setSourceAttempt((value) => value + 1);
+          setStep(0);
+        }
         frozenRef.current = null;
         sessionStorage.removeItem(storageKey);
         if (
@@ -329,7 +368,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
     }
   }
   if (receipt) return <Receipt receipt={receipt} />;
-  if (!may(context, "request"))
+  if (!may(context, "request") && !uncertain)
     return (
       <Notice>
         Seu vínculo permite consultar as fichas autorizadas no histórico.
@@ -337,6 +376,22 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
     );
   return (
     <div className="mx-auto max-w-4xl">
+      {sourceId ? (
+        <RemainingNeedReference
+          sourceId={sourceId}
+          patientId={context.patient!.id}
+          value={form.remainingNeed}
+          onChange={(remainingNeed) =>
+            setForm((current) => ({ ...current, remainingNeed }))
+          }
+          readonly={
+            step !== 0 || uncertain || saving || !may(context, "request")
+          }
+          attempt={sourceAttempt}
+          onReady={setSourceReady}
+          reasonError={fieldErrors.remainingNeed}
+        />
+      ) : null}
       <StepNavigator
         steps={steps}
         active={step}
@@ -435,7 +490,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
             total={7}
             saving={saving}
             uncertain={uncertain}
-            blocked={Boolean(catalogError)}
+            blocked={Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
             finishLabel="Concluir requisição"
             onBack={() => setStep((value) => value - 1)}
             onDraft={() => {

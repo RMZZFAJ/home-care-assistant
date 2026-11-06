@@ -626,6 +626,13 @@ export async function renderDocumentPdf(
   y -= 7;
   text(`${snapshot.code} · Versão documental ${snapshot.version}`, 9);
   if (snapshot.type === "REQ") {
+    const source=snapshot.payload.sourceRequisition as {code?:string;protocol?:string;version?:number;reason?:string}|undefined;
+    if(source) {
+      section("Origem da necessidade remanescente");
+      text(`${source.code??source.protocol??"Requisição de origem"} · Referência na emissão: versão ${source.version}`,9,true);
+      text("Motivo próprio: "+source.reason,9);
+      text("Nova intenção com ciência e atendimento próprios. Aceites anteriores e estoque não são duplicados.",8);
+    }
     section("Ciência familiar");
     if (snapshot.scienceEvents?.length)
       table(

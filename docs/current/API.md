@@ -227,6 +227,18 @@ extraItems e observations. Não aceita quantidade solicitada. Catálogo e
 snapshots são resolvidos no banco. A resposta confirma persistence e receipt;
 RECEIPT_PENDING preserva o ID e a chave se a leitura posterior falhar.
 
+Opcionalmente, remainingNeed contém requisitionId, version e reason próprios
+para emitir nova necessidade vinculada. Não aceita ator, protocolo, snapshots
+ou quantidade solicitada nessa referência. A origem deve ser REQ operacional
+do mesmo paciente e conter ao menos um dos materiais novamente selecionados.
+O motivo tem no mínimo três caracteres Unicode e no máximo1.000 unidades
+UTF-16. Versão obsoleta recebe VERSION_CONFLICT; a interface preserva seleção,
+observação e motivo e exige adoção explícita da referência consultada.
+Detalhe/comprovante incluem sourceRequisition; o detalhe da origem mostra os
+vinte vínculos seguintes mais recentes, com total declarado. Ciência e aceites
+do original não são atribuídos à nova REQ. Recuperar a própria chave confirmada
+exige leitura viva; uma nova emissão exige req.create no banco, após esperas.
+
 COM, ENT e BAL usam type, payload.lines, idempotencyKey e draft.
 Quantidades são exatas e limitadas à precisão da unidade. O parser compara o
 token numérico JSON com o valor decodificado antes da validação: arredondamento,

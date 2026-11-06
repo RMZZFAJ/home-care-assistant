@@ -3,9 +3,13 @@ import Link from "next/link";
 import { buttonClass } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { formatBrazilDate } from "@/lib/receipt";
-import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
+import {
+  formatStockObservation,
+  formatStockObservationTime,
+} from "@/lib/stock-observation";
 import { DocumentActions } from "@/components/documents/document-actions";
 import type { RequisitionReceipt } from "@/types/requisition";
+import { RelatedDocument } from "@/components/documents/related-document";
 import { Summary } from "./requisition-steps";
 import { RequisitionOpening } from "./requisition-opening";
 import { RequisitionDisplay } from "./requisition-display";
@@ -17,7 +21,16 @@ export type SavedReceipt = RequisitionReceipt & {
 
 export function Receipt({ receipt }: { receipt: SavedReceipt }) {
   const id = receipt.requisitionId ?? receipt.id;
-  return id ? <><p className="text-sm">Requisição registrada · {receipt.protocol}</p><RequisitionOpening id={id}><ReceiptContent receipt={receipt} /></RequisitionOpening></> : <ReceiptContent receipt={receipt} />;
+  return id ? (
+    <>
+      <p className="text-sm">Requisição registrada · {receipt.protocol}</p>
+      <RequisitionOpening id={id}>
+        <ReceiptContent receipt={receipt} />
+      </RequisitionOpening>
+    </>
+  ) : (
+    <ReceiptContent receipt={receipt} />
+  );
 }
 function ReceiptContent({ receipt }: { receipt: SavedReceipt }) {
   const id = receipt.requisitionId ?? receipt.id;
@@ -46,9 +59,32 @@ function ReceiptContent({ receipt }: { receipt: SavedReceipt }) {
           <br />
           Pessoa assistida: <strong>{receipt.recipientName}</strong>
         </p>
+        {receipt.sourceRequisition ? (
+          <section
+            className="ui-card mt-4 space-y-2"
+            aria-label="Origem da necessidade remanescente"
+          >
+            <h2>Necessidade remanescente</h2>
+            <RelatedDocument
+              id={receipt.sourceRequisition.id}
+              type="REQ"
+              label={
+                receipt.sourceRequisition.code ??
+                receipt.sourceRequisition.protocol
+              }
+            />
+            <p>Referência: versão {receipt.sourceRequisition.version}.</p>
+            <p>Motivo: {receipt.sourceRequisition.reason}</p>
+          </section>
+        ) : null}
         <Summary
           title="Itens"
-          details={[...receipt.lines, ...receipt.extraItems].map(item => formatStockObservationTime(item.stockObservationAt, item.stockObservationTimeSource))}
+          details={[...receipt.lines, ...receipt.extraItems].map((item) =>
+            formatStockObservationTime(
+              item.stockObservationAt,
+              item.stockObservationTimeSource,
+            ),
+          )}
           rows={[
             ...receipt.lines.map(
               (item) =>

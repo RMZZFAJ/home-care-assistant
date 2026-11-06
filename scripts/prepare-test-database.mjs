@@ -37,6 +37,9 @@ for (const args of [
   // start/status may print local credentials: report success only, never their output.
   if (result.status !== 0) {
     process.stderr.write(result.stderr);
+    // migration up can put its SQL diagnostic on stdout. Unlike start/status,
+    // this command's output contains migration SQL, not local credentials.
+    if (args[0] === "migration") process.stderr.write(result.stdout);
     process.exit(result.status ?? 1);
   }
 }

@@ -88,9 +88,18 @@ export async function POST(request: Request) {
   return api("requisitions.submit", async () => {
     const input = await readJson(request, requisitionInputSchema);
     const auth = await authenticate();
-    await patientContext(auth, input.careRecipientId, "request", true);
+    // Live read also allows recovery of this actor's committed key. New
+    // issuance and all post-wait authorization remain enforced by the RPC.
+    await patientContext(auth, input.careRecipientId);
     const lines = input.lines.map(
-      ({ productId, currentStock, stockObservation, stockObservationAt, urgent, repeatReason }) => ({
+      ({
+        productId,
+        currentStock,
+        stockObservation,
+        stockObservationAt,
+        urgent,
+        repeatReason,
+      }) => ({
         productId,
         currentStock,
         ...(stockObservation ? { stockObservation } : {}),
@@ -99,29 +108,47 @@ export async function POST(request: Request) {
         ...(repeatReason ? { repeatReason } : {}),
       }),
     );
-    const extras = input.extraItems.map(({ name, currentStock, stockObservation, stockObservationAt, urgent }) => ({
-      customName: name,
-      currentStock,
-      ...(stockObservation ? { stockObservation } : {}),
-      ...(stockObservationAt ? { stockObservationAt } : {}),
-      urgent,
-    }));
+    const extras = input.extraItems.map(
+      ({
+        name,
+        currentStock,
+        stockObservation,
+        stockObservationAt,
+        urgent,
+      }) => ({
+        customName: name,
+        currentStock,
+        ...(stockObservation ? { stockObservation } : {}),
+        ...(stockObservationAt ? { stockObservationAt } : {}),
+        urgent,
+      }),
+    );
     const intent = {
       careRecipientId: input.careRecipientId,
       lines,
       extraItems: extras,
       observations: input.observations,
     };
-    const result = await rpc(auth.client, "submit_requisition", {
+    const args = {
       p_care_recipient_id: input.careRecipientId,
       p_idempotency_key: input.idempotencyKey,
-      p_payload_hash: createHash("sha256")
-        .update(JSON.stringify(intent))
-        .digest("hex"),
       p_lines: lines,
       p_extra_items: extras,
       p_observations: input.observations,
-    });
+    };
+    const result = input.remainingNeed
+      ? await rpc(auth.client, "submit_remaining_requisition", {
+          ...args,
+          p_source: input.remainingNeed.requisitionId,
+          p_source_version: input.remainingNeed.version,
+          p_reason: input.remainingNeed.reason,
+        })
+      : await rpc(auth.client, "submit_requisition", {
+          ...args,
+          p_payload_hash: createHash("sha256")
+            .update(JSON.stringify(intent))
+            .digest("hex"),
+        });
     const persisted = (Array.isArray(result) ? result[0] : result) as {
       requisition_id?: string;
       protocol?: string;
