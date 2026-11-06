@@ -51,6 +51,14 @@ rodadas/rechecks. Revisão e edição usam uma superfície, conservando texto/fo
 no conflito e a intenção incerta até recuperação. 112 migrations; CI/replay do
 novo SHA continuam necessários. D-A e os demais critérios seguem em execução.
 
+CI de 5535c55 confirmou checks gerais Windows/Ubuntu, replay limpo/legado de 111
+migrations, integrações completas, Chromium e mobile. iOS/WebKit passou 91 casos e falhou
+em dois consumidores P05 que digitavam em combobox fora da área visível.
+Os dois foram reproduzidos e passaram localmente após iniciar a seleção por
+clique visível, preservando as asserções materiais. Correção restrita ao teste;
+não equivale à aprovação da CI posterior nem a aparelho físico. CI de f9fdb8a
+estava in_progress na consulta pontual; sem polling ou verde presumido.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

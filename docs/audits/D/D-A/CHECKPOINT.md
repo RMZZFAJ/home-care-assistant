@@ -1169,3 +1169,31 @@ replay limpo/legado e suítes gerais do novo SHA continuam na CI. C056 tem prova
 local; sucessão/reconto facultativo C057/C7-AC-003, P07 e demais critérios seguem
 em execução. A via de adiamento imediato e demais famílias de comando ainda
 participarão da matriz final C068. Sem merge, alteração remota ou GO.
+
+## D2.16 — consumidor P05 WebKit e evidência de CI por SHA
+
+Adiamento publicado em f9fdb8a25d563d3ce8fccf1e9bf5a976c296d22d. Draft PR 7
+atualizado; CI 42152588224 desse SHA estava in_progress na consulta pontual.
+Na mesma consulta, CI 42148205279 de 5535c55 já estava concluída com failure:
+banco (instalação limpa/evolução legada de 111 migrations e integração completa),
+checks gerais Windows/Ubuntu, Chromium e mobile passaram. iOS/WebKit passou
+91 casos e falhou em dois percursos P05 no mesmo helper de seleção do conferente.
+O agregador reprovou corretamente. Os resultados não validam o SHA posterior.
+
+Logs do job 127668491024 apontaram opção Teste family fora do viewport após
+fill/ArrowDown. Os dois casos foram reproduzidos localmente em WebKit pelo
+runner da stack conferida. O helper não garantia que o próprio campo estivesse
+visível antes de digitar. Agora inicia por clique real no campo, exige campo
+e opção inteiros no viewport e mantém a seleção por clique normal, sem force
+ou remoção de asserções. Geometria anexada ao relatório comprova viewport
+390×664: campos estavam em y1005/y1221; após clique/scroll, y443/y469 e opções
+visíveis em y480/y506. Extração local em p05-webkit-choice-geometry.json.
+
+Somente esses dois consumidores usam o helper alterado; ambos passaram no
+recheck, incluindo autoria, recuperação, conflito, ledger e PDF já exigidos.
+Código do produto, banco e regras não foram alterados. Não se repetiu replay,
+integração completa ou checks gerais locais. Lint do teste e Markdown deste
+registro são as verificações adicionais pertinentes. A nova CI continuará
+responsável por validar o SHA publicado nos três projetos e no replay de 112 migrations.
+Emulação WebKit não constitui teste em aparelho iOS físico ou homologação P10.
+Reconto/sucessão C057 e demais critérios D2 seguem em execução; sem merge/GO.

@@ -35,9 +35,25 @@ async function login(page: Page, patient: string, role: string) {
 }
 async function choose(page: Page, label: string, name: string) {
   const field = page.getByRole("combobox", { name: label, exact: true });
+  const before = await field.boundingBox();
+  // Fill/press do not require an on-screen control. Start with the visible
+  // pointer interaction a person uses, including the drawer's actual scroll.
+  await field.click();
+  await expect(field).toBeInViewport({ ratio: 1 });
   await field.fill(name);
   await field.press("ArrowDown");
-  await page.getByRole("option", { name, exact: true }).click();
+  const option = page.getByRole("option", { name, exact: true });
+  await expect(option).toBeInViewport({ ratio: 1 });
+  await test.info().attach("P05-visible-choice-" + label, {
+    body: JSON.stringify({
+      viewport: page.viewportSize(),
+      before,
+      field: await field.boundingBox(),
+      option: await option.boundingBox(),
+    }),
+    contentType: "application/json",
+  });
+  await option.click();
 }
 const drawer = (page: Page) =>
   page.getByRole("dialog", { name: /regularização|apuração própria/i });
