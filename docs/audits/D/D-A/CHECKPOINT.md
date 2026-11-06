@@ -943,3 +943,37 @@ Logs locais: stock-availability-before.log, stock-availability-e2e.log e lint.
 O único erro de lint inicial era expressão no helper do teste; corrigido e
 somente esse arquivo revalidado. Tipos/build passaram no runner. Suítes gerais
 ficam para a CI; catálogo, transferências e demais critérios D2 seguem abertos.
+
+## D2.12 — catálogo: fatores e capacidade equivalente
+
+Isolamento de estoque publicado em 3ff00683a01c0d13d6ac905d164e87bb9438302f.
+CI 42136087448 estava in_progress. A consulta da execução anterior, 42134849214
+do SHA 59b2e29, confirmou banco success: replay limpo/legado de 108 migrations
+e integrações completas. Ubuntu falhou apenas no import rpc sem uso em
+delivery-regularization.test.mjs; Windows foi cancelado e navegadores estavam
+em execução. Import removido, lint do arquivo passou; não se repetiu a suíte
+funcional por remoção de import. Não houve verde presumido dos demais jobs.
+
+Contraprova Auth reproduziu fator NaN persistido. Migration 20261106002443
+valida finitude/positividade/limite/precisão antes da coerção e pares de campos,
+preserva código textual e recusa colisão com outro produto atomicamente.
+Constraint protege novas escritas; validação integral é condicional à ausência
+de fator legado inválido, sem reescrever história. Configuração e identidade
+do produto seguem locks stock→catalogue e revalidam capacidade ao final, também
+após espera tardia. Configuração registra seu autor em audit_events.
+Alias /api/catalog agora exige catalog.manage, igual à ação product em /api/admin.
+
+Nove casos Auth passaram: fatores inválidos sem efeito parcial, 1,5 válido,
+código com zero, colisão, delegado sem access.manage/outro paciente recusado,
+cinco esperas observadas com revogação e ACL/DML estreitos. Uma fronteira API
+passou; duas tarefas Chromium distintas passaram entre rodada e recheck.
+Primeira comprovou as duas rotas com sessão real, fator e negativas HTTP;
+segunda cadastrou 1,5 mL na UI. O seletor inicial getByLabel não alcançava o
+select cuja árvore acessível mostrava combobox Produto; corrigido para esse
+papel/nome e repetido somente o caso. Nenhum assert material foi removido.
+
+Lint pertinente passou após retirar import novo sem uso; Markdown e tipos/build
+do runner passaram. Advisor local retornou somente unaccent/public histórico.
+109 migrations; instalação limpa/evolução legada e suítes gerais na CI do novo
+SHA. C029/C044/proveniência/apresentações, P07, BAL e demais D2 permanecem em
+execução. Sem merge, alteração remota, conclusão D-A ou GO.

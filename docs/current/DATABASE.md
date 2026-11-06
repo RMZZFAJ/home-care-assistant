@@ -4,6 +4,16 @@ Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
 B3 registra exceções em precisão, NULL/NaN, revisão BAL legado, sessão
 direta e revogação em espera. O guard e os contratos corretos devem ser
 preservados.
+
+Catálogo: configure_catalogue_unit valida fator finito, positivo, até 1 bilhão
+e compatível com a precisão antes da coerção numeric(18,6). Código permanece
+texto. Unidade/apresentação incompleta, colisão com outro produto e precisão
+incompatível são recusadas atomicamente. Configuração e identidade do produto
+adquirem stock→catalogue e revalidam catalog.manage após esperas e escritas.
+A configuração registra auditoria com o ator real. Grants/RLS continuam estreitos.
+presentation_finite_factor protege escritas novas; é validada integralmente
+somente se não houver fator legado inválido. Valores legados não são corrigidos
+ou apagados automaticamente; exigem revisão explícita antes de novo uso.
 Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
 implementação.

@@ -44,7 +44,10 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 - **Rota:** /api/catalog/presentations
 
-  **Contrato:** Unidades, apresentações e código de barras
+  **Contrato:** Unidades, apresentações e código de barras textual. POST exige
+  catalog.manage, fator finito positivo e código/nome/fator conjuntos.
+  /api/catalog e ação product de /api/admin usam a mesma catalog.manage;
+  delegação de catálogo não concede access.manage.
 
 - **Rota:** /api/units
 

@@ -11,6 +11,7 @@ import {
   uuid,
 } from "@/lib/server/api";
 import { exactQuantity } from "@/lib/validation/documents";
+import { quantity } from "@/lib/quantity";
 
 export async function GET(request: Request) {
   return api("presentations.read", async () => {
@@ -55,9 +56,21 @@ export async function POST(request: Request) {
             .regex(/^\d{8,14}$/)
             .optional(),
           name: z.string().min(2).max(160).optional(),
-          baseQuantity: exactQuantity.optional(),
+          baseQuantity: exactQuantity
+            .refine(
+              (value) => quantity(value).gt(0),
+              "Informe um fator maior que zero.",
+            )
+            .optional(),
         })
-        .strict(),
+        .strict()
+        .refine(
+          (input) =>
+            input.barcode
+              ? input.name !== undefined && input.baseQuantity !== undefined
+              : input.name === undefined && input.baseQuantity === undefined,
+          "Código, nome e fator devem ser informados juntos.",
+        ),
     );
     const auth = await authenticate();
     await patientContext(auth, input.careRecipientId, "catalog.manage", true);

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
 import { unavailableDelivery } from "./delivery-regularization-fixtures.mjs";
-import { actor, rpc, fixtures } from "./v4-fixtures.mjs";
+import { actor, fixtures } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 const ledger = (f) =>
   sql(

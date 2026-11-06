@@ -20,6 +20,14 @@ produz vazio falso. Duas tarefas Chromium de falha/recuperação e o percurso
 existente de correção compensatória passaram; ledger preservado nas leituras,
 axe/overflow em quatro larguras. Sem alteração de banco neste incremento.
 
+Catálogo recebeu fator finito/positivo e validação anterior ao arredondamento,
+com preservação de código textual, auditoria própria e autoridade após esperas.
+O alias /api/catalog usa catalog.manage como /api/admin, sem exigir gestão de
+vínculos. Nove casos Auth, uma fronteira API e duas tarefas Chromium distintas
+passaram entre rodada e recheck. A migration totaliza 109; replay e suítes
+gerais ficam na CI. Consulta de apresentações e proveniência da conversão
+nos documentos ainda não estão concluídas.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

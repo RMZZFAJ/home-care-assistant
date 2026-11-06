@@ -56,7 +56,7 @@ export async function POST(request: Request) {
   return api("catalog.write", async () => {
     const input = await readJson(request, schema);
     const auth = await authenticate();
-    await patientContext(auth, input.careRecipientId, "manage", true);
+    await patientContext(auth, input.careRecipientId, "catalog.manage", true);
     const data = await rpc(auth.client, "admin_upsert_recipient_product", {
       p_care_recipient_id: input.careRecipientId,
       p_product_id: input.id,
