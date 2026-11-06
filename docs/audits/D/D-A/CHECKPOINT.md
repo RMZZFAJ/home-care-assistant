@@ -1802,3 +1802,35 @@ WebKit passaram104/falharam1, inclusive no retry: recuperação de catálogo dei
 de mostrar a mensagem após perder catalog.manage. Esse caso será corrigido em
 lote próprio. Não se presume aprovação global da CI nem humana/AT/aparelho.
 D-A permanece em execução, sem merge ou alteração remota.
+
+## D2.27 — recuperação de catálogo preservada após perda da escrita
+
+CI42260657831/66c03fb falhou no mesmo caso Chromium/WebKit, inclusive no retry;
+mobile, banco/replay/integração e checks gerais passaram. Artefato Chromium
+13526742873 foi verificado pelo SHA-256
+5b87715498699cdcb0adce24e513c43f0fc239f50ca403d3ef05c0447064c487.
+Captura e contexto confirmam substituição da tela pela recusa administrativa,
+ocultando o resultado recuperado. Contraprova local também falhou na mensagem.
+
+O catálogo mantém sua superfície de recuperação sob vínculo/leitura vivos.
+Após perder catalog.manage, novas ações e formulários ficam indisponíveis;
+uma intenção já incerta conserva seu pacote para recuperação pela RPC existente.
+O resultado confirmado permanece visível fora da barreira de escrita. Perda da
+leitura retira o conteúdo protegido. Nenhuma API, grant ou regra de banco foi
+ampliada; a opção de recuperação do shell é usada somente pelo catálogo.
+
+Quatro tarefas passaram em Chromium/WebKit: caso de recuperação e consumidor
+anterior de edição/inativação nos dois projetos. O primeiro passou a observar
+a atualização de autoridade antes de recuperar; PDF, bytes/hash, documentos e
+saldos continuam preservados. Revogar o vínculo depois retira o catálogo e
+recusa a mesma chave com404. Um caso Chromium adicional comprovou gestor
+profissional delegado sem access.manage/audit.read: última capacidade perdida,
+mesmo pacote recuperado, nova chave recusada403 e estado físico idêntico.
+Não se usa override de access.manage para simular ausência dessa capacidade:
+administrador local conserva essa atribuição pelo contrato nativo.
+
+Tipos/build dos runners e lint afetado passaram; axe foi conferido também na
+tela de resultado restrita. Logs catalogue-recovery-before/after e
+catalogue-delegated-recovery, relatórios HTML e artefato CI preservados em output.
+117 migrations, sem reset ou mutação remota. Nova CI própria ainda necessária;
+D-A continua em execução, sem merge ou liberação operacional.

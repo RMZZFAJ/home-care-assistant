@@ -173,6 +173,14 @@ independente preservado. Não houve alteração de banco;117 migrations. A CI de
 mesmo caso de recuperação de catálogo em Chromium/WebKit. Correção dirigida
 segue em execução, sem repetir a matriz geral ou declarar CI global aprovada.
 
+A recuperação de catálogo que a CI66c03fb reprovou foi reproduzida e corrigida.
+Perda só da escrita conserva a intenção incerta e seu resultado sob leitura
+viva, ocultando novas ações; perda da leitura retira o conteúdo protegido.
+Quatro tarefas Chromium/WebKit de recuperação/consumidor anterior e um caso
+adicional de gestor delegado passaram. Mesma chave recupera; chave nova sem
+permissão e vínculo revogado são recusados. PDF/ledger preservados. Nenhum
+grant, API ou migration mudou; a CI do novo SHA continua necessária.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

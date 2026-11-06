@@ -71,6 +71,7 @@ function IdentityCard({
   );
 }
 export function CatalogueIdentityManagement({
+  writable,
   patientId,
   productId,
   products,
@@ -79,6 +80,7 @@ export function CatalogueIdentityManagement({
   onSaved,
   restoreFocusFallbackRef,
 }: {
+  writable: boolean;
   patientId: string;
   productId: string;
   products: { id: string; name: string; unit: string }[];
@@ -137,7 +139,8 @@ export function CatalogueIdentityManagement({
     setPage(1);
   }
   function prepare() {
-    if (!reference || source.loading || source.error || conflict) return;
+    if (!writable || !reference || source.loading || source.error || conflict)
+      return;
     const result = catalogueIdentityCommandSchema.safeParse({
       careRecipientId: patientId,
       productId,
@@ -166,7 +169,7 @@ export function CatalogueIdentityManagement({
     }
   }
   async function save() {
-    if (!prepared) return;
+    if (!prepared || (!writable && !uncertain)) return;
     setBusy(true);
     setError("");
     try {
@@ -258,14 +261,14 @@ export function CatalogueIdentityManagement({
             </p>
             <div className="hca-toolbar">
               <Button
-                disabled={busy || uncertain}
+                disabled={busy || uncertain || !writable}
                 onClick={() => setPrepared(null)}
               >
                 Voltar à escolha
               </Button>
               <Button
                 appearance="primary"
-                disabled={busy}
+                disabled={busy || (!writable && !uncertain)}
                 onClick={() => void save()}
               >
                 {uncertain
@@ -274,6 +277,11 @@ export function CatalogueIdentityManagement({
               </Button>
             </div>
           </section>
+        ) : !writable ? (
+          <Notice error>
+            A permissão de alterar o catálogo não está mais disponível. Feche
+            esta consulta para continuar.
+          </Notice>
         ) : (
           <>
             {source.loading ? (
@@ -417,6 +425,7 @@ export function CatalogueIdentityManagement({
                 <Button
                   appearance="primary"
                   disabled={
+                    !writable ||
                     !action ||
                     source.loading ||
                     Boolean(source.error) ||

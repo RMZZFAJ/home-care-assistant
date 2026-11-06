@@ -18,15 +18,13 @@ import {
   NotificationQueue,
 } from "./notification-settings";
 import { formatBrazilDate } from "@/lib/receipt";
-import {
-  Field,
-  RoleSelect,
-  text,
-  type Row,
-} from "./admin-fields";
+import { Field, RoleSelect, text, type Row } from "./admin-fields";
 import { AlertSettings } from "./alert-settings";
 import { PatientRegistration } from "./patient-registration";
-import { AdministrationNavigation, administrationAreas } from "./administration-navigation";
+import {
+  AdministrationNavigation,
+  administrationAreas,
+} from "./administration-navigation";
 import { CatalogueManagement } from "./catalogue-management";
 import { MembershipManagement } from "./membership-management";
 import { GlobalAccounts } from "./global-accounts";
@@ -57,7 +55,16 @@ const labels: Record<Section, string> = {
 export function AdminConsole() {
   const params = useSearchParams();
   return (
-    <Workspace title="Administração" administration administrationCapabilities={["access.manage", "catalog.manage", "audit.read"]}>
+    <Workspace
+      title="Administração"
+      administration
+      administrationCapabilities={[
+        "access.manage",
+        "catalog.manage",
+        "audit.read",
+      ]}
+      administrationReadRecovery={params.get("section") === "catalog"}
+    >
       {(context) => (
         <PatientAdmin
           key={(context.patient?.id ?? "global") + params.toString()}
@@ -78,7 +85,9 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     requestedSection && Object.hasOwn(labels, requestedSection)
       ? requestedSection
       : "overview";
-  const allowed = section === "overview" || administrationAreas(context).some((area) => area.section === section);
+  const allowed =
+    section === "overview" ||
+    administrationAreas(context).some((area) => area.section === section);
   const [rows, setRows] = useState<Row[]>([]);
   const [templates, setTemplates] = useState<Row[]>([]);
   const [directory, setDirectory] = useState<Row[]>([]);
@@ -86,7 +95,9 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [editing, setEditing] = useState<Row | null>(null);
   const [page, setPage] = useState(1);
   const [notificationTotal, setNotificationTotal] = useState(0);
-  const [loading, setLoading] = useState(!["patient", "import", "overview"].includes(section));
+  const [loading, setLoading] = useState(
+    !["patient", "import", "overview"].includes(section),
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -97,7 +108,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const patientId = context.patient?.id;
   const load = useCallback(
     (signal?: AbortSignal) => {
-      if (!allowed || ["patient", "import", "overview"].includes(section)) return Promise.resolve();
+      if (!allowed || ["patient", "import", "overview"].includes(section))
+        return Promise.resolve();
       const query = new URLSearchParams({ section });
       if (patientId) query.set("careRecipientId", patientId);
       return Promise.all([
@@ -220,18 +232,38 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       refresh,
     );
   }
-  if (!allowed)
-    return <Notice error>Seu vínculo não autoriza esta área administrativa.</Notice>;
+  if (!allowed && section !== "catalog")
+    return (
+      <Notice error>Seu vínculo não autoriza esta área administrativa.</Notice>
+    );
   return (
     <div className="space-y-5">
+      {!allowed ? (
+        <Notice error>
+          Seu vínculo não permite novas mudanças no catálogo. Uma intenção
+          própria já confirmada pode ser recuperada enquanto a leitura
+          permanecer autorizada.
+        </Notice>
+      ) : null}
       <p className="text-sm text-(--muted)">
         {globalMode
           ? "Administração global e por paciente."
           : "Todas as alterações desta área se limitam ao paciente selecionado."}
       </p>
-      <AdministrationNavigation context={context} section={section === "overview" ? null : section} />
-      {section === "catalog" ? <Link className={buttonClass} href="/unidades">Unidades e apresentações / scanner</Link> : null}
-      {section === "memberships" ? <Link className={buttonClass} href="/configuracoes?area=people">Permissões e alterações com dupla aprovação</Link> : null}
+      <AdministrationNavigation
+        context={context}
+        section={section === "overview" ? null : section}
+      />
+      {section === "catalog" && allowed ? (
+        <Link className={buttonClass} href="/unidades">
+          Unidades e apresentações / scanner
+        </Link>
+      ) : null}
+      {section === "memberships" ? (
+        <Link className={buttonClass} href="/configuracoes?area=people">
+          Permissões e alterações com dupla aprovação
+        </Link>
+      ) : null}
       {error && (
         <Notice error>
           {error}
@@ -259,7 +291,9 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           </label>
         </section>
       )}
-      {loading && section !== "overview" && <Notice>Carregando {labels[section].toLowerCase()}…</Notice>}
+      {loading && section !== "overview" && (
+        <Notice>Carregando {labels[section].toLowerCase()}…</Notice>
+      )}
       <fieldset disabled={busy} className="min-w-0 space-y-5">
         {section === "patient" && (
           <PatientRegistration
@@ -270,8 +304,32 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             handle={handle}
           />
         )}
-        {section === "catalog" && patientId ? <CatalogueManagement rows={rows} templates={templates} save={execute} busy={busy} error={error} loading={loading} patientId={patientId} onIdentitySaved={async message => { setMessage(message); await load(); }} /> : null}
-        {section === "memberships" ? <MembershipManagement rows={rows} directory={directory} save={execute} busy={busy} error={error} patientId={patientId} /> : null}
+        {section === "catalog" && patientId ? (
+          <CatalogueManagement
+            writable={allowed}
+            rows={rows}
+            templates={templates}
+            save={execute}
+            busy={busy}
+            error={error}
+            loading={loading}
+            patientId={patientId}
+            onIdentitySaved={async (message) => {
+              setMessage(message);
+              if (allowed) await load();
+            }}
+          />
+        ) : null}
+        {section === "memberships" ? (
+          <MembershipManagement
+            rows={rows}
+            directory={directory}
+            save={execute}
+            busy={busy}
+            error={error}
+            patientId={patientId}
+          />
+        ) : null}
         {section === "invitations" && (
           <>
             <section className={panelClass}>
@@ -518,7 +576,14 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             )}
           </section>
         )}
-        {section === "profiles" && globalMode ? <GlobalAccounts rows={rows} save={execute} busy={busy} error={error} /> : null}
+        {section === "profiles" && globalMode ? (
+          <GlobalAccounts
+            rows={rows}
+            save={execute}
+            busy={busy}
+            error={error}
+          />
+        ) : null}
       </fieldset>
       {busy && <Notice>Salvando operação… Aguarde a confirmação.</Notice>}
     </div>

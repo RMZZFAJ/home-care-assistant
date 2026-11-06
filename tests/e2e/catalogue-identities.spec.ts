@@ -163,6 +163,33 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   sql(
     `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'catalog.manage',false);`,
   );
+  // Observe the authority refresh before recovery; a fast retry must not hide
+  // an unmount race behind the eventual context update.
+  const refreshed = page.waitForResponse(async (response) => {
+    if (!response.url().endsWith("/api/context") || !response.ok())
+      return false;
+    const value = await response.json();
+    return value.data.patients.some(
+      (row: { id: string; capabilities?: Record<string, boolean> }) =>
+        row.id === f.patient && row.capabilities?.["catalog.manage"] === false,
+    );
+  });
+  await page.evaluate(() =>
+    window.dispatchEvent(new Event("hca:profile-updated")),
+  );
+  await refreshed;
+  await expect(
+    page.getByText(/Seu vínculo não permite novas mudanças no catálogo/),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Novo item", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    modal(page).getByRole("button", {
+      name: "Recuperar mesma intenção",
+      exact: true,
+    }),
+  ).toBeVisible();
   await modal(page)
     .getByRole("button", { name: "Recuperar mesma intenção", exact: true })
     .click();
@@ -170,6 +197,7 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   expect(packets).toHaveLength(2);
   expect(packets[1]).toEqual(packets[0]);
   await expect(page.getByText(/A mesma intenção foi recuperada/)).toBeVisible();
+  await audit(page, "catalogue-recovered-without-write");
   await page.unroute("**/api/catalog/identities**");
   const fresh = await page.request.get(
     `/api/catalog?careRecipientId=${f.patient}`,
@@ -231,6 +259,23 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
     .getByRole("button", { name: "Confirmar mudança no catálogo", exact: true })
     .click();
   await expect(modal(page)).toHaveCount(0);
+  expect(identityPhysicalState(f)).toBe(before);
+  sql(`update public.care_recipient_memberships set status='revoked'
+    where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.adminA.id)};`);
+  const noRead = page.waitForResponse(
+    (response) => response.url().endsWith("/api/context") && response.ok(),
+  );
+  await page.evaluate(() =>
+    window.dispatchEvent(new Event("hca:profile-updated")),
+  );
+  await noRead;
+  await expect(
+    page.getByRole("heading", { name: "Catálogo do paciente", exact: true }),
+  ).toHaveCount(0);
+  const denied = await page.request.post("/api/catalog/identities", {
+    data: packets[0],
+  });
+  expect(denied.status()).toBe(404);
   expect(identityPhysicalState(f)).toBe(before);
 });
 
@@ -401,4 +446,77 @@ test("compensação de inativo mantém a referência visível e usa uma única s
   expect(after.documents).toEqual(before.documents);
   expect(after.lines).toEqual(before.lines);
   expect(after.events).toEqual(before.events);
+});
+
+test("gestor delegado conserva somente recuperação própria ao perder a última capacidade administrativa", async ({
+  page,
+}) => {
+  const f = await catalogueIdentityFixture();
+  sql(
+    `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.professional.id)},'catalog.manage',true);`,
+  );
+  await login(page, f.patient, "professional");
+  await open(page, f.patient);
+  await choose(
+    page,
+    "retire",
+    "Motivo próprio do gestor delegado para preservar a identidade e seu estoque",
+  );
+  const before = identityPhysicalState(f);
+  const packets: Record<string, unknown>[] = [];
+  let lost = true;
+  await page.route("**/api/catalog/identities**", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    packets.push(route.request().postDataJSON());
+    if (!lost) return route.continue();
+    lost = false;
+    const response = await route.fetch();
+    expect(response.ok(), await response.text()).toBe(true);
+    await route.abort("failed");
+  });
+  await modal(page)
+    .getByRole("button", { name: "Confirmar mudança no catálogo", exact: true })
+    .click();
+  await expect(
+    modal(page).getByText(/A escolha, o motivo e a chave estão congelados/),
+  ).toBeVisible();
+  sql(
+    `update public.capability_overrides set enabled=false where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.professional.id)} and capability='catalog.manage';`,
+  );
+  const refreshed = page.waitForResponse(async (response) => {
+    if (!response.url().endsWith("/api/context") || !response.ok())
+      return false;
+    const { data } = await response.json();
+    return data.patients.some(
+      (row: { id: string; capabilities: Record<string, boolean> }) =>
+        row.id === f.patient &&
+        !row.capabilities["catalog.manage"] &&
+        !row.capabilities["access.manage"] &&
+        !row.capabilities["audit.read"],
+    );
+  });
+  await page.evaluate(() =>
+    window.dispatchEvent(new Event("hca:profile-updated")),
+  );
+  await refreshed;
+  await expect(
+    page.getByText(/Seu vínculo não permite novas mudanças no catálogo/),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Novo item", exact: true }),
+  ).toHaveCount(0);
+  await modal(page)
+    .getByRole("button", { name: "Recuperar mesma intenção", exact: true })
+    .click();
+  await expect(page.getByText(/A mesma intenção foi recuperada/)).toBeVisible();
+  expect(packets).toHaveLength(2);
+  expect(packets[0]).toEqual(packets[1]);
+  expect(identityPhysicalState(f)).toBe(before);
+  await page.unroute("**/api/catalog/identities**");
+  const denied = await page.request.post("/api/catalog/identities", {
+    data: { ...packets[0], idempotencyKey: randomUUID() },
+  });
+  expect(denied.status()).toBe(403);
+  expect(identityPhysicalState(f)).toBe(before);
+  await audit(page, "catalogue-delegated-recovery-only");
 });
