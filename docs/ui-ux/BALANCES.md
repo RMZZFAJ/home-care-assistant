@@ -81,7 +81,7 @@ Perda de resposta mantém conteúdo/chave congelados até recuperar o próprio a
 Pareceres anteriores identificam autor, grupo, contagem e versão revisada;
 consulta histórica não reaplica estoque. O PDF conserva essas distinções.
 
-No BAL agendado ainda em revisão, família ou supervisão habilitada abre
+No BAL emitido em revisão ou já conciliado, família ou supervisão habilitada abre
 Designar reconto pelo detalhe ou pelo acompanhamento. Contador efetivo e
 observações anteriores ficam em leitura. A pessoa escolhe explicitamente um
 plantão real pela busca e registra justificativa própria. A conferência mostra
@@ -99,6 +99,16 @@ mostra a pendência de designação, em vez de um vazio falso. A lista informa
 total e recorte das 100 mais antigas; outros BAL continuam acessíveis pelo
 histórico paginado e pelo detalhe. Reconto não altera o cumprimento ou o atraso
 original das semanas, nem torna parecer antigo uma revisão da contagem nova.
+
+O legado recebe uma janela real de reconto sem ativar obrigações semanais.
+Por isso a entrada se chama Balanço de estoque, sem presumir periodicidade para
+toda contagem. Revisão do reconto explicita aplicação facultativa da diferença
+ou necessidade dos novos pareceres conforme a política preservada. Designar
+não altera o efeito já aplicado. A nova contagem pode gerar somente a diferença
+atual, identificada como BAL, e não consumo inferido. As versões das contagens
+físicas têm links próprios para os PDFs congelados, inclusive quando nunca houve
+revisor. Observações/quantidades anteriores são consultáveis naquela versão,
+sem reaproveitá-las no formulário vazio da nova profissional.
 
 ## Processamento e validação
 

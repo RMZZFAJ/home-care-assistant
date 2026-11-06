@@ -1295,3 +1295,102 @@ larguras já previstas. Lint do teste passou. Produto, migrations e regras não
 mudaram; não se repetiu integração completa ou replay local. CI posterior precisa
 validar o SHA publicado. Reconto facultativo/legado e demais critérios D2 seguem
 em execução; nenhum resultado local ou anterior equivale a GO/homologação física.
+
+## D2.19 — reconto após conciliação e legado sem obrigação semanal
+
+Base 24bc154d0f0d95e6dc67708680b4df5df9d02ae7, publicada e Draft PR preservado.
+CI 42159766519 estava in_progress na consulta pontual. Duas contraprovas Auth
+falharam antes da migration 20261106040155: BAL facultativo já aprovado não
+permitia nova designação; legado sem ciclo também não oferecia o caminho formal.
+
+A migration amplia designação para submetido/aprovado, preservando o estado e o
+efeito anterior durante a preparação. Ciclo técnico legacy_recount guarda o
+instante oficial anterior somente se conhecido, sem inventar obrigação/data
+semanal ou ativar regime. A nova profissional tem plantão real e confirmação
+pessoal. Novo ato usa referência atual e política preservada: facultativa aplica
+só o delta atual; exigida aguarda os novos pareceres. Snapshots, created_by,
+pareceres, movimentos e datas anteriores não são reescritos. A contagem revalida
+leitura, bal.count, vínculo e fim da janela após efeitos tardios. Recuperação
+própria precede nova capacidade de escrita e não repete a conciliação.
+
+Sucessão/indisponibilidade de reconto agora independe de regime semanal ativo.
+Worker nativo inclui essas atribuições na mesma rotação limitada, com helpers
+privados sem EXECUTE para clientes e índice parcial de candidatas. Sem segundo
+worker. A API preserva campos/versões da designação do incremento anterior;
+hasRecountCycle distingue ciclo formal da existência de agenda semanal.
+
+Cinco cenários funcionais Auth distintos passaram entre rodada e rechecks. C7 exato:
+entrega pessoal deu referência20; Juliana contou18 sem parecer/fila universal;
+Sheila formalmente designada contou17. Dois movimentos BAL de dois e um,
+sem consumo inferido. Parecer facultativo posterior não reaplicou o efeito;
+retry após perda de bal.count recuperou a contagem confirmada. Legado foi contado
+pela designada sem regime/semanas. Aprovação legítima da contagem um enquanto
+reconto estava designado não bloqueou o novo ato nem eliminou seu efeito prévio.
+Perda de bal.count após espera tardia observada no FK/perfil retornou 42501,
+com rollback de delta, evento e versão. Legado também transferiu o mesmo plantão
+e mostrou pendência após perder o novo contador, sem tocar documento ou estoque.
+
+Dois consumidores Auth existentes passaram: sucessão/pareceres do incremento
+anterior e regularização de semanas antigas. No novo teste de ausência de semanas,
+o agregado SQL sem linhas retornou NULL, enquanto o readmodel retorna array vazio.
+A asserção foi corrigida para cada contrato, exigindo também count(*)=0, sem
+tratar NULL como prova suficiente de ausência. Só esse caso foi repetido.
+Lint inicial acusou import actor sem uso após extrair o fixture compartilhado;
+removido, lint pertinente passou. O unitário PDF afetado preservou as três semanas
+legítimas do consumidor anterior. Não se duplicou replay ou suíte geral local.
+
+A interface usa Balanço de estoque, sem chamar todo BAL de semanal. Reconto
+legado abre a contagem pessoal vazia e a conferência explicita efeito facultativo
+ou revisão exigida. Histórico mostra links para PDFs das versões das contagens,
+inclusive sem pareceres, usando a rota versionada existente e seus controles.
+Não se duplicou todo o histórico material em cada snapshot novo. O PDF da janela
+legada informa ausência de obrigação semanal e não imprime semanas vazias.
+
+Duas tarefas Chromium passaram no mesmo runner: novo percurso legado com
+designação, contagem pessoal, perda da resposta após aplicação, revogação de
+bal.count e recuperação sem segundo delta; consumidor anterior com ativação,
+contagem/referência, resposta perdida e documento real. Fontes estáveis durante
+a execução; tipos/build do runner passaram. Axe/overflow 320/390/768/1440 no novo
+fluxo; sem zoom400%/AT/humano/aparelho físico. Relatório local preservado em
+bal-optional-recount-report.html, logs bal-optional-recount-*.
+
+PDFs bal-optional-recount-f8e637d3-7ca8-4398-960c-4ad66931bea1:
+v1 SHA-256 490d290321166c7b575b902d8853b089a9e6b8efed80ac54ebcd5f8172def12e;
+v2 SHA-256 4071bb0f5b17a1de9f476e5f48d9b8021595ad77c5f7a0cf0e93b999550d625d.
+Quatro páginas renderizadas por PDFium e inspecionadas: v1 conserva contador,
+observações e quantidades dois; v2 identifica Sheila, quantidades um, janela
+formal e ausência de semanas. Hashes canônicos/bytes/renderer, eventos e ledger
+confrontados por leitura independente. Fonte e manifestos adjacentes preservados.
+
+Advisor all mantém exatamente as doze chaves WARN anteriores, onze initplan e
+unaccent/public. 114 migrations; 84 históricas preservadas. Instalação limpa,
+evolução legada e matriz geral do SHA publicado ficam na CI. C7-AC-003 e trecho
+BAL de C-FINAL-AC-016 têm prova local integrada. C068 restante, P07, catálogo,
+rastreabilidade/destinação e demais critérios D2 continuam em execução. Sem merge,
+alteração remota, assinatura/provedor ou liberação operacional definitiva.
+
+No fechamento deste incremento, a consulta pontual da CI 42159766519 de 24bc154
+mostrou failure: checks gerais Windows/Ubuntu passaram, instalação limpa/legada
+de 113 migrations passou, mas integração falhou com BAL document required nas
+leituras do workspace; browser foi skipped. Não houve falha mobile nova observada
+nesse SHA, pois a matriz visual não foi executada. Logs do job 127725650966 foram
+inspecionados, sem polling. O resultado não certifica o código local posterior.
+
+O readmodel de recuperação chamava projeção exclusiva de BAL em CTE passível de
+reordenação antes da restrição de identidade/tipo/paciente. Esse é o caminho
+inferido da fonte e do erro; o plano original de CI não foi reproduzido no banco
+local retido, inclusive em quatro probes de plano com uma REQ legítima. Uma
+contraprova Auth controlada com vínculo de tipo incompatível, permitido pelo FK
+histórico de existência, reproduziu o mesmo erro 22023. Esse fixture artificial
+foi removido no finally com ID/paciente/documento exatos; não se afirmou que a CI
+continha vínculos corrompidos.
+
+Na migration 114 ainda não publicada, a consulta agora materializa primeiro as
+identidades BAL do próprio paciente e somente depois chama a projeção. Foi
+aplicada localmente só a definição refinada, sem reset nem edição da 113 publicada.
+A rota específica continua recusando REQ; autorização/RLS não foram relaxadas.
+Cinco controles dirigidos passaram: contraprova de tipo, recuperação válida
+submetida, recuperação válida aprovada/legada, recusa de adiamento e duas edições
+BAL concorrentes com mesma intenção. Somados aos anteriores, seis casos Auth
+novos e cinco consumidores Auth distintos neste incremento. Suíte completa e
+plano/dataset limpos do SHA publicado continuam sob a CI, sem verde presumido.

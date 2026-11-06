@@ -500,7 +500,8 @@ ou ajustes. [Regras e experiência](../ui-ux/BALANCES.md).
 
 `GET /api/balances/recount?documentId=...` consulta a contagem efetiva,
 observações originais, atribuição e destinos reais elegíveis, com bal.read
-revalidado pelo banco. Para BAL agendado ainda submetido, assign_recount exige
+revalidado pelo banco. Para BAL emitido submetido ou conciliado, assign_recount
+exige
 documentId, targetShiftId, targetShiftVersion, referenceHash e justificativa
 própria de 3 a 1.000 unidades UTF-16, mais expectedVersion documental.
 Pessoa, autoria e janela são resolvidas no banco. Referência ou alvo obsoletos
@@ -510,6 +511,13 @@ após perda apenas da capacidade de designar. O resultado congela o ato original
 não comprova uma contagem física nem substitui a consulta da atribuição atual.
 balance_workspace inclui recountRecovery com total e até 100 pendências antigas;
 o histórico paginado e o detalhe permitem abrir os demais registros.
+Legado sem ciclo recebe atribuição formal em plantão real, sem ativar o regime
+semanal. A designação conserva o estado e os movimentos da contagem anterior.
+Só a confirmação pessoal da nova contagem gera versão e conciliação conforme
+reviewPolicy preservada: facultativa aplica a diferença atual; exigida aguarda
+os novos pareceres. Retry confirmado com leitura viva recupera o mesmo ato,
+inclusive após perda apenas de bal.count. PDF com version seleciona o snapshot
+daquela versão; o detalhe oferece links das contagens físicas anteriores.
 
 ## História e erros
 

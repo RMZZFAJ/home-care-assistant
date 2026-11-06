@@ -154,7 +154,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
       .getByRole("link", { name: "Fazer balanço", exact: true })
       .click();
     await expect(
-      counter.getByRole("heading", { name: "Balanço semanal", exact: true }),
+      counter.getByRole("heading", { name: "Balanço de estoque", exact: true }),
     ).toBeVisible();
     const catalogue = (
       await (

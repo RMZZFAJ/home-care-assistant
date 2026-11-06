@@ -691,7 +691,7 @@ export function SupplyDocumentContent({
           data.type === "BAL" &&
           data.status === "submitted" &&
           allowed("bal.count") &&
-          !data.payload.balanceContext ? (
+          !data.payload.balanceContext && !data.balanceRecount?.hasRecountCycle ? (
             <Link
               className={buttonClass}
               href={"/fichas/bal?documentId=" + data.id + "&recount=true"}

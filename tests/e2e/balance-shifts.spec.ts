@@ -67,7 +67,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await page.getByRole("link",{name:/Balanço do seu plantão/}).click();
   await expect(page.getByRole("heading",{name:"Balanços e plantões",exact:true})).toBeVisible();
   await page.getByRole("main").getByRole("link",{name:"Fazer balanço",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Balanço semanal",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Balanço de estoque",exact:true})).toBeVisible();
   await expect(page.getByRole("list",{name:"Barra de etapas; use as setas do teclado para rolar",exact:true}).getByRole("listitem")).toHaveCount(2);
   await expect(page.getByText(/^Referência:/)).toHaveCount(0);
   await page.getByRole("button",{name:"Revisar",exact:true}).click();

@@ -122,6 +122,7 @@ export function BalanceReview({
     }
   }, [busy, reviewing, editor]);
   const context = data.balanceReview;
+  const countEvents = data.events.filter(event => ["bal.issued","bal.submit","bal.recount"].includes(event.action)).sort((a,b)=>a.version-b.version);
   if (!context)
     return (
       <Notice>
@@ -242,6 +243,15 @@ export function BalanceReview({
       {message ? <Notice>{message}</Notice> : null}
       <CountFacts data={data} />
       {data.balanceRecount?.canAssign ? <Link href={recountHref(data.balanceRecount.patientId,data.id)} className="ui-button ui-button-secondary" prefetch={false}>Designar reconto</Link> : data.balanceRecount?.requiresDesignation ? <Notice>O reconto aguarda nova designação da família ou supervisão habilitada no acompanhamento de balanços.</Notice> : null}
+      <section aria-label="Versões das contagens físicas" className="space-y-3">
+        <h3 className="font-semibold">Contagens físicas preservadas</h3>
+        {!countEvents.length ? <p>Nenhuma contagem oficial preservada neste histórico.</p> : null}
+        {countEvents.map(event => {
+          const captured = Array.isArray(data.canonical_snapshot.history) ? data.canonical_snapshot.history.find((row:unknown)=>row && typeof row === "object" && "version" in row && row.version===event.version) : null;
+          const name = captured && typeof captured === "object" && "actorName" in captured && typeof captured.actorName === "string" ? captured.actorName : "Nome não preservado neste histórico";
+          return <article className="rounded-lg border border-(--line) p-3 text-sm space-y-2" key={event.id}><p><strong>Contagem na versão documental {event.version}</strong> · {name} · {formatBrazilDate(event.createdAt)}</p><p>Consulte os materiais, quantidades e observações congelados nessa versão.</p><a href={`/api/documents/${data.id}/pdf?version=${event.version}`} target="_blank" rel="noopener" className="ui-button ui-button-secondary">Consultar PDF da contagem na versão {event.version}</a></article>;
+        })}
+      </section>
       <Notice>
         {["cancelled", "rejected"].includes(data.status)
           ? "Balanço encerrado: pareceres e observações permanecem em leitura."

@@ -3,7 +3,7 @@ import type { BalanceCounter, SupplyPayload } from "./documents";
 export type BalanceRecountContext = {
   documentId: string; patientId: string; code: string; documentVersion: number; status: string;
   counter: BalanceCounter; countVersion: number | null; notes: string;
-  countWindow: SupplyPayload["balanceContext"] | null; isScheduled: boolean;
+  countWindow: SupplyPayload["balanceContext"] | null; isScheduled: boolean; hasRecountCycle: boolean;
   canAssign: boolean; requiresDesignation: boolean; referenceHash: string;
   activeAssignment: (BalanceAssignment & { professionalName: string | null; timezone: string | null }) | null;
   lastAssignment: BalanceAssignment | null; targets?: ScheduledShift[];

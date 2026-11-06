@@ -397,7 +397,7 @@ export const documentLabels: Record<DocumentType, string> = {
   REQ: "Requisição",
   COM: "Compra de insumos",
   ENT: "Entrega / Entrada",
-  BAL: "Balanço semanal",
+  BAL: "Balanço de estoque",
 };
 export const documentStatuses: Record<string, string> = {
   historical: "Registro histórico",

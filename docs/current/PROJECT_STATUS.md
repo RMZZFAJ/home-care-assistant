@@ -67,8 +67,7 @@ casos Auth, quatro fronteiras API, duas tarefas Chromium e o consumidor Auth
 agendado passaram. PDF de três páginas preserva Juliana na contagem um, Sheila
 na dois e os três pareceres próprios; eventos e datas da obrigação preservados,
 com um único ajuste BAL de quatro unidades. 113 migrations; replay e matriz
-geral do novo SHA na CI. Reconto após conciliação já aplicada e legado sem ciclo
-seguem no próximo incremento, sem encerrar D2, merge ou GO.
+geral do novo SHA na CI. D2 continua em execução, sem merge ou GO.
 
 CI 42153551800 de 2b18b1b concluiu banco/replay de 112 migrations, checks gerais,
 Chromium e WebKit com sucesso, mas reprovou um consumidor mobile de apresentações.
@@ -77,6 +76,23 @@ por clique estável, exige geometria visível e alvo real do ponteiro; o cenári
 dirigido passou com asserções materiais preservadas. A tentativa local anterior
 também passou, sem reprodução declarada da falha intermitente. Produto/banco não
 mudaram. CI 42159112693 de eb5c678 estava in_progress na consulta pontual.
+
+Reconto foi ampliado para BAL já conciliado e legado sem ciclo semanal.
+Designação preserva o primeiro efeito; nova contagem usa a referência atual e
+a política preservada. Seis cenários Auth distintos, cinco consumidores Auth,
+uma tarefa Chromium de legado e o consumidor visual agendado passaram, além do
+unitário PDF afetado. C7 exato: referência20, Juliana18 e Sheila17 produziram
+somente ajustes BAL de dois e um, sem fila universal ou consumo inferido.
+Legado recebeu janela real sem ativar regime ou semanas; recuperação após perda
+de bal.count não duplicou efeitos. PDFs v1/v2, quatro páginas, preservam autores,
+observações, quantidades e hashes de cada versão. 114 migrations; suites gerais
+e replay do SHA publicado ficam na CI. P07 e demais critérios D2 seguem abertos.
+CI de 24bc154 concluiu checks gerais e replay limpo/legado de 113 migrations,
+mas falhou na integração com erro de tipo na projeção BAL; browser foi skipped.
+A consulta da migration 114 passou a fazer a seleção
+materializada de identidades/paciente/tipo. Contraprova Auth e quatro consumidores
+afetados passaram no recheck; o plano original de CI não foi reproduzido no banco
+retido. A CI posterior continua necessária, sem aprovação global presumida.
 
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de

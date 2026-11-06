@@ -496,17 +496,16 @@ export async function renderDocumentPdf(
       9,
     );
     text("Contagem efetiva atual: " + stamp(balanceContext.countedAt), 9);
-    if (Array.isArray(balanceContext.weeks))
+    if (Array.isArray(balanceContext.weeks) && balanceContext.weeks.length)
       text(
         "Semanas vinculadas: " +
           balanceContext.weeks
             .map((week) => String(week).split("-").reverse().join("/"))
             .join(", "),
       );
-    text(
-      "A contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no histórico.",
-      8,
-    );
+    text(Array.isArray(balanceContext.weeks) && !balanceContext.weeks.length
+      ? "Esta contagem tem uma janela formal, sem obrigações semanais vinculadas. Não foram criadas semanas retroativas."
+      : "A contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no histórico.", 8);
   }
   section(
     snapshot.type === "REQ"

@@ -212,8 +212,25 @@ após efeitos tardios; helpers privados não são executáveis por clientes.
 Somente o profissional designado registra a nova contagem. created_by, eventos,
 pareceres e datas de satisfação das obrigações anteriores permanecem íntegros.
 O evento recount_recorded distingue o novo ato físico de outra regularização
-das semanas antigas. Este incremento cobre BAL agendado ainda submetido;
-conciliação já aplicada e ciclos legados sem escala permanecem separados.
+das semanas antigas. Conciliação já aplicada permanece íntegra durante a nova
+designação. Ao confirmar reconto, a versão usa o ledger atual e a reviewPolicy
+preservada; facultativa aplica somente a nova diferença e exigida aguarda novos
+pareceres. Metadados do efeito anterior continuam no evento imutável, enquanto
+a versão nova registra seu próprio efeito. Contagem revalida bal.read/bal.count,
+vínculo e fim da janela depois dos efeitos tardios.
+
+bal_cycles.origin distingue scheduled de legacy_recount. Um legado pode ganhar
+ciclo técnico de reconto sem regime ou obrigação semanal. counted_at anterior
+usa somente o instante oficial conhecido, permitindo desconhecimento no ciclo
+legado em vez de fabricar data histórica. A confirmação nova tem autoria/janela
+reais e weeks vazio. process_bal_recounts trata sucessão e indisponibilidade
+mesmo com regime desligado/inexistente; o worker nativo inclui esses pacientes
+na mesma rotação de até 100, sem criar um segundo agendador. Helpers privados
+permanecem sem EXECUTE dos clientes. Não se altera snapshot ou movimento antigo.
+Na recuperação, identidades BAL elegíveis do próprio paciente são materializadas
+antes de chamar a projeção que rejeita outros tipos. Isso preserva a fronteira
+da função independentemente da ordem dos joins; a rota de BAL continua recusando
+REQ diretamente. Fonte incompatível não é convertida em contagem.
 
 ## Identidade, capacidades e integrações
 

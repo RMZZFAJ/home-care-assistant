@@ -9,11 +9,16 @@ import { actor, rpc } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 export const workspace = (client, patient) =>
   rpc(client, "balance_workspace", { p_patient: patient });
-export async function pendingRecount() {
+export async function pendingRecount({
+  reviewPolicy = "required",
+  firstReview = true,
+  referenceQuantity = "5",
+  countQuantity = "2",
+} = {}) {
   const f = await balanceSetup();
   sql(`update public.profiles set full_name='Juliana fictícia, contadora original' where id=${sqlLiteral(f.pro.id)};
     insert into public.patient_settings(care_recipient_id) values(${sqlLiteral(f.patient)}) on conflict do nothing;
-    update public.patient_settings set settings=settings||'{"balReview":"required","balRequirement":"all","balApprovers":["family","supervisor"]}'::jsonb where care_recipient_id=${sqlLiteral(f.patient)};`);
+    update public.patient_settings set settings=settings||jsonb_build_object('balReview',${sqlLiteral(reviewPolicy)},'balRequirement','all','balApprovers',jsonb_build_array('family','supervisor')) where care_recipient_id=${sqlLiteral(f.patient)};`);
   const delivery = await rpc(f.admin, "create_supply_document", {
     p_patient: f.patient,
     p_type: "ENT",
@@ -24,7 +29,7 @@ export async function pendingRecount() {
       recipientId: f.pro.id,
       recipientReason:
         "Entrega pessoal fictícia para comprovar a conciliação após reconto",
-      lines: [{ productId: f.products[0], quantity: "5" }],
+      lines: [{ productId: f.products[0], quantity: referenceQuantity }],
     },
   });
   await rpc(f.pro.client, "supply_document_command", {
@@ -39,7 +44,7 @@ export async function pendingRecount() {
   const payload = {
     lines: f.products.map((productId, i) => ({
       productId,
-      quantity: i ? "0" : "2",
+      quantity: i ? "0" : countQuantity,
     })),
     notes: "Observações originais da contagem um, por Juliana fictícia.",
     balanceAssignment: {
@@ -56,16 +61,18 @@ export async function pendingRecount() {
     p_draft: false,
   });
   const family = await actor("family", f.patient);
-  const document = await rpc(family, "supply_document_command", {
-    p_id: issued.id,
-    p_action: "approve",
-    p_body: {
-      group: "family",
-      comment: "Parecer da primeira contagem, anterior ao reconto.",
-    },
-    p_key: randomUUID(),
-    p_version: issued.version,
-  });
+  const document = firstReview
+    ? await rpc(family, "supply_document_command", {
+        p_id: issued.id,
+        p_action: "approve",
+        p_body: {
+          group: "family",
+          comment: "Parecer da primeira contagem, anterior ao reconto.",
+        },
+        p_key: randomUUID(),
+        p_version: issued.version,
+      })
+    : issued;
   return { ...f, initial, assignment, payload, document, family, delivery };
 }
 export const recountPacket = async (client, f, target, key = randomUUID()) => {
