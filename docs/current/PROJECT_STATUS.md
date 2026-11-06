@@ -162,6 +162,17 @@ Sua revisão usa uma única gaveta.117 migrations; mesmas doze chaves WARN locai
 O novo SHA exige a CI programada; a matriz exata1/5/20/100 e demais critérios D2
 continuam em execução. Sem merge ou alteração remota.
 
+Seleção em REQ/COM/ENT foi verificada com catálogos reais fictícios de1/5/20/100
+materiais: doze tarefas independentes passaram entre rodada/recheck, além do
+consumidor anterior de conversão. Alias, teclado, resultado vazio e mudança de
+categoria preservam seleção/quantidade; total global tem anúncio acessível.
+Overflow real de nomes longos foi corrigido na seleção, apresentação e revisão.
+Axe/overflow em quatro larguras, capturas320 inspecionadas e estado físico
+independente preservado. Não houve alteração de banco;117 migrations. A CI de
+66c03fb aprovou banco/replay/integração, checks gerais e mobile, mas falhou no
+mesmo caso de recuperação de catálogo em Chromium/WebKit. Correção dirigida
+segue em execução, sem repetir a matriz geral ou declarar CI global aprovada.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { restoreStockObservation, validStockObservation } from "@/lib/stock-observation";
-import type {
-  RequisitionFormData,
-  RequisitionLine,
-} from "@/types/requisition";
+import {
+  restoreStockObservation,
+  validStockObservation,
+} from "@/lib/stock-observation";
+import type { RequisitionFormData, RequisitionLine } from "@/types/requisition";
 import type { ItemContext } from "@/types/documents";
 import {
   api,
@@ -92,7 +92,11 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
           Array.isArray(saved.form.extraItems) &&
           Array.isArray(saved.form.observations)
         ) {
-          setForm({ ...saved.form, lines: saved.form.lines.map(restoreStockObservation), extraItems: saved.form.extraItems.map(restoreStockObservation) });
+          setForm({
+            ...saved.form,
+            lines: saved.form.lines.map(restoreStockObservation),
+            extraItems: saved.form.extraItems.map(restoreStockObservation),
+          });
           setMessage("Rascunho deste dispositivo recuperado.");
           if (saved.intent) {
             frozenRef.current = saved.intent;
@@ -213,7 +217,10 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
             ?.quantity_decimals ?? 0,
         )
       )
-        errors[line.productId] = line.stockObservation === "legacy_unclassified" ? "Confirme como informar a observação recuperada do rascunho antigo." : "Revise a informação do estoque e a precisão da unidade.";
+        errors[line.productId] =
+          line.stockObservation === "legacy_unclassified"
+            ? "Confirme como informar a observação recuperada do rascunho antigo."
+            : "Revise a informação do estoque e a precisão da unidade.";
       if (
         itemContext.find((item) => item.productId === line.productId)?.pending
           .length &&
@@ -225,9 +232,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
     if (
       (all || step === 4) &&
       form.extraItems.some(
-        (item) =>
-          !item.name.trim() ||
-          !validStockObservation(item),
+        (item) => !item.name.trim() || !validStockObservation(item),
       )
     )
       errors.extras = "Preencha ou remova os itens extras incompletos.";
@@ -378,6 +383,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
                 updateLine={updateLine}
                 removeLine={removeLine}
                 errors={fieldErrors}
+                selectedCount={form.lines.length}
               />
             ) : null}
             {step === 4 ? (
@@ -424,7 +430,32 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
               Nenhum dado será reenviado com uma chave nova.
             </Notice>
           ) : null}
-          <WizardActions step={step} total={7} saving={saving} uncertain={uncertain} blocked={Boolean(catalogError)} finishLabel="Concluir requisição" onBack={() => setStep((value) => value - 1)} onDraft={() => { try { sessionStorage.setItem(storageKey, JSON.stringify({ savedAt: Date.now(), form })); setMessage("Rascunho salvo neste dispositivo."); } catch { setError("O armazenamento deste dispositivo está indisponível."); } }} onNext={() => { if (validate()) setStep((value) => value + 1); }} onFinish={() => void submit()} />
+          <WizardActions
+            step={step}
+            total={7}
+            saving={saving}
+            uncertain={uncertain}
+            blocked={Boolean(catalogError)}
+            finishLabel="Concluir requisição"
+            onBack={() => setStep((value) => value - 1)}
+            onDraft={() => {
+              try {
+                sessionStorage.setItem(
+                  storageKey,
+                  JSON.stringify({ savedAt: Date.now(), form }),
+                );
+                setMessage("Rascunho salvo neste dispositivo.");
+              } catch {
+                setError(
+                  "O armazenamento deste dispositivo está indisponível.",
+                );
+              }
+            }}
+            onNext={() => {
+              if (validate()) setStep((value) => value + 1);
+            }}
+            onFinish={() => void submit()}
+          />
         </section>
       )}
     </div>

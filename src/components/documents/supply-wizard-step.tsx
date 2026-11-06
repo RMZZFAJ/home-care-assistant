@@ -346,9 +346,20 @@ export function SupplyWizardStep({
               }
             />
           </label>
-          <p role="status" className="text-sm">
-            {visibleProducts.length} materiais encontrados nesta categoria. As
-            seleções permanecem ao filtrar ou trocar de categoria.
+          <p
+            role="status"
+            aria-label="Resultado da busca e seleção de materiais"
+            className="text-sm"
+          >
+            {visibleProducts.length}{" "}
+            {visibleProducts.length === 1
+              ? "material encontrado"
+              : "materiais encontrados"}
+            . {Object.keys(form.quantities).length}{" "}
+            {Object.keys(form.quantities).length === 1
+              ? "material selecionado"
+              : "materiais selecionados"}
+            . As seleções permanecem ao filtrar ou trocar de categoria.
           </p>
           {!visibleProducts.length ? (
             <Notice>
@@ -400,7 +411,10 @@ export function SupplyWizardStep({
                         }
                       />
                     ) : null}
-                    <span>
+                    <span
+                      className="min-w-0"
+                      style={{ overflowWrap: "anywhere" }}
+                    >
                       <strong className="block text-sm">{product.name}</strong>
                       <span className="mt-1 block text-xs text-(--muted)">
                         {product.unit}
@@ -555,7 +569,10 @@ export function SupplyWizardStep({
                 key={product.id}
                 className="flex items-start justify-between gap-4 py-3 text-sm"
               >
-                <span>
+                <span
+                  className="min-w-0 flex-1"
+                  style={{ overflowWrap: "anywhere" }}
+                >
                   {product.name}
                   {form.presentationSelections?.[product.id]?.map((row) => (
                     <small className="mt-2 block break-words" key={row.id}>
@@ -563,7 +580,7 @@ export function SupplyWizardStep({
                     </small>
                   ))}
                 </span>
-                <strong>
+                <strong className="shrink-0">
                   {form.quantities[product.id]
                     ? formatQuantity(form.quantities[product.id], product.unit)
                     : "Quantidade pendente"}

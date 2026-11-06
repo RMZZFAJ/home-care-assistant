@@ -1767,3 +1767,38 @@ oficiais não mudaram; fixtures continuam fictícias na stack local verificada.
 Logs consumption-mobile-before/after e relatório final preservados em output.
 117 migrations permanecem; CI do novo SHA ainda necessária, sem aprovação global
 presumida ou homologação humana/aparelho. D-A segue em execução.
+
+## D2.26 — seleção de materiais com catálogo de um a cem itens
+
+C028 recebeu doze tarefas independentes: REQ, COM e ENT com1/5/20/100 materiais
+canônicos, criados pelas RPCs existentes com Auth real. A fixture conserva os
+dois materiais originais quando a opção de catálogo não é fornecida. Busca por
+nome/alias normaliza acentos, caixa e pontuação; resultado vazio e mudança de
+categoria preservam seleção/quantidade. Total selecionado é global e anunciado
+por status acessível. Teclado percorre a busca e seleciona o material. COM/ENT
+mantêm a quantidade manual sem exigir leitura de código ou apresentação.
+
+Nomes extensos sem espaços expuseram overflow real em320px: primeiro REQ,
+depois o rótulo interno da apresentação em COM. Quebra localizada de nomes e
+contenção flex corrigiram seleção e revisão, preservando os nomes completos.
+Capturas finais de REQ/COM/ENT com cem materiais em320px foram inspecionadas;
+axe/overflow passaram na seleção e revisão em320/390/768/1440. Estado físico,
+documentos e eventos foram confrontados por leitura independente antes/depois;
+nenhuma REQ foi emitida somente por navegar, filtrar ou revisar.
+
+Após a correção, COM com um item passou isoladamente. As onze tarefas restantes
+e o consumidor anterior de conversão COM2x10 após cadastro12 passaram na rodada
+seguinte, sem repetir o caso já aprovado. Tipos/build dos runners e lint dos
+seis fontes afetados passaram. Um erro inicial de inferência do parâmetro JS
+da fixture foi diagnosticado por typecheck dirigido; JSDoc corrigiu o contrato.
+A consulta inicial de outro perfil foi substituída pela rota autorizada de
+preparação ENT; RLS não foi ampliada. O seletor COM segue o rótulo existente,
+que inclui ajuda. Logs catalogue-scale-*, capturas e relatórios HTML preservados.
+
+Não há migration, alteração de autorização ou escrita operacional neste lote;
+117 migrations permanecem. A CI42260657831 de66c03fb concluiu checks gerais
+Windows/Ubuntu, replay limpo/legado, integração e mobile com sucesso. Chromium e
+WebKit passaram104/falharam1, inclusive no retry: recuperação de catálogo deixou
+de mostrar a mensagem após perder catalog.manage. Esse caso será corrigido em
+lote próprio. Não se presume aprovação global da CI nem humana/AT/aparelho.
+D-A permanece em execução, sem merge ou alteração remota.

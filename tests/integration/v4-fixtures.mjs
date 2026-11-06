@@ -47,16 +47,22 @@ async function rpc(client, name, args) {
 async function claimExternalFixtureJob(service, worker, predicate) {
   // Retained local data can put the fixture beyond the first bounded batch.
   // Exercise the worker queue without deleting notices or enlarging its limit.
-  const queueSize = Number(sql("select count(*) from public.requisition_notifications"));
+  const queueSize = Number(
+    sql("select count(*) from public.requisition_notifications"),
+  );
   for (let batch = 0; batch <= queueSize; batch++) {
     const jobs = await rpc(service, "claim_notification_jobs", {
-      p_limit: 100, p_worker_id: worker, p_external_enabled: true,
+      p_limit: 100,
+      p_worker_id: worker,
+      p_external_enabled: true,
     });
     const fixtureJob = jobs.find(predicate);
     if (fixtureJob) return fixtureJob;
     if (!jobs.length) break;
   }
-  assert.fail("The fixture notification was not claimable within the existing queue");
+  assert.fail(
+    "The fixture notification was not claimable within the existing queue",
+  );
 }
 const request = (patient, products) => ({
   p_care_recipient_id: patient,
@@ -70,7 +76,8 @@ const request = (patient, products) => ({
   p_extra_items: [],
   p_observations: [],
 });
-async function setup() {
+/** @param {{catalogue?: {name:string,category:string,unit:string,aliases:string[]}[]|null}} [options] */
+async function setup({ catalogue = null } = {}) {
   const global = await actor("global");
   const patient = (
     await rpc(global, "admin_upsert_recipient", {
@@ -87,16 +94,30 @@ async function setup() {
     );
   const admin = await actor("adminA", patient);
   const products = [];
-  for (let i = 0; i < 2; i++)
+  const definitions =
+    catalogue ??
+    Array.from({ length: 2 }, (_, i) => ({
+      name: "Material fictício V4 " + i,
+      category: "higiene",
+      unit: "unidade",
+      aliases: [],
+    }));
+  assert.ok(
+    Array.isArray(definitions) &&
+      definitions.length >= 1 &&
+      definitions.length <= 100,
+    "Controlled fixture catalogue must contain 1 to 100 items",
+  );
+  for (const definition of definitions)
     products.push(
       (
         await rpc(admin, "admin_upsert_recipient_product", {
           p_care_recipient_id: patient,
           p_product_id: null,
-          p_name: "Material fictício V4 " + i,
-          p_category: "higiene",
-          p_unit: "unidade",
-          p_aliases: [],
+          p_name: definition.name,
+          p_category: definition.category,
+          p_unit: definition.unit,
+          p_aliases: definition.aliases,
           p_is_active: true,
         })
       ).product_id,
@@ -124,7 +145,13 @@ async function issue(patient, products) {
   assert.ifError(lines.error);
   return { id: row.requisition_id, lines: lines.data };
 }
-async function delivery(patient, req, products, extras = {}, dispatcher = "family") {
+async function delivery(
+  patient,
+  req,
+  products,
+  extras = {},
+  dispatcher = "family",
+) {
   const family = await actor(dispatcher, patient);
   return rpc(family, "create_supply_document", {
     p_patient: patient,
@@ -147,4 +174,14 @@ async function delivery(patient, req, products, extras = {}, dispatcher = "famil
   });
 }
 
-export { env, fixtures, actor, rpc, setup, issue, delivery, request, claimExternalFixtureJob };
+export {
+  env,
+  fixtures,
+  actor,
+  rpc,
+  setup,
+  issue,
+  delivery,
+  request,
+  claimExternalFixtureJob,
+};

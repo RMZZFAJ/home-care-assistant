@@ -58,7 +58,8 @@ export function PresentationQuantity({
   );
   return (
     <div
-      className="mt-3 space-y-3 rounded-lg border border-(--line) p-3 text-sm"
+      className="mt-3 min-w-0 space-y-3 rounded-lg border border-(--line) p-3 text-sm"
+      style={{ overflowWrap: "anywhere" }}
       role="group"
       aria-label={`Embalagens de ${product.name}`}
     >

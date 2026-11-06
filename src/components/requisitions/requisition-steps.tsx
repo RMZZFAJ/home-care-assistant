@@ -72,6 +72,7 @@ export function CatalogStep({
   updateLine,
   removeLine,
   errors,
+  selectedCount,
 }: {
   items: Product[];
   itemContext: ItemContext[];
@@ -79,6 +80,7 @@ export function CatalogStep({
   updateLine: (item: Product, patch: Partial<RequisitionLine>) => void;
   removeLine: (id: string) => void;
   errors: Record<string, string>;
+  selectedCount: number;
 }) {
   const [search, setSearch] = useState("");
   const [duplicate, setDuplicate] = useState<Product | null>(null);
@@ -160,6 +162,19 @@ export function CatalogStep({
           placeholder="Nome ou nome alternativo"
         />
       </label>
+      <p
+        role="status"
+        aria-label="Resultado da busca e seleção de materiais"
+        className="text-sm"
+      >
+        {visible.length}{" "}
+        {visible.length === 1 ? "material encontrado" : "materiais encontrados"}
+        . {selectedCount}{" "}
+        {selectedCount === 1
+          ? "material selecionado"
+          : "materiais selecionados"}
+        .
+      </p>
       {!visible.length ? (
         <Notice>Nenhum produto encontrado nesta categoria.</Notice>
       ) : null}
@@ -171,7 +186,7 @@ export function CatalogStep({
             key={item.id}
             className={"ui-product-choice " + (line ? "is-selected" : "")}
           >
-            <label className="flex items-center gap-3 font-semibold">
+            <label className="flex min-w-0 items-start gap-3 font-semibold">
               <input
                 type="checkbox"
                 checked={Boolean(line)}
@@ -183,8 +198,13 @@ export function CatalogStep({
                   } else updateLine(item, {});
                 }}
               />
-              {item.name}
-              <span className="ml-auto text-xs font-normal text-(--muted)">
+              <span
+                className="min-w-0 flex-1"
+                style={{ overflowWrap: "anywhere" }}
+              >
+                {item.name}
+              </span>
+              <span className="ml-auto shrink-0 text-xs font-normal text-(--muted)">
                 {item.unit}
               </span>
             </label>
@@ -479,7 +499,7 @@ export function Review({
   const lines = form.lines;
   const extras = form.extraItems.filter((item) => item.name.trim());
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ overflowWrap: "anywhere" }}>
       <div>
         <p className="text-sm text-(--muted)">Solicitante</p>
         <p className="font-semibold">{requesterName}</p>
