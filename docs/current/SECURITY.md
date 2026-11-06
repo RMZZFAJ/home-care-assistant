@@ -55,6 +55,14 @@ supervisão. Quem contou não aprova a própria contagem. Administração global
 não
 recebe essas competências sem vínculo e contexto local explícitos.
 
+A revisão BAL consulta o contador efetivo do evento oficial, inclusive no
+legado, e registra revisor/grupo segundo autoridade do banco. Observações do
+contador e parecer próprio são fatos separados. Revogação durante espera do
+estoque ou de FK de perfil impede o efeito; evento, parecer e ledger fazem
+rollback juntos. Recuperar um ato próprio já confirmado não exige renovar a
+capacidade de escrita, mas exige leitura viva do paciente. RLS e grants de
+balance_reviews não oferecem edição ou exclusão direta, nem ao service_role.
+
 ## Banco, APIs e objetos privados
 
 RLS, grants explícitos/defaults e SECURITY DEFINER são revisados em conjunto.

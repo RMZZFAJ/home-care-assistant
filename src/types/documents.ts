@@ -97,6 +97,61 @@ export type DocumentEvent = {
   createdAt: string;
   hash: string;
 };
+export type BalanceCounter = {
+  id: string | null;
+  eventId?: string | null;
+  name: string | null;
+  source: string;
+  version?: number;
+  recordedAt?: string;
+};
+export type BalanceReviewRecord = {
+  id: string;
+  count_version: number;
+  counter_id: string;
+  reviewer_id: string;
+  reviewer_name: string;
+  review_group: "family" | "supervisor";
+  comment: string;
+  reference_state: "current" | "historical" | "unavailable";
+  recorded_at: string;
+  reviewed_document_version: number;
+  reviewed_snapshot: {
+    counter: BalanceCounter;
+    notes: string | null;
+    countVersion: number;
+    lines: Pick<
+      SupplyLine,
+      "id" | "name_snapshot" | "quantity" | "unit_snapshot"
+    >[];
+    referenceRevision: string | null;
+    currentRevision: string;
+    appliedBeforeReview: boolean;
+  };
+};
+export type BalanceReviewFacts = {
+  counter: BalanceCounter;
+  countVersion: number | null;
+  notes: string;
+  reviews: BalanceReviewRecord[];
+  legacyApprovals: {
+    actor_id: string;
+    actorName?: string | null;
+    nameSource?: string;
+    review_group: string;
+    count_version: number;
+    created_at: string;
+  }[];
+};
+export type BalanceReviewContext = BalanceReviewFacts & {
+  eligibleGroups: ("family" | "supervisor")[];
+  referenceRevision: string | null;
+  currentRevision: string;
+  referenceState: "current" | "historical" | "unavailable";
+  referenceHash: string;
+  reconciliationApplied: boolean;
+  reviewRequired: boolean;
+};
 export type PurchaseReceipt = {
   id: string;
   state: "pending" | "approved" | "rejected";
@@ -298,6 +353,7 @@ export type SupplyDocument = {
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];
   purchaseProgress?: PurchaseProgress;
+  balanceReview?: BalanceReviewContext;
   deliveryCancellation?: DeliveryCancellationContext | null;
   deliveryRegularization?: DeliveryRegularizationContext | null;
   commandOutcome?: {

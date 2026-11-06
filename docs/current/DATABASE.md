@@ -174,6 +174,21 @@ ledger; mudança desde a contagem impede aprovação até reconto. Política
 opcional aplica diretamente; política obrigatória exige os grupos e as
 identidades distintas configuradas no paciente.
 
+BAL resolve o contador efetivo pelo último evento oficial de emissão,
+submissão ou reconto, inclusive no legado. balance_reviews conserva parecer,
+revisor/nome, grupo, evento e versão da contagem, observações/linhas revisadas
+e referência de estoque. É imutável, possui RLS por bal.read e oferece somente
+SELECT ao cliente autenticado. Aprovações legadas permanecem preservadas;
+nomes consultados no cadastro atual não são tratados como snapshots antigos.
+
+O próprio contador não revisa seu ato. Reconto altera a elegibilidade por
+count_version, sem apagar pareceres anteriores. Comando usa locks stock→document,
+recupera a própria chave com leitura viva e revalida autoridade após esperas
+e efeitos tardios. Comentário tem até 2.000 unidades UTF-16, igual ao formulário
+e à API. A conciliação recusa referência NULL por comparação IS DISTINCT FROM
+e registra appliedRevision/appliedBy. Parecer facultativo posterior, inclusive
+sobre referência histórica, nunca reaplica estoque nem valida o saldo atual.
+
 ## Identidade, capacidades e integrações
 
 Supabase Auth é a autoridade de identidade. profiles guarda dados pessoais e

@@ -23,6 +23,10 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/stale balance review|balance review group unavailable/i.test(message))
+    throw new ApiError("VERSION_CONFLICT","A contagem, a revisão ou sua referência mudou. Compare o estado atual; seu parecer foi preservado.",409);
+  if (/balance count attribution unavailable/i.test(message))
+    throw new ApiError("VALIDATION_ERROR","A autoria da contagem antiga não está íntegra. Preserve o histórico e inicie um reconto autorizado.",400);
   if (/stale (?:or unavailable )?presentation|existing presentation requires identity and version/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "A apresentação mudou ou ficou indisponível. Consulte o fator e a versão atuais; os campos informados foram preservados.", 409);
   if (/administrative regularization required/i.test(message))throw new ApiError("VALIDATION_ERROR","O recebedor está indisponível. Abra a regularização administrativa para registrar base, fatos conhecidos e conferência independente, preservando o recebimento anterior.",400);

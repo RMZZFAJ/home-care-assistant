@@ -33,6 +33,16 @@ e seis tarefas Chromium distintas passaram entre rodadas/rechecks. PDF de três
 páginas confrontado com snapshot, hash e crédito único de 20; páginas inspecionadas.
 110 migrations no conjunto; replay e suítes gerais ficam para a CI do novo SHA.
 
+Revisão BAL agora identifica o contador pelo evento efetivo, inclusive no legado,
+e registra parecer separado e imutável com autor/grupo/versão. Contador não
+revisa o próprio ato; referência NULL/obsoleta não permite conciliação antiga.
+Revisão facultativa posterior não reaplica estoque. Doze casos Auth, três
+fronteiras API e três tarefas Chromium distintas passaram entre rodadas e
+rechecks, mais consumidores Auth/SQL afetados. PDF de três páginas e parecer
+de 2.000 unidades confrontados com snapshot, hash do renderer e ledger e
+inspecionados. 111 migrations; replay/CI geral do novo SHA ainda necessários.
+Sucessão e reconto facultativo após conciliação permanecem em execução.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

@@ -2,6 +2,7 @@
 import { SettingsSection } from "@/components/forms/settings-section";
 import { DeliveryRecipientFacts } from "./delivery-recipient";
 import { DeliveryRegularization } from "./delivery-regularization";
+import { BalanceReview } from "./balance-review";
 import { documentPatientName } from "@/lib/documents/presentation";
 import { SupplyLineSummary } from "./supply-line-summary";
 
@@ -66,6 +67,7 @@ export function SupplyDocumentContent({
   const [purchaseConflict, setPurchaseConflict] = useState(false);
   const [deliveryConflict, setDeliveryConflict] = useState(false);
   const [regularizationEditing, setRegularizationEditing] = useState(false);
+  const [balanceReviewEditing, setBalanceReviewEditing] = useState(false);
   const [focusRevision, setFocusRevision] = useState(0);
   const [comparison, setComparison] = useState<SupplyDocument | null>(null);
   const commandFormRef = useRef<HTMLFormElement | null>(null);
@@ -85,9 +87,13 @@ export function SupplyDocumentContent({
   }, [data?.version, focusRevision]);
   useEffect(() => {
     editingRef.current = Boolean(
-      action || review || uncertain || regularizationEditing,
+      action ||
+      review ||
+      uncertain ||
+      regularizationEditing ||
+      balanceReviewEditing,
     );
-  }, [action, review, uncertain, regularizationEditing]);
+  }, [action, review, uncertain, regularizationEditing, balanceReviewEditing]);
   const pendingRef = useRef<{
     action: string;
     body: unknown;
@@ -359,18 +365,6 @@ export function SupplyDocumentContent({
         allowed("ent.cancel")
       )
         actions.push("withdraw_cancellation");
-    } else if (data.type === "BAL" && data.status === "submitted") {
-      const ownCount =
-        (data.payload.balanceContext?.professionalId ?? data.created_by) ===
-        context.userId;
-      if (
-        !ownCount &&
-        allowed("bal.approve.family") &&
-        ["admin", "family"].includes(context.patient?.role ?? "")
-      )
-        actions.push("approve_family");
-      if (!ownCount && allowed("bal.approve.supervisor"))
-        actions.push("approve_supervisor");
     }
     if (
       !["cancellation_pending", "administratively_closed"].includes(
@@ -640,6 +634,13 @@ export function SupplyDocumentContent({
             />
           ) : null}
           {data.type === "COM" ? <PurchaseDetails data={data} /> : null}
+          {data.type === "BAL" && data.status !== "draft" ? (
+            <BalanceReview
+              data={data}
+              onUpdated={setData}
+              onEditingChange={setBalanceReviewEditing}
+            />
+          ) : null}
           {data.type === "BAL" && data.payload.balanceContext ? (
             <section className="ui-card">
               <h2>Plantão e contagem física</h2>

@@ -1041,3 +1041,71 @@ jobs/triggers/permissões comparados com o HEAD anterior: intactos. Execução
 cancelada não aprova SHA. Sem polling ou duplicação local das suítes gerais.
 BAL, sucessão, P07, rastreabilidade de estoque e demais critérios D2 continuam
 em execução. Sem merge, banco remoto, conclusão da missão ou GO.
+
+## D2.14 — revisão BAL com autoria própria e referência preservada
+
+Apresentações publicadas em 8e7c7a1; complemento documental em 66b95b4.
+O commit independente 0348342 de conexão SonarLint foi preservado. Sua CI
+42142741347 estava in_progress na consulta anterior; 42142658842 de 66b95b4
+foi cancelada. Nenhum resultado pendente/cancelado foi tratado como verde.
+
+Duas contraprovas Auth reproduziram contador legado revisando o próprio ato
+e conciliação após referenceRevision NULL. Migration 20261106012400 resolve
+contador pelo evento efetivo, separa balance_reviews imutável de bal_approvals
+legadas e protege aplicação com IS DISTINCT FROM. appliedRevision/appliedBy
+identificam o efeito confirmado. Revisão posterior facultativa pode registrar
+parecer histórico, sem reaplicar estoque ou validar saldo posterior.
+
+Comando usa locks stock→document, ator/grupo reais, versão da contagem e
+hash da referência. Recupera intenção própria confirmada antes de exigir nova
+escrita, com leitura viva. Revogação após espera de estoque/FK impede o efeito
+e desfaz parecer/evento/ledger. Reconto muda o contador efetivo e a elegibilidade
+das revisões antigas, preservando autor original e pareceres de cada versão.
+Não se inventa elegibilidade histórica nem nome antigo a partir do cadastro.
+
+Doze casos Auth distintos passaram entre rodadas/rechecks: auto-revisão legada,
+parecer distinto, facultativo sem fila universal/sem segundo ajuste, limite
+de texto, NULL, recuperação/revogação, duas esperas observadas, concorrência,
+reconto com autores distintos, RLS/grants e referência posterior. Consumidores
+existentes de substituição no mesmo intervalo e SQL document-invariants passaram.
+Advisor all retornou 13 WARN; a policy de comandos de apresentação ganhou
+initplan do ator nesta migration incremental, sem alterar o predicado por
+paciente. Consumidor Auth de isolamento passou; advisor final caiu para 12:
+onze avisos initplan preexistentes e unaccent/public, sem aviso novo de BAL.
+
+Três fronteiras API passaram. A primeira rodada detectou que Zod 4.6.7 max
+conta pontos Unicode, divergindo do maxlength do navegador e do limite do
+banco. Validação explícita UTF-16 agora aceita 1.000 emojis e recusa 1.001;
+parecer nulo, autoria forjada e referência malformada são recusados antes de Auth.
+
+A fixture da espera de perfil inicialmente tentou inserir um override cuja
+FK esperava o próprio lock controlado. O teste foi cancelado, não validou a
+fronteira. O único holder identificado por PID/usuário/estado/marcador/lock foi
+encerrado; fixture passou a criar override antes da espera e somente alterar
+enabled com statement_timeout durante a barreira. As duas esperas passaram no
+recheck, com rollback integral. Isolamento começou com contexto global inválido
+para adminB; corrigido para seu paciente real, controle de leitura positivo e
+negativas específicas passaram. Nenhuma dessas falhas conta como passe.
+
+BAL-03 mantém contagem/notas em leitura e parecer vazio até 2.000 caracteres.
+Consultar/adotar referência preserva o texto; pendência obsoleta exige reconto.
+Resposta perdida congela corpo/chave e permite recuperar após revogar escrita.
+Três tarefas Chromium distintas passaram: revisão facultativa/recuperação,
+conflito→reconto→consulta→adoção explícita e consumidor por plantão. A asserção
+final do conflito consultava uma lista resumida sem notas; foi corrigida para
+o snapshot persistido e somente esse caso repetido. Axe/overflow/foco nas
+larguras 320/390/768/1440; captura do drawer a 320 px inspecionada.
+
+PDF BAL 2eb073aa, v2, SHA-256
+c5890961a25e4c967ed8283b82724e71129b39ff4c5436761e19776d90d4612f:
+contador, notas originais, parecer familiar de 2.000 unidades e marcador final,
+versão revisada, ressalva de não reaplicação e cronologia distintos. Snapshot,
+registro do renderer/hash e ledger antes/depois confrontados; três páginas
+renderizadas por PDFium e inspecionadas. Manifestos bal-review-...-verification.json
+e -visual-review.json preservados localmente, sem sobrescrever exemplar anterior.
+
+Lint pertinente e tipos/build do runner passaram. 111 migrations; instalação
+limpa/legada, suítes gerais e matriz dos browsers ficam para a CI do novo SHA.
+C054 tem evidência local; C7-AC-003 permanece parcial porque reconto facultativo
+de ciclo já conciliado/sucessão futura ainda não foram concluídos. C056/C057,
+P07 e demais critérios continuam em execução. Sem merge, alteração remota ou GO.

@@ -5,6 +5,12 @@ A/B e as mudanças futuras C não foram corrigidos por este documento.
 Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
 [projeto C3](../audits/C/C3-functional-specification/README.md).
 
+O incremento D2 de revisão já implementa autoria efetiva no legado e no
+regime por plantão, parecer próprio separado das notas, comparação de referência
+e recuperação do ato confirmado. As evidências e os limites vigentes estão no
+[checkpoint D-A](../audits/D/D-A/CHECKPOINT.md); sucessão/reconto facultativo
+e demais critérios ainda dependem dos respectivos incrementos.
+
 ## Ativação e autoridade
 
 O regime novo é opt-in por paciente. Nenhuma migration ativa pacientes ou cria
@@ -57,6 +63,14 @@ O banco produz o contexto documental: ciclo, semanas, janela, responsável real
 e data da contagem. Autor original do rascunho é preservado em substituições.
 PDF e visualizador exibem esse contexto. Política de revisão continua distinta
 do registro da contagem e da efetivação dos ajustes no ledger.
+
+Na ficha, a revisão facultativa continua disponível a outra pessoa elegível
+após a conciliação. O formulário abre com parecer vazio e notas originais em
+leitura. Consultar referência atual preserva o texto; adotar é uma ação separada
+e não envia a revisão. Referência pendente obsoleta exige reconto autorizado.
+Perda de resposta mantém conteúdo/chave congelados até recuperar o próprio ato.
+Pareceres anteriores identificam autor, grupo, contagem e versão revisada;
+consulta histórica não reaplica estoque. O PDF conserva essas distinções.
 
 ## Processamento e validação
 

@@ -212,7 +212,23 @@ export const supplyCommandSchema = z
       submit: z.object({}).strict(),
       approve: z.union([
         z.object({ lines: commandLines, reason: reason.optional() }).strict(),
-        z.object({ group: z.enum(["family", "supervisor"]) }).strict(),
+        z
+          .object({
+            group: z.enum(["family", "supervisor"]),
+            // Match textarea maxlength and the database's UTF-16 limit; Zod max counts code points.
+            comment: z
+              .string()
+              .refine(
+                (value) => value.length <= 2000,
+                "O parecer permite até 2.000 caracteres.",
+              )
+              .optional(),
+            reviewReference: z
+              .string()
+              .regex(/^[0-9a-f]{64}$/)
+              .optional(),
+          })
+          .strict(),
       ]),
       purchase: z
         .object({ lines: commandLines, notes: z.string().max(1000).optional() })

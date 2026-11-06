@@ -218,6 +218,16 @@ obrigatórios e não existe ficha de abastecimento externo.
 Comandos incluem approve, purchase, receive, validate_receipt, reject_receipt,
 close_expectation, reassign, resolve, cancel e consent_cancel, conforme tipo
 e estado.
+BAL approve aceita group family/supervisor, comment opcional com até 2.000
+unidades UTF-16 e reviewReference SHA-256 da referência retornada pelo banco.
+O contrato antigo com somente group continua aceito; a UI envia a referência
+e expectedVersion. balanceReview retorna contador efetivo, contagem, pareceres,
+observações originais e grupos elegíveis para o ator. Referência obsoleta
+produz VERSION_CONFLICT; contagem sem autoria comprovável exige reconto.
+Recuperação da própria intenção confirmada exige bal.read vigente; uma nova
+revisão exige também papel/capacidade efetivos, pessoa distinta e paciente ativo.
+Não recebe contador ou autoria escolhidos pelo cliente e não sobrescreve notas.
+
 ENT receive exige divergences, mesmo vazio. Linhas não selecionadas são
 integralmente aceitas; acceptedQuantity positiva parcial credita o destino.
 Resolução registra received, returned ou missing com quantidade e motivo.

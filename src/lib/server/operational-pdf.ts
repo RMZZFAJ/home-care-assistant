@@ -11,6 +11,7 @@ import {
   type DeliveryCancellationContext,
   type DeliveryRecipientSelection,
   type DeliveryRegularizationContext,
+  type BalanceReviewFacts,
 } from "@/types/documents";
 import { receiptStates } from "@/lib/documents/purchase";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
@@ -50,6 +51,7 @@ export type DocumentSnapshot = {
   purchaseReceipts?: PurchaseReceipt[];
   deliveryCancellation?: DeliveryCancellationContext | null;
   deliveryRegularization?: DeliveryRegularizationContext | null;
+  balanceReviews?: BalanceReviewFacts;
   actors?: { issuer?: Person; recipient?: Person; patient?: Person };
   lines: Record<string, unknown>[];
   payload: Record<string, unknown>;
@@ -995,14 +997,69 @@ export async function renderDocumentPdf(
       snapshot.lines.map((item) => [
         name(item),
         formatQuantity(
-          String(
-            (item.metadata as Record<string, unknown> | undefined)
-              ?.expectedQuantity ?? 0,
-          ),
+          (item.metadata as Record<string, unknown> | undefined)
+            ?.expectedQuantity as string | number | null | undefined,
         ),
         formatQuantity(String(item.quantity ?? 0)),
       ]),
     );
+  }
+  if (snapshot.type === "BAL" && snapshot.balanceReviews) {
+    const facts = snapshot.balanceReviews;
+    section("Autoria da contagem e revisão");
+    text(
+      `Contador efetivo: ${facts.counter.name ?? "Autoria não disponível"} · contagem ${facts.countVersion ?? "não identificada"}`,
+      10,
+      true,
+    );
+    if (facts.counter.source === "current_profile")
+      text("Nome atual do cadastro; o nome histórico não foi preservado.", 8);
+    text("Observações originais de quem contou:", 9, true);
+    text(facts.notes || "Nenhuma observação registrada.");
+    const policy = snapshot.workflow?.reviewPolicy as
+      | { balReview?: string }
+      | undefined;
+    text(
+      policy?.balReview === "optional"
+        ? "Revisão facultativa; a contagem válida não exige fila universal de aprovação."
+        : "Revisão conforme a política registrada para esta contagem.",
+    );
+    for (const review of facts.reviews) {
+      section(
+        `Parecer da ${review.review_group === "family" ? "família" : "supervisão"} · contagem ${review.count_version}`,
+      );
+      text(
+        `${review.reviewer_name} · ${formatBrazilDate(review.recorded_at)} · versão revisada ${review.reviewed_document_version}`,
+        9,
+        true,
+      );
+      text(
+        `Contagem de ${review.reviewed_snapshot.counter.name ?? "Autoria não disponível"}.`,
+      );
+      text("Observações preservadas de quem contou:", 9, true);
+      text(review.reviewed_snapshot.notes || "Nenhuma observação registrada.");
+      if (review.count_version !== facts.countVersion)
+        for (const line of review.reviewed_snapshot.lines)
+          text(
+            `${line.name_snapshot}: contado ${formatQuantity(line.quantity, line.unit_snapshot)}.`,
+            9,
+          );
+      text("Parecer próprio do revisor:", 9, true);
+      text(review.comment || "Parecer sem comentário adicional.");
+      text(
+        review.reviewed_snapshot.appliedBeforeReview
+          ? "Revisão posterior: nenhuma reaplicação de estoque."
+          : "Revisão da contagem para conciliação conforme política e referência.",
+        8,
+      );
+      if (review.reference_state !== "current")
+        text(
+          "Referência posterior alterada ou não preservada; este parecer não valida o estoque atual.",
+          8,
+        );
+    }
+    if (!facts.reviews.length)
+      text("Nenhum parecer independente deste contrato registrado.");
   }
   const convertedLines = snapshot.lines.flatMap((item) =>
     readPresentationConversions(item.presentation_conversions).map((row) => [
