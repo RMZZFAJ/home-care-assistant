@@ -1,6 +1,7 @@
 # Contratos e orientação atuais
 
-AS_IS da base `37cb7f85e96e551d6419871f94dd950712e2565b`, com desvios A/B.
+AS_IS do candidato D-A na branch `feat/phase-d-implementation`, após a base
+integrada PR6 `8ec979a`. Auditorias A/B preservam a origem dos desvios.
 O [estado canônico](PROJECT_STATUS.md) identifica branch/SHA e limites. Não
 confundir requisito de integridade com garantia universal já demonstrada.
 

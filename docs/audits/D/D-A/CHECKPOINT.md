@@ -1,6 +1,7 @@
 # D-A — implementação D0, D1 e D2
 
-Missão vigente de 05/11/2026, America/Sao_Paulo. **EM EXECUÇÃO**.
+Missão vigente de 05/11/2026, America/Sao_Paulo. **CONSOLIDAÇÃO TÉCNICA LOCAL
+D0–D2 CONCLUÍDA**; CI do SHA publicado permanece gate independente.
 Produção permanece **NO-GO**. Não há autorização de merge, D-B/D-C,
 migration remota, envio externo ou liberação operacional definitiva.
 
@@ -2116,3 +2117,76 @@ ancestralidade do merge PR6; gates externos condicionam seus ramos. P07 não
 removeu a UI anterior. C010/C035/C068/C7-010 e os dois pares finais REQ/PDF e
 ENT ainda estão em conclusão, sem inventar aceite. D-A permanece ativa; sem
 merge, alterações remotas ou homologação humana/AT/aparelho/provedor.
+
+## D2.32 — conferência pessoal, pares PDF e consolidação técnica local
+
+Base publicada8ac2b7a/121 migrations. Nenhuma migration nova nem reset neste
+conjunto. A leitura ENT resolve somente os vínculos nativos, sob RLS do leitor,
+sem serviço privilegiado. Expedição já emitida mostra origem/destino,
+recebedor e REQs em leitura. Confirmação pessoal inclui todas as linhas,
+expedido/recebido/pendente, diferença e motivo. Dados de expedição não entram
+no payload editável. Declaração anterior ao protocolo não se anuncia expedida.
+
+Programação BAL agora resume dia, tipo/horário/duração, pessoa ou derivação
+formal, fuso e vigência a partir da referência congelada no formulário.
+Explica obrigações e ausência de contagem/movimento neste ato. Foco passa à
+revisão e retorna ao submit ao voltar; valores preparados permanecem.
+
+Três cenários Auth em pares passaram: seis pacientes independentes confrontam
+devolução anterior e transferência bilateral integral5, parcial3/5 e consumo
+anterior2 com inativação antes do recebimento. Projeções de ledger/custódias
+coincidem, com autores reais, protocolo ENT-0002, negativa de aceite pelo
+administrador e replay sem efeito. D2.21 mantém cobertura própria de criação
+com saldo inativo, ambas direções e esperas/revogação. UI antiga preservada;
+a comparação não autoriza remoção ou conversão silenciosa de intenções.
+
+Doze testes API passaram: nova fronteira de recebimento e quatro consumidores
+COM/BAL/cancelamento/P05, com campos de expedição/ator forjados recusados antes
+de Auth. Tipos dirigidos e lint dos fontes afetados passaram.
+
+Seis casos Chromium distintos passaram entre rodadas: M1 extra/PDF, ENT pessoal,
+retirada5→4/BAL noturno sexta e três consumidores existentes (extra/scanner,
+reassign/cancelamento e BAL com perda de resposta). Rodada inicial: os dois
+consumidores passaram; fixtures novas usaram name em vez de customName no RPC
+e rótulo incorreto de observação. Corrigidas apenas as fixtures afetadas.
+Rodada seguinte: ENT passou; M1 chegou ao confronto de renders e o oráculo
+esperava somente dois registros, ignorando as versões intermediárias que a
+UI gera legitimamente. O oráculo agora exige unicidade e versão/caminho/SHA
+de ambos exemplares solicitados; não apaga ou proíbe emissões legítimas.
+BAL expôs foco no BODY após esconder o formulário; corrigido no produto,
+sem alterar o coletor de teclado/axe. Último runner: três casos passaram,
+incluindo o consumidor anterior BAL; ENT e os outros dois aprovados não foram
+repetidos sem mudança de contrato. Fontes estáveis durante os runners.
+
+M1 conserva item original, product_id NULL, identidade material e evento1
+após associação auditada e atendimento real. Tentativas Auth/DML material são
+recusadas. Ciência expressa original permanece; somente a expedição familiar
+real acrescenta SCI-005, sem atribuir ciência a terceiros. PDFs v2/v6 têm
+registros/caminhos/hashes independentes; reobter v2 devolve bytes idênticos.
+Extração independente encontrou nome original/identidade em ambos; todas as
+cinco páginas foram renderizadas/inspecionadas. QR isolado na última página
+v6 fica registrado para paginação D4, sem mudança do renderer/assinatura agora.
+
+Sheila confirma2 de3 e uma segunda linha integral; família/global consultam e
+recebem403 ao tentar assinar. Resumo e payload concordam com ledger
+FAMILY27/TEAM2/TRANSIT1 no primeiro material, ator Sheila e expedição preservada.
+Quatro larguras320/390/768/1440 e axe passaram; capturas de revisão ENT e BAL
+inspecionadas. Nada equivale a homologação humana/AT/aparelho físico.
+
+Matriz81 preserva colunas de plano/gates. C010/C035/C068/C-NEW015/C7-010 foram
+reconciliados com seu requisito exato e evidências anteriores inalteradas;
+os pares finais C-FINAL008/012 passaram. Não se inventou nova auditoria ou
+repetiu suíte geral para reclassificar prova existente. PASS_LOCAL não é GO.
+
+Artefatos personal-receipt-*, return-transfer-equivalence-auth e m1-resolved-*
+ficam em output. CI8ac2b7a/42293608729 tinha database/replay121 e validações
+Windows/Ubuntu success; três browsers in_progress na última consulta. Isso não
+aprova o próximo SHA; CI publicada deve ser lida por SHA. Nenhum merge,
+mutação remota, envio externo ou D-B/D-C foi executado.
+
+Após todas as suítes mutáveis, os dois jobs locais originalmente ativos foram
+reconciliados: hca-operational-lifecycle e hca-notification-worker passaram de
+paused para active. Stack/API54321/DB54322 verificados; backup externo original
+permanece preservado, sem promessa de restore testado. A consolidação técnica
+local D0–D2 está concluída; publicação/CI são registradas no fechamento, com
+produção NO-GO e gates humanos/externos preservados.

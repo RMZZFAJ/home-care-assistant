@@ -1,6 +1,7 @@
 # Fase D — implementação
 
-**D-A EM EXECUÇÃO**, autorizada em 05/11/2026. Escopo D0–D2;
+**D-A consolidada tecnicamente em ambiente local**, autorizada em 05/11/2026.
+Escopo D0–D2; CI do SHA publicado e liberação permanecem independentes;
 [checkpoint e aceites](D-A/CHECKPOINT.md). A conclusão de um incremento não
 representa conclusão de um lote ou liberação do produto.
 

@@ -147,6 +147,11 @@ export function CommandEditor({
           const value = String(form.get(id) ?? "");
           if (!validQuantity(value, 6, true))
             throw new Error("Informe o recebido nos itens divergentes.");
+          const line = data.lines.find((line) => line.id === id)!;
+          if (quantity(value).gt(line.quantity))
+            throw new Error(
+              "O recebido supera o expedido de " + line.name_snapshot,
+            );
           return {
             lineId: id,
             acceptedQuantity: quantity(value).toFixed(),

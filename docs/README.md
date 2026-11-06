@@ -2,7 +2,7 @@
 
 **Estado atual:** [fonte por SHA](current/PROJECT_STATUS.md). Produção NO-GO;
 A e B1–B8 concluídas como diagnóstico; C é planejamento e organização;
-**D-A EM EXECUÇÃO**, com
+**D-A consolidada localmente; CI e liberação independentes**, com
 [evidências por incremento](audits/D/D-A/CHECKPOINT.md).
 Decisão aprovada não é funcionalidade implementada.
 
@@ -69,5 +69,6 @@ privados não são operação real.
 
 P02 OWNER_APPROVED; 66 fichas/262 controles originais revistos, catálogo de
 274 controles/424 usos e 187 casos planejados.
-[Entrega vigente](audits/C/C10-pr-handoff/README.md). D NÃO INICIADA; sem
-merge. Gates específicos não são aprovados por documento.
+[Entrega histórica C](audits/C/C10-pr-handoff/README.md). D-A executada na
+[Draft PR7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.
+Gates específicos e CI pendente não são aprovados por documento.

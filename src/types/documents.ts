@@ -351,6 +351,13 @@ export type SupplyDocument = {
   };
   canonical_snapshot: Record<string, unknown>;
   lines: SupplyLine[];
+  linkedRequisitions?: {
+    id: string;
+    code: string;
+    protocol: string;
+    itemIds: string[];
+  }[];
+  unavailableRequisitionItems?: number;
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];
   purchaseProgress?: PurchaseProgress;

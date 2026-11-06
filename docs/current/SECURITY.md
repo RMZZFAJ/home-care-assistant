@@ -202,3 +202,10 @@ outro paciente recusa o conjunto inteiro sem revelar seu nome ou notas. A
 negativa de leitura desse paciente foi exercitada com Auth real. A decisão da
 proposta mantém motivo/notas do proponente e grava motivo próprio do decisor,
 inclusive no terminal obsoleto após corte.
+
+A apresentação de vínculos ENT→REQ usa o cliente autenticado do próprio
+leitor. IDs são obtidos da ficha nativa, com filtro adicional do paciente e
+RLS nas REQs; campos do browser não definem autorização. Família/global não
+confirmam pelo recebedor. A matriz D-A registra as esperas observadas de
+sessão/vínculo/capacidade e rollback dos comandos cobertos. Essa prova não se
+estende automaticamente a comandos futuros ou à operação remota.

@@ -6,6 +6,10 @@ import { BalanceReview } from "./balance-review";
 import { TransferDetails } from "./transfer-details";
 import { documentPatientName } from "@/lib/documents/presentation";
 import { SupplyLineSummary } from "./supply-line-summary";
+import {
+  DeliveryDispatchFacts,
+  DeliveryReceiptReview,
+} from "./delivery-receipt-facts";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -93,9 +97,17 @@ export function SupplyDocumentContent({
       review ||
       uncertain ||
       regularizationEditing ||
-      balanceReviewEditing || transferEditing,
+      balanceReviewEditing ||
+      transferEditing,
     );
-  }, [action, review, uncertain, regularizationEditing, balanceReviewEditing, transferEditing]);
+  }, [
+    action,
+    review,
+    uncertain,
+    regularizationEditing,
+    balanceReviewEditing,
+    transferEditing,
+  ]);
   const pendingRef = useRef<{
     action: string;
     body: unknown;
@@ -531,8 +543,15 @@ export function SupplyDocumentContent({
                     : "Compra ou doação de insumos"
                 : undefined
             }
-            code={data.code ?? (data.transfer ? "Declaração sem expedição" : "Rascunho")}
-            unissuedLabel={data.transfer ? "Declaração sem expedição; o protocolo ENT será atribuído ao expedir." : undefined}
+            code={
+              data.code ??
+              (data.transfer ? "Declaração sem expedição" : "Rascunho")
+            }
+            unissuedLabel={
+              data.transfer
+                ? "Declaração sem expedição; o protocolo ENT será atribuído ao expedir."
+                : undefined
+            }
             status={
               data.type === "COM"
                 ? (data.purchaseProgress?.state ?? data.status)
@@ -594,7 +613,18 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
-          {data.transfer ? <TransferDetails data={data} onUpdated={setData} onEditingChange={setTransferEditing} /> : null}
+          {data.type === "ENT" && data.protocol ? (
+            <section className="ui-card">
+              <DeliveryDispatchFacts data={data} />
+            </section>
+          ) : null}
+          {data.transfer ? (
+            <TransferDetails
+              data={data}
+              onUpdated={setData}
+              onEditingChange={setTransferEditing}
+            />
+          ) : null}
           {data.type === "ENT" && data.workflow_data.recipientSelection ? (
             <section className="ui-card space-y-4">
               <DeliveryRecipientFacts
@@ -697,7 +727,8 @@ export function SupplyDocumentContent({
           data.type === "BAL" &&
           data.status === "submitted" &&
           allowed("bal.count") &&
-          !data.payload.balanceContext && !data.balanceRecount?.hasRecountCycle ? (
+          !data.payload.balanceContext &&
+          !data.balanceRecount?.hasRecountCycle ? (
             <Link
               className={buttonClass}
               href={"/fichas/bal?documentId=" + data.id + "&recount=true"}
@@ -771,7 +802,9 @@ export function SupplyDocumentContent({
                   line={line}
                   type={data.type}
                   status={data.status}
-                  declarationOnly={Boolean(data.transfer && data.transfer.state !== "dispatched")}
+                  declarationOnly={Boolean(
+                    data.transfer && data.transfer.state !== "dispatched",
+                  )}
                   purchaseLine={data.purchaseProgress?.lines.find(
                     (item) => item.lineId === line.id,
                   )}
@@ -857,6 +890,9 @@ export function SupplyDocumentContent({
         <p className="whitespace-pre-wrap text-sm leading-6">
           {review?.summary}
         </p>
+        {data?.type === "ENT" && review?.action === "receive" ? (
+          <DeliveryReceiptReview data={data} body={review.body} />
+        ) : null}
         <p className="mt-4 text-xs text-(--muted)">
           Esta operação será registrada na versão documental e na auditoria.
         </p>

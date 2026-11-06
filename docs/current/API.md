@@ -729,3 +729,13 @@ conflita; o erro externo não identifica o outro paciente. Exceção altera só 
 plantão indicado. Corte conserva linhas históricas e impede republicação
 posterior. Leitura continua limitada a42 dias por consulta; a UI pagina/navega
 o calendário sem ampliar esse limite.
+
+## Conferência pessoal ENT
+
+GET/POST /api/documents/:id acrescentam linkedRequisitions e
+unavailableRequisitionItems às ENT. Referências vêm dos itens vinculados pelo
+banco, filtradas pelo paciente e RLS do leitor; não há consulta administrativa.
+Falta de acesso ao vínculo é informada, sem expor dados da REQ protegida.
+O comando receive continua aceitando somente divergences: quantidade recebida,
+problema e observação por linha. Origem/destino/material/vínculos/ator não são
+editáveis nesse ato. A conferência mostra também as linhas integrais.

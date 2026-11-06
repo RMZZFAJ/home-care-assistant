@@ -7,7 +7,7 @@ import { formatZonedDate } from "@/lib/schedules/time";
 import { DeferralFacts } from "./balance-deferral-facts";
 export const weekDays = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
 export type BalanceEditor = { kind: "configure" } | { kind: "defer"; family: boolean } | { kind: "decide"; deferral: BalanceDeferral; approve: boolean } | { kind: "assign"; cycleId: string; allowDeferral: boolean };
-export function BalanceForm({ editor, data: liveData, onReview, onReload, focusReasonRevision=0 }: { editor: BalanceEditor; data: BalanceWorkspace; onReview: (command: BalanceCommand, version?: number) => void; onReload: () => void; focusReasonRevision?: number }) {
+export function BalanceForm({ editor, data: liveData, onReview, onReload, focusReasonRevision=0 }: { editor: BalanceEditor; data: BalanceWorkspace; onReview: (command: BalanceCommand, version?: number, reference?: BalanceWorkspace) => void; onReload: () => void; focusReasonRevision?: number }) {
   const formRef=useRef<HTMLFormElement>(null);
   useEffect(()=>{if(editor.kind==="decide"&&focusReasonRevision>0)formRef.current?.querySelector<HTMLTextAreaElement>('textarea[name="reason"]')?.focus();},[editor.kind,focusReasonRevision]);
   const [data] = useState(liveData);
@@ -17,7 +17,7 @@ export function BalanceForm({ editor, data: liveData, onReview, onReload, focusR
   const [now] = useState(()=>Date.now());
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();const form = new FormData(event.currentTarget), value = (key: string) => String(form.get(key) ?? "");
-    if (editor.kind === "configure") onReview({ action: "configure", body: { enabled: form.get("enabled") === "on", timezone: value("zone"), weekday: Number(value("day")), shiftTypeId: value("type"), professionalId: value("person") || null, startsOn: value("from"), reason: value("reason") } }, regime?.version);
+    if (editor.kind === "configure") onReview({ action: "configure", body: { enabled: form.get("enabled") === "on", timezone: value("zone"), weekday: Number(value("day")), shiftTypeId: value("type"), professionalId: value("person") || null, startsOn: value("from"), reason: value("reason") } }, regime?.version, data);
     if (editor.kind === "defer" && a) onReview({ action: editor.family ? "defer" : "request_deferral", body: { assignmentId: a.id, targetShiftId: value("target"), reason: value("reason") } }, a.version);
     if (editor.kind === "decide") onReview({ action: "decide_deferral", body: { id: editor.deferral.id, approve: editor.approve, reason: value("reason") } });
     if (editor.kind === "assign") onReview({ action: "assign", body: { cycleId: editor.cycleId, targetShiftId: value("target"), reason: value("reason") } });

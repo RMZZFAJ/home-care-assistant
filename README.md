@@ -8,7 +8,9 @@ clínica.
 ## Estado e documentação
 
 **Produção NO-GO.** A e B1–B8 estão encerradas como diagnóstico; C concluiu o
-planejamento documental C0–C10. **D-A EM EXECUÇÃO**, conforme
+planejamento documental C0–C10. **D-A consolidada localmente (D0–D2),
+com CI e gates de liberação
+independentes**, conforme
 [checkpoint](docs/audits/D/D-A/CHECKPOINT.md). Base funcional auditada:
 `37cb7f85e96e551d6419871f94dd950712e2565b`. O estado de deploy produtivo nesta
 missão é NOT_VERIFIED; preview documental não é homologação do produto.
@@ -25,11 +27,11 @@ missão é NOT_VERIFIED; preview documental não é homologação do produto.
 - [Auditorias preservadas](docs/audits/README.md) e
   [plano D](docs/audits/D/README.md).
 
-PWA/push, modalidades futuras de ciência, rascunhos entre aparelhos e
-verificador de exemplar são requisitos planejados; não são anunciados como
-implementados. Os dois P1 herdados receberam correção e regressões locais
-discriminantes em D-A; D1 integral e D2 permanecem em execução. Isso não
-representa liberação operacional.
+PWA/push, ciência por canal externo e assinatura aguardam os lotes próprios.
+Rascunhos próprios REQ/BAL entre aparelhos e os processos D0–D2 estão
+implementados no candidato D-A. Os dois P1 herdados receberam correção e
+regressões discriminantes. Validação local e publicação na Draft PR não
+representam aprovação da CI pendente nem liberação operacional.
 
 O [fechamento definitivo C7–C10](docs/audits/C/C10-pr-handoff/README.md)
 registra P02 OWNER_APPROVED, 66 fichas e 262 controles originais revistos.

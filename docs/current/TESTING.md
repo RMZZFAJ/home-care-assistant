@@ -285,3 +285,19 @@ Nos painéis, overflow apenas do documento não detecta recorte interno. A
 tarefa de datas confronta os limites horizontais de campos/dias com o drawer e
 exige números em uma linha, além de axe e inspeção da captura. Essas
 verificações não substituem avaliação humana de AT.
+
+## Pares finais D-A
+
+requisition-pdf-personal-receipt.spec.ts confronta extra M1/SCI/PDF antigo e
+novo, expedição ENT em leitura com duas linhas e aceite2/3 pessoal, retirada
+familiar5→4 e programação BAL sexta/noturno/fuso. Emissões intermediárias
+legítimas não são duplicação: cada versão solicitada precisa de registro,
+caminho e SHA próprios. O arquivo anterior precisa permanecer idêntico.
+return-transfer-equivalence.test.mjs compara seis pacientes em três pares de
+percursos: integral, parcial e consumo anterior com inativação antes do aceite.
+
+Consumidores anteriores são selecionados conforme componente alterado.
+Rechecks repetem somente falhas/caminhos afetados. Checkpoint preserva as
+falhas de fixture/oráculo e a correção real de foco; não se reduz axe, grants,
+RLS ou asserção material para obter verde. Clean/legado e suítes gerais ficam
+na CI por SHA. Testes locais não atestam AT/aparelho/provedor/restore.

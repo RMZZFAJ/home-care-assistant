@@ -9,6 +9,8 @@ import { RecordDrawer } from "@/components/forms/record-drawer";
 import { formatZonedDate } from "@/lib/schedules/time";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { BalanceForm, weekDays, type BalanceEditor } from "./balance-forms";
+import { BalanceConfigurationFacts } from "./balance-configuration-facts";
+import type { BalanceWorkspace } from "@/types/balances";
 import { DeferralFacts } from "./balance-deferral-facts";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import type { BalanceCommand } from "@/lib/validation/balances";
@@ -20,13 +22,18 @@ export function BalanceConsole() {
 function FollowUp({ context }: { context: WorkspaceContext }) {
   const router = useRouter(), params = useSearchParams(), recountDocumentId = params.get("recountDocumentId");
   const patient = context.patient!, { data, error: loadError, reload } = useBalanceWorkspace(patient.id);
-  const [editor, setEditor] = useState<BalanceEditor | null>(null), [opener, setOpener] = useState<HTMLElement | null>(null), [review, setReview] = useState<{ command: BalanceCommand; version?: number } | null>(null);
+  const [editor, setEditor] = useState<BalanceEditor | null>(null), [opener, setOpener] = useState<HTMLElement | null>(null), [review, setReview] = useState<{ command: BalanceCommand; version?: number; reference?: BalanceWorkspace } | null>(null);
   const [error, setError] = useState(""), [message, setMessage] = useState(""), [busy, setBusy] = useState(false), [uncertain, setUncertain] = useState(false), [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const pendingRef = useRef<object | null>(null);
   const resultRef = useRef<HTMLHeadingElement>(null), focusAfterSuccessRef = useRef(false);
   const [settledDeferralId,setSettledDeferralId]=useState<string|null>(null);
   const [focusReasonRevision,setFocusReasonRevision]=useState(0);
   useEffect(()=>{if(!editor&&!review&&focusAfterSuccessRef.current){focusAfterSuccessRef.current=false;resultRef.current?.focus();}},[editor,review]);
+  const reviewHeadingRef = useRef<HTMLHeadingElement>(null), editorFormRef = useRef<HTMLDivElement>(null), wasReviewRef = useRef(false);
+  useEffect(() => {
+    if (review) { wasReviewRef.current = true; reviewHeadingRef.current?.focus(); }
+    else if (wasReviewRef.current) { wasReviewRef.current = false; editorFormRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus(); }
+  }, [review]);
   const [now] = useState(() => Date.now());
   const formatBrazilDate=(value:string|null)=>formatZonedDate(value,data?.regime?.timezone);
   const family = ["family", "admin"].includes(patient.role), approve = family && can(context, "bal.defer.approve"), configure = family && can(context, "bal.schedule.manage");
@@ -70,11 +77,13 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
       preventClose={uncertain || Boolean(review)} restoreFocusTo={opener} restoreFocusFallbackRef={resultRef}>
       {feedback}
       {loadError ? <Notice error>{loadError}<Button onClick={reload}>Consultar novamente</Button></Notice> : null}
-      <div hidden={Boolean(review)}>
-        <BalanceForm editor={editor} data={data} onReview={(command, version) => setReview({ command, version })} onReload={reload} focusReasonRevision={focusReasonRevision}/>
+      <div ref={editorFormRef} hidden={Boolean(review)}>
+        <BalanceForm editor={editor} data={data} onReview={(command, version, reference) => setReview({ command, version, reference })} onReload={reload} focusReasonRevision={focusReasonRevision}/>
       </div>
       {review ? <section className="space-y-4" aria-label="Conferência da decisão">
+        <h3 ref={reviewHeadingRef} tabIndex={-1}>Confira a decisão do balanço</h3>
         <p>{review.command.action === "configure" ? `Processamento ${review.command.body.enabled ? "ativado" : "pausado"} somente para ${patient.display_name}, a partir de ${review.command.body.startsOn}.` : review.command.action === "request_deferral" ? "A solicitação será encaminhada à família. O prazo atual continua válido." : review.command.action === "decide_deferral" ? review.command.body.approve ? "Aprovar somente o destino congelado, se ainda elegível. A alteração do prazo será explícita e auditável." : "Rejeitar este pedido com motivo próprio, sem alterar atribuição, prazo ou estoque." : "A decisão será registrada com seu responsável e justificativa."}</p>
+        {review.command.action === "configure" ? <BalanceConfigurationFacts command={review.command} data={review.reference ?? data}/> : null}
         {review.command.action === "decide_deferral" && editor.kind === "decide" ? <DeferralFacts deferral={editor.deferral} timezone={data.regime?.timezone}/> : null}
         {"reason" in review.command.body ? <div><h3 className="font-semibold">Sua justificativa</h3><p className="whitespace-pre-wrap break-words">{review.command.body.reason}</p></div> : null}
         <div className="hca-toolbar">
