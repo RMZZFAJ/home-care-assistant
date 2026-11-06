@@ -2,7 +2,7 @@
 import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   api,
   ApiError,
@@ -15,7 +15,7 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { Attachments } from "@/components/documents/attachments";
-import { Dialog, EmptyState, Icon } from "@/components/ui/primitives";
+import { EmptyState, Icon } from "@/components/ui/primitives";
 import { TransitStock, type TransitDocument } from "./transit-stock";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -80,8 +80,23 @@ function PatientStock({
   const [review, setReview] = useState<Record<string, unknown> | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [savedMovement, setSavedMovement] = useState<string | null>(null);
-  const [origin, setOrigin] = useState<{ id: string; opener: HTMLElement } | null>(null);
+  const [origin, setOrigin] = useState<{
+    id: string;
+    opener: HTMLElement;
+  } | null>(null);
   const historyHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const reviewHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const reasonInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const focusAfterReviewRef = useRef(false);
+  useEffect(() => {
+    if (review) reviewHeadingRef.current?.focus();
+  }, [review]);
+  useEffect(() => {
+    if (!review && !busy && focusAfterReviewRef.current) {
+      focusAfterReviewRef.current = false;
+      reasonInputRef.current?.focus();
+    }
+  }, [review, busy]);
   const hasStock =
     can(context, "stock.family.read") || can(context, "stock.team.read");
   const frozenRef = useRef<Record<string, unknown> | null>(null);
@@ -154,6 +169,7 @@ function PatientStock({
       if (rejected) {
         frozenRef.current = null;
         setReview(null);
+        focusAfterReviewRef.current = true;
       }
       setUncertain(!rejected);
       setError(
@@ -174,10 +190,22 @@ function PatientStock({
   );
   return (
     <div className="space-y-5">
-      {can(context, "ent.create") && hasStock ? <Link className={buttonClass} href="/transferencias">Transferir materiais entre família e equipe</Link> : null}
+      {can(context, "ent.create") && hasStock ? (
+        <Link className={buttonClass} href="/transferencias">
+          Transferir materiais entre família e equipe
+        </Link>
+      ) : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      {origin ? <MovementOrigin patientId={patient} movementId={origin.id} opener={origin.opener} onClose={() => setOrigin(null)} restoreFocusFallbackRef={historyHeadingRef} /> : null}
+      {origin ? (
+        <MovementOrigin
+          patientId={patient}
+          movementId={origin.id}
+          opener={origin.opener}
+          onClose={() => setOrigin(null)}
+          restoreFocusFallbackRef={historyHeadingRef}
+        />
+      ) : null}
       <section
         className="ui-card"
         aria-labelledby="stock-balances-heading"
@@ -294,13 +322,101 @@ function PatientStock({
       custody !== "TRANSIT" &&
       can(context, "stock.family.manage") ? (
         <RecordDrawer
-          title="Movimentar estoque familiar"
-          busy={busy || uncertain}
-          onClose={() => setMovementEditor(null)}
+          title={
+            review
+              ? "Confirmar movimentação familiar"
+              : "Movimentar estoque familiar"
+          }
+          busy={busy}
+          preventClose={uncertain}
+          onClose={() => {
+            setMovementEditor(null);
+            setReview(null);
+            frozenRef.current = null;
+          }}
           restoreFocusTo={movementEditor}
+          restoreFocusFallbackRef={historyHeadingRef}
         >
           {error ? <Notice error>{error}</Notice> : null}
-          <form className="mt-4 space-y-4" onSubmit={prepare}>
+          {review ? (
+            <section
+              aria-label="Revisão da movimentação familiar"
+              className="space-y-3"
+            >
+              <h3 ref={reviewHeadingRef} tabIndex={-1}>
+                Confira o movimento e sua referência
+              </h3>
+              <p>Produto: {name(String(review.productId))}</p>
+              <p>
+                Quantidade:{" "}
+                {formatQuantity(
+                  String(review.quantity ?? ""),
+                  products.find(
+                    (product) => product.productId === review.productId,
+                  )?.unit,
+                )}
+              </p>
+              <p>
+                Operação:{" "}
+                {review.action === "inbound"
+                  ? "Entrada avulsa"
+                  : review.action === "outbound"
+                    ? "Retirada"
+                    : review.action === "correction_in"
+                      ? "Correção compensatória de entrada"
+                      : "Correção compensatória de saída"}
+                .
+              </p>
+              {review.referenceId ? (
+                <details>
+                  <summary>Movimento histórico compensado</summary>
+                  <p className="break-all">{String(review.referenceId)}</p>
+                </details>
+              ) : null}
+              <p className="whitespace-pre-wrap">
+                Motivo: {String(review.reason ?? "")}
+              </p>
+              <p>
+                Apenas o saldo familiar deste material será atualizado. A
+                operação original permanecerá no histórico; não há transferência
+                nem consumo inferido.
+              </p>
+              {uncertain ? (
+                <Notice>
+                  Resultado ainda não confirmado. Os campos e a chave estão
+                  congelados até recuperar a mesma tentativa.
+                </Notice>
+              ) : null}
+              <div className="ui-form-actions">
+                <button
+                  className={buttonClass}
+                  disabled={busy || uncertain}
+                  onClick={() => {
+                    focusAfterReviewRef.current = true;
+                    setReview(null);
+                  }}
+                >
+                  Voltar
+                </button>
+                <button
+                  className={primaryClass}
+                  disabled={busy}
+                  onClick={() => void save()}
+                >
+                  {busy
+                    ? "Confirmando…"
+                    : uncertain
+                      ? "Recuperar tentativa"
+                      : "Confirmar"}
+                </button>
+              </div>
+            </section>
+          ) : null}
+          <form
+            hidden={Boolean(review)}
+            className={review ? "hidden" : "mt-4 space-y-4"}
+            onSubmit={prepare}
+          >
             <fieldset
               disabled={busy || uncertain}
               className="grid min-w-0 gap-4 sm:grid-cols-2"
@@ -341,14 +457,37 @@ function PatientStock({
                 >
                   <option value="">Selecione</option>
                   {products
-                    .filter((product) => product.active)
+                    .filter(
+                      (product) =>
+                        product.active ||
+                        (operation.startsWith("correction") &&
+                          Boolean(referenceId) &&
+                          product.productId === movementProductId),
+                    )
                     .map((product) => (
                       <option key={product.productId} value={product.productId}>
                         {product.name} · {product.unit}
+                        {product.active
+                          ? ""
+                          : " · Inativo, somente compensação referenciada"}
                       </option>
                     ))}
                 </select>
               </label>
+              {operation.startsWith("correction") &&
+              referenceId &&
+              products.some(
+                (product) =>
+                  product.productId === movementProductId && !product.active,
+              ) ? (
+                <div className="sm:col-span-2">
+                  <Notice>
+                    Material inativo. Esta ação compensa somente o movimento
+                    histórico indicado, preservando sua identidade e sua
+                    custódia. Não reativa o cadastro nem transfere o saldo.
+                  </Notice>
+                </div>
+              ) : null}
               <label className="text-sm font-semibold">
                 Quantidade
                 <input
@@ -409,6 +548,7 @@ function PatientStock({
               <label className="text-sm font-semibold sm:col-span-2">
                 Motivo
                 <textarea
+                  ref={reasonInputRef}
                   className={inputClass}
                   name="reason"
                   minLength={3}
@@ -442,7 +582,12 @@ function PatientStock({
         aria-busy={history.loading}
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="stock-history-heading" className="font-semibold" ref={historyHeadingRef} tabIndex={-1}>
+          <h2
+            id="stock-history-heading"
+            className="font-semibold"
+            ref={historyHeadingRef}
+            tabIndex={-1}
+          >
             Histórico auditável
           </h2>
           <button
@@ -555,7 +700,14 @@ function PatientStock({
               <p className="mt-2 text-xs text-(--muted)">
                 {formatBrazilDate(movement.created_at)}
               </p>
-              <Button className="mt-2" onClick={event => setOrigin({ id: movement.id, opener: event.currentTarget })}>Consultar origem</Button>
+              <Button
+                className="mt-2"
+                onClick={(event) =>
+                  setOrigin({ id: movement.id, opener: event.currentTarget })
+                }
+              >
+                Consultar origem
+              </Button>
               {movement.reference_type === "document" &&
               movement.reference_id ? (
                 <Link
@@ -634,44 +786,6 @@ function PatientStock({
           </nav>
         ) : null}
       </section>
-      <Dialog
-        open={Boolean(review)}
-        title="Confirmar movimentação familiar"
-        onClose={() => {
-          if (!busy && !uncertain) setReview(null);
-        }}
-      >
-        <p className="text-sm">Produto: {name(String(review?.productId))}</p>
-        <p className="mt-2 text-sm">
-          Quantidade: {String(review?.quantity ?? "")}
-        </p>
-        <p className="mt-2 text-sm">Motivo: {String(review?.reason ?? "")}</p>
-        <p className="mt-3 text-xs text-(--muted)">
-          O saldo familiar será atualizado imediatamente. A operação original
-          permanecerá no histórico.
-        </p>
-        {error ? <Notice error>{error}</Notice> : null}
-        <div className="ui-form-actions">
-          <button
-            className={buttonClass}
-            disabled={busy || uncertain}
-            onClick={() => setReview(null)}
-          >
-            Voltar
-          </button>
-          <button
-            className={primaryClass}
-            disabled={busy}
-            onClick={() => void save()}
-          >
-            {busy
-              ? "Confirmando…"
-              : uncertain
-                ? "Recuperar tentativa"
-                : "Confirmar"}
-          </button>
-        </div>
-      </Dialog>
     </div>
   );
 }

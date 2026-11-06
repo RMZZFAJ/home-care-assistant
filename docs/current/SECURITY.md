@@ -100,6 +100,15 @@ no-store e correlação. Logs omitem payload privado, SQL, credenciais e tokens.
 O navegador conserva tentativas incertas por até 24 horas para recuperação
 idempotente; conclusão e saída removem os rascunhos. Não é histórico oficial.
 
+Gestão de identidade/sucessor exige catalog.manage por paciente, sem conceder
+access.manage ou leitura de custódia. A comparação retorna saldo restrito como
+NULL; seu histórico compartilhado contém somente metadados de identidade, sem
+capturar estoque visto por outro gestor. Comandos exigem intenção exata e motivo
+próprio; autoria vem da sessão. RLS, grants e helpers privados não oferecem DML
+direto. Esperas de estoque/catálogo e uma espera tardia de perfil foram testadas
+com Auth real; encerrar a sessão antes da confirmação reverte os efeitos.
+Inativar não autoriza novo movimento comum, merge ou conversão de unidades.
+
 ## Autenticação pessoal
 
 Convite concede vínculo local somente após aceite pela identidade de e-mail

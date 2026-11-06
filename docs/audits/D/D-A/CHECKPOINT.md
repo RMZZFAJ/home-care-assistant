@@ -1645,3 +1645,98 @@ afetados passaram. A evidência é local/fictícia, sem homologação humana, AT
 zoom400%, aparelho, assinatura ou provedor.116 migrations permanecem; replay,
 integração completa e matriz de browser do novo SHA ficam na CI programada.
 D-A segue em execução, sem merge, alteração remota ou envio externo.
+
+## D2.24 — identidades separadas e destinação explícita do inativo
+
+Migration 20261106161707 implementa comparação de origem/sucessor e os atos
+retire, reactivate e clear_successor, com motivo próprio, hash da referência e
+chave por ator. O sucessor orienta novas seleções; não é alias, conversão,
+transferência nem substituição de IDs existentes. Unidades diferentes são
+mostradas lado a lado. Inativação pode manter todo saldo sem destino obrigatório.
+Reativação conserva a mesma identidade e remove a orientação. Não há novo papel
+ou capacidade padrão. O percurso anterior de edição/inativação permanece.
+
+Tabelas catalogue_successors e catalogue_identity_events têm RLS e SELECT
+limitado; não oferecem DML a clientes/service_role. FKs compostas mantêm o mesmo
+paciente; a RPC recusa autorreferência e ciclos. História imutável conserva
+metadados de identidade/motivo/autoria, sem reter saldo privado visto por outro
+gestor. Comandos ficam em private, sem grants diretos. Contexto projeta NULL para
+custódia restrita e histórico paginado20. Nova escrita exige catalog.manage e
+paciente ativo; recuperação própria exige leitura viva. Helpers privados têm ACL
+revogada e funções privilegiadas usam search_path vazio.
+
+test:db:prepare aplicou117 na stack home-care-assistant, API54321/DB54322, sem
+reset. Refinamentos posteriores dessa migration ainda não publicada aplicaram
+somente o novo corpo de family_stock_movement e o trigger de invalidação; não
+recriaram tabelas ou repetiram migrations históricas. As 84 protegidas estão
+preservadas. Replay limpo/legado e integração completa permanecem na CI.
+
+Doze cenários Auth distintos passaram entre rodadas dirigidas:
+
+- FAMILY4/TEAM4 conservam exatamente os mesmos movimentos/documentos ao inativar
+  e reativar. A identidade não muda nem gera estoque em outro produto.
+- Sucessor em mL com saldo9,5 continua separado do original em unidade. Gestor
+  delegado sem access.manage vê somente custódias autorizadas; história não
+  revela os saldos que outro gestor viu.
+- Chave própria recupera resultado após perda só de escrita; chave nova, outro
+  corpo, paciente estrangeiro e perda de vínculo não conferem nova autoridade.
+- Duas decisões da mesma referência produzem um ato e um conflito. DML direto
+  em orientação/evento e execução de helpers são recusados.
+- Esperas reais de estoque e linha de catálogo impedem escrita após revogação.
+  Uma espera tardia de perfil usa encerramento da sessão Auth real e confirma
+  42501/rollback, sem aceitar timeout como prova de autorização.
+- Campos forjados, referência ausente, outro material, motivo curto e excesso
+  UTF-16 são recusados sem alterações parciais.
+- Remover orientação invalida a revisão dos demais consumidores. Indicação
+  inversa cíclica, inclusive após reativação pelo consumidor legado, é recusada.
+- Nova entrada/retirada comum de inativo falha; chave já confirmada recupera e
+  compensação com referência cria somente seu movimento histórico legítimo.
+- Retorno físico independente de duas unidades inativas passa por declaração,
+  concordância, expedição e aceite pessoal: FAMILY6/TEAM2/TRANSIT0, ainda inativo.
+- Movimento familiar revogado durante espera tardia de perfil também reverte
+  ledger e efeitos ao finalizar, com a sessão Auth realmente encerrada.
+
+A primeira fixture usou withdrawal, inexistente no contrato, e foi corrigida
+para outbound. A expectativa de trânsito zero foi alinhada ao texto decimal
+0.000000 preservado pelo banco. O ensaio tardio inicial terminou57014: revogar
+capacidade invalidava as mesmas revisões de workspace que o comando já mantinha
+enquanto aguardava o perfil. A prova foi separada entre revogação de capacidade
+antes da escrita e encerramento da sessão real após a escrita; não houve aumento
+de timeout, desativação de trigger ou redução da asserção42501/rollback.
+
+Duas contraprovas efetivamente reprovaram antes das correções: entrada comum em
+inativo era aceita; remover somente sucessor não invalidava os consumidores.
+A RPC passou a recusar a operação comum após recuperar chaves já confirmadas,
+preservando compensações referenciadas. O trigger existente de invalidação foi
+acoplado à orientação. Somente essas provas afetadas foram repetidas e passaram.
+
+Duas fronteiras API passaram: intenção estrita sem autor/quantidade/merge e
+limites Unicode anteriores a Auth. Três percursos Chromium novos passaram entre
+rodada/recheck: sucessor com unidade distinta e recuperação após perda de escrita;
+conflito de saldo com falha503/adoção explícita; compensação de inativo. Motivo,
+escolha e foco são preservados; revisão usa uma superfície sem campos editáveis.
+PDF anterior manteve os mesmos bytes/hash e fatos canônicos. A equipe escolhe
+explicitamente o novo material, sem rebinding do antigo. Axe/overflow em
+320/390/768/1440 passaram; capturas320 dos dois materiais foram inspecionadas.
+
+Três consumidores anteriores também passaram na rodada dirigida: edição de
+aliases/inativação, conversão COM2x10 após fator12 e correção familiar com
+paginação/filtro. A única falha visual nova ocorreu no rótulo implícito da
+textarea depois de remontar o campo: captura mostrava valor e foco preservados,
+mas a consulta exata pelo rótulo falhava. Label/id explícitos corrigiram a
+associação, mantendo as asserções. Só esse percurso foi repetido e passou.
+Busca por nome/alias foi acrescentada a COM/ENT, mantendo seleções por categoria;
+o conjunto exato1/5/20/100 de C028 continua separado, sem aprovação presumida.
+
+Tipos/build dos runners, lint pertinente e advisor all local passaram; exatamente
+as doze chaves WARN anteriores, sem chave nova. Logs catalogue-identities-*,
+catalogue-clear-guidance-*, inactive-material-*, family-movement-final-authority
+e relatórios HTML/capturas preservados em output. Evidência fictícia/local;
+sem humano/AT/zoom400%, aparelho, assinatura ou provedor real.
+
+Consulta pontual da CI42250234690/52cb54e: banco, checks gerais Windows/Ubuntu,
+Chromium e WebKit success. Os dois casos C046 passaram nos três projetos.
+Mobile passou101/falhou1 também no retry, em consumption.spec.ts:320, opção
+interceptada pelo portal. Esse consumidor anterior será tratado separadamente;
+não se declarou CI global verde. O novo SHA continua dependente da própria CI.
+D-A permanece em execução, sem merge ou mutação remota.

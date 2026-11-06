@@ -10,7 +10,10 @@ import {
 } from "@/lib/catalog-match";
 import { textRows } from "@/lib/text-rows";
 import { formatQuantity } from "@/lib/quantity";
-import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
+import {
+  formatStockObservation,
+  formatStockObservationTime,
+} from "@/lib/stock-observation";
 import { StockObservationField } from "./stock-observation-field";
 import type {
   ExtraItem,
@@ -36,6 +39,7 @@ export type Product = {
   aliases?: string[];
   active?: boolean;
   is_active?: boolean;
+  selectionPredecessors?: { id: string; name: string; unit: string }[];
 };
 
 export function Identity({
@@ -80,9 +84,11 @@ export function CatalogStep({
   const [duplicate, setDuplicate] = useState<Product | null>(null);
   const [repeatReason, setRepeatReason] = useState("");
   const visible = items.filter((item) =>
-    [item.name, ...(item.aliases ?? [])].some((name) =>
-      normalize(name).includes(normalize(search)),
-    ),
+    [
+      item.name,
+      ...(item.aliases ?? []),
+      ...(item.selectionPredecessors ?? []).map((row) => row.name),
+    ].some((name) => normalize(name).includes(normalize(search))),
   );
   return (
     <div className="space-y-4">
@@ -182,6 +188,16 @@ export function CatalogStep({
                 {item.unit}
               </span>
             </label>
+            {item.selectionPredecessors?.length ? (
+              <p className="mt-2 text-sm">
+                Opção cadastrada para novas escolhas após{" "}
+                {item.selectionPredecessors
+                  .map((row) => `${row.name} (${row.unit})`)
+                  .join(", ")}
+                . Confira a unidade {item.unit}; a seleção é sua e não converte
+                o estoque anterior.
+              </p>
+            ) : null}
             {line ? (
               <div className="mt-4 space-y-3">
                 <p className="text-xs text-(--muted)">
@@ -191,7 +207,15 @@ export function CatalogStep({
                     : formatQuantity(info.familyStock, item.unit)}
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <StockObservationField value={line.currentStock} mode={line.stockObservation} at={line.stockObservationAt} unit={item.unit} decimals={item.quantity_decimals ?? 0} error={errors[item.id]} onChange={change => updateLine(item, change)} />
+                  <StockObservationField
+                    value={line.currentStock}
+                    mode={line.stockObservation}
+                    at={line.stockObservationAt}
+                    unit={item.unit}
+                    decimals={item.quantity_decimals ?? 0}
+                    error={errors[item.id]}
+                    onChange={(change) => updateLine(item, change)}
+                  />
                   <label className="flex min-h-11 items-center gap-3 text-sm">
                     <input
                       type="checkbox"
@@ -301,7 +325,20 @@ export function Extras({
                 className="mt-1 min-h-12 w-full rounded-lg border border-(--line) p-3"
               />
             </label>
-            <StockObservationField value={item.currentStock} mode={item.stockObservation} at={item.stockObservationAt} onChange={change => setItems(items.map(current => current.id === item.id ? { ...current, ...change } : current))} />
+            <StockObservationField
+              value={item.currentStock}
+              mode={item.stockObservation}
+              at={item.stockObservationAt}
+              onChange={(change) =>
+                setItems(
+                  items.map((current) =>
+                    current.id === item.id
+                      ? { ...current, ...change }
+                      : current,
+                  ),
+                )
+              }
+            />
             <div className="flex items-end">
               <button
                 type="button"
@@ -451,7 +488,9 @@ export function Review({
       </div>
       <Summary
         title="Itens do catálogo"
-        details={lines.map(item => formatStockObservationTime(item.stockObservationAt))}
+        details={lines.map((item) =>
+          formatStockObservationTime(item.stockObservationAt),
+        )}
         rows={lines.map(
           (item) =>
             `${item.productName} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation, item.unit)}${item.urgent ? " (urgente)" : ""}${item.repeatReason ? " · Reiteração: " + item.repeatReason : ""}`,
@@ -459,7 +498,9 @@ export function Review({
       />
       <Summary
         title="Itens extras"
-        details={extras.map(item => formatStockObservationTime(item.stockObservationAt))}
+        details={extras.map((item) =>
+          formatStockObservationTime(item.stockObservationAt),
+        )}
         rows={extras.map(
           (item) =>
             `${item.name} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation)}${item.urgent ? " (urgente)" : ""}`,
@@ -472,14 +513,29 @@ export function Review({
     </div>
   );
 }
-export function Summary({ title, rows, details }: { title: string; rows: string[]; details?: string[] }) {
+export function Summary({
+  title,
+  rows,
+  details,
+}: {
+  title: string;
+  rows: string[];
+  details?: string[];
+}) {
   return (
     <div>
       <h3 className="font-bold">{title}</h3>
       {rows.length ? (
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
           {textRows(rows).map((row, index) => (
-            <li key={row.key}><span>{row.value}</span>{details?.[index] ? <span className="block text-xs text-(--muted)">{details[index]}</span> : null}</li>
+            <li key={row.key}>
+              <span>{row.value}</span>
+              {details?.[index] ? (
+                <span className="block text-xs text-(--muted)">
+                  {details[index]}
+                </span>
+              ) : null}
+            </li>
           ))}
         </ul>
       ) : (

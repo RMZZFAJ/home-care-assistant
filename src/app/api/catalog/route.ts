@@ -40,15 +40,68 @@ export async function GET(request: Request) {
     // Archived definitions remain readable with their historical stock by authorized members.
     if (params.get("includeInactive") !== "true")
       query = query.eq("is_active", true);
-    const { data, error } = await query;
+    const [{ data, error }, guidance] = await Promise.all([
+      query,
+      auth.client
+        .from("catalogue_successors")
+        .select("product_id,successor_product_id")
+        .eq("care_recipient_id", patient.id),
+    ]);
     if (error) databaseError(error);
-    return NextResponse.json({
-      data: (data ?? []).map((item) => ({
-        ...item,
-        id: item.product_id,
-        active: item.is_active,
-      })),
-    });
+    if (guidance.error) databaseError(guidance.error);
+    const productRows = data ?? [];
+    // Retired identity labels guide an explicit new selection. They are not
+    // aliases or a replacement for any persisted material ID.
+    const { data: retired, error: retiredError } = guidance.data?.length
+      ? await auth.client
+          .from("care_recipient_products")
+          .select("product_id,name,unit,is_active")
+          .eq("care_recipient_id", patient.id)
+      : { data: [], error: null };
+    if (retiredError) databaseError(retiredError);
+    const definitions = new Map(
+      (retired ?? []).map((row) => [row.product_id, row]),
+    );
+    return NextResponse.json(
+      {
+        data: productRows.map((item) => ({
+          ...item,
+          id: item.product_id,
+          active: item.is_active,
+          successor: (() => {
+            const id = guidance.data?.find(
+                (row) => row.product_id === item.product_id,
+              )?.successor_product_id,
+              row = id ? definitions.get(id) : null;
+            return row
+              ? {
+                  id: row.product_id,
+                  name: row.name,
+                  unit: row.unit,
+                  active: row.is_active,
+                }
+              : null;
+          })(),
+          selectionPredecessors: item.is_active
+            ? (guidance.data ?? [])
+                .filter((row) => row.successor_product_id === item.product_id)
+                .flatMap((row) => {
+                  const source = definitions.get(row.product_id);
+                  return source && !source.is_active
+                    ? [
+                        {
+                          id: source.product_id,
+                          name: source.name,
+                          unit: source.unit,
+                        },
+                      ]
+                    : [];
+                })
+            : [],
+        })),
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   });
 }
 

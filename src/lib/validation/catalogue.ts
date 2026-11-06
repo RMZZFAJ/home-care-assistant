@@ -2,6 +2,30 @@ import { z } from "zod";
 import { exactQuantity } from "./documents";
 import { quantity } from "@/lib/quantity";
 
+export const catalogueIdentityCommandSchema = z
+  .object({
+    careRecipientId: z.string().uuid(),
+    productId: z.string().min(1).max(120),
+    successorId: z.string().min(1).max(120).nullable(),
+    referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
+    action: z.enum(["retire", "reactivate", "clear_successor"]),
+    reason: z
+      .string()
+      .trim()
+      .refine(
+        (value) => Array.from(value).length >= 3 && value.length <= 1000,
+        "Informe um motivo próprio de 3 a 1.000 caracteres.",
+      ),
+    idempotencyKey: z.string().uuid(),
+  })
+  .strict()
+  .refine(
+    (value) =>
+      value.successorId !== value.productId &&
+      (value.action === "retire" || value.successorId === null),
+    "Confira o material e a indicação de sucessor.",
+  );
+
 export const presentationCommandSchema = z
   .object({
     action: z.literal("presentation"),

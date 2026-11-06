@@ -4,7 +4,7 @@ import {
   DeliveryRecipientField,
   DeliveryRecipientReference,
 } from "./delivery-recipient";
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import {
   inputClass,
   Notice,
@@ -20,6 +20,7 @@ import type {
   ProductPresentation,
 } from "@/types/catalogue";
 import { formatQuantity } from "@/lib/quantity";
+import { normalizeCatalogText } from "@/lib/catalog-match";
 import { presentationCaption } from "@/lib/presentation-conversion";
 import type {
   SupplyType,
@@ -91,7 +92,22 @@ export function SupplyWizardStep({
   presentationLoading: boolean;
   refreshPresentations: () => void;
 }) {
-  const category = ["medicamentos", "higiene", "dieta"][step - 1];
+  const category = ["medicamentos", "higiene", "dieta"][step - 1] ?? "";
+  const [searchByCategory, setSearchByCategory] = useState<
+    Record<string, string>
+  >({});
+  const search = searchByCategory[category] ?? "";
+  const visibleProducts = catalog.filter(
+    (product) =>
+      product.category === category &&
+      [
+        product.name,
+        ...(product.aliases ?? []),
+        ...(product.selectionPredecessors ?? []).map((row) => row.name),
+      ].some((name) =>
+        normalizeCatalogText(name).includes(normalizeCatalogText(search)),
+      ),
+  );
   const selected = catalog.filter((product) =>
     Object.hasOwn(form.quantities, product.id),
   );
@@ -316,129 +332,157 @@ export function SupplyWizardStep({
       {step >= 1 && step <= 3 ? (
         <>
           {type !== "BAL" ? <BarcodeScanner onRead={scan} /> : null}
+          <label className="block text-sm font-semibold">
+            Buscar materiais nesta categoria
+            <input
+              type="search"
+              className={inputClass}
+              value={search}
+              onChange={(event) =>
+                setSearchByCategory((current) => ({
+                  ...current,
+                  [category]: event.target.value,
+                }))
+              }
+            />
+          </label>
+          <p role="status" className="text-sm">
+            {visibleProducts.length} materiais encontrados nesta categoria. As
+            seleções permanecem ao filtrar ou trocar de categoria.
+          </p>
+          {!visibleProducts.length ? (
+            <Notice>
+              Nenhum material nesta busca. Ajuste ou limpe o filtro; suas
+              seleções continuam preservadas.
+            </Notice>
+          ) : null}
           <div className="space-y-3">
-            {catalog
-              .filter((product) => product.category === category)
-              .map((product) => {
-                const checked = Object.hasOwn(form.quantities, product.id);
-                return (
-                  <div
-                    className={
-                      "product-choice " +
-                      (checked ? "product-choice-selected" : "")
-                    }
-                    key={product.id}
-                  >
-                    <label className="flex min-w-0 flex-1 items-start gap-3">
-                      {type !== "BAL" ? (
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={(event) =>
-                            setForm((current) => {
-                              const quantities = {
-                                ...current.quantities,
-                              };
-                              const presentationSelections = {
-                                ...current.presentationSelections,
-                              };
-                              const manualQuantities = {
-                                ...current.manualQuantities,
-                              };
-                              if (event.target.checked)
-                                quantities[product.id] = "";
-                              else {
-                                delete quantities[product.id];
-                                delete presentationSelections[product.id];
-                                delete manualQuantities[product.id];
-                              }
-                              return {
-                                ...current,
-                                quantities,
-                                presentationSelections,
-                                manualQuantities,
-                              };
-                            })
-                          }
-                        />
-                      ) : null}
-                      <span>
-                        <strong className="block text-sm">
-                          {product.name}
-                        </strong>
-                        <span className="mt-1 block text-xs text-(--muted)">
-                          {product.unit}
-                          {links[product.id]?.length
-                            ? " · Vinculado à REQ"
-                            : ""}
-                        </span>
-                      </span>
-                    </label>
-                    {checked &&
-                    !form.presentationSelections?.[product.id]?.length ? (
-                      <label className="product-quantity text-xs font-semibold">
-                        {type === "BAL"
-                          ? "Contagem física"
-                          : type === "COM"
-                            ? "Quantidade a adquirir"
-                            : "Quantidade expedida"}
-                        <input
-                          className={inputClass}
-                          inputMode="decimal"
-                          value={form.quantities[product.id]}
-                          aria-label={"Quantidade — " + product.name}
-                          aria-invalid={Boolean(fieldErrors[product.id])}
-                          onChange={(event) =>
-                            setForm((current) => ({
+            {visibleProducts.map((product) => {
+              const checked = Object.hasOwn(form.quantities, product.id);
+              return (
+                <div
+                  className={
+                    "product-choice " +
+                    (checked ? "product-choice-selected" : "")
+                  }
+                  key={product.id}
+                >
+                  <label className="flex min-w-0 flex-1 items-start gap-3">
+                    {type !== "BAL" ? (
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(event) =>
+                          setForm((current) => {
+                            const quantities = {
+                              ...current.quantities,
+                            };
+                            const presentationSelections = {
+                              ...current.presentationSelections,
+                            };
+                            const manualQuantities = {
+                              ...current.manualQuantities,
+                            };
+                            if (event.target.checked)
+                              quantities[product.id] = "";
+                            else {
+                              delete quantities[product.id];
+                              delete presentationSelections[product.id];
+                              delete manualQuantities[product.id];
+                            }
+                            return {
                               ...current,
-                              quantities: {
-                                ...current.quantities,
-                                [product.id]: event.target.value,
-                              },
-                              manualQuantities: {
-                                ...current.manualQuantities,
-                                [product.id]: event.target.value,
-                              },
-                            }))
-                          }
-                        />
-                        {fieldErrors[product.id] ? (
-                          <span className="ui-field-error">
-                            {fieldErrors[product.id]}
-                          </span>
-                        ) : null}
-                      </label>
+                              quantities,
+                              presentationSelections,
+                              manualQuantities,
+                            };
+                          })
+                        }
+                      />
                     ) : null}
-                    {checked && type !== "BAL" ? (
-                      <div className="col-span-full w-full">
-                        <PresentationQuantity
-                          product={product}
-                          selections={
-                            form.presentationSelections?.[product.id] ?? []
-                          }
-                          manual={
-                            form.manualQuantities?.[product.id] ??
-                            form.quantities[product.id] ??
-                            "0"
-                          }
-                          source={presentations}
-                          error={presentationError}
-                          loading={presentationLoading}
-                          refresh={refreshPresentations}
-                          validationError={
-                            form.presentationSelections?.[product.id]?.length
-                              ? fieldErrors[product.id]
-                              : undefined
-                          }
-                          onChange={(selections, manual) =>
-                            updatePackages(product.id, selections, manual)
-                          }
-                        />
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              })}
+                    <span>
+                      <strong className="block text-sm">{product.name}</strong>
+                      <span className="mt-1 block text-xs text-(--muted)">
+                        {product.unit}
+                        {links[product.id]?.length ? " · Vinculado à REQ" : ""}
+                      </span>
+                      {product.selectionPredecessors?.length ? (
+                        <span className="mt-2 block text-xs">
+                          Opção para novas escolhas após{" "}
+                          {product.selectionPredecessors
+                            .map((row) => `${row.name} (${row.unit})`)
+                            .join(", ")}
+                          . Confira a unidade {product.unit}; não há conversão
+                          do saldo anterior.
+                        </span>
+                      ) : null}
+                    </span>
+                  </label>
+                  {checked &&
+                  !form.presentationSelections?.[product.id]?.length ? (
+                    <label className="product-quantity text-xs font-semibold">
+                      {type === "BAL"
+                        ? "Contagem física"
+                        : type === "COM"
+                          ? "Quantidade a adquirir"
+                          : "Quantidade expedida"}
+                      <input
+                        className={inputClass}
+                        inputMode="decimal"
+                        value={form.quantities[product.id]}
+                        aria-label={"Quantidade — " + product.name}
+                        aria-invalid={Boolean(fieldErrors[product.id])}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            quantities: {
+                              ...current.quantities,
+                              [product.id]: event.target.value,
+                            },
+                            manualQuantities: {
+                              ...current.manualQuantities,
+                              [product.id]: event.target.value,
+                            },
+                          }))
+                        }
+                      />
+                      {fieldErrors[product.id] ? (
+                        <span className="ui-field-error">
+                          {fieldErrors[product.id]}
+                        </span>
+                      ) : null}
+                    </label>
+                  ) : null}
+                  {checked && type !== "BAL" ? (
+                    <div className="col-span-full w-full">
+                      <PresentationQuantity
+                        product={product}
+                        selections={
+                          form.presentationSelections?.[product.id] ?? []
+                        }
+                        manual={
+                          form.manualQuantities?.[product.id] ??
+                          form.quantities[product.id] ??
+                          "0"
+                        }
+                        source={presentations}
+                        error={presentationError}
+                        loading={presentationLoading}
+                        refresh={refreshPresentations}
+                        validationError={
+                          form.presentationSelections?.[product.id]?.length
+                            ? fieldErrors[product.id]
+                            : undefined
+                        }
+                        onChange={(selections, manual) =>
+                          updatePackages(product.id, selections, manual)
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         </>
       ) : null}

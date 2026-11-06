@@ -270,7 +270,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             handle={handle}
           />
         )}
-        {section === "catalog" ? <CatalogueManagement rows={rows} templates={templates} save={execute} busy={busy} error={error} loading={loading} /> : null}
+        {section === "catalog" && patientId ? <CatalogueManagement rows={rows} templates={templates} save={execute} busy={busy} error={error} loading={loading} patientId={patientId} onIdentitySaved={async message => { setMessage(message); await load(); }} /> : null}
         {section === "memberships" ? <MembershipManagement rows={rows} directory={directory} save={execute} busy={busy} error={error} patientId={patientId} /> : null}
         {section === "invitations" && (
           <>

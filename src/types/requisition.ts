@@ -21,6 +21,7 @@ export type CatalogItem = {
   category: ProductCategory;
   unit: string;
   quantity_decimals?: number;
+  selectionPredecessors?: { id: string; name: string; unit: string }[];
 };
 
 export type RequisitionLine = {

@@ -136,6 +136,26 @@ Ledger, documentos e eventos permaneceram idênticos nas leituras. Nenhuma
 migration ou permissão nova;116 migrations preservadas. A CI do novo incremento
 continua necessária. Demais critérios D2 seguem em execução, sem merge ou GO.
 
+CI42250234690 de52cb54e passou banco, checks gerais Windows/Ubuntu, Chromium e
+WebKit. Os dois percursos de origem passaram também no mobile; esse projeto
+passou101/falhou1, incluindo retry, em consumidor anterior de consumo com opção
+interceptada pelo portal. A investigação dessa falha é um incremento separado,
+sem repetir a matriz inteira ou presumir aprovação global do SHA.
+
+Catálogo agora compara identidades e registra inativação, reativação ou sucessor
+com referência, motivo e autoria próprios. Unidades diferentes continuam
+separadas; não há merge, conversão ou transferência implícita. Doze casos Auth
+distintos passaram entre rodadas dirigidas, incluindo FAMILY4/TEAM4, ciclos,
+perda de autoridade após esperas e invalidação da orientação. Duas fronteiras
+API e três tarefas Chromium novas passaram entre rodada/recheck; três
+consumidores visuais anteriores afetados também passaram. PDF anterior conserva
+os mesmos bytes/hash; consulta e mudanças cadastrais preservam ledger/documentos.
+Nova entrada/retirada comum de inativo foi efetivamente recusada no banco após
+contraprova; compensação referenciada e retorno físico continuam próprios.
+Sua revisão usa uma única gaveta.117 migrations; mesmas doze chaves WARN locais.
+O novo SHA exige a CI programada; a matriz exata1/5/20/100 e demais critérios D2
+continuam em execução. Sem merge ou alteração remota.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

@@ -3,7 +3,7 @@ import { setup, rpc } from "./v4-fixtures.mjs";
 import { shiftWorker } from "./shift-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 
-export async function transferFixture() {
+export async function transferFixture({ quantity = "10" } = {}) {
   const f = await setup(),
     initiator = await shiftWorker(f.patient),
     counterparty = await shiftWorker(f.patient, "family"),
@@ -22,7 +22,7 @@ export async function transferFixture() {
       recipientId: initiator.id,
       recipientReason:
         "Entrega pessoal fictícia para formar a custódia de origem da transferência",
-      lines: [{ productId: f.products[0], quantity: "10" }],
+      lines: [{ productId: f.products[0], quantity }],
     },
   });
   await rpc(initiator.client, "supply_document_command", {

@@ -159,6 +159,26 @@ documentais também exigem expectedVersion para detectar concorrência.
 
   **Contrato:** Consulta legada; escrita aposentada com HTTP 410
 
+- **Rota:** /api/catalog/identities
+
+  **Contrato:** Comparação e situação de uma identidade no paciente. GET exige
+  catalog.manage e aceita productId, successorId opcional e page, com20 escolhas
+  históricas por página. Retorna unidade, situação, aliases e saldos somente das
+  custódias autorizadas; NULL significa restrição, nunca zero inferido. POST
+  recebe productId, successorId, referenceHash, action, reason e idempotencyKey.
+  Os atos são retire, reactivate e clear_successor. Motivo próprio tem3–1000
+  unidades UTF-16, com mínimo de três caracteres. Banco exige referência atual,
+  paciente ativo e catalog.manage para nova escrita; chave própria já confirmada
+  recupera com leitura viva. Sucessor precisa ser outro material ativo do mesmo
+  paciente e não formar ciclo. Inativar pode conservar saldo sem sucessor;
+  reativar remove a orientação, mantendo a mesma identidade. Nada movimenta
+  estoque, converte unidade ou reescreve documento. A resposta é privada/no-store.
+
+  GET /api/catalog inclui successor e selectionPredecessors como orientação de
+  escolha explícita. O material inativo continua fora da seleção normal; nomes
+  anteriores não se tornam aliases nem substituem IDs persistidos. A busca por
+  nome/alias em COM/ENT/REQ não modifica as seleções feitas em outras categorias.
+
 - **Rota:** /api/attachments
 
   **Contrato:** Reserva, upload validado, vínculo e links privados

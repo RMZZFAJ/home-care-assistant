@@ -435,6 +435,31 @@ selecionadas antes do limite da lista. A interface ENT anterior continua
 disponível enquanto a equivalência integral e as intenções antigas não forem
 reconciliadas para sua substituição.
 
+## Identidades e sucessores do catálogo
+
+Migration 20261106161707 acrescenta catalogue_successors e histórico imutável
+catalogue_identity_events. FKs compostas mantêm origem/sucessor no catálogo do
+mesmo paciente; não há merge de products, linhas ou movimentos. A RPC recusa
+autorreferência, ciclos e sucessor inativo. Histórico conserva nomes/unidades,
+situação, motivo e autoria do ato; não persiste os saldos privados consultados
+por outro ator. Orientação tem SELECT por vínculo; eventos exigem catalog.manage.
+Clientes e service_role não têm DML nas tabelas; comandos próprios ficam em
+private.catalogue_identity_commands, sem acesso direto.
+
+catalogue_identity_context projeta só saldos autorizados, com NULL nas custódias
+restritas. Hash da referência inclui definições e saldos visíveis. O comando
+serializa estoque/catálogo/chave, compara depois dos locks e revalida autoridade
+ao finalizar, inclusive depois de espera de FK/perfil. Recuperação da própria
+chave exige leitura viva, preserva o resultado e não repete evento. Alterar ou
+remover orientação invalida consultas pelos mecanismos existentes; não
+introduz notificação externa. Inativação e reativação não geram movimento.
+
+family_stock_movement recusa nova entrada/retirada comum em material inativo.
+A recuperação da chave confirmada e a compensação histórica com referência
+continuam disponíveis; transferência física segue o processo ENT separado.
+A fronteira final também revalida a autoridade após esperas de triggers/FKs.
+As 84 migrations históricas permanecem intactas;117 compõem este incremento.
+
 ## Verificação
 
 D-A corrigiu o lote REQ na migration 20261105070428: terminais/históricos
