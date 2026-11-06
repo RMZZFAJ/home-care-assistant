@@ -17,6 +17,10 @@ import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import {
+  readPresentationConversions,
+  presentationCaption,
+} from "@/lib/presentation-conversion";
+import {
   formatStockObservation,
   formatStockObservationTime,
 } from "@/lib/stock-observation";
@@ -998,6 +1002,20 @@ export async function renderDocumentPdf(
         ),
         formatQuantity(String(item.quantity ?? 0)),
       ]),
+    );
+  }
+  const convertedLines = snapshot.lines.flatMap((item) =>
+    readPresentationConversions(item.presentation_conversions).map((row) => [
+      name(item),
+      presentationCaption(row),
+    ]),
+  );
+  if (convertedLines.length) {
+    section("Apresentações e equivalências registradas");
+    table(
+      ["MATERIAL", "EMBALAGENS E UNIDADE BASE"],
+      [0.3, 0.7],
+      convertedLines,
     );
   }
   if (snapshot.type === "ENT" && snapshot.deliveryRegularization?.cases.length)

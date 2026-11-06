@@ -109,12 +109,20 @@ test("catalogue preserves fractional factors and textual barcodes and refuses an
     ).error,
   );
   assert.equal(snapshot(f), before);
-  const updated = await rpc(
-    f.admin,
-    "configure_catalogue_unit",
-    configure(f, { p_base_quantity: "2.5" }),
-  );
-  assert.equal(updated.presentationId, result.presentationId);
+  const updated = await rpc(f.admin, "catalogue_presentation_command", {
+    p_patient: f.patient,
+    p_id: result.presentationId,
+    p_version: 1,
+    p_key: crypto.randomUUID(),
+    p_body: {
+      productId: f.product,
+      name: "Embalagem fictícia",
+      barcode: "0123456789012",
+      baseQuantity: "2.5",
+      active: true,
+    },
+  });
+  assert.equal(updated.result.id, result.presentationId);
   assert.equal(
     sql(
       `select base_quantity::text from public.product_presentations where id=${sqlLiteral(result.presentationId)};`,
@@ -183,10 +191,24 @@ for (const wait of ["stock", "catalogue", "presentation"]) {
       const delegated = await actor("professional", f.patient);
       const before = snapshot(f);
       const send = () =>
-        delegated.rpc(
-          "configure_catalogue_unit",
-          configure(f, { p_base_quantity: "2.5" }),
-        );
+        wait === "presentation"
+          ? delegated.rpc("catalogue_presentation_command", {
+              p_patient: f.patient,
+              p_id: existing.presentationId,
+              p_version: 1,
+              p_key: crypto.randomUUID(),
+              p_body: {
+                productId: f.product,
+                name: "Embalagem fictícia",
+                barcode: "0123456789012",
+                baseQuantity: "2.5",
+                active: true,
+              },
+            })
+          : delegated.rpc(
+              "configure_catalogue_unit",
+              configure(f, { p_base_quantity: "2.5" }),
+            );
       const revoke = () =>
         sql(
           `update public.capability_overrides set enabled=false where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.professional.id)} and capability='catalog.manage';`,
@@ -196,7 +218,7 @@ for (const wait of ["stock", "catalogue", "presentation"]) {
           ? await whileRowWaits(
               "product_presentations",
               existing.presentationId,
-              "configure_catalogue_unit",
+              "catalogue_presentation_command",
               send,
               revoke,
             )
@@ -254,15 +276,13 @@ test("catalogue factors retain narrow grants and table writes cannot bypass the 
     const client = await actor(name, f.patient);
     assert.ok(
       (
-        await client
-          .from("product_presentations")
-          .insert({
-            care_recipient_id: f.patient,
-            product_id: f.product,
-            barcode: "0123456789012",
-            name: "Tentativa direta",
-            base_quantity: "NaN",
-          })
+        await client.from("product_presentations").insert({
+          care_recipient_id: f.patient,
+          product_id: f.product,
+          barcode: "0123456789012",
+          name: "Tentativa direta",
+          base_quantity: "NaN",
+        })
       ).error,
     );
   }

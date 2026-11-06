@@ -14,6 +14,22 @@ A configuração registra auditoria com o ator real. Grants/RLS continuam estrei
 presentation_finite_factor protege escritas novas; é validada integralmente
 somente se não houver fator legado inválido. Valores legados não são corrigidos
 ou apagados automaticamente; exigem revisão explícita antes de novo uso.
+
+Apresentações possuem versão e autoria de atualização. product_presentation_versions
+preserva definições observadas; capturedExisting identifica a captura legada,
+sem inventar a autoria/data de uma edição anterior. product_presentation_commands
+conserva intenção e resultado por ator/chave. Auth lê versões no próprio paciente
+e somente seus comandos; nenhuma dessas tabelas oferece DML direto a clientes.
+catalogue_presentation_command usa referência de versão, recuperação própria
+com leitura viva e revalida autoridade após espera e efeitos tardios. Conflitos
+aplicativos usam PT409, separados de falha transacional de serialização.
+
+Linhas COM/ENT guardam presentation_conversions em coluna preenchida pelo
+banco, com código, nome, versão, embalagens, fator, unidade e total calculado.
+O valor é confrontado com quantity antes da escrita, incorporado ao snapshot
+e preservado após mudança do cadastro. Linhas anteriores conservam ausência
+de proveniência validada; não se infere fator a partir de metadata antiga.
+Unidade usada em apresentação também fica protegida antes do primeiro ledger.
 Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
 implementação.

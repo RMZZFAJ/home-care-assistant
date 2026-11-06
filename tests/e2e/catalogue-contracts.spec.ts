@@ -134,10 +134,10 @@ test("apresentação fracionária pode ser configurada na interface existente po
   await login(page, f.patient);
   await page.goto("/unidades?careRecipientId=" + f.patient);
   await page
-    .getByRole("button", { name: "Configurar apresentação", exact: true })
+    .getByRole("button", { name: "Configurar unidade e precisão", exact: true })
     .click();
   const drawer = page.getByRole("dialog", {
-    name: "Unidade base e código de embalagem",
+    name: "Unidade base e precisão",
     exact: true,
   });
   await drawer
@@ -145,21 +145,41 @@ test("apresentação fracionária pode ser configurada na interface existente po
     .selectOption(product.product_id);
   await drawer.getByLabel("Precisão do produto", { exact: true }).fill("1");
   await drawer
-    .getByLabel("EAN / GTIN / UPC opcional", { exact: true })
-    .fill("0123456789012");
-  await drawer
-    .getByLabel("Nome da apresentação", { exact: true })
-    .fill("Frasco fracionário fictício");
-  await drawer
-    .getByLabel("Quantidade base por embalagem", { exact: true })
-    .fill("1.5");
-  await drawer
-    .getByRole("button", { name: "Salvar unidade / apresentação", exact: true })
+    .getByRole("button", { name: "Salvar unidade / precisão", exact: true })
     .click();
   await expect(drawer).toHaveCount(0);
-  await expect(
-    page.getByText("Configuração salva.", { exact: true }),
-  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Nova apresentação", exact: true })
+    .click();
+  const presentation = page.getByRole("dialog", {
+    name: "Nova apresentação",
+    exact: true,
+  });
+  const combo = presentation.getByRole("combobox", {
+    name: "Material da apresentação",
+    exact: true,
+  });
+  await combo.fill("Líquido fracionário da interface");
+  await combo.press("ArrowDown");
+  await page
+    .getByRole("option", { name: /Líquido fracionário da interface/ })
+    .click();
+  await presentation
+    .getByLabel("Código da apresentação", { exact: false })
+    .fill("0123456789012");
+  await presentation
+    .getByLabel("Nome da apresentação", { exact: true })
+    .fill("Frasco fracionário fictício");
+  await presentation
+    .getByLabel("Fator na unidade base", { exact: false })
+    .fill("1.5");
+  await presentation
+    .getByRole("button", { name: "Revisar apresentação", exact: true })
+    .click();
+  await presentation
+    .getByRole("button", { name: "Confirmar apresentação", exact: true })
+    .click();
+  await expect(presentation).toHaveCount(0);
   expect(
     sql(
       `select base_quantity::text from public.product_presentations where care_recipient_id=${sqlLiteral(f.patient)} and product_id=${sqlLiteral(product.product_id)};`,

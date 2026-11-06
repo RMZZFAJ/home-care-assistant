@@ -11,7 +11,16 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
+import {
+  PresentationQuantity,
+  presentationTotal,
+} from "./presentation-quantity";
+import type {
+  PresentationSelection,
+  ProductPresentation,
+} from "@/types/catalogue";
 import { formatQuantity } from "@/lib/quantity";
+import { presentationCaption } from "@/lib/presentation-conversion";
 import type {
   SupplyType,
   CatalogProduct,
@@ -27,6 +36,8 @@ export type WizardState = {
   recipientId: string;
   recipientReason?: string;
   sharedNeedReasons?: Record<string, string>;
+  presentationSelections?: Record<string, PresentationSelection[]>;
+  manualQuantities?: Record<string, string>;
 };
 
 export function SupplyWizardStep({
@@ -50,6 +61,10 @@ export function SupplyWizardStep({
   previousRecipient,
   refreshRecipients,
   adoptRecipients,
+  presentations,
+  presentationError,
+  presentationLoading,
+  refreshPresentations,
 }: {
   step: number;
   type: SupplyType;
@@ -71,11 +86,35 @@ export function SupplyWizardStep({
   previousRecipient?: string | null;
   refreshRecipients: () => void;
   adoptRecipients: () => void;
+  presentations: ProductPresentation[];
+  presentationError: string;
+  presentationLoading: boolean;
+  refreshPresentations: () => void;
 }) {
   const category = ["medicamentos", "higiene", "dieta"][step - 1];
   const selected = catalog.filter((product) =>
     Object.hasOwn(form.quantities, product.id),
   );
+  function updatePackages(
+    productId: string,
+    selections: PresentationSelection[],
+    manual: string,
+  ) {
+    setForm((current) => ({
+      ...current,
+      presentationSelections: {
+        ...current.presentationSelections,
+        [productId]: selections,
+      },
+      manualQuantities: { ...current.manualQuantities, [productId]: manual },
+      quantities: {
+        ...current.quantities,
+        [productId]: selections.length
+          ? presentationTotal(selections, manual)
+          : manual,
+      },
+    }));
+  }
   return (
     <>
       {step === 0 ? (
@@ -300,10 +339,25 @@ export function SupplyWizardStep({
                               const quantities = {
                                 ...current.quantities,
                               };
+                              const presentationSelections = {
+                                ...current.presentationSelections,
+                              };
+                              const manualQuantities = {
+                                ...current.manualQuantities,
+                              };
                               if (event.target.checked)
                                 quantities[product.id] = "";
-                              else delete quantities[product.id];
-                              return { ...current, quantities };
+                              else {
+                                delete quantities[product.id];
+                                delete presentationSelections[product.id];
+                                delete manualQuantities[product.id];
+                              }
+                              return {
+                                ...current,
+                                quantities,
+                                presentationSelections,
+                                manualQuantities,
+                              };
                             })
                           }
                         />
@@ -320,7 +374,8 @@ export function SupplyWizardStep({
                         </span>
                       </span>
                     </label>
-                    {checked ? (
+                    {checked &&
+                    !form.presentationSelections?.[product.id]?.length ? (
                       <label className="product-quantity text-xs font-semibold">
                         {type === "BAL"
                           ? "Contagem física"
@@ -340,6 +395,10 @@ export function SupplyWizardStep({
                                 ...current.quantities,
                                 [product.id]: event.target.value,
                               },
+                              manualQuantities: {
+                                ...current.manualQuantities,
+                                [product.id]: event.target.value,
+                              },
                             }))
                           }
                         />
@@ -349,6 +408,33 @@ export function SupplyWizardStep({
                           </span>
                         ) : null}
                       </label>
+                    ) : null}
+                    {checked && type !== "BAL" ? (
+                      <div className="col-span-full w-full">
+                        <PresentationQuantity
+                          product={product}
+                          selections={
+                            form.presentationSelections?.[product.id] ?? []
+                          }
+                          manual={
+                            form.manualQuantities?.[product.id] ??
+                            form.quantities[product.id] ??
+                            "0"
+                          }
+                          source={presentations}
+                          error={presentationError}
+                          loading={presentationLoading}
+                          refresh={refreshPresentations}
+                          validationError={
+                            form.presentationSelections?.[product.id]?.length
+                              ? fieldErrors[product.id]
+                              : undefined
+                          }
+                          onChange={(selections, manual) =>
+                            updatePackages(product.id, selections, manual)
+                          }
+                        />
+                      </div>
                     ) : null}
                   </div>
                 );
@@ -425,7 +511,14 @@ export function SupplyWizardStep({
                 key={product.id}
                 className="flex items-start justify-between gap-4 py-3 text-sm"
               >
-                <span>{product.name}</span>
+                <span>
+                  {product.name}
+                  {form.presentationSelections?.[product.id]?.map((row) => (
+                    <small className="mt-2 block break-words" key={row.id}>
+                      {presentationCaption(row)}
+                    </small>
+                  ))}
+                </span>
                 <strong>
                   {form.quantities[product.id]
                     ? formatQuantity(form.quantities[product.id], product.unit)

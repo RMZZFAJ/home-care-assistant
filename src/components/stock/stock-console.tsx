@@ -28,7 +28,7 @@ import type {
 import { StockOverview } from "./stock-overview";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Button } from "@fluentui/react-components";
-import { useStockRead } from "./use-stock-read";
+import { useScopedRead } from "@/lib/use-scoped-read";
 
 const locationLabels: Record<string, string> = {
   FAMILY: "Família",
@@ -84,7 +84,7 @@ function PatientStock({
   const frozenRef = useRef<Record<string, unknown> | null>(null);
   const patient = context.patient!.id;
   const revision = `${attempt}:${liveRevision}`;
-  const stock = useStockRead<{
+  const stock = useScopedRead<{
     overview: ProductStock[];
     transit: TransitDocument[];
     metrics: StockMetric[];
@@ -95,7 +95,7 @@ function PatientStock({
       : null,
     revision,
   );
-  const history = useStockRead<{ data: Movement[]; total: number }>(
+  const history = useScopedRead<{ data: Movement[]; total: number }>(
     hasStock
       ? "/api/stock/movements?" +
           new URLSearchParams({

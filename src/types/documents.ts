@@ -16,6 +16,7 @@ export type SupplyLine = {
   waived_quantity?: string;
   fully_checked: boolean;
   metadata: Record<string, unknown>;
+  presentation_conversions?: unknown;
   requisitionItemIds: string[];
 };
 export type DraftLine = {
@@ -23,6 +24,8 @@ export type DraftLine = {
   quantity: string;
   requisitionItemIds?: string[];
   metadata?: Record<string, string>;
+  manualQuantity?: string;
+  presentations?: { id: string; version: number; packages: string }[];
 };
 export type SupplyPayload = {
   lines: DraftLine[];
@@ -331,6 +334,7 @@ export type CatalogProduct = {
   unit: string;
   aliases?: string[];
   quantity_decimals?: number;
+  active?: boolean;
 };
 export const documentLabels: Record<DocumentType, string> = {
   REQ: "Requisição",

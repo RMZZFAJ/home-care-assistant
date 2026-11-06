@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { api, ApiError } from "@/lib/client/api";
 
-/** Each stock read owns its result, retry and freshness. Never reuse another filter. */
-export function useStockRead<T>(url: string | null, revision: string) {
+/** Independent reads retain only an authorized result of the same scope. */
+export function useScopedRead<T>(url: string | null, revision = "") {
   const [attempt, setAttempt] = useState(0);
   const key = JSON.stringify([url, revision, attempt]);
   const [result, setResult] = useState<{

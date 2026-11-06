@@ -49,6 +49,19 @@ documentais também exigem expectedVersion para detectar concorrência.
   /api/catalog e ação product de /api/admin usam a mesma catalog.manage;
   delegação de catálogo não concede access.manage.
 
+  Com action=presentation, POST recebe id/referenceVersion (ambos NULL na
+  criação), productId, barcode textual, name, baseQuantity, active e
+  idempotencyKey. A RPC distingue nova escrita de recuperação do próprio ato:
+  result preserva o resultado aplicado; current informa eventual versão
+  posterior de outra pessoa. Recuperação exige leitura viva; nova mutação
+  exige catalog.manage e paciente ativo. Conflito retorna HTTP 409.
+  O contrato legado ainda configura unidade ou cria código novo; alterar
+  código existente exige o comando com identidade e versão.
+
+  GET aceita includeInactive=true, productId e presentationId; a consulta de
+  uma apresentação inclui versions/versionTotal, em páginas de 20 versões
+  por historyPage. Histórico e definições respeitam o paciente selecionado.
+
 - **Rota:** /api/units
 
   **Contrato:** Unidades de medida globais ou locais
@@ -250,6 +263,18 @@ criação, revisão, submit e reassign, inclusive ao finalizar esperas tardias.
 workflow_data.recipientSelection preserva pessoa escolhida/sugerida, escala,
 motivo, indicador e instante; indicações anteriores permanecem no histórico.
 Indicação não é presença, assinatura ou recebimento pessoal.
+
+## Apresentações registradas em COM e ENT
+
+COM/ENT também aceitam lines[].presentations com id/version/packages e
+manualQuantity adicional. packages é inteiro positivo textual; quantity
+continua em unidade base e deve coincidir com a soma calculada no banco.
+Fator/código/nome/unidade vêm do cadastro versionado autorizado. A fonte
+obsoleta exige comparação e adoção explícita, sem aplicar fator novo à escolha
+antiga. BAL permanece contagem física em base. Entrada manual não exige código.
+presentation_conversions é preenchida pelo banco, integra snapshot/hash e
+alimenta consulta/PDF; metadata legada não é promovida a proveniência validada.
+Documento emitido e recuperação da mesma intenção conservam o fator original.
 
 ## ENT — regularização administrativa e tarefas
 

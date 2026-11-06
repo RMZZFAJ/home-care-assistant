@@ -227,6 +227,12 @@ fictício em cada runner efêmero. Cada projeto mantém todos os seus cenários.
 O check agregado database-and-browser exige sucesso no banco e nos três
 projetos. Não há exclusão de testes nem uso do Supabase remoto na suíte.
 
+O workflow agrupa execuções por PR e cancela as superadas quando chega outro
+commit. O SHA mais recente continua executando a matriz inteira. Pushes na
+master usam grupos únicos por run_id; não são cancelados por essa regra.
+Cancelamento e execução pendente não aprovam um SHA. A configuração usa a
+[concorrência nativa do GitHub](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).
+
 ## Linux local
 
 scripts/verify-linux.sh roda dentro de container Node 24.22.0 com o

@@ -9,10 +9,20 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "../workspace";
-import { Button, Input, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow } from "@fluentui/react-components";
+import {
+  Button,
+  Input,
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableHeaderCell,
+  TableRow,
+} from "@fluentui/react-components";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Icon, EmptyState } from "@/components/ui/primitives";
 import type { CatalogProduct } from "@/types/documents";
+import { PresentationManagement } from "./presentation-management";
 type Unit = {
   id: string;
   code: string;
@@ -24,7 +34,9 @@ type Unit = {
 export function UnitConsole() {
   return (
     <Workspace title="Unidades e apresentações">
-      {(context) => <Units context={context} />}
+      {(context) => (
+        <Units key={context.patient?.id ?? "global"} context={context} />
+      )}
     </Workspace>
   );
 }
@@ -34,7 +46,10 @@ function Units({ context }: { context: WorkspaceContext }) {
     context.globalAdministrationAllowed === true;
   const [search, setSearch] = useState("");
   const [loaded, setLoaded] = useState(false);
-  const [editor, setEditor] = useState<{ mode: "unit" | "presentation"; opener: HTMLElement } | null>(null);
+  const [editor, setEditor] = useState<{
+    mode: "unit" | "presentation";
+    opener: HTMLElement;
+  } | null>(null);
   const [units, setUnits] = useState<Unit[]>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [selected, setSelected] = useState("");
@@ -88,12 +103,94 @@ function Units({ context }: { context: WorkspaceContext }) {
     <div className="space-y-5">
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      <section><div className="hca-section-heading"><div><h2>Unidades disponíveis</h2><p className="hca-field-hint">Unidades base e precisão dos produtos.</p></div><div className="hca-toolbar">{globalMode || can(context, "catalog.manage") ? <Button appearance="primary" icon={<Icon name="plus" />} onClick={(event) => setEditor({ mode: "unit", opener: event.currentTarget })}>Nova unidade</Button> : null}{context.patient && can(context, "catalog.manage") ? <Button onClick={(event) => setEditor({ mode: "presentation", opener: event.currentTarget })}>Configurar apresentação</Button> : null}</div></div>
-      <div className="hca-toolbar"><Input type="search" contentBefore={<Icon name="search" />} aria-label="Pesquisar unidades" value={search} onChange={(_, value) => setSearch(value.value)} placeholder="Nome ou código" /></div>
-      {!loaded && !error ? <Notice>Carregando unidades…</Notice> : null}
-      <div className="hca-records hca-table-container"><Table className="hca-table" aria-label="Unidades base"><TableHeader><TableRow><TableHeaderCell>Unidade</TableHeaderCell><TableHeaderCell>Precisão</TableHeaderCell><TableHeaderCell>Âmbito</TableHeaderCell></TableRow></TableHeader><TableBody>{units.filter((unit) => (unit.name + " " + unit.code).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((unit) => <TableRow key={unit.id}><TableCell><strong>{unit.name}</strong><small className="hca-cell-secondary">{unit.code}</small></TableCell><TableCell>{unit.decimals} casa(s)</TableCell><TableCell>{unit.care_recipient_id ? "Paciente" : "Global"}</TableCell></TableRow>)}</TableBody></Table>{loaded && !units.length ? <EmptyState title="Nenhuma unidade disponível" /> : null}</div></section>
-      {(globalMode || can(context, "catalog.manage")) && editor?.mode === "unit" ? (
-        <RecordDrawer title="Nova unidade" busy={busy} onClose={() => setEditor(null)} restoreFocusTo={editor.opener}>
+      <section>
+        <div className="hca-section-heading">
+          <div>
+            <h2>Unidades disponíveis</h2>
+            <p className="hca-field-hint">
+              Unidades base e precisão dos produtos.
+            </p>
+          </div>
+          <div className="hca-toolbar">
+            {globalMode || can(context, "catalog.manage") ? (
+              <Button
+                appearance="primary"
+                icon={<Icon name="plus" />}
+                onClick={(event) =>
+                  setEditor({ mode: "unit", opener: event.currentTarget })
+                }
+              >
+                Nova unidade
+              </Button>
+            ) : null}
+            {context.patient && can(context, "catalog.manage") ? (
+              <Button
+                onClick={(event) =>
+                  setEditor({
+                    mode: "presentation",
+                    opener: event.currentTarget,
+                  })
+                }
+              >
+                Configurar unidade e precisão
+              </Button>
+            ) : null}
+          </div>
+        </div>
+        <div className="hca-toolbar">
+          <Input
+            type="search"
+            contentBefore={<Icon name="search" />}
+            aria-label="Pesquisar unidades"
+            value={search}
+            onChange={(_, value) => setSearch(value.value)}
+            placeholder="Nome ou código"
+          />
+        </div>
+        {!loaded && !error ? <Notice>Carregando unidades…</Notice> : null}
+        <div className="hca-records hca-table-container">
+          <Table className="hca-table" aria-label="Unidades base">
+            <TableHeader>
+              <TableRow>
+                <TableHeaderCell>Unidade</TableHeaderCell>
+                <TableHeaderCell>Precisão</TableHeaderCell>
+                <TableHeaderCell>Âmbito</TableHeaderCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {units
+                .filter((unit) =>
+                  (unit.name + " " + unit.code)
+                    .toLocaleLowerCase("pt-BR")
+                    .includes(search.toLocaleLowerCase("pt-BR")),
+                )
+                .map((unit) => (
+                  <TableRow key={unit.id}>
+                    <TableCell>
+                      <strong>{unit.name}</strong>
+                      <small className="hca-cell-secondary">{unit.code}</small>
+                    </TableCell>
+                    <TableCell>{unit.decimals} casa(s)</TableCell>
+                    <TableCell>
+                      {unit.care_recipient_id ? "Paciente" : "Global"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+          {loaded && !units.length ? (
+            <EmptyState title="Nenhuma unidade disponível" />
+          ) : null}
+        </div>
+      </section>
+      {(globalMode || can(context, "catalog.manage")) &&
+      editor?.mode === "unit" ? (
+        <RecordDrawer
+          title="Nova unidade"
+          busy={busy}
+          onClose={() => setEditor(null)}
+          restoreFocusTo={editor.opener}
+        >
           {error ? <Notice error>{error}</Notice> : null}
           <form
             className="mt-4 grid gap-4 sm:grid-cols-2"
@@ -167,12 +264,20 @@ function Units({ context }: { context: WorkspaceContext }) {
           </form>
         </RecordDrawer>
       ) : null}
-      {context.patient && can(context, "catalog.manage") && editor?.mode === "presentation" ? (
-        <RecordDrawer title="Unidade base e código de embalagem" busy={busy} onClose={() => setEditor(null)} restoreFocusTo={editor.opener}>
+      {context.patient &&
+      can(context, "catalog.manage") &&
+      editor?.mode === "presentation" ? (
+        <RecordDrawer
+          title="Unidade base e precisão"
+          busy={busy}
+          onClose={() => setEditor(null)}
+          restoreFocusTo={editor.opener}
+        >
           {error ? <Notice error>{error}</Notice> : null}
           <p className="mt-2 text-sm text-(--muted)">
-            Uma apresentação converte cada leitura para a unidade base. A
-            unidade de um produto com movimentações fica preservada.
+            Unidade usada em documentos, estoque ou apresentações não é
+            reinterpretada. Cadastre embalagens na seção Apresentações por
+            material.
           </p>
           <label className="mt-4 block text-sm font-semibold">
             Produto
@@ -201,13 +306,6 @@ function Units({ context }: { context: WorkspaceContext }) {
                   productId: product.id,
                   unit: form.get("unit"),
                   decimals: Number(form.get("decimals")),
-                  ...(form.get("barcode")
-                    ? {
-                        barcode: form.get("barcode"),
-                        name: form.get("name"),
-                        baseQuantity: form.get("baseQuantity"),
-                      }
-                    : {}),
                 });
               }}
             >
@@ -243,39 +341,18 @@ function Units({ context }: { context: WorkspaceContext }) {
                   required
                 />
               </label>
-              <label className="text-sm font-semibold">
-                EAN / GTIN / UPC opcional
-                <input
-                  name="barcode"
-                  inputMode="numeric"
-                  pattern="[0-9]{8,14}"
-                  className={inputClass}
-                />
-              </label>
-              <label className="text-sm font-semibold">
-                Nome da apresentação
-                <input
-                  name="name"
-                  className={inputClass}
-                  placeholder="Caixa com 20 unidades"
-                />
-              </label>
-              <label className="text-sm font-semibold">
-                Quantidade base por embalagem
-                <input
-                  name="baseQuantity"
-                  type="number"
-                  min="0.000001"
-                  step="any"
-                  className={inputClass}
-                />
-              </label>
               <button className={primaryClass} disabled={busy}>
-                Salvar unidade / apresentação
+                Salvar unidade / precisão
               </button>
             </form>
           ) : null}
         </RecordDrawer>
+      ) : null}
+      {context.patient && !globalMode ? (
+        <PresentationManagement
+          patientId={context.patient.id}
+          writable={can(context, "catalog.manage")}
+        />
       ) : null}
     </div>
   );

@@ -843,8 +843,8 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await page.getByLabel("Código manual").fill("1234567890128");
   await page.getByRole("button", { name: "Identificar", exact: true }).click();
   await expect(
-    page.getByLabel("Quantidade — " + product.name, { exact: true }),
-  ).toHaveValue("2");
+    page.getByText("Quantidade total calculada:", { exact: false }),
+  ).toContainText("2 unidade");
   // A real EAN-13 image exercises the fallback decoder independently of the camera stub.
   const left = [
     "0001101",
@@ -891,8 +891,8 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     buffer: barcodeImage,
   });
   await expect(
-    page.getByLabel("Quantidade — " + product.name, { exact: true }),
-  ).toHaveValue("4");
+    page.getByText("Quantidade total calculada:", { exact: false }),
+  ).toContainText("4 unidade");
   await expect(page.getByText(/Código desconhecido/)).not.toBeVisible();
   for (let step = 0; step < 3; step++) {
     const shared = page.getByLabel(

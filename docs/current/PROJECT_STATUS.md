@@ -24,9 +24,14 @@ Catálogo recebeu fator finito/positivo e validação anterior ao arredondamento
 com preservação de código textual, auditoria própria e autoridade após esperas.
 O alias /api/catalog usa catalog.manage como /api/admin, sem exigir gestão de
 vínculos. Nove casos Auth, uma fronteira API e duas tarefas Chromium distintas
-passaram entre rodada e recheck. A migration totaliza 109; replay e suítes
-gerais ficam na CI. Consulta de apresentações e proveniência da conversão
-nos documentos ainda não estão concluídas.
+passaram no incremento de finitude. Apresentações agora têm consulta, histórico,
+edição versionada, inativação explícita e recuperação do próprio comando.
+Conversão COM/ENT captura proveniência no banco: dois pacotes de dez continuam
+20 após o cadastro mudar para doze. Entrada manual permanece disponível.
+Oito casos Auth novos, dois consumidores legados afetados, três fronteiras API
+e seis tarefas Chromium distintas passaram entre rodadas/rechecks. PDF de três
+páginas confrontado com snapshot, hash e crédito único de 20; páginas inspecionadas.
+110 migrations no conjunto; replay e suítes gerais ficam para a CI do novo SHA.
 
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de

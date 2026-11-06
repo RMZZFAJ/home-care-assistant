@@ -24,8 +24,33 @@ const line = z
     quantity: exactQuantity,
     requisitionItemIds: z.array(identifier).max(100).optional(),
     metadata: z.record(z.string(), z.string().max(500)).optional(),
+    manualQuantity: exactQuantity.optional(),
+    presentations: z
+      .array(
+        z
+          .object({
+            id: identifier,
+            version: z.number().int().positive(),
+            packages: z.string().regex(/^[1-9][0-9]{0,8}$/),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(100)
+      .optional(),
   })
-  .strict();
+  .strict()
+  .refine(
+    (value) => !value.manualQuantity || Boolean(value.presentations?.length),
+    "A quantidade adicional precisa de uma apresentação.",
+  )
+  .refine(
+    (value) =>
+      !value.presentations ||
+      new Set(value.presentations.map((row) => row.id)).size ===
+        value.presentations.length,
+    "Selecione cada apresentação uma única vez.",
+  );
 export const supplyPayload = z
   .object({
     lines: z.array(line).min(1).max(1000),
@@ -64,6 +89,17 @@ export const createSupplySchema = z
   })
   .strict()
   .superRefine((value, ctx) => {
+    if (
+      value.type === "BAL" &&
+      value.payload.lines.some(
+        (line) => line.presentations || line.manualQuantity !== undefined,
+      )
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["payload", "lines"],
+        message: "O balanço registra a contagem física na unidade base.",
+      });
     if (value.type === "COM" && !value.draft && !value.payload.origin)
       ctx.addIssue({
         code: "custom",
