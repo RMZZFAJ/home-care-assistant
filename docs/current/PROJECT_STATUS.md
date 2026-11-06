@@ -70,6 +70,14 @@ com um único ajuste BAL de quatro unidades. 113 migrations; replay e matriz
 geral do novo SHA na CI. Reconto após conciliação já aplicada e legado sem ciclo
 seguem no próximo incremento, sem encerrar D2, merge ou GO.
 
+CI 42153551800 de 2b18b1b concluiu banco/replay de 112 migrations, checks gerais,
+Chromium e WebKit com sucesso, mas reprovou um consumidor mobile de apresentações.
+Capturas/log mostram seleção durante a entrada do drawer. O helper agora inicia
+por clique estável, exige geometria visível e alvo real do ponteiro; o cenário
+dirigido passou com asserções materiais preservadas. A tentativa local anterior
+também passou, sem reprodução declarada da falha intermitente. Produto/banco não
+mudaram. CI 42159112693 de eb5c678 estava in_progress na consulta pontual.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

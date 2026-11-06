@@ -1262,3 +1262,36 @@ instalação limpa/legada e suítes gerais do SHA publicado ficam na CI. C057 te
 prova local no BAL agendado submetido. Reconto facultativo após conciliação,
 legado sem ciclo, demais famílias C068, P07 e critérios D2 restantes continuam
 em execução. Sem zoom400%/humano/AT/aparelho/provedor ou liberação operacional.
+
+## D2.18 — consumidor mobile de apresentações e CI por SHA
+
+Reconto/sucessão publicado em eb5c6783e982ec5a478c872ea8083c77177a78b1;
+Draft PR 7 atualizado. CI 42159112693 desse SHA estava in_progress na consulta
+pontual. A consulta do SHA anterior 2b18b1b mostrou failure em 42153551800:
+checks gerais Windows/Ubuntu, banco com replay limpo/legado de 112 migrations
+e integração completa, Chromium e iOS/WebKit passaram. Mobile falhou em um
+caso de apresentações, na segunda seleção de material, inclusive no retry.
+Os consumidores P05 WebKit corrigidos em D2.16 passaram nessa matriz.
+
+Log do job 127686309124 e artifact 13474393531 inspecionados. ZIP baixado pelo
+conector GitHub com digest 0aabb5fd08707f08267efcc6949be638bb5766ecdfcb22e246831661d7fd819b
+conferido; duas capturas/contextos preservados em output/phase-d-work. Clique
+da opção era interceptado pelo portal. O teste local dirigido antes da mudança
+passou, portanto não se declarou reprodução local dessa falha específica.
+O helper digitava logo após abrir o drawer, sem esperar o próprio campo estável.
+
+Seleção agora começa por clique normal no campo, exige campo/opção inteiros no
+viewport, verifica que o centro da opção recebe o ponteiro e seleciona por
+clique normal. Confere também o material escolhido. Sem force, aumento de timeout,
+sleep fixo ou redução das asserções materiais. Geometria anexada mostra viewport
+412×839: campos ainda estavam em x339/x618 durante entrada do drawer; após
+clique ficaram em x26, e opções em x29 com largura355. O arquivo local
+presentation-mobile-pointer-geometry.json conserva os dois controles observados.
+
+Somente esse cenário usa o helper, em duas escolhas. O recheck mobile dirigido
+passou, incluindo recuperação da criação própria, inativação histórica, código
+duplicado, formulário/foco preservados, ledger idêntico e axe/overflow nas quatro
+larguras já previstas. Lint do teste passou. Produto, migrations e regras não
+mudaram; não se repetiu integração completa ou replay local. CI posterior precisa
+validar o SHA publicado. Reconto facultativo/legado e demais critérios D2 seguem
+em execução; nenhum resultado local ou anterior equivale a GO/homologação física.

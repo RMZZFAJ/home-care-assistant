@@ -57,9 +57,42 @@ async function chooseProduct(page: Page, name: string) {
     name: "Material da apresentação",
     exact: true,
   });
+  const before = await combo.boundingBox();
+  await combo.click();
+  await expect(combo).toBeInViewport({ ratio: 1 });
   await combo.fill(name);
   await combo.press("ArrowDown");
-  await page.getByRole("option", { name: new RegExp(name) }).click();
+  const option = page.getByRole("option", { name: new RegExp(name) });
+  await expect(option).toBeInViewport({ ratio: 1 });
+  await expect
+    .poll(() =>
+      option.evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          bounds.x + bounds.width / 2,
+          bounds.y + bounds.height / 2,
+        );
+        return hit === element || Boolean(hit && element.contains(hit));
+      }),
+    )
+    .toBe(true);
+  await test
+    .info()
+    .attach("presentation-product-pointer-" + name, {
+      body: JSON.stringify(
+        {
+          before,
+          after: await combo.boundingBox(),
+          option: await option.boundingBox(),
+          viewport: page.viewportSize(),
+        },
+        null,
+        2,
+      ),
+      contentType: "application/json",
+    });
+  await option.click();
+  await expect(combo).toHaveValue(name);
 }
 async function wizard(page: Page, patient: string) {
   await page.goto("/fichas/com?careRecipientId=" + patient);
