@@ -94,6 +94,17 @@ materializada de identidades/paciente/tipo. Contraprova Auth e quatro consumidor
 afetados passaram no recheck; o plano original de CI não foi reproduzido no banco
 retido. A CI posterior continua necessária, sem aprovação global presumida.
 
+CI de 357d159 passou checks gerais Windows/Ubuntu e instalação limpa/evolução
+legada, mas parou na regressão transactions.sql: atualizar a referência do
+rascunho BAL aplicava a contagem antes da confirmação. Migration incremental
+20261106075328 preserva o estado draft nesse caso; recontos de BAL já enviado
+mantêm o tratamento anterior. A contraprova Auth reproduziu approved em vez de
+draft antes da correção; depois passaram o percurso do rascunho e o reconto
+facultativo já conciliado. A regressão SQL completa exige o dataset limpo da CI:
+na base local retida, parou antes por duplicate review required, sem reset para
+repetir o ambiente. 115 migrations publicadas neste incremento; CI posterior
+ainda necessária. P07 permanece em implementação, separado desta correção.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

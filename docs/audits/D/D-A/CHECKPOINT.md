@@ -1394,3 +1394,35 @@ submetida, recuperação válida aprovada/legada, recusa de adiamento e duas edi
 BAL concorrentes com mesma intenção. Somados aos anteriores, seis casos Auth
 novos e cinco consumidores Auth distintos neste incremento. Suíte completa e
 plano/dataset limpos do SHA publicado continuam sob a CI, sem verde presumido.
+
+## D2.20 — preservar o rascunho BAL ao atualizar a referência
+
+Consulta pontual de 357d159, run 42180846088: checks gerais Windows/Ubuntu
+success; replay limpo/legado preservou protocolos, quantidades, FKs e saldo
+sem paciente, mas transactions.sql falhou com invalid operation for document
+state. Integração e browser não chegaram a executar. Sem polling.
+
+O bloco de reaplicação da migration 114 alcançava também p_recount em draft.
+A contraprova Auth bal-draft-recount.test.mjs usa paciente e materiais novos,
+cria rascunho, expede ENT para tornar a referência obsoleta e atualiza a
+contagem: antes retornou approved quando deveria permanecer draft. Uma primeira
+asserção do teste esperava PT409; a fronteira legada usa P0001 para referência
+obsoleta. Corrigido esse contrato, o defeito material foi reproduzido.
+
+Migration 20261106075328 restringe a reaplicação aos BALs que já não eram draft.
+Nenhuma migration publicada foi editada. test:db:prepare passou sem reset.
+Dois casos Auth dirigidos passaram: atualização preserva draft e zero movimentos
+BAL até o submit explícito, com recuperação idempotente e dois ajustes esperados;
+reconto facultativo agendado após conciliação preserva seu efeito anterior.
+
+A execução isolada de transactions.sql na base local retida parou antes do
+trecho BAL por duplicate review required, pois contém necessidades anteriores
+do mesmo fixture. Não foi declarado PASS SQL, nem feito reset para repetir uma
+evidência que a CI executa com dataset próprio. Replay e regressões completas
+continuam necessários no SHA publicado. Logs bal-draft-recount-before/after,
+-migration e -transactions preservados em output/phase-d-work.
+
+115 migrations publicadas neste commit; 84 históricas preservadas. Trabalho P07
+ainda não publicado permanece separado. D-A segue incompleta, sem merge,
+alteração remota ou liberação operacional. Validação local proporcional à causa;
+não foram repetidos check:contracts, suítes gerais ou build já previstos na PR.
