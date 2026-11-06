@@ -52,8 +52,8 @@ no conflito e a intenção incerta até recuperação. 112 migrations; CI/replay
 novo SHA continuam necessários. D-A e os demais critérios seguem em execução.
 
 CI de 5535c55 confirmou checks gerais Windows/Ubuntu, replay limpo/legado de 111
-migrations, integrações completas, Chromium e mobile. iOS/WebKit passou 91 casos e falhou
-em dois consumidores P05 que digitavam em combobox fora da área visível.
+migrations, integrações completas, Chromium e mobile. iOS/WebKit passou 91
+casos e falhou em dois consumidores P05 que digitavam em combobox fora da área visível.
 Os dois foram reproduzidos e passaram localmente após iniciar a seleção por
 clique visível, preservando as asserções materiais. Correção restrita ao teste;
 não equivale à aprovação da CI posterior nem a aparelho físico. CI de f9fdb8a
