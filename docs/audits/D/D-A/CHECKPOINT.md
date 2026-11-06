@@ -1589,3 +1589,59 @@ Relatório recount-recovery-ios-after-report.html e anexos geométricos preserva
 em output/phase-d-work e output/playwright/phase-d. A evidência é emulação WebKit,
 sem substituir aparelho físico/AT/zoom400% ou CI do SHA publicado. D-A permanece
 em execução, com116 migrations; sem merge ou operação remota.
+
+## D2.23 — origem tipada dos movimentos de estoque
+
+A CI42191441950/run85 do SHA20eac215 concluiu success. Confirma o conjunto
+programado desse SHA, incluindo replay/integração e os três projetos de browser.
+A correção iOS e P07 publicados deixaram de depender do resultado de um SHA
+anterior. Não se repetiram localmente essas suítes gerais aprovadas.
+
+C-AC-046 recebeu GET /api/stock/movements/:id/origin e gaveta somente leitura.
+O servidor usa exclusivamente o cliente Auth do chamador: primeiro movimento
+visível no paciente/custódia, depois recurso real autorizado. Parcela de compra
+resolve receiptId e documentId distintos; a gaveta mostra somente a parcela de
+origem. ENT/BAL consultam a ficha, consumo consulta o relato e compensação
+familiar conserva o movimento original. Inventário legado fica somente leitura.
+Referência ausente, incompatível ou restrita recebe explicação explícita, sem
+adivinhar ficha. Nome atual de perfil/catálogo é rotulado como atual; as origens
+preservam sua autoria histórica. Quantidade do ledger usa texto decimal exato.
+
+Sem schema, migration, grant ou RPC privilegiada nova. As leituras usam a RLS
+existente e os leitores documentais/consumo nativos, sem cliente de worker.
+Acesso ao movimento não concede COM; UUID de parcela não é aceito como UUID de
+movimento. Origem estrangeira/invisível retorna404. API privada usa no-store.
+Links anteriores Abrir ficha e Abrir dossiê administrativo foram conservados;
+o novo botão não substitui seletores/consumidores existentes.
+
+Dois percursos Chromium distintos passaram entre rodadas/rechecks:
+
+- Compra5 recebida em parcelas2/3 abre exatamente a parcela3; ENT, BAL e consumo
+  abrem seus recursos reais. Compensação aponta ao movimento avulso original.
+  Falha503 não apresenta origem falsa; retry conserva contexto e filtros.
+  Foco entra no resultado, permanece no modal e volta ao botão de origem.
+  Axe/overflow320/390/768/1440 passaram; screenshot320 inspecionado.
+- Auth real prova movimento familiar oculto à equipe, consumo da equipe legível,
+  perda de stock.team.read com404 e COM indisponível após perda de com.read,
+  mesmo com estoque legível. Não expõe documento ou observação COM. UUID aleatório,
+  UUID de parcela e paciente estrangeiro recebem404. Estado independente de
+  movimentos, documentos e eventos fica idêntico antes/depois de cada percurso.
+
+A primeira rodada identificou consulta incorreta a care_recipient_id inexistente
+em purchase_receipts: sua RLS deriva do documento pai. Corrigida a seleção do
+vínculo real, sem alterar autorização. A rodada seguinte encontrou perda de foco
+quando retry desaparecia após sucesso; a gaveta agora foca o título do resultado
+na consulta inicial/recuperação manual, sem roubar foco em atualização automática.
+As negativas esperavam403 para paciente estrangeiro, mas o contrato canônico
+responde404; a expectativa foi corrigida. O caso de leitura exata esperava3 sem
+escala; o banco preserva3.000000 como texto, e a asserção agora exige esse valor.
+Após cada correção só o caso afetado foi repetido. Nenhuma asserção de segurança,
+acessibilidade ou preservação foi removida. Uma invocação de filtro mal citada
+não encontrou testes; foi corrigida, sem contabilizá-la como aprovação.
+
+Logs stock-origins-browser-* e relatório final preservados em output/phase-d-work;
+screenshot em output/playwright/phase-d. Tipos/build do runner e lint dos fontes
+afetados passaram. A evidência é local/fictícia, sem homologação humana, AT,
+zoom400%, aparelho, assinatura ou provedor.116 migrations permanecem; replay,
+integração completa e matriz de browser do novo SHA ficam na CI programada.
+D-A segue em execução, sem merge, alteração remota ou envio externo.

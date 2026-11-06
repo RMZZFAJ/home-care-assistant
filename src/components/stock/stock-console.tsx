@@ -29,6 +29,7 @@ import { StockOverview } from "./stock-overview";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Button } from "@fluentui/react-components";
 import { useScopedRead } from "@/lib/use-scoped-read";
+import { MovementOrigin } from "./movement-origin";
 
 const locationLabels: Record<string, string> = {
   FAMILY: "Família",
@@ -79,6 +80,8 @@ function PatientStock({
   const [review, setReview] = useState<Record<string, unknown> | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [savedMovement, setSavedMovement] = useState<string | null>(null);
+  const [origin, setOrigin] = useState<{ id: string; opener: HTMLElement } | null>(null);
+  const historyHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const hasStock =
     can(context, "stock.family.read") || can(context, "stock.team.read");
   const frozenRef = useRef<Record<string, unknown> | null>(null);
@@ -174,6 +177,7 @@ function PatientStock({
       {can(context, "ent.create") && hasStock ? <Link className={buttonClass} href="/transferencias">Transferir materiais entre família e equipe</Link> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
+      {origin ? <MovementOrigin patientId={patient} movementId={origin.id} opener={origin.opener} onClose={() => setOrigin(null)} restoreFocusFallbackRef={historyHeadingRef} /> : null}
       <section
         className="ui-card"
         aria-labelledby="stock-balances-heading"
@@ -438,7 +442,7 @@ function PatientStock({
         aria-busy={history.loading}
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="stock-history-heading" className="font-semibold">
+          <h2 id="stock-history-heading" className="font-semibold" ref={historyHeadingRef} tabIndex={-1}>
             Histórico auditável
           </h2>
           <button
@@ -551,6 +555,7 @@ function PatientStock({
               <p className="mt-2 text-xs text-(--muted)">
                 {formatBrazilDate(movement.created_at)}
               </p>
+              <Button className="mt-2" onClick={event => setOrigin({ id: movement.id, opener: event.currentTarget })}>Consultar origem</Button>
               {movement.reference_type === "document" &&
               movement.reference_id ? (
                 <Link

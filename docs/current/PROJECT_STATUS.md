@@ -123,8 +123,18 @@ replay limpo/legado e 203 integrações, Chromium e mobile. iOS passou97/falhou1
 reconto sem contador encontrou o código no DOM, mas oculto na tela. A falha foi
 reproduzida localmente: os botões comprimiam a identificação a largura zero.
 Correção restrita à linha de recuperação passou no mesmo caso iOS, com código
-visível e axe/overflow em 320/390/768/1440. O novo SHA ainda exige sua própria CI;
-não se declarou aprovação global.
+visível e axe/overflow em 320/390/768/1440. A CI42191441950 do SHA20eac21 concluiu
+com success, incluindo os checks gerais, replay/integração e matriz de browsers
+programados. Esse resultado pertence ao SHA publicado, sem certificar mudanças
+posteriores.
+
+Origem dos movimentos agora tem consulta tipada por sessão/RLS e gaveta própria:
+parcela exata COM, ENT, BAL, consumo e compensação familiar. Dois percursos
+Chromium distintos passaram entre rodadas dirigidas, com negativas Auth reais,
+erro503/recuperação, foco/filtros preservados e axe/overflow em quatro larguras.
+Ledger, documentos e eventos permaneceram idênticos nas leituras. Nenhuma
+migration ou permissão nova;116 migrations preservadas. A CI do novo incremento
+continua necessária. Demais critérios D2 seguem em execução, sem merge ou GO.
 
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de

@@ -81,6 +81,14 @@ Ledger e eventos confirmados são imutáveis para clientes. Saldo vem de
 movimentos transacionais não negativos. SHA-256 compara conteúdo canônico;
 não é assinatura assimétrica nem proteção contra administradores do banco.
 
+Consultar origem de movimento usa o cliente Auth do chamador e as permissões
+existentes, sem service_role ou novos grants. Leitura de estoque não concede
+com.read. A parcela COM é resolvida pelo vínculo real ao documento; receiptId
+não é documentId. Documento/relato e material são conferidos no mesmo paciente.
+Movimento invisível responde404; origem restrita produz explicação genérica sem
+conteúdo documental. Nomes atuais do perfil/catálogo não são apresentados como
+snapshots históricos. A consulta não escreve no ledger, documento ou eventos.
+
 Uploads têm limites, reserva idempotente, validação de formato e sanitização.
 Imagens perdem metadados; PDFs ativos ou excessivos são recusados e páginas
 passivas são copiadas para novo arquivo. Objetos e PDFs ficam privados, com

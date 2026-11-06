@@ -141,6 +141,20 @@ documentais também exigem expectedVersion para detectar concorrência.
 
   **Contrato:** Ledger e operações administrativas familiares
 
+- **Rota:** /api/stock/movements/:id/origin
+
+  **Contrato:** Consulta tipada, somente leitura, com careRecipientId explícito.
+  O UUID identifica um movimento visível pela RLS da própria sessão. A origem
+  exige também leitura do recurso: purchase_receipt resolve sua parcela e COM,
+  BAL/ENT resolvem a ficha, consumption resolve o relato e family_manual conserva
+  o ato avulso ou seu movimento compensado. Inventário legado permanece somente
+  leitura. Sem movimento autorizado, responde404; sem origem autorizada ou
+  identificável, retorna kind=unavailable sem presumir outro UUID ou expor a ficha.
+  Quantidades do movimento são texto decimal exato. Não cria eventos ou efeitos.
+  Na tela, a gaveta conserva filtros, informa falha/consulta anterior e restaura
+  foco. Nome atual do catálogo/perfil é identificado como atual, distinto dos
+  nomes históricos preservados na origem. Resposta privada usa no-store.
+
 - **Rota:** /api/stock/inventory
 
   **Contrato:** Consulta legada; escrita aposentada com HTTP 410
