@@ -977,3 +977,67 @@ do runner passaram. Advisor local retornou somente unaccent/public histórico.
 109 migrations; instalação limpa/evolução legada e suítes gerais na CI do novo
 SHA. C029/C044/proveniência/apresentações, P07, BAL e demais D2 permanecem em
 execução. Sem merge, alteração remota, conclusão D-A ou GO.
+
+## D2.13 — apresentações versionadas e proveniência da conversão
+
+Finitude/capacidade equivalente publicadas em 80753c16b9b2dcf5221eb739a8feb38f1bf6eaae.
+Consulta pontual da CI 42137449589: in_progress. A contraprova Auth de ENT
+com 2 embalagens/20 base confirmou perda do fator/código na linha oficial.
+Migration 20261106003523 acrescenta versões, comandos imutáveis por ator/chave
+e captura da conversão na coluna presentation_conversions, distinta de metadata
+legada. A captura anterior desconhecida é rotulada, sem inventar autoria/data.
+Unidade com apresentação não é reinterpretada antes do primeiro ledger.
+
+Comando novo exige identidade/versão, permite recuperar o próprio resultado com
+leitura viva e separa resultado aplicado de cadastro atual posterior. Novas
+escritas exigem catalog.manage/paciente ativo e revalidação após espera tardia.
+O contrato legado mantém configuração de unidade/criação de código novo;
+edição cega de código existente é recusada e direcionada ao comando versionado.
+A disputa aplicativa com 40001 causou upstream timeout na stack local. Refinada
+para PT409 e mapeamento VERSION_CONFLICT; os três rechecks afetados passaram
+com recusa explícita, sem reduzir a negativa. Apenas definições da migration
+não publicada foram refinadas localmente, com guardas e sem reset.
+
+Oito casos Auth distintos passaram entre rodada e rechecks: captura no banco,
+2x10=20 após cadastro12 e retry, rejeição de total/fator/versão/identidade forjados,
+draft preservado e edição obsoleta recusada, resultado próprio após escrita
+revogada versus versão posterior do par, concorrência, espera tardia com
+rollback de história/comando e RLS/grants. Duas correções de fixture foram
+necessárias: oracle privilegiado de saldo migrou da view filtrada por Auth
+para somatório independente do ledger; segundo setup trocava o contexto do
+cliente cacheado. A primeira rodada de negativas nesse contexto não conta.
+Fixture agora seleciona o paciente correto, prova um controle válido e exige
+a mensagem específica da conversão recusada. Só os dois casos afetados foram
+repetidos. Dois consumidores legados de fator/espera foram adaptados ao comando
+versionado e passaram. Três fronteiras API passaram.
+
+Seis tarefas Chromium distintas passaram entre rodadas/rechecks: consumidor
+fracionário de 1,5 mL; criação com resposta perdida/código duplicado/inativação;
+comparação e adoção explícita/leitura sem inputs editáveis; emissão20 e
+recuperação após cadastro12; escolha obsoleta20 só muda para24 após adoção;
+consumidor anterior de REQ/scan/foto real decodificada/trânsito/aceite.
+Três interrupções iniciais eram seletores dos testes novos. Rechecks dirigidos
+alinharam o nome acessível, inclusive a ajuda da origem COM, sem remover
+asserções de quantidade, autoria, unicidade ou ledger. Inativação preserva
+estoque e devolve foco ao controle estável; duplicata conserva campos/foco.
+Axe/overflow e teclado a 320/390/768/1440; captura do editor a 320 px inspecionada.
+
+PDF aeb585f4, v3: 2 embalagens de fator10, código 0123456789012 e base20 após
+cadastro12. Compra/chegada creditaram 20 uma única vez, com receiptId/ator reais.
+Snapshot/hash/registro do renderer confrontados; as três páginas foram
+renderizadas por PDFium e inspecionadas. SHA-256:
+f4b774f574d561346b6ba226c8e3a66b58a28107141bfae3974102a6f2365462.
+Manifestos locais presentation-provenance-...-verification.json e -visual-review.json.
+Sem sobrescrever PDFs anteriores; sem assinatura, pessoa, impressão, aparelho
+físico, provedor ou homologação geral D4.
+
+Lint pertinente, tipos e build do runner passaram. Advisor local: somente
+unaccent/public histórico. 110 migrations; replay limpo/legado e suítes gerais
+ficam para a CI do novo SHA. O read hook de estoque foi movido sem alterar seu
+comportamento para use-scoped-read, agora consumido também por apresentações.
+CI ganhou concorrência nativa por PR: um novo commit cancela runs superadas que
+já usem a configuração. Pushes master têm grupo único. YAML foi parseado e
+jobs/triggers/permissões comparados com o HEAD anterior: intactos. Execução
+cancelada não aprova SHA. Sem polling ou duplicação local das suítes gerais.
+BAL, sucessão, P07, rastreabilidade de estoque e demais critérios D2 continuam
+em execução. Sem merge, banco remoto, conclusão da missão ou GO.
