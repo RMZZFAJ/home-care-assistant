@@ -314,9 +314,53 @@ test("BAL reconto sem contador mostra recuperação, preserva motivo no conflito
     name: "Recontos aguardando designação",
     exact: true,
   });
+  const recoveryCode = recovery.getByText(f.document.code, { exact: true });
+  await expect(recoveryCode).toBeAttached();
+  const geometry = await recoveryCode.evaluate((element) => {
+    const row = element.closest("article")!,
+      main = element.parentElement!,
+      actions = row.querySelector(".hca-toolbar")!;
+    const bounds = (node: Element) => {
+      const rect = node.getBoundingClientRect();
+      return { width: rect.width, height: rect.height, x: rect.x, y: rect.y };
+    };
+    return {
+      viewport: window.innerWidth,
+      label: bounds(element),
+      main: bounds(main),
+      row: bounds(row),
+      actions: bounds(actions),
+      mainFlex: getComputedStyle(main).flex,
+      rowWrap: getComputedStyle(row).flexWrap,
+    };
+  });
+  await info.attach("recount-recovery-layout", {
+    body: JSON.stringify(geometry, null, 2),
+    contentType: "application/json",
+  });
+  mkdirSync("output/playwright/phase-d", { recursive: true });
+  writeFileSync(
+    `output/playwright/phase-d/recount-recovery-geometry-${info.project.name}.json`,
+    JSON.stringify(geometry, null, 2),
+  );
   await expect(
     recovery.getByText(f.document.code, { exact: true }),
   ).toBeVisible();
+  const initialViewport = page.viewportSize()!;
+  expect(geometry.label.width).toBeGreaterThan(0);
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await recoveryCode.scrollIntoViewIfNeeded();
+    await expect(recoveryCode).toBeVisible();
+    await expect(recoveryCode).toBeInViewport({ ratio: 1 });
+    await audit(page, `recount-recovery-row-${width}`);
+    if (width <= 390)
+      await page.screenshot({
+        path: `output/playwright/phase-d/recount-recovery-row-${info.project.name}-${width}.png`,
+        fullPage: true,
+      });
+  }
+  await page.setViewportSize(initialViewport);
   await expect(page.getByText(/^Não há contagem pendente/)).toHaveCount(0);
   await recovery
     .getByRole("link", { name: "Designar novo reconto", exact: true })

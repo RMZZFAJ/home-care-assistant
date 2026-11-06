@@ -94,6 +94,10 @@ justificativa são conservados no conflito; adotar uma declaração encerrada n�
 reabilita sua confirmação. O fluxo ENT anterior permanece acessível até concluir
 a equivalência necessária à substituição.
 
+Na recuperação de recontos, a identificação e as ações podem ocupar linhas
+separadas em telas estreitas. O código e o nome de quem contou mantêm espaço
+visível, mesmo quando a soma dos botões excede a largura da linha.
+
 Eventos confirmados incluem atores, conteúdo, evidências, vínculos e hash
 anterior. SHA-256 verifica conteúdo canônico, com versão documental imutável
 para clientes. Assinatura Ed25519 e gestão de chaves ficam para o roadmap.

@@ -1558,3 +1558,34 @@ iOS passou97/falhou1, incluindo retry: o consumidor do reconto sem contador
 encontrou BAL-0001 no DOM, mas oculto. A investigação desse consumidor é um
 incremento separado, sem mudar os testes aprovados de transferência. Esses
 resultados pertencem a 57f6cdc; não aprovam o SHA seguinte de P07.
+
+## D2.22 — identificação visível do reconto na tela estreita
+
+Falha comprovada na CI 42184146007/57f6cdc, job iOS127783562356:97 casos passaram,
+um falhou também no retry. O código BAL estava no DOM da região de recuperação,
+mas toBeVisible recebia hidden. Artefato13488725094 foi baixado e confrontado com
+SHA-256 6b1c07d9d3e53dd8d7b313a4c3cd2c77a0afbe118a64b6b30d1208cb3e9710a4;
+duas imagens e dois contextos foram preservados, sem executar instruções deles.
+
+Uma execução local somente do caso BAL reconto sem contador, projeto iOS, manteve
+a falha. Diagnóstico geométrico mediu viewport390, linha324, ações284 e largura
+zero tanto no strong do código quanto na identificação flex:1 1 0%; nowrap.
+Portanto era defeito de layout visível, não ausência do registro ou mero seletor.
+Log recount-recovery-ios-before e geometria/screenshot anteriores preservados.
+
+Uma classe exclusiva dessa linha permite quebra, reserva base de12rem para a
+identificação e conserva as ações dentro da largura disponível. A regra geral
+dos demais registros não foi alterada. Após a correção, o mesmo caso iOS passou:
+identificação/código296px, ações296px e wrap. O teste conserva as negativas e todo
+o percurso de conflito, falha de consulta, texto/foco, adoção explícita, resultado
+e preservação de documento/obrigações/ledger. Acrescenta largura positiva e
+visibilidade real em 320/390/768/1440, com axe/overflow e screenshots320/390.
+As duas imagens finais foram inspecionadas: código, contador e ações legíveis.
+
+Tipos/build do runner e lint dos dois fontes afetados passaram. Somente o caso
+que falhou foi executado antes/depois; não se repetiram os97 aprovados da CI,
+Auth, migrations ou suítes gerais. Sem alteração de banco, permissões ou saldo.
+Relatório recount-recovery-ios-after-report.html e anexos geométricos preservados
+em output/phase-d-work e output/playwright/phase-d. A evidência é emulação WebKit,
+sem substituir aparelho físico/AT/zoom400% ou CI do SHA publicado. D-A permanece
+em execução, com116 migrations; sem merge ou operação remota.

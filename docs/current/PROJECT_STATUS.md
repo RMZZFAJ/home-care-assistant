@@ -120,8 +120,11 @@ o arquivo registrado. CI precisa gerar o novo PDF por sua rota no SHA publicado.
 equivalência integral, migração das intenções antigas e demais critérios D2
 continuam em execução. CI de 57f6cdc confirmou checks gerais Windows/Ubuntu,
 replay limpo/legado e 203 integrações, Chromium e mobile. iOS passou97/falhou1:
-reconto sem contador encontrou o código no DOM, mas oculto na tela. Investigação
-dirigida desse consumidor em andamento; não se declarou aprovação global.
+reconto sem contador encontrou o código no DOM, mas oculto na tela. A falha foi
+reproduzida localmente: os botões comprimiam a identificação a largura zero.
+Correção restrita à linha de recuperação passou no mesmo caso iOS, com código
+visível e axe/overflow em 320/390/768/1440. O novo SHA ainda exige sua própria CI;
+não se declarou aprovação global.
 
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
