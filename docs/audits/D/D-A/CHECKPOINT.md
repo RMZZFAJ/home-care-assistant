@@ -2032,3 +2032,87 @@ CI7a78eae/42282278280: database e validações gerais Windows/Ubuntu success;
 Chromium/mobile failure e iOS in_progress na consulta pontual. Esse estado não
 valida o próximo SHA. D-A continua em execução, sem merge, alteração remota,
 homologação humana/AT/aparelho ou pesquisa de provedor.
+
+## D2.31 — datas avulsas, janela nova BAL e reconciliação de critérios
+
+C-NEW-AC-021 tinha lacuna de implementação: once/weekly/cycle não
+selecionavam12 dias avulsos em45, entre meses. Nova modalidade dates conserva
+pessoa/tipo/fuso e seleção; não exige redigitar horários. Migration121
+acrescenta date[] com constraints e estende o comando nativo por pontos únicos
+verificados. Datas são reais/únicas/bounded, dias da semana e ciclo não são
+aceitos nesse modo. Versão consultada do tipo é obrigatória,
+bloqueada/validada antes da materialização. Instantes usam19–07 no fuso
+declarado; só dias escolhidos geram ocorrências. Modos anteriores, autoridade,
+idempotência, exceção, corte e RLS/grants são preservados.
+
+Duas tentativas de preparo falharam por um marcador inicialmente não exclusivo
+e depois CRLF de Windows dentro do marcador; ambas deram rollback. A preflight
+confirmou o marcador único normalizado; preparo seguinte aplicou121 sem reset.
+Não houve reparo de migration histórica. Nenhum dado local anterior foi
+substituído para repetir evidência.
+
+Cinco casos Auth distintos passaram entre rodadas.12 datas em45 geraram
+somente12 intervalos19–07 com UTC independente e snapshot preservado após
+mudar o tipo. Nova chave com versão antiga recusou PT409. Conflito na oitava
+data, em paciente sem leitura do emissor, reverteu
+série/ocorrências/eventos/cache inteiros; alternativa conservou12 e corte
+preservou linhas/cancelou só futuras. Aprovação depois do corte não
+republicou. Datas inválidas/duplicadas/fora do período e dados incompatíveis
+foram recusados; sessão real perdida após espera observada do worker reverteu
+a série parcial. A primeira fixture usou membership inactive inexistente;
+corrigida para revoked, apenas esse caso foi repetido. Não se declarou esse
+erro de fixture como defeito do produto.
+
+Caso nativo adicional confirmou proposta20–08 anterior ao corte: decidir
+depois dele registra obsolete com motivo próprio e preserva
+snapshots/motivo/notas da proposta. Série e plantões cancelados ficam
+idênticos; replay da chave não cria segundo terminal. Isso complementa a
+contraprova anterior de aprovação da série inteira encerrada.
+
+C-NEW-AC-012 executou janela nova distinta da original24h, com outra pessoa
+num período12h que contém o relógio real. Juliana18 continua
+autora/contadora1; Sheila17 é contadora2. Contadora antiga não pode gravar
+reconto alheio. Parecer1 permanece e não aprova2: só pareceres novos de
+supervisor e família conciliam diferença3 contra referência20.
+Obrigações/prazos/ledger anteriores permanecem e há um único ajuste causal.
+Nenhum relógio do ambiente foi alterado para simular elegibilidade.
+
+Três fronteiras API passaram: datas/referência tipadas, forja/tempo inválido
+antes de Auth e conflito de tipo com código de versão. Seis casos Chromium
+passaram:12 datas/45dias com conflito reservado e retorno sem perder
+seleção/notas; exceção de uma data/corte; BAL em nova janela; publicação
+antiga once; proposta Sheila19–07→Cíntia20–08 com motivos separados; CAS
+preservando a referência. Revisão usa uma única superfície: preparação fica
+inerte/oculta, Voltar recupera campos e foco, confirmação em leitura mantém
+pacote. Foram confrontados DOM/payload, ator, intervalos, notas, eventos e
+ledger; quatro larguras320/390/768/1440 e axe passaram.
+
+A inspeção da primeira captura encontrou recorte interno do calendário apesar
+de document.scrollWidth passar. Formulário e filhos de grade tinham mínimo
+intrínseco maior que o painel. Largura mínima/limite dos controles e quebra em
+leitura corrigiram o recorte; o caso ganhou confronto geométrico com o drawer.
+A captura seguinte mostrou os números de dois dígitos quebrados pela
+combinação de padding e wrap herdados: regra específica mantém padding
+estreito e números em uma linha, agora também asserida. Apenas o caso afetado
+foi repetido nas duas correções; ambos os rechecks passaram e a captura final
+foi inspecionada com sete colunas e números inteiros. Nenhum assert foi
+reduzido e os outros cinco casos não foram repetidos sem hipótese nova.
+
+Tipos dirigidos e lint pertinentes passaram; lazy initializer removeu a única
+advertência nova sem mudar valores. O runner fez seu build necessário à tarefa
+visual. Advisor mantém as mesmas12 chaves WARN.121 migrations e84 hashes
+históricos preservados. Artefatos `selected-dates-*` e `new-window-balance-*` em
+output registram fontes, tentativas, capturas e resultados.
+CIe8432a5/42287968736 tinha database/replay120 e validações Windows/Ubuntu
+success; os três navegadores estavam in_progress na consulta pontual. Isso não
+valida este incremento121; suites gerais/clean/legado ficam na CI do novo SHA.
+
+A matriz reconcilia também evidências existentes sem repetir suítes funcionais
+inalteradas: C042 recusa/retirada ENT já cobertas por16 casos Auth e5 browser;
+C-NEW-AC-011 por D2.15/D2.17; C-NEW-AC-007 por P05 e sucessões comprovadas; D0
+C119 é contrato do oráculo, com renderer amplo em D4, e C121 é coleta mais
+anexos browser, sem homologação humana. C-FINAL-AC-026 usa missão vigente e
+ancestralidade do merge PR6; gates externos condicionam seus ramos. P07 não
+removeu a UI anterior. C010/C035/C068/C7-010 e os dois pares finais REQ/PDF e
+ENT ainda estão em conclusão, sem inventar aceite. D-A permanece ativa; sem
+merge, alterações remotas ou homologação humana/AT/aparelho/provedor.

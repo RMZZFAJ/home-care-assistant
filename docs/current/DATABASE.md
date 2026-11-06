@@ -518,3 +518,20 @@ A dependência D1 private.auth_session usa clock_timestamp e volatilidade real
 para prazos not_after. now congelava o início da transação e permitia comando
 cuja sessão expirou enquanto aguardava o lock. A mudança conserva os mesmos
 joins/ACL e exige prazo vivo nas revalidações posteriores.
+
+## Datas avulsas de uma programação
+
+Migration121 acrescenta shift_series.specific_dates com datas civis tipadas.
+Constraint distingue recurrence dates dos três modos anteriores, limita a
+cardinalidade/período e recusa null. RPC confere unicidade, datas reais, modo,
+campos incompatíveis e versão do tipo sob lock compartilhado. O loop
+materializa somente os dias escolhidos e mantém os mesmos controles de
+autoridade após o mutex do profissional, idempotência, RLS/grants, exceções e
+corte. Séries antigas recebem array vazio; resultados históricos em cache
+conservam sua forma original.
+
+Reconto em janela distinta foi comprovado sem nova mudança de schema:
+Juliana18 permanece contadora1 e Sheila17 torna-se contadora2. A referência
+física20 só sofre ajuste3 após as duas revisões novas exigidas pela política
+preservada. Parecer1 não aprova contagem2 e a satisfação/prazo anteriores
+permanecem.

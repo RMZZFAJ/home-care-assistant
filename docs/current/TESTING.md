@@ -270,3 +270,18 @@ requisition-observation.spec.ts, presentation-provenance.spec.ts e
 workflows.spec.ts mantêm os contratos de observação, conversão e histórico.
 Replay limpo/legado e suites gerais permanecem nos jobs da CI por SHA;
 novos casos dirigidos não exigem repetir localmente suites gerais inalteradas.
+
+## Datas escolhidas e BAL em janela nova
+
+selected-shift-dates.test.mjs cobre12 datas em45 dias,19–07 por instantes UTC,
+tipo obsoleto, conflito reservado com rollback integral, corte, proposta após
+corte e perda real de sessão durante espera. bal-new-window.test.mjs cobre
+contadoras1/2, revisões independentes e ajuste físico causal.
+selected-dates-new-window.spec.ts verifica calendário entre meses, retorno da
+revisão, exceção/corte e reconto; schedules.spec.ts e
+schedule-decisions.spec.ts preservam consumidores anteriores.
+
+Nos painéis, overflow apenas do documento não detecta recorte interno. A
+tarefa de datas confronta os limites horizontais de campos/dias com o drawer e
+exige números em uma linha, além de axe e inspeção da captura. Essas
+verificações não substituem avaliação humana de AT.

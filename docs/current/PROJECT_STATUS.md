@@ -223,6 +223,20 @@ O caso afetado passou localmente com409 para chave nova e recuperação da
 emissão própria anterior. A CI do próximo SHA ainda precisa validá-lo; demais
 critérios D-A seguem em execução, sem merge, produção ou operação remota.
 
+D2.31 implementa datas avulsas em uma série, com seleção entre meses,
+prévia19–07, versão do tipo e publicação atômica.12 dias em45 foram confrontados
+por consultas paginadas e instantes UTC; conflito em outro paciente preserva
+seleção/notas e não vaza sua origem. Exceção/corte mantêm as12 ocorrências e
+proposta posterior ao corte encerra obsoleta. Reconto em outra janela preserva
+Juliana18/contadora1 e Sheila17/contadora2, sem herdar parecer. Cinco casos Auth,
+três API e seis Chromium distintos passaram entre rodadas; somente o caso de
+calendário foi repetido ao corrigir recorte interno/números quebrados. Tipos,
+lint pertinente, quatro larguras e inspeção local passaram.121 migrations;
+replay completo e checks gerais ficam na CI do SHA publicado. CIe8432a5 teve
+banco/replay120 e validações Windows/Ubuntu success; navegadores estavam
+in_progress na consulta pontual. D-A segue em execução, sem merge ou operação
+remota; os critérios restantes estão na matriz de execução.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

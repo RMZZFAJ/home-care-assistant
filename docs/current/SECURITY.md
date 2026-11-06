@@ -194,3 +194,11 @@ compara a revisão de ledger antes de criar documento. Recuperação da própria
 chave permanece sujeita às comparações canônicas nativas. Campos privados
 saem da tela ao perder leitura; capacidades de escrita continuam separadas da
 recuperação de comando já confirmado. Logout limpa as cópias hca da sessão.
+
+Datas escolhidas não transportam papel ou autor. Native schedule_command
+conserva autorização por paciente e pessoa e revalida após o lock do
+profissional. Versão do tipo impede mudança silenciosa de horário. Conflito em
+outro paciente recusa o conjunto inteiro sem revelar seu nome ou notas. A
+negativa de leitura desse paciente foi exercitada com Auth real. A decisão da
+proposta mantém motivo/notas do proponente e grava motivo próprio do decisor,
+inclusive no terminal obsoleto após corte.

@@ -52,3 +52,14 @@ button:disabled { cursor:not-allowed; opacity:.45; }
 .ui-form-actions>.ui-button:first-child { margin-right:auto; }
 .hca-draft-panel, .hca-draft-panel>* { min-width:0; }
 .hca-draft-panel button, .hca-draft-panel a { min-width:0; max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+
+.hca-selected-dates { min-width:0; }
+.hca-date-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; }
+.hca-date-grid button { min-width:0; min-height:44px; width:100%; padding:4px; }
+.hca-date-grid button[aria-pressed=true] { background:var(--brand); color:white; border-color:var(--brand); }
+
+.hca-schedule-form, .hca-schedule-form>*, .hca-schedule-review, .hca-schedule-review>* { min-width:0; max-width:100%; overflow-wrap:anywhere; }
+.hca-schedule-form :where(.fui-Field,.fui-Input,.fui-Select,.fui-Textarea) { min-width:0; width:100%; max-width:100%; }
+.hca-schedule-form select { min-width:0; width:100%; }
+
+.hca-record-drawer .hca-date-grid button { padding:4px; white-space:nowrap; overflow-wrap:normal; font-variant-numeric:tabular-nums; }

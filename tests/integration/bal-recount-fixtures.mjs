@@ -115,6 +115,43 @@ export async function substitute(f) {
   await balanceCommand(f.admin, f.patient, "refresh", {});
   return second;
 }
+export async function newWindowRecount() {
+  const f = await pendingRecount({
+    referenceQuantity: "20",
+    countQuantity: "18",
+  });
+  const second = await shiftWorker(f.patient);
+  sql(
+    `update public.profiles set full_name='Sheila fictícia, reconto em janela nova' where id=${sqlLiteral(second.id)};`,
+  );
+  const hour = Number(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "America/Sao_Paulo",
+      hour: "2-digit",
+      hourCycle: "h23",
+    }).format(new Date()),
+  );
+  const type = await shiftCommand(f.admin, f.patient, "type", {
+    name: "Janela distinta para o reconto",
+    startsLocal: hour >= 12 ? "12:00" : "00:00",
+    durationMinutes: 720,
+  });
+  const series = await shiftCommand(f.admin, f.patient, "series", {
+    professionalId: second.id,
+    shiftTypeId: type.id,
+    timezone: "America/Sao_Paulo",
+    recurrence: "once",
+    weekdays: [],
+    anchorDate: f.today,
+    validUntil: f.today,
+    notes: "Outra janela real de plantão, sem substituir a primeira contagem",
+  });
+  const current = await workspace(f.admin, f.patient),
+    target = current.targets.find((s) => s.series_id === series.id);
+  const designated = await assignRecount(f.family, f, target);
+  if (designated.error) throw designated.error;
+  return { ...f, second, target, designated: designated.data };
+}
 export { actor, rpc, balanceCommand };
 export const recountState = (f) =>
   sql(`select jsonb_build_object(

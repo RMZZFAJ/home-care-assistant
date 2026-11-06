@@ -712,3 +712,20 @@ aceitos; uma abertura documental antiga pendente conserva sua chave original.
 REQ de paciente inativo retorna PATIENT_INACTIVE/409 para chave nova; a chave
 própria já emitida segue para recuperação canônica sob leitura viva. Esse
 mínimo não implementa persistência geral COM/ENT nem amplia a fase para D3.
+
+## Escalas por datas escolhidas
+
+POST /api/schedules aceita series com recurrence dates, dates únicas dentro de
+anchorDate/validUntil e shiftTypeVersion da referência consultada. Essa
+modalidade usa weekdays vazio e não recebe workHours/restHours. De1 a367 datas
+respeitam a janela de até366 dias após a âncora. Instantes usam o
+horário/duração do tipo e o fuso explícito. Mudança do tipo revisado retorna
+VERSION_CONFLICT/409; a confirmação não adota outro horário automaticamente.
+Once/weekly/cycle mantêm os contratos anteriores.
+
+A criação continua uma transação com verificação de conflitos do profissional
+entre pacientes. Nenhuma data ou série parcial persiste quando uma ocorrência
+conflita; o erro externo não identifica o outro paciente. Exceção altera só o
+plantão indicado. Corte conserva linhas históricas e impede republicação
+posterior. Leitura continua limitada a42 dias por consulta; a UI pagina/navega
+o calendário sem ampliar esse limite.
