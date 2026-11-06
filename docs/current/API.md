@@ -115,7 +115,11 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 - **Rota:** /api/stock/balances
 
-  **Contrato:** Confirmados, previsões, trânsito e métricas
+  **Contrato:** Confirmados, previsões, trânsito e métricas. A tela consulta
+  saldos e histórico independentemente, com atualização e erro por fonte.
+  Falha transitória conserva a consulta válida do mesmo filtro, com instante
+  e aviso de desatualização; erro inicial não significa vazio nem saldo zero.
+  Outra custódia/filtro não reutiliza dados anteriores como resultado atual.
 
 - **Rota:** /api/stock/movements
 

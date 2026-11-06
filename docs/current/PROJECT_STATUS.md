@@ -13,6 +13,13 @@ locais discriminantes. D1/D2 ainda não concluídos. Sem merge, alteração remo
 banco ou liberação operacional. As referências de C abaixo são históricas
 da entrega integrada, sem renovar autorização por si próprias.
 
+Estoque agora isola carregamento, erro e atualização de saldos/histórico.
+Falha de uma fonte preserva a outra e a última consulta válida do mesmo
+filtro, identificada como possivelmente desatualizada. Erro inicial não
+produz vazio falso. Duas tarefas Chromium de falha/recuperação e o percurso
+existente de correção compensatória passaram; ledger preservado nas leituras,
+axe/overflow em quatro larguras. Sem alteração de banco neste incremento.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

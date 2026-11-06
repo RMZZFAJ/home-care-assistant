@@ -919,3 +919,27 @@ o aviso de nome de ref foi corrigido e só seu arquivo foi revalidado.
 Instalação limpa/evolução legada e suítes gerais ficam para a CI
 do novo SHA. Sucessão/contagem BAL futura completa, P07 e demais critérios D2
 continuam em execução, sem merge, GO ou homologação humana/física/provedor.
+
+## D2.11 — estoque: consultas independentes
+
+Prévia de desligamento publicada em 59b2e292cab4fc584302f5935ece09d4b9efa0d0.
+CI 42134849214 estava in_progress na consulta pontual. O ensaio anterior
+de estoque falhou: painel sem produto após erro do histórico. A leitura do
+fonte confirmou Promise.all descartando o saldo válido; o seletor de região
+também ainda não existia, limite dessa contraprova anterior à implementação.
+
+Saldos e histórico agora têm resultado, retry, instante e erro independentes.
+Retenção só no mesmo filtro e em erro transitório; 401/403/404 descartam dados.
+Mudança de custódia/página não apresenta consulta antiga como atual. Vazio só
+após consulta válida, nunca por erro. Paciente continua sendo a chave da tela.
+Nenhum contrato RPC, grant, migration ou ledger foi alterado.
+
+Três tarefas Chromium passaram: falhas isoladas/simultâneas e recuperação,
+última consulta com aviso e isolamento de custódia, mais o consumidor existente
+de revisão/paginação/filtro/compensação com saldo final 21 e produto inativo
+preservado. Leitura independente confirmou dois produtos e ledger imutável.
+Foco/axe/overflow em 320/390/768/1440 e captura de 320 px inspecionados.
+Logs locais: stock-availability-before.log, stock-availability-e2e.log e lint.
+O único erro de lint inicial era expressão no helper do teste; corrigido e
+somente esse arquivo revalidado. Tipos/build passaram no runner. Suítes gerais
+ficam para a CI; catálogo, transferências e demais critérios D2 seguem abertos.
