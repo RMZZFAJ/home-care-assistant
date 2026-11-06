@@ -171,6 +171,7 @@ function PatientStock({
   );
   return (
     <div className="space-y-5">
+      {can(context, "ent.create") && hasStock ? <Link className={buttonClass} href="/transferencias">Transferir materiais entre família e equipe</Link> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       <section

@@ -51,6 +51,7 @@ export type DocumentSnapshot = {
   purchaseReceipts?: PurchaseReceipt[];
   deliveryCancellation?: DeliveryCancellationContext | null;
   deliveryRegularization?: DeliveryRegularizationContext | null;
+  transfer?: Omit<import("@/types/transfers").TransferFacts, "canAgree" | "canDispatch" | "canWithdraw">;
   balanceReviews?: BalanceReviewFacts;
   actors?: { issuer?: Person; recipient?: Person; patient?: Person };
   lines: Record<string, unknown>[];
@@ -649,6 +650,25 @@ export async function renderDocumentPdf(
         "Nenhuma ciência foi registrada até esta versão. Emissão, envio ou disponibilização do PDF não comprovam ciência.",
       );
   } else if (snapshot.type === "ENT") {
+    if (snapshot.transfer) {
+      const transfer = snapshot.transfer, declaration = transfer.declaration;
+      ensure(150);
+      section("Declaração e concordância da transferência");
+      const custody = (source: string) => source === "FAMILY" ? "Família" : "Equipe";
+      text(`${custody(declaration.source)} para ${custody(declaration.destination)}`, 10, true);
+      text(`Declarante: ${declaration.actor.name} · ${formatBrazilDate(declaration.recordedAt)}`, 9);
+      text("Justificativa original: " + declaration.reason, 9);
+      text("Contraparte para concordância: " + declaration.counterparty.name, 9);
+      text("Recebedor físico designado: " + declaration.recipient.name, 9);
+      if (transfer.agreement) {
+        text(`${transfer.agreement.decision === "agree" ? "Concordância própria" : "Recusa própria"}: ${transfer.agreement.actor.name} · ${formatBrazilDate(transfer.agreement.recordedAt)}`, 9, true);
+        text(transfer.agreement.reason, 9);
+      } else text("Sem concordância registrada nesta versão.", 9);
+      text(transfer.dispatchedAt ? "Expedição efetiva: " + formatBrazilDate(transfer.dispatchedAt) : "Sem expedição registrada nesta versão.", 9);
+      text(transfer.originDocumentId ? "ENT documental de origem: " + transfer.originDocumentId : "Origem documental não informada.", 8);
+      text("A concordância não comprova recebimento nem credita o destino. O vínculo documental não individualiza lotes.", 8);
+      if (transfer.withdrawal) text(`${transfer.withdrawal.kind === "administrative_close" ? "Encerramento administrativo" : "Retirada pelo declarante"}: ${transfer.withdrawal.actor.name} · ${formatBrazilDate(transfer.withdrawal.recordedAt)} · ${transfer.withdrawal.reason}`, 9);
+    }
     const selection = snapshot.workflow?.recipientSelection as
       | DeliveryRecipientSelection
       | undefined;

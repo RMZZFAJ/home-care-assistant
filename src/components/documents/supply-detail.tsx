@@ -3,6 +3,7 @@ import { SettingsSection } from "@/components/forms/settings-section";
 import { DeliveryRecipientFacts } from "./delivery-recipient";
 import { DeliveryRegularization } from "./delivery-regularization";
 import { BalanceReview } from "./balance-review";
+import { TransferDetails } from "./transfer-details";
 import { documentPatientName } from "@/lib/documents/presentation";
 import { SupplyLineSummary } from "./supply-line-summary";
 
@@ -68,6 +69,7 @@ export function SupplyDocumentContent({
   const [deliveryConflict, setDeliveryConflict] = useState(false);
   const [regularizationEditing, setRegularizationEditing] = useState(false);
   const [balanceReviewEditing, setBalanceReviewEditing] = useState(false);
+  const [transferEditing, setTransferEditing] = useState(false);
   const [focusRevision, setFocusRevision] = useState(0);
   const [comparison, setComparison] = useState<SupplyDocument | null>(null);
   const commandFormRef = useRef<HTMLFormElement | null>(null);
@@ -91,9 +93,9 @@ export function SupplyDocumentContent({
       review ||
       uncertain ||
       regularizationEditing ||
-      balanceReviewEditing,
+      balanceReviewEditing || transferEditing,
     );
-  }, [action, review, uncertain, regularizationEditing, balanceReviewEditing]);
+  }, [action, review, uncertain, regularizationEditing, balanceReviewEditing, transferEditing]);
   const pendingRef = useRef<{
     action: string;
     body: unknown;
@@ -329,6 +331,7 @@ export function SupplyDocumentContent({
         actions.push("receive", "divergence");
       if (
         data.status === "pending_receipt" &&
+        !data.transfer &&
         (data.created_by === context.userId || allowed("access.manage"))
       )
         actions.push("reassign");
@@ -367,6 +370,7 @@ export function SupplyDocumentContent({
         actions.push("withdraw_cancellation");
     }
     if (
+      (!data.transfer || data.transfer.state === "dispatched") &&
       !["cancellation_pending", "administratively_closed"].includes(
         data.status,
       ) &&
@@ -527,7 +531,8 @@ export function SupplyDocumentContent({
                     : "Compra ou doação de insumos"
                 : undefined
             }
-            code={data.code ?? "Rascunho"}
+            code={data.code ?? (data.transfer ? "Declaração sem expedição" : "Rascunho")}
+            unissuedLabel={data.transfer ? "Declaração sem expedição; o protocolo ENT será atribuído ao expedir." : undefined}
             status={
               data.type === "COM"
                 ? (data.purchaseProgress?.state ?? data.status)
@@ -589,6 +594,7 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
+          {data.transfer ? <TransferDetails data={data} onUpdated={setData} onEditingChange={setTransferEditing} /> : null}
           {data.type === "ENT" && data.workflow_data.recipientSelection ? (
             <section className="ui-card space-y-4">
               <DeliveryRecipientFacts
@@ -765,6 +771,7 @@ export function SupplyDocumentContent({
                   line={line}
                   type={data.type}
                   status={data.status}
+                  declarationOnly={Boolean(data.transfer && data.transfer.state !== "dispatched")}
                   purchaseLine={data.purchaseProgress?.lines.find(
                     (item) => item.lineId === line.id,
                   )}

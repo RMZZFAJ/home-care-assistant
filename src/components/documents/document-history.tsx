@@ -45,7 +45,7 @@ export function DocumentRow({ row }: { row: DocumentSummary }) {
     >
       <span className="document-type">{row.type}</span>
       <span className="min-w-0">
-        <strong>{row.code ?? "Rascunho"}</strong>
+        <strong>{row.code ?? (row.status === "draft" ? "Rascunho" : "Registro sem expedição")}</strong>
         <span className="block text-xs text-(--muted)">
           {documentLabels[row.type]} · {formatBrazilDate(row.created_at)}
         </span>

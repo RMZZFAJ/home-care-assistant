@@ -1,4 +1,8 @@
 const labels: Record<string, string> = {
+  "ent.transfer.declared": "Transferência declarada para concordância",
+  "ent.transfer.agreed": "Concordância própria da contraparte registrada",
+  "ent.transfer.declined": "Transferência recusada pela contraparte",
+  "ent.transfer.withdrawn": "Declaração encerrada sem expedição",
   "bal.cycle.configured": "Programação do balanço atualizada",
   "bal.cycle.opened": "Obrigação semanal disponibilizada",
   "bal.cycle.assigned": "Balanço atribuído ao plantão",

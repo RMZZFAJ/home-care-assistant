@@ -25,6 +25,8 @@ export async function GET(request: Request) {
       ![
         "",
         "tasks",
+        "transfer_pending",
+        "transfer_ready",
         "pending_receipt",
         "disputed",
         "cancellation_pending",

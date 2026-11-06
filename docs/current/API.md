@@ -274,6 +274,50 @@ workflow_data.recipientSelection preserva pessoa escolhida/sugerida, escala,
 motivo, indicador e instante; indicações anteriores permanecem no histórico.
 Indicação não é presença, assinatura ou recebimento pessoal.
 
+## Transferência bilateral — P07
+
+GET /api/transfers/preparation recebe careRecipientId/source. Exige ent.create,
+ent.read e leitura do estoque da origem. Retorna pessoas elegíveis na custódia
+oposta, materiais ativos ou inativos com saldo positivo na origem, quantidades
+disponíveis, até 100 ENT recentes com aceite nessa custódia e referenceHash.
+originTotal informa o recorte documental; nenhuma COM ou saldo geral de outra
+custódia é exposto por essa preparação.
+
+POST /api/transfers recebe careRecipientId, idempotencyKey e declaration, com
+source, counterpartyId, recipientId, originDocumentId opcional, referenceHash,
+reason e lines de productId/quantity na unidade base. Reason tem 3–1000 unidades
+UTF-16, com pelo menos três caracteres; quantidades são positivas e exatas.
+Cria ENT em transfer_pending, com materiais e três papéis congelados, sem
+protocolo ou movimento. A ENT de origem é documental, deve ter aceite positivo
+dos materiais na custódia de origem e não identifica lotes individuais.
+
+POST /api/documents/{id}/transfer recebe action, body, expectedVersion e
+idempotencyKey. Agree/decline são decisões pessoais da contraparte, com reason
+próprio. Agree produz transfer_ready; nenhum deles expede ou recebe. Dispatch
+recebe body vazio e pertence ao declarante autorizado: exige concordância e
+elegibilidade vigentes, gera protocolo ENT e usa o motor existente para origem
+→ trânsito. Withdraw encerra declaração ainda não expedida; administrador apto
+pode encerrá-la com autoria administrativa própria. Versão obsoleta, referência
+alterada e intenção incompatível são conflitos, sem efeito parcial.
+
+O recebimento posterior continua no comando ENT existente e pertence somente
+ao recebedor designado. A mesma pessoa pode ser contraparte e recebedor, mas
+registra dois atos distintos. O recebedor desta declaração fica congelado;
+substituí-lo exige encerrar/cancelar e preparar outra transferência. A troca de
+destinatário das ENT comuns mantém seu contrato. Cancelamento após consumo,
+divergências e conciliação usam o motor ENT preservado.
+
+Recuperação da mesma chave/intenção confirmada exige ent.read vivo, sem exigir
+novamente a capacidade da escrita concluída. Nova intenção revalida todas as
+permissões, inclusive após esperas tardias. A API não aceita autores, concordância
+ou aceite fabricados pelo cliente. Delivery task list filtra decisões da
+contraparte e expedições do declarante antes da paginação e aceita os dois novos
+estados. O escopo próprio inclui os três participantes da transferência.
+
+O PDF a partir da expedição contém declaração, concordância e recebimento
+separados. Versões anteriores à expedição ficam no histórico e não são servidas
+como comprovante ENT. Nenhum ato representa assinatura digital.
+
 ## Apresentações registradas em COM e ENT
 
 COM/ENT também aceitam lines[].presentations com id/version/packages e

@@ -23,6 +23,12 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/stale transfer preparation|stale transfer version|transfer decision already settled|transfer already dispatched or closed|transfer agreement required before dispatch|transfer not dispatched/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A transferência ou suas referências mudaram. Compare a situação atual antes de preparar outra confirmação. Sua justificativa foi preservada.", 409);
+  if (/bilateral transfer recipient is frozen/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "O recebedor pertence à declaração e à concordância preservadas. Cancele esta transferência pelo fluxo próprio antes de declarar outra com nova pessoa.", 400);
+  if (/insufficient transfer stock/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "O saldo da custódia de origem não comporta a quantidade declarada. Consulte a referência atual antes de continuar.", 409);
   if (/stale recount assignment reference|stale recount target shift|another recount assignment is active/i.test(message))
     throw new ApiError("VERSION_CONFLICT","A contagem ou o plantão do reconto mudou. Compare a referência atual e revise a pessoa e o período antes de confirmar. Sua justificativa foi preservada.",409);
   if (/obsolete balance deferral|balance deferral already decided/i.test(message))

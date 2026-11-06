@@ -11,6 +11,7 @@ import {
 import { DocumentRow, type DocumentSummary } from "./document-history";
 import { EmptyState } from "@/components/ui/primitives";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import Link from "next/link";
 
 export function DeliveryInbox() {
   return (
@@ -79,10 +80,12 @@ function Inbox({ context }: { context: WorkspaceContext }) {
   return (
     <>
       <p className="text-sm text-(--muted)">
-        Suas tarefas incluem recebimento pessoal, decisões de cancelamento e
+        Suas tarefas incluem concordância e expedição de transferências,
+        recebimento pessoal, decisões de cancelamento e
         encaminhamentos administrativos designados. A consulta não confirma
         recebimento.
       </p>
+      {can(context, "ent.create") ? <Link href="/transferencias" className="ui-button ui-button-secondary">Declarar transferência entre custódias</Link> : null}
       <div className="hca-toolbar">
         <Select
           aria-label="Situação das entregas"
@@ -94,6 +97,8 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           }}
         >
           <option value="tasks">Minhas tarefas executáveis</option>
+          <option value="transfer_pending">Aguardando concordância</option>
+          <option value="transfer_ready">Prontas para expedição</option>
           <option value="pending_receipt">Aguardando recebimento</option>
           <option value="disputed">Com divergência</option>
           <option value="cancellation_pending">Pedido de cancelamento</option>

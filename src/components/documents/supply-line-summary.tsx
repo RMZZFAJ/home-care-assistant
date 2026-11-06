@@ -14,12 +14,28 @@ export function SupplyLineSummary({
   type,
   status,
   purchaseLine,
+  declarationOnly = false,
 }: {
   line: SupplyLine;
   type: DocumentType;
   status: string;
   purchaseLine?: PurchaseProgressLine;
+  declarationOnly?: boolean;
 }) {
+  if (declarationOnly)
+    return (
+      <article className="rounded-xl border border-(--line) p-4">
+        <h3 className="font-semibold">{line.name_snapshot}</h3>
+        <dl className="mt-3 text-sm">
+          <dt>Declarado</dt>
+          <dd>{formatQuantity(line.quantity, line.unit_snapshot)}</dd>
+        </dl>
+        <p className="mt-3 text-sm">
+          Quantidade da declaração preservada, sem expedição ou recebimento
+          nesta transferência.
+        </p>
+      </article>
+    );
   return (
     <article className="rounded-xl border border-(--line) p-4">
       <h3 className="font-semibold">{line.name_snapshot}</h3>

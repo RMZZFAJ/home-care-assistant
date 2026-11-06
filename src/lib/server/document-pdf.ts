@@ -67,6 +67,9 @@ export async function documentPdf(
     .maybeSingle();
   if (error) databaseError(error);
   if (!event) throw new ApiError("NOT_FOUND", "Versão não encontrada.", 404);
+  const snapshot = event.body as DocumentSnapshot;
+  if (snapshot.transfer && !snapshot.protocol)
+    throw new ApiError("VALIDATION_ERROR", "Esta versão registra uma declaração anterior à expedição. Consulte seus atos no histórico; o comprovante ENT está disponível a partir da expedição.");
   const bytes = await renderDocumentPdf(
     event.body as DocumentSnapshot,
     event.content_hash,

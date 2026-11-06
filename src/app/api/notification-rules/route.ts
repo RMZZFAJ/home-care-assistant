@@ -19,6 +19,7 @@ export const notificationEvents = [
   "com.receive",
   "com.validate_receipt",
   "ent.issued",
+  "ent.transfer.declared", "ent.transfer.agreed", "ent.transfer.declined", "ent.transfer.withdrawn",
   "ent.receive",
   "ent.resolve",
   "ent.reassign",

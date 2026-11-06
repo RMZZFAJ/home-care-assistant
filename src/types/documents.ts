@@ -357,6 +357,7 @@ export type SupplyDocument = {
   balanceRecount?: import("./balances").BalanceRecountContext;
   deliveryCancellation?: DeliveryCancellationContext | null;
   deliveryRegularization?: DeliveryRegularizationContext | null;
+  transfer?: import("./transfers").TransferFacts;
   commandOutcome?: {
     state: "committed" | "recovered";
     action: string;
@@ -408,6 +409,8 @@ export const documentStatuses: Record<string, string> = {
   completed_science_pending: "Concluída · ciência pendente",
   archived: "Arquivada",
   draft: "Rascunho",
+  transfer_pending: "Transferência aguardando concordância",
+  transfer_ready: "Transferência pronta para expedição",
   submitted: "Aguardando revisão",
   pending_approval: "Aguardando aprovação",
   approved: "Aprovado",

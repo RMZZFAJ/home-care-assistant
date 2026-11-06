@@ -1426,3 +1426,135 @@ continuam necessários no SHA publicado. Logs bal-draft-recount-before/after,
 ainda não publicado permanece separado. D-A segue incompleta, sem merge,
 alteração remota ou liberação operacional. Validação local proporcional à causa;
 não foram repetidos check:contracts, suítes gerais ou build já previstos na PR.
+
+## D2.21 — declaração, concordância e expedição da transferência P07
+
+Migration 20261106073728 usa ENT e ent_transfers, sem novo tipo de documento,
+capacidade padrão ou grant implícito. Declaração congela materiais, declarante,
+contraparte, recebedor e origem ENT conhecida, com razão própria e referência
+consultada. Cria transfer_pending sem protocolo ou movimento. A contraparte
+registra agree/decline pessoal; agree produz transfer_ready, sem mover estoque.
+Somente o declarante autorizado expede, após revalidar pessoas e saldo. O motor
+ENT preservado gera protocolo, debita origem e credita trânsito; somente o
+recebedor designado confirma o fato físico, inclusive parcialmente. Contraparte
+e recebedor podem ser a mesma pessoa, mantendo atos separados.
+
+O destinatário fica congelado nesta declaração bilateral; sua troca exige outro
+processo explícito, preservando cancelamento e recebimentos. A troca de ENT comum
+permanece disponível. Proposta ainda não expedida admite retirada própria ou
+encerramento administrativo com autor/kind efetivos, sem falsificar decisão ou
+aceite da pessoa desligada. Tabela tem RLS/SELECT por paciente e ent.read, histórico
+imutável e sem DML cliente. Intenções ficam em private.transfer_commands, sem
+grants de cliente. A cadeia anterior ficou sem execução direta; wrapper público
+preserva seus consumidores. Nenhuma migration publicada foi editada.
+
+test:db:prepare aplicou incremento na stack home-care-assistant, API54321/DB54322,
+sem reset. Refinamentos da migration ainda não publicada usaram somente
+CREATE OR REPLACE das definições afetadas; tabelas/rename não foram repetidos.
+UUIDs foram tornados canônicos; referência e paciente ativo são revalidados ao
+final. Origem ENT exige aceite positivo do material na custódia correspondente;
+o vínculo é documental, sem inventar lote. Inativo com saldo positivo permite
+destinação física sem reativação ou baixa inferida.
+
+Treze cenários Auth distintos passaram entre rodadas e rechecks:
+
+- Juliana declara, Ana concorda e Bruno recebe três de cinco: TEAM5, FAMILY23 e
+  TRANSIT2. Declaração/concordância não movem; Ana/admin não recebem por Bruno.
+- Mesma contraparte/recebedor registra dois atos; direção FAMILY → TEAM funciona.
+- Concordância e retirada concorrem na mesma versão; somente uma confirma, sem
+  movimento. DML direto é recusado; recebedor não tem tarefa antes da expedição.
+- Mesma chave/intenção recupera declaração, concordância e expedição depois da
+  perda da respectiva escrita; nova intenção e perda de leitura continuam negadas.
+- Material inativo preserva identidade/saldo e segue expedição/aceite reais.
+- Revogação durante espera observada no lock de estoque impede a declaração.
+- Três esperas tardias observadas em FK/perfil impedem declaração, concordância
+  e expedição após perda da autoridade do ator, revertendo todos os efeitos.
+- Cancelamento de retorno recebido cinco referencia consumo familiar confirmado
+  de dois e devolve somente três; retry não debita consumo ou devolução outra vez.
+- Recusa deixa código/protocolo NULL e zero movimento; origem sem leitura e
+  paciente estrangeiro são recusados.
+- Contraparte desligada não decide; administrador encerra com autoria própria,
+  preservando declarante e saldo. RLS oculta a proposta do vínculo revogado.
+- Revogação da contraparte durante a espera tardia do expedidor reverte também
+  o movimento nativo, preservando a concordância anterior.
+
+Os primeiros asserts de quantidade esperavam texto normalizado; PostgREST retorna
+número e stock_quantity retorna numeric com escala. Foram ajustados para
+comparação numérica exata nos inteiros do fixture, sem mudar os saldos esperados.
+O caso inativo isolado foi repetido; não se repetiram os oito já aprovados.
+Dois consumidores existentes passaram: P06 reassign preservando indicação e ENT
+com consumo confirmado/retorno real. Logs transfer-bilateral-*, transfer-inactive,
+transfer-cancel-compatibility e transfer-counterparty-boundaries preservados.
+
+Três fronteiras API passaram: declaração estrita/quantidade exata, separação dos
+comandos e conflito seguro. O caso UTF-16 reprovou o limite inicial do schema para
+501 emojis; o schema agora verifica unidades UTF-16 e mínimo de três caracteres,
+alinhado ao banco. Recheck passou, mantendo as negativas. A API de recuperação
+exige ent.read; o banco decide novas escritas e autoria.
+
+Interface /transferencias usa gaveta única, seleção explícita das três partes,
+materiais/quantidades base, origem documental opcional e motivo próprio. Consulta,
+erro inicial, vazio, comparação e adoção são explícitos. Pacote incerto permanece
+congelado até recuperação, inclusive depois da perda de ent.create. O detalhe
+mostra atos preservados; tarefas de concordância/expedição são filtradas antes da
+paginação. Recusa/encerramento não geram recebimento. O percurso ENT anterior foi
+mantido; não há remoção nem migração silenciosa de intenções pendentes.
+
+Dois percursos Chromium distintos passaram entre rodadas dirigidas. O primeiro
+confirma os três autores, resposta de declaração perdida após commit, perda de
+escrita e recuperação do mesmo pacote, saldo inativo, expedição e aceite3/5;
+axe/overflow 320/390/768/1440 e PDF real. O segundo produz referência obsoleta por
+consumo confirmado, falha de consulta503, adoção explícita e campos preservados;
+depois encerra a proposta durante o parecer e exige comparar/adotar sem reabrir
+ato encerrado. Justificativa e foco permanecem. Fontes estáveis nos runners,
+sem suíte mutável de banco em paralelo. Tipos/build dos runners passaram.
+
+O primeiro teste esperava403 ao solicitar saldos sem stock.family.read; o contrato
+existente responde200 com somente dados autorizados. Corrigida a expectativa,
+as negativas verificam ausência de FAMILY nos movimentos/métricas e family NULL
+no overview. Uma fixture manteve ent.create revogada também ao tentar uma nova
+concordância, corretamente recusada; restaurada somente após concluir a prova de
+recuperação, antes do ato novo. Não houve relaxamento da autorização.
+
+A primeira rodada visual reproduziu perda de foco no conflito; a restauração
+agora ocorre após o fieldset voltar a habilitar. Screenshot também mostrou
+quantidade de declaração rotulada Expedido; o componente agora mostra Declarado
+até a expedição efetiva. O novo percurso exige essa distinção. Depois da segunda
+rodada, só o percurso ainda falho foi repetido. Relatório final do primeiro em
+transfer-three-actors-report.html; aprovação do conflito no log da segunda rodada.
+
+PDF transfer-8c8d7657-b718-40ef-b4de-971d0661f8ff-v4, três páginas:
+SHA-256 149236af170ef4e43e8fe35f8f131626507aa73495d6014f8318a5dcb66230a3.
+Bytes registrados/API, hash canônico, quatro eventos, autores distintos e ledger
+foram confrontados independentemente. As duas primeiras versões não têm protocolo
+ou aceite; somente expedição5 e recebimento3 acrescentaram movimentos. O arquivo
+registrado foi preservado. Sua inspeção achou seta sem glifo na página2: fonte
+final usa a palavra para. Só o renderizador foi chamado novamente, sem repetir
+E2E, com o mesmo snapshot/hash e sem alterar registro/estoque. Artefato separado
+-final-renderer.pdf tem SHA-256
+ac8749d54017b02903421da4bf5e515a839518959fd4675f18fde9545ad29d0e.
+As três páginas finais foram inspecionadas; nomes, aceite3, divergência2, origem,
+declaração/concordância, histórico e hash estão legíveis. Esse segundo arquivo
+não é o render anterior registrado na API; CI deve produzir o PDF novo pelo fluxo
+real no SHA publicado. Manifestos -source/-database/-integrity/-verification e
+PNGs adjacentes preservam a distinção. Screenshot320 inspecionado; sem prova
+humana/AT/zoom400%/aparelho/provedor ou assinatura digital.
+
+Advisor all, local, manteve exatamente as doze chaves WARN do incremento anterior,
+onze initplan e unaccent/public. A primeira conexão CLI expirou; Docker SQL e
+probe TCP confirmaram a stack, e uma nova consulta concluiu sem diferenças.
+116 migrations agora no conjunto; 84 históricas preservadas. Replay limpo/legado,
+integração completa e suítes gerais ficam na CI do novo SHA. CI 42184146007 de
+57f6cdc estava in_progress na consulta pontual; não certifica este incremento.
+Sem merge, alteração remota, envio externo ou conclusão global de D-A. C7-AC-010
+continua parcial até equivalência integral e tratamento das intenções antigas;
+a interface anterior permanece. Demais critérios D2 continuam em execução.
+
+Na consulta final disponível do mesmo run83/57f6cdc, database, checks gerais
+Windows/Ubuntu, Chromium e mobile concluíram success. Logs confirmaram replay
+limpo/legado, regressões SQL/search_path e 203/203 integrações. A correção do
+rascunho BAL e a seleção materializada foram exercitadas no dataset limpo da CI.
+iOS passou97/falhou1, incluindo retry: o consumidor do reconto sem contador
+encontrou BAL-0001 no DOM, mas oculto. A investigação desse consumidor é um
+incremento separado, sem mudar os testes aprovados de transferência. Esses
+resultados pertencem a 57f6cdc; não aprovam o SHA seguinte de P07.

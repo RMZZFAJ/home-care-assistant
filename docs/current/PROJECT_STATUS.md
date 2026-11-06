@@ -105,6 +105,24 @@ na base local retida, parou antes por duplicate review required, sem reset para
 repetir o ambiente. 115 migrations publicadas neste incremento; CI posterior
 ainda necessária. P07 permanece em implementação, separado desta correção.
 
+Transferência bilateral P07 recebeu banco, API, preparação e decisões na interface.
+Juliana declara cinco, Ana concorda e Bruno recebe três: TEAM5/FAMILY23/TRANSIT2.
+Declaração/concordância não movem estoque; expedição preserva protocolo/motor ENT.
+Treze casos Auth distintos, dois consumidores Auth anteriores, três fronteiras
+API e dois percursos Chromium distintos passaram entre rodadas dirigidas.
+Incluem saldo inativo, consumo/cancelamento sem segundo débito, recuperação após
+perda de escrita, RLS, CAS e quatro esperas tardias de perfil. Axe/overflow em
+quatro larguras; PDF de três páginas confrontado com snapshots/hash/ledger.
+O artefato registrado pela API foi preservado; após corrigir um glifo da legenda,
+o renderizador final foi conferido diretamente em outro artefato, sem substituir
+o arquivo registrado. CI precisa gerar o novo PDF por sua rota no SHA publicado.
+116 migrations; mesmas doze advertências do advisor. A UI anterior foi mantida:
+equivalência integral, migração das intenções antigas e demais critérios D2
+continuam em execução. CI de 57f6cdc confirmou checks gerais Windows/Ubuntu,
+replay limpo/legado e 203 integrações, Chromium e mobile. iOS passou97/falhou1:
+reconto sem contador encontrou o código no DOM, mas oculto na tela. Investigação
+dirigida desse consumidor em andamento; não se declarou aprovação global.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

@@ -401,6 +401,40 @@ pg_cron agenda ciclo documental e worker;
 credencial
 e URL do worker ficam no Vault, configuradas pela RPC de serviço dedicada.
 
+## Transferência bilateral entre custódias
+
+ent_transfers complementa a ENT com declarante, contraparte, recebedor original,
+origem documental opcional e estados pending/agreed/declined/withdrawn/dispatched.
+Declaração, decisão pessoal, encerramento e instante de expedição são preservados
+por trigger; clientes não escrevem ou removem registros. SELECT exige ent.read e
+documento ENT do mesmo paciente. private.transfer_commands guarda intenção e
+resultado por ator/chave, sem acesso direto de clientes.
+
+transfer_preparation só revela saldo da custódia autorizada. O hash inclui
+pessoas, materiais, saldo disponível e origens documentais. Declaração revalida
+essa referência depois das esperas, congela linhas e nomes e não reserva ou
+move material. Não há quantidades predefinidas nem saldo oficial editável.
+
+transfer_command serializa estoque, documento e transferência, exige versão
+exata e revalida autoridade ao finalizar. Concordância/recusa não atribuem aceite
+nem geram movimento. Dispatch reutiliza a cadeia ENT preservada, com Auth do
+declarante efetivo: protocolo e movimento origem → trânsito ocorrem apenas nesse
+ato. A contraparte continua distinta do recebedor, mesmo quando uma pessoa ocupa
+os dois papéis. Só o aceite pessoal positivo credita o destino.
+
+Material inativo com saldo positivo pode seguir destinação física, sem reativar
+o catálogo ou zerar o saldo por inferência. Cancelamento posterior preserva a
+conciliação ENT com consumo confirmado e retorno real. Encerramento de proposta
+não expedida, inclusive por administrador, registra sua autoria e não substitui
+concordância ou recebimento de pessoa indisponível.
+
+Snapshots incluem somente fatos da transferência; flags de ação do leitor não
+entram no hash canônico. Nenhum papel/capacidade recebe novo grant padrão. O motor
+anterior fica sem execução direta por clientes, e as tarefas pessoais são
+selecionadas antes do limite da lista. A interface ENT anterior continua
+disponível enquanto a equivalência integral e as intenções antigas não forem
+reconciliadas para sua substituição.
+
 ## Verificação
 
 D-A corrigiu o lote REQ na migration 20261105070428: terminais/históricos
