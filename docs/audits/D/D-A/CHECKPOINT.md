@@ -1740,3 +1740,30 @@ Mobile passou101/falhou1 também no retry, em consumption.spec.ts:320, opção
 interceptada pelo portal. Esse consumidor anterior será tratado separadamente;
 não se declarou CI global verde. O novo SHA continua dependente da própria CI.
 D-A permanece em execução, sem merge ou mutação remota.
+
+## D2.25 — seleção física do material no consumidor mobile de consumo
+
+CI42250234690/52cb54e, job128009328870: consumption.spec.ts:320 falhou também no
+retry ao clicar na opção. Log confirma interceptação pelo FluentProvider do
+portal; os outros101 casos mobile passaram. Chromium/WebKit e banco/checks
+gerais desse SHA concluíram success. Não se repetiu essa matriz inteira.
+
+Artefato13522260427 foi conferido com SHA-256
+c9ee6e03492c8494f3109cef553a4196a84868268ac363e461020055e623019c.
+Somente os dois PNGs foram extraídos para nomes gerados e inspecionados; o
+manifesto preserva origem/hash. A falha não se reproduziu na execução local
+anterior à alteração: o caso mobile passou. Não se declarou reprodução local.
+
+A etapa anterior preenchia o combobox sem começar por clique visível. O teste
+agora clica no campo, exige campo/opção inteiros no viewport e confere que o
+centro da opção recebe o ponteiro antes da seleção. Geometria anterior/posterior
+e viewport ficam anexados. Não há force, dispatch de evento ou sleep para
+contornar o alvo. As asserções posteriores de pacote, revisão/foco, autoria,
+recuperação da decisão, débito único e atualização da outra sessão permanecem.
+
+Somente esse caso mobile foi repetido após a alteração e passou. Tipos/build do
+runner e lint pertinente passaram. Fonte de produto, banco, permissões e dados
+oficiais não mudaram; fixtures continuam fictícias na stack local verificada.
+Logs consumption-mobile-before/after e relatório final preservados em output.
+117 migrations permanecem; CI do novo SHA ainda necessária, sem aprovação global
+presumida ou homologação humana/aparelho. D-A segue em execução.

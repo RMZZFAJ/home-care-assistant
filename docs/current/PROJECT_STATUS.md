@@ -142,6 +142,12 @@ passou101/falhou1, incluindo retry, em consumidor anterior de consumo com opçã
 interceptada pelo portal. A investigação dessa falha é um incremento separado,
 sem repetir a matriz inteira ou presumir aprovação global do SHA.
 
+O caso mobile de consumo passou localmente antes da alteração, sem reprodução
+declarada. Sua seleção agora começa por clique visível e exige opção inteira no
+viewport/alvo real do ponteiro, com geometria anexada. O mesmo caso dirigido
+passou após a correção, mantendo autoria, recuperação, débito único e segunda
+sessão. Mudança restrita ao teste; a própria CI posterior continua necessária.
+
 Catálogo agora compara identidades e registra inativação, reativação ou sucessor
 com referência, motivo e autoria próprios. Unidades diferentes continuam
 separadas; não há merge, conversão ou transferência implícita. Doze casos Auth

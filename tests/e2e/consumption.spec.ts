@@ -312,12 +312,41 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
     name: "Adicionar material",
     exact: true,
   });
+  const materialBefore = await material.boundingBox();
+  await material.click();
+  await expect(material).toBeInViewport({ ratio: 1 });
   await material.fill("Material fictício V4 0");
   await material.press("ArrowDown");
-  await page
+  const option = page
     .getByRole("option")
-    .filter({ hasText: "Material fictício V4 0 · unidade" })
-    .click();
+    .filter({ hasText: "Material fictício V4 0 · unidade" });
+  await expect(option).toBeInViewport({ ratio: 1 });
+  await expect
+    .poll(() =>
+      option.evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          bounds.x + bounds.width / 2,
+          bounds.y + bounds.height / 2,
+        );
+        return hit === element || Boolean(hit && element.contains(hit));
+      }),
+    )
+    .toBe(true);
+  await test.info().attach("consumption-material-pointer", {
+    body: JSON.stringify(
+      {
+        before: materialBefore,
+        after: await material.boundingBox(),
+        option: await option.boundingBox(),
+        viewport: page.viewportSize(),
+      },
+      null,
+      2,
+    ),
+    contentType: "application/json",
+  });
+  await option.click();
   await page
     .getByRole("textbox", {
       name: "Material fictício V4 0 · quantidade em unidade",
