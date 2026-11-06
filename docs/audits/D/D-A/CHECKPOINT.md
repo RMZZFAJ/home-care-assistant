@@ -877,3 +877,45 @@ mudança no renderer; PDFs anteriores não foram regenerados. Replay de 107
 migrations e suítes completas ficam para a CI do novo SHA. Compensações de
 consumo, transferência bilateral, preview de desligamento, BAL, catálogo e
 demais critérios D2 continuam em execução. Sem conclusão da missão, merge ou GO.
+
+## D2.10 — prévia de desligamento e alvo fixo do vínculo
+
+Recuperação de consumo publicada em 2e9a9a98849f8ff8224925690c4d559ce540dd23.
+Sua CI 42131414896 estava in_progress na consulta pontual, sem verde presumido.
+As duas contraprovas Chromium seguintes falharam antes: alvo trocável no editor
+de função e ausência de pendências no diálogo de revogação.
+
+Migration 20261105235015 acrescenta membership_impact, somente leitura e sem
+novas tabelas. Exige administração local ativa, limita o alvo ao paciente e
+respeita ent.read/bal.read/schedule.read.team em cada grupo. Sem acesso retorna
+fonte indisponível e total desconhecido, nunca zero. Totais completos antecedem
+os recortes de 20 registros/20 linhas por ENT. Inclui aceite/trânsito preservado,
+regularizações designadas, responsabilidade BAL atual, adiamentos ainda não
+aprovados, plantões em andamento/futuros e propostas de escala.
+
+Cinco casos Auth passaram: leitura sem alterar membership/documento/ledger/
+auditoria, papéis/contextos/alvo estrangeiro, fontes negadas sem falso zero,
+BAL vigente/adiamento pendente e revogação imediata, 23 ENT com recorte de 20 e
+ACL estreita. A revogação manteve recebedor e aceite originais e não transferiu
+autoria da assignment BAL. A fronteira API recusa alvo ausente/malformado.
+
+Dois percursos novos e o consumidor existente de revogação passaram entre rodada
+e recheck: função da mesma pessoa sem seletor de outra conta, flags legadas
+compatíveis preservadas, outro vínculo intacto e outra conta em fluxo explícito;
+revogação mantém acesso legítimo da conta a outro paciente; prévia mostra 2/3
+aceitos e 1 em trânsito, conserva última consulta após 503 e permite Revogar agora.
+O terceiro caso expôs perda de foco ao desabilitar Atualizar pendências: o foco
+voltava ao body, fora do modal. Corrigido retorno ao botão após a resposta;
+somente esse caso foi repetido, com foco/axe/overflow a 320/390/768/1440.
+O editor também passou axe/overflow nessas quatro larguras. Captura de 320 px
+membership-urgent-284b1d71-883c-4e6a-9f80-2780cae11ff8-chromium.png foi inspecionada.
+
+O ajuste pontual C030 é compatibilidade da superfície de vínculos usada em D2;
+não inicia a persistência/recuperação geral D3, lote original daquele critério.
+Vínculo revogado usa reativação explícita; autoria anterior permanece intocada.
+Advisor local sem novo alerta: somente unaccent/public histórico. 108 migrations
+no conjunto. Lint/Markdown pertinentes e tipos/build do runner passaram;
+o aviso de nome de ref foi corrigido e só seu arquivo foi revalidado.
+Instalação limpa/evolução legada e suítes gerais ficam para a CI
+do novo SHA. Sucessão/contagem BAL futura completa, P07 e demais critérios D2
+continuam em execução, sem merge, GO ou homologação humana/física/provedor.

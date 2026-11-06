@@ -271,7 +271,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           />
         )}
         {section === "catalog" ? <CatalogueManagement rows={rows} templates={templates} save={execute} busy={busy} error={error} loading={loading} /> : null}
-        {section === "memberships" ? <MembershipManagement rows={rows} directory={directory} save={execute} busy={busy} error={error} /> : null}
+        {section === "memberships" ? <MembershipManagement rows={rows} directory={directory} save={execute} busy={busy} error={error} patientId={patientId} /> : null}
         {section === "invitations" && (
           <>
             <section className={panelClass}>

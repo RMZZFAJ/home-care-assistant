@@ -280,6 +280,15 @@ pedidos de cancelamento e tarefas administrativas designadas. stock_history
 expõe reference_document_id de regularização somente com ent.read do paciente,
 permitindo chegar ao dossiê sem abrir acesso ao conteúdo por uma referência.
 
+membership_impact é uma RPC somente leitura para administração local ativa,
+com alvo limitado a membership do mesmo paciente. Grupos usam ent.read, bal.read
+e schedule.read.team efetivos, sem contornar leituras explicitamente negadas.
+Contagens completas e recortes limitados vêm do mesmo read model; sem permissão
+o total é desconhecido. BAL considera a responsabilidade mais recente do ciclo
+aberto; proposta de adiamento não é tratada como transferência já aprovada.
+Não executa scheduler, comando, auditoria ou alteração de estoque/membership.
+Execução exclusiva a authenticated, com autorização no corpo e search_path vazio.
+
 P06 deriva sugestão das scheduled_shifts publicadas vigentes e pessoas
 vinculadas/ativas com ent.receive efetivo no destino. Múltiplas pessoas não
 produzem sugestão arbitrária; flags não transformam papel incompatível em

@@ -369,6 +369,24 @@ pública para saldo negativo. Transferência entre custódias usa ENT.
 
 ## Administração, identidade e canais
 
+GET /api/admin/membership-impact recebe careRecipientId/userId e exige gestão
+local ativa. O alvo precisa ter vínculo neste paciente. membership_impact retorna
+ENT pendentes com aceite/trânsito por material, regularizações designadas, BAL
+vigente, adiamentos pendentes, plantões em andamento/futuros e propostas de escala.
+Cada grupo respeita a capacidade de leitura do processo: falta de acesso retorna
+available=false/total=null, nunca zero inventado. Totais antecedem o limite de
+20 registros por grupo e 20 linhas por ENT; a interface informa o recorte.
+
+A consulta não revoga, transfere, recebe, conta, aprova ou movimenta estoque.
+Revogar agora permanece disponível durante carregamento/erro da prévia, usando
+o comando de revogação existente com autorização vigente no servidor. Após a
+revogação, P05 e os processos de BAL/escala encaminham as tarefas futuras sem
+atribuir a outra pessoa a autoria do passado. Atualizar a prévia conserva a
+última consulta identificada e restaura foco após a resposta.
+
+Editar função mantém a identidade da conta em leitura; outra conta usa vínculo
+ou convite explícito. Vínculo revogado usa a ação própria de reativação.
+
 /api/admin administra recursos locais e contas globais conforme autorização.
 Convites são criados, reemitidos e revogados por administração local;
 registro e aceite usam /api/invitations/register e /api/invitations/accept.

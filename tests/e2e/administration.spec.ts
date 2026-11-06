@@ -213,7 +213,7 @@ test.describe("administração integrada no ambiente local", () => {
         response.request().postDataJSON().action === "membershipStatus",
     );
     await member.getByRole("button", { name: "Revogar", exact: true }).click();
-    await page.getByRole("button", { name: "Confirmar alteração", exact: true }).click();
+    await page.getByRole("button", { name: "Revogar agora", exact: true }).click();
     expect((await revoked).ok()).toBeTruthy();
     await expect(
       page.getByText("Estado do vínculo atualizado.", { exact: true }),

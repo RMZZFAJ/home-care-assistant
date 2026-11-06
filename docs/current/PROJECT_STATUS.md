@@ -101,8 +101,7 @@ da identidade, incluindo decisões de cancelamento e apuração designada, com
 contagem/filtro antes da página. Quatorze casos Auth e três testes API passaram
 em rodadas dirigidas; quatro tarefas Chromium e dois PDFs de fatos distintos
 passaram, com as seis páginas finais inspecionadas. Limites no checkpoint.
-Preview de
-desligamento, transferência bilateral e demais processos D2 continuam abertos.
+Transferência bilateral e demais processos D2 continuam abertos.
 
 Consulta de d6db5f0/CI 42121891337: checks gerais e replay/integrações aprovados;
 WebKit aprovado, Chromium/móvel com 74 aprovados e uma falha comum de retomada
@@ -119,6 +118,15 @@ afetadas passaram. CI de 20601f5/42129515456 estava in_progress na consulta
 pontual, sem resultado presumido. Dois percursos Chromium passaram: confirmação
 com escrita perdida e complemento recuperado depois da conferência de outra
 pessoa, sem reabrir relato nem duplicar débito. Evidências no checkpoint.
+
+Prévia de desligamento agora informa ENT, regularizações, BAL e escala sob as
+permissões reais de cada processo, sem alterar fatos ou impedir revogação
+urgente durante erro/carregamento. Cinco casos Auth, fronteira API e três
+percursos Chromium passaram entre rodada/recheck, incluindo outro paciente
+preservado e retorno de foco após falha da consulta. Editor mantém a mesma
+pessoa e outra conta usa fluxo explícito. Mudanças gerais D3 e sucessão BAL
+futura completa continuam separadas. A nova migration totaliza 108; replay e
+suítes gerais do novo SHA permanecem para a CI programada.
 
 O núcleo REQ/COM/ENT/BAL completo continua em execução. Evidências por camada e
 falhas intermediárias estão no checkpoint. A CI de `001158b` aprovada não
