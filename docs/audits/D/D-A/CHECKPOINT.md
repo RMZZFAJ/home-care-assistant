@@ -1901,3 +1901,63 @@ Logs remaining-need-*, artefatos/canônicos/relatórios preservados em output.
 CI42268778746/563aaf2 estava in_progress na consulta pontual;6fcf85c foi cancelled.
 Nenhum desses estados valida o novo SHA. D-A e demais critérios continuam em
 execução, sem merge, humano/AT/aparelho/provedor real ou alteração remota.
+
+## D2.29 — base privada REQ/BAL e prazo Auth após espera
+
+C17 recebeu APIs e persistência privada mínima; integração visual continua
+em execução, sem fechar o critério. Novas tabelas privadas mantêm dados parciais
+tipados por paciente/titular/tipo/alvo, revisão/instante do servidor e chave
+própria. Nenhum documento, protocolo, ciência, estoque ou arquivo é criado ou
+apagado por save/descarte. Dados inválidos para emissão podem ser salvos para
+revisão; timestamps e referências tipadas continuam validados. Sem TTL, limpeza
+automática, painel genérico ou expansão COM/ENT da D3.
+
+Save/descarte e confirmação usam mutex do slot e revisão exata. Motores nativos
+REQ/BAL continuam responsáveis por autorização, emissão e efeitos oficiais.
+Consumo privado é atômico com confirmação e tem resultado próprio recuperável;
+descarte posterior não remove documento/ready. Dados consumidos são preservados
+para as decisões de retenção futuras; reconhecimento técnico libera o slot,
+sem significar ciência ou leitura humana do documento. RLS defensiva e grants
+privados foram revisados; outra pessoa administradora não lê o conteúdo.
+
+Dez casos Auth distintos passaram entre rodadas dirigidas: dez saves parciais
+sem efeito oficial ou sequência; outra sessão real retoma modo/data/valor;
+privacidade frente a adminA; disputa5→6 e adoção explícita para7; confirmação
+única REQ e recuperação após perda só de escrita; recusa de descarte consumido
+e reconhecimento com leitura viva; descarte conserva documento e objeto real
+ready no Storage pelo mesmo SHA; BAL parcial só emite ao concluir; revisão de
+alvo BAL legado; disputa descarte/emissão; recuperação de save após outra
+revisão; esperas observadas de slot/perfil com42501/rollback; dados forjados,
+tempo inválido e grants estreitos. O arquivo ready é fictício/local e sua
+finalização usa o worker controlado; não prova scanner/provedor externo.
+
+A contraprova de timestamp inicialmente aceitou tomorrow; validação do novo
+helper passou a exigir ISO/data real e UUIDs tipados, preservando null/valor
+parcial. Só o caso afetado foi repetido. O alvo documental BAL do controle
+ainda não tinha protocolo: a conclusão nativa atribuiu o primeiro número1.
+A expectativa inicial de conservar sequência vazia estava errada e foi
+corrigida, preservando a asserção de nenhum efeito no save privado e a história
+anterior. Não se declarou duplicação de protocolo no produto.
+
+Investigação dirigida de C068 mostrou private.auth_session comparando prazo
+com now, congelado no começo da transação. Contraprova Auth real esperou o
+mutex, fixou prazo futuro após a entrada e observou clock_timestamp ultrapassá-lo
+sem revogar conta/papel/vínculo/sessão; a escrita ainda passou antes da correção.
+O helper compartilhado usa relógio real e volatilidade coerente, com mesmos
+joins/ACL. Depois passaram três casos Auth: rascunho, emissão REQ e movimento
+familiar, cada qual com controle positivo e espera observada. Efeitos são
+revertidos por42501 após prazo expirado. Não é evidência de token falso nem
+mero tempo decorrido; logfile session-deadline-before/after preservado.
+
+Cinco fronteiras API e o consumidor anterior de comprovante passaram. Tipos
+foram verificados somente para APIs/validações afetadas, por tsconfig temporário
+que importa seus consumidores; não se repetiu o typecheck geral. Lint pertinente
+passou. Preparo local registrou20261106185554 na stack correta, sem reset;
+refinamentos da migration não publicada aplicaram apenas helpers/índice novos
+e o corpo Auth compartilhado.119 migrations; as84 históricas permanecem.
+Replay limpo/legado e integração completa ficam na CI do SHA publicado.
+
+CI42274035931/5fd3f53 estava in_progress e563aaf2 foi cancelled na consulta
+pontual. D-A continua em execução, sem merge, alteração remota ou homologação
+humana/AT/aparelho/provedor. Formulários e tarefa visual C17 são o próximo
+consumidor, não evidência já concluída.

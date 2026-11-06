@@ -489,3 +489,26 @@ diagnósticos diretamente. Evidências e limites no
 concorrente,
 Auth real e E2E. Backups permanecem fora do Git. A matriz registra evidências
 da revisão atual; resultados anteriores não substituem gates da evolução.
+
+## Preenchimento privado mínimo de REQ/BAL
+
+private.creation_drafts guarda conteúdo parcial v1 próprio, paciente, tipo,
+alvo BAL quando existente, revisão e instante do servidor. Um slot ativo ou
+consumido não reconhecido existe por titular/paciente/tipo/alvo. Save e descarte
+não chamam emissão, protocolo, ledger, ciência ou remoção de arquivo. Descarte
+explícito limpa apenas conteúdo ativo elegível; objetos oficiais e ready não
+participam desse comando. Sem TTL ou cron de limpeza inventados.
+
+private.creation_draft_commands conserva hash da intenção e resultado técnico
+por chave própria; saves não copiam todo o preenchimento em histórico a cada
+tecla. Mutex da chave e do slot, CAS e lock da linha protegem save/descarte e
+confirmação. commit_creation_draft compõe os motores nativos REQ/BAL e registra
+o ID real consumido na mesma transação. Rascunho documental BAL legado pode
+ser alvo explícito: sua história é preservada; no controle nativo, ainda não
+possuía protocolo antes da conclusão. A base nova também conserva campos
+incompletos que não podem ser enviados como contagem oficial. UI em execução.
+
+A dependência D1 private.auth_session usa clock_timestamp e volatilidade real
+para prazos not_after. now congelava o início da transação e permitia comando
+cuja sessão expirou enquanto aguardava o lock. A mudança conserva os mesmos
+joins/ACL e exige prazo vivo nas revalidações posteriores.

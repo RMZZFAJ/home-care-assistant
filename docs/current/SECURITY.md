@@ -169,3 +169,20 @@ operacionais necessárias. Retenção, base legal e operadores devem ser
 definidos pelo controlador. Resultados atuais e limites ficam em
 [PROJECT_STATUS](PROJECT_STATUS.md); execuções arquivadas são datadas, não
 comprovação atual de homologação externa.
+
+## Rascunho próprio e prazo Auth durante espera
+
+Rascunhos REQ/BAL usam tabelas privadas com RLS defensiva e nenhum grant de
+leitura/escrita direta para clientes ou service_role. RPCs públicas têm grant
+somente authenticated; helpers privados ficam sem EXECUTE dos clientes. Dono
+sempre vem de auth.uid, com sessão/contexto/vínculo e leitura do domínio vivos.
+Papel administrativo de outra pessoa não libera o preenchimento. Save/descarte
+novos exigem capacidade de escrever; chave confirmada e reconhecimento técnico
+do resultado exigem leitura viva. Campos de autor/estado/quantidade solicitada
+não são transportados como controles de autorização. Logs não recebem conteúdo.
+
+O prazo absoluto de auth.sessions.not_after é confrontado com o relógio real,
+também depois de espera. Revogar a sessão e expirar seu prazo durante uma
+transação são contraprovas distintas: ambas devem recusar a escrita e reverter
+efeitos. Três regressões com Auth real cobrem o prazo em rascunho, REQ e estoque
+familiar; não usam token forjado nem inferem expiração só de um sleep.

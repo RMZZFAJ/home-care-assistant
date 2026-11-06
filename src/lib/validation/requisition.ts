@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { exactQuantity } from "./documents";
+import { draftCommitSchema } from "./creation-drafts";
 
 const quantity = exactQuantity
   .transform(Number)
@@ -66,6 +67,7 @@ export const requisitionInputSchema = z
       )
       .max(50),
     idempotencyKey: z.string().uuid(),
+    draftCommit: draftCommitSchema.optional(),
     remainingNeed: z
       .object({
         requisitionId: z.string().uuid(),

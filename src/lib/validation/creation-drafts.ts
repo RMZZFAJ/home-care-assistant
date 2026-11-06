@@ -1,0 +1,153 @@
+import { z } from "zod";
+const id = z.uuid(),
+  revision = z.number().int().positive().max(2147483647);
+const text = (max: number) =>
+  z
+    .string()
+    .refine(
+      (value) => value.length <= max,
+      `Este campo permite até ${max} caracteres.`,
+    );
+const observation = {
+  currentStock: z
+    .union([text(64), z.number().finite()])
+    .nullable()
+    .default(null),
+  stockObservation: z
+    .enum(["observed", "unknown", "unfilled", "legacy_unclassified"])
+    .optional(),
+  stockObservationAt: z.iso
+    .datetime({ offset: true })
+    .max(40)
+    .nullable()
+    .optional(),
+};
+export const requisitionDraftContent = z
+  .object({
+    lines: z
+      .array(
+        z
+          .object({
+            productId: text(120).min(1),
+            productName: text(200),
+            category: z.enum(["medicamentos", "higiene", "dieta"]),
+            unit: text(80).optional(),
+            ...observation,
+            urgent: z.boolean(),
+            repeatReason: text(1000).optional(),
+          })
+          .strict(),
+      )
+      .max(1000),
+    extraItems: z
+      .array(
+        z
+          .object({
+            id: text(120).min(1),
+            name: text(200),
+            ...observation,
+            urgent: z.boolean(),
+          })
+          .strict(),
+      )
+      .max(20),
+    observations: z.array(text(1000)).max(50),
+    remainingNeed: z
+      .object({ requisitionId: id, version: revision, reason: text(1000) })
+      .strict()
+      .optional(),
+  })
+  .strict();
+export const balanceDraftContent = z
+  .object({
+    counts: z
+      .record(text(120).min(1), text(64))
+      .refine((value) => Object.keys(value).length <= 1000),
+    observationTimes: z
+      .record(
+        text(120).min(1),
+        z.iso.datetime({ offset: true }).max(40).nullable(),
+      )
+      .refine((value) => Object.keys(value).length <= 1000),
+    notes: text(3000),
+    materials: z
+      .array(
+        z
+          .object({
+            id: text(120).min(1),
+            name: text(200),
+            unit: text(80),
+            quantityDecimals: z.number().int().min(0).max(6),
+          })
+          .strict(),
+      )
+      .max(1000),
+    context: z
+      .object({
+        mode: z.enum(["legacy", "scheduled"]),
+        documentId: id.nullable(),
+        documentVersion: revision.nullable(),
+        assignmentId: id.nullable(),
+        assignmentVersion: revision.nullable(),
+        referenceRevision: z.string().regex(/^\d+$/).max(20).nullable(),
+      })
+      .strict(),
+  })
+  .strict();
+const scope = {
+  careRecipientId: id,
+  targetDocumentId: id.nullable(),
+  id: id.nullable(),
+  expectedRevision: revision.nullable(),
+  idempotencyKey: id,
+};
+export const creationDraftCommandSchema = z
+  .union([
+    z
+      .object({
+        ...scope,
+        kind: z.literal("REQ"),
+        action: z.literal("save"),
+        content: requisitionDraftContent,
+      })
+      .strict(),
+    z
+      .object({
+        ...scope,
+        kind: z.literal("BAL"),
+        action: z.literal("save"),
+        content: balanceDraftContent,
+      })
+      .strict(),
+    z
+      .object({
+        ...scope,
+        kind: z.enum(["REQ", "BAL"]),
+        action: z.enum(["discard", "acknowledge"]),
+      })
+      .strict(),
+  ])
+  .superRefine((value, ctx) => {
+    if (
+      (value.id === null) !== (value.expectedRevision === null) ||
+      (value.action !== "save" && value.id === null) ||
+      (value.kind === "REQ" && value.targetDocumentId !== null)
+    )
+      ctx.addIssue({
+        code: "custom",
+        message: "Confira a identidade e a revisão do seu rascunho.",
+      });
+    if (
+      value.kind === "BAL" &&
+      value.action === "save" &&
+      value.content.context.documentId !== value.targetDocumentId
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["content", "context"],
+        message: "O balanço do preenchimento precisa corresponder ao rascunho.",
+      });
+  });
+export const draftCommitSchema = z.object({ id, revision }).strict();
+export type RequisitionDraftContent = z.infer<typeof requisitionDraftContent>;
+export type BalanceDraftContent = z.infer<typeof balanceDraftContent>;

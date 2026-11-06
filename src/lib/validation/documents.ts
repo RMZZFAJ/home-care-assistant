@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { quantity } from "@/lib/quantity";
+import { draftCommitSchema } from "./creation-drafts";
 
 const identifier = z.string().uuid();
 export const exactQuantity = z
@@ -86,9 +87,17 @@ export const createSupplySchema = z
     payload: supplyPayload,
     idempotencyKey: identifier,
     draft: z.boolean().default(false),
+    draftCommit: draftCommitSchema.optional(),
   })
   .strict()
   .superRefine((value, ctx) => {
+    if (value.draftCommit && (value.type !== "BAL" || value.draft))
+      ctx.addIssue({
+        code: "custom",
+        path: ["draftCommit"],
+        message:
+          "Este rascunho confirma somente o balanço; salvar preenchimento usa o fluxo privado.",
+      });
     if (
       value.type === "BAL" &&
       value.payload.lines.some(

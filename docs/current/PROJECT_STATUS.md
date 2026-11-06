@@ -194,6 +194,18 @@ advertências locais; replay limpo/legado e integração completa na CI do novo 
 CI42268778746 de563aaf2 estava in_progress na consulta pontual. D-A continua
 em execução, sem merge ou operação remota.
 
+A base privada de rascunhos REQ/BAL está implementada no banco/API. Dez casos
+Auth distintos passaram entre rodadas, cinco fronteiras API e o consumidor
+anterior de comprovante passaram; tipos dirigidos e lint pertinentes passaram.
+Dez saves não alteram documentos/protocolo/ledger; CAS5→6→7 preserva edição;
+descarte conserva documento e arquivo ready real. Confirmação disputa o mesmo
+lock e consome uma única vez. A interface de retomada está em execução; C17 não
+está concluído. Uma contraprova descobriu prazo Auth congelado por now durante
+espera: helper compartilhado usa relógio real; três casos Auth passaram após
+a correção.119 migrations locais, sem reset; replay/suítes gerais na CI.
+CI42274035931 de5fd3f53 estava in_progress e563aaf2 foi cancelled na consulta
+pontual. Nenhum desses estados valida o novo incremento.
+
 Precisão sem arredondamento, referência compensatória e revogação direta de
 perfil/avatar receberam controles locais no incremento `6e7b627`. Prévia de
 convite, reemissão explícita, senha uniforme e invalidação de perfil foram

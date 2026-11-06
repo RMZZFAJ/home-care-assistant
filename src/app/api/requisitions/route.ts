@@ -136,19 +136,37 @@ export async function POST(request: Request) {
       p_extra_items: extras,
       p_observations: input.observations,
     };
-    const result = input.remainingNeed
-      ? await rpc(auth.client, "submit_remaining_requisition", {
-          ...args,
-          p_source: input.remainingNeed.requisitionId,
-          p_source_version: input.remainingNeed.version,
-          p_reason: input.remainingNeed.reason,
-        })
-      : await rpc(auth.client, "submit_requisition", {
-          ...args,
-          p_payload_hash: createHash("sha256")
-            .update(JSON.stringify(intent))
-            .digest("hex"),
-        });
+    const result = input.draftCommit
+      ? (
+          (await rpc(auth.client, "commit_creation_draft", {
+            p_id: input.draftCommit.id,
+            p_expected: input.draftCommit.revision,
+            p_target: null,
+            p_key: input.idempotencyKey,
+            p_body: {
+              action: "issue_req",
+              lines,
+              extraItems: extras,
+              observations: input.observations,
+              ...(input.remainingNeed
+                ? { remainingNeed: input.remainingNeed }
+                : {}),
+            },
+          })) as { result: unknown }
+        ).result
+      : input.remainingNeed
+        ? await rpc(auth.client, "submit_remaining_requisition", {
+            ...args,
+            p_source: input.remainingNeed.requisitionId,
+            p_source_version: input.remainingNeed.version,
+            p_reason: input.remainingNeed.reason,
+          })
+        : await rpc(auth.client, "submit_requisition", {
+            ...args,
+            p_payload_hash: createHash("sha256")
+              .update(JSON.stringify(intent))
+              .digest("hex"),
+          });
     const persisted = (Array.isArray(result) ? result[0] : result) as {
       requisition_id?: string;
       protocol?: string;

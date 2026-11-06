@@ -128,6 +128,10 @@ export const errorCatalog = {
     recommendedAction:
       "Atualize a tela e revise o estado e as aprovações atuais.",
   },
+  DRAFT_VERSION_CONFLICT: {
+    ...conflict,
+    recommendedAction: "Compare o preenchimento salvo com o seu e escolha explicitamente a revisão para continuar.",
+  },
   PATIENT_INACTIVE: {
     ...conflict,
     recommendedAction:

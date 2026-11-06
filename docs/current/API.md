@@ -685,3 +685,21 @@ O catálogo em src/lib/server/error-catalog.ts define code, categoria,
 retryable, recommendedAction e HTTP. Validação, sessão expirada, capacidade
 negada, paciente inativo, saldo insuficiente, versão antiga, idempotência
 conflitante e dependência externa indisponível têm respostas próprias.
+
+## Rascunhos privados REQ/BAL — base API
+
+GET /api/drafts recebe careRecipientId, kind REQ/BAL e targetDocumentId opcional
+para edição de BAL existente; retorna somente o preenchimento próprio da sessão
+autorizada ou o resultado consumido ainda não reconhecido. POST usa action
+save/discard/acknowledge, id/expectedRevision nulos na criação e a revisão exata
+nas alterações. Conteúdo parcial é tipado por domínio; dono, papel, estado e
+campos arbitrários não são aceitos. Save retorna revisão/instante do servidor.
+DRAFT_VERSION_CONFLICT exige comparação; retry recupera a própria tentativa,
+inclusive quando outra revisão já foi salva, sem adotar essa revisão sozinho.
+
+draftCommit opcional em POST /api/requisitions e na criação/revisão BAL contém
+id/revision do rascunho. A confirmação e o consumo do preenchimento são uma
+transação; disputa com descarte decide uma única vez. COM/ENT não aceitam essa
+referência. Um resultado consumido pode ser reconhecido sem alterar o documento.
+As APIs estão implementadas; integração da retomada aos formulários segue em
+execução. A API por si só não fecha C-FINAL-AC-017 nem a persistência geral D3.

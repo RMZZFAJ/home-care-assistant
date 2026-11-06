@@ -23,6 +23,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/stale private draft revision/i.test(message))
+    throw new ApiError("DRAFT_VERSION_CONFLICT", "O rascunho mudou em outro editor ou já foi concluído. Seu preenchimento foi preservado; compare a revisão salva antes de continuar.", 409);
   if (/stale remaining need source/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "A requisição de origem mudou. Consulte e compare a referência atual antes de confirmar a nova necessidade. Sua seleção e seu motivo foram preservados.", 409);
   if (/stale transfer preparation|stale transfer version|transfer decision already settled|transfer already dispatched or closed|transfer agreement required before dispatch|transfer not dispatched/i.test(message))
