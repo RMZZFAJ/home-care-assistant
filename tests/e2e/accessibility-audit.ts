@@ -2,8 +2,8 @@ import {expect, test} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { accessibilityEvidence } from "../support/accessibility-results";
 import { assertKeyboardEntry } from "./keyboard-entry";
-export async function audit(page: import("@playwright/test").Page, label: string) {
-  await expect(page).toHaveTitle("Home Care Assistant");
+export async function audit(page: import("@playwright/test").Page, label: string, expectedTitle = "Home Care Assistant") {
+  await expect(page).toHaveTitle(expectedTitle);
   if (label === "login") await expect(page.getByLabel("E-mail", { exact: true })).toBeEnabled();
   // Establish a known sequential origin before testing keyboard movement.
   // BODY alone does not identify that origin after pointer/viewport changes.

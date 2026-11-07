@@ -22,9 +22,14 @@ sem reset/seed ou mudança de cron/Auth/Vault. [Relatório](../audits/D/D-B/MIGR
 Arquivador/probe são bases técnicas verificadas; backup diário operacional,
 retenção automatizada e monitoramento ainda não estão ativos. A CI aa9f168
 foi consultada e aprovou todos os jobs principais nos três navegadores.
-SonarCloud desse SHA tinha Reliability D/Security B. Quatro apontamentos PATH
-receberam correção local, com unitários e Auth dirigido; reanálise do SHA novo
-é necessária. PAdES, verificação por upload e PWA/push ainda não implementados.
+SonarCloud desse SHA tinha Reliability D/Security B. Os quatro apontamentos PATH
+desapareceram na análise4315eb9; triagem de ETag/MD5 está
+[documentada](../audits/D/D-B/SONAR_TRIAGE.md). D3.1 distingue consulta e intenção
+incerta, protege a classificação42702 e implementa404 público em português.
+28 testes unitários/API e10 casos browser distintos passaram entre rodadas,
+com401/403, quatro larguras, axe e consumidores anteriores. Os três apontamentos
+UI originais receberam correção local. A CI/Sonar do SHA publicado continua
+necessária. PAdES, verificação por upload e PWA/push ainda não implementados.
 
 ## Implementado no candidato
 

@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   distDir: process.env.HCA_E2E === "true" ? ".next-e2e" : ".next",
   /* config options here */
   experimental: {
+    globalNotFound: true,
     optimizePackageImports: ["@fluentui/react-components", "@fluentui/react-icons"],
   },
   turbopack: {

@@ -9,6 +9,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Matriz de execução](ACCEPTANCE_EXECUTION.csv): 75 critérios C9 preservados e
   complementos próprios, sem aprovação por planejamento.
 - [Duas aplicações remotas](MIGRATIONS.md).
+- [Base operacional e limites](OPERATIONS_DOSSIER.md).
+- [Triagem de qualidade](SONAR_TRIAGE.md).
 
 Branch única `feat/phase-d-implementation`; [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7)
 permanece Draft, sem merge ou promoção operacional. Evidência local, CI,

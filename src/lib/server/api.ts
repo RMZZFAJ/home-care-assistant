@@ -23,6 +23,13 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (error?.code === "42702")
+    throw new ApiError(
+      "INTERNAL_ERROR",
+      "Não foi possível processar esta operação. Informe a referência ao suporte.",
+      500,
+      true,
+    );
   if (/stale schedule type reference/i.test(message)) throw new ApiError("VERSION_CONFLICT", "O tipo de plantão mudou. Consulte e revise os horários atuais antes de confirmar.", 409);
   if (/stale private draft revision/i.test(message))
     throw new ApiError("DRAFT_VERSION_CONFLICT", "O rascunho mudou em outro editor ou já foi concluído. Seu preenchimento foi preservado; compare a revisão salva antes de continuar.", 409);

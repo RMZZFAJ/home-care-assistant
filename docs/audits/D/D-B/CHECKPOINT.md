@@ -31,7 +31,7 @@ Sequência verificável:
 
 1. Reconciliação de contratos, baseline, critérios, CI e Sonar: em andamento.
 2. Preflight, backup verificável e aplicação remota D-A: concluídos em DB.1.
-3. D3, consumidores reais e contraprovas: não iniciado.
+3. D3, consumidores reais e contraprovas: em execução a partir de D3.1.
 4. D4, fidelidade, emissão, PAdES-B-T interno e verificação: não iniciado.
 5. D5, PWA, push e avisos internos: não iniciado.
 6. Base operacional de backup/recuperação/monitoramento: não iniciada, salvo
@@ -80,3 +80,50 @@ qualificada; zero mudança inesperada nos digests das tabelas anteriores. Usuár
 documentos, eventos, movimentos e Storage preservados. Nenhum reset, seed, Vault,
 Auth config, cron ou deploy foi alterado. [Evidência por arquivo](INITIAL_REMOTE_MIGRATIONS.json).
 D-B continua em execução; início de D3 está liberado pelas dependências técnicas.
+
+## D3.1 — erro de consulta, intenção incerta e página não encontrada
+
+Base publicada4315eb9. API cliente distingue consulta e comando também em
+timeout, rede, abort e resposta JSON indecifrável. Erro de leitura orienta
+reconsultar a seção; escrita sem resposta verificável conserva status técnico0
+e estado incerto, inclusive quando um proxy apresenta400 após commit. Não se
+limpa a intenção como se houvesse recusa comprovada. Método HTTP explicitamente
+informado é respeitado mesmo sem payload. Respostas HTTP válidas preservam
+código, status e correlação.
+
+SQLSTATE42702 recebe INTERNAL_ERROR500 seguro antes da classificação por texto.
+Ambiguidade legítima do catálogo mantém409. Resposta e log não expõem coluna,
+SQL ou payload privado. Passaram28 unitários/API, incluindo17 casos de transporte
+e11 guards; lint e tipos passaram. O typecheck geral local foi justificado pela
+mudança transversal do cliente HTTP e nova convenção Next/configuração.
+
+404 público em português usa global-not-found conforme guia Next16.4.2 instalado,
+com flag experimental específica: evita depender do shell/contexto autenticado
+para um endereço que não existe. Heading/main, título próprio, noindex, CTAs,
+teclado e320/390/768/1440 conferidos nos três projetos. API sem sessão permanece
+401; outra tarefa autenticada como profissional recebeu403 e preservou o nome
+do paciente. Nada disso libera dados privados ou modifica autorização.
+
+Dez casos browser distintos aprovados entre rodadas: recuperação GET/save nos
+três projetos, 404 nos três,403 Auth Chromium e os consumidores existentes de
+cadastro por convite, preferência e calendário. Primeira rodada:6/9; os três
+404 falharam no coletor que exigia título único. O coletor agora aceita título
+esperado explícito e conserva o default e todos os asserts anteriores. Recheck
+somente404:3/3. A contraprova403 nova omitia isDevelopment obrigatório e recebeu
+400 de validação; corrigido somente o payload de fixture, recheck1/1. Não houve
+redução de regras, force click, sleep arbitrário ou ampliação de timeout.
+
+A captura do resultado recuperado foi repetida em Chromium após fixar scroll0:
+o primeiro full-page conservava a posição sticky do scroll anterior. Captura
+anterior preservada; a nova mostra título, revisão2 e texto mantido. Capturas
+390 do resultado e do404 mobile foram inspecionadas. Axe e geometria passaram;
+isso não é homologação humana/AT/aparelho. Logs d3-request-first,
+d3-public-404-recheck, d3-context-and-capture e d3-authorized-denial-recheck e
+contraprovas ficam em output/playwright/phase-d. Fontes permaneceram estáveis
+em cada runner, sem suíte mutável de banco em paralelo.
+
+Os três apontamentos UI originais foram tratados, mas CI/Sonar do próximo SHA
+continuam independentes. [Triagem S4790](SONAR_TRIAGE.md) documenta checksum
+legado, controles fortes independentes e credencial do provedor indisponível.
+Não se declara Sonar aprovado. Listas/administração, demais rascunhos/estados,
+guias e critérios compartilhados ainda exigem seus próprios incrementos.

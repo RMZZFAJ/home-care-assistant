@@ -35,7 +35,7 @@ export function SelectedShiftDates({
     onChange(
       selected.includes(date)
         ? selected.filter((value) => value !== date)
-        : [...selected, date].sort(),
+        : [...selected, date].sort((a, b) => a.localeCompare(b, "en")),
     );
   }
   const invalid = selected.filter((date) => date < from || date > until);

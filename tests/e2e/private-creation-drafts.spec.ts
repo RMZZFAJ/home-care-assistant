@@ -63,6 +63,84 @@ async function observations(page: Page) {
   for (let i = 0; i < 5; i++) await next(page);
 }
 
+test("D3 consulta falha pede nova leitura e JSON inválido após save confirmado recupera a mesma intenção", async ({ page }, info) => {
+  const f = await privateDraftFixture(), content = reqContent(f);
+  await rpc(f.pro, "creation_draft_command", savePacket(f, "REQ", content));
+  const before = officialState(f);
+  await login(page, f.patient);
+  let failRead = true;
+  await page.route("**/api/drafts?**", async (route) => {
+    if (failRead) { failRead = false; await route.abort("failed"); }
+    else await route.continue();
+  });
+  await open(page, "REQ");
+  await expect(panel(page)).toContainText("Não foi possível consultar esta seção.");
+  await expect(panel(page)).not.toContainText("Recupere a mesma tentativa");
+  await expect(panel(page).getByRole("button", { name: "Recuperar salvamento ou descarte", exact: true })).toHaveCount(0);
+  await panel(page).getByRole("button", { name: "Consultar novamente", exact: true }).click();
+  await expect(panel(page)).toContainText("Revisão 1");
+  await resume(page); await observations(page);
+  const observation = page.getByLabel("Observação 1", { exact: true });
+  await observation.fill("Edição mantida após resposta inválida, sem outra emissão");
+  const packets: unknown[] = [];
+  await page.route("**/api/drafts", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    packets.push(route.request().postDataJSON());
+    if (packets.length === 1) {
+      const persisted = await route.fetch(); expect(persisted.ok(), await persisted.text()).toBe(true);
+      // A proxy status with an undecodable body is not proof of rejection.
+      await route.fulfill({ status: 400, contentType: "application/json", body: "{invalid" });
+    } else await route.continue();
+  });
+  await save(page).click();
+  await expect(panel(page)).toContainText("A resposta desta ação não pôde ser confirmada.");
+  await expect(save(page)).toBeDisabled();
+  await expect(observation).toHaveValue("Edição mantida após resposta inválida, sem outra emissão");
+  expect((await draftContext(f, "REQ")).revision).toBe(2);
+  await panel(page).getByRole("button", { name: "Recuperar salvamento ou descarte", exact: true }).click();
+  await expect(panel(page)).toContainText("Revisão 2");
+  expect(packets).toHaveLength(2); expect(packets[0]).toEqual(packets[1]);
+  const recovered = await draftContext(f, "REQ");
+  expect(recovered.revision).toBe(2);
+  expect(recovered.content.observations).toEqual(["Edição mantida após resposta inválida, sem outra emissão"]);
+  expect(officialState(f)).toBe(before);
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, `d3-request-recovery-${width}`); }
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await page.screenshot({ path: `output/playwright/phase-d/d3-request-recovery-${info.project.name}.png`, fullPage: true });
+});
+
+test("D3 404 público é português, acessível e conserva respostas de autorização próprias", async ({ page }, info) => {
+  const response = await page.goto("/endereco-publico-inexistente-d3");
+  expect(response?.status()).toBe(404);
+  await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
+  await expect(page).toHaveTitle("Página não encontrada | Home Care Assistant");
+  await expect(page.getByRole("main")).toHaveCount(1);
+  await expect(page.getByRole("heading", { name: "Página não encontrada", level: 1, exact: true })).toBeVisible();
+  const enter = page.getByRole("link", { name: "Entrar na minha conta", exact: true });
+  await expect(enter).toHaveAttribute("href", "/login");
+  await enter.focus(); await expect(enter).toBeFocused();
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, `d3-public-404-${width}`, "Página não encontrada | Home Care Assistant"); }
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.screenshot({ path: `output/playwright/phase-d/d3-public-404-${info.project.name}.png`, fullPage: true });
+  const unauthorized = await page.request.get("/api/context");
+  expect(unauthorized.status()).toBe(401); expect((await unauthorized.json()).code).toBe("SESSION_EXPIRED");
+  await enter.click(); await expect(page).toHaveURL(/\/login$/);
+});
+
+test("D3 403 autenticado permanece próprio após navegar pelo 404 público", async ({ page }) => {
+  const f = await privateDraftFixture();
+  const before = sql(`select display_name from public.care_recipients where id=${sqlLiteral(f.patient)};`);
+  await login(page, f.patient);
+  const response = await page.goto("/outro-endereco-inexistente-d3");
+  expect(response?.status()).toBe(404);
+  const denied = await page.request.post("/api/admin", { data: { action: "recipient", id: f.patient, displayName: "Tentativa fictícia não autorizada", isActive: true, isDevelopment: true } });
+  expect(denied.status()).toBe(403);
+  expect((await denied.json()).code).toBe("FORBIDDEN");
+  expect(sql(`select display_name from public.care_recipients where id=${sqlLiteral(f.patient)};`)).toBe(before);
+});
+
 test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7 sem renovar a data observada", async ({
   page,
   browser,

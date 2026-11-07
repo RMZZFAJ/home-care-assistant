@@ -105,6 +105,19 @@ describe("cookie-authenticated mutation guards", () => {
 });
 
 describe("operational time and safe errors", () => {
+  it("keeps SQL 42702 internal and preserves legitimate catalogue alias conflicts", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const response = await api("d3.classification", async () => databaseError({ code: "42702", message: 'column reference "private_payload_marker" is ambiguous' }));
+      const body = await response.json();
+      expect(response.status).toBe(500);
+      expect(body.code).toBe("INTERNAL_ERROR");
+      expect(body.correlationId).toMatch(/^[a-f0-9-]{36}$/);
+      expect(JSON.stringify(body)).not.toMatch(/private_payload_marker|42702|AMBIGUOUS_PRODUCT/);
+      expect(JSON.stringify(log.mock.calls)).not.toContain("private_payload_marker");
+      expect(() => databaseError({ code: "P0001", message: "ambiguous patient catalogue alias" })).toThrow(expect.objectContaining({ code: "AMBIGUOUS_PRODUCT", status: 409 }));
+    } finally { log.mockRestore(); }
+  });
   it("maps São Paulo date filters across UTC day boundary and validates calendar dates", () => {
     expect(saoPauloDateBoundary("2026-10-20")).toBe("2026-10-20T03:00:00.000Z");
     expect(saoPauloDateBoundary("2026-10-20", true)).toBe(

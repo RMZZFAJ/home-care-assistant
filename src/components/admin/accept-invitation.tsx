@@ -113,7 +113,7 @@ export function AcceptInvitation() {
         <label className="block">Nome<input className={inputClass} name="fullName" autoComplete="name" minLength={2} maxLength={160} required disabled={busy} /></label>
         <label className="block">E-mail do convite<input className={inputClass} name="email" type="email" autoComplete="email" required disabled={busy} /></label>
         <NewPasswordField label="Senha pessoal" className={inputClass} disabled={busy} />
-        <button className={primaryClass} disabled={busy}>{busy ? "Registrando…" : "Criar minha conta"}</button>
+        <button type="submit" className={primaryClass} disabled={busy}>{busy ? "Registrando…" : "Criar minha conta"}</button>
       </form></details></> : null}
     </>}
   </section></main>;
