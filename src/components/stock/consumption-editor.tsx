@@ -11,7 +11,10 @@ import {
 } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { formatQuantity, validQuantity } from "@/lib/quantity";
-import { consumptionCommand } from "@/lib/validation/consumption";
+import { consumptionCommand,consumptionResultConfirmed } from "@/lib/validation/consumption";
+import {TransportError} from "@/lib/client/api";
+import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
+import type {ReminderOrigin} from "@/components/notifications/notification-reference";
 import type { CatalogProduct } from "@/types/documents";
 import type { ConsumptionReport } from "@/types/consumption";
 import { ConsumptionLines } from "./consumption-lines";
@@ -30,6 +33,7 @@ export function ConsumptionEditor({
   onClose,
   onSaved,
   restoreFocusTo,
+  sourceReminder,
 }: {
   context: WorkspaceContext;
   report?: ConsumptionReport;
@@ -40,11 +44,14 @@ export function ConsumptionEditor({
   onClose: () => void;
   onSaved: (id: string, data?: ConsumptionReport) => void;
   restoreFocusTo?: HTMLElement | null;
+  sourceReminder?:ReminderOrigin;
 }) {
+  const [origin]=useState(()=>report?null:sourceReminder??null);
+  const originRead=useNotificationReference(context.patient!.id,"consumption",origin?.id??null,"reminder");
   const [baseline, setBaseline] = useState(report),
     [text, setText] = useState(""),
     [kind, setKind] = useState(""),
-    [location, setLocation] = useState("");
+    [location, setLocation] = useState(origin?"CARE_TEAM":"");
   const [lines, setLines] = useState<Record<string, string>>(() =>
     Object.fromEntries(
       (report?.current_lines ?? []).map((line) => [
@@ -104,6 +111,7 @@ export function ConsumptionEditor({
             careRecipientId: context.patient!.id,
             kind,
             location,
+            ...(origin?{reminderId:origin.id}:{}),
           }),
       text,
       lines: Object.entries(lines).map(([productId, quantity]) => ({
@@ -134,10 +142,7 @@ export function ConsumptionEditor({
         frozenRef.current,
       );
       const id = result.id ?? result.data?.id;
-      if (!id)
-        throw new Error(
-          "Não foi possível identificar o resultado. Recupere a mesma tentativa.",
-        );
+      if (!id||!consumptionResultConfirmed(result,frozenRef.current,context.patient!.id))throw new TransportError("Não foi possível reconhecer a confirmação. Recupere a mesma tentativa.","command","INVALID_CONFIRMATION",undefined);
       frozenRef.current = null;
       setUncertain(false);
       onSaved(id, result.data);
@@ -145,9 +150,9 @@ export function ConsumptionEditor({
       const refused =
         reason instanceof ApiError &&
         [400, 401, 403, 404, 409].includes(reason.status);
-      if (refused) frozenRef.current = null;
-      setUncertain(!refused);
-      setConflict(reason instanceof ApiError && reason.status === 409);
+      if (refused&&!uncertain) frozenRef.current = null;
+      setUncertain(uncertain||!refused);
+      setConflict(!uncertain&&reason instanceof ApiError && reason.status === 409);
       setError(
         reason instanceof Error
           ? reason.message
@@ -179,6 +184,7 @@ export function ConsumptionEditor({
       setBusy(false);
     }
   }
+  if(origin&&(originRead.loading||originRead.error||originRead.data?.kind!=="shift_reminder"||!originRead.data.canReport))return <RecordDrawer title="Registrar relato" onClose={onClose} restoreFocusTo={restoreFocusTo} busy={busy} preventClose={uncertain}><Notice error={Boolean(originRead.error)}>Revalide o acesso ao lembrete antes de exibir o preenchimento preservado. {originRead.error}</Notice><Button type="button" onClick={originRead.refresh}>Revalidar acesso ao lembrete</Button>{uncertain?<Button type="button" disabled={busy} onClick={()=>void send()}>Recuperar tentativa</Button>:null}</RecordDrawer>;
   return (
     <RecordDrawer
       title={baseline ? "Complementar relato" : "Registrar relato"}
@@ -188,6 +194,7 @@ export function ConsumptionEditor({
       preventClose={uncertain}
     >
       {error ? <Notice error>{error}</Notice> : null}
+      {origin?<section aria-label="Origem preservada do relato"><h3 className="font-semibold">Lembrete de origem</h3><p>Referência de {origin.period.split("-").reverse().join("/")}. O relato registra sua declaração atual, sem comprovar presença no plantão.</p><p>Custódia: equipe. A referência não pode ser trocada neste preenchimento.</p></section>:null}
       {baseline ? (
         <section className="my-4">
           <h3 className="font-semibold">
@@ -313,6 +320,7 @@ export function ConsumptionEditor({
               <label className="block text-sm font-semibold">
                 Tipo
                 <select
+                  aria-label="Tipo"
                   className={inputClass}
                   value={kind}
                   required
@@ -326,9 +334,11 @@ export function ConsumptionEditor({
               <label className="block text-sm font-semibold">
                 Custódia
                 <select
+                  aria-label="Custódia"
                   className={inputClass}
                   value={location}
                   required
+                  disabled={Boolean(origin)}
                   onChange={(event) => setLocation(event.target.value)}
                 >
                   <option value="">Escolha a custódia</option>

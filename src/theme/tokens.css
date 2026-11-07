@@ -22,9 +22,11 @@
   --hca-bottom-navigation: 68px;
 }
 
-.hca-theme {
+.hca-theme:not([data-portal-node]) {
   min-height: 100dvh;
   background: var(--background);
+}
+.hca-theme {
   color: var(--foreground);
   font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
 }

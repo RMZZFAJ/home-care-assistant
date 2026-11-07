@@ -1,5 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import {useSearchParams} from "next/navigation";
+import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
+import {NotificationReference} from "@/components/notifications/notification-reference";
 import {
   Badge,
   Button,
@@ -63,8 +66,11 @@ function Agenda({ context }: { context: WorkspaceContext }) {
   const patient = context.patient!,
     team = can(context, "schedule.manage.team"),
     publishOwn = can(context, "schedule.manage.own");
-  const [day, setDay] = useState(today),
-    [mode, setMode] = useState<"week" | "month">("week");
+  const params=useSearchParams(),reference=params.get("ref"),notice=useNotificationReference(patient.id,"schedule",reference,params.get("refKind")??"auto");
+  const [fallbackDay]=useState(today),[chosenDay,setChosenDay]=useState<{reference:string|null;day:string}|null>(null);
+  const day=chosenDay?.reference===reference?chosenDay.day:notice.data?.kind==="schedule"?notice.data.referenceDay:fallbackDay;
+  const setDay=(value:string)=>setChosenDay({reference,day:value});
+  const [mode, setMode] = useState<"week" | "month">("week");
   const [person, setPerson] = useState(""),
     [status, setStatus] = useState(""),
     [attempt, setAttempt] = useState(0);
@@ -136,6 +142,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
     return () => controller.abort();
   }, [patient.id, period.from, period.until, queryKey, rangeKey]);
   function open(value: ScheduleEditor, target: HTMLElement) {
+    setDay(day);
     setOpener(target);
     setEditorWorkspace(data);
     setEditor(value);
@@ -451,6 +458,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
   ) : null;
   return (
     <div className="hca-form-stack hca-schedule-agenda">
+      <NotificationReference key={patient.id+":"+reference} read={notice} context={context}/>
       <div className="hca-command-bar">
         {team || publishOwn || can(context, "schedule.propose") ? (
           <Button

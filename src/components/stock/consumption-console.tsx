@@ -19,6 +19,8 @@ import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDetail } from "./consumption-detail";
 import { FlowReviews } from "./flow-reviews";
 import { parseConsumptionPage } from "@/lib/validation/consumption";
+import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
+import {NotificationReference,type ReminderOrigin} from "@/components/notifications/notification-reference";
 
 type Cursor = { at: string; id: string };
 export function ConsumptionConsole() {
@@ -43,10 +45,11 @@ function Reports({ context }: { context: WorkspaceContext }) {
     [query, setQuery] = useState(() =>
       new URLSearchParams(
         [...params].filter(([key]) =>
-          ["q", "kind", "status", "from", "to"].includes(key),
+          ["q", "kind", "status", "from", "to","sourceReminder"].includes(key),
         ),
       ).toString(),
     );
+  const explicitReport=params.get("refKind")==="report",notice=useNotificationReference(patient,"consumption",explicitReport?null:selected??params.get("sourceReminder"),params.get("refKind")??"auto");
   const [read, setRead] = useState<{ query: string; key: string; rows: ConsumptionSummary[] | null; next: Cursor | null; error: string } | null>(null);
   const [attempt, setAttempt] = useState(0),
     [moreBusy, setMoreBusy] = useState(false);
@@ -59,6 +62,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [editor, setEditor] = useState<HTMLElement | null>(null),
     [message, setMessage] = useState(""),
     [referenceError, setReferenceError] = useState("");
+  const [editorOrigin,setEditorOrigin]=useState<ReminderOrigin|null>(null);
   const listHeadingRef = useRef<HTMLHeadingElement>(null),
     triggerRef = useRef<HTMLElement | null>(null),
     generationRef = useRef(0);
@@ -107,7 +111,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
   }, [patient, catalogAttempt]);
   function open(id: string | null) {
     const values = new URLSearchParams(query);
-    if (id) values.set("ref", id);
+    values.set("careRecipientId",patient);
+    if (id){values.set("ref", id);values.set("refKind","report");}
     router.replace("/consumo" + (values.size ? "?" + values : ""), {
       scroll: false,
     });
@@ -115,11 +120,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
   function filter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = new URLSearchParams();
+    values.set("careRecipientId",patient);
+    const source=new URLSearchParams(query).get("sourceReminder");if(source)values.set("sourceReminder",source);
     for (const [key, value] of new FormData(event.currentTarget))
       if (typeof value === "string" && value.trim())
         values.set(key, value.trim());
-    setQuery(values.toString());
-    if (selected) values.set("ref", selected);
+    const applied=new URLSearchParams(values);applied.delete("careRecipientId");setQuery(applied.toString());
+    if (selected){values.set("ref", selected);if(params.get("refKind"))values.set("refKind",params.get("refKind")!);}
     router.replace("/consumo" + (values.size ? "?" + values : ""), {
       scroll: false,
     });
@@ -150,12 +157,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
   };
   return (
     <div className="space-y-5">
+      <NotificationReference key={patient+":"+notice.reference} read={notice} context={context} onReport={(origin,opener)=>{setEditorOrigin(origin);setEditor(opener);}}/>
       {message ? <Notice>{message}</Notice> : null}
       <div className="hca-toolbar">
         {can(context, "consumption.report") ? (
           <Button
             appearance="primary"
-            onClick={(event) => setEditor(event.currentTarget)}
+            onClick={(event) => {setEditorOrigin(null);setEditor(event.currentTarget);}}
           >
             Registrar ocorrência
           </Button>
@@ -310,7 +318,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           </Button>
         ) : null}
       </section>
-      {selected ? (
+      {selected&&(explicitReport||notice.data?.kind==="report") ? (
         <ConsumptionDetail
           key={selected}
           id={selected}
@@ -331,6 +339,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
       ) : null}
       {editor ? (
         <ConsumptionEditor
+          key={editorOrigin?.id??"standalone"}
+          sourceReminder={editorOrigin??undefined}
           context={context}
           products={products}
           catalogError={catalogError}

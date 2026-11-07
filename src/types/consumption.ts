@@ -17,6 +17,7 @@ export type ConsumptionSummary = {
   reported_name: string | null;
 };
 export type ConsumptionReport = ConsumptionSummary & {
+  source_reminder_id?:string|null;
   lines: ConsumptionLine[];
   current_lines: ConsumptionLine[];
   confirmed_by: string | null;

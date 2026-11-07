@@ -7,9 +7,24 @@ CI do SHA publicado é gate independente; pending não significa aprovação.
 CI dfdc7de, run42335739149, concluiu banco, validate Ubuntu/Windows e os três
 projetos browser com SUCCESS. Inclui a correção D3.4a dos consumidores de
 governança que falharam em bd8747b e os estados de leitura D3.4. Essa CI não
-valida os incrementos posteriores. Local133/remoto121;12 migrations D-B
+valida os incrementos posteriores. Local136/remoto121;15 migrations D-B
 aguardam o lote remoto final autorizado.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
+
+CI639b5cb, run42354352749, aprovou banco/validate, mas falhou em preparação
+global Chromium e largura de entregas WebKit; central teve uma tentativa
+instável. D3.9 corrigiu essas causas e passou27/27 casos dirigidos em produção
+nos três projetos, além de9 Auth e27 unitários/API. Avisos resolvem recurso,
+dia/fuso e origem reais; resposta pessoal e relato vinculado recuperam a mesma
+intenção sem baixa de estoque/SCI. [Evidências](../audits/D/D-B/D3_9_EVIDENCE.json).
+CI do novo SHA publicado continua gate separado.
+
+D4 tem [prova isolada](../audits/D/D-B/d4-probe/README.md) de assinatura técnica
+com token RFC3161 interno, validada por pyHanko independente e contraprovas de
+alteração/cobertura. Não é pipeline do produto nem aceite D4. Certificado/TSA
+internos não fornecem confiança externa ou independência temporal. Emissão,
+histórico, verificação pública, D5 e infraestrutura complementar continuam
+pendentes; não há liberação operacional.
 
 D3.4 comprova os estados de sino, central, perfil e consumo:23 unitários e24
 casos browser distintos, com sete rechecks finais em build de produção nos

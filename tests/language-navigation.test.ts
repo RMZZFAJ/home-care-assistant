@@ -58,6 +58,7 @@ describe("notification names describe the resolved destination and retain scope"
   const url=new URL(notificationHref({...row,care_recipient_id:patient}),"https://local.invalid");
   expect(url.pathname).toBe(path);expect(url.searchParams.get("careRecipientId")).toBe(patient);expect(notificationTargetLabel(row)).toBe(label);
   expect(url.searchParams.get("ref")).toBe(row.reminder_id??row.consumption_report_id??row.alert_event_id??null);
+  expect(url.searchParams.get("refKind")).toBe(row.consumption_report_id?"report":row.reminder_id?"reminder":row.alert_event_id?"alert":null);
  });
  it("document destination takes precedence without carrying an unrelated reminder reference",()=>{
   const row={document_id:target,reminder_id:patient,event_key:"schedule.published",care_recipient_id:patient};

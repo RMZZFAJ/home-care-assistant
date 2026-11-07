@@ -828,6 +828,34 @@ comando sem gravar no paciente seguinte. Recuperação conserva a mesma intenç�
 POST configure exige administração local do paciente e revisão da configuração.
 Progresso próprio e apresentação opcional não alteram SCI ou permissões.
 
+## Referências individuais de notificações
+
+GET /api/notifications/target recebe careRecipientId, ref, area e namespace.
+Áreas: schedule, balance, stock e consumption. Namespace: reminder, report,
+alert ou auto para links antigos. Exige sessão Auth, paciente selecionado e
+permissão vigente para o recurso. O identificador nunca concede acesso.
+Retorna fatos do evento e referência atual autorizada, sem marcar resposta,
+presença, ciência ou movimentação. Plantões usam o dia e fuso do recurso;
+um fuso histórico ausente é informado. Alertas distinguem saldo observado e
+saldo oficial atual. Lembrete antigo de BAL não inicia contagem retroativa.
+
+POST na mesma rota aceita apenas careRecipientId, ref, action=no_issues e
+idempotencyKey. Somente o titular autorizado responde ao próprio lembrete
+shift vencido. A revisão pessoal confirma ausência de ocorrências; o banco
+registra resposta, aviso visto e auditoria em uma transação, sem SCI, presença
+ou estoque. Recuperação repete a chave original. Relato já vinculado impede
+uma nova declaração contraditória de ausência.
+
+POST /api/consumption, action=report, pode receber reminderId. A origem precisa
+ser lembrete shift do próprio autor no mesmo paciente e custódia CARE_TEAM.
+Relato, origem, resposta e auditoria são atômicos. Chave antiga de relato avulso
+não é adotada retroativamente. Recuperação de ato confirmado exige leitura
+vigente; criar novo ato exige capacidade de registro. O comprovante inclui
+id, careRecipientId, reminderId e idempotencyKey. Nenhuma baixa é antecipada.
+GET /api/consumption aceita sourceReminder, mantendo paginação por cursor.
+O detalhe devolve source_reminder_id e permite retornar ao lembrete original.
+Prévia do lembrete limita-se a20 relatos; o histórico filtrado permite os demais.
+
 GET /api/whatsapp/flows/submissions pagina pendências próprias no paciente
 autorizado, com total exato, page/pageSize e máximo100 por página. Ordenação é
 created_at/id descendentes. Falha de consulta não confirma lista vazia.

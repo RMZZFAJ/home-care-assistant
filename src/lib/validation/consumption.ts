@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { exactQuantity } from "./documents";
 import { quantity } from "@/lib/quantity";
+import {reminderReportReceipt} from "./notification-reference";
 
 const lines = z
   .array(
@@ -33,8 +34,9 @@ export const consumptionCommand = z.discriminatedUnion("action", [
       text,
       lines,
       idempotencyKey: z.uuid(),
+      reminderId:z.uuid().optional(),
     })
-    .strict(),
+    .strict().refine(value=>!value.reminderId||value.location==="CARE_TEAM",{message:"O relato vinculado ao lembrete usa a custódia da equipe.",path:["location"]}),
   z
     .object({
       action: z.literal("supplement"),
@@ -73,6 +75,14 @@ export const consumptionCommand = z.discriminatedUnion("action", [
 export const consumptionCursor = z
   .object({ at: z.iso.datetime({ offset: true }), id: z.uuid() })
   .strict();
+export function consumptionResultConfirmed(value:unknown,packet:Exclude<z.infer<typeof consumptionCommand>,{action:"confirm"}>,patient:string){
+ if(packet.action==="report"){
+  if(packet.reminderId){const result=reminderReportReceipt.safeParse(value);return result.success&&result.data.careRecipientId===patient&&result.data.careRecipientId===packet.careRecipientId&&result.data.reminderId===packet.reminderId&&result.data.idempotencyKey===packet.idempotencyKey;}
+  return z.object({id:z.uuid()}).safeParse(value).success;
+ }
+ const result=z.object({data:z.object({id:z.uuid(),care_recipient_id:z.uuid(),version:z.number().int().positive()})}).safeParse(value);
+ return result.success&&result.data.data.id===packet.id&&result.data.data.care_recipient_id===patient&&result.data.data.version>=packet.expectedVersion+1;
+}
 export const consumptionFilters = z
   .object({
     kind: z.enum(["consumption", "shortage"]).optional(),
@@ -80,6 +90,7 @@ export const consumptionFilters = z
     search: z.string().trim().max(120).default(""),
     from: z.iso.date().optional(),
     to: z.iso.date().optional(),
+    sourceReminder:z.uuid().optional(),
   })
   .refine(
     (value) => !value.from || !value.to || value.from <= value.to,

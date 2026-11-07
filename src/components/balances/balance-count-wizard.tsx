@@ -21,6 +21,7 @@ import {
 import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { DocumentActions } from "@/components/documents/document-actions";
+import {BalanceNotice} from "@/components/notifications/balance-notice";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
 import { formatZonedDate } from "@/lib/schedules/time";
@@ -42,7 +43,7 @@ export function BalanceEntry() {
     <Workspace title="Balanço de estoque" compact>
       {(context) =>
         context.patient && can(context, "bal.read") ? (
-          <Mode
+          params.get("ref")?<BalanceNotice key={context.patient.id+params.toString()} context={context}/>:<Mode
             key={context.userId + context.patient.id + params.toString()}
             context={context}
             documentId={params.get("documentId")}

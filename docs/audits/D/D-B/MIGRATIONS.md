@@ -196,3 +196,21 @@ da RPC existente. Ambas aplicadas por test:db:prepare na stack local, sem reset.
 Auth final17/17, incluindo grants, CAS, falha atômica nova, primeira etapa antiga,
 segunda etapa antiga concluída e recusa de submissão de edição posterior.
 Nenhuma migration histórica alterada; remoto sem alteração neste incremento.
+
+### Lote local D3.9
+
+Local136/remoto121;15 migrations D-B aguardam reconciliação remota final.
+20261107082257_phase_d3_notice_reference_resolution.sql acrescenta leitura
+autorizada do alvo individual e vínculo composto de relato com lembrete do
+mesmo paciente. Resposta pessoal e relato vinculado são RPCs transacionais,
+com replay próprio, revalidação de contexto e helpers privados fechados.
+20261107084512_phase_d3_notice_reference_consistency.sql usa um único snapshot
+para contagem/prévia, impede ausência contraditória e vincula comprovante à chave.
+20261107090824_phase_d3_notice_reference_timezones.sql conserva o fuso do evento
+e da atribuição para apresentação correta da janela do recurso.
+
+As três foram aplicadas por test:db:prepare na stack local existente, sem reset.
+Auth9/9 passou após a última aplicação, com negativas, espera observada,
+rollback de relato/resposta/auditoria e replay após perda de escrita. Nenhuma
+migration aplicada foi reescrita; as84 históricas continuam preservadas.
+Nenhuma dessas migrations foi aplicada ao remoto nesta etapa.

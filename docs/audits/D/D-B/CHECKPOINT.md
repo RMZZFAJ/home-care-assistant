@@ -518,3 +518,53 @@ conservar a URL não prova essa tarefa. Matriz105×29 e84 migrations históricas
 preservadas; crons originais inalterados e helpers/triggers de falha ausentes.
 CI do candidato, demais D3, D4/D5/operação, remoto final e gates humanos/externos
 continuam pendentes. Sem merge, deploy comandado ou liberação operacional.
+
+## D3.9 — referências individuais e resposta ao lembrete pessoal
+
+Base639b5cb. A CI42354352749 aprovou banco e validate Windows/Ubuntu, mas
+reprovou preparação global em Chromium e largura de entregas em WebKit;
+central teve uma tentativa instável. Corrigidos: min-height de página aplicado
+indevidamente ao portal Fluent, largura mínima dos seletores e troca de modo
+do instrumento antes de a consulta controlada terminar. A aceitação dirigida
+do candidato passou27/27 nos três projetos, incluindo esses casos.
+
+Avisos agora resolvem o recurso exato com autorização vigente: plantão futuro
+no dia/fuso próprio, evento BAL/atribuição/semanas, alerta com saldo observado
+separado do saldo atual e relato/lembrete pessoal com namespaces distintos.
+Lembrete antigo de BAL não inicia contagem retroativa. Abrir uma referência
+não confirma presença, ciência, resposta ou estoque. Contexto e permissões
+continuam no banco/API; identificador e query string não concedem acesso.
+
+O titular pode revisar a declaração de ausência ou abrir relato vinculado ao
+lembrete original. Origem/custódia ficam congeladas no preenchimento. Resposta,
+vínculo, auditoria e aviso visto são atômicos; nenhuma baixa é antecipada.
+Resposta perdida conserva a chave, inclusive após recarga e recuperação403;
+replay não duplica atos. Relato avulso antigo não é vinculado retroativamente.
+Prévia limitada e histórico filtrado permitem seguir origem/consequência.
+
+Auth9/9 comprova negativas, contexto alterado durante espera observada, grants,
+FK entre pacientes, rollback de efeitos tardios e recuperação após perda de
+escrita. Unitários/API27/27, tipos e lint passaram. Produção27/27 inclui novos
+fluxos e consumidores existentes de complemento/consumo. Quatro larguras e
+axe conferidos nas superfícies do [manifesto D3.9](D3_9_EVIDENCE.json).
+Falhas anteriores e limites foram preservados, sem reduzir regras ou testes.
+
+C-AC-014 tem prova local integrada, reutilizando os seis perfis/documentos
+da D3.8 compatíveis. D-B-AC-020 permanece parcial: progresso/catch-up dos jobs
+legados ainda precisam da reconciliação OPS-01 em D5. Rascunhos contextuais
+restantes, sessão/24h e demais D3 continuam pendentes. Local136/remoto121;
+15 migrations D-B aguardam o lote remoto final. Crons originais inalterados,
+sem helpers/triggers de falha. CI do SHA publicado continua gate próprio.
+Git diff --check aponta uma linha vazia final na migration já aplicada
+20261107090824; os bytes foram preservados, sem reescrever SQL ou suprimir regra.
+
+## D4 — prova técnica inicial, sem aceite de produto
+
+A [prova isolada](d4-probe/README.md) produziu assinatura técnica e token
+RFC3161 interno, conferidos por OpenSSL e pyHanko independente. Alteração de
+byte e acréscimo após a assinatura foram recusados por integridade/cobertura.
+Conteúdo/geometria do PDF fictício e render foram inspecionados. Não houve
+chave privada no Git nem confiança instalada no sistema. Nenhum critério D4
+foi concluído: pipeline, runtime, verificador público e emissões reais seguem
+pendentes. Confiança externa, independência temporal, homologações humanas e
+gates D-C/D6 não são inferidos dessa prova.

@@ -30,6 +30,8 @@ import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Button } from "@fluentui/react-components";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { MovementOrigin } from "./movement-origin";
+import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
+import {NotificationReference} from "@/components/notifications/notification-reference";
 
 const locationLabels: Record<string, string> = {
   FAMILY: "Família",
@@ -101,6 +103,7 @@ function PatientStock({
     can(context, "stock.family.read") || can(context, "stock.team.read");
   const frozenRef = useRef<Record<string, unknown> | null>(null);
   const patient = context.patient!.id;
+  const params=useSearchParams(),notice=useNotificationReference(patient,"stock",params.get("ref"),params.get("refKind")??"auto");
   const revision = `${attempt}:${liveRevision}`;
   const stock = useScopedRead<{
     overview: ProductStock[];
@@ -190,6 +193,7 @@ function PatientStock({
   );
   return (
     <div className="space-y-5">
+      <NotificationReference key={patient+":"+notice.reference} read={notice} context={context} onStockFilter={(productId,location)=>{setCustody(location);setFilters(current=>({...current,productId}));setPage(1);historyHeadingRef.current?.focus();}}/>
       {can(context, "ent.create") && hasStock ? (
         <Link className={buttonClass} href="/transferencias">
           Transferir materiais entre família e equipe

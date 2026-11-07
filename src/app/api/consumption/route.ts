@@ -14,6 +14,7 @@ import {
   consumptionCursor,
   consumptionFilters,
 } from "@/lib/validation/consumption";
+import {reminderReportReceipt} from "@/lib/validation/notification-reference";
 
 export async function GET(request: Request) {
   return api("consumption.read", async () => {
@@ -24,6 +25,7 @@ export async function GET(request: Request) {
       search: params.get("q") ?? "",
       from: params.get("from") ?? undefined,
       to: params.get("to") ?? undefined,
+      sourceReminder:params.get("sourceReminder")??undefined,
     });
     const before =
       params.has("beforeAt") || params.has("beforeId")
@@ -49,6 +51,7 @@ export async function GET(request: Request) {
       .order("id", { ascending: false })
       .limit(21);
     if (filters.data.kind) query = query.eq("kind", filters.data.kind);
+    if(filters.data.sourceReminder)query=query.eq("source_reminder_id",filters.data.sourceReminder);
     if (filters.data.status) query = query.eq("status", filters.data.status);
     if (filters.data.search)
       query = query.ilike(
@@ -91,6 +94,11 @@ export async function POST(request: Request) {
         input.careRecipientId,
         input.location === "FAMILY" ? "stock.family.read" : "stock.team.read",
       );
+      if(input.reminderId){
+        const data=reminderReportReceipt.parse(await rpc(auth.client,"report_consumption_from_reminder",{p_patient:input.careRecipientId,p_reminder:input.reminderId,p_kind:input.kind,p_location:input.location,p_text:input.text,p_lines:input.lines,p_key:input.idempotencyKey}));
+        if(data.careRecipientId!==input.careRecipientId||data.reminderId!==input.reminderId||data.idempotencyKey!==input.idempotencyKey)throw new ApiError("INTERNAL_ERROR","A confirmação não corresponde ao lembrete original.",500);
+        return NextResponse.json(data);
+      }
       return NextResponse.json({
         id: await rpc(auth.client, "report_extraordinary_consumption", {
           p_patient: input.careRecipientId,

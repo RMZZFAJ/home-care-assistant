@@ -88,6 +88,8 @@ function Inbox({ context }: { context: WorkspaceContext }) {
       {can(context, "ent.create") ? <Link href="/transferencias" className="ui-button ui-button-secondary">Declarar transferência entre custódias</Link> : null}
       <div className="hca-toolbar">
         <Select
+          style={{ minWidth: 0, maxWidth: "100%" }}
+          select={{ style: { minWidth: 0, maxWidth: "100%" } }}
           aria-label="Situação das entregas"
           value={status}
           onChange={(event) => {
@@ -110,6 +112,8 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           <option value="">Todas</option>
         </Select>
         <Select
+          style={{ minWidth: 0, maxWidth: "100%" }}
+          select={{ style: { minWidth: 0, maxWidth: "100%" } }}
           aria-label="Responsável pelas entregas"
           value={scope}
           disabled={status === "tasks"}

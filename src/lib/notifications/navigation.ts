@@ -17,6 +17,7 @@ function notificationDestination(row: NotificationTarget) {
       ? { ref: (row.consumption_report_id ?? row.reminder_id ?? row.alert_event_id)! }
       : {}),
   });
+  if(!row.document_id&&!row.requisition_id){if(row.consumption_report_id)query.set("refKind","report");else if(row.reminder_id)query.set("refKind","reminder");else if(row.alert_event_id)query.set("refKind","alert");}
   let path:string,label:string;
   if(row.document_id){
     const kind=row.operational_documents?.type;

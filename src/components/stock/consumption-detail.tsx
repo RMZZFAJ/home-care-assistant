@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@fluentui/react-components";
 import {
@@ -150,6 +151,7 @@ export function ConsumptionDetail({
             · versão {data.version}
           </p>
           <p className="text-xs break-all">Referência: {data.id}</p>
+          {data.source_reminder_id?<Link href={"/consumo?"+new URLSearchParams({careRecipientId:context.patient!.id,ref:data.source_reminder_id,refKind:"reminder"})}>Consultar lembrete de origem</Link>:null}
           <section>
             <h3 className="font-semibold">Relato original · versão 1</h3>
             <p className="text-sm">

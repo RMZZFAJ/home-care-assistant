@@ -70,7 +70,7 @@ test("D3 central distingue demora falha resposta inválida e vazio confirmado e 
     await page.goto("/notificacoes?careRecipientId=" + f.patient); await first;
     await expect(center(page).getByRole("status")).toHaveText("Consultando notificações…");
     await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toHaveCount(0);
-    mode = "error"; release(); await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toBeVisible();
+    release(); await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toBeVisible(); mode = "error";
     await center(page).getByRole("button", { name: "Atualizar", exact: true }).click();
     await expect(center(page).getByRole("alert")).toContainText("Falha controlada na leitura da central");
     await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toHaveCount(0);

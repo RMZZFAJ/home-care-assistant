@@ -15,9 +15,10 @@ import { DeferralFacts } from "./balance-deferral-facts";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import type { BalanceCommand } from "@/lib/validation/balances";
 import type { DocumentSummary } from "@/types/documents";
+import {BalanceNotice} from "@/components/notifications/balance-notice";
 
 export function BalanceConsole() {
-  return <Workspace title="Balanços e plantões">{context => context.patient && can(context, "bal.read") ? <FollowUp key={context.patient.id} context={context} /> : <Notice error>Selecione um paciente com permissão para consultar balanços.</Notice>}</Workspace>;
+  return <Workspace title="Balanços e plantões">{context => context.patient && can(context, "bal.read") ? <><BalanceNotice key={"reference:"+context.patient.id} context={context}/><FollowUp key={"followup:"+context.patient.id} context={context} /></> : <Notice error>Selecione um paciente com permissão para consultar balanços.</Notice>}</Workspace>;
 }
 function FollowUp({ context }: { context: WorkspaceContext }) {
   const router = useRouter(), params = useSearchParams(), recountDocumentId = params.get("recountDocumentId");
