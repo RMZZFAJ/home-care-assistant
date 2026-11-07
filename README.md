@@ -8,7 +8,9 @@ clínica.
 ## Estado e documentação
 
 **Produção NO-GO.** A e B1–B8 estão encerradas como diagnóstico; C concluiu o
-planejamento documental C0–C10. **D-A consolidada localmente (D0–D2),
+planejamento documental C0–C10. **D-B em execução**, conforme a
+[ordem e checkpoint](docs/audits/D/D-B/README.md).
+**D-A consolidada localmente (D0–D2),
 com CI e gates de liberação
 independentes**, conforme
 [checkpoint](docs/audits/D/D-A/CHECKPOINT.md). Base funcional auditada:

@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, lstatSync, mkdirSync, realpathSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { trustedExecutable } from "./trusted-executable.mjs";
 
 function inside(parent, target) {
   const child = relative(parent, target);
@@ -31,8 +32,9 @@ export function prepareReportOutput(args = process.argv.slice(2), workspace = pr
     if (existsSync(target) && lstatSync(target).isSymbolicLink()) throw new Error("Cannot replace a symbolic report file.");
     writeFileSync(target, content, { flag: overwrite ? "w" : "wx", mode: 0o600 });
   };
-  const sourceSha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: workspace, encoding: "utf8" }).trim();
-  const sourceTreeDirty = execFileSync("git", ["status", "--porcelain", "--untracked-files=normal"], { cwd: workspace, encoding: "utf8" }).trim().length > 0;
+  const git = trustedExecutable("git");
+  const sourceSha = execFileSync(git, ["rev-parse", "HEAD"], { cwd: workspace, encoding: "utf8" }).trim();
+  const sourceTreeDirty = execFileSync(git, ["status", "--porcelain", "--untracked-files=normal"], { cwd: workspace, encoding: "utf8" }).trim().length > 0;
   const metadata = { sourceSha, sourceTreeDirty, generatedAt: new Date().toISOString(), tool: basename(process.argv[1] ?? "report"), evidence: "CURRENT_RUN_NOT_HISTORICAL_ACCEPTANCE" };
   mkdirSync(output, { recursive: true });
   write("RUN_METADATA.json", `${JSON.stringify(metadata, null, 2)}\n`);

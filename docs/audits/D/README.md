@@ -12,6 +12,9 @@ especificam
 o planejamento de origem. A autorização corrente permite implementar,
 testar localmente, commitar e publicar no
 [Draft PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.
-Replay local foi consentido após backup verificado. D-B/D-C, mutações
-remotas, envio real e liberação definitiva continuam fora desta missão.
-Produção permanece NO-GO.
+O consentimento histórico de replay D-A não autoriza novos resets nesta missão.
+[D-B está em execução](D-B/README.md), autorizada em 06/11/2026. Suas duas
+aplicações remotas têm autorização e procedimentos próprios: as oito pendências
+D-A foram aplicadas após preflight/backup/restore e pós-verificação, remoto121.
+Migrations D-B aguardam implementação/testes e novo preflight. D-C, envio externo,
+merge, deploy e liberação definitiva continuam fora da missão. Produção NO-GO.

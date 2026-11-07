@@ -2,6 +2,7 @@
 
 **Estado atual:** [fonte por SHA](current/PROJECT_STATUS.md). Produção NO-GO;
 A e B1–B8 concluídas como diagnóstico; C é planejamento e organização;
+**D-B em execução** na [ordem vigente](audits/D/D-B/README.md);
 **D-A consolidada localmente; CI e liberação independentes**, com
 [evidências por incremento](audits/D/D-A/CHECKPOINT.md).
 Decisão aprovada não é funcionalidade implementada.

@@ -1,7 +1,7 @@
 # Estado verificável do projeto
 
 Referência editorial:06/11/2026, America/Sao_Paulo. **Produção NO-GO.**
-**Escopo técnico executável D-A (D0–D2) consolidado e validado localmente.**
+**D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
 Base integrada PR6: `8ec979a`. Branch única `feat/phase-d-implementation` e
@@ -9,6 +9,22 @@ Base integrada PR6: `8ec979a`. Branch única `feat/phase-d-implementation` e
 [Checkpoint por incremento](../audits/D/D-A/CHECKPOINT.md) preserva tentativas,
 contraprovas, resultados por SHA e limites. [Matriz81](../audits/D/D-A/ACCEPTANCE_EXECUTION.csv)
 registra a execução local; colunas de planejamento e gates C9 preservadas.
+
+## Continuidade autorizada D-B
+
+[Ordem e checkpoint D-B](../audits/D/D-B/README.md): 75 critérios C9 e 30
+complementos em execução, sem conclusão integral. O remoto autorizado
+qwfrqychokvhdzakibid foi reconciliado de113 para121 migrations, com as oito
+pendências D-A aplicadas, backup cifrado e restore isolado de122 tabelas,
+29 objetos Storage e28 hashes PDF verificados. Digests anteriores preservados,
+sem reset/seed ou mudança de cron/Auth/Vault. [Relatório](../audits/D/D-B/MIGRATIONS.md).
+
+Arquivador/probe são bases técnicas verificadas; backup diário operacional,
+retenção automatizada e monitoramento ainda não estão ativos. A CI aa9f168
+foi consultada e aprovou todos os jobs principais nos três navegadores.
+SonarCloud desse SHA tinha Reliability D/Security B. Quatro apontamentos PATH
+receberam correção local, com unitários e Auth dirigido; reanálise do SHA novo
+é necessária. PAdES, verificação por upload e PWA/push ainda não implementados.
 
 ## Implementado no candidato
 
@@ -69,7 +85,8 @@ Stack local home-care-assistant/API54321/DB54322 verificada. Após os testes,
 os dois jobs cron originalmente ativos foram restaurados para active.
 Backup externo original preservado; não equivale a restore testado.
 
-D-B/D-C, assinatura, SCI-004, pesquisa comercial P03/P09/P13 e homologações
-humanas/AT/aparelho/provedor permanecem fora desta missão. Não houve merge,
-mutação remota ou liberação operacional. [Continuidade](ROADMAP.md) registra
+D-C, SCI-004 e homologações humanas/AT/aparelho/provedor continuam condicionadas.
+D-B inclui assinatura interna/TSA, backup e monitoramento sem contratação externa,
+conforme ordem vigente. Não houve merge, deploy ou liberação operacional.
+[Continuidade](ROADMAP.md) registra
 os gates e a oportunidade de paginação do QR isolado em D4.
