@@ -29,10 +29,11 @@ divergentes são recusados. O parâmetro antigo de versão/renderer ainda possui
 consumidores legados; a migração desses consumidores continua pendente e não
 deve ser confundida com o contrato novo por emissão.
 
-pdf_issuance_public aceita código ou digest e devolve somente metadados mínimos
+pdf_issuance_public é exclusiva do servidor e aceita código ou digest e
+devolve somente metadados mínimos
 de exemplar ready. O resultado é um registro; não constitui verificação atual
 de assinatura nem prova dos bytes de um PDF que o visitante esteja segurando.
-A página canônica por emissão e o upload público isolado ainda estão pendentes.
+A página canônica e o upload limitado/isolado foram acrescentados no lote D4.3.
 A resolução antiga de QR continua preservada. Segredos e limites estão descritos
 na [custódia D4](../audits/D/D-B/SIGNING_CUSTODY.md).
 
@@ -895,3 +896,18 @@ Prévia do lembrete limita-se a20 relatos; o histórico filtrado permite os dema
 GET /api/whatsapp/flows/submissions pagina pendências próprias no paciente
 autorizado, com total exato, page/pageSize e máximo100 por página. Ordenação é
 created_at/id descendentes. Falha de consulta não confirma lista vazia.
+
+## Verificação pública por código e arquivo
+
+GET /api/verification aceita somente code. POST aceita code opcional na query e
+corpo application/pdf de100 bytes a4 MiB, sem hash ou recibo enviados pelo cliente.
+Não exige conta. Código é normalizado e validado; o servidor calcula SHA dos
+bytes e consulta a referência e eventual outra emissão correspondente ao arquivo.
+Retorna metadados mínimos, resultados criptográficos separados e estado da
+política. QR isolado não equivale a conferência dos bytes. Arquivo não localizado,
+legado sem assinatura, perfil não suportado e serviço indisponível são distintos.
+
+Leitura limitada, orçamento compartilhado no banco e worker efêmero protegem
+processamento. Anon/authenticated não executam diretamente as RPCs de consulta
+mínima ou orçamento. Nenhum upload público é persistido no acervo.
+Detalhes, limites e coortes de validação na [verificação D4](../audits/D/D-B/PUBLIC_VERIFICATION.md).

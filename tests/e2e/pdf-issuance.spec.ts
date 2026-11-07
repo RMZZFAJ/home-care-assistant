@@ -109,16 +109,14 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   expect(rows[0].id).not.toBe(first.id);
   expect(rows[0].version).toBe(first.version);
   expect(hash(await download(rows[0].id))).not.toBe(first.sha256);
-  const anon = createClient(env.url, env.anonKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    }),
-    publicResult = await rpc(anon, "pdf_issuance_public", {
-      p_code: first.verificationCode,
-      p_hash: first.sha256,
-    });
+  const publicResponse = await page.request.get(
+    `/api/verification?code=${first.verificationCode}`,
+  );
+  expect(publicResponse.status()).toBe(200);
+  const publicResult = (await publicResponse.json()).reference;
   expect(publicResult).toMatchObject({
     found: true,
-    bytesMatch: true,
+    bytesMatch: null,
     sha256: first.sha256,
   });
   expect(

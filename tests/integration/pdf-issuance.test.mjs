@@ -252,8 +252,17 @@ test("NULL or incomplete verification and missing Storage evidence cannot produc
   const anonymous = createClient(env.url, env.anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  assert.equal(
+    (
+      await anonymous.rpc("pdf_issuance_public", {
+        p_code: r.verificationCode,
+        p_hash: null,
+      })
+    ).error?.code,
+    "42501",
+  );
   assert.deepEqual(
-    await rpc(anonymous, "pdf_issuance_public", {
+    await rpc(service, "pdf_issuance_public", {
       p_code: r.verificationCode,
       p_hash: null,
     }),

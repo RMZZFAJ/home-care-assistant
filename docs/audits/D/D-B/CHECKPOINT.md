@@ -711,3 +711,56 @@ pública completa não foi declarada pronta. D3 restante, D5, automação de bac
 retenção, monitoramento e gates D-C/D6 continuam pendentes. CI do SHA
 publicado é
 gate próprio; Sonar permanece adiado pelo responsável. Sem merge/deploy/GO.
+
+## D4.3 — verificação pública e proteção do processamento
+
+Base58c5837. /verificar e /verificar/emissao/:code oferecem código sem conta e
+upload efêmero. Código/QR consultam registro mínimo, sem aprovar os bytes de quem
+está lendo. Upload compara digest real com a referência e com eventual outra
+emissão; verifica assinatura, cobertura, cadeia e token em worker isolado. Não
+expõe paciente/material/solicitante ou acesso ao PDF privado. QR antigos continuam
+resolvendo sua referência canônica. [Contrato e limites](PUBLIC_VERIFICATION.md).
+
+Cliente/API limitam arquivo a4 MiB. Admissão compartilhada no banco limita
+consulta/upload; somente header da plataforma é considerado quando VERCEL=1,
+sem guardar IP bruto. Anon/Auth não contornam a fachada por RPC. Worker sem
+credenciais tem prazo, heap, concorrência e orçamento de descompressão; encerra
+inclusive em erro. Certificado/chave também têm orçamento antes da criptografia
+nativa. Formato não suportado, assinatura inválida, cadeia desconhecida, carimbo
+ausente/inválido e indisponibilidade não são apresentados como o mesmo resultado.
+
+Produção12/12 passou nos três projetos:três casos privados existentes e a jornada
+pública, com quatro larguras/axe, resposta200 incompleta, outro exemplar, excesso
+de tamanho, código digitável e QR antigo. Coincidência de bytes pelo upload foi
+também demonstrada em Chromium. O ajuste posterior de limite de certificado/chave
+foi validado por unidade/API e pelos quatro PDFs reais; a prova de navegador
+mantém os hashes da coorte anterior, sem inventar12/12 no mesmo fonte final.
+
+Validação final de unidade/API25/25. Inclui os sete
+[artefatos congelados](d4-runtime-proof/README.md), SHA e contraprovas:quatro
+emissões reais, byte alterado com QR intacto, acréscimo posterior e token removido.
+pyHanko aceitou os quatro e recusou as três contraprovas com causas distintas.
+ZXing decodificou os QR rasterizados dos quatro, apontando às respectivas
+identidades. Raiz é pública e efêmera de teste; chaves descartadas. Não é confiança
+automática do produto. Não foram incluídos segredos ou dados clínicos reais.
+
+Auth de emissão6/6 compatível e orçamento/ACL3/3 passaram; SQL service-role passou.
+CI58c5837 tinha validate Windows/Ubuntu verdes e falhou antes dos browsers na
+allowlist exata de worker. O teste recebeu somente as quatro novas entradas
+aprovadas e a negativa de finalização; não houve concessão genérica ou remoção da
+regra. O diagnóstico de navegador encontrou seletor de alert ambíguo com o
+anunciador Next; main delimita o instrumento, mantendo a asserção. Probes de PKI
+foram corrigidos para codificar TBS alterado em DER antes de avaliar o orçamento.
+As falhas e limites permanecem no [manifesto](D4_3_EVIDENCE.json).
+
+Local139/remoto121,18 migrations D-B pendentes. As duas novas foram aplicadas
+sem reset e permanecem imutáveis. Crons originais preservados; sem instrumentos
+de falha instalados. Empacotamento Next incluiu o worker autocontido de cerca de
+2 MB, sem Supabase/provedor de chaves. Validação local não prova execução na
+Vercel; CI do SHA publicado continua gate separado. Sonar permanece adiado.
+
+Próximo lote:consumidores legados de PDF/cache, oráculos documentais específicos,
+combinações de acervo legado/expiração de certificado ainda não ensaiadas,
+rascunhos contextuais/sessão D3, D5 e bases operacionais de backup/monitoramento.
+Rotação, restauração de custódia, incidentes, reconciliação remota final e gates
+humanos/físicos/externos continuam pendentes. Produção NO-GO; PR Draft sem merge.

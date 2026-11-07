@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
@@ -62,6 +63,9 @@ async function Verification({
       <a className="ui-button ui-button-secondary" href="/login">
         Acessar documento com autorização
       </a>
+      <Link className="ui-button ui-button-secondary" href="/verificar">
+        Conferir um arquivo PDF ou código de emissão
+      </Link>
     </main>
   );
 }

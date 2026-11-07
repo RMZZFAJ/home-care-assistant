@@ -231,3 +231,23 @@ real, revogação de leitura, chave sem prova do worker, lease antigo, NULL/reci
 incompleto, ausência de Storage e101 registros com cursor estável. O teste
 negativo de finalização não é prova criptográfica; o pipeline usa PDF real.
 A migration aplicada permanece sem reescrita. Nenhuma mudança remota neste lote.
+
+### Lote local D4.3
+
+Local139/remoto121;18 migrations D-B aguardam o lote remoto final autorizado.
+20261107113421 acrescenta orçamento compartilhado de consulta/upload e leitura
+mínima de legado por digest, sem dados do paciente. Fachada pública limitada no
+HTTP passa a ser a única entrada; RPCs mínimas ficam exclusivas do servidor.
+Tabela privada não recebe grants diretos. Contadores não armazenam IP bruto.
+
+20261107115300 recalcula a janela depois do lock de admissão e indexa SHA dos
+dois acervos legados. O incremento evita depender do instante anterior à espera,
+sem reescrever a migration já aplicada. Ambas tiveram preflight em transação
+revertida e aplicação por test:db:prepare, sem reset ou novo ambiente.
+
+Auth de emissão6/6 compatível, orçamento/ACL3/3 após a última aplicação e SQL
+service-role passaram. A allowlist exata do teste SQL inclui as quatro novas
+funções aprovadas; serviço continua sem finalizar emissão pelo Auth. O orçamento
+foi exercitado com concorrência real, limite pessoal/global e expiração, sem
+limpar contadores para obter verde. CI do novo SHA deve comprovar instalação
+limpa, evolução legada e integração geral. Nenhuma aplicação remota neste lote.

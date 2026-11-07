@@ -7,7 +7,7 @@ CI do SHA publicado é gate independente; pending não significa aprovação.
 CI dfdc7de, run42335739149, concluiu banco, validate Ubuntu/Windows e os três
 projetos browser com SUCCESS. Inclui a correção D3.4a dos consumidores de
 governança que falharam em bd8747b e os estados de leitura D3.4. Essa CI não
-valida os incrementos posteriores. Local137/remoto121;16 migrations D-B
+valida os incrementos posteriores. Local139/remoto121;18 migrations D-B
 aguardam o lote remoto final autorizado.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
 
@@ -30,8 +30,12 @@ Auth6/6, unidade/API18/18 e produção12/12 nos três projetos passaram, incluin
 compartilhamento existente, revogação real e falha após upload. pyHanko aceitou
 assinatura e token dos quatro exemplares reais; extração/geometria e render foram
 conferidos. [Evidências e limites](../audits/D/D-B/D4_2_EVIDENCE.json).
-Página pública por emissão/upload isolado, consumidores legados de PDF, oráculos
-factuais específicos e ensaios de rotação/recuperação ainda pendentes. O GET antigo
+D4.3 implementa página pública, código e upload efêmero limitado/isolado.
+Produção12/12 passou nos três projetos;25 testes de unidade/API e revalidação
+dos quatro artefatos conferem o núcleo final com orçamento criptográfico.
+[Coortes, privacidade e limites](../audits/D/D-B/PUBLIC_VERIFICATION.md).
+Consumidores legados, oráculos factuais específicos e ensaios de rotação/
+recuperação continuam pendentes. O GET antigo
 por versão ainda pode gerar V4. A nova emissão não aprova esses caminhos legados.
 D3 restante, D5, backup/monitoramento e reconciliação remota continuam em execução.
 

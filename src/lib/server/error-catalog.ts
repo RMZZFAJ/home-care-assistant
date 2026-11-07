@@ -47,6 +47,9 @@ const reconciliation = {
 
 /** Stable public contracts. Messages may add context without exposing private data. */
 export const errorCatalog = {
+  VERIFICATION_UNAVAILABLE: dependency,
+  VERIFICATION_BUSY: dependency,
+  RATE_LIMITED: { ...dependency, status:429, recommendedAction:"Aguarde um minuto antes de consultar novamente." },
   SIGNING_UNAVAILABLE: configuration,
   CONTENT_INVALID: { ...dependency, retryable: false },
   SIGNATURE_INVALID: { ...dependency, retryable: false },

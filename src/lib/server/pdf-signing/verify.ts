@@ -144,6 +144,7 @@ export async function verifyTechnicalPdf(
   bytes: Uint8Array,
   policy: SignatureTrustPolicy,
 ): Promise<TechnicalPdfVerification> {
+  let stage: "container" | "document" | "timestamp" = "container";
   try {
     requireSignature(
       bytes.byteLength > 100 && bytes.byteLength <= 10 * 1024 * 1024,
@@ -158,6 +159,7 @@ export async function verifyTechnicalPdf(
       .getForm()
       .getFields()
       .filter((field) => field instanceof PDFSignature);
+    requireSignature(signatures.length > 0, "UNSIGNED_PDF");
     requireSignature(
       signatures.length === 1,
       "EXPECTED_ONE_EMBEDDED_SIGNATURE",
@@ -200,6 +202,7 @@ export async function verifyTechnicalPdf(
       bytes.subarray(0, values[1]),
       bytes.subarray(values[2], values[2] + values[3]),
     ]);
+    stage = "document";
     const cms = decodeCms(contents, true);
     requireSignature(
       !cms.encapContentInfo.eContent,
@@ -207,6 +210,7 @@ export async function verifyTechnicalPdf(
     );
     const document = verifyCms(cms, signedBytes, oid.data, true);
     usage(document.cert, false);
+    stage = "timestamp";
     const token = attribute(document.signerInfo, oid.timestamp, true),
       tokenCms = decodeCms(new Uint8Array(token.toBER(false)));
     const content = octets(tokenCms.encapContentInfo.eContent),
@@ -290,7 +294,11 @@ export async function verifyTechnicalPdf(
         ),
     };
   } catch (error) {
-    if (error instanceof SignatureValidationError) throw error;
-    throw new SignatureValidationError("UNREADABLE_SIGNATURE");
+    const failure =
+      error instanceof SignatureValidationError
+        ? error
+        : new SignatureValidationError("UNREADABLE_SIGNATURE");
+    failure.stage = stage;
+    throw failure;
   }
 }

@@ -43,7 +43,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})$/.exec(pathname)?.[1];
   const segment = pathname.split("/")[2];
   const publicPage = ["/login", "/recuperar-senha", "/convites/aceitar"].includes(pathname)
-    || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
+    || pathname === "/verificar" || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
   const [data, setData] = useState<ContextData | null>(null);
   const [patientId, setPatientId] = useState("");
   const [loading, setLoading] = useState(true);

@@ -172,7 +172,7 @@ describe("real PAdES-B-T technical signature and independent runtime verificatio
   it("rejects missing signature, wrong-purpose TSA key, future clock and missing timestamp provider without fallback", async () => {
     await expect(
       verifyTechnicalPdf(bytes, { roots: [] }),
-    ).rejects.toMatchObject({ code: "EXPECTED_ONE_EMBEDDED_SIGNATURE" });
+    ).rejects.toMatchObject({ code: "UNSIGNED_PDF" });
     expect(() => new InternalTimestampAuthority(identity.signer)).toThrow();
     await expect(
       new InternalTimestampAuthority(

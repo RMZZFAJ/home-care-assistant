@@ -28,6 +28,7 @@ export const arrayBuffer = (bytes: Uint8Array): ArrayBuffer =>
 export const equal = (a: Uint8Array, b: Uint8Array) =>
   a.byteLength === b.byteLength && timingSafeEqual(a, b);
 export class SignatureValidationError extends Error {
+  stage: "container" | "document" | "timestamp" = "container";
   constructor(readonly code: string) {
     super("O arquivo não passou pela validação técnica da assinatura.");
     this.name = "SignatureValidationError";
@@ -92,7 +93,38 @@ export function cmsCertificates(cms: pki.SignedData) {
   });
 }
 export function nativeCertificate(cert: pki.Certificate) {
-  return new X509Certificate(Buffer.from(cert.toSchema().toBER(false)));
+  const bytes = Buffer.from(cert.toSchema().toBER(false));
+  requireSignature(
+    bytes.length <= 16384,
+    "UNSUPPORTED_CERTIFICATE_SIZE_BUDGET",
+  );
+  const native = new X509Certificate(bytes),
+    key = native.publicKey,
+    details = key.asymmetricKeyDetails;
+  // Bound native OpenSSL work before verifying attacker-supplied keys. A worker
+  // deadline alone cannot preempt every synchronous native operation.
+  if (key.asymmetricKeyType === "rsa")
+    requireSignature(
+      (details?.modulusLength ?? 0) >= 2048 &&
+        (details?.modulusLength ?? Infinity) <= 8192 &&
+        typeof details?.publicExponent === "bigint" &&
+        details.publicExponent > BigInt(1) &&
+        details.publicExponent <= BigInt("0xffffffff"),
+      "UNSUPPORTED_CERTIFICATE_KEY_BUDGET",
+    );
+  else if (key.asymmetricKeyType === "ec")
+    requireSignature(
+      ["prime256v1", "secp384r1", "secp521r1"].includes(
+        details?.namedCurve ?? "",
+      ),
+      "UNSUPPORTED_CERTIFICATE_KEY_BUDGET",
+    );
+  else
+    requireSignature(
+      ["ed25519", "ed448"].includes(key.asymmetricKeyType ?? ""),
+      "UNSUPPORTED_CERTIFICATE_KEY_BUDGET",
+    );
+  return native;
 }
 export function certificateForSigner(cms: pki.SignedData) {
   const si = cms.signerInfos[0];
