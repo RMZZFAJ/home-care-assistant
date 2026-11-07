@@ -321,6 +321,11 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
     before.shifts.filter((row: ScheduledShift) => row.id !== original.id),
   );
   await page.getByText("Tipos e programações", { exact: true }).click();
+  // A live refresh used to unmount this disclosure and lose its open state.
+  const refreshed=page.waitForResponse(response=>new URL(response.url()).pathname==="/api/schedules");
+  await page.evaluate(()=>window.dispatchEvent(new Event("hca:data-changed")));
+  await (await refreshed).finished();
+  await expect(page.locator("details").filter({has:page.locator("summary",{hasText:"Tipos e programações"})})).toHaveAttribute("open","");
   await page
     .getByRole("button", { name: "Encerrar série", exact: true })
     .click();

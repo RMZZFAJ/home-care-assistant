@@ -71,6 +71,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
   const day=chosenDay?.reference===reference?chosenDay.day:notice.data?.kind==="schedule"?notice.data.referenceDay:fallbackDay;
   const setDay=(value:string)=>setChosenDay({reference,day:value});
   const [mode, setMode] = useState<"week" | "month">("week");
+  const [detailsOpen,setDetailsOpen]=useState(false);
   const [person, setPerson] = useState(""),
     [status, setStatus] = useState(""),
     [attempt, setAttempt] = useState(0);
@@ -667,8 +668,8 @@ function Agenda({ context }: { context: WorkspaceContext }) {
               ) : null}
             </section>
           ) : null}
-          <details className="ui-card">
-            <summary>Tipos e programações</summary>
+            <details className="ui-card" open={detailsOpen}>
+              <summary onClick={event=>{event.preventDefault();setDetailsOpen(current=>!current);}}>Tipos e programações</summary>
             {currentData.types.map((type) => (
               <div className="hca-record" key={type.id}>
                 <strong>

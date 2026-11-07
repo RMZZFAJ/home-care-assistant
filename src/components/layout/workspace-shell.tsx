@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Avatar, Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, Menu, MenuDivider, MenuItem, MenuItemRadio, MenuList, MenuPopover, MenuTrigger, OverlayDrawer, Select, useRestoreFocusTarget, useRestoreFocusSource } from "@fluentui/react-components";
+import { Avatar, Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, MenuDivider, MenuItem, MenuItemRadio, MenuList, Popover, PopoverSurface, PopoverTrigger, OverlayDrawer, Select, useRestoreFocusTarget, useRestoreFocusSource } from "@fluentui/react-components";
 import { Icon } from "@/components/ui/primitives";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/auth/logout-button";
@@ -24,7 +24,9 @@ function ProfileMenu() {
   const { data, value, selecting, selectProfile } = useWorkspaceState();
   const [open, setOpen] = useState(false);
   const [contexts, setContexts] = useState(false);
+  const [restoreAfterSelection,setRestoreAfterSelection]=useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef=useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!open) return;
     const frame = requestAnimationFrame(() => {
@@ -33,14 +35,22 @@ function ProfileMenu() {
     });
     return () => cancelAnimationFrame(frame);
   }, [open, contexts]);
-  const choose = async (id: string | null) => { if (await selectProfile(id)) { setOpen(false); setContexts(false); } };
-  return <Menu open={open} onOpenChange={(_, next) => { setOpen(next.open); if (!next.open) setContexts(false); }}>
-    <MenuTrigger disableButtonEnhancement><Button appearance="subtle" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data || selecting}>
+  useEffect(()=>{
+    if(!restoreAfterSelection||open||selecting||!data)return;
+    const frame=requestAnimationFrame(()=>{
+      const target=triggerRef.current;
+      if(target?.isConnected&&!target.disabled){target.focus({preventScroll:true});setRestoreAfterSelection(false);}
+    });
+    return ()=>cancelAnimationFrame(frame);
+  },[restoreAfterSelection,open,selecting,data]);
+  const choose = async (id: string | null) => { if (await selectProfile(id)) { setOpen(false); setContexts(false); } setRestoreAfterSelection(true); };
+  return <Popover open={open} trapFocus positioning={{position:"below",align:"end"}} onOpenChange={(_, next) => { setOpen(next.open); if (!next.open) setContexts(false); }}>
+    <PopoverTrigger disableButtonEnhancement><Button ref={triggerRef} appearance="subtle" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data || selecting}>
       <Avatar name={data?.fullName} image={data?.avatarUrl ? { src: data.avatarUrl, alt: "" } : undefined} size={32} color="brand" />
       <span className="hca-profile-identity"><strong>{data?.fullName}</strong><small>{data?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role)}</small></span>
       <Icon name="chevron" width={14} />
-    </Button></MenuTrigger>
-    <MenuPopover className={contexts ? "hca-context-menu" : undefined}><MenuList ref={menuRef} aria-labelledby={undefined} aria-label={contexts ? "Contextos autorizados" : "Ações do usuário"} checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
+    </Button></PopoverTrigger>
+    <PopoverSurface aria-label="Perfil e contexto" className={contexts ? "hca-context-menu" : undefined}><MenuList ref={menuRef} aria-labelledby={undefined} aria-label={contexts ? "Contextos autorizados" : "Ações do usuário"} checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
       {contexts ? <>
         <MenuItem persistOnClick onClick={() => setContexts(false)}>← Voltar ao menu</MenuItem>
         {data?.isGlobalAdmin ? <MenuItemRadio persistOnClick name="context" value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</MenuItemRadio> : null}
@@ -48,14 +58,14 @@ function ProfileMenu() {
           {patient.display_name} · {roleLabel(patient.role)}
         </MenuItemRadio>)}
       </> : <>
-      <MenuItem icon={<Icon name="user" />} onClick={() => router.push("/perfil")}>Meu perfil e segurança</MenuItem>
+      <MenuItem icon={<Icon name="user" />} onClick={() => {setOpen(false);router.push("/perfil");}}>Meu perfil e segurança</MenuItem>
       <MenuItem persistOnClick icon={<Icon name="team" />} onClick={() => setContexts(true)}>Mudar perfil</MenuItem>
-      <MenuItem icon={<Icon name="bell" />} onClick={() => router.push("/notificacoes")}>Preferências e notificações</MenuItem>
+      <MenuItem icon={<Icon name="bell" />} onClick={() => {setOpen(false);router.push("/notificacoes");}}>Central de notificações</MenuItem>
       <MenuDivider />
       <LogoutButton />
       </>}
-    </MenuList></MenuPopover>
-  </Menu>;
+    </MenuList></PopoverSurface>
+  </Popover>;
 }
 
 export function WorkspaceShell({ children,showOnboarding=false }: { children: ReactNode;showOnboarding?:boolean }) {

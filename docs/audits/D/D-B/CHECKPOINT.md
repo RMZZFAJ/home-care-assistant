@@ -610,3 +610,32 @@ Não usar escrita de negócio como prova de sucesso, não regenerar download e
 não entregar objeto antes de ready. Upload público precisa de limites e
 isolamento da leitura de PDF desconhecido; o núcleo atual valida artefatos
 produzidos/controlados, sem endpoint público de upload.
+
+## D4.1a — regressões da CI no menu e na agenda
+
+CI42360570173 de3c61697 aprovou banco/validate Windows/Ubuntu. Chromium/mobile
+reprovaram o menu de perfil; WebKit foi cancelado pelo fail-fast da matriz.
+Chromium registrou também uma tentativa instável ao encerrar a programação.
+O log e o recheck local reproduziram o erro do menu, sem excluir regra axe.
+
+Perfil/contexto agora usam Popover Fluent com foco contido e MenuList, mantendo
+setas, seleção autorizada, Escape e retorno ao acionador. A escolha assíncrona
+restaura o foco após a revalidação e reativação do botão. O retorno mantém main
+acessível; não deixa a página escondida pelo modalizador. “Central de
+notificações” abre a central, sem anunciar preferências inexistentes nessa tela.
+Tipos/programações conservam a abertura durante atualização ao vivo; ações
+continuam indisponíveis durante consulta. As doze ocorrências históricas foram
+preservadas no caso dirigido com refresh explicitamente provocado.
+
+Diagnóstico2/2 passou após a composição modal. Produção inicial21/24 passou e
+os três casos de foco revelaram o retorno assíncrono ainda ausente. Corrigido
+esse retorno, recheck de produção3/3 passou. São24 casos nominais aprovados em
+duas coortes documentadas: cinco perfis, navegação/wizards, preparação global e
+programação, nos três projetos. O último ajuste só restaura foco após seleção;
+capacidade, consulta e contratos dos21 casos compatíveis não foram alterados.
+Tipos e lint dos fontes afetados passaram; não foi repetida a suíte geral.
+[Manifesto do recheck](D4_1A_CI_EVIDENCE.json) preserva fontes por rodada e falhas.
+
+O núcleo criptográfico de7647558 permanece inalterado; seu aceite local não é
+substituído pela validação dos navegadores. Sem migration ou alteração remota.
+CI do próximo SHA publicado continua obrigatória. PR permanece Draft/NO-GO.

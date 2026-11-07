@@ -33,6 +33,13 @@ independentes passaram, incluindo as negativas. Tipos/lint aprovados;
 custódia operacional, oráculo documental e verificador público permanecem
 pendentes; D-B-AC-006/007 continuam parciais.
 
+CI42360570173 de3c61697 aprovou banco/validate e reprovou o menu de perfil em
+Chromium/mobile; WebKit foi cancelado pelo fail-fast. D4.1a corrigiu composição
+modal, retorno de foco após troca e abertura da programação após refresh.
+Prova local:21 casos browser compatíveis mais3 rechecks finais, com tipos/lint
+aprovados. [Coortes e contraprovas](../audits/D/D-B/D4_1A_CI_EVIDENCE.json).
+Resultado da CI do próximo SHA continua separado dessa prova local.
+
 D3.4 comprova os estados de sino, central, perfil e consumo:23 unitários e24
 casos browser distintos, com sete rechecks finais em build de produção nos
 consumidores afetados. Sem falso vazio, spinner após500, perda de edição pessoal
