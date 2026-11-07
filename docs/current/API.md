@@ -911,3 +911,20 @@ Leitura limitada, orçamento compartilhado no banco e worker efêmero protegem
 processamento. Anon/authenticated não executam diretamente as RPCs de consulta
 mínima ou orçamento. Nenhum upload público é persistido no acervo.
 Detalhes, limites e coortes de validação na [verificação D4](../audits/D/D-B/PUBLIC_VERIFICATION.md).
+
+## Acervo privado e compatibilidade de PDFs
+
+GET /api/documents/:id/archive reúne emissões independentes, originais e
+representações legadas. Aceita version opcional e cursor completo
+before/kind/reference; máximo20 por página. Revalida contexto e leitura, sem
+expor caminhos, snapshots ou provas do worker. A página
+/documentos/:id/arquivos oferece os mesmos arquivos e geração explícita.
+
+GET /api/documents/:id/pdf com issuance recupera a emissão assinada exata.
+Com version e renderer=legacy recupera o original; renderer numérico seleciona
+uma representação legada registrada, com padrão4. Ausência retorna
+PDF_NOT_GENERATED404; GET nunca gera ou substitui arquivo. SHA divergente
+retorna PDF_BYTES_DIVERGE503. Autorização é conferida antes e após Storage;
+o stream começa somente depois da verificação integral. Uma nova emissão
+histórica usa POST e não recebe o instante do ato antigo como data de emissão.
+[Contrato do acervo](../audits/D/D-B/DOCUMENT_ARCHIVE.md).

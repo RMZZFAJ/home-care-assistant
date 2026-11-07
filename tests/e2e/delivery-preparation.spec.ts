@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
@@ -151,7 +152,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
     fullPage: true,
     animations: "disabled",
   });
-  const pdf = await page.request.get(`/api/documents/${result.id}/pdf`);
+  const pdf = await generatedPdf(page, `/api/documents/${result.id}/pdf`);
   expect(pdf.ok()).toBe(true);
   if (info.project.name === "chromium") {
     mkdirSync("output/pdf/phase-d", { recursive: true });

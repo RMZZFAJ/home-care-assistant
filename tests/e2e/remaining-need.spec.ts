@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -87,7 +88,8 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
     ownReason =
       "O material entregue não encerrou a necessidade; observei zero agora e declaro uma nova intenção";
   await prepare(page, f, ownReason);
-  const oldPdf = await page.request.get(
+  const oldPdf = await generatedPdf(
+    page,
     `/api/documents/${f.source.id}/pdf?version=${f.sourceVersion}`,
   );
   expect(oldPdf.ok(), await oldPdf.text()).toBe(true);
@@ -163,7 +165,8 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
     }),
   ).toContainText(ownReason);
   expect(physicalState(f)).toBe(before);
-  const oldAgain = await page.request.get(
+  const oldAgain = await generatedPdf(
+    page,
     `/api/documents/${f.source.id}/pdf?version=${f.sourceVersion}`,
   );
   expect(oldAgain.ok()).toBe(true);
@@ -172,7 +175,7 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
       .update(await oldAgain.body())
       .digest("hex"),
   ).toBe(oldHash);
-  const pdf = await page.request.get(`/api/documents/${created}/pdf`);
+  const pdf = await generatedPdf(page, `/api/documents/${created}/pdf`);
   expect(pdf.ok(), await pdf.text()).toBe(true);
   const bytes = await pdf.body();
   expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
@@ -183,7 +186,7 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
   );
   const canonical = JSON.parse(
     sql(
-      `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(created)}),'request',(select to_jsonb(r) from public.requisitions r where id=${sqlLiteral(created)}),'sourceVersion',(select version from public.operational_documents where id=${sqlLiteral(f.source.id)}),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}),'renderers',(select jsonb_agg(to_jsonb(e)) from public.document_pdf_renders e where document_id=${sqlLiteral(created)}));`,
+      `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(created)}),'request',(select to_jsonb(r) from public.requisitions r where id=${sqlLiteral(created)}),'sourceVersion',(select version from public.operational_documents where id=${sqlLiteral(f.source.id)}),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}),'renderers',(select jsonb_agg(to_jsonb(e)) from private.pdf_issuances e where state='ready' and document_id=${sqlLiteral(created)}));`,
     ),
   );
   expect(canonical.request.source_requisition_id).toBe(f.source.id);
@@ -271,7 +274,7 @@ test("origem obsoleta exige comparação e adoção explícita após falha; sele
     })
     .click();
   await expect(reason(page)).toHaveValue(ownReason);
-  for (let i=0;i<6;i++) await next(page);
+  for (let i = 0; i < 6; i++) await next(page);
   await expect(
     page.getByText("0 unidade (observado)", { exact: false }),
   ).toBeVisible();

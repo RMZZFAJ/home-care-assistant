@@ -40,7 +40,7 @@ export function useWorkspaceState() { return use(Context); }
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const requestedPatientId = useSearchParams().get("careRecipientId");
-  const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})$/.exec(pathname)?.[1];
+  const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})(?:\/arquivos)?$/.exec(pathname)?.[1];
   const segment = pathname.split("/")[2];
   const publicPage = ["/login", "/recuperar-senha", "/convites/aceitar"].includes(pathname)
     || pathname === "/verificar" || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);

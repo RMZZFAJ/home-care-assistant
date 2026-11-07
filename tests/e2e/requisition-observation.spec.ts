@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -45,13 +46,11 @@ async function review(page: Page) {
   ).toBeVisible();
 }
 const card = (page: Page, name: string) =>
-  page
-    .locator("article")
-    .filter({
-      has: page.getByRole("checkbox", {
-        name: new RegExp("^" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
-      }),
-    });
+  page.locator("article").filter({
+    has: page.getByRole("checkbox", {
+      name: new RegExp("^" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+    }),
+  });
 const count = (patient: string) =>
   sql(
     `select count(*) from public.requisitions where care_recipient_id=${sqlLiteral(patient)};`,
@@ -365,7 +364,8 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
       exact: false,
     }),
   ).toHaveCount(4);
-  const pdf = await page.request.get(
+  const pdf = await generatedPdf(
+    page,
     `/api/documents/${receipt.requisitionId}/pdf`,
   );
   expect(pdf.ok()).toBe(true);

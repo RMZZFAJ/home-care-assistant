@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -280,7 +281,8 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
       path: `output/playwright/phase-d/delivery-regularization-${info.project.name}.png`,
       fullPage: true,
     });
-    const pdf = await family.request.get(
+    const pdf = await generatedPdf(
+      family,
       `/api/documents/${result.id}/pdf?version=${result.version}`,
     );
     expect(pdf.ok(), await pdf.text().then((t) => t.slice(0, 80))).toBe(true);
@@ -292,7 +294,7 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
     writeFileSync(
       `output/pdf/phase-d/delivery-regularization-${result.id}-v${result.version}.json`,
       sql(
-        `select jsonb_build_object('snapshot',e.body,'canonicalHash',e.content_hash,'document',to_jsonb(d),'render',(select to_jsonb(a) from public.document_pdf_renders a where a.document_id=d.id and a.version=e.version and a.renderer=4),'movements',(select jsonb_agg(to_jsonb(m) order by movement_revision) from public.stock_movements m where care_recipient_id=d.care_recipient_id)) from public.document_events e join public.operational_documents d on d.id=e.document_id where e.document_id=${sqlLiteral(result.id)} and e.version=${result.version};`,
+        `select jsonb_build_object('snapshot',e.body,'canonicalHash',e.content_hash,'document',to_jsonb(d),'render',(select to_jsonb(a) from private.pdf_issuances a where a.document_id=d.id and a.version=e.version and a.state='ready'),'movements',(select jsonb_agg(to_jsonb(m) order by movement_revision) from public.stock_movements m where care_recipient_id=d.care_recipient_id)) from public.document_events e join public.operational_documents d on d.id=e.document_id where e.document_id=${sqlLiteral(result.id)} and e.version=${result.version};`,
       ),
     );
     const inbox = await family.request.get(
@@ -347,7 +349,8 @@ test("P05 profissional futuro encontra sua tarefa e relata apenas apuração pr�
       { exact: true },
     ),
   ).toBeVisible();
-  const pdf = await page.request.get(
+  const pdf = await generatedPdf(
+    page,
     `/api/documents/${result.id}/pdf?version=${result.version}`,
   );
   expect(pdf.ok()).toBe(true);
@@ -359,7 +362,7 @@ test("P05 profissional futuro encontra sua tarefa e relata apenas apuração pr�
   writeFileSync(
     `output/pdf/phase-d/delivery-regularization-unknown-${result.id}-v${result.version}.json`,
     sql(
-      `select jsonb_build_object('snapshot',e.body,'canonicalHash',e.content_hash,'render',(select to_jsonb(a) from public.document_pdf_renders a where a.document_id=e.document_id and a.version=e.version and a.renderer=4),'movements',(select jsonb_agg(to_jsonb(m) order by movement_revision) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)})) from public.document_events e where e.document_id=${sqlLiteral(result.id)} and e.version=${result.version};`,
+      `select jsonb_build_object('snapshot',e.body,'canonicalHash',e.content_hash,'render',(select to_jsonb(a) from private.pdf_issuances a where a.document_id=e.document_id and a.version=e.version and a.state='ready'),'movements',(select jsonb_agg(to_jsonb(m) order by movement_revision) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)})) from public.document_events e where e.document_id=${sqlLiteral(result.id)} and e.version=${result.version};`,
     ),
   );
   await page.goto("/entregas");

@@ -764,3 +764,62 @@ combinações de acervo legado/expiração de certificado ainda não ensaiadas,
 rascunhos contextuais/sessão D3, D5 e bases operacionais de backup/monitoramento.
 Rotação, restauração de custódia, incidentes, reconciliação remota final e gates
 humanos/físicos/externos continuam pendentes. Produção NO-GO; PR Draft sem merge.
+
+## D4.4 — acervo unificado e download exato do legado
+
+Base d0179ca. GET de PDF antigo não gera ou registra representação. Originais
+usam renderer=legacy; representações existentes usam sua revisão, com padrão4.
+Ausência é404 com orientação para Gerar PDF; divergência de digest é503
+recuperável, sem bytes alterados ou substituição do original. Leitura vigente
+é conferida antes e depois do Storage. Emissões assinadas conservam também a
+verificação criptográfica. O stream privado começa após todas as verificações.
+
+Arquivos gerados reúne intenções, originais e V4, com cursor misto estável e
+filtro de versão. Datas/solicitantes legados ausentes permanecem desconhecidos.
+O histórico BAL abre o acervo daquela versão. Outra representação histórica
+usa nova identidade, assinatura e instante próprios. Consultar/baixar conserva
+o exemplar; falha de lista pode ser consultada novamente; revogação limpa as
+ações visíveis. [Contrato](DOCUMENT_ARCHIVE.md).
+
+Prova Auth:dois casos distintos passaram entre rodadas, incluindo103 registros
+mistos, inserção entre páginas, filtros e negativas de contexto/grants/vínculo.
+Unidade/API5/5, tipos e lint afetados passaram. Produção:30 casos compatíveis
+passaram na primeira coorte; os três casos novos do acervo passaram na coorte
+final em Chromium/mobile/iOS. São33 casos distintos aprovados entre coortes,
+sem inventar33/33 no mesmo build. Incluem emissão/recuperação, V4 compartilhado,
+REQ material/SCI, COM, ENT, transferência e BAL legado. Acervo final foi auditado
+por axe em quatro larguras; a imagem de320px em iOS emulado foi inspecionada.
+Não é prova física nem aceite com tecnologia assistiva.
+
+O upload público do V4 identifica registro legado e ausência de assinatura;
+a nova representação histórica é PAdES-B-T, sem assinar retroativamente os bytes
+antigos. Storage adulterado é recusado; restauração controlada dos bytes faz o
+mesmo registro voltar a ser recuperável. Metadados legados permaneceram iguais.
+
+Falhas de preparo ficam preservadas no [manifesto](D4_4_EVIDENCE.json):premissa
+errada sobre contexto, coluna de fixture inexistente, import.meta incompatível
+com coleta CJS, tentativa de compra anterior à aprovação e mock HTTP com
+message em lugar de error. Asserções e regras de autorização não foram removidas.
+Diagnóstico rápido1/1 conferiu o fluxo corrigido antes do aceite final3/3.
+O runner agora recusa coleta inválida antes do build e das chaves efêmeras;
+probes positivo/negativo passaram, sem representar casos funcionais aprovados.
+
+Migration140 aplicada por test:db:prepare sem reset após preflight revertido;
+permanece imutável. Local140/remoto121:19 migrations D-B aguardam o lote final.
+Crons originais continuam ativos por minuto; nenhum trigger/função de falha
+permaneceu. CI da base d0179ca aprovou banco/instalação/evolução/integração e
+validate Windows/Ubuntu; browsers estavam em execução na consulta. Não valida
+este incremento. Sonar continua adiado. Sem merge, deploy ou GO.
+
+Próximo lote:oráculos factuais e acessibilidade documental, proveniência de
+atores/datas, anexos anotados, combinações de expiração e custódia, D3 restante,
+D5 e bases operacionais de backup/monitoramento. O probe de recuperação ainda
+precisa incluir as emissões ready da tabela privada, conservando compatibilidade
+com os backups D-A. Reconciliação remota final e gates D-C/D6 continuam pendentes.
+
+Antes da publicação D4.4, a CI da base d0179ca concluiu Chromium e mobile com
+173 casos aprovados cada e uma falha comum em recuperação de senha após logout.
+O artefato mostra o botão visualmente, com nomes acessíveis ausentes no formulário;
+substituir o papel do seletor não foi aceito como correção demonstrada. A análise
+de limpeza modal segue no incremento seguinte. iOS permanecia em execução.
+A falha é preservada, sem promover a CI da base ou deste lote a verde.

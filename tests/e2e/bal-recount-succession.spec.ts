@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -254,7 +255,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   ).toHaveLength(1);
   expect(adjustments).toHaveLength(1);
   expect(Number(adjustments[0].quantity)).toBe(4);
-  const pdf = await page.request.get(`/api/documents/${document.id}/pdf`);
+  const pdf = await generatedPdf(page, `/api/documents/${document.id}/pdf`);
   expect(pdf.ok()).toBe(true);
   const bytes = await pdf.body();
   mkdirSync("output/pdf/phase-d", { recursive: true });
@@ -276,7 +277,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   writeFileSync(
     base + "-database.json",
     sql(
-      `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(document.id)}),'reviews',(select jsonb_agg(to_jsonb(r)) from public.balance_reviews r where document_id=${sqlLiteral(document.id)}),'renders',(select jsonb_agg(to_jsonb(r)) from public.document_pdf_renders r where document_id=${sqlLiteral(document.id)}));`,
+      `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(document.id)}),'reviews',(select jsonb_agg(to_jsonb(r)) from public.balance_reviews r where document_id=${sqlLiteral(document.id)}),'renders',(select jsonb_agg(to_jsonb(r)) from private.pdf_issuances r where state='ready' and document_id=${sqlLiteral(document.id)}));`,
     ),
   );
 });

@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -91,7 +92,7 @@ test("P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevi
     const state = await rpc(family, "requisition_progress", { p_id: req.id }); expect(state.science[0].mode).toBe("dialog");
     for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "P02 family and personal SCI " + width); }
     mkdirSync("output/playwright/phase-d", { recursive: true }); await page.screenshot({ path: `output/playwright/phase-d/p02-science-${info.project.name}.png`, fullPage: true, animations: "disabled" });
-    const pdf = await page.request.get(`/api/documents/${req.id}/pdf`); expect(pdf.ok()).toBe(true);
+    const pdf = await generatedPdf(page, `/api/documents/${req.id}/pdf`); expect(pdf.ok()).toBe(true);
     expect((await rpc(family, "requisition_progress", { p_id: req.id })).materialIdentity).toBe(state.materialIdentity);
     expect(count(req.id)).toBe(1);
     expect(openings(req.id), "PDF delivery must not fabricate another application opening").toBe(1);

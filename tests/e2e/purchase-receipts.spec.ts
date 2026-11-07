@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -163,7 +164,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.locator(".hca-document-header").screenshot({ path: `output/playwright/phase-d/purchase-pending-header-${info.project.name}.png`, animations: "disabled" });
   await expect(page.getByRole("button", { name: "Informar nova chegada", exact: true })).toHaveCount(0);
-  const pendingPdf = await page.request.get(`/api/documents/${document.id}/pdf`); expect(pendingPdf.ok()).toBe(true);
+  const pendingPdf = await generatedPdf(page, `/api/documents/${document.id}/pdf`); expect(pendingPdf.ok()).toBe(true);
   if (info.project.name === "chromium") { mkdirSync("output/pdf/phase-d", { recursive: true }); writeFileSync(`output/pdf/phase-d/purchase-expectation-${document.id}-v${document.version}-pending.pdf`, await pendingPdf.body(), { flag: "wx" }); }
   await page.getByRole("button", { name: "Validar recebimento", exact: true }).click();
   await expect(form.getByText("2 unidade", { exact: true })).toBeVisible(); await expect(form.locator("input")).toHaveCount(0);
@@ -176,7 +177,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   await expect(page.getByText("Encerrada com quantidade inferior", { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.locator(".hca-document-header").screenshot({ path: `output/playwright/phase-d/purchase-closed-header-${info.project.name}.png`, animations: "disabled" });
-  const finalPdf = await page.request.get(`/api/documents/${final.id}/pdf`); expect(finalPdf.ok()).toBe(true);
+  const finalPdf = await generatedPdf(page, `/api/documents/${final.id}/pdf`); expect(finalPdf.ok()).toBe(true);
   expect((await finalPdf.body()).equals(await pendingPdf.body())).toBe(false);
   if (info.project.name === "chromium") writeFileSync(`output/pdf/phase-d/purchase-expectation-${final.id}-v${final.version}-closed.pdf`, await finalPdf.body(), { flag: "wx" });
   await audit(page, "COM closed below quantity 320"); await page.screenshot({ path: `output/playwright/phase-d/purchase-closed-${info.project.name}.png`, fullPage: true, animations: "disabled" });

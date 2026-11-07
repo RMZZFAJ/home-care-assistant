@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
@@ -101,7 +102,7 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
 }, info) => {
   const f = await catalogueIdentityFixture();
   await login(page, f.patient);
-  const pdf = await page.request.get(`/api/documents/${f.origin.id}/pdf`);
+  const pdf = await generatedPdf(page, `/api/documents/${f.origin.id}/pdf`);
   expect(pdf.ok(), await pdf.text()).toBe(true);
   const firstBytes = await pdf.body(),
     firstHash = createHash("sha256").update(firstBytes).digest("hex");
@@ -213,7 +214,10 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   ).toEqual([
     { id: f.products[0], name: "Material fictício V4 0", unit: "unidade" },
   ]);
-  const afterPdf = await page.request.get(`/api/documents/${f.origin.id}/pdf`);
+  const afterPdf = await generatedPdf(
+    page,
+    `/api/documents/${f.origin.id}/pdf`,
+  );
   expect(afterPdf.ok()).toBe(true);
   expect(
     createHash("sha256")

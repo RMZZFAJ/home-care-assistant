@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -179,7 +180,10 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
   const pending = (await rpc(f.admin, "operational_document", {
     p_id: f.document.id,
   })) as SupplyDocument;
-  const pendingPdf = await page.request.get(`/api/documents/${pending.id}/pdf`);
+  const pendingPdf = await generatedPdf(
+    page,
+    `/api/documents/${pending.id}/pdf`,
+  );
   expect(pendingPdf.ok()).toBe(true);
   if (info.project.name === "chromium") {
     mkdirSync("output/pdf/phase-d", { recursive: true });
@@ -308,7 +312,8 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
     expect(
       final.events.filter((event) => event.action === "ent.consent_cancel"),
     ).toHaveLength(1);
-    const finalPdf = await recipient.request.get(
+    const finalPdf = await generatedPdf(
+      recipient,
       `/api/documents/${final.id}/pdf`,
     );
     expect(finalPdf.ok()).toBe(true);

@@ -249,7 +249,7 @@ export function BalanceReview({
         {countEvents.map(event => {
           const captured = Array.isArray(data.canonical_snapshot.history) ? data.canonical_snapshot.history.find((row:unknown)=>row && typeof row === "object" && "version" in row && row.version===event.version) : null;
           const name = captured && typeof captured === "object" && "actorName" in captured && typeof captured.actorName === "string" ? captured.actorName : "Nome não preservado neste histórico";
-          return <article className="rounded-lg border border-(--line) p-3 text-sm space-y-2" key={event.id}><p><strong>Contagem na versão documental {event.version}</strong> · {name} · {formatBrazilDate(event.createdAt)}</p><p>Consulte os materiais, quantidades e observações congelados nessa versão.</p><a href={`/api/documents/${data.id}/pdf?version=${event.version}`} target="_blank" rel="noopener" className="ui-button ui-button-secondary">Consultar PDF da contagem na versão {event.version}</a></article>;
+          return <article className="rounded-lg border border-(--line) p-3 text-sm space-y-2" key={event.id}><p><strong>Contagem na versão documental {event.version}</strong> · {name} · {formatBrazilDate(event.createdAt)}</p><p>Consulte os materiais, quantidades e observações congelados nessa versão.</p><Link href={`/documentos/${data.id}/arquivos?version=${event.version}`} className="ui-button ui-button-secondary">Consultar PDF da contagem na versão {event.version}</Link></article>;
         })}
       </section>
       <Notice>

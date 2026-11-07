@@ -7,7 +7,7 @@ CI do SHA publicado é gate independente; pending não significa aprovação.
 CI dfdc7de, run42335739149, concluiu banco, validate Ubuntu/Windows e os três
 projetos browser com SUCCESS. Inclui a correção D3.4a dos consumidores de
 governança que falharam em bd8747b e os estados de leitura D3.4. Essa CI não
-valida os incrementos posteriores. Local139/remoto121;18 migrations D-B
+valida os incrementos posteriores. Local140/remoto121;19 migrations D-B
 aguardam o lote remoto final autorizado.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
 
@@ -34,9 +34,15 @@ D4.3 implementa página pública, código e upload efêmero limitado/isolado.
 Produção12/12 passou nos três projetos;25 testes de unidade/API e revalidação
 dos quatro artefatos conferem o núcleo final com orçamento criptográfico.
 [Coortes, privacidade e limites](../audits/D/D-B/PUBLIC_VERIFICATION.md).
-Consumidores legados, oráculos factuais específicos e ensaios de rotação/
-recuperação continuam pendentes. O GET antigo
-por versão ainda pode gerar V4. A nova emissão não aprova esses caminhos legados.
+D4.4 integra originais/V4 e emissões independentes no mesmo acervo. GET antigo
+recupera somente bytes registrados, com SHA e acesso atual; não gera PDF.
+Histórico BAL resolve a versão no acervo; representação histórica nova usa
+identidade/instante próprios. Upload público reconheceu V4 registrado sem
+assinatura. Auth2 casos distintos, unidade/API5/5 e33 casos browser distintos
+passaram entre coortes de produção, com quatro larguras/axe e perda de vínculo.
+[Coortes e contraprovas](../audits/D/D-B/D4_4_EVIDENCE.json).
+Oráculos factuais específicos, anexos anotados, leitura documental acessível e
+ensaios de rotação/recuperação continuam pendentes.
 D3 restante, D5, backup/monitoramento e reconciliação remota continuam em execução.
 
 CI42360570173 de3c61697 aprovou banco/validate e reprovou o menu de perfil em

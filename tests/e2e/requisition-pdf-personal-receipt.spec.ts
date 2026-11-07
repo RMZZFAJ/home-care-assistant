@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -58,7 +59,8 @@ const ledger = (patient: string) =>
     `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)};`,
   );
 async function pdf(page: Page, id: string, version: number) {
-  const response = await page.request.get(
+  const response = await generatedPdf(
+    page,
     `/api/documents/${id}/pdf?version=${version}`,
   );
   expect(response.ok(), await response.text()).toBe(true);
@@ -220,11 +222,10 @@ test("M1 mantém material e ciência após resolução de extra, atendimento e d
   expect(material(id)).toBe(original);
   const renders = JSON.parse(
     sql(
-      `select jsonb_agg(jsonb_build_object('version',version,'row',to_jsonb(r))) from public.document_pdf_renders r where document_id=${sqlLiteral(id)} and renderer=4;`,
+      `select jsonb_agg(jsonb_build_object('version',version,'row',to_jsonb(r))) from private.pdf_issuances r where state='ready' and document_id=${sqlLiteral(id)};`,
     ),
   );
-  // The UI may legitimately render intervening event versions as they appear.
-  // Each requested exemplar must have its own unique immutable registration.
+  // Only explicit generation actions create signed, immutable registrations.
   const versions = renders.map((r: { version: number }) => r.version);
   expect(new Set(versions).size).toBe(versions.length);
   expect(versions).toEqual(
@@ -239,7 +240,14 @@ test("M1 mantém material e ciência após resolução de extra, atendimento e d
     ).row;
     expect(registration.document_id).toBe(id);
     expect(registration.sha256).toBe(hash(bytes));
-    expect(registration.object_path).toBe(`${id}/${version}/render-4.pdf`);
+    expect(registration.object_path).toBe(
+      `issuances/${id}/${registration.id}.pdf`,
+    );
+    expect(registration.validation).toMatchObject({
+      accepted: true,
+      profile: "PAdES-B-T",
+      wholeFile: true,
+    });
   }
   await page.reload();
   await expect(

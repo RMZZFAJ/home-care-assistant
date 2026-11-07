@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -291,7 +292,8 @@ test("transferência separa três autores, recupera declaração incerta com per
     });
     mkdirSync("output/pdf/phase-d", { recursive: true });
     const base = `output/pdf/phase-d/transfer-${id}-v${received.version}`;
-    const pdf = await bruno.request.get(
+    const pdf = await generatedPdf(
+      bruno,
       `/api/documents/${id}/pdf?version=${received.version}`,
     );
     expect(pdf.ok()).toBe(true);
@@ -313,7 +315,7 @@ test("transferência separa três autores, recupera declaração incerta com per
     writeFileSync(
       base + "-database.json",
       sql(
-        `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(id)}),'renders',(select jsonb_agg(to_jsonb(r)) from public.document_pdf_renders r where document_id=${sqlLiteral(id)}));`,
+        `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(id)}),'renders',(select jsonb_agg(to_jsonb(r)) from private.pdf_issuances r where state='ready' and document_id=${sqlLiteral(id)}));`,
       ),
     );
     expect(

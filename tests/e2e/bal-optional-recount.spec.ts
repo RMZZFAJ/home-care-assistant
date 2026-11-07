@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -37,7 +38,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
       name: "Consultar PDF da contagem na versão 1",
       exact: true,
     }),
-  ).toHaveAttribute("href", `/api/documents/${f.document.id}/pdf?version=1`);
+  ).toHaveAttribute("href", `/documentos/${f.document.id}/arquivos?version=1`);
   await page
     .getByRole("link", { name: "Designar reconto", exact: true })
     .click();
@@ -184,7 +185,11 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
   ).toBeVisible();
   const after = JSON.parse(recountState(f));
   expect(after.obligations).toBeNull();
-  expect(sql(`select count(*) from public.bal_obligations where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("0");
+  expect(
+    sql(
+      `select count(*) from public.bal_obligations where care_recipient_id=${sqlLiteral(f.patient)};`,
+    ),
+  ).toBe("0");
   expect(after.events.slice(0, before.events.length)).toEqual(before.events);
   const adjustments = after.ledger.filter(
     (m: { reference_type: string; reference_id: string }) =>
@@ -206,7 +211,8 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
   expect(workspace.obligations).toEqual([]);
   mkdirSync("output/pdf/phase-d", { recursive: true });
   for (const version of [1, 2]) {
-    const response = await page.request.get(
+    const response = await generatedPdf(
+      page,
       `/api/documents/${f.document.id}/pdf?version=${version}`,
     );
     expect(response.ok()).toBe(true);
@@ -232,7 +238,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
   writeFileSync(
     pdfBase + "-database.json",
     sql(
-      `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(f.document.id)}),'renders',(select jsonb_agg(to_jsonb(r)) from public.document_pdf_renders r where document_id=${sqlLiteral(f.document.id)}));`,
+      `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(f.document.id)}),'renders',(select jsonb_agg(to_jsonb(r)) from private.pdf_issuances r where state='ready' and document_id=${sqlLiteral(f.document.id)}));`,
     ),
   );
 });

@@ -31,6 +31,12 @@ worker/provedor com transporte falso. Não utilizam credenciais reais.
 
 ## Validação proporcional por incremento
 
+O runner coleta os casos com --list antes do build e da criação das chaves
+efêmeras. Erro de importação, sintaxe ou seleção termina com falha nessa etapa;
+nenhum caso de navegador foi validado por essa coleta. --list explícito consulta
+a seleção sem iniciar servidor ou provisionar chaves. Uma coleta válida segue
+para o build de produção e a execução normal, com a mesma stack guardada.
+
 Para diagnóstico local dirigido, HCA_E2E_DIAGNOSTIC=true no mesmo runner usa
 Next dev e evita reconstruir toda a aplicação a cada hipótese. Verificação da
 stack/origem, identidades fictícias e bloqueio de envio externo continuam

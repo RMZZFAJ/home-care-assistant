@@ -13,6 +13,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Triagem de qualidade](SONAR_TRIAGE.md).
 - [Custódia documental e limites operacionais](SIGNING_CUSTODY.md).
 - [Verificação pública e limites do parser](PUBLIC_VERIFICATION.md).
+- [Acervo e downloads legados](DOCUMENT_ARCHIVE.md).
 - [Complementos posteriores do responsável](OWNER_AMENDMENTS.md): configuração
   e tratamento específico do SonarCloud adiados expressamente.
 

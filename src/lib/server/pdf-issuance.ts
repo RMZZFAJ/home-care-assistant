@@ -191,10 +191,10 @@ export async function downloadPdfIssuance(
   if (!bytes) throw persistence();
   if (hash(bytes) !== r.sha256 || bytes.length !== r.sizeBytes)
     throw new ApiError(
-      "SIGNATURE_INVALID",
+      "PDF_BYTES_DIVERGE",
       "Os bytes armazenados divergem do exemplar registrado. O arquivo não foi disponibilizado.",
       503,
-      false,
+      true,
     );
   const trust = await loadPdfTrust();
   let current;

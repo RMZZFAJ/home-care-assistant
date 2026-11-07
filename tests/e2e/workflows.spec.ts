@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { selectContext } from "./auth-context";
 import { selectDeliveryRecipient } from "./delivery-recipient";
 import { openNavigation } from "./navigation";
@@ -311,7 +312,10 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await expect(
     page.getByRole("link", { name: "ficha-fisica.png", exact: true }),
   ).toBeVisible();
-  const pdf = await get(page, "/api/documents/" + req.requisitionId + "/pdf");
+  const pdf = await generatedPdf(
+    page,
+    "/api/documents/" + req.requisitionId + "/pdf",
+  );
   expect(pdf.ok(), await pdf.text()).toBeTruthy();
   expect(pdf.headers()["content-type"]).toContain("application/pdf");
   expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");

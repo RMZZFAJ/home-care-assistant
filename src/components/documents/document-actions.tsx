@@ -2,15 +2,25 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { buttonClass, Notice } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
-import { api, TransportError } from "@/lib/client/api";
+import { api, ApiError, TransportError } from "@/lib/client/api";
 import {
-  pdfIssuancePageSchema,
   pdfIssuanceSchema,
   type PdfIssuance,
 } from "@/lib/documents/pdf-issuance";
+import {
+  pdfArchivePageSchema,
+  type PdfArchiveEntry,
+  type PdfArchiveCursor,
+} from "@/lib/documents/pdf-archive";
 import { formatBrazilDate } from "@/lib/receipt";
 
-type Props = { id: string; code: string; version?: number };
+type Props = {
+  id: string;
+  code: string;
+  version?: number;
+  archiveVersion?: number;
+  trackNotices?: boolean;
+};
 type Intention = { key: string; version?: number };
 const steps = {
   reserved: "Solicitação registrada",
@@ -88,16 +98,19 @@ function GeneratedFiles({
   code,
   version,
   userId,
+  archiveVersion,
+  trackNotices = true,
 }: Props & { userId: string }) {
   const headingId = useId(),
     scope = `hca:pdf-intention:${userId}:${id}`,
     endpoint = `/api/documents/${id}/issuances`;
-  const [rows, setRows] = useState<PdfIssuance[]>([]),
-    [next, setNext] = useState<{ at: string; id: string } | null>(null),
+  const [rows, setRows] = useState<PdfArchiveEntry[]>([]),
+    [next, setNext] = useState<PdfArchiveCursor | null>(null),
     [loading, setLoading] = useState(true),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [message, setMessage] = useState(""),
+    [readError, setReadError] = useState(""),
     [pending, setPending] = useState<Intention | null>(null);
   const busyRef = useRef(false),
     sequenceRef = useRef(0);
@@ -105,17 +118,21 @@ function GeneratedFiles({
     sequenceRef.current++;
   }, []);
   const load = useCallback(
-    async (cursor?: { at: string; id: string }) => {
+    async (cursor?: PdfArchiveCursor, quiet = false) => {
       const own = ++sequenceRef.current;
-      setLoading(true);
+      if (!quiet) setLoading(true);
       try {
+        const query = new URLSearchParams();
+        if (archiveVersion) query.set("version", String(archiveVersion));
+        if (cursor) {
+          query.set("before", cursor.at);
+          query.set("kind", cursor.kind);
+          query.set("reference", cursor.reference);
+        }
         const raw = await api<unknown>(
-          endpoint +
-            (cursor
-              ? `?before=${encodeURIComponent(cursor.at)}&beforeId=${cursor.id}`
-              : ""),
+          `/api/documents/${id}/archive${query.size ? "?" + query : ""}`,
         );
-        const page = pdfIssuancePageSchema.safeParse(raw);
+        const page = pdfArchivePageSchema.safeParse(raw);
         if (!page.success)
           throw new Error(
             "Não foi possível confirmar a lista de arquivos. Consulte novamente.",
@@ -126,24 +143,36 @@ function GeneratedFiles({
             ? [
                 ...current,
                 ...page.data.data.filter(
-                  (r) => !current.some((c) => c.id === r.id),
+                  (r) =>
+                    !current.some(
+                      (c) => c.kind === r.kind && c.reference === r.reference,
+                    ),
                 ),
               ]
             : page.data.data,
         );
         setNext(page.data.next);
+        setReadError("");
       } catch (reason) {
-        if (own === sequenceRef.current)
-          setError(
+        if (own === sequenceRef.current) {
+          if (
+            reason instanceof ApiError &&
+            [401, 403].includes(reason.status)
+          ) {
+            setRows([]);
+            setNext(null);
+          }
+          setReadError(
             reason instanceof Error
               ? reason.message
               : "Não foi possível consultar os arquivos.",
           );
+        }
       } finally {
         if (own === sequenceRef.current) setLoading(false);
       }
     },
-    [endpoint],
+    [id, archiveVersion],
   );
   useEffect(() => {
     let live = true;
@@ -171,8 +200,12 @@ function GeneratedFiles({
   }, [load, scope, invalidate]);
   useEffect(() => {
     if (!busy && !pending) return;
-    const timer = setInterval(() => void load(), 2000);
-    return () => clearInterval(timer);
+    const timer = setInterval(() => void load(undefined, true), 2000);
+    const deadline = setTimeout(() => clearInterval(timer), 60000);
+    return () => {
+      clearInterval(timer);
+      clearTimeout(deadline);
+    };
   }, [busy, pending, load]);
   async function generate() {
     if (busyRef.current) return;
@@ -203,7 +236,9 @@ function GeneratedFiles({
         sessionStorage.removeItem(scope);
         setPending(null);
         setMessage(
-          "Arquivo assinado, conferido e armazenado. Visualize ou baixe o exemplar abaixo.",
+          archiveVersion && parsed.data.version !== archiveVersion
+            ? `Arquivo recuperado da versão ${parsed.data.version}. Consulte os arquivos de todas as versões para encontrá-lo.`
+            : "Arquivo assinado, conferido e armazenado. Visualize ou baixe o exemplar abaixo.",
         );
       } else
         setMessage(
@@ -292,77 +327,93 @@ function GeneratedFiles({
       </p>
       {message ? <p role="status">{message}</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
+      {readError ? <Notice error>{readError}</Notice> : null}
       {loading ? (
         <p role="status">Consultando arquivos…</p>
       ) : !rows.length ? (
         <p>
-          Nenhum exemplar gerado neste fluxo. PDFs antigos permanecem no
-          histórico do documento.
+          Nenhum arquivo registrado nesta consulta. Use Gerar PDF para uma nova
+          emissão explícita.
         </p>
       ) : null}
       <ul className="space-y-3">
-        {rows.map((row) => (
-          <li key={row.id} className="rounded-lg border border-(--border) p-3">
-            <p className="font-medium">
-              {code} · Versão {row.version} · {steps[row.step]}
-            </p>
-            <p className="text-sm">
-              Solicitado por {row.requestedName} ·{" "}
-              {formatBrazilDate(row.requestedAt)}
-            </p>
-            {row.readyAt ? (
+        {rows.map((entry) => {
+          if (entry.kind !== "issuance")
+            return (
+              <LegacyFile
+                key={`${entry.kind}:${entry.reference}`}
+                entry={entry}
+                id={id}
+                code={code}
+              />
+            );
+          const row = entry.issuance;
+          return (
+            <li
+              key={row.id}
+              className="rounded-lg border border-(--border) p-3"
+            >
+              <p className="font-medium">
+                {code} · Versão {row.version} · {steps[row.step]}
+              </p>
               <p className="text-sm">
-                Emissão concluída em {formatBrazilDate(row.readyAt)} ·
-                Assinatura técnica e carimbo internos
+                Solicitado por {row.requestedName} ·{" "}
+                {formatBrazilDate(row.requestedAt)}
               </p>
-            ) : null}
-            {row.representation === "derived" ? (
-              <p className="text-sm">
-                Nova representação de uma versão histórica, gerada no momento
-                indicado.
-              </p>
-            ) : null}
-            {row.state === "ready" ? (
-              <div className="mt-2 flex flex-wrap gap-3">
-                <a
-                  className={buttonClass}
-                  href={`/api/documents/${id}/pdf?issuance=${row.id}`}
-                  target="_blank"
-                  rel="noopener"
-                >
-                  Visualizar PDF
-                </a>
-                <a
-                  className={buttonClass}
-                  href={`/api/documents/${id}/pdf?issuance=${row.id}`}
-                  download
-                >
-                  Baixar PDF
-                </a>
-                <button
-                  className={buttonClass}
-                  type="button"
-                  onClick={() => void share(row)}
-                >
-                  Compartilhar PDF
-                </button>
-              </div>
-            ) : (
-              <p className="text-sm">
-                {row.state === "uncertain"
-                  ? "Arquivo ainda não confirmado. O solicitante pode recuperar a mesma emissão."
-                  : "O arquivo ficará disponível após assinatura, validação e confirmação do armazenamento."}
-              </p>
-            )}
-            <details className="mt-2 text-sm">
-              <summary>Identificação do exemplar</summary>
-              <p className="break-all">{row.id}</p>
-              <p className="break-all">
-                Código: HCA-{row.verificationCode.match(/.{4}/g)?.join("-")}
-              </p>
-            </details>
-          </li>
-        ))}
+              {row.readyAt ? (
+                <p className="text-sm">
+                  Emissão concluída em {formatBrazilDate(row.readyAt)} ·
+                  Assinatura técnica e carimbo internos
+                </p>
+              ) : null}
+              {row.representation === "derived" ? (
+                <p className="text-sm">
+                  Nova representação de uma versão histórica, gerada no momento
+                  indicado.
+                </p>
+              ) : null}
+              {row.state === "ready" ? (
+                <div className="mt-2 flex flex-wrap gap-3">
+                  <a
+                    className={buttonClass}
+                    href={`/api/documents/${id}/pdf?issuance=${row.id}`}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Visualizar PDF
+                  </a>
+                  <a
+                    className={buttonClass}
+                    href={`/api/documents/${id}/pdf?issuance=${row.id}`}
+                    download
+                  >
+                    Baixar PDF
+                  </a>
+                  <button
+                    className={buttonClass}
+                    type="button"
+                    onClick={() => void share(row)}
+                  >
+                    Compartilhar PDF
+                  </button>
+                </div>
+              ) : (
+                <p className="text-sm">
+                  {row.state === "uncertain"
+                    ? "Arquivo ainda não confirmado. O solicitante pode recuperar a mesma emissão."
+                    : "O arquivo ficará disponível após assinatura, validação e confirmação do armazenamento."}
+                </p>
+              )}
+              <details className="mt-2 text-sm">
+                <summary>Identificação do exemplar</summary>
+                <p className="break-all">{row.id}</p>
+                <p className="break-all">
+                  Código: HCA-{row.verificationCode.match(/.{4}/g)?.join("-")}
+                </p>
+              </details>
+            </li>
+          );
+        })}
       </ul>
       {next ? (
         <button
@@ -374,7 +425,49 @@ function GeneratedFiles({
           Carregar emissões anteriores
         </button>
       ) : null}
-      <InitialNoticeTracking id={id} />
+      {trackNotices ? <InitialNoticeTracking id={id} /> : null}
     </section>
+  );
+}
+
+function LegacyFile({
+  entry,
+  id,
+  code,
+}: {
+  entry: Exclude<PdfArchiveEntry, { kind: "issuance" }>;
+  id: string;
+  code: string;
+}) {
+  const url = `/api/documents/${id}/pdf?version=${entry.version}&renderer=${entry.kind === "legacy_original" ? "legacy" : entry.renderer}`;
+  return (
+    <li className="rounded-lg border border-(--border) p-3 space-y-2">
+      <p className="font-medium">
+        {code} · Versão {entry.version} ·{" "}
+        {entry.kind === "legacy_original"
+          ? "Arquivo original registrado"
+          : `Representação legada V${entry.renderer}`}
+      </p>
+      <p className="text-sm">
+        Registrado no acervo em {formatBrazilDate(entry.at)}. A data de emissão
+        e o solicitante do arquivo não foram preservados neste registro.
+      </p>
+      <p className="text-sm">
+        Legado: assinatura incorporada não comprovada neste registro. O download
+        confere os bytes e não gera outra representação.
+      </p>
+      <div className="flex flex-wrap gap-3">
+        <a className={buttonClass} href={url} target="_blank" rel="noopener">
+          Visualizar arquivo legado
+        </a>
+        <a className={buttonClass} href={url} download>
+          Baixar arquivo legado
+        </a>
+      </div>
+      <details className="text-sm">
+        <summary>Identificação do arquivo legado</summary>
+        <p className="break-all">SHA-256: {entry.sha256}</p>
+      </details>
+    </li>
   );
 }

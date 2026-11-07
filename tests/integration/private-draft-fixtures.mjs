@@ -125,7 +125,8 @@ export const officialState = (f) =>
  'events',(select jsonb_agg(to_jsonb(e) order by id) from public.document_events e where care_recipient_id=${sqlLiteral(f.patient)}),
  'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}),
  'attachments',(select jsonb_agg(to_jsonb(a) order by id) from public.attachments a where care_recipient_id=${sqlLiteral(f.patient)}),
- 'renders',(select jsonb_agg(to_jsonb(p) order by p.document_id,p.version,p.renderer) from public.document_pdf_renders p join public.operational_documents d on d.id=p.document_id where d.care_recipient_id=${sqlLiteral(f.patient)}));`);
+ 'renders',(select jsonb_agg(to_jsonb(p) order by p.document_id,p.version,p.renderer) from public.document_pdf_renders p join public.operational_documents d on d.id=p.document_id where d.care_recipient_id=${sqlLiteral(f.patient)}),
+ 'issuances',(select jsonb_agg(to_jsonb(p) order by p.id) from private.pdf_issuances p where p.care_recipient_id=${sqlLiteral(f.patient)}));`);
 
 export async function officialWithReadyFile(f) {
   const document = await issue(f.patient, [f.products[1]]);

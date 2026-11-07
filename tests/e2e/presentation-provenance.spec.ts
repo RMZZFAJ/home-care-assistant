@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { randomUUID, createHash } from "node:crypto";
@@ -76,21 +77,19 @@ async function chooseProduct(page: Page, name: string) {
       }),
     )
     .toBe(true);
-  await test
-    .info()
-    .attach("presentation-product-pointer-" + name, {
-      body: JSON.stringify(
-        {
-          before,
-          after: await combo.boundingBox(),
-          option: await option.boundingBox(),
-          viewport: page.viewportSize(),
-        },
-        null,
-        2,
-      ),
-      contentType: "application/json",
-    });
+  await test.info().attach("presentation-product-pointer-" + name, {
+    body: JSON.stringify(
+      {
+        before,
+        after: await combo.boundingBox(),
+        option: await option.boundingBox(),
+        viewport: page.viewportSize(),
+      },
+      null,
+      2,
+    ),
+    contentType: "application/json",
+  });
   await option.click();
   await expect(combo).toHaveValue(name);
 }
@@ -408,7 +407,7 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
     });
     await audit(page, "presentation-issued-" + width);
   }
-  const pdf = await page.request.get(`/api/documents/${id}/pdf`);
+  const pdf = await generatedPdf(page, `/api/documents/${id}/pdf`);
   expect(pdf.status()).toBe(200);
   const bytes = await pdf.body();
   mkdirSync("output/pdf/phase-d", { recursive: true });

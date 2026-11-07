@@ -251,3 +251,14 @@ funções aprovadas; serviço continua sem finalizar emissão pelo Auth. O orça
 foi exercitado com concorrência real, limite pessoal/global e expiração, sem
 limpar contadores para obter verde. CI do novo SHA deve comprovar instalação
 limpa, evolução legada e integração geral. Nenhuma aplicação remota neste lote.
+
+### Lote local D4.4
+
+Local140/remoto121;19 migrations D-B pendentes. A migration20261107123000
+acrescenta pdf_archive, RPC somente Auth, com leitura autorizada de originais,
+representações legadas e intenções independentes. Não modifica artefatos,
+metadados ou snapshots existentes. Grants de anon/serviço permanecem negados.
+Preflight revertido e test:db:prepare passaram sem reset. Auth percorreu103
+registros mistos, cursor estável, filtros e negativas; a interface e os downloads
+foram exercitados nos três projetos. Instalação/evolução/integração completas
+permanecem gate da CI do SHA publicado. Nenhuma aplicação remota neste lote.
