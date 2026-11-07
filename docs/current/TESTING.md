@@ -347,3 +347,18 @@ recebimento físico ou provedor. Unidade confere RFC8291 e VAPID independentemen
 com Node crypto, além dos controles de cache/ativação e payload genérico.
 As coortes, contraprovas e fontes congeladas constam em
 [D5.2](../audits/D/D-B/D5_2_EVIDENCE.json). CI do novo SHA permanece obrigatória.
+
+## Lembretes legados e backup
+
+legacy-reminder-scheduler.test.mjs cobre101 configurações elegíveis em três
+rodadas, downtime, backlog, fonte alterada, falha isolada, rollback e BAL moderno.
+notice-reference.test.mjs e requisition-scheduler.test.mjs são consumidores
+compatíveis obrigatórios desse produtor; o lote dirigido passou16/16 com Auth
+real/serviço. Não há mudança de interface que exija novo build E2E local.
+
+backup-retention.test.mjs usa filesystem real/crypto e calendário controlado;
+backup-snapshots.test.mjs acrescenta SQL real e mutantes de versão/causa/negócio.
+O lote final9/9 não é47 dias de operação nem perda do computador. CLI/captura e
+restore reais são evidência separada em [OPS.2](../audits/D/D-B/OPS_2_EVIDENCE.json).
+Não executar testes mutáveis de banco junto ao E2E. Agenda e fornecedor externo
+permanecem desligados; captura/probe não fazem reset ou importação de roles.

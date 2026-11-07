@@ -1,0 +1,57 @@
+{
+  "sourceSha": "40161055629b710e6c495941d4931ffd3c4b4656",
+  "workflowRun": 42415801564,
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42415801564",
+  "conclusion": "SUCCESS",
+  "jobs": [
+    {
+      "name": "validate (ubuntu-latest)",
+      "conclusion": "success"
+    },
+    {
+      "name": "validate (windows-latest)",
+      "conclusion": "success"
+    },
+    {
+      "name": "database",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (chromium)",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (ios-2)",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (mobile)",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (ios-1)",
+      "conclusion": "success"
+    },
+    {
+      "name": "database-and-browser",
+      "conclusion": "success"
+    }
+  ],
+  "preview": {
+    "state": "READY",
+    "url": "https://home-care-assistant-j44m5muno-rmzzfajs-projects.vercel.app",
+    "schemaAfterProbe": 145,
+    "runtimeHttp": 200,
+    "runtime": {
+      "state": "ready",
+      "protocol": 1,
+      "schema": 1
+    },
+    "pushDevicesWithoutAppSessionHttp": 401,
+    "remoteAuthFixtureCreated": false,
+    "privateJourneyClaim": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "validatesLaterSource": false,
+  "operationalGo": false
+}

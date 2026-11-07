@@ -1047,3 +1047,74 @@ CI e preview do novo SHA exigem observação própria. VAPID de preview, aparelh
 provedores, D3/documentos restantes, recuperação/retenção7+4, monitoramento e
 suporte continuam gates reais. Sonar adiado pelo responsável, D-B ativa, PR Draft,
 sem merge, reset, Auth remoto alterado ou promoção operacional.
+
+## D5.3 e OPS.2 em execução
+
+4016105 publicado; PR7 OPEN Draft e preview READY. Probe Vercel autenticado do
+runtime respondeu200/ready. CI42415801564 aprovou banco e validate Ubuntu/Windows;
+os quatro jobs browser estavam em andamento, sem aprovação antecipada.
+
+Foi reproduzida starvation real no agendador legado: três rodadas alcançaram
+95/101 configurações elegíveis. A primeira tentativa do teste falhou antes,
+por tipo enum presumido na fixture; não é contraprova do produto. A seleção
+agora exclui defaults sem obrigação e usa cursor transacional rotativo100.
+Períodos conhecidos têm catch-up de até sete datas por visita, com continuidade.
+Mudança de versão/data da configuração gera lacuna técnica, sem aplicar novos
+destinatários retroativamente. Falha isolada não bloqueia válidos. BAL moderno
+conserva seu produtor; legado é fallback sem regime ativo.
+
+Migration145 passou por preflight revertido com inscrição, catch-up, lacuna,
+erro/recuperação e grants. Ambiguidade de alias PL/pgSQL foi corrigida antes da
+aplicação. test:db:prepare aplicou somente no local, sem reset. 16/16 casos Auth/
+serviço e consumidores existentes passaram, incluindo101, D→D+1, backlog longo,
+concorrência, rollback, referência/ciência e REQ. Local145/remoto144: uma pendente.
+A migration aplicada não será reescrita.
+
+OPS.2 acrescenta captura remota reutilizável e destino filesystem cifrado com
+índice autenticado, sete slots diários/quatro semanais, críticos preservados e
+fila de poda verificável. Seis testes reais de filesystem passaram: retenção,
+concorrência, recusa de chave/índice/link, captura interrompida e arquivo corrupto
+preservado para conciliação. Relógio e fontes são controlados nesses testes,
+sem provar dias reais de operação. O próximo backup pré-migration exercitará
+o consumidor CLI real; agenda operacional externa permanece desligada.
+
+## Fechamento D5.3/OPS.2 — remoto145 e backup v2 real
+
+CI4016105 terminou SUCCESS em42415801564: banco, validate Ubuntu/Windows,
+Chromium/mobile, iOS1/iOS2 e agregado. Preview4016105 READY/runtime200; não é
+aprovação dos incrementos posteriores. A nova CI exige o SHA publicado próprio.
+
+Backup crítico pelo CLI novo:6681a390-179c-4172-83db-22338589ad5e,78 arquivos,
+10.304.691 bytes. Restauração139 tabelas/FKs,32 objetos/31 PDFs, zero emissão
+assinada ready na fonte e upgrade145 passaram, sem cron/pg_net. Compatibilidade
+preservou386 identidades/229 públicas, autoridades e grants. Dois corpos mudam
+intencionalmente para corrigir o legado; entrada de serviço continua a mesma.
+Aplicação oficial de145 e pós-validação145 SQLs/139 projeções passaram. Cron/
+Vault e dados originais idênticos; saúde sem locks/transações longas/índices
+inválidos. **Local145/remoto145; nenhuma migration pendente.**
+
+OPS.2 passou9/9 testes finais de retenção, concorrência, interrupção, corrupção,
+índice/chave/link e projeções SQL. Corrigida fixture sem linha settings: o mutante
+atualizava zero linhas, sem retirar a expectativa. v2 qualifica somente clocks/
+cursores nomeados; versões, política, causa e fatos continuam exatos. SQL real
+reprovou esses mutantes, e a consulta remota completa143 passou.
+
+Um tick scheduled manual e único do caminho v2 gerou
+701fb22c-876e-41a7-b40c-f32c97edb1fe:78 arquivos/10.529.666 bytes. Hash de fonte
+foi congelado; captura145, autenticação e restauração143 tabelas/FKs,32 objetos/
+31 PDFs passaram. Zero emissão assinada ready, sem cron/pg_net na cópia.
+Os três desvios qualificados são apenas cursor BAL, heartbeat e progresso legado;
+campos estáveis foram conferidos por hash. Um slot diário/semanal e o crítico
+anterior coexistem. A configuração temporária foi removida e a permanente
+permanece desligada; não há tarefa do Windows, fornecedor ou destino independente
+ativado. Probe3,759s não é RTO8h comprovado.
+
+16/16 casos de serviço/Auth e consumidores do scheduler passaram. Nenhuma UI/TS
+de produto mudou desde4016105; sem build E2E local redundante. Lint afetado e
+guard84 passaram. [D5.3](D5_3_EVIDENCE.json), [OPS.2](OPS_2_EVIDENCE.json),
+[contrato de backup](BACKUP_PIPELINE.md) e [recibo remoto](D5_3_REMOTE_MIGRATIONS.json)
+preservam fontes, logs e contraprovas. Agenda externa, recuperação de chaves/
+computador, monitoramento/suporte OPS.3, critérios D3/D4 restantes, aparelhos/AT
+e gates D-C/D6 continuam pendentes. Sonar adiado; D-B ativa e PR Draft.
+Sem merge ou promoção operacional. A configuração local de Sonar fora
+deste lote é preservada.

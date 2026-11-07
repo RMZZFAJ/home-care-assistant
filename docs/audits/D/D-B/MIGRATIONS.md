@@ -3,7 +3,30 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D5.2
+## Estado atual — D5.3
+
+**Local145/remoto145, zero pendências.** Migration20261107213013 corrige seleção
+e progresso de lembretes legados, com checkpoints, diagnóstico e lacunas privadas.
+Entrada pública de serviço e seus grants são preservados. Somente dois corpos
+de funções mudam intencionalmente;386 identidades e229 identidades públicas,
+autoridades e grants anteriores permanecem. Nenhum produtor foi desativado.
+
+O consumidor de backup novo gerou6681a390-179c-4172-83db-22338589ad5e:
+78 arquivos/10.304.691 bytes,139 tabelas/FKs,32 objetos e31 PDFs, zero emissão
+assinada ready na fonte. Manifesto SHA
+ce349754ef70a5ab33505b63f7496aa7e915b54d4ddbc731102dccb484b00c36.
+Cópia autenticada, restaurada em isolamento e evoluída com145 antes da aplicação.
+Probe4,574s não é RTO operacional. Crons/pg_net ficaram ausentes na cópia.
+
+Dry-run oficial mostrou apenas145, sem seed/roles. Após aplicação linked/
+skip-vault,145 SQLs e139 projeções originais coincidiram; nenhum drift de dados,
+cron ou Vault. Nove Auth, sete perfis e32 objetos preservados. Catálogo vivo
+coincide com o local, exceto a qualificação NaN local já conhecida, com predicado
+idêntico. Locks/transações longas/índices inválidos zero.
+[Preflight](D5_3_REMOTE_PREFLIGHT.json), [resultado](D5_3_REMOTE_MIGRATIONS.json)
+e [advisors](D5_3_REMOTE_ADVISORS.json). Publicação/CI são gates separados.
+
+## Fechamento anterior — D5.2
 
 **Local144/remoto144, zero pendências.** A migration20261107195440 acrescenta
 quatro tabelas privadas Push, cinco RPCs pessoais Auth e três de worker/serviço.

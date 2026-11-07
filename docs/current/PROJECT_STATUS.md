@@ -4,6 +4,25 @@ Referência editorial:07/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+CI4016105, run42415801564, terminou SUCCESS: banco, validate Ubuntu/Windows,
+Chromium/mobile e as duas partes iOS, além do agregado. O preview correspondente
+está READY e runtime respondeu200/ready. Isso valida D5.2; os incrementos D5.3/
+OPS.2 abaixo exigem CI própria após publicação. Sonar continua adiado pelo dono.
+[Recibo por SHA e preview](../audits/D/D-B/D5_2_CI_EVIDENCE.json).
+
+D5.3 corrigiu rotação dos lembretes legados e períodos perdidos. A contraprova
+antiga alcançou95/101; a implementação passou16/16 casos de serviço/Auth e
+consumidores existentes. **Local145/remoto145, zero pendências** após captura,
+restauração/upgrade, compatibilidade e pós-validação145/145 SQLs/139 projeções.
+[Contrato](../audits/D/D-B/SCHEDULER_LEGACY.md) e
+[recibo](../audits/D/D-B/D5_3_REMOTE_MIGRATIONS.json).
+
+OPS.2 integra CLI de captura read-only, arquivo cifrado e retenção7+4 em
+filesystem. Críticos ficam preservados, índice/poda são autenticados e falhas
+ficam em quarentena. Nove testes finais passaram, incluindo SQL real para
+projeções estáveis. A agenda permanente continua desligada; backup operacional
+externo não está ativo. [Contrato e limites](../audits/D/D-B/BACKUP_PIPELINE.md).
+
 D5.2 acrescentou consentimento Push por aparelho, isolamento de conta/sessão,
 fanout dos avisos internos, transporte cifrado, destino autorizado e revogação.
 Envio externo permanece desligado. Auth7 casos distintos,22 unitários com
@@ -12,7 +31,7 @@ Tipos/lint afetados e SQL dirigido passaram. Custódia local foi criada e
 recuperada de backup cifrado, sem enviar a chave ao preview.
 [Contrato e limites](../audits/D/D-B/WEB_PUSH.md).
 Após backup renovado, restauração e upgrade isolados, a migration144 foi aplicada:
-**local144/remoto144, zero pendências**. Histórico144/144,135 projeções anteriores,
+local144/remoto144 naquele fechamento. Histórico144/144,135 projeções anteriores,
 cron/Vault e grants Push foram conferidos. O primeiro preflight recusou mudanças
 legítimas entre capturas; o backup foi renovado antes de prosseguir.
 [Recibo atual](../audits/D/D-B/D5_2_REMOTE_MIGRATIONS.json).

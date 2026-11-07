@@ -5,6 +5,14 @@ semanais, cópia antes de alterações críticas, RPO alvo24h e RTO alvo8h.
 Não há agendamento diário ou monitoramento de incidentes implementado neste
 incremento. O ensaio abaixo não aprova o gate operacional D6.
 
+Atualização OPS.2: o [pipeline](BACKUP_PIPELINE.md) agora integra captura remota,
+destino filesystem cifrado, sete slots diários/quatro semanais, críticos
+preservados e recibos de falha. CLI real e restauração/upgrade isolados foram
+exercitados. A agenda permanente continua desligada; não há backup operacional
+externo ativo. Monitoramento persistente/consumidor técnico é o próximo lote.
+[Evidência atual](OPS_2_EVIDENCE.json); as seções seguintes preservam os marcos
+anteriores e seus limites específicos.
+
 ## Implementado e exercitado
 
 scripts/backup-archive.mjs oferece seal, verify e extract sobre diretórios

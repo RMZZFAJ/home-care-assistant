@@ -967,3 +967,12 @@ interno, com três RPCs exclusivas de serviço e revalidação imediatamente ant
 do transporte. WEB_PUSH_EXTERNAL_ENABLED permanece desligado por padrão.
 Accepted é aceite HTTP do serviço; perda de resposta após preparo fica incerta,
 sem reenvio automático. [Contrato, privacidade e limites](../audits/D/D-B/WEB_PUSH.md).
+
+## Progresso dos lembretes legados
+
+O RPC de serviço run_operational_schedule conserva argumentos/grants e os
+campos anteriores. schedule no worker acrescenta legacyReminderPatients,
+legacyReminderFailures e legacyReminderGaps. Contadores não revelam payloads
+ou pessoas e não substituem uma central de incidentes. O helper legado continua
+privado. Rotação100, recuperação de sete datas por visita e lacunas por mudança
+de configuração estão descritas em [D5.3](../audits/D/D-B/SCHEDULER_LEGACY.md).

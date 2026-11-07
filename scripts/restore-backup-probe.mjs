@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { extractBackup } from "./backup-archive.mjs";
 import { getTestEnvironment, testContainer } from "./test-environment.mjs";
 import { trustedExecutable } from "./trusted-executable.mjs";
+import { compareBackupSnapshots } from "./backup-snapshots.mjs";
 import { verifyStorageCapture } from "./verify-storage-capture.mjs";
 
 const prefix = "hca_restore_probe_";
@@ -71,12 +72,9 @@ export async function probeRestore({ directory, key, destination, applyAfterVers
     const query = readFileSync(join(destination, "state-query.sql"), "utf8");
     const expected = JSON.parse(readFileSync(join(destination, "state-before.json"), "utf8")).rows[0].snapshot;
     const restored = JSON.parse(sql(query).split(/\r?\n/).find((line) => line.startsWith("{")));
-    const differences = Object.keys(expected).filter((name) => JSON.stringify(expected[name]) !== JSON.stringify(restored[name]));
-    // Separate pg_dump and Management API snapshots can differ in two live cron
-    // cursors/heartbeats. Their captured rows are restored; they are not a claim
-    // of an atomic cut across two independently committed reads.
-    const volatile = new Set(["private.bal_scheduler_progress", "private.scheduler_health"]);
-    const unexpected = differences.filter((name) => !volatile.has(name) || expected[name].rows !== restored[name]?.rows);
+    // v2 projects only named replay-safe clock/cursor fields. Versions, policy
+    // fingerprints, failure cause and every business table remain exact.
+    const { differences, unexpected } = compareBackupSnapshots(expected, restored, source.snapshotVersion ?? 1);
     assert.deepEqual(unexpected, [], "Every stable captured table count and row digest must restore exactly.");
     const foreignKeyCheck = `do $verify$ declare c record; bad boolean; predicate text; guards text; begin
       for c in select conrelid::regclass relation,confrelid::regclass target,conkey,confkey from pg_constraint where contype='f' loop
