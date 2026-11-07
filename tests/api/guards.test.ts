@@ -7,13 +7,39 @@ import {
   boundedText,
   databaseError,
   patientContext,
+  parseQuery,
   readJson,
   saoPauloDateBoundary,
   validateMutationRequest,
   type AuthContext,
 } from "@/lib/server/api";
+import { auditQuerySchema } from "@/lib/validation/audit";
+import { governanceQuerySchema } from "@/lib/validation/governance";
 
 const patientId = "10000000-0000-4000-8000-000000000001";
+describe("request-query validation has a separate boundary from server results", () => {
+  it("maps invalid audit/governance limits to a safe400 without exposing request values", () => {
+    for (const read of [() => parseQuery(auditQuerySchema, { pageSize: "101" }), () => parseQuery(governanceQuerySchema, { pageSize: "private-invalid-value" })]) {
+      try { read(); throw new Error("Invalid query was accepted"); }
+      catch (reason) {
+        expect(reason).toBeInstanceOf(ApiError);
+        expect(reason).toMatchObject({ status: 400, code: "VALIDATION_ERROR", retryable: false });
+        expect((reason as Error).message).not.toContain("private-invalid-value");
+      }
+    }
+  });
+  it("preserves defaults for omitted query values", () => {
+    expect(parseQuery(auditQuerySchema, {})).toMatchObject({ page: 1, pageSize: 20 });
+    expect(parseQuery(governanceQuerySchema, {})).toMatchObject({ page: 1, pageSize: 20, status: "open" });
+  });
+  it("keeps a broken internal result schema as500 rather than presenting it as a rejected request", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const response = await api("test.result_schema", async () => { z.object({ ok: z.literal(true) }).parse({ ok: false }); return Response.json({ ok: true }); });
+      expect(response.status).toBe(500); expect(await response.json()).toMatchObject({ code: "INTERNAL_ERROR" });
+    } finally { log.mockRestore(); }
+  });
+});
 function request(body: unknown, extra: Record<string, string> = {}) {
   return new Request("https://care.example/api/operation", {
     method: "POST",

@@ -557,6 +557,23 @@ válida é distinguida de falha na consulta posterior. A leitura não revela has
 secreto de convite: aprovação recuperada oferece reemissão explícita, invalidando
 o link anterior. Não há concessão de vínculo somente por aprovar a proposta.
 
+GET /api/admin?section=audit exige vínculo/contexto do paciente e audit.read,
+inclusive na RPC patient_audit_page. Modo global não concede essa leitura.
+Retorna data, total, page, pageSize e opções autorizadas actions/entityTypes.
+page usa1 e aceita1–100000; pageSize usa20 e aceita1–100. query busca código de
+evento, tipo ou nome atual da pessoa; reference corresponde ao evento ou recurso;
+action e entityType filtram códigos persistidos. from/to são dias civis de São
+Paulo, com limite final exclusivo no dia seguinte. Datas impossíveis e períodos
+invertidos são recusados. Filtros antecedem paginação, com created_at/id estáveis.
+Os campos anteriores do evento/metadata são preservados; actor_name_current
+identifica o nome do cadastro atual e não um snapshot da data do evento.
+
+operational_document_list conserva defaults1/20 e teto100. NULL explícito de
+página/tamanho é inválido, inclusive na chamada RPC direta; a API documental
+mantém a normalização limitada anterior. Query inválida das duas consultas
+administrativas recebe400 seguro; falha de schema interno não é reclassificada
+como recusa de input do usuário.
+
 Worker e webhook ficam em /api/notifications/worker e
 /api/notifications/webhook. O primeiro exige segredo de servidor; o segundo
 verifica assinatura Meta antes de processar estado ou mensagem.

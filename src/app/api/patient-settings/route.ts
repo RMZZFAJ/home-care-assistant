@@ -8,6 +8,7 @@ import {
   authenticate,
   databaseError,
   patientContext,
+  parseQuery,
   readJson,
   rpc,
   uuid,
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
     const auth = await authenticate();
     const params = new URL(request.url).searchParams;
     const requested = params.get("careRecipientId");
-    const query = governanceQuerySchema.parse(Object.fromEntries(["status", "kind", "query", "page", "pageSize"].filter(key => params.has(key)).map(key => [key, params.get(key)])));
+    const query = parseQuery(governanceQuerySchema, Object.fromEntries(["status", "kind", "query", "page", "pageSize"].filter(key => params.has(key)).map(key => [key, params.get(key)])));
     const readChanges = async (patientId: string) => rpc(auth.client, "patient_governance_changes", { p_patient: patientId, p_status: query.status, p_kind: query.kind ?? null, p_query: query.query, p_page: query.page, p_size: query.pageSize }) as Promise<{ changes: unknown[]; total: number; page: number; pageSize: number }>;
     if (auth.isGlobalAdmin && uuid.safeParse(requested).success) {
       const page = await readChanges(requested!);

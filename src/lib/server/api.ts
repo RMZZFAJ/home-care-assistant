@@ -512,6 +512,13 @@ export function pageParameters(params: URLSearchParams) {
   };
 }
 
+/** Validate request query input before reading; result validation has its own boundary. */
+export function parseQuery<T>(schema: z.ZodType<T>, value: unknown): T {
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) throw new ApiError("VALIDATION_ERROR", "Revise os filtros e os limites desta consulta.", 400);
+  return parsed.data;
+}
+
 /** First instant of a São Paulo calendar day, including historical DST changes. */
 export function saoPauloDateBoundary(value: string, nextDay = false) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value))

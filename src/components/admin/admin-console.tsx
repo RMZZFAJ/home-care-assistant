@@ -31,6 +31,7 @@ import {
 import { CatalogueManagement } from "./catalogue-management";
 import { MembershipManagement } from "./membership-management";
 import { GlobalAccounts } from "./global-accounts";
+import { AuditHistory } from "./audit-history";
 
 type Section =
   | "patient"
@@ -72,7 +73,7 @@ export function AdminConsole() {
     >
       {(context) => (
         <PatientAdmin
-          key={(context.patient?.id ?? "global") + params.toString()}
+          key={(context.patient?.id ?? "global") + ":" + (params.get("section") ?? "overview")}
           context={context}
         />
       )}
@@ -101,7 +102,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [page, setPage] = useState(1);
   const [notificationTotal, setNotificationTotal] = useState(0);
   const [loading, setLoading] = useState(
-    !["patient", "import", "overview"].includes(section),
+    !["patient", "import", "overview", "audit"].includes(section),
   );
   const command = useCommandIntent<Row, AdministrativeResult>(governanceCommandConfirmed);
   const intentRef = useRef<AdministrativeIntent | null>(null);
@@ -128,7 +129,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   }, [globalMode, patientId, versionAttempt]);
   const load = useCallback(
     (signal?: AbortSignal) => {
-      if (!allowed || ["patient", "import", "overview"].includes(section))
+      if (!allowed || ["patient", "import", "overview", "audit"].includes(section))
         return Promise.resolve();
       const query = new URLSearchParams({ section });
       if (patientId) query.set("careRecipientId", patientId);
@@ -504,34 +505,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         {section === "alerts" && (
           <AlertSettings rows={rows} products={catalog} handle={handle} />
         )}
-        {section === "audit" && (
-          <section className={panelClass}>
-            <h2 className="font-bold">Eventos de auditoria deste contexto</h2>
-            <ul className="mt-4 space-y-3">
-              {rows.map((row) => (
-                <li
-                  key={text(row, "id")}
-                  className="rounded border border-(--line) p-3 text-sm"
-                >
-                  <p className="font-semibold">{text(row, "action")}</p>
-                  <p>
-                    {row.created_at
-                      ? formatBrazilDate(text(row, "created_at"))
-                      : "Data não informada"}{" "}
-                    · {text(row, "entity_type")}
-                  </p>
-                  <p className="break-all text-xs text-(--muted)">
-                    Ator: {text(row, "actor_id") || "Sistema"} · Referência:{" "}
-                    {text(row, "entity_id")}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            {!loading && rows.length === 0 && (
-              <p className="mt-3 text-sm">Nenhum evento encontrado.</p>
-            )}
-          </section>
-        )}
+        {section === "audit" ? <AuditHistory patientId={patientId!} /> : null}
         {section === "import" && (
           <section className={panelClass}>
             <h2 className="font-bold">Importar protocolos físicos 1–11</h2>

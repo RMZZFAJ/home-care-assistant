@@ -192,3 +192,55 @@ O responsável adiou expressamente configuração e tratamento específico do
 SonarCloud para depois de sua configuração adequada. [Complemento da ordem](OWNER_AMENDMENTS.md)
 preserva a instrução e marca OWNER_DEFERRED_SONAR_CONFIGURATION. Isso não declara
 o provedor aprovado nem adia CI funcional, testes ou implementação D-B.
+
+## D3.3 — histórico alcançável e limites explícitos de leitura
+
+Base publicada b7c4f30, PR7 Draft. Migration incremental
+20261107022731_phase_d3_complete_scoped_history.sql aplicada somente no projeto
+local existente, sem reset. Local126/remoto121. O modelo documental original
+foi mantido atrás de um limite validado: defaults1/20, página até100000,
+tamanho1–100 e recusa explícita de NULL. O nome anterior não é executável por
+authenticated. Contraprova anterior preservada: p_page=NULL retornava sucesso.
+Após a correção, Auth real recusou NULL/fora do teto, preservou defaults e
+contagem/ordem; a consulta não mudou documentos nem movimentos.
+
+Auditoria troca o corte100 por total, paginação, período civil de São Paulo,
+busca por referência de evento/recurso e filtros. A mesma capacidade audit.read
+é exigida na API e RPC, inclusive quando delegada a profissional. Não se concede
+leitura clínica em modo global; outro paciente, revogação, anônimo e helper
+antigo continuam negados. Predicado por paciente da consulta anterior foi
+preservado, sem abrir grants de tabela/RLS. Metadata continua no contrato HTTP,
+e o cartão apresenta texto e rastreio sem editor de payload. Nome da pessoa é
+rotulado como cadastro atual, sem inventar snapshot histórico.
+
+Foram usados201 eventos históricos sintéticos num paciente fictício novo, com
+empates de timestamp para conferir a ordem created_at/id. Não são prova de
+convites realmente enviados. Onze páginas e as duas referências conferiram com
+um oráculo SQL independente; períodos, vazios, limite100 e escopos passaram.
+Três testes Auth reais aprovados. Dezesseis unitários de histórico e14 guards
+de API passaram, total30 casos dirigidos. Tipos/lint afetados passaram.
+
+Na primeira rodada browser,2/6: os três testes de consulta chegaram à contraprova
+de HTTP inválido, que revelou ZodError de query classificado como500; um teste
+Chromium também mostrou CTA de repetição removido durante reconsulta. Agora
+parseQuery converte somente input de consulta inválido para400 seguro. Schema
+inválido de resultado interno continua500 no controle unitário. A última falha
+da mesma seleção permanece visível durante atualização, sem virar vazio.
+
+Recheck dos seis casos afetados:6/6 nos três projetos. Abrangem201 IDs em onze
+páginas, referência, reload/filtros, período, respostas inválidas, atraso,503,
+vazio200 e B antes de A. O teste adversarial ignora AbortSignal para A, mantendo
+Auth/HTTP reais: A vazia tardia não substitui B com201 registros. A retomada foi
+sincronizada com o clique real no CTA, preservando o sinal de atualização e
+eliminando a troca prematura do modo de transporte no teste. Foco no filtro,
+320/390/768/1440 e axe conferidos; cartão390 inspecionado. Primeiras falhas e
+logs mantidos em output/playwright/phase-d/d3-history-*. Não houve teste mutável
+de banco em paralelo com o runner nem mudança de fonte durante cada execução.
+
+Um erro DATABASE_UNAVAILABLE do sino foi observado no log Chromium do recheck,
+correlação02d283f4-3d6f-4b49-aecd-bbecb3ad849a. Esse consumidor não é certificado
+por este resultado de histórico; diagnóstico próprio permanece na tarefa C-AC-020.
+PostgreSQL registrou dois statement timeouts na mesma janela, às02:47:19UTC;
+a relação com a consulta exata ainda requer confirmação. O resumo de diagnóstico
+foi reduzido a classes/nomes de funções, sem SQL completo ou claims.
+Demais estados, formulários/guias e rascunhos D3 continuam em execução.

@@ -42,6 +42,12 @@ O responsável adiou configuração e tratamento específico do SonarCloud;
 [complemento vigente](../audits/D/D-B/OWNER_AMENDMENTS.md). O provedor não é
 considerado aprovado por esse adiamento.
 
+D3.3 remove o corte de auditoria, com páginas/referência/período e audit.read
+delegável; NULL deixa de liberar o limite documental. Trinta testes dirigidos
+de unidade/API, três Auth e seis casos browser passaram. Local126/remoto121,
+com a quinta migration D-B ainda local. C-AC-020 mantém investigação própria
+do sino, cuja falha de consulta foi observada no ensaio de histórico.
+
 ## Implementado no candidato
 
 - D0: prontidão real dos serviços, NULL/existência, incomplete do axe,

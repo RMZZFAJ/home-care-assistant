@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { governanceIntentFields } from "@/lib/validation/governance";
+import { auditQuerySchema } from "@/lib/validation/audit";
 import { appOrigin } from "@/lib/server/app-origin";
 import { exactQuantity } from "@/lib/validation/documents";
 import { quantity } from "@/lib/quantity";
@@ -12,8 +13,10 @@ import {
   databaseError,
   patientContext,
   parseUuid,
+  parseQuery,
   readJson,
   requireGlobal,
+  saoPauloDateBoundary,
   rpc,
   uuid,
 } from "@/lib/server/api";
@@ -240,6 +243,14 @@ export async function GET(request: Request) {
       params.get("careRecipientId"),
       ["catalog", "products"].includes(section) ? "catalog.manage" : section === "audit" ? "audit.read" : "manage",
     );
+    if (section === "audit") {
+      const query = parseQuery(auditQuerySchema, Object.fromEntries(["query", "reference", "action", "entityType", "from", "to", "page", "pageSize"].filter(key => params.has(key) && params.get(key) !== "").map(key => [key, params.get(key)])));
+      return NextResponse.json(await rpc(auth.client, "patient_audit_page", {
+        p_patient: patient.id, p_query: query.query, p_reference: query.reference ?? null, p_action: query.action ?? null,
+        p_entity_type: query.entityType ?? null, p_from: query.from ? saoPauloDateBoundary(query.from) : null,
+        p_to: query.to ? saoPauloDateBoundary(query.to, true) : null, p_page: query.page, p_size: query.pageSize,
+      }));
+    }
     if (section === "memberships") {
       const members = (await rpc(auth.client, "admin_list_memberships", {
         p_care_recipient_id: patient.id,
@@ -297,16 +308,7 @@ export async function GET(request: Request) {
               .eq("care_recipient_id", patient.id)
               .order("sort_order")
               .order("name")
-          : section === "audit"
-            ? auth.client
-                .from("audit_events")
-                .select(
-                  "id,actor_id,action,entity_type,entity_id,metadata,created_at",
-                )
-                .eq("metadata->>care_recipient_id", patient.id)
-                .order("created_at", { ascending: false })
-                .limit(100)
-            : section === "notificationRecipients"
+          : section === "notificationRecipients"
               ? auth.client
                   .from("recipient_notification_settings")
                   .select("*")

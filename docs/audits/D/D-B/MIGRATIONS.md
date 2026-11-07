@@ -136,3 +136,13 @@ novas só têm EXECUTE authenticated; auxiliares e nomes antigos permanecem
 revogados. Não se abriu DML/RLS para corrigir leitura. Provas dirigidas Auth,
 HTTP e browser constam no checkpoint; clean/upgrade e integração global do SHA
 publicado devem ser verificados na CI programada antes do preflight remoto final.
+
+### Incremento local D3.3
+
+Local126/remoto121. 20261107022731_phase_d3_complete_scoped_history.sql acrescenta
+leitura paginada de auditoria com audit.read, índice do paciente/ordem e validação
+explícita de NULL/limites na RPC documental existente. Nome antigo revogado;
+nenhuma abertura de RLS/DML. test:db:prepare, três casos Auth e seis casos browser
+dirigidos passaram, com contraprova anterior preservada. Instalação/evolução e
+demais suítes programadas continuam gates da CI do SHA publicado. A migration
+integra a aplicação remota final D-B; não foi aplicada isoladamente ao remoto.
