@@ -108,7 +108,15 @@ export async function issuePdf(
     const r = await readPdfIssuance(client, reserved.id),
       trust = await loadPdfTrust();
     await stage("composing");
+    if (![5, 6].includes(r.rendererRevision))
+      throw new ApiError(
+        "CONTENT_INVALID",
+        "Revisão de renderização não suportada.",
+        503,
+        false,
+      );
     const plan = await composeIssuance(r.snapshot, r.sourceHash, {
+      rendererRevision: r.rendererRevision === 6 ? 6 : 5,
       id: r.id,
       verificationCode: r.verificationCode,
       requestedAt: r.requestedAt,

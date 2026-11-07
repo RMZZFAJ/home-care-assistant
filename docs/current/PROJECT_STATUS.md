@@ -7,7 +7,7 @@ CI do SHA publicado é gate independente; pending não significa aprovação.
 CI dfdc7de, run42335739149, concluiu banco, validate Ubuntu/Windows e os três
 projetos browser com SUCCESS. Inclui a correção D3.4a dos consumidores de
 governança que falharam em bd8747b e os estados de leitura D3.4. Essa CI não
-valida os incrementos posteriores. Local140/remoto121;19 migrations D-B
+valida os incrementos posteriores. Local141/remoto121;20 migrations D-B
 aguardam o lote remoto final autorizado.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
 
@@ -17,6 +17,15 @@ foi cancelado. D4.4a reproduziu o formulário oculto à acessibilidade e passou
 3/3 em produção com navegação completa após signOut. Inclui Escape com Auth
 pendente, confirmação local de e-mail e nova senha. A CI do SHA novo continua
 gate independente. [Contraprovas](../audits/D/D-B/D4_4A_CI_EVIDENCE.json).
+
+D4.5 congela fatos suplementares de origem/datas em novas emissões V6, sem
+reescrever evento/hash canônico ou V5. Auth comprova rename/revogação; seis
+casos novos browser passaram entre coortes. Três PDFs reais foram verificados
+independentemente por fatos/geometria e pyHanko/TSA interna; texto longo tem
+probe sem assinatura com marcador visível. [Evidências](../audits/D/D-B/D4_5_EVIDENCE.json).
+C101 ENT e combinações C105/C106 continuam parciais. CI dbc7171 terminou com
+banco/validate aprovados e browsers reprovados em acervo, foco e carregamento;
+a correção dirigida segue no próximo lote. Não é aprovação do incremento V6.
 
 CI639b5cb, run42354352749, aprovou banco/validate, mas falhou em preparação
 global Chromium e largura de entregas WebKit; central teve uma tentativa
@@ -48,7 +57,7 @@ identidade/instante próprios. Upload público reconheceu V4 registrado sem
 assinatura. Auth2 casos distintos, unidade/API5/5 e33 casos browser distintos
 passaram entre coortes de produção, com quatro larguras/axe e perda de vínculo.
 [Coortes e contraprovas](../audits/D/D-B/D4_4_EVIDENCE.json).
-Oráculos factuais específicos, anexos anotados, leitura documental acessível e
+Combinações factuais restantes, anexos anotados, leitura documental acessível e
 ensaios de rotação/recuperação continuam pendentes.
 D3 restante, D5, backup/monitoramento e reconciliação remota continuam em execução.
 

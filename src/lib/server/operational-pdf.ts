@@ -23,6 +23,10 @@ import {
 import { receiptStates } from "@/lib/documents/purchase";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
+import {
+  sourceNameLabels,
+  type PdfSourceFacts,
+} from "@/lib/documents/pdf-source-facts";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import {
   readPresentationConversions,
@@ -52,6 +56,7 @@ export type DocumentSnapshot = {
   version: number;
   status: string;
   createdAt?: string;
+  sourceFacts?: unknown;
   materialIdentity?: string;
   materialIdentitySource?: string;
   purchaseProgress?: PurchaseProgress;
@@ -154,6 +159,8 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
+  rendererRevision?: 5 | 6;
+  sourceFacts?: PdfSourceFacts;
   id: string;
   verificationCode: string;
   requestedAt: string;
@@ -171,11 +178,17 @@ export type PdfEmissionContext = {
     factGroup?: string;
   }) => void;
 };
+export class PdfTextUnsupportedError extends Error {}
 export async function renderDocumentPdf(
   snapshot: DocumentSnapshot,
   hash: string,
   emission?: PdfEmissionContext,
 ) {
+  const revision = emission?.rendererRevision ?? 5;
+  const sourceFacts = revision === 6 ? emission?.sourceFacts : undefined;
+  const cancelledV6 = Boolean(sourceFacts && snapshot.status === "cancelled");
+  if (emission && revision === 6 && !sourceFacts)
+    throw new Error("V6 requires frozen source facts");
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
   const [regularBytes, boldBytes] = await Promise.all([
@@ -186,6 +199,10 @@ export async function renderDocumentPdf(
     pdf.embedFont(regularBytes, { subset: true }),
     pdf.embedFont(boldBytes, { subset: true }),
   ]);
+  const regularCharacters = sourceFacts
+    ? new Set(font.getCharacterSet())
+    : null;
+  const boldCharacters = sourceFacts ? new Set(bold.getCharacterSet()) : null;
   const date = new Date(
     emission?.requestedAt ?? snapshot.createdAt ?? "2000-01-01T00:00:00Z",
   );
@@ -194,7 +211,7 @@ export async function renderDocumentPdf(
   pdf.setCreationDate(date);
   pdf.setModificationDate(date);
   pdf.setSubject(
-    `Comprovante operacional · conteúdo v${snapshot.version} · renderizador V${emission ? 5 : 4}`,
+    `Comprovante operacional · conteúdo v${snapshot.version} · renderizador V${emission ? revision : 4}`,
   );
   if (emission)
     pdf.catalog.set(
@@ -207,7 +224,7 @@ export async function renderDocumentPdf(
           documentId: snapshot.id,
           version: snapshot.version,
           sourceHash: hash,
-          rendererRevision: 5,
+          rendererRevision: revision,
         }),
       ),
     );
@@ -224,6 +241,12 @@ export async function renderDocumentPdf(
     strong = false,
     color = navy,
   ) => {
+    const characters = strong ? boldCharacters : regularCharacters;
+    if (
+      characters &&
+      [...text].some((character) => !characters.has(character.codePointAt(0)!))
+    )
+      throw new PdfTextUnsupportedError("UNREPRESENTABLE_TEXT");
     emission?.onText?.({
       page: pdf.getPageCount() - 1,
       text,
@@ -438,7 +461,9 @@ export async function renderDocumentPdf(
     });
   }
   const title = {
-    REQ: "REQUISIÇÃO DE MATERIAIS",
+    REQ: sourceFacts?.historical
+      ? "REQUISIÇÃO HISTÓRICA DE MATERIAIS"
+      : "REQUISIÇÃO DE MATERIAIS",
     COM:
       snapshot.payload.origin === "donation"
         ? "DOAÇÃO DE INSUMOS À FAMÍLIA"
@@ -460,22 +485,26 @@ export async function renderDocumentPdf(
       ? snapshot.payload.origin
       : undefined;
   const statusText = snapshot.isHistorical
-    ? "Registro histórico · ciência original não comprovada"
-    : snapshot.type === "REQ" && snapshot.status !== "cancelled"
-      ? snapshot.sciencePolicy?.archived_at
-        ? "Arquivada"
-        : snapshot.sciencePolicy?.completed_at
-          ? "Atendimento concluído"
-          : familyAware
-            ? "Aguardando atendimento"
-            : "Ciência e atendimento pendentes"
-      : (documentStatuses[
-          snapshot.type === "COM"
-            ? (snapshot.purchaseProgress?.state ?? snapshot.status)
-            : snapshot.status
-        ] ?? snapshot.status);
+    ? sourceFacts && snapshot.status === "cancelled"
+      ? "Registro histórico cancelado · ciência original não comprovada"
+      : "Registro histórico · ciência original não comprovada"
+    : sourceFacts && ["cancelled", "rejected"].includes(snapshot.status)
+      ? documentStatuses[snapshot.status]
+      : snapshot.type === "REQ" && snapshot.status !== "cancelled"
+        ? snapshot.sciencePolicy?.archived_at
+          ? "Arquivada"
+          : snapshot.sciencePolicy?.completed_at
+            ? "Atendimento concluído"
+            : familyAware
+              ? "Aguardando atendimento"
+              : "Ciência e atendimento pendentes"
+        : (documentStatuses[
+            snapshot.type === "COM"
+              ? (snapshot.purchaseProgress?.state ?? snapshot.status)
+              : snapshot.status
+          ] ?? snapshot.status);
   text(
-    `${snapshot.code} · ${formatBrazilDate(snapshot.createdAt ?? null)} · ${statusText}`,
+    `${snapshot.code} · ${sourceFacts ? `${sourceFacts.historical ? "Origem" : "Emissão operacional"}: ${formatBrazilDate(sourceFacts.historical ? sourceFacts.sourceCreatedAt : sourceFacts.issuedAt)}` : formatBrazilDate(snapshot.createdAt ?? null)} · ${statusText}`,
     9,
   );
   y -= 12;
@@ -493,13 +522,36 @@ export async function renderDocumentPdf(
   const metrics =
     snapshot.type === "REQ"
       ? [
-          [String(total), "ITENS SOLICITADOS"],
+          [
+            String(total),
+            sourceFacts?.historical ? "ITENS NO REGISTRO" : "ITENS SOLICITADOS",
+          ],
           [
             String(snapshot.lines.filter((item) => item.urgent).length),
             "URGENTES",
           ],
-          [String(attended), "ITENS ATENDIDOS"],
-          [familyAware ? "FAMÍLIA CIENTE" : "PENDENTE", "CIÊNCIA FAMILIAR"],
+          [
+            sourceFacts?.historical ? "NÃO APURADO" : String(attended),
+            sourceFacts?.historical
+              ? "ATENDIMENTO DE ORIGEM"
+              : "ITENS ATENDIDOS",
+          ],
+          [
+            sourceFacts?.historical
+              ? "NÃO COMPROVADA"
+              : cancelledV6
+                ? familyAware
+                  ? "PRESERVADA"
+                  : "NÃO EXIGIDA"
+                : familyAware
+                  ? "FAMÍLIA CIENTE"
+                  : "PENDENTE",
+            sourceFacts?.historical
+              ? "CIÊNCIA ORIGINAL"
+              : cancelledV6
+                ? "REGISTRO DE CIÊNCIA"
+                : "CIÊNCIA FAMILIAR",
+          ],
         ]
       : snapshot.type === "ENT"
         ? [
@@ -507,13 +559,15 @@ export async function renderDocumentPdf(
             [String(checked), "CONFERIDOS INTEGRALMENTE"],
             [String(issues), "DIVERGÊNCIAS"],
             [
-              snapshot.workflow?.acceptedAt
-                ? "REGISTRADO"
-                : snapshot.status === "cancelled"
-                  ? "ENCERRADO"
-                  : snapshot.status === "confirmed"
-                    ? "CONCLUÍDO"
-                    : "PENDENTE",
+              sourceFacts && snapshot.status === "cancelled"
+                ? "ENCERRADO"
+                : snapshot.workflow?.acceptedAt
+                  ? "REGISTRADO"
+                  : snapshot.status === "cancelled"
+                    ? "ENCERRADO"
+                    : snapshot.status === "confirmed"
+                      ? "CONCLUÍDO"
+                      : "PENDENTE",
               "RECEBIMENTO",
             ],
           ]
@@ -522,10 +576,14 @@ export async function renderDocumentPdf(
             [String(snapshot.version), "VERSÃO"],
             [snapshot.type, "OPERAÇÃO"],
             [
-              (snapshot.type === "BAL" && snapshot.status === "approved") ||
-              (snapshot.type === "COM" && snapshot.status === "received")
-                ? "CONCLUÍDO"
-                : "EM ANDAMENTO",
+              sourceFacts && ["cancelled", "rejected"].includes(snapshot.status)
+                ? snapshot.status === "cancelled"
+                  ? "CANCELADO"
+                  : "REJEITADO"
+                : (snapshot.type === "BAL" && snapshot.status === "approved") ||
+                    (snapshot.type === "COM" && snapshot.status === "received")
+                  ? "CONCLUÍDO"
+                  : "EM ANDAMENTO",
               "SITUAÇÃO",
             ],
           ];
@@ -551,15 +609,20 @@ export async function renderDocumentPdf(
       : "Identificação e responsáveis",
   );
   const who = snapshot.actors?.issuer,
-    patient =
-      snapshot.actors?.patient?.name ??
-      snapshot.payload.patientName ??
-      "Registrado no documento";
+    patient = sourceFacts
+      ? (sourceFacts.patientName ?? "Nome do paciente não preservado")
+      : (snapshot.actors?.patient?.name ??
+        snapshot.payload.patientName ??
+        "Registrado no documento");
   fields([
     ["Paciente", patient],
     [
       snapshot.type === "REQ" ? "Solicitado por" : "Responsável",
-      who?.name ?? snapshot.payload.requesterName ?? "Registrado no documento",
+      sourceFacts
+        ? (sourceFacts.issuerName ?? "Autoria nominal desconhecida")
+        : (who?.name ??
+          snapshot.payload.requesterName ??
+          "Registrado no documento"),
     ],
     ["Número do documento", snapshot.code],
     ["Protocolo", snapshot.protocol],
@@ -581,7 +644,12 @@ export async function renderDocumentPdf(
             "Recebedor designado",
             snapshot.actors?.recipient?.name ?? "Registrado no documento",
           ],
-          ["Emissão", formatBrazilDate(snapshot.createdAt ?? null)],
+          [
+            sourceFacts ? "Expedição operacional" : "Emissão",
+            formatBrazilDate(
+              sourceFacts ? sourceFacts.issuedAt : (snapshot.createdAt ?? null),
+            ),
+          ],
         ] as [string, unknown][])
       : ([
           [
@@ -593,6 +661,77 @@ export async function renderDocumentPdf(
           ["Situação", statusText],
         ] as [string, unknown][])),
   ]);
+  if (sourceFacts) {
+    section("Origem, autoria e marcos documentais");
+    const fact = (key: string, label: string, value: string) => {
+      factGroup = "source/" + key;
+      text(`${label}: ${value}`, 9);
+      factGroup = undefined;
+    };
+    if (sourceFacts.historical) {
+      fact(
+        "originalAt",
+        "Data do documento de origem",
+        formatBrazilDate(sourceFacts.sourceCreatedAt),
+      );
+      fact(
+        "importedAt",
+        "Importação no sistema",
+        formatBrazilDate(sourceFacts.importedAt),
+      );
+      fact(
+        "registeredAt",
+        "Primeiro registro técnico no sistema",
+        formatBrazilDate(sourceFacts.registeredAt),
+      );
+      text(
+        "O registro da importação não comprova a data da emissão original nem sua ciência.",
+        8,
+      );
+    } else {
+      if (sourceFacts.draftCreatedAt)
+        fact(
+          "draftCreatedAt",
+          "Primeiro rascunho privado salvo",
+          formatBrazilDate(sourceFacts.draftCreatedAt),
+        );
+      fact(
+        "documentCreatedAt",
+        "Criação da ficha",
+        formatBrazilDate(sourceFacts.documentCreatedAt),
+      );
+      fact(
+        "issuedAt",
+        "Emissão operacional registrada",
+        formatBrazilDate(sourceFacts.issuedAt),
+      );
+    }
+    fact(
+      "issuer",
+      "Responsável na origem",
+      sourceFacts.issuerName ?? "Autoria nominal desconhecida",
+    );
+    fact(
+      "issuerSource",
+      "Proveniência do nome do responsável",
+      sourceNameLabels[sourceFacts.issuerSource],
+    );
+    fact(
+      "issuerId",
+      "Identidade vinculada ao responsável",
+      sourceFacts.issuerId ?? "Identidade não preservada",
+    );
+    fact(
+      "patient",
+      "Paciente no registro de origem",
+      sourceFacts.patientName ?? "Nome do paciente não preservado",
+    );
+    fact(
+      "patientSource",
+      "Proveniência do nome do paciente",
+      sourceNameLabels[sourceFacts.patientSource],
+    );
+  }
   const balanceContext =
     snapshot.type === "BAL"
       ? (snapshot.payload.balanceContext as Record<string, unknown> | undefined)
@@ -730,17 +869,39 @@ export async function renderDocumentPdf(
     continueRequisitionTrace = page !== materialPage;
     section("Situação do atendimento");
     fields([
-      ["Linhas atendidas", `${attended} de ${total}`],
-      ["Linhas pendentes", String(total - attended)],
       [
-        "Ciência familiar",
-        familyAware
-          ? "Família ciente" +
-            (snapshot.sciencePolicy?.science_satisfied_at
-              ? " · " +
-                formatBrazilDate(snapshot.sciencePolicy.science_satisfied_at)
-              : "")
-          : "Pendente nesta versão",
+        sourceFacts?.historical ? "Atendimento da origem" : "Linhas atendidas",
+        sourceFacts?.historical
+          ? "Não comprovado por este registro"
+          : `${attended} de ${total}`,
+      ],
+      [
+        sourceFacts?.historical
+          ? "Uso deste registro"
+          : cancelledV6
+            ? "Linhas não atendidas no registro"
+            : "Linhas pendentes",
+        sourceFacts?.historical
+          ? "Consulta histórica; sem pendência operacional"
+          : String(total - attended),
+      ],
+      [
+        sourceFacts?.historical ? "Ciência original" : "Ciência familiar",
+        sourceFacts?.historical
+          ? "Não comprovada"
+          : cancelledV6
+            ? familyAware
+              ? "Preservada no histórico"
+              : "Sem comprovação registrada; documento cancelado"
+            : familyAware
+              ? "Família ciente" +
+                (snapshot.sciencePolicy?.science_satisfied_at
+                  ? " · " +
+                    formatBrazilDate(
+                      snapshot.sciencePolicy.science_satisfied_at,
+                    )
+                  : "")
+              : "Pendente nesta versão",
       ],
       ["Próximo passo", requisitionNextStep(snapshot)],
     ]);
@@ -791,6 +952,14 @@ export async function renderDocumentPdf(
           }[event.mode] ?? event.mode,
           formatBrazilDate(event.created_at),
         ]),
+      );
+    else if (sourceFacts?.historical)
+      text(
+        "Registro histórico: a ciência original não está comprovada. Esta representação preserva o acervo e não inicia uma pendência operacional de ciência.",
+      );
+    else if (cancelledV6)
+      text(
+        "Nenhuma ciência foi registrada nesta versão cancelada. O documento não exige nova ciência ou atendimento.",
       );
     else
       text(
@@ -1280,7 +1449,14 @@ export async function renderDocumentPdf(
     [0.28, 0.25, 0.47],
     (snapshot.history ?? []).map((event) => [
       formatBrazilDate(event.createdAt),
-      event.actorName || "Sistema",
+      sourceFacts
+        ? (() => {
+            const actor = sourceFacts.historyActors.find(
+              (a) => a.version === event.version,
+            );
+            return `${actor?.name ?? "Nome do responsável não preservado"}${actor?.id ? ` · Identidade ${actor.id}` : ""}`;
+          })()
+        : event.actorName || "Sistema",
       `${documentEventLabel(event.action, purchaseOrigin)} · v${event.version}`,
     ]),
   );
@@ -1320,6 +1496,7 @@ export async function renderDocumentPdf(
   );
   if (!snapshot.demo) {
     if (emission) {
+      if (sourceFacts) ensure(390);
       section("Emissão deste exemplar");
       fields([
         ["Solicitação de geração", formatBrazilDate(emission.requestedAt)],

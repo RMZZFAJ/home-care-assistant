@@ -14,6 +14,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Custódia documental e limites operacionais](SIGNING_CUSTODY.md).
 - [Verificação pública e limites do parser](PUBLIC_VERIFICATION.md).
 - [Acervo e downloads legados](DOCUMENT_ARCHIVE.md).
+- [Autoria, proveniência e datas V6](PDF_SOURCE_FACTS.md).
 - [Complementos posteriores do responsável](OWNER_AMENDMENTS.md): configuração
   e tratamento específico do SonarCloud adiados expressamente.
 

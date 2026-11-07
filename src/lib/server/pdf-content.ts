@@ -3,10 +3,16 @@ import { PDFDocument, PDFHexString, PDFName } from "pdf-lib";
 import { ApiError } from "./api";
 import {
   renderDocumentPdf,
+  PdfTextUnsupportedError,
   type DocumentSnapshot,
   type PdfEmissionContext,
 } from "./operational-pdf";
 import { formatQuantity } from "../quantity";
+import { formatBrazilDate } from "../receipt";
+import {
+  pdfSourceFactsSchema,
+  sourceNameLabels,
+} from "../documents/pdf-source-facts";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
@@ -14,13 +20,16 @@ export type PdfContentPlan = {
   runs: Run[];
   identity: Record<string, unknown>;
   facts: string[];
+  semanticFacts?: Record<string, string>;
 };
 const normalize = (value: string) =>
   value.normalize("NFKC").replaceAll(/\s+/g, "");
 const invalid = (reason = "parse") => {
   const error = new ApiError(
     "CONTENT_INVALID",
-    "O conteúdo do PDF não passou na conferência. A emissão foi preservada para recuperação.",
+    reason === "unrepresentable"
+      ? "Este conteúdo contém caracteres ainda não suportados no PDF. Consulte a ficha no sistema ou solicite uma revisão autorizada."
+      : "O conteúdo do PDF não passou na conferência. A emissão foi preservada para recuperação.",
     503,
     false,
   );
@@ -34,10 +43,25 @@ export async function composeIssuance(
   emission: PdfEmissionContext,
 ): Promise<PdfContentPlan> {
   const runs: Run[] = [];
-  const bytes = await renderDocumentPdf(snapshot, sourceHash, {
-    ...emission,
-    onText: (run) => runs.push(run),
-  });
+  const revision = emission.rendererRevision ?? 5;
+  const parsed =
+    revision === 6
+      ? pdfSourceFactsSchema.safeParse(snapshot.sourceFacts)
+      : null;
+  if (parsed && !parsed.success) throw invalid("source-facts-schema");
+  const sourceFacts = parsed?.success ? parsed.data : undefined;
+  let bytes: Buffer;
+  try {
+    bytes = await renderDocumentPdf(snapshot, sourceHash, {
+      ...emission,
+      sourceFacts,
+      onText: (run) => runs.push(run),
+    });
+  } catch (error) {
+    throw invalid(
+      error instanceof PdfTextUnsupportedError ? "unrepresentable" : "render",
+    );
+  }
   const identity = {
     id: emission.id,
     verificationCode: emission.verificationCode,
@@ -45,7 +69,7 @@ export async function composeIssuance(
     documentId: snapshot.id,
     version: snapshot.version,
     sourceHash,
-    rendererRevision: 5,
+    rendererRevision: revision,
   };
   // These facts come from the frozen source, independently of the painter's run log.
   const facts = [
@@ -57,14 +81,18 @@ export async function composeIssuance(
     emission.verificationCode.match(/.{4}/g)!.join("-"),
     emission.requestedName,
     String(
-      snapshot.actors?.patient?.name ??
-        snapshot.payload.patientName ??
-        "Registrado no documento",
+      sourceFacts
+        ? (sourceFacts.patientName ?? "Nome do paciente não preservado")
+        : (snapshot.actors?.patient?.name ??
+            snapshot.payload.patientName ??
+            "Registrado no documento"),
     ),
     String(
-      snapshot.actors?.issuer?.name ??
-        snapshot.payload.requesterName ??
-        "Registrado no documento",
+      sourceFacts
+        ? (sourceFacts.issuerName ?? "Autoria nominal desconhecida")
+        : (snapshot.actors?.issuer?.name ??
+            snapshot.payload.requesterName ??
+            "Registrado no documento"),
     ),
     ...snapshot.lines.flatMap((line) => [
       String(
@@ -79,7 +107,31 @@ export async function composeIssuance(
         : [formatQuantity(String(line.quantity ?? 0))]),
     ]),
   ];
-  const plan = { bytes, runs, identity, facts };
+  const semanticFacts: Record<string, string> = {};
+  if (sourceFacts) {
+    const f = sourceFacts;
+    Object.assign(semanticFacts, {
+      "source/issuer": f.issuerName ?? "Autoria nominal desconhecida",
+      "source/issuerId": f.issuerId ?? "Identidade não preservada",
+      "source/issuerSource": sourceNameLabels[f.issuerSource],
+      "source/patient": f.patientName ?? "Nome do paciente não preservado",
+      "source/patientSource": sourceNameLabels[f.patientSource],
+    });
+    const dates = f.historical
+      ? {
+          originalAt: f.sourceCreatedAt,
+          importedAt: f.importedAt,
+          registeredAt: f.registeredAt,
+        }
+      : {
+          documentCreatedAt: f.documentCreatedAt,
+          issuedAt: f.issuedAt,
+          ...(f.draftCreatedAt ? { draftCreatedAt: f.draftCreatedAt } : {}),
+        };
+    for (const [key, value] of Object.entries(dates))
+      semanticFacts["source/" + key] = formatBrazilDate(value);
+  }
+  const plan = { bytes, runs, identity, facts, semanticFacts };
   await validateIssuanceContent(bytes, plan);
   return plan;
 }
@@ -132,6 +184,13 @@ export async function validateIssuanceContent(
     }
     const bodyText = normalize(body.join(""));
     const groupText = [...groups.values()].map(normalize);
+    for (const [group, fact] of Object.entries(plan.semanticFacts ?? {})) {
+      if (
+        !groups.has(group) ||
+        !normalize(groups.get(group)!).includes(normalize(fact))
+      )
+        throw invalid("semantic-fact:" + group);
+    }
     const missing = plan.facts.findIndex(
       (fact) =>
         !normalize(fact) ||

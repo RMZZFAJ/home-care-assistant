@@ -4,6 +4,8 @@ const id = "10000000-0000-4000-8000-000000000001";
 it("refuses browser-selected signing facts, readiness and worker proof at the HTTP boundary", async () => {
   for (const patch of [
     { snapshot: {} },
+    { sourceFacts: { issuerName: "forged" } },
+    { rendererRevision: 5 },
     { sha256: "a".repeat(64) },
     { objectPath: "other.pdf" },
     { validation: { accepted: true } },

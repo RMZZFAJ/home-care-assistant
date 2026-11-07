@@ -928,3 +928,15 @@ retorna PDF_BYTES_DIVERGE503. Autorização é conferida antes e após Storage;
 o stream começa somente depois da verificação integral. Uma nova emissão
 histórica usa POST e não recebe o instante do ato antigo como data de emissão.
 [Contrato do acervo](../audits/D/D-B/DOCUMENT_ARCHIVE.md).
+
+## Proveniência de novas emissões V6
+
+POST de emissões recebe somente chave idempotente e versão opcional. O banco
+escolhe rendererRevision=6 e congela fatos documentais suplementares; o navegador
+não define autoria, datas, revisão ou snapshot. Contexto suplementar não altera
+o hash do evento canônico. Histórico físico separa data de origem/importação;
+rascunho, ficha, emissão operacional e solicitação do exemplar são distintos.
+Nomes/IDs históricos são preservados e nome atual recebe rótulo específico.
+Intenções V5 existentes continuam recuperáveis pela revisão original.
+CONTENT_INVALID pode informar caracteres não suportados, sem assinatura ou
+arquivo persistido. [Contrato e provas](../audits/D/D-B/PDF_SOURCE_FACTS.md).

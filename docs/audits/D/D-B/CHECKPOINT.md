@@ -853,3 +853,37 @@ CI do SHA publicado permanece gate separado; Sonar continua adiado. D-B segue
 em execução, sem merge, deploy comandado ou GO. Os próximos probes documentais
 focam datas de criação/emissão e nomes históricos, preservando os snapshots e
 hashes existentes. D3 restante, D5 e bases operacionais continuam pendentes.
+
+## D4.5 — fatos de origem, autoria e datas do PDF V6
+
+Base dbc7171. Novas intenções V6 congelam contexto documental adicional no banco,
+sem alterar eventos/hash canônicos. Rascunho, ficha, emissão operacional e
+solicitação de geração têm rótulos próprios. Origem física conserva data conhecida
+ou desconhecida, nome disponível e importação separada. Rename/revogação não
+substituem autoria/ID preservados; solicitante atual da geração é outro campo.
+V5 pendente foi recuperada pelo pipeline real; download ready conserva os bytes.
+[Contrato e corpus](PDF_SOURCE_FACTS.md); [manifesto](D4_5_EVIDENCE.json).
+
+Auth original3/3, recheck de importação1/1 e rename/revogação1/1 passaram;
+rechecks não são casos distintos adicionais. Unidade6/6, API estrita1/1 e
+compatibilidade V4/V5 8/8 passaram. Seis casos novos de produção passaram entre
+coortes nos três projetos, com axe em quatro larguras. A primeira rodada de18
+teve16 passes, incluindo12 compatíveis, e duas falhas por protocolos físicos
+esgotados na fixture. A coorte final teve5 passes e colisão no nome da evidência
+Chromium; apenas esse caso foi repetido e passou. Produto não mudou entre essas
+duas últimas coortes. Não se declara18/18 no mesmo build.
+
+pyHanko aceitou os três PDFs atuais e TSA contra a raiz interna pública fornecida;
+pdfplumber/pypdf conferiram fatos, posição, geometria, rodapé e grupo emissão/QR.
+As nove páginas foram inspecionadas. Probe COM explicitamente sem assinatura tem
+12 páginas, marcador visível/extraível na página10 e rodapé livre. Caractere não
+representável foi recusado antes de assinatura/Storage com feedback explícito,
+sem adulterar evento. Falhas anteriores e hashes dos logs estão preservados.
+
+Migration141 aplicada sem reset após preflight revertido; local141/remoto121,
+20 migrations D-B pendentes. Crons originais ativos por minuto; instrumentos de
+falha ausentes. CI dbc7171 terminou com banco/validate aprovados e browsers
+reprovados em acervo/foco/carregamento; não valida V6. Próximo lote corrige essas
+falhas dirigidas. C101 ENT específico, combinações C105/C106, acessibilidade PDF,
+anexos/custódia, D3 restante, D5 e bases operacionais permanecem pendentes.
+Sonar adiado; PR Draft; sem merge, deploy comandado ou GO.

@@ -262,3 +262,17 @@ Preflight revertido e test:db:prepare passaram sem reset. Auth percorreu103
 registros mistos, cursor estável, filtros e negativas; a interface e os downloads
 foram exercitados nos três projetos. Instalação/evolução/integração completas
 permanecem gate da CI do SHA publicado. Nenhuma aplicação remota neste lote.
+
+### Lote local D4.5
+
+Local141/remoto121;20 migrations D-B pendentes. A migration20261107150000
+muda o padrão de novas intenções para V6 e congela proveniência factual em
+sourceFacts, sem reescrever o evento/hash canônico ou intenções já existentes.
+Trigger privado, SECURITY DEFINER com search_path vazio e EXECUTE revogado de
+todos os papéis de aplicação. Nenhuma concessão direta de DML foi acrescentada.
+Preflight revertido e test:db:prepare passaram, sem reset ou outra stack.
+Auth real comprovou imutabilidade, origem conhecida/NULL, rename/revogação e
+preservação do evento/efeitos. Banco local tem141 aplicações; crons originais
+preservados e instrumentos de falha ausentes. CI do SHA publicado deve validar
+instalação limpa, evolução legada e integração completa. Nenhuma aplicação remota
+neste incremento. [Contrato e limites](PDF_SOURCE_FACTS.md).
