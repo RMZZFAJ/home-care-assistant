@@ -11,6 +11,13 @@ valida os incrementos posteriores. Local140/remoto121;19 migrations D-B
 aguardam o lote remoto final autorizado.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
 
+CI d0179ca aprovou banco/instalação/evolução/integração e validate, mas falhou
+em onboarding após logout;173 casos passaram em cada job Chromium/mobile e iOS
+foi cancelado. D4.4a reproduziu o formulário oculto à acessibilidade e passou
+3/3 em produção com navegação completa após signOut. Inclui Escape com Auth
+pendente, confirmação local de e-mail e nova senha. A CI do SHA novo continua
+gate independente. [Contraprovas](../audits/D/D-B/D4_4A_CI_EVIDENCE.json).
+
 CI639b5cb, run42354352749, aprovou banco/validate, mas falhou em preparação
 global Chromium e largura de entregas WebKit; central teve uma tentativa
 instável. D3.9 corrigiu essas causas e passou27/27 casos dirigidos em produção

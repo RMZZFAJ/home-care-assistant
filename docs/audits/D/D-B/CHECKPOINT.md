@@ -823,3 +823,33 @@ O artefato mostra o botão visualmente, com nomes acessíveis ausentes no formul
 substituir o papel do seletor não foi aceito como correção demonstrada. A análise
 de limpeza modal segue no incremento seguinte. iOS permanecia em execução.
 A falha é preservada, sem promover a CI da base ou deste lote a verde.
+
+## D4.4a — login acessível após logout e recuperação de senha
+
+Base9958b96. CI d0179ca terminou com banco/validate Windows/Ubuntu aprovados,
+Chromium/mobile com173 casos aprovados cada e a mesma falha no onboarding;
+iOS foi cancelado. O diagnóstico local reproduziu a falha mesmo aguardando
+/login. Três botões visíveis tinham ancestral DIV com aria-hidden=true.
+O formulário estava visualmente presente e inacessível aos seletores por papel.
+[Contraprova e fontes](D4_4A_CI_EVIDENCE.json).
+
+Logout bem-sucedido agora usa navegação completa para /login, após signOut e
+limpeza dos indícios privados locais. O documento novo reinicializa memória
+privada e acessibilidade modal. Falha do Auth conserva o feedback existente;
+não há remoção manual de atributos, troca de papel ou enfraquecimento de regras.
+O teste mantém cadastro, confirmação de e-mail local, vínculo, recuperação,
+alteração de senha e novo acesso, e acrescenta Escape com logout Auth pendente.
+A requisição real é retomada; nenhuma resposta de sucesso foi fabricada.
+
+Diagnóstico final WebKit1/1 e produção final3/3 passaram com o mesmo candidato
+nos três projetos. Tipos/lint passaram. A tentativa com flushSync foi recusada
+pelo lint e removida; fechamento observado por efeito passou em Chromium/mobile,
+mas falhou no último logout WebKit e também foi removido. Essas tentativas não
+recebem aceite final; seus logs foram preservados. O diagnóstico não substitui
+produção. SMTP usado é Mailpit local, sem prova de entrega externa.
+
+Sem novas migrations ou aplicação remota:local140/remoto121,19 pendentes.
+CI do SHA publicado permanece gate separado; Sonar continua adiado. D-B segue
+em execução, sem merge, deploy comandado ou GO. Os próximos probes documentais
+focam datas de criação/emissão e nomes históricos, preservando os snapshots e
+hashes existentes. D3 restante, D5 e bases operacionais continuam pendentes.

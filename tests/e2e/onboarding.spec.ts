@@ -134,9 +134,38 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
     context.data.patients.map((patient: { id: string }) => patient.id),
   ).toEqual([patientA]);
   expect(context.data.fullName).toBe("Pessoa convidada E2E");
-  await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
+  // Closing the modal during pending Auth must not strand the navigation.
+  let releaseLogout!: () => void;
+  const logoutGate = new Promise<void>((resolve) => {
+    releaseLogout = resolve;
+  });
+  await page.route("**/auth/v1/logout**", async (route) => {
+    await logoutGate;
+    await route.continue();
+  });
+  const authLogout = page.waitForRequest(
+    (request) =>
+      new URL(request.url()).pathname === "/auth/v1/logout" &&
+      request.method() === "POST",
+  );
+  try {
+    await page.getByLabel("Menu do usuário", { exact: true }).click();
+    await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
+    await authLogout;
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("menu", { name: "Ações do usuário", exact: true }),
+    ).toHaveCount(0);
+  } finally {
+    releaseLogout();
+  }
+  await expect(page).toHaveURL(/\/login$/);
+  await page.unroute("**/auth/v1/logout**");
   await page.getByLabel("E-mail", { exact: true }).fill(email);
+  await expect(
+    page.getByRole("heading", { name: "Entrar", exact: true }),
+  ).toBeVisible();
+
   await page
     .getByRole("button", { name: "Esqueci minha senha", exact: true })
     .click();
