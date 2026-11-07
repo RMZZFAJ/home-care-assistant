@@ -484,13 +484,17 @@ test("Acervo preserva originais e V4, recusa bytes divergentes e emite versão h
   expect([401, 403]).toContain(
     (await page.request.get(`${url}/pdf?issuance=${signed.id}`)).status(),
   );
-  await files
-    .getByRole("button", { name: "Atualizar arquivos", exact: true })
-    .click();
+  // Live authority invalidation may already have unmounted the archive.
+  // Require the whole private surface to disappear after real revocation.
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await expect(files).toHaveCount(0);
   await expect(
-    files.getByRole("link", { name: "Baixar PDF", exact: true }),
+    page.getByRole("region", { name: "Mudar perfil", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("main").getByRole("link", { name: "Baixar PDF", exact: true }),
   ).toHaveCount(0);
   await expect(
-    files.getByRole("link", { name: "Baixar arquivo legado", exact: true }),
+    page.getByRole("main").getByRole("link", { name: "Baixar arquivo legado", exact: true }),
   ).toHaveCount(0);
 });

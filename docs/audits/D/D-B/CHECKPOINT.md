@@ -887,3 +887,25 @@ reprovados em acervo/foco/carregamento; não valida V6. Próximo lote corrige es
 falhas dirigidas. C101 ENT específico, combinações C105/C106, acessibilidade PDF,
 anexos/custódia, D3 restante, D5 e bases operacionais permanecem pendentes.
 Sonar adiado; PR Draft; sem merge, deploy comandado ou GO.
+
+## D4.5a — foco tardio e contraprovas de atualização ao vivo
+
+Base d17e309. CI dbc7171 aprovou banco e validate; browsers falharam em três
+superfícies. O ensaio curto reproduziu a perda de foco com callbacks de frame
+atrasados. O foco inicial agora respeita a navegação que já chegou ao menu;
+seleção de contexto conserva o comportamento anterior. Setas e Escape foram
+ensaiados seis vezes após abrir/fechar notificações em cada projeto.
+
+No acervo, a CI mostrou área privada já desmontada por revogação real; o teste
+tentava clicar no controle removido. Agora exige remoção da região inteira,
+contexto a selecionar e ausência de links no main, mantendo403/401 reais.
+No histórico, invalidar ao vivo iniciava outra consulta fora da espera controlada;
+o instrumento agora retém a coorte inteira. A invalidação é explícita no ensaio,
+sem remover carregamento/erro/vazio/retry nem a negativa de resposta antiga.
+
+Baseline diagnóstico2 passes/1 falha no histórico; foco atrasado1 falha.
+Diagnóstico corrigido3/3 e aceite final de produção9/9 nos três projetos,
+com o mesmo candidato, passaram. Tipos/lint passaram; sem nova migration.
+[Fontes, logs e limites](D4_5A_CI_EVIDENCE.json). Não se promove diagnóstico,
+CI antiga ou resultado pendente a aprovação. Local141/remoto121;20 pendentes.
+Sonar adiado, D-B em execução, PR Draft e produção NO-GO.

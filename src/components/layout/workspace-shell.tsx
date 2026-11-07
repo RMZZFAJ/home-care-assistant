@@ -30,6 +30,9 @@ function ProfileMenu() {
   useEffect(() => {
     if (!open) return;
     const frame = requestAnimationFrame(() => {
+      // Fluent may already have focused the menu, and the user can navigate
+      // before this frame runs. Initial focus must not undo that navigation.
+      if (!contexts && menuRef.current?.contains(document.activeElement)) return;
       const target = contexts ? menuRef.current?.querySelector<HTMLElement>('[role="menuitemradio"][aria-checked="true"]') : null;
       (target ?? menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]'))?.focus();
     });

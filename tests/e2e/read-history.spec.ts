@@ -72,17 +72,20 @@ test("D3 histórico distingue demora erro e vazio e ignora resposta antiga mesmo
   await page.route("**/api/admin?*", async route => {
     const url = new URL(route.request().url());
     if (url.searchParams.get("section") !== "audit") return route.continue();
-    if (mode === "first") { mode = "live"; const response = await route.fetch(); firstEntered(); await firstGate; return route.fulfill({ response }); }
+    if (mode === "first") { const response = await route.fetch(); firstEntered(); await firstGate; return route.fulfill({ response }); }
     if (mode === "error" && !await page.evaluate(() => Boolean((window as unknown as { hcaAuditManualRetry?: boolean }).hcaAuditManualRetry))) return route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Falha controlada na leitura do histórico" } });
     if (url.searchParams.get("query") === "Resposta antiga sem resultado") { const response = await route.fetch(); oldEntered(); await oldGate; return route.fulfill({ response }); }
     await route.continue();
   });
   try {
     await page.goto(historyUrl(f.patient)); await enteredFirst;
+    // A realtime invalidation can start a newer read while the first is held.
+    // Hold the entire initial cohort so every pending read models the delay.
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     const panel = history(page), query = panel.getByLabel("Buscar código de evento ou nome da pessoa", { exact: true });
     await expect(panel.getByText("Consultando histórico…", { exact: true })).toBeVisible();
     await expect(panel.getByText("Nenhum evento corresponde aos filtros consultados.", { exact: true })).toHaveCount(0);
-    releaseFirst(); await expect(panel.getByText("201 eventos encontrados · página 1 de 11", { exact: true })).toBeVisible();
+    mode = "live"; releaseFirst(); await expect(panel.getByText("201 eventos encontrados · página 1 de 11", { exact: true })).toBeVisible();
     mode = "error"; await query.fill("Termo sem correspondência"); await query.press("Enter");
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do histórico");
     await expect(panel.getByText("Nenhum evento corresponde aos filtros consultados.", { exact: true })).toHaveCount(0);
@@ -101,5 +104,5 @@ test("D3 histórico distingue demora erro e vazio e ignora resposta antiga mesmo
     const denied = await page.request.get(`/api/admin?section=audit&careRecipientId=${other.id}`);
     expect(denied.status()).toBe(404); expect(await denied.text()).not.toContain("Somente outro paciente");
     expect(sql(`select count(*) from public.audit_events where metadata->>'care_recipient_id'=${sqlLiteral(f.patient)} and action='invitation.created';`)).toBe("201");
-  } finally { releaseFirst(); releaseOld(); }
+  } finally { mode = "live"; releaseFirst(); releaseOld(); }
 });

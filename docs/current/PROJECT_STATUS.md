@@ -25,7 +25,9 @@ independentemente por fatos/geometria e pyHanko/TSA interna; texto longo tem
 probe sem assinatura com marcador visível. [Evidências](../audits/D/D-B/D4_5_EVIDENCE.json).
 C101 ENT e combinações C105/C106 continuam parciais. CI dbc7171 terminou com
 banco/validate aprovados e browsers reprovados em acervo, foco e carregamento;
-a correção dirigida segue no próximo lote. Não é aprovação do incremento V6.
+D4.5a reproduziu e corrigiu foco tardio e ajustou os instrumentos de atualização
+ao vivo, com9/9 casos de produção nos três projetos. Não é aprovação da CI nova.
+[Contraprovas](../audits/D/D-B/D4_5A_CI_EVIDENCE.json).
 
 CI639b5cb, run42354352749, aprovou banco/validate, mas falhou em preparação
 global Chromium e largura de entregas WebKit; central teve uma tentativa
