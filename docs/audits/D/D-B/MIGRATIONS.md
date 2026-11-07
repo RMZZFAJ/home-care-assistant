@@ -146,3 +146,12 @@ nenhuma abertura de RLS/DML. test:db:prepare, três casos Auth e seis casos brow
 dirigidos passaram, com contraprova anterior preservada. Instalação/evolução e
 demais suítes programadas continuam gates da CI do SHA publicado. A migration
 integra a aplicação remota final D-B; não foi aplicada isoladamente ao remoto.
+
+### Compatibilidade local D3.4a
+
+Local127/remoto121. 20261107031505_phase_d3_governance_read_compatibility.sql
+restaura data.definitions e preserva as definições efetivas no topo da resposta.
+Mesma autorização e EXECUTE authenticated; auxiliares continuam fechados.
+test:db:prepare sem reset e seis casos Auth dirigidos passaram, incluindo duas
+falhas da CI bd8747b. Instalação/evolução e suíte completa devem ser confirmadas
+pela CI do SHA publicado. A aplicação remota permanece reservada ao lote final.

@@ -448,7 +448,7 @@ test("V4 review: global membership approval requires intended recipient acceptan
   );
   assert.equal(
     (
-      await rpc(admin, "patient_governance", { p_patient: patient })
+      await rpc(admin, "patient_governance_changes", { p_patient: patient, p_status: "applied", p_query: accepted.id })
     ).changes.find((c) => c.id === accepted.id).status,
     "applied",
   );

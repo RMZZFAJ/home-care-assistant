@@ -4,6 +4,12 @@ Referência editorial:06/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+Observação posterior: CI bd8747b passou validate Ubuntu/Windows e falhou em
+dois consumidores de governança; browser foi pulado. A correção incremental
+D3.4a restaura data.definitions e consulta proposta aplicada pela página de
+histórico. Recheck Auth6/6; a nova CI ainda é necessária. Local127/remoto121.
+SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
+
 Base integrada PR6: `8ec979a`. Branch única `feat/phase-d-implementation` e
 [Draft PR7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.
 [Checkpoint por incremento](../audits/D/D-A/CHECKPOINT.md) preserva tentativas,

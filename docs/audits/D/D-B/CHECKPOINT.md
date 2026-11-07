@@ -244,3 +244,30 @@ PostgreSQL registrou dois statement timeouts na mesma janela, às02:47:19UTC;
 a relação com a consulta exata ainda requer confirmação. O resumo de diagnóstico
 foi reduzido a classes/nomes de funções, sem SQL completo ou claims.
 Demais estados, formulários/guias e rascunhos D3 continuam em execução.
+
+## D3.4a — compatibilidade encontrada na CI
+
+A [CI de bd8747b](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42331578984)
+passou validate em Ubuntu/Windows e falhou em dois testes de integração; browser
+foi pulado. SonarCloud falhou e permanece OWNER_DEFERRED_SONAR_CONFIGURATION,
+sem tentativa de configuração ou aprovação presumida.
+
+balance-shifts dependia de data.definitions, removido pela substituição D3.2
+de patient_governance. A nova migration
+20261107031505_phase_d3_governance_read_compatibility.sql restaura o campo e
+mantém a matriz efetiva também no topo, com a mesma autorização/grants.
+Foi criada pelo CLI e aplicada com test:db:prepare somente no projeto local
+existente, sem reset: local127/remoto121. O binário instalado permanece2.121.0;
+a criação do arquivo usou uma invocação temporária npx3.0.0, sem alteração
+de versão do binário, stack ou destino remoto. Os demais comandos usam o
+binário fixo do projeto.
+
+O segundo teste procurava uma proposta aplicada na página padrão aberta. Foi
+direcionado à RPC paginada com status applied e referência da mesma proposta,
+mantendo a prova de aceite, estado e vínculos. Não se reabriu o histórico
+resolvido na consulta inicial. Recheck local com Auth real:6/6, incluindo os
+dois casos que falharam e quatro de governança, autorização após espera e
+grants. Log preservado em output/phase-d-work/d3-ci-compatibility-recheck.log;
+falha original em ci-bd8747b-failed.log. A CI do próximo SHA ainda deve confirmar
+instalação/evolução e suíte completa. Ajustes do sino/central continuam em
+andamento e têm validação própria; este checkpoint não os declara concluídos.
