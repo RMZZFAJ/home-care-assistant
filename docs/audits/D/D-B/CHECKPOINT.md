@@ -926,3 +926,57 @@ chave separada não foi exportada. Sem alteração de fonte, reset, remoto ou de
 Local141/remoto121;20 migrations D-B pendentes. Agenda/retenção7+4, destino
 operacional independente, recuperação de chaves, monitoramento e prova D6
 continuam pendentes. A meta D-B continua ativa e a PR permanece Draft.
+
+## D5.1 — PWA, compatibilidade e reconciliação remota antecipada
+
+Base fc98664. Manifesto/ícones, controles no perfil e worker versionado integram
+o produto. Cache real contém somente orientação offline e três ícones públicos;
+API, HTML autorizado, ficha e PDF privado dependem de rede/autorização. Não há
+fila/replay, skipWaiting ou reload forçado. Duas abas mantêm o worker aguardando;
+rascunho COM confirmado foi reaberto com o mesmo ID e quantidade. Convite depende
+de gesto; aceite não anuncia instalação física concluída. Capacidade ausente
+mantém web. [Contrato](PWA_RUNTIME.md); [manifesto](D5_1_EVIDENCE.json).
+
+Marcador SQL público invoker/stable distingue indisponibilidade e incompatibilidade
+sem sessão/dados privados. Área privada fica inerte e preserva campos; novos
+comandos são recusados antes do fetch, inclusive menu aberto e uploads privados.
+Erro de seleção de contexto é não fatal e aparece no menu, sem desmontar a edição.
+O cliente não concede autorização; API/RPC continuam responsáveis pela decisão.
+Contexto longo respeita o header fixo, sem force click ou redução de teste.
+
+Produção final15/15 passou nos três projetos em8,5min, com fontes de runtime
+estáveis, quatro larguras/axe e jornada acessível existente. Unidade9 casos
+distintos e Auth real1 caso passaram; repetições não são casos adicionais.
+Tipos/lint afetados passaram. Primeira produção teve13 passes/2 falhas iOS;
+teclado offline e fault adapter WebKit foram corrigidos. O adaptador injeta somente
+/api/runtime e recupera por HTTP/SQL real; worker/Auth/rascunho não são simulados.
+Web comum bloqueia workers para interceptações; a suíte PWA habilita workers reais.
+Imagens offline/atualização foram inspecionadas. Logs e contraprovas preservados.
+
+CI fc98664 aprovou banco, validate Ubuntu/Windows e Chromium/mobile. iOS atingiu
+40min com162 casos aprovados/zero falhas de assert observadas e foi cancelado;
+agregado FAILURE. Somente iOS passa a usar duas partes com stacks independentes,
+mesmo limite e execução serial. Coleta final comprova182=94+88, interseção zero
+e união exata; coleta não significa execução nem CI aprovada do novo candidato.
+
+Conforme [novo complemento do responsável](OWNER_AMENDMENTS.md), o remoto foi
+reconciliado neste fechamento. Backup extraordinário cifrado/autenticado e
+restauração isolada conferiram129 tabelas/FKs,32 objetos e31 PDFs legados;
+zero emissão assinada ready na fonte. Upgrade22 passou na cópia. Preflight
+sem drift,97 identidades RPC publicadas preservadas, locks/transações longas/
+índices inválidos zero. As22 migrations foram aplicadas pelo fluxo oficial com
+skip-vault; **local143/remoto143; zero pendências nessa observação**.
+
+Pós-validação143 SQLs e129 projeções originais não encontrou alteração inesperada.
+Cron/Vault têm digests idênticos; somente cursor/heartbeat variam. A única
+qualificação do catálogo vivo é a constraint NaN local NOT VALID, com predicado
+idêntico e remoto validado. Comparação inicial por serialização JSON foi corrigida
+para igualdade semântica; contraprova preservada. REST anônimo real do marcador
+responde200. [Preflight](D5_REMOTE_PREFLIGHT.json),
+[resultado](D5_REMOTE_MIGRATIONS.json) e [advisors](D5_REMOTE_ADVISORS.json).
+
+CI e preview do SHA publicado continuam gates separados. Instalação física/AT,
+Web Push/VAPID/entrega em background, frescor/revogação entre contextos, corpus
+zoom400%/texto300, demais critérios D3/D4, custódia/rotação, agenda7+4 e
+monitoramento seguem pendentes. O backup local ao operador não é rotina externa
+operacional nem prova D6. Sonar adiado; D-B ativa; PR Draft; produção NO-GO.

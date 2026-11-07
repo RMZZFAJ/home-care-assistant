@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/build-pdf-verifier.mjs && next dev",
-    "build": "node scripts/build-pdf-verifier.mjs && next build",
+    "dev": "node scripts/build-pwa.mjs && node scripts/build-pdf-verifier.mjs && next dev",
+    "build": "node scripts/build-pwa.mjs && node scripts/build-pdf-verifier.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "lint:markdown": "markdownlint-cli2 \"README.md\" \"AGENTS.md\" \"docs/**/*.md\"",

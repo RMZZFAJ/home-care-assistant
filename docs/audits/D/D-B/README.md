@@ -15,8 +15,10 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Verificação pública e limites do parser](PUBLIC_VERIFICATION.md).
 - [Acervo e downloads legados](DOCUMENT_ARCHIVE.md).
 - [Autoria, proveniência e datas V6](PDF_SOURCE_FACTS.md).
+- [Instalação, atualização e privacidade PWA](PWA_RUNTIME.md).
 - [Complementos posteriores do responsável](OWNER_AMENDMENTS.md): configuração
-  e tratamento específico do SonarCloud adiados expressamente.
+  e tratamento específico do SonarCloud adiados expressamente; reconciliação
+  remota antecipada para o fechamento de D5.1.
 
 Branch única `feat/phase-d-implementation`; [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7)
 permanece Draft, sem merge ou promoção operacional. Evidência local, CI,

@@ -21,7 +21,7 @@ const serverSnapshot = () => false;
 
 function ProfileMenu() {
   const router = useRouter();
-  const { data, value, selecting, selectProfile } = useWorkspaceState();
+  const { data, value, selecting, selectProfile, selectionError } = useWorkspaceState();
   const [open, setOpen] = useState(false);
   const [contexts, setContexts] = useState(false);
   const [restoreAfterSelection,setRestoreAfterSelection]=useState(false);
@@ -53,7 +53,7 @@ function ProfileMenu() {
       <span className="hca-profile-identity"><strong>{data?.fullName}</strong><small>{data?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role)}</small></span>
       <Icon name="chevron" width={14} />
     </Button></PopoverTrigger>
-    <PopoverSurface aria-label="Perfil e contexto" className={contexts ? "hca-context-menu" : undefined}><MenuList ref={menuRef} aria-labelledby={undefined} aria-label={contexts ? "Contextos autorizados" : "Ações do usuário"} checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
+    <PopoverSurface aria-label="Perfil e contexto" className={contexts ? "hca-context-menu" : undefined}>{contexts && selectionError ? <p role="alert">{selectionError}</p> : null}<MenuList ref={menuRef} aria-labelledby={undefined} aria-label={contexts ? "Contextos autorizados" : "Ações do usuário"} checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
       {contexts ? <>
         <MenuItem persistOnClick onClick={() => setContexts(false)}>← Voltar ao menu</MenuItem>
         {data?.isGlobalAdmin ? <MenuItemRadio persistOnClick name="context" value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</MenuItemRadio> : null}

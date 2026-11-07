@@ -11,7 +11,7 @@ import { roleLabel, useWorkspaceState } from "@/components/layout/workspace-cont
 export function AppWorkspace({ title, children, administration = false, administrationCapabilities = ["access.manage"], administrationReadRecovery = false, compact = false }: {
   title: string; children: (context: WorkspaceContext) => ReactNode; administration?: boolean; administrationCapabilities?: string[]; administrationReadRecovery?: boolean; compact?: boolean;
 }) {
-  const { value, data, error, loading, selecting, load, selectProfile } = useWorkspaceState();
+  const { value, data, error, selectionError, loading, selecting, load, selectProfile } = useWorkspaceState();
   const routePatient = useSearchParams().get("careRecipientId");
   const linkedPatient = data?.documentContext?.patientId ?? routePatient;
   const mismatch = linkedPatient && (value?.activeContext?.mode !== "patient" || value.activeContext.care_recipient_id !== linkedPatient) && !administration;
@@ -26,6 +26,7 @@ export function AppWorkspace({ title, children, administration = false, administ
     </div>
     {loading && !value ? <div className="hca-loading" role="status"><Spinner size="small" />Validando sessão e pacientes autorizados…</div> : null}
     {error ? <MessageBar layout="multiline" intent="error" role="alert"><MessageBarBody><p>{error}</p><div className="hca-toolbar"><Button onClick={() => void load()}>Tentar novamente</Button><Link href="/login">Entrar novamente</Link></div></MessageBarBody></MessageBar> : null}
+    {selectionError ? <MessageBar layout="multiline" intent="error" role="alert"><MessageBarBody>{selectionError}</MessageBarBody></MessageBar> : null}
     {value?.activeContext?.mode === "global" && !value.globalAdministrationAllowed ? <MessageBar layout="multiline" intent="warning"><MessageBarBody>Confirme seu autenticador para administrar. <Link href="/perfil?mfa=required">Verificar autenticação em duas etapas</Link></MessageBarBody></MessageBar> : null}
     {choose ? <section className="ui-card hca-context-selection" aria-label="Mudar perfil">
       <h2 className="text-lg font-semibold">Escolha como deseja atuar</h2>

@@ -25,3 +25,14 @@ de produção. Suítes gerais ficam na CI do SHA publicado, com repetição loca
 somente por falha/hipótese concreta. Evidências mantêm origem, contraprovas e
 limitações; diagnóstico não recebe status de aceite. Evitar releituras amplas,
 monitoramento repetitivo e atualizações manuais duplicadas da matriz.
+
+## Reconciliação remota antecipada — fechamento de D5.1
+
+Em07/11/2026 o responsável determinou aplicar todas as migrations pendentes
+no remoto ao fechar este lote, junto ao próximo commit, para testar o preview
+Vercel durante o desenvolvimento. Essa determinação antecipa o momento do lote
+remoto previsto na seção XIII da ordem; preserva preflight, compatibilidade,
+backup verificável e pós-validação. O alvo continua exclusivamente
+qwfrqychokvhdzakibid. Não autoriza reset, fixtures remotas, merge, promoção de
+produção ou ativação de transportes externos. A PR permanece Draft e o preview
+continua ambiente de desenvolvimento, sem aprovação operacional.

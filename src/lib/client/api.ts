@@ -25,6 +25,17 @@ export class ApiError extends Error {
   }
 }
 
+// Availability preflight only. Server Auth/RPCs remain the authorization source.
+// Browser-only state is never populated by SSR or treated as a permission grant.
+let runtimeCommandsAvailable: boolean | undefined;
+export function setRuntimeCommandsAvailable(available: boolean | undefined) {
+  if (typeof window !== "undefined") runtimeCommandsAvailable = available;
+}
+export function requireRuntimeCommandsAvailable() {
+  if (typeof window !== "undefined" && runtimeCommandsAvailable === false)
+    throw new ApiError("A ação não foi enviada. Aguarde conexão e versão compatíveis antes de tentar novamente. Seus campos foram preservados.", 400, "CLIENT_RUNTIME_BLOCKED");
+}
+
 type RequestKind = "read" | "command";
 export class TransportError extends ApiError {
   readonly outcome: "read_failed" | "uncertain";
@@ -46,6 +57,7 @@ export async function api<T>(
 ): Promise<T> {
   const requestMethod = method?.toUpperCase() ?? (payload === undefined ? "GET" : "POST");
   const requestKind: RequestKind = ["GET", "HEAD", "OPTIONS"].includes(requestMethod) ? "read" : "command";
+  if (requestKind === "command") requireRuntimeCommandsAvailable();
   const controller = new AbortController();
   const cancel = () => controller.abort();
   if (signal?.aborted) controller.abort();

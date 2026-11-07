@@ -1,5 +1,16 @@
 # Contratos de API
 
+## Compatibilidade pública do cliente
+
+GET /api/runtime consulta somente client_schema_contract, sem sessão, cookie ou
+metadata privada. Resposta200 informa state=ready, protocol e schema. Ausência
+do marcador ou versão divergente retorna503/RUNTIME_INCOMPATIBLE; falha de
+infraestrutura retorna503/RUNTIME_UNAVAILABLE. Respostas têm no-store e
+x-correlation-id. O endpoint não concede autorização para dados ou comandos.
+O cliente conserva edições e bloqueia novos envios até recuperar compatibilidade.
+O contrato e os limites do worker estão em
+[PWA D5.1](../audits/D/D-B/PWA_RUNTIME.md).
+
 ## Emissões documentais D4 em implementação local
 
 GET /api/documents/:id/issuances consulta20 registros por página, com cursor

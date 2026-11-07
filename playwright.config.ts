@@ -14,6 +14,8 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
+    // General HTTP fault tests need routable requests. PWA has its own real-worker suite.
+    serviceWorkers: "block",
     baseURL,
     actionTimeout: 15_000,
     navigationTimeout: 30_000,

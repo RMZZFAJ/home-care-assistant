@@ -21,6 +21,8 @@ import { useLiveRevision } from "@/lib/use-live-revision";
 import { SciencePreferenceSettings } from "./profile/science-preference";
 import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
 import { UserGuide } from "@/components/guides/user-guide";
+import { PwaSettings } from "./pwa/pwa-settings";
+import { requireRuntimeCommandsAvailable } from "@/lib/client/api";
 type Profile = ProfileRead["data"];
 type Membership = ProfileRead["memberships"][number];
 type Session = ProfileRead["sessions"][number];
@@ -82,6 +84,7 @@ function ProfileContent() {
     setMessage("");
     try {
       if (action === "avatar") {
+        requireRuntimeCommandsAvailable();
         const response = await fetch("/api/profile", {
           method: "POST",
           body: form,
@@ -138,6 +141,7 @@ function ProfileContent() {
       {message ? <Notice>{message}</Notice> : null}
       {readFailure ? <Notice error>{readFailure.message} <button type="button" className={buttonClass} onClick={() => setReadAttempt(value => value + 1)}>Consultar perfil novamente</button></Notice> : null}
       {reading ? <Notice>{profile ? "Atualizando consulta do perfil…" : "Carregando perfil…"}</Notice> : null}
+      <PwaSettings />
       {profile ? (
         <>
           <SettingsSection title="Identidade pessoal" summary="Nome, identificação profissional e preferências">

@@ -112,9 +112,55 @@ alterada por consequência. Esses avisos não são aprovação geral de seguran�
 
 ## Aplicação final — D-B
 
-**NÃO INICIADA.** Exige implementação e testes locais, revisão de ACL/RLS/RPC,
-novo preflight remoto, compatibilidade, backup pré-alteração e pós-validação.
-Migrations aplicadas não substituem prova dos consumidores reais.
+**LOTE ANTECIPADO D5.1 APLICADO E PÓS-VALIDADO.** O responsável antecipou a
+reconciliação para este fechamento em [complemento expresso](OWNER_AMENDMENTS.md).
+Local143/remoto143;22 pendências D-B aplicadas uma vez. Não há migration
+pendente nessa observação. Novos incrementos da missão exigem nova reconciliação.
+Migrations aplicadas não substituem prova dos consumidores reais nem concluem D-B.
+
+Novo preflight confrontou121 SQLs com os arquivos e o catálogo remoto com o
+registro anterior: sem versão desconhecida ou drift estrutural. Vercel production
+continua8ec979a;97 identidades de funções públicas referenciadas pelos fontes
+publicados foram preservadas, sem perda de grants desses consumidores.
+As evoluções mantêm assinaturas anteriores e acrescentam rascunhos, referências
+e emissões opt-in. Nenhum documento, evento ou exemplar antigo foi reescrito.
+
+Backup88477945-31c5-4239-a029-693aa520d5a7 tem78 arquivos e9.289.109 bytes,
+AES-256-GCM, autenticação por objeto e manifesto cifrado com SHA-256
+866f74c00d81d53c45cd3b28245b742b01ef44ca3dfa245b58cebe999f226eff.
+Captura e custódia ficam fora do Git, com ACL do operador e chave separada.
+Restauração real isolada conferiu129 tabelas/digests estáveis, FKs,32 objetos e
+31 PDFs legados. Zero emissões assinadas ready existiam nessa fonte. Aplicou as
+22 migrations na cópia, sem cron/pg_net ou importação de roles. O banco temporário
+foi removido.8,639s é tempo do probe, sem atribuição de RTO operacional.
+
+Catálogo da cópia coincide sob duas qualificações já discriminadas no preflight
+anterior: alias AS text acrescentado pelo reparse da view e flag NOT VALID da
+fixture NaN local. A view remota viva coincide exatamente com o candidato; a regra
+presentation_finite_factor tem predicado idêntico e está validada no remoto.
+Não se enfraqueceu constraint nem se alterou a fixture para obter equivalência.
+
+Consulta imediatamente anterior confirmou os129 conjuntos estáveis ainda iguais
+ao backup, exceto cursor/heartbeat com contagem preservada. Sem locks aguardando,
+transações longas ou índices inválidos. Dry-run oficial listou exatamente22
+pendências, seeds=[] e roles=[]. Fluxo oficial db push --linked --skip-vault --yes
+aplicou somente essas pendências. Não houve reset, fixtures, configuração Auth,
+ativação de transporte ou atualização de Vault.
+
+Pós-validação conferiu143/143 SQLs e dez seções integrais do catálogo vivo; somente
+a qualificação da constraint local permanece. Projeções originais das129 tabelas
+coincidem, excluindo apenas colunas novas e novas linhas do histórico de migrations.
+Persistem9 usuários Auth,7 perfis e32 objetos. Cron e Vault têm digests preservados;
+somente cursor BAL/heartbeat variaram. Marcador público retornou200 pelo REST
+anônimo real: invoker, stable, sem EXECUTE service_role e sem grants diretos às
+tabelas privadas. Advisor mantém três definer anônimos anteriores; os quatro
+novos controles privados têm RLS e acesso direto revogado. Avisos históricos
+de unaccent/senha vazada continuam sem alteração de configuração.
+
+[Preflight e hashes](D5_REMOTE_PREFLIGHT.json),
+[pós-validação](D5_REMOTE_MIGRATIONS.json) e [advisors](D5_REMOTE_ADVISORS.json)
+separam execução, qualificações e limites. CI dos fontes atuais e teste do preview
+são gates distintos. As seções abaixo preservam os estados históricos de cada lote.
 
 ### Incremento local D3.2
 

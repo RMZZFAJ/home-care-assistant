@@ -6,6 +6,7 @@ import { getE2EEnvironment } from "./e2e-environment.mjs";
 const env = getE2EEnvironment();
 await import("./build-pdf-verifier.mjs");
 await import("./build-legacy-test-renderer.mjs");
+await import("./build-pwa.mjs");
 // Faster local diagnosis uses the same guarded stack and fictional identities.
 // It never substitutes for production-build acceptance; CI always builds fresh.
 const diagnostic = env.HCA_E2E_DIAGNOSTIC === "true" && !env.CI;

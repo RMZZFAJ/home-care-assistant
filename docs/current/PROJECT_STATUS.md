@@ -4,11 +4,28 @@ Referência editorial:07/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D5.1 implementou manifesto, orientação offline estritamente pública, controle de
+compatibilidade, bloqueio de novos envios e atualização sem reload forçado.
+Produção local15/15 nos três projetos passou, com worker real, duas abas e
+recuperação do mesmo rascunho. Instalação física e Push continuam gates próprios.
+[Contrato](../audits/D/D-B/PWA_RUNTIME.md).
+Por determinação posterior do responsável,22 migrations D-B foram aplicadas
+após backup/restauração/compatibilidade: **local143/remoto143; zero pendências**.
+Histórico143/143, preservação das129 projeções anteriores,32 objetos e cron/Vault
+foram pós-validados. [Recibos](../audits/D/D-B/D5_REMOTE_MIGRATIONS.json).
+Isso permite testar o preview durante desenvolvimento; não conclui D-B ou libera
+produção. Novas migrations da missão exigirão reconciliação correspondente.
+
+CI fc98664 aprovou banco, validate e Chromium/mobile; iOS foi cancelado no limite
+de40 minutos, com162 casos aprovados e nenhuma falha de assert observada no log.
+O agregado terminou FAILURE. O lote atual divide somente iOS em duas partes,
+mantendo a coleção completa e todos os gates; CI do SHA novo continua separada.
+
 CI dfdc7de, run42335739149, concluiu banco, validate Ubuntu/Windows e os três
 projetos browser com SUCCESS. Inclui a correção D3.4a dos consumidores de
 governança que falharam em bd8747b e os estados de leitura D3.4. Essa CI não
-valida os incrementos posteriores. Local141/remoto121;20 migrations D-B
-aguardam o lote remoto final autorizado.
+valida os incrementos posteriores. A reconciliação vigente está descrita acima;
+as observações anteriores por SHA permanecem históricas.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
 
 CI d0179ca aprovou banco/instalação/evolução/integração e validate, mas falhou

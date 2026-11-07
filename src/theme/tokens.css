@@ -51,6 +51,7 @@
   font-size: 14px;
 }
 .hca-theme .ui-button { min-height: 36px; border-radius: 4px; padding: 7px 14px; font-weight: 600; }
+.hca-context-selection button { scroll-margin-block: calc(var(--app-header-height) + 16px) 16px; }
 /* Interpolating disabled gray and enabled blue creates unreadable mid-colors. */
 .hca-theme .fui-Button, .hca-record-drawer .fui-Button, .hca-dialog-surface .fui-Button { transition-property: box-shadow, transform; }
 .hca-theme .ui-notice { border-radius: 6px; }

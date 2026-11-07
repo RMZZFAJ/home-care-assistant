@@ -238,8 +238,19 @@ Instalação limpa, evolução legada, SQL/RLS e integrações Auth executam uma
 no job de banco. Após sua aprovação, Chromium desktop, Pixel 7 e iPhone 13
 executam em jobs isolados, com a mesma stack local e provisionamento Auth
 fictício em cada runner efêmero. Cada projeto mantém todos os seus cenários.
-O check agregado database-and-browser exige sucesso no banco e nos três
-projetos. Não há exclusão de testes nem uso do Supabase remoto na suíte.
+O check agregado database-and-browser exige sucesso no banco e em todos os
+jobs browser. iOS divide a coleção completa em shard1/2 e shard2/2, cada um
+com stack própria e execução serial; Chromium/mobile mantêm shard1/1.
+A união das partes precisa cobrir toda a coleção sem interseção. Não há
+exclusão de testes nem uso do Supabase remoto na suíte.
+
+Suítes web comuns usam serviceWorkers=block para interceptações HTTP chegarem
+ao consumidor. pwa.spec.ts habilita workers reais nos três projetos e verifica
+manifesto, cache estritamente público, navegação offline, atualização com duas
+abas, preservação e recuperação do mesmo rascunho. O fault adapter do contrato
+público é explícito e limitado; não simula Auth, persistência ou estado do worker.
+Convite controlado não comprova instalação física no sistema operacional.
+Ver [contrato e limites PWA](../audits/D/D-B/PWA_RUNTIME.md).
 
 O workflow agrupa execuções por PR e cancela as superadas quando chega outro
 commit. O SHA mais recente continua executando a matriz inteira. Pushes na

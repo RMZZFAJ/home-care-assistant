@@ -56,6 +56,14 @@ Chave permaneceu na custódia separada, sem cópia no repositório ou logs públ
 
 ## Limites e próximos consumidores
 
+O fechamento D5.1 produziu novo backup extraordinário do remoto121 e ensaiou a
+evolução até143:129 conjuntos estáveis/FKs,32 objetos,31 PDFs legados e nenhuma
+emissão assinada ready na fonte. Pacote78 arquivos/9.289.109 bytes, cifrado e
+autenticado, custódia separada e ACL do operador. O probe isolado levou8,639s e
+foi removido, sem cron/pg_net. [Recibo e limites](D5_REMOTE_PREFLIGHT.json).
+Esse resultado atualiza a prova pré-migration e não comprova agenda7+4, perda do
+computador do operador, recuperação da chave ou restauração operacional D6.
+
 O destino do preflight é independente do Supabase operacional, no equipamento
 do operador. Isso não significa uma rotina externa diária ativa. Adaptadores
 de captura/destino, agenda, retenção segura7+4, incidentes e observabilidade
