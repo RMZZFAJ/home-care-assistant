@@ -421,7 +421,7 @@ export function PatientSupplyWizard({
               ]),
             ),
           });
-          if (restored && !documentId) setForm(restored);
+          if (restored && (preserved || !documentId)) setForm(restored);
           if (preserved) {
             frozenRef.current = preserved;
             setUncertain(true);
@@ -845,7 +845,7 @@ export function PatientSupplyWizard({
                 : {}),
             },
       );
-      setSaved(requireSupplyConfirmation(result,{patientId,type,id:editing?.id,minimumVersion:editing?editing.version+1:1}));
+      setSaved(requireSupplyConfirmation(result,{patientId,type,id:editing?.id,minimumVersion:frozenRef.current.expectedVersion!==undefined?frozenRef.current.expectedVersion+1:editing?editing.version+1:1}));
       sessionStorage.removeItem(storageKey);
       sessionStorage.removeItem(storageKey + ":start");
       setUncertain(false);
@@ -862,7 +862,7 @@ export function PatientSupplyWizard({
         setStaleLegacyReference(true);
       if (
         reason instanceof ApiError &&
-        reason.code === "DRAFT_VERSION_CONFLICT"
+        reason.code === "DRAFT_VERSION_CONFLICT" && !uncertain
       ) {
         await privateDraft.reportConflict();
         setStep(0);
@@ -870,7 +870,7 @@ export function PatientSupplyWizard({
       if (
         type === "ENT" &&
         reason instanceof ApiError &&
-        reason.status === 409
+        reason.status === 409 && !uncertain
       ) {
         setRecipientPending(true);
         setRecipientAttempt((value) => value + 1);

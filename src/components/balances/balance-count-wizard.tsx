@@ -519,7 +519,7 @@ function ScheduledCount({
     } catch (reason) {
       if (
         reason instanceof ApiError &&
-        [400, 403, 404, 409, 422].includes(reason.status)
+        [400, 403, 404, 409, 422].includes(reason.status) && !uncertain
       ) {
         pendingRef.current = null;
         setUncertain(false);

@@ -7,7 +7,7 @@ CI do SHA publicado é gate independente; pending não significa aprovação.
 CI dfdc7de, run42335739149, concluiu banco, validate Ubuntu/Windows e os três
 projetos browser com SUCCESS. Inclui a correção D3.4a dos consumidores de
 governança que falharam em bd8747b e os estados de leitura D3.4. Essa CI não
-valida os incrementos posteriores. Local131/remoto121; dez migrations D-B
+valida os incrementos posteriores. Local133/remoto121;12 migrations D-B
 aguardam o lote remoto final autorizado.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
 
@@ -37,8 +37,16 @@ chave desconhecida após recusa de acesso. Oito casos Auth,11 unitários/modelos
 API e35 casos browser distintos passaram entre rodadas de produção, incluindo
 REQ/BAL existentes e falhas direcionadas da CI.
 [Manifesto D3.6](../audits/D/D-B/D3_6_EVIDENCE.json).
-C7-AC-004 tem prova local; sessão/24h, demais contextos e revisão legada já
-confirmada continuam pendentes. D4, D5 e demais requisitos seguem em execução.
+C7-AC-004 tem prova local; sessão/24h e demais contextos continuam pendentes.
+
+D3.7 comprova C-AC-077: revisão legada salva, submissão pendente e recuperação
+das duas etapas já concluídas. Mantém chaves/versão da intenção sem submeter
+edição posterior. Auth17/17, contratos API15/15 e24 casos browser distintos
+passaram entre rodadas; o recheck final passou12/12. Tipos/lint passaram.
+[Evidência D3.7](../audits/D/D-B/D3_7_EVIDENCE.json). CI10e6111 aprovou banco e
+validate Windows/Ubuntu; browsers ainda em andamento na observação anterior
+ao novo push. CI do candidato continua gate independente. D4, D5 e demais
+requisitos seguem em execução.
 
 Base integrada PR6: `8ec979a`. Branch única `feat/phase-d-implementation` e
 [Draft PR7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.

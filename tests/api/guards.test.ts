@@ -18,6 +18,15 @@ import { governanceQuerySchema } from "@/lib/validation/governance";
 
 const patientId = "10000000-0000-4000-8000-000000000001";
 describe("request-query validation has a separate boundary from server results", () => {
+  it("returns a typed confirmed stage with correlation while logs retain only the safe error descriptor", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const receipt={kind:"revision" as const,documentId:patientId,idempotencyKey:"10000000-0000-4000-8000-000000000002",version:2};
+    try {
+      const response=await api("test.legacy_revision",async()=>{throw new ApiError("REVISION_SAVED_SUBMISSION_PENDING","A revisão 2 desta ficha foi salva.",503,true,receipt);});
+      const body=await response.json();expect(response.status).toBe(503);expect(body).toMatchObject({code:"REVISION_SAVED_SUBMISSION_PENDING",confirmedStage:receipt,retryable:true});expect(body.correlationId).toBe(response.headers.get("x-correlation-id"));expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(log).toHaveBeenCalledTimes(1);expect(JSON.parse(log.mock.calls[0][0])).toEqual({level:"error",operation:"test.legacy_revision",code:body.code,correlationId:body.correlationId});
+    } finally { log.mockRestore(); }
+  });
   it("maps invalid audit/governance limits to a safe400 without exposing request values", () => {
     for (const read of [() => parseQuery(auditQuerySchema, { pageSize: "101" }), () => parseQuery(governanceQuerySchema, { pageSize: "private-invalid-value" })]) {
       try { read(); throw new Error("Invalid query was accepted"); }

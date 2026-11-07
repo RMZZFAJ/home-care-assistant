@@ -767,6 +767,15 @@ Uma recusa de acesso durante recuperação desconhecida conserva a chave origina
 cache restaurado exige leitura viva antes de exibir conteúdo protegido.
 Revisão/submit sem draftCommit usam revise_and_submit_supply_document e as duas
 chaves da intenção. Para uma intenção nova, as duas etapas são atômicas.
+Uma revisão legada já confirmada recebe tratamento próprio: se submit falhar,
+a API consulta supply_revision_receipt com ator/chave/conteúdo/versão originais.
+Havendo comprovante autorizado, responde503 REVISION_SAVED_SUBMISSION_PENDING
+com confirmedStage contendo kind revision, documentId, idempotencyKey e version.
+A mensagem distingue revisão salva de submissão ainda não confirmada; logs
+conservam somente operação/código/correlação. Ausência do comprovante não afirma
+que nenhuma etapa ocorreu. Conflito de chave continua409 IDEMPOTENCY_CONFLICT.
+O replay conserva a versão original ao submeter: uma edição posterior não é
+adotada automaticamente. A segunda chave recupera submissão antiga concluída.
 Abertura BAL nova consulta GET /api/balances com reference=true: revisão e
 quantidades do ledger são retornadas no mesmo snapshot sem criar ficha.
 O payload BAL sem atribuição pode informar balanceReferenceRevision; a criação

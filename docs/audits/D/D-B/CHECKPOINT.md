@@ -444,3 +444,41 @@ pedido ainda precisam de implementação ou comprovação. Tipos/lint passaram;
 CI do novo SHA e instalação/evolução continuam gates. Não houve fonte mutável
 ou suíte DB concorrente com E2E. Remoto final, D4, D5 e operação não iniciados
 por este lote; PR segue Draft sem merge ou promoção operacional.
+
+## D3.7 — revisão legada confirmada e submissão pendente
+
+Base publicada10e6111; o banco e validate Windows/Ubuntu da CI42349487904
+passaram. Os três browsers ainda estavam em andamento na observação anterior
+ao push deste candidato. Essa CI não aprova as fontes novas.
+
+Local133/remoto121, sem reset;12 migrations D-B aguardam o lote remoto final.
+20261107070558 acrescenta comprovante mínimo de revisão: evento do próprio
+ator, documento, chave, conteúdo, ação e versão originais, sob leitura viva.
+Não executa comandos para descobrir se uma etapa foi gravada. A API distingue
+REVISION_SAVED_SUBMISSION_PENDING, com confirmedStage tipado e correlação,
+sem identidade/chave/payload nos logs. Ausência de comprovante não prova falha.
+
+20261107072253 conserva a versão esperada da revisão original na submissão.
+O replay da primeira etapa pode ler uma edição posterior; isso não autoriza
+submetê-la. A segunda chave recupera uma submissão antiga já confirmada antes
+da comparação de versão. Chave diferente após vinculação continua409.
+O formulário preserva as duas chaves, conteúdo e recuperação após recarga/409;
+a confirmação usa a versão da intenção, inclusive quando ambas as etapas
+legadas já estavam concluídas. Ramo BAL nativo também retém intenção incerta.
+
+Auth final17/17; contratos da API15/15; tipos/lint passaram. Rodada de produção
+inicial9/15 revelou ENT409 voltando à etapa0 e um alvo BAL errado no teste.
+Corrigidos o ramo incerto e a rota do instrumento, o recheck passou9/9.
+A proteção de versão posterior passou no recheck final12/12. São24 casos
+browser distintos aprovados entre rodadas, nos três projetos, com quatro
+larguras e axe nas revisões pendentes. Inclui falta real de saldo ENT30→31,
+reposição autorizada e recuperação sem repetir revisão, além de falhas
+provocadas restritas ao documento fictício para os demais ramos.
+
+[Manifesto D3.7](D3_7_EVIDENCE.json) conserva fontes por rodada, falhas e
+contraprovas. Todos os triggers/helpers de falha foram removidos; os dois
+crons locais originais continuam ativos e com o mesmo agendamento.
+C-AC-077 passa a PASS_LOCAL_AUTH_HTTP_BROWSER. Outros consumidores D3,
+sessões/24h, rascunhos de decisões, guias e navegação continuam pendentes.
+CI do candidato, reconciliação remota final e gates humanos/externos D-C/D6
+permanecem separados. D4, D5 e operação não foram concluídos por este lote.

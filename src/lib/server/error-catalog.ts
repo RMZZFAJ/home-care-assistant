@@ -145,6 +145,7 @@ export const errorCatalog = {
   DATABASE_UNAVAILABLE: dependency,
   AUTH_UNAVAILABLE: dependency,
   PERSISTENCE_UNCONFIRMED: reconciliation,
+  REVISION_SAVED_SUBMISSION_PENDING: reconciliation,
   RECEIPT_PENDING: reconciliation,
   NOTIFICATION_RESULT_UNCONFIRMED: {
     ...reconciliation,

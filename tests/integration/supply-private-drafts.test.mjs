@@ -71,8 +71,39 @@ for(const kind of ["COM","ENT","BAL"])test(`${kind} revision and submission roll
  assert.equal((await owner.rpc("revise_and_submit_supply_document",{...args,p_submission_key:randomUUID()})).error?.code,"23505");assert.equal(official(f),after);
 });
 
+for(const kind of ["COM","ENT","BAL"])test(`${kind} legacy committed revision is proven separately from failed submission and recovers the same keys once`,async()=>{
+ const f=await setup(),owner=kind==="BAL"?await actor("professional",f.patient):f.admin,body=payload(f,kind),doc=await rpc(owner,"create_supply_document",{p_patient:f.patient,p_type:kind,p_payload:body,p_key:randomUUID(),p_draft:true});
+ const args={p_id:doc.id,p_payload:{...body,notes:"Primeira etapa antiga confirmada"},p_key:randomUUID(),p_version:doc.version,p_recount:false},submit={...args,p_submit:true,p_submission_key:randomUUID()};
+ assert.equal(await rpc(owner,"supply_revision_receipt",args),null);
+ const revised=await rpc(owner,"revise_supply_document",args),proof={documentId:doc.id,revisionKey:args.p_key,version:revised.version},before=official(f);
+ assert.equal(revised.version,doc.version+1);assert.equal(revised.status,"draft");assert.deepEqual(await rpc(owner,"supply_revision_receipt",args),proof);
+ for(const changed of [{p_key:randomUUID()},{p_version:doc.version+1},{p_recount:true},{p_payload:{...args.p_payload,notes:"Conteúdo diferente"}}])assert.equal(await rpc(owner,"supply_revision_receipt",{...args,...changed}),null);
+ const peer=await actor(kind==="BAL"?"adminA":"global",f.patient);assert.equal(await rpc(peer,"supply_revision_receipt",args),null);
+ const other=await setup();await rpc(owner,"select_active_context",{p_patient:other.patient});assert.equal((await owner.rpc("supply_revision_receipt",args)).error?.code,"42501");await rpc(owner,"select_active_context",{p_patient:f.patient});
+ sql(`create function private.phase_d3_legacy_submit_fault() returns trigger language plpgsql set search_path='' as $$begin if new.status is distinct from old.status and new.status<>'draft' then raise exception 'controlled legacy submission failure' using errcode='PT499';end if;return new;end;$$;create trigger phase_d3_legacy_submit_fault before update on public.operational_documents for each row when(old.id=${sqlLiteral(doc.id)}::uuid) execute function private.phase_d3_legacy_submit_fault();`);
+ try{assert.equal((await owner.rpc("revise_and_submit_supply_document",submit)).error?.code,"PT499");assert.equal(official(f),before);assert.deepEqual(await rpc(owner,"supply_revision_receipt",args),proof);}
+ finally{sql("drop trigger if exists phase_d3_legacy_submit_fault on public.operational_documents;drop function if exists private.phase_d3_legacy_submit_fault();");}
+ const result=await rpc(owner,"revise_and_submit_supply_document",submit),after=official(f);assert.notEqual(result.status,"draft");assert.deepEqual(await rpc(owner,"revise_and_submit_supply_document",submit),result);assert.equal(official(f),after);assert.deepEqual(await rpc(owner,"supply_revision_receipt",args),proof);
+ assert.equal(sql(`select count(*) from public.document_events where document_id=${sqlLiteral(doc.id)} and action=${sqlLiteral(kind.toLowerCase()+".draft_updated")};`),"1");
+ assert.equal((await owner.rpc("revise_and_submit_supply_document",{...submit,p_submission_key:randomUUID()})).error?.code,"23505");assert.equal(official(f),after);
+});
+
+for(const kind of ["COM","ENT","BAL"]) {
+ test(`${kind} legacy pending submission cannot silently submit an intervening revision`,async()=>{
+  const f=await setup(),owner=kind==="BAL"?await actor("professional",f.patient):f.admin,body=payload(f,kind),doc=await rpc(owner,"create_supply_document",{p_patient:f.patient,p_type:kind,p_payload:body,p_key:randomUUID(),p_draft:true}),args={p_id:doc.id,p_payload:{...body,notes:"Revisão original"},p_key:randomUUID(),p_version:doc.version,p_recount:false,p_submit:true,p_submission_key:randomUUID()};
+  const first=await rpc(owner,"revise_supply_document",{p_id:doc.id,p_payload:args.p_payload,p_key:args.p_key,p_version:doc.version,p_recount:false});
+  await rpc(owner,"revise_supply_document",{p_id:doc.id,p_payload:{...body,notes:"Outra revisão posterior"},p_key:randomUUID(),p_version:first.version,p_recount:false});const before=official(f),failed=await owner.rpc("revise_and_submit_supply_document",args);
+  assert.match(failed.error?.message??"",/stale document version/);assert.equal(official(f),before);assert.equal((await rpc(owner,"supply_revision_receipt",{p_id:doc.id,p_payload:args.p_payload,p_key:args.p_key,p_version:doc.version,p_recount:false})).version,first.version);
+ });
+ test(`${kind} legacy submission already committed is recovered by its original second key`,async()=>{
+  const f=await setup(),owner=kind==="BAL"?await actor("professional",f.patient):f.admin,body=payload(f,kind),doc=await rpc(owner,"create_supply_document",{p_patient:f.patient,p_type:kind,p_payload:body,p_key:randomUUID(),p_draft:true}),args={p_id:doc.id,p_payload:{...body,notes:"Duas etapas antigas confirmadas"},p_key:randomUUID(),p_version:doc.version,p_recount:false,p_submit:true,p_submission_key:randomUUID()};
+  const revised=await rpc(owner,"revise_supply_document",{p_id:doc.id,p_payload:args.p_payload,p_key:args.p_key,p_version:doc.version,p_recount:false}),submitted=await rpc(owner,"supply_document_command",{p_id:doc.id,p_action:"submit",p_body:{},p_key:args.p_submission_key,p_version:revised.version}),before=official(f);
+  assert.deepEqual(await rpc(owner,"revise_and_submit_supply_document",args),submitted);assert.equal(official(f),before);assert.deepEqual(await rpc(owner,"revise_and_submit_supply_document",args),submitted);assert.equal(official(f),before);
+ });
+}
+
 test("extended draft RPCs close direct and helper access, and legacy entrypoints cannot act on COM slots",async()=>{
- const grants=sql("select bool_and(not has_function_privilege(r,p.oid,'execute')) from pg_proc p join pg_namespace n on n.oid=p.pronamespace cross join unnest(array['anon','service_role']) r where (n.nspname='public' and p.proname in ('supply_draft_context','supply_draft_command','commit_supply_draft','revise_and_submit_supply_document')) or (n.nspname='private' and p.proname in ('require_supply_draft_scope','validate_supply_draft'));");assert.equal(grants,"t");
+ const grants=sql("select bool_and(not has_function_privilege(r,p.oid,'execute')) from pg_proc p join pg_namespace n on n.oid=p.pronamespace cross join unnest(array['anon','service_role']) r where (n.nspname='public' and p.proname in ('supply_draft_context','supply_draft_command','commit_supply_draft','revise_and_submit_supply_document','supply_revision_receipt')) or (n.nspname='private' and p.proname in ('require_supply_draft_scope','validate_supply_draft'));");assert.equal(grants,"t");
  assert.equal(sql("select bool_and(not has_function_privilege('authenticated',p.oid,'execute')) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='private' and p.proname in ('require_supply_draft_scope','validate_supply_draft');"),"t");
  const f=await setup(),owner=await actor("family",f.patient),args=packet(f),saved=await rpc(owner,"supply_draft_command",args),legacy={...args,p_id:saved.id,p_expected:1,p_body:{action:"discard"},p_key:randomUUID()};delete legacy.p_purpose;
  assert.equal((await owner.rpc("creation_draft_command",legacy)).error?.code,"42501");assert.equal((await read(owner,args)).state,"active");

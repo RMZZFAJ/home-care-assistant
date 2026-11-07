@@ -183,3 +183,16 @@ stack existente, sem reset. Oito casos Auth passaram entre rodadas, inclusive
 falha provocada na segunda etapa para COM/ENT/BAL e replay sem efeitos duplicados.
 UI/HTTP/CI do candidato ainda pendentes. Dez migrations D-B aguardam o lote
 remoto final; nenhuma destas mudanças foi aplicada ao remoto.
+
+### Lote local D3.7
+
+Local133/remoto121;12 migrations D-B pendentes do lote remoto final autorizado.
+20261107070558_phase_d3_legacy_revision_recovery.sql acrescenta consulta
+autorizada do comprovante mínimo da primeira etapa legada. Somente authenticated;
+nenhuma escrita de revisão/submissão é usada para consultar esse comprovante.
+20261107072253_phase_d3_legacy_submission_version.sql mantém a versão da intenção
+original ao submeter, sem adotar edição posterior por replay. Preserva os grants
+da RPC existente. Ambas aplicadas por test:db:prepare na stack local, sem reset.
+Auth final17/17, incluindo grants, CAS, falha atômica nova, primeira etapa antiga,
+segunda etapa antiga concluída e recusa de submissão de edição posterior.
+Nenhuma migration histórica alterada; remoto sem alteração neste incremento.

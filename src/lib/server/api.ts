@@ -14,6 +14,12 @@ export class ApiError extends Error {
     message: string,
     public status: number = errorCatalog[code].status,
     public retryable: boolean = errorCatalog[code].retryable,
+    public confirmedStage?: {
+      kind: "revision";
+      documentId: string;
+      idempotencyKey: string;
+      version: number;
+    },
   ) {
     super(message);
   }
@@ -221,6 +227,7 @@ export async function api(
         recommendedAction: descriptor.recommendedAction,
         retryable: known.retryable,
         correlationId,
+        ...(known.confirmedStage ? { confirmedStage: known.confirmedStage } : {}),
       },
       {
         status: known.status,
