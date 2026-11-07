@@ -19,6 +19,7 @@ const schema = z
     recount: z.boolean(),
     submit: z.boolean(),
     draftCommit: draftCommitSchema.optional(),
+    draftKind: z.enum(["COM","ENT","BAL"]).default("BAL"),
   })
   .strict();
 export async function POST(
@@ -37,16 +38,16 @@ export async function POST(
           "VALIDATION_ERROR",
           "Salvar o preenchimento privado não altera a ficha oficial.",
         );
-      const committed = (await rpc(auth.client, "commit_creation_draft", {
+      const committed = (await rpc(auth.client, input.draftKind==="BAL"?"commit_creation_draft":"commit_supply_draft", {
         p_id: input.draftCommit.id,
         p_expected: input.draftCommit.revision,
         p_target: id,
         p_key: input.idempotencyKey,
         p_body: {
-          action: "revise_bal",
+          action: input.draftKind==="BAL"?"revise_bal":"revise",
           payload: input.payload,
           expectedVersion: input.expectedVersion,
-          recount: input.recount,
+          ...(input.draftKind==="BAL"?{recount:input.recount}:{}),
           submissionKey: input.submissionKey,
         },
       })) as { result: unknown };
@@ -55,21 +56,14 @@ export async function POST(
         persistence: "confirmed",
       });
     }
-    let data = (await rpc(auth.client, "revise_supply_document", {
+    const data = await rpc(auth.client, "revise_and_submit_supply_document", {
       p_id: id,
       p_payload: input.payload,
       p_key: input.idempotencyKey,
       p_version: input.expectedVersion,
       p_recount: input.recount,
-    })) as { version: number };
-    if (input.submit && !input.recount)
-      data = await rpc(auth.client, "supply_document_command", {
-        p_id: id,
-        p_action: "submit",
-        p_body: {},
-        p_key: input.submissionKey,
-        p_version: data.version,
-      });
+      p_submit:input.submit,p_submission_key:input.submissionKey,
+    });
     return NextResponse.json({ data, persistence: "confirmed" });
   });
 }

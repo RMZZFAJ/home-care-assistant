@@ -7,7 +7,7 @@ CI do SHA publicado é gate independente; pending não significa aprovação.
 CI dfdc7de, run42335739149, concluiu banco, validate Ubuntu/Windows e os três
 projetos browser com SUCCESS. Inclui a correção D3.4a dos consumidores de
 governança que falharam em bd8747b e os estados de leitura D3.4. Essa CI não
-valida o incremento D3.5 posterior. Local130/remoto121; nove migrations D-B
+valida os incrementos posteriores. Local131/remoto121; dez migrations D-B
 aguardam o lote remoto final autorizado.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
 
@@ -26,6 +26,19 @@ entre rodadas de produção; três rechecks finais corrigiram as falhas conjunta
 [Evidências e limites](../audits/D/D-B/D3_5_EVIDENCE.json). C-AC-085/095 têm prova
 local; preparação/guia completos continuam parciais, com controles e tarefas
 GUI-02 pendentes. CI do candidato e demais requisitos D-B continuam gates.
+
+CI5ab4864 aprovou banco e validate Windows/Ubuntu; falhou em13 casos browser.
+D3.6 restringe a apresentação opcional à Visão geral e mantém ajuda manual nas
+tarefas. As13 falhas foram rechecadas localmente, com ajuste do seletor decimal
+textual de transferência. Isso não substitui a CI do novo SHA.
+
+D3.6 implementa rascunhos COM/ENT, conferência contextual pessoal e proteção da
+chave desconhecida após recusa de acesso. Oito casos Auth,11 unitários/modelos/
+API e35 casos browser distintos passaram entre rodadas de produção, incluindo
+REQ/BAL existentes e falhas direcionadas da CI.
+[Manifesto D3.6](../audits/D/D-B/D3_6_EVIDENCE.json).
+C7-AC-004 tem prova local; sessão/24h, demais contextos e revisão legada já
+confirmada continuam pendentes. D4, D5 e demais requisitos seguem em execução.
 
 Base integrada PR6: `8ec979a`. Branch única `feat/phase-d-implementation` e
 [Draft PR7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.

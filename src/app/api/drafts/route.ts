@@ -9,13 +9,16 @@ import {
   uuid,
 } from "@/lib/server/api";
 import { creationDraftCommandSchema } from "@/lib/validation/creation-drafts";
+import { draftPurpose } from "@/lib/validation/supply-drafts";
 export async function GET(request: Request) {
   return api("drafts.read", async () => {
     const params = new URL(request.url).searchParams,
       kind = params.get("kind"),
-      target = params.get("targetDocumentId");
+      target = params.get("targetDocumentId"),purpose=params.get("purpose")??"create",extended=kind==="COM"||kind==="ENT";
     if (
-      !["REQ", "BAL"].includes(kind ?? "") ||
+      !["REQ", "BAL","COM","ENT"].includes(kind ?? "") ||
+      !draftPurpose.safeParse(purpose).success||(!extended&&purpose!=="create")||
+      (extended&&((purpose==="create")!==(target===null)||kind==="COM"&&!["create","revise"].includes(purpose)))||
       (target !== null && !uuid.safeParse(target).success) ||
       (kind === "REQ" && target !== null)
     )
@@ -27,10 +30,11 @@ export async function GET(request: Request) {
       patient = await patientContext(auth, params.get("careRecipientId"));
     return NextResponse.json(
       {
-        data: await rpc(auth.client, "creation_draft_context", {
+        data: await rpc(auth.client, extended?"supply_draft_context":"creation_draft_context", {
           p_patient: patient.id,
           p_kind: kind,
           p_target: target,
+          ...(extended?{p_purpose:purpose}:{}),
         }),
       },
       { headers: { "Cache-Control": "no-store" } },
@@ -46,10 +50,11 @@ export async function POST(request: Request) {
     const patient = await patientContext(auth, input.careRecipientId);
     return NextResponse.json(
       {
-        data: await rpc(auth.client, "creation_draft_command", {
+        data: await rpc(auth.client, input.kind==="COM"||input.kind==="ENT"?"supply_draft_command":"creation_draft_command", {
           p_patient: patient.id,
           p_kind: input.kind,
           p_target: input.targetDocumentId,
+          ...("purpose" in input?{p_purpose:input.purpose}:{}),
           p_id: input.id,
           p_expected: input.expectedRevision,
           p_key: input.idempotencyKey,

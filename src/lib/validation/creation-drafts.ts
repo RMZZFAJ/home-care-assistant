@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { draftPurpose,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
 const id = z.uuid(),
   revision = z.number().int().positive().max(2147483647);
 const text = (max: number) =>
@@ -104,6 +105,15 @@ const scope = {
 export const creationDraftCommandSchema = z
   .union([
     z
+      .object({...scope,kind:z.enum(["COM","ENT"]),purpose:z.enum(["create","revise"]),action:z.literal("save"),content:supplyDraftContent})
+      .strict(),
+    z
+      .object({...scope,kind:z.literal("ENT"),purpose:z.enum(["receive","divergence"]),action:z.literal("save"),content:receiptDraftContent})
+      .strict(),
+    z
+      .object({...scope,kind:z.enum(["COM","ENT"]),purpose:draftPurpose,action:z.enum(["discard","acknowledge"])})
+      .strict(),
+    z
       .object({
         ...scope,
         kind: z.literal("REQ"),
@@ -128,6 +138,10 @@ export const creationDraftCommandSchema = z
       .strict(),
   ])
   .superRefine((value, ctx) => {
+    if ((value.kind==="COM"||value.kind==="ENT")&&((value.purpose==="create")!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise"].includes(value.purpose)))
+      ctx.addIssue({code:"custom",path:["targetDocumentId"],message:"Confira a intenção e o alvo deste preenchimento."});
+    if ((value.kind==="COM"||value.kind==="ENT")&&value.action==="save"&&"form" in value.content&&value.content.context.documentId!==value.targetDocumentId)
+      ctx.addIssue({code:"custom",path:["content","context"],message:"A ficha de referência precisa corresponder ao preenchimento."});
     if (
       (value.id === null) !== (value.expectedRevision === null) ||
       (value.action !== "save" && value.id === null) ||

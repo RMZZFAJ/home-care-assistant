@@ -234,7 +234,7 @@ test("transferência separa três autores, recupera declaração incerta com per
       .getByRole("checkbox", { name: /Material fictício V4 0.*expedido/ })
       .check();
     await bruno
-      .getByRole("spinbutton", { name: "Efetivamente recebido", exact: true })
+      .getByRole("textbox", { name: "Efetivamente recebido", exact: true })
       .fill("3");
     await bruno
       .getByRole("textbox", { name: "Observações da divergência", exact: true })

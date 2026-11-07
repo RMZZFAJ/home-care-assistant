@@ -126,7 +126,9 @@ describe("private typed REQ/BAL draft boundary", () => {
       403,
     );
     for (const query of [
-      `kind=COM&careRecipientId=${patient}`,
+      `kind=UNKNOWN&careRecipientId=${patient}`,
+      `kind=COM&purpose=receive&targetDocumentId=${key}&careRecipientId=${patient}`,
+      `kind=ENT&purpose=divergence&careRecipientId=${patient}`,
       `kind=REQ&careRecipientId=${patient}&targetDocumentId=${key}`,
       `kind=BAL&careRecipientId=${patient}&targetDocumentId=bad`,
     ])
@@ -135,7 +137,7 @@ describe("private typed REQ/BAL draft boundary", () => {
           .status,
       ).toBe(400);
   });
-  it("only BAL may consume a private draft through the existing supply endpoints", () => {
+  it("COM ENT and BAL confirmations may consume a private draft while saving cannot emit one", () => {
     const base = {
       careRecipientId: patient,
       type: "COM",
@@ -149,7 +151,7 @@ describe("private typed REQ/BAL draft boundary", () => {
     expect(createSupplySchema.safeParse(base).success).toBe(true);
     const draftCommit = { id: key, revision: 5 };
     expect(createSupplySchema.safeParse({ ...base, draftCommit }).success).toBe(
-      false,
+      true,
     );
     expect(
       createSupplySchema.safeParse({ ...base, type: "BAL", draftCommit })
@@ -163,6 +165,8 @@ describe("private typed REQ/BAL draft boundary", () => {
         draftCommit,
       }).success,
     ).toBe(false);
+    expect(createSupplySchema.safeParse({...base,type:"ENT",payload:{lines:base.payload.lines,source:"FAMILY",destination:"CARE_TEAM",recipientId:key,recipientReason:"Pessoa indicada para a entrega"},draftCommit}).success).toBe(true);
+    expect(createSupplySchema.safeParse({...base,draft:true,draftCommit}).success).toBe(false);
   });
   it("classifies private CAS conflicts without asking for a new physical count", () => {
     try {

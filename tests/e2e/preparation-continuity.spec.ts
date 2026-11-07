@@ -63,6 +63,7 @@ test("D3 preparação global salva antes do cadastro e recupera criação inativ
 
 test("D3 guia pode ser pulado recuperado reaberto e configurado sem ciência ou mudança de permissões",async({page,browser})=>{
   const f=await setup();await login(page,"adminA",f.patient);
+  await expect(page.getByRole("region",{name:"Apresentação opcional",exact:true})).toBeVisible();await page.goto("/consumo?careRecipientId="+f.patient);await expect(page.getByRole("region",{name:"Apresentação opcional",exact:true})).toHaveCount(0);expect((await(await page.request.get("/api/guides")).json()).data.progress.revision).toBe(0);await page.goto("/");
   const before=sql(`select jsonb_build_object('events',(select count(*) from public.document_events where document_id in(select id from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)})),'members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${sqlLiteral(f.patient)}));`);
   let corrupted=false;const packets:unknown[]=[];
   await page.route("**/api/guides",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(!corrupted){corrupted=true;const response=await route.fetch();expect(response.ok()).toBe(true);const actual=await response.json();return route.fulfill({response,json:{data:{...actual.data,scope:randomUUID()}}});}return route.continue();});

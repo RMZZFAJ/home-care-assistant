@@ -173,3 +173,13 @@ helper privado sem EXECUTE público, authenticated, anon ou service_role.
 O recheck final Auth passou7/7, incluindo recusa de intenção antiga após troca
 de paciente e preservação do progresso de destino. Total pendente D-B: nove
 migrations; a reconciliação remota final ainda não foi iniciada.
+
+### Lote local D3.6 em execução
+
+Local131/remoto121. 20261107055526_phase_d3_supply_private_drafts.sql acrescenta
+propósito aos slots privados, COM/ENT, conferência contextual pessoal e revisão/
+submit atômicos. Entradas REQ/BAL preservadas. Aplicação por test:db:prepare na
+stack existente, sem reset. Oito casos Auth passaram entre rodadas, inclusive
+falha provocada na segunda etapa para COM/ENT/BAL e replay sem efeitos duplicados.
+UI/HTTP/CI do candidato ainda pendentes. Dez migrations D-B aguardam o lote
+remoto final; nenhuma destas mudanças foi aplicada ao remoto.

@@ -11,9 +11,10 @@ import type { CreationDraftContent } from "@/types/creation-drafts";
 import type { CreationDraftController } from "./use-creation-draft";
 
 export function DraftContentSummary({
-  content,
+  content,kind,
 }: {
   content: CreationDraftContent | null;
+  kind?: string | null;
 }) {
   if (!content) return null;
   if ("lines" in content)
@@ -74,6 +75,13 @@ export function DraftContentSummary({
         ) : null}
       </div>
     );
+  if("form" in content)return <div className="hca-form-stack">
+    <p>{content.context.documentId?"Revisão de ficha existente":"Criação de nova ficha"}{content.context.documentVersion?` · versão ${content.context.documentVersion}`:""}</p>
+    <dl>{kind==="COM"?<><dt>Origem da aquisição</dt><dd>{content.form.origin==="donation"?"Doação":content.form.origin==="purchase"?"Compra":"Não escolhida"}</dd></>:<><dt>Custódia de origem da entrega</dt><dd>{content.form.source==="FAMILY"?"Família":"Equipe"}</dd><dt>Pessoa recebedora</dt><dd>{content.context.recipientName||"Não escolhida ou indisponível no diretório atual"}</dd></>}</dl>
+    {content.materials.filter(m=>Object.hasOwn(content.form.quantities,m.id)).map(m=><article className="hca-record min-w-0" key={m.id}><div className="hca-record-main min-w-0 wrap-anywhere"><strong>{m.name}</strong><p>Quantidade: {content.form.quantities[m.id]||"Não preenchida"} {m.unit}</p>{content.form.presentationSelections?.[m.id]?.map(p=><p key={p.id}>{p.packages||"Não preenchido"} embalagem(ns) · {p.name} · {p.baseQuantity} {p.unit} por embalagem · versão {p.version}</p>)}{content.form.sharedNeedReasons?.[m.id]?<p>{content.form.sharedNeedReasons[m.id]}</p>:null}<p>{content.links[m.id]?.length??0} vínculo(s) de necessidade; revalidados na confirmação.</p></div></article>)}
+    {content.form.notes?<p className="whitespace-pre-wrap wrap-anywhere">{content.form.notes}</p>:null}{content.form.recipientReason?<p className="whitespace-pre-wrap wrap-anywhere">Justificativa da pessoa recebedora: {content.form.recipientReason}</p>:null}
+  </div>;
+  if("fields" in content){const name=(key:string)=>content.materials.find(m=>m.id===key)?.name??"Linha não disponível na referência atual";return <div className="hca-form-stack"><p>Conferência pessoal · versão consultada {content.documentVersion}. Salvar não aceita material.</p>{content.divergentIds.length?<ul>{content.divergentIds.map(id=><li key={id}>{name(id)} · divergência em preparação</li>)}</ul>:<p>Nenhuma linha divergente selecionada.</p>}<dl>{Object.entries(content.fields).map(([key,value])=><div key={key}><dt>{key==="reason"?"Observação":key.endsWith(":problem")?name(key.slice(0,-8))+" · diferença":name(key)+" · recebido"}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{({shortage:"Quantidade menor",damaged:"Material avariado",wrong:"Produto divergente",other:"Outra diferença"} as Record<string,string>)[value]??(value||"Não preenchido")}</dd></div>)}</dl></div>;}
   return (
     <div className="hca-form-stack">
       <p>
@@ -125,6 +133,7 @@ export function CreationDraftPanel({
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
   if (!draft.active) return null;
   const saved = draft.offered ?? draft.base;
+  if(draft.readDenied||draft.protectedReadPending)return <section className="ui-card hca-form-stack" aria-label="Rascunho privado"><Notice error>{draft.loadError||"Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada."}</Notice><Button disabled={draft.busy} onClick={draft.reload}>Revalidar acesso ao rascunho</Button>{draft.pending?<Button disabled={draft.busy} onClick={()=>void draft.recover()}>Recuperar mesma tentativa preservada</Button>:null}</section>;
   return (
     <section
       className="ui-card hca-form-stack hca-draft-panel min-w-0"
@@ -165,7 +174,7 @@ export function CreationDraftPanel({
             mesmo comando antes de editar ou descartar.
           </Notice>
           {draft.pending.content ? (
-            <DraftContentSummary content={draft.pending.content} />
+            <DraftContentSummary content={draft.pending.content} kind={draft.kind} />
           ) : null}
           <Button
             appearance="primary"
@@ -202,7 +211,7 @@ export function CreationDraftPanel({
       ) : null}
       {draft.offered?.state === "active" && !draft.pending ? (
         <>
-          <DraftContentSummary content={draft.offered.content} />
+          <DraftContentSummary content={draft.offered.content} kind={draft.kind} />
           <div className="hca-toolbar">
             {resumeHref ? (
               <Link
@@ -233,7 +242,7 @@ export function CreationDraftPanel({
           <div className="grid min-w-0 gap-4 md:grid-cols-2">
             <section className="min-w-0" aria-label="Minha edição">
               <h3>Minha edição</h3>
-              <DraftContentSummary content={current} />
+              <DraftContentSummary content={current} kind={draft.kind} />
             </section>
             <section className="min-w-0" aria-label="Versão salva no servidor">
               <h3>Versão salva no servidor</h3>
@@ -247,7 +256,7 @@ export function CreationDraftPanel({
                         "America/Sao_Paulo",
                       )}
                     </p>
-                    <DraftContentSummary content={draft.comparison.content} />
+                    <DraftContentSummary content={draft.comparison.content} kind={draft.kind} />
                   </>
                 ) : (
                   <p>O rascunho foi descartado no servidor.</p>
@@ -324,7 +333,7 @@ export function CreationDraftPanel({
               Você está descartando somente seu preenchimento privado de{" "}
               {saved?.kind} para {patientName}.
             </p>
-            <DraftContentSummary content={saved?.content ?? null} />
+            <DraftContentSummary content={saved?.content ?? null} kind={draft.kind} />
             <Notice>
               Fichas emitidas, arquivos oficiais e seu histórico serão
               preservados.

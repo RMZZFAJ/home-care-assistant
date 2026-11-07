@@ -31,6 +31,7 @@ import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { DocumentHeader } from "./document-header";
 import {
   PurchaseDetails,
@@ -60,6 +61,7 @@ export function SupplyDocumentContent({
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
+  const [readDenied,setReadDenied]=useState(false);
   const [message, setMessage] = useState("");
   const [action, setAction] = useState<DocumentAction | null>(null);
   const [review, setReview] = useState<{
@@ -67,6 +69,7 @@ export function SupplyDocumentContent({
     body: unknown;
     summary: string;
     expectedVersion: number;
+    draftCommit?:{id:string;revision:number};
   } | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [purchaseConflict, setPurchaseConflict] = useState(false);
@@ -113,6 +116,7 @@ export function SupplyDocumentContent({
     body: unknown;
     expectedVersion: number;
     idempotencyKey: string;
+    draftCommit?:{id:string;revision:number};
   } | null>(null);
   const patientId = context.patient?.id;
   useEffect(() => {
@@ -129,8 +133,9 @@ export function SupplyDocumentContent({
     )
       .then(async (result) => {
         if (controller.signal.aborted) return;
-        if (!editingRef.current) setData(result.data);
-        else
+        setReadDenied(false);
+        setData(current=>!editingRef.current||current===null?result.data:current);
+        if(editingRef.current)
           setMessage(
             "O acompanhamento foi atualizado. Sua operação permanece preservada e será validada contra a versão original ao confirmar.",
           );
@@ -146,12 +151,13 @@ export function SupplyDocumentContent({
         }
       })
       .catch((reason) => {
-        if (!controller.signal.aborted)
+        if (!controller.signal.aborted){
+          if(reason instanceof ApiError&&[401,403,404].includes(reason.status)){setReadDenied(true);setData(null);}
           setError(
             reason instanceof Error
               ? reason.message
               : "Não foi possível carregar a ficha.",
-          );
+          );}
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
@@ -166,6 +172,7 @@ export function SupplyDocumentContent({
         body: review.body,
         expectedVersion: review.expectedVersion,
         idempotencyKey: crypto.randomUUID(),
+        ...(review.draftCommit?{draftCommit:review.draftCommit}:{}),
       };
     if (!pendingRef.current) return;
     setBusy(true);
@@ -176,6 +183,7 @@ export function SupplyDocumentContent({
         "/api/documents/" + id,
         intention,
       );
+      result.data=requireSupplyConfirmation(result,{patientId:data.care_recipient_id,type:data.type,id,minimumVersion:intention.expectedVersion});
       resultFocusRef.current = true;
       setFocusRevision((value) => value + 1);
       setData(result.data);
@@ -242,7 +250,7 @@ export function SupplyDocumentContent({
       const rejected =
         reason instanceof ApiError &&
         [400, 403, 404, 409, 422].includes(reason.status);
-      if (rejected) {
+      if (rejected&&!uncertain) {
         if (
           data.type === "COM" &&
           reason instanceof ApiError &&
@@ -258,7 +266,7 @@ export function SupplyDocumentContent({
         pendingRef.current = null;
         setReview(null);
       }
-      setUncertain(!rejected);
+      setUncertain(uncertain||!rejected);
       setError(
         reason instanceof Error
           ? reason.message
@@ -781,12 +789,13 @@ export function SupplyDocumentContent({
                     setComparison(null);
                     setAttempt((value) => value + 1);
                   }}
-                  onReview={(command, body, summary) =>
+                  onReview={(command, body, summary,draftCommit,expectedVersion) =>
                     setReview({
                       action: command,
                       body,
                       summary,
-                      expectedVersion: data.version,
+                      expectedVersion: expectedVersion??data.version,
+                      ...(draftCommit?{draftCommit}:{}),
                     })
                   }
                 />
@@ -868,7 +877,7 @@ export function SupplyDocumentContent({
         </>
       ) : null}
       <Dialog
-        open={Boolean(review)}
+        open={Boolean(review)&&!readDenied}
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"

@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       auth,
       input.careRecipientId,
       input.draftCommit
-        ? "bal.read"
+        ? input.type.toLowerCase()+".read"
         : input.type === "COM"
           ? "com.create"
           : input.type === "ENT"
@@ -61,12 +61,12 @@ export async function POST(request: Request) {
     );
     const data = input.draftCommit
       ? (
-          (await rpc(auth.client, "commit_creation_draft", {
+          (await rpc(auth.client, input.type==="BAL"?"commit_creation_draft":"commit_supply_draft", {
             p_id: input.draftCommit.id,
             p_expected: input.draftCommit.revision,
             p_target: null,
             p_key: input.idempotencyKey,
-            p_body: { action: "create_bal", payload: input.payload },
+            p_body: { action: input.type==="BAL"?"create_bal":"create", payload: input.payload },
           })) as { result: unknown }
         ).result
       : await rpc(auth.client, "create_supply_document", {

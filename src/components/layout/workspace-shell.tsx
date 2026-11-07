@@ -58,7 +58,7 @@ function ProfileMenu() {
   </Menu>;
 }
 
-export function WorkspaceShell({ children }: { children: ReactNode }) {
+export function WorkspaceShell({ children,showOnboarding=false }: { children: ReactNode;showOnboarding?:boolean }) {
   const { value, data, selecting, selectPatient } = useWorkspaceState();
   const desktop = useSyncExternalStore(subscribe, desktopSnapshot, serverSnapshot);
   const [collapsed, setCollapsed] = useState(false);
@@ -85,7 +85,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       <DrawerHeader><DrawerHeaderTitle action={<Button appearance="subtle" icon={<Icon name="close" />} aria-label="Fechar menu" onClick={() => setMobileOpen(false)} />}>Home Care Assistant</DrawerHeaderTitle></DrawerHeader>
       <DrawerBody>{navigation}</DrawerBody>
     </OverlayDrawer>
-    <div className="hca-workspace-body">{value?.activeContext?<GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id??""}`}/>:null}{children}</div>
+    <div className="hca-workspace-body">{showOnboarding&&value?.activeContext?<GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id??""}`}/>:null}{children}</div>
     {operational && value ? <BottomNavigation context={value} /> : null}
   </div>;
 }

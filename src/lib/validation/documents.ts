@@ -102,12 +102,12 @@ export const createSupplySchema = z
         message:
           "A referência sem plantão pertence somente à contagem BAL sem atribuição.",
       });
-    if (value.draftCommit && (value.type !== "BAL" || value.draft))
+    if (value.draftCommit && value.draft)
       ctx.addIssue({
         code: "custom",
         path: ["draftCommit"],
         message:
-          "Este rascunho confirma somente o balanço; salvar preenchimento usa o fluxo privado.",
+          "Salvar preenchimento usa o fluxo privado; a confirmação emite a ficha.",
       });
     if (
       value.type === "BAL" &&
@@ -192,6 +192,7 @@ export const supplyCommandSchema = z
     idempotencyKey: identifier,
     expectedVersion: z.number().int().positive(),
     body: z.unknown(),
+    draftCommit: draftCommitSchema.optional(),
   })
   .strict()
   .transform((value, ctx) => {

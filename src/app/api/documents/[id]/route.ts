@@ -23,16 +23,11 @@ export async function POST(request: Request, context: Context) {
     const { id } = await context.params;
     const input = await readJson(request, supplyCommandSchema);
     const auth = await authenticate();
+    const result=input.draftCommit?(await rpc(auth.client,"commit_supply_draft",{p_id:input.draftCommit.id,p_expected:input.draftCommit.revision,p_target:parseUuid(id),p_key:input.idempotencyKey,p_body:{action:input.action,body:input.body,expectedVersion:input.expectedVersion}}) as {result:unknown}).result:await rpc(auth.client,"supply_document_command",{p_id:parseUuid(id),p_action:input.action,p_body:input.body,p_key:input.idempotencyKey,p_version:input.expectedVersion});
     return NextResponse.json({
       data: await withRequisitionLinks(
         auth.client,
-        await rpc(auth.client, "supply_document_command", {
-          p_id: parseUuid(id),
-          p_action: input.action,
-          p_body: input.body,
-          p_key: input.idempotencyKey,
-          p_version: input.expectedVersion,
-        }),
+        result,
       ),
       persistence: "confirmed",
     });

@@ -24,6 +24,8 @@ import {
 import type { BalanceCountReference } from "@/types/balances";
 import { BalanceReviewRows } from "@/components/balances/balance-count-fields";
 import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
+import type { SupplyDraftContent } from "@/lib/validation/supply-drafts";
+import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { SupplyWizardStep, type WizardState } from "./supply-wizard-step";
@@ -203,12 +205,17 @@ export function PatientSupplyWizard({
   const privateDraft = useCreationDraft({
     userId: context.userId,
     patientId,
-    kind: type === "BAL" ? "BAL" : null,
+    kind: type,
+    purpose:type==="BAL"?"create":editing?.id||documentId?"revise":"create",
     targetDocumentId: editing?.id ?? documentId,
     enabled:
-      type === "BAL" && !loading && !loadError && can(context, "bal.read"),
+      !loading && !loadError && can(context, type.toLowerCase()+".read"),
     onResume: (draft) => {
       const content = draft.content;
+      if(content&&"form" in content){
+        if(content.context.documentId!==(editing?.id??null)||content.context.documentVersion!==(editing?.version??null)||content.context.requisitionId!==requisitionId){setError("O contexto deste preenchimento mudou. Abra o alvo original ou compare com a ficha vigente antes de continuar.");return false;}
+        setForm(content.form);setLinks(content.links);setDraftMaterials(content.materials);setStep(0);setError("");setFieldErrors({});return true;
+      }
       if (!content || !("counts" in content)) return false;
       if (
         content.context.mode !== "legacy" ||
@@ -240,6 +247,7 @@ export function PatientSupplyWizard({
         quantities: Object.fromEntries(
           catalog.map((product) => [product.id, ""]),
         ),
+        ...(type!=="BAL"?{origin:"" as const,source:"FAMILY" as const,recipientId:"",recipientReason:"",sharedNeedReasons:{},presentationSelections:{},manualQuantities:{}}:{}),
         observationTimes: {},
         notes: "",
       }));
@@ -250,12 +258,16 @@ export function PatientSupplyWizard({
       sessionStorage.removeItem(storageKey);
     },
   });
+  const supplyContent:SupplyDraftContent={form:{quantities:form.quantities,notes:form.notes,origin:form.origin,source:form.source,recipientId:form.recipientId,recipientReason:form.recipientReason,sharedNeedReasons:form.sharedNeedReasons,presentationSelections:form.presentationSelections,manualQuantities:form.manualQuantities},links,materials:balanceContent.materials,context:{documentId:editing?.id??null,documentVersion:editing?.version??null,requisitionId,recipientName:people.find(p=>p.id===form.recipientId)?.name??""}};
+  const privateContent=type==="BAL"?balanceContent:supplyContent;
+  const offeredContent=privateDraft.offered?.content;
+  const originalSource=offeredContent&&"form" in offeredContent?offeredContent.context.requisitionId:null;
+  const resumeHref=originalSource!==requisitionId&&offeredContent&&"form" in offeredContent?`/fichas/${type.toLowerCase()}?careRecipientId=${patientId}${originalSource?"&requisitionId="+originalSource:""}`:undefined;
   const missingBalanceMaterials =
-    type === "BAL"
-      ? Object.keys(form.quantities).filter(
+    Object.keys(form.quantities).filter(
           (id) => !catalog.some((product) => product.id === id),
         )
-      : [];
+      ;
   function updateForm(value: SetStateAction<WizardState>) {
     setForm((current) => {
       const next = typeof value === "function" ? value(current) : value;
@@ -337,7 +349,6 @@ export function PatientSupplyWizard({
           if (raw) {
             const envelope = JSON.parse(raw);
             if (
-              Date.now() - envelope.savedAt < 86_400_000 &&
               envelope.form &&
               typeof envelope.form.quantities === "object"
             ) {
@@ -693,8 +704,8 @@ export function PatientSupplyWizard({
     setStep((current) => Math.min(steps.length - 1, current + 1));
   }
   async function persist(draft: boolean) {
-    if (type === "BAL" && draft && !frozenRef.current) {
-      await privateDraft.save(balanceContent);
+    if (draft && !frozenRef.current) {
+      await privateDraft.save(privateContent);
       return;
     }
     if (
@@ -779,14 +790,16 @@ export function PatientSupplyWizard({
               }
             : {}),
       };
+      const privateCommit=type!=="BAL"?await privateDraft.save(structuredClone(privateContent)):undefined;
+      if(type!=="BAL"&&!privateCommit)return;
       frozenRef.current = {
         payload,
         key: crypto.randomUUID(),
         submissionKey: crypto.randomUUID(),
         draft,
         expectedVersion: editing?.version,
-        ...(type === "BAL" && privateDraft.draftCommit
-          ? { draftCommit: privateDraft.draftCommit }
+        ...(privateCommit||privateDraft.draftCommit
+          ? { draftCommit: privateCommit?{id:privateCommit.id,revision:privateCommit.revision}:privateDraft.draftCommit }
           : {}),
       };
     }
@@ -817,7 +830,7 @@ export function PatientSupplyWizard({
               expectedVersion: frozenRef.current.expectedVersion,
               recount,
               ...(frozenRef.current.draftCommit
-                ? { draftCommit: frozenRef.current.draftCommit }
+                ? { draftCommit: frozenRef.current.draftCommit,...(type!=="BAL"?{draftKind:type}:{}) }
                 : {}),
               submit: !frozenRef.current.draft,
             }
@@ -832,7 +845,7 @@ export function PatientSupplyWizard({
                 : {}),
             },
       );
-      setSaved(result.data);
+      setSaved(requireSupplyConfirmation(result,{patientId,type,id:editing?.id,minimumVersion:editing?editing.version+1:1}));
       sessionStorage.removeItem(storageKey);
       sessionStorage.removeItem(storageKey + ":start");
       setUncertain(false);
@@ -840,7 +853,7 @@ export function PatientSupplyWizard({
       const known =
         reason instanceof ApiError &&
         [400, 403, 404, 409, 413, 422].includes(reason.status);
-      if (known) frozenRef.current = null;
+      if (known&&!uncertain) frozenRef.current = null;
       if (
         type === "BAL" &&
         reason instanceof ApiError &&
@@ -863,7 +876,7 @@ export function PatientSupplyWizard({
         setRecipientAttempt((value) => value + 1);
         setStep(0);
       }
-      setUncertain(!known);
+      setUncertain(uncertain||!known);
       setError(
         reason instanceof Error
           ? reason.message
@@ -955,14 +968,15 @@ export function PatientSupplyWizard({
         ["medicamentos", "higiene", "dieta"].indexOf(product.category) + 1,
       );
   }
-  if (privateDraft.readDenied)
+  if (privateDraft.readDenied||privateDraft.protectedReadPending)
     return (
       <Notice error>
-        Seu acesso ao rascunho foi encerrado. Selecione um vínculo autorizado.
+        Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada.
+        <button type="button" className={buttonClass} onClick={privateDraft.reload}>Revalidar acesso ao rascunho</button>
       </Notice>
     );
-  if (type === "BAL" && !can(context, "bal.read"))
-    return <Notice>Seu acesso ao balanço foi encerrado.</Notice>;
+  if (!can(context, type.toLowerCase()+".read"))
+    return <Notice>Seu vínculo atual não permite consultar este preenchimento. A tentativa original continua preservada.</Notice>;
   if (!allowed && !uncertain && !privateDraft.active)
     return (
       <Notice>
@@ -1019,10 +1033,11 @@ export function PatientSupplyWizard({
     );
   return (
     <div className="mx-auto max-w-4xl min-w-0 space-y-5">
-      {type === "BAL" ? (
+      {privateDraft.active ? (
         <CreationDraftPanel
           draft={privateDraft}
-          current={balanceContent}
+          current={privateContent}
+          resumeHref={resumeHref}
           patientName={context.patient!.display_name}
           disabled={busy || uncertain || loading}
         />

@@ -131,5 +131,5 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const patient = data?.patients.find((row) => row.id === patientId);
   const value: WorkspaceContext | null = data ? { ...data, patient, refresh: load } : null;
   const state = { value, data, loading, selecting, error, requestedPatientId, load, selectProfile, selectPatient };
-  return <Context value={state}>{publicPage ? children : <WorkspaceShell>{children}</WorkspaceShell>}</Context>;
+  return <Context value={state}>{publicPage ? children : <WorkspaceShell showOnboarding={pathname==="/"}>{children}</WorkspaceShell>}</Context>;
 }

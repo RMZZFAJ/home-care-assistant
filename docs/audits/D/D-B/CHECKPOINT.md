@@ -387,3 +387,60 @@ GUI-02, delegação local completa e convergência integral dos guias por papel.
 Diagnóstico não é aceite. Fontes ficaram estáveis durante cada E2E e não houve
 suíte mutável de banco paralela. CI do novo SHA, demais D3, D4, D5, operação e
 gates D-C/D6 permanecem pendentes; sem merge, deploy ou liberação operacional.
+
+## D3.6 — rascunhos COM/ENT e conferência contextual
+
+Base publicada5ab4864. CI42344391368 aprovou banco e validate Windows/Ubuntu,
+mas falhou em13 casos browser. Essa CI não valida este conjunto posterior.
+Local131/remoto121, sem reset; dez migrations aguardam o lote remoto final.
+
+Migration20261107055526 estende a tabela privada por propósito/alvo sem ampliar
+as entradas REQ/BAL. COM/ENT têm slots de criação/revisão; recebimento/divergência
+ENT é pessoal e vinculado ao alvo. Novos helpers/entradas seguem grants fechados
+e verificação viva de permissão. Save/descarte não emitem ficha nem movimentam
+estoque. Confirmar consome a revisão privada com journal e recuperação própria.
+
+A revisão seguida de submit agora ocorre em uma RPC atômica para intenções novas,
+mesmo sem draftCommit. Uma falha na segunda etapa reverte essa revisão nova.
+Isso não prova o ramo legado em que a primeira etapa já havia sido confirmada;
+C-AC-077 permanece parcial e esse ramo precisa de comprovação específica.
+COM, ENT e BAL passaram pela
+contraprova de trigger local restrito ao documento fictício, com snapshot
+independente antes/depois, replay da mesma intenção e conflito de outra segunda
+chave. O trigger/helper do instrumento foi removido em finally.
+
+Oito casos Auth distintos passaram entre a rodada inicial7/8 e o recheck1/1.
+A falha inicial era instrumento: profissional não possui com.read; a negativa
+ficou explícita, e ENT continua verificando ausência de rascunho alheio. Casos
+incluem CAS, dois aparelhos Auth, dois alvos ENT, propósito separado, consumo/
+descarte, grants, entrada legada fechada e rollback após espera observada com
+troca de paciente. Logs d3-supply-drafts-auth-* preservados em output/phase-d-work.
+
+Onze unitários/modelos/API passaram após atualizar expectativas antigas que
+limitavam o contrato a REQ/BAL, mantendo negativas de tipos/intenção/alvo.
+A rodada de produção passou19/19: cinco cenários novos nos três projetos e
+quatro consumidores existentes REQ/BAL em Chromium. Inclui decimal incompleto,
+CAS entre sessões, duas entregas independentes, descarte sem recebimento,
+200 inválido após emissão real,403 na recuperação, revogação Auth real e
+reabertura sem revelar cache. Restaurar autoridade recupera a mesma chave.
+Regressões antigas preservaram observação, arquivo ready e reconto único.
+
+A CI5ab4864 revelou a apresentação opcional em páginas operacionais, alterando
+posições/áreas de controles. A apresentação agora fica na Visão geral; ajuda
+manual permanece disponível. O teste do guia percorre home → tarefa → home
+sem registrar progresso/SCI por navegar. Treze falhas exatas da CI mais três
+casos do guia e três do formulário privado foram rechecados em produção:
+18/19. A falha restante era o seletor spinbutton do consumidor de transferência;
+o campo decimal textual agora requer textbox. Recheck dirigido1/1 passou,
+conservando autores, quantidades, recuperação e oráculos de estoque/PDF.
+Nenhuma regra axe nem asserção de negócio foi removida. São35 casos distintos
+aprovados entre as duas seleções e a repetição afetada, com quatro larguras.
+
+[Manifesto D3.6](D3_6_EVIDENCE.json) guarda hashes do primeiro conjunto e do
+candidato final, logs e contraprovas. C7-AC-004 tem prova local de slots e alvos.
+C-AC-032, C7-AC-005 e D-B-AC-001 continuam parciais: matriz completa de sessão/
+24h/troca de usuário, consumidores adicionais e contextos de aprovação/correção/
+pedido ainda precisam de implementação ou comprovação. Tipos/lint passaram;
+CI do novo SHA e instalação/evolução continuam gates. Não houve fonte mutável
+ou suíte DB concorrente com E2E. Remoto final, D4, D5 e operação não iniciados
+por este lote; PR segue Draft sem merge ou promoção operacional.

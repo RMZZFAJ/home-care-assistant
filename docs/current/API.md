@@ -740,10 +740,13 @@ retryable, recommendedAction e HTTP. Validação, sessão expirada, capacidade
 negada, paciente inativo, saldo insuficiente, versão antiga, idempotência
 conflitante e dependência externa indisponível têm respostas próprias.
 
-## Rascunhos privados REQ/BAL — base API
+## Rascunhos privados de criação e conferência
 
-GET /api/drafts recebe careRecipientId, kind REQ/BAL e targetDocumentId opcional
-para edição de BAL existente; retorna somente o preenchimento próprio da sessão
+GET /api/drafts recebe careRecipientId, kind REQ/BAL/COM/ENT e targetDocumentId.
+REQ/BAL preservam o contrato anterior, com alvo opcional para BAL existente.
+COM/ENT usam purpose=create ou revise; ENT também aceita receive/divergence,
+com alvo obrigatório nesses contextos. A consulta retorna só o preenchimento próprio
+da sessão
 autorizada ou o resultado consumido ainda não reconhecido. POST usa action
 save/discard/acknowledge, id/expectedRevision nulos na criação e a revisão exata
 nas alterações. Conteúdo parcial é tipado por domínio; dono, papel, estado e
@@ -751,13 +754,19 @@ campos arbitrários não são aceitos. Save retorna revisão/instante do servido
 DRAFT_VERSION_CONFLICT exige comparação; retry recupera a própria tentativa,
 inclusive quando outra revisão já foi salva, sem adotar essa revisão sozinho.
 
-draftCommit opcional em POST /api/requisitions e na criação/revisão BAL contém
-id/revision do rascunho. A confirmação e o consumo do preenchimento são uma
-transação; disputa com descarte decide uma única vez. COM/ENT não aceitam essa
-referência. Um resultado consumido pode ser reconhecido sem alterar o documento.
-Os formulários REQ/BAL oferecem retomada explícita, resumo tipado, comparação
+draftCommit opcional em POST /api/requisitions e na criação/revisão COM/ENT/BAL
+contém id/revision do rascunho. A confirmação e o consumo são uma
+transação; disputa com descarte decide uma única vez. Conferência ENT também pode
+consumir o contexto privado em POST /api/documents/:id. Um resultado consumido
+pode ser reconhecido sem alterar o documento. COM/ENT novos salvam o preenchimento
+privado antes da confirmação final, mesmo sem save manual anterior.
+Os quatro formulários oferecem retomada explícita, resumo tipado, comparação
 CAS e descarte confirmado. Salvamento e descarte incertos recuperam a mesma
 chave; recuperação consulta eventual revisão posterior ou ficha consumida.
+Uma recusa de acesso durante recuperação desconhecida conserva a chave original;
+cache restaurado exige leitura viva antes de exibir conteúdo protegido.
+Revisão/submit sem draftCommit usam revise_and_submit_supply_document e as duas
+chaves da intenção. Para uma intenção nova, as duas etapas são atômicas.
 Abertura BAL nova consulta GET /api/balances com reference=true: revisão e
 quantidades do ledger são retornadas no mesmo snapshot sem criar ficha.
 O payload BAL sem atribuição pode informar balanceReferenceRevision; a criação

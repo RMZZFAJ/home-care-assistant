@@ -2,14 +2,19 @@ import type {
   RequisitionDraftContent,
   BalanceDraftContent,
 } from "@/lib/validation/creation-drafts";
+import type { DraftPurpose,ReceiptDraftContent,SupplyDraftContent } from "@/lib/validation/supply-drafts";
+export type DraftKind="REQ"|"BAL"|"COM"|"ENT";
 export type CreationDraftContent =
   | RequisitionDraftContent
-  | BalanceDraftContent;
+  | BalanceDraftContent
+  | SupplyDraftContent
+  | ReceiptDraftContent;
 export type CreationDraft = {
   id: string;
   ownerId: string;
   patientId: string;
-  kind: "REQ" | "BAL";
+  kind: DraftKind;
+  purpose?: DraftPurpose;
   targetDocumentId: string | null;
   schemaVersion: number;
   revision: number;
