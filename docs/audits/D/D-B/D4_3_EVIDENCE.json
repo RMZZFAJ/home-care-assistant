@@ -1,0 +1,614 @@
+{
+  "sourceBaseSha": "58c5837d4395753dbb8b8818153534bd5c4a0772",
+  "stage": "PASS_LOCAL_PUBLIC_FACADE_AND_BOUNDED_PARSER; D-B incomplete",
+  "migrations": {
+    "localCount": 139,
+    "remoteLastReconciledCount": 121,
+    "pending": 18,
+    "newFiles": [
+      "20261107113421_phase_d4_public_verification_limits.sql",
+      "20261107115300_phase_d4_verification_admission_time.sql"
+    ],
+    "localAppliedWithoutReset": true,
+    "remoteApplied": false
+  },
+  "checks": {
+    "authCompatibility": {
+      "passed": 6,
+      "log": "output/phase-d-work/d4-public-auth.log",
+      "scope": "six issuance Auth cases pass; one subsequent new limiter fixture initially selected forbidden global context"
+    },
+    "authPublicBudget": {
+      "passed": 3,
+      "log": "output/phase-d-work/d4-public-auth-admission.log",
+      "scope": "real Auth ACL, atomic per-subject upload budget, request/global limits, expiry; no counter deletion for green"
+    },
+    "sqlServiceRole": "PASS output/phase-d-work/d4-public-service-role.log",
+    "unitApi": {
+      "passed": 25,
+      "log": "output/phase-d-work/d4-public-unit-final-archive.log"
+    },
+    "types": "PASS output/phase-d-work/d4-public-types-final-archive.log",
+    "lint": "PASS affected sources, including final certificate budget and frozen-artifact test",
+    "productionBrowser": {
+      "baseSha": "58c5837d4395753dbb8b8818153534bd5c4a0772",
+      "passed": 12,
+      "production": true,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "bundleIncludedInTrace": [
+        "../../../../../.generated/pdf-verifier.cjs"
+      ],
+      "bundleBytes": 2056754,
+      "bundleSha256": "0c9ea45ed3a8e57f5caaa2483e6001384e56b38824d0b80eb7c8ed7b9fc0b0b7",
+      "sourceLfSha256": {
+        ".gitignore": "0eb2e1b5bad4064b857f46cc7fb7b7a610a471b55cf82d1d7b381bf4c24e5c8f",
+        "next.config.ts": "5a063a84a7144c4177f9ea40058b6b46f0f804f8a577eed9be7e699072cb1995",
+        "package-lock.json": "a698338185dc9a9e46350e3ff85fad9301f771e23cff0050cfc3cb438fef0509",
+        "package.json": "a63c26ba21e70dcdd05db6265867b7290e373eae25ce9b6bf791b68eb0f86e61",
+        "scripts/build-pdf-verifier.mjs": "c14f2b301faf74c2fed27e7a49c6e996ef6c868b1249dbd932216ae7b750728b",
+        "scripts/start-e2e-server.mjs": "0e31ea35a15d4ce3a809de64eb3eb388b77f7a67042e5686691eee6c55a2d0b0",
+        "src/app/api/verification/route.ts": "d7487e2fe3a697170a79e7b5a0301992417eb606f90ea2e9413ae03575c8997a",
+        "src/app/verificar/[id]/page.tsx": "2d9a480db0015a7c51ef61edf2a88b4062e5ec3029c5870971d1e436b240913e",
+        "src/app/verificar/emissao/[code]/page.tsx": "22060c89b0e48a425d96de4808b7079a159ce5d5be181a3bb841d22fbeeb5873",
+        "src/app/verificar/page.tsx": "783076706f59f176593791d334e816d4837d0e74a3a158474cbf9a38f3aba04f",
+        "src/components/documents/public-verification.tsx": "06f5618041cdcc0283532964fbc268d450e1307d91069ff8d9d8fe21f447670f",
+        "src/components/layout/workspace-context.tsx": "5ce69219d66ae05cb529afcd0a8a1a369cb22d969ac70353d7db9762ed1e716e",
+        "src/lib/documents/public-verification.ts": "a0926f5daa3e10652365e646cab400b6d016d925aa883adba0669dbd4c025f3e",
+        "src/lib/server/error-catalog.ts": "9cb1cb1920345b78aa7f80ba8ca37fa3b135fb5d7e24df0e0054b455a08f51b2",
+        "src/lib/server/pdf-signing/cms.ts": "1ecfda16781e42ea0f0909db6702c1095b3a8c0772c5075f813931fe8220f828",
+        "src/lib/server/pdf-signing/public-verifier.ts": "55bc8425b1af80c6626ef57739bb5718e6f5f4e587af5ed10e69f30924f0f7fb",
+        "src/lib/server/pdf-signing/public-worker.ts": "e1091defc325bfa8531b4a2aba9be1b340a812a2aa2b2923de108ce11e5ab438",
+        "src/lib/server/pdf-signing/verify.ts": "6df028ba39a831e8b41c8c667091179186ed5ec1df2fd1fae72f94a4374a691f",
+        "src/lib/server/public-pdf.ts": "62c5afc52144ed3ea3431d860a25acd6a76466b0d7f0250e23859e4ae5412ca8",
+        "supabase/migrations/20261107113421_phase_d4_public_verification_limits.sql": "ac05324ded3bf7ab6519c4e56f9deef3aadddf0bc7357316faffb80a88512294",
+        "supabase/migrations/20261107115300_phase_d4_verification_admission_time.sql": "d172a4606941cb0e187a1292425e6d901abe2e0fc86250cefdaafd2ca7e2ccbe",
+        "tests/api/public-verification-contract.test.ts": "c7a5d1f0e5616b1d2a05ad4050771dad830599eaeff27ec63ef4cfc5219a6042",
+        "tests/database/service-role.sql": "5a75bf8c8c656c71fde37278369c6a6717ee1f7f9dbeda4ca28642771002a087",
+        "tests/e2e/pdf-issuance.spec.ts": "6d4bb98cf0527e0b2332e987ef64be8535ef231197f1fbdffe5da06322f353f8",
+        "tests/e2e/public-verification.spec.ts": "154992c360eab9d5d0ea4cce578f25b58135d181a1dfc8b67fe341963d564a8b",
+        "tests/integration/pdf-issuance.test.mjs": "933d626f88716e0d580b29a582ed5eff1180b3c36f04a68b1e6a4f328dcf75f5",
+        "tests/integration/public-pdf-verification.test.mjs": "5fb1def7417228f0909f53276237fb3954597c75197758a0561d934d54894262",
+        "tests/pdf-signing.test.ts": "8fd352677ea62dba2fc7d7e2fdeb5a3ff5658ff6af96fe836cb98124662b061e",
+        "tests/public-pdf-verifier.test.ts": "edce7fde05decbb5839e24f08ed2bf68dc937a29f753734f86226121dd773547"
+      }
+    },
+    "finalCryptoGuard": {
+      "changedAfterBrowser": [
+        "src/lib/server/pdf-signing/cms.ts",
+        "tests/public-pdf-verifier.test.ts"
+      ],
+      "reason": "bound DER/key size and native OpenSSL work for untrusted keys; no UI/HTTP/DB or normal RSA3072 behavior changed",
+      "freshUnitPassed": 25,
+      "fourRealArtifacts": [
+        {
+          "kind": "com",
+          "sha256": "4752a49367766abcd8278e61252116d4f418e5c68d85f2e5b52e3f59ea40617f",
+          "bytes": 55263,
+          "result": {
+            "status": "verified",
+            "documentSignature": "valid",
+            "timestamp": "valid",
+            "verification": {
+              "profile": "PAdES-B-T",
+              "cryptographicIntegrity": true,
+              "wholeFile": true,
+              "signerTrust": "internal",
+              "timestampTrust": "internal",
+              "certificateFingerprint": "e584bff96125369850fc43c8204afbcd9712115eac98739f9a5f047c62ebd240",
+              "timestampCertificateFingerprint": "594a0f83a741ece41c713fd47d09b15cf8c743b5ccecb1cc528b20716a52cc1f",
+              "timestampAt": "2026-11-07T11:57:17.031Z",
+              "timestampPolicy": "2.25.286883468022885394573621170177492655468",
+              "externalTimeIndependence": false,
+              "revocationEvidence": "configured_internal_denylist_only",
+              "accepted": true
+            }
+          }
+        },
+        {
+          "kind": "req",
+          "sha256": "1d34a082a61cad188301d0d2e0d3561c2c8aacfbb2315127f0aa1b25fa225e9f",
+          "bytes": 56104,
+          "result": {
+            "status": "verified",
+            "documentSignature": "valid",
+            "timestamp": "valid",
+            "verification": {
+              "profile": "PAdES-B-T",
+              "cryptographicIntegrity": true,
+              "wholeFile": true,
+              "signerTrust": "internal",
+              "timestampTrust": "internal",
+              "certificateFingerprint": "e584bff96125369850fc43c8204afbcd9712115eac98739f9a5f047c62ebd240",
+              "timestampCertificateFingerprint": "594a0f83a741ece41c713fd47d09b15cf8c743b5ccecb1cc528b20716a52cc1f",
+              "timestampAt": "2026-11-07T11:57:31.561Z",
+              "timestampPolicy": "2.25.286883468022885394573621170177492655468",
+              "externalTimeIndependence": false,
+              "revocationEvidence": "configured_internal_denylist_only",
+              "accepted": true
+            }
+          }
+        },
+        {
+          "kind": "ent",
+          "sha256": "23c926af52a312643dfabfe668af8b8d1c247cfd66c5fab7e97248ad214ccc19",
+          "bytes": 56315,
+          "result": {
+            "status": "verified",
+            "documentSignature": "valid",
+            "timestamp": "valid",
+            "verification": {
+              "profile": "PAdES-B-T",
+              "cryptographicIntegrity": true,
+              "wholeFile": true,
+              "signerTrust": "internal",
+              "timestampTrust": "internal",
+              "certificateFingerprint": "e584bff96125369850fc43c8204afbcd9712115eac98739f9a5f047c62ebd240",
+              "timestampCertificateFingerprint": "594a0f83a741ece41c713fd47d09b15cf8c743b5ccecb1cc528b20716a52cc1f",
+              "timestampAt": "2026-11-07T11:57:34.296Z",
+              "timestampPolicy": "2.25.286883468022885394573621170177492655468",
+              "externalTimeIndependence": false,
+              "revocationEvidence": "configured_internal_denylist_only",
+              "accepted": true
+            }
+          }
+        },
+        {
+          "kind": "bal",
+          "sha256": "b3a14d7e78aa1cc80c6460795dcfa716c79cf49bb454ee7d341098bed5ab5b14",
+          "bytes": 56152,
+          "result": {
+            "status": "verified",
+            "documentSignature": "valid",
+            "timestamp": "valid",
+            "verification": {
+              "profile": "PAdES-B-T",
+              "cryptographicIntegrity": true,
+              "wholeFile": true,
+              "signerTrust": "internal",
+              "timestampTrust": "internal",
+              "certificateFingerprint": "e584bff96125369850fc43c8204afbcd9712115eac98739f9a5f047c62ebd240",
+              "timestampCertificateFingerprint": "594a0f83a741ece41c713fd47d09b15cf8c743b5ccecb1cc528b20716a52cc1f",
+              "timestampAt": "2026-11-07T11:57:36.760Z",
+              "timestampPolicy": "2.25.286883468022885394573621170177492655468",
+              "externalTimeIndependence": false,
+              "revocationEvidence": "configured_internal_denylist_only",
+              "accepted": true
+            }
+          }
+        }
+      ],
+      "sameSourceBrowserRerun": false
+    },
+    "independentPositive": [
+      {
+        "kind": "com",
+        "sha256": "4752a49367766abcd8278e61252116d4f418e5c68d85f2e5b52e3f59ea40617f",
+        "verification": {
+          "independentVerifier": "pyHanko0.38.1",
+          "integrity": true,
+          "signatureValid": true,
+          "trustedByExplicitInternalRoot": true,
+          "coverage": "ENTIRE_FILE",
+          "subFilter": "/ETSI.CAdES.detached",
+          "timestampPresent": true,
+          "timestampIntegrity": true,
+          "timestampSignatureValid": true,
+          "timestampTrustedByInternalRoot": true,
+          "timeIndependentFromSystem": false,
+          "externalTrust": false,
+          "padesSignedAttributes": [
+            "content_type",
+            "message_digest",
+            "signing_certificate_v2"
+          ],
+          "padesUnsignedAttributes": [
+            "signature_time_stamp_token"
+          ],
+          "accepted": true
+        }
+      },
+      {
+        "kind": "req",
+        "sha256": "1d34a082a61cad188301d0d2e0d3561c2c8aacfbb2315127f0aa1b25fa225e9f",
+        "verification": {
+          "independentVerifier": "pyHanko0.38.1",
+          "integrity": true,
+          "signatureValid": true,
+          "trustedByExplicitInternalRoot": true,
+          "coverage": "ENTIRE_FILE",
+          "subFilter": "/ETSI.CAdES.detached",
+          "timestampPresent": true,
+          "timestampIntegrity": true,
+          "timestampSignatureValid": true,
+          "timestampTrustedByInternalRoot": true,
+          "timeIndependentFromSystem": false,
+          "externalTrust": false,
+          "padesSignedAttributes": [
+            "content_type",
+            "message_digest",
+            "signing_certificate_v2"
+          ],
+          "padesUnsignedAttributes": [
+            "signature_time_stamp_token"
+          ],
+          "accepted": true
+        }
+      },
+      {
+        "kind": "ent",
+        "sha256": "23c926af52a312643dfabfe668af8b8d1c247cfd66c5fab7e97248ad214ccc19",
+        "verification": {
+          "independentVerifier": "pyHanko0.38.1",
+          "integrity": true,
+          "signatureValid": true,
+          "trustedByExplicitInternalRoot": true,
+          "coverage": "ENTIRE_FILE",
+          "subFilter": "/ETSI.CAdES.detached",
+          "timestampPresent": true,
+          "timestampIntegrity": true,
+          "timestampSignatureValid": true,
+          "timestampTrustedByInternalRoot": true,
+          "timeIndependentFromSystem": false,
+          "externalTrust": false,
+          "padesSignedAttributes": [
+            "content_type",
+            "message_digest",
+            "signing_certificate_v2"
+          ],
+          "padesUnsignedAttributes": [
+            "signature_time_stamp_token"
+          ],
+          "accepted": true
+        }
+      },
+      {
+        "kind": "bal",
+        "sha256": "b3a14d7e78aa1cc80c6460795dcfa716c79cf49bb454ee7d341098bed5ab5b14",
+        "verification": {
+          "independentVerifier": "pyHanko0.38.1",
+          "integrity": true,
+          "signatureValid": true,
+          "trustedByExplicitInternalRoot": true,
+          "coverage": "ENTIRE_FILE",
+          "subFilter": "/ETSI.CAdES.detached",
+          "timestampPresent": true,
+          "timestampIntegrity": true,
+          "timestampSignatureValid": true,
+          "timestampTrustedByInternalRoot": true,
+          "timeIndependentFromSystem": false,
+          "externalTrust": false,
+          "padesSignedAttributes": [
+            "content_type",
+            "message_digest",
+            "signing_certificate_v2"
+          ],
+          "padesUnsignedAttributes": [
+            "signature_time_stamp_token"
+          ],
+          "accepted": true
+        }
+      }
+    ],
+    "independentCounterproofs": [
+      {
+        "file": "com-altered.pdf",
+        "exitCode": 1,
+        "proof": {
+          "independentVerifier": "pyHanko0.38.1",
+          "integrity": false,
+          "signatureValid": true,
+          "trustedByExplicitInternalRoot": false,
+          "coverage": "ENTIRE_FILE",
+          "subFilter": "/ETSI.CAdES.detached",
+          "timestampPresent": true,
+          "timestampIntegrity": true,
+          "timestampSignatureValid": true,
+          "timestampTrustedByInternalRoot": true,
+          "timeIndependentFromSystem": false,
+          "externalTrust": false,
+          "padesSignedAttributes": [
+            "content_type",
+            "message_digest",
+            "signing_certificate_v2"
+          ],
+          "padesUnsignedAttributes": [
+            "signature_time_stamp_token"
+          ],
+          "accepted": false
+        }
+      },
+      {
+        "file": "com-appended.pdf",
+        "exitCode": 1,
+        "proof": {
+          "independentVerifier": "pyHanko0.38.1",
+          "integrity": true,
+          "signatureValid": true,
+          "trustedByExplicitInternalRoot": true,
+          "coverage": "ENTIRE_REVISION",
+          "subFilter": "/ETSI.CAdES.detached",
+          "timestampPresent": true,
+          "timestampIntegrity": true,
+          "timestampSignatureValid": true,
+          "timestampTrustedByInternalRoot": true,
+          "timeIndependentFromSystem": false,
+          "externalTrust": false,
+          "padesSignedAttributes": [
+            "content_type",
+            "message_digest",
+            "signing_certificate_v2"
+          ],
+          "padesUnsignedAttributes": [
+            "signature_time_stamp_token"
+          ],
+          "accepted": false
+        }
+      },
+      {
+        "file": "com-no-timestamp.pdf",
+        "exitCode": 1,
+        "proof": {
+          "independentVerifier": "pyHanko0.38.1",
+          "integrity": true,
+          "signatureValid": true,
+          "trustedByExplicitInternalRoot": true,
+          "coverage": "ENTIRE_FILE",
+          "subFilter": "/ETSI.CAdES.detached",
+          "timestampPresent": false,
+          "timestampIntegrity": false,
+          "timestampSignatureValid": false,
+          "timestampTrustedByInternalRoot": false,
+          "timeIndependentFromSystem": false,
+          "externalTrust": false,
+          "padesSignedAttributes": [
+            "content_type",
+            "message_digest",
+            "signing_certificate_v2"
+          ],
+          "padesUnsignedAttributes": [],
+          "accepted": false
+        }
+      }
+    ]
+  },
+  "qrProof": [
+    {
+      "kind": "com",
+      "decodedUrl": "http://127.0.0.1:3100/verificar/emissao/1AB634CDA91DCEBF8729DC4394837DDB",
+      "issuanceId": "4c7aa625-947a-4af3-be6e-3fa790eb9e8e",
+      "correct": true
+    },
+    {
+      "kind": "req",
+      "decodedUrl": "http://127.0.0.1:3100/verificar/emissao/B452F36BF93E834504AB297B8E13BB30",
+      "issuanceId": "566fbac4-2745-4fc9-b2d8-33b7c63f4cbe",
+      "correct": true
+    },
+    {
+      "kind": "ent",
+      "decodedUrl": "http://127.0.0.1:3100/verificar/emissao/F52A9F7CA8A1358E8403E2789E988AF8",
+      "issuanceId": "584b06b6-5919-4723-acbc-18dc807a37fb",
+      "correct": true
+    },
+    {
+      "kind": "bal",
+      "decodedUrl": "http://127.0.0.1:3100/verificar/emissao/40F3EC09708FA072C987EBDC14502F4B",
+      "issuanceId": "a286a891-0380-42c3-99ad-f55377920d7c",
+      "correct": true
+    }
+  ],
+  "limits": {
+    "fileBytes": 4194304,
+    "bodyReadMs": 10000,
+    "workerDeadlineMs": 4000,
+    "workerOldHeapMiB": 96,
+    "workerStackMiB": 4,
+    "perDecodedStreamMiB": 8,
+    "cumulativeDecodedAllocationsMiB": 32,
+    "concurrentParsersPerRuntime": 2,
+    "certificateDerBytes": 16384,
+    "rsaBits": [
+      2048,
+      8192
+    ],
+    "rsaPublicExponentMaxBits": 32,
+    "globalRequestsPerMinute": 60,
+    "globalUploadsPerMinute": 12,
+    "subjectRequestsPerMinute": 20,
+    "subjectUploadsPerMinute": 4,
+    "rawUploadsPersisted": false,
+    "rawAddressesPersisted": false
+  },
+  "counterproofs": [
+    "Correct internal signature vs unknown anchor: intact crypto, unknown chain, no false damage",
+    "Covered byte altered while legitimate QR stays unchanged: invalid signature and divergent file hash",
+    "Appended bytes: original CMS intact but whole file not accepted",
+    "Missing embedded timestamp: valid document signature, invalid/absent time proof",
+    "Configured revocation: intact cryptography, current policy refuses trust",
+    "Compressed object-stream bomb: explicit decompression limit before excess allocation",
+    "Worker timeout terminates and subsequent valid verification succeeds",
+    "Only two concurrent parsers admitted per runtime",
+    "Oversized certificate/key refused before native verification; unsupported is distinct from damaged signature",
+    "Malformed successful response does not render found/not-found as established fact",
+    "Anonymous and Auth callers cannot execute lookup/budget RPCs directly",
+    "A valid PDF of another registered issuance has different bytes/code while its own signature remains valid",
+    "Public response omits patient/material/requestor/source document/snapshot/object path/worker token",
+    "Anonymous public page does not grant private PDF access; direct request401",
+    "Legacy QR still resolves canonical hash/version; no retroactive signature added"
+  ],
+  "failuresPreserved": [
+    "output/phase-d-work/d4-issuance-ci-database-failed.log",
+    "output/phase-d-work/d4-public-auth.log",
+    "output/phase-d-work/d4-public-auth-recheck.log",
+    "output/phase-d-work/d4-public-browser-diagnostic.log",
+    "output/phase-d-work/d4-public-key-budget-unit.log",
+    "output/phase-d-work/d4-public-key-budget-recheck.log"
+  ],
+  "corrections": [
+    "Exact worker allowlist updated for four new approved functions, with negative service finalization assertion retained",
+    "Regular Auth fixture selects its actual patient; budget probes preserve earlier counters and run against observed windows",
+    "Next development route announcer made generic alert locator ambiguous; instrument scoped to main without removing assertions",
+    "PKIJS certificate probe now DER-roundtrips changed TBS fields before native key-budget check; guard not relaxed"
+  ],
+  "packaging": {
+    "esbuild": "0.28.2 dev dependency",
+    "pdfLib": "1.17.1 pinned",
+    "bundleBytes": 2057655,
+    "bundleSha256": "f66f399d6bb923a72aa5b681255d898d9b562286dc55adf4a65ee49ce0381d54",
+    "externalImports": [
+      "node:crypto",
+      "node:worker_threads"
+    ],
+    "secretProvidersIncluded": false,
+    "nextTraceIncludedBundle": true,
+    "observedVercelRuntime": false
+  },
+  "remaining": [
+    "Current SHA CI clean/legacy migration replay and full integration; previous58c5837 database failed at exact worker-function allowlist, validate Windows/Ubuntu succeeded, browsers skipped",
+    "Legacy generation/cache consumers and criterion-specific factual/accessible document oracles",
+    "Complete registration/legacy PDF upload combinations and additional certificate-expiry cases",
+    "Custody rotation/recovery/incident drills; D3 remainder; D5; backup schedule/retention and monitoring",
+    "Final authorized remote reconciliation with fresh backup/preflight and old-production compatibility",
+    "No claim of OS sandbox, external trust/time independence, ICP-Brasil, OCSP/CRL or physical-device/AT/provider approval; Sonar owner-deferred; production NO-GO"
+  ],
+  "sourceLfSha256": {
+    ".gitignore": "0eb2e1b5bad4064b857f46cc7fb7b7a610a471b55cf82d1d7b381bf4c24e5c8f",
+    "next.config.ts": "5a063a84a7144c4177f9ea40058b6b46f0f804f8a577eed9be7e699072cb1995",
+    "package-lock.json": "a698338185dc9a9e46350e3ff85fad9301f771e23cff0050cfc3cb438fef0509",
+    "package.json": "a63c26ba21e70dcdd05db6265867b7290e373eae25ce9b6bf791b68eb0f86e61",
+    "scripts/build-pdf-verifier.mjs": "c14f2b301faf74c2fed27e7a49c6e996ef6c868b1249dbd932216ae7b750728b",
+    "scripts/start-e2e-server.mjs": "0e31ea35a15d4ce3a809de64eb3eb388b77f7a67042e5686691eee6c55a2d0b0",
+    "src/app/api/verification/route.ts": "d7487e2fe3a697170a79e7b5a0301992417eb606f90ea2e9413ae03575c8997a",
+    "src/app/verificar/[id]/page.tsx": "2d9a480db0015a7c51ef61edf2a88b4062e5ec3029c5870971d1e436b240913e",
+    "src/app/verificar/emissao/[code]/page.tsx": "22060c89b0e48a425d96de4808b7079a159ce5d5be181a3bb841d22fbeeb5873",
+    "src/app/verificar/page.tsx": "783076706f59f176593791d334e816d4837d0e74a3a158474cbf9a38f3aba04f",
+    "src/components/documents/public-verification.tsx": "06f5618041cdcc0283532964fbc268d450e1307d91069ff8d9d8fe21f447670f",
+    "src/components/layout/workspace-context.tsx": "5ce69219d66ae05cb529afcd0a8a1a369cb22d969ac70353d7db9762ed1e716e",
+    "src/lib/documents/public-verification.ts": "a0926f5daa3e10652365e646cab400b6d016d925aa883adba0669dbd4c025f3e",
+    "src/lib/server/error-catalog.ts": "9cb1cb1920345b78aa7f80ba8ca37fa3b135fb5d7e24df0e0054b455a08f51b2",
+    "src/lib/server/pdf-signing/cms.ts": "d44736f709b51c86017db8b16fb40fae4a686ac7fcbebcf473c0fcd3a0c1d562",
+    "src/lib/server/pdf-signing/public-verifier.ts": "55bc8425b1af80c6626ef57739bb5718e6f5f4e587af5ed10e69f30924f0f7fb",
+    "src/lib/server/pdf-signing/public-worker.ts": "e1091defc325bfa8531b4a2aba9be1b340a812a2aa2b2923de108ce11e5ab438",
+    "src/lib/server/pdf-signing/verify.ts": "6df028ba39a831e8b41c8c667091179186ed5ec1df2fd1fae72f94a4374a691f",
+    "src/lib/server/public-pdf.ts": "62c5afc52144ed3ea3431d860a25acd6a76466b0d7f0250e23859e4ae5412ca8",
+    "supabase/migrations/20261107113421_phase_d4_public_verification_limits.sql": "ac05324ded3bf7ab6519c4e56f9deef3aadddf0bc7357316faffb80a88512294",
+    "supabase/migrations/20261107115300_phase_d4_verification_admission_time.sql": "d172a4606941cb0e187a1292425e6d901abe2e0fc86250cefdaafd2ca7e2ccbe",
+    "tests/api/public-verification-contract.test.ts": "c7a5d1f0e5616b1d2a05ad4050771dad830599eaeff27ec63ef4cfc5219a6042",
+    "tests/database/service-role.sql": "5a75bf8c8c656c71fde37278369c6a6717ee1f7f9dbeda4ca28642771002a087",
+    "tests/e2e/pdf-issuance.spec.ts": "6d4bb98cf0527e0b2332e987ef64be8535ef231197f1fbdffe5da06322f353f8",
+    "tests/e2e/public-verification.spec.ts": "154992c360eab9d5d0ea4cce578f25b58135d181a1dfc8b67fe341963d564a8b",
+    "tests/integration/pdf-issuance.test.mjs": "933d626f88716e0d580b29a582ed5eff1180b3c36f04a68b1e6a4f328dcf75f5",
+    "tests/integration/public-pdf-verification.test.mjs": "5fb1def7417228f0909f53276237fb3954597c75197758a0561d934d54894262",
+    "tests/pdf-signing.test.ts": "8fd352677ea62dba2fc7d7e2fdeb5a3ff5658ff6af96fe836cb98124662b061e",
+    "tests/public-pdf-verifier.test.ts": "c75108893bc44bb4db8c8113c04b3775569ac3b8aee6fe7c9797d93f7b0c4703"
+  },
+  "frozenRuntimeProof": {
+    "syntheticOnly": true,
+    "root": "public-root.crt",
+    "rootFingerprint": "63613aa2e8c31d83a18d07ab215f4b921cf3d7b7cc182246c3e98a000218f05c",
+    "privateKeysRetained": false,
+    "source": "production local E2E D4.3 before public-key budget guard; all four revalidated after guard",
+    "artifacts": [
+      {
+        "file": "com-signed.pdf",
+        "sha256": "4752a49367766abcd8278e61252116d4f418e5c68d85f2e5b52e3f59ea40617f",
+        "size": 55263,
+        "issuanceId": "4c7aa625-947a-4af3-be6e-3fa790eb9e8e",
+        "verificationCode": "1AB634CDA91DCEBF8729DC4394837DDB",
+        "version": 1,
+        "expected": {
+          "status": "verified",
+          "accepted": true,
+          "wholeFile": true,
+          "signerTrust": "internal",
+          "timestampTrust": "internal"
+        }
+      },
+      {
+        "file": "req-signed.pdf",
+        "sha256": "1d34a082a61cad188301d0d2e0d3561c2c8aacfbb2315127f0aa1b25fa225e9f",
+        "size": 56104,
+        "issuanceId": "566fbac4-2745-4fc9-b2d8-33b7c63f4cbe",
+        "verificationCode": "B452F36BF93E834504AB297B8E13BB30",
+        "version": 3,
+        "expected": {
+          "status": "verified",
+          "accepted": true,
+          "wholeFile": true,
+          "signerTrust": "internal",
+          "timestampTrust": "internal"
+        }
+      },
+      {
+        "file": "ent-signed.pdf",
+        "sha256": "23c926af52a312643dfabfe668af8b8d1c247cfd66c5fab7e97248ad214ccc19",
+        "size": 56315,
+        "issuanceId": "584b06b6-5919-4723-acbc-18dc807a37fb",
+        "verificationCode": "F52A9F7CA8A1358E8403E2789E988AF8",
+        "version": 1,
+        "expected": {
+          "status": "verified",
+          "accepted": true,
+          "wholeFile": true,
+          "signerTrust": "internal",
+          "timestampTrust": "internal"
+        }
+      },
+      {
+        "file": "bal-signed.pdf",
+        "sha256": "b3a14d7e78aa1cc80c6460795dcfa716c79cf49bb454ee7d341098bed5ab5b14",
+        "size": 56152,
+        "issuanceId": "a286a891-0380-42c3-99ad-f55377920d7c",
+        "verificationCode": "40F3EC09708FA072C987EBDC14502F4B",
+        "version": 1,
+        "expected": {
+          "status": "verified",
+          "accepted": true,
+          "wholeFile": true,
+          "signerTrust": "internal",
+          "timestampTrust": "internal"
+        }
+      },
+      {
+        "file": "com-altered.pdf",
+        "sha256": "bfa5e6dc98d1fe76e4f355cccda28931782dde5de527bddc8e1403e017e57e7a",
+        "size": 55263,
+        "expected": {
+          "status": "invalid_signature",
+          "documentSignature": "invalid"
+        }
+      },
+      {
+        "file": "com-appended.pdf",
+        "sha256": "653c620021b48958a170c665a7b54447c779bc2b96e6db34438edf0cd98e4d30",
+        "size": 55289,
+        "expected": {
+          "status": "verified",
+          "accepted": false,
+          "wholeFile": false
+        }
+      },
+      {
+        "file": "com-no-timestamp.pdf",
+        "sha256": "bbaefe2779c72eaaa2be07bcad57c6b51eb30c76891d048f1caea3836e4785f9",
+        "size": 55263,
+        "expected": {
+          "status": "invalid_timestamp",
+          "documentSignature": "valid",
+          "timestamp": "invalid"
+        }
+      }
+    ]
+  },
+  "finalLocalSafety": {
+    "migrations": 139,
+    "faultTriggers": 0,
+    "faultFunctions": 0,
+    "crons": "both original jobs active * * * * *",
+    "remote": "unchanged in this increment"
+  }
+}

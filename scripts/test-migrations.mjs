@@ -7,6 +7,7 @@ import {
   getTestEnvironment,
   sql,
   testRoot,
+  pauseLocalAutomationForTests,
 } from "./test-environment.mjs";
 import {
   seedFixtures,
@@ -35,6 +36,7 @@ function reset(version) {
       result.error?.message ?? result.stderr + "\n" + result.stdout,
     );
   if (existsSync(fixtureFile)) unlinkSync(fixtureFile);
+  pauseLocalAutomationForTests();
 }
 if (process.argv.includes("--sql-only")) {
   await runSqlRegressions(JSON.parse(readFileSync(fixtureFile, "utf8")));
@@ -122,6 +124,7 @@ try {
     { cause: error },
   );
 }
+pauseLocalAutomationForTests();
 assert.equal(
   sql(
     `select protocol from public.requisitions where id='${legacyRequisition}';`,
@@ -211,6 +214,8 @@ async function runSqlRegressions(fixtureIdentities) {
     );
   }
   const regressionFiles = [
+    "harness-oracles.sql",
+    "requisition-scheduler-progress.sql",
     "transactions.sql",
     "invitations-import-outbox.sql",
     "alerts-routing.sql",
@@ -234,6 +239,7 @@ async function runSqlRegressions(fixtureIdentities) {
     )
       continue;
     const content =
+      readFileSync("tests/database/assertions.sql", "utf8") +
       readFileSync("tests/database/assume-context.sql", "utf8") +
       readFileSync(`tests/database/${file}`, "utf8");
     const output = sql(

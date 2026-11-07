@@ -78,6 +78,26 @@ exigem versão esperada. Uma confirmação externa ou leitura de comprovante
 que falha não desfaz o documento já persistido; o cliente recupera a mesma
 intenção. O ledger não admite saldo negativo por exceção pública.
 
+Transferência entre custódias usa a ENT como registro operacional. A página
+/transferencias prepara declaração explícita com contraparte e recebedor
+separados. Uma única gaveta alterna edição e conferência, preserva campos nos
+conflitos e exige adoção explícita da referência atual. Resposta incerta conserva
+o pacote e sua chave até recuperação; perda posterior da capacidade de criar não
+impede recuperar a declaração confirmada com leitura ainda autorizada.
+
+O detalhe mostra os três atos com nomes preservados. A contraparte decide a
+concordância; o declarante expede; o recebedor confirma pessoalmente. Antes da
+expedição, a quantidade aparece como Declarado e não como Expedido. Encerramento
+administrativo registra o ato do administrador. As tarefas de concordância e
+expedição integram o acompanhamento de entregas antes da paginação. Foco e
+justificativa são conservados no conflito; adotar uma declaração encerrada não
+reabilita sua confirmação. O fluxo ENT anterior permanece acessível até concluir
+a equivalência necessária à substituição.
+
+Na recuperação de recontos, a identificação e as ações podem ocupar linhas
+separadas em telas estreitas. O código e o nome de quem contou mantêm espaço
+visível, mesmo quando a soma dos botões excede a largura da linha.
+
 Eventos confirmados incluem atores, conteúdo, evidências, vínculos e hash
 anterior. SHA-256 verifica conteúdo canônico, com versão documental imutável
 para clientes. Assinatura Ed25519 e gestão de chaves ficam para o roadmap.
@@ -85,9 +105,11 @@ para clientes. Assinatura Ed25519 e gestão de chaves ficam para o roadmap.
 REQ concluída com ciência obrigatória pendente conserva a exceção que exige
 arquivamento manual justificado, inclusive após ciência tardia. O contrato
 exige trabalho elegível e não trata importações históricas como
-pendências atuais; A DB-002/B3-001 demonstra que candidaturas terminais ainda
-podem bloquear o lote REQ. Isso permanece defeito aberto, separado do cursor
-BAL. Realtime privado transmite somente revisões por usuário;
+pendências atuais. A DB-002/B3-001 documenta o bloqueio histórico por terminais;
+D-A o corrigiu com filtro antes dos limites, rotação e isolamento de
+candidato inválido, separados do cursor BAL. Provas locais no
+[checkpoint D-A](../audits/D/D-A/CHECKPOINT.md). Realtime privado transmite
+somente revisões por usuário;
 reconexão e consulta periódica recuperam eventos perdidos, sem apagar
 rascunhos.
 

@@ -50,20 +50,32 @@ export async function POST(request: Request) {
     await patientContext(
       auth,
       input.careRecipientId,
-      input.type === "COM"
-        ? "com.create"
-        : input.type === "ENT"
-          ? "ent.create"
-          : "bal.count",
-      true,
+      input.draftCommit
+        ? input.type.toLowerCase()+".read"
+        : input.type === "COM"
+          ? "com.create"
+          : input.type === "ENT"
+            ? "ent.create"
+            : "bal.count",
+      !input.draftCommit,
     );
-    const data = await rpc(auth.client, "create_supply_document", {
-      p_patient: input.careRecipientId,
-      p_type: input.type,
-      p_payload: input.payload,
-      p_key: input.idempotencyKey,
-      p_draft: input.draft,
-    });
+    const data = input.draftCommit
+      ? (
+          (await rpc(auth.client, input.type==="BAL"?"commit_creation_draft":"commit_supply_draft", {
+            p_id: input.draftCommit.id,
+            p_expected: input.draftCommit.revision,
+            p_target: null,
+            p_key: input.idempotencyKey,
+            p_body: { action: input.type==="BAL"?"create_bal":"create", payload: input.payload },
+          })) as { result: unknown }
+        ).result
+      : await rpc(auth.client, "create_supply_document", {
+          p_patient: input.careRecipientId,
+          p_type: input.type,
+          p_payload: input.payload,
+          p_key: input.idempotencyKey,
+          p_draft: input.draft,
+        });
     return NextResponse.json(
       { data, persistence: "confirmed" },
       { status: 201 },

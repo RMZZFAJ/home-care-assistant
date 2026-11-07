@@ -19,6 +19,7 @@ const groups: { label: string; items: Item[] }[] = [
     { label: "Visão geral", href: "/", icon: "home" },
     { label: "Histórico de fichas", href: "/historico", icon: "history" },
     { label: "Notificações", href: "/notificacoes", icon: "bell" },
+    { label: "Guias e ajuda", href: "/guias", icon: "forms" },
     { label: "Escalas e plantões", href: "/escalas", icon: "calendar", capabilities: ["schedule.read.own", "schedule.read.team"] },
   ] },
   { label: "Fichas", items: [
@@ -61,6 +62,7 @@ export function WorkspaceNavigation({ context, operational = false, onNavigate }
     { label: "Gestão autorizada", items: filtered(groups.find((group) => group.label === "Gestão do paciente")!.items) }] : groups.map((group) => ({ ...group, items: filtered(group.items) }));
   if (context?.activeContext?.mode === "global" && context.globalAdministrationAllowed) sections.push({ label: "Administração global", items: [
     { label: "Pacientes", href: "/admin?section=patient", icon: "team" },
+    { label: "Preparar residência", href: "/preparar-residencia", icon: "team" },
     { label: "Contas globais", href: "/admin?section=profiles", icon: "user" },
     { label: "Unidades globais", href: "/unidades", icon: "stock" },
   ] });

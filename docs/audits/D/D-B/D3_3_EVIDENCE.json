@@ -1,0 +1,113 @@
+{
+  "sourceBaseSha": "b7c4f30b57f20f5422dd0c33f1d047f65320102a",
+  "sourceTreeDirty": true,
+  "files": [
+    {
+      "file": "src/app/api/admin/route.ts",
+      "sha256LfUtf8": "19d6cfd784e7f8aaef9e468978bb2a32a40f61a1e56b96d37ad56625b3f08317"
+    },
+    {
+      "file": "src/app/api/patient-settings/route.ts",
+      "sha256LfUtf8": "524117acffe36c804d44469a6d0fafa67f0a5f0d2c18ea7b403e56f3a6087bbf"
+    },
+    {
+      "file": "src/app/design-system.css",
+      "sha256LfUtf8": "a9b002ba3af73a21cf1775a6253ac61120044562dcc588973c26deb3e68295b8"
+    },
+    {
+      "file": "src/components/admin/admin-console.tsx",
+      "sha256LfUtf8": "94b41594bc410ec2960bd45ef3c8dc24e12d11678d36a30a36e7947bd354e21a"
+    },
+    {
+      "file": "src/components/admin/audit-history.tsx",
+      "sha256LfUtf8": "15a8e922bbd0defc9a51c0116955c5836e033dae3403d504a98f41665b370bfe"
+    },
+    {
+      "file": "src/lib/audit-presentation.ts",
+      "sha256LfUtf8": "b7e72d7169f029bbc1f3ea0bf685b498a3a58e79e3f188c25271a056cf604a9a"
+    },
+    {
+      "file": "src/lib/server/api.ts",
+      "sha256LfUtf8": "8391efbf65313b2de0cfc33165f8842f8f600a7263ab375a8961ff51481f2c35"
+    },
+    {
+      "file": "src/lib/validation/audit.ts",
+      "sha256LfUtf8": "3c13cc7453e85815f9f4e90557939d4f00f6b7bb0cd7a4f9e7a4e84c14cff554"
+    },
+    {
+      "file": "supabase/migrations/20261107022731_phase_d3_complete_scoped_history.sql",
+      "sha256LfUtf8": "c7164da72e70f9423aad155e3fce31d8315964984ccf4b0ec462d45242a77aac"
+    },
+    {
+      "file": "tests/api/guards.test.ts",
+      "sha256LfUtf8": "691c1139d4db6e19294fd410ff81a9eff8c5598d326c338281398498a00e649c"
+    },
+    {
+      "file": "tests/e2e/read-history.spec.ts",
+      "sha256LfUtf8": "ffd57b5134e28e72ac1d9c7a34f4a759abf8020cbf6d73591d717bc088aa8d8d"
+    },
+    {
+      "file": "tests/integration/read-history-fixtures.mjs",
+      "sha256LfUtf8": "860c51bcefd24fadc4b5c88afdb718ff3d1fe1fb2bbac0db421eacb69bcef616"
+    },
+    {
+      "file": "tests/integration/read-history.test.mjs",
+      "sha256LfUtf8": "1af60caf907a77db9e5df64293909e206667d1f86c1957599918e79db0830a31"
+    },
+    {
+      "file": "tests/read-history.test.ts",
+      "sha256LfUtf8": "171e3d7ae462b04268b7b0e4bbe8a7f61ec51e451b2790b06515646dc1e70170"
+    }
+  ],
+  "protectedHistoricalMigrationsUnchanged": 84,
+  "localMigrations": 126,
+  "remoteMigrations": 121,
+  "remoteDBApplied": false,
+  "unitAndApiCasesPassed": 30,
+  "authCasesPassed": 3,
+  "browserCasesPassed": 6,
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "fixture": [
+    "16 COM drafts via real Auth RPCs in a new fictitious patient",
+    "201 synthetic audit rows with timestamp ties in a separate fictitious patient; not proof of invitations actually sent"
+  ],
+  "initialBrowserCases": {
+    "passed": 2,
+    "failed": 4
+  },
+  "counterproofs": [
+    "Before migration p_page=NULL returned success;after correction explicit NULL and oversized values rejected",
+    "Oldest event reachable through11 pages and both event/resource references against independent SQL ordering",
+    "Delegated audit.read works without access.manage;revocation,global mode and other patient denied",
+    "Query ZodError previously became500;request-query boundary now400 and broken internal result remains500",
+    "Read error remains visible while revalidating the same selection",
+    "Transport ignoring AbortSignal permits delayed empty A after populated B;current result and focus remain B"
+  ],
+  "logs": [
+    "output/phase-d-work/d3-history-null-before.log",
+    "output/phase-d-work/d3-history-auth.log",
+    "output/phase-d-work/d3-history-guards-unit.log",
+    "output/playwright/phase-d/d3-history-browser-first.log",
+    "output/playwright/phase-d/d3-history-browser-recheck.log"
+  ],
+  "observedOutsideCertifiedScope": [
+    {
+      "consumer": "notifications.mine",
+      "code": "DATABASE_UNAVAILABLE",
+      "correlationId": "02d283f4-3d6f-4b49-aecd-bbecb3ad849a",
+      "note": "C-AC-020 investigation pending;two PostgreSQL statement timeouts in same window without confirmed exact attribution"
+    }
+  ],
+  "humanPhysicalApproval": false,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION"
+}

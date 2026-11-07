@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useClientReady } from "@/lib/use-client-ready";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { NewPasswordField } from "./new-password-field";
 
 export function PasswordRecoveryForm() {
   const ready = useClientReady();
@@ -73,20 +74,7 @@ export function PasswordRecoveryForm() {
           <p className="text-sm">
             Abra esta página pelo link de recuperação ou ativação recebido.
           </p>
-          <label className="block">
-            Nova senha
-            <input
-              className="mt-1 w-full rounded border p-3"
-              type="password"
-              disabled={!ready || busy}
-              autoComplete="new-password"
-              minLength={12}
-              maxLength={72}
-              required
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </label>
+          <NewPasswordField className="mt-1 w-full rounded border p-3" disabled={!ready || busy} value={password} onChange={setPassword} />
           <label className="block">
             Confirmar nova senha
             <input

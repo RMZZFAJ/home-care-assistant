@@ -91,6 +91,15 @@ exige família e/ou supervisão, conforme qualquer grupo ou todos os grupos,
 com identidades distintas. Estoque alterado desde a referência exige reconto.
 As contagens e aprovações anteriores permanecem na história.
 
+Na ficha, Contagem e revisão mostra o contador efetivo e suas observações em
+leitura. Uma pessoa distinta e elegível pode registrar parecer próprio de até
+2.000 caracteres. A revisão é facultativa no primeiro uso e também pode ocorrer
+após a conciliação; nesse caso não repete movimentos nem valida saldo posterior.
+Se a referência de uma contagem ainda pendente mudou, é necessário reconto.
+O parecer digitado permanece durante a comparação: consulte a referência atual,
+adote explicitamente a contagem válida e confira antes de confirmar. Resultado
+incerto congela a intenção; Recupere a revisão para consultar o mesmo ato.
+
 ## Histórico, documentos e notificações
 
 Use a lupa para abrir pesquisa e filtros de ficha, situação, período e código
@@ -139,6 +148,13 @@ O profissional designado conta durante a janela; supervisão pode solicitar
 adiamento, que só altera prazo e responsabilidade após decisão familiar.
 Troca de horário de um plantão com BAL vigente exige essa decisão antes de
 alterar a agenda. Substituição no mesmo período conserva a janela.
+
+A decisão de adiamento mostra destino, versão e período da proposta em leitura,
+separados do plantão atual. Se o alvo mudou, não é possível aprovar outra versão
+silenciosamente; a família pode recusar o pedido pendente com motivo próprio.
+Outro destino exige outro pedido. A recusa preserva prazos e responsabilidade;
+nome e motivo do decisor permanecem na consulta. Conflito conserva a justificativa.
+Em resposta perdida, recupere a mesma confirmação antes de iniciar outra.
 
 Contagem física e revisão são etapas distintas. Na revisão, referência e
 diferenças ficam visíveis. Uma mudança no estoque exige nova conferência; uma

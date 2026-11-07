@@ -9,6 +9,15 @@ import {
 } from "@/lib/server/operational-pdf";
 
 describe("approved document presentation", () => {
+  it("renders the frozen source and own reason of a remaining need without changing the original REQ",async()=>{
+    const original=Object.values(demoDocuments).find(d=>d.type==="REQ")!;
+    const prior=JSON.stringify(original);
+    const snapshot={...original,payload:{...original.payload,sourceRequisition:{id:original.id,code:original.code,protocol:original.protocol,version:3,reason:"O material entregue não encerrou a necessidade fictícia"}}};
+    const bytes=await renderDocumentPdf(snapshot,"c".repeat(64));
+    expect((await PDFDocument.load(bytes)).getPageCount()).toBeGreaterThanOrEqual(2);
+    expect(JSON.stringify(original)).toBe(prior);
+    await mkdir("output/pdf",{recursive:true});await writeFile("output/pdf/req-remaining-need-controlled.pdf",bytes);
+  });
   it("renders the current BAL shift and all linked weeks without altering the historical source",async()=>{
     const original=Object.values(demoDocuments).find(d=>d.type==="BAL")!;
     const serialized=JSON.stringify(original);

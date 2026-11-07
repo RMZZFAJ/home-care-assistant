@@ -86,7 +86,17 @@ export function getTestEnvironment() {
   };
 }
 
-export async function waitForLocalDataApi() {
+export async function dataApiIsReady(response, requiredPaths = ["/rpc/run_operational_schedule"]) {
+  if (!response.ok) return false;
+  try {
+    const schema = await response.json();
+    return schema.swagger === "2.0" && requiredPaths.length > 0 && requiredPaths.every((path) => Object.hasOwn(schema.paths ?? {}, path));
+  } catch {
+    return false;
+  }
+}
+
+export async function waitForLocalDataApi({ legacy = false } = {}) {
   const env = getTestEnvironment();
   for (let attempt = 0; attempt < 45; attempt++) {
     try {
@@ -97,7 +107,9 @@ export async function waitForLocalDataApi() {
         },
         signal: AbortSignal.timeout(2000),
       });
-      if (response.ok) return;
+      // The service role intentionally has no table grants in the current
+      // schema. OpenAPI must expose its allowlisted RPC, not user-only tables.
+      if (await dataApiIsReady(response, legacy ? ["/products", "/profiles"] : ["/rpc/run_operational_schedule"])) return;
     } catch {
       /* Reset restarts the local REST schema cache. */
     }
@@ -109,7 +121,6 @@ export async function waitForLocalDataApi() {
 }
 
 export function assertLocalReplay() {
-  getTestEnvironment();
   const backupIndex = process.argv.indexOf("--backup");
   const backup = backupIndex >= 0 ? process.argv[backupIndex + 1] : undefined;
   if (!process.argv.includes("--replay-local") || !backup) {
@@ -117,6 +128,7 @@ export function assertLocalReplay() {
       "Local reset/replay requires explicit --replay-local --backup <verified backup file>. Ordinary prepare never resets data.",
     );
   }
+  getTestEnvironment();
   const file = resolve(backup);
   if (
     !existsSync(file) ||
@@ -170,4 +182,16 @@ export function sql(statement) {
 
 export function sqlLiteral(value) {
   return `'${String(value).replaceAll("'", "''")}'`;
+}
+
+export function pauseLocalAutomationForTests() {
+  // SQL verifies the local container. Use pg_cron's supported API rather than
+  // editing its extension-owned table. Legacy replay may predate pg_cron.
+  sql(`do $$declare job record;begin
+    if to_regclass('cron.job') is not null then
+      for job in select jobid from cron.job where active and jobname in ('hca-operational-lifecycle','hca-notification-worker') loop
+        perform cron.alter_job(job.jobid,active=>false);
+      end loop;
+    end if;
+  end;$$;`);
 }

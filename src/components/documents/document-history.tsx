@@ -14,10 +14,8 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { EmptyState, Icon, StatusBadge } from "@/components/ui/primitives";
-import {
-  documentLabels,
-  documentStatuses,
-} from "@/types/documents";
+import { documentLabels } from "@/types/documents";
+import {historyFilterPresentation,historyStatusLabels} from "@/lib/documents/presentation";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 
@@ -31,11 +29,7 @@ type Filters = {
   to: string;
 };
 const empty: Filters = { search: "", type: "", status: "", from: "", to: "" };
-const historyFilters = {
-  ...documentStatuses,
-  archive_pending: "Conclusões para revisar e arquivar",
-  science_required: "Requisições para sua ciência",
-};
+const historyFilters = historyStatusLabels;
 export function DocumentRow({ row }: { row: DocumentSummary }) {
   return (
     <Link
@@ -45,10 +39,11 @@ export function DocumentRow({ row }: { row: DocumentSummary }) {
     >
       <span className="document-type">{row.type}</span>
       <span className="min-w-0">
-        <strong>{row.code ?? "Rascunho"}</strong>
+        <strong>{row.code ?? (row.status === "draft" ? "Rascunho" : "Registro sem expedição")}</strong>
         <span className="block text-xs text-(--muted)">
           {documentLabels[row.type]} · {formatBrazilDate(row.created_at)}
         </span>
+        {row.task?<span className="mt-1 block text-sm font-semibold">{row.task.label}</span>:null}
       </span>
       <span className="grid justify-items-end gap-1">
         <StatusBadge status={row.status} />
@@ -144,6 +139,7 @@ function HistoryContent({
     )
       .then(
         (result) => {
+          if(controller.signal.aborted)return;
           setRows(result.data);
           setTotal(result.total);
           setError("");
@@ -162,7 +158,7 @@ function HistoryContent({
       });
     return () => controller.abort();
   }, [context.patient, filters, page, attempt, liveRevision]);
-  const active = Object.entries(filters).filter(([, value]) => value);
+  const active = Object.entries(filters).filter(([, value]) => value).map(([key,value])=>({key,...historyFilterPresentation(key,value)}));
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
@@ -293,12 +289,14 @@ function HistoryContent({
             </div>
           </form>
         ) : null}
+        <p className="sr-only" role="status">{active.length?`Filtros ativos: ${active.map(item=>item.text).join(". ")}.`:"Nenhum filtro ativo."}</p>
         {active.length ? (
           <div
             className="mt-4 flex flex-wrap gap-2"
             aria-label="Filtros ativos"
+            role="group"
           >
-            {active.map(([key, value]) => (
+            {active.map(({key,text,removeLabel}) => (
               <button
                 key={key}
                 className="ui-badge ui-badge-neutral min-h-9"
@@ -307,18 +305,9 @@ function HistoryContent({
                   setDraft({ ...draft, [key]: "" });
                   setLoading(true);
                 }}
-                aria-label={"Remover filtro " + key}
+                aria-label={removeLabel}
               >
-                {key === "type"
-                  ? "Ficha"
-                  : key === "status"
-                    ? "Situação"
-                    : key === "search"
-                      ? "Busca"
-                      : key === "from"
-                        ? "De"
-                        : "Até"}
-                : {documentStatuses[value] ?? value} ×
+                {text} ×
               </button>
             ))}
           </div>

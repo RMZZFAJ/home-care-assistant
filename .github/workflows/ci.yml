@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+# Superseded PR heads do not need to keep running. Push runs have unique groups.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   validate:
     strategy:
@@ -66,10 +71,21 @@ jobs:
         include:
           - project: chromium
             engine: chromium
+            shard: 1/1
+            artifact: chromium
           - project: mobile
             engine: chromium
+            shard: 1/1
+            artifact: mobile
           - project: ios
             engine: webkit
+            shard: 1/2
+            artifact: ios-1
+          - project: ios
+            engine: webkit
+            shard: 2/2
+            artifact: ios-2
+    name: browser (${{ matrix.artifact }})
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
@@ -105,12 +121,15 @@ jobs:
             fi
           done
       - run: npx playwright install --with-deps ${{ matrix.engine }}
-      - run: npm run e2e -- --project=${{ matrix.project }}
+      - run: npm run test:harness -- --project=${{ matrix.project }}
+      - run: npm run e2e -- --project=${{ matrix.project }} --shard=${{ matrix.shard }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure() || cancelled()
         with:
-          name: browser-test-report-${{ matrix.project }}
-          path: playwright-report/
+          name: browser-test-report-${{ matrix.artifact }}
+          path: |
+            playwright-report/
+            output/playwright/harness-results/
           retention-days: 7
 
   database-and-browser:

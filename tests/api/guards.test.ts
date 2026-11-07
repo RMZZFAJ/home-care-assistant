@@ -7,13 +7,48 @@ import {
   boundedText,
   databaseError,
   patientContext,
+  parseQuery,
   readJson,
   saoPauloDateBoundary,
   validateMutationRequest,
   type AuthContext,
 } from "@/lib/server/api";
+import { auditQuerySchema } from "@/lib/validation/audit";
+import { governanceQuerySchema } from "@/lib/validation/governance";
 
 const patientId = "10000000-0000-4000-8000-000000000001";
+describe("request-query validation has a separate boundary from server results", () => {
+  it("returns a typed confirmed stage with correlation while logs retain only the safe error descriptor", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const receipt={kind:"revision" as const,documentId:patientId,idempotencyKey:"10000000-0000-4000-8000-000000000002",version:2};
+    try {
+      const response=await api("test.legacy_revision",async()=>{throw new ApiError("REVISION_SAVED_SUBMISSION_PENDING","A revisão 2 desta ficha foi salva.",503,true,receipt);});
+      const body=await response.json();expect(response.status).toBe(503);expect(body).toMatchObject({code:"REVISION_SAVED_SUBMISSION_PENDING",confirmedStage:receipt,retryable:true});expect(body.correlationId).toBe(response.headers.get("x-correlation-id"));expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(log).toHaveBeenCalledTimes(1);expect(JSON.parse(log.mock.calls[0][0])).toEqual({level:"error",operation:"test.legacy_revision",code:body.code,correlationId:body.correlationId});
+    } finally { log.mockRestore(); }
+  });
+  it("maps invalid audit/governance limits to a safe400 without exposing request values", () => {
+    for (const read of [() => parseQuery(auditQuerySchema, { pageSize: "101" }), () => parseQuery(governanceQuerySchema, { pageSize: "private-invalid-value" })]) {
+      try { read(); throw new Error("Invalid query was accepted"); }
+      catch (reason) {
+        expect(reason).toBeInstanceOf(ApiError);
+        expect(reason).toMatchObject({ status: 400, code: "VALIDATION_ERROR", retryable: false });
+        expect((reason as Error).message).not.toContain("private-invalid-value");
+      }
+    }
+  });
+  it("preserves defaults for omitted query values", () => {
+    expect(parseQuery(auditQuerySchema, {})).toMatchObject({ page: 1, pageSize: 20 });
+    expect(parseQuery(governanceQuerySchema, {})).toMatchObject({ page: 1, pageSize: 20, status: "open" });
+  });
+  it("keeps a broken internal result schema as500 rather than presenting it as a rejected request", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const response = await api("test.result_schema", async () => { z.object({ ok: z.literal(true) }).parse({ ok: false }); return Response.json({ ok: true }); });
+      expect(response.status).toBe(500); expect(await response.json()).toMatchObject({ code: "INTERNAL_ERROR" });
+    } finally { log.mockRestore(); }
+  });
+});
 function request(body: unknown, extra: Record<string, string> = {}) {
   return new Request("https://care.example/api/operation", {
     method: "POST",
@@ -105,6 +140,19 @@ describe("cookie-authenticated mutation guards", () => {
 });
 
 describe("operational time and safe errors", () => {
+  it("keeps SQL 42702 internal and preserves legitimate catalogue alias conflicts", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const response = await api("d3.classification", async () => databaseError({ code: "42702", message: 'column reference "private_payload_marker" is ambiguous' }));
+      const body = await response.json();
+      expect(response.status).toBe(500);
+      expect(body.code).toBe("INTERNAL_ERROR");
+      expect(body.correlationId).toMatch(/^[a-f0-9-]{36}$/);
+      expect(JSON.stringify(body)).not.toMatch(/private_payload_marker|42702|AMBIGUOUS_PRODUCT/);
+      expect(JSON.stringify(log.mock.calls)).not.toContain("private_payload_marker");
+      expect(() => databaseError({ code: "P0001", message: "ambiguous patient catalogue alias" })).toThrow(expect.objectContaining({ code: "AMBIGUOUS_PRODUCT", status: 409 }));
+    } finally { log.mockRestore(); }
+  });
   it("maps São Paulo date filters across UTC day boundary and validates calendar dates", () => {
     expect(saoPauloDateBoundary("2026-10-20")).toBe("2026-10-20T03:00:00.000Z");
     expect(saoPauloDateBoundary("2026-10-20", true)).toBe(

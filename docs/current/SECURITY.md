@@ -55,6 +55,30 @@ supervisão. Quem contou não aprova a própria contagem. Administração global
 não
 recebe essas competências sem vínculo e contexto local explícitos.
 
+A revisão BAL consulta o contador efetivo do evento oficial, inclusive no
+legado, e registra revisor/grupo segundo autoridade do banco. Observações do
+contador e parecer próprio são fatos separados. Revogação durante espera do
+estoque ou de FK de perfil impede o efeito; evento, parecer e ledger fazem
+rollback juntos. Recuperar um ato próprio já confirmado não exige renovar a
+capacidade de escrita, mas exige leitura viva do paciente. RLS e grants de
+balance_reviews não oferecem edição ou exclusão direta, nem ao service_role.
+
+Emissão REQ, inclusive necessidade remanescente, mantém req.create no núcleo
+transacional e revalida após os locks e a escrita. A API exige leitura viva
+para também recuperar a chave já confirmada após perda só da escrita. Outra
+chave exige novamente capacidade de emitir; trocar conteúdo conflita. Origem
+estrangeira/histórica não autoriza novo vínculo operacional. Sessão revogada
+durante espera tardia de perfil reverte emissão e evento causal da origem.
+O núcleo privado não tem EXECUTE para clientes; a nova RPC pública tem grant
+somente authenticated. RLS e grants das tabelas existentes permanecem.
+
+Decidir pedido pendente de adiamento exige bal.defer.approve e autoridade
+familiar efetiva. Recusar alvo obsoleto não exige que ele continue aprovável;
+aprovar exige a mesma versão/destino e pessoa ainda elegível. O comando
+revalida o decisor após esperas e, na aprovação, a capacidade de contar do
+destino antes de confirmar. Proposta e autoria não vêm de campos editáveis.
+Recuperação própria usa leitura viva, enquanto nova decisão exige escrita.
+
 ## Banco, APIs e objetos privados
 
 RLS, grants explícitos/defaults e SECURITY DEFINER são revisados em conjunto.
@@ -66,6 +90,14 @@ Ledger e eventos confirmados são imutáveis para clientes. Saldo vem de
 movimentos transacionais não negativos. SHA-256 compara conteúdo canônico;
 não é assinatura assimétrica nem proteção contra administradores do banco.
 
+Consultar origem de movimento usa o cliente Auth do chamador e as permissões
+existentes, sem service_role ou novos grants. Leitura de estoque não concede
+com.read. A parcela COM é resolvida pelo vínculo real ao documento; receiptId
+não é documentId. Documento/relato e material são conferidos no mesmo paciente.
+Movimento invisível responde404; origem restrita produz explicação genérica sem
+conteúdo documental. Nomes atuais do perfil/catálogo não são apresentados como
+snapshots históricos. A consulta não escreve no ledger, documento ou eventos.
+
 Uploads têm limites, reserva idempotente, validação de formato e sanitização.
 Imagens perdem metadados; PDFs ativos ou excessivos são recusados e páginas
 passivas são copiadas para novo arquivo. Objetos e PDFs ficam privados, com
@@ -76,6 +108,15 @@ Mutações rejeitam origem externa e validam contratos. Respostas sensíveis usa
 no-store e correlação. Logs omitem payload privado, SQL, credenciais e tokens.
 O navegador conserva tentativas incertas por até 24 horas para recuperação
 idempotente; conclusão e saída removem os rascunhos. Não é histórico oficial.
+
+Gestão de identidade/sucessor exige catalog.manage por paciente, sem conceder
+access.manage ou leitura de custódia. A comparação retorna saldo restrito como
+NULL; seu histórico compartilhado contém somente metadados de identidade, sem
+capturar estoque visto por outro gestor. Comandos exigem intenção exata e motivo
+próprio; autoria vem da sessão. RLS, grants e helpers privados não oferecem DML
+direto. Esperas de estoque/catálogo e uma espera tardia de perfil foram testadas
+com Auth real; encerrar a sessão antes da confirmação reverte os efeitos.
+Inativar não autoriza novo movimento comum, merge ou conversão de unidades.
 
 ## Autenticação pessoal
 
@@ -128,3 +169,43 @@ operacionais necessárias. Retenção, base legal e operadores devem ser
 definidos pelo controlador. Resultados atuais e limites ficam em
 [PROJECT_STATUS](PROJECT_STATUS.md); execuções arquivadas são datadas, não
 comprovação atual de homologação externa.
+
+## Rascunho próprio e prazo Auth durante espera
+
+Rascunhos REQ/BAL usam tabelas privadas com RLS defensiva e nenhum grant de
+leitura/escrita direta para clientes ou service_role. RPCs públicas têm grant
+somente authenticated; helpers privados ficam sem EXECUTE dos clientes. Dono
+sempre vem de auth.uid, com sessão/contexto/vínculo e leitura do domínio vivos.
+Papel administrativo de outra pessoa não libera o preenchimento. Save/descarte
+novos exigem capacidade de escrever; chave confirmada e reconhecimento técnico
+do resultado exigem leitura viva. Campos de autor/estado/quantidade solicitada
+não são transportados como controles de autorização. Logs não recebem conteúdo.
+
+O prazo absoluto de auth.sessions.not_after é confrontado com o relógio real,
+também depois de espera. Revogar a sessão e expirar seu prazo durante uma
+transação são contraprovas distintas: ambas devem recusar a escrita e reverter
+efeitos. Três regressões com Auth real cobrem o prazo em rascunho, REQ e estoque
+familiar; não usam token forjado nem inferem expiração só de um sleep.
+
+A referência de contagem consulta somente o paciente selecionado com bal.read
+vivo, como a referência dos BAL já emitidos. EXECUTE da nova RPC é exclusivo
+de authenticated. A confirmação sem plantão revalida leitura após o mutex e
+compara a revisão de ledger antes de criar documento. Recuperação da própria
+chave permanece sujeita às comparações canônicas nativas. Campos privados
+saem da tela ao perder leitura; capacidades de escrita continuam separadas da
+recuperação de comando já confirmado. Logout limpa as cópias hca da sessão.
+
+Datas escolhidas não transportam papel ou autor. Native schedule_command
+conserva autorização por paciente e pessoa e revalida após o lock do
+profissional. Versão do tipo impede mudança silenciosa de horário. Conflito em
+outro paciente recusa o conjunto inteiro sem revelar seu nome ou notas. A
+negativa de leitura desse paciente foi exercitada com Auth real. A decisão da
+proposta mantém motivo/notas do proponente e grava motivo próprio do decisor,
+inclusive no terminal obsoleto após corte.
+
+A apresentação de vínculos ENT→REQ usa o cliente autenticado do próprio
+leitor. IDs são obtidos da ficha nativa, com filtro adicional do paciente e
+RLS nas REQs; campos do browser não definem autorização. Família/global não
+confirmam pelo recebedor. A matriz D-A registra as esperas observadas de
+sessão/vínculo/capacidade e rollback dos comandos cobertos. Essa prova não se
+estende automaticamente a comandos futuros ou à operação remota.

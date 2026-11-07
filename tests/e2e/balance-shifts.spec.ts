@@ -1,3 +1,4 @@
+import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
@@ -67,7 +68,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await page.getByRole("link",{name:/Balanço do seu plantão/}).click();
   await expect(page.getByRole("heading",{name:"Balanços e plantões",exact:true})).toBeVisible();
   await page.getByRole("main").getByRole("link",{name:"Fazer balanço",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Balanço semanal",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Balanço de estoque",exact:true})).toBeVisible();
   await expect(page.getByRole("list",{name:"Barra de etapas; use as setas do teclado para rolar",exact:true}).getByRole("listitem")).toHaveCount(2);
   await expect(page.getByText(/^Referência:/)).toHaveCount(0);
   await page.getByRole("button",{name:"Revisar",exact:true}).click();
@@ -100,7 +101,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   expect(list).toHaveLength(1);
   const stock=(await(await page.request.get("/api/stock/balances?careRecipientId="+patient)).json()).overview;
   expect(stock.every((p:{team:{confirmed:string}})=>p.team.confirmed==="0")).toBe(true);
-  const pdf=await page.request.get("/api/documents/"+id+"/pdf");expect(pdf.ok()).toBe(true);expect((await pdf.body()).length).toBeGreaterThan(1000);
+  const pdf=await generatedPdf(page,"/api/documents/"+id+"/pdf");expect(pdf.ok()).toBe(true);expect((await pdf.body()).length).toBeGreaterThan(1000);
   await capture(page,"bal-conclusao-"+info.project.name,true);
 });
 

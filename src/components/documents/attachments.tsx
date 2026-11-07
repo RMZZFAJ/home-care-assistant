@@ -1,4 +1,5 @@
 "use client";
+import { requireRuntimeCommandsAvailable } from "@/lib/client/api";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   api,
@@ -85,6 +86,7 @@ export function Attachments({
     setBusy(true);
     setError("");
     try {
+      requireRuntimeCommandsAvailable();
       const response = await fetch("/api/attachments", {
         method: "POST",
         body: form,

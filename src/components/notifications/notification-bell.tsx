@@ -1,120 +1,63 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { Popover, PopoverSurface, PopoverTrigger } from "@fluentui/react-components";
 import { api } from "@/components/workspace";
 import { Icon } from "@/components/ui/primitives";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
-import { useLiveRevision } from "@/lib/use-live-revision";
-import { notificationHref } from "@/lib/notifications/navigation";
+import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
+import { useInbox } from "@/lib/notifications/use-inbox";
 
-export type InboxNotification = {
-  id: string;
-  document_id?: string;
-  consumption_report_id?: string;
-  reminder_id?: string;
-  alert_event_id?: string;
-  care_recipient_id?: string;
-  event_key?: string;
-  silent?: boolean;
-  requisition_id?: string;
-  state: string;
-  seen_at: string | null;
-  created_at: string;
-  operational_documents?: { code: string; type: string; status: string } | null;
-  document_events?: { action: string } | null;
-};
 export function NotificationBell({ patientId, disabled = false }: { patientId?: string; disabled?: boolean }) {
-  const liveRevision = useLiveRevision();
+  const inbox = useInbox({ patientId, surface: "bell", pageSize: 8, poll: true, paused: disabled });
   const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState<InboxNotification[]>([]);
-  const [unread, setUnread] = useState(0);
-  const [error, setError] = useState("");
-  const rootRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const controller = new AbortController();
-    let latest = 0;
-    const load = () => {
-      const sequence = ++latest;
-      if (!document.hidden)
-        void api<{ data: InboxNotification[]; unreadCount: number }>(
-          "/api/notifications?surface=bell" +
-            (patientId ? "&careRecipientId=" + patientId : ""),
-          undefined,
-          controller.signal,
-        ).then(
-          (result) => {
-            if (controller.signal.aborted || sequence !== latest) return;
-            setRows(result.data);
-            setUnread(result.unreadCount);
-            setError("");
-          },
-          () => {
-            if (!controller.signal.aborted && sequence === latest)
-              setError("Não foi possível atualizar as notificações.");
-          },
-        );
-    };
-    load();
-    const timer = window.setInterval(load, 30_000);
-    return () => {
-      controller.abort();
-      window.clearInterval(timer);
-    };
-  }, [patientId, liveRevision]);
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-        rootRef.current?.querySelector("button")?.focus();
-      }
-    };
-    document.addEventListener("pointerdown", close);
-    document.addEventListener("keydown", escape);
-    return () => {
-      document.removeEventListener("pointerdown", close);
-      document.removeEventListener("keydown", escape);
-    };
-  }, [open]);
+  const [writeError, setWriteError] = useState("");
+  const rows = inbox.data?.data ?? [], unread = inbox.data?.unreadCount;
   return (
-    <div ref={rootRef} className="notification-bell">
+    <div className="notification-bell">
+      <Popover open={open} onOpenChange={(_, next) => setOpen(next.open)} trapFocus positioning={{ position: "below", align: "end" }}>
+      <PopoverTrigger disableButtonEnhancement>
       <button
         className="ui-icon-button"
         type="button"
         disabled={disabled}
         aria-label={
-          "Notificações" + (unread ? ", " + unread + " não lidas" : "")
+          "Notificações" + (inbox.fresh && unread ? ", " + unread + " não vistas" : "")
         }
         aria-expanded={open}
         aria-controls="notification-panel"
-        onClick={() => setOpen((current) => !current)}
+        onClick={event => event.currentTarget.focus()}
       >
         <Icon name="bell" />
-        {unread ? (
+        {inbox.fresh && unread ? (
           <span className="notification-dot">{unread > 9 ? "9+" : unread}</span>
         ) : null}
       </button>
-      {open ? (
+      </PopoverTrigger>
+      <PopoverSurface className="hca-notification-surface" aria-label="Notificações" >
         <section
           id="notification-panel"
-          className="header-popover notification-panel"
+          className="notification-panel"
           aria-label="Notificações recentes"
         >
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-semibold">Notificações</h2>
-            <span className="ui-badge ui-badge-pending">{unread} novas</span>
+            {inbox.fresh ? <span className="ui-badge ui-badge-pending">{unread} não vistas</span> : null}
+            <button type="button" className="ui-icon-button" aria-label="Fechar notificações" onClick={() => setOpen(false)}><Icon name="close" /></button>
           </div>
-          {error ? <p role="alert">{error}</p> : null}
-          {!rows.length ? (
+          {inbox.scopeRequired ? <p className="py-5 text-sm">Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.</p> : null}
+          {inbox.paused ? <p role="status">Atualizando vínculo…</p> : null}
+          {inbox.loading ? <p role="status">Consultando notificações…</p> : null}
+          {inbox.error ? <div><p role="alert">{inbox.error}</p><button type="button" className="notification-all" onClick={inbox.refresh}>Consultar notificações novamente</button></div> : null}
+          {writeError ? <p role="alert">{writeError}</p> : null}
+          {rows.length > 0 && !inbox.fresh ? <p className="text-sm text-(--muted)">Última consulta confirmada; aguardando atualização.</p> : null}
+          {inbox.fresh && !rows.length ? (
             <p className="py-5 text-sm text-(--muted)">
               Você está em dia. As próximas atualizações aparecerão aqui.
             </p>
-          ) : (
+          ) : rows.length ? (
             <ul>
               {rows.slice(0, 8).map((row) => (
                 <li
@@ -123,23 +66,15 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
                 >
                   <Link
                     href={notificationHref(row)}
+                    tabIndex={0}
                     onClick={() => {
                       setOpen(false);
+                      setWriteError("");
                       void api("/api/notifications", { id: row.id }).then(
+                        inbox.refresh,
                         () =>
-                          setRows((current) =>
-                            current.map((item) =>
-                              item.id === row.id
-                                ? {
-                                    ...item,
-                                    seen_at: new Date().toISOString(),
-                                  }
-                                : item,
-                            ),
-                          ),
-                        () =>
-                          setError(
-                            "Não foi possível marcar a notificação como lida.",
+                          setWriteError(
+                            "Não foi possível confirmar a marcação como vista. Consulte novamente para conferir.",
                           ),
                       );
                     }}
@@ -154,20 +89,23 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
                       )}
                     </span>
                     <time>{formatBrazilDate(row.created_at)}</time>
+                    <span>{notificationTargetLabel(row)}</span>
                   </Link>
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
           <Link
-            href="/notificacoes"
+            href={"/notificacoes" + (patientId ? "?careRecipientId=" + patientId : "")}
+            tabIndex={0}
             className="notification-all"
             onClick={() => setOpen(false)}
           >
             Consultar histórico completo <Icon name="arrow" width="16" />
           </Link>
         </section>
-      ) : null}
+      </PopoverSurface>
+      </Popover>
     </div>
   );
 }

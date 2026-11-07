@@ -93,7 +93,7 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
   await post("/api/invitations/accept", { token: new URLSearchParams(new URL(invitation.invitationUrl).hash.slice(1)).get("token") });
   await logout();
   await login(page, "adminA", patient);
-  let ent = (await post("/api/documents", { careRecipientId: patient, type: "ENT", payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixture.professional.id, lines: [{ productId: "fralda", quantity: "2", requisitionItemIds: [reqData.requisition_items[0].id] }] }, idempotencyKey: crypto.randomUUID() })).data;
+  let ent = (await post("/api/documents", { careRecipientId: patient, type: "ENT", payload: { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixture.professional.id, lines: [{ productId: "fralda", quantity: "2", requisitionItemIds: [reqData.requisition_items[0].id] }] }, idempotencyKey: crypto.randomUUID() })).data;
   await logout();
   await login(page, "professional", patient);
   ent = (await post("/api/documents/" + ent.id, { action: "receive", expectedVersion: ent.version, body: { divergences: [] }, idempotencyKey: crypto.randomUUID() })).data;
@@ -137,7 +137,7 @@ test("operação móvel oferece cinco destinos e caixa de entregas autorizada", 
   await expect(page.getByRole("heading", { name: "Entregas e recebimentos", exact: true })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Responsável pelas entregas", exact: true })).toHaveValue("own");
   await noOverflow(page);
-  const response = await page.request.get(`/api/deliveries?careRecipientId=${patientA}&scope=own`);
+  const response = await page.request.get(`/api/deliveries?careRecipientId=${patientA}&scope=own&status=pending_receipt`);
   expect(response.ok()).toBeTruthy();
   const context = (await (await page.request.get("/api/context")).json()).data;
   for (const row of (await response.json()).data) expect(row.recipient_id).toBe(context.userId);

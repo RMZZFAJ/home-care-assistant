@@ -11,12 +11,9 @@ import {
 import { Dialog } from "@/components/ui/primitives";
 import type { CatalogProduct } from "@/types/documents";
 import { formatBrazilDate } from "@/lib/receipt";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { parseFlowPage, type FlowSubmission as Submission } from "@/lib/validation/flow-reviews";
 
-type Submission = {
-  id: string;
-  created_at: string;
-  body: { kind?: string; text?: string; products?: string[] };
-};
 type Review = {
   id: string;
   accept: boolean;
@@ -33,9 +30,14 @@ export function FlowReviews({
   products: CatalogProduct[];
   onChange: () => void;
 }) {
-  const [rows, setRows] = useState<Submission[]>([]);
-  const [configured, setConfigured] = useState(false);
+  const live = useLiveRevision(), [page, setPage] = useState(1);
   const [attempt, setAttempt] = useState(0);
+  const readKey = JSON.stringify([patientId, page, attempt, live]);
+  const [result, setResult] = useState<{ key: string; data: ReturnType<typeof parseFlowPage> } | null>(null);
+  const [failure, setFailure] = useState<{ key: string; message: string; denied: boolean } | null>(null);
+  const denied = failure?.denied === true;
+  const rows = denied || result?.data.page !== page ? [] : result.data.data, configured = result?.data.configured === true, total = result?.data.total ?? 0;
+  const loading = result?.key !== readKey && failure?.key !== readKey;
   const [selected, setSelected] = useState<Submission | null>(null);
   const [review, setReview] = useState<Review | null>(null);
   const [error, setError] = useState("");
@@ -44,23 +46,22 @@ export function FlowReviews({
   const [uncertain, setUncertain] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
-    api<{ data: Submission[]; configured: boolean }>(
-      "/api/whatsapp/flows/submissions?careRecipientId=" + patientId,
+    api<unknown>(
+      `/api/whatsapp/flows/submissions?careRecipientId=${patientId}&page=${page}&pageSize=20`,
       undefined,
       controller.signal,
     )
-      .then((result) => {
+      .then(parseFlowPage).then((data) => {
         if (!controller.signal.aborted) {
-          setRows(result.data);
-          setConfigured(result.configured);
-          setError("");
+          setResult({ key: readKey, data });
+          setFailure(null);
         }
       })
       .catch((reason) => {
-        if (!controller.signal.aborted) setError(reason.message);
+        if (!controller.signal.aborted) setFailure({ key: readKey, message: reason instanceof Error ? reason.message : "Não foi possível consultar sugestões.", denied: reason instanceof ApiError && [401,403,404,409].includes(reason.status) });
       });
     return () => controller.abort();
-  }, [patientId, attempt]);
+  }, [patientId, page, readKey]);
   function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selected) return;
@@ -107,8 +108,11 @@ export function FlowReviews({
     }
   }
   return (
-    <section className="ui-card">
+    <section className="ui-card" aria-label="Relatos recebidos por Flow">
       <h2 className="font-semibold">Relatos recebidos por Flow</h2>
+      <button type="button" className={buttonClass + " mt-3"} onClick={() => setAttempt(value => value + 1)}>Atualizar sugestões</button>
+      {loading ? <p role="status" className="mt-3">Consultando sugestões…</p> : null}
+      {failure ? <Notice error>{failure.message}</Notice> : null}
       <p className="mt-2 text-sm text-(--muted)">
         {configured
           ? "Confira os dados recebidos no WhatsApp antes de registrá-los no aplicativo."
@@ -161,12 +165,13 @@ export function FlowReviews({
           </li>
         ))}
       </ul>
-      {!rows.length ? (
+      {!loading && !failure && !rows.length ? (
         <p className="mt-4 text-sm text-(--muted)">
           Nenhuma sugestão pendente de confirmação.
         </p>
       ) : null}
-      {selected ? (
+      {total > 20 && !denied ? <nav className="hca-toolbar" aria-label="Páginas das sugestões"><button type="button" className={buttonClass} disabled={loading || page === 1} onClick={() => setPage(value => value - 1)}>Página anterior de sugestões</button><span>Página {page} de {Math.ceil(total / 20)} · {total} sugestões</span><button type="button" className={buttonClass} disabled={loading || page * 20 >= total} onClick={() => setPage(value => value + 1)}>Próxima página de sugestões</button></nav> : null}
+      {selected && !denied ? (
         <form
           className="mt-5 space-y-4 border-t border-(--line) pt-4"
           key={selected.id}
@@ -236,7 +241,7 @@ export function FlowReviews({
         </form>
       ) : null}
       <Dialog
-        open={Boolean(review)}
+        open={Boolean(review) && !denied}
         title="Registrar dados conferidos do Flow"
         onClose={() => {
           if (!busy && !uncertain) setReview(null);

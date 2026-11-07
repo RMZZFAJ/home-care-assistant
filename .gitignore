@@ -21,6 +21,8 @@
 
 # production
 /build
+/.generated/
+/public/service-worker.js
 
 # misc
 .DS_Store

@@ -15,15 +15,23 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { Attachments } from "@/components/documents/attachments";
-import { Dialog, EmptyState, Icon } from "@/components/ui/primitives";
+import { EmptyState, Icon } from "@/components/ui/primitives";
 import { TransitStock, type TransitDocument } from "./transit-stock";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 
-import type { ProductStock, StockMetric, StockMovement as Movement } from "@/types/stock";
+import type {
+  ProductStock,
+  StockMetric,
+  StockMovement as Movement,
+} from "@/types/stock";
 import { StockOverview } from "./stock-overview";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Button } from "@fluentui/react-components";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import { MovementOrigin } from "./movement-origin";
+import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
+import {NotificationReference} from "@/components/notifications/notification-reference";
 
 const locationLabels: Record<string, string> = {
   FAMILY: "Família",
@@ -55,12 +63,6 @@ function PatientStock({
   context: WorkspaceContext;
   initialCustody: string;
 }) {
-  const [transit, setTransit] = useState<TransitDocument[]>([]);
-  const [metrics, setMetrics] = useState<StockMetric[]>([]);
-  const [products, setProducts] = useState<ProductStock[]>([]);
-  const [movements, setMovements] = useState<Movement[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -72,76 +74,63 @@ function PatientStock({
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({ productId: "", from: "", to: "" });
   const [operation, setOperation] = useState("inbound");
-  const [movementEditor, setMovementEditor] = useState<HTMLElement | null>(null);
+  const [movementEditor, setMovementEditor] = useState<HTMLElement | null>(
+    null,
+  );
   const [movementProductId, setMovementProductId] = useState("");
   const [referenceId, setReferenceId] = useState("");
   const [review, setReview] = useState<Record<string, unknown> | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [savedMovement, setSavedMovement] = useState<string | null>(null);
+  const [origin, setOrigin] = useState<{
+    id: string;
+    opener: HTMLElement;
+  } | null>(null);
+  const historyHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const reviewHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const reasonInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const focusAfterReviewRef = useRef(false);
+  useEffect(() => {
+    if (review) reviewHeadingRef.current?.focus();
+  }, [review]);
+  useEffect(() => {
+    if (!review && !busy && focusAfterReviewRef.current) {
+      focusAfterReviewRef.current = false;
+      reasonInputRef.current?.focus();
+    }
+  }, [review, busy]);
   const hasStock =
     can(context, "stock.family.read") || can(context, "stock.team.read");
   const frozenRef = useRef<Record<string, unknown> | null>(null);
-  useEffect(() => {
-    const controller = new AbortController();
-    const patient = context.patient!.id;
-    Promise.all([
-      api<{
-        overview: ProductStock[];
-        transit: TransitDocument[];
-        metrics: typeof metrics;
-      }>(
-        "/api/stock/balances?careRecipientId=" +
-          patient +
-          "&custody=" +
-          custody,
-        undefined,
-        controller.signal,
-      ),
-      hasStock
-        ? api<{ data: Movement[]; total: number }>(
-            "/api/stock/movements?" +
-              new URLSearchParams({
-                careRecipientId: patient,
-                page: String(page),
-                location: custody,
-                ...filters,
-              }),
-            undefined,
-            controller.signal,
-          )
-        : Promise.resolve({ data: [], total: 0 }),
-    ])
-      .then(([stock, history]) => {
-        if (!controller.signal.aborted) {
-          setProducts(stock.overview);
-          setTransit(stock.transit);
-          setMetrics(stock.metrics);
-          setMovements(history.data);
-          setTotal(history.total);
-          setError("");
-        }
-      })
-      .catch((reason) => {
-        if (!controller.signal.aborted)
-          setError(
-            reason instanceof Error
-              ? reason.message
-              : "Não foi possível consultar o estoque.",
-          );
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [
-    context.patient,
-    page,
-    custody,
-    filters,
-    attempt,
-    hasStock,
-    liveRevision,
-  ]);
+  const patient = context.patient!.id;
+  const params=useSearchParams(),notice=useNotificationReference(patient,"stock",params.get("ref"),params.get("refKind")??"auto");
+  const revision = `${attempt}:${liveRevision}`;
+  const stock = useScopedRead<{
+    overview: ProductStock[];
+    transit: TransitDocument[];
+    metrics: StockMetric[];
+  }>(
+    hasStock || (custody === "TRANSIT" && can(context, "ent.read"))
+      ? "/api/stock/balances?" +
+          new URLSearchParams({ careRecipientId: patient, custody })
+      : null,
+    revision,
+  );
+  const history = useScopedRead<{ data: Movement[]; total: number }>(
+    hasStock
+      ? "/api/stock/movements?" +
+          new URLSearchParams({
+            careRecipientId: patient,
+            page: String(page),
+            location: custody,
+            ...filters,
+          })
+      : null,
+    revision,
+  );
+  const products = stock.data?.overview ?? [];
+  const movements = history.data?.data ?? [];
+  const total = history.data?.total ?? 0;
   function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -183,6 +172,7 @@ function PatientStock({
       if (rejected) {
         frozenRef.current = null;
         setReview(null);
+        focusAfterReviewRef.current = true;
       }
       setUncertain(!rejected);
       setError(
@@ -203,23 +193,57 @@ function PatientStock({
   );
   return (
     <div className="space-y-5">
+      <NotificationReference key={patient+":"+notice.reference} read={notice} context={context} onStockFilter={(productId,location)=>{setCustody(location);setFilters(current=>({...current,productId}));setPage(1);historyHeadingRef.current?.focus();}}/>
+      {can(context, "ent.create") && hasStock ? (
+        <Link className={buttonClass} href="/transferencias">
+          Transferir materiais entre família e equipe
+        </Link>
+      ) : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      {loading ? <Notice>Consultando saldos e movimentações…</Notice> : null}
-      <section className="ui-card">
+      {origin ? (
+        <MovementOrigin
+          patientId={patient}
+          movementId={origin.id}
+          opener={origin.opener}
+          onClose={() => setOrigin(null)}
+          restoreFocusFallbackRef={historyHeadingRef}
+        />
+      ) : null}
+      <section
+        className="ui-card"
+        aria-labelledby="stock-balances-heading"
+        aria-busy={stock.loading}
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold">Saldos e previsões</h2>
+          <h2 id="stock-balances-heading" className="font-semibold">
+            Saldos e previsões
+          </h2>
           <button
             className={buttonClass}
-            disabled={loading}
+            aria-disabled={stock.loading}
             onClick={() => {
-              setLoading(true);
-              setAttempt((value) => value + 1);
+              if (!stock.loading) stock.refresh();
             }}
           >
-            Atualizar
+            Atualizar saldos
           </button>
         </div>
+        {stock.loading ? <Notice>Consultando saldos…</Notice> : null}
+        {stock.error ? <Notice error>{stock.error}</Notice> : null}
+        {stock.queriedAt ? (
+          <p className="mt-3 text-xs text-(--muted)">
+            {stock.loading || stock.error
+              ? "Última consulta válida"
+              : "Saldos consultados"}
+            : {formatBrazilDate(stock.queriedAt)}
+            {stock.loading || stock.error
+              ? ". Os valores podem estar desatualizados."
+              : "."}
+          </p>
+        ) : !stock.loading ? (
+          <Notice>Saldos ainda não consultados com sucesso.</Notice>
+        ) : null}
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="text-sm font-semibold">
             Buscar produto
@@ -235,7 +259,10 @@ function PatientStock({
               className={inputClass}
               aria-label="Custódia"
               value={custody}
-              onChange={(event) => setCustody(event.target.value)}
+              onChange={(event) => {
+                setCustody(event.target.value);
+                setPage(1);
+              }}
             >
               <option value="">Todas autorizadas</option>
               {hasFamily ? <option value="FAMILY">Família</option> : null}
@@ -251,21 +278,149 @@ function PatientStock({
           pendentes são previsões e dependem de recebimento válido. Somente a
           ENT aceita atende as linhas REQ.
         </p>
-        {custody === "TRANSIT" ? (
-          <TransitStock documents={transit} search={search} loading={loading} />
+        {custody === "TRANSIT" && stock.data ? (
+          <TransitStock
+            documents={stock.data.transit}
+            search={search}
+            loading={stock.loading}
+          />
         ) : null}
-        {custody !== "TRANSIT" ? <StockOverview products={visible} custody={custody} allowedCustodies={[...(hasFamily ? ["FAMILY"] : []), ...(hasTeam ? ["CARE_TEAM"] : [])]} metrics={metrics} /> : null}
-        {custody !== "TRANSIT" && !loading && !visible.length ? (
+        {custody !== "TRANSIT" && stock.data ? (
+          <StockOverview
+            products={visible}
+            custody={custody}
+            allowedCustodies={[
+              ...(hasFamily ? ["FAMILY"] : []),
+              ...(hasTeam ? ["CARE_TEAM"] : []),
+            ]}
+            metrics={stock.data.metrics}
+          />
+        ) : null}
+        {custody !== "TRANSIT" &&
+        stock.data &&
+        !stock.loading &&
+        !stock.error &&
+        !visible.length ? (
           <EmptyState title="Nenhum produto encontrado">
             Consulte o catálogo ou ajuste a busca.
           </EmptyState>
         ) : null}
       </section>
-      {custody !== "TRANSIT" && can(context, "stock.family.manage") ? <div className="hca-toolbar"><Button appearance="primary" icon={<Icon name="plus" />} onClick={(event) => { setOperation("inbound"); setMovementProductId(""); setReferenceId(""); setMovementEditor(event.currentTarget); }}>Movimentar estoque familiar</Button></div> : null}
-      {movementEditor && custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
-        <RecordDrawer title="Movimentar estoque familiar" busy={busy || uncertain} onClose={() => setMovementEditor(null)} restoreFocusTo={movementEditor}>
+      {custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
+        <div className="hca-toolbar">
+          <Button
+            appearance="primary"
+            icon={<Icon name="plus" />}
+            onClick={(event) => {
+              setOperation("inbound");
+              setMovementProductId("");
+              setReferenceId("");
+              setMovementEditor(event.currentTarget);
+            }}
+          >
+            Movimentar estoque familiar
+          </Button>
+        </div>
+      ) : null}
+      {movementEditor &&
+      custody !== "TRANSIT" &&
+      can(context, "stock.family.manage") ? (
+        <RecordDrawer
+          title={
+            review
+              ? "Confirmar movimentação familiar"
+              : "Movimentar estoque familiar"
+          }
+          busy={busy}
+          preventClose={uncertain}
+          onClose={() => {
+            setMovementEditor(null);
+            setReview(null);
+            frozenRef.current = null;
+          }}
+          restoreFocusTo={movementEditor}
+          restoreFocusFallbackRef={historyHeadingRef}
+        >
           {error ? <Notice error>{error}</Notice> : null}
-          <form className="mt-4 space-y-4" onSubmit={prepare}>
+          {review ? (
+            <section
+              aria-label="Revisão da movimentação familiar"
+              className="space-y-3"
+            >
+              <h3 ref={reviewHeadingRef} tabIndex={-1}>
+                Confira o movimento e sua referência
+              </h3>
+              <p>Produto: {name(String(review.productId))}</p>
+              <p>
+                Quantidade:{" "}
+                {formatQuantity(
+                  String(review.quantity ?? ""),
+                  products.find(
+                    (product) => product.productId === review.productId,
+                  )?.unit,
+                )}
+              </p>
+              <p>
+                Operação:{" "}
+                {review.action === "inbound"
+                  ? "Entrada avulsa"
+                  : review.action === "outbound"
+                    ? "Retirada"
+                    : review.action === "correction_in"
+                      ? "Correção compensatória de entrada"
+                      : "Correção compensatória de saída"}
+                .
+              </p>
+              {review.referenceId ? (
+                <details>
+                  <summary>Movimento histórico compensado</summary>
+                  <p className="break-all">{String(review.referenceId)}</p>
+                </details>
+              ) : null}
+              <p className="whitespace-pre-wrap">
+                Motivo: {String(review.reason ?? "")}
+              </p>
+              <p>
+                Apenas o saldo familiar deste material será atualizado. A
+                operação original permanecerá no histórico; não há transferência
+                nem consumo inferido.
+              </p>
+              {uncertain ? (
+                <Notice>
+                  Resultado ainda não confirmado. Os campos e a chave estão
+                  congelados até recuperar a mesma tentativa.
+                </Notice>
+              ) : null}
+              <div className="ui-form-actions">
+                <button
+                  className={buttonClass}
+                  disabled={busy || uncertain}
+                  onClick={() => {
+                    focusAfterReviewRef.current = true;
+                    setReview(null);
+                  }}
+                >
+                  Voltar
+                </button>
+                <button
+                  className={primaryClass}
+                  disabled={busy}
+                  onClick={() => void save()}
+                >
+                  {busy
+                    ? "Confirmando…"
+                    : uncertain
+                      ? "Recuperar tentativa"
+                      : "Confirmar"}
+                </button>
+              </div>
+            </section>
+          ) : null}
+          <form
+            hidden={Boolean(review)}
+            className={review ? "hidden" : "mt-4 space-y-4"}
+            onSubmit={prepare}
+          >
             <fieldset
               disabled={busy || uncertain}
               className="grid min-w-0 gap-4 sm:grid-cols-2"
@@ -276,7 +431,10 @@ function PatientStock({
                   aria-label="Operação"
                   className={inputClass}
                   value={operation}
-                  onChange={(event) => setOperation(event.target.value)}
+                  onChange={(event) => {
+                    setOperation(event.target.value);
+                    setReferenceId("");
+                  }}
                 >
                   <option value="inbound">Entrada avulsa</option>
                   <option value="outbound">Retirada</option>
@@ -296,18 +454,44 @@ function PatientStock({
                   name="productId"
                   required
                   value={movementProductId}
-                  onChange={(event) => { setMovementProductId(event.target.value); setReferenceId(""); }}
+                  onChange={(event) => {
+                    setMovementProductId(event.target.value);
+                    setReferenceId("");
+                  }}
                 >
                   <option value="">Selecione</option>
                   {products
-                    .filter((product) => product.active)
+                    .filter(
+                      (product) =>
+                        product.active ||
+                        (operation.startsWith("correction") &&
+                          Boolean(referenceId) &&
+                          product.productId === movementProductId),
+                    )
                     .map((product) => (
                       <option key={product.productId} value={product.productId}>
                         {product.name} · {product.unit}
+                        {product.active
+                          ? ""
+                          : " · Inativo, somente compensação referenciada"}
                       </option>
                     ))}
                 </select>
               </label>
+              {operation.startsWith("correction") &&
+              referenceId &&
+              products.some(
+                (product) =>
+                  product.productId === movementProductId && !product.active,
+              ) ? (
+                <div className="sm:col-span-2">
+                  <Notice>
+                    Material inativo. Esta ação compensa somente o movimento
+                    histórico indicado, preservando sua identidade e sua
+                    custódia. Não reativa o cadastro nem transfere o saldo.
+                  </Notice>
+                </div>
+              ) : null}
               <label className="text-sm font-semibold">
                 Quantidade
                 <input
@@ -329,13 +513,46 @@ function PatientStock({
                     name="referenceId"
                     required
                     value={referenceId}
-                    onChange={(event) => { setReferenceId(event.target.value); const original = movements.find((row) => row.id === event.target.value); if (original) setMovementProductId(original.product_id); }}
-                  ><option value="">Selecione uma movimentação do histórico</option>{movements.filter((row) => row.reference_type === "family_manual" && (!movementProductId || row.product_id === movementProductId) && (row.source_location === "FAMILY" || row.destination_location === "FAMILY")).map((row) => <option key={row.id} value={row.id}>{name(row.product_id)} · {formatBrazilDate(row.created_at)} · {formatQuantity(row.quantity)} · {row.source_location === "FAMILY" ? "Retirada" : "Entrada"}</option>)}</select>
+                    onChange={(event) => {
+                      setReferenceId(event.target.value);
+                      const original = movements.find(
+                        (row) => row.id === event.target.value,
+                      );
+                      if (original) setMovementProductId(original.product_id);
+                    }}
+                  >
+                    <option value="">
+                      Selecione uma movimentação do histórico
+                    </option>
+                    {movements
+                      .filter(
+                        (row) =>
+                          row.reference_type === "family_manual" &&
+                          (!movementProductId ||
+                            row.product_id === movementProductId) &&
+                          (operation === "correction_in"
+                            ? row.source_location === "FAMILY" &&
+                              !row.destination_location
+                            : row.destination_location === "FAMILY" &&
+                              !row.source_location),
+                      )
+                      .map((row) => (
+                        <option key={row.id} value={row.id}>
+                          {name(row.product_id)} ·{" "}
+                          {formatBrazilDate(row.created_at)} ·{" "}
+                          {formatQuantity(row.quantity)} ·{" "}
+                          {row.source_location === "FAMILY"
+                            ? "Retirada"
+                            : "Entrada"}
+                        </option>
+                      ))}
+                  </select>
                 </label>
               ) : null}
               <label className="text-sm font-semibold sm:col-span-2">
                 Motivo
                 <textarea
+                  ref={reasonInputRef}
                   className={inputClass}
                   name="reason"
                   minLength={3}
@@ -363,9 +580,29 @@ function PatientStock({
           writable
         />
       ) : null}
-      <section className="ui-card">
+      <section
+        className="ui-card"
+        aria-labelledby="stock-history-heading"
+        aria-busy={history.loading}
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold">Histórico auditável</h2>
+          <h2
+            id="stock-history-heading"
+            className="font-semibold"
+            ref={historyHeadingRef}
+            tabIndex={-1}
+          >
+            Histórico auditável
+          </h2>
+          <button
+            className={buttonClass}
+            aria-disabled={history.loading || !hasStock}
+            onClick={() => {
+              if (!history.loading && hasStock) history.refresh();
+            }}
+          >
+            Atualizar histórico
+          </button>
           <button
             className={buttonClass}
             aria-expanded={showFilters}
@@ -375,6 +612,25 @@ function PatientStock({
             Filtrar
           </button>
         </div>
+        {history.loading ? <Notice>Consultando movimentações…</Notice> : null}
+        {history.error ? <Notice error>{history.error}</Notice> : null}
+        {history.queriedAt ? (
+          <p className="mt-3 text-xs text-(--muted)">
+            {history.loading || history.error
+              ? "Última consulta válida"
+              : "Histórico consultado"}
+            : {formatBrazilDate(history.queriedAt)}
+            {history.loading || history.error
+              ? ". A lista pode estar desatualizada."
+              : "."}
+          </p>
+        ) : !history.loading ? (
+          <Notice>
+            {hasStock
+              ? "Histórico ainda não consultado com sucesso."
+              : "Histórico de movimentos indisponível nas suas permissões."}
+          </Notice>
+        ) : null}
         {showFilters ? (
           <form
             className="mt-4 grid gap-3 sm:grid-cols-3"
@@ -387,7 +643,6 @@ function PatientStock({
                 to: String(form.get("to")),
               });
               setPage(1);
-              setLoading(true);
             }}
           >
             <label className="text-sm">
@@ -449,6 +704,14 @@ function PatientStock({
               <p className="mt-2 text-xs text-(--muted)">
                 {formatBrazilDate(movement.created_at)}
               </p>
+              <Button
+                className="mt-2"
+                onClick={(event) =>
+                  setOrigin({ id: movement.id, opener: event.currentTarget })
+                }
+              >
+                Consultar origem
+              </Button>
               {movement.reference_type === "document" &&
               movement.reference_id ? (
                 <Link
@@ -458,17 +721,48 @@ function PatientStock({
                   Abrir ficha
                 </Link>
               ) : null}
+              {movement.reference_type === "delivery_regularization" &&
+              movement.reference_document_id ? (
+                <Link
+                  className="mt-2 inline-block underline"
+                  href={"/fichas/" + movement.reference_document_id}
+                >
+                  Abrir dossiê administrativo
+                </Link>
+              ) : null}
               <details className="mt-2">
                 <summary className="cursor-pointer text-xs">
                   Referência da movimentação
                 </summary>
                 <p className="break-all text-xs">{movement.id}</p>
               </details>
-              {can(context, "stock.family.manage") && movement.reference_type === "family_manual" && (movement.source_location === "FAMILY" || movement.destination_location === "FAMILY") ? <Button className="mt-3" onClick={(event) => { setOperation(movement.source_location === "FAMILY" ? "correction_in" : "correction_out"); setMovementProductId(movement.product_id); setReferenceId(movement.id); setMovementEditor(event.currentTarget); }}>Corrigir este movimento</Button> : null}
+              {can(context, "stock.family.manage") &&
+              movement.reference_type === "family_manual" &&
+              (movement.source_location === "FAMILY" ||
+                movement.destination_location === "FAMILY") ? (
+                <Button
+                  className="mt-3"
+                  onClick={(event) => {
+                    setOperation(
+                      movement.source_location === "FAMILY"
+                        ? "correction_in"
+                        : "correction_out",
+                    );
+                    setMovementProductId(movement.product_id);
+                    setReferenceId(movement.id);
+                    setMovementEditor(event.currentTarget);
+                  }}
+                >
+                  Corrigir este movimento
+                </Button>
+              ) : null}
             </li>
           ))}
         </ul>
-        {!loading && !movements.length ? (
+        {history.data &&
+        !history.loading &&
+        !history.error &&
+        !movements.length ? (
           <EmptyState title="Sem movimentações neste filtro" />
         ) : null}
         {total > 20 ? (
@@ -478,7 +772,7 @@ function PatientStock({
           >
             <button
               className={buttonClass}
-              disabled={page === 1 || loading}
+              disabled={page === 1 || history.loading}
               onClick={() => setPage((value) => value - 1)}
             >
               Anterior
@@ -488,7 +782,7 @@ function PatientStock({
             </span>
             <button
               className={buttonClass}
-              disabled={page * 20 >= total || loading}
+              disabled={page * 20 >= total || history.loading}
               onClick={() => setPage((value) => value + 1)}
             >
               Próxima
@@ -496,44 +790,6 @@ function PatientStock({
           </nav>
         ) : null}
       </section>
-      <Dialog
-        open={Boolean(review)}
-        title="Confirmar movimentação familiar"
-        onClose={() => {
-          if (!busy && !uncertain) setReview(null);
-        }}
-      >
-        <p className="text-sm">Produto: {name(String(review?.productId))}</p>
-        <p className="mt-2 text-sm">
-          Quantidade: {String(review?.quantity ?? "")}
-        </p>
-        <p className="mt-2 text-sm">Motivo: {String(review?.reason ?? "")}</p>
-        <p className="mt-3 text-xs text-(--muted)">
-          O saldo familiar será atualizado imediatamente. A operação original
-          permanecerá no histórico.
-        </p>
-        {error ? <Notice error>{error}</Notice> : null}
-        <div className="ui-form-actions">
-          <button
-            className={buttonClass}
-            disabled={busy || uncertain}
-            onClick={() => setReview(null)}
-          >
-            Voltar
-          </button>
-          <button
-            className={primaryClass}
-            disabled={busy}
-            onClick={() => void save()}
-          >
-            {busy
-              ? "Confirmando…"
-              : uncertain
-                ? "Recuperar tentativa"
-                : "Confirmar"}
-          </button>
-        </div>
-      </Dialog>
     </div>
   );
 }

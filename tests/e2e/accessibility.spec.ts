@@ -38,7 +38,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     ["/fichas/req", "Requisição de insumos"],
     ["/fichas/com", "Compra de insumos"],
     ["/fichas/ent", "Entrega / Entrada"],
-    ["/fichas/bal", "Balanço semanal"],
+    ["/fichas/bal", "Balanço de estoque"],
     ["/escalas", "Escalas e plantões"],
     ["/balancos", "Balanços e plantões"],
     ["/historico", "Histórico de fichas"],
@@ -80,14 +80,28 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(
     page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }),
   ).toBeVisible();
+  await expect(page.getByRole("dialog",{name:"Perfil e contexto",exact:true})).toBeVisible();
+  await expect(page.getByRole("menuitem",{name:"Meu perfil e segurança",exact:true})).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("menuitem",{name:"Mudar perfil",exact:true})).toBeFocused();
   await audit(page, "profile menu");
   await page.keyboard.press("Escape");
+  await expect(page.getByLabel("Menu do usuário",{exact:true})).toBeFocused();
+  await page.getByLabel("Menu do usuário",{exact:true}).click();
+  await page.getByRole("menuitem",{name:"Central de notificações",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Central de notificações",exact:true})).toBeVisible();
+  await expect(page.getByRole("dialog",{name:"Perfil e contexto",exact:true})).toHaveCount(0);
   await page
     .getByRole("combobox", { name: "Pessoa assistida", exact: true })
     .selectOption(patientB);
   await expect(
     page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
   ).toHaveValue(patientB);
+  await selectContext(page,patientA);
+  await expect(page.getByRole("dialog",{name:"Perfil e contexto",exact:true})).toHaveCount(0);
+  await expect(page.getByLabel("Menu do usuário",{exact:true})).toBeFocused();
+  await expect(page.getByRole("main")).toBeVisible();
+  await audit(page,"profile context return");
 });
 for (const role of [
   "adminA",

@@ -1,0 +1,142 @@
+{
+  "sourceBaseSha": "2865b45dcf693a2c20ba3869a052ef43fd6464db",
+  "sourceTreeDirty": true,
+  "files": [
+    {
+      "file": "scripts/start-e2e-server.mjs",
+      "sha256LfUtf8": "4ca9316f1809f9d666738f24179248f7cb5d25f875ba5b373c126b027442b4a5"
+    },
+    {
+      "file": "src/app/api/notifications/route.ts",
+      "sha256LfUtf8": "cbe0ba207cea6ecef6fce92d557d5a8cfd36cfbf309231fe2052a0fc1648e9fb"
+    },
+    {
+      "file": "src/app/design-system.css",
+      "sha256LfUtf8": "044a1c23d3c6cf0cd30e665f712868e2d4e51cfe88c1a3731b552d6d5db45fde"
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "sha256LfUtf8": "788099e7b7f04663da56345a214073a48ab43bf3cb3dd13ac10588d59a90ad75"
+    },
+    {
+      "file": "src/components/notifications/notification-bell.tsx",
+      "sha256LfUtf8": "d529411a3bcb923f7a5f15714ccaa2254067830db5587c2632193f1b92759b89"
+    },
+    {
+      "file": "src/components/notifications/notification-center.tsx",
+      "sha256LfUtf8": "880b153baf5ddfde04f8c2a403b24d0faa54549f25cc5f76b942fa9101db56a1"
+    },
+    {
+      "file": "src/components/profile-console.tsx",
+      "sha256LfUtf8": "f9021cf1180faef57880aa69aefbb01abe6212978488dbb2be9a5395ef359da3"
+    },
+    {
+      "file": "src/components/stock/consumption-console.tsx",
+      "sha256LfUtf8": "f6f5c919daf181c62510d34b9e1683a0663ac95248d945352179158cf23faf80"
+    },
+    {
+      "file": "src/lib/notifications/inbox.ts",
+      "sha256LfUtf8": "18a358961e25dea437234cfc1a3d24cad0028f581a73221d87239eed7559bfb7"
+    },
+    {
+      "file": "src/lib/notifications/use-inbox.ts",
+      "sha256LfUtf8": "3431733cf6eac9f1fc9d75c29c9cb5ab9df8c915e3a13f1e585f6ab0872faf59"
+    },
+    {
+      "file": "src/lib/validation/consumption.ts",
+      "sha256LfUtf8": "0b3f109e403d4cc84e2e41f8d9984f4d12047ade29a48ce09e001b35b5d69c2a"
+    },
+    {
+      "file": "src/lib/validation/profile.ts",
+      "sha256LfUtf8": "64365e1865d6383323c00d76bd86747e3d33aeeac0510ec5ee0ed6981d6d5dfa"
+    },
+    {
+      "file": "tests/e2e/keyboard-entry.ts",
+      "sha256LfUtf8": "52bcfc4eec415a0e7a1cb88374eec5fc7925ce17cc80043354b01e5fad438aab"
+    },
+    {
+      "file": "tests/e2e/notification-read-states.spec.ts",
+      "sha256LfUtf8": "1e1cde7bd5b5f9dce145cd649aec1408dc1df48b85cbd66d26cf2cf2b576d843"
+    },
+    {
+      "file": "tests/e2e/read-state-consumers.spec.ts",
+      "sha256LfUtf8": "752491b8d2f7c7f44c36ac6db17071a28c2ccf2700a346b54b5c701a4170f3b2"
+    },
+    {
+      "file": "tests/notification-inbox.test.ts",
+      "sha256LfUtf8": "595d524c24f858f871301697df9d8b84d3dccfb9b8fbd57b2b9f3b1369ffcd52"
+    },
+    {
+      "file": "tests/read-state-models.test.ts",
+      "sha256LfUtf8": "2b3a29d938711547211a204efb665ac522cd43697627427a8b642361493d33dd"
+    }
+  ],
+  "localMigrations": 127,
+  "remoteMigrations": 121,
+  "remoteDBApplied": false,
+  "unitCasesPassed": 23,
+  "browserDistinctCasesPassed": 24,
+  "browserFinalAffectedCasesPassed": 7,
+  "diagnosticModeCasesPassed": 1,
+  "diagnosticModeIsAcceptance": false,
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "basePublishedCI": {
+    "sha": "2865b45dcf693a2c20ba3869a052ef43fd6464db",
+    "run": 42333541085,
+    "database": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "browser": "IN_PROGRESS_AT_OBSERVATION",
+    "validatesDirtyUI": false
+  },
+  "logs": [
+    "output/phase-d-work/d3-read-states-unit.log",
+    "output/phase-d-work/d3-notification-states-first.log",
+    "output/phase-d-work/d3-notification-states-recheck.log",
+    "output/phase-d-work/d3-read-consumers-chromium.log",
+    "output/phase-d-work/d3-read-consumers-mobile-ios.log",
+    "output/phase-d-work/d3-notification-webkit-keyboard-recheck.log",
+    "output/phase-d-work/d3-notification-webkit-explicit-links.log",
+    "output/phase-d-work/d3-notification-webkit-focus-diagnostic.log",
+    "output/phase-d-work/d3-read-final-acceptance.log"
+  ],
+  "counterproofs": [
+    "Delayed GET and read failures do not present a confirmed empty inbox/profile/consumption list",
+    "Malformed200 does not manufacture an empty result; profile initial500 terminates loading and has a read retry",
+    "Profile draft survives same-identity reads and empty optional collections; no profile write was sent",
+    "Empty optional profile collections are a controlled HTTP response, not proof of a membership-less production account",
+    "Own selected database context controls notifications; anonymous401, mismatch409 and global context_required verified",
+    "Global mode with a remembered patient does not fetch a clinical inbox",
+    "Opening and reading the bell changes neither document events nor seen_at; views are independent of SCI",
+    "One reported shortage creates no consumption stock movement; existing recovery and101-record navigation still pass",
+    "Old popover obscured a background target; modal containment and all axe rules retained",
+    "WebKit native Tab initially cycled to close; Alt+Tab did not fix it. Explicit link tab stops fixed traversal; focusing the clicked trigger fixed Escape restoration",
+    "Diagnostic dev mode is local-only, keeps all stack/origin/sending guards, and does not replace production-build acceptance"
+  ],
+  "performanceProbe": {
+    "path": "output/phase-d-work/d3-notification-query-before.json",
+    "unscopedMs": [
+      973,
+      904
+    ],
+    "scopedMs": [
+      20,
+      11
+    ],
+    "timeoutReproduced": false,
+    "exactOldTimeoutCauseProven": false,
+    "productionSLAProven": false
+  },
+  "humanPhysicalApproval": false,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION"
+}

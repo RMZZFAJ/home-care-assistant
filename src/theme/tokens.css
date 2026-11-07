@@ -22,9 +22,11 @@
   --hca-bottom-navigation: 68px;
 }
 
-.hca-theme {
+.hca-theme:not([data-portal-node]) {
   min-height: 100dvh;
   background: var(--background);
+}
+.hca-theme {
   color: var(--foreground);
   font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
@@ -49,6 +51,7 @@
   font-size: 14px;
 }
 .hca-theme .ui-button { min-height: 36px; border-radius: 4px; padding: 7px 14px; font-weight: 600; }
+.hca-context-selection button { scroll-margin-block: calc(var(--app-header-height) + 16px) 16px; }
 /* Interpolating disabled gray and enabled blue creates unreadable mid-colors. */
 .hca-theme .fui-Button, .hca-record-drawer .fui-Button, .hca-dialog-surface .fui-Button { transition-property: box-shadow, transform; }
 .hca-theme .ui-notice { border-radius: 6px; }
@@ -63,6 +66,7 @@
 .hca-theme .workspace-navigation a[aria-current=page] { background: var(--brand-soft); color: var(--brand-dark); }
 .hca-dialog-surface { max-width: min(640px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; }
 .hca-dialog-content { overflow-wrap: anywhere; }
+.hca-schedule-decision-actions { position: sticky; bottom: 0; z-index: 1; background: var(--surface, #fff); padding: 12px 0; margin-bottom: 0; border-top: 1px solid var(--border, #e0e0e0); }
 .hca-theme .fui-MessageBarBody, .hca-record-drawer .fui-MessageBarBody, .hca-dialog-surface .fui-MessageBarBody { min-width: 0; overflow-wrap: anywhere; }
 .hca-theme .wizard-navigation { margin-bottom: 20px; }
 .hca-theme .wizard-steps { padding-bottom: 6px; }
@@ -82,6 +86,9 @@
 .hca-record-main strong { display: block; font-size: 14px; font-weight: 600; }
 .hca-record-main small { display: block; margin-top: 4px; color: var(--muted); }
 .hca-record-actions { display: flex; align-items: center; gap: 8px; }
+.hca-recount-recovery-row { flex-wrap: wrap; align-items: flex-start; }
+.hca-recount-recovery-row > .hca-record-main { flex: 1 1 12rem; }
+.hca-recount-recovery-row > .hca-toolbar { max-width: 100%; margin: 0; }
 .hca-compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
 .hca-table-container { overflow: auto; max-width: 100%; }
 .hca-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
@@ -171,7 +178,7 @@
 .hca-settings-content { padding-top: 16px; }
 .hca-settings-content[hidden] { display: none; }
 .hca-profile-trigger, .hca-navigation-toggle, .hca-navigation-drawer button { min-height: 44px; min-width: 44px; }
-.fui-MenuPopover.hca-context-menu { max-height: calc(100dvh - 100px); width: min(340px, calc(100vw - 32px)); max-width: calc(100vw - 32px); overflow-y: auto; overscroll-behavior: contain; }
+.hca-context-menu { max-height: calc(100dvh - 100px); width: min(340px, calc(100vw - 32px)); max-width: calc(100vw - 32px); overflow-y: auto; overscroll-behavior: contain; }
 .hca-context-menu .fui-MenuItem { min-height: 44px; white-space: normal; overflow-wrap: anywhere; }
 .hca-dashboard { display: flex; flex-direction: column; gap: 20px; }
 .hca-dashboard-intro { display: flex; align-items: center; justify-content: space-between; gap: 16px; }

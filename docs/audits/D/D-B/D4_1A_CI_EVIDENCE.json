@@ -1,0 +1,164 @@
+{
+  "sourceBaseSha": "764755813e8fc3e67e9dc152f6a4012472e49866",
+  "failedCiSha": "3c61697475308145c92300827c45caa0c6272842",
+  "failedCiRun": 42360570173,
+  "baseCi": {
+    "database": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "browserChromium": "FAILURE profile menu;selected-date case flaky",
+    "browserMobile": "FAILURE profile menu",
+    "browserIos": "CANCELLED fail-fast"
+  },
+  "first21CaseSources": [
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "sha256LfUtf8": "e29269d226a78ac13d3da0ccb93132023b92b382f9c33e71596f9a3746fa3e80"
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "sha256LfUtf8": "7330da4b5e72bdf13e63da7371339eccbc2fa8f091b75b03c9420221730fd3f4"
+    },
+    {
+      "file": "src/theme/tokens.css",
+      "sha256LfUtf8": "3455cda87fa4a14ee7221990b768d2b8eefc96ddc49ca865ab6a3236ed47ab10"
+    },
+    {
+      "file": "tests/e2e/accessibility.spec.ts",
+      "sha256LfUtf8": "1a2546a7274869f88006a607e89c9b60c17a7afb97490e9f681c76e8d0dea041"
+    },
+    {
+      "file": "tests/e2e/selected-dates-new-window.spec.ts",
+      "sha256LfUtf8": "7e6ee104fa3d3dce671136dcbc22f3e876522a0ecf8d72cf4bbbc2f7749520ae"
+    }
+  ],
+  "finalFocus3CaseSources": [
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "sha256LfUtf8": "fb47bc799af44ac51ca5987a8e3dac132e8e82841c95d1434ee89b38a826295d"
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "sha256LfUtf8": "7330da4b5e72bdf13e63da7371339eccbc2fa8f091b75b03c9420221730fd3f4"
+    },
+    {
+      "file": "src/theme/tokens.css",
+      "sha256LfUtf8": "3455cda87fa4a14ee7221990b768d2b8eefc96ddc49ca865ab6a3236ed47ab10"
+    },
+    {
+      "file": "tests/e2e/accessibility.spec.ts",
+      "sha256LfUtf8": "a53948d78a5f4b1ed390040d7f14e3eac0cd4e600acb7715a56b49f2eb6603c5"
+    },
+    {
+      "file": "tests/e2e/selected-dates-new-window.spec.ts",
+      "sha256LfUtf8": "7e6ee104fa3d3dce671136dcbc22f3e876522a0ecf8d72cf4bbbc2f7749520ae"
+    }
+  ],
+  "firstProduction": {
+    "passed": 21,
+    "failed": 3,
+    "failure": "Post-selection trigger focus absent; menu/keyboard/axe before selection passed"
+  },
+  "finalProductionRecheck": {
+    "passed": 3,
+    "failed": 0,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "covered": "Full login/navigation16routes/wizards/profile menu arrows/Escape/central destination/real profile choice/focus return/main accessibility/axe"
+  },
+  "productionNominalCasesDistinctPassedBetweenCompatibleCohorts": 24,
+  "cohortReuseBoundary": "Final change adds explicit post-selection focus restoration only; role/capability/guide/schedule contracts and assertions of the other21 cases unchanged. This is not a24/24 same-source full rerun.",
+  "sixAuthProfiles": "global in primary navigation case;adminA/family/supervisor/professional/reader in capability cases",
+  "fourViewports": "Controlled selected-date exception/cut case retains320/390/768/1440 and original12-shift oracle",
+  "diagnostic": "Initial1/2 passed reproducing CI profile aria-hidden-focus/partially obscured target; modal composition recheck2/2 passed",
+  "corrections": [
+    "Modal Fluent Popover with MenuList; no manual tabster sentinel patch or axe exclusion",
+    "Async context choice restores trigger focus after the button is enabled; main remains accessible",
+    "Central notification menu item describes its real destination",
+    "Controlled disclosure remains open across a real live schedules refresh; mutations still hidden until read settles"
+  ],
+  "types": "PASS",
+  "changedSourceLint": "PASS",
+  "newMigrations": 0,
+  "localMigrations": 136,
+  "lastReconciledRemoteMigrations": 121,
+  "cryptoCoreChanged": false,
+  "remoteApplied": false,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "humanPhysicalProviderApproval": false,
+  "candidateCI": "Required for the published SHA; no approval inferred",
+  "remaining": [
+    "Application D4 issuance/custody/content oracle/history/public verification",
+    "Other D3;D5;backup automation/monitoring;final remote reconciliation;D-C/D6 gates"
+  ],
+  "logs": [
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-diagnostic-recheck.log",
+      "sha256": "e4eb1e4425c4e0af4f9e853e73ef1cda440fc4712baca99cd47d64ebc1ef0706"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-diagnostic.log",
+      "sha256": "b704ec4b4327dc07b24cc8153e0622b3fb8f768d31b49137300d5c2cdddbdc3f"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-final-status-warnings.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-focus-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-focus-list.log",
+      "sha256": "14955a25d97fdfc024b06232f8ace4b38604a1b241cdc0376ff4b3332357ece5"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-focus-production.log",
+      "sha256": "691f7ede4596f4b11a3695d10cfa981d7f3c4c449da965a3698413a9eb3672ad"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-focus-types.log",
+      "sha256": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-production-list.log",
+      "sha256": "d1a5a1d3c38d32d3f84350d1c988ff8e27ce13aea928288810f1f7b42bca6bd9"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-production.log",
+      "sha256": "6b89aa1435937d57081d10d328aae6f35b5fbbed09d490d48a6e9bfc3e4a9728"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-status-warnings.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d4-ci-overlay-types.log",
+      "sha256": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-ci-chromium.log",
+      "sha256": "2e3172394af6ef620cd1ceca096b5a4718654e6db99b9fd6bebe44d052b568bb"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-ci-mobile.log",
+      "sha256": "b23553f5a2afb301d50165a286d4c2a84fe4d305936bceb877b0fa446c6afda6"
+    }
+  ],
+  "documentationValidation": {
+    "canonicalRows": 105,
+    "canonicalColumnsUnchanged": 29,
+    "localLinksChecked": 32,
+    "localLinks": "PASS",
+    "markdownFiles": 2,
+    "markdownIssues": 0,
+    "historicalMigrationsUnchanged": 84
+  }
+}

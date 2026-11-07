@@ -1,87 +1,40 @@
 "use client";
-import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api, buttonClass, Notice, Workspace } from "../workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryLabels } from "@/lib/notifications/presentation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { Badge, Checkbox } from "@fluentui/react-components";
-import {
-  notificationHref,
-  type NotificationTarget,
-} from "@/lib/notifications/navigation";
-type Notification = NotificationTarget & {
-  id: string;
-  seen_at: string | null;
-  state: string;
-  channel: string;
-  created_at: string;
-  document_id: string | null;
-  requisition_id: string | null;
-  operational_documents: { code: string; type: string } | null;
-  document_events: { action: string } | null;
-};
+import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
+import { useInbox } from "@/lib/notifications/use-inbox";
 export function NotificationCenter() {
   return (
     <Workspace title="Central de notificações">
       {(context) => (
         <Center
-          key={context.patient?.id ?? "all"}
-          patientId={context.patient?.id}
+          key={`${context.activeContext?.mode}:${context.patient?.id ?? "none"}`}
+          patientId={context.activeContext?.mode === "patient" ? context.patient?.id : undefined}
         />
       )}
     </Workspace>
   );
 }
 function Center({ patientId }: { patientId?: string }) {
-  const [rows, setRows] = useState<Notification[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [attempt, setAttempt] = useState(0);
-  const liveRevision = useLiveRevision();
+  const [writeError, setWriteError] = useState("");
   const [unread, setUnread] = useState(false);
-  useEffect(() => {
-    const controller = new AbortController();
-    api<{ data: Notification[]; total: number }>(
-      "/api/notifications?" +
-        new URLSearchParams({
-          ...(patientId ? { careRecipientId: patientId } : {}),
-          page: String(page),
-          pageSize: "20",
-          unread: String(unread),
-        }),
-      undefined,
-      controller.signal,
-    )
-      .then((result) => {
-        if (!controller.signal.aborted) {
-          setRows(result.data);
-          setTotal(result.total);
-          setError("");
-        }
-      })
-      .catch((reason) => {
-        if (!controller.signal.aborted) setError(reason.message);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [patientId, page, unread, attempt, liveRevision]);
+  const inbox = useInbox({ patientId, page, unread });
+  const rows = inbox.data?.data ?? [], total = inbox.data?.total ?? 0;
   return (
-    <section className="ui-card">
+    <section className="ui-card" aria-label="Acompanhamento pessoal">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold">Acompanhamento pessoal</h2>
         <button
           className={buttonClass}
-          disabled={loading}
-          onClick={() => {
-            setLoading(true);
-            setAttempt((value) => value + 1);
-          }}
+          type="button"
+          disabled={inbox.loading || inbox.scopeRequired}
+          onClick={inbox.refresh}
         >
           Atualizar
         </button>
@@ -92,15 +45,17 @@ function Center({ patientId }: { patientId?: string }) {
           onChange={(_, value) => {
             setUnread(value.checked === true);
             setPage(1);
-            setLoading(true);
           }}
         /></div>
-      {error ? <Notice error>{error}</Notice> : null}
-      {loading ? (
+      {inbox.scopeRequired ? <Notice>Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.</Notice> : null}
+      {inbox.error ? <Notice error>{inbox.error} <button type="button" className={buttonClass} onClick={inbox.refresh}>Consultar notificações novamente</button></Notice> : null}
+      {writeError ? <Notice error>{writeError}</Notice> : null}
+      {inbox.loading ? (
         <p className="my-3 text-sm" role="status">
           Consultando notificações…
         </p>
       ) : null}
+      {rows.length > 0 && !inbox.fresh ? <p className="my-3 text-sm text-(--muted)">Última consulta confirmada; aguardando atualização.</p> : null}
       <ul className="hca-notification-list">
         {rows.map((row) => (
           <li
@@ -112,10 +67,10 @@ function Center({ patientId }: { patientId?: string }) {
                 : "hca-notification-unread")
             }
           >
-            <p className="text-sm font-semibold">
+            <div className="text-sm font-semibold">
               <span>{row.operational_documents?.code ?? "Atualização operacional"}</span>
               {!row.seen_at ? <Badge className="ml-3" appearance="tint" color="informative">Não vista</Badge> : null}
-            </p>
+            </div>
             <p className="mt-1 text-sm">
               {documentEventLabel(row.event_key ?? row.document_events?.action)}
             </p>
@@ -134,21 +89,23 @@ function Center({ patientId }: { patientId?: string }) {
               row.consumption_report_id ||
               row.alert_event_id ? (
                 <Link className={buttonClass} href={notificationHref(row)}>
-                  Abrir documento
+                  {notificationTargetLabel(row)}
                 </Link>
               ) : null}
               {!row.seen_at ? (
                 <button
                   className={buttonClass}
+                  type="button"
                   onClick={async () => {
+                    setWriteError("");
                     try {
                       await api("/api/notifications", { id: row.id });
-                      setAttempt((value) => value + 1);
+                      inbox.refresh();
                     } catch (reason) {
-                      setError(
+                      setWriteError(
                         reason instanceof Error
                           ? reason.message
-                          : "Não foi possível marcar.",
+                          : "Não foi possível confirmar a marcação como vista. Consulte novamente para conferir.",
                       );
                     }
                   }}
@@ -164,7 +121,7 @@ function Center({ patientId }: { patientId?: string }) {
           </li>
         ))}
       </ul>
-      {!loading && !rows.length ? (
+      {inbox.fresh && !rows.length ? (
         <p className="my-4 text-sm text-(--muted)">
           Nenhuma notificação neste filtro.
         </p>
@@ -176,10 +133,10 @@ function Center({ patientId }: { patientId?: string }) {
         >
           <button
             className={buttonClass}
-            disabled={page === 1 || loading}
+            type="button"
+            disabled={page === 1 || inbox.loading}
             onClick={() => {
               setPage((value) => value - 1);
-              setLoading(true);
             }}
           >
             Anterior
@@ -189,10 +146,10 @@ function Center({ patientId }: { patientId?: string }) {
           </span>
           <button
             className={buttonClass}
-            disabled={page * 20 >= total || loading}
+            type="button"
+            disabled={page * 20 >= total || inbox.loading}
             onClick={() => {
               setPage((value) => value + 1);
-              setLoading(true);
             }}
           >
             Próxima
@@ -201,7 +158,7 @@ function Center({ patientId }: { patientId?: string }) {
       ) : null}
       <p className="mt-4 text-xs leading-5 text-(--muted)">
         Vista no aplicativo é independente da entrega ou leitura confirmada pelo
-        provedor externo.
+        provedor externo e não registra ciência ou aceite do documento.
       </p>
     </section>
   );

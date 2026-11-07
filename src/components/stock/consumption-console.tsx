@@ -1,37 +1,34 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@fluentui/react-components";
 import {
   api,
   ApiError,
-  buttonClass,
   can,
   inputClass,
   Notice,
-  primaryClass,
   Workspace,
   type WorkspaceContext,
-} from "../workspace";
+} from "@/components/workspace";
+import { useLiveRevision } from "@/lib/use-live-revision";
 import { formatBrazilDate } from "@/lib/receipt";
-import { FlowReviews } from "./flow-reviews";
-import { Button } from "@fluentui/react-components";
-import { RecordDrawer } from "@/components/forms/record-drawer";
-import { Dialog, Icon } from "@/components/ui/primitives";
 import type { CatalogProduct } from "@/types/documents";
-type Report = {
-  id: string;
-  kind: string;
-  location: string;
-  status: string;
-  body: string;
-  created_at: string;
-  lines: { productId: string; quantity: string }[];
-};
+import type { ConsumptionSummary } from "@/types/consumption";
+import { ConsumptionEditor } from "./consumption-editor";
+import { ConsumptionDetail } from "./consumption-detail";
+import { FlowReviews } from "./flow-reviews";
+import { parseConsumptionPage } from "@/lib/validation/consumption";
+import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
+import {NotificationReference,type ReminderOrigin} from "@/components/notifications/notification-reference";
+
+type Cursor = { at: string; id: string };
 export function ConsumptionConsole() {
   return (
     <Workspace title="Faltas e consumo extraordinário">
       {(context) =>
         context.patient ? (
-          <Reports context={context} />
+          <Reports key={context.patient.id} context={context} />
         ) : (
           <Notice>Selecione um paciente.</Notice>
         )
@@ -40,259 +37,336 @@ export function ConsumptionConsole() {
   );
 }
 function Reports({ context }: { context: WorkspaceContext }) {
-  const [editor, setEditor] = useState<HTMLElement | null>(null);
-  const [review, setReview] = useState<{ row: Report; accept: boolean } | null>(null);
-  const [rows, setRows] = useState<Report[]>([]);
-  const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [lines, setLines] = useState<Record<string, string>>({});
-  const [attempt, setAttempt] = useState(0);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [uncertain, setUncertain] = useState(false);
-  const pendingRef = useRef<unknown>(null);
+  const params = useSearchParams(),
+    router = useRouter(),
+    live = useLiveRevision(),
+    patient = context.patient!.id;
+  const selected = params.get("ref"),
+    [query, setQuery] = useState(() =>
+      new URLSearchParams(
+        [...params].filter(([key]) =>
+          ["q", "kind", "status", "from", "to","sourceReminder"].includes(key),
+        ),
+      ).toString(),
+    );
+  const explicitReport=params.get("refKind")==="report",notice=useNotificationReference(patient,"consumption",explicitReport?null:selected??params.get("sourceReminder"),params.get("refKind")??"auto");
+  const [read, setRead] = useState<{ query: string; key: string; rows: ConsumptionSummary[] | null; next: Cursor | null; error: string } | null>(null);
+  const [attempt, setAttempt] = useState(0),
+    [moreBusy, setMoreBusy] = useState(false);
+  const readKey = JSON.stringify([patient, query, live, attempt]), current = read?.query === query ? read : null;
+  const rows = current?.rows ?? null, next = current?.next ?? null, error = current?.error ?? "", reading = current?.key !== readKey;
+  const [products, setProducts] = useState<CatalogProduct[]>([]),
+    [catalogError, setCatalogError] = useState(""),
+    [catalogLoading, setCatalogLoading] = useState(true),
+    [catalogAttempt, setCatalogAttempt] = useState(0);
+  const [editor, setEditor] = useState<HTMLElement | null>(null),
+    [message, setMessage] = useState(""),
+    [referenceError, setReferenceError] = useState("");
+  const [editorOrigin,setEditorOrigin]=useState<ReminderOrigin|null>(null);
+  const listHeadingRef = useRef<HTMLHeadingElement>(null),
+    triggerRef = useRef<HTMLElement | null>(null),
+    generationRef = useRef(0);
   useEffect(() => {
     const controller = new AbortController();
-    Promise.all([
-      api<{ data: Report[] }>(
-        "/api/consumption?careRecipientId=" + context.patient!.id,
-        undefined,
-        controller.signal,
-      ),
-      api<{ data: CatalogProduct[] }>(
-        "/api/catalog?careRecipientId=" + context.patient!.id,
-        undefined,
-        controller.signal,
-      ),
-    ])
-      .then(([r, p]) => {
-        setRows(r.data);
-        setProducts(p.data);
+    generationRef.current++;
+    api<unknown>(
+      `/api/consumption?careRecipientId=${patient}&${query}`,
+      undefined,
+      controller.signal,
+    )
+      .then(value => parseConsumptionPage(value, patient)).then((result) => {
+        if (!controller.signal.aborted) {
+          setRead({ query, key: readKey, rows: result.data, next: result.next, error: "" });
+        }
       })
       .catch((reason) => {
-        if (!controller.signal.aborted) setError(reason.message);
+        if (!controller.signal.aborted) {
+          const unavailable = reason instanceof ApiError && [401, 403, 404, 409].includes(reason.status);
+          setRead(previous => ({ query, key: readKey, rows: !unavailable && previous?.query === query ? previous.rows : null, next: !unavailable && previous?.query === query ? previous.next : null, error: reason instanceof Error ? reason.message : "Não foi possível consultar os relatos." }));
+        }
       });
     return () => controller.abort();
-  }, [context.patient, attempt]);
-  async function send(payload: unknown) {
-    setBusy(true);
-    setError("");
-    if (!pendingRef.current) pendingRef.current = payload;
+  }, [patient, query, readKey]);
+  useEffect(() => {
+    const controller = new AbortController();
+    api<{ data: CatalogProduct[] }>(
+      `/api/catalog?careRecipientId=${patient}&includeInactive=true`,
+      undefined,
+      controller.signal,
+    )
+      .then((result) => {
+        if (!controller.signal.aborted) {
+          setProducts(result.data);
+          setCatalogError("");
+          setCatalogLoading(false);
+        }
+      })
+      .catch((reason) => {
+        if (!controller.signal.aborted) {
+          setCatalogError(reason.message);
+          setCatalogLoading(false);
+        }
+      });
+    return () => controller.abort();
+  }, [patient, catalogAttempt]);
+  function open(id: string | null) {
+    const values = new URLSearchParams(query);
+    values.set("careRecipientId",patient);
+    if (id){values.set("ref", id);values.set("refKind","report");}
+    router.replace("/consumo" + (values.size ? "?" + values : ""), {
+      scroll: false,
+    });
+  }
+  function filter(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const values = new URLSearchParams();
+    values.set("careRecipientId",patient);
+    const source=new URLSearchParams(query).get("sourceReminder");if(source)values.set("sourceReminder",source);
+    for (const [key, value] of new FormData(event.currentTarget))
+      if (typeof value === "string" && value.trim())
+        values.set(key, value.trim());
+    const applied=new URLSearchParams(values);applied.delete("careRecipientId");setQuery(applied.toString());
+    if (selected){values.set("ref", selected);if(params.get("refKind"))values.set("refKind",params.get("refKind")!);}
+    router.replace("/consumo" + (values.size ? "?" + values : ""), {
+      scroll: false,
+    });
+  }
+  async function loadMore() {
+    if (!next) return;
+    setMoreBusy(true);
+    const snapshot = generationRef.current;
     try {
-      await api("/api/consumption", pendingRef.current);
-      pendingRef.current = null;
-      setUncertain(false);
-      setEditor(null);
-      setLines({});
-      setMessage(
-        "Operação confirmada. Relatos só alteram o estoque após confirmação autorizada.",
+      const response = await api<unknown>(
+        `/api/consumption?careRecipientId=${patient}&${query}&` +
+          new URLSearchParams({ beforeAt: next.at, beforeId: next.id }),
       );
-      setAttempt((value) => value + 1);
-      return true;
+      const result = parseConsumptionPage(response, patient);
+      if (snapshot === generationRef.current) {
+        setRead(previous => previous?.query === query ? { ...previous, rows: [...new Map([...(previous.rows ?? []), ...result.data].map(row => [row.id, row])).values()], next: result.next, error: "" } : previous);
+      }
     } catch (reason) {
-      if (
-        reason instanceof ApiError &&
-        [400, 403, 404, 409].includes(reason.status)
-      )
-        pendingRef.current = null;
-      setUncertain(Boolean(pendingRef.current));
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Não foi possível confirmar.",
-      );
-      return false;
+      if (snapshot === generationRef.current)
+        setRead(previous => previous?.query === query ? { ...previous, error: reason instanceof Error ? reason.message : "Não foi possível carregar outra página." } : previous);
     } finally {
-      setBusy(false);
+      setMoreBusy(false);
     }
   }
+  const catalogRetry = () => {
+    setCatalogLoading(true);
+    setCatalogAttempt((value) => value + 1);
+  };
   return (
     <div className="space-y-5">
-      {error ? <Notice error>{error}</Notice> : null}
+      <NotificationReference key={patient+":"+notice.reference} read={notice} context={context} onReport={(origin,opener)=>{setEditorOrigin(origin);setEditor(opener);}}/>
       {message ? <Notice>{message}</Notice> : null}
-      {can(context, "consumption.report") ? <div className="hca-toolbar"><Button appearance="primary" icon={<Icon name="plus" />} onClick={(event) => setEditor(event.currentTarget)}>Registrar ocorrência</Button></div> : null}
-      {can(context, "consumption.report") && editor ? (
-        <RecordDrawer title="Registrar relato" onClose={() => setEditor(null)} restoreFocusTo={editor} busy={busy} preventClose={uncertain}>
-          {error ? <Notice error>{error}</Notice> : null}
-          {uncertain ? <Notice>O envio está preservado. Recupere a mesma tentativa para confirmar o resultado.</Notice> : null}
-          <p className="mt-2 text-sm text-(--muted)">
-            Relate apenas produtos sob responsabilidade familiar. Quantidades
-            serão conferidas antes de movimentar o estoque.
-          </p>
-          <form
-            className="mt-4 space-y-4"
-            onSubmit={(event) => {
-              event.preventDefault();
-              const form = new FormData(event.currentTarget);
-              void send({
-                action: "report",
-                careRecipientId: context.patient!.id,
-                kind: form.get("kind"),
-                location: form.get("location"),
-                text: form.get("text"),
-                lines: Object.entries(lines).map(([productId, quantity]) => ({
-                  productId,
-                  quantity,
-                })),
-                idempotencyKey: crypto.randomUUID(),
-              });
-            }}
+      <div className="hca-toolbar">
+        {can(context, "consumption.report") ? (
+          <Button
+            appearance="primary"
+            onClick={(event) => {setEditorOrigin(null);setEditor(event.currentTarget);}}
           >
-            <fieldset
-              disabled={busy || uncertain}
-              className="min-w-0 space-y-4"
+            Registrar ocorrência
+          </Button>
+        ) : null}
+        <Button onClick={() => setAttempt((value) => value + 1)}>
+          Atualizar lista
+        </Button>
+      </div>
+      <section className="ui-card" aria-label="Relatos registrados">
+        <h2 className="font-semibold" tabIndex={-1} ref={listHeadingRef}>
+          Relatos registrados
+        </h2>
+        <form className="my-4 grid gap-3 sm:grid-cols-2" onSubmit={filter}>
+          <label className="block text-sm">
+            Buscar no relato original
+            <input
+              className={inputClass}
+              name="q"
+              maxLength={120}
+              defaultValue={params.get("q") ?? ""}
+            />
+          </label>
+          <label className="block text-sm">
+            Tipo
+            <select
+              className={inputClass}
+              name="kind"
+              defaultValue={params.get("kind") ?? ""}
             >
-              <label className="block text-sm font-semibold">
-                Tipo
-                <select name="kind" className={inputClass}>
-                  <option value="consumption">Consumo extraordinário</option>
-                  <option value="shortage">Falta de material</option>
-                </select>
-              </label>
-              <label className="block text-sm font-semibold">
-                Custódia
-                <select name="location" className={inputClass}>
-                  <option value="CARE_TEAM">Equipe</option>
-                  {can(context, "stock.family.read") ? (
-                    <option value="FAMILY">Família</option>
-                  ) : null}
-                </select>
-              </label>
-              <label className="block text-sm font-semibold">
-                O que aconteceu?
-                <textarea
-                  name="text"
-                  className={inputClass}
-                  minLength={3}
-                  maxLength={2000}
-                  rows={3}
-                  required
-                />
-              </label>
-              <details>
-                <summary className="min-h-11 cursor-pointer text-sm font-semibold">
-                  Produtos e quantidades confirmáveis
-                </summary>
-                <div className="space-y-3">
-                  {products.map((product) => (
-                    <div
-                      key={product.id}
-                      className="rounded border border-(--line) p-3"
-                    >
-                      <label className="flex min-h-11 items-center gap-3 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={Object.hasOwn(lines, product.id)}
-                          onChange={(event) =>
-                            setLines((current) => {
-                              const next = { ...current };
-                              if (event.target.checked) next[product.id] = "";
-                              else delete next[product.id];
-                              return next;
-                            })
-                          }
-                        />
-                        {product.name}
-                      </label>
-                      {Object.hasOwn(lines, product.id) ? (
-                        <label className="block text-sm">
-                          Quantidade · {product.unit}
-                          <input
-                            className={inputClass}
-                            type="number"
-                            inputMode="decimal"
-                            min="0.000001"
-                            step="any"
-                            value={lines[product.id]}
-                            onChange={(event) =>
-                              setLines({
-                                ...lines,
-                                [product.id]: event.target.value,
-                              })
-                            }
-                            required
-                          />
-                        </label>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              </details>
-            </fieldset>
-            <button className={primaryClass} disabled={busy}>
-              {uncertain ? "Recuperar relato" : "Registrar para conferência"}
-            </button>
-          </form>
-        </RecordDrawer>
-      ) : null}
-      {can(context, "consumption.report") ? (
-        <FlowReviews
-          patientId={context.patient!.id}
-          products={products}
-          onChange={() => setAttempt((value) => value + 1)}
-        />
-      ) : null}
-      <section className="ui-card">
-        <h2 className="font-semibold">Relatos registrados</h2>
-        <ul className="mt-4 space-y-3">
-          {rows.map((row) => (
-            <li key={row.id} className="rounded border border-(--line) p-4">
-              <p className="text-sm font-semibold">
+              <option value="">Todos</option>
+              <option value="consumption">Consumo</option>
+              <option value="shortage">Falta</option>
+            </select>
+          </label>
+          <label className="block text-sm">
+            Estado
+            <select
+              className={inputClass}
+              name="status"
+              defaultValue={params.get("status") ?? ""}
+            >
+              <option value="">Todos</option>
+              <option value="reported">Aguardando conferência</option>
+              <option value="confirmed">Confirmado</option>
+              <option value="rejected">Rejeitado</option>
+            </select>
+          </label>
+          <label className="block text-sm">
+            Desde
+            <input
+              className={inputClass}
+              name="from"
+              type="date"
+              defaultValue={params.get("from") ?? ""}
+            />
+          </label>
+          <label className="block text-sm">
+            Até
+            <input
+              className={inputClass}
+              name="to"
+              type="date"
+              defaultValue={params.get("to") ?? ""}
+            />
+          </label>
+          <Button type="submit">Aplicar filtros</Button>
+        </form>
+        <form
+          className="my-4 space-y-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const id = String(
+              new FormData(event.currentTarget).get("reference") ?? "",
+            ).trim();
+            if (!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id)) {
+              setReferenceError("Confira a referência completa do relato.");
+              return;
+            }
+            setReferenceError("");
+            open(id);
+          }}
+        >
+          <label className="block text-sm">
+            Referência do relato
+            <input
+              className={inputClass}
+              name="reference"
+              maxLength={36}
+              required
+              aria-invalid={Boolean(referenceError)}
+              aria-describedby={
+                referenceError ? "consumption-reference-error" : undefined
+              }
+            />
+          </label>
+          {referenceError ? (
+            <p role="alert" id="consumption-reference-error">
+              {referenceError}
+            </p>
+          ) : null}
+          <Button type="submit">Consultar referência</Button>
+        </form>
+        {error ? (
+          <Notice error>
+            {error} Use Atualizar lista para repetir a consulta.
+          </Notice>
+        ) : null}
+        {reading ? <Notice>Carregando relatos…</Notice> : null}
+        {rows && rows.length > 0 && (reading || error) ? <p className="my-3 text-sm text-(--muted)">Última consulta confirmada; aguardando atualização.</p> : null}
+        <ul className="space-y-3">
+          {rows?.map((row) => (
+            <li
+              className="rounded border border-(--line) p-4 break-words"
+              key={row.id}
+            >
+              <p className="font-semibold">
                 {row.kind === "shortage" ? "Falta" : "Consumo"} ·{" "}
                 {row.location === "FAMILY" ? "Família" : "Equipe"} ·{" "}
                 {row.status === "reported"
-                  ? "Aguardando confirmação"
+                  ? "Aguardando conferência"
                   : row.status === "confirmed"
                     ? "Confirmado"
                     : "Rejeitado"}
               </p>
-              <p className="mt-2 whitespace-pre-wrap text-sm">{row.body}</p>
-              <ul className="mt-2 text-xs">
-                {row.lines.map((line) => (
-                  <li key={line.productId}>
-                    {products.find((product) => product.id === line.productId)
-                      ?.name ?? "Produto"}{" "}
-                    · {line.quantity}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-2 text-xs text-(--muted)">
-                {formatBrazilDate(row.created_at)}
+              <p className="my-2 whitespace-pre-wrap text-sm">{row.body}</p>
+              <p className="text-xs text-(--muted)">
+                {row.reported_name ?? "Nome original não preservado"} ·{" "}
+                {formatBrazilDate(row.created_at)} · versão {row.version}
               </p>
-              {row.status === "reported" &&
-              can(
-                context,
-                row.location === "FAMILY"
-                  ? "stock.family.manage"
-                  : "consumption.confirm",
-              ) ? (
-                <div className="mt-3 flex flex-wrap gap-3">
-                  <button
-                    className={primaryClass}
-                    disabled={busy}
-                    onClick={() => setReview({ row, accept: true })}
-                  >
-                    Confirmar relato e movimento
-                  </button>
-                  <button
-                    className={buttonClass}
-                    disabled={busy}
-                    onClick={() => setReview({ row, accept: false })}
-                  >
-                    Rejeitar relato
-                  </button>
-                </div>
-              ) : null}
+              <Button
+                className="mt-3"
+                onClick={(event) => {
+                  triggerRef.current = event.currentTarget;
+                  open(row.id);
+                }}
+              >
+                Abrir relato <span className="sr-only">{row.id}</span>
+              </Button>
             </li>
           ))}
         </ul>
-        {!rows.length ? (
-          <p className="mt-4 text-sm text-(--muted)">
-            Nenhum relato registrado.
-          </p>
+        {!reading && rows?.length === 0 && !error ? (
+          <p>Nenhum relato encontrado para estes filtros.</p>
+        ) : null}
+        {next ? (
+          <Button
+            className="mt-4"
+            disabled={moreBusy || reading}
+            onClick={() => void loadMore()}
+          >
+            Carregar mais relatos
+          </Button>
         ) : null}
       </section>
-      <Dialog open={Boolean(review)} title="Revisar confirmação do relato" onClose={() => { if (!busy && !uncertain) setReview(null); }}>{review ? <><p>{review.row.body}</p><ul className="my-4 space-y-2">{review.row.lines.map((line) => <li key={line.productId}>{products.find((product) => product.id === line.productId)?.name ?? "Produto"} · {line.quantity}</li>)}</ul><p className="hca-field-hint">{review.accept ? "A confirmação registra o consumo na custódia indicada. O relato e o movimento permanecem auditáveis." : "A rejeição preserva o relato sem movimentar o estoque."}</p>{error ? <Notice error>{error}</Notice> : null}<div className="hca-toolbar"><Button disabled={busy || uncertain} onClick={() => setReview(null)}>Voltar</Button><Button appearance="primary" disabled={busy} onClick={async () => { if (await send({ action: "confirm", id: review.row.id, accept: review.accept })) setReview(null); }}>{uncertain ? "Recuperar confirmação" : review.accept ? "Confirmar consumo" : "Confirmar rejeição"}</Button></div></> : null}</Dialog>
+      {selected&&(explicitReport||notice.data?.kind==="report") ? (
+        <ConsumptionDetail
+          key={selected}
+          id={selected}
+          context={context}
+          products={products}
+          catalogError={catalogError}
+          catalogLoading={catalogLoading}
+          onCatalogRetry={catalogRetry}
+          onChange={() => setAttempt((value) => value + 1)}
+          onClose={() => {
+            open(null);
+            requestAnimationFrame(() => {
+              if (triggerRef.current?.isConnected) triggerRef.current.focus();
+              else listHeadingRef.current?.focus();
+            });
+          }}
+        />
+      ) : null}
+      {editor ? (
+        <ConsumptionEditor
+          key={editorOrigin?.id??"standalone"}
+          sourceReminder={editorOrigin??undefined}
+          context={context}
+          products={products}
+          catalogError={catalogError}
+          catalogLoading={catalogLoading}
+          onCatalogRetry={catalogRetry}
+          restoreFocusTo={editor}
+          onClose={() => setEditor(null)}
+          onSaved={(id) => {
+            setEditor(null);
+            setMessage(
+              "Relato identificado. Consulte a referência para acompanhar complementos, conferência e movimentos registrados.",
+            );
+            setAttempt((value) => value + 1);
+            open(id);
+          }}
+        />
+      ) : null}
+      {can(context, "consumption.report") &&
+      !catalogLoading &&
+      !catalogError ? (
+        <FlowReviews
+          patientId={patient}
+          products={products}
+          onChange={() => setAttempt((value) => value + 1)}
+        />
+      ) : null}
     </div>
   );
 }

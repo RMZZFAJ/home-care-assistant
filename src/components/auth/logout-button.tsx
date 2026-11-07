@@ -1,12 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { MenuItem } from "@fluentui/react-components";
 
 export function LogoutButton() {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   async function logout() {
@@ -25,8 +23,8 @@ export function LogoutButton() {
       return;
     }
     for (const key of Object.keys(sessionStorage)) if (key.startsWith("hca:")) sessionStorage.removeItem(key);
-    router.replace("/login");
-    router.refresh();
+    // A fresh document releases modal accessibility and private client state.
+    window.location.replace("/login");
     } catch { setError("Não foi possível conectar para encerrar a sessão. Tente novamente."); }
     finally { setLoading(false); }
   }

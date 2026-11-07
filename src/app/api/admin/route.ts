@@ -1,6 +1,8 @@
 import { createHash, randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { governanceIntentFields } from "@/lib/validation/governance";
+import { auditQuerySchema } from "@/lib/validation/audit";
 import { appOrigin } from "@/lib/server/app-origin";
 import { exactQuantity } from "@/lib/validation/documents";
 import { quantity } from "@/lib/quantity";
@@ -10,8 +12,11 @@ import {
   authenticate,
   databaseError,
   patientContext,
+  parseUuid,
+  parseQuery,
   readJson,
   requireGlobal,
+  saoPauloDateBoundary,
   rpc,
   uuid,
 } from "@/lib/server/api";
@@ -99,6 +104,7 @@ const schema = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("recipient"),
+      ...governanceIntentFields,
       id: uuid.nullable(),
       displayName: z.string().trim().min(2).max(160),
       isActive: z.boolean(),
@@ -109,6 +115,7 @@ const schema = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("product"),
+      ...governanceIntentFields,
       careRecipientId: uuid,
       id: z.string().min(1).max(120).nullable(),
       name: z.string().trim().min(2).max(160),
@@ -123,6 +130,7 @@ const schema = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("adoptProduct"),
+      ...governanceIntentFields,
       careRecipientId: uuid,
       productId: z.string().min(1).max(120),
     })
@@ -130,6 +138,7 @@ const schema = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("membership"),
+      ...governanceIntentFields,
       careRecipientId: uuid,
       userId: uuid,
       role,
@@ -140,6 +149,7 @@ const schema = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("membershipStatus"),
+      ...governanceIntentFields,
       careRecipientId: uuid,
       userId: uuid,
       status: z.enum(["active", "revoked"]),
@@ -165,6 +175,7 @@ const schema = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("alertRule"),
+      ...governanceIntentFields,
       careRecipientId: uuid,
       productId: z.string().min(1).max(120),
       location,
@@ -176,6 +187,7 @@ const schema = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("notificationRecipient"),
+      ...governanceIntentFields,
       careRecipientId: uuid,
       recipientUserId: uuid,
       recipientGroup: z.enum(["family", "supervision", "care_team", "other"]),
@@ -222,7 +234,7 @@ export async function GET(request: Request) {
     if (auth.isGlobalAdmin)
       return NextResponse.json({
         data: await rpc(auth.client, "global_patient_administration", {
-          p_patient: uuid.parse(params.get("careRecipientId")),
+          p_patient: parseUuid(params.get("careRecipientId")),
           p_section: section,
         }),
       });
@@ -231,6 +243,14 @@ export async function GET(request: Request) {
       params.get("careRecipientId"),
       ["catalog", "products"].includes(section) ? "catalog.manage" : section === "audit" ? "audit.read" : "manage",
     );
+    if (section === "audit") {
+      const query = parseQuery(auditQuerySchema, Object.fromEntries(["query", "reference", "action", "entityType", "from", "to", "page", "pageSize"].filter(key => params.has(key) && params.get(key) !== "").map(key => [key, params.get(key)])));
+      return NextResponse.json(await rpc(auth.client, "patient_audit_page", {
+        p_patient: patient.id, p_query: query.query, p_reference: query.reference ?? null, p_action: query.action ?? null,
+        p_entity_type: query.entityType ?? null, p_from: query.from ? saoPauloDateBoundary(query.from) : null,
+        p_to: query.to ? saoPauloDateBoundary(query.to, true) : null, p_page: query.page, p_size: query.pageSize,
+      }));
+    }
     if (section === "memberships") {
       const members = (await rpc(auth.client, "admin_list_memberships", {
         p_care_recipient_id: patient.id,
@@ -288,16 +308,7 @@ export async function GET(request: Request) {
               .eq("care_recipient_id", patient.id)
               .order("sort_order")
               .order("name")
-          : section === "audit"
-            ? auth.client
-                .from("audit_events")
-                .select(
-                  "id,actor_id,action,entity_type,entity_id,metadata,created_at",
-                )
-                .eq("metadata->>care_recipient_id", patient.id)
-                .order("created_at", { ascending: false })
-                .limit(100)
-            : section === "notificationRecipients"
+          : section === "notificationRecipients"
               ? auth.client
                   .from("recipient_notification_settings")
                   .select("*")
@@ -339,9 +350,9 @@ export async function POST(request: Request) {
             ? input.id
             : null;
       if (target) {
-        const governance = (await rpc(auth.client, "patient_governance", {
-          p_patient: target,
-        })) as { data: { version: number } };
+        if (!("idempotencyKey" in input) || !input.idempotencyKey || !("expectedVersion" in input) || !input.expectedVersion)
+          throw new ApiError("VALIDATION_ERROR", "Informe a intenção e a versão da proposta revisada. Atualize a seção antes de preparar uma nova alteração.", 400);
+        const args = Object.fromEntries(Object.entries(input).filter(([key]) => !["idempotencyKey", "expectedVersion"].includes(key)));
         const data = await rpc(auth.client, "configure_patient_access", {
           p_patient: target,
           p_kind:
@@ -349,9 +360,9 @@ export async function POST(request: Request) {
           p_change:
             input.action === "membership"
               ? { userId: input.userId, role: input.role }
-              : { operation: input.action, args: input },
-          p_key: crypto.randomUUID(),
-          p_version: governance.data.version,
+              : { operation: input.action, args },
+          p_key: input.idempotencyKey,
+          p_version: input.expectedVersion,
         });
         return NextResponse.json({ data, pendingApproval: true });
       }
@@ -371,6 +382,7 @@ export async function POST(request: Request) {
     if (input.action === "recipient") {
       if (input.id) await patientContext(auth, input.id, "manage");
       else requireGlobal(auth);
+      if (!input.id && !input.isActive) throw new ApiError("VALIDATION_ERROR", "Para preparar uma residência inativa, use Preparar residência. Nenhum cadastro foi criado.", 400);
       if (!input.id && input.initialAdministratorEmail) {
         return NextResponse.json({
           data: await rpc(auth.client, "create_patient_with_administrator", {

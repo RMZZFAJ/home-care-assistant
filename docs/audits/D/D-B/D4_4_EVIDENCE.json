@@ -1,0 +1,265 @@
+{
+  "sourceBaseSha": "d0179ca17ae8487140a22e387da4cd805c303334",
+  "stage": "PASS_LOCAL_ARCHIVE_AND_EXACT_LEGACY_DOWNLOAD; D-B incomplete",
+  "migrations": {
+    "localCount": 140,
+    "remoteLastReconciledCount": 121,
+    "pending": 19,
+    "newFiles": [
+      "20261107123000_phase_d4_document_archive.sql"
+    ],
+    "preflightTransactionRolledBack": true,
+    "localAppliedWithoutReset": true,
+    "remoteApplied": false
+  },
+  "checks": {
+    "authMixedArchive": {
+      "passed": 1,
+      "records": 103,
+      "newInsertionDuringPaging": true,
+      "log": "output/phase-d-work/d4-archive-auth-recheck.log"
+    },
+    "authAuthorityFinal": {
+      "passed": 1,
+      "log": "output/phase-d-work/d4-archive-auth-authority-final.log"
+    },
+    "unitApi": {
+      "passed": 5,
+      "log": "output/phase-d-work/d4-archive-unit-final.log"
+    },
+    "types": "PASS output/phase-d-work/d4-archive-types-publish.log; subsequent test-only change corrected the untyped simulated HTTP envelope",
+    "lint": "PASS output/phase-d-work/d4-archive-lint-publish.log and d4-archive-scripts-lint.log",
+    "productionBrowser": {
+      "status": "PASS_ACROSS_DIRECTED_COHORTS",
+      "planned": 33,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "log": "output/phase-d-work/d4-archive-production-recheck.log",
+      "sourceLfSha256": {
+        "scripts/build-legacy-test-renderer.mjs": "fcf9d70ec135c15153b8a50342c8b9895b85487eb16a2e6826f2fbb62c5c69f5",
+        "scripts/start-e2e-server.mjs": "dd9cbc3e6fa9fc4b9c68aa7827161279eaa1d8e6cf33283fbcd50b48e53b0515",
+        "src/app/api/documents/[id]/archive/route.ts": "7269744cbe5ff43653913a73e429187339d5664b4d6d9f33b526320cc9ac6948",
+        "src/app/api/documents/[id]/pdf/route.ts": "21ae914664adc55c0e32eb310404d98f296a4112a4268c8de747a3178a806021",
+        "src/app/documentos/[id]/arquivos/page.tsx": "f4f755995b755c89b1cf02d512d9bf8f0dc60c024974ab5ef3a4361f575af5a5",
+        "src/components/documents/balance-review.tsx": "06bc736885f6101f9fe66556c8679c31591403d7559f9f580d8eeb6c10bd5a87",
+        "src/components/documents/document-actions.tsx": "f6c001ad0229794bf493135da78b5b0cc427283b7438213c8eaafdc26b7cadac",
+        "src/components/documents/document-file-view.tsx": "f0f1c724d8a979f70726ad43a3c8ee9c869e02a36c77d0f170b17f98a3ad0fc3",
+        "src/components/layout/workspace-context.tsx": "d85b2e92bd18dae566d81e2948a66ac624358f2d3a4e801b8ec73bcb34ebf08f",
+        "src/lib/documents/pdf-archive.ts": "66fe3e57722792daacd5d181ce4cc4c45e88af7c13d6d4416158cbc0ee31023b",
+        "src/lib/server/document-pdf.ts": "d383942847013787f49c0f61b6ec3c030e8e9c466154c842b8a8a4ef2b9f57f6",
+        "src/lib/server/error-catalog.ts": "1c35a208788dded23b8b2d071ab2163481ff6a05099e5015a512b8bce6dfcd37",
+        "src/lib/server/pdf-issuance.ts": "b3d5c2048aadcec90cc971baa97a863687ffb54511e334f30a19139c2966fd8c",
+        "supabase/migrations/20261107123000_phase_d4_document_archive.sql": "0bfd98f12619b6839db9f1dc278d0d395426ba116a0da73e6068857debc50fdd",
+        "tests/document-archive.test.ts": "d89070f285616823f131d0815feaa96bb86e411a95ccf13ecebf9b3edd812ebc",
+        "tests/e2e/bal-optional-recount.spec.ts": "7c8e3be7a8492f94169b30c7355cabe4f37052f3786b0e53ad19e7c265484d1a",
+        "tests/e2e/bal-recount-succession.spec.ts": "54f0f065ddfb6f63f6fcd4d138201cf126b7e214fd9b3880819f73e750db5cf6",
+        "tests/e2e/bal-review.spec.ts": "98781b64c14c52af00be8ad90a7b8a59d1fa72e5573e6b2492a74a0c4f783541",
+        "tests/e2e/balance-shifts.spec.ts": "d119df45c19f3557a1e1b470ef1bcac3de2d03f5a50d6e6ff0d8868c82afe9e8",
+        "tests/e2e/catalogue-identities.spec.ts": "df86c5de27d6e334c8353e8b8d85c99ed64aafa7073eaa873fd2490c75ecd5af",
+        "tests/e2e/delivery-cancellation.spec.ts": "dc99e19055ddb3008ad309b22efc2a8f01a98c9b11533fb9f3964f774d97f6f3",
+        "tests/e2e/delivery-preparation.spec.ts": "873ea4a8989067f66f9d3e572d133a1e9d9895c98c54f1722342d1ede21cef8d",
+        "tests/e2e/delivery-regularization.spec.ts": "aaa8e47cde4e343cc90dfd22aca61edafd97cc96e5436743f9c63fc3b83ddda7",
+        "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562",
+        "tests/e2e/pdf-issuance.spec.ts": "eca2592cdc6b3991ba345483733829f8aba9d49215498d304cdfbea602942b25",
+        "tests/e2e/presentation-provenance.spec.ts": "b029d05340549ef4dbfec7e7926ef0fcdc660987bf9cc82daf7d3baee2e1577a",
+        "tests/e2e/purchase-receipts.spec.ts": "84e8d05d403be2aef8038b47bb1e2d5c749b84cab66238886ef1979b816e30ea",
+        "tests/e2e/remaining-need.spec.ts": "999b311c532dab9ea5270bb4f4cf7c4482b4e8d6c2ffb338e2d46f46e4b55824",
+        "tests/e2e/requisition-observation.spec.ts": "aa44578233a2528b10bfa063fa799e84a3f5e2a02463b6b60253a7d05df58ce9",
+        "tests/e2e/requisition-pdf-personal-receipt.spec.ts": "2c2d90118a233c915b60bf72dfacccdbfd2e0af91a555da85843c199944c708f",
+        "tests/e2e/requisition-science.spec.ts": "7d7fc6cbb23abc14b0ce23375f76ecc2e53ab737f48b97558f0f9c756b2779a7",
+        "tests/e2e/transfer-bilateral.spec.ts": "c539592d06691015fe15707fdd4313ed78b69c87fe0a4f84c624de94bfbbbdc6",
+        "tests/e2e/workflows.spec.ts": "b87fcf8ddc970c08e6d140f7db586ee3edbacf8836aff78290bcdb66ffa1b6d6",
+        "tests/integration/pdf-archive.test.mjs": "c0c837dbfbf5063f6d7324e01d93bfb38163f29b38ca9813765811c8b1ef4d18",
+        "tests/integration/private-draft-fixtures.mjs": "33240baddd49986800f3b009d8d3d74e4e6ef05f67508574ad309483ea5dedcd",
+        "tests/support/legacy-pdf-fixtures.mjs": "c78c89b6a46f23460d3829fd9b55b93d830bc61cb0c70ef68ce3e57d1ce4038f"
+      },
+      "compatibilityPassed": 30,
+      "fixtureFailures": 3,
+      "failureReason": "The new archive fixture attempted purchase before required approval; contract correctly refused. Final fixture uses authorized approve to advance business version.",
+      "archiveRecheck": {
+        "status": "PASS",
+        "log": "output/phase-d-work/d4-archive-production-accepted.log",
+        "planned": 3,
+        "previousFailedCohortLfSha256": {
+          "scripts/build-legacy-test-renderer.mjs": "fcf9d70ec135c15153b8a50342c8b9895b85487eb16a2e6826f2fbb62c5c69f5",
+          "scripts/start-e2e-server.mjs": "dd9cbc3e6fa9fc4b9c68aa7827161279eaa1d8e6cf33283fbcd50b48e53b0515",
+          "src/app/api/documents/[id]/archive/route.ts": "7269744cbe5ff43653913a73e429187339d5664b4d6d9f33b526320cc9ac6948",
+          "src/app/api/documents/[id]/pdf/route.ts": "21ae914664adc55c0e32eb310404d98f296a4112a4268c8de747a3178a806021",
+          "src/app/documentos/[id]/arquivos/page.tsx": "f4f755995b755c89b1cf02d512d9bf8f0dc60c024974ab5ef3a4361f575af5a5",
+          "src/components/documents/balance-review.tsx": "06bc736885f6101f9fe66556c8679c31591403d7559f9f580d8eeb6c10bd5a87",
+          "src/components/documents/document-actions.tsx": "f6c001ad0229794bf493135da78b5b0cc427283b7438213c8eaafdc26b7cadac",
+          "src/components/documents/document-file-view.tsx": "14e120fadc75aeee467b4caa3ac8d9fdd0d5bbfb39b0b5cf68896713bafb70cd",
+          "src/components/layout/workspace-context.tsx": "d85b2e92bd18dae566d81e2948a66ac624358f2d3a4e801b8ec73bcb34ebf08f",
+          "src/lib/documents/pdf-archive.ts": "66fe3e57722792daacd5d181ce4cc4c45e88af7c13d6d4416158cbc0ee31023b",
+          "src/lib/server/document-pdf.ts": "d383942847013787f49c0f61b6ec3c030e8e9c466154c842b8a8a4ef2b9f57f6",
+          "src/lib/server/error-catalog.ts": "1c35a208788dded23b8b2d071ab2163481ff6a05099e5015a512b8bce6dfcd37",
+          "src/lib/server/pdf-issuance.ts": "b3d5c2048aadcec90cc971baa97a863687ffb54511e334f30a19139c2966fd8c",
+          "supabase/migrations/20261107123000_phase_d4_document_archive.sql": "0bfd98f12619b6839db9f1dc278d0d395426ba116a0da73e6068857debc50fdd",
+          "tests/document-archive.test.ts": "2043b491232593a793b10c06fe847af53b66368c14c9b01bf097da5fcee57f2c",
+          "tests/e2e/bal-optional-recount.spec.ts": "7c8e3be7a8492f94169b30c7355cabe4f37052f3786b0e53ad19e7c265484d1a",
+          "tests/e2e/bal-recount-succession.spec.ts": "54f0f065ddfb6f63f6fcd4d138201cf126b7e214fd9b3880819f73e750db5cf6",
+          "tests/e2e/bal-review.spec.ts": "98781b64c14c52af00be8ad90a7b8a59d1fa72e5573e6b2492a74a0c4f783541",
+          "tests/e2e/balance-shifts.spec.ts": "d119df45c19f3557a1e1b470ef1bcac3de2d03f5a50d6e6ff0d8868c82afe9e8",
+          "tests/e2e/catalogue-identities.spec.ts": "df86c5de27d6e334c8353e8b8d85c99ed64aafa7073eaa873fd2490c75ecd5af",
+          "tests/e2e/delivery-cancellation.spec.ts": "dc99e19055ddb3008ad309b22efc2a8f01a98c9b11533fb9f3964f774d97f6f3",
+          "tests/e2e/delivery-preparation.spec.ts": "873ea4a8989067f66f9d3e572d133a1e9d9895c98c54f1722342d1ede21cef8d",
+          "tests/e2e/delivery-regularization.spec.ts": "aaa8e47cde4e343cc90dfd22aca61edafd97cc96e5436743f9c63fc3b83ddda7",
+          "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562",
+          "tests/e2e/pdf-issuance.spec.ts": "717c4e1cbf1771fe00419dfacaee1d6513e6f1bdd7b7e9c23d95dbe16f46cd1e",
+          "tests/e2e/presentation-provenance.spec.ts": "b029d05340549ef4dbfec7e7926ef0fcdc660987bf9cc82daf7d3baee2e1577a",
+          "tests/e2e/purchase-receipts.spec.ts": "84e8d05d403be2aef8038b47bb1e2d5c749b84cab66238886ef1979b816e30ea",
+          "tests/e2e/remaining-need.spec.ts": "999b311c532dab9ea5270bb4f4cf7c4482b4e8d6c2ffb338e2d46f46e4b55824",
+          "tests/e2e/requisition-observation.spec.ts": "aa44578233a2528b10bfa063fa799e84a3f5e2a02463b6b60253a7d05df58ce9",
+          "tests/e2e/requisition-pdf-personal-receipt.spec.ts": "2c2d90118a233c915b60bf72dfacccdbfd2e0af91a555da85843c199944c708f",
+          "tests/e2e/requisition-science.spec.ts": "7d7fc6cbb23abc14b0ce23375f76ecc2e53ab737f48b97558f0f9c756b2779a7",
+          "tests/e2e/transfer-bilateral.spec.ts": "c539592d06691015fe15707fdd4313ed78b69c87fe0a4f84c624de94bfbbbdc6",
+          "tests/e2e/workflows.spec.ts": "b87fcf8ddc970c08e6d140f7db586ee3edbacf8836aff78290bcdb66ffa1b6d6",
+          "tests/integration/pdf-archive.test.mjs": "c0c837dbfbf5063f6d7324e01d93bfb38163f29b38ca9813765811c8b1ef4d18",
+          "tests/integration/private-draft-fixtures.mjs": "33240baddd49986800f3b009d8d3d74e4e6ef05f67508574ad309483ea5dedcd",
+          "tests/support/legacy-pdf-fixtures.mjs": "c78c89b6a46f23460d3829fd9b55b93d830bc61cb0c70ef68ce3e57d1ce4038f"
+        },
+        "sourceLfSha256": {
+          "scripts/build-legacy-test-renderer.mjs": "fcf9d70ec135c15153b8a50342c8b9895b85487eb16a2e6826f2fbb62c5c69f5",
+          "scripts/start-e2e-server.mjs": "dd9cbc3e6fa9fc4b9c68aa7827161279eaa1d8e6cf33283fbcd50b48e53b0515",
+          "src/app/api/documents/[id]/archive/route.ts": "7269744cbe5ff43653913a73e429187339d5664b4d6d9f33b526320cc9ac6948",
+          "src/app/api/documents/[id]/pdf/route.ts": "21ae914664adc55c0e32eb310404d98f296a4112a4268c8de747a3178a806021",
+          "src/app/documentos/[id]/arquivos/page.tsx": "f4f755995b755c89b1cf02d512d9bf8f0dc60c024974ab5ef3a4361f575af5a5",
+          "src/components/documents/balance-review.tsx": "06bc736885f6101f9fe66556c8679c31591403d7559f9f580d8eeb6c10bd5a87",
+          "src/components/documents/document-actions.tsx": "f6c001ad0229794bf493135da78b5b0cc427283b7438213c8eaafdc26b7cadac",
+          "src/components/documents/document-file-view.tsx": "14e120fadc75aeee467b4caa3ac8d9fdd0d5bbfb39b0b5cf68896713bafb70cd",
+          "src/components/layout/workspace-context.tsx": "d85b2e92bd18dae566d81e2948a66ac624358f2d3a4e801b8ec73bcb34ebf08f",
+          "src/lib/documents/pdf-archive.ts": "66fe3e57722792daacd5d181ce4cc4c45e88af7c13d6d4416158cbc0ee31023b",
+          "src/lib/server/document-pdf.ts": "d383942847013787f49c0f61b6ec3c030e8e9c466154c842b8a8a4ef2b9f57f6",
+          "src/lib/server/error-catalog.ts": "1c35a208788dded23b8b2d071ab2163481ff6a05099e5015a512b8bce6dfcd37",
+          "src/lib/server/pdf-issuance.ts": "b3d5c2048aadcec90cc971baa97a863687ffb54511e334f30a19139c2966fd8c",
+          "supabase/migrations/20261107123000_phase_d4_document_archive.sql": "0bfd98f12619b6839db9f1dc278d0d395426ba116a0da73e6068857debc50fdd",
+          "tests/document-archive.test.ts": "2043b491232593a793b10c06fe847af53b66368c14c9b01bf097da5fcee57f2c",
+          "tests/e2e/bal-optional-recount.spec.ts": "7c8e3be7a8492f94169b30c7355cabe4f37052f3786b0e53ad19e7c265484d1a",
+          "tests/e2e/bal-recount-succession.spec.ts": "54f0f065ddfb6f63f6fcd4d138201cf126b7e214fd9b3880819f73e750db5cf6",
+          "tests/e2e/bal-review.spec.ts": "98781b64c14c52af00be8ad90a7b8a59d1fa72e5573e6b2492a74a0c4f783541",
+          "tests/e2e/balance-shifts.spec.ts": "d119df45c19f3557a1e1b470ef1bcac3de2d03f5a50d6e6ff0d8868c82afe9e8",
+          "tests/e2e/catalogue-identities.spec.ts": "df86c5de27d6e334c8353e8b8d85c99ed64aafa7073eaa873fd2490c75ecd5af",
+          "tests/e2e/delivery-cancellation.spec.ts": "dc99e19055ddb3008ad309b22efc2a8f01a98c9b11533fb9f3964f774d97f6f3",
+          "tests/e2e/delivery-preparation.spec.ts": "873ea4a8989067f66f9d3e572d133a1e9d9895c98c54f1722342d1ede21cef8d",
+          "tests/e2e/delivery-regularization.spec.ts": "aaa8e47cde4e343cc90dfd22aca61edafd97cc96e5436743f9c63fc3b83ddda7",
+          "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562",
+          "tests/e2e/pdf-issuance.spec.ts": "45d8baf425e7fee150f4f8d8626e0fb372237883c2d36046e707f1b29425dada",
+          "tests/e2e/presentation-provenance.spec.ts": "b029d05340549ef4dbfec7e7926ef0fcdc660987bf9cc82daf7d3baee2e1577a",
+          "tests/e2e/purchase-receipts.spec.ts": "84e8d05d403be2aef8038b47bb1e2d5c749b84cab66238886ef1979b816e30ea",
+          "tests/e2e/remaining-need.spec.ts": "999b311c532dab9ea5270bb4f4cf7c4482b4e8d6c2ffb338e2d46f46e4b55824",
+          "tests/e2e/requisition-observation.spec.ts": "aa44578233a2528b10bfa063fa799e84a3f5e2a02463b6b60253a7d05df58ce9",
+          "tests/e2e/requisition-pdf-personal-receipt.spec.ts": "2c2d90118a233c915b60bf72dfacccdbfd2e0af91a555da85843c199944c708f",
+          "tests/e2e/requisition-science.spec.ts": "7d7fc6cbb23abc14b0ce23375f76ecc2e53ab737f48b97558f0f9c756b2779a7",
+          "tests/e2e/transfer-bilateral.spec.ts": "c539592d06691015fe15707fdd4313ed78b69c87fe0a4f84c624de94bfbbbdc6",
+          "tests/e2e/workflows.spec.ts": "b87fcf8ddc970c08e6d140f7db586ee3edbacf8836aff78290bcdb66ffa1b6d6",
+          "tests/integration/pdf-archive.test.mjs": "c0c837dbfbf5063f6d7324e01d93bfb38163f29b38ca9813765811c8b1ef4d18",
+          "tests/integration/private-draft-fixtures.mjs": "33240baddd49986800f3b009d8d3d74e4e6ef05f67508574ad309483ea5dedcd",
+          "tests/support/legacy-pdf-fixtures.mjs": "c78c89b6a46f23460d3829fd9b55b93d830bc61cb0c70ef68ce3e57d1ce4038f"
+        },
+        "passed": 3,
+        "production": true
+      },
+      "distinctPassed": 33,
+      "scope": "30 compatibility cases from first production cohort plus3 final archive cases; not33/33 from one build"
+    },
+    "collectionPreflight": {
+      "invalidSyntaxRefusedBeforeBuild": "PASS output/phase-d-work/d4-archive-collection-negative.log",
+      "positiveList": "PASS output/phase-d-work/d4-archive-collection-positive.log; exactly3 cases; no server or private identity provisioning",
+      "functionalProof": false
+    },
+    "diagnosticOnly": {
+      "passed": 1,
+      "production": false,
+      "log": "output/phase-d-work/d4-archive-diagnostic.log",
+      "scope": "complete archive journey after correcting fixture approval and HTTP error envelope"
+    },
+    "markdown": "PASS7 affected Markdown files; initial3 blank-line diagnostics corrected"
+  },
+  "counterproofs": [
+    "No legacy artifact: explicit404; no generation/upload/issuance/business mutation",
+    "Legacy original and V4 have exact preserved digests and no retroactive signing",
+    "Tampered Storage bytes refused503; original restored without modifying immutable metadata",
+    "Historical new representation uses actual new issuance identity/time and origin version",
+    "Archive page filters business versions and keeps mixed cursor stable",
+    "Anonymous and service RPC execution denied; wrong context and revoked membership denied",
+    "Live authority rechecked after privileged Storage IO in targeted unit test",
+    "Private drafts no-side-effect state includes independent issuance registrations"
+  ],
+  "failedAttempts": [
+    {
+      "log": "output/phase-d-work/d4-archive-auth.log",
+      "reason": "Incorrect test assumption allowed reading another active patient; real context guard refused; corrected expectation"
+    },
+    {
+      "log": "output/phase-d-work/d4-archive-auth-recheck.log",
+      "reason": "Mixed103-record test passed; revocation fixture used a nonexistent is_active column; corrected to existing status=revoked contract"
+    },
+    {
+      "log": "output/phase-d-work/d4-archive-production.log",
+      "reason": "Collection failed before cases: Playwright CJS transform could not load import.meta in helper; createRequire uses absolute package.json path"
+    },
+    {
+      "log": "output/phase-d-work/d4-archive-production-recheck.log",
+      "reason": "30 cases passed; three archive project cases failed in fixture before historical generation because purchase required approval. No assertion or authorization rule removed."
+    },
+    {
+      "log": "output/phase-d-work/d4-archive-production-final.log",
+      "reason": "Three project cases reached signed historical issuance and legacy unsigned verification; mock error used message instead of error, so the client correctly rendered its safe fallback. Mock corrected to existing HTTP500/error contract; expectation retained."
+    }
+  ],
+  "limits": [
+    "Fresh clean/legacy installation and full regression are CI gates for published SHA",
+    "No new remote migration, merge, deployment or operational GO",
+    "Sonar setup and remediation remain owner-deferred",
+    "Factual/accessibility/attachment/custody/expiry combinations remain separate criteria",
+    "D3 remaining, D5 and backup/monitoring implementations remain pending",
+    "Physical device, AT and external/provider homologation remain D-C/D6 gates"
+  ],
+  "ciBaseObserved": {
+    "sha": "d0179ca17ae8487140a22e387da4cd805c303334",
+    "run": 42372182501,
+    "validateWindows": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "databaseCleanLegacyIntegration": "SUCCESS",
+    "browsers": {
+      "chromium": "FAILURE onboarding password recovery selector;173 other cases passed",
+      "mobile": "FAILURE same case;173 other cases passed",
+      "ios": "IN_PROGRESS"
+    },
+    "validatesThisWorkingTree": false,
+    "failureAnalysis": "Artifact still shows the recovery button visually, but its accessible name and the login labels are absent after logout. Investigating modal accessibility cleanup; not treating selector replacement as an established fix.",
+    "logs": [
+      "output/phase-d-work/ci-d0179ca-chromium.log",
+      "output/phase-d-work/ci-d0179ca-mobile.log"
+    ]
+  },
+  "finalLocalMetadata": {
+    "localMigrations": 140,
+    "faultTriggers": 0,
+    "faultFunctions": 0,
+    "crons": [
+      {
+        "name": "hca-notification-worker",
+        "active": true,
+        "schedule": "* * * * *"
+      },
+      {
+        "name": "hca-operational-lifecycle",
+        "active": true,
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "visual": {
+    "screenshots": [
+      "output/playwright/phase-d/pdf-archive-chromium.png",
+      "output/playwright/phase-d/pdf-archive-mobile.png",
+      "output/playwright/phase-d/pdf-archive-ios.png"
+    ],
+    "inspected": "iOS emulation at320 CSS px; registered originals/V4, derived issuance, actions and text fit; no clipping/overflow",
+    "physicalDevice": false
+  }
+}

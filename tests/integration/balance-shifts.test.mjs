@@ -92,7 +92,9 @@ test("scheduler retains missed shifts and regularizes previous weeks with only o
   assert.equal(final.obligations.filter(o => o.state === "regularized" && o.regularized_by === doc.id && o.missed_at).length, 2);
   assert.equal(final.obligations.filter(o => o.state === "counted" && o.count_document_id === doc.id).length, 1);
   assert.ok(final.obligations.every(o => new Date(o.actual_count_at).toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10)));
-  await balanceCommand(admin, patient, "assign_recount", { documentId: doc.id, targetShiftId: a.shift_id, reason: "Nova conferência física autorizada" }, doc.version);
+  const recountSource = await rpc(admin, "balance_recount_context", {p_id: doc.id});
+  const recountTarget = pending.targets.find(row => row.id === a.shift_id);
+  await balanceCommand(admin, patient, "assign_recount", { documentId: doc.id, targetShiftId: a.shift_id, targetShiftVersion: recountTarget.version, referenceHash: recountSource.referenceHash, reason: "Nova conferência física autorizada" }, doc.version);
   const recountState = await workspace(pro.client, patient), recount = recountState.eligibility.assignment;
   const recounted = await rpc(pro.client, "revise_supply_document", { p_id: doc.id, p_key: randomUUID(), p_version: doc.version, p_recount: true, p_payload: { lines: products.map(productId => ({ productId, quantity: "0" })), balanceAssignment: { id: recount.id, version: recount.version, referenceRevision: recountState.referenceRevision } } });
   assert.ok(recounted.version > doc.version);
@@ -142,7 +144,7 @@ test("ambiguous coverage is unassigned until family resolution and stays isolate
 test("ledger changes invalidate a captured count reference and forged schedule context cannot replace the DB snapshot",async()=>{
   const {patient,pro,products}=await balanceSetup(),initial=await workspace(pro.client,patient),a=initial.eligibility.assignment;
   const family=await actor("family",patient);
-  const ent=await rpc(family,"create_supply_document",{p_patient:patient,p_type:"ENT",p_key:randomUUID(),p_payload:{source:"FAMILY",destination:"CARE_TEAM",recipientId:pro.id,lines:[{productId:products[0],quantity:"1",metadata:{extraItemReason:"Conferência de revisão do estoque"}}]}});
+  const ent=await rpc(family,"create_supply_document",{p_patient:patient,p_type:"ENT",p_key:randomUUID(),p_payload:{ recipientReason: "Escolha manual fictícia para este recebimento", source:"FAMILY",destination:"CARE_TEAM",recipientId:pro.id,lines:[{productId:products[0],quantity:"1",metadata:{extraItemReason:"Conferência de revisão do estoque"}}]}});
   await rpc(pro.client,"supply_document_command",{p_id:ent.id,p_action:"receive",p_version:ent.version,p_key:randomUUID(),p_body:{divergences:[]}});
   const payload={lines:products.map(productId=>({productId,quantity:"0"})),balanceAssignment:{id:a.id,version:a.version,referenceRevision:initial.referenceRevision},balanceContext:{professionalId:randomUUID(),professionalName:"Conteúdo não confiável"}};
   const args={p_patient:patient,p_type:"BAL",p_payload:payload,p_key:randomUUID(),p_draft:true};

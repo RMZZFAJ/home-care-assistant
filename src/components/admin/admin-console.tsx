@@ -2,7 +2,10 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCommandIntent } from "@/lib/client/use-command-intent";
+import { ApiError } from "@/lib/client/api";
+import { governanceCommandConfirmed } from "@/lib/validation/governance";
 import {
   api,
   buttonClass,
@@ -18,18 +21,18 @@ import {
   NotificationQueue,
 } from "./notification-settings";
 import { formatBrazilDate } from "@/lib/receipt";
-import {
-  Field,
-  RoleSelect,
-  text,
-  type Row,
-} from "./admin-fields";
+import { Field, RoleSelect, text, type Row } from "./admin-fields";
 import { AlertSettings } from "./alert-settings";
 import { PatientRegistration } from "./patient-registration";
-import { AdministrationNavigation, administrationAreas } from "./administration-navigation";
+import {
+  AdministrationNavigation,
+  administrationAreas,
+} from "./administration-navigation";
 import { CatalogueManagement } from "./catalogue-management";
 import { MembershipManagement } from "./membership-management";
 import { GlobalAccounts } from "./global-accounts";
+import { AuditHistory } from "./audit-history";
+import { useLiveRevision } from "@/lib/use-live-revision";
 
 type Section =
   | "patient"
@@ -42,6 +45,8 @@ type Section =
   | "profiles"
   | "notificationRecipients"
   | "notifications";
+type AdministrativeResult = { data?: unknown; invitationUrl?: string; pendingApproval?: boolean };
+type AdministrativeIntent = { payload: Row; success: string; refreshContext: boolean };
 const labels: Record<Section, string> = {
   patient: "Paciente",
   catalog: "Catálogo",
@@ -57,10 +62,19 @@ const labels: Record<Section, string> = {
 export function AdminConsole() {
   const params = useSearchParams();
   return (
-    <Workspace title="Administração" administration administrationCapabilities={["access.manage", "catalog.manage", "audit.read"]}>
+    <Workspace
+      title="Administração"
+      administration
+      administrationCapabilities={[
+        "access.manage",
+        "catalog.manage",
+        "audit.read",
+      ]}
+      administrationReadRecovery={params.get("section") === "catalog"}
+    >
       {(context) => (
         <PatientAdmin
-          key={(context.patient?.id ?? "global") + params.toString()}
+          key={(context.patient?.id ?? "global") + ":" + (params.get("section") ?? "overview")}
           context={context}
         />
       )}
@@ -78,7 +92,9 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     requestedSection && Object.hasOwn(labels, requestedSection)
       ? requestedSection
       : "overview";
-  const allowed = section === "overview" || administrationAreas(context).some((area) => area.section === section);
+  const allowed =
+    section === "overview" ||
+    administrationAreas(context).some((area) => area.section === section);
   const [rows, setRows] = useState<Row[]>([]);
   const [templates, setTemplates] = useState<Row[]>([]);
   const [directory, setDirectory] = useState<Row[]>([]);
@@ -86,18 +102,43 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [editing, setEditing] = useState<Row | null>(null);
   const [page, setPage] = useState(1);
   const [notificationTotal, setNotificationTotal] = useState(0);
-  const [loading, setLoading] = useState(!["patient", "import", "overview"].includes(section));
-  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(
+    !["patient", "import", "overview", "audit"].includes(section),
+  );
+  const command = useCommandIntent<Row, AdministrativeResult>(governanceCommandConfirmed);
+  const intentRef = useRef<AdministrativeIntent | null>(null);
+  const loadSequenceRef = useRef(0);
+  const versionRef = useRef<number | null>(null);
+  const [versionAttempt, setVersionAttempt] = useState(0);
+  const [conflict, setConflict] = useState(false);
+  const [confirmationRevision, setConfirmationRevision] = useState(0);
+  const [localBusy, setLocalBusy] = useState(false);
+  const busy = localBusy || command.busy || command.uncertain || conflict;
   const [error, setError] = useState("");
+  const [readError, setReadError] = useState("");
+  const [readDenied, setReadDenied] = useState(false);
+  const live = useLiveRevision(), queueRevision = section === "notifications" ? live : 0;
+  const [queueReadRevision,setQueueReadRevision]=useState(-1);
+  const queueRefreshing=section==="notifications"&&queueReadRevision!==queueRevision;
   const [message, setMessage] = useState("");
   const [invitationUrl, setInvitationUrl] = useState("");
   const [report, setReport] = useState<unknown>(null);
   const [importText, setImportText] = useState("");
   const [importReviewed, setImportReviewed] = useState(false);
   const patientId = context.patient?.id;
+  useEffect(() => {
+    if (!globalMode || !patientId) return;
+    const controller = new AbortController();
+    void api<{ data: { version: number } }>("/api/patient-settings?careRecipientId=" + patientId, undefined, controller.signal).then(result => {
+      if (!controller.signal.aborted) { versionRef.current = result.data.version; setConflict(false); }
+    }).catch(reason => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Não foi possível consultar a versão administrativa."); });
+    return () => controller.abort();
+  }, [globalMode, patientId, versionAttempt]);
   const load = useCallback(
     (signal?: AbortSignal) => {
-      if (!allowed || ["patient", "import", "overview"].includes(section)) return Promise.resolve();
+      if (!allowed || ["patient", "import", "overview", "audit"].includes(section))
+        return Promise.resolve();
+      const sequence = ++loadSequenceRef.current;
       const query = new URLSearchParams({ section });
       if (patientId) query.set("careRecipientId", patientId);
       return Promise.all([
@@ -133,39 +174,62 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           : Promise.resolve({ data: [] as Row[] }),
       ]).then(
         ([result, models, people, products]) => {
-          if (signal?.aborted) return;
+          if (signal?.aborted || sequence !== loadSequenceRef.current) return;
           setRows(result.data ?? []);
           setNotificationTotal(result.total ?? 0);
           setDirectory(people.data);
           setCatalog(products.data);
           if (section === "catalog") setTemplates(models.data);
           setLoading(false);
+          setReadError("");
+          setReadDenied(false);
+          setQueueReadRevision(queueRevision);
         },
         (reason) => {
-          if (!signal?.aborted) {
-            setError(
+          if (!signal?.aborted && sequence === loadSequenceRef.current) {
+            setReadError(
               reason instanceof Error
                 ? reason.message
                 : "Não foi possível carregar a seção.",
             );
             setLoading(false);
+            setReadDenied(reason instanceof ApiError && [401,403,404,409].includes(reason.status));
+            setQueueReadRevision(queueRevision);
           }
         },
       );
     },
-    [section, patientId, globalMode, page, allowed],
+    [section, patientId, globalMode, page, allowed,queueRevision],
   );
   useEffect(() => {
     const controller = new AbortController();
     void load(controller.signal);
     return () => controller.abort();
-  }, [load]);
+  }, [load, queueRevision]);
+  async function confirmed(result: AdministrativeResult, packet: AdministrativeIntent) {
+    setMessage(result.pendingApproval ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras." : packet.success);
+    setEditing(null);
+    setConfirmationRevision(value => value + 1);
+    if (result.invitationUrl) setInvitationUrl(result.invitationUrl);
+    if (packet.payload.action === "historicalImport") setReport(result.data);
+    intentRef.current = null;
+    // A failing read after this point cannot make the completed command uncertain.
+    try { if (packet.refreshContext) await context.refresh(); await load(); setVersionAttempt(value => value + 1); }
+    catch (reason) { setError("A ação foi confirmada. A consulta posterior falhou: " + (reason instanceof Error ? reason.message : "Atualize esta seção.")); }
+    return result;
+  }
+  function failed(reason: unknown) {
+    if (reason instanceof ApiError && reason.status === 409 && globalMode) setConflict(true);
+    setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.");
+    return null;
+  }
   async function execute(
     payload: Row,
     success: string,
     refreshContext = false,
   ) {
-    setBusy(true);
+    if (busy) return null;
+    setLocalBusy(true);
     setError("");
     setMessage("");
     setInvitationUrl("");
@@ -179,32 +243,22 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         "historicalImport",
         "process",
       ].includes(String(payload.action));
-      const result = await api<{
-        data?: unknown;
-        invitationUrl?: string;
-        pendingApproval?: boolean;
-      }>(isNotification ? "/api/admin/notifications" : "/api/admin", {
+      const globalProposal = globalMode && ["membership", "product", "adoptProduct", "membershipStatus", "alertRule", "notificationRecipient", "recipient"].includes(String(payload.action)) && (payload.action !== "recipient" || Boolean(payload.id));
+      if (globalProposal && versionRef.current === null) throw new Error("Consulte a versão administrativa antes de preparar esta proposta.");
+      const packet: AdministrativeIntent = { payload, success, refreshContext };
+      if (globalProposal) intentRef.current = packet;
+      const body = {
         ...(scoped ? { careRecipientId: patientId } : {}),
         ...payload,
-      });
-      setMessage(
-        result.pendingApproval
-          ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras."
-          : success,
-      );
-      setEditing(null);
-      if (result.invitationUrl) setInvitationUrl(result.invitationUrl);
-      if (payload.action === "historicalImport") setReport(result.data);
-      if (refreshContext) await context.refresh();
-      await load();
-      return result;
+        ...(globalProposal ? { idempotencyKey: crypto.randomUUID(), expectedVersion: versionRef.current } : {}),
+      };
+      const url = isNotification ? "/api/admin/notifications" : "/api/admin";
+      const result = globalProposal ? await command.send(url, body) : await api<AdministrativeResult>(url, body);
+      return await confirmed(result, packet);
     } catch (reason) {
-      setError(
-        reason instanceof Error ? reason.message : "Não foi possível salvar.",
-      );
-      return null;
+      return failed(reason);
     } finally {
-      setBusy(false);
+      setLocalBusy(false);
     }
   }
   function handle(
@@ -220,27 +274,51 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       refresh,
     );
   }
-  if (!allowed)
-    return <Notice error>Seu vínculo não autoriza esta área administrativa.</Notice>;
+  if (!allowed && section !== "catalog")
+    return (
+      <Notice error>Seu vínculo não autoriza esta área administrativa.</Notice>
+    );
+  const recovery = command.uncertain ? <Notice error>O resultado da alteração é incerto. Recupere a mesma tentativa antes de enviar outra. <button className={buttonClass} disabled={command.busy} onClick={async () => { setError(""); try { const result = await command.recover(); if (intentRef.current) await confirmed(result, intentRef.current); } catch (reason) { failed(reason); } }}>Recuperar mesma alteração administrativa</button></Notice>
+    : conflict ? <Notice error>A versão ou a intenção mudou. Seus campos foram preservados; nenhuma nova proposta foi enviada. <button className={buttonClass} onClick={() => { versionRef.current = null; setVersionAttempt(value => value + 1); setError(""); }}>Revisar versão administrativa vigente</button></Notice> : null;
   return (
     <div className="space-y-5">
+      {!allowed ? (
+        <Notice error>
+          Seu vínculo não permite novas mudanças no catálogo. Uma intenção
+          própria já confirmada pode ser recuperada enquanto a leitura
+          permanecer autorizada.
+        </Notice>
+      ) : null}
       <p className="text-sm text-(--muted)">
         {globalMode
           ? "Administração global e por paciente."
           : "Todas as alterações desta área se limitam ao paciente selecionado."}
       </p>
-      <AdministrationNavigation context={context} section={section === "overview" ? null : section} />
-      {section === "catalog" ? <Link className={buttonClass} href="/unidades">Unidades e apresentações / scanner</Link> : null}
-      {section === "memberships" ? <Link className={buttonClass} href="/configuracoes?area=people">Permissões e alterações com dupla aprovação</Link> : null}
+      <AdministrationNavigation
+        context={context}
+        section={section === "overview" ? null : section}
+      />
+      {section === "catalog" && allowed ? (
+        <Link className={buttonClass} href="/unidades">
+          Unidades e apresentações / scanner
+        </Link>
+      ) : null}
+      {section === "memberships" ? (
+        <Link className={buttonClass} href="/configuracoes?area=people">
+          Permissões e alterações com dupla aprovação
+        </Link>
+      ) : null}
       {error && (
         <Notice error>
           {error}
-          <button className={`${buttonClass} ml-3`} onClick={() => void load()}>
+          <button className={`${buttonClass} ml-3`} onClick={() => { if (globalMode && versionRef.current === null) setVersionAttempt(value => value + 1); void load(); }}>
             Recarregar
           </button>
         </Notice>
       )}
       {message && <Notice>{message}</Notice>}
+      {readError ? <Notice error>{readError} <button type="button" className={buttonClass} onClick={() => void load()}>Atualizar seção</button></Notice> : null}
+      {recovery}
       {invitationUrl && (
         <section className={panelClass}>
           <h2 className="font-bold">Link de convite</h2>
@@ -259,8 +337,11 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           </label>
         </section>
       )}
-      {loading && section !== "overview" && <Notice>Carregando {labels[section].toLowerCase()}…</Notice>}
-      <fieldset disabled={busy} className="min-w-0 space-y-5">
+      {loading && section !== "overview" && (
+        <Notice>Carregando {labels[section].toLowerCase()}…</Notice>
+      )}
+      {queueRefreshing&&!loading?<Notice>Atualizando fila de notificações…</Notice>:null}
+      <fieldset disabled={busy} hidden={readDenied} className="min-w-0 space-y-5">
         {section === "patient" && (
           <PatientRegistration
             patient={context.patient}
@@ -270,8 +351,36 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             handle={handle}
           />
         )}
-        {section === "catalog" ? <CatalogueManagement rows={rows} templates={templates} save={execute} busy={busy} error={error} loading={loading} /> : null}
-        {section === "memberships" ? <MembershipManagement rows={rows} directory={directory} save={execute} busy={busy} error={error} /> : null}
+        {section === "catalog" && patientId ? (
+          <CatalogueManagement
+            recovery={recovery}
+            confirmationRevision={confirmationRevision}
+            writable={allowed}
+            rows={rows}
+            templates={templates}
+            save={execute}
+            busy={busy}
+            error={error}
+            loading={loading}
+            patientId={patientId}
+            onIdentitySaved={async (message) => {
+              setMessage(message);
+              if (allowed) await load();
+            }}
+          />
+        ) : null}
+        {section === "memberships" ? (
+          <MembershipManagement
+            recovery={recovery}
+            confirmationRevision={confirmationRevision}
+            rows={rows}
+            directory={directory}
+            save={execute}
+            busy={busy}
+            error={error}
+            patientId={patientId}
+          />
+        ) : null}
         {section === "invitations" && (
           <>
             <section className={panelClass}>
@@ -375,6 +484,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
               rows={rows}
               execute={execute}
               isGlobalAdmin={globalMode}
+              queried={!loading && !readError && !queueRefreshing}
             />
             {notificationTotal > 20 && (
               <nav
@@ -411,34 +521,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         {section === "alerts" && (
           <AlertSettings rows={rows} products={catalog} handle={handle} />
         )}
-        {section === "audit" && (
-          <section className={panelClass}>
-            <h2 className="font-bold">Eventos de auditoria deste contexto</h2>
-            <ul className="mt-4 space-y-3">
-              {rows.map((row) => (
-                <li
-                  key={text(row, "id")}
-                  className="rounded border border-(--line) p-3 text-sm"
-                >
-                  <p className="font-semibold">{text(row, "action")}</p>
-                  <p>
-                    {row.created_at
-                      ? formatBrazilDate(text(row, "created_at"))
-                      : "Data não informada"}{" "}
-                    · {text(row, "entity_type")}
-                  </p>
-                  <p className="break-all text-xs text-(--muted)">
-                    Ator: {text(row, "actor_id") || "Sistema"} · Referência:{" "}
-                    {text(row, "entity_id")}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            {!loading && rows.length === 0 && (
-              <p className="mt-3 text-sm">Nenhum evento encontrado.</p>
-            )}
-          </section>
-        )}
+        {section === "audit" ? <AuditHistory patientId={patientId!} /> : null}
         {section === "import" && (
           <section className={panelClass}>
             <h2 className="font-bold">Importar protocolos físicos 1–11</h2>
@@ -518,7 +601,14 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             )}
           </section>
         )}
-        {section === "profiles" && globalMode ? <GlobalAccounts rows={rows} save={execute} busy={busy} error={error} /> : null}
+        {section === "profiles" && globalMode ? (
+          <GlobalAccounts
+            rows={rows}
+            save={execute}
+            busy={busy}
+            error={error}
+          />
+        ) : null}
       </fieldset>
       {busy && <Notice>Salvando operação… Aguarde a confirmação.</Notice>}
     </div>

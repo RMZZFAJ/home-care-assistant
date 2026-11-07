@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { unstable_rethrow } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { quantity } from "@/lib/quantity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { appOrigins } from "@/lib/server/app-origin";
 import { errorCatalog, type ErrorCode } from "@/lib/server/error-catalog";
@@ -13,6 +14,12 @@ export class ApiError extends Error {
     message: string,
     public status: number = errorCatalog[code].status,
     public retryable: boolean = errorCatalog[code].retryable,
+    public confirmedStage?: {
+      kind: "revision";
+      documentId: string;
+      idempotencyKey: string;
+      version: number;
+    },
   ) {
     super(message);
   }
@@ -22,6 +29,72 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (error?.code === "42702")
+    throw new ApiError(
+      "INTERNAL_ERROR",
+      "Não foi possível processar esta operação. Informe a referência ao suporte.",
+      500,
+      true,
+    );
+  if (/stale schedule type reference/i.test(message)) throw new ApiError("VERSION_CONFLICT", "O tipo de plantão mudou. Consulte e revise os horários atuais antes de confirmar.", 409);
+  if (/stale private draft revision/i.test(message))
+    throw new ApiError("DRAFT_VERSION_CONFLICT", "O rascunho mudou em outro editor ou já foi concluído. Seu preenchimento foi preservado; compare a revisão salva antes de continuar.", 409);
+  if (/stale remaining need source/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A requisição de origem mudou. Consulte e compare a referência atual antes de confirmar a nova necessidade. Sua seleção e seu motivo foram preservados.", 409);
+  if (/stale transfer preparation|stale transfer version|transfer decision already settled|transfer already dispatched or closed|transfer agreement required before dispatch|transfer not dispatched/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A transferência ou suas referências mudaram. Compare a situação atual antes de preparar outra confirmação. Sua justificativa foi preservada.", 409);
+  if (/bilateral transfer recipient is frozen/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "O recebedor pertence à declaração e à concordância preservadas. Cancele esta transferência pelo fluxo próprio antes de declarar outra com nova pessoa.", 400);
+  if (/insufficient transfer stock/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "O saldo da custódia de origem não comporta a quantidade declarada. Consulte a referência atual antes de continuar.", 409);
+  if (/stale recount assignment reference|stale recount target shift|another recount assignment is active/i.test(message))
+    throw new ApiError("VERSION_CONFLICT","A contagem ou o plantão do reconto mudou. Compare a referência atual e revise a pessoa e o período antes de confirmar. Sua justificativa foi preservada.",409);
+  if (/obsolete balance deferral|balance deferral already decided/i.test(message))
+    throw new ApiError("VERSION_CONFLICT","O pedido ou o plantão proposto mudou. O destino permanece congelado; uma aprovação antiga não pode substituí-lo. Confira a situação atual e preserve sua justificativa.",409);
+  if (/stale balance review|balance review group unavailable/i.test(message))
+    throw new ApiError("VERSION_CONFLICT","A contagem, a revisão ou sua referência mudou. Compare o estado atual; seu parecer foi preservado.",409);
+  if (/balance count attribution unavailable/i.test(message))
+    throw new ApiError("VALIDATION_ERROR","A autoria da contagem antiga não está íntegra. Preserve o histórico e inicie um reconto autorizado.",400);
+  if (/stale (?:or unavailable )?presentation|existing presentation requires identity and version/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A apresentação mudou ou ficou indisponível. Consulte o fator e a versão atuais; os campos informados foram preservados.", 409);
+  if (/administrative regularization required/i.test(message))throw new ApiError("VALIDATION_ERROR","O recebedor está indisponível. Abra a regularização administrativa para registrar base, fatos conhecidos e conferência independente, preservando o recebimento anterior.",400);
+  if (/stale regularization|regularization decision conflict|regularization proposal not eligible/i.test(message))throw new ApiError("VERSION_CONFLICT","A entrega ou a proposta de regularização mudou. Consulte a versão e a decisão atuais antes de preparar outra confirmação.",409);
+  if (/unknown physical facts require an active follow-up owner/i.test(message))throw new ApiError("VALIDATION_ERROR","Indique uma pessoa ativa e elegível para encaminhar a apuração das quantidades ainda desconhecidas. Nenhuma quantidade desconhecida será baixada.",400);
+  if (/regularization exceeds pending transit/i.test(message))throw new ApiError("VALIDATION_ERROR","As quantidades apuradas excedem a pendência em trânsito. Confira somente a nova declaração física; os aceites anteriores permanecem preservados.",400);
+  if (/purchase origin required/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Escolha compra ou doação antes de emitir esta ficha. A origem histórica não informada continua preservada.", 400);
+  if (/stale delivery recipient reference/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "As pessoas elegíveis ou a sugestão da escala mudaram. Consulte e compare as referências atuais; sua escolha e justificativa foram preservadas.", 409);
+  if (/recipient selection reason required|invalid recipient selection reason/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Registre a justificativa própria da escolha manual ou troca de recebedor, com 3 a 1000 caracteres.", 400);
+  if (/historical requisition is read only/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Esta requisição histórica é somente consulta. Registre uma nova necessidade ou prepare uma ficha avulsa para o ato atual.", 400);
+  if (/no purchase expectation remaining/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Não existe expectativa não adquirida elegível para encerrar nesta versão. Materiais já adquiridos continuam sujeitos à chegada e conferência.", 400);
+  if (/delivery cancellation decision conflict/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Este pedido já mudou ou recebeu outra decisão. Consulte o pedido e seu resultado antes de continuar.", 409);
+  if (/stale delivery consumption reference|delivery unit reference changed/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "As referências da conciliação mudaram. Consulte a situação atual e revise as devoluções preservadas antes de confirmar.", 409);
+  if (/delivery consumption reference unavailable/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Não foi possível comprovar as referências de consumo desta conciliação. Atualize a seção; o dado de origem não pode ser corrigido neste formulário.", 400);
+  if (/delivery transit requires reconciliation/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Ainda há material em trânsito sem conciliação. Registre sua situação real antes de concluir o cancelamento.", 400);
+  if (/confirmed delivery consumption insufficient/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "A parte que não será devolvida precisa de consumo já confirmado e disponível para conciliação. Confira as devoluções reais e os relatos vinculados.", 400);
+  if (/consumption decision conflict/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Outro responsável já decidiu esta versão. Consulte o relato e a decisão registrada antes de continuar.", 409);
+  if (/stale consumption report/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "O relato recebeu um complemento. Consulte a versão atual e revise seu conteúdo antes de decidir.", 409);
+  if (/structured consumption supplement required/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Este consumo precisa de material e quantidade. Registre um complemento antes de confirmar o desconto.", 400);
+  if (/purchase has acquisition or receipt facts/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Esta ficha já tem aquisição, parcelas ou encerramento registrados. Preserve esses fatos; confira as parcelas e encerre somente a expectativa ainda não adquirida.", 400);
+  if (/stale preference version/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Sua preferência mudou em outra sessão. Recarregue o estado antes de confirmar uma nova alteração.", 409);
+  if (/science preference or authority changed/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Sua preferência ou habilitação mudou. Consulte novamente a referência antes de confirmar ciência.", 409);
+  if (/stale document material/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A referência do conteúdo desta requisição não confere. Reabra a requisição antes de confirmar ciência.", 409);
   if (/balance requires family deferral before schedule period change/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "Este plantão tem um BAL designado. Registre a decisão familiar no acompanhamento do balanço antes de alterar o período ou cancelar o plantão.",409);
   if (/distinct balance reviewer/i.test(message))
@@ -154,6 +227,7 @@ export async function api(
         recommendedAction: descriptor.recommendedAction,
         retryable: known.retryable,
         correlationId,
+        ...(known.confirmedStage ? { confirmedStage: known.confirmedStage } : {}),
       },
       {
         status: known.status,
@@ -244,8 +318,18 @@ export async function readJson<T>(
   const body = await boundedText(request, maxBytes);
   let json: unknown;
   try {
-    json = JSON.parse(body);
-  } catch {
+    json = JSON.parse(body, (_key, value, ...details: unknown[]) => {
+      if (typeof value === "number") {
+        const source = (details[0] as { source?: string } | undefined)?.source;
+        // Node is pinned to 24. Compare the wire token before a rounded Number
+        // can pass a schema or become an authoritative decimal quantity.
+        if (!source || !Number.isFinite(value) || !quantity(source).eq(quantity(value)))
+          throw new ApiError("VALIDATION_ERROR", "Um número enviado perde precisão. Revise o valor informado.");
+      }
+      return value;
+    });
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
     throw new ApiError("INVALID_JSON", "JSON inválido.");
   }
   const parsed = schema.safeParse(json);
@@ -433,6 +517,13 @@ export function pageParameters(params: URLSearchParams) {
     start: (page - 1) * pageSize,
     end: page * pageSize - 1,
   };
+}
+
+/** Validate request query input before reading; result validation has its own boundary. */
+export function parseQuery<T>(schema: z.ZodType<T>, value: unknown): T {
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) throw new ApiError("VALIDATION_ERROR", "Revise os filtros e os limites desta consulta.", 400);
+  return parsed.data;
 }
 
 /** First instant of a São Paulo calendar day, including historical DST changes. */

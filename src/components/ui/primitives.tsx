@@ -1,5 +1,7 @@
 "use client";
 
+import {documentStatusLabel} from "@/lib/documents/presentation";
+
 import { useEffect, useRef, type ReactNode, type SVGProps } from "react";
 import {
   Badge,
@@ -48,13 +50,14 @@ export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconN
   return <Component width={20} height={20} aria-hidden="true" {...props} />;
 }
 export function StatusBadge({ status }: { status: string }) {
-  const tone = [
+  const tone = !Object.hasOwn(documentStatuses,status)?"neutral":[
     "approved",
     "confirmed",
     "received",
     "delivered",
     "read",
     "completed",
+    "closed_below_quantity",
   ].includes(status)
     ? "success"
     : ["disputed", "rejected", "failed", "cancelled"].includes(status)
@@ -63,8 +66,8 @@ export function StatusBadge({ status }: { status: string }) {
         ? "neutral"
         : "pending";
   return (
-    <Badge appearance="tint" color={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "informative"}>
-      {documentStatuses[status] ?? status}
+    <Badge appearance="tint" style={{ height: "auto", minHeight: "1.5rem", maxWidth: "100%", whiteSpace: "normal", lineHeight: 1.4, paddingBlock: "0.125rem" }} color={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "informative"}>
+      {documentStatusLabel(status)}
     </Badge>
   );
 }
@@ -160,17 +163,19 @@ export function Dialog({
   title,
   children,
   onClose,
+  closeDisabled = false,
 }: {
   open: boolean;
   title: string;
   children: ReactNode;
   onClose: () => void;
+  closeDisabled?: boolean;
 }) {
   return (
-    <FluentDialog open={open} onOpenChange={(_, data) => { if (!data.open) onClose(); }}>
+    <FluentDialog open={open} onOpenChange={(_, data) => { if (!data.open && !closeDisabled) onClose(); }}>
       <DialogSurface className="hca-dialog-surface">
         <DialogBody>
-          <DialogTitle action={<Button appearance="subtle" aria-label="Fechar diálogo" icon={<Icon name="close" />} onClick={onClose} />}>
+          <DialogTitle action={<Button appearance="subtle" aria-label="Fechar diálogo" disabled={closeDisabled} icon={<Icon name="close" />} onClick={onClose} />}>
             {title}
           </DialogTitle>
           <DialogContent className="hca-dialog-content">{children}</DialogContent>

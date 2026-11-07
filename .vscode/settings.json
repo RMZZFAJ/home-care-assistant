@@ -19,5 +19,9 @@
             ],
             "icon": "terminal-powershell"
         }
+    },
+    "sonarlint.connectedMode.project": {
+        "connectionId": "renatomazzarino",
+        "projectKey": "RMZZFAJ_home-care-assistant"
     }
 }

@@ -1,10 +1,9 @@
 "use client";
 import Link from "next/link";
 import { SettingsSection } from "@/components/forms/settings-section";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   api,
-  ApiError,
   buttonClass,
   can,
   inputClass,
@@ -14,7 +13,14 @@ import {
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { formatBrazilDate } from "@/lib/receipt";
-import { formatQuantity } from "@/lib/quantity";
+import {
+  formatStockObservation,
+  formatStockObservationTime,
+} from "@/lib/stock-observation";
+import type {
+  StockObservation,
+  StockObservationTimeSource,
+} from "@/types/requisition";
 import { textRows } from "@/lib/text-rows";
 import { requisitionDocumentState } from "@/lib/documents/presentation";
 import { Attachments } from "@/components/documents/attachments";
@@ -26,6 +32,7 @@ import {
 import { RelatedDocument } from "@/components/documents/related-document";
 import { Dialog } from "@/components/ui/primitives";
 import { ResolveExtraItem } from "./resolve-extra-item";
+import { RequisitionDisplay } from "./requisition-display";
 import {
   deliveryLabels,
   type DeliveryStatus,
@@ -33,13 +40,17 @@ import {
 
 type Progress = {
   version: number;
+  materialIdentity: string;
+  familyAware: boolean;
+  personalScience: boolean;
+  designationPending: boolean;
   scienceSatisfied: boolean;
   eligible: boolean;
   completedAt: string | null;
   manualArchiveRequired: boolean;
   archivedAt: string | null;
   archiveReason: string | null;
-  policy: { scienceAutomatic?: boolean } | null;
+  policy: { scienceRequired?: boolean } | null;
   preferences: Record<string, boolean>;
   events: TimelineEvent[];
   science: {
@@ -60,6 +71,15 @@ type Detail = {
   is_historical?: boolean;
   requester_name_snapshot?: string;
   recipient_name_snapshot?: string;
+  sourceRequisition?: import("@/types/requisition").RequisitionReceipt["sourceRequisition"];
+  remainingNeeds: {
+    id: string;
+    code: string | null;
+    protocol: string;
+    created_at: string;
+    remaining_need_reason: string;
+  }[];
+  remainingNeedTotal: number;
   requisition_items: {
     id: string;
     product_id: string | null;
@@ -67,6 +87,9 @@ type Detail = {
     custom_name: string | null;
     unit_snapshot: string;
     current_stock: string | null;
+    stock_observation?: StockObservation;
+    stock_observation_at?: string | null;
+    stock_observation_time_source?: StockObservationTimeSource;
     urgent: boolean;
     resolution?: { product_id: string } | null;
   }[];
@@ -85,9 +108,11 @@ type Detail = {
 };
 const modes: Record<string, string> = {
   express: "Expressa no aplicativo",
-  app_visible: "Automática · conteúdo exibido",
-  whatsapp_read: "Automática · leitura correlacionada no WhatsApp",
-  whatsapp_confirm: "Simplificada · WhatsApp verificado",
+  dialog: "Confirmação em diálogo antes de abrir",
+  tacit: "Tácita por preferência anterior à emissão",
+  app_visible: "Ciência automática legada · conteúdo exibido",
+  whatsapp_read: "Ciência legada · leitura correlacionada no WhatsApp",
+  whatsapp_confirm: "Ciência legada · WhatsApp verificado",
   dispatch: "Por expedição autorizada",
 };
 
@@ -106,9 +131,6 @@ export function RequisitionDocumentContent({
   const [busy, setBusy] = useState(false);
   const [reason, setReason] = useState("");
   const [review, setReview] = useState<"archive" | "cancel" | null>(null);
-  const visibleRef = useRef<HTMLDivElement>(null);
-  const automaticRef = useRef(false);
-  const automaticAttemptsRef = useRef(0);
   useEffect(() => {
     const controller = new AbortController();
     void api<{ data: Detail }>(
@@ -127,54 +149,6 @@ export function RequisitionDocumentContent({
       });
     return () => controller.abort();
   }, [id, attempt, revision]);
-  useEffect(() => {
-    if (
-      !data ||
-      data.is_historical ||
-      automaticRef.current ||
-      data.progress.science.some((row) => row.user_id === context.userId) ||
-      !data.progress.eligible ||
-      !data.progress.preferences.scienceAutomatic ||
-      !data.progress.policy?.scienceAutomatic ||
-      !visibleRef.current
-    )
-      return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          document.hidden ||
-          !entries.some((entry) => entry.isIntersecting) ||
-          automaticRef.current
-        )
-          return;
-        automaticRef.current = true;
-        automaticAttemptsRef.current += 1;
-        void api(`/api/requisitions/${id}/science`, {
-          mode: "app_visible",
-          expectedVersion: data.progress.version,
-        })
-          .then(() => {
-            setMessage(
-              "Ciência automática registrada após exibição do conteúdo.",
-            );
-            setAttempt((value) => value + 1);
-          })
-          .catch((cause) => {
-            if (
-              cause instanceof ApiError &&
-              cause.status === 409 &&
-              automaticAttemptsRef.current < 3
-            ) {
-              automaticRef.current = false;
-              setAttempt((value) => value + 1);
-            } else setError(cause.message);
-          });
-      },
-      { threshold: 0.5 },
-    );
-    observer.observe(visibleRef.current);
-    return () => observer.disconnect();
-  }, [data, id, context.userId]);
   async function action(operation: "science" | "archive" | "cancel") {
     if (!data) return;
     setBusy(true);
@@ -183,7 +157,11 @@ export function RequisitionDocumentContent({
       await api(
         `/api/requisitions/${id}/${operation === "cancel" ? "status" : operation}`,
         operation === "science"
-          ? { mode: "express", expectedVersion: data.progress.version }
+          ? {
+              mode: "express",
+              expectedVersion: data.progress.version,
+              materialIdentity: data.progress.materialIdentity,
+            }
           : operation === "cancel"
             ? { status: "cancelled", reason }
             : { reason },
@@ -210,12 +188,30 @@ export function RequisitionDocumentContent({
   }
   if (!data)
     return (
-      <Notice error={Boolean(error)}>
-        {error || "Carregando requisição…"}
-      </Notice>
+      <div className="space-y-3">
+        <Notice error={Boolean(error)}>
+          {error || "Carregando requisição…"}
+        </Notice>
+        {error ? (
+          <button
+            type="button"
+            className={buttonClass}
+            onClick={() => setAttempt((value) => value + 1)}
+          >
+            Tentar carregar requisição
+          </button>
+        ) : null}
+      </div>
     );
   const { fulfillment: f, progress: p } = data;
-  const documentState = requisitionDocumentState({ historical: data.is_historical, status: data.status, archivedAt: p.archivedAt, completedAt: p.completedAt, scienceSatisfied: p.scienceSatisfied, fulfilled: f.fulfilled });
+  const documentState = requisitionDocumentState({
+    historical: data.is_historical,
+    status: data.status,
+    archivedAt: p.archivedAt,
+    completedAt: p.completedAt,
+    scienceSatisfied: p.scienceSatisfied,
+    fulfilled: f.fulfilled,
+  });
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <Link className={buttonClass} href="/historico">
@@ -223,7 +219,23 @@ export function RequisitionDocumentContent({
       </Link>
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      <DocumentHeader id={id} type="REQ" code={data.code ?? data.protocol} protocol={data.protocol} status={documentState} version={p.version} createdAt={data.created_at} dateLabel={data.is_historical && !data.created_at ? "Data original desconhecida" : undefined} observedRef={visibleRef} patientName={data.recipient_name_snapshot ?? context.patient?.display_name}>
+      <DocumentHeader
+        id={id}
+        type="REQ"
+        code={data.code ?? data.protocol}
+        protocol={data.protocol}
+        status={documentState}
+        version={p.version}
+        createdAt={data.created_at}
+        dateLabel={
+          data.is_historical && !data.created_at
+            ? "Data original desconhecida"
+            : undefined
+        }
+        patientName={
+          data.recipient_name_snapshot ?? context.patient?.display_name
+        }
+      >
         <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
           <span>
             Solicitante:{" "}
@@ -252,9 +264,11 @@ export function RequisitionDocumentContent({
             <strong>
               {data.is_historical
                 ? "Não comprovada no original"
-                : p.scienceSatisfied
-                  ? "Exigência satisfeita"
-                  : "Pendente"}
+                : p.familyAware
+                  ? "Família ciente"
+                  : p.designationPending
+                    ? "Pendente de designação"
+                    : "Ciência não registrada"}
             </strong>
             <p className="text-xs">Independente do recebimento</p>
           </div>
@@ -274,6 +288,59 @@ export function RequisitionDocumentContent({
           </div>
         </div>
       </DocumentHeader>
+      {data.sourceRequisition ? (
+        <section
+          className="ui-card space-y-3"
+          aria-label="Origem da necessidade remanescente"
+        >
+          <h2>Origem da necessidade remanescente</h2>
+          <RelatedDocument
+            type="REQ"
+            id={data.sourceRequisition.id}
+            label={
+              data.sourceRequisition.code ?? data.sourceRequisition.protocol
+            }
+          />
+          <p>Referência na emissão: versão {data.sourceRequisition.version}.</p>
+          <p className="whitespace-pre-wrap">
+            Motivo próprio: {data.sourceRequisition.reason}
+          </p>
+          <p>
+            Esta requisição tem ciência e atendimento próprios; os aceites
+            anteriores pertencem à origem.
+          </p>
+        </section>
+      ) : null}
+      {data.remainingNeedTotal > 0 ? (
+        <section
+          className="ui-card space-y-3"
+          aria-label="Necessidades seguintes"
+        >
+          <h2>Necessidades seguintes</h2>
+          <p>
+            {data.remainingNeeds.length} de {data.remainingNeedTotal} registros,
+            mais recentes primeiro.
+          </p>
+          {data.remainingNeeds.map((row) => (
+            <article key={row.id}>
+              <RelatedDocument
+                type="REQ"
+                id={row.id}
+                label={row.code ?? row.protocol}
+              />
+              <p>{row.remaining_need_reason}</p>
+            </article>
+          ))}
+        </section>
+      ) : null}
+      {!data.is_historical && can(context, "req.create") ? (
+        <Link
+          className={buttonClass}
+          href={`/fichas/req?careRecipientId=${data.care_recipient_id}&sourceRequisitionId=${id}`}
+        >
+          Declarar nova necessidade remanescente
+        </Link>
+      ) : null}
       <section className="ui-card">
         <h2 className="font-semibold">Materiais requisitados</h2>
         <p className="mt-2 text-xs text-(--muted)">
@@ -305,13 +372,18 @@ export function RequisitionDocumentContent({
                   ) : null}
                 </div>
                 <p className="mt-2 text-xs text-(--muted)">
-                  {item.current_stock === null
-                    ? "Estoque desconhecido"
-                    : "Estoque observado na emissão: " +
-                      formatQuantity(
-                        String(item.current_stock),
-                        item.unit_snapshot,
-                      )}
+                  Estoque da equipe informado:{" "}
+                  {formatStockObservation(
+                    item.current_stock,
+                    item.stock_observation,
+                    item.unit_snapshot,
+                  )}
+                  <span className="block text-xs text-(--muted)">
+                    {formatStockObservationTime(
+                      item.stock_observation_at,
+                      item.stock_observation_time_source,
+                    )}
+                  </span>
                 </p>
                 <div className="mt-2 flex flex-wrap gap-3">
                   {line?.deliveries.map((delivery) => (
@@ -353,10 +425,23 @@ export function RequisitionDocumentContent({
         <p className="mt-2 text-sm">
           {data.is_historical
             ? "A ciência original não foi comprovada. Nenhuma confirmação foi inferida na importação."
-            : p.scienceSatisfied
-              ? "Ciência exigida satisfeita. As evidências abaixo identificam a origem de cada registro."
-              : "A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente."}
+            : p.familyAware
+              ? "Família ciente por uma pessoa habilitada. Cada pessoa mantém seu próprio registro."
+              : p.policy?.scienceRequired === false
+                ? "A exigência foi dispensada pela regra desta requisição. Isso não registra ciência em nome de ninguém."
+                : "A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente."}
         </p>
+        {!data.is_historical ? (
+          <p className="mt-2 text-sm">
+            Minha ciência:{" "}
+            {p.personalScience
+              ? "registrada"
+              : p.eligible
+                ? "pendente"
+                : "sem habilitação neste paciente"}
+            .
+          </p>
+        ) : null}
         <ul className="mt-3 space-y-2">
           {p.science.map((row) => (
             <li
@@ -375,8 +460,9 @@ export function RequisitionDocumentContent({
         p.eligible &&
         !p.archivedAt &&
         data.status !== "cancelled" &&
-        !p.science.some((row) => row.user_id === context.userId) &&
-        p.preferences.scienceExpress !== false ? (
+        !p.science.some(
+          (row) => row.user_id === context.userId && row.mode === "express",
+        ) ? (
           <button
             type="button"
             className={primaryClass + " mt-4"}
@@ -411,6 +497,7 @@ export function RequisitionDocumentContent({
           </p>
         ) : null}
       </section>
+      <RequisitionDisplay key={id} id={id} reference={p} showHistory />
       <DocumentTimeline events={p.events} />
       {!data.is_historical &&
       !p.archivedAt &&
@@ -473,7 +560,13 @@ export function RequisitionDocumentContent({
           </button>
         </form>
       </Dialog>
-      <SettingsSection title="Avisos e acompanhamento" summary={data.requisition_notifications.length + " aviso(s) · estados do aplicativo e do provedor são independentes"}>
+      <SettingsSection
+        title="Avisos e acompanhamento"
+        summary={
+          data.requisition_notifications.length +
+          " aviso(s) · estados do aplicativo e do provedor são independentes"
+        }
+      >
         <p className="mt-2 text-xs text-(--muted)">
           Enviado, entregue, lido e ciência são fatos independentes.
         </p>

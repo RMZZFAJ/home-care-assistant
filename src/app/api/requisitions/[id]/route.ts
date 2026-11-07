@@ -22,7 +22,7 @@ export async function GET(
     const { data, error } = await auth.client
       .from("requisitions")
       .select(
-        "id,code,protocol,care_recipient_id,status,created_at,updated_at,is_historical,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body,created_at),requisition_status_history(id,from_status,to_status,changed_by,changed_at,reason),requisition_notifications(id,recipient_group,recipient_label,channel,state,attempts,attempted_at)",
+        "id,code,protocol,care_recipient_id,status,created_at,updated_at,is_historical,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,stock_observation,stock_observation_at,stock_observation_time_source,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body,created_at),requisition_status_history(id,from_status,to_status,changed_by,changed_at,reason),requisition_notifications(id,recipient_group,recipient_label,channel,state,attempts,attempted_at)",
       )
       .eq("id", id)
       .maybeSingle();
@@ -40,6 +40,21 @@ export async function GET(
         data.requisition_items.map((item) => item.id),
       );
     if (resolutionError) databaseError(resolutionError);
+    const {
+      data: remainingNeeds,
+      error: remainingError,
+      count: remainingNeedTotal,
+    } = await auth.client
+      .from("requisitions")
+      .select("id,code,protocol,created_at,remaining_need_reason", {
+        count: "exact",
+      })
+      .eq("source_requisition_id", id)
+      .eq("care_recipient_id", data.care_recipient_id)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .limit(20);
+    if (remainingError) databaseError(remainingError);
     const [notifications, fulfillment, progress] = await Promise.all([
       rpc(auth.client, "document_delivery_status", { p_document: id }),
       rpc(auth.client, "requisition_fulfillment", { p_requisition: id }),
@@ -48,6 +63,9 @@ export async function GET(
     return NextResponse.json({
       data: {
         ...data,
+        sourceRequisition: receipt.sourceRequisition,
+        remainingNeeds: remainingNeeds ?? [],
+        remainingNeedTotal: remainingNeedTotal ?? 0,
         requisition_items: data.requisition_items.map((item) => ({
           ...item,
           resolution:

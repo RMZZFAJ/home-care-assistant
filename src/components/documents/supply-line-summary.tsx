@@ -1,18 +1,49 @@
-import type { SupplyLine, DocumentType } from "@/types/documents";
+import type {
+  SupplyLine,
+  DocumentType,
+  PurchaseProgressLine,
+} from "@/types/documents";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import {
+  readPresentationConversions,
+  presentationCaption,
+} from "@/lib/presentation-conversion";
 
 export function SupplyLineSummary({
   line,
   type,
   status,
+  purchaseLine,
+  declarationOnly = false,
 }: {
   line: SupplyLine;
   type: DocumentType;
   status: string;
+  purchaseLine?: PurchaseProgressLine;
+  declarationOnly?: boolean;
 }) {
+  if (declarationOnly)
+    return (
+      <article className="rounded-xl border border-(--line) p-4">
+        <h3 className="font-semibold">{line.name_snapshot}</h3>
+        <dl className="mt-3 text-sm">
+          <dt>Declarado</dt>
+          <dd>{formatQuantity(line.quantity, line.unit_snapshot)}</dd>
+        </dl>
+        <p className="mt-3 text-sm">
+          Quantidade da declaração preservada, sem expedição ou recebimento
+          nesta transferência.
+        </p>
+      </article>
+    );
   return (
     <article className="rounded-xl border border-(--line) p-4">
       <h3 className="font-semibold">{line.name_snapshot}</h3>
+      {readPresentationConversions(line.presentation_conversions).map((row) => (
+        <p key={row.id} className="mt-2 wrap-break-word text-sm">
+          {presentationCaption(row)}
+        </p>
+      ))}
       <dl className="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
         <div>
           <dt className="text-(--muted)">
@@ -36,6 +67,28 @@ export function SupplyLineSummary({
               <dt>Adquirido</dt>
               <dd>{formatQuantity(line.purchased_quantity)}</dd>
             </div>
+            {purchaseLine ? (
+              <>
+                <div>
+                  <dt>Em conferência</dt>
+                  <dd>
+                    {formatQuantity(purchaseLine.pendingValidationQuantity)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Aquisição sem chegada válida</dt>
+                  <dd>{formatQuantity(purchaseLine.unarrivedQuantity)}</dd>
+                </div>
+                <div>
+                  <dt>Não será adquirido</dt>
+                  <dd>{formatQuantity(purchaseLine.waivedQuantity)}</dd>
+                </div>
+                <div>
+                  <dt>Por adquirir</dt>
+                  <dd>{formatQuantity(purchaseLine.remainingExpectation)}</dd>
+                </div>
+              </>
+            ) : null}
           </>
         ) : type === "ENT" ? (
           <>
@@ -72,7 +125,13 @@ export function SupplyLineSummary({
           </div>
         )}
         <div>
-          <dt>{type === "ENT" ? "Conciliado" : "Recebido / validado"}</dt>
+          <dt>
+            {type === "ENT"
+              ? "Conciliado"
+              : type === "COM"
+                ? "Validado"
+                : "Recebido / validado"}
+          </dt>
           <dd>
             {formatQuantity(
               type === "ENT"
@@ -86,13 +145,17 @@ export function SupplyLineSummary({
         <p className="mt-3 text-xs">
           {line.fully_checked
             ? "Linha integralmente conferida"
-            : line.metadata.issueOpen
-              ? "Divergência aberta"
-              : status === "confirmed"
-                ? "Linha conciliada com diferença"
-                : status === "cancelled"
-                  ? "Expedição cancelada e compensada"
-                  : "Aguardando conferência"}
+            : status === "administratively_closed"
+              ? line.metadata.issueOpen
+                ? "Encerramento administrativo · situação física ainda desconhecida"
+                : "Conciliação administrativa registrada · aceite pessoal preservado"
+              : line.metadata.issueOpen
+                ? "Divergência aberta"
+                : status === "confirmed"
+                  ? "Linha conciliada com diferença"
+                  : status === "cancelled"
+                    ? "Expedição cancelada e compensada"
+                    : "Aguardando conferência"}
         </p>
       ) : null}
       {line.requisitionItemIds.length ? (

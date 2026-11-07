@@ -1,4 +1,6 @@
+import { generatedPdf } from "./generated-pdf";
 import { selectContext } from "./auth-context";
+import { selectDeliveryRecipient } from "./delivery-recipient";
 import { openNavigation } from "./navigation";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
@@ -92,7 +94,10 @@ async function prepare(page: Page, count = 1) {
 async function next(page: Page) {
   await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
 }
-async function confirm(page: Page) {
+async function confirm(
+  page: Page,
+  expectedMessage = "Operação confirmada e registrada na ficha.",
+) {
   await page
     .getByRole("button", { name: "Revisar operação", exact: true })
     .click();
@@ -110,7 +115,7 @@ async function confirm(page: Page) {
   expect(response.ok(), await response.text()).toBeTruthy();
   await expect(dialog).not.toBeVisible();
   await expect(
-    page.getByText("Operação confirmada e registrada na ficha.", {
+    page.getByText(expectedMessage, {
       exact: false,
     }),
   ).toBeVisible();
@@ -154,9 +159,11 @@ async function issueSupply(
       (requestId ? "&requisitionId=" + requestId : ""),
   );
   if (type === "ENT")
-    await page
-      .getByLabel("Destinatário designado", { exact: false })
-      .selectOption(fixtures().professional.id);
+    await selectDeliveryRecipient(
+      page,
+      "Teste professional",
+      "Pessoa indicada manualmente para receber estes materiais",
+    );
   if (type === "COM")
     await page.getByLabel("Forma de aquisição").selectOption("donation");
   await next(page);
@@ -217,18 +224,24 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await page
     .getByRole("button", { name: "Aprovar itens", exact: true })
     .click();
-  await confirm(page);
+  await confirm(page, "Decisão de aprovação registrada.");
   await logout(page);
   await login(page, "family");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
   await page
     .getByRole("button", { name: "Registrar aquisição", exact: true })
     .click();
-  await confirm(page);
   await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
+    .getByLabel(product.name + " · unidade", { exact: true })
+    .fill("10");
+  await confirm(page, "Aquisição registrada.");
+  await page
+    .getByRole("button", { name: "Informar nova chegada", exact: true })
     .click();
-  await confirm(page);
+  await page
+    .getByLabel(product.name + " · unidade", { exact: true })
+    .fill("10");
+  await confirm(page, "Chegada registrada e aguardando conferência.");
   let stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
@@ -239,7 +252,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await page
     .getByRole("button", { name: "Validar recebimento", exact: true })
     .click();
-  await confirm(page);
+  await confirm(page, "Parcela validada.");
   stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
@@ -287,7 +300,9 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   })
     .png()
     .toBuffer();
-  await page.getByRole("button", { name: "Anexos e ficha física", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Anexos e ficha física", exact: true })
+    .click();
   await page.getByLabel("Adicionar foto ou PDF").setInputFiles({
     name: "ficha-fisica.png",
     mimeType: "image/png",
@@ -297,7 +312,8 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await expect(
     page.getByRole("link", { name: "ficha-fisica.png", exact: true }),
   ).toBeVisible();
-  const pdf = await get(page,
+  const pdf = await generatedPdf(
+    page,
     "/api/documents/" + req.requisitionId + "/pdf",
   );
   expect(pdf.ok(), await pdf.text()).toBeTruthy();
@@ -367,14 +383,13 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     })
   ).receipt;
   const detail = (
-    await (
-      await get(page, "/api/requisitions/" + req.requisitionId)
-    ).json()
+    await (await get(page, "/api/requisitions/" + req.requisitionId)).json()
   ).data;
   const first = await post(page, "/api/documents", {
     careRecipientId: patient,
     type: "ENT",
     payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures().professional.id,
@@ -393,6 +408,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     careRecipientId: patient,
     type: "ENT",
     payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures().professional.id,
@@ -439,7 +455,10 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
         data: {
           careRecipientId: patient,
           type: "COM",
-          payload: { lines: [{ productId: products[0].id, quantity: "1" }] },
+          payload: {
+            origin: "purchase",
+            lines: [{ productId: products[0].id, quantity: "1" }],
+          },
           idempotencyKey: randomUUID(),
           draft: false,
         },
@@ -447,9 +466,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     ).status(),
   ).toBe(403);
   const navigation = await openNavigation(page);
-  await expect(
-    navigation.nav.locator('a[href="/fichas/com"]'),
-  ).toHaveCount(0);
+  await expect(navigation.nav.locator('a[href="/fichas/com"]')).toHaveCount(0);
   await navigation.close();
   await logout(page);
   await login(page, "reader");
@@ -505,9 +522,7 @@ test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async (
     page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
   ).toBeVisible();
   const listing = await (
-    await get(page,
-      "/api/documents?careRecipientId=" + patient + "&type=REQ",
-    )
+    await get(page, "/api/documents?careRecipientId=" + patient + "&type=REQ")
   ).json();
   expect(listing.total).toBe(1);
   expect(listing.data[0].id).toBe(savedId);
@@ -520,13 +535,14 @@ test("histórico filtra código e período e conserva o documento de paciente re
 }) => {
   await login(page);
   const { patient, products } = await prepare(page);
+  const intentKey = randomUUID();
   const req = (
     await post(page, "/api/requisitions", {
       careRecipientId: patient,
       lines: [{ productId: products[0].id, currentStock: 2, urgent: false }],
       extraItems: [],
       observations: ["Observação original"],
-      idempotencyKey: randomUUID(),
+      idempotencyKey: intentKey,
     })
   ).receipt;
   await post(page, "/api/admin", {
@@ -543,11 +559,17 @@ test("histórico filtra código e período e conserva o documento de paciente re
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
   await expect(page).toHaveURL(/search=REQ-0001/);
-  await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
+  await expect(
+    page.locator("body style[data-make-styles-rehydration]"),
+  ).toHaveCount(0);
   await expect
-    .poll(() => page.evaluate(() =>
-      document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-    ))
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <=
+          document.documentElement.clientWidth,
+      ),
+    )
     .toBe(true);
   await expect(
     page.getByRole("link").filter({ hasText: "REQ-0001" }),
@@ -559,6 +581,19 @@ test("histórico filtra código e período e conserva o documento de paciente re
   await expect(
     page.getByText("Observação original", { exact: true }),
   ).toBeVisible();
+  const recovered = await page.request.post("/api/requisitions", {
+    data: {
+      careRecipientId: patient,
+      lines: [{ productId: products[0].id, currentStock: 2, urgent: false }],
+      extraItems: [],
+      observations: ["Observação original"],
+      idempotencyKey: intentKey,
+    },
+  });
+  expect(recovered.ok(), await recovered.text()).toBe(true);
+  expect((await recovered.json()).receipt.requisitionId).toBe(
+    req.requisitionId,
+  );
   const denied = await page.request.post("/api/requisitions", {
     data: {
       careRecipientId: patient,
@@ -569,6 +604,7 @@ test("histórico filtra código e período e conserva o documento de paciente re
     },
   });
   expect(denied.status()).toBe(409);
+  expect(await denied.json()).toMatchObject({ code: "PATIENT_INACTIVE" });
 });
 
 test("estoque familiar: revisão, paginação, filtro e correção compensatória auditável", async ({
@@ -593,18 +629,23 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   await page.getByRole("button", { name: "Próxima", exact: true }).click();
   await expect(page.getByText("2 / 2", { exact: true })).toBeVisible();
   const history = await (
-    await get(page,
+    await get(
+      page,
       "/api/stock/movements?careRecipientId=" + patient + "&page=2",
     )
   ).json();
   const reference = history.data[0].id;
-  await page.getByRole("button", { name: "Movimentar estoque familiar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Movimentar estoque familiar", exact: true })
+    .click();
   await page
     .getByLabel("Operação", { exact: true })
     .selectOption("correction_out");
   await page.getByLabel("Produto", { exact: true }).selectOption(product.id);
   await page.getByLabel("Quantidade", { exact: true }).fill("1");
-  await page.getByLabel("Movimento original a compensar").selectOption(reference);
+  await page
+    .getByLabel("Movimento original a compensar")
+    .selectOption(reference);
   await page
     .getByLabel("Motivo", { exact: true })
     .fill("Correção auditável E2E");
@@ -635,7 +676,14 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   });
   await page.reload();
   await expect(
-    page.getByRole("row", { name: product.name + " · Família", exact: true }).or(page.getByRole("article", { name: product.name + " · Família", exact: true })),
+    page
+      .getByRole("row", { name: product.name + " · Família", exact: true })
+      .or(
+        page.getByRole("article", {
+          name: product.name + " · Família",
+          exact: true,
+        }),
+      ),
   ).toContainText("Inativo");
 });
 
@@ -706,9 +754,8 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
     .getByLabel("Motivo / justificativa")
     .fill("Contagem descartada após revisão operacional");
   await confirm(page);
-  const detail = (
-    await (await get(page, "/api/documents/" + bal.id)).json()
-  ).data;
+  const detail = (await (await get(page, "/api/documents/" + bal.id)).json())
+    .data;
   expect(detail.status).toBe("cancelled");
   expect(
     detail.events.some(
@@ -767,9 +814,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     .click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
   const original = (
-    await (
-      await get(page, "/api/requisitions/" + extra.requisitionId)
-    ).json()
+    await (await get(page, "/api/requisitions/" + extra.requisitionId)).json()
   ).data.requisition_items[0];
   expect(original.product_id).toBeNull();
   expect(original.resolution.product_id).toBe(product.id);
@@ -813,9 +858,11 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     });
   });
   await page.goto("/fichas/ent?careRecipientId=" + patient);
-  await page
-    .getByLabel("Destinatário designado", { exact: false })
-    .selectOption(fixtures().professional.id);
+  await selectDeliveryRecipient(
+    page,
+    "Teste professional",
+    "Pessoa indicada manualmente para receber estes materiais",
+  );
   await page
     .getByText("Vincular requisições pendentes", { exact: true })
     .click();
@@ -842,8 +889,8 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await page.getByLabel("Código manual").fill("1234567890128");
   await page.getByRole("button", { name: "Identificar", exact: true }).click();
   await expect(
-    page.getByLabel("Quantidade — " + product.name, { exact: true }),
-  ).toHaveValue("2");
+    page.getByText("Quantidade total calculada:", { exact: false }),
+  ).toContainText("2 unidade");
   // A real EAN-13 image exercises the fallback decoder independently of the camera stub.
   const left = [
     "0001101",
@@ -890,8 +937,8 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     buffer: barcodeImage,
   });
   await expect(
-    page.getByLabel("Quantidade — " + product.name, { exact: true }),
-  ).toHaveValue("4");
+    page.getByText("Quantidade total calculada:", { exact: false }),
+  ).toContainText("4 unidade");
   await expect(page.getByText(/Código desconhecido/)).not.toBeVisible();
   for (let step = 0; step < 3; step++) {
     const shared = page.getByLabel(
@@ -931,9 +978,8 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     .click();
   await confirm(page);
   for (const id of [extra.requisitionId, second.requisitionId]) {
-    const req = (
-      await (await get(page, "/api/requisitions/" + id)).json()
-    ).data;
+    const req = (await (await get(page, "/api/requisitions/" + id)).json())
+      .data;
     expect(req.fulfillment.fulfilled).toBe(1);
   }
 });
@@ -957,6 +1003,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
       careRecipientId: patient,
       type: "ENT",
       payload: {
+        recipientReason: "Escolha manual fictícia para este recebimento",
         source: "FAMILY",
         destination: "CARE_TEAM",
         recipientId: fixtures().professional.id,
@@ -1006,7 +1053,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await page
     .getByLabel("Motivo / justificativa")
     .fill("Devolução integral acordada com o recebedor");
-  await confirm(page);
+  await confirm(page, "Pedido de cancelamento registrado, sem estorno.");
   await expect(
     page.getByText("Cancelamento aguardando consentimento", { exact: true }),
   ).toBeVisible();
@@ -1029,7 +1076,19 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await page
     .getByLabel("Motivo / justificativa")
     .fill("Quatro unidades efetivamente devolvidas à família");
-  await confirm(page);
+  await expect(
+    page.getByText("Consumo já confirmado disponível: 0 unidade", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(page.locator('input[name$=":consumed"]')).toHaveCount(0);
+  const actualReturn = page.getByRole("textbox", {
+    name: `Devolução física real · ${product.name} · unidade`,
+    exact: true,
+  });
+  await expect(actualReturn).toHaveValue("");
+  await actualReturn.fill("4");
+  await confirm(page, "Cancelamento consentido.");
   stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)
@@ -1058,6 +1117,7 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
       careRecipientId: patient,
       type: "ENT",
       payload: {
+        recipientReason: "Escolha manual fictícia para este recebimento",
         source: "FAMILY",
         destination: "CARE_TEAM",
         recipientId: fixtures().professional.id,
@@ -1121,17 +1181,37 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(5);
   await expect(
-    page.getByText("Consumo · Equipe · Aguardando confirmação", {
+    page.getByText("Consumo · Equipe · Aguardando conferência", {
       exact: true,
     }),
   ).toBeVisible();
+  const reports = (
+    await (
+      await get(page, "/api/consumption?careRecipientId=" + patient)
+    ).json()
+  ).data;
+  expect(reports).toHaveLength(1);
+  const report = reports[0];
+  expect(report).toMatchObject({
+    kind: "consumption",
+    location: "CARE_TEAM",
+    status: "reported",
+    version: 1,
+  });
   await logout(page);
   await login(page, "adminA");
-  await page.goto("/consumo?careRecipientId=" + patient);
+  await page.goto("/consumo?careRecipientId=" + patient + "&ref=" + report.id);
   await page
-    .getByRole("button", { name: "Confirmar relato e movimento", exact: true })
+    .getByRole("button", { name: "Conferir consumo", exact: true })
     .click();
-  await page.getByRole("dialog").getByRole("button", { name: "Confirmar consumo", exact: true }).click();
+  const decision = page.getByRole("dialog", {
+    name: "Revisar confirmação do consumo",
+    exact: true,
+  });
+  await expect(decision.locator("input,textarea,select")).toHaveCount(0);
+  await decision
+    .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })
+    .click();
   await expect(
     page.getByText("Consumo · Equipe · Confirmado", { exact: true }),
   ).toBeVisible();

@@ -1,21 +1,30 @@
 "use client";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, MessageBar, MessageBarBody, OverlayDrawer } from "@fluentui/react-components";
 import { Icon } from "@/components/ui/primitives";
 
 /** Contextual editing keeps the list and its filters in place. */
-export function RecordDrawer({ title, children, onClose, busy = false, restoreFocusTo, trackChanges = true, preventClose = false }: {
-  title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; trackChanges?: boolean; preventClose?: boolean;
+export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false }: {
+  title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
+  recovery?: ReactNode;
 }) {
   const [dirty, setDirty] = useState(false);
   const [discard, setDiscard] = useState(false);
-  useEffect(() => () => {
-    if (restoreFocusTo?.isConnected) requestAnimationFrame(() => restoreFocusTo.focus());
-  }, [restoreFocusTo]);
+  const restoreFrameRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    // A replacement effect (including Strict Mode's probe) is not a close.
+    if (restoreFrameRef.current !== undefined) cancelAnimationFrame(restoreFrameRef.current);
+    const fallback = restoreFocusFallbackRef?.current;
+    return () => { restoreFrameRef.current = requestAnimationFrame(() => {
+      if (restoreFocusTo?.isConnected && !restoreFocusTo.matches(':disabled,[aria-disabled="true"]')) restoreFocusTo.focus();
+      else if (fallback?.isConnected) fallback.focus();
+    }); };
+  }, [restoreFocusTo,restoreFocusFallbackRef]);
   const requestClose = () => { if (!busy && !preventClose) { if (dirty) setDiscard(true); else onClose(); } };
-  return <OverlayDrawer open position="end" size="medium" className="hca-record-drawer" onOpenChange={(_, data) => { if (!data.open) requestClose(); }}>
+  return <OverlayDrawer open aria-label={title} position="end" size="medium" className="hca-record-drawer" onOpenChange={(_, data) => { if (!data.open) requestClose(); }}>
     <DrawerHeader><DrawerHeaderTitle action={<Button appearance="subtle" icon={<Icon name="close" />} aria-label="Fechar edição" disabled={busy || preventClose} onClick={requestClose} />}>{title}</DrawerHeaderTitle></DrawerHeader>
     <DrawerBody>
+      {recovery}
       {discard ? <MessageBar layout="multiline" intent="warning" role="alert"><MessageBarBody>Há alterações ainda não salvas.<div className="hca-toolbar"><Button onClick={() => setDiscard(false)}>Continuar editando</Button><Button onClick={onClose}>Descartar alterações</Button></div></MessageBarBody></MessageBar> : null}
       <fieldset className="min-w-0" disabled={busy} onChange={() => { if (trackChanges) setDirty(true); }}>{children}</fieldset>
     </DrawerBody>

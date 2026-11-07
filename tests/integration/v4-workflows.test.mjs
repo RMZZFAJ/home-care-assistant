@@ -69,6 +69,7 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
   assert.ifError(secondLines.error);
   const family = await actor("family", patient);
   const payload = {
+    recipientReason: "Escolha manual fictícia para este recebimento",
     source: "FAMILY",
     destination: "CARE_TEAM",
     recipientId: fixtures.professional.id,
@@ -212,7 +213,7 @@ test("V4: local changes apply immediately; global proposals need a different loc
   const local = await rpc(admin, "configure_patient_access", {
     p_patient: patient,
     p_kind: "settings",
-    p_change: { scienceByDispatch: false },
+    p_change: { scienceRequired: false },
     p_key: randomUUID(),
     p_version: 1,
   });
@@ -269,12 +270,12 @@ test("V4: completion without science permanently blocks automatic archive and pr
   await rpc(admin, "configure_patient_access", {
     p_patient: patient,
     p_kind: "settings",
-    p_change: { scienceByDispatch: false },
+    p_change: { scienceRoles: ["family"], scienceUsers: [] },
     p_key: randomUUID(),
     p_version: 1,
   });
   const req = await issue(patient, [products[0]]),
-    ent = await delivery(patient, req, [products[0]]);
+    ent = await delivery(patient, req, [products[0]], {}, "adminA");
   const pro = await actor("professional", patient);
   await rpc(pro, "supply_document_command", {
     p_id: ent.id,
@@ -321,12 +322,12 @@ test("V4: completion without science permanently blocks automatic archive and pr
   );
 });
 
-test("V4: automatic science requires both policy and personal consent, preserving its actual origin", async () => {
+test("V4: legacy header visibility consent cannot record new SCI and the manual alternative remains available", async () => {
   const { patient, admin, products } = await setup();
   await rpc(admin, "configure_patient_access", {
     p_patient: patient,
     p_kind: "settings",
-    p_change: { scienceAutomatic: true, scienceByDispatch: false },
+    p_change: { scienceAutomatic: true },
     p_key: randomUUID(),
     p_version: 1,
   });
@@ -369,16 +370,18 @@ test("V4: automatic science requires both policy and personal consent, preservin
       scienceWhatsApp: false,
     },
   });
-  const accepted = await rpc(family, "acknowledge_requisition", {
+  assert.ok((await family.rpc("acknowledge_requisition", {
     p_id: req.id,
     p_mode: "app_visible",
     p_version: 1,
-  });
+  })).error);
+  assert.equal((await rpc(family, "requisition_progress", { p_id: req.id })).science.length, 0);
+  const accepted = await rpc(family, "acknowledge_requisition", { p_id: req.id, p_mode: "express", p_version: 1 });
   assert.equal(accepted.scienceSatisfied, true);
-  assert.equal(accepted.science[0].mode, "app_visible");
+  assert.equal(accepted.science[0].mode, "express");
   const repeated = await rpc(family, "acknowledge_requisition", {
     p_id: req.id,
-    p_mode: "app_visible",
+    p_mode: "express",
     p_version: 1,
   });
   assert.equal(repeated.science.length, 1);
@@ -827,7 +830,7 @@ test("V4: purpose-bound receipt Flow preserves partial stock and no-issues never
   );
 });
 
-test("V4: WhatsApp science requires verified contact, consent and correlated template evidence (local provider contract)", async () => {
+test("V4: WhatsApp read remains communication and new identified SCI awaits external homologation (local contract)", async () => {
   const { patient, admin, products } = await setup(),
     service = createClient(env.url, env.serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -862,7 +865,7 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
     p_change: {
       scienceWhatsApp: true,
       scienceAutomatic: true,
-      scienceByDispatch: false,
+      scienceByDispatch: true,
     },
     p_key: randomUUID(),
     p_version: 1,
@@ -903,7 +906,7 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
       p_worker: first.worker,
       p_hash: hash,
     }),
-    true,
+    false,
   );
   assert.equal(
     await rpc(service, "confirm_whatsapp_science", {
@@ -919,12 +922,12 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
       p_phone: "15555550102",
       p_hash: hash,
     }),
-    true,
+    false,
   );
   assert.equal(
     (await rpc(family, "requisition_progress", { p_id: first.req.id }))
-      .science[0].mode,
-    "whatsapp_confirm",
+      .science.length,
+    0,
   );
   assert.equal(
     await rpc(service, "confirm_whatsapp_science", {
@@ -968,7 +971,8 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
   });
   assert.equal(
     (await rpc(family, "requisition_progress", { p_id: second.req.id }))
-      .science[0].mode,
-    "whatsapp_read",
+      .science.length,
+    0,
   );
+  assert.equal(sql(`select state from public.requisition_notifications where id=${sqlLiteral(second.job.id)};`), "read", "Provider communication evidence survives without creating SCI");
 });

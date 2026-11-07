@@ -23,35 +23,34 @@ type State = {
   loading: boolean;
   selecting: boolean;
   error: string;
+  selectionError: string;
   requestedPatientId: string | null;
   load: () => Promise<void>;
   selectProfile: (id: string | null) => Promise<boolean>;
   selectPatient: (id: string) => Promise<void>;
 };
 const empty: State = {
-  value: null, data: null, loading: true, selecting: false, error: "", requestedPatientId: null,
+  value: null, data: null, loading: true, selecting: false, error: "", selectionError: "", requestedPatientId: null,
   load: async () => {}, selectProfile: async () => false, selectPatient: async () => {},
 };
 const Context = createContext<State>(empty);
-export const roleLabels: Record<string, string> = {
-  admin: "Administrador do paciente", family: "Familiar", supervisor: "Supervisor",
-  professional: "Profissional", reader: "Leitor",
-};
+export {roleLabels,roleLabel} from "@/lib/role-labels";
 export function useWorkspaceState() { return use(Context); }
 
 /** One authority read model survives navigation; browser selection never authorizes. */
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const requestedPatientId = useSearchParams().get("careRecipientId");
-  const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})$/.exec(pathname)?.[1];
+  const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})(?:\/arquivos)?$/.exec(pathname)?.[1];
   const segment = pathname.split("/")[2];
   const publicPage = ["/login", "/recuperar-senha", "/convites/aceitar"].includes(pathname)
-    || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
+    || pathname === "/verificar" || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
   const [data, setData] = useState<ContextData | null>(null);
   const [patientId, setPatientId] = useState("");
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState(false);
   const [error, setError] = useState("");
+  const [selectionError, setSelectionError] = useState("");
   const sequenceRef = useRef(0);
   const load = useCallback((signal?: AbortSignal) => {
     const sequence = ++sequenceRef.current;
@@ -100,7 +99,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [load, publicPage]);
   const selectProfile = async (id: string | null) => {
     setSelecting(true);
-    setError("");
+    setSelectionError("");
     try {
       await api("/api/context", { careRecipientId: id });
       if (!documentId) {
@@ -116,7 +115,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       window.dispatchEvent(new Event("hca:context-changed"));
       return true;
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Não foi possível selecionar o perfil.");
+      setSelectionError(reason instanceof Error ? reason.message : "Não foi possível selecionar o perfil.");
       return false;
     } finally { setSelecting(false); }
   };
@@ -130,6 +129,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   };
   const patient = data?.patients.find((row) => row.id === patientId);
   const value: WorkspaceContext | null = data ? { ...data, patient, refresh: load } : null;
-  const state = { value, data, loading, selecting, error, requestedPatientId, load, selectProfile, selectPatient };
-  return <Context value={state}>{publicPage ? children : <WorkspaceShell>{children}</WorkspaceShell>}</Context>;
+  const state = { value, data, loading, selecting, error, selectionError, requestedPatientId, load, selectProfile, selectPatient };
+  return <Context value={state}>{publicPage ? children : <WorkspaceShell showOnboarding={pathname==="/"}>{children}</WorkspaceShell>}</Context>;
 }

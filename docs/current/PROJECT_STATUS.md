@@ -1,98 +1,251 @@
 # Estado verificável do projeto
 
-Referência editorial:04/11/2026, America/Sao_Paulo. **Produção NO-GO.** Esta é
-a entrada canônica de estado; contratos atuais ficam em current, decisões
-humanas em decisions e especificações futuras em audits/C.
+Referência editorial:07/11/2026, America/Sao_Paulo. **Produção NO-GO.**
+**D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
+CI do SHA publicado é gate independente; pending não significa aprovação.
 
-**C7–C10 concluídas e fechamento definitivo incorporado em 04/11/2026.**
-[Checkpoint](../audits/C/C10-pr-handoff/CHECKPOINT.md). As 121 causas e 165
-origens permanecem reconciliadas. P02 está OWNER_APPROVED: SCI-001 mantida,
-SCI-002 dialogada, SCI-003 comunicação, SCI-004 futura condicionada e SCI-005
-obrigatória/permanente/não configurável por ator efetivo habilitado; ANY
-familiar sem exigir todos.
+D5.1 implementou manifesto, orientação offline estritamente pública, controle de
+compatibilidade, bloqueio de novos envios e atualização sem reload forçado.
+Produção local15/15 nos três projetos passou, com worker real, duas abas e
+recuperação do mesmo rascunho. Instalação física e Push continuam gates próprios.
+[Contrato](../audits/D/D-B/PWA_RUNTIME.md).
+Por determinação posterior do responsável,22 migrations D-B foram aplicadas
+após backup/restauração/compatibilidade: **local143/remoto143; zero pendências**.
+Histórico143/143, preservação das129 projeções anteriores,32 objetos e cron/Vault
+foram pós-validados. [Recibos](../audits/D/D-B/D5_REMOTE_MIGRATIONS.json).
+Isso permite testar o preview durante desenvolvimento; não conclui D-B ou libera
+produção. Novas migrations da missão exigirão reconciliação correspondente.
 
-Revisão individual: 66 fichas, 262 controles originais e 171 relações.
-Catálogo atual: 274 controles/424 usos; 187 casos planejados (20 refinados
-entre os 161 anteriores e 26 novos), todos PLANNED_NOT_EXECUTED. Os 12
-controles adicionais cobrem lacunas de estado, login/MFA/unidade e ciência.
-Direção visual aprovada; nenhuma tela/política foi implementada por esta C.
-Código/configuração/testes permanecem idênticos ao SHA de entrada
-266c6541bd5d3268b7e08a839df601e823ec74b5; o reparo anterior de CI nesse SHA é
-distinto desta missão documental. Base de aplicação permanece a auditada.
+CI fc98664 aprovou banco, validate e Chromium/mobile; iOS foi cancelado no limite
+de40 minutos, com162 casos aprovados e nenhuma falha de assert observada no log.
+O agregado terminou FAILURE. O lote atual divide somente iOS em duas partes,
+mantendo a coleção completa e todos os gates; CI do SHA novo continua separada.
 
-P03/P05/P07/P08/P09/P10/P13/P15/OPS-01/PERF-01 não impedem D0 geral/D1
-independente; ramos e homologações seguem gates específicos. Contratações
-P03/P09/P13 são pesquisa externa do responsável com ChatGPT. Abrir branch D
-exige integração prévia do PR6 à master e autorização posterior. Kit
-temporário continua removido; HTML/oito PNG e auditorias A/B preservados.
-Draft PR não autoriza merge, cleanup de branches ou produção.
+CI dfdc7de, run42335739149, concluiu banco, validate Ubuntu/Windows e os três
+projetos browser com SUCCESS. Inclui a correção D3.4a dos consumidores de
+governança que falharam em bd8747b e os estados de leitura D3.4. Essa CI não
+valida os incrementos posteriores. A reconciliação vigente está descrita acima;
+as observações anteriores por SHA permanecem históricas.
+SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
 
-<!-- c-table:start -->
+CI d0179ca aprovou banco/instalação/evolução/integração e validate, mas falhou
+em onboarding após logout;173 casos passaram em cada job Chromium/mobile e iOS
+foi cancelado. D4.4a reproduziu o formulário oculto à acessibilidade e passou
+3/3 em produção com navegação completa após signOut. Inclui Escape com Auth
+pendente, confirmação local de e-mail e nova senha. A CI do SHA novo continua
+gate independente. [Contraprovas](../audits/D/D-B/D4_4A_CI_EVIDENCE.json).
 
-- **Referência:** product_code_sha
+D4.5 congela fatos suplementares de origem/datas em novas emissões V6, sem
+reescrever evento/hash canônico ou V5. Auth comprova rename/revogação; seis
+casos novos browser passaram entre coortes. Três PDFs reais foram verificados
+independentemente por fatos/geometria e pyHanko/TSA interna; texto longo tem
+probe sem assinatura com marcador visível. [Evidências](../audits/D/D-B/D4_5_EVIDENCE.json).
+C101 ENT e combinações C105/C106 continuam parciais. CI dbc7171 terminou com
+banco/validate aprovados e browsers reprovados em acervo, foco e carregamento;
+D4.5a reproduziu e corrigiu foco tardio e ajustou os instrumentos de atualização
+ao vivo, com9/9 casos de produção nos três projetos. Não é aprovação da CI nova.
+[Contraprovas](../audits/D/D-B/D4_5A_CI_EVIDENCE.json).
 
-  **Estado e prova:** `37cb7f85e96e551d6419871f94dd950712e2565b`; base de
-  aplicação src/supabase preservada; suporte e testes do reparo CI foram
-  congelados em 266c654 e permanecem intactos nesta ordem complementar.
+CI639b5cb, run42354352749, aprovou banco/validate, mas falhou em preparação
+global Chromium e largura de entregas WebKit; central teve uma tentativa
+instável. D3.9 corrigiu essas causas e passou27/27 casos dirigidos em produção
+nos três projetos, além de9 Auth e27 unitários/API. Avisos resolvem recurso,
+dia/fuso e origem reais; resposta pessoal e relato vinculado recuperam a mesma
+intenção sem baixa de estoque/SCI. [Evidências](../audits/D/D-B/D3_9_EVIDENCE.json).
+CI do novo SHA publicado continua gate separado.
 
-- **Referência:** audit_input_sha
+D4.2 integra emissão assinada ao produto: intenção Auth, oráculo independente
+por texto/posição, PAdES-B-T com TSA interna, Storage sem sobrescrita, read-back,
+registro final e Arquivos gerados em REQ/COM/ENT/BAL. Recuperação conserva a mesma
+intenção; download usa bytes registrados e revalida integridade/acesso. Custódia
+local protegida e política pública separada têm adaptadores para valores de
+ambiente, sem processo residente no runtime. Não há confiança externa/ICP-Brasil.
 
-  **Estado e prova:** `227f26ca695a3d01512a854f4b19f2639b91ba87`, A/B1–B8
-  encerradas.
+Auth6/6, unidade/API18/18 e produção12/12 nos três projetos passaram, incluindo
+compartilhamento existente, revogação real e falha após upload. pyHanko aceitou
+assinatura e token dos quatro exemplares reais; extração/geometria e render foram
+conferidos. [Evidências e limites](../audits/D/D-B/D4_2_EVIDENCE.json).
+D4.3 implementa página pública, código e upload efêmero limitado/isolado.
+Produção12/12 passou nos três projetos;25 testes de unidade/API e revalidação
+dos quatro artefatos conferem o núcleo final com orçamento criptográfico.
+[Coortes, privacidade e limites](../audits/D/D-B/PUBLIC_VERIFICATION.md).
+D4.4 integra originais/V4 e emissões independentes no mesmo acervo. GET antigo
+recupera somente bytes registrados, com SHA e acesso atual; não gera PDF.
+Histórico BAL resolve a versão no acervo; representação histórica nova usa
+identidade/instante próprios. Upload público reconheceu V4 registrado sem
+assinatura. Auth2 casos distintos, unidade/API5/5 e33 casos browser distintos
+passaram entre coortes de produção, com quatro larguras/axe e perda de vínculo.
+[Coortes e contraprovas](../audits/D/D-B/D4_4_EVIDENCE.json).
+Combinações factuais restantes, anexos anotados, leitura documental acessível e
+ensaios de rotação/recuperação continuam pendentes.
+D3 restante, D5, backup/monitoramento e reconciliação remota continuam em execução.
 
-- **Referência:** branch documental
+CI42360570173 de3c61697 aprovou banco/validate e reprovou o menu de perfil em
+Chromium/mobile; WebKit foi cancelado pelo fail-fast. D4.1a corrigiu composição
+modal, retorno de foco após troca e abertura da programação após refresh.
+Prova local:21 casos browser compatíveis mais3 rechecks finais, com tipos/lint
+aprovados. [Coortes e contraprovas](../audits/D/D-B/D4_1A_CI_EVIDENCE.json).
+Resultado da CI do próximo SHA continua separado dessa prova local.
 
-  **Estado e prova:** `audit/phase-b`; SHA final de C é o commit que contém
-  este estado, resolvível pelos comandos abaixo. Não gravar hash
-  autorreferente no próprio manifesto.
+D3.4 comprova os estados de sino, central, perfil e consumo:23 unitários e24
+casos browser distintos, com sete rechecks finais em build de produção nos
+consumidores afetados. Sem falso vazio, spinner após500, perda de edição pessoal
+ou ciência por apenas consultar; Tab/Escape conferidos nos três projetos.
+Evidência e limites no [manifesto D3.4](../audits/D/D-B/D3_4_EVIDENCE.json).
+O responsável pediu execução mais econômica, preservando os gates:
+lotes por fluxo, diagnóstico menor e aceite do candidato estável.
 
-- **Referência:** master preservada
+D3.5 acrescenta preparação privada/global com retomada e CAS, criação inativa,
+guias por papel e continuidade de consumo/Flow/fila administrativa entre sessões.
+Sete casos Auth, cinco unitários e18 execuções browser nos três projetos passaram
+entre rodadas de produção; três rechecks finais corrigiram as falhas conjuntas.
+[Evidências e limites](../audits/D/D-B/D3_5_EVIDENCE.json). C-AC-085/095 têm prova
+local; preparação/guia completos continuam parciais, com controles e tarefas
+GUI-02 pendentes. CI do candidato e demais requisitos D-B continuam gates.
 
-  **Estado e prova:** `34dcb835c5c49068e0417f7306eb4e501aa868bc`; sem merge em
-  C.
+CI5ab4864 aprovou banco e validate Windows/Ubuntu; falhou em13 casos browser.
+D3.6 restringe a apresentação opcional à Visão geral e mantém ajuda manual nas
+tarefas. As13 falhas foram rechecadas localmente, com ajuste do seletor decimal
+textual de transferência. Isso não substitui a CI do novo SHA.
 
-- **Referência:** last_production_deploy_sha
+D3.6 implementa rascunhos COM/ENT, conferência contextual pessoal e proteção da
+chave desconhecida após recusa de acesso. Oito casos Auth,11 unitários/modelos/
+API e35 casos browser distintos passaram entre rodadas de produção, incluindo
+REQ/BAL existentes e falhas direcionadas da CI.
+[Manifesto D3.6](../audits/D/D-B/D3_6_EVIDENCE.json).
+C7-AC-004 tem prova local; sessão/24h e demais contextos continuam pendentes.
 
-  **Estado e prova:** `NOT_VERIFIED` nesta missão. Resultados remotos B7 são
-  históricos e não assumidos atuais.
+D3.7 comprova C-AC-077: revisão legada salva, submissão pendente e recuperação
+das duas etapas já concluídas. Mantém chaves/versão da intenção sem submeter
+edição posterior. Auth17/17, contratos API15/15 e24 casos browser distintos
+passaram entre rodadas; o recheck final passou12/12. Tipos/lint passaram.
+[Evidência D3.7](../audits/D/D-B/D3_7_EVIDENCE.json). CI10e6111 aprovou banco e
+validate Windows/Ubuntu; browsers ainda em andamento na observação anterior
+ao novo push. CI do candidato continua gate independente. D4, D5 e demais
+requisitos seguem em execução.
 
-- **Referência:** Fase C
+D3.8 comprova localmente C-AC-013/021: vocabulário humano, fallbacks explícitos
+e consultas de entregas/estoque protegidas contra respostas invertidas.
+Papéis locais e administração global continuam separados. Nomes de destinos e
+contexto dos avisos foram corrigidos; C-AC-014 continua parcial até cada tela
+resolver sua referência individual, incluindo plantão e alerta de estoque.
+46 unitários/apresentação e21 casos browser distintos passaram; seis rechecks
+afetados também passaram. [Evidência D3.8](../audits/D/D-B/D3_8_EVIDENCE.json).
+CIebc4464 aprovou banco e validate Windows/Ubuntu; browsers ainda em andamento
+na observação anterior ao push deste lote. Tipos/lint passaram; nenhuma
+migration nova. CI do novo SHA e demais requisitos continuam gates separados.
 
-  **Estado e prova:** C0–C10 documentalmente concluídas: decisões,
-  especificação, planos e reorganização validados. A autoridade de publicação
-  é o commit/ref resolvido no Git.
+Base integrada PR6: `8ec979a`. Branch única `feat/phase-d-implementation` e
+[Draft PR7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.
+[Checkpoint por incremento](../audits/D/D-A/CHECKPOINT.md) preserva tentativas,
+contraprovas, resultados por SHA e limites. [Matriz81](../audits/D/D-A/ACCEPTANCE_EXECUTION.csv)
+registra a execução local; colunas de planejamento e gates C9 preservadas.
 
-- **Referência:** Fase D
+## Continuidade autorizada D-B
 
-  **Estado e prova:** **NÃO INICIADA**; nenhuma correção
-  funcional/migration/ativação realizada em C.
+[Ordem e checkpoint D-B](../audits/D/D-B/README.md): 75 critérios C9 e 30
+complementos em execução, sem conclusão integral. O remoto autorizado
+qwfrqychokvhdzakibid foi reconciliado de113 para121 migrations, com as oito
+pendências D-A aplicadas, backup cifrado e restore isolado de122 tabelas,
+29 objetos Storage e28 hashes PDF verificados. Digests anteriores preservados,
+sem reset/seed ou mudança de cron/Auth/Vault. [Relatório](../audits/D/D-B/MIGRATIONS.md).
 
-<!-- c-table:end -->
+Arquivador/probe são bases técnicas verificadas; backup diário operacional,
+retenção automatizada e monitoramento ainda não estão ativos. A CI aa9f168
+foi consultada e aprovou todos os jobs principais nos três navegadores.
+SonarCloud desse SHA tinha Reliability D/Security B. Os quatro apontamentos PATH
+desapareceram na análise4315eb9; triagem de ETag/MD5 está
+[documentada](../audits/D/D-B/SONAR_TRIAGE.md). D3.1 distingue consulta e intenção
+incerta, protege a classificação42702 e implementa404 público em português.
+28 testes unitários/API e10 casos browser distintos passaram entre rodadas,
+com401/403, quatro larguras, axe e consumidores anteriores. Os três apontamentos
+UI originais receberam correção local. A CI/Sonar do SHA publicado continua
+necessária. PAdES, verificação por upload e PWA/push ainda não implementados.
 
-```sh
-git branch --show-current
-git rev-parse HEAD
-git log -1 --format=%H -- docs/audits/C
-git ls-remote origin refs/heads/audit/phase-b
-```
+D3.2 implementa consulta paginada de propostas abertas/histórico, comparação em
+leitura, chave/versão originais nas duas entradas administrativas e recuperação
+de intenção incerta. Passaram27 unitários, oito testes Auth distintos e os nove
+casos novos de navegador entre rodadas nos três projetos; três consumidores
+anteriores também passaram. O conflito exige revisão autoritativa explícita,
+sem apagar outro editor por retorno tardio. Local125/remoto121: quatro migrations
+D3 continuam locais, para o preflight final autorizado. [Checkpoint D3.2](../audits/D/D-B/CHECKPOINT.md).
+O responsável adiou configuração e tratamento específico do SonarCloud;
+[complemento vigente](../audits/D/D-B/OWNER_AMENDMENTS.md). O provedor não é
+considerado aprovado por esse adiamento.
 
-Os 165 registros originais foram reconciliados em 121 causas, e 28 grupos de
-requisitos aprovados, vários sobre os mesmos processos; não são 149 defeitos
-novos. Existem 30 DEC, 20 oportunidades e 15 questões atualizadas pelas
-respostas C7 (P01–P12 originais e P13–P15 derivados). As pendências restantes
-estão no [registro atual](../audits/C/C7-decision-closure/OPEN_DECISIONS.md).
-Os dois P1 de decisão de escala e progresso REQ seguem abertos. O guard
-protege 84 migrations; contagens de suítes anteriores ficam nos pacotes
-datados e não são apresentadas como CI verde atual.
+D3.3 remove o corte de auditoria, com páginas/referência/período e audit.read
+delegável; NULL deixa de liberar o limite documental. Trinta testes dirigidos
+de unidade/API, três Auth e seis casos browser passaram. Local126/remoto121,
+com a quinta migration D-B ainda local. C-AC-020 mantém investigação própria
+do sino, cuja falha de consulta foi observada no ensaio de histórico.
 
-PWA/Web Push, modalidades futuras de ciência, draft cross-device e verificador
-de exemplar estão planejados. WhatsApp/Meta/Flows permanecem diferidos para
-ativação/homologação posterior; não remover contratos existentes. Backup com
-TOC, emulação, screenshots e transporte controlado não substituem restore,
-participante, aparelho/AT/impressão ou provedor real.
+## Implementado no candidato
 
-Consultar [C](../audits/C/README.md),
-[gate futuro](../audits/C/C5-execution-roadmap/RELEASE_CUTS_AND_GATES.md) e
-[história A/B](../audits/README.md). Os históricos de PRs/deploys e
-autorizações ficam em archive e auditorias datadas, sem renovar permissão
-corrente.
+- D0: prontidão real dos serviços, NULL/existência, incomplete do axe,
+  preservação/exportação e contrato do oráculo PDF com controles negativos.
+- D1: filas/progresso REQ e decisões de escala P1 corrigidos; precisão,
+  concorrência, versão, recuperação e autoridade depois de esperas observadas.
+  A sessão é conferida pelo relógio atual, inclusive após atingir seu prazo.
+- REQ: material emitido imutável, observação zero/vazia/desconhecida e instante,
+  atendimento por ENT, necessidade remanescente em nova REQ vinculada e P02.
+  SCI individual/ANY familiar não atribui ato a terceiros; SCI-005 é obrigatória
+  na expedição familiar efetiva, sem ciência por draft ou tentativa revertida.
+- COM/ENT: origem explícita, parcelas, validação/rejeição e encerramento inferior;
+  sugestão de recebedor editável com justificativa, aceite pessoal, divergências,
+  cancelamento/recusa/retirada, consumo referenciado e tratamento P05.
+- BAL: referência física explícita, contagem/reconto, mesma janela ou nova pessoa
+  e janela, autores/versões preservados, revisão facultativa distinta de efeito
+  físico e decisões de adiamento obsoletas sem apagar a história.
+- Estoque/catálogo: movimentos causais, correções compensatórias, consumo,
+  declaração/concordância/expedição bilateral, saldo inativo e sucessores sem
+  fusão destrutiva, apresentações versionadas e seleção em catálogos1/5/20/100.
+  Devolução antiga e intenções continuam preservadas; três pares locais
+  confrontaram conservação, recebedor, protocolo e replay dos dois percursos.
+- Escalas: recorrências e datas avulsas entre meses, tipo/versão e fuso,
+  conflitos reservados atômicos, exceção de uma data, corte e propostas em leitura.
+- Rascunhos próprios REQ/BAL entre aparelhos: revisão/horário do servidor,
+  comparação explícita de conflitos, confirmação atômica e recuperação da mesma
+  intenção. Descarte preserva documentos oficiais, ready e autoria.
+
+## Evidência e limites
+
+Último conjunto D2.32: três casos Auth em pares,12 testes API e seis casos
+Chromium distintos passaram entre rodadas, com rechecks somente afetados.
+M1 manteve material/SCI/evento original após associação de extra e atendimento;
+PDFv2/v6 têm registros e hashes independentes, v2 reobtido com bytes idênticos.
+Extração e inspeção das cinco páginas foram independentes da resposta HTTP.
+ENT mostrou todas as linhas e contexto em leitura; Sheila recebeu2 de3,
+família/global não assinaram e uma unidade permaneceu em trânsito. Retirada
+familiar5→4 e configuração BAL sexta/noturno/fuso coincidiram com banco/ledger.
+Tipos/lint dirigidos, quatro larguras e axe aprovados; sem homologação humana.
+
+121 migrations incrementais no candidato;84 migrations históricas protegidas.
+CI7b7c97a/42297092802 concluiu banco/replay121 e validações Windows/Ubuntu
+com success, mas teve falhas de foco BAL, largura WebKit e clique mobile.
+Essas regressões foram corrigidas: oito casos dirigidos passaram entre
+rodadas nos três projetos, incluindo comparação/justificativa preservada,
+quatro larguras e clique sem force. A CI do SHA seguinte continua necessária;
+resultado anterior ou pending não é aprovação. Nenhuma suíte geral local foi
+repetida para este reparo. O Vercel7b7 estava success; SonarCloud permanece
+check externo separado, sem resultado aprovado presumido.
+
+Os35 avisos de editor fornecidos foram corrigidos:25 referências Markdown
+com serviço instalado25→0 e10 aliases Tailwind com CSS equivalente. Prosa,
+decisões e regras de diagnóstico preservadas; detalhes e hashes constam do
+[registro de reparos](../audits/D/D-A/EDITOR_DIAGNOSTICS_REPAIRS.json).
+
+Stack local home-care-assistant/API54321/DB54322 verificada. Após os testes,
+os dois jobs cron originalmente ativos foram restaurados para active.
+Backup externo original preservado; não equivale a restore testado.
+
+D-C, SCI-004 e homologações humanas/AT/aparelho/provedor continuam condicionadas.
+D-B inclui assinatura interna/TSA, backup e monitoramento sem contratação externa,
+conforme ordem vigente. Não houve merge, deploy ou liberação operacional.
+[Continuidade](ROADMAP.md) registra
+os gates e a oportunidade de paginação do QR isolado em D4.
+
+OPS.1 ampliou o probe para exigir SHA/bytes das emissões assinadas ready,
+com compatibilidade para backups sem essa tabela. SQL isolado e nova restauração
+do backup cifrado anterior passaram:122 conjuntos,29 objetos,28 PDFs, sem cron
+ou pg_net. Agenda/retenção, destino independente e gate D6 continuam pendentes.
+[Evidência e limites](../audits/D/D-B/OPS_1_EVIDENCE.json).

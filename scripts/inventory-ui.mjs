@@ -1,7 +1,9 @@
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import ts from "typescript";
+import { prepareReportOutput } from "./report-output.mjs";
 
+const output = prepareReportOutput();
 const root = process.cwd();
 const posix = (value) => value.split(path.sep).join("/");
 async function walk(directory) {
@@ -40,8 +42,8 @@ const records = await Promise.all(files.map(async (file) => {
   return { file: posix(file), lines: source.split(/\r?\n/).length, imports, exports, headings, stateHooks,
     kind: path.basename(file) === "page.tsx" ? "page" : path.basename(file) === "layout.tsx" ? "layout" : "component" };
 }));
-const report = { base: "d467f92", records };
-await writeFile(path.join(root, "docs/ui-ux/inventory.json"), JSON.stringify(report, null, 2) + "\n");
+const report = { ...output.metadata, records };
+output.write("inventory.json", JSON.stringify(report, null, 2) + "\n");
 const lines = ["# Inventário de interface", "", "Gerado por scripts/inventory-ui.mjs. O JSON adjacente registra dependências,", "exports e pontos de estado, incluindo componentes renderizados indiretamente."];
 for (const [title, selected] of [
   ["Páginas e layouts", records.filter((row) => row.kind !== "component")],
@@ -55,5 +57,5 @@ for (const [title, selected] of [
   }
 }
 lines.push("", "## Cobertura de estados", "", "Cada área deve ser verificada em carregamento, vazio, erro, bloqueio por", "capacidade, conflito, processamento e resultado real. A matriz de homologação", "registrará variações por contexto, paciente, documento e largura de tela.", "");
-await writeFile(path.join(root, "docs/ui-ux/INVENTORY.md"), lines.join("\n"));
+output.write("INVENTORY.md", lines.join("\n"));
 console.log(`Inventário: ${records.filter((row) => row.kind === "page").length} páginas, ${records.filter((row) => row.file.startsWith("src/components/")).length} arquivos de componentes.`);

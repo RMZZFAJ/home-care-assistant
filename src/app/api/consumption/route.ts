@@ -1,83 +1,140 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import {
   api,
+  ApiError,
   authenticate,
   databaseError,
   patientContext,
   readJson,
   rpc,
-  uuid,
+  saoPauloDateBoundary,
 } from "@/lib/server/api";
-import { exactQuantity } from "@/lib/validation/documents";
-const schema = z.discriminatedUnion("action", [
-  z
-    .object({
-      action: z.literal("report"),
-      careRecipientId: uuid,
-      kind: z.enum(["consumption", "shortage"]),
-      location: z.enum(["FAMILY", "CARE_TEAM"]),
-      text: z.string().trim().min(3).max(2000),
-      lines: z
-        .array(
-          z
-            .object({
-              productId: z.string().min(1).max(120),
-              quantity: exactQuantity,
-            })
-            .strict(),
-        )
-        .max(100),
-      idempotencyKey: uuid,
-    })
-    .strict(),
-  z
-    .object({ action: z.literal("confirm"), id: uuid, accept: z.boolean() })
-    .strict(),
-]);
+import {
+  consumptionCommand,
+  consumptionCursor,
+  consumptionFilters,
+} from "@/lib/validation/consumption";
+import {reminderReportReceipt} from "@/lib/validation/notification-reference";
+
 export async function GET(request: Request) {
   return api("consumption.read", async () => {
-    const auth = await authenticate();
-    const patient = await patientContext(
-      auth,
-      new URL(request.url).searchParams.get("careRecipientId"),
-    );
-    const { data, error } = await auth.client
+    const params = new URL(request.url).searchParams;
+    const filters = consumptionFilters.safeParse({
+      kind: params.get("kind") ?? undefined,
+      status: params.get("status") ?? undefined,
+      search: params.get("q") ?? "",
+      from: params.get("from") ?? undefined,
+      to: params.get("to") ?? undefined,
+      sourceReminder:params.get("sourceReminder")??undefined,
+    });
+    const before =
+      params.has("beforeAt") || params.has("beforeId")
+        ? consumptionCursor.safeParse({
+            at: params.get("beforeAt"),
+            id: params.get("beforeId"),
+          })
+        : null;
+    if (!filters.success || (before && !before.success))
+      throw new ApiError(
+        "VALIDATION_ERROR",
+        "Confira os filtros e a referência de paginação.",
+      );
+    const auth = await authenticate(),
+      patient = await patientContext(auth, params.get("careRecipientId"));
+    let query = auth.client
       .from("consumption_reports")
-      .select("*")
+      .select(
+        "id,care_recipient_id,kind,location,status,body,created_at,version,reported_by,reported_name",
+      )
       .eq("care_recipient_id", patient.id)
       .order("created_at", { ascending: false })
-      .limit(100);
-    if (error) databaseError(error);
-    return NextResponse.json({ data });
+      .order("id", { ascending: false })
+      .limit(21);
+    if (filters.data.kind) query = query.eq("kind", filters.data.kind);
+    if(filters.data.sourceReminder)query=query.eq("source_reminder_id",filters.data.sourceReminder);
+    if (filters.data.status) query = query.eq("status", filters.data.status);
+    if (filters.data.search)
+      query = query.ilike(
+        "body",
+        "%" +
+          filters.data.search.replaceAll("%", "\\%").replaceAll("_", "\\_") +
+          "%",
+      );
+    if (filters.data.from)
+      query = query.gte("created_at", saoPauloDateBoundary(filters.data.from));
+    if (filters.data.to)
+      query = query.lt(
+        "created_at",
+        saoPauloDateBoundary(filters.data.to, true),
+      );
+    if (before?.success)
+      query = query.or(
+        `created_at.lt.${before.data.at},and(created_at.eq.${before.data.at},id.lt.${before.data.id})`,
+      );
+    const result = await query;
+    if (result.error) databaseError(result.error);
+    const rows = result.data ?? [],
+      data = rows.slice(0, 20),
+      last = data.at(-1);
+    return NextResponse.json({
+      data,
+      next:
+        rows.length > 20 && last ? { at: last.created_at, id: last.id } : null,
+    });
   });
 }
+
 export async function POST(request: Request) {
   return api("consumption.write", async () => {
-    const input = await readJson(request, schema);
-    const auth = await authenticate();
-    if (input.action === "confirm")
+    const input = await readJson(request, consumptionCommand),
+      auth = await authenticate();
+    if (input.action === "report") {
+      await patientContext(
+        auth,
+        input.careRecipientId,
+        input.location === "FAMILY" ? "stock.family.read" : "stock.team.read",
+      );
+      if(input.reminderId){
+        const data=reminderReportReceipt.parse(await rpc(auth.client,"report_consumption_from_reminder",{p_patient:input.careRecipientId,p_reminder:input.reminderId,p_kind:input.kind,p_location:input.location,p_text:input.text,p_lines:input.lines,p_key:input.idempotencyKey}));
+        if(data.careRecipientId!==input.careRecipientId||data.reminderId!==input.reminderId||data.idempotencyKey!==input.idempotencyKey)throw new ApiError("INTERNAL_ERROR","A confirmação não corresponde ao lembrete original.",500);
+        return NextResponse.json(data);
+      }
       return NextResponse.json({
-        data: await rpc(auth.client, "confirm_extraordinary_consumption", {
-          p_id: input.id,
-          p_accept: input.accept,
+        id: await rpc(auth.client, "report_extraordinary_consumption", {
+          p_patient: input.careRecipientId,
+          p_kind: input.kind,
+          p_location: input.location,
+          p_text: input.text,
+          p_lines: input.lines,
+          p_key: input.idempotencyKey,
         }),
       });
+    }
+    const report = (await rpc(auth.client, "consumption_report", {
+      p_id: input.id,
+    })) as { care_recipient_id: string; location: string };
     await patientContext(
       auth,
-      input.careRecipientId,
-      "consumption.report",
-      true,
+      report.care_recipient_id,
+      report.location === "FAMILY" ? "stock.family.read" : "stock.team.read",
     );
     return NextResponse.json({
-      id: await rpc(auth.client, "report_extraordinary_consumption", {
-        p_patient: input.careRecipientId,
-        p_kind: input.kind,
-        p_location: input.location,
-        p_text: input.text,
-        p_lines: input.lines,
-        p_key: input.idempotencyKey,
-      }),
+      data:
+        input.action === "supplement"
+          ? await rpc(auth.client, "supplement_consumption_report", {
+              p_id: input.id,
+              p_text: input.text,
+              p_lines: input.lines,
+              p_key: input.idempotencyKey,
+              p_version: input.expectedVersion,
+            })
+          : await rpc(auth.client, "decide_consumption_report", {
+              p_id: input.id,
+              p_accept: input.accept,
+              p_reason: input.reason ?? null,
+              p_key: input.idempotencyKey,
+              p_version: input.expectedVersion,
+            }),
     });
   });
 }

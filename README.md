@@ -8,7 +8,12 @@ clínica.
 ## Estado e documentação
 
 **Produção NO-GO.** A e B1–B8 estão encerradas como diagnóstico; C concluiu o
-planejamento documental C0–C10. **D NÃO INICIADA.** Base funcional auditada:
+planejamento documental C0–C10. **D-B em execução**, conforme a
+[ordem e checkpoint](docs/audits/D/D-B/README.md).
+**D-A consolidada localmente (D0–D2),
+com CI e gates de liberação
+independentes**, conforme
+[checkpoint](docs/audits/D/D-A/CHECKPOINT.md). Base funcional auditada:
 `37cb7f85e96e551d6419871f94dd950712e2565b`. O estado de deploy produtivo nesta
 missão é NOT_VERIFIED; preview documental não é homologação do produto.
 
@@ -24,15 +29,17 @@ missão é NOT_VERIFIED; preview documental não é homologação do produto.
 - [Auditorias preservadas](docs/audits/README.md) e
   [plano D](docs/audits/D/README.md).
 
-PWA/push, modalidades futuras de ciência, rascunhos entre aparelhos e
-verificador de exemplar são requisitos planejados; não são anunciados como
-implementados. Os dois P1 herdados continuam abertos até correção/regressão
-autorizada.
+PWA/push, ciência por canal externo e assinatura aguardam os lotes próprios.
+Rascunhos próprios REQ/BAL entre aparelhos e os processos D0–D2 estão
+implementados no candidato D-A. Os dois P1 herdados receberam correção e
+regressões discriminantes. Validação local e publicação na Draft PR não
+representam aprovação da CI pendente nem liberação operacional.
 
 O [fechamento definitivo C7–C10](docs/audits/C/C10-pr-handoff/README.md)
 registra P02 OWNER_APPROVED, 66 fichas e 262 controles originais revistos.
 Catálogo atual: 274 controles/424 usos; 187 aceites planejados. Draft PR 6
-permanece para revisão, sem merge ou início D.
+foi integrado à master. A implementação D-A usa o Draft PR 7, sem merge ou
+liberação definitiva.
 
 ## Desenvolvimento
 

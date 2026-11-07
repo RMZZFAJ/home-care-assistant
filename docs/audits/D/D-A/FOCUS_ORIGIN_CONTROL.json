@@ -1,0 +1,82 @@
+{
+  "baselineHead": "743549a",
+  "scope": "D0 harness initial conditions while validating D1.2",
+  "productRun": "14 of 15 schedule E2E passed; existing schedules.spec.ts failed in ios keyboard entry",
+  "directedRun": "Same ios scenario failed with focus instrumentation and unchanged assertions",
+  "observedFocus": {
+    "events": [
+      {
+        "type": "keydown",
+        "targetTag": "BODY",
+        "activeTag": "BODY",
+        "documentFocused": true
+      }
+    ],
+    "finalActiveTag": "BODY",
+    "finalDocumentFocused": false,
+    "focusinEvents": 0,
+    "hiddenOrSentinelFocusEvents": 0
+  },
+  "interpretation": "The Tab key left the document from its previous sequential origin. No hidden Tabster focus trap was observed in this failure.",
+  "primaryReference": "https://html.spec.whatwg.org/multipage/interaction.html#sequential-focus-navigation",
+  "correction": "Establish the real skip-link or main landmark as the initial condition, then require a different accessible element reached by Tab. Focusing the origin alone cannot pass.",
+  "discriminatingControls": {
+    "previousEndOfDocumentOrigin": "PASS_WITH_CONTROLLED_INITIAL_ORIGIN",
+    "tabPreventDefaultTrap": "REJECTED_AS_EXPECTED",
+    "ariaHiddenKeyboardStop": "REJECTED_AS_EXPECTED",
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "total": 9,
+    "failures": 0
+  },
+  "initialSyntheticRun": {
+    "passed": 8,
+    "failed": 1,
+    "reason": "The initial fixture incorrectly required identical native Tab behavior across engines before testing the corrected helper. It was replaced by an explicit BODY initial condition and an independent first-field focus assertion."
+  },
+  "correctedProductRun": {
+    "passed": 15,
+    "failed": 0,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "scope": "schedule-decisions.spec.ts and schedules.spec.ts"
+  },
+  "limits": "Synthetic local browser controls. No claim of physical keyboard, assistive technology or human acceptance. No timeout, retry, axe rule or product assertion was reduced.",
+  "ciFollowUp": {
+    "sourceHead": "6e7b627c9fc63de7e88647432a5f36e11fb40c79",
+    "runId": 41997444516,
+    "failedSurface": "login main without tabindex; the helper incorrectly assumed every landmark was programmatically focusable",
+    "affectedProjects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "correction": "Use an existing first control when neither skip link nor focusable landmark exists; a real Tab movement to a different accessible target is still mandatory.",
+    "controls": {
+      "total": 30,
+      "passed": 30,
+      "failed": 0,
+      "publicMainControl": "PASS",
+      "trappedPublicControl": "REJECTED_AS_EXPECTED"
+    },
+    "productRun": {
+      "total": 36,
+      "passed": 36,
+      "failed": 0,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "scope": "accessibility.spec.ts, identity-contracts.spec.ts and onboarding.spec.ts",
+      "localRetries": 0
+    },
+    "unchangedRequirements": "No timeout, retry, axe rule or assertion reduced."
+  }
+}

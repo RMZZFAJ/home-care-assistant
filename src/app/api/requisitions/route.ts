@@ -88,36 +88,103 @@ export async function POST(request: Request) {
   return api("requisitions.submit", async () => {
     const input = await readJson(request, requisitionInputSchema);
     const auth = await authenticate();
-    await patientContext(auth, input.careRecipientId, "request", true);
+    // Live read also allows recovery of this actor's committed key. New
+    // issuance and all post-wait authorization remain enforced by the RPC.
+    const patient = await patientContext(auth, input.careRecipientId);
+    if (patient.is_active === false) {
+      // Historical own-key recovery remains possible with live read. A fresh
+      // issuance retains the established inactive-patient conflict contract.
+      const existing = await auth.client
+        .from("requisitions")
+        .select("id")
+        .eq("care_recipient_id", patient.id)
+        .eq("created_by", auth.userId)
+        .eq("idempotency_key", input.idempotencyKey)
+        .maybeSingle();
+      if (existing.error) databaseError(existing.error);
+      if (!existing.data)
+        throw new ApiError(
+          "PATIENT_INACTIVE",
+          "O paciente está inativo. O histórico permanece disponível.",
+          409,
+        );
+    }
     const lines = input.lines.map(
-      ({ productId, currentStock, urgent, repeatReason }) => ({
+      ({
         productId,
         currentStock,
+        stockObservation,
+        stockObservationAt,
+        urgent,
+        repeatReason,
+      }) => ({
+        productId,
+        currentStock,
+        ...(stockObservation ? { stockObservation } : {}),
+        ...(stockObservationAt ? { stockObservationAt } : {}),
         urgent,
         ...(repeatReason ? { repeatReason } : {}),
       }),
     );
-    const extras = input.extraItems.map(({ name, currentStock, urgent }) => ({
-      customName: name,
-      currentStock,
-      urgent,
-    }));
+    const extras = input.extraItems.map(
+      ({
+        name,
+        currentStock,
+        stockObservation,
+        stockObservationAt,
+        urgent,
+      }) => ({
+        customName: name,
+        currentStock,
+        ...(stockObservation ? { stockObservation } : {}),
+        ...(stockObservationAt ? { stockObservationAt } : {}),
+        urgent,
+      }),
+    );
     const intent = {
       careRecipientId: input.careRecipientId,
       lines,
       extraItems: extras,
       observations: input.observations,
     };
-    const result = await rpc(auth.client, "submit_requisition", {
+    const args = {
       p_care_recipient_id: input.careRecipientId,
       p_idempotency_key: input.idempotencyKey,
-      p_payload_hash: createHash("sha256")
-        .update(JSON.stringify(intent))
-        .digest("hex"),
       p_lines: lines,
       p_extra_items: extras,
       p_observations: input.observations,
-    });
+    };
+    const result = input.draftCommit
+      ? (
+          (await rpc(auth.client, "commit_creation_draft", {
+            p_id: input.draftCommit.id,
+            p_expected: input.draftCommit.revision,
+            p_target: null,
+            p_key: input.idempotencyKey,
+            p_body: {
+              action: "issue_req",
+              lines,
+              extraItems: extras,
+              observations: input.observations,
+              ...(input.remainingNeed
+                ? { remainingNeed: input.remainingNeed }
+                : {}),
+            },
+          })) as { result: unknown }
+        ).result
+      : input.remainingNeed
+        ? await rpc(auth.client, "submit_remaining_requisition", {
+            ...args,
+            p_source: input.remainingNeed.requisitionId,
+            p_source_version: input.remainingNeed.version,
+            p_reason: input.remainingNeed.reason,
+          })
+        : await rpc(auth.client, "submit_requisition", {
+            ...args,
+            p_payload_hash: createHash("sha256")
+              .update(JSON.stringify(intent))
+              .digest("hex"),
+          });
     const persisted = (Array.isArray(result) ? result[0] : result) as {
       requisition_id?: string;
       protocol?: string;

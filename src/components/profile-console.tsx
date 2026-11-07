@@ -3,6 +3,7 @@ import { SettingsSection } from "@/components/forms/settings-section";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   api,
+  ApiError,
   buttonClass,
   errorMessage,
   inputClass,
@@ -14,34 +15,17 @@ import { ContactSettings } from "./auth/contact-settings";
 import { MfaSettings } from "./auth/mfa-settings";
 import Image from "next/image";
 import { formatBrazilDate } from "@/lib/receipt";
-type Profile = {
-  full_name: string;
-  professional_registration: string | null;
-  professional_state: string | null;
-  professional_category: string | null;
-  notification_preferences: Record<string, boolean>;
-  avatar: string | null;
-  email: string;
-  phone: string | null;
-  providers: string[];
-};
-type Membership = {
-  care_recipient_id: string;
-  role: string;
-  status: string;
-  care_recipients: {
-    id: string;
-    display_name: string;
-    is_active: boolean;
-  } | null;
-};
-type Session = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  userAgent: string;
-  current: boolean;
-};
+import { NewPasswordField } from "./auth/new-password-field";
+import { newPasswordSchema } from "@/lib/validation/password";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { SciencePreferenceSettings } from "./profile/science-preference";
+import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
+import { UserGuide } from "@/components/guides/user-guide";
+import { PwaSettings } from "./pwa/pwa-settings";
+import { requireRuntimeCommandsAvailable } from "@/lib/client/api";
+type Profile = ProfileRead["data"];
+type Membership = ProfileRead["memberships"][number];
+type Session = ProfileRead["sessions"][number];
 export function ProfileConsole() {
   return (
     <Workspace title="Meu perfil e segurança">
@@ -57,23 +41,33 @@ function ProfileContent() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const liveRevision = useLiveRevision();
+  const [readAttempt, setReadAttempt] = useState(0), [settledRead, setSettledRead] = useState("");
+  const [readFailure, setReadFailure] = useState<{ key: string; message: string } | null>(null);
+  const readKey = JSON.stringify([attempt, liveRevision, readAttempt]);
+  const reading = settledRead !== readKey && readFailure?.key !== readKey;
   useEffect(() => {
     const controller = new AbortController();
-    api<{ data: Profile; sessions: Session[]; memberships: Membership[] }>(
+    api<unknown>(
       "/api/profile",
       undefined,
       controller.signal,
     )
-      .then((result) => {
+      .then(parseProfileRead).then((result) => {
+        if (controller.signal.aborted) return;
         setProfile(result.data);
         setMemberships(result.memberships);
         setSessions(result.sessions);
+        setSettledRead(readKey);
+        setReadFailure(null);
       })
       .catch((reason) => {
-        if (!controller.signal.aborted) setError(reason.message);
+        if (controller.signal.aborted) return;
+        if (reason instanceof ApiError && [401, 403, 404].includes(reason.status)) { setProfile(null); setMemberships([]); setSessions([]); }
+        setReadFailure({ key: readKey, message: reason instanceof Error ? reason.message : "Não foi possível consultar o perfil." });
       });
     return () => controller.abort();
-  }, [attempt]);
+  }, [readKey]);
   async function save(
     event: FormEvent<HTMLFormElement>,
     action: "update" | "password" | "avatar",
@@ -81,11 +75,16 @@ function ProfileContent() {
     event.preventDefault();
     const element = event.currentTarget;
     const form = new FormData(element);
+    if (action === "password") {
+      const parsed = newPasswordSchema.safeParse(form.get("password"));
+      if (!parsed.success) { setError(parsed.error.issues[0].message); return; }
+    }
     setBusy(true);
     setError("");
     setMessage("");
     try {
       if (action === "avatar") {
+        requireRuntimeCommandsAvailable();
         const response = await fetch("/api/profile", {
           method: "POST",
           body: form,
@@ -114,9 +113,9 @@ function ProfileContent() {
                   internal: form.has("internal"),
                   whatsapp: form.has("whatsapp"),
                   email: form.has("email"),
-                  scienceExpress: form.has("scienceExpress"),
-                  scienceWhatsApp: form.has("scienceWhatsApp"),
-                  scienceAutomatic: form.has("scienceAutomatic"),
+                  scienceExpress: profile?.notification_preferences.scienceExpress ?? true,
+                  scienceWhatsApp: profile?.notification_preferences.scienceWhatsApp ?? false,
+                  scienceAutomatic: profile?.notification_preferences.scienceAutomatic ?? false,
                 },
               },
         );
@@ -137,12 +136,13 @@ function ProfileContent() {
     }
   }
   return (
-    <div className="mx-auto max-w-3xl space-y-5">
+    <section className="mx-auto max-w-3xl space-y-5" aria-label="Perfil pessoal">
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      {!profile ? (
-        <Notice>Carregando perfil…</Notice>
-      ) : (
+      {readFailure ? <Notice error>{readFailure.message} <button type="button" className={buttonClass} onClick={() => setReadAttempt(value => value + 1)}>Consultar perfil novamente</button></Notice> : null}
+      {reading ? <Notice>{profile ? "Atualizando consulta do perfil…" : "Carregando perfil…"}</Notice> : null}
+      <PwaSettings />
+      {profile ? (
         <>
           <SettingsSection title="Identidade pessoal" summary="Nome, identificação profissional e preferências">
             
@@ -228,54 +228,6 @@ function ProfileContent() {
                     Canais externos dependem de configuração e validação do
                     contato. Preferências não concedem permissões.
                   </p>
-                  <fieldset className="mt-5 space-y-2">
-                    <legend className="font-semibold">
-                      Ciência das requisições
-                    </legend>
-                    {[
-                      [
-                        "scienceExpress",
-                        "Expressa no aplicativo",
-                        "Você confirma após consultar o documento; a ação fica atribuída à sua sessão.",
-                      ],
-                      [
-                        "scienceWhatsApp",
-                        "Simplificada pelo WhatsApp",
-                        "Permite confirmar com seu telefone verificado e desafio de uso único, quando a política do paciente permitir.",
-                      ],
-                      [
-                        "scienceAutomatic",
-                        "Automática por eventos autorizados",
-                        "Conteúdo efetivamente exibido ou leitura correlacionada no WhatsApp pode registrar ciência automática. Não equivale a confirmação expressa.",
-                      ],
-                    ].map(([key, label, description]) => (
-                      <label
-                        key={key}
-                        className="block rounded-lg border border-(--line) p-3"
-                      >
-                        <span className="flex min-h-11 items-center gap-3">
-                          <input
-                            name={key}
-                            type="checkbox"
-                            defaultChecked={
-                              profile.notification_preferences[key] ??
-                              key === "scienceExpress"
-                            }
-                          />
-                          {label}
-                        </span>
-                        <span className="block text-xs font-normal text-(--muted)">
-                          {description}
-                        </span>
-                      </label>
-                    ))}
-                    <p className="text-xs text-(--muted)">
-                      A política do paciente também deve autorizar o modo.
-                      Expedição só registra ciência quando você é entregador e
-                      responsável autorizado; a evidência identifica essa
-                      origem.
-                    </p>
-                  </fieldset>
                 </div>
               </fieldset>
               <button className={primaryClass} disabled={busy}>
@@ -283,6 +235,7 @@ function ProfileContent() {
               </button>
             </form>
           </SettingsSection>
+          <SciencePreferenceSettings />
           <SettingsSection title="Foto de perfil" summary="Imagem utilizada na identificação da sua conta">
             
             {profile.avatar ? (
@@ -331,21 +284,7 @@ function ProfileContent() {
                     autoComplete="current-password"
                   />
                 </label>
-                <label className="block text-sm font-semibold">
-                  Nova senha
-                  <input
-                    className={inputClass}
-                    name="password"
-                    type="password"
-                    minLength={12}
-                    maxLength={256}
-                    required
-                    autoComplete="new-password"
-                  />
-                  <span className="text-xs text-(--muted)">
-                    Use pelo menos 12 caracteres.
-                  </span>
-                </label>
+                <NewPasswordField className={inputClass} disabled={busy} />
                 <button className={primaryClass} disabled={busy}>
                   Alterar senha
                 </button>
@@ -446,8 +385,9 @@ function ProfileContent() {
               Encerrar outras sessões
             </button>
           </SettingsSection>
+          <SettingsSection title="Guias e ajuda" summary="Reabrir orientações e guardar seu progresso"><UserGuide/></SettingsSection>
         </>
-      )}
-    </div>
+      ) : null}
+    </section>
   );
 }
