@@ -1,6 +1,6 @@
 # Estado verificável do projeto
 
-Referência editorial:06/11/2026, America/Sao_Paulo. **Produção NO-GO.**
+Referência editorial:07/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
@@ -9,6 +9,15 @@ dois consumidores de governança; browser foi pulado. A correção incremental
 D3.4a restaura data.definitions e consulta proposta aplicada pela página de
 histórico. Recheck Auth6/6; a nova CI ainda é necessária. Local127/remoto121.
 SonarCloud segue adiado expressamente pelo responsável, sem Quality Gate aprovado.
+
+D3.4 comprova os estados de sino, central, perfil e consumo:23 unitários e24
+casos browser distintos, com sete rechecks finais em build de produção nos
+consumidores afetados. Sem falso vazio, spinner após500, perda de edição pessoal
+ou ciência por apenas consultar; Tab/Escape conferidos nos três projetos.
+Evidência e limites no [manifesto D3.4](../audits/D/D-B/D3_4_EVIDENCE.json).
+CI2865b45 aprovou banco e validate Windows/Ubuntu; não valida o incremento UI
+posterior. O responsável pediu execução mais econômica, preservando os gates:
+lotes por fluxo, diagnóstico menor e aceite do candidato estável.
 
 Base integrada PR6: `8ec979a`. Branch única `feat/phase-d-implementation` e
 [Draft PR7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.

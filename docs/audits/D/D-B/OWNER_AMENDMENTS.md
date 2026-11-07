@@ -14,3 +14,14 @@ prossegue. O estado observado do provedor permanece registrado, sem atribuir
 aprovação a Quality Gate falho ou não configurado. As correções já implementadas
 e suas evidências são preservadas. CI funcional, testes, contratos e gates D-C
 mantêm os requisitos aplicáveis da ordem.
+
+## Eficiência da execução — 07/11/2026
+
+O responsável solicitou reduzir tempo e custo, preservando qualidade, rigor e
+execução integral. A missão continua com os mesmos critérios e limites.
+As próximas entregas serão agrupadas por fluxo; diagnóstico usa verificações
+menores e modo local rápido do runner. Aceite usa candidato estável com build
+de produção. Suítes gerais ficam na CI do SHA publicado, com repetição local
+somente por falha/hipótese concreta. Evidências mantêm origem, contraprovas e
+limitações; diagnóstico não recebe status de aceite. Evitar releituras amplas,
+monitoramento repetitivo e atualizações manuais duplicadas da matriz.

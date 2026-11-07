@@ -18,9 +18,9 @@ import type { ConsumptionSummary } from "@/types/consumption";
 import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDetail } from "./consumption-detail";
 import { FlowReviews } from "./flow-reviews";
+import { parseConsumptionPage } from "@/lib/validation/consumption";
 
 type Cursor = { at: string; id: string };
-type Page = { data: ConsumptionSummary[]; next: Cursor | null };
 export function ConsumptionConsole() {
   return (
     <Workspace title="Faltas e consumo extraordinário">
@@ -47,11 +47,11 @@ function Reports({ context }: { context: WorkspaceContext }) {
         ),
       ).toString(),
     );
-  const [rows, setRows] = useState<ConsumptionSummary[] | null>(null),
-    [next, setNext] = useState<Cursor | null>(null),
-    [error, setError] = useState(""),
-    [attempt, setAttempt] = useState(0),
+  const [read, setRead] = useState<{ query: string; key: string; rows: ConsumptionSummary[] | null; next: Cursor | null; error: string } | null>(null);
+  const [attempt, setAttempt] = useState(0),
     [moreBusy, setMoreBusy] = useState(false);
+  const readKey = JSON.stringify([patient, query, live, attempt]), current = read?.query === query ? read : null;
+  const rows = current?.rows ?? null, next = current?.next ?? null, error = current?.error ?? "", reading = current?.key !== readKey;
   const [products, setProducts] = useState<CatalogProduct[]>([]),
     [catalogError, setCatalogError] = useState(""),
     [catalogLoading, setCatalogLoading] = useState(true),
@@ -65,32 +65,24 @@ function Reports({ context }: { context: WorkspaceContext }) {
   useEffect(() => {
     const controller = new AbortController();
     generationRef.current++;
-    api<Page>(
+    api<unknown>(
       `/api/consumption?careRecipientId=${patient}&${query}`,
       undefined,
       controller.signal,
     )
-      .then((result) => {
+      .then(value => parseConsumptionPage(value, patient)).then((result) => {
         if (!controller.signal.aborted) {
-          setRows(result.data);
-          setNext(result.next);
-          setError("");
+          setRead({ query, key: readKey, rows: result.data, next: result.next, error: "" });
         }
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {
-          setError(reason.message);
-          if (
-            reason instanceof ApiError &&
-            [401, 403].includes(reason.status)
-          ) {
-            setRows(null);
-            setNext(null);
-          }
+          const unavailable = reason instanceof ApiError && [401, 403, 404, 409].includes(reason.status);
+          setRead(previous => ({ query, key: readKey, rows: !unavailable && previous?.query === query ? previous.rows : null, next: !unavailable && previous?.query === query ? previous.next : null, error: reason instanceof Error ? reason.message : "Não foi possível consultar os relatos." }));
         }
       });
     return () => controller.abort();
-  }, [patient, query, live, attempt]);
+  }, [patient, query, readKey]);
   useEffect(() => {
     const controller = new AbortController();
     api<{ data: CatalogProduct[] }>(
@@ -137,26 +129,17 @@ function Reports({ context }: { context: WorkspaceContext }) {
     setMoreBusy(true);
     const snapshot = generationRef.current;
     try {
-      const result = await api<Page>(
+      const response = await api<unknown>(
         `/api/consumption?careRecipientId=${patient}&${query}&` +
           new URLSearchParams({ beforeAt: next.at, beforeId: next.id }),
       );
+      const result = parseConsumptionPage(response, patient);
       if (snapshot === generationRef.current) {
-        setRows((current) => [
-          ...new Map(
-            [...(current ?? []), ...result.data].map((row) => [row.id, row]),
-          ).values(),
-        ]);
-        setNext(result.next);
-        setError("");
+        setRead(previous => previous?.query === query ? { ...previous, rows: [...new Map([...(previous.rows ?? []), ...result.data].map(row => [row.id, row])).values()], next: result.next, error: "" } : previous);
       }
     } catch (reason) {
       if (snapshot === generationRef.current)
-        setError(
-          reason instanceof Error
-            ? reason.message
-            : "Não foi possível carregar outra página.",
-        );
+        setRead(previous => previous?.query === query ? { ...previous, error: reason instanceof Error ? reason.message : "Não foi possível carregar outra página." } : previous);
     } finally {
       setMoreBusy(false);
     }
@@ -181,7 +164,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           Atualizar lista
         </Button>
       </div>
-      <section className="ui-card">
+      <section className="ui-card" aria-label="Relatos registrados">
         <h2 className="font-semibold" tabIndex={-1} ref={listHeadingRef}>
           Relatos registrados
         </h2>
@@ -280,7 +263,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
             {error} Use Atualizar lista para repetir a consulta.
           </Notice>
         ) : null}
-        {rows === null && !error ? <Notice>Carregando relatos…</Notice> : null}
+        {reading ? <Notice>Carregando relatos…</Notice> : null}
+        {rows && rows.length > 0 && (reading || error) ? <p className="my-3 text-sm text-(--muted)">Última consulta confirmada; aguardando atualização.</p> : null}
         <ul className="space-y-3">
           {rows?.map((row) => (
             <li
@@ -313,13 +297,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
             </li>
           ))}
         </ul>
-        {rows?.length === 0 && !error ? (
+        {!reading && rows?.length === 0 && !error ? (
           <p>Nenhum relato encontrado para estes filtros.</p>
         ) : null}
         {next ? (
           <Button
             className="mt-4"
-            disabled={moreBusy}
+            disabled={moreBusy || reading}
             onClick={() => void loadMore()}
           >
             Carregar mais relatos

@@ -85,3 +85,19 @@ export const consumptionFilters = z
     (value) => !value.from || !value.to || value.from <= value.to,
     "Revise o período.",
   );
+
+const consumptionPage = z.object({
+  data: z.array(z.object({
+    id: z.uuid(), care_recipient_id: z.uuid(), kind: z.enum(["consumption", "shortage"]),
+    location: z.enum(["FAMILY", "CARE_TEAM"]), status: z.enum(["reported", "confirmed", "rejected"]),
+    body: z.string(), created_at: z.iso.datetime({ offset: true }), version: z.number().int().positive(),
+    reported_by: z.uuid(), reported_name: z.string().nullable(),
+  })).max(20),
+  next: consumptionCursor.nullable(),
+});
+export function parseConsumptionPage(value: unknown, patient: string) {
+  const result = consumptionPage.safeParse(value);
+  if (!result.success || result.data.data.some(row => row.care_recipient_id !== patient))
+    throw new Error("A resposta da consulta dos relatos não pôde ser lida. Atualize a lista.");
+  return result.data;
+}

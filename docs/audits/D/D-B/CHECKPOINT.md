@@ -271,3 +271,63 @@ grants. Log preservado em output/phase-d-work/d3-ci-compatibility-recheck.log;
 falha original em ci-bd8747b-failed.log. A CI do próximo SHA ainda deve confirmar
 instalação/evolução e suíte completa. Ajustes do sino/central continuam em
 andamento e têm validação própria; este checkpoint não os declara concluídos.
+
+## D3.4 — leitura do sino, central, perfil e consumo
+
+Base2865b45. Consulta pessoal de notificações agora exige a seleção revogável
+do banco e restringe as duas consultas ao paciente e destinatário, mantendo
+RLS/leitura documental. Parâmetro de outro paciente retorna409 e alteração de
+contexto durante leitura impede disponibilizar o resultado. Modo global,
+inclusive com paciente lembrado no seletor, informa vínculo necessário; não
+consulta a caixa clínica. API não converte contagem/dados ausentes em zero.
+
+O probe anterior preservado em d3-notification-query-before.json mediu as mesmas
+duas leituras com Auth real no conjunto local retido:973/904ms sem filtro e
+20/11ms com filtro, para adminA/global respectivamente. O timeout anterior não
+foi reproduzido; esses tempos não comprovam sua causa exata nem representam
+SLA em produção. Não foi criado índice por inferência ou alterada a RLS.
+
+Sino e central compartilham leitura validada, cancelamento/seleção, recuperação
+e distinção de demora, falha e vazio confirmado. A marcação usa “vista”, separada
+da ciência. Contagem zero não aparece antes de consulta válida; resultado
+anterior do mesmo escopo é explicitamente rotulado, e perda de autorização
+oculta dados anteriores. O sino usa Popover Fluent com foco contido, botão de
+fechar e retorno ao acionador. A primeira contraprova de axe encontrou ação
+de fundo parcialmente coberta pelo painel antigo. A adaptação modal revelou
+uma limitação do helper de teclado, que procurava main oculto. O helper passou
+a iniciar no modal ativo e exigir que o Tab permaneça em conteúdo acessível,
+mantendo as verificações de sentinela/aria-hidden e todas as regras axe.
+
+Perfil deixa de manter spinner após500 inicial, separa leitura de gravação,
+rejeita resposta inválida, recupera por GET e preserva formulário ainda não
+salvo durante reconsulta. Modelo aceita dados opcionais/dispositivo ausentes
+sem inventar identidade ou instante. Consumo vincula resultado aos filtros e
+revisão consultados, oculta vazio antigo durante nova leitura, valida página e
+cursor e preserva a geração de paginação contra retorno tardio. Falha não cria
+movimentação nem confirma um relato. Estados de Flow/fila administrativa têm
+execução separada em C-AC-095; não são certificados por estes testes.
+
+Unitários dos três modelos de leitura:23/23. CI2865b45 aprovou banco, instalação/
+evolução e validate Ubuntu/Windows; browsers ainda em andamento na observação.
+Essa CI valida a correção de compatibilidade publicada e não o código UI ainda
+em validação local. [Manifesto final D3.4](D3_4_EVIDENCE.json) registra17 fontes,
+23 unitários e24 casos browser distintos entre rodadas:15 novos e9 consumidores
+existentes. Chrome5/5; mobile/WebKit15/16, com falha de teclado do sino mantida.
+A hipótese Alt+Tab não resolveu o caso. Tab stops explícitos nos links
+corrigiram travessia; foco no acionador clicado corrigiu retorno por Escape.
+Diagnóstico local1/1 é DIAGNOSTIC_ONLY. Rodada final com build de produção7/7,
+selecionada por lista: sino nos três projetos e os quatro consumidores Chrome
+pendentes. C-AC-020 tem comprovação local, sem equivaler a AT/aparelho humano.
+Perfil sem dados opcionais e coleções vazias foi transporte HTTP controlado;
+os demais resultados consultaram Auth/banco reais. Código do sino não alterou
+seen_at/eventos ao apenas abrir, e a falta reportada não gerou movimento.
+
+Captura390 inspecionada, sem conteúdo cortado. Tipos, lint afetado e os modelos
+passaram. Fontes ficaram estáveis e não houve suíte mutável de banco em paralelo
+com E2E. O modo diagnóstico do runner conserva as guardas, usa Next dev só
+localmente e é ignorado na CI; aceite continua build/start. Next dev reformatou
+o bloco gerado de AGENTS; apenas sua quebra de linha foi restaurada para MD013,
+sem alterar instruções ou reduzir regras. Por orientação do responsável, os
+próximos incrementos serão agrupados por fluxo e terão validação conjunta,
+conforme [complemento de eficiência](OWNER_AMENDMENTS.md). Outros critérios D3,
+D4, D5 e infraestrutura permanecem em execução; remoto final não iniciado.

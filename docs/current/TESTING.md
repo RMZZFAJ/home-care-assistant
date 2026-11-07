@@ -31,6 +31,14 @@ worker/provedor com transporte falso. Não utilizam credenciais reais.
 
 ## Validação proporcional por incremento
 
+Para diagnóstico local dirigido, HCA_E2E_DIAGNOSTIC=true no mesmo runner usa
+Next dev e evita reconstruir toda a aplicação a cada hipótese. Verificação da
+stack/origem, identidades fictícias e bloqueio de envio externo continuam
+obrigatórios. Esse resultado deve ser rotulado DIAGNOSTIC_ONLY e não substitui
+o aceite com build de produção. Sem a variável, o runner mantém build/start;
+na CI o modo diagnóstico é sempre ignorado. Fontes ficam estáveis durante cada
+execução. Consolidar alterações do mesmo fluxo antes da rodada de aceite.
+
 Os comandos gerais acima continuam na CI da PR. Não é necessário executá-los
 todos localmente a cada edição e repetir a mesma matriz após cada correção.
 Antes de publicar um conjunto coerente, selecionar a evidência que discrimina

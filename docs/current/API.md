@@ -205,9 +205,21 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 - **Rota:** /api/notifications
 
-  **Contrato:** Caixa pessoal paginada e ciência independente
+  **Contrato:** Caixa pessoal paginada e marcação como vista, independente da ciência
 
 <!-- c-table:end -->
+
+Na caixa pessoal, GET /api/notifications usa o paciente selecionado na sessão
+revogável do banco e filtra também a identidade destinatária. O parâmetro
+careRecipientId, quando informado, deve corresponder a essa seleção: divergência
+retorna409 CONTEXT_REQUIRED. Sem contexto de paciente, responde
+availability=patient_context_required, sem consultar notificações de outros
+pacientes. A seleção é conferida novamente depois das leituras autorizadas.
+Resposta consultada inclui availability=ready, careRecipientId, data, total,
+unreadCount, page e pageSize. O sino exclui silenciosas antes da paginação;
+na central, o filtro de não vistas se aplica antes da página. Falha de leitura
+ou resultado inválido não vira caixa vazia. POST marca vista no aplicativo;
+não registra ciência, aceite documental ou leitura confirmada por provedor.
 
 ## Documentos e quantidades
 
