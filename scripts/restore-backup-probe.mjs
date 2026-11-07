@@ -15,6 +15,23 @@ export function assertProbeDatabase(name) {
   return name;
 }
 
+/** Compare the restored registries with Storage bytes already authenticated. */
+export function verifyRegisteredPdfCapture(sql, storage) {
+  const rows = (query) => JSON.parse(sql(query).split(/\r?\n/).find((line) => line.startsWith("[")));
+  const legacy = rows("select coalesce(jsonb_agg(to_jsonb(x)),'[]'::jsonb) from (select object_path,sha256 from public.document_pdf_renders union select object_path,sha256 from public.document_pdfs) x;");
+  // D-A captures predate this table. Never reference it in a parsed query until
+  // its existence in the isolated restored database has been confirmed.
+  const signed = sql("select to_regclass('private.pdf_issuances') is not null;").trim() === "t"
+    ? rows("select coalesce(jsonb_agg(jsonb_build_object('object_path',object_path,'sha256',sha256)),'[]'::jsonb) from private.pdf_issuances where state='ready';")
+    : [];
+  for (const reference of [...legacy, ...signed]) {
+    const object = storage.objects.find((entry) => entry.bucket === "document-receipts" && entry.name === reference.object_path);
+    assert.ok(object, "Registered PDF bytes must exist in the recovery package.");
+    assert.equal(object.sha256, reference.sha256, "Registered PDF digest must match recovered Storage bytes.");
+  }
+  return { pdfDigestsVerified: legacy.length + signed.length, signedIssuanceDigestsVerified: signed.length };
+}
+
 /** No reset, no roles import and no second Supabase stack. The original DB is untouched. */
 export async function probeRestore({ directory, key, destination, applyAfterVersion }) {
   getTestEnvironment();
@@ -71,12 +88,7 @@ export async function probeRestore({ directory, key, destination, applyAfterVers
        if bad then raise exception 'restored foreign key has orphaned records'; end if;
       end loop; end; $verify$;`;
     sql(foreignKeyCheck);
-    const renders = JSON.parse(sql("select coalesce(jsonb_agg(to_jsonb(x)),'[]'::jsonb) from (select object_path,sha256 from public.document_pdf_renders union select object_path,sha256 from public.document_pdfs) x;").split(/\r?\n/).find((line) => line.startsWith("[")));
-    for (const render of renders) {
-      const object = storage.objects.find((entry) => entry.bucket === "document-receipts" && entry.name === render.object_path);
-      assert.ok(object, "Registered PDF bytes must exist in the recovery package.");
-      assert.equal(object.sha256, render.sha256, "Registered PDF digest must match recovered Storage bytes.");
-    }
+    const pdfCoverage = verifyRegisteredPdfCapture(sql, storage);
     const forbiddenExtensions = Number(sql("select count(*) from pg_extension where extname in ('pg_cron','pg_net');").trim());
     assert.equal(forbiddenExtensions, 0, "Recovery probe must have no cron or HTTP-egress extension.");
     const migrations = [];
@@ -98,7 +110,7 @@ export async function probeRestore({ directory, key, destination, applyAfterVers
       // Catalogue text differences remain a separate preflight review. A
       // successful restore never promotes unmatched sections to equivalent.
     }
-    result = { ...verified, restoredTables: Object.keys(expected).length, stableTableDigestsMatched: true, volatileSnapshotDifferences: differences, foreignKeysChecked: true, storageObjectsVerified: storage.objects.length, pdfDigestsVerified: renders.length, migrationsAppliedToProbe: migrations, catalogueComparison, cronEnabled: false, networkExtensionEnabled: false, seconds: (Date.now() - start) / 1000, operationalRecoveryGate: "D6_NOT_SATISFIED_BY_THIS_PROBE" };
+    result = { ...verified, restoredTables: Object.keys(expected).length, stableTableDigestsMatched: true, volatileSnapshotDifferences: differences, foreignKeysChecked: true, storageObjectsVerified: storage.objects.length, ...pdfCoverage, migrationsAppliedToProbe: migrations, catalogueComparison, cronEnabled: false, networkExtensionEnabled: false, seconds: (Date.now() - start) / 1000, operationalRecoveryGate: "D6_NOT_SATISFIED_BY_THIS_PROBE" };
     writeFileSync(join(destination, "RECOVERY_PROBE.json"), JSON.stringify(result, null, 2) + "\n", { flag: "wx", mode: 0o600 });
   } finally {
     // Name is generated locally and checked again; never drops postgres or a supplied target.

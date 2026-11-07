@@ -909,3 +909,20 @@ com o mesmo candidato, passaram. Tipos/lint passaram; sem nova migration.
 [Fontes, logs e limites](D4_5A_CI_EVIDENCE.json). Não se promove diagnóstico,
 CI antiga ou resultado pendente a aprovação. Local141/remoto121;20 pendentes.
 Sonar adiado, D-B em execução, PR Draft e produção NO-GO.
+
+## OPS.1 — cobertura de PDFs ready na recuperação
+
+Base fee8bfe. restore-backup-probe inclui referências ready da tabela privada e
+conserva backups anteriores à D-B por check de existência antes do SQL. Emissão
+incerta sem upload não é exigida como ready; ready ausente/divergente é recusado.
+Um caso SQL com banco isolado passou, incluindo contraprovas; lint
+passou. O backup cifrado original teve nova restauração real isolada:122 conjuntos,
+FKs,29 objetos,28 PDFs, sem cron/pg_net; zero emissões assinadas na cópia antiga.
+O probe levou4,702s, sem atribuir esse resultado a RTO operacional.
+[Evidência e escopo](OPS_1_EVIDENCE.json).
+
+Destinos/diagnósticos de recuperação ficam fora do Git, com ACL do operador;
+chave separada não foi exportada. Sem alteração de fonte, reset, remoto ou deploy.
+Local141/remoto121;20 migrations D-B pendentes. Agenda/retenção7+4, destino
+operacional independente, recuperação de chaves, monitoramento e prova D6
+continuam pendentes. A meta D-B continua ativa e a PR permanece Draft.

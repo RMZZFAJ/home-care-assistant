@@ -34,6 +34,26 @@ em ambiente com gravações concorrentes exige reconciliação/quarentena própr
 o ensaio registrou somente dois controles de cron mutáveis entre snapshots,
 sem divergência de fatos, identidades ou arquivos. Detalhes em [migrations](MIGRATIONS.md).
 
+## Cobertura de emissões assinadas — OPS.1
+
+O probe agora inclui private.pdf_issuances em state=ready, conferindo cada SHA
+contra os bytes capturados. Intenções sem arquivo pronto não são inventadas
+como artefatos recuperáveis. Um check to_regclass conserva compatibilidade com
+backups anteriores à tabela privada. O recibo separa total de PDFs e emissões
+assinadas conferidas. [Evidências](OPS_1_EVIDENCE.json).
+
+Regressão SQL em banco isolado na stack existente passou: schema legado sem
+tabela de emissão, ready ausente recusado, ready coincidente aceito, conteúdo
+adulterado recusado e intenção incerta sem upload excluída da exigência de ready.
+Usa digest de PDF sintético assinado real; não é restauração integral de dados
+assinados de produção. Nenhuma tabela do banco operacional local foi alterada.
+
+O backup cifrado original foi restaurado novamente em destino externo novo com
+ACL do operador:122 conjuntos/digests estáveis, FKs,29 objetos e28 PDFs
+conferidos; zero emissões assinadas nesse backup anterior à D-B. O banco isolado
+foi removido, sem cron/pg_net.4,702s é duração do probe, não RTO operacional.
+Chave permaneceu na custódia separada, sem cópia no repositório ou logs públicos.
+
 ## Limites e próximos consumidores
 
 O destino do preflight é independente do Supabase operacional, no equipamento

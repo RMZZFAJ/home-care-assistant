@@ -226,3 +226,9 @@ D-B inclui assinatura interna/TSA, backup e monitoramento sem contratação exte
 conforme ordem vigente. Não houve merge, deploy ou liberação operacional.
 [Continuidade](ROADMAP.md) registra
 os gates e a oportunidade de paginação do QR isolado em D4.
+
+OPS.1 ampliou o probe para exigir SHA/bytes das emissões assinadas ready,
+com compatibilidade para backups sem essa tabela. SQL isolado e nova restauração
+do backup cifrado anterior passaram:122 conjuntos,29 objetos,28 PDFs, sem cron
+ou pg_net. Agenda/retenção, destino independente e gate D6 continuam pendentes.
+[Evidência e limites](../audits/D/D-B/OPS_1_EVIDENCE.json).
