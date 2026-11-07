@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { MenuItem } from "@fluentui/react-components";
+import { detachPushForLogout } from "@/lib/push/logout";
 
 export function LogoutButton() {
   const [error, setError] = useState("");
@@ -17,6 +18,7 @@ export function LogoutButton() {
       setError("Não foi possível encerrar a sessão neste ambiente.");
       return;
     }
+    await detachPushForLogout();
     const { error: signOutError } = await supabase.auth.signOut();
     if (signOutError) {
       setError("Não foi possível encerrar a sessão. Tente novamente.");

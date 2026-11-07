@@ -3,6 +3,30 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
+## Estado atual — D5.2
+
+**Local144/remoto144, zero pendências.** A migration20261107195440 acrescenta
+quatro tabelas privadas Push, cinco RPCs pessoais Auth e três de worker/serviço.
+Não reescreve aplicações anteriores nem ativa transporte. O preflight inicial
+recusou alterações posteriores à captura em Auth/sessões e notificações/revisão.
+A captura completa foi renovada, preservando a primeira e sua contraprova.
+
+Backup final b065691e-d9af-43ea-88f8-7d6c8111c0a3,77 arquivos/10.094.070 bytes,
+manifesto SHA d55dec16160c02c94a810ecbe5e492eaf255f49926f32952bc515905fcb7b33c:
+autenticado e restaurado em banco isolado no container local existente.
+Foram conferidos135 tabelas/FKs,32 objetos e31 PDFs, zero emissão assinada ready
+na fonte; upgrade144 passou na cópia sem cron/pg_net. Não é prova D6 operacional.
+
+Dry-run oficial mostrou somente144, sem seeds/roles. Aplicação linked/skip-vault
+passou após compatibilidade:372 definições anteriores,221 públicas, e seus grants
+permanecem idênticos. Pós-validação comparou144 SQLs e135 projeções originais,
+sem alteração inesperada; cron/Vault idênticos, locks/transações longas/índices
+inválidos zero. A qualificação conhecida da constraint NaN local permanece.
+Novas tabelas têm RLS e nenhum grant direto; as oito RPCs têm papéis e
+search_path conferidos. Não há inscrição ou entrega Push remota criada.
+[Preflight](D5_2_REMOTE_PREFLIGHT.json), [resultado](D5_2_REMOTE_MIGRATIONS.json)
+e [advisors](D5_2_REMOTE_ADVISORS.json). PR Draft, produção NO-GO.
+
 ## Aplicação inicial — D-A
 
 **APLICAÇÃO INICIAL E PÓS-VERIFICAÇÃO CONCLUÍDAS.** Baseline aa9f168:

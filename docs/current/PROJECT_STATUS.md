@@ -4,13 +4,32 @@ Referência editorial:07/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D5.2 acrescentou consentimento Push por aparelho, isolamento de conta/sessão,
+fanout dos avisos internos, transporte cifrado, destino autorizado e revogação.
+Envio externo permanece desligado. Auth7 casos distintos,22 unitários com
+crypto independente e18 casos de produção local entre duas coortes passaram.
+Tipos/lint afetados e SQL dirigido passaram. Custódia local foi criada e
+recuperada de backup cifrado, sem enviar a chave ao preview.
+[Contrato e limites](../audits/D/D-B/WEB_PUSH.md).
+Após backup renovado, restauração e upgrade isolados, a migration144 foi aplicada:
+**local144/remoto144, zero pendências**. Histórico144/144,135 projeções anteriores,
+cron/Vault e grants Push foram conferidos. O primeiro preflight recusou mudanças
+legítimas entre capturas; o backup foi renovado antes de prosseguir.
+[Recibo atual](../audits/D/D-B/D5_2_REMOTE_MIGRATIONS.json).
+
+CI4bf8247 terminou FAILURE: banco, validate Ubuntu/Windows e iOS1 passaram;
+Chromium/mobile/iOS2 falharam no seletor de status da verificação pública.
+O histórico também teve uma falha na tentativa controlada. Consumidores foram
+corrigidos e comprovados localmente, sem reduzir asserções. O novo SHA exige CI
+própria. Coleta iOS184=94+90, sem perda ou duplicação, não significa execução.
+
 D5.1 implementou manifesto, orientação offline estritamente pública, controle de
 compatibilidade, bloqueio de novos envios e atualização sem reload forçado.
 Produção local15/15 nos três projetos passou, com worker real, duas abas e
 recuperação do mesmo rascunho. Instalação física e Push continuam gates próprios.
 [Contrato](../audits/D/D-B/PWA_RUNTIME.md).
 Por determinação posterior do responsável,22 migrations D-B foram aplicadas
-após backup/restauração/compatibilidade: **local143/remoto143; zero pendências**.
+após backup/restauração/compatibilidade: local143/remoto143 naquele fechamento.
 Histórico143/143, preservação das129 projeções anteriores,32 objetos e cron/Vault
 foram pós-validados. [Recibos](../audits/D/D-B/D5_REMOTE_MIGRATIONS.json).
 Isso permite testar o preview durante desenvolvimento; não conclui D-B ou libera

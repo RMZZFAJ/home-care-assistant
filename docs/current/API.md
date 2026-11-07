@@ -951,3 +951,19 @@ Nomes/IDs históricos são preservados e nome atual recebe rótulo específico.
 Intenções V5 existentes continuam recuperáveis pela revisão original.
 CONTENT_INVALID pode informar caracteres não suportados, sem assinatura ou
 arquivo persistido. [Contrato e provas](../audits/D/D-B/PDF_SOURCE_FACTS.md).
+
+## Web Push por aparelho
+
+GET /api/push/devices retorna configuração pública e metadados próprios; não
+retorna endpoints/chaves das inscrições. POST exige consentimento explícito,
+inscrição estrita e sessão Auth atual. PATCH pausa por oito horas, retoma ou
+revoga somente um aparelho próprio. POST /api/push/session revoga somente as
+inscrições vinculadas à sessão corrente. Todos os comandos conferem origem/CSRF.
+
+GET /api/push/open?id recebe UUID opaco, exige Auth e revalida destinatário,
+vínculo e recurso antes de construir um caminho interno. Não marca visto ou
+ciência. O worker operacional existente processa a fila derivada do aviso
+interno, com três RPCs exclusivas de serviço e revalidação imediatamente antes
+do transporte. WEB_PUSH_EXTERNAL_ENABLED permanece desligado por padrão.
+Accepted é aceite HTTP do serviço; perda de resposta após preparo fica incerta,
+sem reenvio automático. [Contrato, privacidade e limites](../audits/D/D-B/WEB_PUSH.md).

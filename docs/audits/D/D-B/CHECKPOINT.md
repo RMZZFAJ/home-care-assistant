@@ -980,3 +980,70 @@ Web Push/VAPID/entrega em background, frescor/revogação entre contextos, corpu
 zoom400%/texto300, demais critérios D3/D4, custódia/rotação, agenda7+4 e
 monitoramento seguem pendentes. O backup local ao operador não é rotina externa
 operacional nem prova D6. Sonar adiado; D-B ativa; PR Draft; produção NO-GO.
+
+## D5.2 em execução — inscrições e transporte Push
+
+Base4bf8247 publicada e preview READY; acesso público conferiu login/runtime/
+manifesto/worker/offline200 e API privada sem sessão401. Fingerprint publicado
+coincide com o checkout LF; variação CRLF do lockfile local foi discriminada.
+Recibo posterior permanece em output/phase-d-work/d5-preview-public-probe.json.
+CI42407243042 terminou: banco e validate Ubuntu/Windows SUCCESS, iOS1 SUCCESS;
+Chromium/mobile/iOS2 FAILURE por seletor status global na verificação pública.
+Histórico WebKit teve uma tentativa falha adicional no retry controlado. Os
+seletores/transporte estão sendo corrigidos sem retirar as asserções.
+
+Migration144 aplicada apenas no local após preflight revertido e prepare. Quatro
+tabelas privadas vinculam aparelhos, trilha, entregas e tentativas ao aviso interno
+existente. Endpoints/chaves não têm grants diretos; três RPCs de serviço têm
+consumidor real no worker. Consentimento, sessão, alvo, lease, conta e expiração
+são revalidados. API/perfil/worker/click/logout estão em implementação e o envio
+externo permanece desligado. [Contrato e limites atuais](WEB_PUSH.md).
+
+Auth7 casos distintos passaram entre coortes;22 unitários passaram, com
+decriptação e VAPID independentes. Contraprovas preservadas: status inválido na
+fixture de revogação e inventário antigo de listeners. Tipos/lint e browser finais
+continuam pendentes; um diagnóstico WebKit dirigido está em execução. Não se
+declara aceite de produção desse lote. Local144/remoto143, uma migration nova
+pendente; nenhuma migration aplicada foi reescrita. Próximo commit exige a
+reconciliação correspondente e a preservação do estado Draft, conforme autorização.
+
+## D5.2 — implementação, custódia local e remoto144
+
+Consentimento e gestão por aparelho, APIs, worker Push e abertura autorizada
+estão implementados. O aviso interno continua produtor canônico; payload opaco
+e mensagem genérica não carregam dados do paciente. Não há ciência implícita.
+Grants/RLS, sessões, reatribuição de conta, leases, backoff e resultados incertos
+foram comprovados. Envio externo continua desligado. [Contrato](WEB_PUSH.md).
+
+Auth7 casos distintos e22 unitários passaram entre coortes, com decriptação
+RFC8291/VAPID independentes. Produção local comprovou18 casos distintos entre
+duas coortes:12 inalterados preservados e6/6 afetados finais nos três projetos.
+Primeira coorte14 passes/4 falhas; retry de histórico e nomes de fixture foram
+corrigidos sem excluir asserções ou apagar dados. Runtime permaneceu idêntico.
+Tipos/lint afetados, SQL de serviço dirigido e guard84 passaram. Coleta iOS tem
+184=94+90, união exata/interseção zero; não é execução da CI. Capturas dos
+controles foram inspecionadas; AT físico e recebimento real permanecem pendentes.
+
+Custódia VAPID persistente local foi criada fora do Git com ACL do operador,
+cifrada, autenticada e recuperada; ECDH independente conferiu a identidade.
+Nenhuma chave foi enviada ao preview. Não equivale a HSM, recuperação em outro
+computador ou rotina externa. O runner usa outra identidade efêmera e força
+transporte desligado. Adaptadores de capacidade/envio são explícitos nos testes.
+
+O primeiro preflight remoto recusou mudanças posteriores ao backup em Auth/
+sessões e notificações/revisão. Captura, cifragem, restauração e upgrade foram
+renovados antes de aplicar. Backup final b065691e-d9af-43ea-88f8-7d6c8111c0a3:
+135 tabelas/FKs,32 objetos,31 PDFs, zero emissão assinada ready na fonte.
+Fluxo oficial aplicou somente144; **local144/remoto144, zero pendências**.
+144 SQLs e135 projeções preservadas, cron/Vault idênticos, saúde sem locks/
+transações longas/índices inválidos. Catálogo vivo coincide com o local exceto
+validação da constraint NaN conhecida, com predicado idêntico. Push remoto tem
+zero registros, RLS sem grants diretos e oito RPCs com papéis conferidos.
+[Preflight](D5_2_REMOTE_PREFLIGHT.json), [resultado](D5_2_REMOTE_MIGRATIONS.json),
+[advisors](D5_2_REMOTE_ADVISORS.json) e [evidência consolidada](D5_2_EVIDENCE.json).
+
+CI4bf8247 terminou FAILURE; correções de consumidor foram comprovadas localmente.
+CI e preview do novo SHA exigem observação própria. VAPID de preview, aparelhos/
+provedores, D3/documentos restantes, recuperação/retenção7+4, monitoramento e
+suporte continuam gates reais. Sonar adiado pelo responsável, D-B ativa, PR Draft,
+sem merge, reset, Auth remoto alterado ou promoção operacional.

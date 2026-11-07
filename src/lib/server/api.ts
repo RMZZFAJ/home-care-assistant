@@ -29,6 +29,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/invalid push|expired push subscription|push device limit reached|push device requires consent/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "A inscrição está inválida, expirou ou atingiu o limite de aparelhos ativos. Consulte os avisos deste aparelho antes de confirmar novamente.", 400);
   if (error?.code === "42702")
     throw new ApiError(
       "INTERNAL_ERROR",

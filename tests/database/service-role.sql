@@ -22,8 +22,15 @@ select pg_temp.assert_ok(not exists(select 1 from pg_class c join pg_namespace n
 select pg_temp.assert_ok(not exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
   where n.nspname='public' and not exists(select 1 from pg_depend d where d.classid='pg_proc'::regclass and d.objid=p.oid and d.deptype='e')
     and has_function_privilege('service_role',p.oid,'EXECUTE')
-    and p.proname not in ('claim_notification_jobs','validate_notification_job','complete_notification_job','notification_webhook','notification_job_state','notification_document_payload','finalize_attachment','register_document_pdf','issue_whatsapp_challenge','accept_whatsapp_receipt','flow_exchange','inbound_report_context','ingest_whatsapp_report','notification_safe_failure','acknowledge_no_issues','bind_notification_template','configure_worker_schedule','confirm_whatsapp_science','issue_reminder_challenge','issue_science_challenge','notification_notice_payload','register_document_render','run_operational_schedule','claim_pdf_issuance','claim_pdf_verification','pdf_issuance_public','legacy_pdf_public')),
+    and p.proname not in ('claim_notification_jobs','validate_notification_job','complete_notification_job','notification_webhook','notification_job_state','notification_document_payload','finalize_attachment','register_document_pdf','issue_whatsapp_challenge','accept_whatsapp_receipt','flow_exchange','inbound_report_context','ingest_whatsapp_report','notification_safe_failure','acknowledge_no_issues','bind_notification_template','configure_worker_schedule','confirm_whatsapp_science','issue_reminder_challenge','issue_science_challenge','notification_notice_payload','register_document_render','run_operational_schedule','claim_pdf_issuance','claim_pdf_verification','pdf_issuance_public','legacy_pdf_public','claim_web_push_deliveries','prepare_web_push_delivery','complete_web_push_delivery')),
   'service role executes only the worker application functions');
+
+select pg_temp.assert_ok(not exists(select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace
+ where n.nspname='private' and c.relname like 'web_push_%' and
+ (has_table_privilege('anon',c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE') or
+ has_table_privilege('authenticated',c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE') or
+ has_table_privilege('service_role',c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE'))),
+ 'push endpoints, keys and attempts have no direct client or service DML grants');
 
 select pg_temp.assert_ok(not has_function_privilege('service_role','public.complete_pdf_issuance(uuid,text,text,integer,jsonb,text,text)','EXECUTE') and not has_function_privilege('service_role','public.pdf_issuance_stage(uuid,text,text,text)','EXECUTE'),'PDF worker cannot finalize or act without the current initiating Auth authority');
 

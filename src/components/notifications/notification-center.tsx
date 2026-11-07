@@ -8,14 +8,15 @@ import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { Badge, Checkbox } from "@fluentui/react-components";
 import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
 import { useInbox } from "@/lib/notifications/use-inbox";
+import { PushArrival } from "./push-arrival";
 export function NotificationCenter() {
   return (
     <Workspace title="Central de notificações">
       {(context) => (
-        <Center
+        <><PushArrival /><Center
           key={`${context.activeContext?.mode}:${context.patient?.id ?? "none"}`}
           patientId={context.activeContext?.mode === "patient" ? context.patient?.id : undefined}
-        />
+        /></>
       )}
     </Workspace>
   );

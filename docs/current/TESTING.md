@@ -331,3 +331,19 @@ O audit anexa geometria dos elementos quando há transbordamento horizontal;
 asserções de largura e axe permanecem obrigatórias. Para seleção pontual por
 --test-list, os caminhos são relativos a tests/e2e; conferir --list e exigir a
 contagem esperada antes de executar. Saída0 com zero casos não é evidência.
+
+## Web Push e compatibilidade PWA
+
+tests/integration/web-push.test.mjs usa Auth real local para isolamento,
+reconsentimento, produtor REQ nativo, concorrência, leases e revogação. O runner
+oficial prepara a stack existente; não execute a suíte junto com E2E mutável.
+O SQL de grants pode ser dirigido com
+node scripts/test-migrations.mjs --sql-only --sql-file service-role.sql.
+
+tests/e2e/web-push.spec.ts usa worker/API/banco reais, com capacidade nativa e
+transporte explicitamente controlados. O runner força envio externo desligado e
+gera VAPID efêmero protegido. Esses casos não comprovam permissão do sistema,
+recebimento físico ou provedor. Unidade confere RFC8291 e VAPID independentemente
+com Node crypto, além dos controles de cache/ativação e payload genérico.
+As coortes, contraprovas e fontes congeladas constam em
+[D5.2](../audits/D/D-B/D5_2_EVIDENCE.json). CI do novo SHA permanece obrigatória.

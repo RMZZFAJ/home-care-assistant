@@ -14,6 +14,9 @@ const testEnv = {
   HCA_PDF_SIGNING_SECRET: "",
   HCA_PDF_TRUST_POLICY_FILE: "",
   HCA_PDF_SIGNING_SECRET_FILE: "",
+  HCA_WEB_PUSH_SECRET: "",
+  HCA_WEB_PUSH_SECRET_FILE: "",
+  WEB_PUSH_EXTERNAL_ENABLED: "false",
 };
 // Collect before an expensive application build or ephemeral key provisioning.
 // A collection error cannot accidentally become a successful browser run.
@@ -44,6 +47,7 @@ try {
       HCA_PDF_SIGNING_SECRET: "",
       HCA_PDF_TRUST_POLICY_FILE: identity.trustFile,
       HCA_PDF_SIGNING_SECRET_FILE: identity.secretFile,
+      HCA_WEB_PUSH_SECRET_FILE: identity.pushFile,
     },
     stdio: "inherit",
   });

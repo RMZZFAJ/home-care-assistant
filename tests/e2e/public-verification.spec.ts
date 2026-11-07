@@ -190,7 +190,7 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
     `select content_hash from public.document_events where document_id=${sqlLiteral(f.doc.id)} and version=1;`,
   );
   await page.goto(`/verificar/${f.doc.id}?version=1&hash=${hash}`);
-  await expect(page.getByRole("status")).toContainText(
+  await expect(page.getByRole("main").getByRole("status")).toContainText(
     "Hash e versão correspondem ao conteúdo registrado",
   );
   await page

@@ -1,11 +1,14 @@
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
-import { it, expect } from "vitest";
+import { it, expect, vi } from "vitest";
 
 function environment() {
   const handlers: Record<string, (event: Record<string, unknown>) => void> = {};
   const stores = new Map<string, Map<string, Response>>();
   const requested: Request[] = [];
+  const shown: { title: string; options: NotificationOptions }[] = [],
+    opened: string[] = [],
+    messages: unknown[] = [];
   let disconnected = false,
     claimed = false,
     skipped = false;
@@ -15,12 +18,23 @@ function environment() {
       handlers[name] = handler;
     },
     clients: {
+      openWindow: async (url: string) => {
+        opened.push(url);
+      },
+      matchAll: async () => [
+        { postMessage: (message: unknown) => messages.push(message) },
+      ],
       claim: async () => {
         claimed = true;
       },
     },
     skipWaiting: () => {
       skipped = true;
+    },
+    registration: {
+      showNotification: async (title: string, options: NotificationOptions) => {
+        shown.push({ title, options });
+      },
     },
   };
   const cacheStorage = {
@@ -79,6 +93,9 @@ function environment() {
     handlers,
     stores,
     requested,
+    shown,
+    opened,
+    messages,
     lifecycle,
     read,
     disconnect: () => {
@@ -106,7 +123,83 @@ it("PWA caches only explicit anonymous public assets and does not force activati
     "fetch",
     "install",
     "message",
+    "notificationclick",
+    "push",
+    "pushsubscriptionchange",
   ]);
+});
+it("push lock-screen content is fixed, generic and independent of payload text or external URLs", async () => {
+  const e = environment(),
+    id = "11111111-1111-4111-8111-111111111111";
+  let work: Promise<unknown> | undefined;
+  for (const data of [
+    {
+      v: 1,
+      id,
+      title: "Private patient",
+      body: "Secret quantity",
+      url: "https://evil.test/",
+    },
+    { v: 1, id: "//evil.test/" },
+  ]) {
+    e.handlers.push({
+      data: { json: () => data },
+      waitUntil: (value: Promise<unknown>) => {
+        work = value;
+      },
+    });
+    await work;
+  }
+  expect(e.shown).toHaveLength(2);
+  for (const shown of e.shown) {
+    expect(shown.title).toBe("Home Care Assistant");
+    expect(shown.options.body).not.toMatch(
+      /Private patient|Secret quantity|evil/,
+    );
+    expect(Object.keys(shown.options.data)).toEqual(["id"]);
+  }
+  expect(e.shown[0].options.data.id).toBe(id);
+  expect(e.shown[1].options.data.id).toBeNull();
+  expect(e.requested).toHaveLength(0);
+});
+it("notification click opens only an authenticated same-origin destination and preserves existing edit tabs", async () => {
+  const e = environment(),
+    id = "11111111-1111-4111-8111-111111111111",
+    close = vi.fn();
+  let work: Promise<unknown> | undefined;
+  for (const value of [id, "https://evil.test/", "//evil.test/"]) {
+    e.handlers.notificationclick({
+      notification: { close, data: { id: value, url: "https://evil.test/" } },
+      waitUntil: (promise: Promise<unknown>) => {
+        work = promise;
+      },
+    });
+    await work;
+  }
+  expect(e.opened).toEqual([
+    "https://care.example/notificacoes?push=" + id,
+    "https://care.example/notificacoes",
+    "https://care.example/notificacoes",
+  ]);
+  expect(close).toHaveBeenCalledTimes(3);
+  expect(e.skipped()).toBe(false);
+  expect(e.requested).toHaveLength(0);
+});
+it("subscription renewal requests a fresh app consultation without inheriting account consent or transmitting keys", async () => {
+  const e = environment();
+  let work: Promise<unknown> | undefined;
+  e.handlers.pushsubscriptionchange({
+    newSubscription: {
+      endpoint: "secret capability",
+      keys: { auth: "private" },
+    },
+    waitUntil: (promise: Promise<unknown>) => {
+      work = promise;
+    },
+  });
+  await work;
+  expect(e.messages).toEqual([{ type: "HCA_PUSH_SUBSCRIPTION_CHANGED" }]);
+  expect(e.requested).toHaveLength(0);
 });
 it("private APIs, PDFs, framework data, query variants and commands cannot enter the PWA cache", async () => {
   const e = environment();

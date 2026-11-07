@@ -1,0 +1,334 @@
+{
+  "sourceBaseSha": "4bf8247f9e2debc71c92ba4e555090957e084698",
+  "at": "2026-11-07T21:24:05.590652+00:00",
+  "stage": "IMPLEMENTED_LOCAL_AUTH_CRYPTO_BROWSER_AND_REMOTE_144; external delivery disabled; mission incomplete",
+  "implementation": [
+    "Existing internal notification producer fans out only for consenting current-session devices",
+    "Four private RLS tables without direct grants; five personal Auth RPCs and three service-only worker RPCs",
+    "Real AES128GCM/VAPID transport with opaque delivery UUID only, generic local lockscreen content, bounded backoff and uncertain no-auto-replay state",
+    "Own-device consent/pause/resume/revoke, account reassignment audit, session logout cleanup and authorized opaque destination",
+    "Protected persistent local VAPID custody, independent recovery; no provider environment secret installed"
+  ],
+  "auth": {
+    "distinctPassed": 7,
+    "firstCohort": {
+      "passed": 6,
+      "failed": 1
+    },
+    "affectedRecheck": {
+      "passed": 1
+    },
+    "counterproof": "Fixture used nonexistent inactive membership status; corrected to revoked, migration unchanged",
+    "coverage": [
+      "Real Auth isolation and grants negatives",
+      "Native REQ producer and internal notice delivery before push",
+      "Two devices and explicit cross-account reassignment",
+      "Authority revoked between claim and preparation",
+      "Lease recovery before preparation; uncertainty after preparation",
+      "Provider expiry and bounded five-attempt backoff",
+      "Concurrent disjoint claims, pause and real Auth session deadline"
+    ]
+  },
+  "unit": {
+    "passed": 22,
+    "firstCounterproof": "Old explicit listener inventory omitted three new real handlers; inventory and independent handler assertions updated without removing cache/activation controls",
+    "independentCrypto": [
+      "RFC8291 decryption using Node crypto",
+      "ES256 VAPID JWT signature and audience verification"
+    ],
+    "realProvider": false
+  },
+  "productionBrowser": {
+    "distinctCasesProved": 18,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "firstCohort": {
+      "planned": 18,
+      "passed": 14,
+      "failed": 4,
+      "unchangedCasesRetained": 12
+    },
+    "finalAffectedCohort": {
+      "planned": 6,
+      "passed": 6,
+      "failed": 0
+    },
+    "singleCohort18Of18Claim": false,
+    "applicationRuntimeUnchangedAcrossCohorts": true,
+    "changedTestAdapters": [
+      "read-history: recover only after actual marked manual retry, waiter starts on release",
+      "web-push: unique labels for both devices; retained historical rows remain untouched"
+    ],
+    "nativeCapability": "Explicit controlled Notification/PushManager adapter; no OS permission prompt",
+    "transport": "Code-injected controlled HTTP transport; actual queue RPC consumer, Auth, API, SQL and service worker",
+    "coverage": [
+      "Gesture, refusal, unsupported fallback, own metadata without endpoint/auth",
+      "Native REQ -> internal notice -> two delivery rows -> actual worker RPC sequence",
+      "Authorized same-origin opening and no business acknowledgement",
+      "Own-device revoke without revoking another device",
+      "Existing onboarding/public verification/two-tab PWA draft/history compatibility"
+    ],
+    "widths": [
+      1440,
+      768,
+      390,
+      320
+    ],
+    "axe": "PASS directed tasks",
+    "visual": "Inspected narrow controls and device states; full-page sticky header position is a capture limit; not physical or human AT evidence"
+  },
+  "checks": {
+    "affectedTypes": "PASS",
+    "affectedLint": "PASS",
+    "directedServiceRoleSql": "PASS with official direct Node runner and real Auth helpers",
+    "serviceRoleCounterproofs": [
+      "Manual file lacked shared pg_temp helpers and rolled back",
+      "PowerShell npm flag forwarding accidentally selected full retained-fixture SQL suite; duplicate fixture stopped it, no reset; direct --sql-file invocation passed"
+    ],
+    "historicalMigrations": {
+      "unchanged": 84,
+      "guard": "PASS"
+    }
+  },
+  "iosCollection": {
+    "all": 184,
+    "shard1": 94,
+    "shard2": 90,
+    "intersection": 0,
+    "unionExact": true,
+    "executionClaim": false
+  },
+  "localCustody": {
+    "at": "2026-11-07T20:52:15.959Z",
+    "keyVersion": "local-push-20261107-v1",
+    "publicKeySha256": "d3f301a199dd721889e8d8450dea8ad4b94c045684e231d79ca57ea78df54206",
+    "recoveredKeyPairMatched": true,
+    "encryptedArchiveAuthenticated": true,
+    "files": 2,
+    "externalSendsEnabled": false,
+    "operationalKeyRecoveryD6": false,
+    "backupId": "76c9b975-d165-4b27-9848-ad40d68f6138",
+    "manifestSha256": "0c70e076af61ea8745930a1747ba59f97c9520d9b2cb6df4409359087b2ddf37",
+    "ownerOnlyAcl": true,
+    "separateEncryptionKey": true,
+    "previewOrProductionKeyProvisioned": false,
+    "independentComputerLossRecovery": false
+  },
+  "remote": {
+    "preflight": "D5_2_REMOTE_PREFLIGHT.json",
+    "postValidation": "D5_2_REMOTE_MIGRATIONS.json",
+    "advisors": "D5_2_REMOTE_ADVISORS.json",
+    "before": 143,
+    "after": 144,
+    "pending": 0,
+    "backupId": "b065691e-d9af-43ea-88f8-7d6c8111c0a3",
+    "refreshCounterproof": "Final preflight refused intervening live Auth/session and notification/workspace changes; complete capture, encryption, authenticated restore and upgrade repeated before applying"
+  },
+  "ci": {
+    "baseSha": "4bf8247f9e2debc71c92ba4e555090957e084698",
+    "baseRun": 42407243042,
+    "baseConclusion": "FAILURE",
+    "basePassed": [
+      "database",
+      "validate Ubuntu",
+      "validate Windows",
+      "browser ios-1"
+    ],
+    "correctedConsumers": [
+      "Public verification uses content main status, retaining global PWA status",
+      "Controlled history manual retry cannot race unsolicited Realtime recovery"
+    ],
+    "newSha": "NOT_PUBLISHED_YET"
+  },
+  "sources": [
+    {
+      "path": "package-lock.json",
+      "mode": "text-lf",
+      "sha256": "938809f38f2106c9bc39c3a4f3fba2365ff515bb26ec47b2965a1dcdd5c6c6f1"
+    },
+    {
+      "path": "package.json",
+      "mode": "text-lf",
+      "sha256": "7fcffa449d9ab1b915f4f2f7dbeb4c3393b51f851c0d511a48182c7dc0ddedf5"
+    },
+    {
+      "path": "scripts/build-pwa.mjs",
+      "mode": "text-lf",
+      "sha256": "c7b1f98300db65474cf9b40a029a12ee7b0158891885c0cb07100f91a42e4b33"
+    },
+    {
+      "path": "scripts/create-local-push-custody.mjs",
+      "mode": "text-lf",
+      "sha256": "ac96fc5c44ffd5665b6746ccce27d55476806bfd6a327357b5a9219031f2a519"
+    },
+    {
+      "path": "scripts/pwa-worker.js",
+      "mode": "text-lf",
+      "sha256": "181eff5c9a72a0f81f9a7c649644e587ba2890d23d3ae5a4c88bfa689238c25a"
+    },
+    {
+      "path": "scripts/run-e2e.mjs",
+      "mode": "text-lf",
+      "sha256": "5c27c3c07c5d6c3ba38dc94f71aa58fd97b4ace8c996f0ff704a931fd049b4f3"
+    },
+    {
+      "path": "src/app/api/notifications/worker/route.ts",
+      "mode": "text-lf",
+      "sha256": "8b4a40e38509d84af77f26415a6eacd88fcad50be0d48f7ff91c876f483572b8"
+    },
+    {
+      "path": "src/app/api/push/devices/route.ts",
+      "mode": "text-lf",
+      "sha256": "0883e680933b324809aa461427e5d3f98edfe3c727a622937076d23f68a16e5a"
+    },
+    {
+      "path": "src/app/api/push/open/route.ts",
+      "mode": "text-lf",
+      "sha256": "7bb0157171ba1f0d6746086819ba420fa29c613684fd7acda2587747a9fe7730"
+    },
+    {
+      "path": "src/app/api/push/session/route.ts",
+      "mode": "text-lf",
+      "sha256": "2bc7b6e436987cab25101e0f42e307544c7f9d6928e9f402a09bb2ab7fe2c31c"
+    },
+    {
+      "path": "src/components/auth/logout-button.tsx",
+      "mode": "text-lf",
+      "sha256": "e6f90e33a0296529e63d782817be9cbb5059e71abdfb822efac15f4728307a39"
+    },
+    {
+      "path": "src/components/notifications/notification-center.tsx",
+      "mode": "text-lf",
+      "sha256": "a6f47eb57e5e73212b32acef52228afcf02a61a6903a694176fcabb809137812"
+    },
+    {
+      "path": "src/components/notifications/push-arrival.tsx",
+      "mode": "text-lf",
+      "sha256": "cbbe7e88371ffb6f9ea2c7e492944b67f77f8f1f09b2c659ce3a27fd7efb76b3"
+    },
+    {
+      "path": "src/components/profile-console.tsx",
+      "mode": "text-lf",
+      "sha256": "d7f3c65ba863c51274a1bcd79fc2bf154e792827d4d9cb56e64af50cbc69a74e"
+    },
+    {
+      "path": "src/components/pwa/push-settings.tsx",
+      "mode": "text-lf",
+      "sha256": "dba72784300bbe4a10a6e5accca042c8292333355d6fd4dc19ab17604733ae3a"
+    },
+    {
+      "path": "src/lib/push/logout.ts",
+      "mode": "text-lf",
+      "sha256": "530dc50de4371a57f87e0dc0c0c6a3c388b7989e244d5d687fd24ced89c962e2"
+    },
+    {
+      "path": "src/lib/push/subscription.ts",
+      "mode": "text-lf",
+      "sha256": "48c85fc0262d3bc998b9272d20db76be7d9996c7eecc979e2c52d315d72e5fa9"
+    },
+    {
+      "path": "src/lib/server/api.ts",
+      "mode": "text-lf",
+      "sha256": "6a07f89f344f434720d9580a0386cd0e9f4184241019f75235324a3e8ac68835"
+    },
+    {
+      "path": "src/lib/server/error-catalog.ts",
+      "mode": "text-lf",
+      "sha256": "bc717add4a17842c9483805164bbdc3483156002be15af3ea8dc714f02818ef5"
+    },
+    {
+      "path": "src/lib/server/web-push.ts",
+      "mode": "text-lf",
+      "sha256": "663ab32e81c627a88224d6f303ed543208ed70137399a15ce12d5996f2159d33"
+    },
+    {
+      "path": "supabase/migrations/20261107195440_phase_d5_web_push_transport.sql",
+      "mode": "text-lf",
+      "sha256": "8c83fc6ebb9d67a57248d3a3b53c79e602bc6373356b8c48d6d91d8322a8c57b"
+    },
+    {
+      "path": "tests/database/service-role.sql",
+      "mode": "text-lf",
+      "sha256": "ecf642329b2e6fa827f122fe01e82418a1d8244de6a0174073d2d2cadfa8ee9f"
+    },
+    {
+      "path": "tests/e2e/public-verification.spec.ts",
+      "mode": "text-lf",
+      "sha256": "734c2a317a6a35db9cc106f83169b1cd5e676fe0d9ac0879bbfee40947a8cd6e"
+    },
+    {
+      "path": "tests/e2e/read-history.spec.ts",
+      "mode": "text-lf",
+      "sha256": "38560dd39c322e2824301fbb3be6610d000d0b68e219f78306405c80587cb55b"
+    },
+    {
+      "path": "tests/e2e/web-push.spec.ts",
+      "mode": "text-lf",
+      "sha256": "ce99ee91835316abbc34fa335df65807a5de9ac5f1a4ca45e42ab9f0e88493dc"
+    },
+    {
+      "path": "tests/integration/web-push.test.mjs",
+      "mode": "text-lf",
+      "sha256": "f75cdc930fbd695e001330d76d030a423901be0d7e0b153bd5fa8ebb27b54885"
+    },
+    {
+      "path": "tests/pwa-worker.test.ts",
+      "mode": "text-lf",
+      "sha256": "04fd7fe0cfec6d9983cabddfebc717e5a08ec6c75c7abad1217dce63ea1b8a51"
+    },
+    {
+      "path": "tests/support/test-signing-identity.mjs",
+      "mode": "text-lf",
+      "sha256": "bc50bcdb79fbc84277c945b951d9365cc36f62703035dd644b4ffd7485fb0514"
+    },
+    {
+      "path": "tests/web-push.test.ts",
+      "mode": "text-lf",
+      "sha256": "6f2dd4e941743149d40cf872cff8d88ffbce9093d1cf0bc7ea49a33e58fa76d2"
+    }
+  ],
+  "logLfSha256": {
+    "d5-push-auth-first.log": "1f3e2de8973ac5f2b9bf6c633b0c58b7f737c84c54ccd38ed78932818b14624a",
+    "d5-push-auth-revocation.log": "1a60905d86ae717998d5f59e8d237d6acf9526ebc9d073295e470e58996588d2",
+    "d5-push-unit-first.log": "e6d8d9687b1c2e1e2d043cb9881dec709cab0257644f1fd7fa4475a9df58b75e",
+    "d5-push-unit-final.log": "2e3ec18a3cb2311ea5ff8351ba3532b632eb95524227426901d87503985ed09c",
+    "d5-push-production.log": "d6354f7e1418d8182afc16f1c843dc508717358f0723515c559335ec027fda1b",
+    "d5-push-production-final.log": "c70fb57d112c47bae19b632593c5493a6428878a73a0b262263c55a31a6f5ddb",
+    "d5-push-browser-diagnostic.log": "7d5e68b8a05cd4cbf23558b048136eaf63eef3ad9faba4325b93389e3c8bc41d",
+    "d5-push-browser-diagnostic-recheck.log": "c19803b4596b3c5448e55f04823aeff0650da4bc529202ab3481a5ecb2080c85",
+    "d5-push-production-counterproof-diagnostic.log": "cbe43fd69511868c2fb1e9722eb7a460045abc1f21fc2803bf733ba47a1c14be",
+    "d5-push-service-role.log": "797281532dcd5d75c9d30f0a795cdccfa5d87e191148ef9aa28876b34c3cd8c4",
+    "d5-push-service-role-runner.log": "821c93ad42df14f49b663736af9a7dfdee9e7e312a1ae584b32fdbe1a16b8f48",
+    "d5-push-service-role-directed.log": "759997cdd3c022e0aeb90ffe4d02605e0b8bed403e07042650182e5dd8d420cd",
+    "d5-push-types-post-counterproof.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "d5-push-lint-formatted.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "d5-push-corrected-test-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "d5-push-contracts.log": "fa4deead48764fff4ad5a30b4b612da8dc310070ec685493d8c95105b59ff39f",
+    "d5-push-remote-preflight.log": "e22db6293586612045611b08cdaf9c69cae0ca5ba66150ab945e9dc5244e4de2",
+    "d5-push-remote-refreshed-capture.log": "7f2f67103394aa9f705d24b2b1e4a9290072805c4320da6137458ddb15365a8f",
+    "d5-push-remote-refreshed-finalization.log": "d572b11f6e00c436f6bcb98f1e0c7545278aebe6c181ca0690211edb1818ba3a",
+    "d5-push-remote-apply.log": "f8be1db4ddb82defce9c781808d922eb37f6d36d798ae506973379ef32e92681",
+    "d5-push-remote-postcheck.log": "5f1a1279122329f0b23b3188ab0d81f43ae964c3d3efe4b49053b6be616a7a89"
+  },
+  "screenshotsSha256": {
+    "output/playwright/phase-d/web-push-devices-chromium.png": "5c68f2dcd191174d9fe4054fcaa84ef3805d0ff14933eb1aa0a5b79cd5b37c50",
+    "output/playwright/phase-d/web-push-devices-mobile.png": "9aac774366748549b585c40ff7074248a4ca7e43e8d135b9e72e86092e11cca2",
+    "output/playwright/phase-d/web-push-devices-ios.png": "844ffcc2d787a9fe76aff32d7b32899bfc160b1e0c255be2ffb85ba4f7abbd24"
+  },
+  "remainingGates": [
+    "CI of published SHA",
+    "Preview-specific VAPID and signing custody with environment separation",
+    "Physical install, background/closed-app delivery and OS permission behavior",
+    "External provider not activated or homologated",
+    "Reconciliation/support, D3 remaining criteria and document corpus",
+    "Operational independent backup schedule 7 daily + 4 weekly, monitoring and D6 restore",
+    "Human accessibility and D-C/D6 gates"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "prState": "DRAFT_NO_MERGE",
+  "missionComplete": false
+}

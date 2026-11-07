@@ -2,7 +2,7 @@ import { mkdtemp, writeFile, readFile, rm, realpath } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname, basename } from "node:path";
-import { randomBytes, createHash, X509Certificate } from "node:crypto";
+import { randomBytes, createHash, createECDH, X509Certificate } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { P12Signer } from "@libpdf/core";
 
@@ -179,6 +179,14 @@ export async function testSigningIdentity() {
       }),
       { mode: 0o600 },
     );
+    const pushKey = createECDH("prime256v1");
+    pushKey.generateKeys();
+    await writeFile(file("web-push-secret.json"), JSON.stringify({
+      environment: "local", keyVersion: "ephemeral-push-test-v1",
+      subject: "https://home-care-assistant.invalid",
+      publicKey: pushKey.getPublicKey().toString("base64url"),
+      privateKey: Buffer.from(pushKey.getPrivateKey("hex").padStart(64, "0"), "hex").toString("base64url"),
+    }), { mode: 0o600 });
     return {
       signer,
       tsa,
@@ -186,6 +194,7 @@ export async function testSigningIdentity() {
       dispose,
       trustFile: file("trust.json"),
       secretFile: file("runtime-secret.json"),
+      pushFile: file("web-push-secret.json"),
     };
   } catch (error) {
     await dispose();

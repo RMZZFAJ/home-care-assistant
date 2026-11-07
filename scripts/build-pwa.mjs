@@ -29,7 +29,7 @@ for (const path of [
   "scripts/build-pwa.mjs",
   "public/offline.html",
 ])
-  hash.update(path).update(await readFile(path));
+  hash.update(path).update((await readFile(path, "utf8")).replaceAll("\r\n", "\n"));
 const contract = JSON.parse(
   await readFile("src/lib/pwa/contract.json", "utf8"),
 );

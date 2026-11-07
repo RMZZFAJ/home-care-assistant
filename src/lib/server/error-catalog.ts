@@ -47,6 +47,8 @@ const reconciliation = {
 
 /** Stable public contracts. Messages may add context without exposing private data. */
 export const errorCatalog = {
+  PUSH_NOT_CONFIGURED: configuration,
+  PUSH_RESULT_UNCONFIRMED: reconciliation,
   PDF_BYTES_DIVERGE: {
     ...dependency,
     recommendedAction:

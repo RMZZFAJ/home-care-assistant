@@ -29,7 +29,9 @@ missão é NOT_VERIFIED; preview documental não é homologação do produto.
 - [Auditorias preservadas](docs/audits/README.md) e
   [plano D](docs/audits/D/README.md).
 
-PWA/push, ciência por canal externo e assinatura aguardam os lotes próprios.
+PWA e Web Push têm implementação no candidato D-B; entrega externa permanece
+desligada e aparelhos físicos aguardam homologação. PDFs usam assinatura e TSA
+internas, sem afirmar ICP-Brasil. Consulte os limites e evidências no checkpoint.
 Rascunhos próprios REQ/BAL entre aparelhos e os processos D0–D2 estão
 implementados no candidato D-A. Os dois P1 herdados receberam correção e
 regressões discriminantes. Validação local e publicação na Draft PR não

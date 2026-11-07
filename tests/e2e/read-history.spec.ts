@@ -61,7 +61,13 @@ test("D3 histórico distingue demora erro e vazio e ignora resposta antiga mesmo
     const native = window.fetch.bind(window);
     window.fetch = (input, init) => {
       const url = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url, window.location.origin);
-      return native(input, url.pathname === "/api/admin" && url.searchParams.get("query") === "Resposta antiga sem resultado" ? { ...init, signal: undefined } : init);
+      let options = init;
+      const state = window as unknown as { hcaNextAuditRetry?: boolean };
+      if (url.pathname === "/api/admin" && url.searchParams.get("section") === "audit" && state.hcaNextAuditRetry) {
+        state.hcaNextAuditRetry = false;
+        const headers = new Headers(init?.headers); headers.set("x-hca-controlled-audit-retry", "1"); options = { ...init, headers };
+      }
+      return native(input, url.pathname === "/api/admin" && url.searchParams.get("query") === "Resposta antiga sem resultado" ? { ...options, signal: undefined } : options);
     };
   });
   await login(page, f.patient);
@@ -73,7 +79,10 @@ test("D3 histórico distingue demora erro e vazio e ignora resposta antiga mesmo
     const url = new URL(route.request().url());
     if (url.searchParams.get("section") !== "audit") return route.continue();
     if (mode === "first") { const response = await route.fetch(); firstEntered(); await firstGate; return route.fulfill({ response }); }
-    if (mode === "error" && !await page.evaluate(() => Boolean((window as unknown as { hcaAuditManualRetry?: boolean }).hcaAuditManualRetry))) return route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Falha controlada na leitura do histórico" } });
+    if (mode === "error") {
+      if (route.request().headers()["x-hca-controlled-audit-retry"] === "1") mode = "live";
+      else return route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Falha controlada na leitura do histórico" } });
+    }
     if (url.searchParams.get("query") === "Resposta antiga sem resultado") { const response = await route.fetch(); oldEntered(); await oldGate; return route.fulfill({ response }); }
     await route.continue();
   });
@@ -90,14 +99,21 @@ test("D3 histórico distingue demora erro e vazio e ignora resposta antiga mesmo
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do histórico");
     await expect(panel.getByText("Nenhum evento corresponde aos filtros consultados.", { exact: true })).toHaveCount(0);
     const retry = panel.getByRole("button", { name: "Consultar histórico novamente", exact: true });
-    await retry.evaluate(button => button.addEventListener("click", () => { (window as unknown as { hcaAuditManualRetry: boolean }).hcaAuditManualRetry = true; }, { once: true }));
-    await retry.click(); mode = "live";
+    await page.evaluate(() => {
+      const mark = (event: MouseEvent) => {
+        if (!(event.target instanceof Element) || event.target.closest("button")?.textContent?.trim() !== "Consultar histórico novamente") return;
+        (window as unknown as { hcaNextAuditRetry: boolean }).hcaNextAuditRetry = true;
+        document.removeEventListener("click", mark, true);
+      };
+      document.addEventListener("click", mark, true);
+    });
+    await retry.click();
     await expect(panel.getByText("Nenhum evento corresponde aos filtros consultados.", { exact: true })).toBeVisible();
-    const oldResponse = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin" && new URL(response.url()).searchParams.get("query") === "Resposta antiga sem resultado");
     await query.fill("Resposta antiga sem resultado"); await query.press("Enter"); await enteredOld;
     const name = sql(`select full_name from public.profiles where id=${sqlLiteral(fixtures.adminA.id)};`);
     await query.fill(name); await query.press("Enter");
     await expect(panel.getByText("201 eventos encontrados · página 1 de 11", { exact: true })).toBeVisible(); await expect(query).toBeFocused();
+    const oldResponse = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin" && new URL(response.url()).searchParams.get("query") === "Resposta antiga sem resultado");
     releaseOld(); await (await oldResponse).finished();
     await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
     await expect(panel.getByText("201 eventos encontrados · página 1 de 11", { exact: true })).toBeVisible(); await expect(query).toHaveValue(name);

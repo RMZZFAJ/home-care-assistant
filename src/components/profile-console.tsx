@@ -22,6 +22,7 @@ import { SciencePreferenceSettings } from "./profile/science-preference";
 import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
 import { UserGuide } from "@/components/guides/user-guide";
 import { PwaSettings } from "./pwa/pwa-settings";
+import { PushSettings } from "./pwa/push-settings";
 import { requireRuntimeCommandsAvailable } from "@/lib/client/api";
 type Profile = ProfileRead["data"];
 type Membership = ProfileRead["memberships"][number];
@@ -142,6 +143,7 @@ function ProfileContent() {
       {readFailure ? <Notice error>{readFailure.message} <button type="button" className={buttonClass} onClick={() => setReadAttempt(value => value + 1)}>Consultar perfil novamente</button></Notice> : null}
       {reading ? <Notice>{profile ? "Atualizando consulta do perfil…" : "Carregando perfil…"}</Notice> : null}
       <PwaSettings />
+      <PushSettings />
       {profile ? (
         <>
           <SettingsSection title="Identidade pessoal" summary="Nome, identificação profissional e preferências">

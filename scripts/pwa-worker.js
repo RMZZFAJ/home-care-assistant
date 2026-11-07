@@ -40,6 +40,58 @@ self.addEventListener("message", (event) => {
   if (event.data?.type === "HCA_RUNTIME" && event.ports[0])
     event.ports[0].postMessage(BUILD);
 });
+self.addEventListener("push", (event) => {
+  // Lock-screen text is always local and generic, even for hostile payloads.
+  let id = null;
+  try {
+    const data = event.data?.json();
+    if (
+      data?.v === 1 &&
+      typeof data.id === "string" &&
+      /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(
+        data.id,
+      )
+    )
+      id = data.id;
+  } catch {
+    /* Malformed payload still gets only the public, generic notice. */
+  }
+  event.waitUntil(
+    self.registration.showNotification("Home Care Assistant", {
+      body: "Há uma atualização no aplicativo. Entre para consultar suas notificações.",
+      icon: "/pwa/icon-192.png",
+      badge: "/pwa/icon-192.png",
+      ...(id ? { tag: "hca-push-" + id } : {}),
+      data: { id },
+    }),
+  );
+});
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const id = event.notification.data?.id;
+  const path =
+    typeof id === "string" &&
+    /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(
+      id,
+    )
+      ? "/notificacoes?push=" + encodeURIComponent(id)
+      : "/notificacoes";
+  // Open a new authenticated destination; never navigate away from unsaved edits.
+  event.waitUntil(
+    self.clients.openWindow(new URL(path, self.location.origin).href),
+  );
+});
+self.addEventListener("pushsubscriptionchange", (event) => {
+  // A browser renewal never inherits an account's consent automatically.
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clients) => {
+        for (const client of clients)
+          client.postMessage({ type: "HCA_PUSH_SUBSCRIPTION_CHANGED" });
+      }),
+  );
+});
 self.addEventListener("fetch", (event) => {
   const request = event.request,
     url = new URL(request.url);
