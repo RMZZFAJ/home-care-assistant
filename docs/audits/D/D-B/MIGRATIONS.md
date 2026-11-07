@@ -155,3 +155,21 @@ Mesma autorização e EXECUTE authenticated; auxiliares continuam fechados.
 test:db:prepare sem reset e seis casos Auth dirigidos passaram, incluindo duas
 falhas da CI bd8747b. Instalação/evolução e suíte completa devem ser confirmadas
 pela CI do SHA publicado. A aplicação remota permanece reservada ao lote final.
+
+### Lote local D3.5 em execução
+
+Local130/remoto121. 20261107035508_phase_d3_residence_preparation_and_guides.sql
+acrescenta preparação privada, journal/CAS, criação global e guias próprios,
+sem ato clínico por progresso. 20261107040539_phase_d3_preparation_read_models.sql
+acrescenta páginas estáveis, resumo limitado a metadados e validação de
+responsáveis ativos. Aplicadas por test:db:prepare sem reset. Sete casos Auth
+distintos passaram entre rodadas; interface/HTTP/CI ainda não concluídos.
+Helpers/tabelas privados continuam fechados; RPCs somente authenticated com
+autorização revogável. Nenhuma delas foi aplicada ao remoto.
+
+20261107044658_phase_d3_guide_context_intent.sql vincula progresso ao escopo
+consultado e verifica-o antes e depois do comando. A entrada antiga tornou-se
+helper privado sem EXECUTE público, authenticated, anon ou service_role.
+O recheck final Auth passou7/7, incluindo recusa de intenção antiga após troca
+de paciente e preservação do progresso de destino. Total pendente D-B: nove
+migrations; a reconciliação remota final ainda não foi iniciada.

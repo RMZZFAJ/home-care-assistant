@@ -1,5 +1,6 @@
 "use client";
 import type { FormEvent } from "react";
+import Link from "next/link";
 import {
   buttonClass,
   panelClass,
@@ -25,6 +26,7 @@ export function PatientRegistration({
     refresh?: boolean,
   ) => void;
 }) {
+  if(globalMode&&(creating||!patient?.id))return <section className={panelClass}><h2 className="font-semibold">Preparar nova residência</h2><p className="my-3">O roteiro mantém a mesma preparação, administração inicial e tarefas delegadas, sem liberar produção.</p><Link className={primaryClass} href="/preparar-residencia">Preparar residência</Link>{patient?.id?<button type="button" className={buttonClass} onClick={onToggle}>Voltar ao paciente atual</button>:null}</section>;
   return (
     <section className={panelClass}>
       <h2 className="mb-4 text-lg font-semibold">Cadastro do paciente</h2>

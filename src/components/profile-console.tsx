@@ -20,6 +20,7 @@ import { newPasswordSchema } from "@/lib/validation/password";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { SciencePreferenceSettings } from "./profile/science-preference";
 import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
+import { UserGuide } from "@/components/guides/user-guide";
 type Profile = ProfileRead["data"];
 type Membership = ProfileRead["memberships"][number];
 type Session = ProfileRead["sessions"][number];
@@ -380,6 +381,7 @@ function ProfileContent() {
               Encerrar outras sessões
             </button>
           </SettingsSection>
+          <SettingsSection title="Guias e ajuda" summary="Reabrir orientações e guardar seu progresso"><UserGuide/></SettingsSection>
         </>
       ) : null}
     </section>

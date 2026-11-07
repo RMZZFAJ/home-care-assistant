@@ -793,3 +793,23 @@ Falta de acesso ao vínculo é informada, sem expor dados da REQ protegida.
 O comando receive continua aceitando somente divergences: quantidade recebida,
 problema e observação por linha. Origem/destino/material/vínculos/ator não são
 editáveis nesse ato. A conferência mostra também as linhas integrais.
+
+## Preparação de residência e guias
+
+GET /api/residence-preparations é exclusivo do modo global autorizado. Lista
+preparações próprias em páginas de50, com page/query; id consulta a preparação
+e seu resumo de metadados. POST aceita save/create/discard com revisão esperada
+e chave da mesma intenção. Salvar não cria paciente. Criar exige identidade,
+fuso explícito, administração inicial confirmada e responsáveis distintos;
+isActive=false é preservado. Não concede vínculo ao criador global. Resumo,
+contagens e progresso não aprovam estoque físico nem liberação operacional.
+
+GET /api/guides deriva papel/contexto vigentes no banco. POST progress recebe
+expectedScope, revisão, etapa, escolha e chave; troca de contexto rejeita o
+comando sem gravar no paciente seguinte. Recuperação conserva a mesma intenção.
+POST configure exige administração local do paciente e revisão da configuração.
+Progresso próprio e apresentação opcional não alteram SCI ou permissões.
+
+GET /api/whatsapp/flows/submissions pagina pendências próprias no paciente
+autorizado, com total exato, page/pageSize e máximo100 por página. Ordenação é
+created_at/id descendentes. Falha de consulta não confirma lista vazia.

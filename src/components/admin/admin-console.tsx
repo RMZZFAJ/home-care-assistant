@@ -32,6 +32,7 @@ import { CatalogueManagement } from "./catalogue-management";
 import { MembershipManagement } from "./membership-management";
 import { GlobalAccounts } from "./global-accounts";
 import { AuditHistory } from "./audit-history";
+import { useLiveRevision } from "@/lib/use-live-revision";
 
 type Section =
   | "patient"
@@ -106,6 +107,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   );
   const command = useCommandIntent<Row, AdministrativeResult>(governanceCommandConfirmed);
   const intentRef = useRef<AdministrativeIntent | null>(null);
+  const loadSequenceRef = useRef(0);
   const versionRef = useRef<number | null>(null);
   const [versionAttempt, setVersionAttempt] = useState(0);
   const [conflict, setConflict] = useState(false);
@@ -113,6 +115,11 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [localBusy, setLocalBusy] = useState(false);
   const busy = localBusy || command.busy || command.uncertain || conflict;
   const [error, setError] = useState("");
+  const [readError, setReadError] = useState("");
+  const [readDenied, setReadDenied] = useState(false);
+  const live = useLiveRevision(), queueRevision = section === "notifications" ? live : 0;
+  const [queueReadRevision,setQueueReadRevision]=useState(-1);
+  const queueRefreshing=section==="notifications"&&queueReadRevision!==queueRevision;
   const [message, setMessage] = useState("");
   const [invitationUrl, setInvitationUrl] = useState("");
   const [report, setReport] = useState<unknown>(null);
@@ -131,6 +138,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     (signal?: AbortSignal) => {
       if (!allowed || ["patient", "import", "overview", "audit"].includes(section))
         return Promise.resolve();
+      const sequence = ++loadSequenceRef.current;
       const query = new URLSearchParams({ section });
       if (patientId) query.set("careRecipientId", patientId);
       return Promise.all([
@@ -166,33 +174,38 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           : Promise.resolve({ data: [] as Row[] }),
       ]).then(
         ([result, models, people, products]) => {
-          if (signal?.aborted) return;
+          if (signal?.aborted || sequence !== loadSequenceRef.current) return;
           setRows(result.data ?? []);
           setNotificationTotal(result.total ?? 0);
           setDirectory(people.data);
           setCatalog(products.data);
           if (section === "catalog") setTemplates(models.data);
           setLoading(false);
+          setReadError("");
+          setReadDenied(false);
+          setQueueReadRevision(queueRevision);
         },
         (reason) => {
-          if (!signal?.aborted) {
-            setError(
+          if (!signal?.aborted && sequence === loadSequenceRef.current) {
+            setReadError(
               reason instanceof Error
                 ? reason.message
                 : "Não foi possível carregar a seção.",
             );
             setLoading(false);
+            setReadDenied(reason instanceof ApiError && [401,403,404,409].includes(reason.status));
+            setQueueReadRevision(queueRevision);
           }
         },
       );
     },
-    [section, patientId, globalMode, page, allowed],
+    [section, patientId, globalMode, page, allowed,queueRevision],
   );
   useEffect(() => {
     const controller = new AbortController();
     void load(controller.signal);
     return () => controller.abort();
-  }, [load]);
+  }, [load, queueRevision]);
   async function confirmed(result: AdministrativeResult, packet: AdministrativeIntent) {
     setMessage(result.pendingApproval ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras." : packet.success);
     setEditing(null);
@@ -304,6 +317,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         </Notice>
       )}
       {message && <Notice>{message}</Notice>}
+      {readError ? <Notice error>{readError} <button type="button" className={buttonClass} onClick={() => void load()}>Atualizar seção</button></Notice> : null}
       {recovery}
       {invitationUrl && (
         <section className={panelClass}>
@@ -326,7 +340,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       {loading && section !== "overview" && (
         <Notice>Carregando {labels[section].toLowerCase()}…</Notice>
       )}
-      <fieldset disabled={busy} className="min-w-0 space-y-5">
+      {queueRefreshing&&!loading?<Notice>Atualizando fila de notificações…</Notice>:null}
+      <fieldset disabled={busy} hidden={readDenied} className="min-w-0 space-y-5">
         {section === "patient" && (
           <PatientRegistration
             patient={context.patient}
@@ -469,6 +484,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
               rows={rows}
               execute={execute}
               isGlobalAdmin={globalMode}
+              queried={!loading && !readError && !queueRefreshing}
             />
             {notificationTotal > 20 && (
               <nav

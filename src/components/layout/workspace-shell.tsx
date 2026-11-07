@@ -7,6 +7,7 @@ import { Avatar, Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, Menu, Menu
 import { Icon } from "@/components/ui/primitives";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { GuideOnboarding } from "@/components/guides/user-guide";
 import { BottomNavigation, WorkspaceNavigation } from "@/components/navigation/workspace-navigation";
 import { roleLabels, useWorkspaceState } from "./workspace-context";
 
@@ -84,7 +85,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       <DrawerHeader><DrawerHeaderTitle action={<Button appearance="subtle" icon={<Icon name="close" />} aria-label="Fechar menu" onClick={() => setMobileOpen(false)} />}>Home Care Assistant</DrawerHeaderTitle></DrawerHeader>
       <DrawerBody>{navigation}</DrawerBody>
     </OverlayDrawer>
-    <div className="hca-workspace-body">{children}</div>
+    <div className="hca-workspace-body">{value?.activeContext?<GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id??""}`}/>:null}{children}</div>
     {operational && value ? <BottomNavigation context={value} /> : null}
   </div>;
 }

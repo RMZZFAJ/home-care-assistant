@@ -5,7 +5,7 @@ import { api, ApiError, TransportError } from "./api";
 
 // Holds one immutable command while its outcome is unknown. A read failure
 // after a successful command is handled by the caller, outside this boundary.
-export function useCommandIntent<Packet extends object, Result>(confirmed: (value: unknown) => boolean) {
+export function useCommandIntent<Packet extends object, Result>(confirmed: (value: unknown, packet: Packet) => boolean) {
   const currentRef = useRef<{ url: string; packet: Packet } | null>(null);
   const sendingRef = useRef(false);
   const unresolvedRef = useRef(false);
@@ -18,7 +18,7 @@ export function useCommandIntent<Packet extends object, Result>(confirmed: (valu
     currentRef.current = intent;
     try {
       const result = await api<Result>(intent.url, intent.packet);
-      if (!confirmed(result)) throw new TransportError("A resposta não contém uma confirmação reconhecível. Recupere a mesma tentativa para verificar o resultado.", "command", "INVALID_CONFIRMATION", undefined);
+      if (!confirmed(result, intent.packet)) throw new TransportError("A resposta não contém uma confirmação reconhecível. Recupere a mesma tentativa para verificar o resultado.", "command", "INVALID_CONFIRMATION", undefined);
       currentRef.current = null;
       unresolvedRef.current = false;
       setUncertain(false);

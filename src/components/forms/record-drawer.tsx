@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, MessageBar, MessageBarBody, OverlayDrawer } from "@fluentui/react-components";
 import { Icon } from "@/components/ui/primitives";
 
@@ -10,11 +10,15 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
 }) {
   const [dirty, setDirty] = useState(false);
   const [discard, setDiscard] = useState(false);
-  useEffect(() => () => {
-    requestAnimationFrame(() => {
+  const restoreFrameRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    // A replacement effect (including Strict Mode's probe) is not a close.
+    if (restoreFrameRef.current !== undefined) cancelAnimationFrame(restoreFrameRef.current);
+    const fallback = restoreFocusFallbackRef?.current;
+    return () => { restoreFrameRef.current = requestAnimationFrame(() => {
       if (restoreFocusTo?.isConnected && !restoreFocusTo.matches(':disabled,[aria-disabled="true"]')) restoreFocusTo.focus();
-      else restoreFocusFallbackRef?.current?.focus();
-    });
+      else if (fallback?.isConnected) fallback.focus();
+    }); };
   }, [restoreFocusTo,restoreFocusFallbackRef]);
   const requestClose = () => { if (!busy && !preventClose) { if (dirty) setDiscard(true); else onClose(); } };
   return <OverlayDrawer open aria-label={title} position="end" size="medium" className="hca-record-drawer" onOpenChange={(_, data) => { if (!data.open) requestClose(); }}>

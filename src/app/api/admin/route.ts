@@ -382,6 +382,7 @@ export async function POST(request: Request) {
     if (input.action === "recipient") {
       if (input.id) await patientContext(auth, input.id, "manage");
       else requireGlobal(auth);
+      if (!input.id && !input.isActive) throw new ApiError("VALIDATION_ERROR", "Para preparar uma residência inativa, use Preparar residência. Nenhum cadastro foi criado.", 400);
       if (!input.id && input.initialAdministratorEmail) {
         return NextResponse.json({
           data: await rpc(auth.client, "create_patient_with_administrator", {

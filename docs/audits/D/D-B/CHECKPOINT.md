@@ -331,3 +331,59 @@ sem alterar instruções ou reduzir regras. Por orientação do responsável, os
 próximos incrementos serão agrupados por fluxo e terão validação conjunta,
 conforme [complemento de eficiência](OWNER_AMENDMENTS.md). Outros critérios D3,
 D4, D5 e infraestrutura permanecem em execução; remoto final não iniciado.
+
+## D3.5 — continuidade entre sessões, preparação e guias
+
+Base dfdc7de, cuja CI42335739149 terminou SUCCESS em banco, validate Windows/
+Ubuntu e três projetos browser. Essa aprovação não valida o candidato posterior.
+Local130/remoto121; nove migrations D-B aguardam o lote remoto final autorizado.
+Migrations128–130 aplicadas à stack existente com test:db:prepare, sem reset.
+
+Preparação global privada salva antes de criar paciente, retoma em outra sessão,
+usa CAS e apresenta comparação integral antes de reter valores locais para nova
+revisão. Criação respeita isActive=false, vincula só a administração inicial
+confirmada e não concede vínculo ao criador global. Perda de resposta recupera
+a mesma intenção sem duplicar paciente. Resumo expõe metadados registrados e
+pendências humanas, sem quantidades clínicas ou aprovação de produção.
+
+Guias derivam papel/contexto do banco. Progresso próprio e configuração local
+não alteram SCI, documentos ou permissões. O comando vincula expectedScope,
+revisão, etapa e escolha; resposta200 de outro contexto não confirma a intenção.
+Entrada antiga tornou-se helper privado fechado. Recuperação mantém a chave.
+
+Consumo, Flow e fila administrativa têm casos de duas sessões Auth, com edição
+ou conciliação aberta preservada durante atualização. Trocar paciente limpa
+dados/seleção e ignora resposta antiga entregue integralmente, mesmo quando o
+transporte controlado ignora AbortSignal. Flow tem total/páginas limitadas e
+alcança a mais antiga entre101 pendências, conforme ordenação SQL independente.
+Ingresso Flow e aviso externo incerto são fixtures SQL locais; não provam Meta,
+WhatsApp ou entrega externa. A conciliação incerta permaneceu intocada.
+
+Sete casos Auth finais e cinco unitários passaram. Incluem101 preparações,
+CAS concorrente, negativas, grants, replay, responsáveis ativos e rollback após
+espera observada em profiles: perder o contexto global não deixou paciente,
+vínculo, revisão ou journal parcial. Voltar legitimamente permitiu a intenção.
+Erros dos instrumentos actor/whitelist anteriores continuam preservados.
+
+Aceite browser:15/18 na rodada conjunta de produção; os três casos de preparação
+foram repetidos e passaram3/3. São18 execuções, seis cenários em cada um dos três
+projetos, com quatro larguras/axe em preparação e guia. A primeira rodada errou
+a expectativa403: operação inativa retorna PATIENT_INACTIVE/409 sem documento.
+Mobile/WebKit preservaram scroll ao redimensionar e deixaram passos parcialmente
+sob o cabeçalho. A auditoria por largura agora começa na origem de scroll, com
+todas as regras axe mantidas; isso não aprova todo estado rolado/foco da aplicação.
+Capturas e contextos da falha foram copiados para output/phase-d-work.
+
+Diagnóstico encontrou drawer visível porém aria-hidden: cleanup substituído pelo
+Strict Mode restaurava o acionador durante a edição. Cancelar o frame substituído
+corrigiu o caso dirigido. O fallback captura apenas o alvo conectado do efeito
+que fecha; consumidores restantes são gate da CI candidata. Preparação confirmada
+limpa o erro de comando antigo. Tipos e lint passaram; lint final afetado sem avisos.
+
+[Manifesto D3.5](D3_5_EVIDENCE.json) registra fontes, logs, contraprovas e limites.
+C-AC-085/095 têm comprovação local conjunta. C7-AC-006/007 e D-B-AC-004 continuam
+parciais: faltam controles próprios de adoção de materiais/abertura física em
+GUI-02, delegação local completa e convergência integral dos guias por papel.
+Diagnóstico não é aceite. Fontes ficaram estáveis durante cada E2E e não houve
+suíte mutável de banco paralela. CI do novo SHA, demais D3, D4, D5, operação e
+gates D-C/D6 permanecem pendentes; sem merge, deploy ou liberação operacional.
