@@ -2,7 +2,7 @@ import { mkdtemp, writeFile, readFile, rm, realpath } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname, basename } from "node:path";
-import { randomBytes } from "node:crypto";
+import { randomBytes, createHash, X509Certificate } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { P12Signer } from "@libpdf/core";
 
@@ -146,7 +146,47 @@ export async function testSigningIdentity() {
       ),
       tsa = await P12Signer.create(await readFile(file("tsa.p12")), password),
       root = await readFile(file("root.crt"), "utf8");
-    return { signer, tsa, root, dispose };
+    const fingerprint = (provider) =>
+      createHash("sha256")
+        .update(new X509Certificate(provider.certificate).raw)
+        .digest("hex");
+    await writeFile(
+      file("runtime-secret.json"),
+      JSON.stringify({
+        environment: "local",
+        keyVersion: "ephemeral-test-v1",
+        signerP12: (await readFile(file("signer.p12"))).toString("base64"),
+        signerPassword: password,
+        timestampP12: (await readFile(file("tsa.p12"))).toString("base64"),
+        timestampPassword: password,
+      }),
+      { mode: 0o600 },
+    );
+    await writeFile(
+      file("trust.json"),
+      JSON.stringify({
+        environment: "local",
+        revision: "ephemeral-test-v1",
+        roots: [{ pem: root, trust: "internal" }],
+        revokedFingerprints: [],
+        issuers: [
+          {
+            keyVersion: "ephemeral-test-v1",
+            signerFingerprint: fingerprint(signer),
+            timestampFingerprint: fingerprint(tsa),
+          },
+        ],
+      }),
+      { mode: 0o600 },
+    );
+    return {
+      signer,
+      tsa,
+      root,
+      dispose,
+      trustFile: file("trust.json"),
+      secretFile: file("runtime-secret.json"),
+    };
   } catch (error) {
     await dispose();
     throw error;

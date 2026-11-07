@@ -1,5 +1,7 @@
 import { api, ApiError, authenticate, uuid } from "@/lib/server/api";
 import { documentPdf } from "@/lib/server/document-pdf";
+import { downloadPdfIssuance } from "@/lib/server/pdf-issuance";
+export const runtime = "nodejs";
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -12,12 +14,20 @@ export async function GET(
     const raw = new URL(request.url).searchParams.get("version");
     if (raw && !/^[1-9]\d{0,8}$/.test(raw))
       throw new ApiError("VALIDATION_ERROR", "Versão inválida.");
-    const result = await documentPdf(
-      auth.client,
-      id,
-      raw ? Number(raw) : undefined,
-      new URL(request.url).searchParams.get("renderer") === "legacy",
-    );
+    const issuance = new URL(request.url).searchParams.get("issuance");
+    if (issuance && !uuid.safeParse(issuance).success)
+      throw new ApiError(
+        "VALIDATION_ERROR",
+        "Identificação de exemplar inválida.",
+      );
+    const result = issuance
+      ? await downloadPdfIssuance(auth.client, id, issuance)
+      : await documentPdf(
+          auth.client,
+          id,
+          raw ? Number(raw) : undefined,
+          new URL(request.url).searchParams.get("renderer") === "legacy",
+        );
     return new Response(new Uint8Array(result.bytes), {
       headers: {
         "content-type": "application/pdf",

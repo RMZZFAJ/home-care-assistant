@@ -1,6 +1,13 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { PDFDocument, rgb, degrees, type PDFFont } from "pdf-lib";
+import {
+  PDFDocument,
+  PDFHexString,
+  PDFName,
+  rgb,
+  degrees,
+  type PDFFont,
+} from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import QRCode from "qrcode";
 import {
@@ -51,7 +58,10 @@ export type DocumentSnapshot = {
   purchaseReceipts?: PurchaseReceipt[];
   deliveryCancellation?: DeliveryCancellationContext | null;
   deliveryRegularization?: DeliveryRegularizationContext | null;
-  transfer?: Omit<import("@/types/transfers").TransferFacts, "canAgree" | "canDispatch" | "canWithdraw">;
+  transfer?: Omit<
+    import("@/types/transfers").TransferFacts,
+    "canAgree" | "canDispatch" | "canWithdraw"
+  >;
   balanceReviews?: BalanceReviewFacts;
   actors?: { issuer?: Person; recipient?: Person; patient?: Person };
   lines: Record<string, unknown>[];
@@ -143,9 +153,28 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   }
   return result;
 }
+export type PdfEmissionContext = {
+  id: string;
+  verificationCode: string;
+  requestedAt: string;
+  requestedName: string;
+  representation: "operational" | "derived";
+  verificationOrigin: string;
+  onText?: (run: {
+    page: number;
+    text: string;
+    x: number;
+    baseline: number;
+    width: number;
+    size: number;
+    decoration?: boolean;
+    factGroup?: string;
+  }) => void;
+};
 export async function renderDocumentPdf(
   snapshot: DocumentSnapshot,
   hash: string,
+  emission?: PdfEmissionContext,
 ) {
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
@@ -157,16 +186,36 @@ export async function renderDocumentPdf(
     pdf.embedFont(regularBytes, { subset: true }),
     pdf.embedFont(boldBytes, { subset: true }),
   ]);
-  const date = new Date(snapshot.createdAt ?? "2000-01-01T00:00:00Z");
+  const date = new Date(
+    emission?.requestedAt ?? snapshot.createdAt ?? "2000-01-01T00:00:00Z",
+  );
   pdf.setTitle(`${snapshot.code} - Home Care Assistant`);
   pdf.setAuthor("Home Care Assistant");
   pdf.setCreationDate(date);
   pdf.setModificationDate(date);
   pdf.setSubject(
-    `Comprovante operacional · conteúdo v${snapshot.version} · renderizador V4`,
+    `Comprovante operacional · conteúdo v${snapshot.version} · renderizador V${emission ? 5 : 4}`,
   );
+  if (emission)
+    pdf.catalog.set(
+      PDFName.of("HCAIssuance"),
+      PDFHexString.fromText(
+        JSON.stringify({
+          id: emission.id,
+          verificationCode: emission.verificationCode,
+          requestedAt: emission.requestedAt,
+          documentId: snapshot.id,
+          version: snapshot.version,
+          sourceHash: hash,
+          rendererRevision: 5,
+        }),
+      ),
+    );
   let page = pdf.addPage([pageWidth, pageHeight]),
     y = 736;
+  let decoration = false;
+  let factGroup: string | undefined;
+  let groupCounter = 0;
   const draw = (
     text: string,
     x: number,
@@ -174,7 +223,17 @@ export async function renderDocumentPdf(
     size = 9,
     strong = false,
     color = navy,
-  ) =>
+  ) => {
+    emission?.onText?.({
+      page: pdf.getPageCount() - 1,
+      text,
+      x,
+      baseline: top - size,
+      width: (strong ? bold : font).widthOfTextAtSize(text, size),
+      size,
+      decoration,
+      factGroup,
+    });
     page.drawText(text, {
       x,
       y: top - size,
@@ -182,7 +241,9 @@ export async function renderDocumentPdf(
       font: strong ? bold : font,
       color,
     });
+  };
   function header() {
+    decoration = true;
     page.drawRectangle({
       x: 0,
       y: pageHeight - 82,
@@ -218,6 +279,7 @@ export async function renderDocumentPdf(
         opacity: 0.34,
         rotate: degrees(31),
       });
+    decoration = false;
   }
   header();
   function nextPage() {
@@ -244,9 +306,47 @@ export async function renderDocumentPdf(
   function fields(entries: [string, unknown][]) {
     for (let i = 0; i < entries.length; i += 2) {
       const cells = entries.slice(i, i + 2);
+      const group = ++groupCounter;
       const rows = cells.map(([, value]) =>
         wrap(value, font, 9, width / 2 - 24),
       );
+      if (emission && Math.max(...rows.map((row) => row.length)) > 40) {
+        // Split an oversized field pair before painting. Every fragment retains its label.
+        for (
+          let offset = 0;
+          offset < Math.max(...rows.map((row) => row.length));
+          offset += 40
+        ) {
+          if (offset) nextPage();
+          const fragment = rows.map((row) => row.slice(offset, offset + 40)),
+            height = Math.max(
+              42,
+              ...fragment.map((row) => 27 + row.length * 12),
+            );
+          ensure(height);
+          cells.forEach(([label], index) => {
+            const x = margin + (index * width) / 2;
+            decoration = true;
+            draw(
+              label.toLocaleUpperCase("pt-BR") +
+                (offset ? " (CONTINUAÇÃO)" : ""),
+              x + 12,
+              y - 8,
+              7,
+              true,
+              muted,
+            );
+            decoration = false;
+            factGroup = `${group}:${index}`;
+            fragment[index].forEach((row, n) =>
+              draw(row, x + 12, y - 21 - n * 12, 9),
+            );
+            factGroup = undefined;
+          });
+          y -= height;
+        }
+        continue;
+      }
       const height = Math.max(42, ...rows.map((row) => 27 + row.length * 12));
       ensure(height);
       cells.forEach(([label], index) => {
@@ -261,7 +361,9 @@ export async function renderDocumentPdf(
           borderWidth: 0.5,
         });
         draw(label.toLocaleUpperCase("pt-BR"), x + 12, y - 8, 7, true, muted);
+        factGroup = `${group}:${index}`;
         rows[index].forEach((row, n) => draw(row, x + 12, y - 21 - n * 12, 9));
+        factGroup = undefined;
       });
       y -= height;
     }
@@ -278,15 +380,40 @@ export async function renderDocumentPdf(
         color: navy,
       });
       let x = margin;
+      decoration = true;
       headers.forEach((title, i) => {
         draw(title, x + 8, y - 7, 7, true, white);
         x += widths[i];
       });
+      decoration = false;
       y -= 24;
     };
     heading();
     rows.forEach((cells, index) => {
+      const group = ++groupCounter;
       const lines = cells.map((cell, i) => wrap(cell, font, 8, widths[i] - 16));
+      if (emission && Math.max(...lines.map((row) => row.length)) > 45) {
+        for (
+          let offset = 0;
+          offset < Math.max(...lines.map((row) => row.length));
+          offset += 45
+        ) {
+          if (offset || y - 520 < 70) {
+            nextPage();
+            heading();
+          }
+          const fragment = lines.map((row) => row.slice(offset, offset + 45));
+          let x = margin;
+          fragment.forEach((cell, i) => {
+            factGroup = `${group}:${i}`;
+            cell.forEach((row, n) => draw(row, x + 8, y - 6 - n * 11, 8));
+            factGroup = undefined;
+            x += widths[i];
+          });
+          y -= Math.max(22, ...fragment.map((row) => row.length * 11 + 12));
+        }
+        return;
+      }
       const height = Math.max(22, ...lines.map((row) => row.length * 11 + 12));
       if (y - height < 70) {
         nextPage();
@@ -302,7 +429,9 @@ export async function renderDocumentPdf(
         });
       let x = margin;
       lines.forEach((cell, i) => {
+        factGroup = `${group}:${i}`;
         cell.forEach((row, n) => draw(row, x + 8, y - 6 - n * 11, 8));
+        factGroup = undefined;
         x += widths[i];
       });
       y -= height;
@@ -504,9 +633,12 @@ export async function renderDocumentPdf(
             .map((week) => String(week).split("-").reverse().join("/"))
             .join(", "),
       );
-    text(Array.isArray(balanceContext.weeks) && !balanceContext.weeks.length
-      ? "Esta contagem tem uma janela formal, sem obrigações semanais vinculadas. Não foram criadas semanas retroativas."
-      : "A contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no histórico.", 8);
+    text(
+      Array.isArray(balanceContext.weeks) && !balanceContext.weeks.length
+        ? "Esta contagem tem uma janela formal, sem obrigações semanais vinculadas. Não foram criadas semanas retroativas."
+        : "A contagem física é atual. Eventuais semanas anteriores são regularizadas por este documento; seus prazos e atrasos permanecem no histórico.",
+      8,
+    );
   }
   section(
     snapshot.type === "REQ"
@@ -576,8 +708,7 @@ export async function renderDocumentPdf(
     );
   y -= 10;
   const intent = snapshot.payload.intent as
-    | { observations?: string[] }
-    | undefined;
+    { observations?: string[] } | undefined;
   const notes = snapshot.payload.notes ?? intent?.observations?.join("\n");
   if (notes) text("Observação: " + String(notes), 8);
   text(
@@ -626,12 +757,21 @@ export async function renderDocumentPdf(
   y -= 7;
   text(`${snapshot.code} · Versão documental ${snapshot.version}`, 9);
   if (snapshot.type === "REQ") {
-    const source=snapshot.payload.sourceRequisition as {code?:string;protocol?:string;version?:number;reason?:string}|undefined;
-    if(source) {
+    const source = snapshot.payload.sourceRequisition as
+      | { code?: string; protocol?: string; version?: number; reason?: string }
+      | undefined;
+    if (source) {
       section("Origem da necessidade remanescente");
-      text(`${source.code??source.protocol??"Requisição de origem"} · Referência na emissão: versão ${source.version}`,9,true);
-      text("Motivo próprio: "+source.reason,9);
-      text("Nova intenção com ciência e atendimento próprios. Aceites anteriores e estoque não são duplicados.",8);
+      text(
+        `${source.code ?? source.protocol ?? "Requisição de origem"} · Referência na emissão: versão ${source.version}`,
+        9,
+        true,
+      );
+      text("Motivo próprio: " + source.reason, 9);
+      text(
+        "Nova intenção com ciência e atendimento próprios. Aceites anteriores e estoque não são duplicados.",
+        8,
+      );
     }
     section("Ciência familiar");
     if (snapshot.scienceEvents?.length)
@@ -658,27 +798,59 @@ export async function renderDocumentPdf(
       );
   } else if (snapshot.type === "ENT") {
     if (snapshot.transfer) {
-      const transfer = snapshot.transfer, declaration = transfer.declaration;
+      const transfer = snapshot.transfer,
+        declaration = transfer.declaration;
       ensure(150);
       section("Declaração e concordância da transferência");
-      const custody = (source: string) => source === "FAMILY" ? "Família" : "Equipe";
-      text(`${custody(declaration.source)} para ${custody(declaration.destination)}`, 10, true);
-      text(`Declarante: ${declaration.actor.name} · ${formatBrazilDate(declaration.recordedAt)}`, 9);
+      const custody = (source: string) =>
+        source === "FAMILY" ? "Família" : "Equipe";
+      text(
+        `${custody(declaration.source)} para ${custody(declaration.destination)}`,
+        10,
+        true,
+      );
+      text(
+        `Declarante: ${declaration.actor.name} · ${formatBrazilDate(declaration.recordedAt)}`,
+        9,
+      );
       text("Justificativa original: " + declaration.reason, 9);
-      text("Contraparte para concordância: " + declaration.counterparty.name, 9);
+      text(
+        "Contraparte para concordância: " + declaration.counterparty.name,
+        9,
+      );
       text("Recebedor físico designado: " + declaration.recipient.name, 9);
       if (transfer.agreement) {
-        text(`${transfer.agreement.decision === "agree" ? "Concordância própria" : "Recusa própria"}: ${transfer.agreement.actor.name} · ${formatBrazilDate(transfer.agreement.recordedAt)}`, 9, true);
+        text(
+          `${transfer.agreement.decision === "agree" ? "Concordância própria" : "Recusa própria"}: ${transfer.agreement.actor.name} · ${formatBrazilDate(transfer.agreement.recordedAt)}`,
+          9,
+          true,
+        );
         text(transfer.agreement.reason, 9);
       } else text("Sem concordância registrada nesta versão.", 9);
-      text(transfer.dispatchedAt ? "Expedição efetiva: " + formatBrazilDate(transfer.dispatchedAt) : "Sem expedição registrada nesta versão.", 9);
-      text(transfer.originDocumentId ? "ENT documental de origem: " + transfer.originDocumentId : "Origem documental não informada.", 8);
-      text("A concordância não comprova recebimento nem credita o destino. O vínculo documental não individualiza lotes.", 8);
-      if (transfer.withdrawal) text(`${transfer.withdrawal.kind === "administrative_close" ? "Encerramento administrativo" : "Retirada pelo declarante"}: ${transfer.withdrawal.actor.name} · ${formatBrazilDate(transfer.withdrawal.recordedAt)} · ${transfer.withdrawal.reason}`, 9);
+      text(
+        transfer.dispatchedAt
+          ? "Expedição efetiva: " + formatBrazilDate(transfer.dispatchedAt)
+          : "Sem expedição registrada nesta versão.",
+        9,
+      );
+      text(
+        transfer.originDocumentId
+          ? "ENT documental de origem: " + transfer.originDocumentId
+          : "Origem documental não informada.",
+        8,
+      );
+      text(
+        "A concordância não comprova recebimento nem credita o destino. O vínculo documental não individualiza lotes.",
+        8,
+      );
+      if (transfer.withdrawal)
+        text(
+          `${transfer.withdrawal.kind === "administrative_close" ? "Encerramento administrativo" : "Retirada pelo declarante"}: ${transfer.withdrawal.actor.name} · ${formatBrazilDate(transfer.withdrawal.recordedAt)} · ${transfer.withdrawal.reason}`,
+          9,
+        );
     }
     const selection = snapshot.workflow?.recipientSelection as
-      | DeliveryRecipientSelection
-      | undefined;
+      DeliveryRecipientSelection | undefined;
     if (selection) {
       ensure(135);
       section("Indicação do recebedor");
@@ -1043,8 +1215,7 @@ export async function renderDocumentPdf(
     text("Observações originais de quem contou:", 9, true);
     text(facts.notes || "Nenhuma observação registrada.");
     const policy = snapshot.workflow?.reviewPolicy as
-      | { balReview?: string }
-      | undefined;
+      { balReview?: string } | undefined;
     text(
       policy?.balReview === "optional"
         ? "Revisão facultativa; a contagem válida não exige fila universal de aprovação."
@@ -1148,8 +1319,34 @@ export async function renderDocumentPdf(
     muted,
   );
   if (!snapshot.demo) {
+    if (emission) {
+      section("Emissão deste exemplar");
+      fields([
+        ["Solicitação de geração", formatBrazilDate(emission.requestedAt)],
+        ["Solicitante da geração", emission.requestedName],
+        [
+          "Representação",
+          emission.representation === "derived"
+            ? "Nova representação de uma versão histórica"
+            : "Documento operacional",
+        ],
+        ["Assinador técnico", "Home Care Assistant"],
+      ]);
+      text(
+        "A assinatura técnica do sistema e o carimbo de tempo interno não representam assinatura pessoal nem confiança ICP-Brasil. O horário do token é verificado no arquivo; a TSA interna não oferece independência temporal de terceiro.",
+        8,
+      );
+      text(
+        `Código de verificação: HCA-${emission.verificationCode.match(/.{4}/g)!.join("-")}`,
+        8,
+        true,
+      );
+      text(`Identificação do exemplar: ${emission.id}`, 8);
+    }
     ensure(86);
-    const verifyUrl = `https://home-care-assistant.vercel.app/verificar/${snapshot.id}?version=${snapshot.version}&hash=${hash}`;
+    const verifyUrl = emission
+      ? `${emission.verificationOrigin}/verificar/emissao/${emission.verificationCode}`
+      : `https://home-care-assistant.vercel.app/verificar/${snapshot.id}?version=${snapshot.version}&hash=${hash}`;
     const qr = await pdf.embedPng(
       await QRCode.toBuffer(verifyUrl, {
         errorCorrectionLevel: "M",
@@ -1160,7 +1357,9 @@ export async function renderDocumentPdf(
     page.drawImage(qr, { x: margin, y: y - 76, width: 76, height: 76 });
     draw("Verificação de integridade", margin + 88, y - 8, 9, true);
     for (const [index, row] of wrap(
-      "O QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso autorizado.",
+      emission
+        ? "O QR consulta o registro deste exemplar. Para comparar os bytes e validar a assinatura, envie o PDF na página de verificação. O conteúdo privado exige acesso autorizado."
+        : "O QR exibe somente correspondência do hash e versão. O documento completo continua exigindo acesso autorizado.",
       font,
       8,
       width - 100,

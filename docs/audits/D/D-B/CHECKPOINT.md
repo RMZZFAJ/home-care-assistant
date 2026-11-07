@@ -639,3 +639,75 @@ Tipos e lint dos fontes afetados passaram; não foi repetida a suíte geral.
 O núcleo criptográfico de7647558 permanece inalterado; seu aceite local não é
 substituído pela validação dos navegadores. Sem migration ou alteração remota.
 CI do próximo SHA publicado continua obrigatória. PR permanece Draft/NO-GO.
+
+## D4.2 — emissão assinada integrada
+
+Basecb7e6c2. Reserva Auth por intenção pessoal congela snapshot, versão, nome,
+instante e código aleatório. O worker recebe lease/token separado da chave do
+navegador. O pipeline compõe V5, confere texto/geometria por parser
+independente,
+assina PAdES-B-T com TSA interna, valida, persiste sem sobrescrever, relê o
+objeto
+vencedor e finaliza com sessão/capacidade/prova do worker revalidadas no banco.
+Nenhum recibo fabricado pelo cliente basta para produzir ready.
+
+Arquivos gerados integra REQ/COM/ENT/BAL. Gerar PDF é explícito; abrir a ficha
+não
+gera exemplar. Resposta perdida ou JSON200 inválido conserva a mesma intenção
+durante reload. Histórico mostra solicitante, versão, momento, estado e ações.
+Nova geração explícita cria outra identidade; visualizar/baixar/compartilhar
+usam
+os mesmos bytes registrados. Download confere hash, tamanho, assinatura e
+leitura
+atual antes/depois do I/O, sem depender de chave privada ativa.
+
+Validação final: Auth6/6; unidade/API18/18; produção12/12 nos três projetos de
+navegador, com consumidor V4 de compartilhamento, quatro larguras e axe. Inclui
+falha após upload antes de ready, recuperação dos mesmos bytes, cache adulterado
+recusado e restaurado, revogação real de leitura nos tipos REQ/ENT/BAL,101
+intenções
+em cursor estável e ausência de efeitos no documento/eventos/estoque pela
+geração.
+Tipos e lint dos fontes afetados passaram sem avisos. Diagnóstico2/2 foi mantido
+como diagnóstico, sem substituir o aceite de produção.
+
+pyHanko0.38.1 independente aceitou assinatura e token dos quatro PDFs reais.
+pdfplumber conferiu SHA/tamanho/identidade e nenhum caractere fora da página;
+PDFium renderizou a inspeção visual. Não há selo de acessibilidade estrutural,
+conformidade jurídica, confiança externa ou aparelho físico. As falhas iniciais
+do oráculo de material longo foram preservadas: o agrupamento por célula evita
+que cabeçalhos/colunas interrompam o fato, mantendo a conferência de cada trecho
+extraído em sua posição. Os seis snapshots demonstrativos e notas longas passam.
+
+A [custódia local](SIGNING_CUSTODY.md) usa chaves cifradas RSA3072 fora do Git,
+ACL restrita, pares distintos para assinatura/TSA e raiz fora do segredo do
+runtime. Política pública separada mantém versões/fingerprints/denylist.
+Ambiente
+incorreto, segredo ausente e chave revogada são recusados. Arquivo local é
+somente
+adapter de desenvolvimento; runtime Vercel aceita valores protegidos por
+ambiente,
+sem OpenSSL ou processo residente. Testes usam PKI efêmera e cleanup protegido.
+Rotação, recuperação independente da custódia e incidente ainda precisam de
+ensaio.
+
+Local137/remoto121;16 migrations D-B pendentes do lote remoto final.
+Migration137
+foi aplicada por test:db:prepare sem reset e permanece imutável. Nenhum helper
+ou
+trigger de falha ficou instalado; os dois crons originais continuam ativos por
+minuto. [Manifesto D4.2](D4_2_EVIDENCE.json) conserva19 hashes LF das fontes,
+resultados, contraprovas, artefatos e limites. Matriz105×29 preservada.
+
+Próximo lote: página canônica de emissão, código e upload público
+limitado/isolado;
+compatibilidade dos consumidores legados de PDF e respectivos oráculos factuais;
+demais falhas/concorrência e custódia. O GET antigo por versão ainda pode
+gerar V4
+e usa cache legado; não recebe o aceite do contrato novo. O QR novo já carrega
+código opaco, mas a página de destino ainda precisa ser implementada.
+Verificação
+pública completa não foi declarada pronta. D3 restante, D5, automação de backup,
+retenção, monitoramento e gates D-C/D6 continuam pendentes. CI do SHA
+publicado é
+gate próprio; Sonar permanece adiado pelo responsável. Sem merge/deploy/GO.

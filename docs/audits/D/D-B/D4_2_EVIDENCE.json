@@ -1,0 +1,243 @@
+{
+  "sourceBaseSha": "cb7e6c2376e30e14d2ed2a0c6025176bffc206e4",
+  "stage": "PASS_LOCAL_INTEGRATED_NEW_ISSUANCE; phase D-B incomplete",
+  "scope": "Auth intention -> server-only lease -> content/geometry oracle -> PAdES-B-T -> immutable Storage -> final Auth receipt -> generated-file history and exact download",
+  "migration": {
+    "localCount": 137,
+    "remoteLastReconciledCount": 121,
+    "pendingDB": 16,
+    "file": "20261107104648_phase_d4_pdf_issuance_lifecycle.sql",
+    "localAppliedWithoutReset": true,
+    "remoteApplied": false
+  },
+  "checks": {
+    "auth": {
+      "passed": 6,
+      "log": "output/phase-d-work/d4-issuance-auth-first.log"
+    },
+    "unitApi": {
+      "passed": 18,
+      "log": "output/phase-d-work/d4-issuance-unit-final.log"
+    },
+    "types": "PASS",
+    "affectedLint": "PASS, no warnings",
+    "diagnosticBrowser": {
+      "passed": 2,
+      "project": "chromium",
+      "acceptance": false
+    },
+    "productionBrowser": {
+      "state": "PASS",
+      "passed": 12,
+      "nominalCases": 4,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "build": "fresh production build",
+      "widths": [
+        320,
+        390,
+        768,
+        1440
+      ],
+      "axe": "new history section; no rule removed",
+      "log": "output/phase-d-work/d4-issuance-browser-production.log"
+    },
+    "independentFourTypes": "pyHanko0.38.1 accepts embedded CMS and RFC3161 token for REQ/COM/ENT/BAL; pdfplumber SHA/size/identity and page bounds; PDFium visual contact inspected"
+  },
+  "independentArtifacts": [
+    {
+      "kind": "com",
+      "sha256": "3ca59b6bccec0423cfa9c884b7ea39702d7da3325c3864b2294a35f5343435d6",
+      "pages": 3,
+      "characters": 2533,
+      "outsidePage": 0,
+      "signature": {
+        "independentVerifier": "pyHanko0.38.1",
+        "integrity": true,
+        "signatureValid": true,
+        "trustedByExplicitInternalRoot": true,
+        "coverage": "ENTIRE_FILE",
+        "subFilter": "/ETSI.CAdES.detached",
+        "timestampPresent": true,
+        "timestampIntegrity": true,
+        "timestampSignatureValid": true,
+        "timestampTrustedByInternalRoot": true,
+        "timeIndependentFromSystem": false,
+        "externalTrust": false,
+        "padesSignedAttributes": [
+          "content_type",
+          "message_digest",
+          "signing_certificate_v2"
+        ],
+        "padesUnsignedAttributes": [
+          "signature_time_stamp_token"
+        ],
+        "accepted": true
+      }
+    },
+    {
+      "kind": "req",
+      "sha256": "0c5bc71cb6e20bfa88fe372b9dcc5f2c00e03232e1ecc24ea82e7027ce34309a",
+      "pages": 3,
+      "characters": 3145,
+      "outsidePage": 0,
+      "signature": {
+        "independentVerifier": "pyHanko0.38.1",
+        "integrity": true,
+        "signatureValid": true,
+        "trustedByExplicitInternalRoot": true,
+        "coverage": "ENTIRE_FILE",
+        "subFilter": "/ETSI.CAdES.detached",
+        "timestampPresent": true,
+        "timestampIntegrity": true,
+        "timestampSignatureValid": true,
+        "timestampTrustedByInternalRoot": true,
+        "timeIndependentFromSystem": false,
+        "externalTrust": false,
+        "padesSignedAttributes": [
+          "content_type",
+          "message_digest",
+          "signing_certificate_v2"
+        ],
+        "padesUnsignedAttributes": [
+          "signature_time_stamp_token"
+        ],
+        "accepted": true
+      }
+    },
+    {
+      "kind": "ent",
+      "sha256": "33616b535f96c4f879e8e249eb15a3c48437e33ac1047493ddffffe609c2a301",
+      "pages": 3,
+      "characters": 2934,
+      "outsidePage": 0,
+      "signature": {
+        "independentVerifier": "pyHanko0.38.1",
+        "integrity": true,
+        "signatureValid": true,
+        "trustedByExplicitInternalRoot": true,
+        "coverage": "ENTIRE_FILE",
+        "subFilter": "/ETSI.CAdES.detached",
+        "timestampPresent": true,
+        "timestampIntegrity": true,
+        "timestampSignatureValid": true,
+        "timestampTrustedByInternalRoot": true,
+        "timeIndependentFromSystem": false,
+        "externalTrust": false,
+        "padesSignedAttributes": [
+          "content_type",
+          "message_digest",
+          "signing_certificate_v2"
+        ],
+        "padesUnsignedAttributes": [
+          "signature_time_stamp_token"
+        ],
+        "accepted": true
+      }
+    },
+    {
+      "kind": "bal",
+      "sha256": "c5a0e3b8dedd86e93a9888c048ea10882e87837850114cccd13b90e6c92e9a29",
+      "pages": 3,
+      "characters": 2650,
+      "outsidePage": 0,
+      "signature": {
+        "independentVerifier": "pyHanko0.38.1",
+        "integrity": true,
+        "signatureValid": true,
+        "trustedByExplicitInternalRoot": true,
+        "coverage": "ENTIRE_FILE",
+        "subFilter": "/ETSI.CAdES.detached",
+        "timestampPresent": true,
+        "timestampIntegrity": true,
+        "timestampSignatureValid": true,
+        "timestampTrustedByInternalRoot": true,
+        "timeIndependentFromSystem": false,
+        "externalTrust": false,
+        "padesSignedAttributes": [
+          "content_type",
+          "message_digest",
+          "signing_certificate_v2"
+        ],
+        "padesUnsignedAttributes": [
+          "signature_time_stamp_token"
+        ],
+        "accepted": true
+      }
+    }
+  ],
+  "counterproofs": [
+    "Observed advisory-lock wait then context switch: no intention committed",
+    "Auth caller cannot claim service proof; owner key alone cannot set ready",
+    "Another authorized reader cannot use the initiating owner lease",
+    "Reclaimed lease invalidates the previous token",
+    "Revoked live read blocks stages/finalization/private download/list",
+    "NULL, missing or extended validation cannot set ready",
+    "Missing Storage object cannot set ready",
+    "101 intentions paginate once across insertion of a newer row",
+    "Invalid successful HTTP response retains the same command through reload",
+    "Distinct intentions retain distinct identifiers and final hashes for the same business version",
+    "Fault after upload before ready recovers the exact existing bytes",
+    "Privileged controlled Storage tamper is refused on download, then original bytes restored",
+    "Unknown root, internal revocation, wrong pin, missing/mismatched token and appended bytes: D4.1 crypto suite rerun",
+    "Independent parser rejects identity replacement and unpainted expected text",
+    "Cross-environment/local-in-workspace custody and revoked active key are refused"
+  ],
+  "failuresPreserved": [
+    "output/phase-d-work/d4-content-providers.log",
+    "output/phase-d-work/d4-content-overflow-recheck.log",
+    "output/phase-d-work/d4-content-reason.log"
+  ],
+  "correction": "Long semantic material facts crossed page headers/other table cells. Grouped per-cell extracted text while retaining exact per-run position/content checks; no check removed. All four kinds and long notes/materials pass.",
+  "custody": {
+    "environment": "local",
+    "keyVersion": "local-20261107-v1",
+    "directory": "LOCALAPPDATA/home-care-assistant/key-custody/pdf-local-20261107-v1",
+    "windowsOwnerOnlyAcl": true,
+    "privateMaterialTracked": false,
+    "rootInRuntimeSecret": false,
+    "recoveryAndRotationDrill": "PENDING"
+  },
+  "limits": [
+    "Only new issuance endpoints obey this contract; legacy version GET still has old consumers/generation/cache path",
+    "New QR resolves to a canonical page still to be implemented; old QR resolution preserved",
+    "Public upload isolation and discriminated live verification pending",
+    "No PDF tagging/assistive-reader or physical-device acceptance",
+    "No privileged-infrastructure WORM claim; application uses exclusive path, upsert=false, DB immutability and hash/signature checks",
+    "Content gate independently confirms selected canonical facts and all painted runs; remaining criterion-specific semantic oracles still required",
+    "No external time independence, ICP-Brasil, OCSP/CRL or external trust inferred",
+    "Custody rotation/recovery/incident drill, final remote migrations, D3 remainder, D5, backup schedule/retention and monitoring pending",
+    "Published candidate CI is separate; Sonar explicitly owner-deferred; production NO-GO"
+  ],
+  "sourceLfSha256": {
+    "scripts/create-local-pdf-custody.mjs": "27b687f6247480cec68ad406500845d9b54e572e54041175c2948ef2545ef96d",
+    "scripts/run-e2e.mjs": "7a41b927fdf97cc5ae68c4eacbe53e98bc7058462206a9098fa8aebca3ebc9ab",
+    "src/app/api/documents/[id]/issuances/route.ts": "f17f36e2ac416858abe699b6cfeecb4c467f2cbe7e41b7fe7de87ce4e7fb85f1",
+    "src/app/api/documents/[id]/pdf/route.ts": "73ae8e7431e32353800b450b1a8cb4102e293ba25e9a459197095f98904f1281",
+    "src/components/documents/document-actions.tsx": "ce2892a61e9cf121a632cd4836efa20819f7ff87d72b460d8cf33c38d867ea66",
+    "src/lib/documents/pdf-issuance.ts": "da60c01ac7b2bc8f770dcf46af8015b870c3f5169d1430a707ca41f0dbaa3f7e",
+    "src/lib/server/error-catalog.ts": "116a478fb33377b6d78632978a5889c9a60775a85d39c397637d1bd90047d76f",
+    "src/lib/server/operational-pdf.ts": "397dc5dc7bb17ab48e6f8aed714ab9bea9e84b1bdc01f0d8f2d5f0e54824bdef",
+    "src/lib/server/pdf-content.ts": "dde327b597e5a3388cc6bcaa8b4a430502702684c074e2ffdc921a6915d62a1a",
+    "src/lib/server/pdf-issuance.ts": "1b8c59603e24afbc9d5e0d8d9cc2c09138b944fb0cfe31c4874467d9c7718c3e",
+    "src/lib/server/pdf-signing/providers.ts": "521718f1d5eff302b19b007841cad6297505ba38b4097d54d79ac616ebd2ce11",
+    "supabase/migrations/20261107104648_phase_d4_pdf_issuance_lifecycle.sql": "009a055e4f3d2dd1fa9c2334554c4939b6f7d0498dfc161b971400a1d79e7edf",
+    "tests/api/pdf-issuance-contract.test.ts": "37d69584792de6231af9908ce6dd5a0bdf8dff8abb1e72fe6457835c7e2c27c9",
+    "tests/e2e/pdf-issuance.spec.ts": "87a3b1c651a8b0966f7526367a8bae471394d4e186e75528f7d70933c343ffb9",
+    "tests/e2e/v4.spec.ts": "3608b2c7f638659659210a404cfcbf8bf0e550fbf1e4030e858cf2d2ca384c78",
+    "tests/integration/pdf-issuance.test.mjs": "8bdac495103985304d4aba7780e2efd03a21aa48a4de1f1e90d30140b8ca34f5",
+    "tests/pdf-content.test.ts": "ba39f6e73c168de051304b559d0431e41edc0e93311d1b6153e74ee323cad5ce",
+    "tests/pdf-providers.test.ts": "c7c279bd665c79d0b43bc4efcfda46e75e826516f90065bcd8987fe722be42fd",
+    "tests/support/test-signing-identity.mjs": "55d5143edbdb90bcfa643363ada6c5ea44c83499a6c8f7e3ad1f40643458178e"
+  },
+  "finalLocalSafety": {
+    "migrations": 137,
+    "faultTriggers": 0,
+    "faultFunctions": 0,
+    "originalCrons": "both active, each * * * * *",
+    "controlledStorageTamper": "original bytes restored and downloaded with matching hash in every browser project"
+  }
+}

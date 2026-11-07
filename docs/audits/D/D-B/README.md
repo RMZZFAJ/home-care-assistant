@@ -11,6 +11,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Duas aplicações remotas](MIGRATIONS.md).
 - [Base operacional e limites](OPERATIONS_DOSSIER.md).
 - [Triagem de qualidade](SONAR_TRIAGE.md).
+- [Custódia documental e limites operacionais](SIGNING_CUSTODY.md).
 - [Complementos posteriores do responsável](OWNER_AMENDMENTS.md): configuração
   e tratamento específico do SonarCloud adiados expressamente.
 

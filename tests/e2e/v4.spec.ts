@@ -192,6 +192,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     await expect(
       pro.getByRole("listitem").filter({ hasText: "Material V4 visual" }),
     ).toHaveCount(1);
+    await family.getByRole("button", { name: "Gerar PDF", exact: true }).click();
     await expect(
       family.getByRole("button", { name: "Compartilhar PDF", exact: true }),
     ).toBeEnabled({ timeout: 15000 });

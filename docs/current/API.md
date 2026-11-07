@@ -1,5 +1,41 @@
 # Contratos de API
 
+## Emissões documentais D4 em implementação local
+
+GET /api/documents/:id/issuances consulta20 registros por página, com cursor
+before/beforeId (par obrigatório). A leitura depende da sessão, contexto e
+capacidade vigente do documento. A lista não envia snapshot, caminho privado
+ou credencial de processamento. Não cria arquivo por simples consulta.
+
+POST na mesma rota recebe somente idempotencyKey e version opcional positiva.
+O banco congela versão, snapshot canônico, autoria nominal, instante, código
+público aleatório e identidade da emissão. A chave pessoal reapresentada
+recupera a mesma intenção; mudança de seletor documental conflita. Cada nova
+chave explícita cria outra emissão, sem alterar documento, SCI ou estoque.
+Resposta200 exige ready;202 representa processamento ainda não concluído.
+
+A orquestração obtém claim de serviço com lease de cinco minutos e token
+aleatório que nunca vai ao navegador. Composição/oráculo precedem assinatura
+PAdES-B-T e verificação. Upload usa caminho exclusivo e upsert=false. Read-back
+confere identidade, texto, geometria, assinatura e bytes vencedores antes do
+registro final pela sessão Auth e pelo token do worker. Falha/ambiguidade
+preservam a intenção; objeto enviado sem ready pode ser recuperado e validado.
+As RPCs não concedem ao cliente a capacidade de forjar sucesso só com sua chave.
+
+GET /api/documents/:id/pdf?issuance=UUID recupera somente exemplar ready daquele
+documento; não renderiza. Revalida leitura antes e depois do I/O, hash/tamanho
+e assinatura sob a política pública atual, sem exigir chave privada. Bytes
+divergentes são recusados. O parâmetro antigo de versão/renderer ainda possui
+consumidores legados; a migração desses consumidores continua pendente e não
+deve ser confundida com o contrato novo por emissão.
+
+pdf_issuance_public aceita código ou digest e devolve somente metadados mínimos
+de exemplar ready. O resultado é um registro; não constitui verificação atual
+de assinatura nem prova dos bytes de um PDF que o visitante esteja segurando.
+A página canônica por emissão e o upload público isolado ainda estão pendentes.
+A resolução antiga de QR continua preservada. Segredos e limites estão descritos
+na [custódia D4](../audits/D/D-B/SIGNING_CUSTODY.md).
+
 Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
 Precisão number/string, etapa parcialmente confirmada, paginação e
 classificação de erro têm desvios B4. Correção de estoque sem referência ainda

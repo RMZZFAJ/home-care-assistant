@@ -214,3 +214,20 @@ Auth9/9 passou após a última aplicação, com negativas, espera observada,
 rollback de relato/resposta/auditoria e replay após perda de escrita. Nenhuma
 migration aplicada foi reescrita; as84 históricas continuam preservadas.
 Nenhuma dessas migrations foi aplicada ao remoto nesta etapa.
+
+### Lote local D4.2
+
+Local137/remoto121;16 migrations D-B pendentes do lote remoto final.
+20261107104648_phase_d4_pdf_issuance_lifecycle.sql acrescenta identidade de
+emissão em tabela privada, intenção pessoal idempotente, snapshot canônico
+congelado, claim de serviço com lease/token e finalização Auth. Caminho e
+intenção são imutáveis; registro ready não pode ser alterado ou excluído.
+Grants diretos e helpers privados continuam fechados. Leitura/histórico exigem
+capacidade atual; consulta pública expõe somente metadados mínimos de ready.
+
+DDL foi pré-validado em transação revertida e aplicado por test:db:prepare,
+na stack existente, sem reset. Auth6/6 passou: contexto trocado durante espera
+real, revogação de leitura, chave sem prova do worker, lease antigo, NULL/recibo
+incompleto, ausência de Storage e101 registros com cursor estável. O teste
+negativo de finalização não é prova criptográfica; o pipeline usa PDF real.
+A migration aplicada permanece sem reescrita. Nenhuma mudança remota neste lote.
