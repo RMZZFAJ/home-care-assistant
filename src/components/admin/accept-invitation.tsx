@@ -1,4 +1,5 @@
 "use client";
+import {roleLabel} from "@/lib/role-labels";
 
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
@@ -7,7 +8,6 @@ import { NewPasswordField } from "@/components/auth/new-password-field";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatBrazilDate } from "@/lib/receipt";
-import { roles } from "./admin-fields";
 
 type Preview = { state: "ready" | "login_required" | "wrong_account" | "accepted" | "declined" | "expired" | "revoked" | "invalid"; patientName?: string; recipientEmail?: string; role?: string; inviterName?: string; expiresAt?: string; canManageStock?: boolean; canCountStock?: boolean };
 const stateMessages: Partial<Record<Preview["state"], string>> = {
@@ -100,7 +100,7 @@ export function AcceptInvitation() {
       {preview?.state !== "ready" && preview ? <Notice error={Boolean(terminal) || preview.state === "wrong_account"}>{stateMessages[preview.state]}</Notice> : null}
       {preview?.patientName ? <dl className="space-y-3 rounded-lg border border-(--line) p-4" aria-label="Resumo do vínculo convidado">
         <div><dt className="text-sm text-(--muted)">Paciente</dt><dd className="font-semibold">{preview.patientName}</dd></div>
-        <div><dt className="text-sm text-(--muted)">Função neste paciente</dt><dd>{roles[preview.role as keyof typeof roles] ?? preview.role}</dd></div>
+        <div><dt className="text-sm text-(--muted)">Função neste paciente</dt><dd>{roleLabel(preview.role)}</dd></div>
         <div><dt className="text-sm text-(--muted)">Conta convidada</dt><dd className="break-all">{preview.recipientEmail}</dd></div>
         <div><dt className="text-sm text-(--muted)">Convite emitido por</dt><dd>{preview.inviterName || "Nome não disponível"}</dd></div>
         <div><dt className="text-sm text-(--muted)">Válido até</dt><dd>{preview.expiresAt ? formatBrazilDate(preview.expiresAt) + " (America/Sao_Paulo)" : "Não disponível"}</dd></div>

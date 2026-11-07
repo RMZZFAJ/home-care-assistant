@@ -482,3 +482,39 @@ C-AC-077 passa a PASS_LOCAL_AUTH_HTTP_BROWSER. Outros consumidores D3,
 sessões/24h, rascunhos de decisões, guias e navegação continuam pendentes.
 CI do candidato, reconciliação remota final e gates humanos/externos D-C/D6
 permanecem separados. D4, D5 e operação não foram concluídos por este lote.
+
+## D3.8 — vocabulário, destinos e consultas por filtro
+
+Base publicadaebc4464; CI42351683111 aprovou banco e validate Windows/Ubuntu,
+com browsers ainda em andamento na observação anterior ao novo push. Nenhuma
+migration nova: local133/remoto121;12 D-B aguardam reconciliação final.
+
+Histórico traduz chips/anúncios e conserva outros filtros ao remover uma data.
+Papéis locais compartilham cinco rótulos, sem incluir administração global.
+Situação/função desconhecida tem fallback humano e selo neutro. Os dez eventos
+de escala e os tipos de proposta têm apresentação e fallback testados; produtor
+SQL da escala conferido. Mais/sino/central nomeiam a tarefa efetiva, preservando
+paciente/ref. Corrigido Badge dentro de parágrafo na central. Navegação pelos
+seis perfis Auth e abertura de compra real mantiveram as capacidades vigentes.
+
+Entregas/estoque já protegiam a consulta por chave/abort e não foram reescritos.
+Respostas vazias antigas, liberadas após dados atuais com fetch sem abort, não
+substituem entrega pendente/saldo familiar30. Erro500, vazio e retry preservam
+foco e fatos originais. Estoque testado com administração e família; entregas
+com recebedor profissional. Vazio de estoque e situação futura são respostas
+controladas: o banco mantém saldo/situação originais, sem fato físico novo.
+
+Tipos/lint passaram.46 unitários/apresentação, sendo19 de linguagem/destinos e
+27 de governança. Produção21/21, incluindo duas regressões existentes de
+sino/central nos três projetos. Rechecks3/3 do selo desconhecido e3/3 do estoque
+familiar:21 casos nominais distintos e27 execuções aprovadas. Quatro larguras
+e axe nas superfícies do [manifesto D3.8](D3_8_EVIDENCE.json). Diagnóstico rápido
+não é aceite; falhas de foco do instrumento, seletor do anunciador Next e grep
+ancorado foram preservadas. Explicação do grep D3.7 corrigida sem apagar o log.
+
+C-AC-013/021 têm prova local. C-AC-014 segue parcial: cada tela ainda precisa
+resolver o ref individual, incluindo período do plantão e alerta de estoque;
+conservar a URL não prova essa tarefa. Matriz105×29 e84 migrations históricas
+preservadas; crons originais inalterados e helpers/triggers de falha ausentes.
+CI do candidato, demais D3, D4/D5/operação, remoto final e gates humanos/externos
+continuam pendentes. Sem merge, deploy comandado ou liberação operacional.

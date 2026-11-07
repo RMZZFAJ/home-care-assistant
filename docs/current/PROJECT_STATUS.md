@@ -48,6 +48,17 @@ validate Windows/Ubuntu; browsers ainda em andamento na observação anterior
 ao novo push. CI do candidato continua gate independente. D4, D5 e demais
 requisitos seguem em execução.
 
+D3.8 comprova localmente C-AC-013/021: vocabulário humano, fallbacks explícitos
+e consultas de entregas/estoque protegidas contra respostas invertidas.
+Papéis locais e administração global continuam separados. Nomes de destinos e
+contexto dos avisos foram corrigidos; C-AC-014 continua parcial até cada tela
+resolver sua referência individual, incluindo plantão e alerta de estoque.
+46 unitários/apresentação e21 casos browser distintos passaram; seis rechecks
+afetados também passaram. [Evidência D3.8](../audits/D/D-B/D3_8_EVIDENCE.json).
+CIebc4464 aprovou banco e validate Windows/Ubuntu; browsers ainda em andamento
+na observação anterior ao push deste lote. Tipos/lint passaram; nenhuma
+migration nova. CI do novo SHA e demais requisitos continuam gates separados.
+
 Base integrada PR6: `8ec979a`. Branch única `feat/phase-d-implementation` e
 [Draft PR7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.
 [Checkpoint por incremento](../audits/D/D-A/CHECKPOINT.md) preserva tentativas,

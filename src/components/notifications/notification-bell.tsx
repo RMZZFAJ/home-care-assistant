@@ -7,7 +7,7 @@ import { api } from "@/components/workspace";
 import { Icon } from "@/components/ui/primitives";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
-import { notificationHref } from "@/lib/notifications/navigation";
+import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
 import { useInbox } from "@/lib/notifications/use-inbox";
 
 export function NotificationBell({ patientId, disabled = false }: { patientId?: string; disabled?: boolean }) {
@@ -89,6 +89,7 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
                       )}
                     </span>
                     <time>{formatBrazilDate(row.created_at)}</time>
+                    <span>{notificationTargetLabel(row)}</span>
                   </Link>
                 </li>
               ))}

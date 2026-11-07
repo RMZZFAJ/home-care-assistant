@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api, ApiError, buttonClass, can, Notice, primaryClass, Workspace } from "@/components/workspace";
-import { useWorkspaceState, roleLabels } from "@/components/layout/workspace-context";
+import { useWorkspaceState, roleLabel } from "@/components/layout/workspace-context";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { guideProgressConfirmed, guideConfigurationConfirmed, parseGuide, type GuideCommand, type GuideContext } from "@/lib/validation/guides";
 import { guideSteps } from "@/lib/guide-content";
@@ -35,7 +35,7 @@ export function UserGuide() {
     try{const saved=await command.send("/api/guides",{action:"progress",expectedScope:data.scope,expectedRevision:data.progress.revision,step:next,status,idempotencyKey:crypto.randomUUID()});guide.adopt(parseGuide(saved.data));setStep({scope:data.scope,value:next});setMessage(status==="completed"?"Guia percorrido. Nenhum ato operacional foi confirmado.":"Seu progresso foi guardado.");}
     catch(reason){setError(reason instanceof Error?reason.message:"Não foi possível guardar seu progresso.");if(reason instanceof ApiError&&reason.status===409)guide.refresh();}
   }
-  return <section aria-label="Guia do seu perfil" className="ui-card"><h2 className="font-semibold">{data?.role==="global"?"Administração global":roleLabels[data?.role??""]??"Orientações de consulta"}</h2>
+  return <section aria-label="Guia do seu perfil" className="ui-card"><h2 className="font-semibold">{data?.role==="global"?"Administração global":roleLabel(data?.role)}</h2>
     <p className="mt-2 text-sm">Guia opcional · versão 2026-11-D3 · seu progresso não altera permissões, ciência ou recebimentos.</p>
     {guide.error?<Notice error>{guide.error}<button type="button" className={buttonClass} onClick={guide.refresh}>Consultar guia novamente</button></Notice>:!data?<p role="status">Consultando seu guia…</p>:null}
     {error?<Notice error>{error}</Notice>:null}{message?<Notice>{message}</Notice>:null}

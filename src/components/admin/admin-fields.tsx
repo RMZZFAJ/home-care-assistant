@@ -3,13 +3,8 @@ import { useId } from "react";
 import { Checkbox, Field as FluentField, Input, Select, type InputProps } from "@fluentui/react-components";
 export type Row = Record<string, unknown>;
 
-export const roles = {
-  admin: "Administrador do paciente",
-  supervisor: "Supervisor",
-  professional: "Profissional",
-  family: "Familiar",
-  reader: "Leitor",
-};
+import {roleLabels as roles} from "@/lib/role-labels";
+export {roles};
 export function text(row: Row, key: string) {
   return row[key] == null ? "" : String(row[key]);
 }

@@ -33,10 +33,7 @@ const empty: State = {
   load: async () => {}, selectProfile: async () => false, selectPatient: async () => {},
 };
 const Context = createContext<State>(empty);
-export const roleLabels: Record<string, string> = {
-  admin: "Administrador do paciente", family: "Familiar", supervisor: "Supervisor",
-  professional: "Profissional", reader: "Leitor",
-};
+export {roleLabels,roleLabel} from "@/lib/role-labels";
 export function useWorkspaceState() { return use(Context); }
 
 /** One authority read model survives navigation; browser selection never authorizes. */

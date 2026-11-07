@@ -6,7 +6,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryLabels } from "@/lib/notifications/presentation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { Badge, Checkbox } from "@fluentui/react-components";
-import { notificationHref } from "@/lib/notifications/navigation";
+import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
 import { useInbox } from "@/lib/notifications/use-inbox";
 export function NotificationCenter() {
   return (
@@ -67,10 +67,10 @@ function Center({ patientId }: { patientId?: string }) {
                 : "hca-notification-unread")
             }
           >
-            <p className="text-sm font-semibold">
+            <div className="text-sm font-semibold">
               <span>{row.operational_documents?.code ?? "Atualização operacional"}</span>
               {!row.seen_at ? <Badge className="ml-3" appearance="tint" color="informative">Não vista</Badge> : null}
-            </p>
+            </div>
             <p className="mt-1 text-sm">
               {documentEventLabel(row.event_key ?? row.document_events?.action)}
             </p>
@@ -89,7 +89,7 @@ function Center({ patientId }: { patientId?: string }) {
               row.consumption_report_id ||
               row.alert_event_id ? (
                 <Link className={buttonClass} href={notificationHref(row)}>
-                  Abrir documento
+                  {notificationTargetLabel(row)}
                 </Link>
               ) : null}
               {!row.seen_at ? (

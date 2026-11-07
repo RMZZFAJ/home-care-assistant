@@ -9,7 +9,7 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { GuideOnboarding } from "@/components/guides/user-guide";
 import { BottomNavigation, WorkspaceNavigation } from "@/components/navigation/workspace-navigation";
-import { roleLabels, useWorkspaceState } from "./workspace-context";
+import { roleLabel, useWorkspaceState } from "./workspace-context";
 
 const subscribe = (callback: () => void) => {
   const media = window.matchMedia("(min-width: 1024px)");
@@ -37,7 +37,7 @@ function ProfileMenu() {
   return <Menu open={open} onOpenChange={(_, next) => { setOpen(next.open); if (!next.open) setContexts(false); }}>
     <MenuTrigger disableButtonEnhancement><Button appearance="subtle" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data || selecting}>
       <Avatar name={data?.fullName} image={data?.avatarUrl ? { src: data.avatarUrl, alt: "" } : undefined} size={32} color="brand" />
-      <span className="hca-profile-identity"><strong>{data?.fullName}</strong><small>{data?.activeContext?.mode === "global" ? "Administração global" : roleLabels[value?.patient?.role ?? ""]}</small></span>
+      <span className="hca-profile-identity"><strong>{data?.fullName}</strong><small>{data?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role)}</small></span>
       <Icon name="chevron" width={14} />
     </Button></MenuTrigger>
     <MenuPopover className={contexts ? "hca-context-menu" : undefined}><MenuList ref={menuRef} aria-labelledby={undefined} aria-label={contexts ? "Contextos autorizados" : "Ações do usuário"} checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
@@ -45,7 +45,7 @@ function ProfileMenu() {
         <MenuItem persistOnClick onClick={() => setContexts(false)}>← Voltar ao menu</MenuItem>
         {data?.isGlobalAdmin ? <MenuItemRadio persistOnClick name="context" value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</MenuItemRadio> : null}
         {data?.patients.filter((patient) => patient.hasMembership).map((patient) => <MenuItemRadio persistOnClick key={patient.id} name="context" value={patient.id} disabled={selecting} onClick={() => void choose(patient.id)}>
-          {patient.display_name} · {roleLabels[patient.role] ?? patient.role}
+          {patient.display_name} · {roleLabel(patient.role)}
         </MenuItemRadio>)}
       </> : <>
       <MenuItem icon={<Icon name="user" />} onClick={() => router.push("/perfil")}>Meu perfil e segurança</MenuItem>

@@ -1,4 +1,5 @@
 "use client";
+import {roleLabel} from "@/lib/role-labels";
 import { useState, type ReactNode } from "react";
 import {
   Badge,
@@ -11,7 +12,7 @@ import { RecordDrawer } from "@/components/forms/record-drawer";
 import { MembershipImpact } from "./membership-impact";
 import { Dialog, EmptyState, Icon } from "@/components/ui/primitives";
 import { Notice } from "@/components/workspace";
-import { RoleSelect, roles, text, bool, type Row } from "./admin-fields";
+import { RoleSelect, text, bool, type Row } from "./admin-fields";
 
 export function MembershipManagement({
   rows,
@@ -51,7 +52,7 @@ export function MembershipManagement({
     (
       name(row) +
       " " +
-      (roles[text(row, "role") as keyof typeof roles] ?? text(row, "role"))
+      (roleLabel(text(row, "role")))
     )
       .toLocaleLowerCase("pt-BR")
       .includes(search.toLocaleLowerCase("pt-BR")),
@@ -98,8 +99,7 @@ export function MembershipManagement({
             <div className="hca-record-main">
               <h3>{name(row)}</h3>
               <small>
-                {roles[text(row, "role") as keyof typeof roles] ??
-                  text(row, "role")}
+                {roleLabel(text(row, "role"))}
               </small>
               <Badge
                 appearance="tint"

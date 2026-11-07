@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Button, MessageBar, MessageBarBody, Spinner } from "@fluentui/react-components";
 import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
-import { roleLabels, useWorkspaceState } from "@/components/layout/workspace-context";
+import { roleLabel, useWorkspaceState } from "@/components/layout/workspace-context";
 
 export function AppWorkspace({ title, children, administration = false, administrationCapabilities = ["access.manage"], administrationReadRecovery = false, compact = false }: {
   title: string; children: (context: WorkspaceContext) => ReactNode; administration?: boolean; administrationCapabilities?: string[]; administrationReadRecovery?: boolean; compact?: boolean;
@@ -22,7 +22,7 @@ export function AppWorkspace({ title, children, administration = false, administ
   const canRecover = administrationReadRecovery && value?.activeContext?.mode === "patient" && value.patient?.hasMembership;
   return <main id="workspace-content" className={"workspace-content" + (compact ? " hca-compact-workspace" : "")} tabIndex={-1}>
     <div className="page-heading"><div><p className="eyebrow">{value?.patient?.display_name ?? "Home Care Assistant"}</p><h1>{title}</h1></div>
-      {value?.activeContext ? <span className="context-tag">{value.activeContext.mode === "global" ? "Administração global" : roleLabels[value.patient?.role ?? ""]}</span> : null}
+      {value?.activeContext ? <span className="context-tag">{value.activeContext.mode === "global" ? "Administração global" : roleLabel(value.patient?.role)}</span> : null}
     </div>
     {loading && !value ? <div className="hca-loading" role="status"><Spinner size="small" />Validando sessão e pacientes autorizados…</div> : null}
     {error ? <MessageBar layout="multiline" intent="error" role="alert"><MessageBarBody><p>{error}</p><div className="hca-toolbar"><Button onClick={() => void load()}>Tentar novamente</Button><Link href="/login">Entrar novamente</Link></div></MessageBarBody></MessageBar> : null}
@@ -33,7 +33,7 @@ export function AppWorkspace({ title, children, administration = false, administ
       <p>Escolha um contexto autorizado para esta sessão.</p>
       <div className="hca-context-options">
         {value.isGlobalAdmin ? <Button disabled={selecting} onClick={() => void selectProfile(null)}>Administração global</Button> : null}
-        {value.patients.filter((patient) => patient.hasMembership).map((patient) => <Button key={patient.id} disabled={selecting} onClick={() => void selectProfile(patient.id)}>{patient.display_name} · {roleLabels[patient.role] ?? patient.role}</Button>)}
+        {value.patients.filter((patient) => patient.hasMembership).map((patient) => <Button key={patient.id} disabled={selecting} onClick={() => void selectProfile(patient.id)}>{patient.display_name} · {roleLabel(patient.role)}</Button>)}
       </div>
     </section> : null}
     {!error && value?.activeContext && !mismatch ? !value.patient && !value.isGlobalAdmin ? <MessageBar layout="multiline"><MessageBarBody>Nenhum paciente autorizado está vinculado à sua conta.</MessageBarBody></MessageBar> : administration && !canAdminister && !canRecover ? <MessageBar layout="multiline" intent="error"><MessageBarBody>Seu vínculo não permite administrar este paciente.</MessageBarBody></MessageBar> : <div key={`${value.patient?.id ?? "global"}:${value.activeContext.mode}`}>

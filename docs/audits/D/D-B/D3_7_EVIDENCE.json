@@ -180,7 +180,7 @@
   ],
   "failuresAndCorrections": [
     "Initial Auth2/4: fixture adminB had no membership; use the distinct authorized global member. Affected2/2 passed; final17/17 passed.",
-    "Initial diagnostic selector with accented shell argument selected no tests. ASCII selector listed the exact case before execution.",
+    "Initial anchored diagnostic selector selected no full Playwright title. An unanchored selector listed the exact case before execution. Root cause clarified during D3.8; the raw log is preserved.",
     "Diagnostic form asserted cache removal while UI was still Registrando. It now waits for Documento persistido; no assertion was removed.",
     "First production15:9 passed/6 failed. ENT409 wrongly moved the frozen recovery to step0; fixed only that uncertain branch. BAL test used monitoring URL instead of /fichas/bal. Affected9/9 and final12/12 passed."
   ],

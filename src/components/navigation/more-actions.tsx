@@ -13,7 +13,7 @@ const actions: { label: string; description: string; href: string; icon: IconNam
   { label: "Notificações", description: "Avisos e tarefas relacionados ao cuidado", href: "/notificacoes", icon: "bell" },
   { label: "Meu perfil e segurança", description: "Contato, preferências, senha e autenticação", href: "/perfil", icon: "user" },
   { label: "Administração do paciente", description: "Pessoas, catálogo e regras autorizadas", href: "/admin", icon: "settings", capability: "access.manage" },
-  { label: "Catálogo e unidades", description: "Apresentações e medidas dos produtos", href: "/unidades", icon: "stock", capability: "catalog.manage" },
+  { label: "Unidades e apresentações", description: "Apresentações e medidas dos produtos", href: "/unidades", icon: "stock", capability: "catalog.manage" },
 ];
 export function MoreActions() {
   return <Workspace title="Mais opções">{(context) => <nav aria-label="Rotina e funções autorizadas" className="hca-records">{actions.filter((action) => (!action.capability || can(context, action.capability)) && (!action.capabilities || action.capabilities.some(capability => can(context, capability)))).map((action) => <Link className="hca-record" key={action.href} href={action.href} prefetch={false}>

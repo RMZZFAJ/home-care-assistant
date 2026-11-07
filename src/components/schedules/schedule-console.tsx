@@ -41,18 +41,7 @@ const stateLabels: Record<string, string> = {
   rejected: "Recusado",
   obsolete: "Obsoleto",
 };
-const eventLabels: Record<string, string> = {
-  "schedule.type": "Tipo de plantão atualizado",
-  "schedule.proposed": "Programação proposta",
-  "schedule.published": "Programação publicada",
-  "schedule.approve": "Programação aprovada",
-  "schedule.reject": "Programação recusada",
-  "schedule.end_series": "Programação encerrada",
-  "schedule.change_requested": "Alteração proposta",
-  "schedule.change_decided": "Decisão de alteração",
-  "schedule.change": "Plantão alterado",
-  "schedule.cancel": "Plantão cancelado",
-};
+import {scheduleEventLabel} from "@/lib/schedules/presentation";
 export function ScheduleConsole() {
   return (
     <Workspace title="Escalas e plantões">
@@ -724,7 +713,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
             {currentData.events.map((event) => (
               <p key={event.id}>
                 {stamp(event.created_at, "America/Sao_Paulo")} ·{" "}
-                {eventLabels[event.action] ?? "Alteração registrada"} ·{" "}
+                {scheduleEventLabel(event.action)} ·{" "}
                 {event.actor_name_snapshot ??
                   "Nome do autor não preservado no evento antigo"}{" "}
                 · {event.reason || "Sem motivo adicional"}
