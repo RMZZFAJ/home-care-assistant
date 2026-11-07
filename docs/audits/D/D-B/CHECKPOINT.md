@@ -568,3 +568,45 @@ chave privada no Git nem confiança instalada no sistema. Nenhum critério D4
 foi concluído: pipeline, runtime, verificador público e emissões reais seguem
 pendentes. Confiança externa, independência temporal, homologações humanas e
 gates D-C/D6 não são inferidos dessa prova.
+
+## D4.1 — núcleo criptográfico Node
+
+Base3c61697. Implementados signTechnicalPdf, TSA RFC3161 em memória e verificação
+separada de AcroForm/ByteRange, CMS, digest, vínculo ESSCertIDv2, certificado,
+cadeia e token temporal. A chave de TSA exige EKU crítico e exclusivo para
+carimbo; não pode assinar o documento. O núcleo não usa processo externo ou
+serviço residente. OpenSSL gera somente as identidades efêmeras dos testes.
+
+Seis casos criptográficos passaram com chaves RSA3072 reais. pyHanko0.38.1
+independente aprovou o PDF do adapter Node e recusou ausência de carimbo e
+token válido para outra assinatura. Também testados byte alterado, acréscimo
+posterior, cadeia desconhecida, revogação configurada, certificado inesperado,
+relógio futuro, falha de TSA e unicidade de seriais em concorrência. A política
+de TSA usa UUID privado; sua codificação DER foi conferida independentemente.
+
+O primeiro gerador produziu OCTET STRING construído BER por comportamento do
+construtor PKIJS. A montagem foi corrigida para DER; a regra de verificação não
+foi relaxada. Tipos e lint passaram. Arquivos de pesquisa terminados em.ts,
+incluindo resposta404, foram renomeados para.txt no output ignorado para não
+entrarem na descoberta de tipos. Não foi ampliada a exclusão do compilador.
+
+LibPDF0.5.3, PKIJS3.4.3 e ASN1js3.1.0 estão fixados no lockfile. npm audit
+reportou26 avisos; os pacotes apontados mantêm exatamente as versões do
+baseline. Não houve correção forçada ou atribuição de aprovação ao SonarCloud.
+[Manifesto D4.1](D4_1_EVIDENCE.json) conserva fontes, resultados e limites.
+
+D-B-AC-006/007 continuam parciais. O núcleo ainda precisa ser ligado ao ciclo
+de emissão da aplicação: reserva Auth, composição/oráculo, assinatura, upload
+imutável, registro ready, histórico e verificação pública. Custódia real,
+versões/rotação, incidente e confiança operacional não foram configurados.
+Não há exemplar de REQ/COM/ENT/BAL anunciado como assinado por este lote.
+Sem nova migration, alteração remota, deploy ou liberação operacional.
+
+Próximo lote D4.2: reserva por intenção própria; claim privado do worker com
+token não entregue ao navegador; finalização pela sessão Auth revalidada e
+comprovante do worker; caminho imutável por emissão. Recuperação consulta o
+objeto vencedor, valida fatos/identidade/assinatura e registra os mesmos bytes.
+Não usar escrita de negócio como prova de sucesso, não regenerar download e
+não entregar objeto antes de ready. Upload público precisa de limites e
+isolamento da leitura de PDF desconhecido; o núcleo atual valida artefatos
+produzidos/controlados, sem endpoint público de upload.

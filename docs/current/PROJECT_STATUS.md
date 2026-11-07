@@ -26,6 +26,13 @@ internos não fornecem confiança externa ou independência temporal. Emissão,
 histórico, verificação pública, D5 e infraestrutura complementar continuam
 pendentes; não há liberação operacional.
 
+D4.1 implementa o núcleo Node de assinatura, TSA interna e verificação dos
+bytes/certificado/carimbo. Seis testes criptográficos e três verificações
+independentes passaram, incluindo as negativas. Tipos/lint aprovados;
+[evidências e limites](../audits/D/D-B/D4_1_EVIDENCE.json). Integração com emissão,
+custódia operacional, oráculo documental e verificador público permanecem
+pendentes; D-B-AC-006/007 continuam parciais.
+
 D3.4 comprova os estados de sino, central, perfil e consumo:23 unitários e24
 casos browser distintos, com sete rechecks finais em build de produção nos
 consumidores afetados. Sem falso vazio, spinner após500, perda de edição pessoal
