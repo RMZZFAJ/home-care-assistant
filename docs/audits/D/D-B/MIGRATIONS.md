@@ -115,3 +115,24 @@ alterada por consequência. Esses avisos não são aprovação geral de seguran�
 **NÃO INICIADA.** Exige implementação e testes locais, revisão de ACL/RLS/RPC,
 novo preflight remoto, compatibilidade, backup pré-alteração e pós-validação.
 Migrations aplicadas não substituem prova dos consumidores reais.
+
+### Incremento local D3.2
+
+Local125 / remoto121. Quatro arquivos novos, ainda sem aplicação remota:
+
+- 20261107013356_phase_d3_governance_recovery.sql: leitura autorizada e limitada,
+  comparação e versão original da intenção.
+- 20261107015914_phase_d3_governance_compatibility.sql: nomes do catálogo,
+  herança e preservação da alteração deliberada do próprio vínculo.
+- 20261107020304_phase_d3_governance_own_transition.sql: contexto da sessão
+  permanece verificável quando a própria ação legítima revoga o vínculo;
+  sessão/assurance/ator/linha resultante continuam necessários.
+- 20261107021123_phase_d3_open_governance_requests.sql: consulta inicial inclui
+  aprovação pendente e convite aguardando aceite, antes da paginação.
+
+Todos criados pelo CLI e aplicados com test:db:prepare no projeto local existente,
+sem reset. As revisões anteriores e suas contraprovas foram preservadas. RPCs
+novas só têm EXECUTE authenticated; auxiliares e nomes antigos permanecem
+revogados. Não se abriu DML/RLS para corrigir leitura. Provas dirigidas Auth,
+HTTP e browser constam no checkpoint; clean/upgrade e integração global do SHA
+publicado devem ser verificados na CI programada antes do preflight remoto final.

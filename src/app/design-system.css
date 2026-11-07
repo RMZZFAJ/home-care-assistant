@@ -70,5 +70,9 @@ button:disabled { cursor:not-allowed; opacity:.45; }
 .hca-schedule-agenda .hca-toolbar :where(.fui-Field,.fui-Input,.fui-Select) { min-width:0; max-width:100%; }
 .hca-schedule-agenda .hca-toolbar :where(input,select) { min-width:0; max-width:100%; }
 
+.hca-governance-proposals { min-width:0; max-width:100%; }
+.hca-governance-proposals .hca-toolbar :where(.fui-Field,.fui-Input,.fui-Select,input,select) { min-width:0; max-width:100%; }
+.hca-governance-proposals :where(p,summary,td) { overflow-wrap:anywhere; }
+
 .hca-schedule-agenda .hca-record { flex-wrap:wrap; }
 .hca-schedule-agenda .hca-record>:where(strong,span) { min-width:0; max-width:100%; overflow-wrap:anywhere; }

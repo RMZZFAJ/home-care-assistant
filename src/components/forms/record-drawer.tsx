@@ -4,8 +4,9 @@ import { Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, MessageBar, Messag
 import { Icon } from "@/components/ui/primitives";
 
 /** Contextual editing keeps the list and its filters in place. */
-export function RecordDrawer({ title, children, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false }: {
+export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
+  recovery?: ReactNode;
 }) {
   const [dirty, setDirty] = useState(false);
   const [discard, setDiscard] = useState(false);
@@ -19,6 +20,7 @@ export function RecordDrawer({ title, children, onClose, busy = false, restoreFo
   return <OverlayDrawer open aria-label={title} position="end" size="medium" className="hca-record-drawer" onOpenChange={(_, data) => { if (!data.open) requestClose(); }}>
     <DrawerHeader><DrawerHeaderTitle action={<Button appearance="subtle" icon={<Icon name="close" />} aria-label="Fechar edição" disabled={busy || preventClose} onClick={requestClose} />}>{title}</DrawerHeaderTitle></DrawerHeader>
     <DrawerBody>
+      {recovery}
       {discard ? <MessageBar layout="multiline" intent="warning" role="alert"><MessageBarBody>Há alterações ainda não salvas.<div className="hca-toolbar"><Button onClick={() => setDiscard(false)}>Continuar editando</Button><Button onClick={onClose}>Descartar alterações</Button></div></MessageBarBody></MessageBar> : null}
       <fieldset className="min-w-0" disabled={busy} onChange={() => { if (trackChanges) setDirty(true); }}>{children}</fieldset>
     </DrawerBody>

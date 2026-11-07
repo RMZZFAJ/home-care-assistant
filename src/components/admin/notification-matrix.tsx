@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api, inputClass, Notice } from "@/components/workspace";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { roles } from "./admin-fields";
@@ -28,6 +28,7 @@ export function NotificationMatrix({
   busy,
   configure,
   configurationError = "",
+  recovery,
 }: {
   patientId: string;
   version: number;
@@ -37,6 +38,7 @@ export function NotificationMatrix({
     change: Record<string, unknown>,
   ) => Promise<boolean>;
   configurationError?: string;
+  recovery?: ReactNode;
 }) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
@@ -150,7 +152,7 @@ export function NotificationMatrix({
     <div className="hca-records hca-matrix-scroll" tabIndex={0} role="region" aria-label="Tabela de notificações; rolagem horizontal por função"><Table className="hca-table hca-matrix" aria-label="Canais por evento e função"><TableHeader><TableRow><TableHeaderCell>Evento</TableHeaderCell>{columns.map(([role, label]) => <TableHeaderCell key={role}>{label}</TableHeaderCell>)}</TableRow></TableHeader><TableBody>{data.events.filter((event) => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((event) => <TableRow key={event}><TableCell className="hca-matrix-name"><h3>{documentEventLabel(event)}</h3></TableCell>{columns.map(([role, label]) => {
       const rule = data.rules.find((row) => row.event === event && row.subject_role === role), selected = rule?.channels ?? ["internal"];
       return <TableCell key={role}><div className="hca-channel-cell">{available(event).map((channel) => <Tooltip key={channel.code} content={channel.label} relationship="label"><Checkbox className="hca-channel-checkbox" label={<Icon name={channel.code === "internal" ? "bell" : channel.code === "email" ? "forms" : "team"} />} aria-label={documentEventLabel(event) + " · " + label + " · " + channel.label} disabled={busy || pending} checked={selected.includes(channel.code)} onChange={(_, value) => void update(event, role, { channels: value.checked ? [...selected, channel.code] : selected.filter((code) => code !== channel.code) })} /></Tooltip>)}<Button appearance="subtle" icon={<Icon name="more" />} aria-label={"Opções de " + documentEventLabel(event) + " · " + label} disabled={busy || pending} onClick={(value) => setEditor({ event, role, opener: value.currentTarget })} /></div>
-      {editor?.event === event && editor.role === role ? <RecordDrawer title={documentEventLabel(event) + " · " + label} onClose={() => setEditor(null)} busy={busy || pending} restoreFocusTo={editor.opener} trackChanges={false}>{error || configurationError ? <Notice error>{error || configurationError}</Notice> : null}<div className="hca-form"><p className="hca-field-hint">Cada alteração é salva e confirmada pelo servidor.</p>
+      {editor?.event === event && editor.role === role ? <RecordDrawer title={documentEventLabel(event) + " · " + label} onClose={() => setEditor(null)} busy={busy || pending} recovery={recovery} restoreFocusTo={editor.opener} trackChanges={false}>{error || configurationError ? <Notice error>{error || configurationError}</Notice> : null}<div className="hca-form"><p className="hca-field-hint">Cada alteração é salva e confirmada pelo servidor.</p>
                       <label className="block text-xs">
                         Comportamento
                         <select

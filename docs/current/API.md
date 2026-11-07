@@ -532,6 +532,31 @@ paciente usa initialAdministratorEmail confirmado e atribuição inicial
 explícita.
 Administração de acesso de um administrador ativo não é removida por override.
 
+GET /api/patient-settings exige careRecipientId e retorna configuração,
+diretório e propostas autorizadas. changesOnly=true retorna somente changes,
+total, page e pageSize. A consulta aceita status open, pending,
+awaiting_acceptance, applied, rejected ou all; open é o padrão e reúne aprovação
+pendente e aceite pendente. kind filtra os cinco tipos de governança; query
+busca referência/conteúdo no paciente autorizado. page inicia em1 e tem teto
+1000000; pageSize usa20 e aceita1–50. NULL explícito é inválido nas RPCs.
+Filtros precedem contagem/paginação, com ordem created_at/id determinística.
+
+POST /api/patient-settings recebe careRecipientId, kind, change,
+idempotencyKey e expectedVersion; decisões incluem requestId e decision.
+Propostas globais pelo alias /api/admin também exigem idempotencyKey e
+expectedVersion do cliente, preservados em cada reenvio. A rota não gera
+automaticamente outra chave nem busca uma versão nova para reaplicar o comando.
+O banco recupera a mesma proposta e conflita quando conteúdo ou versão da
+intenção diferem. Revisar a configuração vigente é uma ação explícita anterior
+a outra intenção. Aprovação local distinta e aceite pessoal permanecem exigidos.
+
+Resultado de transporte incerto conserva o pacote da tentativa na tarefa atual;
+um reenvio recusado não comprova a não execução da primeira tentativa.
+JSON200 sem id/status reconhecíveis também não confirma a ação. Uma resposta
+válida é distinguida de falha na consulta posterior. A leitura não revela hash
+secreto de convite: aprovação recuperada oferece reemissão explícita, invalidando
+o link anterior. Não há concessão de vínculo somente por aprovar a proposta.
+
 Worker e webhook ficam em /api/notifications/worker e
 /api/notifications/webhook. O primeiro exige segredo de servidor; o segundo
 verifica assinatura Meta antes de processar estado ou mensagem.

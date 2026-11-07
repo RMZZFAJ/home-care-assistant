@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Badge,
   Button,
@@ -19,6 +19,8 @@ export function MembershipManagement({
   save,
   busy,
   error,
+  recovery,
+  confirmationRevision = 0,
   patientId,
 }: {
   rows: Row[];
@@ -26,14 +28,21 @@ export function MembershipManagement({
   save: (payload: Row, message: string, refresh?: boolean) => Promise<unknown>;
   busy: boolean;
   error: string;
+  recovery?: ReactNode;
+  confirmationRevision?: number;
   patientId?: string;
 }) {
   const [search, setSearch] = useState("");
-  const [editor, setEditor] = useState<{
+  type Editor = {
     row: Row | null;
     opener: HTMLElement;
-  } | null>(null);
-  const [change, setChange] = useState<Row | null>(null);
+  };
+  const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
+  const editor = editorState?.revision === confirmationRevision ? editorState : null;
+  const setEditor = (value: Editor | null) => setEditorState(value ? { ...value, revision: confirmationRevision } : null);
+  const [changeState, setChangeState] = useState<{ row: Row; revision: number } | null>(null);
+  const change = changeState?.revision === confirmationRevision ? changeState.row : null;
+  const setChange = (row: Row | null) => setChangeState(row ? { row, revision: confirmationRevision } : null);
   const name = (row: Row) =>
     (row.profiles as { full_name?: string } | null)?.full_name ||
     text(row, "full_name") ||
@@ -125,6 +134,7 @@ export function MembershipManagement({
         <RecordDrawer
           title={editor.row ? "Editar vínculo" : "Vincular conta existente"}
           busy={busy}
+          recovery={recovery}
           restoreFocusTo={editor.opener}
           onClose={() => setEditor(null)}
         >
@@ -152,7 +162,7 @@ export function MembershipManagement({
                 "Vínculo salvo e auditado.",
                 true,
               );
-              if (result) setEditor(null);
+              if (result) setEditorState(current => current === editor ? null : current);
             }}
           >
             {editor.row ? (
@@ -215,6 +225,7 @@ export function MembershipManagement({
           operações.
         </p>
         {error ? <Notice error>{error}</Notice> : null}
+        {recovery}
         <div className="hca-toolbar">
           <Button disabled={busy} onClick={() => setChange(null)}>
             Voltar
@@ -233,7 +244,7 @@ export function MembershipManagement({
                 "Estado do vínculo atualizado.",
                 true,
               );
-              if (result) setChange(null);
+              if (result) setChangeState(current => current === changeState ? null : current);
             }}
           >
             {change?.status === "revoked"

@@ -110,7 +110,11 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await expect(archiveDays).toHaveValue("9");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "configuração mudou em outra sessão" })).toBeVisible();
+    await expect(archiveDays).toHaveValue("9");
+    await expect(archiveDays).toBeDisabled();
+    await page.getByRole("dialog").getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
     await expect(archiveDays).toHaveValue("10");
     await archiveDays.fill("11");
@@ -174,6 +178,8 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         .getByRole("alert")
         .filter({ hasText: "configuração mudou em outra sessão" }),
     ).toBeVisible();
+    await expect(end).toBeDisabled();
+    await cell.getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
     await expect(end).toBeEnabled();
     await expect(end).toHaveValue("");
     expect((await persisted()).quiet_start).toBe(20);
@@ -200,8 +206,13 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
       });
       await start.selectOption("19");
       await expect(page.getByRole("alert").first()).toBeVisible();
+      if (failure === "network") {
+        await expect(start).toBeDisabled();
+        expect((await persisted()).quiet_start).toBe(20);
+        await cell.getByRole("button", { name: "Recuperar mesma alteração", exact: true }).click();
+      }
       await expect(start).toBeEnabled();
-      await expect(start).toHaveValue("20");
+      await expect(start).toHaveValue(failure === "network" ? "19" : "20");
       expect((await persisted()).cooldown_minutes).toBe(23);
       await page.unrouteAll({ behavior: "wait" });
     }

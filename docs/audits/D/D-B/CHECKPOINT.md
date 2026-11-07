@@ -127,3 +127,68 @@ continuam independentes. [Triagem S4790](SONAR_TRIAGE.md) documenta checksum
 legado, controles fortes independentes e credencial do provedor indisponível.
 Não se declara Sonar aprovado. Listas/administração, demais rascunhos/estados,
 guias e critérios compartilhados ainda exigem seus próprios incrementos.
+
+## D3.2 — propostas, comparação e recuperação administrativa
+
+Base publicada3d9afdf. A consulta de governança passa a filtrar antes de paginar,
+com ordem created_at/id determinística, total, páginas limitadas, busca por
+referência/conteúdo e estados distintos. O percurso inicial mantém propostas
+aguardando aprovação e convites aprovados aguardando aceite. Filtros ficam na
+URL. Nenhuma leitura decide proposta, cria vínculo ou concede capacidade.
+
+As duas entradas HTTP conservam chave e versão da intenção. O alias /api/admin
+deixa de inventar chave/versão a cada envio. O banco compara também a versão
+original; conteúdo/versão diferentes conflitam, e uma versão nova exige revisão
+explícita. A revisão aguarda a leitura autoritativa antes de liberar outra ação.
+Resultado incerto congela o pacote. Reenvio recusado ou JSON200 sem confirmação
+reconhecível conserva a incerteza da primeira tentativa. Falha no GET posterior
+a um resultado válido informa ação confirmada e consulta falha, separadamente.
+
+Cinco tipos têm comparação em leitura, autor, referência e versões. Nomes de
+pessoas e do catálogo são resolvidos pelo modelo autorizado. Herança de
+capacidade identifica a regra da função; ausência de valor específico fica
+explícita. Tipo/campo desconhecido não é aprovável. Não há textarea de payload.
+Convite já aprovado mantém a reemissão explícita que invalida o segredo anterior.
+
+Foram criadas quatro migrations incrementais, apenas locais: governança,
+compatibilidade, transição própria e filtro de propostas abertas. Os arquivos
+anteriores não foram reescritos. Revalidação após esperas é mantida. A exceção
+estreita para alteração deliberada do próprio vínculo exige sessão válida,
+assurance, contexto selecionado, resultado aplicado e correspondência exata
+da linha modificada; a proteção do último administrador continua obrigatória.
+As duas possibilidades de transição própria passaram com Auth real. A hipótese
+foi antes reproduzida e preservada; diagnóstico transacional sob proprietário do
+banco foi somente investigação, separado dessa prova Auth.
+
+Oito testes Auth distintos passaram, com 51 registros, duas identidades
+administrativas, concorrência, conflito, negativas de escopo/grants, dois pontos
+de espera observados, seis operações administrativas e convite aguardando aceite.
+Vinte e sete casos unitários passaram. Tipos e lint dos fontes afetados passaram.
+Os ensaios usaram a stack existente em54321/54322, dados fictícios e nenhum reset.
+
+Os nove casos novos de browser foram aprovados entre as rodadas dirigidas nos
+três projetos. Permanecem as contraprovas iniciais: botão de recuperação herdava
+fieldset disabled; select excedia320px; fixture de negativa exigia403 para um
+UUID inexistente cujo contrato é404. O último foi substituído por outro paciente
+real da fixture, com referência própria, negado pela RLS sem expor conteúdo.
+O botão passou para fora do fieldset bloqueado; regras de acessibilidade e
+largura foram preservadas. A aprovação real conserva requestId/versão e torna
+as demais propostas antigas não aprováveis por conflito.
+
+A rodada dos consumidores existentes também revelou convite escondido pelo
+filtro pending e liberação prematura antes da leitura vigente após conflito.
+As duas causas foram corrigidas no produto, sem alterar o oráculo dos convites.
+O consumidor de duas sessões também comprovou um fechamento tardio sobre editor
+aberto depois da gravação anterior: agora o retorno só encerra o editor da própria
+ação. Recheck dirigido desse consumidor passou, incluindo preservação de9,
+revisão explícita para10, foco no acionador, recuperação da mesma alteração de
+notificação e compatibilidade dos demais horários. Os três consumidores existentes
+passaram. Capturas, logs e falhas conservados em output/playwright/phase-d; cartão
+de comparação em390 inspecionado. Não equivalem a aprovação
+humana, AT ou aparelho físico. O restante de D3, D4, D5 e a base operacional
+continua em execução; aplicação remota final D-B ainda não iniciada.
+
+O responsável adiou expressamente configuração e tratamento específico do
+SonarCloud para depois de sua configuração adequada. [Complemento da ordem](OWNER_AMENDMENTS.md)
+preserva a instrução e marca OWNER_DEFERRED_SONAR_CONFIGURATION. Isso não declara
+o provedor aprovado nem adia CI funcional, testes ou implementação D-B.

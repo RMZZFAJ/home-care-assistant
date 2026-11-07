@@ -31,6 +31,17 @@ com401/403, quatro larguras, axe e consumidores anteriores. Os três apontamento
 UI originais receberam correção local. A CI/Sonar do SHA publicado continua
 necessária. PAdES, verificação por upload e PWA/push ainda não implementados.
 
+D3.2 implementa consulta paginada de propostas abertas/histórico, comparação em
+leitura, chave/versão originais nas duas entradas administrativas e recuperação
+de intenção incerta. Passaram27 unitários, oito testes Auth distintos e os nove
+casos novos de navegador entre rodadas nos três projetos; três consumidores
+anteriores também passaram. O conflito exige revisão autoritativa explícita,
+sem apagar outro editor por retorno tardio. Local125/remoto121: quatro migrations
+D3 continuam locais, para o preflight final autorizado. [Checkpoint D3.2](../audits/D/D-B/CHECKPOINT.md).
+O responsável adiou configuração e tratamento específico do SonarCloud;
+[complemento vigente](../audits/D/D-B/OWNER_AMENDMENTS.md). O provedor não é
+considerado aprovado por esse adiamento.
+
 ## Implementado no candidato
 
 - D0: prontidão real dos serviços, NULL/existência, incomplete do axe,

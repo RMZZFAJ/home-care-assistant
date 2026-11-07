@@ -2,7 +2,10 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCommandIntent } from "@/lib/client/use-command-intent";
+import { ApiError } from "@/lib/client/api";
+import { governanceCommandConfirmed } from "@/lib/validation/governance";
 import {
   api,
   buttonClass,
@@ -40,6 +43,8 @@ type Section =
   | "profiles"
   | "notificationRecipients"
   | "notifications";
+type AdministrativeResult = { data?: unknown; invitationUrl?: string; pendingApproval?: boolean };
+type AdministrativeIntent = { payload: Row; success: string; refreshContext: boolean };
 const labels: Record<Section, string> = {
   patient: "Paciente",
   catalog: "Catálogo",
@@ -98,7 +103,14 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [loading, setLoading] = useState(
     !["patient", "import", "overview"].includes(section),
   );
-  const [busy, setBusy] = useState(false);
+  const command = useCommandIntent<Row, AdministrativeResult>(governanceCommandConfirmed);
+  const intentRef = useRef<AdministrativeIntent | null>(null);
+  const versionRef = useRef<number | null>(null);
+  const [versionAttempt, setVersionAttempt] = useState(0);
+  const [conflict, setConflict] = useState(false);
+  const [confirmationRevision, setConfirmationRevision] = useState(0);
+  const [localBusy, setLocalBusy] = useState(false);
+  const busy = localBusy || command.busy || command.uncertain || conflict;
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [invitationUrl, setInvitationUrl] = useState("");
@@ -106,6 +118,14 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [importText, setImportText] = useState("");
   const [importReviewed, setImportReviewed] = useState(false);
   const patientId = context.patient?.id;
+  useEffect(() => {
+    if (!globalMode || !patientId) return;
+    const controller = new AbortController();
+    void api<{ data: { version: number } }>("/api/patient-settings?careRecipientId=" + patientId, undefined, controller.signal).then(result => {
+      if (!controller.signal.aborted) { versionRef.current = result.data.version; setConflict(false); }
+    }).catch(reason => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Não foi possível consultar a versão administrativa."); });
+    return () => controller.abort();
+  }, [globalMode, patientId, versionAttempt]);
   const load = useCallback(
     (signal?: AbortSignal) => {
       if (!allowed || ["patient", "import", "overview"].includes(section))
@@ -172,12 +192,30 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     void load(controller.signal);
     return () => controller.abort();
   }, [load]);
+  async function confirmed(result: AdministrativeResult, packet: AdministrativeIntent) {
+    setMessage(result.pendingApproval ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras." : packet.success);
+    setEditing(null);
+    setConfirmationRevision(value => value + 1);
+    if (result.invitationUrl) setInvitationUrl(result.invitationUrl);
+    if (packet.payload.action === "historicalImport") setReport(result.data);
+    intentRef.current = null;
+    // A failing read after this point cannot make the completed command uncertain.
+    try { if (packet.refreshContext) await context.refresh(); await load(); setVersionAttempt(value => value + 1); }
+    catch (reason) { setError("A ação foi confirmada. A consulta posterior falhou: " + (reason instanceof Error ? reason.message : "Atualize esta seção.")); }
+    return result;
+  }
+  function failed(reason: unknown) {
+    if (reason instanceof ApiError && reason.status === 409 && globalMode) setConflict(true);
+    setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.");
+    return null;
+  }
   async function execute(
     payload: Row,
     success: string,
     refreshContext = false,
   ) {
-    setBusy(true);
+    if (busy) return null;
+    setLocalBusy(true);
     setError("");
     setMessage("");
     setInvitationUrl("");
@@ -191,32 +229,22 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         "historicalImport",
         "process",
       ].includes(String(payload.action));
-      const result = await api<{
-        data?: unknown;
-        invitationUrl?: string;
-        pendingApproval?: boolean;
-      }>(isNotification ? "/api/admin/notifications" : "/api/admin", {
+      const globalProposal = globalMode && ["membership", "product", "adoptProduct", "membershipStatus", "alertRule", "notificationRecipient", "recipient"].includes(String(payload.action)) && (payload.action !== "recipient" || Boolean(payload.id));
+      if (globalProposal && versionRef.current === null) throw new Error("Consulte a versão administrativa antes de preparar esta proposta.");
+      const packet: AdministrativeIntent = { payload, success, refreshContext };
+      if (globalProposal) intentRef.current = packet;
+      const body = {
         ...(scoped ? { careRecipientId: patientId } : {}),
         ...payload,
-      });
-      setMessage(
-        result.pendingApproval
-          ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras."
-          : success,
-      );
-      setEditing(null);
-      if (result.invitationUrl) setInvitationUrl(result.invitationUrl);
-      if (payload.action === "historicalImport") setReport(result.data);
-      if (refreshContext) await context.refresh();
-      await load();
-      return result;
+        ...(globalProposal ? { idempotencyKey: crypto.randomUUID(), expectedVersion: versionRef.current } : {}),
+      };
+      const url = isNotification ? "/api/admin/notifications" : "/api/admin";
+      const result = globalProposal ? await command.send(url, body) : await api<AdministrativeResult>(url, body);
+      return await confirmed(result, packet);
     } catch (reason) {
-      setError(
-        reason instanceof Error ? reason.message : "Não foi possível salvar.",
-      );
-      return null;
+      return failed(reason);
     } finally {
-      setBusy(false);
+      setLocalBusy(false);
     }
   }
   function handle(
@@ -236,6 +264,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     return (
       <Notice error>Seu vínculo não autoriza esta área administrativa.</Notice>
     );
+  const recovery = command.uncertain ? <Notice error>O resultado da alteração é incerto. Recupere a mesma tentativa antes de enviar outra. <button className={buttonClass} disabled={command.busy} onClick={async () => { setError(""); try { const result = await command.recover(); if (intentRef.current) await confirmed(result, intentRef.current); } catch (reason) { failed(reason); } }}>Recuperar mesma alteração administrativa</button></Notice>
+    : conflict ? <Notice error>A versão ou a intenção mudou. Seus campos foram preservados; nenhuma nova proposta foi enviada. <button className={buttonClass} onClick={() => { versionRef.current = null; setVersionAttempt(value => value + 1); setError(""); }}>Revisar versão administrativa vigente</button></Notice> : null;
   return (
     <div className="space-y-5">
       {!allowed ? (
@@ -267,12 +297,13 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       {error && (
         <Notice error>
           {error}
-          <button className={`${buttonClass} ml-3`} onClick={() => void load()}>
+          <button className={`${buttonClass} ml-3`} onClick={() => { if (globalMode && versionRef.current === null) setVersionAttempt(value => value + 1); void load(); }}>
             Recarregar
           </button>
         </Notice>
       )}
       {message && <Notice>{message}</Notice>}
+      {recovery}
       {invitationUrl && (
         <section className={panelClass}>
           <h2 className="font-bold">Link de convite</h2>
@@ -306,6 +337,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         )}
         {section === "catalog" && patientId ? (
           <CatalogueManagement
+            recovery={recovery}
+            confirmationRevision={confirmationRevision}
             writable={allowed}
             rows={rows}
             templates={templates}
@@ -322,6 +355,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         ) : null}
         {section === "memberships" ? (
           <MembershipManagement
+            recovery={recovery}
+            confirmationRevision={confirmationRevision}
             rows={rows}
             directory={directory}
             save={execute}

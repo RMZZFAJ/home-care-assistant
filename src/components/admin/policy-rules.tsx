@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { Button, Checkbox, Field, Input, Select } from "@fluentui/react-components";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Notice } from "@/components/workspace";
@@ -14,17 +14,23 @@ const groups = [
   { code: "archive", title: "Encerramento e histórico" },
 ];
 const days = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-export function PolicyRules({ settings, directory, busy, error, message, versionKey, onStartEditing, save }: {
+export function PolicyRules({ settings, directory, busy, locked, recovery, revision, error, message, versionKey, onStartEditing, save }: {
   settings: Settings; directory: { id: string; name: string; role: string }[]; busy: boolean; error: string; message: string; versionKey: string;
+  locked: boolean; recovery: ReactNode; revision: number;
   onStartEditing: () => void; save: (event: FormEvent<HTMLFormElement>) => Promise<boolean>;
 }) {
-  const [editor, setEditor] = useState<{ group: string; baseline: Settings; opener: HTMLElement } | null>(null);
+  type Editor = { group: string; baseline: Settings; opener: HTMLElement };
+  const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
+  const editor = editorState?.revision === revision ? editorState : null;
+  const setEditor = (value: Editor | null) => setEditorState(value ? { ...value, revision } : null);
   const values = editor?.baseline ?? settings;
   const selected = (key: string, value: string) => Array.isArray(values[key]) && values[key].includes(value);
   const summary = (group: string) => group === "bal" ? `${settings.balDay == null ? "Dia não configurado" : days[Number(settings.balDay)]} · revisão ${settings.balReview === "required" ? "obrigatória" : "opcional"}` : group === "science" ? `${settings.scienceRequired === true ? "Ciência exigida" : "Ciência opcional"} · uma pessoa habilitada · expedição familiar sempre registra ciência` : group === "messages" ? `Primeiro lembrete: ${settings.reminderHours} h · repetição: ${settings.reminderRepeatHours} h` : `Arquivamento após ${settings.archiveDays} dias da conclusão`;
   return <section aria-label="Política do paciente"><div className="hca-section-heading"><div><h2>Política do paciente</h2><p>Documentos existentes preservam a política de emissão. Alterações são versionadas.</p></div></div><div className="hca-records">{groups.map((group) => <article key={group.code} className="hca-record"><div className="hca-record-main"><h3>{group.title}</h3><small>{summary(group.code)}</small></div><Button aria-label={"Editar " + group.title} onClick={(event) => { onStartEditing(); setEditor({ group: group.code, baseline: settings, opener: event.currentTarget }); }}>Editar</Button></article>)}</div>
     {editor ? <RecordDrawer title={groups.find((group) => group.code === editor.group)?.title ?? "Editar política"} busy={busy} restoreFocusTo={editor.opener} onClose={() => setEditor(null)}>{error ? <Notice error>{error}</Notice> : null}{message ? <Notice>{message}</Notice> : null}
-      <form key={versionKey} className="hca-form" onSubmit={async (event) => { if (await save(event)) setEditor(null); }}>
+      {recovery}
+      <form key={versionKey} className="hca-form" onSubmit={async (event) => { if (await save(event)) setEditorState(current => current === editor ? null : current); }}>
+        <fieldset disabled={locked} className="hca-form min-w-0">
         <div hidden={editor.group !== "bal"} className="hca-form">
           <Field label="Dia do BAL"><Select name="balDay" defaultValue={String(values.balDay ?? "")}><option value="">Não configurado</option>{days.map((day, index) => <option key={day} value={index}>{day}</option>)}</Select></Field>
           <Field label="Revisão do BAL"><Select name="balReview" defaultValue={String(values.balReview)}><option value="optional">Opcional</option><option value="required">Obrigatória</option></Select></Field>
@@ -47,6 +53,7 @@ export function PolicyRules({ settings, directory, busy, error, message, version
         </div>
         <div hidden={editor.group !== "archive"} className="hca-form"><Field label="Arquivar após conclusão (dias)"><Input name="archiveDays" type="number" required min={1} max={365} defaultValue={String(values.archiveDays)} /></Field></div>
         <Button appearance="primary" disabled={busy} type="submit">Registrar política</Button>
+        </fieldset>
       </form>
     </RecordDrawer> : null}
   </section>;

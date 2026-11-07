@@ -36,3 +36,9 @@ Foi solicitada renovação da conexão de modo assíncrono; implementação dos
 demais ramos prossegue. Não foi alterado o Quality Gate ou a classificação
 remota por suposição. Qualquer substituição futura desse checksum deve
 preservar ou fortalecer as contraprovas de integridade, não apenas obter verde.
+
+O responsável respondeu posteriormente e adiou a configuração do SonarCloud e
+o tratamento específico dos seus apontamentos. [Decisão vigente](OWNER_AMENDMENTS.md):
+OWNER_DEFERRED_SONAR_CONFIGURATION. Não serão feitas novas tentativas de
+configuração/triagem nesta missão por causa dessa credencial. O estado continua
+sem aprovação do provedor; os demais testes e critérios D-B prosseguem.

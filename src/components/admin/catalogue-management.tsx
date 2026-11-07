@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import {
   Badge,
   Button,
@@ -26,6 +26,8 @@ export function CatalogueManagement({
   save,
   busy,
   error,
+  recovery,
+  confirmationRevision = 0,
   loading,
   patientId,
   onIdentitySaved,
@@ -36,6 +38,8 @@ export function CatalogueManagement({
   save: (payload: Row, message: string) => Promise<unknown>;
   busy: boolean;
   error: string;
+  recovery?: ReactNode;
+  confirmationRevision?: number;
   loading: boolean;
   patientId: string;
   onIdentitySaved: (message: string) => Promise<void>;
@@ -48,11 +52,14 @@ export function CatalogueManagement({
     opener: HTMLElement;
   } | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const [editor, setEditor] = useState<{
+  type Editor = {
     row: Row | null;
     mode: "product" | "model";
     opener: HTMLElement;
-  } | null>(null);
+  };
+  const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
+  const editor = editorState?.revision === confirmationRevision ? editorState : null;
+  const setEditor = (value: Editor | null) => setEditorState(value ? { ...value, revision: confirmationRevision } : null);
   const active = (row: Row) =>
     bool(row, "is_active", bool(row, "active", true));
   const filtered = rows.filter(
@@ -253,6 +260,7 @@ export function CatalogueManagement({
                     : "Adicionar item exclusivo deste paciente"
               }
               busy={busy}
+              recovery={recovery}
               onClose={() => setEditor(null)}
               restoreFocusTo={editor.opener}
             >
@@ -271,7 +279,7 @@ export function CatalogueManagement({
                       },
                       "Modelo adicionado ao catálogo deste paciente.",
                     );
-                    if (result) setEditor(null);
+                    if (result) setEditorState(current => current === editor ? null : current);
                   }}
                 >
                   <p>A cópia será editável apenas neste paciente.</p>
@@ -312,7 +320,7 @@ export function CatalogueManagement({
                       },
                       "Item salvo e auditado.",
                     );
-                    if (result) setEditor(null);
+                    if (result) setEditorState(current => current === editor ? null : current);
                   }}
                 >
                   <Field
