@@ -1759,3 +1759,40 @@ requisitos executáveis continuam próprios. [Dossiê](ENT_TEMPORAL.md),
 [coortes/reuso](ENT_TEMPORAL_EVIDENCE.json),
 [corpus](d4-ent-clocks-proof/CORPUS.json) e
 [verificação](d4-ent-clocks-proof/VERIFICATION.json).
+
+## D4.10 — tarefa de recebimento e estado encerrado ENT
+
+Base9987804. Corrigida causa real: V7 cancelada e V8 encerrada sem aceite
+continuavam instruindo conferência pessoal. Novas intenções ENT usam V9;
+declaração, métrica e linhas leem estado/aceite/representação congelados.
+Versão derivada preservada não cria tarefa atual. Encerramento administrativo
+não inventa aceite nem resolve situação física desconhecida. Fatos V8 mantidos.
+Sem revisão estética. Bytes V5–V8 e três entrypoints anteriores preservados;
+aviso passivo no acervo ENT orienta consultar a ficha atual. Download e grants
+permanecem. C108 reusa núcleo de histórico inalterado; DocumentActions mudou
+somente nesse aviso, coberto por uma extensão Chromium aprovada.
+
+37 unitários distintos aprovados em coortes, dois Auth, nove cenários de
+produção nos três motores, três consumidores existentes e extensão do aviso.
+Produção:12 casos distintos,14 execuções,13 PASS/1 FAIL. Falha foi timeout
+de contexto antes do PDF, correlação e erro PostgreSQL preservados; repetição
+dirigida sem mudança passou. Sete PDFs reais independentes: seis V9 e um V8
+recuperado. Identidade/bytes, região semântica, limites/rodapé, idioma,
+ENTIRE_FILE e TSA interna conferidos. Tipos e lint afetados passaram.
+
+Migration157 aplicada e pós-validada no remoto autorizado:157 versões e novo
+SQL exatos, seis funções/grants iguais ao local, três entrypoints antigos
+intactos, helpers fechados, dois crons iguais, sem locks/índices inválidos.
+Sem reset/fixture/Auth remoto ou backup/restore/comparação de dados redundante.
+Advisors204 segurança/164 desempenho,0 ERROR, warnings conservados. Sem
+transporte externo, promoção ou alteração de produção.
+
+Matriz105x39:45 PASS/50 PARTIAL/10 NOT_STARTED,29 colunas canônicas intactas.
+C105 permanece parcial com o novo escopo ENT; C106 e demais combinações,
+anexos, PDF marcado, humano/AT/aparelho e D-C/D6 continuam próprios. CI9987804
+observada em andamento; o novo SHA exige CI própria. Sonar adiado pelo
+responsável; PR7 Draft, sem merge; meta ativa e prioridade diária mantida.
+[Dossiê](ENT_TERMINAL.md), [coortes](ENT_TERMINAL_EVIDENCE.json),
+[remoto](ENT_TERMINAL_REMOTE_MIGRATIONS.json),
+[corpus](d4-ent-terminal-proof/CORPUS.json) e
+[verificação](d4-ent-terminal-proof/VERIFICATION.json).

@@ -43,6 +43,7 @@ import type {
 } from "@/types/requisition";
 import { documentVariant } from "@/lib/documents/variant";
 import type { PdfFidelityFacts } from "@/lib/documents/pdf-fidelity";
+import { entReceiptState } from "@/lib/documents/ent-receipt-state";
 
 type Person = {
   id?: string;
@@ -163,7 +164,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -193,6 +194,7 @@ export async function renderDocumentPdf(
   const sourceFacts = revision >= 6 ? emission?.sourceFacts : undefined;
   const fidelity = revision >= 7 ? emission?.fidelityFacts : undefined;
   const cancelledV6 = Boolean(sourceFacts && snapshot.status === "cancelled");
+  const entState = revision >= 9 && snapshot.type === "ENT" ? entReceiptState(snapshot.status,Boolean(sourceFacts?.historical),typeof snapshot.workflow?.acceptedAt === "string" ? snapshot.workflow.acceptedAt : null,emission?.representation) : null;
   if (emission && revision >= 6 && !sourceFacts)
     throw new Error("Frozen source facts required");
   if (emission && revision >= 7 && !fidelity)
@@ -503,7 +505,10 @@ export async function renderDocumentPdf(
       snapshot.payload.origin === "donation")
       ? snapshot.payload.origin
       : undefined;
-  const statusText = snapshot.isHistorical
+  const preservedEntStatus=entState?Object.hasOwn(documentStatuses,snapshot.status)?documentStatuses[snapshot.status]:"Situação não reconhecida nesta versão":null;
+  const statusText = entState
+    ? entState.kind==="historical" ? "Registro histórico · recebimento original não apurado" : entState.kind==="derived" ? "Estado da versão preservada: "+preservedEntStatus : preservedEntStatus
+    : snapshot.isHistorical
     ? sourceFacts && snapshot.status === "cancelled"
       ? "Registro histórico cancelado · ciência original não comprovada"
       : "Registro histórico · ciência original não comprovada"
@@ -578,7 +583,7 @@ export async function renderDocumentPdf(
             [String(checked), "CONFERIDOS INTEGRALMENTE"],
             [String(issues), "DIVERGÊNCIAS"],
             [
-              sourceFacts && snapshot.status === "cancelled"
+              entState ? entState.metric : sourceFacts && snapshot.status === "cancelled"
                 ? "ENCERRADO"
                 : snapshot.workflow?.acceptedAt
                   ? "REGISTRADO"
@@ -587,7 +592,7 @@ export async function renderDocumentPdf(
                     : snapshot.status === "confirmed"
                       ? "CONCLUÍDO"
                       : "PENDENTE",
-              "RECEBIMENTO",
+              entState?.label ?? "RECEBIMENTO",
             ],
           ]
         : [
@@ -1081,11 +1086,13 @@ export async function renderDocumentPdf(
       );
     }
     section("Declaração do recebimento");
+    if(entState)factGroup="fidelity/ent/receipt-state";
     text(
-      snapshot.workflow?.acceptedAt
+      entState ? entState.declaration : snapshot.workflow?.acceptedAt
         ? `Conferência registrada em ${formatBrazilDate(String(snapshot.workflow.acceptedAt))}. Os aceites positivos são preservados independentemente das divergências.`
         : "Este comprovante foi emitido antes do aceite. A pessoa designada deve conferir os itens e informar quantidades efetivamente recebidas. Nenhum aceite é presumido.",
     );
+    if(entState)factGroup=undefined;
     y -= 8;
     table(
       ["MATERIAL", "ACEITO", "CONCILIADO", "SITUAÇÃO"],
@@ -1094,7 +1101,9 @@ export async function renderDocumentPdf(
         name(item),
         formatQuantity(String(item.accepted_quantity ?? 0)),
         formatQuantity(String(item.reconciled_quantity ?? 0)),
-        item.fully_checked
+        entState && entState.kind !== "pending"
+          ? item.fully_checked ? "Conferência integral preservada" : (item.metadata as Record<string,unknown>|undefined)?.issueOpen ? "Situação física não confirmada no registro" : quantity(String(item.reconciled_quantity??0)).gt(0) ? "Conciliação preservada" : entState.pendingLine
+          : item.fully_checked
           ? "Integralmente conferido"
           : (item.metadata as Record<string, unknown> | undefined)?.issueOpen
             ? "Divergência aberta"
@@ -1238,7 +1247,7 @@ export async function renderDocumentPdf(
       };
       text(states[item.state], 10, true);
       text("Procedimento: " + item.id, 8);
-      if (revision === 8) {
+      if (revision >= 8) {
         const key = `regularization/${item.id}`;
         fidelityFact(key + "/before", "Estado anterior da ficha", `${documentStatuses[item.before_snapshot.status] ?? item.before_snapshot.status} · v${item.before_snapshot.version}`);
         fidelityFact(key + "/after", "Resultado deste procedimento", states[item.state] + (item.decision ? ` · v${item.decision.version}` : " · sem decisão registrada"));
@@ -1259,7 +1268,7 @@ export async function renderDocumentPdf(
           : "Sem recebimento pessoal declarado no registro original.",
         9,
       );
-      if (revision === 8) {
+      if (revision >= 8) {
         fidelityFact(`regularization/${item.id}/reason`, "Motivo original", item.proposal.reason);
         fidelityFact(`regularization/${item.id}/basis`, "Evidências e limites", item.proposal.basis);
       } else {
@@ -1282,7 +1291,7 @@ export async function renderDocumentPdf(
       for (const line of lines) {
         ensure(130);
         text(line.name + " · " + line.unit, 10, true);
-        if (revision === 8) {
+        if (revision >= 8) {
           const key = `regularization/${item.id}/${line.lineId}`;
           const applied = item.state === "approved" ? quantity(line.receivedQuantity).plus(line.returnedQuantity).plus(line.missingQuantity) : quantity("0");
           fidelityFact(key + "/before", "Conciliação anterior e trânsito anterior", `${formatQuantity(line.priorReconciledQuantity, line.unit)} · ${formatQuantity(line.pendingQuantity, line.unit)}`);
@@ -1324,7 +1333,7 @@ export async function renderDocumentPdf(
           9,
           true,
         );
-        if (revision === 8) fidelityFact(`regularization/${item.id}/decisionReason`, "Justificativa da decisão", item.decision.reason);
+        if (revision >= 8) fidelityFact(`regularization/${item.id}/decisionReason`, "Justificativa da decisão", item.decision.reason);
         else text("Justificativa da decisão: " + item.decision.reason, 9);
       }
       if (quantity(item.proposal.unknownQuantity).gt(0)) {

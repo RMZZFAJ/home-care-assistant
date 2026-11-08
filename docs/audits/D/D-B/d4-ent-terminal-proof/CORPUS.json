@@ -1,0 +1,535 @@
+[
+  {
+    "label": "administrative-false-current",
+    "file": "administrative-false-current-65bceb0a-0732-48bc-ac18-462273de3c58.pdf",
+    "publicRoot": "root-5dbfb0612434136e.crt",
+    "identity": {
+      "id": "65bceb0a-0732-48bc-ac18-462273de3c58",
+      "verificationCode": "0F1C58407AEF8CE1B99EC3103EE0F6E5",
+      "requestedAt": "2026-11-08T21:30:26.000497+00:00",
+      "documentId": "d5377c2e-e198-49ca-8cbd-20ffebd39ed9",
+      "version": 3,
+      "sourceHash": "a598cede96d4524fc2114dd45b6fa6ac0d5a0423291cba5360f98d3c03ed5f51",
+      "rendererRevision": 9
+    },
+    "sha256": "600ebdbeb83f640bf6fd3853161bb46195b077b71965f3d05aa5546df8f03aa1",
+    "sourceHash": "a598cede96d4524fc2114dd45b6fa6ac0d5a0423291cba5360f98d3c03ed5f51",
+    "code": "ENT-0001",
+    "sourceStatus": "administratively_closed",
+    "sourceAcceptedAt": null,
+    "sourceAcceptedBy": null,
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T21:30:20.82619+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 802af591",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T21:30:20.82619+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 3
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T21:30:20.803514+00:00"
+    },
+    "representation": "operational",
+    "sourceLines": [
+      {
+        "id": "ae0ee918-2a12-43cd-8f44-5d49afb50196",
+        "metadata": {
+          "issueOpen": true,
+          "physicalUnknownQuantity": "5.000000",
+          "administrativeRegularizationId": "8571b488-6cdf-4f58-b76a-ca2be86e3cb9"
+        },
+        "quantity": 5,
+        "product_id": "patient-99becd2a-bd08-476d-b6e2-fd5fbb25e9b8",
+        "document_id": "d5377c2e-e198-49ca-8cbd-20ffebd39ed9",
+        "fully_checked": false,
+        "name_snapshot": "Material fictício V4 0",
+        "unit_snapshot": "unidade",
+        "waived_quantity": 0,
+        "accepted_quantity": 0,
+        "approved_quantity": 0,
+        "care_recipient_id": "3a797465-7a35-4512-ab59-6d1ae1ace2c0",
+        "category_snapshot": "higiene",
+        "purchased_quantity": 0,
+        "reconciled_quantity": 0,
+        "presentation_conversions": []
+      }
+    ],
+    "legacyIncorrectInstructionPreserved": false
+  },
+  {
+    "label": "administrative-false-prior",
+    "file": "administrative-false-prior-45f299a8-833f-46f1-a800-aab1005cb0c5.pdf",
+    "publicRoot": "root-5dbfb0612434136e.crt",
+    "identity": {
+      "id": "45f299a8-833f-46f1-a800-aab1005cb0c5",
+      "verificationCode": "42D46AC6BCD26275A42863BC0A5524AB",
+      "requestedAt": "2026-11-08T21:30:27.499482+00:00",
+      "documentId": "d5377c2e-e198-49ca-8cbd-20ffebd39ed9",
+      "version": 1,
+      "sourceHash": "fc3b09d3d230f6012c3fd5b64d07350e0b12596d74f1d07b022f139a05835bb1",
+      "rendererRevision": 9
+    },
+    "sha256": "46c2db319182d6d21c0bb1f9190905950224e95b8cd6ad0acc50c5b847356a7b",
+    "sourceHash": "fc3b09d3d230f6012c3fd5b64d07350e0b12596d74f1d07b022f139a05835bb1",
+    "code": "ENT-0001",
+    "sourceStatus": "pending_receipt",
+    "sourceAcceptedAt": null,
+    "sourceAcceptedBy": null,
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T21:30:20.82619+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 802af591",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T21:30:20.82619+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T21:30:20.803514+00:00"
+    },
+    "representation": "derived",
+    "sourceLines": [
+      {
+        "id": "ae0ee918-2a12-43cd-8f44-5d49afb50196",
+        "metadata": {},
+        "quantity": 5,
+        "product_id": "patient-99becd2a-bd08-476d-b6e2-fd5fbb25e9b8",
+        "document_id": "d5377c2e-e198-49ca-8cbd-20ffebd39ed9",
+        "fully_checked": false,
+        "name_snapshot": "Material fictício V4 0",
+        "unit_snapshot": "unidade",
+        "waived_quantity": 0,
+        "accepted_quantity": 0,
+        "approved_quantity": 0,
+        "care_recipient_id": "3a797465-7a35-4512-ab59-6d1ae1ace2c0",
+        "category_snapshot": "higiene",
+        "purchased_quantity": 0,
+        "reconciled_quantity": 0,
+        "presentation_conversions": []
+      }
+    ],
+    "legacyIncorrectInstructionPreserved": false
+  },
+  {
+    "label": "legacy-v8-recovered",
+    "file": "legacy-v8-recovered-47239487-e68b-4aca-b8da-e2eef0eda5b8.pdf",
+    "publicRoot": "root-5dbfb0612434136e.crt",
+    "identity": {
+      "id": "47239487-e68b-4aca-b8da-e2eef0eda5b8",
+      "verificationCode": "0B69FB2344513D36F39E006B2CB9CFF5",
+      "requestedAt": "2026-11-08T21:30:21.919902+00:00",
+      "documentId": "d5377c2e-e198-49ca-8cbd-20ffebd39ed9",
+      "version": 3,
+      "sourceHash": "a598cede96d4524fc2114dd45b6fa6ac0d5a0423291cba5360f98d3c03ed5f51",
+      "rendererRevision": 8
+    },
+    "sha256": "8ef999da4091c00e3b7692e29ada2c17acd5f9b59d66d9873536c583b9ea4040",
+    "sourceHash": "a598cede96d4524fc2114dd45b6fa6ac0d5a0423291cba5360f98d3c03ed5f51",
+    "code": "ENT-0001",
+    "sourceStatus": "administratively_closed",
+    "sourceAcceptedAt": null,
+    "sourceAcceptedBy": null,
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T21:30:20.82619+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 802af591",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T21:30:20.82619+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 3
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T21:30:20.803514+00:00"
+    },
+    "representation": "operational",
+    "sourceLines": [
+      {
+        "id": "ae0ee918-2a12-43cd-8f44-5d49afb50196",
+        "metadata": {
+          "issueOpen": true,
+          "physicalUnknownQuantity": "5.000000",
+          "administrativeRegularizationId": "8571b488-6cdf-4f58-b76a-ca2be86e3cb9"
+        },
+        "quantity": 5,
+        "product_id": "patient-99becd2a-bd08-476d-b6e2-fd5fbb25e9b8",
+        "document_id": "d5377c2e-e198-49ca-8cbd-20ffebd39ed9",
+        "fully_checked": false,
+        "name_snapshot": "Material fictício V4 0",
+        "unit_snapshot": "unidade",
+        "waived_quantity": 0,
+        "accepted_quantity": 0,
+        "approved_quantity": 0,
+        "care_recipient_id": "3a797465-7a35-4512-ab59-6d1ae1ace2c0",
+        "category_snapshot": "higiene",
+        "purchased_quantity": 0,
+        "reconciled_quantity": 0,
+        "presentation_conversions": []
+      }
+    ],
+    "legacyIncorrectInstructionPreserved": true
+  },
+  {
+    "label": "cancelled-false-current",
+    "file": "cancelled-false-current-cc66dae6-478a-4d4e-b290-df4bfa845406.pdf",
+    "publicRoot": "root-5dbfb0612434136e.crt",
+    "identity": {
+      "id": "cc66dae6-478a-4d4e-b290-df4bfa845406",
+      "verificationCode": "6076E2F786C507DBECF41A5595BA0396",
+      "requestedAt": "2026-11-08T21:30:14.786513+00:00",
+      "documentId": "02175005-1623-4abb-8861-13d4da950b3e",
+      "version": 2,
+      "sourceHash": "771fb766422dfa05d63ee373cd9e0f94911714c9faa25f5e34d6a06a712553de",
+      "rendererRevision": 9
+    },
+    "sha256": "86ff037af7ebbb740eead1b63c3e48bb3c17cc78d0025c4d1369db682ede5de0",
+    "sourceHash": "771fb766422dfa05d63ee373cd9e0f94911714c9faa25f5e34d6a06a712553de",
+    "code": "ENT-0001",
+    "sourceStatus": "cancelled",
+    "sourceAcceptedAt": null,
+    "sourceAcceptedBy": null,
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T21:30:08.696695+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 ac52730e",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T21:30:08.696695+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 2
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T21:30:08.669764+00:00"
+    },
+    "representation": "operational",
+    "sourceLines": [
+      {
+        "id": "dfbc2430-2842-4496-9fad-e6cb7455ed2d",
+        "metadata": {},
+        "quantity": 5,
+        "product_id": "patient-d484ba8d-9adc-460e-9cb3-237f6169a682",
+        "document_id": "02175005-1623-4abb-8861-13d4da950b3e",
+        "fully_checked": false,
+        "name_snapshot": "Material fictício V4 0",
+        "unit_snapshot": "unidade",
+        "waived_quantity": 0,
+        "accepted_quantity": 0,
+        "approved_quantity": 0,
+        "care_recipient_id": "7ff9b351-3e85-4973-8857-20ed7d4282f6",
+        "category_snapshot": "higiene",
+        "purchased_quantity": 0,
+        "reconciled_quantity": 0,
+        "presentation_conversions": []
+      }
+    ],
+    "legacyIncorrectInstructionPreserved": false
+  },
+  {
+    "label": "cancelled-false-prior",
+    "file": "cancelled-false-prior-6892a099-0d7b-4159-9835-a236ddd5f13f.pdf",
+    "publicRoot": "root-5dbfb0612434136e.crt",
+    "identity": {
+      "id": "6892a099-0d7b-4159-9835-a236ddd5f13f",
+      "verificationCode": "CD890C451C0B600A6284ED17B6B1FB29",
+      "requestedAt": "2026-11-08T21:30:17.333587+00:00",
+      "documentId": "02175005-1623-4abb-8861-13d4da950b3e",
+      "version": 1,
+      "sourceHash": "b27100fcdc8545e7c5abbe9f8b72c8f876b9df9c8a9950976c7c3a4e35280dda",
+      "rendererRevision": 9
+    },
+    "sha256": "005fcddff5058c3339b6dee2248b7bd4cd80e2b5460c172eca21e98c7edfdec0",
+    "sourceHash": "b27100fcdc8545e7c5abbe9f8b72c8f876b9df9c8a9950976c7c3a4e35280dda",
+    "code": "ENT-0001",
+    "sourceStatus": "pending_receipt",
+    "sourceAcceptedAt": null,
+    "sourceAcceptedBy": null,
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T21:30:08.696695+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 ac52730e",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T21:30:08.696695+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T21:30:08.669764+00:00"
+    },
+    "representation": "derived",
+    "sourceLines": [
+      {
+        "id": "dfbc2430-2842-4496-9fad-e6cb7455ed2d",
+        "metadata": {},
+        "quantity": 5,
+        "product_id": "patient-d484ba8d-9adc-460e-9cb3-237f6169a682",
+        "document_id": "02175005-1623-4abb-8861-13d4da950b3e",
+        "fully_checked": false,
+        "name_snapshot": "Material fictício V4 0",
+        "unit_snapshot": "unidade",
+        "waived_quantity": 0,
+        "accepted_quantity": 0,
+        "approved_quantity": 0,
+        "care_recipient_id": "7ff9b351-3e85-4973-8857-20ed7d4282f6",
+        "category_snapshot": "higiene",
+        "purchased_quantity": 0,
+        "reconciled_quantity": 0,
+        "presentation_conversions": []
+      }
+    ],
+    "legacyIncorrectInstructionPreserved": false
+  },
+  {
+    "label": "administrative-true-current",
+    "file": "administrative-true-current-f465e272-6925-4106-a58e-e75e71acb2c5.pdf",
+    "publicRoot": "root-5dbfb0612434136e.crt",
+    "identity": {
+      "id": "f465e272-6925-4106-a58e-e75e71acb2c5",
+      "verificationCode": "E93A4F4112E208542603BC155D24402A",
+      "requestedAt": "2026-11-08T21:30:36.994666+00:00",
+      "documentId": "5f4add11-f0b6-47c5-ada4-e8ef69a8ec18",
+      "version": 4,
+      "sourceHash": "df59ca70cdbbb466267f97a0a6345819ee9b3d807d4b5c39f4ded48dc5ceca0b",
+      "rendererRevision": 9
+    },
+    "sha256": "66187a53defa55c12cdef36099dba64d8e2e1f6dfe24451f6f2695ca2685cb58",
+    "sourceHash": "df59ca70cdbbb466267f97a0a6345819ee9b3d807d4b5c39f4ded48dc5ceca0b",
+    "code": "ENT-0001",
+    "sourceStatus": "administratively_closed",
+    "sourceAcceptedAt": "2026-11-08T21:30:32.338781+00:00",
+    "sourceAcceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T21:30:32.29875+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 3c0aa198",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T21:30:32.29875+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 4
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T21:30:32.27327+00:00"
+    },
+    "representation": "operational",
+    "sourceLines": [
+      {
+        "id": "98d10b17-6740-4644-bd2a-edcc0bed21e8",
+        "metadata": {
+          "receipt": {
+            "notes": "Duas unidades aceitas pessoalmente; demais ainda não confirmadas",
+            "lineId": "98d10b17-6740-4644-bd2a-edcc0bed21e8",
+            "acceptedQuantity": "2"
+          },
+          "issueOpen": true,
+          "physicalUnknownQuantity": "3.000000",
+          "administrativeRegularizationId": "fd9f0a30-77d3-4ed3-a372-8518691b9f07"
+        },
+        "quantity": 5,
+        "product_id": "patient-9b096b9d-8018-4ea0-a0cf-dcedf474b896",
+        "document_id": "5f4add11-f0b6-47c5-ada4-e8ef69a8ec18",
+        "fully_checked": false,
+        "name_snapshot": "Material fictício V4 0",
+        "unit_snapshot": "unidade",
+        "waived_quantity": 0,
+        "accepted_quantity": 2,
+        "approved_quantity": 0,
+        "care_recipient_id": "53962b29-e9c0-4ac6-aa4a-c70a26a55072",
+        "category_snapshot": "higiene",
+        "purchased_quantity": 0,
+        "reconciled_quantity": 0,
+        "presentation_conversions": []
+      }
+    ],
+    "legacyIncorrectInstructionPreserved": false
+  },
+  {
+    "label": "administrative-true-prior",
+    "file": "administrative-true-prior-35eef7e4-6ef6-4105-9db5-269a8edf44f2.pdf",
+    "publicRoot": "root-5dbfb0612434136e.crt",
+    "identity": {
+      "id": "35eef7e4-6ef6-4105-9db5-269a8edf44f2",
+      "verificationCode": "84EFA4174CE2D121F42C514CA679BD63",
+      "requestedAt": "2026-11-08T21:30:38.481189+00:00",
+      "documentId": "5f4add11-f0b6-47c5-ada4-e8ef69a8ec18",
+      "version": 2,
+      "sourceHash": "1eb3bc1461be2923bbc53996e54d29b7b1742b8af95d1f25c21cf32b45a2d7dc",
+      "rendererRevision": 9
+    },
+    "sha256": "1c340c87b557509a6c5ea7f52a62abdb2a8d7be4ff87cd224698bb6441f17ca5",
+    "sourceHash": "1eb3bc1461be2923bbc53996e54d29b7b1742b8af95d1f25c21cf32b45a2d7dc",
+    "code": "ENT-0001",
+    "sourceStatus": "disputed",
+    "sourceAcceptedAt": "2026-11-08T21:30:32.338781+00:00",
+    "sourceAcceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T21:30:32.29875+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 3c0aa198",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T21:30:32.29875+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T21:30:32.27327+00:00"
+    },
+    "representation": "derived",
+    "sourceLines": [
+      {
+        "id": "98d10b17-6740-4644-bd2a-edcc0bed21e8",
+        "metadata": {
+          "receipt": {
+            "notes": "Duas unidades aceitas pessoalmente; demais ainda não confirmadas",
+            "lineId": "98d10b17-6740-4644-bd2a-edcc0bed21e8",
+            "acceptedQuantity": "2"
+          },
+          "issueOpen": true
+        },
+        "quantity": 5,
+        "product_id": "patient-9b096b9d-8018-4ea0-a0cf-dcedf474b896",
+        "document_id": "5f4add11-f0b6-47c5-ada4-e8ef69a8ec18",
+        "fully_checked": false,
+        "name_snapshot": "Material fictício V4 0",
+        "unit_snapshot": "unidade",
+        "waived_quantity": 0,
+        "accepted_quantity": 2,
+        "approved_quantity": 0,
+        "care_recipient_id": "53962b29-e9c0-4ac6-aa4a-c70a26a55072",
+        "category_snapshot": "higiene",
+        "purchased_quantity": 0,
+        "reconciled_quantity": 0,
+        "presentation_conversions": []
+      }
+    ],
+    "legacyIncorrectInstructionPreserved": false
+  }
+]

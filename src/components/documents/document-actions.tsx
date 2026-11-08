@@ -39,6 +39,7 @@ export function DocumentActions(props: Props) {
       key={`${data.userId}:${props.id}`}
       {...props}
       userId={data.userId}
+      entDocument={data.documentContext?.id===props.id&&data.documentContext.type==="ENT"}
     />
   ) : (
     <p role="status">Validando acesso aos arquivos…</p>
@@ -60,7 +61,8 @@ function GeneratedFiles({
   userId,
   archiveVersion,
   trackNotices = true,
-}: Props & { userId: string }) {
+  entDocument,
+}: Props & { userId: string;entDocument:boolean }) {
   const headingId = useId(),
     scope = `hca:pdf-intention:${userId}:${id}`,
     endpoint = `/api/documents/${id}/issuances`;
@@ -326,6 +328,7 @@ function GeneratedFiles({
                   Assinatura técnica e carimbo internos
                 </p>
               ) : null}
+              {entDocument&&row.rendererRevision<9?<p className="ui-notice text-sm" role="note">Este arquivo preserva orientações de uma emissão anterior. Consulte a ficha no aplicativo para saber se há tarefa atual. Você pode gerar um novo PDF para obter a representação atualizada; o arquivo original permanece preservado.</p>:null}
               {row.representation === "derived" ? (
                 <p className="text-sm">
                   Nova representação de uma versão histórica, gerada no momento

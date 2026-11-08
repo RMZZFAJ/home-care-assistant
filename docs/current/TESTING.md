@@ -438,7 +438,7 @@ npm run e2e -- tests/e2e/pdf-regularization.spec.ts
 ```
 
 Preparar a stack local com test:db:prepare, sem reset; não executar Auth mutável
-em paralelo ao E2E. O caso da interface gera V8, recupera V7, compara bytes,
+em paralelo ao E2E. O caso gera V9 com fatos V8, recupera V7 e compara bytes,
 confere aceite/ledger por leitura independente e verifica código/upload sem
 sessão de aplicativo. Outros casos preservam desconhecido e rejeição.
 O corpus só contém dados fictícios e certificados públicos de teste.
@@ -461,3 +461,21 @@ triggers nem usam o remoto. Não executar a suíte Auth mutável junto ao E2E.
 O teste separa datas por rótulo, mantém duas emissões distintas e os bytes de
 cada download; não é ensaio físico ou espera real de24 horas.
 [Coortes e reuso de C108](../audits/D/D-B/ENT_TEMPORAL.md).
+
+## Estado terminal e versão preservada no PDF ENT
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/pdf-ent-terminal.test.ts
+node --test --test-concurrency=1 tests/integration/ent-terminal.test.mjs
+npm run e2e -- tests/e2e/ent-terminal.spec.ts
+.venv/Scripts/python.exe docs/audits/D/D-B/d4-ent-terminal-proof/verify.py \
+  docs/audits/D/D-B/d4-ent-terminal-proof/CORPUS.json \
+  --output output/ent-terminal-independent.json
+```
+
+Usar a stack local existente, test:db:prepare incremental e Auth fictício;
+não executar a suíte Auth mutável junto ao E2E. Preservar os testes temporais
+e de regularização existentes: novas intenções ENT usam V9, replay conserva
+a revisão original. Dois hashes legados e o V8 real preservam inclusive a
+orientação antiga, enquanto V9 e o aviso no acervo têm critérios próprios.
+[Coortes, falha preservada e limites](../audits/D/D-B/ENT_TERMINAL.md).

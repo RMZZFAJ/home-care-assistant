@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "artifacts": [
+    {
+      "file": "administrative-false-current-65bceb0a-0732-48bc-ac18-462273de3c58.pdf",
+      "revision": 9,
+      "sha256": "600ebdbeb83f640bf6fd3853161bb46195b077b71965f3d05aa5546df8f03aa1",
+      "pages": 4,
+      "stateAndTask": "PASS",
+      "signature": "ENTIRE_FILE",
+      "internalTimestamp": true
+    },
+    {
+      "file": "administrative-false-prior-45f299a8-833f-46f1-a800-aab1005cb0c5.pdf",
+      "revision": 9,
+      "sha256": "46c2db319182d6d21c0bb1f9190905950224e95b8cd6ad0acc50c5b847356a7b",
+      "pages": 3,
+      "stateAndTask": "PASS",
+      "signature": "ENTIRE_FILE",
+      "internalTimestamp": true
+    },
+    {
+      "file": "legacy-v8-recovered-47239487-e68b-4aca-b8da-e2eef0eda5b8.pdf",
+      "revision": 8,
+      "sha256": "8ef999da4091c00e3b7692e29ada2c17acd5f9b59d66d9873536c583b9ea4040",
+      "pages": 4,
+      "stateAndTask": "PASS",
+      "signature": "ENTIRE_FILE",
+      "internalTimestamp": true
+    },
+    {
+      "file": "cancelled-false-current-cc66dae6-478a-4d4e-b290-df4bfa845406.pdf",
+      "revision": 9,
+      "sha256": "86ff037af7ebbb740eead1b63c3e48bb3c17cc78d0025c4d1369db682ede5de0",
+      "pages": 3,
+      "stateAndTask": "PASS",
+      "signature": "ENTIRE_FILE",
+      "internalTimestamp": true
+    },
+    {
+      "file": "cancelled-false-prior-6892a099-0d7b-4159-9835-a236ddd5f13f.pdf",
+      "revision": 9,
+      "sha256": "005fcddff5058c3339b6dee2248b7bd4cd80e2b5460c172eca21e98c7edfdec0",
+      "pages": 3,
+      "stateAndTask": "PASS",
+      "signature": "ENTIRE_FILE",
+      "internalTimestamp": true
+    },
+    {
+      "file": "administrative-true-current-f465e272-6925-4106-a58e-e75e71acb2c5.pdf",
+      "revision": 9,
+      "sha256": "66187a53defa55c12cdef36099dba64d8e2e1f6dfe24451f6f2695ca2685cb58",
+      "pages": 4,
+      "stateAndTask": "PASS",
+      "signature": "ENTIRE_FILE",
+      "internalTimestamp": true
+    },
+    {
+      "file": "administrative-true-prior-35eef7e4-6ef6-4105-9db5-269a8edf44f2.pdf",
+      "revision": 9,
+      "sha256": "1c340c87b557509a6c5ea7f52a62abdb2a8d7be4ff87cd224698bb6441f17ca5",
+      "pages": 3,
+      "stateAndTask": "PASS",
+      "signature": "ENTIRE_FILE",
+      "internalTimestamp": true
+    }
+  ],
+  "externalTrustOrTime": false,
+  "externalRevocation": false,
+  "styleOrHumanApproval": false
+}

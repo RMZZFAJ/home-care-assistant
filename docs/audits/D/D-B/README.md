@@ -18,6 +18,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Dados técnicos, variantes e conferências V7](PDF_FIDELITY.md).
 - [Fatos, execução e totais da regularização ENT V8](REGULARIZATION_PDF.md).
 - [Marcos temporais ENT e evento/arquivo exato](ENT_TEMPORAL.md).
+- [Estado terminal, versão preservada e tarefa no PDF ENT](ENT_TERMINAL.md).
 - [Comparação das versões e autoria histórica](DOCUMENT_VERSION_HISTORY.md).
 - [Instalação, atualização e privacidade PWA](PWA_RUNTIME.md).
 - [PWA no Preview protegido: causa, recuperação e endereço estável](PWA_PREVIEW_ACCESS.md).

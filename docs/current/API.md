@@ -986,16 +986,17 @@ o stream começa somente depois da verificação integral. Uma nova emissão
 histórica usa POST e não recebe o instante do ato antigo como data de emissão.
 [Contrato do acervo](../audits/D/D-B/DOCUMENT_ARCHIVE.md).
 
-## Proveniência de novas emissões V6–V8
+## Proveniência de novas emissões V6–V9
 
 POST de emissões recebe somente chave idempotente e versão opcional. O servidor
-usa o entrypoint versionado e o banco escolhe V7, ou V8 para evento ENT com
-regularizações, e congela fatos documentais suplementares; o navegador
+usa reserve_pdf_issuance_v9: o banco escolhe V9 para ENT e V7 para os demais
+tipos, congelando fatos documentais suplementares. Antes, V8 era escolhida
+para evento ENT com regularizações. O navegador
 não define autoria, datas, revisão ou snapshot. Contexto suplementar não altera
 o hash do evento canônico. Histórico físico separa data de origem/importação;
 rascunho, ficha, emissão operacional e solicitação do exemplar são distintos.
 Nomes/IDs históricos são preservados e nome atual recebe rótulo específico.
-Intenções V5/V6/V7 existentes continuam recuperáveis pela revisão original.
+Intenções V5/V6/V7/V8 existentes continuam recuperáveis pela revisão original.
 CONTENT_INVALID pode informar caracteres não suportados, sem assinatura ou
 arquivo persistido. [Contrato e provas](../audits/D/D-B/PDF_SOURCE_FACTS.md).
 
@@ -1005,6 +1006,11 @@ execução e conciliação/trânsito antes/depois. Proposta sem aprovação não
 estoque; desconhecido permanece em trânsito e o aceite original é preservado.
 Os entrypoints antigos permanecem; a mesma chave recupera o exemplar anterior.
 [Contrato V8](../audits/D/D-B/REGULARIZATION_PDF.md).
+
+V9 conserva esses fatos e distingue estado encerrado, aceite pessoal e versão
+preservada. Só a representação operacional pendente sem aceite solicita nova
+conferência. Acervo ENT mostra aviso para revisões anteriores, sem alterar
+o download original. [Contrato V9](../audits/D/D-B/ENT_TERMINAL.md).
 
 ## Web Push por aparelho
 

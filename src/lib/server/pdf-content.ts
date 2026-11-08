@@ -9,6 +9,7 @@ import {
 } from "./operational-pdf";
 import { formatQuantity, quantity } from "../quantity";
 import { documentStatuses } from "@/types/documents";
+import { entReceiptState } from "@/lib/documents/ent-receipt-state";
 import { formatBrazilDate } from "../receipt";
 import {
   pdfSourceFactsSchema,
@@ -179,7 +180,8 @@ export async function composeIssuance(
     for (const review of snapshot.balanceReviews?.legacyApprovals ?? [])
       semanticFacts[`fidelity/legacy-review/${review.actor_id}/${review.count_version}`] = `${review.actor_id} · ${review.actorName ?? "Nome não preservado"}`;
   }
-  if (revision === 8 && snapshot.type === "ENT") for (const item of snapshot.deliveryRegularization?.cases ?? []) {
+  if (revision >= 9 && snapshot.type === "ENT") semanticFacts["fidelity/ent/receipt-state"] = entReceiptState(snapshot.status,Boolean(sourceFacts?.historical),typeof snapshot.workflow?.acceptedAt === "string" ? snapshot.workflow.acceptedAt : null,emission.representation).declaration;
+  if (revision >= 8 && snapshot.type === "ENT") for (const item of snapshot.deliveryRegularization?.cases ?? []) {
     // Derived from the frozen business facts, independently of painter runs.
     const prefix = `fidelity/regularization/${item.id}`;
     const outcomes = { pending: "Proposta aguardando conferência independente", approved: "Encerramento administrativo aprovado", rejected: "Proposta rejeitada, sem movimentação", withdrawn: "Proposta retirada, sem movimentação", obsolete: "Proposta obsoleta encerrada, sem movimentação" };

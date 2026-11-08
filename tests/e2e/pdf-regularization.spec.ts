@@ -33,8 +33,7 @@ async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,rev
   expect(frozen).toMatchObject({state:"ready",sha256:digest(bytes),validation:{accepted:true,profile:"PAdES-B-T",wholeFile:true,signerTrust:"internal",timestampTrust:"internal"}});
   const text=compact((await PDF.load(bytes)).extractText().flatMap(p=>p.lines.map(l=>l.spans.flatMap(s=>s.chars.map(c=>c.char)).join(""))).join(" "));
   const item=frozen.snapshot.deliveryRegularization?.cases?.[0];
-  if(revision===8){
-    expect(item).toBeTruthy();
+  if(revision>=8&&item){
     for(const fact of [item.id,item.proposed_by,item.reviewer_id,item.before_snapshot.acceptedBy,item.proposal.reason,item.proposal.basis,"Estado anterior da ficha","Conciliação após este procedimento e trânsito restante"].filter(Boolean))expect(text,label+": "+fact).toContain(compact(fact));
     if(item.decision)for(const fact of [item.decision.actorId,item.decision.reason,...item.decision.lines.flatMap((l:{movementIds:string[]})=>l.movementIds)])expect(text,label+": "+fact).toContain(compact(fact));
   }
@@ -61,13 +60,13 @@ test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva 
   await files.getByRole("button",{name:"Gerar PDF",exact:true}).click();
   await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
   const link=await files.getByRole("link",{name:"Baixar PDF",exact:true}).getAttribute("href");expect(link).toBeTruthy();
-  const current=await inspect(page,f,"approved-current",await page.request.get(link!),8);
+  const current=await inspect(page,f,"approved-current",await page.request.get(link!),9);
   expect(current.identity.id).not.toBe(old.id);
   const recovery=await page.request.post(`/api/documents/${f.doc.id}/issuances`,{data:{version:f.doc.version,idempotencyKey:key}});
   expect(recovery.status()).toBe(200);expect((await recovery.json()).id).toBe(old.id);
   await inspect(page,f,"old-v7-recovered",await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${old.id}`),7);
-  await inspect(page,f,"original-before-proposal",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.original.version}`),7);
-  await inspect(page,f,"proposal-before-decision",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.proposed.version}`),8);
+  await inspect(page,f,"original-before-proposal",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.original.version}`),9);
+  await inspect(page,f,"proposal-before-decision",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.proposed.version}`),9);
   expect(regularizationLedger(f.patient)).toBe(before);
   expect(sql(`select accepted_quantity::text from public.document_lines where id=${sqlLiteral(f.doc.lines[0].id)};`)).toMatch(/^2(?:\.0+)?$/);
   expect(sql(`select workflow_data->>'acceptedBy' from public.operational_documents where id=${sqlLiteral(f.doc.id)};`)).toBe(fixtures.professional.id);
@@ -79,7 +78,7 @@ test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva 
     const reference=await guest.request.get(endpoint);expect(reference.status()).toBe(200);
     expect((await reference.json()).reference).toMatchObject({found:true,issuanceId:current.identity.id,bytesMatch:null});
     const upload=await guest.request.post(endpoint,{headers:{origin:new URL(page.url()).origin,"content-type":"application/pdf"},data:current.bytes});
-    expect(upload.status(),upload.status()===200?"V8 public upload":await upload.text()).toBe(200);
+    expect(upload.status(),upload.status()===200?"Current ENT public upload":await upload.text()).toBe(200);
     const result=await upload.json();
     expect(result.reference).toMatchObject({found:true,issuanceId:current.identity.id,bytesMatch:true});
     expect(result.analysis).toMatchObject({status:"verified",verification:{accepted:true,wholeFile:true,signerTrust:"internal",timestampTrust:"internal"}});
@@ -90,7 +89,7 @@ test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva 
 for(const mode of ["unknown","rejected"] as const)test(`ENT ${mode} gera exemplar assinado sem atribuir execução ou aceite alheio`,async({page})=>{
   const f=await regularizationPdfFixture(mode==="unknown"?{unknownOnly:true}:{state:"rejected"}),before=regularizationLedger(f.patient);
   await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
-  await inspect(page,f,mode,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.doc.version}`),8);
+  await inspect(page,f,mode,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.doc.version}`),9);
   expect(regularizationLedger(f.patient)).toBe(before);
   expect(sql(`select count(*) from public.stock_movements where reference_type='delivery_regularization' and reference_id=${sqlLiteral(f.item.id)};`)).toBe("0");
 });

@@ -4,13 +4,26 @@ Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Estado atual:local156/remoto156, zero migrations pendentes. Prioridade vigente:
+Estado atual:local157/remoto157, zero migrations pendentes. Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
 
-D4.9 comprovou os marcos ENT sem mudança de runtime: preparação/rascunho,
+D4.10 corrigiu orientação de recebimento em ENT encerrada e versão preservada.
+Novas intenções ENT usam V9; bytes antigos permanecem, com aviso no acervo.
+37 unitários distintos em coortes, dois Auth e12 casos distintos de produção
+aprovados;14 execuções de produção incluem13 PASS e um timeout preservado,
+seguido de repetição dirigida aprovada. Sete PDFs reais têm verificação
+independente. Migration157 aplicada e pós-validada no remoto; sem reset,
+backup/restore redundante ou fixture remoto. C105/C106 continuam parciais,
+matriz45 PASS/50 PARTIAL/10 NOT_STARTED. Sem revisão estética.
+[Provas e limites](../audits/D/D-B/ENT_TERMINAL.md).
+
+CI9987804 observada em andamento; não valida D4.10. O próximo SHA exige CI
+própria. [Recibo](../audits/D/D-B/CI_9987804_OBSERVATION.json).
+
+Estado anterior D4.9 comprovou os marcos ENT: preparação/rascunho,
 expedição e geração do exemplar, com bytes estáveis no download. Um unitário,
 dois Auth e seis casos de produção passaram; quatro PDFs reais têm fatos,
 assinatura e TSA interna conferidos por oráculo independente. Relógios antigos
