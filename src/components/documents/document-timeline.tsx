@@ -1,5 +1,5 @@
 "use client";
-import { Suspense } from "react";
+import { Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
@@ -9,6 +9,7 @@ import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { Notice } from "@/components/workspace";
 import { compareVersionFacts, versionEventLabel, type DocumentVersion, type VersionComparison } from "@/lib/documents/version-history";
+import { parseDocumentHistoryRead } from "@/lib/validation/document-history";
 
 export type TimelineEvent = {
   id: string;
@@ -41,7 +42,8 @@ function TimelineContent({ id, version, events, title = "Linha do tempo" }: Time
   const selected = positive("historyVersion"), before = positive("historyBefore");
   const revision = useLiveRevision();
   const query = selected === null ? null : `/api/documents/${id}/history?version=${selected}${before === null ? "" : "&before=" + before}`;
-  const read = useScopedRead<{ data: VersionComparison }>(query, String(revision));
+  const decode = useCallback((value: unknown) => parseDocumentHistoryRead(value, id, selected ?? 0, before), [id, selected, before]);
+  const read = useScopedRead<{ data: VersionComparison }>(query, String(revision), decode);
   const comparison = read.data?.data;
   const changes = comparison ? compareVersionFacts(comparison.before?.facts ?? [], comparison.selected.facts) : [];
   const versions = comparison?.versions ?? events.filter((event): event is TimelineEvent & { version: number } => typeof event.version === "number");

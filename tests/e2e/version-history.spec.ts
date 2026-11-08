@@ -22,6 +22,50 @@ const comparison = (page: Page) => page.getByRole("region", { name: "Comparaçã
 const frozen = (page: Page, version: number) => page.getByRole("article", { name: `Conteúdo preservado da versão ${version}`, exact: true });
 test.afterEach(async ({ page }) => { await page.unrouteAll({ behavior: "wait" }); });
 
+test("Histórico rejeita resposta200 inválida ou de outra versão como falha de leitura recuperável", async ({ page }, info) => {
+  const f = await versionHistoryFixture();
+  await login(page, f.patient);
+  const url = `/api/documents/${f.doc.id}/history?version=${f.approved.version}`;
+  const response = await page.request.get(url);
+  expect(response.status()).toBe(200);
+  const valid = await response.json();
+  const hashes = historyHashes(f.doc.id), ledger = fidelityLedger(f.patient);
+  const issuanceCount = sql(`select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)};`);
+  let commands = 0;
+  const pageErrors: string[] = [];
+  page.on("pageerror", error => pageErrors.push(error.message));
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") commands++; });
+  await page.goto(`/fichas/${f.doc.id}?historyVersion=${f.approved.version}`);
+  await expect(frozen(page, f.approved.version)).toBeVisible();
+  const malformed: [string, (body: typeof valid) => void][] = [
+    ["missing selected", body => { body.data.selected = null; }],
+    ["other document", body => { body.data.documentId = randomUUID(); }],
+    ["other selected version", body => { body.data.selected.version = f.doc.version; }],
+    ["missing previous version", body => { body.data.before = null; }],
+    ["inconsistent hash", body => { body.data.selected.hash = "0".repeat(64); }],
+    ["invalid facts", body => { body.data.selected.facts = [{ key: "x", label: "x", value: { private: "must not render" } }]; }],
+    ["invalid attribution", body => { body.data.selected.actorSource = "self_verified"; }],
+  ];
+  const section = comparison(page), retry = section.getByRole("button", { name: "Atualizar histórico desta seção", exact: true });
+  for (const [name, mutate] of malformed) {
+    const body = structuredClone(valid); mutate(body);
+    await page.route("**" + url, route => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) }), { times: 1 });
+    await retry.focus(); await retry.press("Enter");
+    await expect(section.getByRole("alert"), name).toContainText("A resposta do histórico não pôde ser conferida");
+    await expect(section.locator("[aria-invalid],input,textarea")).toHaveCount(0);
+    await expect(section.getByRole("article")).toHaveCount(0);
+    await expect(retry).toBeFocused();
+    await retry.press("Enter");
+    await expect(frozen(page, f.approved.version)).toContainText(f.oldName);
+    await expect(retry).toBeFocused();
+  }
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "history read recovery " + width); }
+  expect(pageErrors).toEqual([]); expect(commands).toBe(0);
+  expect(historyHashes(f.doc.id)).toBe(hashes); expect(fidelityLedger(f.patient)).toBe(ledger);
+  expect(sql(`select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)};`)).toBe(issuanceCount);
+  await info.attach("history-read-recovery", { body: JSON.stringify({ rejected: malformed.map(([name]) => name), selected: f.approved.version, commands, unchangedHistoryLedgerIssuances: true }), contentType: "application/json" });
+});
+
 test("Histórico COM compara snapshots, não usa nome/catálogo posterior e conserva o arquivo e a seleção ao voltar", async ({ page, browser }, info) => {
   const f = await versionHistoryFixture(); await login(page, f.patient); await page.goto(`/fichas/${f.doc.id}`);
   const oldFile = await generatedPdf(page, `/api/documents/${f.doc.id}/pdf?version=${f.approved.version}`);

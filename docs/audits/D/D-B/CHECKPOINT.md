@@ -1906,3 +1906,33 @@ seus limites. [Dossiê](PROFESSIONAL_CREDENTIALS.md),
 [provas](PROFESSIONAL_CREDENTIALS_EVIDENCE.json),
 [remoto](CREDENTIAL_REMOTE_MIGRATIONS.json), [advisors](CREDENTIAL_ADVISORS.json)
 e [CI base](CI_C8C34F4_OBSERVATION.json).
+
+## D3.18 — falha de leitura tipada no histórico
+
+Baseccebfcb. Resposta200 com selected:null derrubou a página inteira no
+baseline Chromium. Decoder agora confere estrutura, documento, versão exata,
+predecessor, índice/hash/ação e proveniência antes de renderizar. Erro fica na
+seção com Atualizar; fatos não viram input inválido. Decimal/código/nome antigo,
+protocolo ausente e aviso de fatos adicionais são preservados. O decoder do
+useScopedRead é opcional, com consumidor real no histórico; demais caminhos
+continuam como antes. Não se confunde conferir projeção com verificar assinatura.
+
+Dez unitários anteriores/sete novos passaram; os sete foram repetidos após
+redução sem spread na busca do predecessor. Produção15 PASS nos três motores:
+três novos e12 consumidores anteriores. Sete respostas defeituosas por motor,
+retry por Enter com foco preservado, zero pageerror/comando, história/ledger/
+emissões iguais; REQ/COM/ENT/BAL,503 e negativas Auth reais cobertas. Baseline
+FAIL, screenshot e contexto preservados. Tipos/lint passaram; Axe mantido.
+
+Nenhuma migration ou mutação remota: local161, SQLs inalterados e recibo remoto
+161 anterior preservado; sem backup/restore redundante. CI base: validação
+Windows/Ubuntu SUCCESS e banco em andamento; Preview estávelccebfcb READY.
+Novo SHA exige CI própria. PR7 Draft, Sonar adiado, sem merge/promoção.
+
+Matriz48 PASS/51 PARTIAL/6 NOT_STARTED;105x39,29 colunas canônicas/complementos
+preservados. C034 mantém prova com regressão ampliada. C-FINAL-AC-023 agora
+parcial, sem aprovar demais superfícies, humano/AT/aparelho ou D-C/D6. PDFs,
+certificado/TSA, backup e monitoramento conservam seus limites. Meta ativa,
+prioridade diária. [Dossiê](HISTORY_READ_BOUNDARY.md),
+[evidências](HISTORY_READ_BOUNDARY_EVIDENCE.json),
+[CI base](CI_CCEBFCB_OBSERVATION.json).

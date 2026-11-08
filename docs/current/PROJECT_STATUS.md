@@ -10,6 +10,15 @@ dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
 
+D3.18 corrigiu crash da página por resposta200 malformada no histórico.
+Documento/versão/referência/autoria são conferidos antes de renderizar; falha
+permite atualizar a seção, sem pedir alteração do fato imutável.17 unitários
+distintos e15 casos de produção passaram nos três motores; tipos/lint passaram.
+Sem migration nova: local/remoto161. Matriz48 PASS/51 PARTIAL/6 NOT_STARTED;
+C-FINAL-AC-023 parcial para essa superfície. Novo SHA exige CI própria; base
+ccebfcb com Preview estável READY, validação Windows/Ubuntu SUCCESS e banco
+em andamento na observação. [Provas](../audits/D/D-B/HISTORY_READ_BOUNDARY.md).
+
 D3.17 entregou declaração profissional e conferência familiar por paciente,
 com revisão, snapshot/ator/instante e recuperação sem duplicar. Sete unitários,
 cinco Auth distintos e12 casos de produção passaram; mais15 regressões e30

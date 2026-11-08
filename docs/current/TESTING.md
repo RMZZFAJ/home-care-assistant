@@ -521,3 +521,14 @@ abrangem C026 REQ, menu family e recurring-selection nos três motores; o
 harness keyboard-entry preserva controles negativos inert/aria-hidden/Tab e
 acrescenta main oculto preservado e dois main visíveis. Não reduzir regras Axe.
 [Coortes e contraprovas](../audits/D/D-B/PROFESSIONAL_CREDENTIALS_EVIDENCE.json).
+
+## Limite de leitura histórica D3.18
+
+Unitários document-history-read.test.ts e version-history.test.ts; produção
+pelo runner e2e com tests/e2e/version-history.spec.ts nos três motores. A nova
+contraprova intercepta200 com sete projeções inválidas e exige erro de seção,
+retry/foco, zero pageerror e ausência de comandos/efeitos oficiais. Os quatro
+consumidores existentes são preservados e reexecutados; nenhum teste mutável
+de banco corre em paralelo. Axe segue habilitado. Não se infere integridade
+criptográfica a partir da validação de uma projeção JSON.
+[Resultados e contraprovas](../audits/D/D-B/HISTORY_READ_BOUNDARY_EVIDENCE.json).

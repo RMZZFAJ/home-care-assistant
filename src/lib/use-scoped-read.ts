@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { api, ApiError } from "@/lib/client/api";
 
 /** Independent reads retain only an authorized result of the same scope. */
-export function useScopedRead<T>(url: string | null, revision = "") {
+export function useScopedRead<T>(url: string | null, revision = "", decode?: (value: unknown) => T) {
   const [attempt, setAttempt] = useState(0);
   const key = JSON.stringify([url, revision, attempt]);
   const [result, setResult] = useState<{
@@ -16,8 +16,9 @@ export function useScopedRead<T>(url: string | null, revision = "") {
   useEffect(() => {
     if (!url) return;
     const controller = new AbortController();
-    api<T>(url, undefined, controller.signal)
-      .then((data) => {
+    api<unknown>(url, undefined, controller.signal)
+      .then((value) => {
+        const data = decode ? decode(value) : value as T;
         if (!controller.signal.aborted)
           setResult({
             key,
@@ -45,7 +46,7 @@ export function useScopedRead<T>(url: string | null, revision = "") {
         }));
       });
     return () => controller.abort();
-  }, [url, key]);
+  }, [url, key, decode]);
   const sameScope = url !== null && result?.url === url;
   return {
     data: sameScope ? result.data : null,
