@@ -163,7 +163,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7;
+  rendererRevision?: 5 | 6 | 7 | 8;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -191,11 +191,11 @@ export async function renderDocumentPdf(
 ) {
   const revision = emission?.rendererRevision ?? 5;
   const sourceFacts = revision >= 6 ? emission?.sourceFacts : undefined;
-  const fidelity = revision === 7 ? emission?.fidelityFacts : undefined;
+  const fidelity = revision >= 7 ? emission?.fidelityFacts : undefined;
   const cancelledV6 = Boolean(sourceFacts && snapshot.status === "cancelled");
   if (emission && revision >= 6 && !sourceFacts)
     throw new Error("Frozen source facts required");
-  if (emission && revision === 7 && !fidelity)
+  if (emission && revision >= 7 && !fidelity)
     throw new Error("Frozen fidelity facts required");
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
@@ -1238,6 +1238,17 @@ export async function renderDocumentPdf(
       };
       text(states[item.state], 10, true);
       text("Procedimento: " + item.id, 8);
+      if (revision === 8) {
+        const key = `regularization/${item.id}`;
+        fidelityFact(key + "/before", "Estado anterior da ficha", `${documentStatuses[item.before_snapshot.status] ?? item.before_snapshot.status} · v${item.before_snapshot.version}`);
+        fidelityFact(key + "/after", "Resultado deste procedimento", states[item.state] + (item.decision ? ` · v${item.decision.version}` : " · sem decisão registrada"));
+        fidelityFact(key + "/proposer", "Identidade do proponente", `${item.proposal.proposedName} · ${item.proposed_by} · ${formatBrazilDate(item.proposed_at)}`);
+        fidelityFact(key + "/reviewer", "Identidade do conferente designado", `${item.proposal.reviewerName} · ${item.reviewer_id}`);
+        fidelityFact(key + "/receipt", "Identidade do aceite pessoal original", item.before_snapshot.acceptedBy ?? "Sem aceite pessoal declarado");
+        fidelityFact(key + "/decision", "Identidade da decisão", item.decision ? `${item.decision.actorName} · ${item.decision.actorId} · ${formatBrazilDate(item.decision.recordedAt)}` : "Sem decisão registrada");
+        const executed = item.state === "approved" && item.decision?.lines.some(line => line.movementIds?.length);
+        fidelityFact(key + "/executor", "Execução transacional dos movimentos", executed && item.decision ? `${item.decision.actorName} · ${item.decision.actorId} · ${formatBrazilDate(item.decision.recordedAt)}` : "Sem movimentação de estoque identificada neste procedimento");
+      }
       text(
         `Proposta de ${item.proposal.proposedName} · ${formatBrazilDate(item.proposed_at)} · referência v${item.before_snapshot.version}`,
         9,
@@ -1248,8 +1259,13 @@ export async function renderDocumentPdf(
           : "Sem recebimento pessoal declarado no registro original.",
         9,
       );
-      text("Motivo original: " + item.proposal.reason, 9);
-      text("Evidências e limites: " + item.proposal.basis, 9);
+      if (revision === 8) {
+        fidelityFact(`regularization/${item.id}/reason`, "Motivo original", item.proposal.reason);
+        fidelityFact(`regularization/${item.id}/basis`, "Evidências e limites", item.proposal.basis);
+      } else {
+        text("Motivo original: " + item.proposal.reason, 9);
+        text("Evidências e limites: " + item.proposal.basis, 9);
+      }
       text(
         "Conferente independente designado: " + item.proposal.reviewerName,
         9,
@@ -1266,6 +1282,12 @@ export async function renderDocumentPdf(
       for (const line of lines) {
         ensure(130);
         text(line.name + " · " + line.unit, 10, true);
+        if (revision === 8) {
+          const key = `regularization/${item.id}/${line.lineId}`;
+          const applied = item.state === "approved" ? quantity(line.receivedQuantity).plus(line.returnedQuantity).plus(line.missingQuantity) : quantity("0");
+          fidelityFact(key + "/before", "Conciliação anterior e trânsito anterior", `${formatQuantity(line.priorReconciledQuantity, line.unit)} · ${formatQuantity(line.pendingQuantity, line.unit)}`);
+          fidelityFact(key + "/after", "Conciliação após este procedimento e trânsito restante", `${formatQuantity(quantity(line.priorReconciledQuantity).plus(applied).toFixed(), line.unit)} · ${formatQuantity(quantity(line.pendingQuantity).minus(applied).toFixed(), line.unit)}`);
+        }
         text(
           `Expedido: ${formatQuantity(line.expeditedQuantity)} · Aceite pessoal preservado: ${formatQuantity(line.acceptedQuantity)} · Conciliação anterior: ${formatQuantity(line.priorReconciledQuantity)}`,
           9,
@@ -1302,7 +1324,8 @@ export async function renderDocumentPdf(
           9,
           true,
         );
-        text("Justificativa da decisão: " + item.decision.reason, 9);
+        if (revision === 8) fidelityFact(`regularization/${item.id}/decisionReason`, "Justificativa da decisão", item.decision.reason);
+        else text("Justificativa da decisão: " + item.decision.reason, 9);
       }
       if (quantity(item.proposal.unknownQuantity).gt(0)) {
         ensure(65);

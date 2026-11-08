@@ -4,19 +4,28 @@ Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Estado atual:local155/remoto155, zero pendências após backup, restore/upgrade
-e pré/pós-validação. Lista frequente privada guarda só materiais; não copia
-estimativa/estoque, urgência ou motivos antigos. Cinco unitários, quatro Auth
-e sete execuções de produção em coortes passaram, com emissão posterior
-conferida por payload/linhas. Matriz43 PASS/51 PARTIAL/11 NOT_STARTED.
+Estado atual:local156/remoto156, zero migrations pendentes. Prioridade vigente:
+fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
+dependências necessárias. Remoto confirmado como desenvolvimento com testes:
+validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
+restore e comparação integral por rotina.
 
-CI f0840dc terminou4 SUCCESS/4 FAILURE. Retomada e oráculos foram ajustados;
-um defeito real de foco da verificação pública foi corrigido após reprodução
-no WebKit. Nove casos distintos dos reparos passaram em coortes nos três
-motores; harness final24 PASS, sem reduzir regras ou aumentar timeouts.
-O próximo SHA exige CI própria. D-B continua em execução; PDF segue técnico,
-sem reformulação estética, e gates externos/D6 continuam identificados.
-[Provas e limites](../audits/D/D-B/RECURRING_SELECTION.md).
+D4.8 completa os fatos do PDF da regularização ENT: antes/depois, identidades,
+instantes, limites e efeitos de estoque, preservando aceite e intenções antigas.
+Cinco unitários novos+dez existentes, três Auth e nove casos de produção nos
+três motores passaram em coortes; uma extensão Chromium também confirmou
+código/upload públicos sem sessão. Seis PDFs reais têm fatos, assinatura
+ENTIRE_FILE e timestamp interno conferidos por oráculo independente.
+Sem redesenho estético. Matriz43 PASS/52 PARTIAL/10 NOT_STARTED.
+[Provas e limites](../audits/D/D-B/REGULARIZATION_PDF.md).
+
+Listas frequentes privadas e recuperação da etapa de REQ/COM/ENT/BAL continuam
+implementadas. O commit do responsável3add56f, somente SonarLint, foi preservado;
+CI105dc9d foi cancelada por supersessão. CI3add56f foi observada com banco e
+validate Windows/Ubuntu SUCCESS; quatro browsers ainda em andamento. Esses
+resultados não validam D4.8: o novo SHA exige sua própria CI. Falhas f0840dc e
+seus reparos locais permanecem rastreáveis, sem aprovação retroativa.
+[Entrega anterior](../audits/D/D-B/RECURRING_SELECTION.md).
 
 Estado anterior D4.6: local152/remoto152, zero migrations pendentes após
 backup válido,

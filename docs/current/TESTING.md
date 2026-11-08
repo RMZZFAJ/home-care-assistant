@@ -427,3 +427,19 @@ A verificação pública exige foco no resultado montado e o código formatado
 completo antes da próxima consulta. Não foram aumentados timeouts nem removidas
 regras. CI f0840dc falhou e permanece reprovada; as correções locais exigem CI
 própria no próximo SHA. [Coortes](../audits/D/D-B/RECURRING_SELECTION.md).
+
+## PDF técnico da regularização ENT
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/pdf-regularization.test.ts \
+  tests/pdf-fidelity.test.ts
+node --test --test-concurrency=1 tests/integration/pdf-regularization.test.mjs
+npm run e2e -- tests/e2e/pdf-regularization.spec.ts
+```
+
+Preparar a stack local com test:db:prepare, sem reset; não executar Auth mutável
+em paralelo ao E2E. O caso da interface gera V8, recupera V7, compara bytes,
+confere aceite/ledger por leitura independente e verifica código/upload sem
+sessão de aplicativo. Outros casos preservam desconhecido e rejeição.
+O corpus só contém dados fictícios e certificados públicos de teste.
+[Provas e limites](../audits/D/D-B/REGULARIZATION_PDF.md).

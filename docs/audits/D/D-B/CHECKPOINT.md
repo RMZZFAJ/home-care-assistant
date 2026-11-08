@@ -1663,3 +1663,58 @@ recuperação operacional/RPO/RTO continuam gates; Sonar adiado e meta ativa.
 [Dossiê](RECURRING_SELECTION.md), [coortes](RECURRING_SELECTION_EVIDENCE.json),
 [pós-DDL](RECURRING_SELECTION_REMOTE_MIGRATIONS.json) e
 [CI anterior](CI_F0840DC_OBSERVATION.json).
+
+## D4.8 — regularização ENT e prioridade da operação diária
+
+Orientações posteriores: fichas/PDFs/estoque/recuperação primeiro; apoio depois
+das dependências necessárias. Remoto contém somente testes do responsável,
+que dispensou backup/restore/comparação integral repetidos por migration.
+Complementos preservados em OWNER_AMENDMENTS; missão integral continua ativa.
+
+V8 explicita estado/versão anterior, resultado/versão do procedimento,
+identidades e instantes de proposta/conferência/decisão/execução, aceite
+original, motivos/base/limites e conciliação/trânsito antes/depois. Propostas
+sem aprovação não executam e desconhecido permanece em trânsito. Sem mudança
+estética. Seleção é pelo evento congelado; outros documentos ficam V7.
+Mesma chave mantém V7 anterior; helpers continuam privados e a UI não escolhe
+revisão, autoria ou snapshot. GET baixa bytes registrados, sem gerar.
+
+Cinco unitários novos+dez existentes passaram em coortes;18 controles V4/V5/V6
+e o digest V7 regularizado permanecem exatos. Três Auth distintos passaram,
+incluindo isolamento/revogação/grants/replay/estados e ledger. Primeiro Auth
+teve duas expectativas de fixture corrigidas; marcador longo foi corrigido
+para múltiplas linhas no teste, sem perda real de texto. Falhas preservadas.
+
+Produção:9 PASS nos3 motores; extensão Chromium1 PASS confere consulta por
+código/upload sem sessão do app e ausência de dados privados. Inicialmente
+18 PDFs reais foram gerados; seis exemplares distintos estão no corpus com
+raiz pública, sem chave. pyHanko/pdfplumber/pypdf conferem fatos associados,
+quantidades/ledger, geometria/rodapé, ENTIRE_FILE e TSA interna. Dois negativos
+independentes recusam executor/total falsos. Não é confiança externa/ICP.
+
+Uma cópia bruta de evidência .spec.ts entrou no include TypeScript e impediu
+o início da coorte adicional. Arquivada como .txt; tipos e início de produção
+passaram. Só nome do artefato recebeu browserName no hook; fontes de produto
+ficaram estáveis nos ensaios. Não se excluiu teste nem se relaxou regra.
+
+Migration156 remota aplicada após validação local, histórico155 e dry-run
+com apenas a pendente, sem roles/seeds/Vault. Pós-validação: histórico156 SQL
+exato; funções/grants pertinentes iguais ao local, reservas anteriores intactas,
+helpers fechados, dois crons ativos, sem locks aguardando/índices inválidos.
+Sem backup/restore/comparação integral redundantes, conforme nova orientação.
+Advisors203 segurança/164 desempenho,0 ERROR; +1 RPC autenticada, guards
+comprovados e warnings mantidos. Sem Auth/fixture/reset remoto ou envio externo.
+
+Commit do responsável3add56f, somente configuração SonarLint, foi preservado.
+CI105dc9d cancelada por supersessão; não aprovada. CI3add56f observada com banco
+e validate Windows/Ubuntu SUCCESS e quatro browsers em andamento. Isso não
+valida este novo lote nem substitui CI própria do SHA publicado. Sonar permanece
+adiado pelo responsável; PR7 Draft, sem merge ou promoção.
+
+Matriz105x39:43 PASS/52 PARTIAL/10 NOT_STARTED,29 colunas canônicas intactas.
+C7-AC-002 agora parcial: núcleo técnico comprovado; comunicação proporcional,
+designação/aceite físico, AT/aparelho e D-C/D6 permanecem próprios. Próximo
+núcleo diário: marcos temporais de ENT e pendências factuais de fichas/estoque.
+[Dossiê](REGULARIZATION_PDF.md), [coortes](REGULARIZATION_PDF_EVIDENCE.json),
+[pós-DDL](REGULARIZATION_PDF_REMOTE_MIGRATIONS.json) e
+[oráculo independente](d4-regularization-proof/VERIFICATION.json).

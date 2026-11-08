@@ -7,7 +7,8 @@ import {
   type DocumentSnapshot,
   type PdfEmissionContext,
 } from "./operational-pdf";
-import { formatQuantity } from "../quantity";
+import { formatQuantity, quantity } from "../quantity";
+import { documentStatuses } from "@/types/documents";
 import { formatBrazilDate } from "../receipt";
 import {
   pdfSourceFactsSchema,
@@ -53,7 +54,7 @@ export async function composeIssuance(
       : null;
   if (parsed && !parsed.success) throw invalid("source-facts-schema");
   const sourceFacts = parsed?.success ? parsed.data : undefined;
-  const fidelity = revision === 7 ? pdfFidelitySchema.safeParse(snapshot.documentFacts) : null;
+  const fidelity = revision >= 7 ? pdfFidelitySchema.safeParse(snapshot.documentFacts) : null;
   if (fidelity && !fidelity.success) throw invalid("fidelity-facts-schema");
   let bytes: Buffer;
   try {
@@ -178,6 +179,27 @@ export async function composeIssuance(
     for (const review of snapshot.balanceReviews?.legacyApprovals ?? [])
       semanticFacts[`fidelity/legacy-review/${review.actor_id}/${review.count_version}`] = `${review.actor_id} · ${review.actorName ?? "Nome não preservado"}`;
   }
+  if (revision === 8 && snapshot.type === "ENT") for (const item of snapshot.deliveryRegularization?.cases ?? []) {
+    // Derived from the frozen business facts, independently of painter runs.
+    const prefix = `fidelity/regularization/${item.id}`;
+    const outcomes = { pending: "Proposta aguardando conferência independente", approved: "Encerramento administrativo aprovado", rejected: "Proposta rejeitada, sem movimentação", withdrawn: "Proposta retirada, sem movimentação", obsolete: "Proposta obsoleta encerrada, sem movimentação" };
+    semanticFacts[prefix + "/before"] = `${documentStatuses[item.before_snapshot.status] ?? item.before_snapshot.status} · v${item.before_snapshot.version}`;
+    semanticFacts[prefix + "/after"] = outcomes[item.state] + (item.decision ? ` · v${item.decision.version}` : " · sem decisão registrada");
+    semanticFacts[prefix + "/proposer"] = `${item.proposal.proposedName} · ${item.proposed_by} · ${formatBrazilDate(item.proposed_at)}`;
+    semanticFacts[prefix + "/reviewer"] = `${item.proposal.reviewerName} · ${item.reviewer_id}`;
+    semanticFacts[prefix + "/receipt"] = item.before_snapshot.acceptedBy ?? "Sem aceite pessoal declarado";
+    semanticFacts[prefix + "/decision"] = item.decision ? `${item.decision.actorName} · ${item.decision.actorId} · ${formatBrazilDate(item.decision.recordedAt)}` : "Sem decisão registrada";
+    const hasEffects = item.state === "approved" && item.decision?.lines.some(line => line.movementIds?.length);
+    semanticFacts[prefix + "/executor"] = hasEffects && item.decision ? `${item.decision.actorName} · ${item.decision.actorId} · ${formatBrazilDate(item.decision.recordedAt)}` : "Sem movimentação de estoque identificada neste procedimento";
+    semanticFacts[prefix + "/reason"] = item.proposal.reason;
+    semanticFacts[prefix + "/basis"] = item.proposal.basis;
+    if (item.decision) semanticFacts[prefix + "/decisionReason"] = item.decision.reason;
+    for (const line of item.decision?.lines.length ? item.decision.lines : item.proposal.lines) {
+      const settled = item.state === "approved" ? quantity(line.receivedQuantity).plus(line.returnedQuantity).plus(line.missingQuantity) : quantity(0);
+      semanticFacts[prefix + `/${line.lineId}/before`] = `${formatQuantity(line.priorReconciledQuantity, line.unit)} · ${formatQuantity(line.pendingQuantity, line.unit)}`;
+      semanticFacts[prefix + `/${line.lineId}/after`] = `${formatQuantity(quantity(line.priorReconciledQuantity).plus(settled).toFixed(), line.unit)} · ${formatQuantity(quantity(line.pendingQuantity).minus(settled).toFixed(), line.unit)}`;
+    }
+  }
   const plan = { bytes, runs, identity, facts, semanticFacts };
   await validateIssuanceContent(bytes, plan);
   return plan;
@@ -247,7 +269,7 @@ export async function validateIssuanceContent(
     if (!plan.facts.length || missing !== -1)
       throw invalid("source-fact:" + missing);
     const parsed = await PDFDocument.load(bytes, { updateMetadata: false });
-    if (plan.identity.rendererRevision === 7 && parsed.catalog.lookupMaybe(PDFName.of("Lang"), PDFString)?.decodeText() !== "pt-BR")
+    if (Number(plan.identity.rendererRevision) >= 7 && parsed.catalog.lookupMaybe(PDFName.of("Lang"), PDFString)?.decodeText() !== "pt-BR")
       throw invalid("language");
     const identity = JSON.parse(
       parsed.catalog

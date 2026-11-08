@@ -64,3 +64,39 @@ recuperação continuam exigidos. Paginação e limites de texto são verificado
 para impedir perda ou corte de dados, sem polimento estético. Critérios de
 redesenho e comparação estética dos PDFs ficam para a aparência futura, sem
 aprovação inventada; isso não adia correções técnicas nem permite omitir fatos.
+
+## Operação diária antes de ferramentas de suporte — 08/11/2026
+
+O responsável priorizou fichas REQ/COM/ENT/BAL, PDFs, estoque e os demais
+critérios que afetam diretamente a operação diária. Guias, monitores de suporte
+e ferramentas sem impacto direto imediato serão concluídos depois desse núcleo.
+Essa ordem não elimina requisitos da missão nem autoriza aprovação parcial.
+Dependências estruturais necessárias à operação permanecem antes dos respectivos
+fluxos: autorização, integridade, idempotência, recuperação e guardas proporcionais
+ao ambiente nas migrations. Reutilizar evidências apenas com fontes/contratos compatíveis;
+executar regressões dirigidas para as lacunas efetivas.
+
+Próxima sequência: regularização ENT e seu PDF técnico; marcos temporais e
+versões das fichas; pendências factuais de REQ/COM/BAL e estoque; recuperação e
+erros dessas tarefas. Em seguida, concluir os complementos de apoio e reconciliar
+os critérios compostos. Nenhum gate humano, físico, externo ou D-C/D6 é convertido
+em aprovação pela mudança de prioridade.
+
+## Supabase remoto de desenvolvimento e validação proporcional — 08/11/2026
+
+O responsável esclareceu que o remoto contém somente seus testes, sem dados
+reais a preservar a qualquer custo. Dispensou a repetição de backup completo,
+reconstrução e comparação integral a cada migration. Esta instrução posterior
+substitui essa exigência recorrente da ordem original neste banco de
+desenvolvimento. Não equivale a um ensaio de recuperação operacional aprovado.
+
+Para os próximos lotes: confirmar o projeto qwfrqychokvhdzakibid e o histórico
+aplicado; validar localmente migrations e contratos afetados; revisar o dry-run;
+aplicar somente as migrations incrementais pendentes e conferir histórico SQL,
+schema e saúde pertinentes. Usar regressões específicas ao impacto. Backup,
+restauração e comparações integrais adicionais dependem de necessidade concreta,
+em vez de serem repetidos por rotina. Os artefatos anteriores são preservados.
+Ensaios de backup/recuperação da infraestrutura continuam no critério próprio;
+RPO/RTO e recuperação operacional não recebem aprovação por este esclarecimento.
+Permanecem a branch atual, PR7 Draft, aplicação remota no fechamento do lote e
+os limites de publicação e transportes externos da missão.
