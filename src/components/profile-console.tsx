@@ -147,6 +147,7 @@ function ProfileContent() {
       {profile ? (
         <>
           <SettingsSection title="Identidade pessoal" summary="Nome, identificação profissional e preferências">
+            <p className="hca-field-hint">Função e registro são informados por você. Preencha o registro somente quando aplicável à sua função; sem registro aplicável, deixe-o em branco. A família registra sua própria conferência por paciente, sem validação externa automática.</p>
             
             <p className="mt-2 text-sm text-(--muted)">{profile.email}</p>
             <form

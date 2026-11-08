@@ -211,3 +211,13 @@ RLS nas REQs; campos do browser não definem autorização. Família/global não
 confirmam pelo recebedor. A matriz D-A registra as esperas observadas de
 sessão/vínculo/capacidade e rollback dos comandos cobertos. Essa prova não se
 estende automaticamente a comandos futuros ou à operação remota.
+
+## Conferência profissional D3.17
+
+Registro informado não concede papel/capacidade nem comprova fonte externa.
+Conferência exige ator Auth distinto do titular, contexto do paciente e papel
+local/capacidade compatíveis. O servidor produz autoria/instante, bloqueia
+revisão obsoleta e revalida após espera. Tabelas/helper privados não recebem
+acesso direto; RPCs guardadas têm grants explícitos. Negativas com Auth real
+incluem revogação de vínculo e sessão durante locks, sem efeito parcial.
+[Provas e limites](../audits/D/D-B/PROFESSIONAL_CREDENTIALS.md).

@@ -51,3 +51,14 @@ test("a hidden landmark cannot become an accessible keyboard origin", async ({ p
   await page.setContent('<a href="#content">Ir para o conteúdo</a><main id="content" tabindex="-1" aria-hidden="true"><button>Oculto</button></main>');
   await expect(assertKeyboardEntry(page, "hidden landmark")).rejects.toThrow("requires an interactive landmark");
 });
+
+test("a cached hidden route cannot make the active landmark ambiguous", async ({ page }) => {
+  await page.setContent('<main hidden tabindex="-1"><input aria-label="Campo da rota preservada"></main><main id="active" tabindex="-1"><input aria-label="Campo atual"><button>Avançar atual</button></main>');
+  await assertKeyboardEntry(page, "active route with hidden cached landmark");
+  await expect(page.getByLabel("Campo atual", { exact: true })).toBeFocused();
+});
+
+test("two visible landmarks cannot pass the keyboard oracle", async ({ page }) => {
+  await page.setContent('<main tabindex="-1"><button>Primeira rota</button></main><main tabindex="-1"><button>Segunda rota</button></main>');
+  await expect(assertKeyboardEntry(page, "ambiguous visible landmarks")).rejects.toThrow("requires an interactive landmark");
+});

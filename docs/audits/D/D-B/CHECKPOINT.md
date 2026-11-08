@@ -1868,3 +1868,41 @@ AT/humano/aparelho e D-C/D6 permanecem próprios. [Dossiê](DRAFT_LIFECYCLE.md),
 [coortes](DRAFT_LIFECYCLE_EVIDENCE.json),
 [remoto](DRAFT_LIFECYCLE_REMOTE_OBSERVATION.json) e
 [CI base](CI_BCA3933_OBSERVATION.json).
+
+## D3.17 — declaração profissional e conferência familiar
+
+Basec8c34f4. Perfil próprio informa nome/função/registro/UF, sem registro
+fictício obrigatório. Família/admin local com capacidade confere outra pessoa
+no paciente explícito; banco congela valor/revisão/hash/ator/instante. Mudança
+e restauração do valor exigem nova conferência. Nenhum papel/selo externo é
+concedido; upload/consulta externa continuam adiados conforme P01.
+
+Sete unitários e cinco Auth distintos passaram em coortes; dez execuções Auth
+incluem sete PASS/três FAIL conservadas. Doze casos de produção passaram nos
+três motores: seis novos e seis consumidores existentes do painel. Replay após
+commit com resposta perdida, histórico20+2, leitura503, perfil próprio,409 sem
+rebase, revisão após mudança e negativas reais de lock/sessão/vínculo cobertas.
+Renomeação posterior de ref tem equivalência textual, sem mudança de fluxo.
+
+CI da base falhou em C026 e main ambíguo de rota preservada. Reprodução local
+confirmou; produto centraliza campo inválido, teste exige posição/hit-test.
+Oráculo exige um único main visível, preservando inert/aria-hidden/traps.
+Quinze regressões de produção e30 controles sintéticos passaram nos três
+motores, incluindo listas frequentes. Axe não foi reduzido. Tipos/lint passaram.
+CI do novo SHA continua obrigatória, sem aprovação por resultado anterior.
+
+Local/remoto161, zero pendências. Migrations158–160 e índice161 tiveram
+pré-validação incremental, histórico/dry-run/pós-check dirigido, sem repetir
+backup/restore integral do banco descartável. O índice corrigiu FK sem cobertura.
+Advisors: segurança208 INFO43/WARN165; desempenho166 INFO155/WARN11, zero ERROR.
+RLS privado fechado/RPCs guardadas e índices sem carga estão qualificados.
+Sem reset/fixture/Auth remoto, transporte externo, merge ou promoção.
+
+Matriz105x39:48 PASS/50 PARTIAL/7 NOT_STARTED;29 colunas canônicas e complementos
+preservados. C7-AC-001/C-FINAL-AC-020 passam localmente; humano/AT/aparelho,
+zoom400% real, validação externa e D-C/D6 continuam próprios. Sonar adiado,
+PR7 Draft, meta ativa e prioridade diária. PDF/TSA/backups/monitoramento mantêm
+seus limites. [Dossiê](PROFESSIONAL_CREDENTIALS.md),
+[provas](PROFESSIONAL_CREDENTIALS_EVIDENCE.json),
+[remoto](CREDENTIAL_REMOTE_MIGRATIONS.json), [advisors](CREDENTIAL_ADVISORS.json)
+e [CI base](CI_C8C34F4_OBSERVATION.json).

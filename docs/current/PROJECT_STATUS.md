@@ -4,11 +4,20 @@ Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Estado atual:local157/remoto157, zero migrations pendentes. Prioridade vigente:
+Estado atual:local161/remoto161, zero migrations pendentes. Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
+
+D3.17 entregou declaração profissional e conferência familiar por paciente,
+com revisão, snapshot/ator/instante e recuperação sem duplicar. Sete unitários,
+cinco Auth distintos e12 casos de produção passaram; mais15 regressões e30
+controles de teclado corrigem falhas da CI base sem reduzir Axe. Tipos/lint
+passaram. Migrations158–161 aplicadas e pós-validadas no remoto. Matriz48 PASS/
+50 PARTIAL/7 NOT_STARTED; novo SHA exige CI própria. Validação externa, humano/
+AT/aparelho seguem gates específicos. Sonar adiado; PR7 Draft, produção NO-GO.
+[Dossiê e limites](../audits/D/D-B/PROFESSIONAL_CREDENTIALS.md).
 
 D3.16 removeu o corte de24h dos envelopes REQ/BAL, conforme a política vigente.
 A cópia local é opcional da aba; salvar na conta permite retomar em sessão

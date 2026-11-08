@@ -10,6 +10,7 @@ import {
 } from "@fluentui/react-components";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { MembershipImpact } from "./membership-impact";
+import { CredentialReview } from "./credential-review";
 import { Dialog, EmptyState, Icon } from "@/components/ui/primitives";
 import { Notice } from "@/components/workspace";
 import { RoleSelect, text, bool, type Row } from "./admin-fields";
@@ -23,6 +24,7 @@ export function MembershipManagement({
   recovery,
   confirmationRevision = 0,
   patientId,
+  credentialReviewAllowed = false,
 }: {
   rows: Row[];
   directory: Row[];
@@ -32,8 +34,10 @@ export function MembershipManagement({
   recovery?: ReactNode;
   confirmationRevision?: number;
   patientId?: string;
+  credentialReviewAllowed?: boolean;
 }) {
   const [search, setSearch] = useState("");
+  const [credential, setCredential] = useState<{ subjectId: string; opener: HTMLElement } | null>(null);
   type Editor = {
     row: Row | null;
     opener: HTMLElement;
@@ -121,6 +125,7 @@ export function MembershipManagement({
               <Button appearance="subtle" onClick={() => setChange(row)}>
                 {row.status === "revoked" ? "Reativar" : "Revogar"}
               </Button>
+              {patientId ? <Button disabled={!credentialReviewAllowed} title={!credentialReviewAllowed ? "Selecione seu vínculo local para conferir uma credencial." : undefined} onClick={event => setCredential({ subjectId: text(row, "user_id"), opener: event.currentTarget })}>Conferir credencial</Button> : null}
             </div>
           </article>
         ))}
@@ -130,6 +135,7 @@ export function MembershipManagement({
           </EmptyState>
         ) : null}
       </div>
+      {credential && patientId ? <CredentialReview patientId={patientId} subjectId={credential.subjectId} opener={credential.opener} onClose={() => setCredential(null)}/> : null}
       {editor ? (
         <RecordDrawer
           title={editor.row ? "Editar vínculo" : "Vincular conta existente"}

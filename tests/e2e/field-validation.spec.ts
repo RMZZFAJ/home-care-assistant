@@ -61,6 +61,14 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await observation.fill("x".repeat(1001));
   await next(page);
   await errorAt(observation, "A observação deve ter até 1.000 caracteres.");
+  const placement = await observation.evaluate(element => {
+    const box = element.getBoundingClientRect();
+    const center = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+    return { top: box.top, bottom: box.bottom, height: innerHeight, exposed: center === element || element.contains(center) };
+  });
+  expect(placement.top).toBeGreaterThan(150);
+  expect(placement.bottom).toBeLessThan(placement.height - 64);
+  expect(placement.exposed).toBe(true);
   await expect(observation).toHaveValue("x".repeat(1001));
   await expect(page.getByRole("heading", { name: "Observações", exact: true })).toBeVisible();
   expect(commands).toBe(0);

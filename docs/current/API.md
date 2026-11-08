@@ -1036,3 +1036,15 @@ legacyReminderFailures e legacyReminderGaps. Contadores não revelam payloads
 ou pessoas e não substituem uma central de incidentes. O helper legado continua
 privado. Rotação100, recuperação de sete datas por visita e lacunas por mudança
 de configuração estão descritas em [D5.3](../audits/D/D-B/SCHEDULER_LEGACY.md).
+
+## Declaração profissional e conferência familiar
+
+GET /api/admin/credentials recebe careRecipientId/userId e cursor opcional
+beforeAt/beforeId. Exige contexto explícito e access.manage no paciente, com
+regra local no RPC. Retorna declaração consultada, revisão/hash, estado,
+histórico20 e cursor; externalValidation é null. Resposta private/no-store.
+POST aceita somente paciente, pessoa, expectedRevision textual bigint,
+outcome checked/not_confirmed, note e idempotencyKey. Auth/CSRF, limite8k e
+schema estrito; autor/instante não são entradas. Revisão/intenção obsoleta409;
+replay conserva registro. Nenhum papel ou validação externa é concedido.
+[Contrato e provas](../audits/D/D-B/PROFESSIONAL_CREDENTIALS.md).

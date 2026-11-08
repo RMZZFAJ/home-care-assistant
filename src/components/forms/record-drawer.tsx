@@ -4,9 +4,10 @@ import { Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, MessageBar, Messag
 import { Icon } from "@/components/ui/primitives";
 
 /** Contextual editing keeps the list and its filters in place. */
-export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false }: {
+export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
   recovery?: ReactNode;
+  hasUnsavedChanges?: boolean;
 }) {
   const [dirty, setDirty] = useState(false);
   const [discard, setDiscard] = useState(false);
@@ -22,7 +23,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
       else if (fallback?.isConnected) fallback.focus();
     }); };
   }, [restoreFocusTo,restoreFocusFallbackRef]);
-  const requestClose = () => { if (!busy && !preventClose) { if (dirty) setDiscard(true); else onClose(); } };
+  const requestClose = () => { if (!busy && !preventClose) { if (hasUnsavedChanges ?? dirty) setDiscard(true); else onClose(); } };
   const continueEditing = () => {
     if (busy || preventClose) return;
     setDiscard(false);

@@ -86,7 +86,12 @@ function PatientRequisition({
   useEffect(() => {
     if (!focusErrorRef.current) return;
     const target = [...(fieldsRef.current?.querySelectorAll<HTMLElement>('[data-field-error]') ?? [])].find(element => element.dataset.fieldError === focusErrorRef.current) ?? fieldsRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
-    if (target) { target.focus(); focusErrorRef.current = null; }
+    if (target) {
+      // Keep the invalid field clear of the fixed header and sticky steps.
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({ block: "center", inline: "nearest" });
+      focusErrorRef.current = null;
+    }
   }, [step, fieldErrors]);
   const frozenRef = useRef<Record<string, unknown> | null>(null);
   const [uncertain, setUncertain] = useState(false);

@@ -374,6 +374,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         ) : null}
         {section === "memberships" ? (
           <MembershipManagement
+            credentialReviewAllowed={!globalMode}
             recovery={recovery}
             confirmationRevision={confirmationRevision}
             rows={rows}

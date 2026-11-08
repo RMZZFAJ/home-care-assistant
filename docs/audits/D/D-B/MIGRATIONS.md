@@ -3,7 +3,20 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D5.3
+## Estado atual — D3.17
+
+Local161/remoto161, zero pendências. Migrations158–161 acrescentam declaração
+versionada e conferência familiar privada, corrigem cast de enum e ciclo de
+vida da metadata, e indexam FK do sujeito. Aplicação incremental com projeto,
+histórico SQL, validação local/Auth, dry-run e pós-check específico; sem reset,
+fixtures/Auth remoto ou backup/restore integral repetido do banco de testes.
+Funções/grants, RLS, trigger, backfill e crons conferidos. Aviso de FK resolvido;
+RLS privado/RPC autenticada permanecem intencionais e guardados. Sem promoção.
+[Recibo composto](CREDENTIAL_REMOTE_MIGRATIONS.json),
+[etapa160](CREDENTIAL_REMOTE_STAGE_160.json), [advisors](CREDENTIAL_ADVISORS.json)
+e [provas](PROFESSIONAL_CREDENTIALS_EVIDENCE.json). Registros abaixo são históricos.
+
+## Etapa D5.3 — registro histórico
 
 **Local145/remoto145, zero pendências.** Migration20261107213013 corrige seleção
 e progresso de lembretes legados, com checkpoints, diagnóstico e lacunas privadas.

@@ -535,3 +535,15 @@ Juliana18 permanece contadora1 e Sheila17 torna-se contadora2. A referência
 física20 só sofre ajuste3 após as duas revisões novas exigidas pela política
 preservada. Parecer1 não aprova contagem2 e a satisfação/prazo anteriores
 permanecem.
+
+## Declarações e conferências profissionais D3.17
+
+Migrations158–161: private.professional_declarations acompanha mudanças
+materiais do perfil por trigger, revisão bigint e hash; backfill não inventa
+instante histórico. private.professional_credential_reviews congela valor,
+revisão, resultado, ator e instante por paciente. RLS/grants fecham leitura e
+escrita direta. RPCs Auth guardadas revalidam depois de locks, rejeitam
+autoconferência/global sem contexto, preservam replay e paginam por tupla.
+Índice do sujeito cobre FK; metadata sem histórico acompanha exclusão do
+perfil, enquanto conferências mantêm referências. Local/remoto161 reconciliado.
+[Recibo](../audits/D/D-B/CREDENTIAL_REMOTE_MIGRATIONS.json).

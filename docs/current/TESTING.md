@@ -510,3 +510,14 @@ oficiais. Sem suíte mutável de banco em paralelo. REQ e BAL repetem comandos
 reais já confirmados, com a mesma chave, sem duplicar ficha ou ledger.
 A retomada entre sessões exige rascunho salvo na conta; a cópia de aba é
 opcional. [Coortes, contraprovas e limites](../audits/D/D-B/DRAFT_LIFECYCLE.md).
+
+## Credenciais profissionais e regressões D3.17
+
+Depois de test:db:prepare na stack local autorizada, executar o teste Auth
+tests/integration/credentials.test.mjs e o unitário professional-credential.
+O runner E2E recebe credentials.spec.ts e record-drawer-focus.spec.ts. Não
+executar suítes mutáveis de banco simultaneamente ao E2E. Regressões dirigidas
+abrangem C026 REQ, menu family e recurring-selection nos três motores; o
+harness keyboard-entry preserva controles negativos inert/aria-hidden/Tab e
+acrescenta main oculto preservado e dois main visíveis. Não reduzir regras Axe.
+[Coortes e contraprovas](../audits/D/D-B/PROFESSIONAL_CREDENTIALS_EVIDENCE.json).
