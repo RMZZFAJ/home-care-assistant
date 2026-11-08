@@ -97,6 +97,9 @@ test("C030 editar função fixa a mesma pessoa e conserva o vínculo de outra co
 test("desligamento mostra ENT parcial e preserva a revogação urgente quando a consulta de pendências falha", async ({
   page,
 }, info) => {
+  // Fixture, Auth, four axe/layout audits and final read-back share this budget.
+  // Keep the runner's 15s action/expect limits; WebKit exceeded only the old total.
+  test.setTimeout(60_000);
   const f = await unavailableDelivery({ revoke: false }),
     before = sql(
       `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`,

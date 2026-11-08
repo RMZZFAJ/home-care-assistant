@@ -23,6 +23,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Preparação da primeira residência e contingência](PILOT_AND_CONTINGENCY.md).
 - [Prazo e resultado do acompanhamento inicial de avisos](NOTICE_TRACKING.md).
 - [Anexos, recuperação, abandono e fidelidade PDF](ATTACHMENTS.md).
+- [Validação de campos, vínculo e nome curto](FIELD_VALIDATION.md).
 - [Complementos posteriores do responsável](OWNER_AMENDMENTS.md): configuração
   e tratamento específico do SonarCloud adiados expressamente; reconciliação
   remota antecipada para o fechamento de D5.1.

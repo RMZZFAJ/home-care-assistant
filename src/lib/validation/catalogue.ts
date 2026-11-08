@@ -32,10 +32,14 @@ export const presentationCommandSchema = z
     careRecipientId: z.string().uuid(),
     id: z.string().uuid().nullable(),
     referenceVersion: z.number().int().positive().nullable(),
-    productId: z.string().min(1).max(120),
-    barcode: z.string().regex(/^\d{8,14}$/),
-    name: z.string().trim().min(2).max(160),
-    baseQuantity: exactQuantity.refine(
+    productId: z.string().min(1, "Escolha o material da apresentação.").max(120),
+    barcode: z.string().regex(/^\d{8,14}$/, "Informe um código de 8 a 14 algarismos, preservando os zeros iniciais."),
+    name: z.string().trim().min(2, "Informe um nome de pelo menos dois caracteres.").max(160, "O nome da apresentação deve ter até 160 caracteres."),
+    baseQuantity: z.unknown().transform((value, ctx) => {
+      const result = exactQuantity.safeParse(value);
+      if (!result.success) { ctx.addIssue({ code: "custom", message: "Informe um fator válido, com até seis casas decimais." }); return z.NEVER; }
+      return result.data;
+    }).refine(
       (value) => quantity(value).gt(0),
       "Informe um fator maior que zero.",
     ),

@@ -1,0 +1,23 @@
+{
+  "at": "2026-11-08 08:05:42 UTC",
+  "project": "qwfrqychokvhdzakibid",
+  "before": {
+    "rls_enabled_no_policy": 41,
+    "extension_in_public": 1,
+    "anon_security_definer_function_executable": 3,
+    "authenticated_security_definer_function_executable": 153,
+    "auth_leaked_password_protection": 1
+  },
+  "after": {
+    "rls_enabled_no_policy": 41,
+    "extension_in_public": 1,
+    "anon_security_definer_function_executable": 3,
+    "authenticated_security_definer_function_executable": 153,
+    "auth_leaked_password_protection": 1
+  },
+  "expectedDelta": {},
+  "providerGrouping": "Counts use each grouped lint count, not the number of group objects.",
+  "interpretation": "No new function, grant, table or policy. Three existing function bodies preserve all authorities and add explicit-null short-name removal. Existing advisories retained and not approved away.",
+  "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+  "operationalGo": false
+}

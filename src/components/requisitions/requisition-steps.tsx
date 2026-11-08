@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Dialog } from "@/components/ui/primitives";
 import { RelatedDocument } from "@/components/documents/related-document";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -234,6 +234,7 @@ export function CatalogStep({
                     unit={item.unit}
                     decimals={item.quantity_decimals ?? 0}
                     error={errors[item.id]}
+                    errorKey={item.id}
                     onChange={(change) => updateLine(item, change)}
                   />
                   <label className="flex min-h-11 items-center gap-3 text-sm">
@@ -260,8 +261,11 @@ export function CatalogStep({
                       ))}
                     </p>
                     <label className="mt-3 block font-semibold">
-                      Motivo da nova requisição
+                      <span id={item.id + "-repeat-label"}>Motivo da nova requisição</span>
                       <textarea
+                        aria-labelledby={item.id + "-repeat-label"}
+                        data-field-error={item.id + ":repeat"}
+                        aria-describedby={errors[item.id + ":repeat"] ? item.id + "-repeat-error" : undefined}
                         className={inputClass}
                         value={line.repeatReason ?? ""}
                         minLength={3}
@@ -274,7 +278,7 @@ export function CatalogStep({
                         }
                       />
                       {errors[item.id + ":repeat"] ? (
-                        <span className="ui-field-error">
+                        <span id={item.id + "-repeat-error"} className="ui-field-error">
                           {errors[item.id + ":repeat"]}
                         </span>
                       ) : null}
@@ -290,11 +294,13 @@ export function CatalogStep({
   );
 }
 export function Extras({
+  errors = {},
   items,
   setItems,
   products,
   adopt,
 }: {
+  errors?: Record<string, string>;
   items: ExtraItem[];
   setItems: (items: ExtraItem[]) => void;
   products: Product[];
@@ -329,9 +335,13 @@ export function Extras({
             className="grid gap-3 rounded-xl border border-(--line) p-4 sm:grid-cols-[1fr_auto_auto]"
           >
             <label className="text-sm font-semibold">
-              Nome
+              <span id={item.id + "-name-label"}>Nome</span>
               <input
+                aria-labelledby={item.id + "-name-label"}
                 value={item.name}
+                data-field-error={item.id + ":name"}
+                aria-invalid={Boolean(errors[item.id + ":name"])}
+                aria-describedby={errors[item.id + ":name"] ? item.id + "-name-error" : undefined}
                 maxLength={200}
                 onChange={(event) =>
                   setItems(
@@ -344,8 +354,11 @@ export function Extras({
                 }
                 className="mt-1 min-h-12 w-full rounded-lg border border-(--line) p-3"
               />
+              {errors[item.id + ":name"] ? <span id={item.id + "-name-error"} className="ui-field-error">{errors[item.id + ":name"]}</span> : null}
             </label>
             <StockObservationField
+              error={errors[item.id + ":stock"]}
+              errorKey={item.id + ":stock"}
               value={item.currentStock}
               mode={item.stockObservation}
               at={item.stockObservationAt}
@@ -431,12 +444,15 @@ export function Extras({
   );
 }
 export function Observations({
+  errors = {},
   observations,
   setObservations,
 }: {
+  errors?: Record<string, string>;
   observations: string[];
   setObservations: (observations: string[]) => void;
 }) {
+  const fieldId = useId();
   const [rows, setRows] = useState(() =>
     observations.map((value) => ({ id: crypto.randomUUID(), value })),
   );
@@ -450,9 +466,12 @@ export function Observations({
         Registre apenas informações operacionais necessárias.
       </p>
       {rows.map((row, index) => (
-        <div key={row.id} className="flex gap-2">
+        <div key={row.id} className="flex flex-wrap gap-2">
           <textarea
             aria-label={`Observação ${index + 1}`}
+            data-field-error={"observation:" + index}
+            aria-invalid={Boolean(errors["observation:" + index])}
+            aria-describedby={errors["observation:" + index] ? fieldId + "-" + index : undefined}
             rows={3}
             value={row.value}
             onChange={(event) =>
@@ -473,6 +492,7 @@ export function Observations({
           >
             Remover
           </button>
+          {errors["observation:" + index] ? <p id={fieldId + "-" + index} className="ui-field-error w-full">{errors["observation:" + index]}</p> : null}
         </div>
       ))}
       <button

@@ -87,6 +87,12 @@ function PatientRequisition({
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const fieldsRef = useRef<HTMLDivElement>(null), focusErrorRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!focusErrorRef.current) return;
+    const target = [...(fieldsRef.current?.querySelectorAll<HTMLElement>('[data-field-error]') ?? [])].find(element => element.dataset.fieldError === focusErrorRef.current) ?? fieldsRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    if (target) { target.focus(); focusErrorRef.current = null; }
+  }, [step, fieldErrors]);
   const frozenRef = useRef<Record<string, unknown> | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -318,20 +324,19 @@ function PatientRequisition({
       if (
         itemContext.find((item) => item.productId === line.productId)?.pending
           .length &&
-        (line.repeatReason?.trim().length ?? 0) < 3
+        ((line.repeatReason?.trim().length ?? 0) < 3 || (line.repeatReason?.trim().length ?? 0) > 1000)
       )
         errors[line.productId + ":repeat"] =
-          "Justifique a nova requisição deste produto ainda pendente.";
+          "Justifique a nova requisição deste produto, entre três e 1.000 caracteres.";
     }
-    if (
-      (all || step === 4) &&
-      form.extraItems.some(
-        (item) => !item.name.trim() || !validStockObservation(item),
-      )
-    )
-      errors.extras = "Preencha ou remova os itens extras incompletos.";
-    if ((all || step === 5) && form.observations.some((item) => !item.trim()))
-      errors.observations = "Preencha ou remova as observações vazias.";
+    if (all || step === 4) for (const item of form.extraItems) {
+      if (!item.name.trim()) errors[item.id + ":name"] = "Informe o nome do item extra ou remova-o.";
+      if (!validStockObservation(item)) errors[item.id + ":stock"] = "Revise a informação de estoque deste item extra.";
+    }
+    if (all || step === 5) form.observations.forEach((item, index) => {
+      if (!item.trim()) errors["observation:" + index] = "Preencha a observação ou remova-a.";
+      else if (item.trim().length > 1000) errors["observation:" + index] = "A observação deve ter até 1.000 caracteres.";
+    });
     if (all && !form.lines.length && !form.extraItems.length)
       errors.lines = "Selecione ao menos um item.";
     setFieldErrors(errors);
@@ -345,18 +350,18 @@ function PatientRequisition({
         Object.values(errors)[0] ?? "Aguarde o catálogo e confira seu acesso.",
       );
       if (all && Object.keys(errors).length) {
-        const id = Object.keys(errors)[0].split(":")[0];
-        const product = products.find((item) => item.id === id);
+        const key = Object.keys(errors)[0];
+        const product = products.find((item) => key === item.id || key === item.id + ":repeat");
         if (product)
           setStep(
             ["medicamentos", "higiene", "dieta"].indexOf(product.category) + 1,
           );
+        else if (form.extraItems.some(item => key === item.id + ":name" || key === item.id + ":stock")) setStep(4);
+        else if (key.startsWith("observation:")) setStep(5);
+        else if (key.startsWith("remaining")) setStep(0);
+        else if (key === "lines" || key === "catalog") setStep(1);
       }
-      window.setTimeout(
-        () =>
-          document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
-        50,
-      );
+      focusErrorRef.current = Object.keys(errors)[0] ?? null;
       return false;
     }
     setError("");
@@ -464,7 +469,7 @@ function PatientRequisition({
       </Notice>
     );
   return (
-    <div className="mx-auto max-w-4xl min-w-0 space-y-5">
+    <div ref={fieldsRef} className="mx-auto max-w-4xl min-w-0 space-y-5">
       <CreationDraftPanel
         draft={privateDraft}
         current={draftContent}
@@ -571,6 +576,7 @@ function PatientRequisition({
             ) : null}
             {step === 4 ? (
               <Extras
+                errors={fieldErrors}
                 items={form.extraItems}
                 setItems={(extraItems) => setForm({ ...form, extraItems })}
                 products={products}
@@ -592,6 +598,7 @@ function PatientRequisition({
             ) : null}
             {step === 5 ? (
               <Observations
+                errors={fieldErrors}
                 observations={form.observations}
                 setObservations={(observations) =>
                   setForm({ ...form, observations })

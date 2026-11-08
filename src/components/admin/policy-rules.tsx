@@ -5,6 +5,7 @@ import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Notice } from "@/components/workspace";
 import { ReminderSettings } from "./reminder-settings";
 import { roles } from "./admin-fields";
+import type { ShortNameMode } from "@/lib/validation/governance";
 
 type Settings = Record<string, unknown>;
 const groups = [
@@ -21,15 +22,16 @@ export function PolicyRules({ settings, directory, busy, locked, recovery, revis
 }) {
   type Editor = { group: string; baseline: Settings; opener: HTMLElement };
   const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
+  const [shortNameMode, setShortNameMode] = useState<ShortNameMode>("keep"), [shortName, setShortName] = useState("");
   const editor = editorState?.revision === revision ? editorState : null;
   const setEditor = (value: Editor | null) => setEditorState(value ? { ...value, revision } : null);
   const values = editor?.baseline ?? settings;
   const selected = (key: string, value: string) => Array.isArray(values[key]) && values[key].includes(value);
   const summary = (group: string) => group === "bal" ? `${settings.balDay == null ? "Dia não configurado" : days[Number(settings.balDay)]} · revisão ${settings.balReview === "required" ? "obrigatória" : "opcional"}` : group === "science" ? `${settings.scienceRequired === true ? "Ciência exigida" : "Ciência opcional"} · uma pessoa habilitada · expedição familiar sempre registra ciência` : group === "messages" ? `Primeiro lembrete: ${settings.reminderHours} h · repetição: ${settings.reminderRepeatHours} h` : `Arquivamento após ${settings.archiveDays} dias da conclusão`;
-  return <section aria-label="Política do paciente"><div className="hca-section-heading"><div><h2>Política do paciente</h2><p>Documentos existentes preservam a política de emissão. Alterações são versionadas.</p></div></div><div className="hca-records">{groups.map((group) => <article key={group.code} className="hca-record"><div className="hca-record-main"><h3>{group.title}</h3><small>{summary(group.code)}</small></div><Button aria-label={"Editar " + group.title} onClick={(event) => { onStartEditing(); setEditor({ group: group.code, baseline: settings, opener: event.currentTarget }); }}>Editar</Button></article>)}</div>
+  return <section aria-label="Política do paciente"><div className="hca-section-heading"><div><h2>Política do paciente</h2><p>Documentos existentes preservam a política de emissão. Alterações são versionadas.</p></div></div><div className="hca-records">{groups.map((group) => <article key={group.code} className="hca-record"><div className="hca-record-main"><h3>{group.title}</h3><small>{summary(group.code)}</small></div><Button disabled={locked} aria-label={"Editar " + group.title} onClick={(event) => { onStartEditing(); setShortNameMode("keep"); setShortName(String(settings.patientShortName ?? "")); setEditor({ group: group.code, baseline: settings, opener: event.currentTarget }); }}>Editar</Button></article>)}</div>
     {editor ? <RecordDrawer title={groups.find((group) => group.code === editor.group)?.title ?? "Editar política"} busy={busy} restoreFocusTo={editor.opener} onClose={() => setEditor(null)}>{error ? <Notice error>{error}</Notice> : null}{message ? <Notice>{message}</Notice> : null}
       {recovery}
-      <form key={versionKey} className="hca-form" onSubmit={async (event) => { if (await save(event)) setEditorState(current => current === editor ? null : current); }}>
+      <form key={versionKey} className="hca-form hca-policy-rules-form" onSubmit={async (event) => { if (await save(event)) setEditorState(current => current === editor ? null : current); }}>
         <fieldset disabled={locked} className="hca-form min-w-0">
         <div hidden={editor.group !== "bal"} className="hca-form">
           <Field label="Dia do BAL"><Select name="balDay" defaultValue={String(values.balDay ?? "")}><option value="">Não configurado</option>{days.map((day, index) => <option key={day} value={index}>{day}</option>)}</Select></Field>
@@ -47,7 +49,9 @@ export function PolicyRules({ settings, directory, busy, locked, recovery, revis
         </div>
         <div hidden={editor.group !== "messages"} className="hca-form">
           <Checkbox name="whatsappSimpleAcceptance" label="Aceite ENT simplificado pelo WhatsApp verificado" defaultChecked={values.whatsappSimpleAcceptance === true} />
-          <Field label="Nome curto nas mensagens"><Input name="patientShortName" maxLength={60} defaultValue={String(values.patientShortName ?? "")} /></Field>
+          <Field label="O que fazer com o nome curto"><Select name="patientShortNameAction" value={shortNameMode} onChange={event => setShortNameMode(event.target.value as ShortNameMode)}><option value="keep">Manter o nome atual</option><option value="change">Alterar o nome curto</option><option value="remove">Remover e usar o nome do cadastro</option></Select></Field>
+          <Field label="Nome curto nas mensagens" validationState={shortNameMode === "change" && error.startsWith("Informe um nome curto") ? "error" : "none"} validationMessage={shortNameMode === "change" && error.startsWith("Informe um nome curto") ? error : undefined}><Input name="patientShortName" maxLength={60} value={shortName} disabled={shortNameMode !== "change"} onChange={(_, data) => setShortName(data.value)} /></Field>
+          <p className="hca-field-hint">Manter não altera esse campo. Remover volta a usar o nome do cadastro; apagar ou digitar espaços ao alterar exige corrigir o valor ou escolher remover.</p>
           {[["reminderHours", "Primeiro lembrete (horas)", 1, 720], ["reminderRepeatHours", "Repetir lembrete (horas)", 1, 720], ["shareWaitSeconds", "Acompanhamento inicial (segundos)", 0, 10]].map(([key, label, min, max]) => <Field key={String(key)} label={String(label)}><Input name={String(key)} type="number" min={Number(min)} max={Number(max)} required defaultValue={String(values[String(key)])} /></Field>)}
           <ReminderSettings settings={values} directory={directory} />
         </div>

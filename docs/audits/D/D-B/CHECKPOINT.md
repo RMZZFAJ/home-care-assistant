@@ -1379,3 +1379,53 @@ preservadas:29 PASS/48 PARTIAL/28 NOT_STARTED. O novo SHA requer sua própria
 CI. Missão ativa; PR7 OPEN Draft, sem merge; Sonar adiado pelo responsável.
 Restam critérios de formulários/fidelidade, demais itens da matriz e gates
 humanos/AT/aparelhos/D-C/D6. Arquivo Sonar do usuário continua fora do commit.
+
+## D3.6 — formulários e identidade, validado local/remoto
+
+Base publicada `f05754d581beaa6da410610d35982ca003e53a65`. C026, C030 e C031
+comprovados por validação dirigida. Mensagens de
+validação contextual e foco foram implementados em REQ e apresentações.
+Nome curto distingue manter, alterar e remover explicitamente; JSON null
+representa a remoção, enquanto omissão conserva o valor. Migration151 aplicada
+na stack local verificada e no remoto, sem reset. Unitários41/41 e tipos/lint
+dirigidos passaram. Auth real confirmou três casos distintos, incluindo
+negativas, aprovação local distinta e replay; uma leitura incorreta no teste
+foi corrigida e somente esse caso foi reensaiado.
+
+21 casos distintos de produção compõem três coortes qualificadas. Seis casos
+REQ/apresentação conservam consumidores/hashes; os 15 finais repetem política,
+comparação, recuperação e vínculos. Foram 37 resultados terminais,35 passes e
+duas falhas anteriores, com interrupção por reboot preservada. Diagnóstico
+9 execuções/5 passes/4 falhas é separado. Uma falha de teste por orçamento
+total WebKit foi corrigida com60s somente naquele caso, mantendo15s por ação
+e todas as asserções. Corte real de controles em320px e uma primeira correção
+de layout reprovada por axe foram corrigidos e reensaiados. Foco volta ao
+botão de origem depois da consulta da versão confirmada, sem CAS obsoleto.
+
+Remoto151/local151, histórico151/151, zero pendências antes do commit. Cópia
+e5c5148c:79 arquivos/11059964 bytes; restore151 conjuntos/FKs,33 objetos/32 PDFs
+e hash de uma emissão ready, upgrade151 aprovado. Dois preflights e uma
+captura recusados por atividade concorrente foram preservados. A cópia válida
+restaurada foi mantida; a atividade posterior ficou explícita, com schema,
+histórico e Storage exatos e nenhuma remoção de linha. A comparação de
+preservação usa o snapshot imediatamente anterior ao DDL, não o ponto antigo
+de backup. 407 identidades/grants preservadas, três corpos alterados; Auth9,
+profiles7, Storage33, cron/Vault e151 projeções pós-validados. Advisors sem
+aumento; flag local conhecida da condição finita qualificada. Probe2,911s não
+aprova recuperação operacional/RPO/RTO/D6. Sem Auth/fixture remoto, reset,
+integração externa ou promoção. Matriz32 PASS/48 PARTIAL/25 NOT_STARTED;
+29 colunas canônicas preservadas. CI f05754d terminou8/8 SUCCESS; novo SHA
+exige CI própria. [Dossiê e recibos](FIELD_VALIDATION.md).
+
+## D5.4 — falha do Preview protegido, correção prioritária em curso
+
+Em08/11 o responsável relatou falha no Samsung Galaxy S24 Ultra, Chrome e PWA,
+mesmo após reinstalar: orientação offline, atualização e preparo para Push.
+É evidência física relatada pelo responsável; não é ensaio físico do agente.
+A hipótese de credenciais omitidas no precache foi reproduzida com o worker
+real em origem loopback com barreira por cookie: script acessível, instalação
+redundant em vez de activated. Correção ainda não aplicada neste incremento.
+Devem ser comprovados diagnóstico, recuperação, disponibilidade do botão Push,
+atualização Android/Chrome e URL estável de Preview, mantendo proteção,
+privacidade do cache, ausência de replay e autorização. Os critérios D5
+continuam PARTIAL. A execução D-B e a PR7 Draft permanecem ativas.

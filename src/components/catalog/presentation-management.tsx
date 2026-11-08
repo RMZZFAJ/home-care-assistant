@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Button, Combobox, Option } from "@fluentui/react-components";
 import { api, ApiError, inputClass, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
@@ -257,6 +257,11 @@ function PresentationEditor({
     typeof presentationCommandSchema.parse
   > | null>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const fieldId = useId(), fieldRefsRef = useRef<Record<string, HTMLElement | null>>({}), focusFieldRef = useRef<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (focusFieldRef.current) { fieldRefsRef.current[focusFieldRef.current]?.focus(); focusFieldRef.current = null; }
+  }, [fieldErrors]);
   const focusAfterRejectionRef = useRef(false);
   useEffect(() => {
     if (!review && !busy && focusAfterRejectionRef.current) {
@@ -285,11 +290,18 @@ function PresentationEditor({
       idempotencyKey: crypto.randomUUID(),
     });
     if (!result.success) {
-      setError(result.error.issues[0]?.message ?? "Confira os campos.");
-      firstInputRef.current?.focus();
+      const errors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const key = String(issue.path[0]);
+        if (["productId", "name", "barcode", "baseQuantity"].includes(key) && !errors[key]) errors[key] = issue.message;
+      }
+      const first = ["productId", "name", "barcode", "baseQuantity"].find(key => errors[key]);
+      setFieldErrors(errors); focusFieldRef.current = first ?? "name";
+      setError(first ? errors[first] : "Confira os campos da apresentação.");
       return;
     }
     packetRef.current = result.data;
+    setFieldErrors({});
     setError("");
     setReview(true);
   }
@@ -387,6 +399,9 @@ function PresentationEditor({
           <label className="block text-sm font-semibold">
             Material
             <Combobox
+              ref={node => { fieldRefsRef.current.productId = node?.querySelector<HTMLInputElement>("input") ?? node; }}
+              aria-invalid={Boolean(fieldErrors.productId)}
+              aria-describedby={fieldErrors.productId ? fieldId + "-productId" : undefined}
               style={{ minWidth: 0, width: "100%" }}
               aria-label="Material da apresentação"
               value={productSearch || product?.name || ""}
@@ -416,6 +431,7 @@ function PresentationEditor({
                   </Option>
                 ))}
             </Combobox>
+            {fieldErrors.productId ? <span id={fieldId + "-productId"} className="ui-field-error">{fieldErrors.productId}</span> : null}
           </label>
         )}
         {!initial && product ? (
@@ -488,6 +504,7 @@ function PresentationEditor({
           </div>
         ) : (
           <form
+            noValidate
             className="space-y-4"
             onSubmit={(event) => {
               event.preventDefault();
@@ -496,9 +513,12 @@ function PresentationEditor({
           >
             <fieldset className="min-w-0 space-y-4" disabled={disabled}>
               <label className="block text-sm font-semibold">
-                Nome da apresentação
+                <span id={fieldId + "-name-label"}>Nome da apresentação</span>
                 <input
-                  ref={firstInputRef}
+                  aria-labelledby={fieldId + "-name-label"}
+                  ref={node => { firstInputRef.current = node; fieldRefsRef.current.name = node; }}
+                  aria-invalid={Boolean(fieldErrors.name)}
+                  aria-describedby={fieldErrors.name ? fieldId + "-name" : undefined}
                   className={inputClass}
                   value={name}
                   onChange={(event) => setName(event.target.value)}
@@ -506,10 +526,15 @@ function PresentationEditor({
                   maxLength={160}
                   required
                 />
+                {fieldErrors.name ? <span id={fieldId + "-name"} className="ui-field-error">{fieldErrors.name}</span> : null}
               </label>
               <label className="block text-sm font-semibold">
-                Código da apresentação
+                <span id={fieldId + "-barcode-label"}>Código da apresentação</span>
                 <input
+                  aria-labelledby={fieldId + "-barcode-label"}
+                  ref={node => { fieldRefsRef.current.barcode = node; }}
+                  aria-invalid={Boolean(fieldErrors.barcode)}
+                  aria-describedby={fieldErrors.barcode ? fieldId + "-barcode" : undefined}
                   className={inputClass}
                   value={barcode}
                   onChange={(event) => setBarcode(event.target.value)}
@@ -521,10 +546,15 @@ function PresentationEditor({
                 <span className="block text-xs font-normal">
                   Mantenha todos os zeros iniciais.
                 </span>
+                {fieldErrors.barcode ? <span id={fieldId + "-barcode"} className="ui-field-error">{fieldErrors.barcode}</span> : null}
               </label>
               <label className="block text-sm font-semibold">
-                Fator na unidade base
+                <span id={fieldId + "-baseQuantity-label"}>Fator na unidade base</span>
                 <input
+                  aria-labelledby={fieldId + "-baseQuantity-label"}
+                  ref={node => { fieldRefsRef.current.baseQuantity = node; }}
+                  aria-invalid={Boolean(fieldErrors.baseQuantity)}
+                  aria-describedby={fieldErrors.baseQuantity ? fieldId + "-baseQuantity" : undefined}
                   className={inputClass}
                   inputMode="decimal"
                   value={factor}
@@ -532,6 +562,7 @@ function PresentationEditor({
                   maxLength={64}
                   required
                 />
+                {fieldErrors.baseQuantity ? <span id={fieldId + "-baseQuantity"} className="ui-field-error">{fieldErrors.baseQuantity}</span> : null}
                 <span className="block text-xs font-normal">
                   Quantidade de {product?.unit ?? "unidade base"} em uma
                   embalagem; positiva, sem arredondamento.
@@ -550,7 +581,7 @@ function PresentationEditor({
               <Button
                 type="submit"
                 appearance="primary"
-                disabled={disabled || !product}
+                disabled={disabled}
               >
                 Revisar apresentação
               </Button>

@@ -430,3 +430,24 @@ finita, com predicado preservado. Advisors: INFO privado39→41 e funções Auth
 [pós-check](ATTACHMENTS_REMOTE_MIGRATIONS.json),
 [advisors](ATTACHMENTS_REMOTE_ADVISORS.json) e
 [evidência](ATTACHMENTS_EVIDENCE.json). Probe5,392s não comprova D6/RPO/RTO.
+
+### Formulários e remoção explícita — remoto151
+
+151 foi aplicada pelo CLI vinculado, sem roles/seeds/Vault, após testes Auth e
+consumidores, backup válido restaurado, upgrade isolado e pré-validação. Não
+cria tabelas, políticas ou grants. Três corpos existentes passam a distinguir
+omissão e JSON null para nome curto; assinatura, autoridade, CAS, replay e
+propostas anteriores permanecem preservados.
+
+Atividade após o backup foi documentada separadamente e não confundida com
+perda causada pela migration. A pré-validação exigiu schema, histórico e
+Storage exatos à cópia, sem linhas removidas e cópia verificada com menos de
+uma hora. A pós-validação compara o snapshot imediatamente anterior ao DDL.
+Histórico151/151,407 identidades/grants,151 projeções, Auth9/profiles7,33 objetos,
+cron/Vault e marcador HTTP200/protocolo1/schema1 foram conferidos. Catálogo
+coincide salvo a flag local conhecida; advisors sem aumento. Nenhum reset,
+fixture/Auth remoto, transporte externo ou promoção.
+[Preflight](FIELD_VALIDATION_REMOTE_PREFLIGHT.json),
+[pós-check](FIELD_VALIDATION_REMOTE_MIGRATIONS.json),
+[advisors](FIELD_VALIDATION_REMOTE_ADVISORS.json) e
+[provas e qualificações](FIELD_VALIDATION_EVIDENCE.json).

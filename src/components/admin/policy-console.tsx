@@ -18,6 +18,7 @@ import { Button } from "@fluentui/react-components";
 import { useRouter, useSearchParams } from "next/navigation";
 import { roles } from "./admin-fields";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { shortNameChange } from "@/lib/validation/governance";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { GovernanceProposals } from "./governance-proposals";
 import { governanceCommandConfirmed } from "@/lib/validation/governance";
@@ -85,8 +86,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const command = useCommandIntent<ConfigurationPacket, ConfigurationResult>(governanceCommandConfirmed);
   const [invitationBusy, setInvitationBusy] = useState(false);
   const [reviewing, setReviewing] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [conflict, setConflict] = useState(false);
-  const busy = command.busy || invitationBusy || reviewing;
+  const busy = command.busy || invitationBusy || reviewing || confirming;
   const locked = busy || command.uncertain || conflict;
   const params = useSearchParams();
   const router = useRouter();
@@ -119,6 +121,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
     return () => controller.abort();
   }, [patientId, readAttempt, liveRevision]);
   async function confirmed(result: ConfigurationResult) {
+    setConfirming(true);
     setInvitationUrl(result.invitationUrl ?? "");
     setInvitationRecovery(result.invitationRecovery ?? null);
     setMessage(result.data.status === "awaiting_acceptance"
@@ -127,12 +130,12 @@ function Policies({ context }: { context: WorkspaceContext }) {
         ? "Proposta global registrada. Referência: " + result.data.id + ". Um administrador local distinto deve aprovar."
         : "Configuração aplicada no paciente.");
     setEditingVersion(null);
-    setAttempt(value => value + 1);
     try {
       const authoritative = await api<PolicyData>("/api/patient-settings?careRecipientId=" + patientId);
       if (authoritative.data.version >= (currentVersionRef.current ?? 0)) { currentVersionRef.current = authoritative.data.version; setData(authoritative); }
       await context.refresh();
     } catch (reason) { setError("A ação foi confirmada, mas a consulta posterior falhou. " + (reason instanceof Error ? reason.message : "Atualize esta seção.")); }
+    finally { setConfirming(false); setAttempt(value => value + 1); }
     return true;
   }
   async function reviewCurrent() {
@@ -224,8 +227,12 @@ function Policies({ context }: { context: WorkspaceContext }) {
       days: form.getAll("shiftDays"),
       userIds: form.getAll("shiftUsers"),
     };
-    if (String(form.get("patientShortName") ?? "").trim())
-      change.patientShortName = String(form.get("patientShortName")).trim();
+    try { Object.assign(change, shortNameChange(String(form.get("patientShortNameAction") ?? "keep"), String(form.get("patientShortName") ?? ""))); }
+    catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Confira o nome curto.");
+      const input = event.currentTarget.elements.namedItem("patientShortName"); if (input instanceof HTMLElement) input.focus();
+      return Promise.resolve(false);
+    }
     return configure("settings", change);
   }
   if (!data)

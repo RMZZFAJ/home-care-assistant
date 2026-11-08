@@ -36,3 +36,8 @@ backup verificável e pós-validação. O alvo continua exclusivamente
 qwfrqychokvhdzakibid. Não autoriza reset, fixtures remotas, merge, promoção de
 produção ou ativação de transportes externos. A PR permanece Draft e o preview
 continua ambiente de desenvolvimento, sem aprovação operacional.
+
+A orientação vigente para o fechamento da etapa em andamento é reconciliar
+todas as migrations pendentes no remoto ao commitar, permitindo o teste do
+preview. O procedimento acima é mantido em cada fechamento correspondente;
+não equivale a homologação da versão em desenvolvimento.

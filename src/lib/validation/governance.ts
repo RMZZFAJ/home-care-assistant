@@ -1,6 +1,15 @@
 import { z } from "zod";
 
 export const governanceKinds = ["capability", "settings", "membership", "notification_rule", "administration"] as const;
+export type ShortNameMode = "keep" | "change" | "remove";
+export function shortNameChange(mode: string, value: string): { patientShortName?: string | null } {
+  if (mode === "keep") return {};
+  if (mode === "remove") return { patientShortName: null };
+  if (mode !== "change") throw new Error("Escolha se deseja manter, alterar ou remover o nome curto.");
+  const name = value.trim();
+  if (!name || name.length > 60) throw new Error("Informe um nome curto de 1 a 60 caracteres, ou escolha remover.");
+  return { patientShortName: name };
+}
 const commandResultSchema = z.object({ data: z.object({ id: z.string().uuid(), status: z.enum(["pending", "awaiting_acceptance", "applied", "rejected"]) }) });
 export const governanceCommandConfirmed = (value: unknown) => commandResultSchema.safeParse(value).success;
 export const governanceIntentFields = {

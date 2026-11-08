@@ -33,6 +33,7 @@ const operationFields: Record<string, string[]> = {
 const subjectKeys = ["userId", "subjectUser", "recipientUserId"];
 const days = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
 function valueLabel(key: string, value: unknown, change: GovernanceChange, directory: { id: string; name: string }[]): string {
+  if (key === "patientShortName" && (value == null || value === "")) return "Sem nome curto · usar o nome do cadastro";
   if (key === "enabled" && value === null) return "Herdar a regra da função" + (typeof change.current?._inheritedEnabled === "boolean" ? change.current._inheritedEnabled ? " (permitir)" : " (restringir)" : "");
   if (value === undefined || value === null) return "Não registrado";
   if (subjectKeys.includes(key)) return change.subjectName ?? directory.find(person => person.id === value)?.name ?? "Pessoa sem nome disponível neste registro";

@@ -1,8 +1,27 @@
 # Estado verificável do projeto
 
-Referência editorial:07/11/2026, America/Sao_Paulo. **Produção NO-GO.**
+Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
+
+Estado atual: local151/remoto151, zero migrations pendentes após backup válido,
+restauração/upgrade, compatibilidade e pré/pós-validação. C026/030/031 comprovam
+validação contextual, identidade do vínculo e ações explícitas de nome curto.
+41 unitários, três casos Auth distintos e21 casos distintos de produção em
+coortes qualificadas passaram. Matriz32 PASS/48 PARTIAL/25 NOT_STARTED;
+CI da base f05754d terminou integralmente SUCCESS, sem validar antecipadamente
+o incremento novo. [Provas](../audits/D/D-B/FIELD_VALIDATION.md).
+
+PWA/Push no Preview protegido têm falha física relatada pelo responsável em
+Samsung S24 Ultra e reproduzida localmente com barreira de acesso por cookie.
+A correção é prioritária e ainda está em execução; não há homologação física
+de sucesso. D5 permanece parcial, com proteção Vercel, privacidade do cache e
+ausência de replay preservados como requisitos. Sonar continua adiado pelo dono.
+
+## Registro histórico por incremento
+
+Os números e estados abaixo descrevem seus respectivos fechamentos. O resumo
+acima e os recibos correspondentes registram o estado corrente.
 
 CI4016105, run42415801564, terminou SUCCESS: banco, validate Ubuntu/Windows,
 Chromium/mobile e as duas partes iOS, além do agregado. O preview correspondente

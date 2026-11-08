@@ -41,7 +41,7 @@ export const requisitionLineSchema = z
     unit: z.string().trim().min(1).max(80).optional(),
     ...observation,
     urgent: z.boolean(),
-    repeatReason: z.string().trim().min(3).max(1000).optional(),
+    repeatReason: z.string().trim().min(3, "Informe um motivo com pelo menos três caracteres.").max(1000, "O motivo deve ter até 1.000 caracteres.").optional(),
   })
   .strict()
   .superRefine(coherentObservation);
@@ -49,7 +49,7 @@ export const requisitionLineSchema = z
 export const extraItemSchema = z
   .object({
     id: z.string().trim().min(1).max(120),
-    name: z.string().trim().min(1, "Informe o nome do item.").max(200),
+    name: z.string().trim().min(1, "Informe o nome do item.").max(200, "O nome do item deve ter até 200 caracteres."),
     ...observation,
     urgent: z.boolean(),
   })
@@ -63,7 +63,7 @@ export const requisitionInputSchema = z
     extraItems: z.array(extraItemSchema).max(20),
     observations: z
       .array(
-        z.string().trim().min(1, "A observação não pode ser vazia.").max(1000),
+        z.string().trim().min(1, "A observação não pode ser vazia.").max(1000, "A observação deve ter até 1.000 caracteres."),
       )
       .max(50),
     idempotencyKey: z.string().uuid(),
