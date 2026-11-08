@@ -390,3 +390,20 @@ Sem reset, fixture/Auth remoto, promoção ou ativação de fornecedor externo.
 [Preflight](OPS_3_REMOTE_PREFLIGHT.json), [pós-check](OPS_3_REMOTE_MIGRATIONS.json),
 [advisors](OPS_3_REMOTE_ADVISORS.json) e [evidência](OPS_3_EVIDENCE.json).
 CI do SHA publicado, os critérios restantes e gates D-C/D6 permanecem próprios.
+
+### Fechamento do acompanhamento inicial — remoto148
+
+20261108002700 foi aplicada após cópia fresca autenticada, restauração e upgrade
+isolados, compatibilidade e preflight. Local148/remoto148 sem pendências.
+Acrescenta somente a política0–10 do documento autorizado, sem payload de
+configuração local nem caminho anon/serviço. Os398 contratos anteriores,
+corpos e grants permanecem iguais. A API mantém data e acrescenta waitSeconds.
+
+Histórico148/148,149 conjuntos anteriores, Auth9/profiles7, Storage33, cron e
+Vault preservados. Locks/transações longas/índices inválidos zero; runtime
+anônimo200/protocolo1/schema1. Catálogo vivo equivalente, salvo a qualificação
+NaN local conhecida com predicado idêntico. Sem reset, fixture/Auth remoto,
+fornecedor externo ou promoção. [Preflight](NOTICE_TRACKING_REMOTE_PREFLIGHT.json),
+[pós-check](NOTICE_TRACKING_REMOTE_MIGRATIONS.json),
+[advisors](NOTICE_TRACKING_REMOTE_ADVISORS.json) e
+[provas locais](NOTICE_TRACKING_EVIDENCE.json). CI do novo SHA continua gate.

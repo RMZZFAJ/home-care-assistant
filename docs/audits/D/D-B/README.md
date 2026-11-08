@@ -20,6 +20,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Rotação, recuperação e lacunas dos lembretes legados](SCHEDULER_LEGACY.md).
 - [Captura, destino cifrado e retenção de backup](BACKUP_PIPELINE.md).
 - [Monitoramento, suporte global e impacto pessoal](OBSERVABILITY.md).
+- [Preparação da primeira residência e contingência](PILOT_AND_CONTINGENCY.md).
+- [Prazo e resultado do acompanhamento inicial de avisos](NOTICE_TRACKING.md).
 - [Complementos posteriores do responsável](OWNER_AMENDMENTS.md): configuração
   e tratamento específico do SonarCloud adiados expressamente; reconciliação
   remota antecipada para o fechamento de D5.1.

@@ -1211,3 +1211,74 @@ OPS.3 e impacto/ajuda recebem implementação parcial comprovada, sem falsa
 homologação externa. Sonar permanece adiado. A configuração Sonar do usuário
 continua fora deste lote. D-B ativa, PR7 Draft, sem merge ou promoção.
 [Evidência e contraprovas](OPS_3_EVIDENCE.json).
+
+### Continuidade — roteiro do piloto
+
+OPS.3 publicado em1e11536, origem sincronizada, PR7 OPEN Draft; CI119/run42428525557
+e preview correspondentes estavam em andamento na observação inicial. Remoto147
+permanece reconciliado. A única alteração fora do lote é o arquivo Sonar do
+usuário, preservado também no staging.
+
+Preparado [roteiro do piloto e contingência](PILOT_AND_CONTINGENCY.md), ligado aos
+controles já implementados de preparação global, responsáveis distintos,
+retomada/CAS e tarefas locais. Seis hashes de consumidores/contratos D3.5
+coincidem; a evidência é reutilizada explicitamente, sem repetir suítes por
+mudança somente documental. [Recibo](PILOT_EVIDENCE.json). Nenhuma residência,
+responsável, aceite ou GO foi inventado. Matriz105x39 preservada:25 PASS,
+48 PARTIAL e32 NOT_STARTED. O complemento documental aguarda próximo lote de
+publicação; não cancelar a CI em curso apenas por atualização documental.
+
+### C-AC-023 — janela inicial de avisos em implementação
+
+Hipótese concreta confirmada no código: InitialNoticeTracking mantinha o
+deadline fixo10s após um resultado terminal e ignorava shareWaitSeconds. O
+controlador novo usa a política0–10 do documento autorizado, mantém o prazo
+absoluto, encerra polling/timeout ao consultar estado terminal e cancela apenas
+as próprias leituras. Não recebe controlador da emissão PDF. Zero desativa o
+acompanhamento repetido, sem confirmar entrega ou ciência. Resposta inválida
+é indisponibilidade, sem virar zero pendências.
+
+15 unitários de relógio controlado passaram:0/5/10, terminal antes/depois,
+primeira resposta tardia, resposta que ignora abort, desmontagem e inválidos.
+Preflight revertido passou; migration20261108002700 aplicada somente localmente,
+sem reset. Local148/remoto147; uma pendente para o próximo fechamento autorizado.
+Dois casos HTTP com Auth real passaram em política/default/privacidade, contexto,
+revogação e negativas de global/anon/serviço. Tipos e lint iniciais passaram.
+
+O primeiro diagnóstico de navegador alcançou os estados corretos, mas três
+oráculos usavam document_id inexistente em stock_movements. A fixture agora
+confronta as movimentações do paciente pelo vínculo do documento. A rechecagem
+dirigida está em execução; diagnóstico não é aceite. Falha e oráculos continuam
+preservados. C-AC-023 ainda não recebe conclusão. A próxima publicação exige
+aceite em build de produção, evidência, backup e reconciliação148, depois CI do
+SHA correspondente. O preview1e11536 segue READY no remoto147; runtime200/ready,
+rota privada401 e heartbeat da aplicação Preview foram observados sem criar
+sessão Auth ou fixture remota. [Recibo](PREVIEW_1E11536_OBSERVATION.json).
+
+### Fechamento C-AC-023 e documentação do piloto
+
+Local148/remoto148, histórico148/148 reconciliado e sem pendências. A migration
+adiciona somente leitura minimizada de shareWaitSeconds, sob autorização vigente
+do documento. Os398 contratos anteriores e seus grants/corpos foram preservados;
+nenhuma tabela ou estado operacional mudou pela migration. Os149 conjuntos
+anteriores, Auth9, profiles7, Storage33, cron e Vault foram confrontados, com os
+clocks/cursors nomeados qualificados. Restauração/upgrade da cópia fresca passou:
+149 conjuntos/FKs,33 objetos,32 PDFs e hash de uma emissão ready. Tempo3,684s do
+probe não comprova RPO/RTO/D6.
+
+15 unitários e dois casos HTTP Auth passaram; os15 casos de produção nos três
+projetos incluem9 novos e6 de consumidores PDF. O PDF lento confirmou bytes
+mesmo após encerrar a janela5; terminal antes do prazo10 não regrediu,0 não
+reiniciou polling e desmontagem descarta respostas tardias. Tipos/lint passaram.
+Diagnóstico e falhas de fixture permanecem separados do aceite. A CI de1e11536
+terminou com oito jobs SUCCESS, incluindo banco completo e todos os navegadores.
+O [recibo por SHA](CI_1E11536_OBSERVATION.json) não aprova o próximo incremento.
+[Evidência](NOTICE_TRACKING_EVIDENCE.json) e [recibo remoto](NOTICE_TRACKING_REMOTE_MIGRATIONS.json).
+
+O roteiro do piloto reutiliza seis consumidores/contratos D3.5 com hashes
+iguais; somente Markdown/referências/evidência do complemento são validados,
+sem repetir testes funcionais por documentação. Residência, responsáveis reais,
+homologação de canais, AT/aparelhos, recuperação de chaves e decisão D-C/D6
+continuam pendentes. Matriz105x39 mantém29 colunas iniciais e passa a26 PASS,
+48 PARTIAL e31 NOT_STARTED. Missão D-B ativa, Sonar adiado, PR7 Draft, sem merge
+ou promoção. Arquivo Sonar do usuário permanece fora do commit.

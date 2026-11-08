@@ -298,3 +298,13 @@ de disponibilidade externa, RPO/RTO operacional ou D6. A matriz D-B mantém25 PA
 47 PARTIAL e33 NOT_STARTED; a missão continua. Sonar adiado pelo responsável,
 PR7 Draft, sem merge ou promoção. [Contrato](../audits/D/D-B/OBSERVABILITY.md)
 e [evidência](../audits/D/D-B/OPS_3_EVIDENCE.json).
+
+C-AC-023 corrige a janela inicial de avisos: respeita0/5/10 segundos,
+conserva resultado terminal e cancela somente as próprias leituras, mantendo
+PDF independente. 15 unitários, dois casos HTTP Auth e15 casos em build de
+produção passaram; banco local/remoto148 reconciliado após nova cópia/probe e
+pós-validação. [Provas](../audits/D/D-B/NOTICE_TRACKING_EVIDENCE.json).
+O [roteiro do piloto](../audits/D/D-B/PILOT_AND_CONTINGENCY.md) conecta controles
+já implementados aos responsáveis e gates ainda a designar. Matriz26 PASS,
+48 PARTIAL e31 NOT_STARTED, com colunas originais preservadas. D-B continua
+ativa; CI do novo SHA e D-C/D6 permanecem próprios. Sem merge ou promoção.

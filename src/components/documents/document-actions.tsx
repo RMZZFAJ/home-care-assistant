@@ -13,6 +13,7 @@ import {
   type PdfArchiveCursor,
 } from "@/lib/documents/pdf-archive";
 import { formatBrazilDate } from "@/lib/receipt";
+import { initialNoticeMessage, startInitialNoticeTracking, type InitialNoticeState } from "@/lib/notifications/initial-tracking";
 
 type Props = {
   id: string;
@@ -44,55 +45,14 @@ export function DocumentActions(props: Props) {
   );
 }
 function InitialNoticeTracking({ id }: { id: string }) {
-  const [message, setMessage] = useState(
-    "Documento salvo. Consultando os avisos iniciais…",
-  );
-  useEffect(() => {
-    const controller = new AbortController();
-    let timer: ReturnType<typeof setTimeout>;
-    const deadline = setTimeout(() => {
-      controller.abort();
-      setMessage(
-        "Documento salvo. Os avisos continuam sendo processados; consulte o acompanhamento.",
-      );
-    }, 10000);
-    async function track() {
-      try {
-        const response = await fetch(`/api/documents/${id}/notifications`, {
-          cache: "no-store",
-          signal: controller.signal,
-        });
-        if (response.ok) {
-          const body = await response.json(),
-            pending = body.data.filter((r: { state: string }) =>
-              ["pending", "processing", "uncertain"].includes(r.state),
-            ).length;
-          if (!controller.signal.aborted) {
-            setMessage(
-              pending
-                ? `Documento salvo · ${pending} aviso(s) aguardando resultado.`
-                : "Documento salvo. Consulte os estados individuais dos avisos abaixo.",
-            );
-            if (pending) timer = setTimeout(() => void track(), 1800);
-          }
-        }
-      } catch {
-        /* Tracking has a fixed deadline; no provider success is assumed. */
-      }
-    }
-    void track();
-    return () => {
-      controller.abort();
-      clearTimeout(deadline);
-      clearTimeout(timer);
-    };
-  }, [id]);
-  return (
-    <p className="text-xs text-(--muted)" role="status">
-      {message}
-    </p>
-  );
+  const [state, setState] = useState<InitialNoticeState>({ kind: "checking" });
+  useEffect(() => startInitialNoticeTracking(
+    signal => api<unknown>(`/api/documents/${id}/notifications`, undefined, signal),
+    setState,
+  ), [id]);
+  return <p className="text-xs text-(--muted)" role="status" data-notice-tracking={state.kind}>{initialNoticeMessage(state)}</p>;
 }
+
 function GeneratedFiles({
   id,
   code,
