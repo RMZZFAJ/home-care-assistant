@@ -11,9 +11,17 @@ antigos. A aparência dos PDFs foi adiada pelo responsável. Passaram16 casos
 unitários distintos, cinco Auth e30 de produção em coortes;14 exemplares reais
 tiveram dados e PAdES-B-T/TSA interna conferidos independentemente. Dezoito
 controles V4/V5/V6 conservam bytes exatos. Isso não representa ICP-Brasil,
-tempo externo, PDF marcado ou homologação física. Matriz38 PASS/50 PARTIAL/
-17 NOT_STARTED; C105/C106 e os demais gates continuam próprios.
+tempo externo, PDF marcado ou homologação física. Matriz40 PASS/51 PARTIAL/
+14 NOT_STARTED; C105/C106 e os demais gates continuam próprios.
 [Provas e qualificação da atividade remota](../audits/D/D-B/PDF_FIDELITY.md).
+
+D4.7 acrescenta comparação humana de versões REQ/COM/ENT/BAL, autoria congelada,
+motivo/ressalva em leitura, retorno da seleção pelo acervo e revalidação Auth/RLS.
+Passaram10 unitários distintos e18 casos de produção em coortes, com falhas
+preservadas. Três arquivos tiveram versão/hash vinculados ao evento exato;
+histórico não altera bytes, eventos ou estoque. Sem migration nova. CI df49881
+terminou8/8 SUCCESS e seu Preview protegido ficou READY; o incremento novo
+exige CI/Preview próprios. [Provas](../audits/D/D-B/DOCUMENT_VERSION_HISTORY.md).
 
 PWA/Push no Preview protegido tiveram falha física relatada no Samsung S24 Ultra
 e reproduzida com barreira de acesso por cookie. A correção envia credenciais

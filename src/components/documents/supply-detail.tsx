@@ -1,5 +1,5 @@
 "use client";
-import { SettingsSection } from "@/components/forms/settings-section";
+import { DocumentTimeline } from "./document-timeline";
 import { DeliveryRecipientFacts } from "./delivery-recipient";
 import { DeliveryRegularization } from "./delivery-regularization";
 import { BalanceReview } from "./balance-review";
@@ -28,7 +28,6 @@ import { DocumentDeliveryStatus } from "@/components/notifications/document-deli
 import { Attachments } from "./attachments";
 import { CommandEditor, type DocumentAction } from "./supply-command-editor";
 import { type PatientPerson, type SupplyDocument } from "@/types/documents";
-import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -839,42 +838,7 @@ export function SupplyDocumentContent({
             onChange={() => setAttempt((value) => value + 1)}
           />
           <DocumentDeliveryStatus id={data.id} version={data.version} />
-          <SettingsSection
-            title="Versões e integridade"
-            summary={data.events.length + " versão(ões) · SHA-256 por evento"}
-          >
-            <p className="mt-2 text-xs text-(--muted)">
-              O hash permite comparar o conteúdo canônico registrado. A
-              rastreabilidade depende também dos controles de acesso e do
-              histórico do banco.
-            </p>
-            <ol className="mt-4 space-y-3">
-              {data.events.map((event) => (
-                <li key={event.id} className="text-sm">
-                  <strong>
-                    v{event.version} ·{" "}
-                    {documentEventLabel(
-                      event.action,
-                      data.type === "COM" ? data.payload.origin : undefined,
-                    )}
-                  </strong>
-                  <p className="text-xs text-(--muted)">
-                    {formatBrazilDate(event.createdAt)} ·{" "}
-                    {people.find((person) => person.id === event.actorId)
-                      ?.name ?? "Responsável registrado"}
-                  </p>
-                  <details className="mt-1">
-                    <summary className="cursor-pointer text-xs">
-                      SHA-256
-                    </summary>
-                    <code className="block break-all text-xs">
-                      {event.hash}
-                    </code>
-                  </details>
-                </li>
-              ))}
-            </ol>
-          </SettingsSection>
+          <DocumentTimeline id={id} version={data.version} events={data.events} title="Versões e integridade" />
         </>
       ) : null}
       <Dialog

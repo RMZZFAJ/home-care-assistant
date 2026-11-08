@@ -498,7 +498,7 @@ export function RequisitionDocumentContent({
         ) : null}
       </section>
       <RequisitionDisplay key={id} id={id} reference={p} showHistory />
-      <DocumentTimeline events={p.events} />
+      <DocumentTimeline id={id} version={p.version} events={p.events} />
       {!data.is_historical &&
       !p.archivedAt &&
       data.status !== "cancelled" &&

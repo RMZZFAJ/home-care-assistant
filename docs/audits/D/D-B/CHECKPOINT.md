@@ -1540,3 +1540,55 @@ aprova o novo SHA. Publicação incremental/CI/Preview próprios seguem gate;
 missão ativa, PR7 OPEN Draft, Sonar adiado, sem merge/promoção/integração externa.
 [Dossiê](PDF_FIDELITY.md), [provas](PDF_FIDELITY_EVIDENCE.json) e
 [pós-check qualificado](PDF_FIDELITY_REMOTE_MIGRATIONS.json).
+
+## D4.7 — registro inicial da comparação histórica
+
+Base df49881 publicada. O Preview correspondente já está READY no endereço
+estável, com proteção, assets públicos exatos, runtime200 e fronteira privada401
+conferidos pelo operador. CI42473738962 aprovou banco/validate Ubuntu/Windows;
+quatro jobs browser estavam ativos na observação. Isso não aprova D4.7 novo.
+
+Histórico de supply usava nome atual do diretório por actorId. O novo leitor
+usa exclusivamente o nome congelado e sinaliza sua ausência. Consulta Auth/RLS
+por versão exata, referência anterior e revalidação final foi acrescentada,
+sem migration. Projeção mantém números originais, diff por identidade, fatos em
+leitura e desconhecimento explícito dos campos ainda sem descrição. URL conserva
+versão/referência ao consultar arquivos e voltar; consulta não emite exemplar.
+
+Nove unitários distintos aprovados em duas coortes/12 resultados; tipos/lint
+finais passaram. Diagnósticos iniciais de imports/tupla foram corrigidos sem
+reduzir regras. Produção dirigida15 casos nos três motores está em execução;
+fontes estáveis, sem outro ensaio mutável de banco em paralelo. Nenhum critério
+novo aprovado antes das provas. [Contrato e limites](DOCUMENT_VERSION_HISTORY.md).
+
+### D4.7 — fechamento local da comparação histórica
+
+Passaram10 unitários distintos em coortes/25 execuções, um probe Auth real após
+duas recusas de fixture e18 casos distintos de produção:12 novos/6 consumidores.
+São42 resultados/24 passes/18 falhas preservadas, com3 resultados de diagnóstico
+Next dev separados (2 passes/1 falha). Não se declara uma rodada única18/18.
+Foram corrigidos perda real de foco no botão desabilitado e rótulos/números
+brutos; as demais falhas eram de fixture/asserção/seletor do teste novo.
+
+Treze hashes delimitam cada coorte. Os caminhos REQ/BAL e consumidores PDF
+inalterados reaproveitam suas provas; a última COM3/3 cobre apresentação comum,
+quatro larguras, ator/catálogo posteriores, negativas reais, retomada da seleção,
+versão/hash incorporados e mesmos bytes.48 snapshots sintéticos foram inspecionados
+para descrição dos campos, sem confundir isso com48 execuções de fluxo.
+Tipos/lint finais passaram; dois cron locais continuam ativos.
+
+Leitura restrita passou3/3: familiar sem criar/aprovar/comprar lê a história,
+enquanto compra retorna403 sem alteração. A fixture clínica inicialmente
+recusada preserva a barreira financeira, comprovada por RPC/RLS; não foi
+liberada por override para satisfazer o teste. Fontes finais correspondem à
+última coorte, com guard de propriedade própria também coberto por unidade.
+
+C034/C-NEW-AC-017 locais; CFINAL018 parcial. Matriz105x39:40 PASS/51 PARTIAL/
+14 NOT_STARTED;29 colunas canônicas intactas. HTML histórico por versão não
+conclui PDF marcado, demais estados, tarefas humanas/AT/aparelhos ou D-C/D6.
+Local152/remoto152 reconsultado; nenhum SQL novo, reset, Auth/fixture remoto,
+transporte externo ou promoção. CI df49881 terminou8/8 SUCCESS e Preview READY;
+o SHA novo exige seus próprios gates. PR7 Draft e missão ativa; Sonar adiado.
+[Dossiê](DOCUMENT_VERSION_HISTORY.md),
+[evidências](DOCUMENT_VERSION_HISTORY_EVIDENCE.json) e
+[vínculos arquivo/versão](DOCUMENT_VERSION_HISTORY_BINDINGS.json).

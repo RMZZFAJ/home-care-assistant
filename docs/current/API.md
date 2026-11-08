@@ -56,6 +56,33 @@ Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
 implementação.
 
+## Comparação das versões documentais
+
+GET /api/documents/:id/history recebe version obrigatória e before opcional,
+ambas positivas em formato decimal. A referência precisa existir e ser anterior
+à versão escolhida; omissão escolhe a anterior disponível. Não substitui uma
+versão ausente pela atual. Retorna data com selected, before (ou null) e versões
+disponíveis, sem corpo canônico bruto ou contexto de autoridade.
+
+A sessão Auth precisa da leitura vigente do documento antes e depois do I/O;
+as linhas de origem passam pelo RLS desse mesmo cliente. A resposta usa private,
+no-store. Dados são imutáveis em leitura; a rota não emite PDF nem cria evento.
+COM conserva a barreira financeira do papel familiar/administrativo; um
+override clínico não a remove. Capacidade de leitura não concede compra.
+Nome é o preservado no evento, desconhecido explícito ou sistema sem autor
+pessoal. Não consulta perfil/catálogo atual para recompor autoria ou materiais.
+
+Cada versão contém hash canônico, autoria/data, fatos rotulados e indicador de
+campos ainda sem descrição. Números usam o token original de body::text e são
+formatados por Decimal. Hash do evento, SHA-256 do arquivo e verificação da
+assinatura permanecem resultados separados. Campos futuros não são despejados
+como JSON nem tratados silenciosamente como comparação completa.
+
+Inválido retorna400; sem sessão401; sem leitura403; versão ausente ou referência
+invertida404; corpo congelado incompatível409/CONTENT_INVALID. Interface oferece
+Atualizar a seção, sem transformar fatos antigos em campos editáveis.
+[Contrato e provas](../audits/D/D-B/DOCUMENT_VERSION_HISTORY.md).
+
 ## Regras comuns
 
 As rotas usam sessão Supabase, perfil ativo e capacidades efetivas no

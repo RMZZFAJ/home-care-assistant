@@ -8,9 +8,11 @@ import { DocumentActions } from "./document-actions";
 export function DocumentFileView({
   id,
   version,
+  historyBefore,
 }: {
   id: string;
   version?: number;
+  historyBefore?: number;
 }) {
   const { data, loading } = useWorkspaceState(),
     doc = data?.documentContext?.id === id ? data.documentContext : null;
@@ -83,7 +85,7 @@ export function DocumentFileView({
               </Link>
             ) : null}
             <Link
-              href={`/historico/${id}`}
+              href={`/historico/${id}${version ? `?historyVersion=${version}${historyBefore ? "&historyBefore=" + historyBefore : ""}` : ""}`}
               className="ui-button ui-button-secondary"
             >
               Voltar ao acompanhamento

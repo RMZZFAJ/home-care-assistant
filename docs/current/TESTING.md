@@ -362,3 +362,21 @@ O lote final9/9 não é47 dias de operação nem perda do computador. CLI/captur
 restore reais são evidência separada em [OPS.2](../audits/D/D-B/OPS_2_EVIDENCE.json).
 Não executar testes mutáveis de banco junto ao E2E. Agenda e fornecedor externo
 permanecem desligados; captura/probe não fazem reset ou importação de roles.
+
+## Comparação de versões documentais
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/version-history.test.ts
+npm run e2e -- tests/e2e/version-history.spec.ts tests/e2e/pdf-source-facts.spec.ts
+```
+
+A unidade cobre número exato, identidade da linha, proveniência, ausência de
+versão e revalidação após a consulta. O E2E usa Auth/RLS reais, dados fictícios,
+rename/revogação, erro/retry, teclado, acervo e vínculos de versão/hash/bytes.
+O runner confere a stack local e mantém envio externo desabilitado. Diagnóstico
+com HCA_E2E_DIAGNOSTIC=true usa Next dev e não substitui a produção.
+
+Após correção, repetir os casos afetados e conservar as coortes/hashes das
+provas inalteradas. A inspeção dos campos de48 snapshots sintéticos não é48
+fluxos executados nem prova de todos os estados, AT, impressão ou aparelho.
+[Resultados e contraprovas](../audits/D/D-B/DOCUMENT_VERSION_HISTORY_EVIDENCE.json).
