@@ -4,6 +4,7 @@ import { createWorkerClient } from "@/lib/server/service-client";
 import { secretMatches } from "@/lib/notifications/webhook";
 import { processNotifications } from "@/lib/notifications/worker";
 import { processWebPush } from "@/lib/server/web-push";
+import { observeHeartbeat } from "@/lib/server/operations-observer";
 
 export const maxDuration = 120;
 export async function POST(request: Request) {
@@ -20,10 +21,13 @@ export async function POST(request: Request) {
     const client = createWorkerClient();
     const schedule = await rpc(client, "run_operational_schedule");
     const data = await processNotifications(client);
+    const webPush = await processWebPush(client);
+    const operationsObservation = await observeHeartbeat(client, "worker");
     return NextResponse.json({
       data,
-      webPush: await processWebPush(client),
+      webPush,
       schedule,
+      operationsObservation,
     });
   });
 }

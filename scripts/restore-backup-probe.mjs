@@ -9,6 +9,8 @@ import { getTestEnvironment, testContainer } from "./test-environment.mjs";
 import { trustedExecutable } from "./trusted-executable.mjs";
 import { compareBackupSnapshots } from "./backup-snapshots.mjs";
 import { verifyStorageCapture } from "./verify-storage-capture.mjs";
+import { reportRecoveryProbe, reportRecoveryFailure } from "./operations-telemetry.mjs";
+import { externalOperatorPath } from "./operator-files.mjs";
 
 const prefix = "hca_restore_probe_";
 export function assertProbeDatabase(name) {
@@ -34,7 +36,7 @@ export function verifyRegisteredPdfCapture(sql, storage) {
 }
 
 /** No reset, no roles import and no second Supabase stack. The original DB is untouched. */
-export async function probeRestore({ directory, key, destination, applyAfterVersion }) {
+export async function probeRestore({ directory, key, destination, applyAfterVersion, telemetry }) {
   getTestEnvironment();
   if (!isAbsolute(destination)) throw new Error("An explicit external restore directory is required.");
   const verified = await extractBackup({ directory, destination, key });
@@ -114,13 +116,20 @@ export async function probeRestore({ directory, key, destination, applyAfterVers
     // Name is generated locally and checked again; never drops postgres or a supplied target.
     run(["exec", testContainer, "dropdb", "-U", "supabase_admin", "--if-exists", assertProbeDatabase(database)]);
   }
+  if (telemetry) result.telemetry = await reportRecoveryProbe(telemetry, result);
   return result;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  let telemetry;
   try {
     const option = (name) => { const index = process.argv.indexOf(name); if (index < 0 || !process.argv[index + 1]) throw new Error(`Required option: ${name}`); return process.argv[index + 1]; };
     const key = readFileSync(option("--key-file"));
-    console.log(JSON.stringify(await probeRestore({ directory: option("--archive"), destination: option("--destination"), key, applyAfterVersion: process.argv.includes("--apply-after") ? option("--apply-after") : undefined })));
-  } catch (error) { console.error(error instanceof Error ? error.message : "Recovery probe failed."); process.exitCode = 1; }
+    if (process.argv.includes("--telemetry-file")) {
+      const bytes = readFileSync(await externalOperatorPath(option("--telemetry-file")));
+      if (bytes.length > 4096) throw new Error("Invalid telemetry configuration.");
+      telemetry = JSON.parse(bytes.toString("utf8"));
+    }
+    console.log(JSON.stringify(await probeRestore({ directory: option("--archive"), destination: option("--destination"), key, applyAfterVersion: process.argv.includes("--apply-after") ? option("--apply-after") : undefined, telemetry })));
+  } catch (error) { await reportRecoveryFailure(telemetry); console.error(error instanceof Error ? error.message : "Recovery probe failed."); process.exitCode = 1; }
 }

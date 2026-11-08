@@ -97,6 +97,11 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(
     page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
   ).toHaveValue(patientB);
+  // The native select value changes before the context request and linked
+  // route finish. Observe the actual B workspace before starting a return to A.
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", patientB);
+  await expect(page).toHaveURL(new RegExp("careRecipientId=" + patientB));
+  await expect(page.getByRole("region", { name: "Acompanhamento pessoal", exact: true })).toBeVisible();
   await selectContext(page,patientA);
   await expect(page.getByRole("dialog",{name:"Perfil e contexto",exact:true})).toHaveCount(0);
   await expect(page.getByLabel("Menu do usuário",{exact:true})).toBeFocused();

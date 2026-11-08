@@ -14,6 +14,8 @@ const clocks = new Map([
   ],
   ["private.legacy_reminder_checkpoints", ["closed_through", "checked_at"]],
   ["private.legacy_reminder_failures", ["attempts", "last_failure_at"]],
+  ["private.operations_components", ["observed_at", "success_at"]],
+  ["private.operations_incidents", ["last_observed_at"]],
 ]);
 const literal = (value) => "'" + value.replaceAll("'", "''") + "'";
 const identifier = (value) => '"' + value.replaceAll('"', '""') + '"';

@@ -369,3 +369,24 @@ preservação do evento/efeitos. Banco local tem141 aplicações; crons originai
 preservados e instrumentos de falha ausentes. CI do SHA publicado deve validar
 instalação limpa, evolução legada e integração completa. Nenhuma aplicação remota
 neste incremento. [Contrato e limites](PDF_SOURCE_FACTS.md).
+
+### Fechamento OPS.3 — remoto147
+
+As migrations146/147 foram aplicadas no remoto autorizado após captura crítica
+fresca, autenticação e restauração/upgrade isolados. Local147/remoto147, sem
+pendências. A compatibilidade preservou387 identidades anteriores e seus grants;
+somente public.run_operational_schedule recebeu retorno aditivo e coletor em
+subtransação. As tabelas novas são privadas, sem grants diretos, e não concedem
+escopo clínico ao suporte. 147 corrige a recusa CAS para PT409 sem reescrever146.
+
+O pós-check confrontou os143 conjuntos anteriores, incluindo as145 linhas
+anteriores de histórico, e reconciliou separadamente todos os147 SQLs aplicados.
+Somente os clocks/cursors nomeados tiveram projeção qualificada. Auth9/profiles7,
+Storage33, cron e Vault preservados; locks, transações longas e índices inválidos
+zero. Catálogo vivo equivalente, salvo a qualificação conhecida do flag de
+validação NaN local, com predicado igual. Runtime anônimo200/protocolo1/schema1.
+Sem reset, fixture/Auth remoto, promoção ou ativação de fornecedor externo.
+
+[Preflight](OPS_3_REMOTE_PREFLIGHT.json), [pós-check](OPS_3_REMOTE_MIGRATIONS.json),
+[advisors](OPS_3_REMOTE_ADVISORS.json) e [evidência](OPS_3_EVIDENCE.json).
+CI do SHA publicado, os critérios restantes e gates D-C/D6 permanecem próprios.

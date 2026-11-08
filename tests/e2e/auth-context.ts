@@ -11,6 +11,7 @@ export async function selectContext(page: Page, patient: string | null) {
     const person = data.patients.find((row: { id: string }) => row.id === patient);
     const label = patient ? new RegExp("^" + String(person?.display_name).replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + " · ") : "Administração global";
     if (await chooser.isVisible()) {
+      if (patient) await chooser.getByRole("textbox", { name: "Buscar perfil autorizado", exact: true }).fill(person.display_name);
       await chooser.getByRole("button", { name: label, exact: !patient }).click();
     } else {
       await page.getByLabel("Menu do usuário", { exact: true }).click();

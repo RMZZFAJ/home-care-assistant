@@ -9,11 +9,12 @@ import { Badge, Checkbox } from "@fluentui/react-components";
 import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
 import { useInbox } from "@/lib/notifications/use-inbox";
 import { PushArrival } from "./push-arrival";
+import { DeliveryImpact } from "./delivery-impact";
 export function NotificationCenter() {
   return (
     <Workspace title="Central de notificações">
       {(context) => (
-        <><PushArrival /><Center
+        <><PushArrival />{context.activeContext?.mode === "patient" && context.patient ? <DeliveryImpact key={context.patient.id} patientId={context.patient.id} /> : null}<Center
           key={`${context.activeContext?.mode}:${context.patient?.id ?? "none"}`}
           patientId={context.activeContext?.mode === "patient" ? context.patient?.id : undefined}
         /></>

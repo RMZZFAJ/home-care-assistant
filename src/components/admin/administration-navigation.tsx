@@ -16,6 +16,7 @@ const areas: { section: string; title: string; description: string; group: strin
   { section: "audit", title: "Auditoria", description: "Eventos e responsáveis preservados no histórico.", group: "Comunicação e controle", capability: "audit.read", icon: "history" },
   { section: "import", title: "Importação histórica", description: "Pré-validar e incorporar fontes físicas revisadas.", group: "Comunicação e controle", capability: "access.manage", icon: "upload" },
   { section: "profiles", title: "Contas globais", description: "Identidades e privilégios globais, separados dos vínculos locais.", group: "Administração global", capability: "access.manage", icon: "settings", globalOnly: true },
+  { section: "operations", title: "Monitoramento e suporte", description: "Incidentes técnicos, observações e políticas por ambiente.", group: "Administração global", capability: "access.manage", icon: "history", globalOnly: true },
 ];
 export function administrationAreas(context: WorkspaceContext) {
   const global = context.activeContext?.mode === "global" && context.globalAdministrationAllowed;

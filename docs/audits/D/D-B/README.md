@@ -8,7 +8,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Checkpoint incremental](CHECKPOINT.md).
 - [Matriz de execução](ACCEPTANCE_EXECUTION.csv): 75 critérios C9 preservados e
   complementos próprios, sem aprovação por planejamento.
-- [Duas aplicações remotas](MIGRATIONS.md).
+- [Reconciliação das migrations](MIGRATIONS.md).
 - [Base operacional e limites](OPERATIONS_DOSSIER.md).
 - [Triagem de qualidade](SONAR_TRIAGE.md).
 - [Custódia documental e limites operacionais](SIGNING_CUSTODY.md).
@@ -19,6 +19,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Consentimento, transporte e privacidade Web Push](WEB_PUSH.md).
 - [Rotação, recuperação e lacunas dos lembretes legados](SCHEDULER_LEGACY.md).
 - [Captura, destino cifrado e retenção de backup](BACKUP_PIPELINE.md).
+- [Monitoramento, suporte global e impacto pessoal](OBSERVABILITY.md).
 - [Complementos posteriores do responsável](OWNER_AMENDMENTS.md): configuração
   e tratamento específico do SonarCloud adiados expressamente; reconciliação
   remota antecipada para o fechamento de D5.1.

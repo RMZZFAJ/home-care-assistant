@@ -33,6 +33,7 @@ import { MembershipManagement } from "./membership-management";
 import { GlobalAccounts } from "./global-accounts";
 import { AuditHistory } from "./audit-history";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { OperationsConsole } from "./operations-console";
 
 type Section =
   | "patient"
@@ -44,7 +45,8 @@ type Section =
   | "import"
   | "profiles"
   | "notificationRecipients"
-  | "notifications";
+  | "notifications"
+  | "operations";
 type AdministrativeResult = { data?: unknown; invitationUrl?: string; pendingApproval?: boolean };
 type AdministrativeIntent = { payload: Row; success: string; refreshContext: boolean };
 const labels: Record<Section, string> = {
@@ -58,6 +60,7 @@ const labels: Record<Section, string> = {
   profiles: "Contas globais",
   notificationRecipients: "Destinatários",
   notifications: "Notificações",
+  operations: "Monitoramento e suporte",
 };
 export function AdminConsole() {
   const params = useSearchParams();
@@ -103,7 +106,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [page, setPage] = useState(1);
   const [notificationTotal, setNotificationTotal] = useState(0);
   const [loading, setLoading] = useState(
-    !["patient", "import", "overview", "audit"].includes(section),
+    !["patient", "import", "overview", "audit", "operations"].includes(section),
   );
   const command = useCommandIntent<Row, AdministrativeResult>(governanceCommandConfirmed);
   const intentRef = useRef<AdministrativeIntent | null>(null);
@@ -136,7 +139,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   }, [globalMode, patientId, versionAttempt]);
   const load = useCallback(
     (signal?: AbortSignal) => {
-      if (!allowed || ["patient", "import", "overview", "audit"].includes(section))
+      if (!allowed || ["patient", "import", "overview", "audit", "operations"].includes(section))
         return Promise.resolve();
       const sequence = ++loadSequenceRef.current;
       const query = new URLSearchParams({ section });
@@ -522,6 +525,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           <AlertSettings rows={rows} products={catalog} handle={handle} />
         )}
         {section === "audit" ? <AuditHistory patientId={patientId!} /> : null}
+        {section === "operations" && globalMode ? <OperationsConsole key={context.userId} /> : null}
         {section === "import" && (
           <section className={panelClass}>
             <h2 className="font-bold">Importar protocolos físicos 1–11</h2>

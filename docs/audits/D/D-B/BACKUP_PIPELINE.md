@@ -5,6 +5,14 @@ CLI real já capturou o remoto144 e produziu cópia cifrada/autenticada, restaur
 em isolamento e evoluída até145. A agenda permanece desligada. RPO24h/RTO8h são
 alvos de homologação; segundos do probe não comprovam recuperação operacional.
 
+OPS.3 acrescenta adaptador interno opcional de telemetria, desligado na
+configuração permanente. Uma cópia só gera BACKUP_VERIFIED após autenticação
+de todos os membros e conferência de identidade/hash/tamanho; o horário vem do
+manifesto autenticado. O operador vê disabled, confirmed ou unconfirmed. Uma
+falha de registro técnico conserva o resultado real da cópia. --telemetry-file
+no probe de recuperação registra RECOVERY_PROBE_VERIFIED somente após o ensaio
+isolado e não libera D6. [Contrato e limites](OBSERVABILITY.md).
+
 ## Consumidor e configuração
 
 scripts/operations-backup.mjs integra captura remota read-only, arquivo

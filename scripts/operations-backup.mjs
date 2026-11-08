@@ -5,6 +5,7 @@ import { runBackup, backupStoreStatus } from "./backup-filesystem-store.mjs";
 import { externalOperatorPath, inside } from "./operator-files.mjs";
 import { captureRemoteBackup } from "./backup-remote-capture.mjs";
 import { verifyBackup } from "./backup-archive.mjs";
+import { reportVerifiedBackup, reportBackupFailure } from "./operations-telemetry.mjs";
 
 /** Config contains paths/references only. The encryption key remains separate. */
 export async function runConfiguredBackup(configFile, command) {
@@ -22,6 +23,7 @@ export async function runConfiguredBackup(configFile, command) {
     "scheduleEnabled",
     "keepCriticalCapture",
     "source",
+    "telemetry",
   ];
   if (
     config.format !== "hca-operator-backup-v1" ||
@@ -70,7 +72,8 @@ export async function runConfiguredBackup(configFile, command) {
     )
   )
     throw new Error("Invalid backup source configuration.");
-  return runBackup({
+  let result;
+  try { result = await runBackup({
     root,
     key,
     mode: command,
@@ -80,7 +83,9 @@ export async function runConfiguredBackup(configFile, command) {
       captureRemoteBackup(destination, config.source, (step) =>
         process.stderr.write("Backup capture: " + step + "\n"),
       ),
-  });
+  }); } catch (error) { await reportBackupFailure(config.telemetry); throw error; }
+  if (result.state === "verified") result.telemetry = await reportVerifiedBackup(config.telemetry, result, key);
+  return result;
 }
 if (
   process.argv[1] &&

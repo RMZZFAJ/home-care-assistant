@@ -136,3 +136,23 @@ test("legacy archive compatibility never extends its two original qualifications
   );
   assert.throws(() => backupStateQuery([]), /explicit/);
 });
+
+test("monitor observations qualify only clocks; incident severity, version, state and policy remain exact", () => {
+  getTestEnvironment();
+  const tables = [{ schema: "private", name: "operations_components" }, { schema: "private", name: "operations_incidents" }, { schema: "private", name: "operations_config" }];
+  const snapshot = backupStateQuery(tables);
+  const output = sql(`begin;
+    select private.operations_condition('operator','recovery','RECOVERY_FAILURE',true,'warning',1);
+    ${snapshot}
+    update private.operations_components set observed_at=now()+interval '1 second',success_at=now()+interval '1 second' where environment='operator';
+    update private.operations_incidents set last_observed_at=now()+interval '1 second' where environment='operator';
+    ${snapshot}
+    update private.operations_incidents set severity='critical',version=version+1 where environment='operator' and code='RECOVERY_FAILURE';
+    update private.operations_config set version=version+1 where environment='operator';
+    ${snapshot}
+    rollback;`);
+  const values = output.split(/\r?\n/).filter(s => s.startsWith("{")).map(s => JSON.parse(s));
+  assert.equal(values.length, 3);
+  assert.deepEqual(compareBackupSnapshots(values[0], values[1], 2).unexpected, []);
+  assert.deepEqual(new Set(compareBackupSnapshots(values[1], values[2], 2).unexpected), new Set(["private.operations_incidents", "private.operations_config"]));
+});

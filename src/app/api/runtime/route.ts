@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import contract from "@/lib/pwa/contract.json";
 import { api } from "@/lib/server/api";
+import { observeApplicationHeartbeat } from "@/lib/server/operations-observer";
 
 export const dynamic = "force-dynamic";
 function unavailable(state: "incompatible" | "unavailable") {
@@ -41,6 +42,7 @@ async function readRuntime() {
       );
     const compatible =
       data?.protocol === contract.protocol && data?.schema === contract.schema;
+    if (compatible) await observeApplicationHeartbeat();
     return compatible
       ? Response.json({ state: "ready", ...contract })
       : unavailable("incompatible");

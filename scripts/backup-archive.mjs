@@ -139,10 +139,10 @@ async function decryptMember(input, entry, manifest, key, output) {
   await pipeline(createReadStream(source), decryptor(key, entry.iv, entry.tag, aad(manifest.backupId, entry.path)), measure, sink);
   if (bytes !== entry.bytes || hash.digest("hex") !== entry.sha256) throw new Error("Backup member integrity mismatch.");
 }
-export async function verifyBackup({ directory, key, repository = workspace }) {
+export async function verifyBackup({ directory, key, repository = workspace, includeMetadata = false }) {
   const { input, manifest, manifestSha256 } = await openManifest(directory, key, repository);
   for (const entry of manifest.entries) await decryptMember(input, entry, manifest, key);
-  return { backupId: manifest.backupId, files: manifest.entries.length, bytes: manifest.entries.reduce((sum, e) => sum + e.bytes, 0), manifestSha256, verified: true };
+  return { backupId: manifest.backupId, files: manifest.entries.length, bytes: manifest.entries.reduce((sum, e) => sum + e.bytes, 0), manifestSha256, verified: true, ...(includeMetadata ? { metadata: manifest.metadata } : {}) };
 }
 export async function extractBackup({ directory, destination, key, repository = workspace }) {
   // Authenticate every object before exposing any restored plaintext.

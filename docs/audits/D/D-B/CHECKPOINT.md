@@ -1118,3 +1118,96 @@ computador, monitoramento/suporte OPS.3, critérios D3/D4 restantes, aparelhos/A
 e gates D-C/D6 continuam pendentes. Sonar adiado; D-B ativa e PR Draft.
 Sem merge ou promoção operacional. A configuração local de Sonar fora
 deste lote é preservada.
+
+## OPS.3 iniciado — observabilidade e suporte técnico
+
+19a3568 publicado, PR7 OPEN Draft. CI42420469538 iniciou; o verde4016105 é
+histórico e não aprova esse incremento. A configuração local de Sonar continua
+fora do commit. Remoto145 permanece reconciliado; nenhum transporte foi ativado.
+
+Iniciado rascunho20261107223318, ainda não aplicado nem validado. Define estado
+técnico por ambiente, política de limiares/severidades, eventos minimizados,
+incidentes, histórico e intenções idempotentes. Não há coluna para payload
+clínico, endpoint, telefone, SQL ou segredo. O arquivo, ainda não aplicado,
+restringe eventos/coleta ao serviço e leitura/comandos ao Auth autorizado.
+Coletores, comandos e leituras já têm rascunho; API/UI e testes continuam a
+implementar. Nenhum critério OPS.3 recebe aceite.
+
+Consumidores previstos: serviço existente de scheduler/worker, falhas API seguras,
+CLI de backup/recuperação e área global técnica em Administração. Equipe recebe
+impacto e ajuda no próprio paciente, sem detalhes globais. Reutilizar Auth real,
+contexto global e assurance atuais; não derivar privilégios de campos do browser.
+Próximo fechamento exige testes dirigidos, backup fresco e reconciliação146
+somente após completar e comprovar os contratos. A meta D-B permanece ativa.
+
+### OPS.3 — implementação local e contraprovas em andamento
+
+Local147/remoto145. As migrations146/147 já aplicadas localmente são imutáveis;
+146 tem SHA256cd36221fb7f4320fab4bfacb41043a125ad80b123a7cfeb0c2f7d9c2aef6d9d5.
+Seis tabelas privadas, eventos minimizados, políticas por ambiente, incidentes,
+histórico e intenções CAS estão integrados ao scheduler/API/worker. A área global
+em Administração e o impacto pessoal em Notificações estão implementados.
+Tipagem, lint afetado e allowlist de serviço passaram. Dezessete testes unitários
+de monitoramento, runtime/worker e arquivo cifrado passaram.
+
+Auth HTTP real confirmou negativas de contexto/papel, idempotência, privacidade,
+observação monotônica sem inundar histórico, CAS, histórico101+, contexto e prazo
+após lock. Ensaio revertido da falha do coletor preservou o retorno operacional
+do scheduler. Clocks de observação são qualificados no backup; severidade,
+estado, versão e política continuam exatos. O adaptador interno de backup exige
+arquivo autenticado e horário original do manifesto; falha de telemetria não
+invalida a cópia verificada. Integração de recuperação permanece separada deD6.
+
+A primeira corrida CAS revelou timeout504 por raise40001 deliberado, conforme
+[diagnóstico oficial do Supabase](https://supabase.com/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b).
+147 preserva146 e substitui somente as duas recusas CAS de operations_command
+por PT409; a API devolve VERSION_CONFLICT409. Rechecagens de corrida, privacidade,
+histórico, prazo, impacto e filesystem passaram. Erros de fixture, produtores
+concorrentes e o primeiro diagnóstico permanecem nos logs, sem apagar falhas.
+
+A captura crítica fresca d77b1cc9-70eb-474f-973c-71344a009b5f foi autenticada:
+79 arquivos/10.608.947 bytes, manifesto
+a068614d2c46a729759dedf94d5c6ce478352ecdb4ba6634dc42091bdce5d798.
+Agenda permanente e telemetria do operador continuam desligadas. Restauração,
+evolução147, preflight e reconciliação remota ainda precisam ser concluídos.
+
+CI19a terminou FAILURE somente no caso acessível iOS1; os outros jobs passaram.
+O preview19a está READY. O primeiro ciclo local novo usa build de produção e
+fontes estáveis. Chrome/mobile passaram na jornada acessível e o impacto pessoal
+passou em Chrome; os primeiros três casos globais esbarraram em getByLabel exact
+para select encapsulado. Um probe sem aplicação confirmou label0/combobox1,
+preservando o nome acessível correto. A correção do consumidor e o aceite final
+ficam pendentes; nenhum caso falho recebe aprovação. [Contrato](OBSERVABILITY.md).
+
+### OPS.3 — fechamento técnico do lote
+
+Local147/remoto147, histórico integral reconciliado e sem pendências. A captura
+crítica fresca restaurou143 conjuntos,33 objetos e32 PDFs, incluindo hash de uma
+emissão ready, e a cópia foi evoluída até147 em isolamento. Compatibilidade e
+pós-check preservaram387 identidades anteriores, autoridades/grants, Auth9,
+profiles7, Storage33, cron e Vault. Só o retorno final do scheduler existente
+foi estendido. A primeira projeção do verificador incluía as duas linhas novas
+de migration; a rechecagem isolou as145 anteriores e confrontou os147 SQLs,
+sem tolerar mudança nos fatos anteriores. Sem reset ou fixture remota.
+
+17 casos Auth/SQL/filesystem passaram em dois grupos,17 unitários e18 casos
+distintos em build de produção nos três projetos. Os nove casos globais
+afetados passaram novamente; os nove de jornada/foco/impacto foram conservados
+sem mudança nos consumidores. Diagnóstico3/3 separado. O caso adicional de
+coleta observou o prazo real do PDF com configuração1/2 segundos; não removeu
+o guard que recusou alterar requested_at. Proposta de política é preservada
+no conflito e pede revisão explícita da versão vigente. Tipos/lint, allowlist
+de serviço e guard84 passaram. CI do novo SHA é o próximo gate automático.
+
+A mesma cópia e o probe produziram BACKUP_VERIFIED e RECOVERY_PROBE_VERIFIED
+por HTTP real na stack local, com horário original do backup. A credencial
+temporária foi removida. Agenda/telemetria permanentes seguem desligadas, sem
+backup operacional externo nem aprovação D6. Presença dos Secrets de serviço,
+PDF e Push em Preview foi conferida pelo CLI, sem expor valores; pull omite
+Secrets. O runtime do próximo preview ainda deve ser observado.
+
+Matriz105x39 mantém as29 colunas iniciais:25 PASS,47 PARTIAL,33 NOT_STARTED.
+OPS.3 e impacto/ajuda recebem implementação parcial comprovada, sem falsa
+homologação externa. Sonar permanece adiado. A configuração Sonar do usuário
+continua fora deste lote. D-B ativa, PR7 Draft, sem merge ou promoção.
+[Evidência e contraprovas](OPS_3_EVIDENCE.json).

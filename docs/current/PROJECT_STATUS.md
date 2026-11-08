@@ -287,3 +287,14 @@ com compatibilidade para backups sem essa tabela. SQL isolado e nova restauraç�
 do backup cifrado anterior passaram:122 conjuntos,29 objetos,28 PDFs, sem cron
 ou pg_net. Agenda/retenção, destino independente e gate D6 continuam pendentes.
 [Evidência e limites](../audits/D/D-B/OPS_1_EVIDENCE.json).
+
+OPS.3 integra monitoramento persistente, suporte global minimizado, políticas
+e histórico, recuperação da mesma tentativa e impacto/ajuda pessoal. Local e
+remoto147 estão reconciliados após cópia/restauração/upgrade e pós-validação.
+17 casos Auth/SQL/filesystem,17 unitários e18 casos distintos em build de produção
+passaram em grupos dirigidos; a CI do SHA publicado ainda é gate próprio.
+Agenda de backup e telemetria do operador continuam desligadas, sem comprovação
+de disponibilidade externa, RPO/RTO operacional ou D6. A matriz D-B mantém25 PASS,
+47 PARTIAL e33 NOT_STARTED; a missão continua. Sonar adiado pelo responsável,
+PR7 Draft, sem merge ou promoção. [Contrato](../audits/D/D-B/OBSERVABILITY.md)
+e [evidência](../audits/D/D-B/OPS_3_EVIDENCE.json).

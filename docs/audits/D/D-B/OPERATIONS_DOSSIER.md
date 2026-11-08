@@ -9,7 +9,8 @@ Atualização OPS.2: o [pipeline](BACKUP_PIPELINE.md) agora integra captura remo
 destino filesystem cifrado, sete slots diários/quatro semanais, críticos
 preservados e recibos de falha. CLI real e restauração/upgrade isolados foram
 exercitados. A agenda permanente continua desligada; não há backup operacional
-externo ativo. Monitoramento persistente/consumidor técnico é o próximo lote.
+externo ativo. Monitoramento persistente e consumidor técnico estão em
+validação no lote [OPS.3](OBSERVABILITY.md); nenhum aceite operacional foi dado.
 [Evidência atual](OPS_2_EVIDENCE.json); as seções seguintes preservam os marcos
 anteriores e seus limites específicos.
 

@@ -7,6 +7,7 @@ import { quantity } from "@/lib/quantity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { appOrigins } from "@/lib/server/app-origin";
 import { errorCatalog, type ErrorCode } from "@/lib/server/error-catalog";
+import { observeApiFailure } from "@/lib/server/operations-observer";
 
 export class ApiError extends Error {
   constructor(
@@ -91,6 +92,8 @@ export function databaseError(
     throw new ApiError("VALIDATION_ERROR", "Este consumo precisa de material e quantidade. Registre um complemento antes de confirmar o desconto.", 400);
   if (/purchase has acquisition or receipt facts/i.test(message))
     throw new ApiError("VALIDATION_ERROR", "Esta ficha já tem aquisição, parcelas ou encerramento registrados. Preserve esses fatos; confira as parcelas e encerre somente a expectativa ainda não adquirida.", 400);
+  if (error?.code === "PT409" && message === "operations version conflict")
+    throw new ApiError("VERSION_CONFLICT", "O acompanhamento técnico mudou em outra sessão. Atualize a consulta antes de enviar uma nova alteração.", 409);
   if (/stale preference version/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "Sua preferência mudou em outra sessão. Recarregue o estado antes de confirmar uma nova alteração.", 409);
   if (/science preference or authority changed/i.test(message))
@@ -220,6 +223,8 @@ export async function api(
         correlationId,
       }),
     );
+    // Bounded best-effort persistence cannot change the original failure.
+    await observeApiFailure(operation, known.code, known.status, correlationId).catch(() => undefined);
     const descriptor = errorCatalog[known.code];
     return NextResponse.json(
       {
