@@ -107,3 +107,13 @@ sem merge/promoção ou integração externa; Sonar adiado pelo responsável.
 Matriz40 PASS/51 PARTIAL/14 NOT_STARTED, com29 colunas canônicas preservadas.
 Idioma/HTML histórico avançam C111/C-NEW-AC-018 somente a parcial; estrutura
 marcada do PDF, demais estados e gates D-C/D6 continuam próprios.
+
+## Reconciliação posterior de C108 — D4.9
+
+O [lote temporal e de rastreabilidade](ENT_TEMPORAL.md) reconciliou C108 com a
+implementação D4.7 já comprovada. As13 fontes registradas de histórico/testes,
+os consumidores de download/acervo e o lockfile permanecem iguais aos de
+8a17202, cuja CI concluiu8/8 SUCCESS. Antes/depois/motivo e o arquivo da versão
+escolhida completam a lacuna anterior. Nenhum teste histórico foi reclassificado
+como nova execução; as falhas e coortes continuam preservadas. C108 passa
+localmente, com AT/aparelho/D-C/D6 e CI do próximo SHA separados.

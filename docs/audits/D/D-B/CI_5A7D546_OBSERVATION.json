@@ -1,0 +1,56 @@
+{
+  "recordedAt": "2026-11-08T21:09:55.222Z",
+  "sha": "5a7d546528918c63dbc8cd38de7784309484009b",
+  "runId": 42517981989,
+  "jobs": [
+    {
+      "id": 128845179441,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128845179651,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128845179688,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128849013973,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128849014001,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128849014003,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128849014151,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128857764939,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "qualification": "All eight jobs completed successfully for the D4.8 runtime base. The new ENT temporal tests are not included in this SHA; the next published SHA requires its own CI."
+}

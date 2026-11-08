@@ -60,8 +60,18 @@ O verificador confere sua ausência de assinatura, marcador, geometria e rodapé
 O raster do marcador e as nove páginas dos exemplares reais foram inspecionados.
 Não equivalem a prova com tecnologia assistiva ou dispositivo físico.
 
-C100/C102 têm prova local dirigida; C101 conserva pendência específica de ENT
+Estado daquele lote: C100/C102 têm prova local dirigida; C101 conserva
+pendência específica de ENT
 com preparação e expedição em dias distintos. C105/C106 continuam parciais:
 faltam combinações factuais e visuais de todos os estados, documentos/anexos e
 conteúdos extensos. PDF acessível, anexos anotados, custódia/rotação, CI do SHA,
 D3 restante, D5, bases operacionais e reconciliação remota final continuam gates.
+
+## Reconciliação posterior — D4.9
+
+O [lote temporal ENT](ENT_TEMPORAL.md) concluiu a lacuna local de C101: preparação
+armazenada e rascunho privado em dias anteriores, primeira expedição, exemplares
+distintos e download exato. Dois Auth, seis casos de produção e quatro PDFs
+assinados foram conferidos. Relógios antigos são fixtures locais explícitas;
+não houve mudança de runtime nem teste físico de24 horas. Os gates de AT,
+aparelho, PDF marcado e D-C/D6 não são aprovados por essa reconciliação.

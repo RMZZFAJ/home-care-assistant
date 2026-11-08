@@ -443,3 +443,21 @@ confere aceite/ledger por leitura independente e verifica código/upload sem
 sessão de aplicativo. Outros casos preservam desconhecido e rejeição.
 O corpus só contém dados fictícios e certificados públicos de teste.
 [Provas e limites](../audits/D/D-B/REGULARIZATION_PDF.md).
+
+## Datas da preparação, expedição e exemplar ENT
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/ent-temporal-pdf.test.ts
+node --test --test-concurrency=1 tests/integration/ent-temporal.test.mjs
+npm run e2e -- tests/e2e/ent-temporal.spec.ts
+.venv/Scripts/python.exe docs/audits/D/D-B/d4-fidelity-proof/verify.py \
+  docs/audits/D/D-B/d4-ent-clocks-proof/CORPUS.json \
+  --output output/ent-clocks-independent.json
+```
+
+O runner verifica a stack local. As fixtures controlam somente a data armazenada
+de novos registros fictícios, preservando eventos/hashes; não desabilitam
+triggers nem usam o remoto. Não executar a suíte Auth mutável junto ao E2E.
+O teste separa datas por rótulo, mantém duas emissões distintas e os bytes de
+cada download; não é ensaio físico ou espera real de24 horas.
+[Coortes e reuso de C108](../audits/D/D-B/ENT_TEMPORAL.md).

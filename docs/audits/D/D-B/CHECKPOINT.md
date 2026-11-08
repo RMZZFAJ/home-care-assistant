@@ -1718,3 +1718,44 @@ núcleo diário: marcos temporais de ENT e pendências factuais de fichas/estoqu
 [Dossiê](REGULARIZATION_PDF.md), [coortes](REGULARIZATION_PDF_EVIDENCE.json),
 [pós-DDL](REGULARIZATION_PDF_REMOTE_MIGRATIONS.json) e
 [oráculo independente](d4-regularization-proof/VERIFICATION.json).
+
+## D4.9 — marcos ENT e reconciliação do vínculo histórico
+
+Base5a7d546; prioridade diária mantida. Runtime, aparência e migrations não
+foram alterados: os marcos já estavam separados, faltava a prova ENT de C101.
+Dois Auth, um unitário discriminante e seis casos de produção passaram nas
+duas variantes e três motores. Quatro PDFs reais, entre12 gerações do ensaio,
+foram conferidos pelo oráculo independente existente, sem modificar o script.
+Fatos, rótulo/data, identidade/bytes, geometria/rodapé, ENTIRE_FILE e TSA interna
+passaram. Data da criação não pode ocupar o campo da expedição mesmo quando
+ambas aparecem no arquivo; negativo independente recusou essa adulteração.
+
+Preparação retida usa criação armazenada anterior e expedição por novo evento;
+rascunho privado preserva seu primeiro salvamento após consumo. Duas intenções
+geram exemplares próprios; download repetido e relógio do navegador avançado
+conservam bytes/ID/data e número de emissões. Pré-expedição não reserva, nem
+move estoque; cliente Auth não altera datas de ficha ou evento. Ledger intacto.
+Relógios antigos controlam só novas fixtures locais de desenvolvimento; eventos,
+corpos e hashes originais não mudam, nenhum trigger é desabilitado. Não é
+espera real de24 horas, avanço do relógio do servidor ou aparelho físico.
+
+C108 ainda carregava a lacuna D4.4. D4.7 já oferece antes/depois/motivo e arquivo
+da versão selecionada. Treze fontes/testes mais cinco consumidores/lockfile
+coincidem no candidato e em8a17202; sua CI terminou8/8 SUCCESS. Reconciliação
+reusa as coortes qualificadas e três vínculos versão/hash/arquivo, sem executar
+ou recontar a suíte antiga. Renderização/reserva D4.8 e oráculo de teclado
+evoluíram fora desses contratos e conservam suas provas próprias.
+
+Read-only remoto confirmou156 migrations, última20261108194000; nenhuma nova
+migration ou mutação remota neste lote. Sem reset, backup/restore redundante,
+Auth/fixture remoto ou envio externo. Tipos e lint dos testes passaram. CI5a7d546
+terminou8/8 SUCCESS, incluindo banco e quatro jobs de navegadores. Esse resultado
+valida o runtime base, mas o próximo SHA exige CI própria para os novos testes.
+PR7 Draft, sem merge/promoção; meta ativa.
+
+Matriz105x39:45 PASS/50 PARTIAL/10 NOT_STARTED;29 colunas canônicas intactas.
+C101/C108 passam localmente; AT/humano/aparelho/PDF marcado/D-C/D6 e demais
+requisitos executáveis continuam próprios. [Dossiê](ENT_TEMPORAL.md),
+[coortes/reuso](ENT_TEMPORAL_EVIDENCE.json),
+[corpus](d4-ent-clocks-proof/CORPUS.json) e
+[verificação](d4-ent-clocks-proof/VERIFICATION.json).

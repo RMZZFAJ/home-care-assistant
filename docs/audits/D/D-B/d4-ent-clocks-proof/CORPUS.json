@@ -1,0 +1,208 @@
+[
+  {
+    "label": "ent-prepared-1",
+    "file": "prepared-1-3bed7685-02a6-4af4-bcf9-72723a869fa0.pdf",
+    "publicRoot": "root-62a5e76d411df3a5.crt",
+    "code": "ENT-0001",
+    "issuanceId": "3bed7685-02a6-4af4-bcf9-72723a869fa0",
+    "documentId": "a98ae534-cf94-47c4-97ae-9125d2f743ce",
+    "version": 2,
+    "rendererRevision": 7,
+    "sha256": "f25bdf34fd3ae612de4e43f46dabe9d7beb239fe9b27f94387696031df756a6e",
+    "sourceHash": "47d187fb22227e7d8a5685c630bf5c6164e4fd48550214b49f7bd7b76123b635",
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T20:15:31.363925+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 c07b69a5",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T20:15:30.718261+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 2
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-06T12:00:00+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "expectedText": [
+      "Criação da ficha: 06/11/2026, 09:00",
+      "Emissão operacional registrada: 08/11/2026, 17:15"
+    ],
+    "absentText": [
+      "Primeiro rascunho privado salvo"
+    ],
+    "requestedAt": "2026-11-08T20:15:37.779084+00:00",
+    "clockControl": "Only new local fictional creation metadata is backdated; canonical event clocks/body/hash are preserved. Not elapsed-day or physical-device evidence."
+  },
+  {
+    "label": "ent-prepared-2",
+    "file": "prepared-2-4d0158b4-108c-42f2-9387-a3c88f36bb02.pdf",
+    "publicRoot": "root-62a5e76d411df3a5.crt",
+    "code": "ENT-0001",
+    "issuanceId": "4d0158b4-108c-42f2-9387-a3c88f36bb02",
+    "documentId": "a98ae534-cf94-47c4-97ae-9125d2f743ce",
+    "version": 2,
+    "rendererRevision": 7,
+    "sha256": "8d50b6edfc6edde0e490f42aa16bf535d8f6c082685399181c9bf05cbc9ac8b8",
+    "sourceHash": "47d187fb22227e7d8a5685c630bf5c6164e4fd48550214b49f7bd7b76123b635",
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T20:15:31.363925+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 c07b69a5",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T20:15:30.718261+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 2
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-06T12:00:00+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "expectedText": [
+      "Criação da ficha: 06/11/2026, 09:00",
+      "Emissão operacional registrada: 08/11/2026, 17:15"
+    ],
+    "absentText": [
+      "Primeiro rascunho privado salvo"
+    ],
+    "requestedAt": "2026-11-08T20:15:39.834867+00:00",
+    "clockControl": "Only new local fictional creation metadata is backdated; canonical event clocks/body/hash are preserved. Not elapsed-day or physical-device evidence."
+  },
+  {
+    "label": "ent-private-1",
+    "file": "private-1-76cdfd19-5efb-43ae-add7-b32b1bfc8c89.pdf",
+    "publicRoot": "root-62a5e76d411df3a5.crt",
+    "code": "ENT-0001",
+    "issuanceId": "76cdfd19-5efb-43ae-add7-b32b1bfc8c89",
+    "documentId": "57f0a914-c9c1-40e7-9857-bada61874ae7",
+    "version": 1,
+    "rendererRevision": 7,
+    "sha256": "ecc04edba3fc9dcc83cf8e49d21176e5524f42b0a1e9cf185ed037fbd6bd7850",
+    "sourceHash": "597a0ffadafff984c70ae322db4f6c1486a830b3e27f6e69218e17694d9c83eb",
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T20:15:43.940679+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 ec29c18f",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T20:15:43.940679+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": "2026-11-05T12:00:00+00:00",
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T20:15:43.90411+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "expectedText": [
+      "Criação da ficha: 08/11/2026, 17:15",
+      "Emissão operacional registrada: 08/11/2026, 17:15",
+      "Primeiro rascunho privado salvo: 05/11/2026, 09:00"
+    ],
+    "absentText": [],
+    "requestedAt": "2026-11-08T20:15:48.787899+00:00",
+    "clockControl": "Only new local fictional creation metadata is backdated; canonical event clocks/body/hash are preserved. Not elapsed-day or physical-device evidence."
+  },
+  {
+    "label": "ent-private-2",
+    "file": "private-2-7978c72e-7033-46d5-943b-3098d8e78e2d.pdf",
+    "publicRoot": "root-62a5e76d411df3a5.crt",
+    "code": "ENT-0001",
+    "issuanceId": "7978c72e-7033-46d5-943b-3098d8e78e2d",
+    "documentId": "57f0a914-c9c1-40e7-9857-bada61874ae7",
+    "version": 1,
+    "rendererRevision": 7,
+    "sha256": "639a56b14c85d78c646515b26457aa5e9f6311ebba2581aafd28f21e9c2f34cb",
+    "sourceHash": "597a0ffadafff984c70ae322db4f6c1486a830b3e27f6e69218e17694d9c83eb",
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T20:15:43.940679+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 ec29c18f",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T20:15:43.940679+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": "2026-11-05T12:00:00+00:00",
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T20:15:43.90411+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "expectedText": [
+      "Criação da ficha: 08/11/2026, 17:15",
+      "Emissão operacional registrada: 08/11/2026, 17:15",
+      "Primeiro rascunho privado salvo: 05/11/2026, 09:00"
+    ],
+    "absentText": [],
+    "requestedAt": "2026-11-08T20:15:50.669426+00:00",
+    "clockControl": "Only new local fictional creation metadata is backdated; canonical event clocks/body/hash are preserved. Not elapsed-day or physical-device evidence."
+  }
+]

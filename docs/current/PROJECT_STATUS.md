@@ -10,7 +10,22 @@ dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
 
-D4.8 completa os fatos do PDF da regularização ENT: antes/depois, identidades,
+D4.9 comprovou os marcos ENT sem mudança de runtime: preparação/rascunho,
+expedição e geração do exemplar, com bytes estáveis no download. Um unitário,
+dois Auth e seis casos de produção passaram; quatro PDFs reais têm fatos,
+assinatura e TSA interna conferidos por oráculo independente. Relógios antigos
+são fixtures locais explícitas; não há prova física de24 horas. C108 também
+foi reconciliado com13 fontes/testes e cinco consumidores/lockfile iguais ao
+SHA8a17202 aprovado. Não se repetiu a suíte antiga. Matriz45 PASS/50 PARTIAL/
+10 NOT_STARTED. [Provas e limites](../audits/D/D-B/ENT_TEMPORAL.md).
+
+CI5a7d546 terminou8/8 SUCCESS: banco, validate Windows/Ubuntu e quatro jobs de
+navegadores, mais o gate agregado. Esse resultado valida o runtime base D4.8;
+o próximo SHA exige CI própria para os novos testes D4.9.
+[Recibo por SHA](../audits/D/D-B/CI_5A7D546_OBSERVATION.json).
+
+Estado anterior D4.8: completa os fatos do PDF da regularização ENT:
+antes/depois, identidades,
 instantes, limites e efeitos de estoque, preservando aceite e intenções antigas.
 Cinco unitários novos+dez existentes, três Auth e nove casos de produção nos
 três motores passaram em coortes; uma extensão Chromium também confirmou
@@ -20,10 +35,11 @@ Sem redesenho estético. Matriz43 PASS/52 PARTIAL/10 NOT_STARTED.
 [Provas e limites](../audits/D/D-B/REGULARIZATION_PDF.md).
 
 Listas frequentes privadas e recuperação da etapa de REQ/COM/ENT/BAL continuam
-implementadas. O commit do responsável3add56f, somente SonarLint, foi preservado;
+implementadas. Histórico: o commit do responsável3add56f, somente SonarLint,
+foi preservado;
 CI105dc9d foi cancelada por supersessão. CI3add56f foi observada com banco e
 validate Windows/Ubuntu SUCCESS; quatro browsers ainda em andamento. Esses
-resultados não validam D4.8: o novo SHA exige sua própria CI. Falhas f0840dc e
+resultados eram a observação anterior à aprovação de5a7d546. Falhas f0840dc e
 seus reparos locais permanecem rastreáveis, sem aprovação retroativa.
 [Entrega anterior](../audits/D/D-B/RECURRING_SELECTION.md).
 
