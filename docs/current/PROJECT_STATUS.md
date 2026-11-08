@@ -10,6 +10,20 @@ dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
 
+D3.15 corrigiu perda de foco ao continuar edição e forneceu destino contextual
+após salvar no catálogo. O aviso bloqueia descarte durante tentativa pendente.
+Nove casos de produção passaram nos três motores, incluindo o consumidor
+existente de edição/inativação; tipos e lint passaram. Baseline e seis falhas
+intermediárias preservados. C037 agora parcial; matriz45 PASS/51 PARTIAL/
+9 NOT_STARTED. Nenhuma migration nova. Outros diálogos e AT/humano/aparelho
+continuam próprios. [Provas e limites](../audits/D/D-B/DRAWER_FOCUS.md).
+
+Preview827531e READY na origem estável, SHA conferido antes/depois do probe:
+runtime200/ready, emissões401 sem sessão do app e worker302 sem acesso Vercel.
+CI827531e observada com validate Windows/Ubuntu SUCCESS e banco em andamento;
+o novo incremento de foco exige CI própria. Essa observação é mais recente
+que os recibos históricos abaixo, sem aprovar jobs ainda pendentes.
+
 D4.10 corrigiu orientação de recebimento em ENT encerrada e versão preservada.
 Novas intenções ENT usam V9; bytes antigos permanecem, com aviso no acervo.
 37 unitários distintos em coortes, dois Auth e12 casos distintos de produção

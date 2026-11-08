@@ -479,3 +479,18 @@ e de regularização existentes: novas intenções ENT usam V9, replay conserva
 a revisão original. Dois hashes legados e o V8 real preservam inclusive a
 orientação antiga, enquanto V9 e o aviso no acervo têm critérios próprios.
 [Coortes, falha preservada e limites](../audits/D/D-B/ENT_TERMINAL.md).
+
+## Teclado ao continuar, descartar e salvar no catálogo
+
+```sh
+npm run e2e -- tests/e2e/record-drawer-focus.spec.ts \
+  tests/e2e/administration.spec.ts \
+  --grep 'RecordDrawer|catálogo edita nomes alternativos' --max-failures=1
+```
+
+Runner local com Auth fictício; nenhuma suíte mutável de banco em paralelo.
+O teste retém um POST legítimo sem simular sucesso, confere busy e o libera;
+descarte não grava e salvar cria uma única linha. O foco exige destinos próprios
+do contexto. Hidden é uma intervenção controlada para exercitar o fallback.
+Não é ensaio humano/AT ou aparelho físico.
+[Coortes e contraprovas](../audits/D/D-B/DRAWER_FOCUS.md).

@@ -1796,3 +1796,36 @@ responsável; PR7 Draft, sem merge; meta ativa e prioridade diária mantida.
 [remoto](ENT_TERMINAL_REMOTE_MIGRATIONS.json),
 [corpus](d4-ent-terminal-proof/CORPUS.json) e
 [verificação](d4-ent-terminal-proof/VERIFICATION.json).
+
+## D3.15 — continuidade de teclado na edição diária
+
+Base827531e. Reprodução real do catálogo confirmou perda do campo após
+Continuar editando. RecordDrawer preserva último controle e devolve foco antes
+de remover o aviso; controle indisponível usa fallback habilitado/visível.
+Busy/preventClose também protegem os botões de descarte. O catálogo fornece
+o título como destino explícito quando o acionador ainda está desabilitado
+pela atualização após salvar. Sem escrita ou descarte implícito, sem nova
+abstração ou alteração de autorização. Aparência de PDF permanece fora do lote.
+
+Baseline1 FAIL no retorno ao campo; primeira correção6 FAIL no retorno após
+salvar. Essas contraprovas estão preservadas. Uma coleta foi barrada por tipo
+HTMLElement/SVGElement no teste antes de executar navegadores; corrigida com
+métodos de atributo. Coorte final9 PASS nos três motores: seis novos casos
+390/1440 e três consumidores existentes de edição/inativação do catálogo.
+Descarte/Escape não gravam, continuar preserva valor, hidden controlado exige
+fallback visível, POST legítimo retido mantém o painel ocupado, salvar cria
+uma linha e retorna a destino contextual. Tipos e lint passaram. Nenhuma suíte
+mutável de banco em paralelo ou repetição global local sem necessidade.
+
+Nenhuma migration: local/remoto157, pós-DDL do lote anterior preservado, sem
+nova operação remota. Preview827531e READY na origem estável, SHA antes/depois
+do probe, runtime200/ready, emissões401 sem sessão e worker302 sem acesso Vercel.
+CI827531e observada com validate Windows/Ubuntu SUCCESS e banco em andamento;
+o novo SHA exige CI própria. Sonar adiado; PR7 Draft, sem merge/promoção.
+
+Matriz105x39:45 PASS/51 PARTIAL/9 NOT_STARTED;29 colunas canônicas e complementos
+aprovados intactos. C037 agora parcial local. Demais diálogos, Voltar/Confirmar,
+humano/AT/aparelho e D-C/D6 continuam próprios; meta ativa, prioridade diária.
+[Dossiê](DRAWER_FOCUS.md), [coortes](DRAWER_FOCUS_EVIDENCE.json),
+[Preview V9](ENT_TERMINAL_PREVIEW_OBSERVATION.json) e
+[CI base](CI_827531E_OBSERVATION.json).

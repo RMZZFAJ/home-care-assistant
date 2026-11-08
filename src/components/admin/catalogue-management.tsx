@@ -263,6 +263,7 @@ export function CatalogueManagement({
               recovery={recovery}
               onClose={() => setEditor(null)}
               restoreFocusTo={editor.opener}
+              restoreFocusFallbackRef={headingRef}
             >
               {error ? <Notice error>{error}</Notice> : null}
               {editor.mode === "model" ? (

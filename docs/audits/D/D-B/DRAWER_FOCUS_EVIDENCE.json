@@ -1,0 +1,115 @@
+{
+  "recordedAt": "2026-11-08T22:10:01.445328+00:00",
+  "baseSha": "827531e29b2816126f8fd82b06dbdba4d64fa3c7",
+  "sourceLfSha256": {
+    "src/components/forms/record-drawer.tsx": "ff956887e22d19234e8f67d93fa65b576db794fcd1504dfe08dd3afab18f084b",
+    "src/components/admin/catalogue-management.tsx": "41e9c2fb9f5239d1d62a81f2922fa4ea4c8b59c4e470675123cf77058cd979b4",
+    "tests/e2e/record-drawer-focus.spec.ts": "437d35108f4b9c7fc1a985f0fd742a8e83e3e4071451b3ce2bbd87ecef098b84"
+  },
+  "validation": {
+    "finalProductionPassed": 9,
+    "distinctNewEngineWidthCases": 6,
+    "distinctExistingCatalogueCases": 3,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "widths": [
+      390,
+      1440
+    ],
+    "totalBrowserExecutions": 16,
+    "passingExecutions": 9,
+    "preservedFailingExecutions": 7,
+    "buildRejectedWithoutBrowserCases": 1,
+    "types": true,
+    "affectedLint": true,
+    "newMirrorUnitTests": false
+  },
+  "counterproofs": {
+    "originalContinueLostFieldFocus": true,
+    "intermediateSixCasesFoundDisabledOpenerAfterConfirmedSave": true,
+    "sameFormContentRetainedOnContinue": true,
+    "controlledPreviousInputHiddenChoosesVisibleFallback": true,
+    "discardAndCleanCloseCreateNoCatalogueRow": true,
+    "busyWriteClosesNoDrawerAndPermitsNoDiscard": true,
+    "successfulWriteCreatesExactlyOneCatalogueRow": true,
+    "noArbitraryBodyOrPageStartAcceptedAsSuccess": true
+  },
+  "focusDestinations": {
+    "continue": "Previous available form control, otherwise first available control or preserved fieldset",
+    "discardAndCleanClose": "Original enabled opener",
+    "confirmedSave": "Original enabled opener, otherwise explicit contextual catalogue heading"
+  },
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "migrations": 157,
+    "newMigrations": 0,
+    "schemaChanged": false,
+    "previousPostValidation": "ENT_TERMINAL_REMOTE_MIGRATIONS.json",
+    "fixtureOrAuthOrResetRemote": false
+  },
+  "logsLfSha256": {
+    "drawer-focus-before.log": "4cfd9ef3f065bf37d7a0c6e66c719b458046092e288f56c1bcdf3b78c0d1af94",
+    "drawer-focus-build-rejected.log": "3d48f31228572ff77e4a4d4474c18ccb3fb34a818e76ba74825048ee4dcbbb9b",
+    "drawer-focus-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drawer-focus-final-production.log": "2439a67e38ffebd1a82c9678fad188f8d408a8bbf65b0c2e68347db0a4d4d5e3",
+    "drawer-focus-final-types.log": "91a5fddecc8fa491f11006a56ce5d5e3baaa3b2ee19599be315d3e45e646edd9",
+    "drawer-focus-lint-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drawer-focus-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drawer-focus-markdown.log": "894fbe3006cfebe2a80531d0adf06fe0f9ef94d0588ac39ddd5996b6eb270f16",
+    "drawer-focus-production.log": "6cb335778574a93e00a927c68e76ca955b3a79715f9315f08292f56cc4b01786",
+    "drawer-focus-types-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drawer-focus-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "preservedRawArtifactSha256": {
+    "drawer-focus-before-artifacts\\baseline-spec.txt": "948ebe519373602bebd39e9353efa307979a606bb2af638125538fed56e15cb0",
+    "drawer-focus-before-artifacts\\error-context.md": "2e2f2b1b187207467f050def881f903b111ff3aa26f5301dac9b44f2a2ac4ded",
+    "drawer-focus-before-artifacts\\test-failed-1.png": "f509074c17eb2b247cdc57cd102e15a1a3c2418e9fddb1294661e216e8917cbc",
+    "drawer-focus-intermediate-artifacts\\intermediate-spec.txt": "e8e0feecabecc4a4069aa495ceb9651df8d0cf770beecefab1c902844e53fdb2",
+    "drawer-focus-intermediate-artifacts\\record-drawer-intermediate.txt": "5e6fb7466444f317c85fc02bf2629b2b52005cc4cbc9221a0ed050680f382f83",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-64555-r-conservam-foco-e-intenção-chromium\\error-context.md": "ad91139f74ec0e4960842ac0a907a322ff2e994a91e607f220378aaa39af8494",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-64555-r-conservam-foco-e-intenção-chromium\\test-failed-1.png": "576fedaa89156cd44a900b901e491d34a402bde30364044ba53b96e2623ddf03",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-64555-r-conservam-foco-e-intenção-ios\\error-context.md": "ad91139f74ec0e4960842ac0a907a322ff2e994a91e607f220378aaa39af8494",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-64555-r-conservam-foco-e-intenção-ios\\test-failed-1.png": "4563c69cf0dc2e9f35233344ce3bc45ec7526152d6057b47193e60b352e97f6d",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-64555-r-conservam-foco-e-intenção-mobile\\error-context.md": "d6e3f12f17d606e0c8134ab6b8807c12c7a2f98187c7058894e4acacbab44f83",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-64555-r-conservam-foco-e-intenção-mobile\\test-failed-1.png": "b39402f32382ed248f464ae480f2ef7070307778dcd8ec8a9392467ea6521266",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-7081d-r-conservam-foco-e-intenção-chromium\\error-context.md": "a7fd254723c2ab31275893bf81d90b923f17121bd7fda79561be767664b9a64a",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-7081d-r-conservam-foco-e-intenção-chromium\\test-failed-1.png": "1f533ae88aeab23a48795fff74e63f1b9430b00034ab913922f9b3dc8196e89f",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-7081d-r-conservam-foco-e-intenção-ios\\error-context.md": "a7fd254723c2ab31275893bf81d90b923f17121bd7fda79561be767664b9a64a",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-7081d-r-conservam-foco-e-intenção-ios\\test-failed-1.png": "b70c9d1568d425a268f9afeb95f505d7a19a5006a9276d58347e4d890525dea0",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-7081d-r-conservam-foco-e-intenção-mobile\\error-context.md": "a7fd254723c2ab31275893bf81d90b923f17121bd7fda79561be767664b9a64a",
+    "drawer-focus-intermediate-artifacts\\record-drawer-focus-Record-7081d-r-conservam-foco-e-intenção-mobile\\test-failed-1.png": "4b1e45e59a5ad8a2fe6694e2fd4d4a577a7d8eee1dfc480f88dc7ced1af38cab"
+  },
+  "typeFailure": "New test initially used HTMLElement.hidden on a Locator element union. Build rejected before browsers. Replaced with DOM attribute methods, then types passed.",
+  "remaining": [
+    "Other criterion-specific drawers/dialogs and confirmations",
+    "Human/AT announcement and physical device",
+    "Own published SHA CI",
+    "Other executable D-B criteria and D-C/D6 gates"
+  ],
+  "goalComplete": false,
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "counts": {
+      "PASS": 45,
+      "PARTIAL": 51,
+      "NOT_STARTED": 9
+    },
+    "canonicalColumnsPreserved": 29,
+    "approvedComplementsPreserved": true,
+    "changedCriteria": [
+      "C-AC-037"
+    ]
+  },
+  "documentationValidation": {
+    "localLinks": 187,
+    "canonicalColumnsPreserved": 29,
+    "approvedComplementPreserved": true,
+    "changedCriteria": [
+      "C-AC-037"
+    ]
+  }
+}
