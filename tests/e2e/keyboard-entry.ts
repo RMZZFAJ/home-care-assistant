@@ -9,6 +9,12 @@ export async function assertKeyboardEntry(page: Page, label: string) {
   const modal = page.getByRole("dialog").and(page.locator('[aria-modal="true"]')).filter({ visible: true }).last();
   const hasModal = await modal.count() > 0;
   const skip = page.getByRole("link", { name: "Ir para o conteúdo", exact: true });
+  const readinessScope = hasModal ? modal : page.getByRole("main", { includeHidden: true });
+  // The runtime barrier deliberately makes the page inert until its version
+  // check settles. Focus is rejected while inert; visibility is insufficient.
+  await expect.poll(() => readinessScope.evaluate(element => !element.closest('[inert], [aria-hidden="true"]')), {
+    message: label + " keyboard entry requires an interactive landmark",
+  }).toBe(true);
   const scope = hasModal ? modal : page.getByRole("main");
   const origin = !hasModal && await skip.count() ? skip : await scope.evaluate(element => element.hasAttribute("tabindex")) ? scope : scope
     .locator('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([data-tabster-dummy])')

@@ -130,7 +130,8 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   await page
     .getByRole("button", { name: "Continuar rascunho", exact: true })
     .click();
-  await hygiene(page);
+  await expect(page.locator('[aria-current="step"]')).toContainText("Higiene");
+  await expect(page.getByRole("heading", { name: "Higiene", exact: true })).toBeVisible();
   await expect(input).toHaveValue("1,25");
   await review(page);
   await expect(

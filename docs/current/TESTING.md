@@ -403,3 +403,27 @@ consulta a persistência independente, retoma etapas e compara versões em leitu
 Não rodar a suíte mutável junto ao E2E. A CI cobre a suíte completa nos três
 motores; não repetir todos os builds locais a cada ajuste.
 [Coortes, vínculos e limites](../audits/D/D-B/DRAFT_NAVIGATION.md).
+
+## Seleção frequente e foco da verificação
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/recurring-selection.test.ts
+node --test --test-concurrency=1 \
+  tests/integration/recurring-selection.test.mjs
+npm run e2e -- tests/e2e/recurring-selection.spec.ts --project=chromium
+npm run test:harness -- tests/harness/keyboard-entry.spec.ts
+npm run e2e -- tests/e2e/public-verification.spec.ts \
+  --grep 'resolve QR e código sem conta'
+```
+
+O ensaio confere payload e linhas emitidas, sem copiar estoque7/urgência/motivo
+antigos. Outra sessão usa a mesma lista privada; outra conta não a lê.
+CAS de nome, replay, revogação e esperas observadas usam Auth real. Checkbox que
+se torna inelegível não habilita confirmação vazia. Metadados e saves não emitem
+atos oficiais; só a confirmação explícita posterior cria a REQ fictícia.
+
+O oráculo aguarda o landmark sair de inert/aria-hidden e mantém suas negativas.
+A verificação pública exige foco no resultado montado e o código formatado
+completo antes da próxima consulta. Não foram aumentados timeouts nem removidas
+regras. CI f0840dc falhou e permanece reprovada; as correções locais exigem CI
+própria no próximo SHA. [Coortes](../audits/D/D-B/RECURRING_SELECTION.md).

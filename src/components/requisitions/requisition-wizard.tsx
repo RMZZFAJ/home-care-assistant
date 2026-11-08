@@ -20,6 +20,8 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { RecurringSelection } from "./recurring-selection";
+import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
@@ -450,6 +452,10 @@ function PatientRequisition({
     );
   if (!can(context, "req.read"))
     return <Notice>Seu acesso à requisição foi encerrado.</Notice>;
+  const selectionLibrary = (readonly = false) => <RecurringSelection key={context.userId+":"+context.patient!.id} userId={context.userId} patientId={context.patient!.id} catalogue={products} lines={form.lines}
+    disabled={readonly||saving||uncertain||loadingCatalog||Boolean(catalogError)||privateDraft.blocked||!may(context,"request")} canSave={may(context,"request")}
+    cataloguePending={loadingCatalog} catalogueError={catalogError} onRefresh={()=>{setLoadingCatalog(true);setCatalogAttempt(value=>value+1);}}
+    onApply={ids=>setForm(current=>({...current,lines:applyMaterialSelection(current.lines,ids,products).lines}))}/>;
   if (
     !may(context, "request") &&
     !uncertain &&
@@ -458,12 +464,13 @@ function PatientRequisition({
     !privateDraft.base
   )
     return (
-      <Notice>
+      <div className="hca-form-stack"><Notice>
         Seu vínculo permite consultar as fichas autorizadas no histórico.
-      </Notice>
+      </Notice>{selectionLibrary(true)}</div>
     );
   return (
     <div ref={fieldsRef} className="mx-auto max-w-4xl min-w-0 space-y-5">
+      {selectionLibrary()}
       <CreationDraftPanel
         draft={privateDraft}
         current={draftContent}

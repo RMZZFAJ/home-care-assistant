@@ -28,6 +28,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Anexos, recuperação, abandono e fidelidade PDF](ATTACHMENTS.md).
 - [Validação de campos, vínculo e nome curto](FIELD_VALIDATION.md).
 - [Etapa e conteúdo do rascunho privado](DRAFT_NAVIGATION.md).
+- [Lista frequente privada e regressões de recuperação/foco](RECURRING_SELECTION.md).
 - [Origem tipada do movimento: reconciliação de provas](STOCK_ORIGIN_RECONCILIATION.md).
 - [Complementos posteriores do responsável](OWNER_AMENDMENTS.md): configuração
   e tratamento específico do SonarCloud adiados expressamente; reconciliação

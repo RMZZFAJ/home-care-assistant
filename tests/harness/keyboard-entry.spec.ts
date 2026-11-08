@@ -34,3 +34,20 @@ test("the public-form fallback cannot pass a trapped first control", async ({ pa
   await page.setContent('<main><input aria-label="E-mail" onkeydown="if(event.key===\'Tab\')event.preventDefault()"><input aria-label="Senha"></main>');
   await expect(assertKeyboardEntry(page, "trapped public form")).rejects.toThrow("different accessible content");
 });
+
+test("an inert runtime gate must become interactive before keyboard entry", async ({ page }) => {
+  await page.setContent('<div id="gate" inert><a href="#content">Ir para o conteúdo</a><input aria-label="Primeiro campo"><main id="content" tabindex="-1"><input aria-label="Último campo"></main></div>');
+  await page.evaluate(() => { setTimeout(() => document.getElementById("gate")?.removeAttribute("inert"), 50); });
+  await assertKeyboardEntry(page, "released runtime gate");
+  await expect(page.getByLabel("Primeiro campo", { exact: true })).toBeFocused();
+});
+
+test("a permanently inert page cannot pass the keyboard oracle", async ({ page }) => {
+  await page.setContent('<div inert><a href="#content">Ir para o conteúdo</a><main id="content" tabindex="-1"><button>Continuar</button></main></div>');
+  await expect(assertKeyboardEntry(page, "blocked runtime gate")).rejects.toThrow("requires an interactive landmark");
+});
+
+test("a hidden landmark cannot become an accessible keyboard origin", async ({ page }) => {
+  await page.setContent('<a href="#content">Ir para o conteúdo</a><main id="content" tabindex="-1" aria-hidden="true"><button>Oculto</button></main>');
+  await expect(assertKeyboardEntry(page, "hidden landmark")).rejects.toThrow("requires an interactive landmark");
+});

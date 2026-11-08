@@ -81,9 +81,13 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
     }),
   ).toBeVisible();
   await expect(result).toContainText("não comprova falsificação");
-  await code.fill(
-    `HCA-${f.a.row.verificationCode.toLowerCase().match(/.{4}/g)!.join("-")}`,
-  );
+  // The result deliberately schedules heading focus. Finish that transition
+  // before starting the next edit, then verify the complete formatted value.
+  await expect(result.getByRole("heading", { name: "Emissão não localizada", exact: true })).toBeFocused();
+  const formattedCode = `HCA-${f.a.row.verificationCode.toLowerCase().match(/.{4}/g)!.join("-")}`;
+  await expect(code).toHaveJSProperty("maxLength", 64);
+  await code.fill(formattedCode);
+  await expect(code).toHaveValue(formattedCode);
   await page.route("**/api/verification?code=*", async (route) => {
     if (route.request().method() === "GET")
       await route.fulfill({

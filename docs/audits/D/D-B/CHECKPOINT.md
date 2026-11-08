@@ -1621,3 +1621,45 @@ PR7 Draft, sem merge, produção NO-GO, missão D-B ativa.
 [Dossiê](DRAFT_NAVIGATION.md), [evidências](DRAFT_NAVIGATION_EVIDENCE.json),
 [pós-DDL](DRAFT_NAVIGATION_REMOTE_MIGRATIONS.json) e
 [origem tipada](STOCK_ORIGIN_RECONCILIATION.md).
+
+## D3.14 — seleção frequente, identidade textual e fechamento de CI
+
+REQ-05/C-NEW-AC-024 implementado por usuário/paciente: drawer busca e permite
+escolha explícita, nome2–80, disponibilidade atual e retorno com foco. Lista
+guarda só IDs textuais; novas linhas não copiam estoque7, urgência ou motivos.
+Duplicatas preservam a edição atual; zero membros elegíveis não habilita sucesso.
+Salvar/aplicar não emite; uma confirmação explícita posterior teve payload e
+linhas oficiais conferidos. Extra não catalogado não entra na lista.
+
+Cinco unitários e quatro Auth reais passaram. Produção: cinco casos iniciais
+(três novos+dois de compatibilidade) e dois rechecks finais de elegibilidade
+passaram; fontes/coortes são qualificadas no dossiê. Protótipo154 corrigido
+incrementalmente pela155 após descobrir identidade textual; primeira tentativa
+155 revertida antes de aplicação. Três falhas Auth e três diagnósticos de UI
+foram preservados e corrigidos; Next dev não é contado como produção.
+
+Remote155/local155, zero pendências. Primeiro preflight recusou mudanças de
+Auth/monitoramento desde captura; novo backup520ddb89 verificado e restaurado,
+80 arquivos/11341372 bytes,151 tabelas/FKs,34 objetos/33 PDFs/duas emissões por
+digest. Upgrade153→155 isolado4,283s;410 funções/grants anteriores preservados.
+Pós-DDL conserva todos os campos antigos, sem projeção nova de colunas, e
+confere o histórico155. Duas tabelas novas vazias; cron/Vault/Storage intactos.
+Advisors202 segurança/164 desempenho,0 ERROR; +2 RPCs autenticadas/+2 índices
+sem uso observado. Não se suprimiram avisos ou removeram índices para aprovação.
+
+CI f0840dc terminou4 SUCCESS/4 FAILURE, não aprovada. Consumidor antigo de
+retomada esperava início; testes de teclado/foco entravam antes da prontidão.
+Uma espera forte reproduziu falha real de foco no WebKit, corrigida no produto
+com foco após commit do resultado e sequência vigente. Código completo43 antes
+de consultar; QR/upload/regras de integridade preservados. Coortes de reparo:
+12 execuções/11 PASS/1 FAIL, nove casos distintos com PASS nos três motores;
+harness final24 PASS mantém traps, ocultos, inert e landmark oculto negativos.
+O novo SHA exige sua própria CI completa; não se converteu f0840dc em verde.
+
+Matriz105x39:43 PASS/51 PARTIAL/11 NOT_STARTED,29 colunas canônicas intactas.
+Sem aparência PDF nova, reset, Auth/fixture remoto, transporte externo, merge
+ou promoção. D6/humano/AT/aparelho, S24 físico, ICP-Brasil/TSA externa e
+recuperação operacional/RPO/RTO continuam gates; Sonar adiado e meta ativa.
+[Dossiê](RECURRING_SELECTION.md), [coortes](RECURRING_SELECTION_EVIDENCE.json),
+[pós-DDL](RECURRING_SELECTION_REMOTE_MIGRATIONS.json) e
+[CI anterior](CI_F0840DC_OBSERVATION.json).

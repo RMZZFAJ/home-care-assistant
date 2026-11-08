@@ -4,13 +4,19 @@ Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Estado atual:local153/remoto153, zero pendências após backup, restore/upgrade
-e pré/pós-validação. Rascunhos retomam a etapa salva com resumo em leitura,
-sem mudar hash do conteúdo ou efeitos oficiais. Passaram16 unitários,30 Auth
-e6 cenários de produção Chromium; CI completa do novo SHA é independente.
-Origem tipada reconciliada com seis PASS de CI e fontes inalteradas. Matriz
-42 PASS/51 PARTIAL/12 NOT_STARTED; D-B permanece em execução.
-[Resultados e limites](../audits/D/D-B/DRAFT_NAVIGATION.md).
+Estado atual:local155/remoto155, zero pendências após backup, restore/upgrade
+e pré/pós-validação. Lista frequente privada guarda só materiais; não copia
+estimativa/estoque, urgência ou motivos antigos. Cinco unitários, quatro Auth
+e sete execuções de produção em coortes passaram, com emissão posterior
+conferida por payload/linhas. Matriz43 PASS/51 PARTIAL/11 NOT_STARTED.
+
+CI f0840dc terminou4 SUCCESS/4 FAILURE. Retomada e oráculos foram ajustados;
+um defeito real de foco da verificação pública foi corrigido após reprodução
+no WebKit. Nove casos distintos dos reparos passaram em coortes nos três
+motores; harness final24 PASS, sem reduzir regras ou aumentar timeouts.
+O próximo SHA exige CI própria. D-B continua em execução; PDF segue técnico,
+sem reformulação estética, e gates externos/D6 continuam identificados.
+[Provas e limites](../audits/D/D-B/RECURRING_SELECTION.md).
 
 Estado anterior D4.6: local152/remoto152, zero migrations pendentes após
 backup válido,

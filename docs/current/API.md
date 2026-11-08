@@ -817,6 +817,17 @@ conflitante e dependência externa indisponível têm respostas próprias.
 
 ## Rascunhos privados de criação e conferência
 
+GET /api/requisitions/selections lista os conjuntos de materiais do usuário
+autenticado no paciente selecionado, com Cache-Control no-store. POST recebe
+careRecipientId, name de2–80 caracteres, productIds textuais distintos
+(1–1000) e idempotencyKey UUID. Não recebe estoque, urgência ou motivo.
+Nova lista exige req.create; leitura e recuperação da própria intenção exigem
+req.read atual. RPCs revalidam sessão/contexto/capacidade após esperas.
+Nomes são únicos por dono/paciente, sem alterar uma lista anterior. A mesma
+chave recupera o resultado original; mudar seus fatos é conflito. As tabelas
+privadas não têm grants diretos para clientes. Aplicar é edição do formulário;
+a emissão continua usando o contrato transacional de requisição existente.
+
 GET /api/drafts recebe careRecipientId, kind REQ/BAL/COM/ENT e targetDocumentId.
 REQ/BAL preservam o contrato anterior, com alvo opcional para BAL existente.
 COM/ENT usam purpose=create ou revise; ENT também aceita receive/divergence,

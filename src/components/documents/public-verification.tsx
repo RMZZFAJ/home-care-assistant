@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type RefObject,
@@ -42,7 +43,16 @@ export function PublicVerification({
     [result, setResult] = useState<PublicPdfResult | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null),
     requestRef = useRef<AbortController | null>(null),
-    sequenceRef = useRef(0);
+    sequenceRef = useRef(0),
+    focusResultRef = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    // Focus only after the matching result and its heading have committed.
+    // An animation frame can run before React has attached the new ref.
+    if (result && focusResultRef.current === sequenceRef.current) {
+      focusResultRef.current = null;
+      headingRef.current?.focus();
+    }
+  }, [result]);
   const cancel = useCallback(() => {
     requestRef.current?.abort();
     sequenceRef.current++;
@@ -55,8 +65,8 @@ export function PublicVerification({
           "Não foi possível confirmar a resposta da verificação. Consulte novamente.",
         );
       if (sequence !== sequenceRef.current) return;
+      focusResultRef.current = focus ? sequence : null;
       setResult(parsed.data);
-      if (focus) requestAnimationFrame(() => headingRef.current?.focus());
     },
     [],
   );
