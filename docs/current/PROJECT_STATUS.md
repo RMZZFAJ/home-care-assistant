@@ -308,3 +308,14 @@ O [roteiro do piloto](../audits/D/D-B/PILOT_AND_CONTINGENCY.md) conecta controle
 já implementados aos responsáveis e gates ainda a designar. Matriz26 PASS,
 48 PARTIAL e31 NOT_STARTED, com colunas originais preservadas. D-B continua
 ativa; CI do novo SHA e D-C/D6 permanecem próprios. Sem merge ou promoção.
+
+C-AC-017/052/107 implementam anexos com arquivo/chave congelados, origem
+atestada pelo servidor, recuperação pelos bytes do Storage e abandono formal
+sem apagar ready ou história. Anotações/campos PDF recebem recusa explícita;
+novos envios têm4 MiB compatíveis com o transporte. Onze unitários, dez casos
+Auth/Storage, um consumidor anterior e trinta casos distintos de navegador
+passaram em grupos qualificados. [Provas](../audits/D/D-B/ATTACHMENTS_EVIDENCE.json).
+Local150/remoto150 reconciliado após cópia fresca, upgrade isolado e pós-check.
+Matriz29 PASS/48 PARTIAL/28 NOT_STARTED. A CI42ca8df falhou no contrato antigo
+da fixture V4; esse consumidor foi corrigido e reensaiado. O novo SHA ainda
+exige CI própria. Sonar adiado; D-B ativa, D-C/D6 e GO operacional pendentes.

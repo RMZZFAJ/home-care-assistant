@@ -47,6 +47,8 @@ const reconciliation = {
 
 /** Stable public contracts. Messages may add context without exposing private data. */
 export const errorCatalog = {
+  PDF_ANNOTATIONS_UNSUPPORTED: { ...validation, recommendedAction: "Exporte uma cópia com as anotações e campos incorporados às páginas; confira o conteúdo e envie a cópia." },
+  ATTACHMENT_PENDING: { ...conflict, recommendedAction: "Recupere a mesma tentativa. Resultado pendente impede abandonar o envio." },
   PUSH_NOT_CONFIGURED: configuration,
   PUSH_RESULT_UNCONFIRMED: reconciliation,
   PDF_BYTES_DIVERGE: {

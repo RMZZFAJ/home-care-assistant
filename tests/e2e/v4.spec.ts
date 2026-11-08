@@ -230,7 +230,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
       async (route) => {
         trackingRequests += 1;
         await route.fulfill({
-          json: { data: [{ state: "pending", channel: "internal" }] },
+          json: { data: [{ state: "pending", channel: "internal" }], waitSeconds: 10 },
         });
       },
     );
@@ -243,7 +243,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     await family.clock.runFor(11_000);
     await expect(
       family.getByText(
-        "Documento salvo. Os avisos continuam sendo processados; consulte o acompanhamento.",
+        "Documento salvo. Acompanhamento inicial encerrado; consulte os estados atuais dos avisos.",
         { exact: true },
       ),
     ).toBeVisible();

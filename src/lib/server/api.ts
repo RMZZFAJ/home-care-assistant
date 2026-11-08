@@ -30,6 +30,10 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (/attachment attempt pending|attachment attempt terminal|legacy attachment attempt/i.test(message))
+    throw new ApiError("ATTACHMENT_PENDING", "Esta tentativa ainda precisa ser consultada ou já foi concluída. Recupere seu resultado antes de escolher outro arquivo.");
+  if (/attachment limit reached/i.test(message))
+    throw new ApiError("VALIDATION_ERROR", "A operação já possui dez anexos ou reservas em andamento. Consulte as tentativas antes de adicionar outro arquivo.");
   if (/invalid push|expired push subscription|push device limit reached|push device requires consent/i.test(message))
     throw new ApiError("VALIDATION_ERROR", "A inscrição está inválida, expirou ou atingiu o limite de aparelhos ativos. Consulte os avisos deste aparelho antes de confirmar novamente.", 400);
   if (error?.code === "42702")

@@ -1282,3 +1282,100 @@ homologação de canais, AT/aparelhos, recuperação de chaves e decisão D-C/D6
 continuam pendentes. Matriz105x39 mantém29 colunas iniciais e passa a26 PASS,
 48 PARTIAL e31 NOT_STARTED. Missão D-B ativa, Sonar adiado, PR7 Draft, sem merge
 ou promoção. Arquivo Sonar do usuário permanece fora do commit.
+
+### Anexos: implementação e provas antes do fechamento
+
+42ca8df publicado, PR7 OPEN Draft, remoto148 reconciliado. Seu preview está
+READY; runtime200/ready e rota privada401 observados sem criar Auth ou fixture
+remota. CI42ca8df já aprovou Linux/Windows e banco completo; navegadores ainda
+estavam em execução na observação. Isso não valida o incremento de anexos.
+
+Local150/remoto148: duas migrations novas ainda não foram aplicadas no remoto.
+149 cria tentativas e recibos privados, abandono formal e exclusão mútua no
+Storage;150 exige atestado do servidor para a origem. Ambas passaram preflight
+com rollback e preparo local sem reset. São incrementais e já ficam imutáveis.
+O cliente congela arquivo/chave, confere recibo e consulta a mesma intenção;
+recuperação verifica bytes do Storage antes de confirmar e vincular uma vez.
+Nova seleção depende de confirmação ou abandono de reserva sem envio pendente.
+
+Onze unitários, nove Auth/Storage reais, consumidor anterior de rascunho/ready
+e SQL de privilégios passaram. A rodada Auth inicial teve seis passes e uma
+falha de fixture ao selecionar modo global com uma conta familiar; a negativa
+foi preservada e o contexto correto passou. Movimento manual exigiu papel com
+stock.family.manage; a contraprova familiar foi mantida no teste final. A
+revisão adversarial acrescentou a fronteira de atestado exclusivo do servidor;
+nove casos finais repetiram o conjunto afetado após esse reforço.
+
+PDFs com anotações/campos são recusados com explicação, incluindo o exemplo B6;
+não há mais remoção silenciosa de Annots. Novos anexos têm4 MiB, com overhead
+abaixo do teto de transporte4,5 MB. Origem e derivado recebem hashes separados;
+proveniência legada não é inventada. Não há TTL, limpeza ou eliminação de ready.
+
+Diagnóstico de interface em andamento; não é aceite em build de produção.
+Matriz passa provisoriamente a26 PASS/51 PARTIAL/28 NOT_STARTED, mantendo105x39
+e as29 colunas iniciais. Próximos passos: navegador de produção, evidência,
+cópia fresca/upgrade/preflight e aplicação remota149/150 antes do commit,
+depois CI do SHA. Sem merge, promoção ou transporte externo; Sonar adiado.
+
+### Fechamento dos anexos e reconciliação150
+
+C-AC-017/052/107 têm implementação e contraprovas locais. Arquivo, impressão
+e chave ficam congelados; resposta inválida, perda antes/depois do commit e
+timeout nativo30s não liberam nova intenção. A recuperação confronta bytes do
+Storage, conserva um arquivo/evento e funciona após recarga; outra preparação
+é bloqueada até resolver o envio. Original renomeado pode retomar somente após
+conferir os mesmos bytes, com os metadados congelados do registro. Dados
+divergentes do Storage não são promovidos a ready.
+
+Dez abandonos formais liberam vagas sem apagar linhas, hashes ou história.
+Dois candidatos disputam a última vaga sem ambos recebê-la; ready e seus bytes
+ficam preservados. Início/abandono e INSERT do Storage compartilham exclusão
+mútua. Ausência de objeto e idade do envio não autorizam expiração. Declaração
+do navegador não atesta origem; as duas RPCs de serviço fazem atestado/recibo.
+Os dois auxiliares e quatro RPCs Auth mantêm contexto/titularidade vigentes.
+
+Onze unitários, dez casos Auth/Storage, um consumidor de rascunho/ready e SQL
+de privilégios passaram. Trinta casos distintos em produção foram compostos
+por cinco grupos, com hashes de fontes e reuso dos consumidores inalterados;
+não se declara uma única rodada de trinta. Foram46 execuções:42 passes e4
+falhas intermediárias preservadas/corrigidas. O diagnóstico5/5 é separado.
+Os três navegadores testaram timeout real30s, bytes, seleção congelada e
+recuperação. Layout320/390/768/1440 e inspeção de capturas não aprovam AT,
+aparelho físico ou zoom400%. O exemplo B6, FreeText/Ink/widgets são recusados
+com explicação, sem retirar a barreira de conteúdo ativo.
+
+A primeira rodada teve15 passes e3 falhas: replay multipart do WebKit nos
+adaptadores de perda de resposta e fill do seletor na jornada antiga. A perda
+agora ocorre somente após a resposta real do envio nativo, conservando bytes;
+digitação normal e verificação do contexto conservaram a jornada. Na CI42ca8df,
+Linux/Windows/banco e iOS1 passaram; os outros navegadores falharam na fixture
+V4 sem waitSeconds e com a mensagem antiga. Ela foi corrigida e reensaiada nos
+três. Um caso ENT excedeu30s totais antes da tela interativa no Chromium;
+reensaio com90s para preparo/consultas passou, mantendo15s por ação/assertiva.
+Não se afirma correção de produto nem aprovação da CI pelo ajuste do teste.
+
+Remoto150/local150, histórico150/150 e sem pendências. Cópia crítica
+012a5c4b-a398-4632-b403-597da91d708e:79 arquivos,10922839 bytes, manifesto
+780588a5ebca622b092fdc4952e1c6787bae0fda77ac97cd44dc176cdb87faea.
+BD restaurado isoladamente com149 conjuntos/FKs;33 objetos/32 PDFs e hash de
+uma emissão ready conferidos em arquivos. Probe5,392s não aprova retomada do
+Storage, independência de chave/computador ou RPO/RTO/D6.
+
+399 identidades anteriores de função/grants preservadas, dois corpos legados
+alterados como previsto e política evidence_upload comparada. Os149 conjuntos
+anteriores, Auth9/profiles7, Storage33, cron e Vault foram preservados sob as
+qualificações de clock/cursor já nomeadas. Sem locks, transações longas ou
+índices inválidos. Catálogo igual salvo a flag local conhecida da condição
+finita. Advisors privados39→41 e funções Auth149→153, anon3 inalterado; não
+foram suprimidos avisos. Tabelas novas sem grants diretos; sem fixture/Auth
+remoto, reset, transporte externo, alteração de cron/Vault ou promoção.
+
+[Evidência](ATTACHMENTS_EVIDENCE.json), [contrato](ATTACHMENTS.md),
+[preflight](ATTACHMENTS_REMOTE_PREFLIGHT.json),
+[pós-check](ATTACHMENTS_REMOTE_MIGRATIONS.json),
+[advisors](ATTACHMENTS_REMOTE_ADVISORS.json) e
+[CI42ca8df](CI_42CA8DF_OBSERVATION.json). Matriz105x39 e29 colunas iniciais
+preservadas:29 PASS/48 PARTIAL/28 NOT_STARTED. O novo SHA requer sua própria
+CI. Missão ativa; PR7 OPEN Draft, sem merge; Sonar adiado pelo responsável.
+Restam critérios de formulários/fidelidade, demais itens da matriz e gates
+humanos/AT/aparelhos/D-C/D6. Arquivo Sonar do usuário continua fora do commit.

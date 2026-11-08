@@ -608,8 +608,13 @@ test("ENT mantém pedido e trânsito parcial até conciliação real, sem oferec
 test("ENT atualiza uma fonte indisponível por consulta e comparação, preservando a justificativa própria", async ({
   page,
 }) => {
-  const f = await prepared({ request: true }),
+  // The total budget includes cold Auth/database preparation and both source
+  // comparison round trips. Per-action/assertion timeouts remain unchanged.
+  test.setTimeout(90_000);
+  const setupStarted = Date.now();
+  const f = await test.step("Preparar a fonte autorizada", () => prepared({ request: true })),
     before = ledger(f.patient);
+  test.info().annotations.push({ type: "fixture-ms", description: String(Date.now() - setupStarted) });
   sql(
     `insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled) values(${sqlLiteral(f.patient)},'stock.team.read',${sqlLiteral(fixtures.professional.id)},false);`,
   );

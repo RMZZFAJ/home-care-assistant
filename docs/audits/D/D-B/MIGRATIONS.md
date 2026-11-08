@@ -407,3 +407,26 @@ fornecedor externo ou promoção. [Preflight](NOTICE_TRACKING_REMOTE_PREFLIGHT.j
 [pós-check](NOTICE_TRACKING_REMOTE_MIGRATIONS.json),
 [advisors](NOTICE_TRACKING_REMOTE_ADVISORS.json) e
 [provas locais](NOTICE_TRACKING_EVIDENCE.json). CI do novo SHA continua gate.
+
+### Fechamento dos anexos — remoto150
+
+149/150 foram aplicadas após cópia crítica fresca, restauração/upgrade
+isolados, preflight e compatibilidade. Local150/remoto150, histórico integral
+150/150 reconciliado, sem pendências; não houve reset, seed, mudança de Auth,
+Vault, cron ou ativação de transporte externo.
+
+Os399 contratos anteriores e grants foram preservados. reserve exclui abandono
+formal da capacidade; finalize recusa terminal divergente e exige atestado para
+tentativas rastreadas. A política evidence_upload conserva INSERT autenticado
+e passa a bloquear abandono concorrente e upload fora do ciclo autorizado.
+As duas tabelas privadas têm RLS sem grants diretos; atestado e recibo são
+RPCs exclusivas do serviço. Nova origem não é atribuída retroativamente.
+
+149 projeções de conjuntos anteriores, Auth9/profiles7,33 objetos, cron e Vault
+foram confrontados. Catálogo coincide salvo a flag local conhecida da condição
+finita, com predicado preservado. Advisors: INFO privado39→41 e funções Auth
+149→153, sem novas funções anônimas; alertas anteriores não foram suprimidos.
+[Preflight](ATTACHMENTS_REMOTE_PREFLIGHT.json),
+[pós-check](ATTACHMENTS_REMOTE_MIGRATIONS.json),
+[advisors](ATTACHMENTS_REMOTE_ADVISORS.json) e
+[evidência](ATTACHMENTS_EVIDENCE.json). Probe5,392s não comprova D6/RPO/RTO.
