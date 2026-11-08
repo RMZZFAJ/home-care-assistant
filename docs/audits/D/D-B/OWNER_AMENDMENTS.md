@@ -41,3 +41,15 @@ A orientação vigente para o fechamento da etapa em andamento é reconciliar
 todas as migrations pendentes no remoto ao commitar, permitindo o teste do
 preview. O procedimento acima é mantido em cada fechamento correspondente;
 não equivale a homologação da versão em desenvolvimento.
+
+## Preview protegido e PWA — 08/11/2026
+
+O responsável relatou falha real no Samsung Galaxy S24 Ultra, Chrome e PWA
+instalada, persistente após reinstalação. Autorizou correção e regressões
+proporcionais, commit/push na branch atual, PR7 Draft e produção preservada.
+Determinou reproduzir a barreira de acesso por cookie e revisar diagnóstico de
+instalação/ativação, recuperação, botão Push, relação entre worker/PWA/inscrição,
+acesso autenticado ao Preview, atualização Android/Chrome e endereço estável.
+Não autoriza desativar proteção, cachear dados/respostas privadas, reduzir
+autorização, replay offline ou substituir a correção por aumento do timeout.
+A falha física relatada não equivale à homologação física da correção pelo agente.

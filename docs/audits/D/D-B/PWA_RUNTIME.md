@@ -16,7 +16,13 @@ Confirmação física por sistema operacional continua gate D-C.
 O build gera service-worker.js sem segredos, com fingerprint de fontes,
 configuração e assets públicos. Dev, build de produto e runner E2E usam o mesmo
 gerador. O script é servido com no-store e escopo explícito. Cache contém
-somente offline.html e três ícones anônimos, sem cookies na captura.
+somente os bytes públicos de offline.html e três ícones. A busca desses quatro
+arquivos usa credenciais somente da mesma origem para atravessar a proteção
+de acesso ao Preview. O build fixa tamanho, tipo e SHA-256 de cada arquivo.
+Redirecionamento, resposta não autorizada, conteúdo divergente e excesso de
+bytes impedem a instalação. O cache recebe uma nova resposta dos bytes
+verificados, sem copiar cookies, Vary ou cabeçalhos privados da entrega.
+Isso substitui a captura com credenciais omitidas que falhava no Preview.
 
 APIs, HTML autenticado, fichas, PDFs, respostas do framework e comandos não
 entram nesse cache. Um GET privado depende da rede e das autorizações existentes.
@@ -38,6 +44,26 @@ para salvar rascunhos no servidor antes de fechar. Uma aba ainda aberta conserva
 seus campos; fechar outra aba não força a troca. A ativação limpa somente caches
 públicos próprios antigos. É o ciclo de
 [atualização do Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers).
+
+Instalação recusada é identificada pelo estado real redundant; ativação e
+confirmação de versão são fases distintas. O prazo de observação produz
+pendência, não uma confirmação de falha. O aparelho pode tentar preparar
+novamente sem limpar Auth, rascunhos ou armazenamento de outras aplicações.
+Uma atualização recusada conserva o cache público da versão já ativa.
+
+Ativar avisos exige registro ativo e versão confirmada antes de solicitar
+permissão. Uma troca de controlador invalida essa prontidão até nova consulta.
+O clique não espera oito segundos por um worker inexistente. Instalar a PWA
+na tela inicial e inscrever Push continuam capacidades diferentes; uma não
+confirma a outra. Consentimento e autorização por conta/aparelho continuam
+independentes da disponibilidade do worker.
+
+Em Preview, o layout pode oferecer o endereço estável da branch fornecido
+pelo ambiente Vercel. Esse endereço é orientação de navegação, sem autoridade
+e sem contexto privado na URL. Uma instalação feita por URL de deployment
+continua ligada àquela origem. O usuário deve salvar seus rascunhos e abrir o
+endereço estável, autenticando-se nele quando necessário; não há transferência
+automática de sessão, bypass ou redirecionamento para produção.
 
 O contrato público /api/runtime consulta um marcador SQL de protocolo/schema
 sem cookie ou identidade. Ausência do marcador, incompatibilidade e infraestrutura

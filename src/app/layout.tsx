@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/theme/providers";
 import "@/theme/tokens.css";
 import { WorkspaceProvider } from "@/components/layout/workspace-context";
 import { PwaProvider } from "@/components/pwa/pwa-provider";
+import { stablePreviewOrigin } from "@/lib/pwa/preview-origin";
 
 export const metadata: Metadata = {
   title: "Home Care Assistant",
@@ -24,7 +25,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <Suspense fallback={<main className="p-6" role="status">Carregando seu espaço de cuidado…</main>}>
-            <PwaProvider><WorkspaceProvider>{children}</WorkspaceProvider></PwaProvider>
+            <PwaProvider previewOrigin={stablePreviewOrigin(process.env.VERCEL_ENV, process.env.VERCEL_BRANCH_URL)}><WorkspaceProvider>{children}</WorkspaceProvider></PwaProvider>
           </Suspense>
           <LiveSession />
         </ThemeProvider>

@@ -1,0 +1,249 @@
+{
+  "at": "2026-11-08T09:10:46.588590+00:00",
+  "sourceBase": "2fe86b70d68f81816a07d4f07a2c8864deac6497",
+  "scope": "Owner-reported protected Preview PWA failure; D5.4 directed correction, full D-B remains active",
+  "sourceLfSha256": {
+    "scripts/build-pwa.mjs": "7c014eeb6609a53ba3f4d3e99c8fc175b9f8c2dca034f66a1740b15a373d7b3c",
+    "scripts/pwa-worker.js": "f8849c00fb6e92e1cef998d5c587d709d60934228d9a024f75a9d3c59e324c88",
+    "src/app/layout.tsx": "db8375d920bf098dd4beca3905ddd5d957c5e703e14be7b02f4e4705ac92d93c",
+    "src/components/pwa/push-settings.tsx": "1a961647273cabeb04198a65a7110c472e46e5ab8df1e62e66ba9cc338f194ef",
+    "src/components/pwa/pwa-provider.tsx": "b4f6e3d8b587af7c598fa5ee72e7ed7c0586376a1c65882658f6cc9227c0aa71",
+    "src/components/pwa/pwa-settings.tsx": "81aefaf240df63e83435c75ba0fc39431915e70b497f0591d1eb969a6b99621a",
+    "src/lib/pwa/contract.json": "a7ecb172b6c5f432fdd66b95e02c670a63e7bdda472dd40812c830e75916613a",
+    "src/lib/pwa/preview-origin.ts": "09bed0b1d884e41a3a9fc6ff35a064025231ef42ce087c7541514a22291a972a",
+    "src/lib/pwa/worker.ts": "22a9c94039ecfc97c556cc7f02f9deb8a450aa18cbfceeac601a7f3f52398999",
+    "tests/e2e/pwa-access-gate.spec.ts": "0c51c730bb6ec80eabc21f0731aab1da1c46aa00856307cc855b443b35872931",
+    "tests/e2e/pwa.spec.ts": "f1acc549b12c309bdf74e9e85de64ec3628013d17933664340cdcb62e81ef67f",
+    "tests/e2e/web-push.spec.ts": "782a57682adf2d7457fddb6423b9df8766008bff97718763fa017c8d7d4748e9",
+    "tests/pwa-lifecycle.test.ts": "5403fb1c4f3f9ed106c7cca0b14d3a33b51f764a1d9f36626f80233afe3e007e",
+    "tests/pwa-worker.test.ts": "e215f59e1c16beee9e31eb440b8344d5bf7d8ef22b19a99944350773e55bfa5b",
+    "tests/web-push.test.ts": "6f2dd4e941743149d40cf872cff8d88ffbce9093d1cf0bc7ea49a33e58fa76d2"
+  },
+  "rootCause": {
+    "before": "Real original worker becomes redundant behind an HttpOnly same-origin access cookie barrier because precache requests omit credentials",
+    "beforeLog": "pwa-protection-before.log",
+    "equivalentBarrier": "Actual loopback HTTP 401/307 gate on page/script/assets, not a mocked worker or disabled Vercel protection",
+    "fix": "same-origin delivery credentials; redirect error; four build-pinned public assets, exact type/size/SHA256, bounded read, sanitized new cache responses",
+    "protectionSettingsChanged": false,
+    "privateCacheAllowed": false,
+    "offlineReplayAdded": false
+  },
+  "validation": {
+    "unit": {
+      "distinctPassingCases": 27,
+      "cohorts": [
+        {
+          "log": "pwa-protection-unit.log",
+          "passed": 26,
+          "composition": "worker10, lifecycle5, WebPush crypto11"
+        },
+        {
+          "log": "pwa-worker-same-size-recheck.log",
+          "passed": 10,
+          "qualification": "Affected worker suite after strengthening the poison fixture to equal-size bytes"
+        },
+        {
+          "log": "pwa-activation-unit.log",
+          "passed": 6,
+          "qualification": "Current lifecycle suite with activation failure classification and safe diagnostics"
+        }
+      ]
+    },
+    "production": {
+      "distinctPassingCases": 39,
+      "completedExecutions": 48,
+      "passedExecutions": 45,
+      "failedExecutions": 3,
+      "projects": [
+        "chromium",
+        "mobile (Android emulation)",
+        "ios (WebKit emulation)"
+      ],
+      "cohorts": [
+        {
+          "log": "pwa-protection-production.log",
+          "passed": 36,
+          "sourceLfSha256": {
+            "scripts/build-pwa.mjs": "7c014eeb6609a53ba3f4d3e99c8fc175b9f8c2dca034f66a1740b15a373d7b3c",
+            "scripts/pwa-worker.js": "f8849c00fb6e92e1cef998d5c587d709d60934228d9a024f75a9d3c59e324c88",
+            "src/app/layout.tsx": "db8375d920bf098dd4beca3905ddd5d957c5e703e14be7b02f4e4705ac92d93c",
+            "src/components/pwa/push-settings.tsx": "1a961647273cabeb04198a65a7110c472e46e5ab8df1e62e66ba9cc338f194ef",
+            "src/components/pwa/pwa-provider.tsx": "3283deeab491dc45db48321f8607e165e20516619c7029712b9a66bc59f4e31a",
+            "src/components/pwa/pwa-settings.tsx": "3d785aa6f72d3f042d2f93fc4f97981977205aaa33f40dea447c3d71001f195c",
+            "src/lib/pwa/contract.json": "a7ecb172b6c5f432fdd66b95e02c670a63e7bdda472dd40812c830e75916613a",
+            "src/lib/pwa/preview-origin.ts": "09bed0b1d884e41a3a9fc6ff35a064025231ef42ce087c7541514a22291a972a",
+            "src/lib/pwa/worker.ts": "3e3ba1f3401cffff9cdbbbc068a88f6c87131c6254e874a41c4e4cf565cb65f5",
+            "tests/e2e/pwa-access-gate.spec.ts": "9c501a7ad2900aba25915a2ed6b4f417d48d096a76e2f6e4de2468b7e27bc226",
+            "tests/e2e/pwa.spec.ts": "f1acc549b12c309bdf74e9e85de64ec3628013d17933664340cdcb62e81ef67f",
+            "tests/e2e/web-push.spec.ts": "782a57682adf2d7457fddb6423b9df8766008bff97718763fa017c8d7d4748e9",
+            "tests/pwa-lifecycle.test.ts": "da375ab5701753ba8fcd1fac8ea6e0a2aff6f69cee19bf8e675d1730c681c068",
+            "tests/pwa-worker.test.ts": "e215f59e1c16beee9e31eb440b8344d5bf7d8ef22b19a99944350773e55bfa5b",
+            "tests/web-push.test.ts": "6f2dd4e941743149d40cf872cff8d88ffbce9093d1cf0bc7ea49a33e58fa76d2"
+          },
+          "qualification": "Five native access-gate cases, four existing PWA cases and three WebPush cases in each project"
+        },
+        {
+          "log": "pwa-activation-production.log",
+          "passed": 3,
+          "failed": 3,
+          "sourceLfSha256": {
+            "scripts/build-pwa.mjs": "7c014eeb6609a53ba3f4d3e99c8fc175b9f8c2dca034f66a1740b15a373d7b3c",
+            "scripts/pwa-worker.js": "f8849c00fb6e92e1cef998d5c587d709d60934228d9a024f75a9d3c59e324c88",
+            "src/app/layout.tsx": "db8375d920bf098dd4beca3905ddd5d957c5e703e14be7b02f4e4705ac92d93c",
+            "src/components/pwa/push-settings.tsx": "1a961647273cabeb04198a65a7110c472e46e5ab8df1e62e66ba9cc338f194ef",
+            "src/components/pwa/pwa-provider.tsx": "b4f6e3d8b587af7c598fa5ee72e7ed7c0586376a1c65882658f6cc9227c0aa71",
+            "src/components/pwa/pwa-settings.tsx": "81aefaf240df63e83435c75ba0fc39431915e70b497f0591d1eb969a6b99621a",
+            "src/lib/pwa/contract.json": "a7ecb172b6c5f432fdd66b95e02c670a63e7bdda472dd40812c830e75916613a",
+            "src/lib/pwa/preview-origin.ts": "09bed0b1d884e41a3a9fc6ff35a064025231ef42ce087c7541514a22291a972a",
+            "src/lib/pwa/worker.ts": "22a9c94039ecfc97c556cc7f02f9deb8a450aa18cbfceeac601a7f3f52398999",
+            "tests/e2e/pwa-access-gate.spec.ts": "2b25582827156b04f2869f4ec16d968c244b27c2b62a2d7b432458c3fa7734ee",
+            "tests/e2e/pwa.spec.ts": "f1acc549b12c309bdf74e9e85de64ec3628013d17933664340cdcb62e81ef67f",
+            "tests/e2e/web-push.spec.ts": "782a57682adf2d7457fddb6423b9df8766008bff97718763fa017c8d7d4748e9",
+            "tests/pwa-lifecycle.test.ts": "5403fb1c4f3f9ed106c7cca0b14d3a33b51f764a1d9f36626f80233afe3e007e",
+            "tests/pwa-worker.test.ts": "e215f59e1c16beee9e31eb440b8344d5bf7d8ef22b19a99944350773e55bfa5b",
+            "tests/web-push.test.ts": "6f2dd4e941743149d40cf872cff8d88ffbce9093d1cf0bc7ea49a33e58fa76d2"
+          },
+          "qualification": "Current UI recovery passes; rejected auxiliary activate promise did not cause redundant in real browsers, invalid fixture assumption preserved"
+        },
+        {
+          "log": "pwa-activation-production-recheck.log",
+          "passed": 6,
+          "sourceLfSha256": {
+            "scripts/build-pwa.mjs": "7c014eeb6609a53ba3f4d3e99c8fc175b9f8c2dca034f66a1740b15a373d7b3c",
+            "scripts/pwa-worker.js": "f8849c00fb6e92e1cef998d5c587d709d60934228d9a024f75a9d3c59e324c88",
+            "src/app/layout.tsx": "db8375d920bf098dd4beca3905ddd5d957c5e703e14be7b02f4e4705ac92d93c",
+            "src/components/pwa/push-settings.tsx": "1a961647273cabeb04198a65a7110c472e46e5ab8df1e62e66ba9cc338f194ef",
+            "src/components/pwa/pwa-provider.tsx": "b4f6e3d8b587af7c598fa5ee72e7ed7c0586376a1c65882658f6cc9227c0aa71",
+            "src/components/pwa/pwa-settings.tsx": "81aefaf240df63e83435c75ba0fc39431915e70b497f0591d1eb969a6b99621a",
+            "src/lib/pwa/contract.json": "a7ecb172b6c5f432fdd66b95e02c670a63e7bdda472dd40812c830e75916613a",
+            "src/lib/pwa/preview-origin.ts": "09bed0b1d884e41a3a9fc6ff35a064025231ef42ce087c7541514a22291a972a",
+            "src/lib/pwa/worker.ts": "22a9c94039ecfc97c556cc7f02f9deb8a450aa18cbfceeac601a7f3f52398999",
+            "tests/e2e/pwa-access-gate.spec.ts": "0c51c730bb6ec80eabc21f0731aab1da1c46aa00856307cc855b443b35872931",
+            "tests/e2e/pwa.spec.ts": "f1acc549b12c309bdf74e9e85de64ec3628013d17933664340cdcb62e81ef67f",
+            "tests/e2e/web-push.spec.ts": "782a57682adf2d7457fddb6423b9df8766008bff97718763fa017c8d7d4748e9",
+            "tests/pwa-lifecycle.test.ts": "5403fb1c4f3f9ed106c7cca0b14d3a33b51f764a1d9f36626f80233afe3e007e",
+            "tests/pwa-worker.test.ts": "e215f59e1c16beee9e31eb440b8344d5bf7d8ef22b19a99944350773e55bfa5b",
+            "tests/web-push.test.ts": "6f2dd4e941743149d40cf872cff8d88ffbce9093d1cf0bc7ea49a33e58fa76d2"
+          },
+          "qualification": "Native held activation remains genuinely activating through observation deadline; release confirms readiness. Current UI recovery and Push guard rerun in all projects"
+        }
+      ],
+      "reuseQualification": "Not one 39-case all-green run. After first36 only activation phase classification/messages and its tests changed; worker/build/cache/Push sources and existing consumers retained exact LF hashes. All three UI recovery cases rerun against final provider/helper/settings; corrected activation fixture is the only delta after intermediate snapshot."
+    },
+    "diagnostic": {
+      "postFixCompletedExecutions": 5,
+      "passed": 4,
+      "failed": 1,
+      "qualification": "Gate4 pass; UI test closed its already-open independent settings panel, corrected before production. Baseline failure is separate and expected.",
+      "acceptanceProof": false
+    },
+    "types": {
+      "exitCode": 0,
+      "terminalObservation": "FINAL_TYPES_PASS, tool chunk dfaddb"
+    },
+    "affectedLint": {
+      "exitCode": 0,
+      "terminalObservation": "FINAL_AFFECTED_LINT_PASS, tool chunk dfaddb",
+      "initialFailure": "Duplicate crypto global comment removed; no lint rule suppressed"
+    },
+    "accessibility": {
+      "widths": [
+        320,
+        390,
+        768,
+        1440
+      ],
+      "axeRulesPreserved": true,
+      "physicalDeviceOrAssistiveTechnologyApproval": false
+    },
+    "securityConsumersPreserved": [
+      "private API/PDF/framework/query exclusion",
+      "no offline replay",
+      "worker schema/protocol handshake",
+      "authorization and session-scoped consent",
+      "generic lock-screen content",
+      "no forced skipWaiting/reload"
+    ],
+    "documentation": {
+      "markdownFiles": 7,
+      "issues": 0,
+      "localLinks": "PASS",
+      "json": "PASS",
+      "matrix": "105x39; first29 and criterion states exact",
+      "sourceHashes": "15/15 exact"
+    }
+  },
+  "lifecycle": {
+    "registrationSpecificObservation": true,
+    "redundantIsFailure": true,
+    "observationDeadlineIsPendingNotSuccessOrFailure": true,
+    "safeRetryWithoutReinstallOrStorageClearing": true,
+    "confirmedActiveWorkerRequiredBeforePushPermission": true,
+    "controllerChangeInvalidatesReadiness": true,
+    "pwaInstallationDoesNotProvePushReadiness": true
+  },
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "migrations": 151,
+    "latest": "20261108023830",
+    "newMigrations": 0,
+    "readOnlyLedgerReverified": true,
+    "pending": 0,
+    "backupAndRestoreUnchangedEvidence": "FIELD_VALIDATION.md;FIELD_VALIDATION_REMOTE_MIGRATIONS.json"
+  },
+  "localCron": {
+    "hca-operational-lifecycle": true,
+    "hca-notification-worker": true,
+    "reconciliationLog": "pwa-local-cron-reconciliation.log"
+  },
+  "preview": {
+    "stableBranchOrigin": "https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app",
+    "newShaVerification": "PENDING_PUSH_AND_READY",
+    "originGuidanceIsAuthorization": false,
+    "physicalSamsungSuccess": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "missionComplete": false,
+  "operationalGo": false,
+  "limits": [
+    "CI must validate the published SHA",
+    "Actual protected Preview receipt follows push/READY",
+    "Owner Samsung Galaxy S24 Ultra Chrome/installed-PWA failure is not a physical success retest",
+    "No real external Push transport activation, remote Auth fixture, merge, production promotion or protection change",
+    "Human/physical/AT, provider delivery, independent recovery and D-C/D6 gates remain separate"
+  ],
+  "logLfSha256": {
+    "pwa-activation-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-activation-production-recheck.log": "4b92c9eedd8dcff7765d10f7e59cfa8b2a196307b1b7c15a236e6ea297f6c6ce",
+    "pwa-activation-production.log": "6c17d22d6df8564ac2e85592a5a84798b348c2ed4ca13b32b9f6e302c4fe325b",
+    "pwa-activation-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-activation-unit.log": "3869153f8cabc5e1b473b138bd76de90c998a98e1e81463e5fb5813459245627",
+    "pwa-final-test-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-lint-final2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-local-cron-reconciliation.log": "c71306087e174530e060c35615de06f0f95aaed35cd1ec83c26a9fe0f1603652",
+    "pwa-protection-before.log": "8695f079b0374296a5f57daf45ac2c5d8954dd3400db4363251f21ce30f993ac",
+    "pwa-protection-gate-diagnostic.log": "2b503ba545e6a9b66e03b6f1a2c40d987b96bd63d40f757a4535f71c49dd4200",
+    "pwa-protection-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-protection-lint.log": "38793e090927946f517dd18efb4b3d9f06b0e7b90d38a10da87bfe0f1a0ae8fa",
+    "pwa-protection-production.log": "815c0b63f7910ca554f3c37a22178370f277356916f1b72e797b32091c2e87c2",
+    "pwa-protection-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-protection-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-protection-ui-diagnostic.log": "3f53ac0e8268c625bd2077ed463f665c1d8007939fa5618f6f4095dbbf35e0dd",
+    "pwa-protection-unit-first.log": "06c8733f2728465a6406d208520c94c9ffc7935603dcbe792cf785e2c9345fe3",
+    "pwa-protection-unit.log": "9a0f9bb650c6aa92c86aed0eaa0ef24ad75bf4254d09201af727fe0bc41dd36f",
+    "pwa-types-final2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pwa-worker-same-size-recheck.log": "d7b162b2e4458c61ff15ae5ef248ddf044a241cd0f76bebd992fd578c20605d6"
+  },
+  "counterproofLfSha256": {
+    "pwa-activation-first-chromium.md": "c702cc52658951038524eea419849143d543881d30adf5c7a0816e1cbae69794",
+    "pwa-activation-first-ios.md": "c702cc52658951038524eea419849143d543881d30adf5c7a0816e1cbae69794",
+    "pwa-activation-first-mobile.md": "c702cc52658951038524eea419849143d543881d30adf5c7a0816e1cbae69794",
+    "pwa-protection-before-error-context.md": "032b0587181b224379b755c6b59113d4feae46536d12791a07f84fda2ed00e32",
+    "pwa-ui-first-test-error-context.md": "e22de31975a2db3129c8049599195ef2466a81edd816b6d1badf5232650a526c"
+  },
+  "counterproofScreenshotsSha256": {
+    "pwa-protection-before-failure.png": "6796aae7b5027158932550cad3cef71800932a324ee56b553dd668c6a107fa10",
+    "pwa-ui-first-test-failure.png": "f6733b13720c724f8ea59be2db86db789df63737485ea01ea698a6b6c767b988"
+  }
+}

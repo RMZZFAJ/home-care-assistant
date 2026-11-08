@@ -8,19 +8,63 @@ const PUBLIC_FILES = [
   "/pwa/icon-512.png",
   "/pwa/apple-180.png",
 ];
+async function verifiedPublicResponse(path) {
+  const expected = BUILD.assets[path];
+  const request = new Request(new URL(path, self.location.origin), {
+    // Deployment Protection authenticates delivery of these public files.
+    // The cache contains only independently pinned bytes, never that response.
+    credentials: "same-origin",
+    redirect: "error",
+    cache: "reload",
+  });
+  let response;
+  try { response = await fetch(request); }
+  catch { throw new Error("network_or_access"); }
+  if ([401, 403].includes(response.status)) throw new Error("access_required");
+  if (!response.ok || response.redirected || ["opaque", "opaqueredirect"].includes(response.type) ||
+      (response.url && response.url !== request.url) ||
+      response.headers.get("Content-Type")?.split(";")[0].trim().toLowerCase() !== expected.contentType || !response.body)
+    throw new Error("public_asset_invalid");
+  const reader = response.body.getReader(), chunks = [];
+  let length = 0;
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      length += value.length;
+      if (length > expected.bytes) { await reader.cancel(); throw new Error("public_asset_invalid"); }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  if (length !== expected.bytes) throw new Error("public_asset_invalid");
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+  const digest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), byte => byte.toString(16).padStart(2, "0")).join("");
+  if (digest !== expected.sha256) throw new Error("public_asset_invalid");
+  // Exclude access cookies, private/Vary headers and any gateway response.
+  return new Response(bytes, { headers: { "Content-Type": expected.contentType, "Cache-Control": "public, max-age=31536000, immutable" } });
+}
+async function reportPreparationFailure(reason) {
+  try {
+    for (const client of await self.clients.matchAll({ type: "window", includeUncontrolled: true }))
+      client.postMessage({ type: "HCA_OFFLINE_PREPARATION_FAILED", reason });
+  } catch { /* Failure reporting cannot promote an unsuccessful installation. */ }
+}
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
-      const cache = await caches.open(CACHE);
-      for (const path of PUBLIC_FILES) {
-        const request = new Request(new URL(path, self.location.origin), {
-          credentials: "omit",
-          cache: "reload",
-        });
-        const response = await fetch(request);
-        if (!response.ok || response.redirected || response.type === "opaque")
-          throw new Error("Public offline asset unavailable");
-        await cache.put(path, response);
+      let createdCache = false;
+      try {
+        const responses = await Promise.all(PUBLIC_FILES.map(verifiedPublicResponse));
+        createdCache = !(await caches.keys()).includes(CACHE);
+        const cache = await caches.open(CACHE);
+        for (let index = 0; index < PUBLIC_FILES.length; index++) await cache.put(PUBLIC_FILES[index], responses[index]);
+      } catch (error) {
+        if (createdCache) await caches.delete(CACHE).catch(() => false);
+        const reason = ["access_required", "network_or_access", "public_asset_invalid"].includes(error?.message) ? error.message : "storage_unavailable";
+        await reportPreparationFailure(reason);
+        throw error;
       }
     })(),
   );
@@ -101,7 +145,7 @@ self.addEventListener("fetch", (event) => {
       (async () =>
         (await caches.open(CACHE))
           .match(url.pathname)
-          .then((response) => response ?? fetch(request)))(),
+          .then((response) => response ?? verifiedPublicResponse(url.pathname)))(),
     );
     return;
   }

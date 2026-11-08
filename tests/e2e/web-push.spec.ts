@@ -371,3 +371,41 @@ test("Web Push negado não repete pedido, não inscreve e mantém a central e o 
     page.getByRole("heading", { name: "Central de notificações", exact: true }),
   ).toBeVisible();
 });
+
+test("preparação recusada explica a falha, bloqueia permissão Push e recupera o worker real sem reinstalar", async ({ page }) => {
+  const f = await setup(), value = subscription();
+  await adapter(page, value, "granted");
+  await page.addInitScript(() => {
+    const state = { blocked: true, calls: 0 };
+    (window as unknown as { hcaRegistrationGate: typeof state }).hcaRegistrationGate = state;
+    const original = ServiceWorkerContainer.prototype.register;
+    ServiceWorkerContainer.prototype.register = function (...args) {
+      state.calls++;
+      return state.blocked ? Promise.reject(new DOMException("Controlled Preview registration denial", "SecurityError")) : original.apply(this, args);
+    };
+  });
+  await openProfile(page, f.patient);
+  await expect(panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true })).toBeDisabled();
+  expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number; subscriptions: number } }).hcaPushCapability)).toMatchObject({ requests: 0, subscriptions: 0 });
+  await page.getByRole("button", { name: "Aplicativo neste aparelho", exact: true }).click();
+  const app = page.getByRole("region", { name: "Aplicativo neste aparelho", exact: true });
+  await expect(app.getByRole("alert").filter({ hasText: "Não foi possível iniciar a preparação" })).toBeVisible();
+  const attempts = await page.evaluate(() => (window as unknown as { hcaRegistrationGate: { calls: number } }).hcaRegistrationGate.calls);
+  await app.getByRole("button", { name: "Consultar atualizações", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { hcaRegistrationGate: { calls: number } }).hcaRegistrationGate.calls)).toBeGreaterThan(attempts);
+  await expect(app.getByRole("alert").filter({ hasText: "Não foi possível iniciar a preparação" })).toBeVisible();
+  const clock = await page.evaluate(() => performance.timeOrigin);
+  await page.evaluate(() => { (window as unknown as { hcaRegistrationGate: { blocked: boolean } }).hcaRegistrationGate.blocked = false; });
+  await app.getByRole("button", { name: "Tentar preparar orientação offline novamente", exact: true }).click();
+  await expect(app.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(clock);
+  expect(await page.evaluate(() => matchMedia("(display-mode: standalone)").matches)).toBe(false);
+  for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 950 }); await audit(page, "PWA-preparation-recovery-" + width); }
+  const activate = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
+  await expect(activate).toBeEnabled();
+  expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number } }).hcaPushCapability.requests)).toBe(0);
+  await activate.click();
+  await expect(panel(page).getByText(/^Avisos vinculados a esta conta neste aparelho/)).toBeVisible();
+  expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number; subscriptions: number } }).hcaPushCapability)).toMatchObject({ requests: 1, subscriptions: 1 });
+  expect(sql(`select count(*) from private.web_push_devices where fingerprint=${sqlLiteral(createHash("sha256").update(value.endpoint).digest("hex"))} and user_id=${sqlLiteral(fixtures.family.id)} and state='active';`)).toBe("1");
+});

@@ -33,7 +33,18 @@ for (const path of [
 const contract = JSON.parse(
   await readFile("src/lib/pwa/contract.json", "utf8"),
 );
-const build = { ...contract, revision: hash.digest("hex").slice(0, 24) };
+const assets = {};
+for (const [path, contentType] of [
+  ["/offline.html", "text/html"],
+  ["/pwa/icon-192.png", "image/png"],
+  ["/pwa/icon-512.png", "image/png"],
+  ["/pwa/apple-180.png", "image/png"],
+]) {
+  const bytes = await readFile("public" + path);
+  assets[path] = { contentType, bytes: bytes.length, sha256: createHash("sha256").update(bytes).digest("hex") };
+}
+hash.update(JSON.stringify(assets));
+const build = { ...contract, revision: hash.digest("hex").slice(0, 24), assets };
 const template = await readFile("scripts/pwa-worker.js", "utf8");
 await writeFile(
   "public/service-worker.js",

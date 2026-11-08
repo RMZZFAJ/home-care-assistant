@@ -1417,15 +1417,42 @@ integração externa ou promoção. Matriz32 PASS/48 PARTIAL/25 NOT_STARTED;
 29 colunas canônicas preservadas. CI f05754d terminou8/8 SUCCESS; novo SHA
 exige CI própria. [Dossiê e recibos](FIELD_VALIDATION.md).
 
-## D5.4 — falha do Preview protegido, correção prioritária em curso
+## D5.4 — Preview protegido, correção e recuperação validadas localmente
 
 Em08/11 o responsável relatou falha no Samsung Galaxy S24 Ultra, Chrome e PWA,
 mesmo após reinstalar: orientação offline, atualização e preparo para Push.
 É evidência física relatada pelo responsável; não é ensaio físico do agente.
 A hipótese de credenciais omitidas no precache foi reproduzida com o worker
 real em origem loopback com barreira por cookie: script acessível, instalação
-redundant em vez de activated. Correção ainda não aplicada neste incremento.
-Devem ser comprovados diagnóstico, recuperação, disponibilidade do botão Push,
-atualização Android/Chrome e URL estável de Preview, mantendo proteção,
-privacidade do cache, ausência de replay e autorização. Os critérios D5
-continuam PARTIAL. A execução D-B e a PR7 Draft permanecem ativas.
+redundant em vez de activated. O reparo usa credenciais same-origin para entrega
+e fixa tipo/tamanho/SHA-256 dos quatro arquivos públicos no build. Valida todos
+antes de escrever e cria respostas limpas para o cache. Resposta privada de
+mesmo tamanho,401, redirecionamento e erro de armazenamento não são promovidos;
+limpeza só atinge a nova preparação incompleta. Cache privado/replay/autorização
+e notificações genéricas mantêm seus contratos. Proteção Vercel preservada.
+
+Registro, instalação, ativação pendente, falha real e confirmação de versão
+têm estados próprios. Prazo de observação não vira aprovação ou falha inventada.
+Retry recupera sem limpar Auth/rascunhos ou reinstalar. Push exige o registro
+ativo confirmado antes de solicitar permissão e revalida depois dela; troca de
+controlador invalida prontidão. Instalação na tela inicial é etapa distinta.
+A URL estável da branch é orientada na interface a partir de variável validada
+do servidor, sem conceder acesso ou transferir sessão entre origens.
+
+27 unitários distintos e39 casos distintos de produção local aprovados em
+coortes com hashes:36/36 iniciais;3 passes de interface e3 falhas de hipótese de
+fixture activate;6/6 finais com ativação realmente pendente e recuperação nos
+três motores. Total48 resultados/45 passes/3 falhas preservadas. A rejeição de
+Promise auxiliar não tornou o worker redundant e não foi aceita como prova;
+o teste corrigido segura a ativação real, atravessa o prazo sem prontidão e
+libera a confirmação real. O primeiro diagnóstico de interface fechou um painel
+já aberto; corrigido antes de produção. Tipos/lint afetados passaram, sem
+suprimir regra. Axe, teclado e quatro larguras não homologam AT/aparelho físico.
+
+Sem migration nova: ledger remoto151 reconsultado, zero pendências; os dois
+jobs cron locais retornaram ativos e remoto não foi alterado. O novo SHA exige
+CI e inspeção própria do Preview. Reteste físico S24/Chrome/PWA pelo endereço
+estável, entrega externa e D-C/D6 continuam gates separados. Matriz105x39,
+29 colunas canônicas e32 PASS/48 PARTIAL/25 NOT_STARTED preservados. Critérios
+D5 seguem PARTIAL. Missão ativa, PR7 OPEN Draft, sem merge/promoção; Sonar
+adiado. [Dossiê](PWA_PREVIEW_ACCESS.md) e [recibo](PWA_PREVIEW_ACCESS_EVIDENCE.json).

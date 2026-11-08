@@ -118,7 +118,8 @@ function PersonalPushSettings() {
   const enrolled =
     current?.state === "active" && current.currentSession && current.enabled;
   async function enroll() {
-    if (busy || !data?.publicKey || !capable || permission === "denied") return;
+    const registration = pwa.readyRegistration();
+    if (busy || !data?.publicKey || !capable || permission === "denied" || !registration) return;
     // Permission request starts synchronously within the user's click gesture.
     const permissionPromise =
       Notification.permission === "granted"
@@ -136,20 +137,7 @@ function PersonalPushSettings() {
         );
         return;
       }
-      const registration = await Promise.race([
-        navigator.serviceWorker.ready,
-        new Promise<never>((_, reject) =>
-          setTimeout(
-            () =>
-              reject(
-                new Error(
-                  "O aplicativo ainda não está pronto para ativar avisos. Consulte novamente.",
-                ),
-              ),
-            8000,
-          ),
-        ),
-      ]);
+      if (pwa.readyRegistration() !== registration) throw new Error("A preparação do aplicativo mudou. Consulte o aplicativo neste aparelho antes de tentar novamente.");
       let subscription = await registration.pushManager.getSubscription();
       const key = keyBytes(data.publicKey);
       if (
@@ -288,11 +276,12 @@ function PersonalPushSettings() {
           <button
             type="button"
             className="ui-button ui-button-primary"
-            disabled={busy || reading || pwa.offline || permission === "denied"}
+            disabled={busy || reading || pwa.offline || permission === "denied" || pwa.worker !== "ready" || pwa.runtime !== "ready"}
             onClick={() => void enroll()}
           >
             {busy ? "Confirmando…" : "Ativar avisos neste aparelho"}
           </button>
+          {pwa.worker !== "ready" || pwa.runtime !== "ready" ? <p role="status">Aguarde a preparação do aplicativo neste aparelho antes de ativar avisos. Consulte a seção Aplicativo neste aparelho para verificar ou recuperar essa preparação.</p> : null}
         </div>
       ) : null}
       <button

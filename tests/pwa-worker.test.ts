@@ -1,8 +1,13 @@
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
+import { createHash, webcrypto } from "node:crypto";
 import { it, expect, vi } from "vitest";
 
-function environment() {
+function environment(options: { requireCookie?: boolean; poison?: boolean; failPut?: boolean } = {}) {
+  const files = Object.fromEntries(["/offline.html", "/pwa/icon-192.png", "/pwa/icon-512.png", "/pwa/apple-180.png"].map(path => {
+    const bytes = new Uint8Array(readFileSync("public" + path));
+    return [path, { bytes, contentType: path.endsWith(".png") ? "image/png" : "text/html", sha256: createHash("sha256").update(bytes).digest("hex") }];
+  }));
   const handlers: Record<string, (event: Record<string, unknown>) => void> = {};
   const stores = new Map<string, Map<string, Response>>();
   const requested: Request[] = [];
@@ -44,6 +49,7 @@ function environment() {
       if (!stores.has(name)) stores.set(name, new Map());
       return {
         put: async (key: string, response: Response) => {
+          if (options.failPut && key.endsWith("icon-192.png")) throw new Error("Quota exceeded");
           stores.get(name)!.set(key, response);
         },
         match: async (key: string) => stores.get(name)!.get(key)?.clone(),
@@ -54,7 +60,7 @@ function environment() {
     readFileSync("scripts/pwa-worker.js", "utf8").replace(
       '"__HCA_PWA_BUILD__"',
       JSON.stringify(
-        JSON.stringify({ protocol: 1, schema: 1, revision: "sentinel-v1" }),
+        JSON.stringify({ protocol: 1, schema: 1, revision: "sentinel-v1", assets: Object.fromEntries(Object.entries(files).map(([path, file]) => [path, { bytes: file.bytes.length, sha256: file.sha256, contentType: file.contentType }])) }),
       ),
     ),
     {
@@ -63,9 +69,15 @@ function environment() {
       URL,
       Request,
       Response,
+      crypto: webcrypto,
       fetch: async (request: Request) => {
         requested.push(request);
         if (disconnected) throw new TypeError("Network unavailable");
+        const file = files[new URL(request.url).pathname];
+        if (file) {
+          if (options.requireCookie && request.credentials !== "same-origin") return new Response("Preview authentication required", { status: 401 });
+          return new Response(options.poison ? "Private account contents".padEnd(file.bytes.length, "!").slice(0, file.bytes.length) : file.bytes, { headers: { "Content-Type": file.contentType, "Cache-Control": "private, no-store", "Set-Cookie": "fixture_access=not-for-cache", "Vary": "Cookie" } });
+        }
         return new Response("Private or public network bytes");
       },
     },
@@ -105,8 +117,8 @@ function environment() {
     skipped: () => skipped,
   };
 }
-it("PWA caches only explicit anonymous public assets and does not force activation", async () => {
-  const e = environment();
+it("PWA passes the same-origin access gate and caches only pinned public bytes without authentication headers or forced activation", async () => {
+  const e = environment({ requireCookie: true });
   await e.lifecycle("install");
   expect(e.requested.map((r) => new URL(r.url).pathname).sort()).toEqual([
     "/offline.html",
@@ -114,7 +126,12 @@ it("PWA caches only explicit anonymous public assets and does not force activati
     "/pwa/icon-192.png",
     "/pwa/icon-512.png",
   ]);
-  expect(e.requested.every((r) => r.credentials === "omit")).toBe(true);
+  expect(e.requested.every((r) => r.credentials === "same-origin" && r.redirect === "error" && !r.headers.has("Authorization"))).toBe(true);
+  for (const response of e.stores.get("hca-public-pwa-sentinel-v1")!.values()) {
+    expect(response.headers.has("Set-Cookie")).toBe(false);
+    expect(response.headers.has("Vary")).toBe(false);
+    expect(response.headers.get("Cache-Control")).toContain("public");
+  }
   expect(e.skipped()).toBe(false);
   e.handlers.message({ data: { type: "HCA_SKIP_WAITING" }, ports: [] });
   expect(e.skipped()).toBe(false);
@@ -127,6 +144,30 @@ it("PWA caches only explicit anonymous public assets and does not force activati
     "push",
     "pushsubscriptionchange",
   ]);
+});
+it("a successful-looking authenticated/private response cannot replace even one pinned public asset", async () => {
+  const e = environment({ poison: true });
+  await expect(e.lifecycle("install")).rejects.toThrow("public_asset_invalid");
+  expect(e.stores.size).toBe(0);
+  expect(e.messages).toEqual([{ type: "HCA_OFFLINE_PREPARATION_FAILED", reason: "public_asset_invalid" }]);
+});
+it("failed cache writes remove only the incomplete new candidate and a retry preserves unrelated data", async () => {
+  const options = { failPut: true }, e = environment(options);
+  e.stores.set("unrelated", new Map([["private", new Response("unrelated data")]]));
+  await expect(e.lifecycle("install")).rejects.toThrow("Quota exceeded");
+  expect([...e.stores.keys()]).toEqual(["unrelated"]);
+  options.failPut = false;
+  await e.lifecycle("install"); await e.lifecycle("activate");
+  expect(e.claimed()).toBe(true); expect(e.stores.get("unrelated")!.has("private")).toBe(true);
+});
+it("an unsuccessful reinstall never removes an existing active public cache of the same revision", async () => {
+  const options = { poison: false }, e = environment(options);
+  await e.lifecycle("install");
+  const before = e.stores.get("hca-public-pwa-sentinel-v1");
+  options.poison = true;
+  await expect(e.lifecycle("install")).rejects.toThrow("public_asset_invalid");
+  expect(e.stores.get("hca-public-pwa-sentinel-v1")).toBe(before);
+  expect(before!.size).toBe(4);
 });
 it("push lock-screen content is fixed, generic and independent of payload text or external URLs", async () => {
   const e = environment(),

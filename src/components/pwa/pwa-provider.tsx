@@ -13,6 +13,7 @@ import {
 import { usePathname } from "next/navigation";
 import contract from "@/lib/pwa/contract.json";
 import { setRuntimeCommandsAvailable } from "@/lib/client/api";
+import { activeWorker, workerContract, workerFailure, type WorkerPhase } from "@/lib/pwa/worker";
 
 type Runtime = "checking" | "ready" | "unavailable" | "incompatible";
 type WorkerState = "checking" | "ready" | "unavailable" | "error";
@@ -24,6 +25,8 @@ type State = {
   runtime: Runtime;
   offline: boolean;
   worker: WorkerState;
+  workerPhase: WorkerPhase;
+  workerIssue: string;
   waiting: boolean;
   installed: boolean;
   canInstall: boolean;
@@ -34,6 +37,9 @@ type State = {
   install: () => Promise<void>;
   checkUpdates: () => Promise<void>;
   refresh: () => Promise<void>;
+  retryWorker: () => Promise<void>;
+  readyRegistration: () => ServiceWorkerRegistration | null;
+  previewInstallUrl: string | null;
 };
 const Context = createContext<State | null>(null);
 export function usePwa() {
@@ -41,29 +47,7 @@ export function usePwa() {
   if (!value) throw new Error("PWA settings require their provider");
   return value;
 }
-function workerContract(worker: ServiceWorker) {
-  return new Promise<{ protocol: number; schema: number; revision: string }>(
-    (resolve, reject) => {
-      const channel = new MessageChannel();
-      const close = () => {
-        channel.port1.close();
-        channel.port2.close();
-      };
-      const timer = setTimeout(() => {
-        close();
-        reject(new Error("Worker did not confirm its version"));
-      }, 5000);
-      channel.port1.onmessage = (event) => {
-        clearTimeout(timer);
-        close();
-        resolve(event.data);
-      };
-      worker.postMessage({ type: "HCA_RUNTIME" }, [channel.port2]);
-    },
-  );
-}
-
-export function PwaProvider({ children }: { children: ReactNode }) {
+export function PwaProvider({ children, previewOrigin = null }: { children: ReactNode; previewOrigin?: string | null }) {
   const pathname = usePathname();
   const publicPage =
     ["/login", "/recuperar-senha", "/convites/aceitar"].includes(pathname) ||
@@ -71,6 +55,7 @@ export function PwaProvider({ children }: { children: ReactNode }) {
     pathname.startsWith("/verificar/");
   const [runtime, setRuntime] = useState<Runtime>("checking"),
     [offline, setOffline] = useState(false);
+  const [origin, setOrigin] = useState("");
   useLayoutEffect(() => {
     setRuntimeCommandsAvailable(
       publicPage || (!offline && runtime === "ready"),
@@ -79,6 +64,9 @@ export function PwaProvider({ children }: { children: ReactNode }) {
   }, [publicPage, offline, runtime]);
   const [worker, setWorker] = useState<WorkerState>("checking"),
     [waiting, setWaiting] = useState(false);
+  const [workerPhase, setWorkerPhase] = useState<WorkerPhase>("registering"),
+    [workerIssue, setWorkerIssue] = useState(""),
+    [preparationAttempt, setPreparationAttempt] = useState(0);
   const [installed, setInstalled] = useState(false),
     [canInstall, setCanInstall] = useState(false),
     [installing, setInstalling] = useState(false);
@@ -87,6 +75,8 @@ export function PwaProvider({ children }: { children: ReactNode }) {
     [revision, setRevision] = useState("");
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null),
     promptRef = useRef<InstallPrompt | null>(null);
+  const readyRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
+  const readyWorkerRef = useRef<ServiceWorker | null>(null);
   const sequenceRef = useRef(0),
     requestRef = useRef<AbortController | null>(null);
   const invalidate = useCallback(() => {
@@ -131,9 +121,14 @@ export function PwaProvider({ children }: { children: ReactNode }) {
     let live = true;
     const online = () => {
       setOffline(false);
+      setPreparationAttempt(value => value + 1);
       void refresh();
     };
     const disconnected = () => setOffline(true);
+    const controllerChanged = () => {
+      readyRegistrationRef.current = null; readyWorkerRef.current = null;
+      setPreparationAttempt(value => value + 1);
+    };
     const installPrompt = (event: Event) => {
       event.preventDefault();
       promptRef.current = event as InstallPrompt;
@@ -148,6 +143,7 @@ export function PwaProvider({ children }: { children: ReactNode }) {
     void Promise.resolve().then(() => {
       if (!live) return;
       setOffline(!navigator.onLine);
+      setOrigin(location.origin);
       setInstalled(
         window.matchMedia("(display-mode: standalone)").matches ||
           Boolean(
@@ -162,6 +158,7 @@ export function PwaProvider({ children }: { children: ReactNode }) {
     window.addEventListener("offline", disconnected);
     window.addEventListener("beforeinstallprompt", installPrompt);
     window.addEventListener("appinstalled", appInstalled);
+    if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("controllerchange", controllerChanged);
     return () => {
       live = false;
       invalidate();
@@ -169,6 +166,7 @@ export function PwaProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("offline", disconnected);
       window.removeEventListener("beforeinstallprompt", installPrompt);
       window.removeEventListener("appinstalled", appInstalled);
+      if ("serviceWorker" in navigator) navigator.serviceWorker.removeEventListener("controllerchange", controllerChanged);
     };
   }, [refresh, invalidate]);
   useEffect(() => {
@@ -180,21 +178,41 @@ export function PwaProvider({ children }: { children: ReactNode }) {
       return;
     let live = true;
     const listenerController = new AbortController();
-    const preparationDeadline = setTimeout(() => {
-      if (live) setWorker("error");
-    }, 12000);
-    void navigator.serviceWorker
+    const registrationDeadline = setTimeout(() => { if (live) setWorkerPhase("pending"); }, 12000);
+    let failure = "registration_failed";
+    const known = new Set<ServiceWorker>();
+    const preparationFailed = (event: MessageEvent) => {
+      if (!live || !known.has(event.source as ServiceWorker) || event.data?.type !== "HCA_OFFLINE_PREPARATION_FAILED") return;
+      const reason = event.data.reason;
+      if (["access_required", "network_or_access", "public_asset_invalid", "storage_unavailable"].includes(reason)) {
+        failure = reason; setWorkerIssue(reason);
+      }
+    };
+    navigator.serviceWorker.addEventListener("message", preparationFailed, { signal: listenerController.signal });
+    void Promise.resolve().then(() => {
+      if (!live) return null;
+      setWorker("checking"); setWorkerPhase("registering"); setWorkerIssue("");
+      return navigator.serviceWorker
       .register("/service-worker.js", { scope: "/", updateViaCache: "none" })
       .then(async (current) => {
         if (!live) return;
+        clearTimeout(registrationDeadline);
+        if (current.scope !== new URL("/", location.origin).href) throw new Error("registration_failed");
         registrationRef.current = current;
         const update = () => {
           if (live) setWaiting(Boolean(current.waiting));
         };
         const observe = () => {
+          if (current.active) known.add(current.active);
+          if (current.waiting) known.add(current.waiting);
           const incoming = current.installing;
           if (!incoming) return;
-          incoming.addEventListener("statechange", update, {
+          known.add(incoming);
+          incoming.addEventListener("statechange", () => {
+            if (!live) return;
+            if (incoming.state === "redundant") setWorkerIssue(failure === "registration_failed" ? "update_failed" : failure);
+            queueMicrotask(update);
+          }, {
             signal: listenerController.signal,
           });
         };
@@ -203,21 +221,11 @@ export function PwaProvider({ children }: { children: ReactNode }) {
         });
         observe();
         update();
-        const ready = await new Promise<ServiceWorkerRegistration>(
-          (resolve, reject) => {
-            const deadline = setTimeout(
-              () => reject(new Error("Offline worker did not become ready")),
-              10000,
-            );
-            void navigator.serviceWorker.ready.then((value) => {
-              clearTimeout(deadline);
-              resolve(value);
-            });
-          },
-        );
-        if (!live || !ready.active) return;
-        const version = await workerContract(ready.active);
-        clearTimeout(preparationDeadline);
+        failure = "installation_failed";
+        const active = await activeWorker(current, listenerController.signal, value => { if (live) setWorkerPhase(value); });
+        if (!live) return;
+        setWorkerPhase("verifying"); failure = "contract_unconfirmed";
+        const version = await workerContract(active);
         if (!live) return;
         if (
           version.protocol !== contract.protocol ||
@@ -229,18 +237,34 @@ export function PwaProvider({ children }: { children: ReactNode }) {
           return;
         }
         setRevision(version.revision);
+        readyRegistrationRef.current = current;
+        readyWorkerRef.current = active;
+        setWorkerPhase("ready");
         setWorker("ready");
+        failure = "update_failed";
       })
-      .catch(() => {
-        clearTimeout(preparationDeadline);
-        if (live) setWorker("error");
+      .catch((reason) => {
+        clearTimeout(registrationDeadline);
+        if (live) { readyRegistrationRef.current = null; setWorker("error"); setWorkerPhase("failed"); setWorkerIssue(workerFailure(reason, failure)); }
       });
+    });
     return () => {
       live = false;
       listenerController.abort();
-      clearTimeout(preparationDeadline);
+      clearTimeout(registrationDeadline);
+      readyRegistrationRef.current = null;
+      readyWorkerRef.current = null;
     };
-  }, [runtime]);
+  }, [runtime, preparationAttempt]);
+  async function retryWorker() {
+    setError(""); setMessage("");
+    if (runtime !== "ready") await refresh();
+    setPreparationAttempt(value => value + 1);
+  }
+  function readyRegistration() {
+    const current = readyRegistrationRef.current;
+    return runtime === "ready" && !offline && navigator.onLine && worker === "ready" && current?.active?.state === "activated" && current.active === readyWorkerRef.current ? current : null;
+  }
   async function install() {
     const invitation = promptRef.current;
     if (!invitation || installing) return;
@@ -264,16 +288,16 @@ export function PwaProvider({ children }: { children: ReactNode }) {
   }
   async function checkUpdates() {
     setError("");
+    setWorkerIssue("");
     try {
-      if (!registrationRef.current) {
-        await refresh();
+      if (!registrationRef.current || worker === "error") {
+        await retryWorker();
         return;
       }
       await registrationRef.current.update();
-      if (worker === "error" || worker === "checking") await refresh();
       setWaiting(Boolean(registrationRef.current.waiting));
       setMessage(
-        "Verificação concluída. Uma versão nova aguardará o encerramento das abas antigas.",
+        registrationRef.current.installing ? "Preparando uma atualização. A versão atual continua disponível enquanto o navegador verifica os arquivos públicos." : "Verificação concluída. Uma versão nova aguardará o encerramento das abas antigas.",
       );
     } catch {
       setError(
@@ -295,6 +319,8 @@ export function PwaProvider({ children }: { children: ReactNode }) {
         runtime,
         offline,
         worker,
+        workerPhase,
+        workerIssue,
         waiting,
         installed,
         canInstall,
@@ -305,6 +331,9 @@ export function PwaProvider({ children }: { children: ReactNode }) {
         install,
         checkUpdates,
         refresh,
+        retryWorker,
+        readyRegistration,
+        previewInstallUrl: previewOrigin && origin && origin !== previewOrigin ? previewOrigin : null,
       }}
     >
       {offline || runtime !== "ready" ? (
