@@ -15,6 +15,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Verificação pública e limites do parser](PUBLIC_VERIFICATION.md).
 - [Acervo e downloads legados](DOCUMENT_ARCHIVE.md).
 - [Autoria, proveniência e datas V6](PDF_SOURCE_FACTS.md).
+- [Dados técnicos, variantes e conferências V7](PDF_FIDELITY.md).
 - [Instalação, atualização e privacidade PWA](PWA_RUNTIME.md).
 - [PWA no Preview protegido: causa, recuperação e endereço estável](PWA_PREVIEW_ACCESS.md).
 - [Consentimento, transporte e privacidade Web Push](WEB_PUSH.md).

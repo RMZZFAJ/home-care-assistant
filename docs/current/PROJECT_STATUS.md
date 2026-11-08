@@ -4,28 +4,37 @@ Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Estado atual: local151/remoto151, zero migrations pendentes após backup válido,
-restauração/upgrade, compatibilidade e pré/pós-validação. C026/030/031 comprovam
-validação contextual, identidade do vínculo e ações explícitas de nome curto.
-41 unitários, três casos Auth distintos e21 casos distintos de produção em
-coortes qualificadas passaram. Matriz32 PASS/48 PARTIAL/25 NOT_STARTED;
-CI da base f05754d terminou integralmente SUCCESS, sem validar antecipadamente
-o incremento novo. [Provas](../audits/D/D-B/FIELD_VALIDATION.md).
+Estado atual: local152/remoto152, zero migrations pendentes após backup válido,
+restauração/upgrade, compatibilidade e pré/pós-validação. D4.6 amplia a fidelidade
+técnica de REQ/ENT/BAL/COM, com revisão7 e preservação de intenções e bytes
+antigos. A aparência dos PDFs foi adiada pelo responsável. Passaram16 casos
+unitários distintos, cinco Auth e30 de produção em coortes;14 exemplares reais
+tiveram dados e PAdES-B-T/TSA interna conferidos independentemente. Dezoito
+controles V4/V5/V6 conservam bytes exatos. Isso não representa ICP-Brasil,
+tempo externo, PDF marcado ou homologação física. Matriz38 PASS/50 PARTIAL/
+17 NOT_STARTED; C105/C106 e os demais gates continuam próprios.
+[Provas e qualificação da atividade remota](../audits/D/D-B/PDF_FIDELITY.md).
 
 PWA/Push no Preview protegido tiveram falha física relatada no Samsung S24 Ultra
 e reproduzida com barreira de acesso por cookie. A correção envia credenciais
 somente na própria origem e cacheia apenas bytes públicos fixados pelo build.
 Diagnóstico, recuperação e bloqueio de Push até prontidão foram implementados:
 39 casos distintos de produção local em coortes e27 unitários passaram, além
-de tipos/lint. CI do SHA publicado e inspeção do novo Preview são gates próprios;
-não há homologação física de sucesso. D5 permanece parcial. Proteção Vercel
-preservada; cache privado e replay vedados conforme o contrato; Sonar adiado.
+de tipos/lint. CI b1541df concluiu8/8 SUCCESS e seu Preview protegido ficou READY,
+com assets públicos exatos e fronteira privada401. O novo incremento exige CI
+e inspeção próprias; não há homologação física de sucesso. D5 permanece parcial.
+Proteção Vercel preservada; cache privado e replay vedados conforme o contrato;
+Sonar adiado.
 [Provas e reteste pelo endereço estável](../audits/D/D-B/PWA_PREVIEW_ACCESS.md).
 
 ## Registro histórico por incremento
 
 Os números e estados abaixo descrevem seus respectivos fechamentos. O resumo
 acima e os recibos correspondentes registram o estado corrente.
+
+D3.6 comprovou C026/030/031 com41 unitários, três casos Auth e21 casos distintos
+de produção em coortes. Migration151 precedeu o lote técnico de PDF; seu estado
+local151/remoto151 é histórico. [Provas](../audits/D/D-B/FIELD_VALIDATION.md).
 
 CI4016105, run42415801564, terminou SUCCESS: banco, validate Ubuntu/Windows,
 Chromium/mobile e as duas partes iOS, além do agregado. O preview correspondente

@@ -1,0 +1,251 @@
+{
+  "at": "2026-11-08T10:52:56.735048+00:00",
+  "sourceBase": "b1541df18f7e3198cc35002c170ab9281e3a40e8",
+  "stage": "D4.6 technical fidelity; appearance deferred by owner; full D-B remains active",
+  "criteria": [
+    "C-AC-015",
+    "C-AC-036",
+    "C-AC-103",
+    "C-AC-104",
+    "C-AC-109"
+  ],
+  "reconciledUnchangedCriterion": "C-NEW-AC-019",
+  "sourceLfSha256": {
+    "src/lib/server/operational-pdf.ts": "323d0eb70e1f65c3704255b4531a7e2310d5b8704ff7928bf709663baf129728",
+    "src/lib/server/pdf-content.ts": "ff5122a704d141a11d69b637c6c544ff9f1c827fb8ab213fd92525dec0e2e406",
+    "src/lib/server/pdf-issuance.ts": "36af3ec98ea7b78636fc365a5d9502ccfab34e859a3a909499ab0af2c0bc5bdf",
+    "src/lib/documents/pdf-fidelity.ts": "f10da4136054f5a062a4083d56e876ccb28917abe27910b6548c3efea90a1165",
+    "src/lib/documents/variant.ts": "d7fa4c41e924c842a810a5a8f0bb056d06c21fb9ac5f91915c484411d906ee2b",
+    "src/components/documents/supply-detail.tsx": "e62e316ef9f0b4a8b4d3d4d4b13e89d3558a9fcfa59b7460569dd144428c6b2e",
+    "supabase/migrations/20261108093000_phase_d4_pdf_fidelity_revision.sql": "8b82e78b27041af7d89f5358c11b23f9c227ad0713a6ca214ff4651da6744e2f",
+    "tests/pdf-fidelity.test.ts": "6039761e6d859c1a2fc88932e2244ba2353029a3a7fe73ce5cd05305b5d22180",
+    "tests/support/pdf-fidelity-fixtures.ts": "24a111fbedf90b3746b4fd9777f074bc458e9109dfd85e81fc0a799a5fe1ed63",
+    "tests/support/pdf-renderer-legacy-digests.json": "3f27d31bcbdfefb8d1c758029c40527e2b456eb3faa1f834b9bcf94616114069",
+    "tests/integration/pdf-fidelity-fixtures.mjs": "09910b73dc02af82cee9c70ad2484fab50ce1f6cf073a336f74ff980a307376f",
+    "tests/integration/pdf-fidelity.test.mjs": "d4431c094aa14ae5ebd2e68fb469d22ce13194d471304a5fbf19c74b518acebd",
+    "tests/e2e/pdf-fidelity.spec.ts": "3b9e202b19b880ed883ee6030c5aa539f95de76408d1c62551df931309fdcc24",
+    "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+    "tests/e2e/pdf-issuance.spec.ts": "1b8b8589ad5193aedf0c6590f965eaa6fb95ccd851a9445ede2f5a0ac9474ce9",
+    "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+  },
+  "ownerScope": {
+    "pdfRedesignDeferred": true,
+    "technicalDataNotDeferred": true,
+    "fontsColorsCssRedesigned": false
+  },
+  "implementation": [
+    "Explicit V7 reservation RPC retains V6 RPC/default and shared intention lock/replay; existing ready bytes preserved",
+    "DB freezes supplemental resolution and receipt-event facts up to selected version; original business event/hash unchanged",
+    "Variant titles; precise REQ observations/time/item status; original ENT damage note and separate missing/returned facts",
+    "Historical BAL review/approval and preserved policy distinguished; malformed policy cannot claim current eligibility",
+    "COM receipt and event IDs, actors/time and rejected/pending/validated states; no stock credit from PDF generation",
+    "Technical facts bound to semantic groups, including each REQ row; pt-BR file language without full tagged-PDF/AT claim",
+    "Final V7 subject distinguishes historical representation from document representation; V4/V5/V6 byte controls unchanged"
+  ],
+  "validation": {
+    "unit": {
+      "distinctPassingCases": 16,
+      "completedExecutions": 24,
+      "passedExecutions": 23,
+      "failedExecutions": 1,
+      "composition": "Fidelity10 plus existing source-facts6; only affected cases repeated",
+      "initialFailure": "Case-sensitive expected heading in a new test; normalization made semantic checks independent of casing, no product change to satisfy it"
+    },
+    "legacyBytes": {
+      "controlledArtifacts": 18,
+      "exact": true,
+      "revisions": [
+        4,
+        5,
+        6
+      ],
+      "receipt": "tests/support/pdf-renderer-legacy-digests.json",
+      "qualification": "Unsigned renderer probes captured before source changes. Receipt path corrected to existing support folder without regenerating original bytes; not operational or signed-issuance proof."
+    },
+    "auth": {
+      "distinctPassingCases": 5,
+      "completedExecutions": 7,
+      "passedExecutions": 6,
+      "failedExecutions": 1,
+      "qualification": "Real local Auth/RPC negative scopes, concurrent reservation, cross-revision replay, version cutoffs, stock preservation and factual provenance. REQ fixture attempted precision change after history; valid protection refusal retained. Fresh decimal unit configured before use; only affected REQ case repeated, plus BAL helper refactor recheck."
+    },
+    "production": {
+      "distinctPassingCases": 30,
+      "completedExecutions": 36,
+      "passedExecutions": 33,
+      "failedExecutions": 3,
+      "cohorts": [
+        {
+          "log": "pdf-fidelity-production.log",
+          "passed": 27,
+          "failed": 3,
+          "sourceLfSha256": {
+            "src/lib/server/operational-pdf.ts": "a9e8f8f77785714a73dade9b22819c9139588ae32759e3167a4bf98b67f20e88",
+            "src/lib/server/pdf-content.ts": "efe2e40ebafe2dd800649bfa7f959e4660eb3b361dc46ae11de4332c37ef7f41",
+            "src/lib/server/pdf-issuance.ts": "36af3ec98ea7b78636fc365a5d9502ccfab34e859a3a909499ab0af2c0bc5bdf",
+            "src/lib/documents/pdf-fidelity.ts": "f10da4136054f5a062a4083d56e876ccb28917abe27910b6548c3efea90a1165",
+            "src/lib/documents/variant.ts": "d7fa4c41e924c842a810a5a8f0bb056d06c21fb9ac5f91915c484411d906ee2b",
+            "src/components/documents/supply-detail.tsx": "e62e316ef9f0b4a8b4d3d4d4b13e89d3558a9fcfa59b7460569dd144428c6b2e",
+            "supabase/migrations/20261108093000_phase_d4_pdf_fidelity_revision.sql": "8b82e78b27041af7d89f5358c11b23f9c227ad0713a6ca214ff4651da6744e2f",
+            "tests/pdf-fidelity.test.ts": "40a128f15ed639938c4ae4967b3d08655912186166661338829661834c2a6e09",
+            "tests/support/pdf-fidelity-fixtures.ts": "24a111fbedf90b3746b4fd9777f074bc458e9109dfd85e81fc0a799a5fe1ed63",
+            "tests/support/pdf-renderer-legacy-digests.json": "3f27d31bcbdfefb8d1c758029c40527e2b456eb3faa1f834b9bcf94616114069",
+            "tests/integration/pdf-fidelity-fixtures.mjs": "09910b73dc02af82cee9c70ad2484fab50ce1f6cf073a336f74ff980a307376f",
+            "tests/integration/pdf-fidelity.test.mjs": "d4431c094aa14ae5ebd2e68fb469d22ce13194d471304a5fbf19c74b518acebd",
+            "tests/e2e/pdf-fidelity.spec.ts": "9a60038bd1dd433f8c45164be681a66271033da582229f82860760e1f98b561c",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/pdf-issuance.spec.ts": "1b8b8589ad5193aedf0c6590f965eaa6fb95ccd851a9445ede2f5a0ac9474ce9",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        },
+        {
+          "log": "pdf-fidelity-production-recheck.log",
+          "passed": 6,
+          "sourceLfSha256": {
+            "src/lib/server/operational-pdf.ts": "1ede5abcfd42ea9c71c14602328101120a9ffa01b06c62dfebac40a4f14e297f",
+            "src/lib/server/pdf-content.ts": "3e0d2db4b8c78263ea0cf81e73e687abe0181578cba17ba416ebe8b901686491",
+            "src/lib/server/pdf-issuance.ts": "36af3ec98ea7b78636fc365a5d9502ccfab34e859a3a909499ab0af2c0bc5bdf",
+            "src/lib/documents/pdf-fidelity.ts": "f10da4136054f5a062a4083d56e876ccb28917abe27910b6548c3efea90a1165",
+            "src/lib/documents/variant.ts": "d7fa4c41e924c842a810a5a8f0bb056d06c21fb9ac5f91915c484411d906ee2b",
+            "src/components/documents/supply-detail.tsx": "e62e316ef9f0b4a8b4d3d4d4b13e89d3558a9fcfa59b7460569dd144428c6b2e",
+            "supabase/migrations/20261108093000_phase_d4_pdf_fidelity_revision.sql": "8b82e78b27041af7d89f5358c11b23f9c227ad0713a6ca214ff4651da6744e2f",
+            "tests/pdf-fidelity.test.ts": "3788ef815f45dba5b5b0ad7236ed15272b8d9037d7651798e3de43db3f81c48b",
+            "tests/support/pdf-fidelity-fixtures.ts": "24a111fbedf90b3746b4fd9777f074bc458e9109dfd85e81fc0a799a5fe1ed63",
+            "tests/support/pdf-renderer-legacy-digests.json": "3f27d31bcbdfefb8d1c758029c40527e2b456eb3faa1f834b9bcf94616114069",
+            "tests/integration/pdf-fidelity-fixtures.mjs": "09910b73dc02af82cee9c70ad2484fab50ce1f6cf073a336f74ff980a307376f",
+            "tests/integration/pdf-fidelity.test.mjs": "d4431c094aa14ae5ebd2e68fb469d22ce13194d471304a5fbf19c74b518acebd",
+            "tests/e2e/pdf-fidelity.spec.ts": "3b9e202b19b880ed883ee6030c5aa539f95de76408d1c62551df931309fdcc24",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/pdf-issuance.spec.ts": "1b8b8589ad5193aedf0c6590f965eaa6fb95ccd851a9445ede2f5a0ac9474ce9",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        }
+      ],
+      "qualification": "Not one all-green30 run. First REQ tests selected another patient while still on previous document route; guard correctly retained document context. Target route is now opened before context selection. REQ/BAL rerun in Chromium/Android emulation/WebKit. REQ semantic instrumentation changed group association only, not painted bytes. Final malformed-policy guard and representation-subject wording checked in directed units; canonical browser paths and data rendering otherwise unchanged. CI must validate published candidate."
+    },
+    "independent": {
+      "manifest": "d4-fidelity-proof/CORPUS.json",
+      "signedArtifacts": 14,
+      "logicalLabels": 12,
+      "result": "d4-fidelity-proof/VERIFICATION.json",
+      "counterproofs": "d4-fidelity-proof/ORACLE_COUNTERPROOFS.json",
+      "internalTimestampAndWholeFile": true,
+      "qualification": "Two cohort roots; duplicated BAL labels are distinct real issuances. Corpus predates final metadata-subject wording only; frozen facts, text/bounds and signature receipts remain exact historical evidence. New wording covered by units. Negative oracle probes deliberately alter expected facts while retaining original signed bytes, not claims that product emitted wrong bytes.",
+      "publishedCorpusRecheck": {
+        "passed": true,
+        "signedArtifacts": 14,
+        "sameResultsAsCapturedVerification": true,
+        "at": "2026-11-08T10:59:01.206306+00:00"
+      }
+    },
+    "diagnosticBrowserRun": false,
+    "typesAndAffectedLint": {
+      "typecheckExit": 0,
+      "affectedLintExit": 0,
+      "affectedSources": 12,
+      "afterFinalMetadataAndPolicyGuard": true,
+      "terminalReceipt": "Observed terminal process exit0 with typecheck0/affectedLint0"
+    },
+    "localPrepare": {
+      "reset": false,
+      "migrations": 152,
+      "preflightRolledBackBeforeApply": true
+    },
+    "localCron": {
+      "hca-operational-lifecycle": true,
+      "hca-notification-worker": true
+    }
+  },
+  "attachmentsReuse": {
+    "criterion": "C-NEW-AC-019",
+    "sourceReceipt": "ATTACHMENTS_EVIDENCE.json",
+    "sourceHashesMatched": 16,
+    "sourceFiles": {
+      "src/app/api/attachments/route.ts": "1bb13c3882cee20c0f492fe5d6faaa02a992dd00c4683ee3e6a3d8aee3f27409",
+      "src/components/documents/attachments.tsx": "b5fb81b739464179e10cae09bbf7e3e31edd29513dbaf13d549b31159f946342",
+      "src/lib/documents/attachment-attempt.ts": "95b160fc08327593fa4afb68e0ee0a85db62cafaec6d9d93aa6f7308ff4343d0",
+      "src/lib/server/api.ts": "cbb5b8d64dee338f04ddbe61365d8f276a6b86c12258d8e3fc283aac14c66d96",
+      "src/lib/server/error-catalog.ts": "e2e192eab95179cdf28d4cb4d6d76aae26a9b793cb39c16fa69f4e832d2b9bec",
+      "src/lib/server/files.ts": "685ed49710be9c66105eebb28f7793a468080d060669fbb6040663096e166b89",
+      "supabase/migrations/20261108010230_phase_d3_attachment_attempts.sql": "9aecdfa2f95003dfb6203e0947441171dc9a487e0a5faaeb5fc0b62b1a5d856e",
+      "supabase/migrations/20261108011800_phase_d3_attachment_source_attestation.sql": "a0b11b1c8a4aef0b95b2a3764db852b151b85b47138115e854008bbfd5496445",
+      "tests/attachment-attempt.test.ts": "a41cb5f7d105dd9af46b0416576366a81c3f9cccafb08c7d74ad31de778fd57d",
+      "tests/database/service-role.sql": "abb4f451608fdecdf22c8d340f68d61c4da9ad9e7445b70eb642b8feaab45528",
+      "tests/e2e/attachment-attempts.spec.ts": "f04692bcfabe47d9c0f78a720237f30fabcf85cf4f9bbe0bbb7b909b8b74fc18",
+      "tests/files.test.ts": "8f345ea2b1aa1b714d7fc61544f05178f9069646a6e36044da0adc1d774f7d9b",
+      "tests/integration/attachment-attempts.test.mjs": "65e660ccf22b4d4278398ee21a52944feb9750b8d0cfeebea3bb277c96b8dbc2",
+      "tests/e2e/auth-context.ts": "fcab779ab87b5439808a546a2e05590d8a2b98059c1e0e4c5ee611be9d347e39",
+      "tests/e2e/v4.spec.ts": "09ac9b70d66141fa589cc3b276456c4b03bbd72559fa6d31862444a44baaf2fa",
+      "tests/e2e/delivery-cancellation.spec.ts": "d869dbfb3b702976113740f0a2afe14dde5a5dd078afa4a17b624c0cf67075c1"
+    },
+    "ci": "CI_B1541DF_OBSERVATION.json",
+    "qualification": "Existing annotation/form refusal, original/derived hashes, source attestation and ready preservation reused. No new attachment implementation or copied provider/physical approval."
+  },
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "migrations": 152,
+    "pending": 0,
+    "preflight": "PDF_FIDELITY_REMOTE_PREFLIGHT.json",
+    "post": "PDF_FIDELITY_REMOTE_MIGRATIONS.json",
+    "activity": "PDF_FIDELITY_REMOTE_ACTIVITY.json",
+    "advisors": "PDF_FIDELITY_REMOTE_ADVISORS.json",
+    "backup": "0648d0ac-f100-429f-ae57-f92591a69638",
+    "preservation": "149 stable table projections match; two technical monitoring tables qualified by exact old-history prefix and closed-enum reconstruction. No claim that all151 table bytes match.",
+    "noResetAuthFixtureExternalTransportOrProductionPromotion": true
+  },
+  "publishedPwa": {
+    "sha": "b1541df18f7e3198cc35002c170ab9281e3a40e8",
+    "ci": "CI_B1541DF_OBSERVATION.json",
+    "preview": "PWA_PREVIEW_OBSERVATION.json",
+    "physicalSamsungSuccessRetest": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "missionComplete": false,
+  "operationalGo": false,
+  "remaining": [
+    "Other criteria and all-state completeness C105/C106",
+    "Readable history/diff and version-qualified alternative",
+    "Complete tagged reading structure/assistive-technology proof, human/physical/print gates",
+    "ICP-Brasil/external time/revocation and provider/device operations remain separate",
+    "Operational independent recovery/RPO/RTO/D-C/D6; no approval by isolated restore timing",
+    "New published SHA needs its own CI and Preview observation"
+  ],
+  "logLfSha256": {
+    "fidelity-activity-qualification-final.log": "6095906ae791ac1fef3a0137c8af1c1e3686cf1bf680de96c1653db1d0492506",
+    "fidelity-activity-qualification.log": "e4e31d5777eb532004b420beb43ec1d4756e145b62b622608604b1cc0c7ad766",
+    "fidelity-critical-capture.log": "a454477bd45e18ab4a49eb4e40cecea041bca15adf9f2c41a2b820c8256d5618",
+    "fidelity-remote-apply-publication.log": "485f86b0ca703b2f682817a46e965d4a2dc2e19c5975019af65dd013bf8c4c5b",
+    "fidelity-remote-apply.log": "a5d7e459b39f923650731596a43e316ffad5159799c1f79d8d6cd9bf562f3e59",
+    "fidelity-remote-dry-run.log": "044577713861df27a24c5687568dd30861e5425a3bac2b2709aef9e5f4babbdd",
+    "fidelity-remote-post-final.log": "8c928578628a320d1574939c5f5865cc0cddb54baf8733016554173abecd0dc2",
+    "fidelity-remote-post.log": "9bc83a1010d498b262ff678aa2338aab973b2cfe7880d061920d3e23eef6b224",
+    "fidelity-remote-preflight.log": "1a564d3f10f05c4712787626187bb504ca74112642cc40ac2c89a07520878772",
+    "pdf-fidelity-auth-bal-recheck.log": "bb78c50e4f213d12bc686e15057b304755c8adc1dcbd4e661e96686dfaf63520",
+    "pdf-fidelity-auth-req-recheck.log": "4ae42920c2bbb86e6cfb177f7f3b61eb7ab694aa8f057fa3cd3a13e2f06cfd2d",
+    "pdf-fidelity-auth.log": "af83377c59c76fa0fbd8aa64cfbafb063e0bff8da720c13b67599cf0711e2493",
+    "pdf-fidelity-bal-unit-recheck.log": "4aacabe019f123e453165d54a1b15d74ea72956cf38809c0d3b9b8254b4f04ae",
+    "pdf-fidelity-com-unit-recheck.log": "d74ed4dc152d3739022c93adb18c6624c0a7ba112dec8ae3d2d86cc0b3a97773",
+    "pdf-fidelity-cron-reconcile.log": "25aaa453d8432dd3c65e4a72630b9f13eae1a5051ad934d5532b3511bdd85a0c",
+    "pdf-fidelity-independent-final.log": "92f88421cf581d7bcabd7eb1842ba0d152085ebc92202aa8a0c6287e1d9a8721",
+    "pdf-fidelity-independent-first.log": "e6e1dc2c86a7cc1a106f86867f57fa94b4029eec3169e0d19bb2c2ccef965884",
+    "pdf-fidelity-language-unit.log": "8e346dbbb43ae14b38d9b2a7b53209e4a1e822123f86608b9bfc52184d7016b7",
+    "pdf-fidelity-legacy-unit-final.log": "6eaa04ba01ad5ef5370f4610c5c8f9376c8c51e21d8872269c3ff20d2ea520e1",
+    "pdf-fidelity-local-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "pdf-fidelity-metadata-legacy-unit.log": "cce8bfe41e1e0c8fdba567600b71f945555d950e02fca33ce501ecf5f6037050",
+    "pdf-fidelity-policy-shape-unit.log": "4379590adfa416cce9adb81821bd721668b65e7b9ef7a8c0c8d96b5ee65d272d",
+    "pdf-fidelity-preflight-first.log": "5afcf450d5a8d874f15782280f9ac9687525e755bb3251f4e975a95b096dccf2",
+    "pdf-fidelity-preflight.log": "58ede8d5f3356ea618ebaca03937523a8e00d1080e85eec23ce1976df1f3e666",
+    "pdf-fidelity-production-recheck.log": "9b46f53570037dece85ea88b8cdf55b69f1bd6d28e4af7ab5d78ca8d1c212424",
+    "pdf-fidelity-production.log": "f3b8cb48f4e4d66e9fb1b75b94c87e8139fdf845c8c838d1ee15bfa67a95ed6e",
+    "pdf-fidelity-req-gate-unit.log": "0c15f123ef8eb13192f232d4d99c7d2d228abccdb0eb669b4e88f9e221f3f003",
+    "pdf-fidelity-unit.log": "8a81e98c3af9e9579bfa78587f7b0892e72d59458a0aa3b11f5854db28b9ed97",
+    "pdf-fidelity-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pdf-fidelity-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pdf-fidelity-repo-corpus-verification.log": "c97d36966f1bed1540b31040547f8260121fcd4b3b12b891ee21c339a1deb930"
+  },
+  "browserCounterproofLfSha256": {
+    "pdf-fidelity-first-req-chromium.md": "bd8cf6945d125add6ee25c65918567db4f2ef1cfa72d089615cb7f714dd68299",
+    "pdf-fidelity-first-req-ios.md": "6df0778ed8c8d2bc8e484932eccfa086bd4b9ab7b315c953f100d2a4b1187425",
+    "pdf-fidelity-first-req-mobile.md": "34ab1706a730db9e2c01d997b5a9d91a08e03e3c5168ec2cd474ed9ba17328ca"
+  }
+}

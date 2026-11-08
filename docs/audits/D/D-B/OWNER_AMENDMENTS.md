@@ -53,3 +53,14 @@ acesso autenticado ao Preview, atualização Android/Chrome e endereço estável
 Não autoriza desativar proteção, cachear dados/respostas privadas, reduzir
 autorização, replay offline ou substituir a correção por aumento do timeout.
 A falha física relatada não equivale à homologação física da correção pelo agente.
+
+## PDFs: prioridade técnica e aparência futura — 08/11/2026
+
+O responsável determinou concentrar o trabalho nos dados corretos e na parte
+técnica dos PDFs; uma nova aparência será implementada por ele posteriormente.
+Não redesenhar composição, cores, tipografia ou identidade visual neste lote.
+Autoria, proveniência, datas, versões, conteúdo, integridade, assinatura e
+recuperação continuam exigidos. Paginação e limites de texto são verificados
+para impedir perda ou corte de dados, sem polimento estético. Critérios de
+redesenho e comparação estética dos PDFs ficam para a aparência futura, sem
+aprovação inventada; isso não adia correções técnicas nem permite omitir fatos.

@@ -1,0 +1,110 @@
+{
+  "status": "PREFLIGHT_ACCEPTED_FOR_PENDING_ONLY_APPLICATION",
+  "at": "2026-11-08T10:25:05.363Z",
+  "project": "qwfrqychokvhdzakibid",
+  "sourceBase": "b1541df18f7e3198cc35002c170ab9281e3a40e8",
+  "before": 151,
+  "target": 152,
+  "pending": 1,
+  "remoteHistorySqlMatched": 151,
+  "compatibility": {
+    "existingFunctionIdentities": 407,
+    "changedDefinitions": [
+      "private.freeze_pdf_source_facts"
+    ],
+    "addedFunctions": [
+      "private.freeze_pdf_fidelity_facts",
+      "public.reserve_pdf_issuance_v7"
+    ],
+    "oldAuthoritiesAndGrantsPreserved": true,
+    "oldReserveDefinitionUnchanged": true,
+    "legacyDefault6": true,
+    "newRpcSelects7WithoutClientRevision": true,
+    "oldIntentionsReplayOriginalRevision": true,
+    "noBusinessDml": true,
+    "viewsUnchangedExceptIsolatedRedundantUnionAlias": true,
+    "viewQualification": "Only isolated restored private.operational_scheduler_candidates adds redundant AS text to the second UNION arm's 'ENT' literal; all remaining definition bytes and public output names match",
+    "newTables": 0,
+    "newTriggers": 1
+  },
+  "backup": {
+    "backupId": "0648d0ac-f100-429f-ae57-f92591a69638",
+    "files": 79,
+    "bytes": 11114941,
+    "manifestSha256": "3f443c092dda60cd3d686556b691d9cbaa9de8fbed84bf53a63187d1b5bb1444",
+    "verified": true,
+    "restoredTables": 151,
+    "stableTableDigestsMatched": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 33,
+    "pdfDigestsVerified": 32,
+    "signedIssuanceDigestsVerified": 1,
+    "migrationsAppliedToProbe": [
+      "20261108093000_phase_d4_pdf_fidelity_revision.sql"
+    ],
+    "catalogueComparison": {
+      "views": false,
+      "columns": true,
+      "indexes": true,
+      "defaults": true,
+      "policies": true,
+      "triggers": true,
+      "functions": true,
+      "relations": true,
+      "constraints": false,
+      "table_grants": true,
+      "function_grants": true
+    },
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 3.67,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "sourcePreservation": {
+    "baseline": "Fresh immediate pre-DDL snapshot",
+    "originalTableProjections": 151,
+    "activitySinceBackup": [],
+    "storageAndHistoryExactSinceBackup": true,
+    "schemaExactSinceBackup": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ]
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0,
+    "cron": [
+      {
+        "active": true,
+        "name": "hca-notification-worker",
+        "schedule": "* * * * *"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle",
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "dryRun": {
+    "pending": 1,
+    "seeds": [],
+    "roles": [],
+    "skipVault": true
+  },
+  "remoteAuthOrFixtureCreated": false,
+  "externalTransportActivated": false,
+  "operationalGo": false
+}

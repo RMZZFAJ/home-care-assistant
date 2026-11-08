@@ -1456,3 +1456,87 @@ estável, entrega externa e D-C/D6 continuam gates separados. Matriz105x39,
 29 colunas canônicas e32 PASS/48 PARTIAL/25 NOT_STARTED preservados. Critérios
 D5 seguem PARTIAL. Missão ativa, PR7 OPEN Draft, sem merge/promoção; Sonar
 adiado. [Dossiê](PWA_PREVIEW_ACCESS.md) e [recibo](PWA_PREVIEW_ACCESS_EVIDENCE.json).
+
+### Observação publicada do reparo PWA
+
+b1541df foi commitado e enviado. Preview da branch READY no mesmo SHA,
+deployment dpl_6e2d3cZEXMc3ZM6DwU19bgpqcQtv. Em09:17 UTC a inspeção mostrou
+proteção ativa302 sem acesso, worker no-store/raiz, quatro arquivos públicos
+com tipo/tamanho/SHA-256 exatos, runtime200/ready e API privada401 sem sessão
+da aplicação. Requisição de operador autenticada pela CLI não é sessão física
+Android. [Recibo sanitizado](PWA_PREVIEW_OBSERVATION.json). Reteste S24 continua
+pendente. CI42466270684 é própria desse SHA; resultado não aprova D4.6 novo.
+
+## D4.6 — registros intermediários da validação técnica
+
+Os dois registros abaixo preservam o andamento; o fechamento corrente está
+na subseção final, após a qualificação da atividade de monitoramento.
+
+O responsável adiou a aparência dos PDFs e priorizou a parte técnica. Sem
+redesenho de fontes/cores/composição; verificações de limites continuam para
+impedir perda de dados. Revisão7 usa RPC versionada e congelamento privado de
+resoluções ENT/eventos de parcelas COM, preservando fonte/hash canônico e
+default/RPC6. Títulos semânticos, observação REQ, avaria/resoluções ENT,
+pareceres antigos/política BAL e proveniência de parcelas COM foram ampliados.
+
+18 controles de bytes V4/V5/V6 exatos, cinco casos Auth distintos e preflight
+com rollback/preparo local aprovados. Primeira produção:27 passes/3 falhas do
+novo teste REQ ao trocar contexto antes de sair da rota do documento anterior.
+Guarda preservada; rodada dirigida REQ/BAL em execução. Oráculo Python aprovou
+oito exemplares assinados, sem prova estética/AT ou confiança externa. Nenhum
+critério novo fechado antecipadamente. Local152/remoto151; migration152 já é
+imutável localmente, remota depende das provas finais e backup/compatibilidade.
+[Contrato e próximos passos](PDF_FIDELITY.md). Missão ativa, sem merge/promoção.
+
+### D4.6 — avanço e pós-validação pendente
+
+Rodada dirigida6/6 passou; são30 casos distintos em coortes,36 resultados,
+33 passes/3 falhas anteriores preservadas. Quatorze exemplares assinados foram
+conferidos independentemente com duas contraprovas do oráculo. CI b1541df
+concluiu8/8 SUCCESS; isso não aprova o incremento novo.
+
+Cópia crítica0648d0ac verificada/restaurada e upgrade152 isolado passaram.
+Preflight aceitou407 identidades/grants anteriores, uma definição ampliada e
+duas funções novas; default/RPC6 conservados. A migration152 foi aplicada no
+remoto pelo CLI, sem roles/seeds/Vault. Local152/remoto152 neste ponto.
+Não reaplicar. A primeira pós-validação recusou divergência nas projeções
+private.operations_history e private.operations_incidents durante a janela
+DDL. Histórico152/152 e catálogo passaram antes da recusa; a causa das duas
+mudanças precisa ser rastreada antes de concluir preservação. Recusa e snapshot
+imediato permanecem protegidos; nenhum pós-check final aprovado por inferência.
+
+### D4.6 — fechamento local e remoto152 pós-validado
+
+Investigação fechou a recusa: o incidente existente HEARTBEAT_STALE de Preview
+escalou às10:26 UTC, antes do CLI às10:28. As21 linhas antigas de histórico são
+exatas e o evento acrescido reproduz o digest pós-check; a alteração somente de
+severity/version de um incidente reproduz o outro digest entre três valores
+permitidos. A recuperação posterior às10:34 ficou separada. As149 demais
+projeções estáveis coincidem; não se afirma igualdade de todas as151 tabelas.
+Nenhuma tabela excluída genericamente ou comparador/monitoramento relaxado.
+
+Local152/remoto152, histórico SQL152/152, zero pendências. Backup crítico
+0648d0ac:79 arquivos/11114941 bytes verificados; restore151 conjuntos/FKs,
+33 objetos/32 PDFs e digest de uma emissão, upgrade152 isolado aprovado.
+407 contratos/grants antigos, default/RPC6, Auth9/profiles7, cron/Vault e
+Storage33 preservados; runtime200/protocolo1/schema1 e negativas anônimas
+conferidos. Catálogo equivalente com qualificações conhecidas documentadas;
+advisors acrescentam somente a RPC Auth versionada, sem suprimir alertas.
+Probe3,67s não homologa recuperação operacional/RPO/RTO/D6.
+
+Passaram16 unitários distintos, cinco Auth e30 de produção em coortes;
+24/7/36 resultados terminais respectivamente, com1/1/3 falhas preservadas.
+18 controles antigos exatos e14 PDFs reais aprovados por verificador
+independente, incluindo associação de evento/quantidade, idioma, limites,
+rodapé e assinatura/TSA interna. Corpus revalidado após publicação documental;
+metadado Subject final e guard de política receberam unidade dirigida e
+tipos/lint finais. Sem aprovação estética/AT/ICP-Brasil/aparelho físico.
+
+Matriz105x39:38 PASS/50 PARTIAL/17 NOT_STARTED,29 colunas canônicas intactas.
+C015/C036/C103/C104/C109 locais; C-NEW-AC-019 reconciliado com16 hashes exatos
+do lote anterior. C111/C-NEW-AC-018 somente parciais; demais estados, história
+comparável e gates humanos/AT/D-C/D6 continuam. CI b1541df8/8 SUCCESS não
+aprova o novo SHA. Publicação incremental/CI/Preview próprios seguem gate;
+missão ativa, PR7 OPEN Draft, Sonar adiado, sem merge/promoção/integração externa.
+[Dossiê](PDF_FIDELITY.md), [provas](PDF_FIDELITY_EVIDENCE.json) e
+[pós-check qualificado](PDF_FIDELITY_REMOTE_MIGRATIONS.json).

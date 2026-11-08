@@ -4,6 +4,7 @@ import {
   PDFDocument,
   PDFHexString,
   PDFName,
+  PDFString,
   rgb,
   degrees,
   type PDFFont,
@@ -40,6 +41,8 @@ import type {
   StockObservation,
   StockObservationTimeSource,
 } from "@/types/requisition";
+import { documentVariant } from "@/lib/documents/variant";
+import type { PdfFidelityFacts } from "@/lib/documents/pdf-fidelity";
 
 type Person = {
   id?: string;
@@ -57,6 +60,7 @@ export type DocumentSnapshot = {
   status: string;
   createdAt?: string;
   sourceFacts?: unknown;
+  documentFacts?: unknown;
   materialIdentity?: string;
   materialIdentitySource?: string;
   purchaseProgress?: PurchaseProgress;
@@ -159,8 +163,9 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6;
+  rendererRevision?: 5 | 6 | 7;
   sourceFacts?: PdfSourceFacts;
+  fidelityFacts?: PdfFidelityFacts;
   id: string;
   verificationCode: string;
   requestedAt: string;
@@ -185,10 +190,13 @@ export async function renderDocumentPdf(
   emission?: PdfEmissionContext,
 ) {
   const revision = emission?.rendererRevision ?? 5;
-  const sourceFacts = revision === 6 ? emission?.sourceFacts : undefined;
+  const sourceFacts = revision >= 6 ? emission?.sourceFacts : undefined;
+  const fidelity = revision === 7 ? emission?.fidelityFacts : undefined;
   const cancelledV6 = Boolean(sourceFacts && snapshot.status === "cancelled");
-  if (emission && revision === 6 && !sourceFacts)
-    throw new Error("V6 requires frozen source facts");
+  if (emission && revision >= 6 && !sourceFacts)
+    throw new Error("Frozen source facts required");
+  if (emission && revision === 7 && !fidelity)
+    throw new Error("Frozen fidelity facts required");
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
   const [regularBytes, boldBytes] = await Promise.all([
@@ -206,12 +214,13 @@ export async function renderDocumentPdf(
   const date = new Date(
     emission?.requestedAt ?? snapshot.createdAt ?? "2000-01-01T00:00:00Z",
   );
-  pdf.setTitle(`${snapshot.code} - Home Care Assistant`);
+  pdf.setTitle(`${fidelity ? documentVariant(snapshot.type, snapshot.payload, snapshot.workflow) + " · " : ""}${snapshot.code} - Home Care Assistant`);
   pdf.setAuthor("Home Care Assistant");
   pdf.setCreationDate(date);
   pdf.setModificationDate(date);
+  if (fidelity) pdf.catalog.set(PDFName.of("Lang"), PDFString.of("pt-BR"));
   pdf.setSubject(
-    `Comprovante operacional · conteúdo v${snapshot.version} · renderizador V${emission ? revision : 4}`,
+    `${fidelity ? emission?.representation === "derived" ? "Representação de versão histórica" : "Representação documental" : "Comprovante operacional"} · conteúdo v${snapshot.version} · renderizador V${emission ? revision : 4}`,
   );
   if (emission)
     pdf.catalog.set(
@@ -320,6 +329,13 @@ export async function renderDocumentPdf(
       y -= size * 1.6;
     }
   }
+  function fidelityFact(key: string, label: string, value: string) {
+    ensure(45);
+    text(label, 9, true);
+    factGroup = "fidelity/" + key;
+    text(value, 9);
+    factGroup = undefined;
+  }
   function section(title: string) {
     ensure(55);
     y -= 17;
@@ -391,7 +407,7 @@ export async function renderDocumentPdf(
       y -= height;
     }
   }
-  function table(headers: string[], fractions: number[], rows: string[][]) {
+  function table(headers: string[], fractions: number[], rows: string[][], rowKeys?: string[]) {
     const widths = fractions.map((fraction) => width * fraction);
     const heading = () => {
       ensure(45);
@@ -414,6 +430,7 @@ export async function renderDocumentPdf(
     heading();
     rows.forEach((cells, index) => {
       const group = ++groupCounter;
+      const cellGroup = (column: number) => rowKeys?.[index] ? `${rowKeys[index]}/${column}` : `${group}:${column}`;
       const lines = cells.map((cell, i) => wrap(cell, font, 8, widths[i] - 16));
       if (emission && Math.max(...lines.map((row) => row.length)) > 45) {
         for (
@@ -428,7 +445,7 @@ export async function renderDocumentPdf(
           const fragment = lines.map((row) => row.slice(offset, offset + 45));
           let x = margin;
           fragment.forEach((cell, i) => {
-            factGroup = `${group}:${i}`;
+            factGroup = cellGroup(i);
             cell.forEach((row, n) => draw(row, x + 8, y - 6 - n * 11, 8));
             factGroup = undefined;
             x += widths[i];
@@ -452,7 +469,7 @@ export async function renderDocumentPdf(
         });
       let x = margin;
       lines.forEach((cell, i) => {
-        factGroup = `${group}:${i}`;
+        factGroup = cellGroup(i);
         cell.forEach((row, n) => draw(row, x + 8, y - 6 - n * 11, 8));
         factGroup = undefined;
         x += widths[i];
@@ -473,7 +490,9 @@ export async function renderDocumentPdf(
     ENT: "COMPROVANTE DE ENTREGA DE MATERIAIS",
     BAL: "BALANÇO DO ESTOQUE DA EQUIPE",
   }[snapshot.type];
-  text(title, snapshot.type === "ENT" ? 17 : 19, true);
+  text(fidelity && !(snapshot.type === "REQ" && sourceFacts?.historical)
+    ? documentVariant(snapshot.type, snapshot.payload, snapshot.workflow).toLocaleUpperCase("pt-BR") : title,
+    snapshot.type === "ENT" ? 17 : 19, true);
   y -= 6;
   const familyAware =
     snapshot.sciencePolicy?.familyAware ??
@@ -798,7 +817,7 @@ export async function renderDocumentPdf(
       [0.06, 0.47, 0.24, 0.23],
       snapshot.lines.map((item, i) => [
         String(i + 1).padStart(2, "0"),
-        item.stock_observation
+        fidelity || item.stock_observation
           ? name(item) +
             "\nEstoque da equipe: " +
             formatStockObservation(
@@ -811,19 +830,21 @@ export async function renderDocumentPdf(
                 ? item.unit_snapshot
                 : undefined,
             ) +
-            (Object.hasOwn(item, "stock_observation_at")
+            (fidelity || Object.hasOwn(item, "stock_observation_at")
               ? "\n" +
                 formatStockObservationTime(
                   typeof item.stock_observation_at === "string"
                     ? item.stock_observation_at
                     : null,
-                  item.stock_observation_time_source as StockObservationTimeSource,
+                  (fidelity && !["client_draft", "server_submission", "legacy_unknown"].includes(String(item.stock_observation_time_source))
+                    ? "legacy_unknown" : item.stock_observation_time_source) as StockObservationTimeSource,
                 )
               : "")
           : name(item),
         String(item.unit_snapshot ?? "Não informada"),
         item.urgent ? "URGENTE" : "Rotina",
       ]),
+      fidelity ? snapshot.lines.map((item, index) => `fidelity/requisition/${item.id ?? index}`) : undefined,
     );
   else
     table(
@@ -845,6 +866,18 @@ export async function renderDocumentPdf(
         String(item.unit_snapshot ?? ""),
       ]),
     );
+  if (fidelity && snapshot.type === "REQ") {
+    text("O estoque informado é uma observação pontual, não é quantidade pedida nem saldo oficial. Atendimento indica algum aceite positivo na ENT vinculada; não comprova satisfação integral da necessidade.", 8);
+    for (const [index, item] of snapshot.lines.entries()) {
+      const state = typeof item.id === "string" ? snapshot.fulfillmentLines?.find(line => line.id === item.id) : undefined;
+      factGroup = `fidelity/requisition/${item.id ?? index}/status`;
+      text(`Item ${String(index + 1).padStart(2, "0")} · ${sourceFacts?.historical
+        ? "Atendimento não apurado na origem histórica"
+        : state ? state.attended ? "Atendimento com aceite positivo registrado" : "Sem aceite positivo registrado"
+          : "Situação de atendimento não preservada nesta versão"}`, 8);
+      factGroup = undefined;
+    }
+  }
   y -= 10;
   const intent = snapshot.payload.intent as
     { observations?: string[] } | undefined;
@@ -1070,6 +1103,28 @@ export async function renderDocumentPdf(
               : "Aguardando conferência",
       ]),
     );
+    if (fidelity) {
+      for (const item of snapshot.lines) {
+        const metadata = item.metadata as Record<string, unknown> | undefined;
+        const receipt = metadata?.receipt as Record<string, unknown> | undefined;
+        if (!receipt || !Object.keys(receipt).length) continue;
+        section("Divergência preservada · " + name(item));
+        const problem = { shortage: "Quantidade menor", damaged: "Material avariado", wrong: "Produto divergente", other: "Outra diferença" };
+        fidelityFact(`delivery/${item.id}/problem`, "Classificação declarada", Object.hasOwn(problem, String(receipt.problem)) ? problem[receipt.problem as keyof typeof problem] : "Classificação não preservada");
+        fidelityFact(`delivery/${item.id}/notes`, "Nota do recebimento", typeof receipt.notes === "string" && receipt.notes ? receipt.notes : "Nota não preservada");
+        fidelityFact(`delivery/${item.id}/accepted`, "Aceito na declaração divergente original", receipt.acceptedQuantity == null ? "Quantidade não preservada" : formatQuantity(String(receipt.acceptedQuantity), String(item.unit_snapshot ?? "")));
+      }
+      for (const event of fidelity.deliveryResolutions) {
+        const line = snapshot.lines.find(item => item.id === event.lineId);
+        section("Resolução de divergência · " + (line ? name(line) : "Material não identificado no registro"));
+        fidelityFact(`resolution/${event.eventId}/event`, "Evento e versão preservados", `${event.eventId} · v${event.version}`);
+        fidelityFact(`resolution/${event.eventId}/actor`, "Responsável no evento", `${event.actorName ?? "Nome histórico não preservado"} · ${event.actorId ?? "Identidade não preservada"} · ${formatBrazilDate(event.recordedAt)}`);
+        const labels = { received: "Recebimento complementar", returned: "Devolução à origem", missing: "Falta ou perda conciliada" };
+        fidelityFact(`resolution/${event.eventId}/outcome`, "Destino desta parcela da diferença", event.resolution ? labels[event.resolution] : "Resolução não preservada");
+        fidelityFact(`resolution/${event.eventId}/quantity`, "Quantidade desta resolução", event.quantity === null ? "Quantidade não preservada" : formatQuantity(event.quantity, line ? String(line.unit_snapshot ?? "") : undefined));
+        fidelityFact(`resolution/${event.eventId}/reason`, "Motivo preservado", event.reason || "Motivo não preservado");
+      }
+    }
     if (snapshot.deliveryCancellation) {
       const cancellation = snapshot.deliveryCancellation,
         request = cancellation.request;
@@ -1355,6 +1410,20 @@ export async function renderDocumentPdf(
           9,
         );
       if (receipt.reason) text("Motivo: " + receipt.reason, 9);
+      if (fidelity) {
+        const events = fidelity.purchaseReceiptEvents.filter(event => event.receiptId === receipt.id);
+        if (!events.length) text("Vínculo com o evento de origem da parcela não preservado; não foi inferido por quantidade ou data.", 8);
+        for (const event of events) {
+          fidelityFact(`purchase/${event.eventId}/event`, "Evento desta parcela", `${event.eventId} · v${event.version} · ${documentEventLabel(event.action, purchaseOrigin)}`);
+          fidelityFact(`purchase/${event.eventId}/actor`, "Responsável no evento", `${event.actorName ?? "Nome histórico não preservado"} · ${event.actorId ?? "Identidade não preservada"} · ${formatBrazilDate(event.recordedAt)}`);
+        }
+      }
+    }
+    if (fidelity) for (const event of fidelity.purchaseReceiptEvents.filter(event => !snapshot.purchaseReceipts?.some(receipt => receipt.id === event.receiptId))) {
+      section("Evento de chegada sem parcela preservada no snapshot");
+      fidelityFact(`purchase/${event.eventId}/event`, "Evento preservado", `${event.eventId} · v${event.version} · ${documentEventLabel(event.action, purchaseOrigin)}`);
+      fidelityFact(`purchase/${event.eventId}/actor`, "Responsável no evento", `${event.actorName ?? "Nome histórico não preservado"} · ${event.actorId ?? "Identidade não preservada"} · ${formatBrazilDate(event.recordedAt)}`);
+      text(event.receiptId ? "Referência da parcela preservada: " + event.receiptId : "Identificador da parcela não preservado; não foi inferido por quantidade ou data.", 8);
     }
   } else {
     section("Referência e reconciliação");
@@ -1384,12 +1453,18 @@ export async function renderDocumentPdf(
     text("Observações originais de quem contou:", 9, true);
     text(facts.notes || "Nenhuma observação registrada.");
     const policy = snapshot.workflow?.reviewPolicy as
-      { balReview?: string } | undefined;
+      { balReview?: string; balRequirement?: string; balApprovers?: string[] } | undefined;
     text(
       policy?.balReview === "optional"
         ? "Revisão facultativa; a contagem válida não exige fila universal de aprovação."
         : "Revisão conforme a política registrada para esta contagem.",
     );
+    if (fidelity) {
+      const groups = Array.isArray(policy?.balApprovers) ? policy.balApprovers.map(group => group === "family" ? "Família" : group === "supervisor" ? "Supervisão" : "Grupo não identificado").join(", ") : "Grupos não preservados";
+      fidelityFact("review-policy/groups", "Grupos na política desta contagem", groups || "Nenhum grupo habilitado");
+      fidelityFact("review-policy/requirement", "Condição preservada de revisão", policy?.balReview === "optional" ? "Revisão facultativa"
+        : policy?.balRequirement === "all" ? "Todos os grupos habilitados" : policy?.balRequirement === "any" ? "Qualquer grupo habilitado" : "Condição não preservada");
+    }
     for (const review of facts.reviews) {
       section(
         `Parecer da ${review.review_group === "family" ? "família" : "supervisão"} · contagem ${review.count_version}`,
@@ -1399,6 +1474,11 @@ export async function renderDocumentPdf(
         9,
         true,
       );
+      if (fidelity) fidelityFact(`review/${review.id}/scope`, "Alcance deste parecer", review.count_version !== facts.countVersion
+        ? "Registro de contagem anterior; não é parecer vigente da contagem atual."
+        : facts.counter.id && review.reviewer_id !== facts.counter.id && review.reference_state === "current" && Array.isArray(policy?.balApprovers) && policy.balApprovers.includes(review.review_group)
+          ? "Parecer da contagem atual e grupo habilitado na política preservada."
+          : "Parecer preservado; elegibilidade vigente não comprovada por este contexto.");
       text(
         `Contagem de ${review.reviewed_snapshot.counter.name ?? "Autoria não disponível"}.`,
       );
@@ -1426,6 +1506,15 @@ export async function renderDocumentPdf(
     }
     if (!facts.reviews.length)
       text("Nenhum parecer independente deste contrato registrado.");
+    if (fidelity && facts.legacyApprovals.length) {
+      section("Registros legados de aprovação");
+      for (const approval of facts.legacyApprovals) {
+        const group = approval.review_group === "family" ? "Família" : approval.review_group === "supervisor" ? "Supervisão" : "Grupo não identificado";
+        fidelityFact(`legacy-review/${approval.actor_id}/${approval.count_version}`, "Registro legado preservado", `Contagem ${approval.count_version} · ${group} · ${approval.actor_id} · ${approval.actorName ?? "Nome não preservado"} · ${formatBrazilDate(approval.created_at)}`);
+        text(approval.count_version !== facts.countVersion ? "Aprovação de contagem anterior; não é aprovação vigente da contagem atual." : "Registro legado desta contagem; elegibilidade histórica não reconstituída.", 8);
+        text("O nome é o cadastro consultado ao compor o snapshot; não é prova do nome histórico no ato.", 8);
+      }
+    }
   }
   const convertedLines = snapshot.lines.flatMap((item) =>
     readPresentationConversions(item.presentation_conversions).map((row) => [

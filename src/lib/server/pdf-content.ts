@@ -1,5 +1,5 @@
 import { PDF } from "@libpdf/core";
-import { PDFDocument, PDFHexString, PDFName } from "pdf-lib";
+import { PDFDocument, PDFHexString, PDFName, PDFString } from "pdf-lib";
 import { ApiError } from "./api";
 import {
   renderDocumentPdf,
@@ -13,6 +13,9 @@ import {
   pdfSourceFactsSchema,
   sourceNameLabels,
 } from "../documents/pdf-source-facts";
+import { pdfFidelitySchema } from "../documents/pdf-fidelity";
+import { formatStockObservation, formatStockObservationTime } from "../stock-observation";
+import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
@@ -45,16 +48,19 @@ export async function composeIssuance(
   const runs: Run[] = [];
   const revision = emission.rendererRevision ?? 5;
   const parsed =
-    revision === 6
+    revision >= 6
       ? pdfSourceFactsSchema.safeParse(snapshot.sourceFacts)
       : null;
   if (parsed && !parsed.success) throw invalid("source-facts-schema");
   const sourceFacts = parsed?.success ? parsed.data : undefined;
+  const fidelity = revision === 7 ? pdfFidelitySchema.safeParse(snapshot.documentFacts) : null;
+  if (fidelity && !fidelity.success) throw invalid("fidelity-facts-schema");
   let bytes: Buffer;
   try {
     bytes = await renderDocumentPdf(snapshot, sourceHash, {
       ...emission,
       sourceFacts,
+      fidelityFacts: fidelity?.success ? fidelity.data : undefined,
       onText: (run) => runs.push(run),
     });
   } catch (error) {
@@ -131,6 +137,47 @@ export async function composeIssuance(
     for (const [key, value] of Object.entries(dates))
       semanticFacts["source/" + key] = formatBrazilDate(value);
   }
+  if (fidelity?.success) {
+    const f = fidelity.data;
+    if (snapshot.type === "REQ") for (const [index, line] of snapshot.lines.entries()) {
+      const key = `fidelity/requisition/${line.id ?? index}`;
+      const timeSource = ["client_draft", "server_submission", "legacy_unknown"].includes(String(line.stock_observation_time_source)) ? line.stock_observation_time_source as StockObservationTimeSource : "legacy_unknown";
+      const stock = typeof line.current_stock === "string" || typeof line.current_stock === "number" ? line.current_stock : null;
+      semanticFacts[key + "/1"] = "Estoque da equipe: " + formatStockObservation(stock, line.stock_observation as StockObservation, typeof line.unit_snapshot === "string" ? line.unit_snapshot : undefined)
+        + " " + formatStockObservationTime(typeof line.stock_observation_at === "string" ? line.stock_observation_at : null, timeSource);
+      const status = typeof line.id === "string" ? snapshot.fulfillmentLines?.find(item => item.id === line.id) : undefined;
+      semanticFacts[key + "/status"] = `Item ${String(index + 1).padStart(2, "0")} · ${sourceFacts?.historical ? "Atendimento não apurado na origem histórica" : status ? status.attended ? "Atendimento com aceite positivo registrado" : "Sem aceite positivo registrado" : "Situação de atendimento não preservada nesta versão"}`;
+    }
+    for (const line of snapshot.type === "ENT" ? snapshot.lines : []) {
+      const receipt = (line.metadata as { receipt?: Record<string, unknown> } | undefined)?.receipt;
+      if (!receipt || !Object.keys(receipt).length) continue;
+      semanticFacts[`fidelity/delivery/${line.id}/notes`] = typeof receipt.notes === "string" && receipt.notes ? receipt.notes : "Nota não preservada";
+      semanticFacts[`fidelity/delivery/${line.id}/accepted`] = receipt.acceptedQuantity == null ? "Quantidade não preservada" : formatQuantity(String(receipt.acceptedQuantity), String(line.unit_snapshot ?? ""));
+    }
+    for (const event of f.deliveryResolutions) {
+      const prefix = `fidelity/resolution/${event.eventId}`;
+      semanticFacts[prefix + "/event"] = event.eventId;
+      semanticFacts[prefix + "/actor"] = `${event.actorName ?? "Nome histórico não preservado"} · ${event.actorId ?? "Identidade não preservada"} · ${formatBrazilDate(event.recordedAt)}`;
+      semanticFacts[prefix + "/reason"] = event.reason || "Motivo não preservado";
+      const line = snapshot.lines.find(line => line.id === event.lineId);
+      semanticFacts[prefix + "/quantity"] = event.quantity === null ? "Quantidade não preservada" : formatQuantity(event.quantity, line ? String(line.unit_snapshot ?? "") : undefined);
+      semanticFacts[prefix + "/outcome"] = event.resolution === "received" ? "Recebimento complementar"
+        : event.resolution === "returned" ? "Devolução à origem" : event.resolution === "missing" ? "Falta ou perda conciliada" : "Resolução não preservada";
+    }
+    for (const event of f.purchaseReceiptEvents) {
+      semanticFacts[`fidelity/purchase/${event.eventId}/event`] = event.eventId;
+      semanticFacts[`fidelity/purchase/${event.eventId}/actor`] = `${event.actorName ?? "Nome histórico não preservado"} · ${event.actorId ?? "Identidade não preservada"} · ${formatBrazilDate(event.recordedAt)}`;
+    }
+    const reviewPolicy = snapshot.workflow?.reviewPolicy as { balApprovers?: string[] } | undefined;
+    for (const review of snapshot.balanceReviews?.reviews ?? [])
+      semanticFacts[`fidelity/review/${review.id}/scope`] = review.count_version !== snapshot.balanceReviews?.countVersion
+        ? "Registro de contagem anterior; não é parecer vigente da contagem atual."
+        : snapshot.balanceReviews?.counter.id && review.reviewer_id !== snapshot.balanceReviews.counter.id && review.reference_state === "current" && Array.isArray(reviewPolicy?.balApprovers) && reviewPolicy.balApprovers.includes(review.review_group)
+          ? "Parecer da contagem atual e grupo habilitado na política preservada."
+          : "Parecer preservado; elegibilidade vigente não comprovada por este contexto.";
+    for (const review of snapshot.balanceReviews?.legacyApprovals ?? [])
+      semanticFacts[`fidelity/legacy-review/${review.actor_id}/${review.count_version}`] = `${review.actor_id} · ${review.actorName ?? "Nome não preservado"}`;
+  }
   const plan = { bytes, runs, identity, facts, semanticFacts };
   await validateIssuanceContent(bytes, plan);
   return plan;
@@ -200,6 +247,8 @@ export async function validateIssuanceContent(
     if (!plan.facts.length || missing !== -1)
       throw invalid("source-fact:" + missing);
     const parsed = await PDFDocument.load(bytes, { updateMetadata: false });
+    if (plan.identity.rendererRevision === 7 && parsed.catalog.lookupMaybe(PDFName.of("Lang"), PDFString)?.decodeText() !== "pt-BR")
+      throw invalid("language");
     const identity = JSON.parse(
       parsed.catalog
         .lookup(PDFName.of("HCAIssuance"), PDFHexString)

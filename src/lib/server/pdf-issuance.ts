@@ -82,7 +82,7 @@ export async function issuePdf(
   version: number | undefined,
   verificationOrigin: string,
 ) {
-  const reserved = (await rpc(client, "reserve_pdf_issuance", {
+  const reserved = (await rpc(client, "reserve_pdf_issuance_v7", {
     p_document: documentId,
     p_key: key,
     p_version: version ?? null,
@@ -108,7 +108,7 @@ export async function issuePdf(
     const r = await readPdfIssuance(client, reserved.id),
       trust = await loadPdfTrust();
     await stage("composing");
-    if (![5, 6].includes(r.rendererRevision))
+    if (![5, 6, 7].includes(r.rendererRevision))
       throw new ApiError(
         "CONTENT_INVALID",
         "Revisão de renderização não suportada.",
@@ -116,7 +116,7 @@ export async function issuePdf(
         false,
       );
     const plan = await composeIssuance(r.snapshot, r.sourceHash, {
-      rendererRevision: r.rendererRevision === 6 ? 6 : 5,
+      rendererRevision: r.rendererRevision as 5 | 6 | 7,
       id: r.id,
       verificationCode: r.verificationCode,
       requestedAt: r.requestedAt,

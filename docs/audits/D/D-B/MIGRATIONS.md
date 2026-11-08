@@ -451,3 +451,34 @@ fixture/Auth remoto, transporte externo ou promoção.
 [pós-check](FIELD_VALIDATION_REMOTE_MIGRATIONS.json),
 [advisors](FIELD_VALIDATION_REMOTE_ADVISORS.json) e
 [provas e qualificações](FIELD_VALIDATION_EVIDENCE.json).
+
+### Fidelidade técnica do PDF V7 — remoto152
+
+20261108093000 foi aplicada pelo CLI vinculado após backup crítico0648d0ac
+verificado/restaurado, upgrade isolado e pré-validação. Local152/remoto152,
+SQL152/152 reconciliados e zero pendências. O SQL aplicado é imutável, SHA-256
+LF8b82e78b27041af7d89f5358c11b23f9c227ad0713a6ca214ff4651da6744e2f.
+
+Preserva407 identidades/grants, amplia somente o guard privado de origem e
+acrescenta trigger suplementar/RPC Auth versionada. Default e reserva antigos
+continuam V6; mesma intenção reusa sua revisão original e ready conserva seus
+bytes. Eventos, hash canônico e estoque não são reescritos. Não há tabelas novas
+ou mudança de políticas Storage; helpers privados não recebem EXECUTE público.
+
+A primeira pós-validação recusou mudança em duas tabelas de monitoramento.
+Reconstrução read-only comprovou escalonamento do heartbeat de Preview anterior
+à transação DDL:21 linhas antigas exatas, um evento acrescentado e somente
+severity/version de um incidente. As149 outras projeções estáveis coincidem;
+não há afirmação de igualdade integral das151 tabelas. Recuperação posterior
+foi separada, sem relaxar o comparador de backup ou silenciar o monitoramento.
+
+Auth9/profiles7, Storage33, cron/Vault, grants e catálogo foram conferidos;
+locks/transações longas/índices inválidos zero. Runtime200/protocolo1/schema1,
+RPC anônima401/42501. Advisors Auth153→154 corresponde somente à RPC nova;
+demais contagens de segurança/desempenho permanecem. Sem reset, seed, fixture/
+Auth remoto, fornecedor externo ou promoção. Restore/upgrade3,67s não homologa
+RPO/RTO/D6. [Preflight](PDF_FIDELITY_REMOTE_PREFLIGHT.json),
+[pós-check](PDF_FIDELITY_REMOTE_MIGRATIONS.json),
+[atividade qualificada](PDF_FIDELITY_REMOTE_ACTIVITY.json),
+[advisors](PDF_FIDELITY_REMOTE_ADVISORS.json) e
+[provas](PDF_FIDELITY_EVIDENCE.json).

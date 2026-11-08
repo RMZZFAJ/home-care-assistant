@@ -5,6 +5,7 @@ import { DeliveryRegularization } from "./delivery-regularization";
 import { BalanceReview } from "./balance-review";
 import { TransferDetails } from "./transfer-details";
 import { documentPatientName } from "@/lib/documents/presentation";
+import { documentVariant } from "@/lib/documents/variant";
 import { SupplyLineSummary } from "./supply-line-summary";
 import {
   DeliveryDispatchFacts,
@@ -549,7 +550,7 @@ export function SupplyDocumentContent({
                   : data.payload.origin === "purchase"
                     ? "Compra de insumos"
                     : "Compra ou doação de insumos"
-                : undefined
+                : data.type === "BAL" ? documentVariant(data.type, data.payload, data.workflow_data) : undefined
             }
             code={
               data.code ??
