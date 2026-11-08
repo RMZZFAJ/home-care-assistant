@@ -106,8 +106,10 @@ Anexos não ampliam a autorização do seu autor após revogação.
 
 Mutações rejeitam origem externa e validam contratos. Respostas sensíveis usam
 no-store e correlação. Logs omitem payload privado, SQL, credenciais e tokens.
-O navegador conserva tentativas incertas por até 24 horas para recuperação
-idempotente; conclusão e saída removem os rascunhos. Não é histórico oficial.
+A recuperação local usa cópia opcional da aba, sem expiração por tempo imposta.
+Conclusão remove o envelope da tentativa; logout limpa as cópias locais hca.
+Rascunho salvo na conta permanece no servidor e não é apagado pelo logout.
+Recuperação revalida o acesso e preserva a chave original. Não é histórico oficial.
 
 Gestão de identidade/sucessor exige catalog.manage por paciente, sem conceder
 access.manage ou leitura de custódia. A comparação retorna saldo restrito como

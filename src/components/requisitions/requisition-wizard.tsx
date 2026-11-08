@@ -161,7 +161,6 @@ function PatientRequisition({
         if (!raw) return;
         const saved = JSON.parse(raw);
         if (
-          Date.now() - saved.savedAt > 86_400_000 ||
           (saved.form?.careRecipientId &&
             saved.form.careRecipientId !== context.patient!.id)
         ) {
@@ -179,7 +178,9 @@ function PatientRequisition({
             lines: saved.form.lines.map(restoreStockObservation),
             extraItems: saved.form.extraItems.map(restoreStockObservation),
           });
-          setMessage("Rascunho deste dispositivo recuperado.");
+          setMessage(saved.intent
+            ? "Tentativa desta aba recuperada. Consulte a mesma tentativa antes de iniciar outra requisição."
+            : "Preenchimento desta aba recuperado. Salve um rascunho na conta para retomar em outra sessão ou aparelho.");
           if (saved.intent) {
             frozenRef.current = saved.intent;
             setStep(6);

@@ -83,7 +83,7 @@ function Mode({
         );
         if (active)
           setRecoverable(
-            Boolean(cache?.pending && Date.now() - cache.savedAt < 86_400_000),
+            Boolean(cache?.pending),
           );
       } catch {
         if (active) setRecoverable(false);
@@ -297,7 +297,7 @@ function ScheduledCount({
           observationTimes?: Record<string, string | null>;
           pending?: Attempt;
         };
-        if (Date.now() - cache.savedAt < 86_400_000) {
+        if (cache && typeof cache === "object") {
           if (
             cache.assignmentId === state.data.eligibility.assignment?.id &&
             cache.referenceRevision === state.data.referenceRevision
@@ -318,7 +318,7 @@ function ScheduledCount({
               "Há uma tentativa pendente. Recupere o resultado antes de continuar.",
             );
           }
-        } else sessionStorage.removeItem(storageKey);
+        }
       }
     };
     load()

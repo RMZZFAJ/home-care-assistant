@@ -494,3 +494,19 @@ descarte não grava e salvar cria uma única linha. O foco exige destinos própr
 do contexto. Hidden é uma intervenção controlada para exercitar o fallback.
 Não é ensaio humano/AT ou aparelho físico.
 [Coortes e contraprovas](../audits/D/D-B/DRAWER_FOCUS.md).
+
+## Retenção, sessão e titular do rascunho
+
+```sh
+npm run e2e -- tests/e2e/draft-lifecycle.spec.ts \
+  tests/e2e/requisition-observation.spec.ts \
+  --grep 'REQ conserva|REQ salva|BAL agendada|rascunho anterior conserva' \
+  --max-failures=1
+```
+
+O runner confere a stack local. As fixtures controlam somente metadata de
+novos rascunhos fictícios e envelopes locais; não alteram relógios/eventos
+oficiais. Sem suíte mutável de banco em paralelo. REQ e BAL repetem comandos
+reais já confirmados, com a mesma chave, sem duplicar ficha ou ledger.
+A retomada entre sessões exige rascunho salvo na conta; a cópia de aba é
+opcional. [Coortes, contraprovas e limites](../audits/D/D-B/DRAFT_LIFECYCLE.md).

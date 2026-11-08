@@ -167,6 +167,7 @@ export function CreationDraftPanel({
           ? "O resultado oficial deste preenchimento já está disponível."
           : "Salvar este preenchimento não gera protocolo, ciência ou movimentação de estoque."}
       </p>
+      {!draft.consumed && !draft.pending ? <p className="hca-field-hint">Para retomar em outra aba, sessão ou aparelho, use Salvar rascunho. O preenchimento ainda não salvo pode ficar apenas nesta aba.</p> : null}
       {draft.loading ? (
         <Notice>Consultando seu rascunho no servidor…</Notice>
       ) : null}

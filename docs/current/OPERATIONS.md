@@ -112,7 +112,11 @@ nem protege contra um administrador do banco que altere dados e controles.
 Gravação, envio ao provedor, entrega, leitura e ciência no aplicativo são
 independentes. Falha externa não desfaz o documento. Resultado incerto exige
 conciliação antes de reenviar. Em falha de rede, recupere a mesma tentativa
-para evitar duplicação; rascunhos locais expiram em 24 horas.
+para evitar duplicação. Não há expiração automática de24h para rascunhos.
+Para retomar em outra aba, sessão ou aparelho, use Salvar rascunho na conta.
+A cópia local é opcional e pode desaparecer ao fechar a aba; sair da conta
+limpa essa cópia, preservando o rascunho já salvo no servidor. Resolva uma
+tentativa incerta antes de iniciar outro envio.
 
 ## Relatos e canais externos
 

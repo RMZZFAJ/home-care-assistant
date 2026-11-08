@@ -20,6 +20,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Marcos temporais ENT e evento/arquivo exato](ENT_TEMPORAL.md).
 - [Estado terminal, versão preservada e tarefa no PDF ENT](ENT_TERMINAL.md).
 - [Retorno de teclado e edição preservada no catálogo](DRAWER_FOCUS.md).
+- [Retenção, aba, sessão e titular do rascunho](DRAFT_LIFECYCLE.md).
 - [Comparação das versões e autoria histórica](DOCUMENT_VERSION_HISTORY.md).
 - [Instalação, atualização e privacidade PWA](PWA_RUNTIME.md).
 - [PWA no Preview protegido: causa, recuperação e endereço estável](PWA_PREVIEW_ACCESS.md).

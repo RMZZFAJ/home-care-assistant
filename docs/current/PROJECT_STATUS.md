@@ -10,6 +10,19 @@ dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
 
+D3.16 removeu o corte de24h dos envelopes REQ/BAL, conforme a política vigente.
+A cópia local é opcional da aba; salvar na conta permite retomar em sessão
+nova, sem apagar o draft no logout.12 casos de produção passaram nos três
+motores, com replay de REQ/BAL sem duplicação, isolamento por titular/paciente
+e consumidor legado0/7 preservado. Tipos e lint passaram; três falhas anteriores
+conservadas. C032 agora PASS local; matriz46 PASS/50 PARTIAL/9 NOT_STARTED.
+Sem migration ou mutação remota; consulta confirmou157. O novo SHA exige CI
+própria. [Provas e limites](../audits/D/D-B/DRAFT_LIFECYCLE.md).
+
+Preview basebca3933 READY; sua CI foi observada com banco e validate Windows/
+Ubuntu SUCCESS, quatro browsers em andamento. Isso não aprova o novo incremento
+nem os jobs ainda pendentes. [Recibo](../audits/D/D-B/CI_BCA3933_OBSERVATION.json).
+
 D3.15 corrigiu perda de foco ao continuar edição e forneceu destino contextual
 após salvar no catálogo. O aviso bloqueia descarte durante tentativa pendente.
 Nove casos de produção passaram nos três motores, incluindo o consumidor
@@ -258,7 +271,8 @@ chave desconhecida após recusa de acesso. Oito casos Auth,11 unitários/modelos
 API e35 casos browser distintos passaram entre rodadas de produção, incluindo
 REQ/BAL existentes e falhas direcionadas da CI.
 [Manifesto D3.6](../audits/D/D-B/D3_6_EVIDENCE.json).
-C7-AC-004 tem prova local; sessão/24h e demais contextos continuam pendentes.
+C7-AC-004 tem prova local. A antiga pendência de sessão/24h de C032 foi
+reconciliada depois em D3.16; demais critérios e contextos têm provas próprias.
 
 D3.7 comprova C-AC-077: revisão legada salva, submissão pendente e recuperação
 das duas etapas já concluídas. Mantém chaves/versão da intenção sem submeter

@@ -1829,3 +1829,42 @@ humano/AT/aparelho e D-C/D6 continuam próprios; meta ativa, prioridade diária.
 [Dossiê](DRAWER_FOCUS.md), [coortes](DRAWER_FOCUS_EVIDENCE.json),
 [Preview V9](ENT_TERMINAL_PREVIEW_OBSERVATION.json) e
 [CI base](CI_827531E_OBSERVATION.json).
+
+## D3.16 — retenção e escopo da recuperação privada
+
+Basebca3933. Reprodução mostrou que o buffer REQ removia a chave de tentativa
+real já confirmada após24h. O mesmo corte existia no modo e envelope BAL
+agendado. Removidos os três cortes conforme VI.4/VII.1 da ordem atual. A cópia
+opcional da aba continua isolada por usuário/paciente/alvo; a contagem editável
+exige assignment/referenceRevision correspondentes, e a rota pendente conserva
+sua lista permitida. Interface e instruções atuais distinguem aba de conta.
+Logout limpa local sem excluir o draft salvo; nenhuma ficha nasce ao digitar.
+
+Coorte final12 PASS nos três motores: nove casos novos de recuperação/escopo
+e três consumidores legados REQ. Envelope26h reenvia exatamente a mesma chave/
+pacote e recupera a mesma ficha/comprovante; BAL aprovado tem ledger real não
+vazio, preservado no replay. Metadata26h de draft novo, logout, outro paciente,
+outro titular com rascunho próprio e contexto novo conservam ID/revisão/hash/
+etapa sem efeito oficial. Valores legados0/7 permanecem a revisar.
+
+17 execuções:14 PASS/3 FAIL preservadas. Baseline perdeu recuperação; fixture
+usou coluna updated_at inexistente e foi corrigida para saved_at; a expectativa
+submitted de BAL opcional foi corrigida para seu contrato approved, com ledger
+não vazio e sem alterar regra do produto. Tipagem inicial do teste corrigida
+antes do browser. Avisos do limite de falhas não são casos adicionais. Respostas
+CONTEXT_REQUIRED de notificações na troca de sessão permanecem nos logs.
+Tipos/lint afetados passaram; sem repetir suíte global local. Relógios antigos
+são controles fictícios, sem alterar eventos nem alegar espera física de26h.
+
+Read-only remoto confirmou157, última20261108212500; nenhuma migration nova,
+Auth/fixture/reset remoto, backup/restore redundante ou envio externo. Preview
+basebca3933 READY, API/PWA iguais ao probe827531e. CI base com banco e validate
+Windows/Ubuntu SUCCESS, quatro browsers em andamento; novo SHA exige CI própria.
+Sonar adiado, PR7 Draft, sem merge/promoção; meta ativa, operação diária primeiro.
+
+Matriz105x39:46 PASS/50 PARTIAL/9 NOT_STARTED;29 colunas canônicas preservadas.
+C032 recebe complemento da ordem vigente, sem TTL imposto. Outros consumidores,
+AT/humano/aparelho e D-C/D6 permanecem próprios. [Dossiê](DRAFT_LIFECYCLE.md),
+[coortes](DRAFT_LIFECYCLE_EVIDENCE.json),
+[remoto](DRAFT_LIFECYCLE_REMOTE_OBSERVATION.json) e
+[CI base](CI_BCA3933_OBSERVATION.json).
