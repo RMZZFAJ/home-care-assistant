@@ -5,6 +5,7 @@ import { api, ApiError } from "@/lib/client/api";
 import { creationDraftCommandSchema } from "@/lib/validation/creation-drafts";
 import { parsePrivateDraft,parsePrivateDraftResult } from "@/lib/validation/private-draft-results";
 import type { DraftPurpose } from "@/lib/validation/supply-drafts";
+import type { DraftNavigation } from "@/lib/forms/draft-navigation";
 import type {
   CreationDraft,
   CreationDraftContent,
@@ -15,6 +16,7 @@ import type {
 type Packet = Record<string, unknown> & {
   action: "save" | "discard" | "acknowledge";
   content?: CreationDraftContent;
+  navigation?: DraftNavigation;
 };
 type Options = {
   userId: string;
@@ -23,6 +25,7 @@ type Options = {
   purpose?: DraftPurpose;
   targetDocumentId?: string | null;
   enabled?: boolean;
+  navigation?: DraftNavigation;
   onResume: (draft: CreationDraft) => boolean;
   onDiscard: () => void;
 };
@@ -35,6 +38,7 @@ export function useCreationDraft({
   purpose = "create",
   targetDocumentId = null,
   enabled = true,
+  navigation,
   onResume,
   onDiscard,
 }: Options) {
@@ -204,6 +208,7 @@ export function useCreationDraft({
           savedAt: result.savedAt,
           contentHash: "",
           content: packet.content!,
+          navigation: packet.navigation ?? null,
           consumedDocumentId: result.consumedDocumentId,
         };
         if (restorePendingRef.current && !onResume(savedDraft)) {
@@ -308,6 +313,7 @@ export function useCreationDraft({
       idempotencyKey: crypto.randomUUID(),
       action,
       ...(content ? { content } : {}),
+      ...(action === "save" && navigation ? { navigation } : {}),
     };
   }
   function resume(draft = offered) {
@@ -337,6 +343,8 @@ export function useCreationDraft({
   return {
     active,
     kind,
+    purpose,
+    navigation,
     base,
     offered,
     comparison,

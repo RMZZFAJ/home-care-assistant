@@ -60,7 +60,7 @@ export async function POST(request: Request) {
           p_key: input.idempotencyKey,
           p_body:
             input.action === "save"
-              ? { action: input.action, content: input.content }
+              ? { action: input.action, content: input.content, ...(input.navigation ? { navigation: input.navigation } : {}) }
               : { action: input.action },
         }),
       },

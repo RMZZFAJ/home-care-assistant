@@ -1592,3 +1592,32 @@ o SHA novo exige seus próprios gates. PR7 Draft e missão ativa; Sonar adiado.
 [Dossiê](DOCUMENT_VERSION_HISTORY.md),
 [evidências](DOCUMENT_VERSION_HISTORY_EVIDENCE.json) e
 [vínculos arquivo/versão](DOCUMENT_VERSION_HISTORY_BINDINGS.json).
+
+## D3.13 — etapa privada e reconciliação da origem
+
+C-NEW-AC-014 preserva etapa fora de content/contentHash, com listas fechadas por
+tipo/finalidade/modo, resumo em leitura, CAS e recuperação do pacote original.
+REQ/COM/ENT/BAL retomam a etapa adotada; legado sem etapa retoma o início.
+16 unitários,30 Auth e6 produção Chromium passaram; cinco Next dev são separados.
+A coleta inicial .test.tsx foi corrigida para .test.ts e cinco casos novos
+foram efetivamente executados, sem relaxar o filtro. Tipos/lint passaram.
+
+Migration153 aplicada local/remoto após backup verificado, restore de151 tabelas,
+34 objetos,33 PDFs e duas emissões assinadas por digest, e upgrade isolado.
+409 identidades/grants existentes preservados; somente três definições mudam,
+mais um helper privado sem execução para clientes. Nenhum DML de negócio.
+Pós-DDL conserva todos os campos antigos, projeta só a nova coluna e exige NULL
+nas linhas anteriores; cron/Vault/políticas Storage preservados. Zero pendências.
+
+C-NEW-AC-023 reconciliado sem nova implementação: seis PASS de dois cenários
+nos três motores, nos logs da CI42480516297/8a17202, fontes/contratos idênticos.
+Matriz105x39:42 PASS/51 PARTIAL/12 NOT_STARTED; primeiras29 colunas intactas.
+CI8a17202 terminou8/8 SUCCESS; Preview protegido READY e probe da origem estável
+com quatro ativos fixados, SW anônimo302 e APIs privadas401 sem sessão do app.
+O novo SHA requer CI própria. PDFs continuam técnicos; aparência com o owner.
+D6/humano/AT/aparelho, ICP-Brasil/TSA externa e demais critérios continuam gates;
+backup/probe não equivalem a RPO/RTO ou recuperação operacional. Sonar adiado,
+PR7 Draft, sem merge, produção NO-GO, missão D-B ativa.
+[Dossiê](DRAFT_NAVIGATION.md), [evidências](DRAFT_NAVIGATION_EVIDENCE.json),
+[pós-DDL](DRAFT_NAVIGATION_REMOTE_MIGRATIONS.json) e
+[origem tipada](STOCK_ORIGIN_RECONCILIATION.md).

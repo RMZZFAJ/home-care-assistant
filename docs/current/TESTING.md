@@ -380,3 +380,26 @@ Após correção, repetir os casos afetados e conservar as coortes/hashes das
 provas inalteradas. A inspeção dos campos de48 snapshots sintéticos não é48
 fluxos executados nem prova de todos os estados, AT, impressão ou aparelho.
 [Resultados e contraprovas](../audits/D/D-B/DOCUMENT_VERSION_HISTORY_EVIDENCE.json).
+
+## Etapa de rascunho privado
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/draft-navigation.test.ts \
+  tests/api/private-drafts-contract.test.ts tests/supply-draft-models.test.ts
+node --test --test-concurrency=1 tests/integration/draft-navigation.test.mjs \
+  tests/integration/private-drafts.test.mjs \
+  tests/integration/supply-private-drafts.test.mjs
+draft_cases='BAL agendado recupera|D3 consulta falha|REQ em dois aparelhos'
+draft_cases="$draft_cases|BAL parcial recupera|COM entre duas|ENT emite com"
+npm run e2e -- tests/e2e/private-creation-drafts.spec.ts \
+  tests/e2e/supply-private-drafts.spec.ts \
+  --project=chromium --grep "$draft_cases"
+```
+
+Executar após test:db:prepare no projeto local, sem reset. A suíte Auth recusa
+etapa de outro domínio/finalidade, verifica CAS/replay, cliente legado sem etapa,
+hash de conteúdo estável e ausência de efeito oficial por salvamento. O E2E
+consulta a persistência independente, retoma etapas e compara versões em leitura.
+Não rodar a suíte mutável junto ao E2E. A CI cobre a suíte completa nos três
+motores; não repetir todos os builds locais a cada ajuste.
+[Coortes, vínculos e limites](../audits/D/D-B/DRAFT_NAVIGATION.md).

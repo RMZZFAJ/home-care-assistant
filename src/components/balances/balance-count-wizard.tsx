@@ -14,6 +14,7 @@ import {
 import { StepNavigator } from "@/components/ui/primitives";
 import { PatientSupplyWizard } from "@/components/documents/supply-wizard";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import {
   CreationDraftPanel,
   BalanceObservationTimes,
@@ -197,6 +198,7 @@ function ScheduledCount({
     userId: context.userId,
     patientId: context.patient!.id,
     kind: "BAL",
+    navigation: navigationForStep("BAL", step),
     targetDocumentId: editing?.id ?? documentId,
     enabled: !loading && can(context, "bal.read"),
     onResume: (draft) => {
@@ -219,7 +221,7 @@ function ScheduledCount({
       setObservationTimes(content.observationTimes);
       setNotes(content.notes);
       setDraftMaterials(content.materials);
-      setStep(0);
+      setStep(stepForNavigation("BAL",draft.navigation));
       setError("");
       setFieldErrors({});
       return true;
@@ -722,7 +724,7 @@ function ScheduledCount({
         </Notice>
       ) : null}
       <StepNavigator
-        steps={["Contagem", "Revisão"]}
+        steps={draftFlowStages.BAL.map(stage => stage.label)}
         active={step}
         disabled={busy || uncertain || privateDraft.blocked}
         onChange={setStep}

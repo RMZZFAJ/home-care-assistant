@@ -20,6 +20,7 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { StepNavigator } from "@/components/ui/primitives";
@@ -34,15 +35,7 @@ import {
 } from "./requisition-steps";
 import { Receipt, type SavedReceipt } from "./requisition-receipt";
 
-const steps = [
-  "Identificação",
-  "Medicamentos",
-  "Higiene",
-  "Dieta",
-  "Itens extras",
-  "Observações",
-  "Revisão",
-];
+const steps = draftFlowStages.REQ.map(stage => stage.label);
 export function RequisitionWizard() {
   const sourceId = useSearchParams().get("sourceRequisitionId");
   return (
@@ -116,6 +109,7 @@ function PatientRequisition({
     userId: context.userId,
     patientId: context.patient!.id,
     kind: "REQ",
+    navigation: navigationForStep("REQ", step),
     enabled: can(context, "req.read"),
     onResume: (draft) => {
       if (!draft.content || !("lines" in draft.content)) return false;
@@ -135,7 +129,7 @@ function PatientRequisition({
             : line;
         }),
       });
-      setStep(0);
+      setStep(stepForNavigation("REQ", draft.navigation));
       setError("");
       setFieldErrors({});
       return true;

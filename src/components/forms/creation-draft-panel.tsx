@@ -9,8 +9,28 @@ import { formatZonedDate } from "@/lib/schedules/time";
 import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
 import type { CreationDraftContent } from "@/types/creation-drafts";
 import type { CreationDraftController } from "./use-creation-draft";
+import { navigationLabel, type DraftNavigation } from "@/lib/forms/draft-navigation";
 
-export function DraftContentSummary({
+export function DraftContentSummary({content,kind,navigation}: {
+  content: CreationDraftContent | null;
+  kind?: string | null;
+  navigation?: DraftNavigation | null;
+}) {
+  if (!content) return null;
+  const version = "context" in content ? content.context.documentVersion : "documentVersion" in content ? content.documentVersion : null;
+  const reference = "counts" in content ? content.context.referenceRevision : null;
+  return <div className="hca-form-stack">
+    <dl aria-label="Referências do preenchimento preservado">
+      <dt>Etapa do preenchimento</dt><dd>{navigationLabel(navigation)}</dd>
+      <dt>Versão base da ficha</dt><dd>{version ?? "Sem ficha oficial como base"}</dd>
+      {kind === "BAL" ? <><dt>Referência de estoque preservada</dt><dd>{reference ?? "Não preservada neste rascunho"}</dd></> : null}
+      <dt>Política base preservada</dt><dd>Não preservada neste rascunho; as regras vigentes serão conferidas na confirmação.</dd>
+    </dl>
+    <DraftFieldsSummary content={content} kind={kind}/>
+  </div>;
+}
+
+function DraftFieldsSummary({
   content,kind,
 }: {
   content: CreationDraftContent | null;
@@ -174,7 +194,7 @@ export function CreationDraftPanel({
             mesmo comando antes de editar ou descartar.
           </Notice>
           {draft.pending.content ? (
-            <DraftContentSummary content={draft.pending.content} kind={draft.kind} />
+            <DraftContentSummary content={draft.pending.content} kind={draft.kind} navigation={draft.pending.navigation} />
           ) : null}
           <Button
             appearance="primary"
@@ -211,7 +231,7 @@ export function CreationDraftPanel({
       ) : null}
       {draft.offered?.state === "active" && !draft.pending ? (
         <>
-          <DraftContentSummary content={draft.offered.content} kind={draft.kind} />
+          <DraftContentSummary content={draft.offered.content} kind={draft.kind} navigation={draft.offered.navigation} />
           <div className="hca-toolbar">
             {resumeHref ? (
               <Link
@@ -242,7 +262,7 @@ export function CreationDraftPanel({
           <div className="grid min-w-0 gap-4 md:grid-cols-2">
             <section className="min-w-0" aria-label="Minha edição">
               <h3>Minha edição</h3>
-              <DraftContentSummary content={current} kind={draft.kind} />
+              <DraftContentSummary content={current} kind={draft.kind} navigation={draft.navigation} />
             </section>
             <section className="min-w-0" aria-label="Versão salva no servidor">
               <h3>Versão salva no servidor</h3>
@@ -256,7 +276,7 @@ export function CreationDraftPanel({
                         "America/Sao_Paulo",
                       )}
                     </p>
-                    <DraftContentSummary content={draft.comparison.content} kind={draft.kind} />
+                    <DraftContentSummary content={draft.comparison.content} kind={draft.kind} navigation={draft.comparison.navigation} />
                   </>
                 ) : (
                   <p>O rascunho foi descartado no servidor.</p>
@@ -333,7 +353,7 @@ export function CreationDraftPanel({
               Você está descartando somente seu preenchimento privado de{" "}
               {saved?.kind} para {patientName}.
             </p>
-            <DraftContentSummary content={saved?.content ?? null} kind={draft.kind} />
+            <DraftContentSummary content={saved?.content ?? null} kind={draft.kind} navigation={saved?.navigation} />
             <Notice>
               Fichas emitidas, arquivos oficiais e seu histórico serão
               preservados.

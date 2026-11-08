@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { draftNavigationSchema } from "./draft-navigation";
+import { navigationAllowed } from "../forms/draft-navigation";
 import { draftPurpose,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
 const id = z.uuid(),
   revision = z.number().int().positive().max(2147483647);
@@ -102,13 +104,14 @@ const scope = {
   expectedRevision: revision.nullable(),
   idempotencyKey: id,
 };
+const navigation = { navigation: draftNavigationSchema.optional() };
 export const creationDraftCommandSchema = z
   .union([
     z
-      .object({...scope,kind:z.enum(["COM","ENT"]),purpose:z.enum(["create","revise"]),action:z.literal("save"),content:supplyDraftContent})
+      .object({...scope,...navigation,kind:z.enum(["COM","ENT"]),purpose:z.enum(["create","revise"]),action:z.literal("save"),content:supplyDraftContent})
       .strict(),
     z
-      .object({...scope,kind:z.literal("ENT"),purpose:z.enum(["receive","divergence"]),action:z.literal("save"),content:receiptDraftContent})
+      .object({...scope,...navigation,kind:z.literal("ENT"),purpose:z.enum(["receive","divergence"]),action:z.literal("save"),content:receiptDraftContent})
       .strict(),
     z
       .object({...scope,kind:z.enum(["COM","ENT"]),purpose:draftPurpose,action:z.enum(["discard","acknowledge"])})
@@ -117,6 +120,7 @@ export const creationDraftCommandSchema = z
       .object({
         ...scope,
         kind: z.literal("REQ"),
+        ...navigation,
         action: z.literal("save"),
         content: requisitionDraftContent,
       })
@@ -125,6 +129,7 @@ export const creationDraftCommandSchema = z
       .object({
         ...scope,
         kind: z.literal("BAL"),
+        ...navigation,
         action: z.literal("save"),
         content: balanceDraftContent,
       })
@@ -138,6 +143,8 @@ export const creationDraftCommandSchema = z
       .strict(),
   ])
   .superRefine((value, ctx) => {
+    if (value.action === "save" && !navigationAllowed(value.kind, "purpose" in value ? value.purpose : "create", value.navigation, value.content))
+      ctx.addIssue({ code: "custom", path: ["navigation"], message: "A etapa salva não corresponde ao formulário de origem. Consulte o rascunho novamente." });
     if ((value.kind==="COM"||value.kind==="ENT")&&((value.purpose==="create")!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise"].includes(value.purpose)))
       ctx.addIssue({code:"custom",path:["targetDocumentId"],message:"Confira a intenção e o alvo deste preenchimento."});
     if ((value.kind==="COM"||value.kind==="ENT")&&value.action==="save"&&"form" in value.content&&value.content.context.documentId!==value.targetDocumentId)

@@ -4,15 +4,24 @@ Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Estado atual: local152/remoto152, zero migrations pendentes após backup válido,
+Estado atual:local153/remoto153, zero pendências após backup, restore/upgrade
+e pré/pós-validação. Rascunhos retomam a etapa salva com resumo em leitura,
+sem mudar hash do conteúdo ou efeitos oficiais. Passaram16 unitários,30 Auth
+e6 cenários de produção Chromium; CI completa do novo SHA é independente.
+Origem tipada reconciliada com seis PASS de CI e fontes inalteradas. Matriz
+42 PASS/51 PARTIAL/12 NOT_STARTED; D-B permanece em execução.
+[Resultados e limites](../audits/D/D-B/DRAFT_NAVIGATION.md).
+
+Estado anterior D4.6: local152/remoto152, zero migrations pendentes após
+backup válido,
 restauração/upgrade, compatibilidade e pré/pós-validação. D4.6 amplia a fidelidade
 técnica de REQ/ENT/BAL/COM, com revisão7 e preservação de intenções e bytes
 antigos. A aparência dos PDFs foi adiada pelo responsável. Passaram16 casos
 unitários distintos, cinco Auth e30 de produção em coortes;14 exemplares reais
 tiveram dados e PAdES-B-T/TSA interna conferidos independentemente. Dezoito
 controles V4/V5/V6 conservam bytes exatos. Isso não representa ICP-Brasil,
-tempo externo, PDF marcado ou homologação física. Matriz40 PASS/51 PARTIAL/
-14 NOT_STARTED; C105/C106 e os demais gates continuam próprios.
+tempo externo, PDF marcado ou homologação física. Matriz da etapa D4.6:
+40 PASS/51 PARTIAL/14 NOT_STARTED; C105/C106 e demais gates continuam próprios.
 [Provas e qualificação da atividade remota](../audits/D/D-B/PDF_FIDELITY.md).
 
 D4.7 acrescenta comparação humana de versões REQ/COM/ENT/BAL, autoria congelada,
@@ -20,8 +29,8 @@ motivo/ressalva em leitura, retorno da seleção pelo acervo e revalidação Aut
 Passaram10 unitários distintos e18 casos de produção em coortes, com falhas
 preservadas. Três arquivos tiveram versão/hash vinculados ao evento exato;
 histórico não altera bytes, eventos ou estoque. Sem migration nova. CI df49881
-terminou8/8 SUCCESS e seu Preview protegido ficou READY; o incremento novo
-exige CI/Preview próprios. [Provas](../audits/D/D-B/DOCUMENT_VERSION_HISTORY.md).
+terminou8/8 SUCCESS. CI8a17202 também passou8/8 e Preview protegido ficou READY;
+o incremento atual exige seus próprios gates. [Provas](../audits/D/D-B/DOCUMENT_VERSION_HISTORY.md).
 
 PWA/Push no Preview protegido tiveram falha física relatada no Samsung S24 Ultra
 e reproduzida com barreira de acesso por cookie. A correção envia credenciais

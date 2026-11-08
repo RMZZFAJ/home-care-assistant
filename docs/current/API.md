@@ -826,6 +826,14 @@ autorizada ou o resultado consumido ainda não reconhecido. POST usa action
 save/discard/acknowledge, id/expectedRevision nulos na criação e a revisão exata
 nas alterações. Conteúdo parcial é tipado por domínio; dono, papel, estado e
 campos arbitrários não são aceitos. Save retorna revisão/instante do servidor.
+Save aceita navigation opcional: objeto estrito com version=1 e stage de uma
+lista fechada compatível com tipo, finalidade e modo do formulário. É metadado
+privado separado de content/contentHash, sem autoridade ou efeito oficial.
+Omitir navigation em um novo save limpa a etapa anterior. Drafts antigos sem
+etapa continuam legíveis e retomam o início; o resumo informa essa ausência.
+A consulta esconde navigation e content quando o rascunho foi consumido.
+Retry conserva o pacote original, inclusive sua etapa, e não a etapa atual
+do navegador. Conferência de ficha, plantão e estoque continua obrigatória.
 DRAFT_VERSION_CONFLICT exige comparação; retry recupera a própria tentativa,
 inclusive quando outra revisão já foi salva, sem adotar essa revisão sozinho.
 

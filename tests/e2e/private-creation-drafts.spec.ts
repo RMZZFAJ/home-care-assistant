@@ -21,6 +21,7 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { balanceSetup } from "../integration/shift-fixtures.mjs";
 
 test.setTimeout(180_000);
 mkdirSync("output/playwright/phase-d", { recursive: true });
@@ -63,6 +64,23 @@ async function observations(page: Page) {
   for (let i = 0; i < 5; i++) await next(page);
 }
 
+test("BAL agendado recupera a revisão em leitura com referências salvas sem novo ato oficial",async({page})=>{
+  const f=await balanceSetup(),before=officialState(f);
+  await login(page,f.patient,f.pro.email);await open(page,"BAL");
+  for(let i=0;i<f.products.length;i++)await page.getByLabel(`Material fictício V4 ${i} · unidade`,{exact:true}).fill("0");
+  await next(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
+  await save(page).click();await expect(panel(page)).toContainText("Revisão 1");
+  const saved=await draftContext(f,"BAL",f.pro.client);
+  expect(saved.navigation).toEqual({version:1,stage:"review"});
+  expect(saved.content.context.mode).toBe("scheduled");
+  await page.reload();
+  await expect(panel(page)).toContainText("Referência de estoque preservada"+saved.content.context.referenceRevision);
+  await expect(panel(page)).toContainText("Etapa do preenchimentoRevisão");
+  await expect(panel(page).getByRole("textbox")).toHaveCount(0);
+  await resume(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
+  expect(officialState(f)).toBe(before);
+});
+
 test("D3 consulta falha pede nova leitura e JSON inválido após save confirmado recupera a mesma intenção", async ({ page }, info) => {
   const f = await privateDraftFixture(), content = reqContent(f);
   await rpc(f.pro, "creation_draft_command", savePacket(f, "REQ", content));
@@ -103,6 +121,13 @@ test("D3 consulta falha pede nova leitura e JSON inválido após save confirmado
   const recovered = await draftContext(f, "REQ");
   expect(recovered.revision).toBe(2);
   expect(recovered.content.observations).toEqual(["Edição mantida após resposta inválida, sem outra emissão"]);
+  expect(recovered.navigation).toEqual({ version: 1, stage: "notes" });
+  await page.reload();
+  await expect(panel(page)).toContainText("Etapa do preenchimentoObservações");
+  await expect(panel(page).getByRole("textbox")).toHaveCount(0);
+  await resume(page);
+  await expect(page.locator('[aria-current="step"]')).toContainText("Observações");
+  await expect(observation).toHaveValue("Edição mantida após resposta inválida, sem outra emissão");
   expect(officialState(f)).toBe(before);
   for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, `d3-request-recovery-${width}`); }
   await page.setViewportSize({ width: 390, height: 900 });
@@ -172,6 +197,7 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
     await page
       .getByLabel("Observação 1", { exact: true })
       .fill("Texto de A salvo na revisão seis");
+    await next(page);
     await save(page).click();
     await expect(panel(page)).toContainText("Revisão 6");
     await second
@@ -211,6 +237,8 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
     });
     await expect(theirs).toContainText("Revisão 6");
     await expect(theirs).toContainText("Texto de A");
+    await expect(theirs).toContainText("Etapa do preenchimentoRevisão");
+    await expect(panel(second).getByRole("region", { name: "Minha edição", exact: true })).toContainText("Etapa do preenchimentoObservações");
     await expect(theirs.getByRole("textbox")).toHaveCount(0);
     for (const width of [320, 390, 768, 1440]) {
       await second.setViewportSize({ width, height: 900 });
@@ -229,6 +257,7 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
     await save(second).click();
     await expect(panel(second)).toContainText("Revisão 7");
     const current = await draftContext(f);
+    expect(current.navigation).toEqual({ version: 1, stage: "notes" });
     expect(current.content.observations).toEqual([
       "Texto próprio de B que precisa sobreviver ao conflito",
     ]);
@@ -300,6 +329,9 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   expect(packets).toHaveLength(2);
   expect(packets[0]).toEqual(packets[1]);
   const saved = await draftContext(f, "BAL");
+  expect(saved.navigation).toEqual({ version: 1, stage: "higiene" });
+  await expect(page.locator('[aria-current="step"]')).toContainText("Higiene");
+  await expect(count).toHaveValue("1,");
   expect(saved.content.counts[f.products[0]]).toBe("1,");
   expect(saved.content.observationTimes).toEqual(balance.observationTimes);
   expect(officialState(f)).toBe(before);
@@ -437,6 +469,7 @@ test("reconto BAL privado retoma em outro aparelho e confirma uma única versão
     p_kind: "BAL",
     p_target: f.document.id,
   });
+  expect(own.navigation).toEqual({ version: 1, stage: "count" });
   const device = await browser.newContext({
     baseURL: new URL(page.url()).origin,
   });

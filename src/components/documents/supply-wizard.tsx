@@ -17,6 +17,7 @@ import {
 } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import {
   CreationDraftPanel,
   BalanceObservationTimes,
@@ -46,14 +47,7 @@ import {
   type DeliveryPreparation,
 } from "@/types/documents";
 
-const steps = [
-  "Identificação",
-  "Medicamentos",
-  "Higiene",
-  "Dieta",
-  "Observações",
-  "Revisão",
-];
+const steps = draftFlowStages.SUPPLY.map(stage => stage.label);
 type SourceRequest = {
   care_recipient_id: string;
   is_historical?: boolean;
@@ -206,6 +200,7 @@ export function PatientSupplyWizard({
     userId: context.userId,
     patientId,
     kind: type,
+    navigation: navigationForStep("SUPPLY", step),
     purpose:type==="BAL"?"create":editing?.id||documentId?"revise":"create",
     targetDocumentId: editing?.id ?? documentId,
     enabled:
@@ -214,7 +209,7 @@ export function PatientSupplyWizard({
       const content = draft.content;
       if(content&&"form" in content){
         if(content.context.documentId!==(editing?.id??null)||content.context.documentVersion!==(editing?.version??null)||content.context.requisitionId!==requisitionId){setError("O contexto deste preenchimento mudou. Abra o alvo original ou compare com a ficha vigente antes de continuar.");return false;}
-        setForm(content.form);setLinks(content.links);setDraftMaterials(content.materials);setStep(0);setError("");setFieldErrors({});return true;
+        setForm(content.form);setLinks(content.links);setDraftMaterials(content.materials);setStep(stepForNavigation("SUPPLY",draft.navigation));setError("");setFieldErrors({});return true;
       }
       if (!content || !("counts" in content)) return false;
       if (
@@ -236,7 +231,7 @@ export function PatientSupplyWizard({
         notes: content.notes,
       }));
       setDraftMaterials(content.materials);
-      setStep(0);
+      setStep(stepForNavigation("SUPPLY",draft.navigation));
       setError("");
       setFieldErrors({});
       return true;

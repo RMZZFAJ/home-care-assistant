@@ -3,6 +3,7 @@ import { useRef,useState } from "react";
 import { Notice,buttonClass } from "@/components/workspace";
 import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { navigationForStep } from "@/lib/forms/draft-navigation";
 import type { ReceiptDraftContent } from "@/lib/validation/supply-drafts";
 import { CommandEditorFields,type CommandEditorProps,type ReceiptDraftHandle } from "./supply-command-fields";
 export type {DocumentAction} from "./supply-command-fields";
@@ -17,6 +18,7 @@ function ReceiptEditor(props:CommandEditorProps&{purpose:"receive"|"divergence"}
   const [baseline,setBaseline]=useState(empty),[comparison,setComparison]=useState(false);
   const [current,setCurrent]=useState(empty);
   const draft=useCreationDraft({userId:props.context.userId,patientId:props.data.care_recipient_id,kind:"ENT",purpose:props.purpose,targetDocumentId:props.data.id,
+    navigation:navigationForStep(props.purpose==="receive"?"RECEIVE":"DIVERGENCE",0),
     onResume:saved=>{if(!saved.content||!("fields" in saved.content))return false;setInitial(saved.content);setBaseline(saved.content);setCurrent(saved.content);setFormRevision(v=>v+1);setError("");return true;},
     onDiscard:()=>{setInitial(undefined);setBaseline(empty);setCurrent(empty);setFormRevision(v=>v+1);setError("");},
   });
