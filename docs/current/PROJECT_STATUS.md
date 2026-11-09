@@ -4,11 +4,12 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação5c4c470: Preview READY; Windows/Ubuntu/banco eios-2 PASS. ios-1
-reprovou sobreposição do sino com a apresentação inicial; demais browsers
-em andamento na consulta. D3.38: cinco preparos privados da regularização,
-33 unitários/API,21 Auth e14 browsers distintos PASS. CI própria obrigatória.
-[Observação](../audits/D/D-B/CI_5C4C470_OBSERVATION.json).
+Observação3109e83: Preview READY e Windows/Ubuntu/banco PASS; browsers em
+andamento na consulta. D3.39 corrige isolamento e reposicionamento do sino,
+com8 cenários distintos aprovados. O guia permanece montado, seu progresso e
+os efeitos oficiais são preservados. CI completa do novo SHA é independente.
+[Observação](../audits/D/D-B/CI_3109E83_OBSERVATION.json),
+[correção](../audits/D/D-B/NOTIFICATION_ISOLATION.md).
 
 Estado atual:local172/remoto172, zero migrations pendentes. Matriz105x39: 56
 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.

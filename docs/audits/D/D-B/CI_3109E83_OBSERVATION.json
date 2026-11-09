@@ -1,0 +1,61 @@
+{
+  "assembledAt": "2026-11-09 17:43:57 UTC",
+  "sha": "3109e833b08a74f89d48168eb8fda4d4afa8e1aa",
+  "runId": 42663704443,
+  "runUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42663704443",
+  "jobs": [
+    {
+      "id": 129321884182,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129321884551,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129321884781,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129332090513,
+      "name": "browser (ios-2)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129332090551,
+      "name": "browser (ios-1)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129332090574,
+      "name": "browser (mobile)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129332090696,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ],
+  "preview": {
+    "state": "READY",
+    "deploymentId": "dpl_C2e6Xmg5uNJTx7p5AbuWRaHYgiEE",
+    "url": "https://home-care-assistant-n2w66nhl5-rmzzfajs-projects.vercel.app"
+  },
+  "snapshotLimit": "States recorded from connector during D3.39;not approval of the next SHA",
+  "priorFailure": "CI_5C4C470_OBSERVATION.json",
+  "limits": [
+    "Sonar deferred;PR7 Draft;no merge or production",
+    "Local regression proof does not replace complete own SHA CI"
+  ]
+}

@@ -2711,3 +2711,31 @@ sem merge/produção,meta ativa. Sem nova aprovação de assinatura,backup,
 monitoramento ou transportes.
 [Dossiê](REGULARIZATION_DRAFTS.md), [provas](REGULARIZATION_DRAFTS_VALIDATION.json),
 [remoto](REGULARIZATION_DRAFTS_REMOTE.json), [CI](CI_5C4C470_OBSERVATION.json).
+
+## D3.39 — foco e posição do sino
+
+Base3109e83. Base UI1.9 exige Close registrado para ativar o gerenciador modal;
+botão comum deixava o onboarding exposto enquanto o painel o sobrepunha.
+Contraprova WebKit reproduzida. Popover.Close substitui o botão, ID duplicado
+retirado, modo trap-focus preservado. Guia continua no DOM e retorna à navegação
+ao fechar, sem mudança de progresso ou ciência. Escape e foco de retorno passam.
+
+Redução768→320 também produziu overflow persistente no Chromium móvel:
+client320/scroll644, escala0,4969; esperar não corrigiu. Posicionamento fixo
+oficial da biblioteca no sino resolve; outro consumidor mantém o padrão.
+Oito identidades PASS:6 do sino (3 motores) e2 do guia (móvel/WebKit). Axe,
+quatro larguras, Tab/Shift+Tab, ID único, consulta sem escrita, histórico,
+abertura explícita do aviso com marcação única, progresso/eventos/estoque
+preservados. Rodadas:1 contraprova falha;8 com7 PASS/1 overflow;1 probe ainda
+falho;6 afetados finais PASS.2 casos do guia inalterados conservados. Tipos/lint
+e duas capturas conferidos. Nenhuma regra removida ou timeout aumentado.
+
+Sem SQL novo. Leitura confirma172 versões e digest igual, zero pendências;
+sem reset, fixtures remotas ou backup redundante. Matriz105x39/primeiras30,
+56 PASS/49 PARTIAL e18 UI preservados. CI3109e83:Windows/Ubuntu/banco PASS,
+browsers em andamento, Preview READY na consulta. CI própria do novo SHA e
+paridade66/171 continuam. Transferências,BAL/REQ contextuais e externos pendentes.
+Sonar adiado, PR7 Draft, sem merge/produção, meta ativa; assinatura,backup e
+monitoramento sem nova aprovação.
+[Dossiê](NOTIFICATION_ISOLATION.md), [provas](NOTIFICATION_ISOLATION_VALIDATION.json),
+[CI](CI_3109E83_OBSERVATION.json).

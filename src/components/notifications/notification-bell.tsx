@@ -33,16 +33,15 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
           <span className="notification-dot">{unread > 9 ? "9+" : unread}</span>
         ) : null}
       </Popover.Trigger>
-      <PopoverPopup id="notification-panel" className="hca-notification-surface" aria-label="Notificações" >
+      <PopoverPopup id="notification-panel" positionMethod="fixed" className="hca-notification-surface" aria-label="Notificações" >
         <section
-          id="notification-panel"
           className="notification-panel"
           aria-label="Notificações recentes"
         >
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-semibold">Notificações</h2>
             {inbox.fresh ? <span className="ui-badge ui-badge-pending">{unread} não vistas</span> : null}
-            <button type="button" className="ui-icon-button" aria-label="Fechar notificações" onClick={() => setOpen(false)}><Icon name="close" /></button>
+            <Popover.Close type="button" className="ui-icon-button" aria-label="Fechar notificações"><Icon name="close" /></Popover.Close>
           </div>
           {inbox.scopeRequired ? <p className="py-5 text-sm">Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.</p> : null}
           {inbox.paused ? <p role="status">Atualizando vínculo…</p> : null}
