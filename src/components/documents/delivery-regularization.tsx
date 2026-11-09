@@ -1,4 +1,5 @@
 "use client";
+import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useId, useRef, useState } from "react";
@@ -229,29 +230,31 @@ function PersonChoice({
         aria-describedby={error ? id + "-error" : undefined}
         placeholder="Busque e selecione uma pessoa"
         triggerLabel={"Abrir opções de " + label.toLocaleLowerCase("pt-BR")}
-        onQueryChange={queryValue => {
+        onQueryChange={(queryValue) => {
           setSearch(queryValue);
           onChange("");
         }}
-        onSelectionChange={nextIds => {
+        onSelectionChange={(nextIds) => {
           if (people.some((p) => p.id === nextIds[0])) {
             onChange(nextIds[0]!);
             setSearch(null);
           }
         }}
-        options={(people
-          .filter(
-            (p) =>
-              !search ||
-              p.name
-                .toLocaleLowerCase("pt-BR")
-                .includes(search.toLocaleLowerCase("pt-BR")),
-          )
-          .map((p) => (
-            ({ value: p.id, label: p.name, content: <>
-              {p.name}
-            </> })
-          ))) ?? []}
+        options={
+          people
+            .filter(
+              (p) =>
+                !search ||
+                p.name
+                  .toLocaleLowerCase("pt-BR")
+                  .includes(search.toLocaleLowerCase("pt-BR")),
+            )
+            .map((p) => ({
+              value: p.id,
+              label: p.name,
+              content: <>{p.name}</>,
+            })) ?? []
+        }
       />
       {error ? (
         <p id={id + "-error"} className="ui-field-error">
@@ -438,6 +441,14 @@ function RegularizationEditor({
   const intentRef = useRef<Packet | null>(null),
     formRef = useRef<HTMLFormElement>(null),
     reviewRef = useRef<HTMLHeadingElement>(null);
+  const [focusRevision, setFocusRevision] = useState(0);
+  useEffect(() => {
+    if (!focusRevision) return;
+    const frame = requestAnimationFrame(() =>
+      formRef.current?.querySelector<HTMLElement>("textarea,input")?.focus(),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [focusRevision]);
   const formId = useId(),
     details = reference.deliveryRegularization!;
   const current = details.cases.find((c) => c.id === details.currentId);
@@ -451,8 +462,8 @@ function RegularizationEditor({
       )?.quantityDecimals;
     const valid = Boolean(
       e &&
-      decimals != null &&
-      amounts.every(([key]) => validQuantity(e[key], decimals, true)),
+        decimals != null &&
+        amounts.every(([key]) => validQuantity(e[key], decimals, true)),
     );
     const unknown = valid
       ? remaining(l)
@@ -683,18 +694,15 @@ function RegularizationEditor({
             </p>
             {canAdopt ? (
               <ActionButton
-                onClick={() => {
+                onClick={(event) => {
+                  holdDialogFocus(event.currentTarget);
                   setReference(comparison);
                   setComparison(null);
                   setBlocked(false);
                   setReview(false);
                   intentRef.current = null;
                   setErrors({});
-                  requestAnimationFrame(() =>
-                    formRef.current
-                      ?.querySelector<HTMLElement>("textarea,input")
-                      ?.focus(),
-                  );
+                  setFocusRevision((value) => value + 1);
                 }}
               >
                 Usar referência atual
@@ -934,14 +942,11 @@ function RegularizationEditor({
           {review && !uncertain ? (
             <ActionButton
               disabled={busy}
-              onClick={() => {
+              onClick={(event) => {
+                holdDialogFocus(event.currentTarget);
                 setReview(false);
                 intentRef.current = null;
-                requestAnimationFrame(() =>
-                  formRef.current
-                    ?.querySelector<HTMLElement>("textarea")
-                    ?.focus(),
-                );
+                setFocusRevision((value) => value + 1);
               }}
             >
               Editar meus campos

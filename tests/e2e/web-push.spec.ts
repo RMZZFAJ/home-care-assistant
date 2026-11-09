@@ -206,6 +206,7 @@ test("Web Push liga consentimento real de API, evento interno, worker controlado
   ).toBeVisible();
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(() => window.scrollTo(0, 0));
     await audit(page, "push-profile");
   }
   mkdirSync("output/playwright/phase-d", { recursive: true });

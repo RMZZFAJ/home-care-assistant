@@ -1,9 +1,18 @@
 "use client";
-import { ActionButton, FormField, LoadingIndicator, Pill, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
+import { holdDialogFocus } from "@/lib/forms/dialog-focus";
+import {
+  ActionButton,
+  FormField,
+  LoadingIndicator,
+  Pill,
+  SelectField,
+  TextAreaField,
+  TextInput,
+} from "@/components/ui/controls";
 import { useEffect, useRef, useState } from "react";
-import {useSearchParams} from "next/navigation";
-import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
-import {NotificationReference} from "@/components/notifications/notification-reference";
+import { useSearchParams } from "next/navigation";
+import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
+import { NotificationReference } from "@/components/notifications/notification-reference";
 
 import {
   api,
@@ -37,7 +46,7 @@ const stateLabels: Record<string, string> = {
   rejected: "Recusado",
   obsolete: "Obsoleto",
 };
-import {scheduleEventLabel} from "@/lib/schedules/presentation";
+import { scheduleEventLabel } from "@/lib/schedules/presentation";
 export function ScheduleConsole() {
   return (
     <Workspace title="Escalas e plantões">
@@ -59,12 +68,28 @@ function Agenda({ context }: { context: WorkspaceContext }) {
   const patient = context.patient!,
     team = can(context, "schedule.manage.team"),
     publishOwn = can(context, "schedule.manage.own");
-  const params=useSearchParams(),reference=params.get("ref"),notice=useNotificationReference(patient.id,"schedule",reference,params.get("refKind")??"auto");
-  const [fallbackDay]=useState(today),[chosenDay,setChosenDay]=useState<{reference:string|null;day:string}|null>(null);
-  const day=chosenDay?.reference===reference?chosenDay.day:notice.data?.kind==="schedule"?notice.data.referenceDay:fallbackDay;
-  const setDay=(value:string)=>setChosenDay({reference,day:value});
+  const params = useSearchParams(),
+    reference = params.get("ref"),
+    notice = useNotificationReference(
+      patient.id,
+      "schedule",
+      reference,
+      params.get("refKind") ?? "auto",
+    );
+  const [fallbackDay] = useState(today),
+    [chosenDay, setChosenDay] = useState<{
+      reference: string | null;
+      day: string;
+    } | null>(null);
+  const day =
+    chosenDay?.reference === reference
+      ? chosenDay.day
+      : notice.data?.kind === "schedule"
+        ? notice.data.referenceDay
+        : fallbackDay;
+  const setDay = (value: string) => setChosenDay({ reference, day: value });
   const [mode, setMode] = useState<"week" | "month">("week");
-  const [detailsOpen,setDetailsOpen]=useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [person, setPerson] = useState(""),
     [status, setStatus] = useState(""),
     [attempt, setAttempt] = useState(0);
@@ -87,11 +112,16 @@ function Agenda({ context }: { context: WorkspaceContext }) {
   const pendingRef = useRef<object | null>(null);
   const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const reviewOpen = Boolean(review);
+  const previousReviewOpenRef = useRef(false);
   useEffect(() => {
-    if (!reviewOpen) return;
-    const frame = requestAnimationFrame(() =>
-      reviewHeadingRef.current?.focus(),
-    );
+    const returnToForm = previousReviewOpenRef.current && !reviewOpen;
+    previousReviewOpenRef.current = reviewOpen;
+    if (!reviewOpen && !returnToForm) return;
+    // Queue after the DOM commit so the dialog's removed-control recovery runs first.
+    const frame = requestAnimationFrame(() => {
+      if (reviewOpen) reviewHeadingRef.current?.focus();
+      else document.getElementById("schedule-review-button")?.focus();
+    });
     return () => cancelAnimationFrame(frame);
   }, [reviewOpen]);
   const live = useLiveRevision(),
@@ -214,10 +244,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
     >
       <div className="hca-toolbar">
         <strong>{shift.type_name}</strong>
-        <Pill
-
-          tone={shift.status === "published" ? "accent" : "neutral"}
-        >
+        <Pill tone={shift.status === "published" ? "accent" : "neutral"}>
           {stateLabels[shift.status]}
         </Pill>
       </div>
@@ -424,11 +451,9 @@ function Agenda({ context }: { context: WorkspaceContext }) {
       <div className="hca-toolbar hca-schedule-decision-actions">
         <ActionButton
           disabled={busy || uncertain}
-          onClick={() => {
+          onClick={(event) => {
+            holdDialogFocus(event.currentTarget);
             setReview(null);
-            requestAnimationFrame(() =>
-              document.getElementById("schedule-review-button")?.focus(),
-            );
           }}
         >
           Voltar
@@ -452,7 +477,11 @@ function Agenda({ context }: { context: WorkspaceContext }) {
   ) : null;
   return (
     <div className="hca-form-stack hca-schedule-agenda">
-      <NotificationReference key={patient.id+":"+reference} read={notice} context={context}/>
+      <NotificationReference
+        key={patient.id + ":" + reference}
+        read={notice}
+        context={context}
+      />
       <div className="hca-command-bar">
         {team || publishOwn || can(context, "schedule.propose") ? (
           <ActionButton
@@ -544,13 +573,16 @@ function Agenda({ context }: { context: WorkspaceContext }) {
           {mode === "month" ? "Próximo mês" : "Próxima semana"}
         </ActionButton>
       </div>
-      <ActionButton aria-disabled={loading} onClick={() => { if (!loading) setAttempt(value => value + 1); }}>Atualizar escala</ActionButton>
+      <ActionButton
+        aria-disabled={loading}
+        onClick={() => {
+          if (!loading) setAttempt((value) => value + 1);
+        }}
+      >
+        Atualizar escala
+      </ActionButton>
       {loading ? <LoadingIndicator label="Carregando escala" /> : null}
-      {!loading && query.error ? (
-        <Notice error>
-          {query.error}
-        </Notice>
-      ) : null}
+      {!loading && query.error ? <Notice error>{query.error}</Notice> : null}
       {!loading && currentData && !query.error ? (
         <>
           <p className="hca-muted">
@@ -659,8 +691,15 @@ function Agenda({ context }: { context: WorkspaceContext }) {
               ) : null}
             </section>
           ) : null}
-            <details className="ui-card" open={detailsOpen}>
-              <summary onClick={event=>{event.preventDefault();setDetailsOpen(current=>!current);}}>Tipos e programações</summary>
+          <details className="ui-card" open={detailsOpen}>
+            <summary
+              onClick={(event) => {
+                event.preventDefault();
+                setDetailsOpen((current) => !current);
+              }}
+            >
+              Tipos e programações
+            </summary>
             {currentData.types.map((type) => (
               <div className="hca-record" key={type.id}>
                 <strong>

@@ -101,7 +101,26 @@ test("COM conflito compara a expectativa atual, preserva o motivo e exige nova c
   await expect(page.getByRole("button", { name: "Consultar versão atual da COM", exact: true })).toBeVisible();
   await expect(form.getByRole("textbox", { name: "Motivo / justificativa", exact: true })).toHaveValue("Motivo fictício preservado depois da mudança de versão.");
   expect(Number((await rpc(f.admin, "operational_document", { p_id: document.id })).lines[0].waived_quantity)).toBe(0);
+  let historyFault = 403;
+  await page.route(`**/api/documents/${document.id}/history?**`, async route => {
+    const query = new URL(route.request().url()).searchParams;
+    expect(query.get("before")).toBe(String(document.version));
+    expect(query.get("version")).toBe(String(newer.version));
+    if (historyFault) return route.fulfill({ status: historyFault, contentType: "application/json", body: JSON.stringify(historyFault === 200 ? { data: {} } : { code: "FORBIDDEN", error: "Referência fictícia recusada" }) });
+    return route.continue();
+  });
   await page.getByRole("button", { name: "Consultar versão atual da COM", exact: true }).click();
+  const facts = page.getByRole("region", { name: "Fatos oficiais das referências da operação", exact: true });
+  const adopt = page.getByRole("button", { name: "Usar versão atual e revisar novamente", exact: true });
+  for (const next of [200, 0]) {
+    await expect(facts.getByRole("alert")).toContainText("Não foi possível conferir as referências oficiais");
+    await expect(facts.getByRole("article")).toHaveCount(0);
+    await expect(adopt).toBeDisabled();
+    await expect(form.getByRole("textbox", { name: "Motivo / justificativa", exact: true })).toHaveValue("Motivo fictício preservado depois da mudança de versão.");
+    historyFault = next;
+    await facts.getByRole("button", { name: "Consultar novamente as referências da operação", exact: true }).click();
+  }
+  await expect(facts.getByRole("article", { name: `Conteúdo preservado da versão ${newer.version}`, exact: true })).toBeVisible();
   const comparison = page.getByRole("region", { name: "Comparar versões da COM", exact: true });
   await expect(comparison.getByText("8 unidade → 7 unidade", { exact: true })).toBeVisible(); await expect(comparison.locator("input,textarea,select")).toHaveCount(0);
   await page.getByRole("button", { name: "Usar versão atual e revisar novamente", exact: true }).click();

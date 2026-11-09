@@ -2615,3 +2615,33 @@ paridade66/171, regressões CI e gates D-C/D6/humano/AT/aparelhos/provedores
 continuam. Sonar adiado, PR7 Draft, produção NO-GO e meta ativa.
 [Dossiê](ENT_OPERATION_DRAFTS.md), [provas](ENT_OPERATION_DRAFTS_VALIDATION.json),
 [remoto](ENT_OPERATION_DRAFTS_REMOTE.json).
+
+## D3.36 — consumidores, referência COM e foco — 09/11/2026
+
+Base27d2a06. Corrida comprovada por chamadas/eventos: o destino recebia foco e
+Base UI o substituía pelo popup no mesmo quadro. Efeito após commit sozinho
+não resolveu. Helper compartilhado mantém foco no diálogo antes de remover o
+controle e depois o transfere ao destino. Regularização, retorno da revisão
+de escala e nova consulta de origem passam em Chromium móvel e WebKit/iOS.
+
+COM adota explicitamente duas versões oficiais e atualiza a referência privada
+da mesma ficha/paciente/propósito.403/200 inválido bloqueiam adoção e ocultam
+fatos, conservando o motivo. Contraprova real de motivo perdido: FormData omite
+campos desabilitados durante o conflito; a adoção preserva a última captura viva
+e limpa a confirmação. CAS, confirmação nova e estoque permanecem protegidos.
+Consumidores seguem abas reais, marcos/metadados/título inequívocos; troca de
+paciente sai antes da ficha anterior. BAL mantém todos os GETs da barreira.
+
+20 browsers distintos PASS:16 móveis Chromium e4 WebKit. Rodadas14(6/8),16(13/3),
+4(2/2) e8(8/0), com reuso por consumidor/fonte, sem inflar contagem. Tipos, lint,
+Markdown, links,84 hashes históricos e primeiras30 colunas preservados. Fontes
+congeladas por runner, sem suíte mutável de banco paralela. Sem SQL novo:
+169 versões reconciliadas, sem nova operação remota redundante. CI27d2a06
+Windows/Ubuntu/banco PASS, Preview READY; browsers pendentes na observação.
+Novo SHA precisa de CI própria completa, sem aprovação por resultado anterior.
+
+Matriz105x39,56 PASS/49 PARTIAL e UI18 mantidos. Demais formulários contextuais,
+paridade66/171, CI e gates D-C/D6/humano/AT/aparelhos/provedores continuam.
+Sonar adiado, PR7 Draft, sem merge/produção, meta ativa.
+[Dossiê](CONSUMER_REGRESSIONS.md), [provas](CONSUMER_REGRESSIONS_VALIDATION.json),
+[CI observada](CI_27D2A06_OBSERVATION.json).

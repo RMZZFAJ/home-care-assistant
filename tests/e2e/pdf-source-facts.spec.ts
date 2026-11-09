@@ -41,9 +41,10 @@ test("PDF atual assina fatos de rascunho e origens físicas conhecida e desconhe
     ["historical-null", unknown],
     ["historical-known", known],
   ] as const) {
-    await page.goto(`/historico/${f.doc.id}`);
-  await selectDocumentSection(page, "files");
+    await page.goto("/historico");
     await selectContext(page, f.patient);
+    await page.goto(`/historico/${f.doc.id}`);
+    await selectDocumentSection(page, "files");
     const files = page.getByRole("region", {
       name: "Arquivos gerados",
       exact: true,

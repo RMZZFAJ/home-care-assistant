@@ -1,3 +1,4 @@
+import { startFocusProbe, attachFocusProbe } from "./focus-diagnostics";
 import { test, expect, type Page, type Locator } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import {
@@ -113,6 +114,7 @@ async function chunks(page: Page, patient: string): Promise<ScheduledShift[]> {
 test("doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07", async ({
   page,
 }, info) => {
+  await startFocusProbe(page);
   const f = await selectedDatesFixture();
   await conflictingOtherPatient(f);
   const before = datesState(f);
@@ -201,9 +203,16 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await review(page)
     .getByRole("button", { name: "Voltar", exact: true })
     .click();
-  await expect(
-    edit(page).getByRole("button", { name: "Revisar alteração", exact: true }),
-  ).toBeFocused();
+  try {
+    await expect(
+      edit(page).getByRole("button", {
+        name: "Revisar alteração",
+        exact: true,
+      }),
+    ).toBeFocused();
+  } finally {
+    await attachFocusProbe(page);
+  }
   await expect(
     edit(page).getByText("12 datas selecionadas", { exact: true }),
   ).toBeVisible();
@@ -322,10 +331,18 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
   );
   await page.getByText("Tipos e programações", { exact: true }).click();
   // A live refresh used to unmount this disclosure and lose its open state.
-  const refreshed=page.waitForResponse(response=>new URL(response.url()).pathname==="/api/schedules");
-  await page.evaluate(()=>window.dispatchEvent(new Event("hca:data-changed")));
+  const refreshed = page.waitForResponse(
+    (response) => new URL(response.url()).pathname === "/api/schedules",
+  );
+  await page.evaluate(() =>
+    window.dispatchEvent(new Event("hca:data-changed")),
+  );
   await (await refreshed).finished();
-  await expect(page.locator("details").filter({has:page.locator("summary",{hasText:"Tipos e programações"})})).toHaveAttribute("open","");
+  await expect(
+    page.locator("details").filter({
+      has: page.locator("summary", { hasText: "Tipos e programações" }),
+    }),
+  ).toHaveAttribute("open", "");
   await page
     .getByRole("button", { name: "Encerrar série", exact: true })
     .click();

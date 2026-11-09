@@ -1,3 +1,4 @@
+import { startFocusProbe, attachFocusProbe } from "./focus-diagnostics";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -444,6 +445,7 @@ test("C043 caixa padrão oferece decisão pessoal de cancelamento e remove a tar
 test("P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual", async ({
   page,
 }) => {
+  await startFocusProbe(page);
   const f = await unavailableDelivery();
   f.document = await unknownCase(f, fixtures.adminA.id);
   await login(page, f.patient, "adminA");
@@ -506,9 +508,13 @@ test("P05 conflito preserva campos próprios e só permite nova proposta após c
   await page
     .getByRole("button", { name: "Usar referência atual", exact: true })
     .click();
-  await expect(
-    page.getByLabel("Sua justificativa", { exact: true }),
-  ).toBeFocused();
+  try {
+    await expect(
+      page.getByLabel("Sua justificativa", { exact: true }),
+    ).toBeFocused();
+  } finally {
+    await attachFocusProbe(page);
+  }
   await expect(
     page.getByLabel("Devolução física apurada · Material fictício V4 0", {
       exact: true,

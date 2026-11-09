@@ -23,6 +23,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
   confirmação preservada, comparação autorizada e migrations167/168.
 - [Preenchimentos privados ENT](ENT_OPERATION_DRAFTS.md): cinco decisões,
   referência exata, autoridade pessoal e migration169 reconciliada.
+- [Regressões dos consumidores e foco](CONSUMER_REGRESSIONS.md): adoção COM
+  integrada ao preenchimento, foco estável e20 casos dirigidos.
 - [Nova aparência canônica](../../../ui-ux/CANONICAL_MODEL.md) e
   [execução adicional UI](UI_MODEL_ACCEPTANCE.csv):migração integral em andamento.
 - [Roteiro técnico GUI-04 e recuperação de leitura](RECOVERY_RUNBOOK.md).

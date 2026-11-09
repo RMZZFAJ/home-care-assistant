@@ -1,3 +1,4 @@
+import { startFocusProbe, attachFocusProbe } from "./focus-diagnostics";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -36,6 +37,7 @@ const sourceUrl = (
 test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos", async ({
   page,
 }, info) => {
+  await startFocusProbe(page);
   const f = await stockOriginFixture(),
     before = stockOriginState(f);
   await login(page, f.patient);
@@ -106,12 +108,16 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
   await expect(exact).toBeVisible();
   await expect(exact).toContainText("3 unidade");
   await expect(exact).not.toContainText("2 unidade");
-  await expect(
-    drawer(page).getByRole("heading", {
-      name: "Movimento consultado",
-      exact: true,
-    }),
-  ).toBeFocused();
+  try {
+    await expect(
+      drawer(page).getByRole("heading", {
+        name: "Movimento consultado",
+        exact: true,
+      }),
+    ).toBeFocused();
+  } finally {
+    await attachFocusProbe(page);
+  }
   await page.keyboard.press("Tab");
   await expect(drawer(page).locator(":focus")).toBeVisible();
   for (const width of [320, 390, 768, 1440]) {

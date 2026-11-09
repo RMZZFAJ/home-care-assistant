@@ -4,12 +4,11 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação56b445e: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
-cadeia limpa, evolução legada e integração. Browsers têm falhas de consumidores
-das abas, seletores, foco e auditoria em posição rolada; correção em andamento.
-Não há aprovação global da CI. Novo SHA exige validação própria. A observação
-anterior de allowlist permanece em
-[evidência histórica](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
+Observação27d2a06: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
+cadeia limpa, evolução legada e integração. Browsers em andamento na consulta.
+D3.36 corrigiu regressões de consumidores, adoção COM e foco, com20 cenários
+dirigidos aprovados; novo SHA exige CI completa própria. Não há aprovação global.
+[Observação](../audits/D/D-B/CI_27D2A06_OBSERVATION.json).
 
 Estado atual:local169/remoto169, zero migrations pendentes. Matriz105x39: 56
 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
@@ -49,6 +48,7 @@ aparência.
 [Rascunhos das operações COM](../audits/D/D-B/COM_ACTION_DRAFTS.md).
 [Decisões COM e referências oficiais](../audits/D/D-B/COM_DECISION_DRAFTS.md).
 [Preenchimentos privados ENT](../audits/D/D-B/ENT_OPERATION_DRAFTS.md).
+[Regressões dos consumidores e foco](../audits/D/D-B/CONSUMER_REGRESSIONS.md).
 
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das

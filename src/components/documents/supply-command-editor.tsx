@@ -1,5 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
+import { useImperativeHandle, useRef, useState, type RefObject } from "react";
+import type { SupplyDocument } from "@/types/documents";
 import { Notice, buttonClass } from "@/components/workspace";
 import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
@@ -21,7 +22,13 @@ import {
 export type { DocumentAction } from "./supply-command-fields";
 
 type OperationPurpose = EntOperationPurpose | ComOperationPurpose;
-export function CommandEditor(props: CommandEditorProps) {
+export type OperationReferenceHandle = {
+  adoptClosingReference: (official: SupplyDocument) => boolean;
+};
+type OperationEditorProps = CommandEditorProps & {
+  referenceAdoptionRef?: RefObject<OperationReferenceHandle | null>;
+};
+export function CommandEditor(props: OperationEditorProps) {
   const purpose = props.action;
   if (
     (props.data.type === "ENT" && isEntOperationPurpose(purpose)) ||
@@ -38,7 +45,7 @@ export function CommandEditor(props: CommandEditorProps) {
   return <CommandEditorFields {...props} />;
 }
 function PrivateOperationEditor(
-  props: CommandEditorProps & {
+  props: OperationEditorProps & {
     kind: "COM" | "ENT";
     purpose: OperationPurpose;
   },
@@ -104,6 +111,42 @@ function PrivateOperationEditor(
       materials: baseline.materials,
     };
   };
+  useImperativeHandle(props.referenceAdoptionRef, () => ({
+    adoptClosingReference(official) {
+      if (
+        props.kind !== "COM" ||
+        props.purpose !== "close_expectation" ||
+        official.type !== "COM" ||
+        official.id !== props.data.id ||
+        official.care_recipient_id !== props.data.care_recipient_id ||
+        official.version <= baseline.documentVersion ||
+        draft.blocked
+      )
+        return false;
+      // Called only by the explicit adoption of authorized, frozen comparison facts.
+      const content = snapshot();
+      restore({
+        ...content,
+        documentVersion: official.version,
+        // FormData omits controls disabled by the conflict. Keep the last live
+        // private reason capture, while always clearing the old acknowledgement.
+        fields: {
+          ...content.fields,
+          reason: current.fields.reason ?? baseline.fields.reason ?? "",
+          confirmed: "",
+        },
+        materials: official.lines.map((line) => ({
+          id: line.id,
+          name: line.name_snapshot,
+          unit: line.unit_snapshot,
+          quantityDecimals: 0,
+        })),
+      });
+      setConfirmationReset(true);
+      setComparison(false);
+      return true;
+    },
+  }));
   const stale = baseline.documentVersion !== props.data.version;
   const currentIds = new Set(props.data.lines.map((line) => line.id));
   const removedValues = com

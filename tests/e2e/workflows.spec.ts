@@ -282,7 +282,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await page.getByLabel("Efetivamente recebido").fill("6");
   await confirm(page);
   await expect(
-    page.getByText("0/1 linhas integralmente conferidas", { exact: true }),
+    page.getByRole("list", { name: "Marcos da ficha", exact: true }).getByText("0/1 linhas integralmente conferidas", { exact: true }),
   ).toBeVisible();
   stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
@@ -446,7 +446,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
   await editor.getByLabel("Efetivamente recebido").nth(1).fill("0");
   await confirm(page);
   await expect(
-    page.getByText("8/10 linhas integralmente conferidas", { exact: true }),
+    page.getByRole("list", { name: "Marcos da ficha", exact: true }).getByText("8/10 linhas integralmente conferidas", { exact: true }),
   ).toBeVisible();
   expect(
     (await get(page, "/api/documents/" + first.data.id)).ok(),
@@ -578,7 +578,7 @@ test("histórico filtra código e período e conserva o documento de paciente re
   ).toBeVisible();
   await page.getByRole("link").filter({ hasText: "REQ-0001" }).click();
   await expect(
-    page.locator("p").filter({ hasText: "Paciente: " + req.recipientName }),
+    page.getByRole("region", { name: "Resumo da ficha", exact: true }).getByText(req.recipientName, { exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText("Observação original", { exact: true }),
@@ -728,7 +728,6 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
   let interceptRead = true;
   await page.route("**/api/documents/" + bal.id, async (route) => {
     if (interceptRead && route.request().method() === "GET") {
-      interceptRead = false;
       observedRead.resolve();
       await heldRead.promise;
     }
@@ -739,7 +738,7 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
     .click();
   await observedRead.promise;
   try {
-    await openDocumentMore(page);
+    // The pending read may expose no header yet; all matching reads stay held.
     await expect(
       page.getByRole("button", {
         name: "Solicitar cancelamento",
@@ -747,8 +746,8 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
         disabled: false,
       }),
     ).toHaveCount(0);
-    await closeDocumentMore(page);
   } finally {
+    interceptRead = false;
     heldRead.resolve();
   }
   await openDocumentMore(page);
@@ -804,6 +803,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await page.goto(
     "/historico/" + extra.requisitionId + "?careRecipientId=" + patient,
   );
+  await selectDocumentSection(page, "materials");
   await page
     .getByRole("combobox", { name: "Produto correspondente", exact: true })
     .selectOption(product.id);

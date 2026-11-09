@@ -1,4 +1,5 @@
 "use client";
+import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useRef, type RefObject } from "react";
@@ -252,8 +253,11 @@ export function MovementOrigin({
       !source.error &&
       focusResultRef.current
     ) {
-      focusResultRef.current = false;
-      resultHeadingRef.current?.focus();
+      const frame = requestAnimationFrame(() => {
+        focusResultRef.current = false;
+        resultHeadingRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(frame);
     }
   }, [source.loading, source.data, source.error]);
   return (
@@ -272,7 +276,8 @@ export function MovementOrigin({
           <Notice error>
             {source.error}
             <ActionButton
-              onClick={() => {
+              onClick={(event) => {
+                holdDialogFocus(event.currentTarget);
                 focusResultRef.current = true;
                 source.refresh();
               }}

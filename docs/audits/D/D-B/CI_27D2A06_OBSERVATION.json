@@ -1,0 +1,54 @@
+{
+  "sha": "27d2a06844f87ee685d1aa3801ccb6c6c290737b",
+  "runId": 42635697064,
+  "jobs": [
+    {
+      "id": 129223133658,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129223134101,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129223134620,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129231866424,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129231866539,
+      "name": "browser (mobile)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129231866634,
+      "name": "browser (ios-2)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129231866748,
+      "name": "browser (ios-1)",
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ],
+  "preview": {
+    "id": "dpl_Exg928MoVJmp2jFnrb4jF1zJeM3C",
+    "state": "READY",
+    "url": "home-care-assistant-8nxictr57-rmzzfajs-projects.vercel.app"
+  },
+  "scope": "Point-in-time prior SHA observation during D3.36; browser pending is not approval of this or the next SHA"
+}

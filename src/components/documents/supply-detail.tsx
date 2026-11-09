@@ -31,7 +31,12 @@ import {
 import { Dialog } from "@/components/ui/primitives";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { Attachments } from "./attachments";
-import { CommandEditor, type DocumentAction } from "./supply-command-editor";
+import {
+  CommandEditor,
+  type DocumentAction,
+  type OperationReferenceHandle,
+} from "./supply-command-editor";
+import { DraftReferenceComparison } from "./draft-reference-comparison";
 import { type PatientPerson, type SupplyDocument } from "@/types/documents";
 import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -108,6 +113,7 @@ export function SupplyDocumentContent({
   const [focusRevision, setFocusRevision] = useState(0);
   const [comparison, setComparison] = useState<SupplyDocument | null>(null);
   const commandFormRef = useRef<HTMLFormElement | null>(null);
+  const referenceAdoptionRef = useRef<OperationReferenceHandle | null>(null);
   const decisionFocusRef = useRef(false);
   const moreTriggerRef = useRef<HTMLButtonElement>(null);
   const operationOpenerRef = useRef<HTMLButtonElement | null>(null);
@@ -542,23 +548,42 @@ export function SupplyDocumentContent({
                 original={data}
                 current={comparison}
               />
-              <button
-                type="button"
-                className={primaryClass}
-                disabled={busy || !comparison.purchaseProgress}
-                onClick={() => {
-                  decisionFocusRef.current = true;
-                  setData(comparison);
-                  setComparison(null);
-                  setPurchaseConflict(false);
-                  setReview(null);
-                  setMessage(
-                    "Versão atual carregada. Confira os valores preservados e prepare uma nova revisão. O encerramento exige nova concordância com o resumo.",
-                  );
-                }}
+              <DraftReferenceComparison
+                id={data.id}
+                fromVersion={data.version}
+                toVersion={comparison.version}
               >
-                Usar versão atual e revisar novamente
-              </button>
+                {(ready) => (
+                  <button
+                    type="button"
+                    className={primaryClass}
+                    disabled={busy || !ready || !comparison.purchaseProgress}
+                    onClick={() => {
+                      if (
+                        action === "close_expectation" &&
+                        !referenceAdoptionRef.current?.adoptClosingReference(
+                          comparison,
+                        )
+                      ) {
+                        setError(
+                          "Não foi possível atualizar a referência do preenchimento. Consulte as versões novamente.",
+                        );
+                        return;
+                      }
+                      decisionFocusRef.current = true;
+                      setData(comparison);
+                      setComparison(null);
+                      setPurchaseConflict(false);
+                      setReview(null);
+                      setMessage(
+                        "Versão atual carregada. Confira os valores preservados e prepare uma nova revisão. O encerramento exige nova concordância com o resumo.",
+                      );
+                    }}
+                  >
+                    Usar versão atual e revisar novamente
+                  </button>
+                )}
+              </DraftReferenceComparison>
             </>
           ) : (
             <button
@@ -969,6 +994,7 @@ export function SupplyDocumentContent({
                   {action ? (
                     <CommandEditor
                       key={data.id + action}
+                      referenceAdoptionRef={referenceAdoptionRef}
                       action={action}
                       data={data}
                       people={people.filter(
