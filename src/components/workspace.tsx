@@ -1,13 +1,14 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { FeedbackBanner } from "@/components/ui/feedback";
 export type { PatientContext, WorkspaceContext } from "@/types/workspace";
 export { api, ApiError, errorMessage } from "@/lib/client/api";
 export { can, may } from "@/lib/client/capabilities";
 
-export const inputClass = "ui-input";
-export const buttonClass = "ui-button ui-button-secondary";
-export const primaryClass = "ui-button ui-button-primary";
+export const inputClass = "hca-text-input";
+export const buttonClass = "hca-control hca-control--secondary";
+export const primaryClass = "hca-control hca-control--primary";
 export const panelClass = "ui-card";
 
 export function Notice({
@@ -18,12 +19,9 @@ export function Notice({
   error?: boolean;
 }) {
   return (
-    <div
-      role={error ? "alert" : "status"}
-      className={"ui-notice " + (error ? "ui-notice-error" : "")}
-    >
+    <FeedbackBanner tone={error ? "error" : "info"}>
       {children}
-    </div>
+    </FeedbackBanner>
   );
 }
 

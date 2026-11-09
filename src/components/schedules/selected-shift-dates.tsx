@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useState } from "react";
-import { Button } from "@fluentui/react-components";
+
 import { Notice } from "@/components/workspace";
 
 export const selectedDayLabel = (value: string) =>
@@ -46,20 +47,20 @@ export function SelectedShiftDates({
     >
       <h3>{label}</h3>
       <div className="hca-toolbar">
-        <Button
+        <ActionButton
           type="button"
           aria-label="Mês anterior das datas"
           onClick={() => move(-1)}
         >
           Anterior
-        </Button>
-        <Button
+        </ActionButton>
+        <ActionButton
           type="button"
           aria-label="Próximo mês das datas"
           onClick={() => move(1)}
         >
           Próximo
-        </Button>
+        </ActionButton>
       </div>
       <p>
         Selecione os dias desejados. Trocar o mês conserva a seleção e o horário
@@ -107,14 +108,14 @@ export function SelectedShiftDates({
       ) : null}
       <div className="hca-toolbar" aria-label="Datas escolhidas">
         {selected.map((date) => (
-          <Button
+          <ActionButton
             key={date}
             type="button"
             aria-label={"Remover data " + selectedDayLabel(date)}
             onClick={() => toggle(date)}
           >
             {selectedDayLabel(date)} ×
-          </Button>
+          </ActionButton>
         ))}
       </div>
     </section>

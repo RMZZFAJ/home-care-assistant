@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useEffect,useRef,useState } from "react";
-import { Button,Combobox,Option } from "@fluentui/react-components";
+import { Combobox, Option } from "@fluentui/react-components";
 import { api,ApiError } from "@/lib/client/api";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { Notice,inputClass } from "@/components/workspace";
@@ -74,19 +75,19 @@ export function RecurringSelection({userId,patientId,catalogue,lines,disabled,ca
   const eligible=(id:string)=>catalogue.find(item=>item.id===id&&item.active!==false&&item.is_active!==false);
   const applicable=checked.filter(id=>eligible(id)&&!lines.some(line=>line.productId===id));
   return <section aria-label="Listas frequentes" className="hca-form-stack">
-    <div className="hca-toolbar"><Button onClick={event=>{setTrigger(event.currentTarget);setOpen(true);setReady(false);onRefresh();}} disabled={!hydrated}>Usar lista frequente</Button>
+    <div className="hca-toolbar"><ActionButton onClick={event=>{setTrigger(event.currentTarget);setOpen(true);setReady(false);onRefresh();}} disabled={!hydrated}>Usar lista frequente</ActionButton>
       {pending?<span role="status">Há um salvamento de lista para recuperar.</span>:null}</div>
     {!open&&message?<p role="status">{message}</p>:null}
     {open?<RecordDrawer title="Usar lista frequente" busy={command.busy} trackChanges={false} onClose={()=>setOpen(false)} restoreFocusTo={trigger}>
       <p>Paciente atual. A lista guarda somente materiais; não traz estoque, urgência ou justificativas anteriores.</p>
       {cataloguePending?<Notice>Atualizando disponibilidade dos materiais…</Notice>:null}
-      {catalogueError?<Notice error>{catalogueError}<Button onClick={onRefresh}>Reconsultar disponibilidade</Button></Notice>:null}
-      {referenceError?<Notice error>{referenceError}<Button onClick={()=>setReferenceAttempt(value=>value+1)}>Consultar referência local novamente</Button></Notice>:null}
+      {catalogueError?<Notice error>{catalogueError}<ActionButton onClick={onRefresh}>Reconsultar disponibilidade</ActionButton></Notice>:null}
+      {referenceError?<Notice error>{referenceError}<ActionButton onClick={()=>setReferenceAttempt(value=>value+1)}>Consultar referência local novamente</ActionButton></Notice>:null}
       {loading?<Notice>Consultando suas listas neste paciente…</Notice>:null}
-      {readError?<Notice error>{readError}<Button onClick={()=>setAttempt(value=>value+1)}>Consultar listas novamente</Button></Notice>:null}
+      {readError?<Notice error>{readError}<ActionButton onClick={()=>setAttempt(value=>value+1)}>Consultar listas novamente</ActionButton></Notice>:null}
       {ready&&!loading?<>
         {error?<Notice error>{error}</Notice>:null}{message?<p role="status">{message}</p>:null}
-        {pending?<section aria-label="Salvamento de lista pendente"><p>O resultado desta tentativa ainda não foi confirmado. Recupere o mesmo comando antes de salvar outra lista.</p><dl><dt>Nome preservado</dt><dd>{pending.name}</dd><dt>Materiais preservados</dt><dd>{pending.productIds.length}</dd></dl><Button onClick={()=>void transmit(pending,true)}>Recuperar salvamento da lista</Button></section>:null}
+        {pending?<section aria-label="Salvamento de lista pendente"><p>O resultado desta tentativa ainda não foi confirmado. Recupere o mesmo comando antes de salvar outra lista.</p><dl><dt>Nome preservado</dt><dd>{pending.name}</dd><dt>Materiais preservados</dt><dd>{pending.productIds.length}</dd></dl><ActionButton onClick={()=>void transmit(pending,true)}>Recuperar salvamento da lista</ActionButton></section>:null}
         <label className="hca-form-stack"><span>Buscar lista frequente</span>
           <Combobox value={query} selectedOptions={chosen?[chosen]:[]} onChange={event=>{setQuery(event.target.value);setChosen(null);setChecked([]);}} onOptionSelect={(_,data)=>{setChosen(data.optionValue??null);setQuery(data.optionText??"");setChecked([]);}} placeholder="Nome da lista" aria-label="Buscar lista frequente">
             {visible.map(row=><Option key={row.id} value={row.id}>{row.name}</Option>)}
@@ -97,14 +98,14 @@ export function RecurringSelection({userId,patientId,catalogue,lines,disabled,ca
         {selected?<section aria-label="Materiais da lista escolhida"><h3>{selected.name}</h3><ul className="hca-form-stack">{selected.productIds.map(id=>{
           const product=eligible(id),duplicate=lines.some(line=>line.productId===id);
           return <li key={id}><label className="flex min-h-11 items-center gap-2"><input className="h-5 w-5" type="checkbox" checked={checked.includes(id)} disabled={!product||duplicate||disabled} onChange={event=>setChecked(value=>event.target.checked?[...value,id]:value.filter(item=>item!==id))}/> {product?.name??"Material indisponível no catálogo atual"}{product?` · ${product.unit}`:""}</label>{!product?<p>Fora da nova inclusão; a lista original permanece preservada.</p>:duplicate?<p>Já selecionado; seus valores atuais serão mantidos.</p>:null}</li>;
-        })}</ul><Button appearance="primary" disabled={disabled||!applicable.length} onClick={()=>{onApply(applicable);setChecked([]);setMessage("Materiais selecionados adicionados ao preenchimento. Confira a observação e a urgência de cada item.");setOpen(false);}}>Adicionar materiais selecionados</Button></section>:null}
+        })}</ul><ActionButton variant="primary" disabled={disabled||!applicable.length} onClick={()=>{onApply(applicable);setChecked([]);setMessage("Materiais selecionados adicionados ao preenchimento. Confira a observação e a urgência de cada item.");setOpen(false);}}>Adicionar materiais selecionados</ActionButton></section>:null}
         <section aria-label="Salvar seleção como lista"><h3>Salvar seleção como lista</h3><p>Guarda os materiais ativos selecionados na requisição. Itens extras não catalogados e valores preenchidos não serão copiados.</p>
           {canSave?<><label className="hca-form-stack"><span>Nome da seleção recorrente</span><input ref={nameRef} className={inputClass} value={name} onChange={event=>{setName(event.target.value);setNameError("");}} minLength={2} maxLength={80} autoComplete="off" required aria-invalid={Boolean(nameError)} aria-describedby="selection-name-help selection-name-error" disabled={Boolean(pending)||disabled}/></label>
           <p id="selection-name-help">De2 a80 caracteres. {name.length}/80.</p>{nameError?<p id="selection-name-error" className="ui-field-error">{nameError}</p>:<span id="selection-name-error"/>}
-          <Button disabled={Boolean(pending)||Boolean(referenceError)||disabled||!lines.some(line=>eligible(line.productId))} onClick={save}>Salvar seleção como lista</Button></>:<p>Seu acesso permite consultar as listas preservadas; salvar uma nova exige permissão para preparar requisição.</p>}
+          <ActionButton disabled={Boolean(pending)||Boolean(referenceError)||disabled||!lines.some(line=>eligible(line.productId))} onClick={save}>Salvar seleção como lista</ActionButton></>:<p>Seu acesso permite consultar as listas preservadas; salvar uma nova exige permissão para preparar requisição.</p>}
         </section>
       </>:null}
-      <Button onClick={()=>setOpen(false)} disabled={command.busy}>Voltar à requisição</Button>
+      <ActionButton onClick={()=>setOpen(false)} disabled={command.busy}>Voltar à requisição</ActionButton>
     </RecordDrawer>:null}
   </section>;
 }

@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useId, useRef, useState } from "react";
-import { Button, Combobox, Option } from "@fluentui/react-components";
+import { Combobox, Option } from "@fluentui/react-components";
 import { api, ApiError, inputClass, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { EmptyState } from "@/components/ui/primitives";
@@ -75,19 +76,19 @@ export function PresentationManagement({
           </p>
         </div>
         <div className="hca-toolbar">
-          <Button ref={refreshRef} onClick={() => source.refresh()}>
+          <ActionButton ref={refreshRef} onClick={() => source.refresh()}>
             Atualizar apresentações
-          </Button>
+          </ActionButton>
           {writable ? (
-            <Button
-              appearance="primary"
+            <ActionButton
+              variant="primary"
               disabled={!catalog.data}
               onClick={(event) =>
                 setEditor({ row: null, opener: event.currentTarget })
               }
             >
               Nova apresentação
-            </Button>
+            </ActionButton>
           ) : null}
         </div>
       </div>
@@ -161,7 +162,7 @@ export function PresentationManagement({
                   ? `1 embalagem = ${formatQuantity(row.base_quantity, product?.unit)}`
                   : "Fator legado inválido: requer revisão explícita, sem conversão."}
               </p>
-              <Button
+              <ActionButton
                 className="mt-2"
                 onClick={(event) =>
                   setEditor({ row, opener: event.currentTarget })
@@ -169,7 +170,7 @@ export function PresentationManagement({
                 aria-label={`Consultar ${row.name}`}
               >
                 Consultar{writable ? " / editar" : ""}
-              </Button>
+              </ActionButton>
             </li>
           );
         })}
@@ -182,21 +183,21 @@ export function PresentationManagement({
       ) : null}
       {filtered.length > 15 ? (
         <nav aria-label="Páginas das apresentações" className="hca-pagination">
-          <Button
+          <ActionButton
             disabled={currentPage <= 1}
             onClick={() => setPage(currentPage - 1)}
           >
             Anterior
-          </Button>
+          </ActionButton>
           <span>
             {currentPage} / {Math.ceil(filtered.length / 15)}
           </span>
-          <Button
+          <ActionButton
             disabled={currentPage * 15 >= filtered.length}
             onClick={() => setPage(currentPage + 1)}
           >
             Próxima
-          </Button>
+          </ActionButton>
         </nav>
       ) : null}
       {editor ? (
@@ -376,7 +377,7 @@ function PresentationEditor({
             <p>
               Nome atual: {comparison.name}. Código atual: {comparison.barcode}.
             </p>
-            <Button
+            <ActionButton
               disabled={disabled}
               onClick={() => {
                 setReference(comparison);
@@ -385,7 +386,7 @@ function PresentationEditor({
               }}
             >
               Adotar referência atual e manter meus campos
-            </Button>
+            </ActionButton>
           </div>
         ) : null}
         {initial ? (
@@ -480,7 +481,7 @@ function PresentationEditor({
               original.
             </p>
             <div className="hca-toolbar">
-              <Button
+              <ActionButton
                 disabled={busy || uncertain}
                 onClick={() => {
                   setReview(false);
@@ -488,9 +489,9 @@ function PresentationEditor({
                 }}
               >
                 Voltar aos campos
-              </Button>
-              <Button
-                appearance="primary"
+              </ActionButton>
+              <ActionButton
+                variant="primary"
                 disabled={busy}
                 onClick={() => void save()}
               >
@@ -499,7 +500,7 @@ function PresentationEditor({
                   : uncertain
                     ? "Recuperar apresentação"
                     : "Confirmar apresentação"}
-              </Button>
+              </ActionButton>
             </div>
           </div>
         ) : (
@@ -578,13 +579,13 @@ function PresentationEditor({
               </label>
             </fieldset>
             {writable ? (
-              <Button
+              <ActionButton
                 type="submit"
-                appearance="primary"
+                variant="primary"
                 disabled={disabled}
               >
                 Revisar apresentação
-              </Button>
+              </ActionButton>
             ) : (
               <Notice>
                 Consulta em leitura. Seu vínculo não permite editar esta
@@ -596,9 +597,9 @@ function PresentationEditor({
         {reference ? (
           <section className="space-y-3" aria-label="Histórico da apresentação">
             <h3 className="font-semibold">Histórico de equivalências</h3>
-            <Button onClick={() => history.refresh()}>
+            <ActionButton onClick={() => history.refresh()}>
               Atualizar histórico da apresentação
-            </Button>
+            </ActionButton>
             {history.loading ? <Notice>Consultando histórico…</Notice> : null}
             {history.error ? (
               <Notice error>
@@ -636,21 +637,21 @@ function PresentationEditor({
                 className="hca-pagination"
                 aria-label="Páginas do histórico da apresentação"
               >
-                <Button
+                <ActionButton
                   disabled={historyPage === 1}
                   onClick={() => setHistoryPage(historyPage - 1)}
                 >
                   Mais recentes
-                </Button>
+                </ActionButton>
                 <span>{historyPage}</span>
-                <Button
+                <ActionButton
                   disabled={
                     historyPage * 20 >= (history.data?.versionTotal ?? 0)
                   }
                   onClick={() => setHistoryPage(historyPage + 1)}
                 >
                   Mais antigas
-                </Button>
+                </ActionButton>
               </nav>
             ) : null}
           </section>

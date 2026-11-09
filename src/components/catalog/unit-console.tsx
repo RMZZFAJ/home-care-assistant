@@ -1,4 +1,5 @@
 "use client";
+import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, TextInput } from "@/components/ui/controls";
 import { useEffect, useState } from "react";
 import {
   api,
@@ -9,16 +10,7 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "../workspace";
-import {
-  Button,
-  Input,
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableHeaderCell,
-  TableRow,
-} from "@fluentui/react-components";
+
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Icon, EmptyState } from "@/components/ui/primitives";
 import type { CatalogProduct } from "@/types/documents";
@@ -113,18 +105,18 @@ function Units({ context }: { context: WorkspaceContext }) {
           </div>
           <div className="hca-toolbar">
             {globalMode || can(context, "catalog.manage") ? (
-              <Button
-                appearance="primary"
-                icon={<Icon name="plus" />}
+              <ActionButton
+                variant="primary"
+
                 onClick={(event) =>
                   setEditor({ mode: "unit", opener: event.currentTarget })
                 }
-              >
+              >{<Icon name="plus" />}
                 Nova unidade
-              </Button>
+              </ActionButton>
             ) : null}
             {context.patient && can(context, "catalog.manage") ? (
-              <Button
+              <ActionButton
                 onClick={(event) =>
                   setEditor({
                     mode: "presentation",
@@ -133,31 +125,31 @@ function Units({ context }: { context: WorkspaceContext }) {
                 }
               >
                 Configurar unidade e precisão
-              </Button>
+              </ActionButton>
             ) : null}
           </div>
         </div>
         <div className="hca-toolbar">
-          <Input
+          <TextInput
             type="search"
-            contentBefore={<Icon name="search" />}
+            leading={<Icon name="search" />}
             aria-label="Pesquisar unidades"
             value={search}
-            onChange={(_, value) => setSearch(value.value)}
+            onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSearch(controlValue); }}
             placeholder="Nome ou código"
           />
         </div>
         {!loaded && !error ? <Notice>Carregando unidades…</Notice> : null}
         <div className="hca-records hca-table-container">
-          <Table className="hca-table" aria-label="Unidades base">
-            <TableHeader>
-              <TableRow>
-                <TableHeaderCell>Unidade</TableHeaderCell>
-                <TableHeaderCell>Precisão</TableHeaderCell>
-                <TableHeaderCell>Âmbito</TableHeaderCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <DataTable className="hca-table" aria-label="Unidades base">
+            <DataTableHead>
+              <DataTableRow>
+                <DataTableHeading>Unidade</DataTableHeading>
+                <DataTableHeading>Precisão</DataTableHeading>
+                <DataTableHeading>Âmbito</DataTableHeading>
+              </DataTableRow>
+            </DataTableHead>
+            <DataTableBody>
               {units
                 .filter((unit) =>
                   (unit.name + " " + unit.code)
@@ -165,19 +157,19 @@ function Units({ context }: { context: WorkspaceContext }) {
                     .includes(search.toLocaleLowerCase("pt-BR")),
                 )
                 .map((unit) => (
-                  <TableRow key={unit.id}>
-                    <TableCell>
+                  <DataTableRow key={unit.id}>
+                    <DataTableCell>
                       <strong>{unit.name}</strong>
                       <small className="hca-cell-secondary">{unit.code}</small>
-                    </TableCell>
-                    <TableCell>{unit.decimals} casa(s)</TableCell>
-                    <TableCell>
+                    </DataTableCell>
+                    <DataTableCell>{unit.decimals} casa(s)</DataTableCell>
+                    <DataTableCell>
                       {unit.care_recipient_id ? "Paciente" : "Global"}
-                    </TableCell>
-                  </TableRow>
+                    </DataTableCell>
+                  </DataTableRow>
                 ))}
-            </TableBody>
-          </Table>
+            </DataTableBody>
+          </DataTable>
           {loaded && !units.length ? (
             <EmptyState title="Nenhuma unidade disponível" />
           ) : null}

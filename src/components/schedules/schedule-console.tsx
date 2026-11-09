@@ -1,17 +1,10 @@
 "use client";
+import { ActionButton, FormField, LoadingIndicator, Pill, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
 import { useEffect, useRef, useState } from "react";
 import {useSearchParams} from "next/navigation";
 import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
 import {NotificationReference} from "@/components/notifications/notification-reference";
-import {
-  Badge,
-  Button,
-  Field,
-  Input,
-  Select,
-  Spinner,
-  Textarea,
-} from "@fluentui/react-components";
+
 import {
   api,
   ApiError,
@@ -221,12 +214,12 @@ function Agenda({ context }: { context: WorkspaceContext }) {
     >
       <div className="hca-toolbar">
         <strong>{shift.type_name}</strong>
-        <Badge
-          appearance="tint"
-          color={shift.status === "published" ? "brand" : "informative"}
+        <Pill
+
+          tone={shift.status === "published" ? "accent" : "neutral"}
         >
           {stateLabels[shift.status]}
-        </Badge>
+        </Pill>
       </div>
       <p>{shift.professional_name}</p>
       <p>
@@ -241,14 +234,14 @@ function Agenda({ context }: { context: WorkspaceContext }) {
       (team ||
         (shift.professional_id === context.userId &&
           (can(context, "schedule.propose") || publishOwn))) ? (
-        <Button
+        <ActionButton
           disabled={busy || uncertain}
           onClick={(event) =>
             open({ kind: "shift", shift }, event.currentTarget)
           }
         >
           {team || publishOwn ? "Alterar plantão" : "Propor alteração"}
-        </Button>
+        </ActionButton>
       ) : null}
     </article>
   );
@@ -366,8 +359,8 @@ function Agenda({ context }: { context: WorkspaceContext }) {
         </Notice>
       ) : null}
       {decision ? (
-        <Field label="Motivo desta decisão" required={reasonRequired}>
-          <Textarea
+        <FormField label="Motivo desta decisão" required={reasonRequired}>
+          <TextAreaField
             value={decisionReason}
             minLength={3}
             maxLength={1000}
@@ -401,14 +394,14 @@ function Agenda({ context }: { context: WorkspaceContext }) {
           <small>
             O motivo de quem propôs e as notas acima são preservados.
           </small>
-        </Field>
+        </FormField>
       ) : null}
       {errors}
       {conflict ? (
         <Notice error>
           A versão ou uma condição necessária mudou. A revisão exibida foi
           preservada e não será aprovada automaticamente com dados novos.
-          <Button
+          <ActionButton
             disabled={busy}
             onClick={() => {
               setReview(null);
@@ -419,7 +412,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
             }}
           >
             Fechar revisão e atualizar
-          </Button>
+          </ActionButton>
         </Notice>
       ) : null}
       {!canConfirm ? (
@@ -429,7 +422,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
         </Notice>
       ) : null}
       <div className="hca-toolbar hca-schedule-decision-actions">
-        <Button
+        <ActionButton
           disabled={busy || uncertain}
           onClick={() => {
             setReview(null);
@@ -439,9 +432,9 @@ function Agenda({ context }: { context: WorkspaceContext }) {
           }}
         >
           Voltar
-        </Button>
-        <Button
-          appearance="primary"
+        </ActionButton>
+        <ActionButton
+          variant="primary"
           disabled={
             busy ||
             conflict ||
@@ -453,7 +446,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
           onClick={() => void send()}
         >
           {uncertain ? "Recuperar confirmação" : confirmLabel}
-        </Button>
+        </ActionButton>
       </div>
     </div>
   ) : null;
@@ -462,8 +455,8 @@ function Agenda({ context }: { context: WorkspaceContext }) {
       <NotificationReference key={patient.id+":"+reference} read={notice} context={context}/>
       <div className="hca-command-bar">
         {team || publishOwn || can(context, "schedule.propose") ? (
-          <Button
-            appearance="primary"
+          <ActionButton
+            variant="primary"
             disabled={
               loading ||
               busy ||
@@ -473,22 +466,22 @@ function Agenda({ context }: { context: WorkspaceContext }) {
             onClick={(event) => open({ kind: "series" }, event.currentTarget)}
           >
             Nova programação
-          </Button>
+          </ActionButton>
         ) : null}
         {can(context, "schedule.types.manage") ? (
-          <Button
+          <ActionButton
             disabled={loading || busy || uncertain || !data}
             onClick={(event) => open({ kind: "type" }, event.currentTarget)}
           >
             Novo tipo de plantão
-          </Button>
+          </ActionButton>
         ) : null}
       </div>
       {!editor && !review ? errors : null}
       {message ? <Notice>{message}</Notice> : null}
       <div className="hca-toolbar">
-        <Field label="Data de referência">
-          <Input
+        <FormField label="Data de referência">
+          <TextInput
             type="date"
             value={day}
             onChange={(event) => {
@@ -496,9 +489,9 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                 setDay(event.target.value);
             }}
           />
-        </Field>
-        <Field label="Visualização">
-          <Select
+        </FormField>
+        <FormField label="Visualização">
+          <SelectField
             value={mode}
             onChange={(event) =>
               setMode(event.target.value as "week" | "month")
@@ -506,11 +499,11 @@ function Agenda({ context }: { context: WorkspaceContext }) {
           >
             <option value="week">Semana</option>
             <option value="month">Mês</option>
-          </Select>
-        </Field>
+          </SelectField>
+        </FormField>
         {can(context, "schedule.read.team") ? (
-          <Field label="Profissional">
-            <Select
+          <FormField label="Profissional">
+            <SelectField
               value={person}
               onChange={(event) => setPerson(event.target.value)}
             >
@@ -520,11 +513,11 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                   {item.name}
                 </option>
               ))}
-            </Select>
-          </Field>
+            </SelectField>
+          </FormField>
         ) : null}
-        <Field label="Situação">
-          <Select
+        <FormField label="Situação">
+          <SelectField
             value={status}
             onChange={(event) => setStatus(event.target.value)}
           >
@@ -536,23 +529,23 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                   {value}
                 </option>
               ))}
-          </Select>
-        </Field>
+          </SelectField>
+        </FormField>
       </div>
       <div className="hca-toolbar" role="group" aria-label="Período da escala">
-        <Button onClick={() => setDay(adjacentPeriod(day, mode, -1))}>
+        <ActionButton onClick={() => setDay(adjacentPeriod(day, mode, -1))}>
           {mode === "month" ? "Mês anterior" : "Semana anterior"}
-        </Button>
+        </ActionButton>
         <strong>
           {period.from.split("-").reverse().join("/")} a{" "}
           {period.until.split("-").reverse().join("/")}
         </strong>
-        <Button onClick={() => setDay(adjacentPeriod(day, mode, 1))}>
+        <ActionButton onClick={() => setDay(adjacentPeriod(day, mode, 1))}>
           {mode === "month" ? "Próximo mês" : "Próxima semana"}
-        </Button>
+        </ActionButton>
       </div>
-      <Button aria-disabled={loading} onClick={() => { if (!loading) setAttempt(value => value + 1); }}>Atualizar escala</Button>
-      {loading ? <Spinner label="Carregando escala" /> : null}
+      <ActionButton aria-disabled={loading} onClick={() => { if (!loading) setAttempt(value => value + 1); }}>Atualizar escala</ActionButton>
+      {loading ? <LoadingIndicator label="Carregando escala" /> : null}
       {!loading && query.error ? (
         <Notice error>
           {query.error}
@@ -581,7 +574,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                       {series.professional_name} · {series.type_name} ·{" "}
                       {series.anchor_date} a {series.valid_until}
                     </span>
-                    <Button
+                    <ActionButton
                       onClick={(event) =>
                         openReview(
                           { action: "approve", body: { id: series.id } },
@@ -591,8 +584,8 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                       }
                     >
                       Aprovar programação
-                    </Button>
-                    <Button
+                    </ActionButton>
+                    <ActionButton
                       onClick={(event) =>
                         open(
                           {
@@ -605,7 +598,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                       }
                     >
                       Rejeitar programação
-                    </Button>
+                    </ActionButton>
                   </article>
                 ))}
               {currentData.changes.map((change) => (
@@ -621,7 +614,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                     <p>{change.reason}</p>
                     {change.is_stale ? <p>Proposta desatualizada</p> : null}
                   </div>
-                  <Button
+                  <ActionButton
                     onClick={(event) =>
                       openReview(
                         change.is_stale
@@ -641,8 +634,8 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                     {change.is_stale
                       ? "Revisar proposta desatualizada"
                       : "Aprovar alteração"}
-                  </Button>
-                  <Button
+                  </ActionButton>
+                  <ActionButton
                     onClick={(event) =>
                       open(
                         {
@@ -655,7 +648,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                     }
                   >
                     Rejeitar alteração
-                  </Button>
+                  </ActionButton>
                 </article>
               ))}
               {!currentData.changes.length &&
@@ -675,13 +668,13 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                   {type.duration_minutes / 60}h
                 </strong>
                 {can(context, "schedule.types.manage") ? (
-                  <Button
+                  <ActionButton
                     onClick={(event) =>
                       open({ kind: "type", type }, event.currentTarget)
                     }
                   >
                     Editar tipo
-                  </Button>
+                  </ActionButton>
                 ) : null}
               </div>
             ))}
@@ -697,7 +690,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                   </span>
                   {team ||
                   (publishOwn && series.professional_id === context.userId) ? (
-                    <Button
+                    <ActionButton
                       onClick={(event) =>
                         open(
                           {
@@ -710,7 +703,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
                       }
                     >
                       Encerrar série
-                    </Button>
+                    </ActionButton>
                   ) : null}
                 </div>
               ))}

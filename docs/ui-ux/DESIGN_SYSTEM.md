@@ -12,6 +12,15 @@ migrar: trabalho pendente, não alternativa visual aprovada. Remover provider,
 Griffel, imports, estilos e dependência Fluent ao terminar a migração integral,
 com regressões dos consumidores. Não criar ponte que apenas reproduza sua API.
 
+Controles nativos compartilham ActionButton/ActionLink, FormField, TextInput,
+SelectField, TextAreaField, CheckboxField, Pill, LoadingIndicator e DataTable.
+Usam props/eventos HTML:capturar valor/checked antes de updater adiado,sem
+callback Fluent de dois argumentos. FormField associa label,ajuda e erro ao
+ID do controle;outputs não recebem validação de input. FeedbackBanner e
+ProgressMeter representam fatos sem confundir persistência,ciência ou entrega.
+Ainda restam17 arquivos com controles compostos/provider Fluent a retirar.
+[Prova local](../audits/D/D-B/UI_MODEL_STAGE_2.md).
+
 ## Componentes e comportamento
 
 Usar componentes reutilizáveis para botões, campos, badges, banners, cards,

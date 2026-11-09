@@ -1,9 +1,10 @@
 "use client";
+import { ActionButton, CheckboxField, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, SelectField, TextInput } from "@/components/ui/controls";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api, inputClass, Notice } from "@/components/workspace";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { roles } from "./admin-fields";
-import { Button, Checkbox, Input, Select, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow, Tooltip } from "@fluentui/react-components";
+import { Tooltip } from "@fluentui/react-components";
 import { Icon } from "@/components/ui/primitives";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 type Rule = {
@@ -148,10 +149,10 @@ export function NotificationMatrix({
   return <section aria-label="Matriz de notificações">
     {error ? <Notice error>{error}</Notice> : null}
     <div className="hca-section-heading"><div><h2>Eventos × funções · múltiplos canais</h2><p>Canais disponíveis conforme o provedor; destino verificado, consentimento e autorização continuam obrigatórios.</p></div></div>
-    <div className="hca-toolbar"><Input type="search" aria-label="Pesquisar eventos de notificação" placeholder="Buscar evento" contentBefore={<Icon name="search" />} value={search} onChange={(_, value) => setSearch(value.value)} /><Select aria-label="Função nas notificações" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="">Todas as funções</option>{Object.entries(roles).map(([role, label]) => <option key={role} value={role}>{label}</option>)}</Select></div>
-    <div className="hca-records hca-matrix-scroll" tabIndex={0} role="region" aria-label="Tabela de notificações; rolagem horizontal por função"><Table className="hca-table hca-matrix" aria-label="Canais por evento e função"><TableHeader><TableRow><TableHeaderCell>Evento</TableHeaderCell>{columns.map(([role, label]) => <TableHeaderCell key={role}>{label}</TableHeaderCell>)}</TableRow></TableHeader><TableBody>{data.events.filter((event) => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((event) => <TableRow key={event}><TableCell className="hca-matrix-name"><h3>{documentEventLabel(event)}</h3></TableCell>{columns.map(([role, label]) => {
+    <div className="hca-toolbar"><TextInput type="search" aria-label="Pesquisar eventos de notificação" placeholder="Buscar evento" leading={<Icon name="search" />} value={search} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSearch(controlValue); }} /><SelectField aria-label="Função nas notificações" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="">Todas as funções</option>{Object.entries(roles).map(([role, label]) => <option key={role} value={role}>{label}</option>)}</SelectField></div>
+    <div className="hca-records hca-matrix-scroll" tabIndex={0} role="region" aria-label="Tabela de notificações; rolagem horizontal por função"><DataTable className="hca-table hca-matrix" aria-label="Canais por evento e função"><DataTableHead><DataTableRow><DataTableHeading>Evento</DataTableHeading>{columns.map(([role, label]) => <DataTableHeading key={role}>{label}</DataTableHeading>)}</DataTableRow></DataTableHead><DataTableBody>{data.events.filter((event) => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((event) => <DataTableRow key={event}><DataTableCell className="hca-matrix-name"><h3>{documentEventLabel(event)}</h3></DataTableCell>{columns.map(([role, label]) => {
       const rule = data.rules.find((row) => row.event === event && row.subject_role === role), selected = rule?.channels ?? ["internal"];
-      return <TableCell key={role}><div className="hca-channel-cell">{available(event).map((channel) => <Tooltip key={channel.code} content={channel.label} relationship="label"><Checkbox className="hca-channel-checkbox" label={<Icon name={channel.code === "internal" ? "bell" : channel.code === "email" ? "forms" : "team"} />} aria-label={documentEventLabel(event) + " · " + label + " · " + channel.label} disabled={busy || pending} checked={selected.includes(channel.code)} onChange={(_, value) => void update(event, role, { channels: value.checked ? [...selected, channel.code] : selected.filter((code) => code !== channel.code) })} /></Tooltip>)}<Button appearance="subtle" icon={<Icon name="more" />} aria-label={"Opções de " + documentEventLabel(event) + " · " + label} disabled={busy || pending} onClick={(value) => setEditor({ event, role, opener: value.currentTarget })} /></div>
+      return <DataTableCell key={role}><div className="hca-channel-cell">{available(event).map((channel) => <Tooltip key={channel.code} content={channel.label} relationship="label"><CheckboxField className="hca-channel-checkbox" label={<Icon name={channel.code === "internal" ? "bell" : channel.code === "email" ? "forms" : "team"} />} aria-label={documentEventLabel(event) + " · " + label + " · " + channel.label} disabled={busy || pending} checked={selected.includes(channel.code)} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.checked; return void update(event, role, { channels: controlValue ? [...selected, channel.code] : selected.filter((code) => code !== channel.code) }); }} /></Tooltip>)}<ActionButton variant="quiet"  aria-label={"Opções de " + documentEventLabel(event) + " · " + label} disabled={busy || pending} onClick={(value) => setEditor({ event, role, opener: value.currentTarget })} >{<Icon name="more" />}</ActionButton></div>
       {editor?.event === event && editor.role === role ? <RecordDrawer title={documentEventLabel(event) + " · " + label} onClose={() => setEditor(null)} busy={busy || pending} recovery={recovery} restoreFocusTo={editor.opener} trackChanges={false}>{error || configurationError ? <Notice error>{error || configurationError}</Notice> : null}<div className="hca-form"><p className="hca-field-hint">Cada alteração é salva e confirmada pelo servidor.</p>
                       <label className="block text-xs">
                         Comportamento
@@ -247,7 +248,7 @@ export function NotificationMatrix({
                         </label>
                       ))}
 
-      </div></RecordDrawer> : null}</TableCell>;
-    })}</TableRow>)}</TableBody></Table></div>
+      </div></RecordDrawer> : null}</DataTableCell>;
+    })}</DataTableRow>)}</DataTableBody></DataTable></div>
   </section>;
 }

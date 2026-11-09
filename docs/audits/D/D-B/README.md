@@ -6,6 +6,7 @@ atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitorame
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
 - [Checkpoint incremental](CHECKPOINT.md).
+- [Controles nativos e feedback](UI_MODEL_STAGE_2.md):migração visual em execução.
 - [Nova aparência canônica](../../../ui-ux/CANONICAL_MODEL.md) e
   [execução adicional UI](UI_MODEL_ACCEPTANCE.csv):migração integral em andamento.
 - [Roteiro técnico GUI-04 e recuperação de leitura](RECOVERY_RUNBOOK.md).

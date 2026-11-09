@@ -1,8 +1,9 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "@fluentui/react-components";
+
 import { Notice } from "@/components/workspace";
 import { RecordDrawer } from "./record-drawer";
 import { formatZonedDate } from "@/lib/schedules/time";
@@ -153,7 +154,7 @@ export function CreationDraftPanel({
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
   if (!draft.active) return null;
   const saved = draft.offered ?? draft.base;
-  if(draft.readDenied||draft.protectedReadPending)return <section className="ui-card hca-form-stack" aria-label="Rascunho privado"><Notice error>{draft.loadError||"Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada."}</Notice><Button disabled={draft.busy} onClick={draft.reload}>Revalidar acesso ao rascunho</Button>{draft.pending?<Button disabled={draft.busy} onClick={()=>void draft.recover()}>Recuperar mesma tentativa preservada</Button>:null}</section>;
+  if(draft.readDenied||draft.protectedReadPending)return <section className="ui-card hca-form-stack" aria-label="Rascunho privado"><Notice error>{draft.loadError||"Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada."}</Notice><ActionButton disabled={draft.busy} onClick={draft.reload}>Revalidar acesso ao rascunho</ActionButton>{draft.pending?<ActionButton disabled={draft.busy} onClick={()=>void draft.recover()}>Recuperar mesma tentativa preservada</ActionButton>:null}</section>;
   return (
     <section
       className="ui-card hca-form-stack hca-draft-panel min-w-0"
@@ -174,9 +175,9 @@ export function CreationDraftPanel({
       {draft.loadError ? (
         <Notice error>
           {draft.loadError}
-          <Button onClick={draft.reload} disabled={draft.busy}>
+          <ActionButton onClick={draft.reload} disabled={draft.busy}>
             Consultar novamente
-          </Button>
+          </ActionButton>
         </Notice>
       ) : null}
       {draft.error ? <Notice error>{draft.error}</Notice> : null}
@@ -197,13 +198,13 @@ export function CreationDraftPanel({
           {draft.pending.content ? (
             <DraftContentSummary content={draft.pending.content} kind={draft.kind} navigation={draft.pending.navigation} />
           ) : null}
-          <Button
-            appearance="primary"
+          <ActionButton
+            variant="primary"
             disabled={draft.busy || disabled}
             onClick={() => void draft.recover()}
           >
             Recuperar salvamento ou descarte
-          </Button>
+          </ActionButton>
         </>
       ) : null}
       {draft.consumed ? (
@@ -222,12 +223,12 @@ export function CreationDraftPanel({
           >
             Abrir ficha concluída
           </Link>
-          <Button
+          <ActionButton
             disabled={draft.busy || !!draft.pending || disabled}
             onClick={() => void draft.acknowledge()}
           >
             Confirmar resultado e começar novo preenchimento
-          </Button>
+          </ActionButton>
         </>
       ) : null}
       {draft.offered?.state === "active" && !draft.pending ? (
@@ -243,13 +244,13 @@ export function CreationDraftPanel({
                 Continuar rascunho
               </Link>
             ) : (
-              <Button
-                appearance="primary"
+              <ActionButton
+                variant="primary"
                 disabled={draft.busy || disabled}
                 onClick={() => draft.resume()}
               >
                 Continuar rascunho
-              </Button>
+              </ActionButton>
             )}
           </div>
         </>
@@ -283,29 +284,29 @@ export function CreationDraftPanel({
                   <p>O rascunho foi descartado no servidor.</p>
                 )
               ) : (
-                <Button
+                <ActionButton
                   disabled={draft.busy}
                   onClick={() => void draft.compare()}
                 >
                   Consultar versão para comparar
-                </Button>
+                </ActionButton>
               )}
             </section>
           </div>
           <div className="hca-toolbar">
-            <Button
+            <ActionButton
               disabled={!draft.compared || draft.busy || disabled}
               onClick={draft.keepLocal}
             >
               Manter minha edição para salvar nova revisão
-            </Button>
+            </ActionButton>
             {draft.comparison?.state === "active" ? (
-              <Button
+              <ActionButton
                 disabled={draft.busy || disabled}
                 onClick={() => draft.resume(draft.comparison)}
               >
                 Usar versão salva no servidor
-              </Button>
+              </ActionButton>
             ) : null}
           </div>
         </>
@@ -316,7 +317,7 @@ export function CreationDraftPanel({
         <p>Sua edição atual ainda não foi salva no servidor.</p>
       ) : null}
       {saved?.state === "active" && !draft.pending && !draft.conflict ? (
-        <Button
+        <ActionButton
           disabled={draft.busy || disabled}
           onClick={(event) => {
             setTrigger(event.currentTarget);
@@ -324,7 +325,7 @@ export function CreationDraftPanel({
           }}
         >
           Descartar e começar nova
-        </Button>
+        </ActionButton>
       ) : null}
       {confirmDiscard ? (
         <RecordDrawer
@@ -340,14 +341,14 @@ export function CreationDraftPanel({
             {draft.pending ? (
               <Notice>
                 A resposta do descarte ainda não foi confirmada.
-                <Button
+                <ActionButton
                   disabled={draft.busy || disabled}
                   onClick={async () => {
                     if (await draft.recover()) setConfirmDiscard(false);
                   }}
                 >
                   Recuperar descarte
-                </Button>
+                </ActionButton>
               </Notice>
             ) : null}
             <p>
@@ -359,21 +360,21 @@ export function CreationDraftPanel({
               Fichas emitidas, arquivos oficiais e seu histórico serão
               preservados.
             </Notice>
-            <Button
-              appearance="primary"
+            <ActionButton
+              variant="primary"
               disabled={disabled || !!draft.pending}
               onClick={async () => {
                 if (await draft.discard()) setConfirmDiscard(false);
               }}
             >
               Confirmar descarte do rascunho
-            </Button>
-            <Button
+            </ActionButton>
+            <ActionButton
               disabled={draft.busy || !!draft.pending}
               onClick={() => setConfirmDiscard(false)}
             >
               Continuar preenchimento
-            </Button>
+            </ActionButton>
           </div>
         </RecordDrawer>
       ) : null}

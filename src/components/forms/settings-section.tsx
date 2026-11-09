@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useId, useState, type ReactNode } from "react";
-import { Button } from "@fluentui/react-components";
+
 import { Icon } from "@/components/ui/primitives";
 
 /** Keep fields mounted so closing a section does not discard its draft. */
@@ -10,9 +11,9 @@ export function SettingsSection({ title, summary, initiallyOpen = false, childre
   const [open, setOpen] = useState(initiallyOpen);
   const id = useId();
   return <section className="ui-card hca-settings-section" aria-labelledby={id + "-title"}>
-    <h2 id={id + "-title"}><Button appearance="subtle" aria-expanded={open} aria-controls={id + "-content"} onClick={() => setOpen((current) => !current)}>
+    <h2 id={id + "-title"}><ActionButton variant="quiet" aria-expanded={open} aria-controls={id + "-content"} onClick={() => setOpen((current) => !current)}>
       <span>{title}</span><Icon name="down" style={{ transform: open ? "rotate(180deg)" : undefined }} />
-    </Button></h2>
+    </ActionButton></h2>
     {summary ? <p className="hca-settings-summary">{summary}</p> : null}
     <div id={id + "-content"} hidden={!open} className="hca-settings-content">{children}</div>
   </section>;

@@ -1,6 +1,7 @@
 "use client";
+import { ProgressMeter } from '@/components/ui/feedback';
 import Link from "next/link";
-import { ProgressBar } from "@fluentui/react-components";
+
 import { Icon } from "@/components/ui/primitives";
 import { DocumentRow } from "@/components/documents/document-history";
 import type { DashboardData } from "@/types/dashboard";
@@ -23,7 +24,7 @@ export function RequestProgress({ data }: { data: DashboardData }) {
   if (!request?.fulfillment) return null;
   return <section className="ui-card hca-request-progress"><div className="hca-section-heading"><h2>Atendimento da requisição</h2><Icon name="forms" /></div>
     <strong>{request.code}</strong><p>{request.fulfillment.fulfilled} de {request.fulfillment.total} itens atendidos</p>
-    <ProgressBar value={request.fulfillment.fulfilled} max={Math.max(1, request.fulfillment.total)} aria-label="Itens da requisição atendidos" />
+    <ProgressMeter value={request.fulfillment.fulfilled} max={Math.max(1, request.fulfillment.total)} aria-label="Itens da requisição atendidos" />
     <p className="text-xs text-(--muted)">Ciência familiar e recebimento de materiais possuem registros próprios.</p>
     <Link href={"/documentos/" + request.id} className="ui-button ui-button-secondary" prefetch={false}>Abrir requisição</Link>
   </section>;

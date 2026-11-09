@@ -1,13 +1,8 @@
 "use client";
+import { ActionButton, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
 import {roleLabel} from "@/lib/role-labels";
 import { useState, type ReactNode } from "react";
-import {
-  Badge,
-  Button,
-  Field as FluentField,
-  Input,
-  Select,
-} from "@fluentui/react-components";
+
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { MembershipImpact } from "./membership-impact";
 import { CredentialReview } from "./credential-review";
@@ -68,24 +63,24 @@ export function MembershipManagement({
           <h2>Pessoas e vínculos</h2>
           <p>A função e as permissões se aplicam somente a este paciente.</p>
         </div>
-        <Button
-          appearance="primary"
-          icon={<Icon name="plus" />}
+        <ActionButton
+          variant="primary"
+
           onClick={(event) =>
             setEditor({ row: null, opener: event.currentTarget })
           }
-        >
+        >{<Icon name="plus" />}
           Vincular conta
-        </Button>
+        </ActionButton>
       </div>
       <div className="hca-toolbar">
-        <Input
+        <TextInput
           type="search"
           aria-label="Pesquisar pessoas"
           placeholder="Nome ou função"
-          contentBefore={<Icon name="search" />}
+          leading={<Icon name="search" />}
           value={search}
-          onChange={(_, data) => setSearch(data.value)}
+          onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSearch(controlValue); }}
         />
         <span role="status" className="hca-result-count">
           {filtered.length} vínculos
@@ -105,15 +100,15 @@ export function MembershipManagement({
               <small>
                 {roleLabel(text(row, "role"))}
               </small>
-              <Badge
-                appearance="tint"
-                color={row.status === "revoked" ? "informative" : "success"}
+              <Pill
+
+                tone={row.status === "revoked" ? "neutral" : "success"}
               >
                 {row.status === "revoked" ? "Revogado" : "Ativo"}
-              </Badge>
+              </Pill>
             </div>
             <div className="hca-record-actions">
-              <Button
+              <ActionButton
                 aria-label={"Editar vínculo de " + name(row)}
                 disabled={row.status === "revoked"}
                 onClick={(event) =>
@@ -121,11 +116,11 @@ export function MembershipManagement({
                 }
               >
                 Editar
-              </Button>
-              <Button appearance="subtle" onClick={() => setChange(row)}>
+              </ActionButton>
+              <ActionButton variant="quiet" onClick={() => setChange(row)}>
                 {row.status === "revoked" ? "Reativar" : "Revogar"}
-              </Button>
-              {patientId ? <Button disabled={!credentialReviewAllowed} title={!credentialReviewAllowed ? "Selecione seu vínculo local para conferir uma credencial." : undefined} onClick={event => setCredential({ subjectId: text(row, "user_id"), opener: event.currentTarget })}>Conferir credencial</Button> : null}
+              </ActionButton>
+              {patientId ? <ActionButton disabled={!credentialReviewAllowed} title={!credentialReviewAllowed ? "Selecione seu vínculo local para conferir uma credencial." : undefined} onClick={event => setCredential({ subjectId: text(row, "user_id"), opener: event.currentTarget })}>Conferir credencial</ActionButton> : null}
             </div>
           </article>
         ))}
@@ -181,8 +176,8 @@ export function MembershipManagement({
                 </p>
               </div>
             ) : (
-              <FluentField label="Conta vinculada">
-                <Select
+              <FormField label="Conta vinculada">
+                <SelectField
                   name="userId"
                   defaultValue={editor.row ? text(editor.row, "user_id") : ""}
                   required
@@ -196,8 +191,8 @@ export function MembershipManagement({
                       {text(person, "full_name")}
                     </option>
                   ))}
-                </Select>
-              </FluentField>
+                </SelectField>
+              </FormField>
             )}
             <RoleSelect
               value={editor.row ? text(editor.row, "role") : "professional"}
@@ -206,9 +201,9 @@ export function MembershipManagement({
               Permissões específicas ficam na matriz. Uma conta nova deve ser
               convidada pelo e-mail e aceitar o convite.
             </p>
-            <Button appearance="primary" disabled={busy} type="submit">
+            <ActionButton variant="primary" disabled={busy} type="submit">
               Salvar vínculo
-            </Button>
+            </ActionButton>
           </form>
         </RecordDrawer>
       ) : null}
@@ -233,11 +228,11 @@ export function MembershipManagement({
         {error ? <Notice error>{error}</Notice> : null}
         {recovery}
         <div className="hca-toolbar">
-          <Button disabled={busy} onClick={() => setChange(null)}>
+          <ActionButton disabled={busy} onClick={() => setChange(null)}>
             Voltar
-          </Button>
-          <Button
-            appearance="primary"
+          </ActionButton>
+          <ActionButton
+            variant="primary"
             disabled={busy}
             onClick={async () => {
               if (!change) return;
@@ -256,7 +251,7 @@ export function MembershipManagement({
             {change?.status === "revoked"
               ? "Confirmar alteração"
               : "Revogar agora"}
-          </Button>
+          </ActionButton>
         </div>
         {change && change.status !== "revoked" && patientId ? (
           <MembershipImpact

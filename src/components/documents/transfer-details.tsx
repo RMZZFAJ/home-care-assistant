@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton, FormField, LoadingIndicator, TextAreaField } from "@/components/ui/controls";
 import { useEffect, useRef, useState } from "react";
-import { Button, Field, Spinner, Textarea } from "@fluentui/react-components";
+
 import { api, ApiError, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -226,23 +227,23 @@ export function TransferDetails({
       <div className="hca-toolbar">
         {facts.canAgree ? (
           <>
-            <Button appearance="primary" onClick={() => start("agree")}>
+            <ActionButton variant="primary" onClick={() => start("agree")}>
               {actionLabels.agree}
-            </Button>
-            <Button onClick={() => start("decline")}>
+            </ActionButton>
+            <ActionButton onClick={() => start("decline")}>
               {actionLabels.decline}
-            </Button>
+            </ActionButton>
           </>
         ) : null}
         {facts.canDispatch ? (
-          <Button appearance="primary" onClick={() => start("dispatch")}>
+          <ActionButton variant="primary" onClick={() => start("dispatch")}>
             {actionLabels.dispatch}
-          </Button>
+          </ActionButton>
         ) : null}
         {facts.canWithdraw ? (
-          <Button onClick={() => start("withdraw")}>
+          <ActionButton onClick={() => start("withdraw")}>
             {actionLabels.withdraw}
-          </Button>
+          </ActionButton>
         ) : null}
       </div>
       {selected ? (
@@ -268,13 +269,13 @@ export function TransferDetails({
                 o estado vigente antes de preparar outra confirmação.
               </Notice>
               {comparison.loading ? (
-                <Spinner label="Consultando transferência atual" />
+                <LoadingIndicator label="Consultando transferência atual" />
               ) : comparison.error ? (
                 <Notice error>
                   {comparison.error}
-                  <Button onClick={comparison.refresh}>
+                  <ActionButton onClick={comparison.refresh}>
                     Tentar consulta atual novamente
-                  </Button>
+                  </ActionButton>
                 </Notice>
               ) : comparison.data ? (
                 <>
@@ -285,7 +286,7 @@ export function TransferDetails({
                   <TransferFactsDisplay
                     facts={comparison.data.data.transfer!}
                   />
-                  <Button
+                  <ActionButton
                     onClick={() => {
                       const current = comparison.data!.data;
                       onUpdated(current);
@@ -298,7 +299,7 @@ export function TransferDetails({
                     }}
                   >
                     Adotar estado atual e revisar minha decisão
-                  </Button>
+                  </ActionButton>
                 </>
               ) : null}
             </section>
@@ -344,7 +345,7 @@ export function TransferDetails({
                 ) : null}
                 <div className="hca-toolbar">
                   {!uncertain ? (
-                    <Button
+                    <ActionButton
                       onClick={() => {
                         setReviewing(false);
                         requestAnimationFrame(() =>
@@ -353,16 +354,16 @@ export function TransferDetails({
                       }}
                     >
                       Voltar à minha decisão
-                    </Button>
+                    </ActionButton>
                   ) : null}
-                  <Button appearance="primary" onClick={() => void confirm()}>
+                  <ActionButton variant="primary" onClick={() => void confirm()}>
                     {uncertain
                       ? "Recuperar mesmo ato"
                       : "Confirmar " +
                         (selected.action === "dispatch"
                           ? "expedição"
                           : "decisão")}
-                  </Button>
+                  </ActionButton>
                 </div>
               </>
             ) : (
@@ -374,26 +375,26 @@ export function TransferDetails({
                 }}
               >
                 {selected.action !== "dispatch" ? (
-                  <Field label="Sua justificativa para este ato" required>
-                    <Textarea
+                  <FormField label="Sua justificativa para este ato" required>
+                    <TextAreaField
                       ref={reasonFieldRef}
                       required
                       minLength={3}
                       maxLength={1000}
                       value={reason}
-                      onChange={(_, value) => setReason(value.value)}
-                      resize="vertical"
+                      onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setReason(controlValue); }}
+
                     />
-                  </Field>
+                  </FormField>
                 ) : (
                   <p>
                     A concordância anterior está preservada. Confirme apenas se
                     esta é a expedição física efetiva.
                   </p>
                 )}
-                <Button
+                <ActionButton
                   type="submit"
-                  appearance="primary"
+                  variant="primary"
                   disabled={
                     needsRefresh ||
                     !selectedAllowed ||
@@ -401,7 +402,7 @@ export function TransferDetails({
                   }
                 >
                   Revisar meu ato
-                </Button>
+                </ActionButton>
               </form>
             )}
           </div>

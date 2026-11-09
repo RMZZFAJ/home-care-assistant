@@ -20,7 +20,14 @@ async function login(page: Page, role: "global" | "adminA", patient: string | nu
 test.afterEach(async ({ page }) => { await page.unrouteAll({ behavior: "wait" }); });
 const count = (patient: string) => Number(sql(`select count(*) from public.access_change_requests where care_recipient_id=${sqlLiteral(patient)};`));
 async function widths(page: Page, label: string) {
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, `${label} ${width}`); }
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    // Opening comparisons scrolls the document. Compare the same task origin,
+    // rather than an arbitrary clipped strip beneath the sticky header.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+    await audit(page, `${label} ${width}`);
+  }
 }
 
 test("D3 proposta administrativa recupera a mesma intenção e ambas as entradas recusam rebase ou conteúdo alterado", async ({ page }, info) => {

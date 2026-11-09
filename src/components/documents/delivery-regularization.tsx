@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useId, useRef, useState } from "react";
-import { Button, Combobox, Option } from "@fluentui/react-components";
+import { Combobox, Option } from "@fluentui/react-components";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import {
   api,
@@ -328,22 +329,22 @@ export function DeliveryRegularization({
       ) : null}
       <div className="hca-toolbar">
         {write && details.canPropose ? (
-          <Button
-            appearance="primary"
+          <ActionButton
+            variant="primary"
             onClick={(e) => open("propose", e.currentTarget)}
           >
             Preparar regularização
-          </Button>
+          </ActionButton>
         ) : null}
         {write && details.canReview ? (
           <>
             {details.canApprove ? (
-              <Button
-                appearance="primary"
+              <ActionButton
+                variant="primary"
                 onClick={(e) => open("approve", e.currentTarget)}
               >
                 Conferir proposta
-              </Button>
+              </ActionButton>
             ) : (
               <Notice>
                 A proposta perdeu uma referência necessária à aprovação. É
@@ -351,22 +352,22 @@ export function DeliveryRegularization({
                 próprio.
               </Notice>
             )}
-            <Button onClick={(e) => open("reject", e.currentTarget)}>
+            <ActionButton onClick={(e) => open("reject", e.currentTarget)}>
               Rejeitar proposta
-            </Button>
+            </ActionButton>
           </>
         ) : null}
         {write && details.canClose ? (
-          <Button onClick={(e) => open("withdraw", e.currentTarget)}>
+          <ActionButton onClick={(e) => open("withdraw", e.currentTarget)}>
             {current?.proposed_by === context.userId
               ? "Retirar minha proposta"
               : "Encerrar proposta obsoleta"}
-          </Button>
+          </ActionButton>
         ) : null}
         {active && can(context, "ent.follow_up") && details.canRecordFinding ? (
-          <Button onClick={(e) => open("finding", e.currentTarget)}>
+          <ActionButton onClick={(e) => open("finding", e.currentTarget)}>
             Registrar apuração própria
-          </Button>
+          </ActionButton>
         ) : null}
       </div>
       {write &&
@@ -683,7 +684,7 @@ function RegularizationEditor({
               atual explicitamente e revise novamente antes de enviar.
             </p>
             {canAdopt ? (
-              <Button
+              <ActionButton
                 onClick={() => {
                   setReference(comparison);
                   setComparison(null);
@@ -699,18 +700,18 @@ function RegularizationEditor({
                 }}
               >
                 Usar referência atual
-              </Button>
+              </ActionButton>
             ) : (
-              <Button onClick={() => onSaved(comparison)}>
+              <ActionButton onClick={() => onSaved(comparison)}>
                 Abrir resultado atual
-              </Button>
+              </ActionButton>
             )}
           </section>
         ) : null}
         {!uncertain ? (
-          <Button disabled={busy} onClick={() => void compare()}>
+          <ActionButton disabled={busy} onClick={() => void compare()}>
             Consultar ficha e elegibilidade atuais
-          </Button>
+          </ActionButton>
         ) : null}
         {review ? (
           <section
@@ -877,7 +878,7 @@ function RegularizationEditor({
                               </div>
                             ))}
                           </div>
-                          <Button
+                          <ActionButton
                             onClick={() =>
                               setEntries((v) => ({
                                 ...v,
@@ -890,7 +891,7 @@ function RegularizationEditor({
                             }
                           >
                             Manter {l.name} como desconhecido
-                          </Button>
+                          </ActionButton>
                         </>
                       )}
                       <p className="text-sm">
@@ -922,18 +923,18 @@ function RegularizationEditor({
                   ) : null}
                 </>
               ) : null}
-              <Button type="submit" appearance="primary">
+              <ActionButton type="submit" variant="primary">
                 Revisar ato administrativo
-              </Button>
+              </ActionButton>
             </fieldset>
           </form>
         )}
         <div className="hca-toolbar">
-          <Button disabled={busy || uncertain} onClick={onClose}>
+          <ActionButton disabled={busy || uncertain} onClick={onClose}>
             Voltar sem registrar
-          </Button>
+          </ActionButton>
           {review && !uncertain ? (
-            <Button
+            <ActionButton
               disabled={busy}
               onClick={() => {
                 setReview(false);
@@ -946,11 +947,11 @@ function RegularizationEditor({
               }}
             >
               Editar meus campos
-            </Button>
+            </ActionButton>
           ) : null}
           {review || uncertain ? (
-            <Button
-              appearance="primary"
+            <ActionButton
+              variant="primary"
               disabled={busy || blocked}
               onClick={() => void send()}
             >
@@ -963,7 +964,7 @@ function RegularizationEditor({
                     : mode === "finding"
                       ? "Registrar minha apuração"
                       : "Registrar decisão sem movimentar"}
-            </Button>
+            </ActionButton>
           ) : null}
         </div>
       </div>

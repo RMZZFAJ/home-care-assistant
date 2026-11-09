@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Button, Combobox, Option } from "@fluentui/react-components";
+import { Combobox, Option } from "@fluentui/react-components";
 import {
   api,
   ApiError,
@@ -184,7 +185,7 @@ export function ConsumptionEditor({
       setBusy(false);
     }
   }
-  if(origin&&(originRead.loading||originRead.error||originRead.data?.kind!=="shift_reminder"||!originRead.data.canReport))return <RecordDrawer title="Registrar relato" onClose={onClose} restoreFocusTo={restoreFocusTo} busy={busy} preventClose={uncertain}><Notice error={Boolean(originRead.error)}>Revalide o acesso ao lembrete antes de exibir o preenchimento preservado. {originRead.error}</Notice><Button type="button" onClick={originRead.refresh}>Revalidar acesso ao lembrete</Button>{uncertain?<Button type="button" disabled={busy} onClick={()=>void send()}>Recuperar tentativa</Button>:null}</RecordDrawer>;
+  if(origin&&(originRead.loading||originRead.error||originRead.data?.kind!=="shift_reminder"||!originRead.data.canReport))return <RecordDrawer title="Registrar relato" onClose={onClose} restoreFocusTo={restoreFocusTo} busy={busy} preventClose={uncertain}><Notice error={Boolean(originRead.error)}>Revalide o acesso ao lembrete antes de exibir o preenchimento preservado. {originRead.error}</Notice><ActionButton type="button" onClick={originRead.refresh}>Revalidar acesso ao lembrete</ActionButton>{uncertain?<ActionButton type="button" disabled={busy} onClick={()=>void send()}>Recuperar tentativa</ActionButton>:null}</RecordDrawer>;
   return (
     <RecordDrawer
       title={baseline ? "Complementar relato" : "Registrar relato"}
@@ -251,9 +252,9 @@ export function ConsumptionEditor({
           ) : null}
           {conflict && baseline ? (
             <div className="space-y-3">
-              <Button disabled={busy} onClick={() => void compare()}>
+              <ActionButton disabled={busy} onClick={() => void compare()}>
                 Consultar versão atual do relato
-              </Button>
+              </ActionButton>
               {current ? (
                 <>
                   <p>
@@ -267,7 +268,7 @@ export function ConsumptionEditor({
                   </p>
                   <ConsumptionLines lines={current.current_lines} />
                   {current.status === "reported" ? (
-                    <Button
+                    <ActionButton
                       onClick={() => {
                         setBaseline(current);
                         setCurrent(null);
@@ -278,7 +279,7 @@ export function ConsumptionEditor({
                       }}
                     >
                       Usar referência atual e revisar complemento
-                    </Button>
+                    </ActionButton>
                   ) : (
                     <Notice>
                       Este relato já foi decidido. Consulte o resultado; novos
@@ -290,7 +291,7 @@ export function ConsumptionEditor({
             </div>
           ) : null}
           <div className="hca-toolbar">
-            <Button
+            <ActionButton
               disabled={busy || uncertain}
               onClick={() => {
                 setReview(null);
@@ -299,9 +300,9 @@ export function ConsumptionEditor({
               }}
             >
               Voltar à edição
-            </Button>
-            <Button
-              appearance="primary"
+            </ActionButton>
+            <ActionButton
+              variant="primary"
               disabled={busy || conflict}
               onClick={() => void send()}
             >
@@ -310,7 +311,7 @@ export function ConsumptionEditor({
                 : baseline
                   ? "Salvar complemento sem desconto"
                   : "Registrar relato sem desconto"}
-            </Button>
+            </ActionButton>
           </div>
         </section>
       ) : (
@@ -374,7 +375,7 @@ export function ConsumptionEditor({
           {catalogError ? (
             <Notice error>
               {catalogError}{" "}
-              <Button onClick={onCatalogRetry}>Atualizar materiais</Button>
+              <ActionButton onClick={onCatalogRetry}>Atualizar materiais</ActionButton>
             </Notice>
           ) : null}
           <label
@@ -449,7 +450,7 @@ export function ConsumptionEditor({
                   Quantidade positiva; até {decimals} casas decimais. Aceita
                   vírgula ou ponto.
                 </p>
-                <Button
+                <ActionButton
                   onClick={() =>
                     setLines((current) => {
                       const next = { ...current };
@@ -459,19 +460,19 @@ export function ConsumptionEditor({
                   }
                 >
                   Remover {product?.name ?? "material"}
-                </Button>
+                </ActionButton>
               </div>
             );
           })}
-          <Button
+          <ActionButton
             type="submit"
-            appearance="primary"
+            variant="primary"
             disabled={Boolean(
               Object.keys(lines).length && (catalogLoading || catalogError),
             )}
           >
             Revisar {baseline ? "complemento" : "relato"}
-          </Button>
+          </ActionButton>
         </form>
       )}
     </RecordDrawer>

@@ -1,13 +1,7 @@
 "use client";
+import { ActionButton, CheckboxField, FormField, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
 import { useState, type FormEvent } from "react";
-import {
-  Button,
-  Checkbox,
-  Field,
-  Input,
-  Select,
-  Textarea,
-} from "@fluentui/react-components";
+
 import type { ScheduleCommand } from "@/lib/validation/schedules";
 import type {
   ScheduleWorkspace,
@@ -175,25 +169,25 @@ export function ScheduleForm({
     >
       {editor.kind === "type" ? (
         <>
-          <Field label="Nome do plantão">
-            <Input
+          <FormField label="Nome do plantão">
+            <TextInput
               name="name"
               required
               minLength={2}
               maxLength={100}
               defaultValue={editor.type?.name}
             />
-          </Field>
-          <Field label="Início local">
-            <Input
+          </FormField>
+          <FormField label="Início local">
+            <TextInput
               name="start"
               type="time"
               required
               defaultValue={editor.type?.starts_local.slice(0, 5) ?? "07:00"}
             />
-          </Field>
-          <Field label="Duração em minutos">
-            <Input
+          </FormField>
+          <FormField label="Duração em minutos">
+            <TextInput
               name="duration"
               type="number"
               min={15}
@@ -203,8 +197,8 @@ export function ScheduleForm({
               required
             />
             <small>720 minutos = 12 horas; 1440 minutos = 24 horas.</small>
-          </Field>
-          <Checkbox
+          </FormField>
+          <CheckboxField
             name="active"
             label="Disponível para novas escalas"
             defaultChecked={editor.type?.is_active ?? true}
@@ -218,8 +212,8 @@ export function ScheduleForm({
       ) : null}
       {editor.kind === "series" ? (
         <>
-          <Field label="Profissional">
-            <Select
+          <FormField label="Profissional">
+            <SelectField
               name="person"
               defaultValue={team ? data.professionals[0]?.id : ownId}
               required
@@ -231,10 +225,10 @@ export function ScheduleForm({
                     {p.name}
                   </option>
                 ))}
-            </Select>
-          </Field>
-          <Field label="Tipo de plantão">
-            <Select name="type" required>
+            </SelectField>
+          </FormField>
+          <FormField label="Tipo de plantão">
+            <SelectField name="type" required>
               {data.types
                 .filter((t) => t.is_active)
                 .map((t) => (
@@ -243,10 +237,10 @@ export function ScheduleForm({
                     {t.duration_minutes / 60}h
                   </option>
                 ))}
-            </Select>
-          </Field>
-          <Field label="Repetição">
-            <Select
+            </SelectField>
+          </FormField>
+          <FormField label="Repetição">
+            <SelectField
               value={recurrence}
               onChange={(e) => setRecurrence(e.target.value)}
             >
@@ -254,13 +248,13 @@ export function ScheduleForm({
               <option value="once">Data específica</option>
               <option value="dates">Datas escolhidas</option>
               <option value="cycle">Ciclo de trabalho e descanso</option>
-            </Select>
-          </Field>
+            </SelectField>
+          </FormField>
           {recurrence === "weekly" ? (
             <fieldset className="hca-weekdays">
               <legend>Dias da semana</legend>
               {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d, n) => (
-                <Checkbox
+                <CheckboxField
                   key={d}
                   label={d}
                   name="day"
@@ -271,41 +265,41 @@ export function ScheduleForm({
             </fieldset>
           ) : null}
           {recurrence === "cycle" ? (
-            <Field label="Regime">
-              <Select value={cycle} onChange={(e) => setCycle(e.target.value)}>
+            <FormField label="Regime">
+              <SelectField value={cycle} onChange={(e) => setCycle(e.target.value)}>
                 {["12x36", "24x48", "24x24"].map((c) => (
                   <option key={c}>{c}</option>
                 ))}
-              </Select>
+              </SelectField>
               <small>
                 Use um tipo com a mesma duração de trabalho. O ciclo mantém
                 horas corridas a partir da data de início.
               </small>
-            </Field>
+            </FormField>
           ) : null}
-          <Field label="Primeiro dia / âncora">
-            <Input
+          <FormField label="Primeiro dia / âncora">
+            <TextInput
               name="from"
               type="date"
               value={fromDate}
-              onChange={(_, data) => setFromDate(data.value)}
+              onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setFromDate(controlValue); }}
               required
             />
-          </Field>
+          </FormField>
           {recurrence !== "once" ? (
-            <Field label="Válida até">
-              <Input
+            <FormField label="Válida até">
+              <TextInput
                 name="until"
                 type="date"
                 value={untilDate}
-                onChange={(_, data) => setUntilDate(data.value)}
+                onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setUntilDate(controlValue); }}
                 required
               />
               <small>
                 Até 366 dias após a âncora. Todas as ocorrências são verificadas
                 antes da gravação.
               </small>
-            </Field>
+            </FormField>
           ) : null}
           {recurrence === "dates" &&
           /^\d{4}-\d{2}-\d{2}$/.test(fromDate) &&
@@ -319,8 +313,8 @@ export function ScheduleForm({
             />
           ) : null}
           {dateError ? <Notice error>{dateError}</Notice> : null}
-          <Field label="Fuso horário">
-            <Select name="zone" defaultValue="America/Sao_Paulo">
+          <FormField label="Fuso horário">
+            <SelectField name="zone" defaultValue="America/Sao_Paulo">
               {[
                 "America/Sao_Paulo",
                 "America/Manaus",
@@ -333,14 +327,14 @@ export function ScheduleForm({
               ].map((z) => (
                 <option key={z}>{z}</option>
               ))}
-            </Select>
-          </Field>
-          <Field label="Observações">
-            <Textarea name="notes" maxLength={2000} />
-          </Field>
-          <Field label="Motivo de registro retroativo, quando necessário">
-            <Input name="reason" maxLength={1000} />
-          </Field>
+            </SelectField>
+          </FormField>
+          <FormField label="Observações">
+            <TextAreaField name="notes" maxLength={2000} />
+          </FormField>
+          <FormField label="Motivo de registro retroativo, quando necessário">
+            <TextInput name="reason" maxLength={1000} />
+          </FormField>
           {!team && !publishOwn ? (
             <p className="hca-muted">
               Sua programação será proposta para aprovação.
@@ -354,18 +348,18 @@ export function ScheduleForm({
             As ocorrências a partir da data escolhida serão canceladas. O
             histórico e os documentos permanecem preservados.
           </p>
-          <Field label="Encerrar a partir de">
-            <Input name="from" type="date" defaultValue={today} required />
-          </Field>
-          <Field label="Justificativa">
-            <Textarea name="reason" required minLength={3} maxLength={1000} />
-          </Field>
+          <FormField label="Encerrar a partir de">
+            <TextInput name="from" type="date" defaultValue={today} required />
+          </FormField>
+          <FormField label="Justificativa">
+            <TextAreaField name="reason" required minLength={3} maxLength={1000} />
+          </FormField>
         </>
       ) : null}
       {editor.kind === "reject" || editor.kind === "reject_change" ? (
-        <Field label="Motivo da rejeição">
-          <Textarea name="reason" minLength={3} maxLength={1000} required />
-        </Field>
+        <FormField label="Motivo da rejeição">
+          <TextAreaField name="reason" minLength={3} maxLength={1000} required />
+        </FormField>
       ) : null}
       {editor.kind === "shift" ? (
         <>
@@ -373,20 +367,20 @@ export function ScheduleForm({
             {editor.shift.type_name} · {editor.shift.professional_name}
           </p>
           {team || publishOwn ? (
-            <Field label="Operação">
-              <Select
+            <FormField label="Operação">
+              <SelectField
                 value={shiftAction}
                 onChange={(e) => setShiftAction(e.target.value)}
               >
                 <option value="change">Alterar / substituir</option>
                 <option value="cancel">Cancelar por ausência</option>
-              </Select>
-            </Field>
+              </SelectField>
+            </FormField>
           ) : null}
           {shiftAction !== "cancel" ? (
             <>
-              <Field label="Profissional de destino">
-                <Select
+              <FormField label="Profissional de destino">
+                <SelectField
                   name="person"
                   defaultValue={editor.shift.professional_id}
                 >
@@ -397,10 +391,10 @@ export function ScheduleForm({
                         {p.name}
                       </option>
                     ))}
-                </Select>
-              </Field>
-              <Field label="Início do plantão">
-                <Input
+                </SelectField>
+              </FormField>
+              <FormField label="Início do plantão">
+                <TextInput
                   name="start"
                   type="datetime-local"
                   defaultValue={localMinute(
@@ -409,9 +403,9 @@ export function ScheduleForm({
                   )}
                   required
                 />
-              </Field>
-              <Field label="Fim do plantão">
-                <Input
+              </FormField>
+              <FormField label="Fim do plantão">
+                <TextInput
                   name="end"
                   type="datetime-local"
                   defaultValue={localMinute(
@@ -420,20 +414,20 @@ export function ScheduleForm({
                   )}
                   required
                 />
-              </Field>
+              </FormField>
               <p className="hca-muted">Horários em {editor.shift.timezone}.</p>
-              <Field label="Observações">
-                <Textarea
+              <FormField label="Observações">
+                <TextAreaField
                   name="notes"
                   defaultValue={editor.shift.notes}
                   maxLength={2000}
                 />
-              </Field>
+              </FormField>
             </>
           ) : null}
-          <Field label="Justificativa">
-            <Textarea name="reason" minLength={3} maxLength={1000} required />
-          </Field>
+          <FormField label="Justificativa">
+            <TextAreaField name="reason" minLength={3} maxLength={1000} required />
+          </FormField>
           {!team && !publishOwn ? (
             <p>
               A proposta depende de aprovação; o plantão atual permanece válido.
@@ -441,9 +435,9 @@ export function ScheduleForm({
           ) : null}
         </>
       ) : null}
-      <Button id="schedule-review-button" appearance="primary" type="submit">
+      <ActionButton id="schedule-review-button" variant="primary" type="submit">
         Revisar alteração
-      </Button>
+      </ActionButton>
     </form>
   );
 }

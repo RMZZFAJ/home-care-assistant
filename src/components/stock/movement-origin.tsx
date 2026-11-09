@@ -1,7 +1,8 @@
 "use client";
+import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useRef, type RefObject } from "react";
-import { Button, Spinner } from "@fluentui/react-components";
+
 import { Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { DocumentHeader } from "@/components/documents/document-header";
@@ -265,19 +266,19 @@ export function MovementOrigin({
     >
       <div className="space-y-4">
         {source.loading ? (
-          <Spinner label="Consultando origem autorizada" />
+          <LoadingIndicator label="Consultando origem autorizada" />
         ) : null}
         {source.error ? (
           <Notice error>
             {source.error}
-            <Button
+            <ActionButton
               onClick={() => {
                 focusResultRef.current = true;
                 source.refresh();
               }}
             >
               Tentar consultar origem novamente
-            </Button>
+            </ActionButton>
           </Notice>
         ) : null}
         {source.data ? (

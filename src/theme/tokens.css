@@ -90,10 +90,6 @@
 .hca-recount-recovery-row > .hca-toolbar { max-width: 100%; margin: 0; }
 .hca-compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
 .hca-table-container { overflow: auto; max-width: 100%; }
-.hca-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-.hca-table th { background: #f8f9fb; color: var(--muted); font-size: 12px; font-weight: 600; }
-.hca-table th, .hca-table td { padding: 12px 14px; border-bottom: 1px solid var(--line); }
-.hca-table tr:last-child td { border-bottom: none; }
 .hca-task-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 7px; background: var(--brand-soft); color: var(--brand); flex-shrink: 0; }
 
 @media (min-width: 1024px) {
@@ -279,9 +275,7 @@
   .hca-section-heading { flex-wrap: wrap; }
   .hca-record-actions { flex-direction: column; align-items: stretch; }
   .hca-record-actions button, .hca-record-drawer button { min-height: 44px; }
-  .hca-table th, .hca-table td { padding: 10px 8px; }
-  .hca-table { font-size: 12px; }
-  .hca-administration-toolbar { gap: 8px; }
+      .hca-administration-toolbar { gap: 8px; }
 }
 @media (max-width: 767px) {
   .hca-theme .fui-Button, .hca-record-drawer .fui-Button, .fui-MenuItem, .fui-MenuItemRadio { min-height: 44px; }

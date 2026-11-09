@@ -1,4 +1,5 @@
 "use client";
+import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import {
   useEffect,
@@ -7,14 +8,7 @@ import {
   type FormEvent,
   type RefObject,
 } from "react";
-import {
-  Button,
-  Combobox,
-  Field,
-  Option,
-  Spinner,
-  Textarea,
-} from "@fluentui/react-components";
+import { Combobox, Field, Option, Textarea } from "@fluentui/react-components";
 import { api, ApiError, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { formatZonedDate } from "@/lib/schedules/time";
@@ -336,10 +330,10 @@ export function BalanceRecountAssignment({
         <Notice>
           Há uma justificativa ou escolha ainda não confirmada.
           <div className="hca-toolbar">
-            <Button onClick={() => setDiscard(false)}>
+            <ActionButton onClick={() => setDiscard(false)}>
               Continuar editando
-            </Button>
-            <Button onClick={onClose}>Descartar alterações</Button>
+            </ActionButton>
+            <ActionButton onClick={onClose}>Descartar alterações</ActionButton>
           </div>
         </Notice>
       ) : null}
@@ -348,9 +342,9 @@ export function BalanceRecountAssignment({
         <Notice>
           O resultado ainda não foi confirmado. A pessoa, o período e a
           justificativa desta tentativa permanecem congelados.
-          <Button disabled={busy} onClick={() => void send()}>
+          <ActionButton disabled={busy} onClick={() => void send()}>
             Recuperar a mesma tentativa
-          </Button>
+          </ActionButton>
         </Notice>
       ) : null}
       {result ? (
@@ -381,9 +375,9 @@ export function BalanceRecountAssignment({
             posteriores podem mudar.
           </Notice>
           <div className="hca-toolbar">
-            <Button appearance="primary" onClick={onClose}>
+            <ActionButton variant="primary" onClick={onClose}>
               Consultar acompanhamento atual
-            </Button>
+            </ActionButton>
             <Link href={"/documentos/" + documentId} prefetch={false}>
               Abrir balanço
             </Link>
@@ -394,7 +388,7 @@ export function BalanceRecountAssignment({
           <div hidden={reviewing} className="space-y-4">
             {!reference ? (
               error || inaccessible ? (
-                <Button
+                <ActionButton
                   disabled={busy || querying}
                   onClick={() => {
                     setError("");
@@ -402,21 +396,21 @@ export function BalanceRecountAssignment({
                   }}
                 >
                   Tentar consultar novamente
-                </Button>
+                </ActionButton>
               ) : (
-                <Spinner label="Consultando contagem para reconto" />
+                <LoadingIndicator label="Consultando contagem para reconto" />
               )
             ) : (
               <CountFacts source={reference} />
             )}
             {reference ? (
-              <Button
+              <ActionButton
                 ref={queryRef}
                 disabled={busy || querying || uncertain}
                 onClick={() => void consult()}
               >
                 Comparar com a situação atual
-              </Button>
+              </ActionButton>
             ) : null}
             {comparison ? (
               <section
@@ -445,12 +439,12 @@ export function BalanceRecountAssignment({
                   a usar a versão atual do plantão escolhido, se ele continuar
                   disponível; confira-os novamente.
                 </p>
-                <Button
+                <ActionButton
                   disabled={busy || querying || uncertain}
                   onClick={adopt}
                 >
                   Adotar referência atual
-                </Button>
+                </ActionButton>
               </section>
             ) : null}
             {needsRefresh && !comparison ? (
@@ -532,13 +526,13 @@ export function BalanceRecountAssignment({
                   Pareceres da contagem anterior permanecem históricos e não
                   aprovam automaticamente a nova contagem.
                 </p>
-                <Button
-                  appearance="primary"
+                <ActionButton
+                  variant="primary"
                   type="submit"
                   disabled={blocked || !target || reason.trim().length < 3}
                 >
                   Revisar designação
-                </Button>
+                </ActionButton>
               </form>
             ) : null}
           </div>
@@ -567,7 +561,7 @@ export function BalanceRecountAssignment({
                 registrada pessoalmente durante o plantão.
               </p>
               <div className="hca-toolbar">
-                <Button
+                <ActionButton
                   disabled={busy || uncertain}
                   onClick={() => {
                     packetRef.current = null;
@@ -575,14 +569,14 @@ export function BalanceRecountAssignment({
                   }}
                 >
                   Voltar
-                </Button>
-                <Button
-                  appearance="primary"
+                </ActionButton>
+                <ActionButton
+                  variant="primary"
                   disabled={busy}
                   onClick={() => void send()}
                 >
                   {uncertain ? "Recuperar confirmação" : "Confirmar designação"}
-                </Button>
+                </ActionButton>
               </div>
             </section>
           ) : null}

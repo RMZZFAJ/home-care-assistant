@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@fluentui/react-components";
+
 import { api, ApiError, inputClass, Notice } from "@/components/workspace";
 import { Dialog } from "@/components/ui/primitives";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -156,9 +157,9 @@ export function ConsumptionDecision({
               <p className="hca-field-hint">
                 {reason.length}/1000 caracteres. O original permanece íntegro.
               </p>
-              <Button type="submit" appearance="primary">
+              <ActionButton type="submit" variant="primary">
                 Revisar rejeição
-              </Button>
+              </ActionButton>
             </form>
           )
         ) : null}
@@ -178,9 +179,9 @@ export function ConsumptionDecision({
         ) : null}
         {conflict ? (
           <div className="space-y-3">
-            <Button disabled={busy} onClick={() => void compare()}>
+            <ActionButton disabled={busy} onClick={() => void compare()}>
               Consultar decisão e versão atuais
-            </Button>
+            </ActionButton>
             {current ? (
               <>
                 <p>
@@ -193,7 +194,7 @@ export function ConsumptionDecision({
                 </p>
                 <ConsumptionLines lines={current.current_lines} />
                 {current.status === "reported" ? (
-                  <Button
+                  <ActionButton
                     onClick={() => {
                       setReference(current);
                       setCurrent(null);
@@ -204,7 +205,7 @@ export function ConsumptionDecision({
                     }}
                   >
                     Revisar versão atual
-                  </Button>
+                  </ActionButton>
                 ) : (
                   <>
                     <p>
@@ -213,9 +214,9 @@ export function ConsumptionDecision({
                       · {formatBrazilDate(current.confirmed_at)}
                     </p>
                     <p>{current.decision?.reason}</p>
-                    <Button onClick={() => onSaved(current)}>
+                    <ActionButton onClick={() => onSaved(current)}>
                       Abrir resultado registrado
-                    </Button>
+                    </ActionButton>
                   </>
                 )}
               </>
@@ -223,11 +224,11 @@ export function ConsumptionDecision({
           </div>
         ) : null}
         <div className="hca-toolbar">
-          <Button disabled={busy || uncertain} onClick={onClose}>
+          <ActionButton disabled={busy || uncertain} onClick={onClose}>
             Voltar sem decidir
-          </Button>
+          </ActionButton>
           {review && !accept ? (
-            <Button
+            <ActionButton
               disabled={busy || uncertain}
               onClick={() => {
                 setReview(false);
@@ -236,11 +237,11 @@ export function ConsumptionDecision({
               }}
             >
               Editar motivo
-            </Button>
+            </ActionButton>
           ) : null}
           {review ? (
-            <Button
-              appearance="primary"
+            <ActionButton
+              variant="primary"
               disabled={
                 busy ||
                 conflict ||
@@ -257,7 +258,7 @@ export function ConsumptionDecision({
                   : reference.kind === "shortage"
                     ? "Confirmar falta sem desconto"
                     : "Confirmar consumo e descontar"}
-            </Button>
+            </ActionButton>
           ) : null}
         </div>
       </div>

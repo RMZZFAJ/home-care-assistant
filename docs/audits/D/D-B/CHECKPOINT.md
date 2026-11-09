@@ -2310,3 +2310,32 @@ meta ativa. Próximo:migrar controles/shell e fichas/Andamentos,com todos os
 recursos preservados,seguindo depois66 composições/171 relações e gates finais.
 [Contrato](../../../ui-ux/CANONICAL_MODEL.md),[provas](UI_MODEL_STAGE_1.json),
 [execução](UI_MODEL_ACCEPTANCE.csv),[consumidores](UI_COMPONENT_MIGRATION.csv).
+
+## D3.27 — controles nativos, feedback e tabelas — 09/11/2026
+
+Base94f36eb.49 consumidores migrados:botões,campos,selects,checkboxes,textareas,
+badges,espera,tabelas;avisos e progresso também nativos. Labels/ajuda/required/
+erros associados ao controle real. Eventos usam API HTML,com captura do valor
+antes de updater adiado;sem adaptador Fluent. Notice e constantes alcançam
+formulários já nativos. Seis regras legadas de tabela removidas.17 arquivos
+Fluent restantes,identificados no ledger;campos com seletores compostos ficam
+para seu lote próprio,sem falsa conversão ou perda de busca/múltipla seleção.
+
+20 cenários distintos Chromium/iOS PASS:3 iniciais e17 restantes,sem repetir
+os três aprovados no mesmo código de produto. Administração,BAL,REQ/COM/PDFs,
+cinco propostas/readonly/negativas,notificações,descarte/foco,escala,catálogo/
+unidade/barcode/inteiros e senha/OTP com Auth real. Tipos/lint PASS. Matriz
+56/49/0,105x39,primeiras30 preservadas;UI adicional continua parcial.
+
+Contraprova Axe:botão Limpar filtros parcialmente sob o cabeçalho após abrir
+comparações e redimensionar. Header/hit-test íntegros;alvo era do corpo da página.
+Normalizada origem da consulta por largura,sem mudar regras Axe/larguras/efeitos.
+Diagnóstico só em falha,não coleta valores privados. Falhas e geometria por hash.
+
+Sem API/RPC/schema/worker/assinatura alterados,sem replay/envio externo. Local/
+remoto164/última20261109024515/digest iguais,zero SQL nova/pendente. CI94f36eb
+Windows/Ubuntu/banco PASS,browsers em andamento na observação;novo SHA exige
+CI própria. PR7 Draft,produção NO-GO,Sonar adiado,meta ativa. Próximo:seletores
+compostos/menus/provider/shell,fichas em abas/Andamentos e paridade integral.
+[Dossiê](UI_MODEL_STAGE_2.md),[provas](UI_MODEL_STAGE_2.json),
+[observação](UI_MODEL_NATIVE_OBSERVATION.json),[ledger](UI_COMPONENT_MIGRATION.csv).

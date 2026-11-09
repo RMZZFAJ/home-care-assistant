@@ -1,11 +1,12 @@
 "use client";
+import { CheckboxField, Pill } from "@/components/ui/controls";
 import Link from "next/link";
 import { useState } from "react";
 import { api, buttonClass, Notice, Workspace } from "../workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryLabels } from "@/lib/notifications/presentation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
-import { Badge, Checkbox } from "@fluentui/react-components";
+
 import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
 import { useInbox } from "@/lib/notifications/use-inbox";
 import { PushArrival } from "./push-arrival";
@@ -41,13 +42,13 @@ function Center({ patientId }: { patientId?: string }) {
           Atualizar
         </button>
       </div>
-      <div className="hca-toolbar"><Checkbox
+      <div className="hca-toolbar"><CheckboxField
           checked={unread}
           label="Somente não vistas"
-          onChange={(_, value) => {
-            setUnread(value.checked === true);
+          onChange={controlEvent => { const controlValue = controlEvent.currentTarget.checked;
+            setUnread(controlValue === true);
             setPage(1);
-          }}
+           }}
         /></div>
       {inbox.scopeRequired ? <Notice>Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.</Notice> : null}
       {inbox.error ? <Notice error>{inbox.error} <button type="button" className={buttonClass} onClick={inbox.refresh}>Consultar notificações novamente</button></Notice> : null}
@@ -71,7 +72,7 @@ function Center({ patientId }: { patientId?: string }) {
           >
             <div className="text-sm font-semibold">
               <span>{row.operational_documents?.code ?? "Atualização operacional"}</span>
-              {!row.seen_at ? <Badge className="ml-3" appearance="tint" color="informative">Não vista</Badge> : null}
+              {!row.seen_at ? <Pill className="ml-3"  tone="neutral">Não vista</Pill> : null}
             </div>
             <p className="mt-1 text-sm">
               {documentEventLabel(row.event_key ?? row.document_events?.action)}

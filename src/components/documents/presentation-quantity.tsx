@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useId, useState } from "react";
-import { Button, Combobox, Option } from "@fluentui/react-components";
+import { Combobox, Option } from "@fluentui/react-components";
 import { inputClass, Notice } from "@/components/workspace";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import type { CatalogProduct } from "@/types/documents";
@@ -76,12 +77,12 @@ export function PresentationQuantity({
           anteriores foram preservadas.
         </Notice>
       ) : null}
-      <Button
+      <ActionButton
         aria-label={"Atualizar embalagens de " + product.name}
         onClick={refresh}
       >
         Atualizar embalagens
-      </Button>
+      </ActionButton>
       {selections.map((selected) => {
         const current = available.find((row) => row.id === selected.id);
         const changed = current?.version !== selected.version;
@@ -126,7 +127,7 @@ export function PresentationQuantity({
                   ? `Cadastro atual v${current.version}: ${current.name}, código ${current.barcode}, fator ${formatQuantity(current.base_quantity, product.unit)}. Sua escolha anterior não foi alterada.`
                   : "Esta apresentação não está disponível na fonte consultada. A escolha anterior foi preservada; revise antes de emitir."}
                 {current ? (
-                  <Button
+                  <ActionButton
                     aria-label={"Adotar fator atual de " + selected.name}
                     onClick={() =>
                       onChange(
@@ -148,11 +149,11 @@ export function PresentationQuantity({
                     }
                   >
                     Adotar fator atual
-                  </Button>
+                  </ActionButton>
                 ) : null}
               </Notice>
             ) : null}
-            <Button
+            <ActionButton
               aria-label={"Remover " + selected.name}
               onClick={() =>
                 onChange(
@@ -162,7 +163,7 @@ export function PresentationQuantity({
               }
             >
               Remover embalagem
-            </Button>
+            </ActionButton>
           </div>
         );
       })}
@@ -225,7 +226,7 @@ export function PresentationQuantity({
             ))}
         </Combobox>
       </label>
-      <Button
+      <ActionButton
         aria-label={"Adicionar embalagem de " + product.name}
         disabled={
           !chosen ||
@@ -255,7 +256,7 @@ export function PresentationQuantity({
         }}
       >
         Adicionar embalagem
-      </Button>
+      </ActionButton>
       {!loading && !error && !available.length ? (
         <p>
           Sem apresentação ativa para este material. Informe diretamente em{" "}

@@ -1,7 +1,8 @@
 "use client";
+import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
-import { Button, Spinner } from "@fluentui/react-components";
+
 import { api, ApiError, inputClass, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -260,21 +261,21 @@ export function CatalogueIdentityManagement({
               Motivo próprio: {prepared.packet.reason}
             </p>
             <div className="hca-toolbar">
-              <Button
+              <ActionButton
                 disabled={busy || uncertain || !writable}
                 onClick={() => setPrepared(null)}
               >
                 Voltar à escolha
-              </Button>
-              <Button
-                appearance="primary"
+              </ActionButton>
+              <ActionButton
+                variant="primary"
                 disabled={busy || (!writable && !uncertain)}
                 onClick={() => void save()}
               >
                 {uncertain
                   ? "Recuperar mesma intenção"
                   : "Confirmar mudança no catálogo"}
-              </Button>
+              </ActionButton>
             </div>
           </section>
         ) : !writable ? (
@@ -285,7 +286,7 @@ export function CatalogueIdentityManagement({
         ) : (
           <>
             {source.loading ? (
-              <Spinner label="Consultando material, situação e saldos autorizados" />
+              <LoadingIndicator label="Consultando material, situação e saldos autorizados" />
             ) : null}
             {source.error ? (
               <Notice error>
@@ -293,9 +294,9 @@ export function CatalogueIdentityManagement({
                 {source.data
                   ? "Última consulta preservada; confirme a referência vigente antes de agir."
                   : "A consulta não foi concluída."}
-                <Button onClick={() => source.refresh()}>
+                <ActionButton onClick={() => source.refresh()}>
                   Tentar consulta do material novamente
-                </Button>
+                </ActionButton>
               </Notice>
             ) : null}
             {reference ? (
@@ -344,7 +345,7 @@ export function CatalogueIdentityManagement({
                             label="Referência atual do sucessor"
                           />
                         ) : null}
-                        <Button
+                        <ActionButton
                           onClick={() => {
                             setAdopted(comparison);
                             setComparison(null);
@@ -354,12 +355,12 @@ export function CatalogueIdentityManagement({
                           }}
                         >
                           Adotar referência consultada e manter meu motivo
-                        </Button>
+                        </ActionButton>
                       </>
                     ) : null}
-                    <Button onClick={() => void consultConflict()}>
+                    <ActionButton onClick={() => void consultConflict()}>
                       Consultar referência para comparação
-                    </Button>
+                    </ActionButton>
                   </section>
                 ) : null}
                 <label className="block text-sm font-semibold">
@@ -422,8 +423,8 @@ export function CatalogueIdentityManagement({
                     onChange={(event) => setReason(event.target.value)}
                   />
                 </div>
-                <Button
-                  appearance="primary"
+                <ActionButton
+                  variant="primary"
                   disabled={
                     !writable ||
                     !action ||
@@ -434,7 +435,7 @@ export function CatalogueIdentityManagement({
                   onClick={prepare}
                 >
                   Revisar mudança no catálogo
-                </Button>
+                </ActionButton>
                 <Link
                   className="ui-button ui-button-secondary"
                   href={
@@ -450,14 +451,14 @@ export function CatalogueIdentityManagement({
                 >
                   <h3>Escolhas registradas</h3>
                   {older.loading ? (
-                    <Spinner label="Consultando escolhas anteriores" />
+                    <LoadingIndicator label="Consultando escolhas anteriores" />
                   ) : null}
                   {older.error ? (
                     <Notice error>
                       {older.error}
-                      <Button onClick={() => older.refresh()}>
+                      <ActionButton onClick={() => older.refresh()}>
                         Tentar histórico novamente
-                      </Button>
+                      </ActionButton>
                     </Notice>
                   ) : null}
                   {history?.events.length === 0 ? (
@@ -491,21 +492,21 @@ export function CatalogueIdentityManagement({
                       aria-label="Páginas das escolhas de catálogo"
                       className="hca-toolbar"
                     >
-                      <Button
+                      <ActionButton
                         disabled={page <= 1}
                         onClick={() => setPage((value) => value - 1)}
                       >
                         Escolhas anteriores
-                      </Button>
+                      </ActionButton>
                       <span>
                         Página {page} de {Math.ceil(reference.eventTotal / 20)}
                       </span>
-                      <Button
+                      <ActionButton
                         disabled={page * 20 >= reference.eventTotal}
                         onClick={() => setPage((value) => value + 1)}
                       >
                         Mais escolhas
-                      </Button>
+                      </ActionButton>
                     </nav>
                   ) : null}
                 </section>

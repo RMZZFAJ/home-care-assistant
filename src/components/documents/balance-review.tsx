@@ -1,8 +1,9 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { recountHref } from "@/components/balances/balance-recount-assignment";
-import { Button } from "@fluentui/react-components";
+
 import { api, ApiError, inputClass, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -262,7 +263,7 @@ export function BalanceReview({
       {context.eligibleGroups.length ? (
         <div className="hca-toolbar">
           {context.eligibleGroups.map((group) => (
-            <Button
+            <ActionButton
               key={group}
               onClick={(event) => {
                 setComment("");
@@ -279,7 +280,7 @@ export function BalanceReview({
               {group === "family"
                 ? "Revisão da família"
                 : "Revisão da supervisão"}
-            </Button>
+            </ActionButton>
           ))}
         </div>
       ) : (
@@ -369,7 +370,7 @@ export function BalanceReview({
             </p>
             <CountFacts data={editor.reference} />
             {!reviewing ? (
-              <Button
+              <ActionButton
                 ref={queryRef}
                 disabled={busy || uncertain}
                 onClick={() => void consult()}
@@ -377,7 +378,7 @@ export function BalanceReview({
                 {busy
                   ? "Consultando referência…"
                   : "Consultar referência atual"}
-              </Button>
+              </ActionButton>
             ) : null}
             {comparison?.balanceReview ? (
               <section
@@ -386,7 +387,7 @@ export function BalanceReview({
               >
                 <h3 className="font-semibold">Referência atual</h3>
                 <CountFacts data={comparison} />
-                <Button
+                <ActionButton
                   className="max-w-full"
                   disabled={
                     busy ||
@@ -408,7 +409,7 @@ export function BalanceReview({
                   }}
                 >
                   Adotar referência atual e manter meu parecer
-                </Button>
+                </ActionButton>
                 <p className="text-sm">
                   Adotar não envia a revisão. Confira novamente antes de
                   confirmar.
@@ -422,7 +423,7 @@ export function BalanceReview({
                   {comment || "Sem comentário adicional."}
                 </p>
                 <div className="hca-toolbar">
-                  <Button
+                  <ActionButton
                     disabled={busy || uncertain}
                     onClick={() => {
                       setReviewing(false);
@@ -430,9 +431,9 @@ export function BalanceReview({
                     }}
                   >
                     Voltar ao parecer
-                  </Button>
-                  <Button
-                    appearance="primary"
+                  </ActionButton>
+                  <ActionButton
+                    variant="primary"
                     disabled={busy}
                     onClick={() => void save()}
                   >
@@ -441,7 +442,7 @@ export function BalanceReview({
                       : uncertain
                         ? "Recuperar revisão"
                         : "Confirmar revisão"}
-                  </Button>
+                  </ActionButton>
                 </div>
               </div>
             ) : (
@@ -468,9 +469,9 @@ export function BalanceReview({
                     contou.
                   </span>
                 </label>
-                <Button
+                <ActionButton
                   type="submit"
-                  appearance="primary"
+                  variant="primary"
                   disabled={
                     busy ||
                     uncertain ||
@@ -481,7 +482,7 @@ export function BalanceReview({
                   }
                 >
                   Revisar parecer
-                </Button>
+                </ActionButton>
               </form>
             )}
           </div>

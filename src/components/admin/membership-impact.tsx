@@ -1,7 +1,8 @@
 "use client";
+import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Button, Spinner } from "@fluentui/react-components";
+
 import { api, Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
@@ -121,9 +122,9 @@ export function MembershipImpact({
         as tarefas futuras pelos processos próprios; recebimentos e autorias
         anteriores permanecem preservados.
       </p>
-      {loading ? <Spinner label="Consultando pendências do vínculo" /> : null}
+      {loading ? <LoadingIndicator label="Consultando pendências do vínculo" /> : null}
       {!loading && result.error ? <Notice error>{result.error}</Notice> : null}
-      <Button
+      <ActionButton
         ref={refreshRef}
         disabled={loading}
         onClick={() => {
@@ -132,7 +133,7 @@ export function MembershipImpact({
         }}
       >
         Atualizar pendências
-      </Button>
+      </ActionButton>
       {data ? (
         <>
           {loading || result.error ? (

@@ -1,4 +1,5 @@
 "use client";
+import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   api,
@@ -14,7 +15,7 @@ import {
 import { PermissionMatrix } from "./permission-matrix";
 import { NotificationMatrix } from "./notification-matrix";
 import { PolicyRules } from "./policy-rules";
-import { Button } from "@fluentui/react-components";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { roles } from "./admin-fields";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -239,12 +240,12 @@ function Policies({ context }: { context: WorkspaceContext }) {
     return (
       <Notice error={Boolean(error)}>
         {error || "Carregando configurações…"}
-        {error ? <Button onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</Button> : null}
+        {error ? <ActionButton onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</ActionButton> : null}
       </Notice>
     );
   const settings = { ...defaults, ...data.data.settings };
-  const recovery = command.uncertain ? <Notice error>O resultado da alteração ainda não foi confirmado. O conteúdo e a chave da tentativa estão preservados. <Button disabled={busy} onClick={async () => { setError(""); try { await confirmed(await command.recover()); } catch (reason) { failed(reason); } }}>Recuperar mesma alteração</Button></Notice>
-    : conflict ? <Notice error>Revise a configuração vigente antes de preparar outra intenção. <Button disabled={busy} onClick={() => void reviewCurrent()}>Revisar configuração vigente</Button></Notice> : null;
+  const recovery = command.uncertain ? <Notice error>O resultado da alteração ainda não foi confirmado. O conteúdo e a chave da tentativa estão preservados. <ActionButton disabled={busy} onClick={async () => { setError(""); try { await confirmed(await command.recover()); } catch (reason) { failed(reason); } }}>Recuperar mesma alteração</ActionButton></Notice>
+    : conflict ? <Notice error>Revise a configuração vigente antes de preparar outra intenção. <ActionButton disabled={busy} onClick={() => void reviewCurrent()}>Revisar configuração vigente</ActionButton></Notice> : null;
   return (
     <div className="space-y-5">
       <p className="text-sm text-(--muted)">
@@ -253,7 +254,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
           : "Atuação local: alterações autorizadas são aplicadas imediatamente."}{" "}
         · Política v{data.data.version}
       </p>
-      {error ? <Notice error>{error}{!command.uncertain && !conflict ? <Button onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</Button> : null}</Notice> : null}
+      {error ? <Notice error>{error}{!command.uncertain && !conflict ? <ActionButton onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</ActionButton> : null}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {recovery}
       {invitationRecovery ? <Notice>{invitationRecovery.notice}{context.activeContext?.mode === "patient" && context.patient?.role === "admin" ? <button className={buttonClass} disabled={busy} onClick={() => void reissueInvitation(invitationRecovery.invitationId)}>Reemitir convite e invalidar link anterior</button> : <p>Um administrador local deve reemitir o convite.</p>}</Notice> : null}
@@ -269,7 +270,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
           />
         </Notice>
       ) : null}
-      <nav aria-label="Áreas da configuração" className="hca-configuration-tabs">{[["rules", "Regras"], ["permissions", "Permissões"], ["notifications", "Notificações"], ["people", "Pessoas e propostas"]].map(([area, label]) => { const query = new URLSearchParams(params.toString()); query.set("area", area); return <Button key={area} as="a" appearance="subtle" className="hca-configuration-tab" href={"/configuracoes?" + query} aria-current={tab === area ? "page" : undefined} onClick={(event) => { if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) { event.preventDefault(); setTab(area); } }}>{label}</Button>; })}</nav>
+      <nav aria-label="Áreas da configuração" className="hca-configuration-tabs">{[["rules", "Regras"], ["permissions", "Permissões"], ["notifications", "Notificações"], ["people", "Pessoas e propostas"]].map(([area, label]) => { const query = new URLSearchParams(params.toString()); query.set("area", area); return <ActionLink key={area}  variant="quiet" className="hca-configuration-tab" href={"/configuracoes?" + query} aria-current={tab === area ? "page" : undefined} onClick={(event) => { if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) { event.preventDefault(); setTab(area); } }}>{label}</ActionLink>; })}</nav>
       <div hidden={tab !== "rules"}>
         <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
       </div>

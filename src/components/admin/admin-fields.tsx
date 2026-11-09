@@ -1,6 +1,7 @@
 "use client";
+import { CheckboxField, FormField, SelectField, TextInput, type TextInputProps } from "@/components/ui/controls";
 import { useId } from "react";
-import { Checkbox, Field as FluentField, Input, Select, type InputProps } from "@fluentui/react-components";
+
 export type Row = Record<string, unknown>;
 
 import {roleLabels as roles} from "@/lib/role-labels";
@@ -24,7 +25,7 @@ export function Field({
   name: string;
   label: string;
   value?: string | number;
-  type?: InputProps["type"];
+  type?: TextInputProps["type"];
   required?: boolean;
   min?: number;
   max?: number;
@@ -32,8 +33,8 @@ export function Field({
 }) {
   const id = useId();
   return (
-    <FluentField label={{ children: label, htmlFor: id }}>
-      <Input
+    <FormField label={label} htmlFor={id}>
+      <TextInput
         id={id}
         name={name}
         defaultValue={String(value)}
@@ -43,7 +44,7 @@ export function Field({
         max={max}
         step={step}
       />
-    </FluentField>
+    </FormField>
   );
 }
 export function Check({
@@ -55,18 +56,18 @@ export function Check({
   label: string;
   checked?: boolean;
 }) {
-  return <Checkbox name={name} defaultChecked={checked} label={label} />;
+  return <CheckboxField name={name} defaultChecked={checked} label={label} />;
 }
 export function RoleSelect({ value = "professional" }: { value?: string }) {
   return (
-    <FluentField label="Função neste paciente">
-      <Select name="role" defaultValue={value}>
+    <FormField label="Função neste paciente">
+      <SelectField name="role" defaultValue={value}>
         {Object.entries(roles).map(([key, label]) => (
           <option key={key} value={key}>
             {label}
           </option>
         ))}
-      </Select>
-    </FluentField>
+      </SelectField>
+    </FormField>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@fluentui/react-components";
+
 import {
   api,
   ApiError,
@@ -124,10 +125,10 @@ export function ConsumptionDetail({
         <h2 className="font-semibold" tabIndex={-1} ref={headingRef}>
           Relato e conferência
         </h2>
-        <Button onClick={onClose}>Voltar à lista</Button>
-        <Button onClick={() => setAttempt((value) => value + 1)}>
+        <ActionButton onClick={onClose}>Voltar à lista</ActionButton>
+        <ActionButton onClick={() => setAttempt((value) => value + 1)}>
           Atualizar relato
-        </Button>
+        </ActionButton>
       </div>
       {error ? (
         <Notice error>
@@ -189,14 +190,14 @@ export function ConsumptionDetail({
               </p>
               <div className="hca-toolbar">
                 {supplement ? (
-                  <Button onClick={(event) => setEditor(event.currentTarget)}>
+                  <ActionButton onClick={(event) => setEditor(event.currentTarget)}>
                     Adicionar complemento
-                  </Button>
+                  </ActionButton>
                 ) : null}
                 {decide ? (
                   <>
-                    <Button
-                      appearance="primary"
+                    <ActionButton
+                      variant="primary"
                       disabled={
                         data.kind === "consumption" &&
                         !data.current_lines.length
@@ -208,14 +209,14 @@ export function ConsumptionDetail({
                       {data.kind === "shortage"
                         ? "Conferir falta"
                         : "Conferir consumo"}
-                    </Button>
-                    <Button
+                    </ActionButton>
+                    <ActionButton
                       onClick={() =>
                         setDecision({ report: data, accept: false })
                       }
                     >
                       Rejeitar relato
-                    </Button>
+                    </ActionButton>
                   </>
                 ) : null}
               </div>

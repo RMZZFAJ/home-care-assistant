@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import { useEffect, useId, useRef } from "react";
-import { Button, Spinner } from "@fluentui/react-components";
+
 import { Notice, inputClass } from "@/components/workspace";
 import { RelatedDocument } from "@/components/documents/related-document";
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -68,12 +69,12 @@ export function RemainingNeedReference({
         Selecione os materiais e informe a observação atual nas próximas etapas.
       </p>
       {source.loading ? (
-        <Spinner label="Consultando a requisição de origem" />
+        <LoadingIndicator label="Consultando a requisição de origem" />
       ) : null}
       {source.error ? (
         <Notice error>
           {source.error}{" "}
-          <Button onClick={source.refresh}>Tentar origem novamente</Button>
+          <ActionButton onClick={source.refresh}>Tentar origem novamente</ActionButton>
         </Notice>
       ) : null}
       {data && valid ? (
@@ -109,7 +110,7 @@ export function RemainingNeedReference({
                   nova requisição.
                 </Notice>
               ) : null}
-              <Button
+              <ActionButton
                 disabled={source.loading || Boolean(source.error)}
                 onClick={() => {
                   onChange({
@@ -123,7 +124,7 @@ export function RemainingNeedReference({
                 {value
                   ? "Adotar referência atual e manter meu motivo"
                   : "Preparar nova necessidade com esta referência"}
-              </Button>
+              </ActionButton>
             </>
           ) : null}
         </>

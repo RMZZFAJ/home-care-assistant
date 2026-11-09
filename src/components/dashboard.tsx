@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import { useEffect, useState } from "react";
-import { Button, Spinner } from "@fluentui/react-components";
+
 import { api, Notice, Workspace, type WorkspaceContext } from "@/components/workspace";
 import { EmptyState } from "@/components/ui/primitives";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -24,7 +25,7 @@ function PatientDashboard({ context }: { context: WorkspaceContext }) {
     }, (reason) => { if (!controller.signal.aborted) setError(reason.message); });
     return () => controller.abort();
   }, [context.patient, attempt, revision]);
-  if (error) return <Notice error>{error}<Button onClick={() => setAttempt((value) => value + 1)}>Tentar novamente</Button></Notice>;
-  if (!data) return <Spinner label="Organizando suas próximas ações" size="small" />;
+  if (error) return <Notice error>{error}<ActionButton onClick={() => setAttempt((value) => value + 1)}>Tentar novamente</ActionButton></Notice>;
+  if (!data) return <LoadingIndicator label="Organizando suas próximas ações"  />;
   return ["professional", "supervisor"].includes(context.patient!.role) ? <OperationsDashboard context={context} data={data} /> : <ManagementDashboard context={context} data={data} />;
 }

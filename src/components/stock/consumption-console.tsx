@@ -1,7 +1,8 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@fluentui/react-components";
+
 import {
   api,
   ApiError,
@@ -161,16 +162,16 @@ function Reports({ context }: { context: WorkspaceContext }) {
       {message ? <Notice>{message}</Notice> : null}
       <div className="hca-toolbar">
         {can(context, "consumption.report") ? (
-          <Button
-            appearance="primary"
+          <ActionButton
+            variant="primary"
             onClick={(event) => {setEditorOrigin(null);setEditor(event.currentTarget);}}
           >
             Registrar ocorrência
-          </Button>
+          </ActionButton>
         ) : null}
-        <Button onClick={() => setAttempt((value) => value + 1)}>
+        <ActionButton onClick={() => setAttempt((value) => value + 1)}>
           Atualizar lista
-        </Button>
+        </ActionButton>
       </div>
       <section className="ui-card" aria-label="Relatos registrados">
         <h2 className="font-semibold" tabIndex={-1} ref={listHeadingRef}>
@@ -229,7 +230,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
               defaultValue={params.get("to") ?? ""}
             />
           </label>
-          <Button type="submit">Aplicar filtros</Button>
+          <ActionButton type="submit">Aplicar filtros</ActionButton>
         </form>
         <form
           className="my-4 space-y-2"
@@ -264,7 +265,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
               {referenceError}
             </p>
           ) : null}
-          <Button type="submit">Consultar referência</Button>
+          <ActionButton type="submit">Consultar referência</ActionButton>
         </form>
         {error ? (
           <Notice error>
@@ -293,7 +294,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
                 {row.reported_name ?? "Nome original não preservado"} ·{" "}
                 {formatBrazilDate(row.created_at)} · versão {row.version}
               </p>
-              <Button
+              <ActionButton
                 className="mt-3"
                 onClick={(event) => {
                   triggerRef.current = event.currentTarget;
@@ -301,7 +302,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
                 }}
               >
                 Abrir relato <span className="sr-only">{row.id}</span>
-              </Button>
+              </ActionButton>
             </li>
           ))}
         </ul>
@@ -309,13 +310,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
           <p>Nenhum relato encontrado para estes filtros.</p>
         ) : null}
         {next ? (
-          <Button
+          <ActionButton
             className="mt-4"
             disabled={moreBusy || reading}
             onClick={() => void loadMore()}
           >
             Carregar mais relatos
-          </Button>
+          </ActionButton>
         ) : null}
       </section>
       {selected&&(explicitReport||notice.data?.kind==="report") ? (

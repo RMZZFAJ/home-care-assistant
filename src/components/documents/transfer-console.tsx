@@ -1,4 +1,5 @@
 "use client";
+import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import {
   useEffect,
@@ -7,16 +8,7 @@ import {
   type FormEvent,
   type RefObject,
 } from "react";
-import {
-  Button,
-  Combobox,
-  Field,
-  Input,
-  Option,
-  Select,
-  Spinner,
-  Textarea,
-} from "@fluentui/react-components";
+import { Combobox, Field, Input, Option, Select, Textarea } from "@fluentui/react-components";
 import {
   api,
   ApiError,
@@ -85,13 +77,13 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
                 ) : null}
               </Select>
             </Field>
-            <Button
-              appearance="primary"
+            <ActionButton
+              variant="primary"
               disabled={!source}
               onClick={() => setEditing(true)}
             >
               Preparar declaração
-            </Button>
+            </ActionButton>
           </>
         ) : (
           <Notice>
@@ -297,10 +289,10 @@ function TransferDeclarationEditor({
         <Notice>
           Há uma declaração ainda não registrada.
           <div className="hca-toolbar">
-            <Button onClick={() => setDiscard(false)}>
+            <ActionButton onClick={() => setDiscard(false)}>
               Continuar editando
-            </Button>
-            <Button onClick={onClose}>Descartar declaração</Button>
+            </ActionButton>
+            <ActionButton onClick={onClose}>Descartar declaração</ActionButton>
           </div>
         </Notice>
       ) : null}
@@ -328,9 +320,9 @@ function TransferDeclarationEditor({
       ) : !reference ? (
         <>
           {!error ? (
-            <Spinner label="Consultando pessoas e saldo da origem" />
+            <LoadingIndicator label="Consultando pessoas e saldo da origem" />
           ) : (
-            <Button
+            <ActionButton
               onClick={() => {
                 setError("");
                 setRefreshing(true);
@@ -338,7 +330,7 @@ function TransferDeclarationEditor({
               }}
             >
               Tentar consultar novamente
-            </Button>
+            </ActionButton>
           )}
         </>
       ) : (
@@ -378,7 +370,7 @@ function TransferDeclarationEditor({
                   .
                 </p>
               ))}
-              <Button
+              <ActionButton
                 onClick={() => {
                   setReference(comparison);
                   setComparison(null);
@@ -386,7 +378,7 @@ function TransferDeclarationEditor({
                 }}
               >
                 Adotar referência atual e revisar meus campos
-              </Button>
+              </ActionButton>
             </section>
           ) : null}
           {needsRefresh ? (
@@ -397,11 +389,11 @@ function TransferDeclarationEditor({
           ) : null}
           {!packet ? (
             <>
-              <Button disabled={refreshing} onClick={refresh}>
+              <ActionButton disabled={refreshing} onClick={refresh}>
                 {refreshing
                   ? "Consultando referência…"
                   : "Comparar referência atual"}
-              </Button>
+              </ActionButton>
               {!reference.people.length ? (
                 <Notice>
                   Não há pessoa habilitada na custódia de destino. A declaração
@@ -544,7 +536,7 @@ function TransferDeclarationEditor({
                             }
                           />
                         </Field>
-                        <Button
+                        <ActionButton
                           onClick={() =>
                             setLines((previous) =>
                               previous.filter(
@@ -554,7 +546,7 @@ function TransferDeclarationEditor({
                           }
                         >
                           Remover {product?.name ?? "material"}
-                        </Button>
+                        </ActionButton>
                       </fieldset>
                     );
                   })
@@ -597,15 +589,15 @@ function TransferDeclarationEditor({
                     resize="vertical"
                   />
                 </Field>
-                <Button
+                <ActionButton
                   type="submit"
-                  appearance="primary"
+                  variant="primary"
                   disabled={
                     needsRefresh || !reference.people.length || !lines.length
                   }
                 >
                   Revisar declaração
-                </Button>
+                </ActionButton>
               </form>
             </>
           ) : (
@@ -658,7 +650,7 @@ function TransferDeclarationEditor({
               ) : null}
               <div className="hca-toolbar">
                 {!uncertain ? (
-                  <Button
+                  <ActionButton
                     onClick={() => {
                       setPacket(null);
                       requestAnimationFrame(() =>
@@ -667,13 +659,13 @@ function TransferDeclarationEditor({
                     }}
                   >
                     Voltar aos meus campos
-                  </Button>
+                  </ActionButton>
                 ) : null}
-                <Button appearance="primary" onClick={() => void submit()}>
+                <ActionButton variant="primary" onClick={() => void submit()}>
                   {uncertain
                     ? "Recuperar mesma declaração"
                     : "Registrar declaração sem expedir"}
-                </Button>
+                </ActionButton>
               </div>
             </section>
           )}

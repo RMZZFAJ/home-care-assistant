@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton, LoadingIndicator, SelectField } from "@/components/ui/controls";
 import { useEffect, useState } from "react";
-import { Button, Select, Spinner } from "@fluentui/react-components";
+
 import {
   api,
   can,
@@ -87,9 +88,9 @@ function Inbox({ context }: { context: WorkspaceContext }) {
       </p>
       {can(context, "ent.create") ? <Link href="/transferencias" className="ui-button ui-button-secondary">Declarar transferência entre custódias</Link> : null}
       <div className="hca-toolbar">
-        <Select
+        <SelectField
           style={{ minWidth: 0, maxWidth: "100%" }}
-          select={{ style: { minWidth: 0, maxWidth: "100%" } }}
+
           aria-label="Situação das entregas"
           value={status}
           onChange={(event) => {
@@ -110,10 +111,10 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           </option>
           <option value="cancelled">Canceladas</option>
           <option value="">Todas</option>
-        </Select>
-        <Select
+        </SelectField>
+        <SelectField
           style={{ minWidth: 0, maxWidth: "100%" }}
-          select={{ style: { minWidth: 0, maxWidth: "100%" } }}
+
           aria-label="Responsável pelas entregas"
           value={scope}
           disabled={status === "tasks"}
@@ -124,17 +125,17 @@ function Inbox({ context }: { context: WorkspaceContext }) {
         >
           <option value="own">Destinadas a mim</option>
           <option value="team">Histórico autorizado do paciente</option>
-        </Select>
+        </SelectField>
       </div>
       {!loading && result.error ? (
         <Notice error>
           {result.error}
-          <Button onClick={() => setAttempt((value) => value + 1)}>
+          <ActionButton onClick={() => setAttempt((value) => value + 1)}>
             Tentar novamente
-          </Button>
+          </ActionButton>
         </Notice>
       ) : null}
-      {loading ? <Spinner label="Consultando entregas e tarefas" /> : null}
+      {loading ? <LoadingIndicator label="Consultando entregas e tarefas" /> : null}
       {result.rows.length ? (
         <section aria-label="Entregas da consulta" aria-busy={loading}>
           {loading || result.error ? (
@@ -158,21 +159,21 @@ function Inbox({ context }: { context: WorkspaceContext }) {
       ) : null}
       {result.total > 20 ? (
         <div className="hca-toolbar">
-          <Button
+          <ActionButton
             disabled={page === 1 || loading}
             onClick={() => setPage((value) => value - 1)}
           >
             Anterior
-          </Button>
+          </ActionButton>
           <span>
             Página {page} · {result.total} entregas
           </span>
-          <Button
+          <ActionButton
             disabled={page * 20 >= result.total || loading}
             onClick={() => setPage((value) => value + 1)}
           >
             Próxima
-          </Button>
+          </ActionButton>
         </div>
       ) : null}
     </>

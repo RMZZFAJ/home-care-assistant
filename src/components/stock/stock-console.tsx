@@ -1,4 +1,5 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -27,7 +28,7 @@ import type {
 } from "@/types/stock";
 import { StockOverview } from "./stock-overview";
 import { RecordDrawer } from "@/components/forms/record-drawer";
-import { Button } from "@fluentui/react-components";
+
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { MovementOrigin } from "./movement-origin";
 import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
@@ -308,18 +309,18 @@ function PatientStock({
       </section>
       {custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
         <div className="hca-toolbar">
-          <Button
-            appearance="primary"
-            icon={<Icon name="plus" />}
+          <ActionButton
+            variant="primary"
+
             onClick={(event) => {
               setOperation("inbound");
               setMovementProductId("");
               setReferenceId("");
               setMovementEditor(event.currentTarget);
             }}
-          >
+          >{<Icon name="plus" />}
             Movimentar estoque familiar
-          </Button>
+          </ActionButton>
         </div>
       ) : null}
       {movementEditor &&
@@ -704,14 +705,14 @@ function PatientStock({
               <p className="mt-2 text-xs text-(--muted)">
                 {formatBrazilDate(movement.created_at)}
               </p>
-              <Button
+              <ActionButton
                 className="mt-2"
                 onClick={(event) =>
                   setOrigin({ id: movement.id, opener: event.currentTarget })
                 }
               >
                 Consultar origem
-              </Button>
+              </ActionButton>
               {movement.reference_type === "document" &&
               movement.reference_id ? (
                 <Link
@@ -740,7 +741,7 @@ function PatientStock({
               movement.reference_type === "family_manual" &&
               (movement.source_location === "FAMILY" ||
                 movement.destination_location === "FAMILY") ? (
-                <Button
+                <ActionButton
                   className="mt-3"
                   onClick={(event) => {
                     setOperation(
@@ -754,7 +755,7 @@ function PatientStock({
                   }}
                 >
                   Corrigir este movimento
-                </Button>
+                </ActionButton>
               ) : null}
             </li>
           ))}

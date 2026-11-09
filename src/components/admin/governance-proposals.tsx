@@ -1,8 +1,9 @@
 "use client";
+import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, FormField, SelectField, TextInput } from "@/components/ui/controls";
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Field, Input, Select, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow } from "@fluentui/react-components";
+
 import { api, Notice, type WorkspaceContext } from "@/components/workspace";
 import { governanceComparison, governanceFilterLabels, governanceKindLabels, governanceStatusLabels, type GovernanceChange } from "@/lib/governance-presentation";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -42,13 +43,13 @@ export function GovernanceProposals({ context, directory, version, revision, bus
       event.preventDefault(); const values = new FormData(event.currentTarget);
       navigate({ proposalStatus: String(values.get("status")), proposalKind: String(values.get("kind")), proposalQuery: String(values.get("query")).trim(), proposalPage: "1" });
     }}>
-      <Field label="Situação da proposta"><Select name="status" defaultValue={status}><option value="all">Todas</option>{Object.entries(governanceFilterLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select></Field>
-      <Field label="Tipo de proposta"><Select name="kind" defaultValue={kind}><option value="">Todos os tipos</option>{Object.entries(governanceKindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select></Field>
-      <Field label="Buscar proposta por referência ou conteúdo"><Input name="query" type="search" defaultValue={query} maxLength={160} /></Field>
-      <Button type="submit">Consultar propostas</Button>
-      <Button type="button" onClick={() => navigate({ proposalStatus: "open", proposalKind: "", proposalQuery: "", proposalPage: "1" })}>Limpar filtros de propostas</Button>
+      <FormField label="Situação da proposta"><SelectField name="status" defaultValue={status}><option value="all">Todas</option>{Object.entries(governanceFilterLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</SelectField></FormField>
+      <FormField label="Tipo de proposta"><SelectField name="kind" defaultValue={kind}><option value="">Todos os tipos</option>{Object.entries(governanceKindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</SelectField></FormField>
+      <FormField label="Buscar proposta por referência ou conteúdo"><TextInput name="query" type="search" defaultValue={query} maxLength={160} /></FormField>
+      <ActionButton type="submit">Consultar propostas</ActionButton>
+      <ActionButton type="button" onClick={() => navigate({ proposalStatus: "open", proposalKind: "", proposalQuery: "", proposalPage: "1" })}>Limpar filtros de propostas</ActionButton>
     </form>
-    {error ? <Notice error>{error} <Button onClick={() => { setLoading(true); setRetry(value => value + 1); }}>Consultar propostas novamente</Button></Notice> : null}
+    {error ? <Notice error>{error} <ActionButton onClick={() => { setLoading(true); setRetry(value => value + 1); }}>Consultar propostas novamente</ActionButton></Notice> : null}
     {loading ? <Notice>Consultando propostas…</Notice> : null}
     {!loading && !error && data ? <>
       <p role="status">{data.total} {data.total === 1 ? "proposta encontrada" : "propostas encontradas"} · página {data.page} de {Math.max(1, Math.ceil(data.total / data.pageSize))}</p>
@@ -63,18 +64,18 @@ export function GovernanceProposals({ context, directory, version, revision, bus
           {change.base_version !== version && change.status === "pending" ? <Notice error>A configuração mudou após esta proposta. Preserve a proposta original e prepare outra após revisar a configuração vigente.</Notice> : null}
           <details><summary className="cursor-pointer font-semibold">Comparar configuração vigente e proposta</summary>
             <div className="hca-matrix-scroll mt-3" role="region" tabIndex={0} aria-label={"Comparação da proposta " + change.id.slice(0, 8)}>
-              <Table className="hca-table" aria-label="Configuração vigente e proposta"><TableHeader><TableRow><TableHeaderCell>Campo</TableHeaderCell><TableHeaderCell>Vigente agora</TableHeaderCell><TableHeaderCell>Proposta registrada</TableHeaderCell></TableRow></TableHeader><TableBody>{comparison.rows.map(row => <TableRow key={row.key}><TableCell>{row.label}</TableCell><TableCell><span className="whitespace-pre-wrap break-words">{row.current}</span></TableCell><TableCell><span className="whitespace-pre-wrap break-words">{row.proposed}</span></TableCell></TableRow>)}</TableBody></Table>
+              <DataTable className="hca-table" aria-label="Configuração vigente e proposta"><DataTableHead><DataTableRow><DataTableHeading>Campo</DataTableHeading><DataTableHeading>Vigente agora</DataTableHeading><DataTableHeading>Proposta registrada</DataTableHeading></DataTableRow></DataTableHead><DataTableBody>{comparison.rows.map(row => <DataTableRow key={row.key}><DataTableCell>{row.label}</DataTableCell><DataTableCell><span className="whitespace-pre-wrap break-words">{row.current}</span></DataTableCell><DataTableCell><span className="whitespace-pre-wrap break-words">{row.proposed}</span></DataTableCell></DataTableRow>)}</DataTableBody></DataTable>
             </div>
           </details>
           {!comparison.supported ? <Notice error>Esta proposta contém um tipo ou campo que esta versão não reconhece. Consulte a origem antes de aprovar.</Notice> : null}
-          {change.status === "awaiting_acceptance" ? <div><p>O vínculo depende do aceite do destinatário.</p>{local && change.resolution?.invitationId ? <Button disabled={busy} onClick={() => void reissue(change.resolution!.invitationId!)}>Reemitir convite e invalidar link anterior</Button> : null}</div> : null}
+          {change.status === "awaiting_acceptance" ? <div><p>O vínculo depende do aceite do destinatário.</p>{local && change.resolution?.invitationId ? <ActionButton disabled={busy} onClick={() => void reissue(change.resolution!.invitationId!)}>Reemitir convite e invalidar link anterior</ActionButton> : null}</div> : null}
           {change.status === "pending" && local && change.proposed_by !== context.userId ? <div className="hca-toolbar">
-            <Button appearance="primary" disabled={busy || !comparison.supported || change.base_version !== version} onClick={() => void configure(change.kind, change.proposed, change.id, "approve")}>Aprovar proposta</Button>
-            <Button disabled={busy} onClick={() => void configure(change.kind, change.proposed, change.id, "reject")}>Rejeitar proposta</Button>
+            <ActionButton variant="primary" disabled={busy || !comparison.supported || change.base_version !== version} onClick={() => void configure(change.kind, change.proposed, change.id, "approve")}>Aprovar proposta</ActionButton>
+            <ActionButton disabled={busy} onClick={() => void configure(change.kind, change.proposed, change.id, "reject")}>Rejeitar proposta</ActionButton>
           </div> : change.status === "pending" ? <p>Aguardando administrador local distinto do proponente.</p> : null}
         </article>;
       })}
-      <nav className="hca-toolbar" aria-label="Páginas de propostas"><Button disabled={data.page === 1} onClick={() => navigate({ proposalPage: String(data.page - 1) })}>Propostas anteriores</Button><Button disabled={data.page * data.pageSize >= data.total} onClick={() => navigate({ proposalPage: String(data.page + 1) })}>Próxima página de propostas</Button></nav>
+      <nav className="hca-toolbar" aria-label="Páginas de propostas"><ActionButton disabled={data.page === 1} onClick={() => navigate({ proposalPage: String(data.page - 1) })}>Propostas anteriores</ActionButton><ActionButton disabled={data.page * data.pageSize >= data.total} onClick={() => navigate({ proposalPage: String(data.page + 1) })}>Próxima página de propostas</ActionButton></nav>
     </> : null}
   </section>;
 }

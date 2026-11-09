@@ -1,6 +1,7 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import Link from "next/link";
-import { Menu, MenuItemLink, MenuList, MenuPopover, MenuTrigger, Button } from "@fluentui/react-components";
+import { Menu, MenuItemLink, MenuList, MenuPopover, MenuTrigger } from "@fluentui/react-components";
 import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
 import { Icon, type IconName } from "@/components/ui/primitives";
@@ -25,6 +26,6 @@ export function administrationAreas(context: WorkspaceContext) {
 export function AdministrationNavigation({ context, section }: { context: WorkspaceContext; section?: string | null }) {
   const allowed = administrationAreas(context);
   const query = context.patient ? "&careRecipientId=" + context.patient.id : "";
-  if (section) return <div className="hca-toolbar hca-administration-toolbar"><Link href={context.patient ? "/admin?careRecipientId=" + context.patient.id : "/admin"} prefetch={false}>Administração</Link><span aria-hidden="true">/</span><strong>{allowed.find((area) => area.section === section)?.title ?? "Área indisponível"}</strong><Menu><MenuTrigger disableButtonEnhancement><Button appearance="subtle" icon={<Icon name="more" />}>Outras áreas</Button></MenuTrigger><MenuPopover><MenuList>{allowed.map((area) => <MenuItemLink key={area.section} href={"/admin?section=" + area.section + query} icon={<Icon name={area.icon} />}>{area.title}</MenuItemLink>)}</MenuList></MenuPopover></Menu></div>;
+  if (section) return <div className="hca-toolbar hca-administration-toolbar"><Link href={context.patient ? "/admin?careRecipientId=" + context.patient.id : "/admin"} prefetch={false}>Administração</Link><span aria-hidden="true">/</span><strong>{allowed.find((area) => area.section === section)?.title ?? "Área indisponível"}</strong><Menu><MenuTrigger disableButtonEnhancement><ActionButton variant="quiet" >{<Icon name="more" />}Outras áreas</ActionButton></MenuTrigger><MenuPopover><MenuList>{allowed.map((area) => <MenuItemLink key={area.section} href={"/admin?section=" + area.section + query} icon={<Icon name={area.icon} />}>{area.title}</MenuItemLink>)}</MenuList></MenuPopover></Menu></div>;
   return <nav aria-label="Áreas administrativas" className="hca-administration-center">{[...new Set(allowed.map((area) => area.group))].map((group) => <section key={group}><div className="hca-section-heading"><h2>{group}</h2></div><div className="hca-compact-grid">{allowed.filter((area) => area.group === group).map((area) => <Link className="ui-card hca-admin-destination" key={area.section} href={"/admin?section=" + area.section + query} prefetch={false}><Icon name={area.icon} /><h3>{area.title}</h3><p>{area.description}</p></Link>)}</div></section>)}</nav>;
 }

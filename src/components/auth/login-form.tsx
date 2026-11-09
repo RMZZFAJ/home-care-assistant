@@ -1,7 +1,9 @@
 "use client";
+import { FeedbackBanner } from '@/components/ui/feedback';
+import { ActionButton, FormField, LoadingIndicator, TextInput } from "@/components/ui/controls";
 
 import { FormEvent, useState } from "react";
-import { Button, Field, Input, MessageBar, MessageBarBody, Spinner } from "@fluentui/react-components";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { useClientReady } from "@/lib/use-client-ready";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -138,15 +140,15 @@ export function LoginForm() {
 
   return (
     <form onSubmit={submit} className="hca-auth-form">
-      {searchParams.get("error") ? <MessageBar layout="multiline" intent="warning" role="alert"><MessageBarBody>Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</MessageBarBody></MessageBar> : null}
-      <Field label={{ children: "E-mail", htmlFor: "login-email" }}><Input id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={(_, data) => setEmail(data.value)} size="large" /></Field>
-      <Field label={{ children: "Senha", htmlFor: "login-password" }}><Input id="login-password" name="password" required disabled={!ready || loading} type="password" autoComplete="current-password" value={password} onChange={(_, data) => setPassword(data.value)} size="large" /></Field>
-      {error ? <MessageBar layout="multiline" intent="error" role="alert"><MessageBarBody>{error}</MessageBarBody></MessageBar> : null}
-      {notice ? <MessageBar layout="multiline" intent="success" role="status"><MessageBarBody>{notice}</MessageBarBody></MessageBar> : null}
-      <Button type="submit" appearance="primary" size="large" disabled={loading || !ready} icon={loading ? <Spinner size="tiny" /> : undefined}>{loading ? "Entrando..." : "Entrar"}</Button>
-      <Button appearance="transparent" type="button" onClick={recoverPassword} disabled={loading || !ready}>Esqueci minha senha</Button>
+      {searchParams.get("error") ? <FeedbackBanner  tone="warning" role="alert">Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</FeedbackBanner> : null}
+      <FormField label={"E-mail"} htmlFor={"login-email"}><TextInput id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setEmail(controlValue); }} roomy /></FormField>
+      <FormField label={"Senha"} htmlFor={"login-password"}><TextInput id="login-password" name="password" required disabled={!ready || loading} type="password" autoComplete="current-password" value={password} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setPassword(controlValue); }} roomy /></FormField>
+      {error ? <FeedbackBanner  tone="error" role="alert">{error}</FeedbackBanner> : null}
+      {notice ? <FeedbackBanner  tone="success" role="status">{notice}</FeedbackBanner> : null}
+      <ActionButton type="submit" variant="primary" roomy disabled={loading || !ready} >{loading ? <LoadingIndicator compact /> : undefined}{loading ? "Entrando..." : "Entrar"}</ActionButton>
+      <ActionButton variant="quiet" type="button" onClick={recoverPassword} disabled={loading || !ready}>Esqueci minha senha</ActionButton>
       <div className="hca-auth-divider"><span />ou<span /></div>
-      <Button type="button" size="large" onClick={signInWithGoogle} disabled={loading || !ready}>Continuar com Google</Button>
+      <ActionButton type="button" roomy onClick={signInWithGoogle} disabled={loading || !ready}>Continuar com Google</ActionButton>
     </form>
   );
 }

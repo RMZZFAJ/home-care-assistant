@@ -33,6 +33,17 @@ export async function audit(page: import("@playwright/test").Page, label: string
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
   const evidence = accessibilityEvidence(label, result);
+  if (result.violations.some(item => item.id === "target-size")) {
+    const header = await page.locator(".app-header").evaluateAll(elements => elements.map(header => ({
+      bounds: header.getBoundingClientRect().toJSON(),
+      controls: Array.from(header.querySelectorAll<HTMLElement>("button,select,a")).map(element => {
+        const bounds = element.getBoundingClientRect(), style = getComputedStyle(element);
+        return { tag: element.tagName, className: element.className, bounds: bounds.toJSON(), padding: style.padding, lineHeight: style.lineHeight, display: style.display,
+          hit: [0.1, 0.5, 0.9].map(fraction => document.elementsFromPoint(bounds.left + bounds.width * fraction, bounds.top + bounds.height / 2).slice(0, 4).map(hit => ({ tag: hit.tagName, className: hit.getAttribute("class") }))) };
+      }),
+    })));
+    await test.info().attach("header-target-geometry", { body: JSON.stringify(header, null, 2), contentType: "application/json" });
+  }
   await test.info().attach("axe-" + label.replaceAll(/[^a-z0-9-]/gi, "-"), {
     body: JSON.stringify(evidence, null, 2), contentType: "application/json",
   });

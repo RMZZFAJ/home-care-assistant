@@ -12,13 +12,14 @@ não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B
 Estado atual:local164/remoto164, zero migrations pendentes. Matriz105x39:
 56 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
-sem redução de funções. Guias ativos e AGENTS atualizados;primeira fundação
-compartilhada implementada.12 casos Chromium/iOS PASS,comparação do modal em
-cinco larguras e remoção de colisão de contraste das etapas. Ainda restam56
-consumidores Fluent,shell/controles,abas e Andamentos persistidos. O registro
-UI adicional possui18 requisitos;resultados funcionais anteriores não aprovam
-a nova aparência. [Contrato](../ui-ux/CANONICAL_MODEL.md),
-[provas](../audits/D/D-B/UI_MODEL_STAGE_1.md).
+sem redução de funções. D3.27 migrou49 consumidores para controles nativos,
+labels/ajuda/erros,avisos e progresso;constantes de formulário/Notice também
+migradas.20 cenários distintos Chromium/iOS PASS,tipos/lint PASS. Restam17
+arquivos Fluent,seletores compostos/menus,provider/shell e estilos globais,
+abas e Andamentos persistidos. Registro UI adicional18 requisitos;resultados
+funcionais anteriores não aprovam toda a nova aparência.
+[Contrato](../ui-ux/CANONICAL_MODEL.md),
+[provas atuais](../audits/D/D-B/UI_MODEL_STAGE_2.md).
 
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das

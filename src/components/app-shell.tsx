@@ -1,9 +1,11 @@
 "use client";
+import { FeedbackBanner } from '@/components/ui/feedback';
+import { ActionButton, LoadingIndicator, TextInput } from "@/components/ui/controls";
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Button, Input, MessageBar, MessageBarBody, Spinner } from "@fluentui/react-components";
+
 import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
 import { roleLabel, useWorkspaceState } from "@/components/layout/workspace-context";
@@ -27,24 +29,24 @@ export function AppWorkspace({ title, children, administration = false, administ
     <div className="page-heading"><div><p className="eyebrow">{account ? "Conta pessoal" : value?.patient?.display_name ?? "Home Care Assistant"}</p><h1>{title}</h1></div>
       {account ? <span className="context-tag">Sua conta</span> : value?.activeContext ? <span className="context-tag">{value.activeContext.mode === "global" ? "Administração global" : roleLabel(value.patient?.role)}</span> : null}
     </div>
-    {loading && !value ? <div className="hca-loading" role="status"><Spinner size="small" />Validando sessão e pacientes autorizados…</div> : null}
-    {error ? <MessageBar layout="multiline" intent="error" role="alert"><MessageBarBody><p>{error}</p><div className="hca-toolbar"><Button onClick={() => void load()}>Tentar novamente</Button><Link href="/login">Entrar novamente</Link></div></MessageBarBody></MessageBar> : null}
-    {selectionError ? <MessageBar layout="multiline" intent="error" role="alert"><MessageBarBody>{selectionError}</MessageBarBody></MessageBar> : null}
-    {!account && value?.activeContext?.mode === "global" && !value.globalAdministrationAllowed ? <MessageBar layout="multiline" intent="warning"><MessageBarBody>Confirme seu autenticador para administrar. <Link href="/perfil?mfa=required">Verificar autenticação em duas etapas</Link></MessageBarBody></MessageBar> : null}
+    {loading && !value ? <div className="hca-loading" role="status"><LoadingIndicator  />Validando sessão e pacientes autorizados…</div> : null}
+    {error ? <FeedbackBanner  tone="error" role="alert"><p>{error}</p><div className="hca-toolbar"><ActionButton onClick={() => void load()}>Tentar novamente</ActionButton><Link href="/login">Entrar novamente</Link></div></FeedbackBanner> : null}
+    {selectionError ? <FeedbackBanner  tone="error" role="alert">{selectionError}</FeedbackBanner> : null}
+    {!account && value?.activeContext?.mode === "global" && !value.globalAdministrationAllowed ? <FeedbackBanner  tone="warning">Confirme seu autenticador para administrar. <Link href="/perfil?mfa=required">Verificar autenticação em duas etapas</Link></FeedbackBanner> : null}
     {choose && !selecting ? <section className="ui-card hca-context-selection" aria-label="Mudar perfil">
       <h2 className="text-lg font-semibold">Escolha como deseja atuar</h2>
       {data?.documentContext ? <p>Este documento pertence a {data.documentContext.displayName}. Selecione seu vínculo para continuar na tarefa.</p> : null}
       <p>Escolha um contexto autorizado para esta sessão.</p>
-      <Input aria-label="Buscar perfil autorizado" placeholder="Nome do paciente" value={profileSearch} onChange={(_, next) => setProfileSearch(next.value)} />
+      <TextInput aria-label="Buscar perfil autorizado" placeholder="Nome do paciente" value={profileSearch} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setProfileSearch(controlValue); }} />
       {profiles.length > 50 ? <p>Exibindo 50 de {profiles.length} vínculos. Use a busca para localizar o paciente.</p> : null}
       {!profiles.length ? <p>Nenhum vínculo corresponde à busca.</p> : null}
       <div className="hca-context-options">
-        {value.isGlobalAdmin ? <Button disabled={selecting} onClick={() => void selectProfile(null)}>Administração global</Button> : null}
-        {profiles.slice(0, 50).map((patient) => <Button key={patient.id} disabled={selecting} onClick={() => void selectProfile(patient.id)}>{patient.display_name} · {roleLabel(patient.role)}</Button>)}
+        {value.isGlobalAdmin ? <ActionButton disabled={selecting} onClick={() => void selectProfile(null)}>Administração global</ActionButton> : null}
+        {profiles.slice(0, 50).map((patient) => <ActionButton key={patient.id} disabled={selecting} onClick={() => void selectProfile(patient.id)}>{patient.display_name} · {roleLabel(patient.role)}</ActionButton>)}
       </div>
     </section> : null}
-    {!error && value && account ? <div key={"account:" + value.userId}>{children(value)}</div> : !error && value?.activeContext && !mismatch ? !value.patient && !value.isGlobalAdmin ? <MessageBar layout="multiline"><MessageBarBody>Nenhum paciente autorizado está vinculado à sua conta.</MessageBarBody></MessageBar> : administration && !canAdminister && !canRecover ? <MessageBar layout="multiline" intent="error"><MessageBarBody>Seu vínculo não permite administrar este paciente.</MessageBarBody></MessageBar> : <div key={`${value.patient?.id ?? "global"}:${value.activeContext.mode}`}>
-      {value.patient?.is_active === false ? <MessageBar layout="multiline" intent="warning"><MessageBarBody>Paciente inativo. O histórico permanece disponível; novas operações estão suspensas.</MessageBarBody></MessageBar> : null}
+    {!error && value && account ? <div key={"account:" + value.userId}>{children(value)}</div> : !error && value?.activeContext && !mismatch ? !value.patient && !value.isGlobalAdmin ? <FeedbackBanner >Nenhum paciente autorizado está vinculado à sua conta.</FeedbackBanner> : administration && !canAdminister && !canRecover ? <FeedbackBanner  tone="error">Seu vínculo não permite administrar este paciente.</FeedbackBanner> : <div key={`${value.patient?.id ?? "global"}:${value.activeContext.mode}`}>
+      {value.patient?.is_active === false ? <FeedbackBanner  tone="warning">Paciente inativo. O histórico permanece disponível; novas operações estão suspensas.</FeedbackBanner> : null}
       {children(value)}
     </div> : null}
   </main>;

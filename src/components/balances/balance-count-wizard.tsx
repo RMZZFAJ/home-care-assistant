@@ -1,8 +1,10 @@
 "use client";
+import { ProgressMeter } from '@/components/ui/feedback';
+import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Button, ProgressBar, Spinner } from "@fluentui/react-components";
+
 import {
   api,
   ApiError,
@@ -97,10 +99,10 @@ function Mode({
     return (
       <Notice error>
         {error}
-        <Button onClick={reload}>Tentar novamente</Button>
+        <ActionButton onClick={reload}>Tentar novamente</ActionButton>
       </Notice>
     );
-  if (!data) return <Spinner label="Verificando plantão e disponibilidade" />;
+  if (!data) return <LoadingIndicator label="Verificando plantão e disponibilidade" />;
   if (
     !data.regime?.activated_at &&
     !data.eligibility.assignment &&
@@ -631,7 +633,7 @@ function ScheduledCount({
         <DocumentDeliveryStatus id={saved.id} version={saved.version} />
       </section>
     );
-  if (loading) return <Spinner label="Preparando contagem física" />;
+  if (loading) return <LoadingIndicator label="Preparando contagem física" />;
   const draftPanel = (
     <CreationDraftPanel
       draft={privateDraft}
@@ -707,7 +709,7 @@ function ScheduledCount({
               {draftMaterials.find((material) => material.id === id)?.name ??
                 "Material indisponível"}
               : {counts[id]}
-              <Button
+              <ActionButton
                 disabled={busy || uncertain || privateDraft.blocked}
                 onClick={() =>
                   setCounts((current) => {
@@ -718,7 +720,7 @@ function ScheduledCount({
                 }
               >
                 Remover material indisponível
-              </Button>
+              </ActionButton>
             </div>
           ))}
         </Notice>
@@ -743,7 +745,7 @@ function ScheduledCount({
                 Acompanhar / solicitar adiamento
               </Link>
             </div>
-            <ProgressBar
+            <ProgressMeter
               value={progress}
               max={Math.max(products.length, 1)}
               aria-label="Progresso da contagem física"
@@ -812,16 +814,16 @@ function ScheduledCount({
         }
       />
       {uncertain && step === 0 ? (
-        <Button
+        <ActionButton
           disabled={busy}
-          appearance="primary"
+          variant="primary"
           onClick={() => void save(false)}
         >
           Recuperar a mesma tentativa
-        </Button>
+        </ActionButton>
       ) : null}
       {needsRecount && !uncertain ? (
-        <Button
+        <ActionButton
           disabled={busy}
           onClick={() => {
             setCounts({});
@@ -835,7 +837,7 @@ function ScheduledCount({
           }}
         >
           Iniciar nova conferência e atualizar referência
-        </Button>
+        </ActionButton>
       ) : null}
     </div>
   );
