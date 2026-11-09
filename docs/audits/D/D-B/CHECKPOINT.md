@@ -2778,7 +2778,7 @@ Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
 
 ## Complemento D3.41 — recuperação e quadro ao responsável
 
-Base cb 83e 84. Corrida no teste REQ503→403:espera de resposta, recuperação
+Base cb83e84. Corrida no teste REQ503→403:espera de resposta, recuperação
 retida, botão indisponível, erro antigo retirado e só depois próxima recusa.
 Sem alteração do consumidor, timeout ou exigência de apagar conteúdo recusado.
 6 cenários dirigidos PASS, sem retry, três por motor;anexo instável anterior
@@ -2796,3 +2796,38 @@ Sem SQL novo;local/remoto 174 reconciliados. Matriz/primeiras 30/18 linhas
 preservadas. CI própria pendente;Sonar adiado;PR7 Draft, sem merge/produção.
 [Detalhe](PREVIEW_RECOVERY_AND_STATUS.md),
 [provas](PREVIEW_RECOVERY_AND_STATUS_VALIDATION.json).
+
+## D3.42 — preparação e recuperação das decisões REQ
+
+Base88a4b5b. Arquivar,cancelar e identificar extra preservam campos privados
+por ator/paciente/ficha/propósito; confirmação salva,revê e sela referências
+antes dos comandos oficiais. Conjunção legada de capacidades preservada;
+revogação/mudança após journal fazem rollback integral. Replay exato e consulta
+pessoal após perda de escrita não emitem outro ato.403/200 inválido retiram
+fatos/conteúdo conforme a leitura recusada,sem apagar edição própria.
+
+34 unitários/API,16 Auth reais distintos e20 browsers distintos aprovados por
+reuso qualificado.14 sucessos da rodada16 conservados;dois erros de revisão
+sem hash corrigidos/repetidos,junto de quatro casos de foco do RecordDrawer.
+Revalidação mantém edição quando a revisão confirmada é a mesma;outra revisão
+exige comparação. Campo removido devolve foco ao controle editável disponível.
+Dois runners anteriores interrompidos são contraprovas,sem aprovação. Runners
+finais diagnósticos,28 fontes conferidos,sem suíte mutável paralela. CI própria
+precisa cobrir produção e integração completa. Axe,quatro larguras,duas
+capturas de sucesso conferidas;emulação não é aparelho físico.
+
+Três fixtures inválidas tentaram relabelar emitidas como históricas e foram
+recusadas. Provas corrigidas preservam a guarda. Consulta histórica real sem
+lifecycle mantém NULL,sem obrigação fictícia. Correções da autoria175 não
+reexecutaram migration nem reescreveram histórico;statements intermediários
+locais conservados. Remoto recebeu candidato final uma vez:175 versões,nove
+funções/ACL/constraint coincidem;dry-run vazio. Advisors cinco classes,com
+adição esperada de um RPC Auth SECURITY DEFINER,167→168.
+
+Matriz105x39/primeiras30,56 PASS/49 PARTIAL e18 requisitos visuais preservados.
+BAL contextual e paridade66/171 ainda pendentes. Quadro temporário atualizado,
+visual≈60% estimado. CI88a4b5b FAIL em foco mobile,regressão dirigida corrigida;
+Preview anterior READY. CI do próximo SHA é gate separado. Sonar adiado,
+PR7 Draft,sem merge/produção,meta ativa.
+[Detalhe](REQ_DECISION_DRAFTS.md),[provas](REQ_DECISION_DRAFTS_VALIDATION.json),
+[remoto](REQ_DECISION_DRAFTS_REMOTE.json),[CI](CI_88A4B5B_OBSERVATION.json).

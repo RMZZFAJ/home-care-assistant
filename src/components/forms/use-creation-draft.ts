@@ -4,7 +4,7 @@ import { useCallback,useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/client/api";
 import { creationDraftCommandSchema } from "@/lib/validation/creation-drafts";
 import { parsePrivateDraft,parsePrivateDraftResult } from "@/lib/validation/private-draft-results";
-import type { DraftPurpose } from "@/lib/validation/supply-drafts";
+import { usesSupplyDraftTransport, type DraftPurpose } from "@/lib/validation/supply-drafts";
 import type { DraftNavigation } from "@/lib/forms/draft-navigation";
 import type {
   CreationDraft,
@@ -62,7 +62,7 @@ export function useCreationDraft({
   const unresolvedRef = useRef(false);
   const generationRef = useRef(0);
   const active = enabled && kind !== null;
-  const extended=kind==="COM"||kind==="ENT";
+  const extended=usesSupplyDraftTransport(kind,purpose);
   const storageKey = `hca:private-draft-command:${userId}:${patientId}:${kind}:${targetDocumentId ?? "new"}`+(extended?":"+purpose:"");
   const url =
     `/api/drafts?careRecipientId=${patientId}&kind=${kind}` +
@@ -140,6 +140,43 @@ export function useCreationDraft({
       generationRef.current = current + 1;
     };
   }, [active, attempt, kind, patientId, purpose,storageKey, targetDocumentId, url,parseRead]);
+
+  async function revalidateRead() {
+    if (!active || inFlightRef.current) return false;
+    const current = generationRef.current;
+    setBusy(true);
+    setProtectedReadPending(true);
+    setLoadError("");
+    try {
+      const result = await api<{ data: CreationDraft | null }>(url);
+      if (current !== generationRef.current) return false;
+      const row = parseRead(result.data);
+      setReadDenied(false);
+      setProtectedReadPending(false);
+      // Rechecking access cannot silently replace an acknowledged working copy.
+      // A changed revision still needs the existing explicit CAS comparison.
+      if (!restorePendingRef.current && !unresolvedRef.current) {
+        // Save replies confirm the immutable revision without returning its hash.
+        const unchanged = (!base && !row) || (base?.state === "active" && row?.state === "active" && base.id === row.id && base.revision === row.revision && (!base.contentHash || base.contentHash === row.contentHash));
+        if (unchanged) setBase(row);
+        else {
+          setComparison(row);
+          setOffered(null);
+          setConflict(true);
+          setCompared(true);
+        }
+      }
+      return true;
+    } catch (cause) {
+      if (current !== generationRef.current) return false;
+      setLoadError(cause instanceof Error ? cause.message : "Não foi possível revalidar o preenchimento privado.");
+      setReadDenied(cause instanceof ApiError && [401, 403, 404].includes(cause.status));
+      // Keep the private view protected until a valid scoped read succeeds.
+      return false;
+    } finally {
+      if (current === generationRef.current) setBusy(false);
+    }
+  }
 
   async function compare() {
     const current = generationRef.current;
@@ -368,6 +405,7 @@ export function useCreationDraft({
       setLoading(true);
       setAttempt((value) => value + 1);
     },
+    revalidateRead,
     compare,
     reportConflict: () => {
       setConflict(true);

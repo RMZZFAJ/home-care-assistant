@@ -5,6 +5,8 @@ NO-GO.** A ordem integral preservada em [OWNER_EXECUTION_ORDER.txt](OWNER_EXECUT
 atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitoramento.
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
+- [Decisões privadas de requisição](REQ_DECISION_DRAFTS.md): arquivamento,
+  cancelamento,associação de extra,revalidação e migration175.
 - [Declaração de transferência entre sessões](TRANSFER_DECLARATION_DRAFTS.md):
   duas direções privadas,referência atual,confirmação única e migration174.
 - [Recuperação dirigida e quadro de atualização](PREVIEW_RECOVERY_AND_STATUS.md):

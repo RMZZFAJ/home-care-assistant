@@ -10,7 +10,6 @@ import {
   ApiError,
   buttonClass,
   can,
-  inputClass,
   Notice,
   primaryClass,
   type WorkspaceContext,
@@ -45,7 +44,12 @@ import {
   type TimelineEvent,
 } from "@/components/documents/document-timeline";
 import { RelatedDocument } from "@/components/documents/related-document";
-import { Dialog } from "@/components/ui/primitives";
+import { RequisitionDecisionEditor } from "./requisition-decision-editor";
+import { requisitionDecisionLabels } from "@/lib/forms/requisition-decision-draft";
+import {
+  requisitionOperationPurposes,
+  type RequisitionOperationPurpose,
+} from "@/lib/validation/supply-drafts";
 import { ResolveExtraItem } from "./resolve-extra-item";
 import { RequisitionDisplay, OpeningHistory } from "./requisition-display";
 import {
@@ -165,9 +169,25 @@ export function RequisitionDocumentContent({
       refreshButtonRef.current?.focus();
     }
   }, [reading]);
-  const [reason, setReason] = useState("");
   const moreTriggerRef = useRef<HTMLButtonElement>(null);
-  const [review, setReview] = useState<"archive" | "cancel" | null>(null);
+  const [decision, setDecision] = useState<{
+    purpose: RequisitionOperationPurpose;
+    consulting: boolean;
+    trigger: HTMLElement | null;
+  } | null>(null);
+  function openDecision(
+    purpose: RequisitionOperationPurpose,
+    consulting = false,
+  ) {
+    setDecision({
+      purpose,
+      consulting,
+      trigger:
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null,
+    });
+  }
   useEffect(() => {
     const controller = new AbortController();
     queueMicrotask(() => {
@@ -199,34 +219,17 @@ export function RequisitionDocumentContent({
       });
     return () => controller.abort();
   }, [id, attempt, revision]);
-  async function action(operation: "science" | "archive" | "cancel") {
+  async function recordScience() {
     if (!data) return;
     setBusy(true);
     setError("");
     try {
-      await api(
-        `/api/requisitions/${id}/${operation === "cancel" ? "status" : operation}`,
-        operation === "science"
-          ? {
-              mode: "express",
-              expectedVersion: data.progress.version,
-              materialIdentity: data.progress.materialIdentity,
-            }
-          : operation === "cancel"
-            ? { status: "cancelled", reason }
-            : { reason },
-        undefined,
-        operation === "cancel" ? "PATCH" : "POST",
-      );
-      setMessage(
-        operation === "science"
-          ? "Ciência expressa registrada com sua identidade."
-          : operation === "cancel"
-            ? "Requisição cancelada com justificativa e histórico preservado."
-            : "Arquivamento registrado com justificativa, preservando as ciências pendentes.",
-      );
-      setReview(null);
-      setReason("");
+      await api(`/api/requisitions/${id}/science`, {
+        mode: "express",
+        expectedVersion: data.progress.version,
+        materialIdentity: data.progress.materialIdentity,
+      });
+      setMessage("Ciência expressa registrada com sua identidade.");
       setAttempt((value) => value + 1);
     } catch (cause) {
       setError(
@@ -270,6 +273,7 @@ export function RequisitionDocumentContent({
       <DocumentBreadcrumb code={data.code ?? data.protocol} />
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
+
       <DocumentHeader
         headingLevel={1}
         progressActionRef={setProgressActionTarget}
@@ -344,7 +348,7 @@ export function RequisitionDocumentContent({
                 type="button"
                 className={primaryClass}
                 disabled={busy}
-                onClick={() => void action("science")}
+                onClick={() => void recordScience()}
               >
                 Li a requisição e confirmo minha ciência
               </button>
@@ -371,10 +375,7 @@ export function RequisitionDocumentContent({
               <button
                 className={buttonClass}
                 disabled={busy}
-                onClick={() => {
-                  setReason("");
-                  setReview("archive");
-                }}
+                onClick={() => openDecision("archive")}
               >
                 Revisar arquivamento manual
               </button>
@@ -382,14 +383,12 @@ export function RequisitionDocumentContent({
             {!data.is_historical &&
             !p.archivedAt &&
             data.status !== "cancelled" &&
-            can(context, "req.review") ? (
+            can(context, "req.review") &&
+            can(context, "req.create") ? (
               <button
                 className={buttonClass}
                 disabled={busy}
-                onClick={() => {
-                  setReason("");
-                  setReview("cancel");
-                }}
+                onClick={() => openDecision("cancel")}
               >
                 Cancelar requisição
               </button>
@@ -427,6 +426,25 @@ export function RequisitionDocumentContent({
         reference={p}
         onRecorded={setOpeningRevision}
       />
+      <details className="ui-card">
+        <summary>Minhas decisões em preparação</summary>
+        <p>
+          Consulte ou descarte seus próprios preenchimentos e reconheça
+          resultados anteriores. Esta consulta não repete decisões oficiais.
+        </p>
+        <div className="hca-toolbar">
+          {requisitionOperationPurposes.map((purpose) => (
+            <button
+              key={purpose}
+              type="button"
+              className={buttonClass}
+              onClick={() => openDecision(purpose, true)}
+            >
+              Consultar preparação: {requisitionDecisionLabels[purpose]}
+            </button>
+          ))}
+        </div>
+      </details>
       <DocumentTabs
         type="REQ"
         value={tabs.value}
@@ -628,20 +646,7 @@ export function RequisitionDocumentContent({
           data.requisition_items.some(
             (item) => !item.product_id && !item.resolution,
           ) ? (
-            <ResolveExtraItem
-              patientId={data.care_recipient_id}
-              requestId={id}
-              items={data.requisition_items
-                .filter((item) => !item.product_id && !item.resolution)
-                .map((item) => ({
-                  id: item.id,
-                  name:
-                    item.product_name_snapshot ??
-                    item.custom_name ??
-                    "Item extra",
-                }))}
-              onChange={() => setAttempt((value) => value + 1)}
-            />
+            <ResolveExtraItem onOpen={() => openDecision("resolve_extra")} />
           ) : null}
         </DocumentPanel>
         <DocumentPanel value="workflow">
@@ -751,53 +756,26 @@ export function RequisitionDocumentContent({
           </DocumentPanel>
         ) : null}
       </DocumentTabs>
-      <Dialog
-        finalFocus={moreTriggerRef}
-        open={review !== null}
-        title={
-          review === "cancel"
-            ? "Revisar cancelamento da REQ"
-            : "Revisar arquivamento manual"
-        }
-        onClose={() => {
-          if (!busy) setReview(null);
-        }}
-      >
-        <form
-          className="space-y-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (review) void action(review);
+      {decision ? (
+        <RequisitionDecisionEditor
+          key={`${context.userId}:${data.care_recipient_id}:${data.id}:${decision.purpose}:${decision.consulting}`}
+          id={data.id}
+          patientId={data.care_recipient_id}
+          context={context}
+          purpose={decision.purpose}
+          consulting={decision.consulting}
+          restoreFocusTo={decision.trigger}
+          restoreFocusFallbackRef={moreTriggerRef}
+          onClose={() => setDecision(null)}
+          onSaved={() => {
+            setDecision(null);
+            setAttempt((value) => value + 1);
+            setMessage(
+              "Decisão registrada ou recuperada. Consulte os fatos atuais desta requisição.",
+            );
           }}
-        >
-          <p className="text-sm">
-            {data.code ?? data.protocol} · {f.fulfilled}/{f.total} itens
-            atendidos.{" "}
-            {review === "cancel"
-              ? "O cancelamento preserva todos os eventos. Entregas vinculadas precisam estar formalmente resolvidas."
-              : "O arquivamento mantém as ciências registradas e eventuais ciências pendentes, sem criar confirmação."}
-          </p>
-          <label className="block text-sm font-semibold">
-            Justificativa
-            <textarea
-              autoFocus
-              className={inputClass}
-              required
-              minLength={3}
-              maxLength={1000}
-              value={reason}
-              onChange={(event) => setReason(event.target.value)}
-            />
-          </label>
-          <button type="submit" className={primaryClass} disabled={busy}>
-            {busy
-              ? "Registrando…"
-              : review === "cancel"
-                ? "Confirmar cancelamento"
-                : "Confirmar arquivamento"}
-          </button>
-        </form>
-      </Dialog>
+        />
+      ) : null}
     </div>
   );
 }

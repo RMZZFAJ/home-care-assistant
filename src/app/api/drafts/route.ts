@@ -9,18 +9,18 @@ import {
   uuid,
 } from "@/lib/server/api";
 import { creationDraftCommandSchema } from "@/lib/validation/creation-drafts";
-import { draftPurpose, newSupplyDraftPurposes, comOperationPurposes, entDraftPurposes } from "@/lib/validation/supply-drafts";
+import { usesSupplyDraftTransport,draftPurpose, newSupplyDraftPurposes, comOperationPurposes, entDraftPurposes } from "@/lib/validation/supply-drafts";
 export async function GET(request: Request) {
   return api("drafts.read", async () => {
     const params = new URL(request.url).searchParams,
       kind = params.get("kind"),
-      target = params.get("targetDocumentId"),purpose=params.get("purpose")??"create",extended=kind==="COM"||kind==="ENT";
+      target = params.get("targetDocumentId"),purpose=params.get("purpose")??"create",extended=usesSupplyDraftTransport(kind,purpose);
     if (
       !["REQ", "BAL","COM","ENT"].includes(kind ?? "") ||
       !draftPurpose.safeParse(purpose).success||(!extended&&purpose!=="create")||
       (extended&&(newSupplyDraftPurposes.includes(purpose)!==(target===null)||kind==="COM"&&!["create","revise",...comOperationPurposes].includes(purpose)||kind==="ENT"&&!["create","revise",...entDraftPurposes].includes(purpose)))||
       (target !== null && !uuid.safeParse(target).success) ||
-      (kind === "REQ" && target !== null)
+      (kind === "REQ" && !extended && target !== null)
     )
       throw new ApiError(
         "VALIDATION_ERROR",
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     const patient = await patientContext(auth, input.careRecipientId);
     return NextResponse.json(
       {
-        data: await rpc(auth.client, input.kind==="COM"||input.kind==="ENT"?"supply_draft_command":"creation_draft_command", {
+        data: await rpc(auth.client, usesSupplyDraftTransport(input.kind,"purpose" in input ? input.purpose : "create")?"supply_draft_command":"creation_draft_command", {
           p_patient: patient.id,
           p_kind: input.kind,
           p_target: input.targetDocumentId,

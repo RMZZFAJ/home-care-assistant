@@ -74,7 +74,7 @@ describe("private typed REQ/BAL draft boundary", () => {
   it("preserves incomplete values privately while the issuance contract still rejects them", () => {
     const result = creationDraftCommandSchema.parse(save);
     expect(result.action).toBe("save");
-    if (result.action === "save" && result.kind === "REQ")
+    if (result.action === "save" && result.kind === "REQ" && !("purpose" in result))
       expect(result.content.lines[0].currentStock).toBe("1,");
     expect(
       requisitionInputSchema.safeParse({

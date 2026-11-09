@@ -2,7 +2,7 @@
 import { ActionButton } from "@/components/ui/controls";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type RefObject } from "react";
 
 import { Notice } from "@/components/workspace";
 import { RecordDrawer } from "./record-drawer";
@@ -117,6 +117,10 @@ function DraftFieldsSummary({
     {content.fields.reason ? <p className="whitespace-pre-wrap wrap-anywhere">Sua justificativa: {content.fields.reason}</p> : null}
     {content.fields.query ? <p className="whitespace-pre-wrap wrap-anywhere">Busca preservada: {content.fields.query}</p> : null}
   </div>;
+  if ("fields" in content && kind === "REQ") return <dl className="hca-form-stack">
+    <div><dt>Justificativa própria</dt><dd className="whitespace-pre-wrap wrap-anywhere">{content.fields.reason || "Não preenchida"}</dd></div>
+    {purpose === "resolve_extra" ? <><div><dt>Item extra preservado</dt><dd>{content.fields.itemLabel || "Não escolhido"}</dd></div><div><dt>Produto correspondente preservado</dt><dd>{content.fields.productLabel || "Não escolhido"}{content.fields.productUnit ? ` · ${content.fields.productUnit}` : ""}</dd></div></> : null}
+  </dl>;
   if ("fields" in content) {
     const name = (key: string) => content.materials.find(m => m.id === key)?.name ?? "Linha não disponível na referência atual";
     const entDecision = kind === "ENT" && purpose !== "receive" && purpose !== "divergence";
@@ -182,22 +186,26 @@ export function CreationDraftPanel({
   resumeLabel = "Continuar rascunho",
   discardLabel = "Descartar e começar nova",
   acknowledgeLabel = "Confirmar resultado e começar novo preenchimento",
+  onRevalidateRead,
+  revalidationRef,
   disabled = false,
 }: {
   draft: CreationDraftController;
-  current: CreationDraftContent;
+  current: CreationDraftContent | null;
   patientName: string;
   resumeHref?: string;
   resumeLabel?: string;
   discardLabel?: string;
   acknowledgeLabel?: string;
+  onRevalidateRead?: () => void;
+  revalidationRef?: RefObject<HTMLButtonElement | null>;
   disabled?: boolean;
 }) {
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
   if (!draft.active) return null;
   const saved = draft.offered ?? draft.base;
-  if(draft.readDenied||draft.protectedReadPending)return <section className="ui-card hca-form-stack" aria-label="Rascunho privado"><Notice error>{draft.loadError||"Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada."}</Notice><ActionButton disabled={draft.busy} onClick={draft.reload}>Revalidar acesso ao rascunho</ActionButton>{draft.pending?<ActionButton disabled={draft.busy} onClick={()=>void draft.recover()}>Recuperar mesma tentativa preservada</ActionButton>:null}</section>;
+  if(draft.readDenied||draft.protectedReadPending)return <section className="ui-card hca-form-stack" aria-label="Rascunho privado"><Notice error>{draft.loadError||"Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada."}</Notice><ActionButton ref={revalidationRef} disabled={draft.busy} onClick={onRevalidateRead ?? draft.reload}>Revalidar acesso ao rascunho</ActionButton>{draft.pending?<ActionButton disabled={draft.busy} onClick={()=>void draft.recover()}>Recuperar mesma tentativa preservada</ActionButton>:null}</section>;
   return (
     <section
       className="ui-card hca-form-stack hca-draft-panel min-w-0"
@@ -354,7 +362,7 @@ export function CreationDraftPanel({
           </div>
         </>
       ) : null}
-      {draft.base?.state === "active" &&
+      {current && draft.base?.state === "active" &&
       !draft.blocked &&
       JSON.stringify(current) !== JSON.stringify(draft.base.content) ? (
         <p>Sua edição atual ainda não foi salva no servidor.</p>

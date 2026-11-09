@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { draftNavigationSchema } from "./draft-navigation";
 import { navigationAllowed } from "../forms/draft-navigation";
-import { draftPurpose,entDeclarationPurposes,entDeclarationDraftPurpose,transferDeclarationDraftContent,newSupplyDraftPurposes,declarationSourceForPurpose,comOperationDraftPurpose,comOperationPurposes,entDraftPurpose,entDraftPurposes,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
+import { requisitionOperationPurpose,requisitionOperationDraftContent,draftPurpose,entDeclarationPurposes,entDeclarationDraftPurpose,transferDeclarationDraftContent,newSupplyDraftPurposes,declarationSourceForPurpose,comOperationDraftPurpose,comOperationPurposes,entDraftPurpose,entDraftPurposes,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
 const id = z.uuid(),
   revision = z.number().int().positive().max(2147483647);
 const text = (max: number) =>
@@ -107,6 +107,8 @@ const scope = {
 const navigation = { navigation: draftNavigationSchema.optional() };
 export const creationDraftCommandSchema = z
   .union([
+    z.object({...scope,...navigation,kind:z.literal("REQ"),purpose:requisitionOperationPurpose,action:z.literal("save"),content:requisitionOperationDraftContent}).strict(),
+    z.object({...scope,kind:z.literal("REQ"),purpose:requisitionOperationPurpose,action:z.enum(["discard","acknowledge"])}).strict(),
     z
       .object({...scope,...navigation,kind:z.enum(["COM","ENT"]),purpose:z.enum(["create","revise"]),action:z.literal("save"),content:supplyDraftContent})
       .strict(),
@@ -160,7 +162,7 @@ export const creationDraftCommandSchema = z
     if (
       (value.id === null) !== (value.expectedRevision === null) ||
       (value.action !== "save" && value.id === null) ||
-      (value.kind === "REQ" && value.targetDocumentId !== null)
+      (value.kind === "REQ" && ("purpose" in value ? value.targetDocumentId === null : value.targetDocumentId !== null))
     )
       ctx.addIssue({
         code: "custom",

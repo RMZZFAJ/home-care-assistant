@@ -26,9 +26,15 @@ ou liberação que depende de você. “Participantes/equipe” são pessoas que
 usarão ou avaliarão o sistema; “serviço externo” depende também do fornecedor.
 
 Pendência comum: as verificações dirigidas deste lote passaram; a rodada
-completa do código publicado ainda precisa ser concluída. A falha do teste de
-recuperação de requisição foi corrigida. O banco remoto está atualizado, com
-174 atualizações aplicadas. A fase continua em execução.
+completa do novo código publicado ainda precisa ser concluída. A rodada
+anterior encontrou uma falha de foco, já corrigida e verificada localmente.
+O banco remoto está atualizado, com 175 atualizações aplicadas. A fase
+continua em execução.
+
+Neste lote, arquivar, cancelar e identificar item extra na requisição ganharam
+preenchimento privado recuperável entre sessões, comparação antes de confirmar
+e recuperação após perda de resposta. A troca das classes de quebra de texto
+também está concluída. Os demais pontos pendentes continuam abaixo.
 
 ## Funcionalidades e critérios da D-B
 
@@ -64,11 +70,12 @@ recuperação de requisição foi corrigida. O banco remoto está atualizado, co
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈85%. Falta: Completar decisões contextuais de requisição e
-  balanço e revisão transversal. Responsável: Codex.
+  execução · ≈85%. Falta: Completar decisões contextuais de balanço e revisão
+  transversal. As três decisões de requisição deste lote estão implementadas
+  e verificadas localmente. Responsável: Codex.
 - **Preservar edição durante falha, conflito e perda de contexto** — Em
-  execução · ≈80%. Falta: Completar fluxos restantes de requisição e balanço e
-  combinações de falha. Responsável: Codex.
+  execução · ≈80%. Falta: Completar fluxos restantes de balanço e combinações
+  transversais de falha. Responsável: Codex.
 
 ### Fichas e Andamentos
 
@@ -363,9 +370,9 @@ incluídos.
 - **Cabeçalho, menu lateral, paciente e navegação móvel** — 80%. Já aplicado:
   Estrutura e navegação do modelo. Falta: Fechar comparação de todos os
   estados e larguras. Responsável: Codex.
-- **Formulários, apoio, avisos e recuperação** — 70%. Já aplicado: Criação e
-  vários atos COM/ENT/transferência. Falta: Requisição, balanço e variações
-  restantes. Responsável: Codex.
+- **Formulários, apoio, avisos e recuperação** — 75%. Já aplicado: Criação,
+  vários atos COM/ENT/transferência e as três decisões de requisição deste
+  lote. Falta: Balanço e variações restantes. Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 50%. Já aplicado: Base e
   vários consumidores migrados. Falta: Completar páginas e verificar textos e
   quantidades inteiros. Responsável: Codex.
@@ -454,41 +461,38 @@ Esta é a ordem do trabalho restante. Os quadros anteriores estão agrupados por
 funcionalidade, sem representar ordem de execução. Tudo que já está 100% será
 preservado e incluído na revisão final; não será refeito sem motivo.
 
-1. **Fechar este lote.** Concluir regressões da recuperação de requisição e
-   dos anexos, publicar declarações recuperáveis de transferência, entregar
-   este quadro e corrigir as classes de quebra de texto em todo o código em
-   uso.
-2. **Completar formulários da operação diária.** Terminar decisões contextuais
-   de requisição e balanço, rascunhos, conflitos, retomada e mensagens de cada
-   etapa.
-3. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
+1. **Completar formulários da operação diária.** Terminar decisões contextuais
+   de balanço, rascunhos, conflitos, retomada e mensagens de cada etapa;
+   conferir em conjunto os formulários já concluídos. Este lote de requisição,
+   o quadro e as classes de quebra de texto ficam encerrados antes disso.
+2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.
-4. **Fechar a parte técnica dos PDFs e da assinatura.** Completar os casos
+3. **Fechar a parte técnica dos PDFs e da assinatura.** Completar os casos
    restantes de dados, longos, regularização, acessibilidade, recuperação,
    verificação, confiança, troca e recuperação de chaves. Sem redesenhar a
    aparência dos PDFs.
-5. **Concluir a nova aparência nas demais áreas.** Administração, cadastros,
+4. **Concluir a nova aparência nas demais áreas.** Administração, cadastros,
    perfil, guias, avisos e aplicativo; conferir todas as 66 composições e 171
    relações. A aparência das áreas dos passos 2 a 4 será trabalhada junto com
    esses passos, sem deixar uma camada visual incompatível para o final.
-6. **Fechar entrada e orientação por papel.** Completar adoção de materiais,
+5. **Fechar entrada e orientação por papel.** Completar adoção de materiais,
    preparação física e guias; a liberação real fica com as pessoas
    responsáveis.
-7. **Fechar aplicativo e avisos.** Concluir atualização, perda de sessão,
+6. **Fechar aplicativo e avisos.** Concluir atualização, perda de sessão,
    troca de paciente, recuperação e preparação de entrega; organizar o reteste
    no S24 Ultra e nos serviços externos somente dentro da autorização vigente.
-8. **Completar suporte, monitoramento e backups.** Fechar cobertura,
+7. **Completar suporte, monitoramento e backups.** Fechar cobertura,
    ocorrências, retenção, recuperação de chaves e preparação da operação.
    Agenda permanente, destino externo e liberação dependem das decisões
    identificadas acima.
-9. **Consolidar a D-B.** Rever todos os critérios, executar as verificações
+8. **Consolidar a D-B.** Rever todos os critérios, executar as verificações
    finais, corrigir falhas, reconciliar as últimas atualizações do banco e
    atualizar este quadro. Acompanhar a configuração do Sonar sem fingir sua
    aprovação.
-10. **Entregar o fechamento e as próximas validações.** Separar o que ficou
-    pronto do que depende de você, participantes, fornecedores ou da próxima
-    fase. Manter a PR7 em Draft, sem merge e sem alteração de produção.
+9. **Entregar o fechamento e as próximas validações.** Separar o que ficou
+   pronto do que depende de você, participantes, fornecedores ou da próxima
+   fase. Manter a PR7 em Draft, sem merge e sem alteração de produção.
 
 As atualizações necessárias do banco remoto e os commits serão feitos ao longo
 dos lotes. Não haverá reset remoto nem repetição de backups pesados a cada

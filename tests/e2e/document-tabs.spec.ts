@@ -13,7 +13,7 @@ import {
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDocumentSection, openDocumentMore } from "./document-sections";
+import { selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
@@ -604,6 +604,11 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
   );
   await login(page, f.patient);
   await page.goto(`/documentos/${req.id}`);
+  await openDocumentMore(page);
+  await expect(page.getByRole("button", { name: "Cancelar requisição", exact: true })).toHaveCount(0);
+  await closeDocumentMore(page);
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'req.create',true);`);
+  await page.reload();
   const more = page.getByRole("button", { name: "Mais", exact: true }),
     before = official(req.id, f.patient);
   await more.focus();
@@ -613,7 +618,7 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
     .getByRole("button", { name: "Cancelar requisição", exact: true })
     .click();
   const dialog = page.getByRole("dialog", {
-    name: "Revisar cancelamento da REQ",
+    name: "Cancelar requisição",
     exact: true,
   });
   await expect(dialog).toBeVisible();
@@ -625,6 +630,8 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
     .getByRole("textbox", { name: "Justificativa", exact: true })
     .fill("Motivo fictício ainda não confirmado");
   await dialog.press("Escape");
+  await expect(dialog.getByRole("alert").filter({ hasText: "Há alterações ainda não salvas." })).toBeVisible();
+  await dialog.getByRole("button", { name: "Descartar alterações", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(more).toBeFocused();
   expect(official(req.id, f.patient)).toBe(before);

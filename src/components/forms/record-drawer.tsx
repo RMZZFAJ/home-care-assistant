@@ -28,7 +28,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
     setDiscard(false);
     const form = formRef.current, previous = editFocusRef.current;
     const available = (element: HTMLElement) => element.getClientRects().length > 0 && !element.matches(':disabled,[aria-disabled="true"]') && !element.closest('[inert],[hidden],[aria-hidden="true"]');
-    const target = previous && form?.contains(previous) && available(previous)
+    const target = previous && previous !== form && form?.contains(previous) && available(previous)
       ? previous
       : Array.from(form?.querySelectorAll<HTMLElement>('input:not([type="hidden"]), select, textarea, button, [tabindex="0"]') ?? []).find(available);
     // The form stays mounted. Move focus before removing the warning's button.

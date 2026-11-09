@@ -1,0 +1,67 @@
+{
+  "observedAt": "2026-11-09",
+  "sha": "88a4b5baa526b2b272e0489ecdbb78c6192a0be5",
+  "runId": 42693239665,
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42693239665",
+  "jobs": [
+    {
+      "id": 129418213516,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129418213949,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129418214227,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129429593984,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129429594036,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129429594042,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    {
+      "id": 129429594153,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129452069395,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "outcome": "FAIL; no global approval",
+  "failure": {
+    "project": "mobile",
+    "test": "RecordDrawer 1440: continuar, descartar, Escape e salvar conservam foco e intenção",
+    "file": "tests/e2e/record-drawer-focus.spec.ts",
+    "line": 45,
+    "message": "Expected Categoria select focused after hidden original input; failed in initial attempt and retry",
+    "passed": 292,
+    "artifactId": 13711114516
+  },
+  "limits": "Chromium cancelled, not approved. Both iOS shards/database/Ubuntu/Windows succeeded. Directed remediation is pending and never rewrites the failed SHA outcome. Sonar owner-deferred;PR7 Draft;no merge/production."
+}

@@ -804,6 +804,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     "/historico/" + extra.requisitionId + "?careRecipientId=" + patient,
   );
   await selectDocumentSection(page, "materials");
+  await page.getByRole("button", { name: "Identificar item extra", exact: true }).click();
   await page
     .getByRole("combobox", { name: "Produto correspondente", exact: true })
     .selectOption(product.id);

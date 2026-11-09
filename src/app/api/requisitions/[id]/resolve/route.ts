@@ -1,3 +1,5 @@
+import { requisitionDraftFields, requireRequisitionDraftFields } from "@/lib/validation/requisition-decisions";
+import { commitRequisitionDraft } from "@/lib/server/requisition-draft";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
@@ -13,12 +15,13 @@ import {
 
 const schema = z
   .object({
+    ...requisitionDraftFields,
     itemId: uuid,
     productId: z.string().min(1).max(120),
     reason: z.string().trim().min(3).max(1000),
     idempotencyKey: uuid,
   })
-  .strict();
+  .strict().superRefine(requireRequisitionDraftFields);
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -37,6 +40,10 @@ export async function POST(
       .maybeSingle();
     if (error) databaseError(error);
     if (!data) throw new ApiError("NOT_FOUND", "Item não encontrado.", 404);
+    if (input.draftCommit) {
+      await patientContext(auth, data.care_recipient_id);
+      return NextResponse.json({ data: await commitRequisitionDraft(auth.client, id, "resolve_extra", input, { reason: input.reason, itemId: input.itemId, productId: input.productId }) });
+    }
     await patientContext(auth, data.care_recipient_id, "catalog.manage", true);
     return NextResponse.json({
       data: await rpc(auth.client, "resolve_requisition_item", {

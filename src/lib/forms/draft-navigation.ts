@@ -5,6 +5,9 @@ const common = [
   { id: "dieta", label: "Dieta" },
 ] as const;
 export const draftFlowStages = {
+  REQ_ARCHIVE: [{ id: "req_archive", label: "Arquivamento da requisição" }],
+  REQ_CANCEL: [{ id: "req_cancel", label: "Cancelamento da requisição" }],
+  REQ_RESOLVE_EXTRA: [{ id: "req_resolve_extra", label: "Identificação de item extra" }],
   REQ: [...common, { id: "extras", label: "Itens extras" }, { id: "notes", label: "Observações" }, { id: "review", label: "Revisão" }],
   SUPPLY: [...common, { id: "notes", label: "Observações" }, { id: "review", label: "Revisão" }],
   BAL: [{ id: "count", label: "Contagem" }, { id: "review", label: "Revisão" }],
@@ -34,10 +37,13 @@ export const draftFlowStages = {
   TRANSFER_DISPATCH: [{ id: "ent_transfer_dispatch", label: "Expedição da transferência" }],
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
-export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal", "ent_cancellation_consent","ent_regularization_proposal","ent_regularization_approval","ent_regularization_rejection","ent_regularization_withdrawal","ent_regularization_finding","ent_transfer_agree","ent_transfer_decline","ent_transfer_withdraw","ent_transfer_dispatch","ent_transfer_declaration"] as const;
+export const draftStageIds = ["req_archive", "req_cancel", "req_resolve_extra","identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal", "ent_cancellation_consent","ent_regularization_proposal","ent_regularization_approval","ent_regularization_rejection","ent_regularization_withdrawal","ent_regularization_finding","ent_transfer_agree","ent_transfer_decline","ent_transfer_withdraw","ent_transfer_dispatch","ent_transfer_declaration"] as const;
 export type DraftFlow = keyof typeof draftFlowStages;
 export type DraftNavigation = { version: 1; stage: typeof draftStageIds[number] };
 export function draftFlow(kind: string, purpose = "create", content?: unknown): DraftFlow | null {
+  if (kind === "REQ" && purpose === "archive") return "REQ_ARCHIVE";
+  if (kind === "REQ" && purpose === "cancel") return "REQ_CANCEL";
+  if (kind === "REQ" && purpose === "resolve_extra") return "REQ_RESOLVE_EXTRA";
   if (kind === "COM" && purpose === "approve") return "APPROVE";
   if (kind === "COM" && purpose === "purchase") return "PURCHASE";
   if (kind === "COM" && purpose === "receive") return "ARRIVAL";

@@ -1,3 +1,5 @@
+import { requisitionDraftFields, requireRequisitionDraftFields } from "@/lib/validation/requisition-decisions";
+import { commitRequisitionDraft } from "@/lib/server/requisition-draft";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
@@ -17,7 +19,7 @@ export async function POST(
   return api("requisition.archive", async () => {
     const input = await readJson(
       request,
-      z.object({ reason: z.string().trim().min(3).max(1000) }).strict(),
+      z.object({ ...requisitionDraftFields, reason: z.string().trim().min(3).max(1000) }).strict().superRefine(requireRequisitionDraftFields),
     );
     const auth = await authenticate();
     const id = parseUuid((await context.params).id);
@@ -29,6 +31,10 @@ export async function POST(
     if (error) databaseError(error);
     if (!document)
       throw new ApiError("NOT_FOUND", "Requisição não encontrada.", 404);
+    if (input.draftCommit) {
+      await patientContext(auth, document.care_recipient_id);
+      return NextResponse.json({ data: await commitRequisitionDraft(auth.client, id, "archive", input, { reason: input.reason }) });
+    }
     await patientContext(auth, document.care_recipient_id, "req.archive", true);
     return NextResponse.json({
       data: await rpc(auth.client, "archive_requisition", {

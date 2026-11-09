@@ -131,6 +131,7 @@ test("M1 mantém material e ciência após resolução de extra, atendimento e d
   ).toHaveCount(0);
   const beforePdf = await pdf(page, id, firstVersion);
   expect(sciences(id)).toEqual(science);
+  await page.getByRole("button", { name: "Identificar item extra", exact: true }).click();
   await page
     .getByRole("combobox", { name: "Produto correspondente", exact: true })
     .selectOption(f.products[0]);

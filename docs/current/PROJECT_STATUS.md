@@ -19,8 +19,17 @@ raiz cobre105 critérios e estimativas visuais/funcionais,sem alterar os estados
 da matriz técnica. CI própria segue pendente.
 [Detalhe](../audits/D/D-B/PREVIEW_RECOVERY_AND_STATUS.md).
 
-Estado atual:local174/remoto174,zero migrations pendentes. Matriz105x39:56
-PASS/49 PARTIAL/0 NOT_STARTED;contagens não equivalem à conclusão da fase.
+D3.42 implementa três decisões REQ com preparação privada,comparação e replay
+exato.34 unitários/API,16 Auth reais e20 browsers distintos aprovados por
+reuso qualificado;rodadas finais diagnósticas,CI própria ainda obrigatória.
+Revalidação da mesma revisão conserva edição;outra revisão exige comparação.
+Regressão de foco do RecordDrawer corrigida e repetida nos dois motores.
+Local/remoto175,nove funções e grants coincidem;dry-run sem pendências. A
+CI88a4b5b terminou FAIL em foco mobile,com Chromium cancelado;ambos iOS,banco,
+Ubuntu e Windows PASS. Preview anterior READY;sem aprovação global.
+[Incremento](../audits/D/D-B/REQ_DECISION_DRAFTS.md),
+[CI observada](../audits/D/D-B/CI_88A4B5B_OBSERVATION.json).
+Matriz105x39:56 PASS/49 PARTIAL/0 NOT_STARTED;contagens não concluem a fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
 sem redução de funções. D3.28 concluiu a retirada técnica do Fluent: seletores
 compostos, menus, popovers, tooltips, provider/Griffel e dependência. Shell e

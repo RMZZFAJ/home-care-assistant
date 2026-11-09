@@ -1,6 +1,6 @@
 # Complemento D3.41 — recuperação, quadro e quebra de texto
 
-A CI f 233be 9 falhou duas vezes no cenário REQ403 do WebKit. O consumidor
+A CI f233be9 falhou duas vezes no cenário REQ403 do WebKit. O consumidor
 já retira os dados ao receber 401/403/404. O teste passava do retry 503 para
 403 esperando cabeçalho e foco que podiam pertencer ao estado anterior,
 sem confirmar o término da leitura de recuperação. A resposta 503 mantém
