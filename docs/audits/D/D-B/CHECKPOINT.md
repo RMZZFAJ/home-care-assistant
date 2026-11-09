@@ -2369,3 +2369,40 @@ Paridade integral, listas/cartões, fichas em abas, Andamentos persistidos e gat
 D-C/D6/humanos/físicos/externos continuam pendentes. Sonar adiado, PR7 Draft,
 produção NO-GO, meta ativa. [Dossiê](UI_MODEL_STAGE_3.md),
 [fontes](UI_MODEL_STAGE_3.json), [casos](UI_MODEL_COMPOSED_BROWSER.json).
+
+## D3.29 — Andamentos persistidos — 09/11/2026
+
+Base dc8f970. Nova função integrada a REQ/COM/ENT/BAL: categoria, etapa opcional,
+texto até2000 unidades UTF-16 e oito referências autorizadas. Tabela privada
+append-only com RLS, autoria/nome histórico/horário/hash do banco, RPCs Auth,
+capacidade por paciente e intenção idempotente com trava concorrente. Paciente
+inativo não aceita nova publicação; recuperação própria ainda exige leitura.
+Referências de outro paciente são recusadas; links são filtrados na leitura.
+
+Fatos automáticos documentais e registros humanos têm cronologia ascendente,
+filtros e paginação completa, sem converter lembretes/logs arbitrários em fatos.
+Editor e rascunho por usuário/ficha, congelamento e recuperação após reload,
+sem replay automático. Referência não executa HTML nem ultrapassa o limite de
+texto por inserção programática. Busca vinculada ao documento preserva o
+contrato da lista existente e minimiza sua resposta.
+
+Quatro testes Auth reais e19 cenários distintos Chromium/iOS aprovados; inclui
+fluxo das quatro fichas,43 registros, recusa de leitura, concorrência, permissões,
+recuperação, bytes documentais/estoque e regressões de histórico/PDF/recebimento.
+Editor avaliado em cinco larguras, com Axe. Build/tipos e lint dirigido PASS.
+Contraprovas e limites de reuso estão no dossiê; nenhuma regra suprimida.
+
+Migration165 aplicada e reconciliada no remoto qwfrqychokvhdzakibid:165/165,
+última20261109091550, sem pendências; funções finais/grants/capacidade iguais
+ao local. Sem reset, fixture/Auth, roles, seeds ou Vault remotos. Advisors
+apontam as duas RPCs Auth SECURITY DEFINER; fronteira intencional revisada,
+sem EXECUTE anon/service_role ou grants diretos na tabela. Demais avisos do
+projeto não são declarados resolvidos. CI própria permanece gate para cadeia
+limpa, evolução legada e integração completa, sem reset local redundante.
+
+105x39 e primeiras30 colunas preservadas,56 PASS/49 PARTIAL. UI adicional
+atualizada. Próximo: fichas em abas, marcos do cabeçalho e paridade integral,
+mantendo todos os recursos e a nova recuperação. Sonar adiado; D-C/D6 e gates
+humanos/físicos/externos separados. PR7 Draft, produção NO-GO, meta ativa.
+[Dossiê](DOCUMENT_PROGRESS.md), [provas](DOCUMENT_PROGRESS_VALIDATION.json),
+[remoto](DOCUMENT_PROGRESS_REMOTE.json), [advisors](DOCUMENT_PROGRESS_ADVISORS.json).

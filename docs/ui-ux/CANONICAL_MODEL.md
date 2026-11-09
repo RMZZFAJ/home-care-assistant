@@ -49,13 +49,16 @@ paginação completa. Marcos de progresso não determinam cronologia. A etapa
 relacionada é apenas atributo. Auditoria continua separada; nem todo log vira
 andamento. Autores, instantes, estados e consequências vêm dos fatos reais.
 
-Registrar andamento é função real a implementar: texto até 2000 caracteres,
+Registrar andamento é função real integrada às quatro fichas: texto até 2000 caracteres,
 categoria, etapa opcional, referências autorizadas, autoria/instante gerados
 no servidor/banco e confirmação recuperável da mesma intenção. Categorias:
 Registro complementar, Providência, Contato e Pendência. Exibir texto com escape,
 sem executar HTML. Referência não concede acesso a ficha/paciente alheio.
 Registro complementar não muda conteúdo original, estoque, atendimento, ciência,
 recebimento, snapshots, hashes ou arquivos/versões emitidos anteriormente.
+Implementação e provas: [Andamentos persistidos](../audits/D/D-B/DOCUMENT_PROGRESS.md).
+A composição final em abas, os marcos do cabeçalho e a paridade das demais
+superfícies continuam sujeitos à conclusão da migração visual.
 
 ## Preservação e aceite
 

@@ -1,0 +1,67 @@
+{
+  "at": "2026-11-09T09:50:03.680Z",
+  "project": "qwfrqychokvhdzakibid",
+  "groups": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "title": "RLS Enabled No Policy",
+      "count": 44
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "title": "Extension in Public",
+      "count": 1
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "title": "Public Can Execute SECURITY DEFINER Function",
+      "count": 3
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "title": "Signed-In Users Can Execute SECURITY DEFINER Function",
+      "count": 167
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "title": "Leaked Password Protection Disabled",
+      "count": 1
+    }
+  ],
+  "newObjects": [
+    {
+      "detail": "Function `public.document_progress(p_document uuid, p_filter text, p_page integer, p_size integer)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/document_progress`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+      "metadata": {
+        "name": "document_progress",
+        "schema": "public",
+        "language": "plpgsql",
+        "arguments": "p_document uuid, p_filter text, p_page integer, p_size integer",
+        "security_definer": true
+      },
+      "observed_at": "2026-11-09T09:48:11.677Z"
+    },
+    {
+      "detail": "Function `public.document_progress_publish(p_document uuid, p_key uuid, p_body jsonb)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/document_progress_publish`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+      "metadata": {
+        "name": "document_progress_publish",
+        "schema": "public",
+        "language": "plpgsql",
+        "arguments": "p_document uuid, p_key uuid, p_body jsonb",
+        "security_definer": true
+      },
+      "observed_at": "2026-11-09T09:48:11.677Z"
+    }
+  ],
+  "review": {
+    "status": "REVIEWED_INTENDED_AUTHENTICATED_RPC_BOUNDARIES",
+    "reason": "Two authenticated-only SECURITY DEFINER RPCs access a private append-only table.Each requires live Auth and document authority;new publication also requires patient-active write capability.Explicit grants deny anon/service/direct table access;negative and concurrent tests use real Auth.",
+    "anonymousOrServiceAccessToNewRpc": false,
+    "evidence": "DOCUMENT_PROGRESS_VALIDATION.json;DOCUMENT_PROGRESS_REMOTE.json",
+    "otherAdvisorGroups": "General project findings remain separate;not declared resolved by this feature."
+  }
+}

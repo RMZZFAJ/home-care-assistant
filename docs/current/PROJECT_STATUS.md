@@ -9,19 +9,23 @@ SQL de funções de serviço e browsers SKIPPED. Lista do teste corrigida com
 grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
 não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
-Estado atual:local164/remoto164, zero migrations pendentes. Matriz105x39:
+Estado atual:local165/remoto165, zero migrations pendentes. Matriz105x39:
 56 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
 sem redução de funções. D3.28 concluiu a retirada técnica do Fluent: seletores
 compostos, menus, popovers, tooltips, provider/Griffel e dependência. Shell e
 tokens compartilhados seguem o modelo; comparação de cabeçalho/navegação e
 modal em cinco larguras. 36 cenários distintos Chromium/iOS aprovados nos lotes
-dirigidos, com limites de reuso documentados. Restam paridade de todas as telas,
-listas/cartões, fichas em abas e Andamentos persistidos. Registro UI adicional
+dirigidos, com limites de reuso documentados. D3.29 integrou Andamentos persistidos
+às quatro fichas, com autoria do banco, recuperação após reload, referências
+autorizadas e cronologia paginada. Migration165 reconciliada. Restam paridade de
+todas as telas, listas/cartões, fichas em abas e marcos do cabeçalho. Registro UI
+adicional
 18 requisitos; resultados
 funcionais anteriores não aprovam toda a nova aparência.
 [Contrato](../ui-ux/CANONICAL_MODEL.md),
 [provas atuais](../audits/D/D-B/UI_MODEL_STAGE_3.md).
+[Andamentos e provas do lote atual](../audits/D/D-B/DOCUMENT_PROGRESS.md).
 
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das

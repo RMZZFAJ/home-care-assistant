@@ -33,6 +33,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { DocumentHeader } from "./document-header";
+import { DocumentProgress } from "./document-progress";
 import {
   PurchaseDetails,
   PurchaseExpectationComparison,
@@ -622,6 +623,7 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
+          <DocumentProgress id={id} type={data.type} patientId={data.care_recipient_id} context={context} />
           {data.type === "ENT" && data.protocol ? (
             <section className="ui-card">
               <DeliveryDispatchFacts data={data} />

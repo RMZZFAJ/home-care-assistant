@@ -400,7 +400,13 @@ test("preparação recusada explica a falha, bloqueia permissão Push e recupera
   await expect(app.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(clock);
   expect(await page.evaluate(() => matchMedia("(display-mode: standalone)").matches)).toBe(false);
-  for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 950 }); await audit(page, "PWA-preparation-recovery-" + width); }
+  for (const width of [1440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 950 });
+    // Reflow must start this visual task at its actual section, rather than
+    // preserving a previous viewport's arbitrary mid-control scroll offset.
+    await app.evaluate(element => element.scrollIntoView({ block: "start" }));
+    await audit(page, "PWA-preparation-recovery-" + width);
+  }
   const activate = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
   await expect(activate).toBeEnabled();
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number } }).hcaPushCapability.requests)).toBe(0);

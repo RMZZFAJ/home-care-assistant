@@ -25,6 +25,7 @@ import { textRows } from "@/lib/text-rows";
 import { requisitionDocumentState } from "@/lib/documents/presentation";
 import { Attachments } from "@/components/documents/attachments";
 import { DocumentHeader } from "@/components/documents/document-header";
+import { DocumentProgress } from "@/components/documents/document-progress";
 import {
   DocumentTimeline,
   type TimelineEvent,
@@ -341,6 +342,7 @@ export function RequisitionDocumentContent({
           Declarar nova necessidade remanescente
         </Link>
       ) : null}
+      <DocumentProgress id={id} type="REQ" patientId={data.care_recipient_id} context={context} />
       <section className="ui-card">
         <h2 className="font-semibold">Materiais requisitados</h2>
         <p className="mt-2 text-xs text-(--muted)">
