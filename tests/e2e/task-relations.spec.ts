@@ -19,13 +19,23 @@ async function login(page: Page, patient: string) {
 test("relação REQ para ENT abre fatos de expedição em leitura, recupera consulta e recusa outro paciente", async ({ page }, info) => {
   const f = await remainingNeedFixture(), other = await setup();
   const foreign = await rpc(other.admin, "create_supply_document", { p_patient: other.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Recebedor de outro paciente fictício", lines: [{ productId: other.products[0], quantity: "1" }] } });
-  await login(page, f.patient); await page.goto(`/historico/${f.source.id}`);
+  await login(page, f.patient);
+  // Opening the source REQ records its own post-render event. Finish that
+  // authorized action before measuring whether the related ENT is read-only.
+  const sourceOpening = page.waitForResponse(response => new URL(response.url()).pathname === `/api/requisitions/${f.source.id}/openings` && response.request().method() === "POST");
+  await page.goto(`/historico/${f.source.id}`);
+  expect((await sourceOpening).status()).toBe(200);
   const open = page.getByRole("button", { name: new RegExp("^" + f.ent.code + " · aceito") });
   await expect(open).toBeVisible();
   const response = await page.request.get(`/api/documents/${f.ent.id}`); expect(response.status()).toBe(200);
   const body = await response.json();
   await info.attach("related-read-shape", { body: JSON.stringify({ type: body.data.type, lineTypes: Object.fromEntries(Object.entries(body.data.lines[0]).map(([name, value]) => [name, Array.isArray(value) ? "array" : value === null ? "null" : typeof value])) }), contentType: "application/json" });
   const before = physicalState(f);
+  const openingHistory = async () => {
+    const response = await page.request.get(`/api/requisitions/${f.source.id}/openings`);
+    expect(response.status()).toBe(200); return response.json();
+  };
+  const beforeOpenings = await openingHistory();
   let writes = 0;
   page.on("request", request => { if (/^\/api\/(documents|requisitions|stock|balances)/.test(new URL(request.url()).pathname) && request.method() !== "GET") writes++; });
   await open.click(); const dialog = page.getByRole("dialog").filter({ visible: true }); await expect(dialog).toHaveCount(1);
@@ -45,5 +55,6 @@ test("relação REQ para ENT abre fatos de expedição em leitura, recupera cons
   await refresh.press("Enter"); await expect(dialog.getByText("Expedido", { exact: true })).toBeVisible();
   const denied = await page.request.get(`/api/documents/${foreign.id}`); expect(denied.status()).toBe(403); expect(await denied.text()).not.toContain(foreign.code);
   expect(physicalState(f)).toBe(before); expect(writes).toBe(0);
+  expect(await openingHistory()).toEqual(beforeOpenings);
   for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "related delivery read " + width); }
 });

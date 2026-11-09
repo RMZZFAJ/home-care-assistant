@@ -1,0 +1,19 @@
+{
+  "at": "2026-11-09 06:35:13 UTC",
+  "projectId": "qwfrqychokvhdzakibid",
+  "local": {
+    "count": 164,
+    "last": "20261109024515",
+    "versionsSha256": "178b8f89324a10bc2de1b146640897a30ee243452a2f5a68c50f396ea0bae6bc"
+  },
+  "newSqlFiles": 0,
+  "pending": 0,
+  "action": "Read-only reconciliation; no migration to apply; no remote fixture, reset or redundant backup.",
+  "preview": {
+    "sha": "76fabb66fbbe31647af9b7c800a566f014943f76",
+    "id": "dpl_6pgtAAef2qL7YRYaFiJT83NEPpoz",
+    "state": "READY",
+    "stableUrl": "https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app",
+    "proves": "Observed prior deployment state only; does not prove this patch or physical-device operation."
+  }
+}

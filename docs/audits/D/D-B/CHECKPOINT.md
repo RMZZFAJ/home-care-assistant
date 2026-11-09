@@ -2249,3 +2249,32 @@ aprova o novo SHA. PR7 Draft, Sonar adiado, meta ativa.
 [Dossiê](SCOPE_WALKTHROUGH.md), [provas](SCOPE_WALKTHROUGH_EVIDENCE.json),
 [remoto](SCOPE_WALKTHROUGH_REMOTE_OBSERVATION.json),
 [CI anterior](CI_86025BA_OBSERVATION.json).
+
+## D3.25 — GUI-04 e fronteira de consulta relacionada — 09/11/2026
+
+Base76fabb6. Roteiro inicial de recuperação integrado ao suporte global, usando
+somente fatos técnicos autorizados do ambiente. Cópia e probe exigem ID/hash/
+contagens e ordem temporal compatíveis; falha posterior ou recorte incompleto
+não empresta sucesso antigo. Falha/carregamento/ambiente errado ocultam o roteiro;
+outputs não têm inputs ou ações de restore. Titular/substituto, quarentena real,
+custódia externa e retomada seguem sem aprovação D-C/D6.
+
+Primeiro E2E falhou no foco do retry; disabled nativo corrigido para guarda
+aria-disabled. Contraprova preservada. Recheck interrompido não contado;
+repetição completa3/3 Chromium PASS,cinco larguras e Axe.18 unitários,tipos/lint
+PASS. CI anterior teve iOS-2 FAIL no contador de gravações REQ→ENT nas duas
+tentativas. A abertura inicial da REQ é POST legítimo pós-render; teste agora
+aguarda essa resposta antes de iniciar a medição da relação,mantendo zero
+escritas e acrescentando igualdade do histórico de aberturas. Chromium+iOS2/2
+PASS. Sem mudança de API,autorização,SQL ou mecanismo de ciência.
+
+Dez fontes e corpo/setup do guia de D3.19 qualificados; scripts/SQL de cópia,
+probe e telemetria correspondentes têm hashes preservados. Eventos novos são
+controlados,não nova prova de backup/restore. C-FINAL023 PASS local composto;
+C-FINAL025 PARTIAL apenas por início de GUI-04. Matriz56/48/1,105x39,primeiras30
+colunas intactas;66 composições/171 relações e comparação de viewports pendentes.
+Local/remoto164,última20261109024515 e digest iguais,zero pendências para aplicar.
+CI76fabb6 Windows/Ubuntu/banco e três grupos browsers PASS,iOS-2 FAIL;Preview
+READY. CI do novo SHA obrigatória. PR7 Draft,Sonar adiado,meta ativa,produção NO-GO.
+[Dossiê](RECOVERY_RUNBOOK.md),[provas](RECOVERY_RUNBOOK_EVIDENCE.json),
+[remoto](RECOVERY_RUNBOOK_REMOTE_OBSERVATION.json),[CI anterior](CI_76FABB6_OBSERVATION.json).

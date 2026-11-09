@@ -6,6 +6,7 @@ atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitorame
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
 - [Checkpoint incremental](CHECKPOINT.md).
+- [Roteiro técnico GUI-04 e recuperação de leitura](RECOVERY_RUNBOOK.md).
 - [Matriz de execução](ACCEPTANCE_EXECUTION.csv): 75 critérios C9 preservados e
   complementos próprios, sem aprovação por planejamento.
 - [Reconciliação das migrations](MIGRATIONS.md).

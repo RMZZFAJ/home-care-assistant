@@ -7,6 +7,7 @@ import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { formatBrazilDate } from "@/lib/receipt";
 import { environmentLabels, incidentLabels, operationLabels, operationPolicy, operationsConfirmed, operationsDiagnostics, operationsHistory, type Diagnostics, type Incident, type OperationEnvironment, type OperationsCommand, type OperationsReceipt } from "@/lib/operations/contracts";
 import type { z } from "zod";
+import { RecoveryRunbook } from "./recovery-runbook";
 
 const stateLabels = { open: "Aberto", acknowledged: "Em acompanhamento", resolved: "Encerrado" };
 const actionLabels = { opened: "Aberto", observed: "Observação atualizada", acknowledged: "Acompanhamento iniciado", resolved: "Encerrado pelo suporte", recovered: "Condição deixou de ser detectada", configured: "Política configurada", escalated: "Severidade alterada" };
@@ -29,8 +30,9 @@ function EnvironmentConsole({ environment, setLocked }: { environment: Operation
   const command = useCommandIntent<OperationsCommand, OperationsReceipt>(operationsConfirmed);
   const [error, setError] = useState(""), [message, setMessage] = useState("");
   const parsed = read.data ? operationsDiagnostics.safeParse(read.data.data) : null;
-  const busy = command.busy || command.uncertain, data = parsed?.success ? parsed.data : null;
-  const readFailure = read.error || (parsed && !parsed.success ? "Resposta técnica sem confirmação reconhecível. Consulte novamente." : "");
+  const sameEnvironment = parsed?.success && parsed.data.environment === environment;
+  const busy = command.busy || command.uncertain, data = sameEnvironment ? parsed.data : null;
+  const readFailure = read.error || (parsed && !sameEnvironment ? "Resposta técnica sem confirmação reconhecível. Consulte novamente." : "");
   async function send(packet: OperationsCommand) {
     setError(""); setMessage(""); setLocked(true);
     try {
@@ -51,13 +53,14 @@ function EnvironmentConsole({ environment, setLocked }: { environment: Operation
     catch (reason) { setError(reason instanceof Error ? reason.message : "Confirmação ainda indisponível."); }
   }
   return <>
-    <div className="hca-toolbar"><label>Incidentes<select className={inputClass} value={state} disabled={busy} onChange={event => { setState(event.target.value); setPage(1); }}><option value="active">Ativos</option><option value="resolved">Encerrados</option><option value="all">Todos</option></select></label><button type="button" className={buttonClass} disabled={read.loading || command.busy} onClick={read.refresh}>Atualizar monitoramento</button></div>
+    <div className="hca-toolbar"><label>Incidentes<select className={inputClass} value={state} disabled={busy} onChange={event => { setState(event.target.value); setPage(1); }}><option value="active">Ativos</option><option value="resolved">Encerrados</option><option value="all">Todos</option></select></label><button type="button" className={buttonClass} aria-disabled={read.loading || command.busy} onClick={() => { if (!read.loading && !command.busy) read.refresh(); }}>Atualizar monitoramento</button></div>
     {read.loading ? <p role="status">Consultando observações técnicas…</p> : null}
     {readFailure ? <Notice error>{readFailure}</Notice> : null}
     {read.error && data ? <p>Última consulta confirmada preservada. As alterações aguardam uma nova consulta válida.</p> : null}
     {error ? <Notice error>{error}</Notice> : null}{message ? <Notice>{message}</Notice> : null}
     {command.uncertain ? <Notice error>Resultado incerto. Preserve este ambiente e recupere a mesma tentativa antes de alterar outra condição. <button type="button" className={buttonClass} disabled={command.busy} onClick={() => void recover()}>Recuperar alteração técnica</button></Notice> : null}
     {data ? <>
+      {!read.loading && !readFailure ? <RecoveryRunbook data={data} /> : <p>Roteiro de recuperação aguardando consulta válida deste ambiente.</p>}
       <p className="text-sm">Consulta: {formatBrazilDate(data.consultedAt)}. “Observado” indica atividade registrada; não comprova funcionamento contínuo. Componentes sem observação precisam de verificação.</p>
       <ul className="hca-compact-grid" aria-label="Componentes observados">{data.components.map(component => <li className="ui-card" key={component.component}><strong>{operationLabels[component.component]}</strong><p>{component.state === "attention" ? "Requer atenção" : component.state === "unobserved" ? "Sem observação" : "Atividade observada"}</p><p className="text-sm">{component.observedAt ? formatBrazilDate(component.observedAt) : "Nenhum registro de atividade"}</p></li>)}</ul>
       <section aria-label="Incidentes técnicos" className="space-y-3"><h3 className="font-semibold">Incidentes técnicos · {data.total}</h3>{!data.data.length ? <p>Nenhum incidente corresponde a este filtro.</p> : null}{data.data.map(incident => <IncidentCard key={incident.id} incident={incident} environment={environment} busy={busy || read.loading || Boolean(readFailure)} send={send} openHistory={() => setHistory(incident.id)} />)}

@@ -48,6 +48,52 @@ async function fault() {
   const id = sql(`select id from private.operations_incidents where last_event_id=${sqlLiteral(receipt.id)};`); ownIncidents.add(id); return id;
 }
 
+test("GUI04 roteiro liga cópia e ensaio reais, distingue falha e ambiente e nunca restaura pelo painel", async ({ page }) => {
+  const archiveId = randomUUID(), manifestSha256 = "a".repeat(64);
+  const metrics = { archiveId, manifestSha256, files: 12, bytes: 3456 };
+  let sequence = 0;
+  const start = Date.now();
+  async function record(component: "backup" | "recovery", code: string, values: typeof metrics | Record<string, never>) {
+    const key = randomUUID();
+    const receipt = await rpc(service, "record_operations_event", { p_event: { environment: "local", component, code, idempotencyKey: key, correlationId: key, observedAt: new Date(start + sequence++ * 1000).toISOString(), metrics: values } });
+    if (code === "RECOVERY_FAILURE") {
+      const id = sql(`select id from private.operations_incidents where last_event_id=${sqlLiteral(receipt.id)};`);
+      ownIncidents.add(id);
+    }
+  }
+  await record("backup", "BACKUP_VERIFIED", metrics); await record("recovery", "RECOVERY_PROBE_VERIFIED", metrics);
+  const business = () => sql("select jsonb_build_object('docs',(select count(*) from public.operational_documents),'science',(select count(*) from public.requisition_science_events),'stock',(select count(*) from public.stock_movements),'outbox',(select count(*) from public.requisition_notifications));");
+  const before = business(), writes: string[] = [];
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/operations" && request.method() !== "GET") writes.push(request.method()); });
+  await login(page); await openConsole(page, "local");
+  const guide = consoleRegion(page).getByRole("region", { name: "Roteiro de recuperação do serviço", exact: true });
+  await expect(guide).toContainText("Registros compatíveis da mesma cópia.");
+  await expect(guide).toContainText(archiveId); await expect(guide).toContainText(manifestSha256);
+  await expect(guide).toContainText("não é um inventário completo"); await expect(guide).toContainText("dependem da validação D6");
+  await expect(guide.locator("input,select,textarea,button")).toHaveCount(0);
+  for (const width of [320, 390, 768, 1024, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "GUI04 recovery " + width); }
+  const refresh = consoleRegion(page).getByRole("button", { name: "Atualizar monitoramento", exact: true });
+  await record("recovery", "RECOVERY_PROBE_VERIFIED", { ...metrics, manifestSha256: "b".repeat(64) });
+  await refresh.click(); await expect(guide).toContainText("ainda não confirmados neste recorte");
+  await record("recovery", "RECOVERY_FAILURE", {}); await refresh.click();
+  await expect(guide).toContainText("Ensaio de recuperação não confirmado");
+  let mode = "error";
+  await page.route("**/api/operations?*", async route => {
+    if (mode === "error") return route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Consulta técnica GUI04 indisponível" } });
+    if (mode === "wrong-scope") { const response = await route.fetch(); const body = await response.json(); body.data.environment = "preview"; return route.fulfill({ response, json: body }); }
+    return route.continue();
+  });
+  await refresh.click(); await expect(consoleRegion(page)).toContainText("Consulta técnica GUI04 indisponível");
+  await expect(guide).toHaveCount(0); await expect(refresh).toBeFocused();
+  mode = "wrong-scope"; await refresh.click(); await expect(consoleRegion(page)).toContainText("Resposta técnica sem confirmação reconhecível.");
+  await expect(guide).toHaveCount(0); await expect(consoleRegion(page).getByRole("list", { name: "Componentes observados", exact: true })).toHaveCount(0);
+  mode = "live"; await refresh.click(); await expect(guide).toBeVisible();
+  await expect(guide).toContainText("Ensaio de recuperação não confirmado");
+  await consoleRegion(page).getByRole("combobox", { name: "Ambiente técnico", exact: true }).selectOption("preview");
+  await expect(guide).toContainText("Ambiente: Preview"); await expect(guide).not.toContainText(archiveId);
+  expect(writes).toEqual([]); expect(business()).toBe(before);
+});
+
 test("OPS3 suporte global recupera a mesma alteração incerta e preserva histórico sem efeito operacional", async ({ page }) => {
   const id = await fault(); await login(page); await openConsole(page);
   const card = consoleRegion(page).getByRole("article", { name: "Integridade documental recusada", exact: true });

@@ -10,12 +10,23 @@ grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
 não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
 Estado atual:local164/remoto164, zero migrations pendentes. Matriz105x39:
-55 PASS/48 PARTIAL/2 NOT_STARTED; contagens não equivalem à conclusão da fase.
+56 PASS/48 PARTIAL/1 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
+
+D3.25 implementou GUI-04 no suporte global:registros de cópia/ensaio vinculados
+por identificador/hash/contagens, isolamento e gate de retomada explícitos.
+Falha/ambiente errado ocultam o roteiro; nova consulta preserva foco.18 unitários,
+três cenários Chromium e relação REQ→ENT no Chromium/iOS passaram. A relação
+agora aguarda a abertura inicial da REQ antes de medir zero gravações na ENT,
+conferindo também histórico de aberturas. C-FINAL023 PASS local composto;
+C-FINAL025 iniciado, sem aprovação das66 composições. SQL164/164,zero pendências.
+CI76fabb6 aprovou Windows/Ubuntu/banco e três grupos de browsers,mas iOS-2
+falhou no contador da relação; não é aprovação global nem do novo SHA.
+Preview anterior READY. [Provas](../audits/D/D-B/RECOVERY_RUNBOOK.md).
 
 D3.24 concluiu a prova local de C021/C7-006:quatro cenários Chromium de criação
 global, conta alheia, vínculos locais e comunicação, mais uma contraprova Auth
