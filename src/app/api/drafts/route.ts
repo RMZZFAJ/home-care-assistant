@@ -9,7 +9,7 @@ import {
   uuid,
 } from "@/lib/server/api";
 import { creationDraftCommandSchema } from "@/lib/validation/creation-drafts";
-import { draftPurpose, comOperationPurposes } from "@/lib/validation/supply-drafts";
+import { draftPurpose, comOperationPurposes, entOperationPurposes } from "@/lib/validation/supply-drafts";
 export async function GET(request: Request) {
   return api("drafts.read", async () => {
     const params = new URL(request.url).searchParams,
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     if (
       !["REQ", "BAL","COM","ENT"].includes(kind ?? "") ||
       !draftPurpose.safeParse(purpose).success||(!extended&&purpose!=="create")||
-      (extended&&((purpose==="create")!==(target===null)||kind==="COM"&&!["create","revise",...comOperationPurposes].includes(purpose)||kind==="ENT"&&!["create","revise","receive","divergence"].includes(purpose)))||
+      (extended&&((purpose==="create")!==(target===null)||kind==="COM"&&!["create","revise",...comOperationPurposes].includes(purpose)||kind==="ENT"&&!["create","revise",...entOperationPurposes].includes(purpose)))||
       (target !== null && !uuid.safeParse(target).success) ||
       (kind === "REQ" && target !== null)
     )

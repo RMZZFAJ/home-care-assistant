@@ -21,6 +21,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
   chegada entre sessões, referência obsoleta e consumo único; migration166.
 - [Decisões COM e referências oficiais](COM_DECISION_DRAFTS.md): parcelas,
   confirmação preservada, comparação autorizada e migrations167/168.
+- [Preenchimentos privados ENT](ENT_OPERATION_DRAFTS.md): cinco decisões,
+  referência exata, autoridade pessoal e migration169 reconciliada.
 - [Nova aparência canônica](../../../ui-ux/CANONICAL_MODEL.md) e
   [execução adicional UI](UI_MODEL_ACCEPTANCE.csv):migração integral em andamento.
 - [Roteiro técnico GUI-04 e recuperação de leitura](RECOVERY_RUNBOOK.md).

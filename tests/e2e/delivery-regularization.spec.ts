@@ -225,6 +225,7 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
     await family
       .getByRole("link", { name: new RegExp(proposed.code!) })
       .click();
+    await selectDocumentSection(family, "workflow");
     await family
       .getByRole("button", { name: "Conferir proposta", exact: true })
       .click();
@@ -323,6 +324,7 @@ test("P05 profissional futuro encontra sua tarefa e relata apenas apuração pr�
     page.getByText("Relatar apuração da pendência física", { exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: new RegExp(document.code!) }).click();
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", { name: "Registrar apuração própria", exact: true })
     .click();
@@ -345,6 +347,7 @@ test("P05 profissional futuro encontra sua tarefa e relata apenas apuração pr�
   expect(result.deliveryRegularization!.cases[0].findings[0].actor_id).toBe(
     fixtures.supervisor.id,
   );
+  await selectDocumentSection(page, "materials");
   await expect(
     page.getByText(
       "Encerramento administrativo · situação física ainda desconhecida",

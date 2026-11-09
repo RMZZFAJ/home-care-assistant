@@ -16,9 +16,14 @@ export const draftFlowStages = {
   REJECT_RECEIPT: [{ id: "receipt_rejection", label: "Rejeição da parcela" }],
   CLOSE_EXPECTATION: [{ id: "expectation_closure", label: "Encerramento da expectativa" }],
   CANCEL_COM: [{ id: "com_cancellation", label: "Cancelamento da COM" }],
+  REASSIGN_ENT: [{ id: "ent_reassignment", label: "Troca de destinatário" }],
+  RESOLVE_ENT: [{ id: "ent_resolution", label: "Conciliação da entrega" }],
+  CANCEL_ENT: [{ id: "ent_cancellation", label: "Pedido de cancelamento da ENT" }],
+  REFUSE_ENT: [{ id: "ent_cancellation_refusal", label: "Recusa do cancelamento" }],
+  WITHDRAW_ENT: [{ id: "ent_cancellation_withdrawal", label: "Retirada do meu pedido" }],
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
-export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation"] as const;
+export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal"] as const;
 export type DraftFlow = keyof typeof draftFlowStages;
 export type DraftNavigation = { version: 1; stage: typeof draftStageIds[number] };
 export function draftFlow(kind: string, purpose = "create", content?: unknown): DraftFlow | null {
@@ -31,6 +36,11 @@ export function draftFlow(kind: string, purpose = "create", content?: unknown): 
   if (kind === "COM" && purpose === "cancel") return "CANCEL_COM";
   if (kind === "ENT" && purpose === "receive") return "RECEIVE";
   if (kind === "ENT" && purpose === "divergence") return "DIVERGENCE";
+  if (kind === "ENT" && purpose === "reassign") return "REASSIGN_ENT";
+  if (kind === "ENT" && purpose === "resolve") return "RESOLVE_ENT";
+  if (kind === "ENT" && purpose === "cancel") return "CANCEL_ENT";
+  if (kind === "ENT" && purpose === "refuse_cancellation") return "REFUSE_ENT";
+  if (kind === "ENT" && purpose === "withdraw_cancellation") return "WITHDRAW_ENT";
   if (!["create", "revise"].includes(purpose)) return null;
   if (kind === "REQ") return purpose === "create" ? "REQ" : null;
   if (kind === "BAL") {

@@ -5,7 +5,11 @@ export const comOperationPurposes = ["approve", "purchase", "receive", "validate
 export const comOperationDraftPurpose = z.enum(comOperationPurposes);
 export type ComOperationPurpose = z.infer<typeof comOperationDraftPurpose>;
 export const isComOperationPurpose = (value: string): value is ComOperationPurpose => comOperationDraftPurpose.safeParse(value).success;
-export const draftPurpose=z.enum(["create","revise","receive","divergence","approve","purchase","validate_receipt","reject_receipt","close_expectation","cancel"]);
+export const entOperationPurposes = ["receive", "divergence", "reassign", "resolve", "cancel", "refuse_cancellation", "withdraw_cancellation"] as const;
+export const entOperationDraftPurpose = z.enum(entOperationPurposes);
+export type EntOperationPurpose = z.infer<typeof entOperationDraftPurpose>;
+export const isEntOperationPurpose = (value: string): value is EntOperationPurpose => entOperationDraftPurpose.safeParse(value).success;
+export const draftPurpose=z.enum(["create","revise","receive","divergence","approve","purchase","validate_receipt","reject_receipt","close_expectation","cancel","reassign","resolve","refuse_cancellation","withdraw_cancellation"]);
 export const draftMaterials=z.array(z.object({id:text(120).min(1),name:text(200),unit:text(80),quantityDecimals:z.number().int().min(0).max(6)}).strict()).max(1000);
 export const supplyDraftContent=z.object({
   form:z.object({

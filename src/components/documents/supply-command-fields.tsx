@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useImperativeHandle,
   useRef,
   useState,
@@ -25,6 +26,7 @@ import {
   acquisitionRemaining,
   arrivalRemaining,
 } from "@/lib/documents/purchase";
+import { deliveryRequestDraftFields } from "@/lib/forms/delivery-draft-reference";
 import { formatBrazilDate } from "@/lib/receipt";
 import { PurchaseReceiptContent } from "./purchase-details";
 import { DeliveryConsumptionReferences } from "./delivery-cancellation";
@@ -97,6 +99,37 @@ export function CommandEditorFields({
   const [divergent, setDivergent] = useState<string[]>(
     initialDraft?.divergentIds ?? [],
   );
+  const [recipientSelection, setRecipientSelection] = useState(
+    initialDraft?.fields.recipientId ?? "",
+  );
+  const [resolutionSelection, setResolutionSelection] = useState(
+    initialDraft?.fields.resolution ??
+      (data.recipient_id === context.userId ? "received" : "returned"),
+  );
+  const [frozenRequest] = useState(() => ({
+    ...deliveryRequestDraftFields(data),
+    ...(initialDraft?.fields.requestId !== undefined
+      ? { requestId: initialDraft.fields.requestId }
+      : {}),
+    ...(initialDraft?.fields.requestLabel !== undefined
+      ? { requestLabel: initialDraft.fields.requestLabel }
+      : {}),
+  }));
+  const eligibleRecipients = useMemo(() => {
+    const roles =
+      data.payload.destination === "FAMILY"
+        ? ["admin", "family"]
+        : ["admin", "professional", "supervisor"];
+    return people.filter(
+      (person) =>
+        roles.includes(person.role) &&
+        person.id !== data.recipient_id &&
+        person.id !== data.created_by,
+    );
+  }, [people, data.payload.destination, data.recipient_id, data.created_by]);
+  const selectedRecipient = eligibleRecipients.find(
+    (person) => person.id === recipientSelection,
+  );
   const formElementRef = useRef<HTMLFormElement | null>(null);
   useImperativeHandle(formRef, () => formElementRef.current!);
   const [fieldRevision, setFieldRevision] = useState(0);
@@ -120,6 +153,15 @@ export function CommandEditorFields({
       selectedReceipt
     )
       fields.receiptLabel = `Parcela ${data.receipts.indexOf(selectedReceipt) + 1} · ${selectedReceipt.submitted_name ?? "Nome histórico não preservado"} · ${formatBrazilDate(selectedReceipt.created_at)} · ${selectedReceipt.lines.length} produto(s)`;
+    if (action === "reassign" && selectedRecipient)
+      fields.recipientLabel = selectedRecipient.name;
+    if (action === "resolve") {
+      const line = data.lines.find((item) => item.id === fields.lineId);
+      if (line)
+        fields.lineLabel = `${line.name_snapshot} · ${line.unit_snapshot}`;
+    }
+    if (action === "refuse_cancellation" || action === "withdraw_cancellation")
+      Object.assign(fields, frozenRequest);
     return {
       documentVersion: data.version,
       fields,
@@ -131,7 +173,14 @@ export function CommandEditorFields({
         quantityDecimals: 0,
       })),
     };
-  }, [data, divergent, action, selectedReceipt]);
+  }, [
+    data,
+    divergent,
+    action,
+    selectedReceipt,
+    selectedRecipient,
+    frozenRequest,
+  ]);
   useImperativeHandle(snapshotRef, () => ({ snapshot: captureSnapshot }), [
     captureSnapshot,
   ]);
@@ -140,7 +189,9 @@ export function CommandEditorFields({
       onDraftChange(captureSnapshot());
   }, [onDraftChange, captureSnapshot, fieldRevision]);
   const [selectedLine, setSelectedLine] = useState(
-    data.lines.find((line) => line.metadata.issueOpen)?.id ?? "",
+    initialDraft?.fields.lineId ??
+      data.lines.find((line) => line.metadata.issueOpen)?.id ??
+      "",
   );
   const lines = data.lines.filter((line) =>
     action === "purchase"
@@ -288,10 +339,29 @@ export function CommandEditorFields({
           "\n\nDispensar somente a expectativa não adquirida, sem entrada ou baixa de material. Parcelas pendentes continuam exigindo conferência.\nMotivo: " +
           reason;
       } else if (action === "reassign") {
-        body = { recipientId: form.get("recipientId"), reason };
+        if (!selectedRecipient)
+          throw new Error(
+            "Escolha expressamente uma pessoa elegível para receber esta entrega.",
+          );
+        body = { recipientId: recipientSelection, reason };
         summary =
           "Alterar o destinatário antes do primeiro aceite. Motivo: " + reason;
       } else if (action === "resolve") {
+        const selected = data.lines.find(
+          (line) => line.id === selectedLine && line.metadata.issueOpen,
+        );
+        if (!selected)
+          throw new Error(
+            "Escolha uma linha divergente vigente para esta conciliação.",
+          );
+        if (
+          !["received", "returned", "missing"].includes(resolutionSelection) ||
+          (resolutionSelection === "received" &&
+            data.recipient_id !== context.userId)
+        )
+          throw new Error(
+            "Escolha uma solução disponível para sua atuação; recebimento pessoal pertence à pessoa indicada na entrega.",
+          );
         const value = String(form.get("quantity"));
         if (!validQuantity(value, 6, true))
           throw new Error("Informe a quantidade conciliada.");
@@ -301,11 +371,7 @@ export function CommandEditorFields({
           resolution: form.get("resolution"),
           reason,
         };
-        summary =
-          "Conciliar " +
-          formatQuantity(value) +
-          " da linha selecionada com a solução informada. Motivo: " +
-          reason;
+        summary = `Conciliar ${selected.name_snapshot}: ${formatQuantity(value, selected.unit_snapshot)}. Solução: ${{ received: "Recebimento complementar confirmado por mim", returned: "Material voltou à custódia de origem", missing: "Falta / perda conciliada" }[resolutionSelection as "received" | "returned" | "missing"]}. Motivo: ${reason}`;
       } else if (action === "cancel") {
         body = { reason };
         summary =
@@ -319,6 +385,10 @@ export function CommandEditorFields({
         if (!request || request.status !== "pending")
           throw new Error(
             "Não existe pedido de cancelamento vigente para esta ação. Atualize a ficha.",
+          );
+        if (frozenRequest.requestId !== request.id)
+          throw new Error(
+            "O pedido deste preenchimento mudou. Compare as referências e escolha expressamente a referência vigente.",
           );
         body = { reason, requestId: request.id };
         summary = `${action === "refuse_cancellation" ? "Recusar" : "Retirar meu"} pedido de cancelamento de ${request.requestedName ?? "nome não preservado"}, ${formatBrazilDate(request.requestedAt)}. Motivo original: ${request.reason}\nJustificativa desta decisão: ${reason}\nA ficha retorna à conferência vigente; esta decisão não movimenta estoque.`;
@@ -393,10 +463,7 @@ export function CommandEditorFields({
     "refuse_cancellation",
     "withdraw_cancellation",
   ].includes(action);
-  const recipientRole =
-    data.payload.destination === "FAMILY"
-      ? ["admin", "family"]
-      : ["admin", "professional", "supervisor"];
+
   return (
     <form
       ref={formElementRef}
@@ -532,8 +599,10 @@ export function CommandEditorFields({
                 .filter((receipt) => receipt.state === "pending")
                 .map((receipt) => (
                   <option key={receipt.id} value={receipt.id}>
-                    Parcela {data.receipts.indexOf(receipt) + 1} · {receipt.lines.length} produto(s) ·{" "}
-                    {new Date(receipt.created_at).toLocaleString("pt-BR")} · {receipt.submitted_name ?? "Nome histórico não preservado"}
+                    Parcela {data.receipts.indexOf(receipt) + 1} ·{" "}
+                    {receipt.lines.length} produto(s) ·{" "}
+                    {new Date(receipt.created_at).toLocaleString("pt-BR")} ·{" "}
+                    {receipt.submitted_name ?? "Nome histórico não preservado"}
                   </option>
                 ))}
             </select>
@@ -611,19 +680,24 @@ export function CommandEditorFields({
       {action === "reassign" ? (
         <label className="block text-sm font-semibold">
           Novo destinatário
-          <select name="recipientId" className={inputClass} required>
+          <select
+            name="recipientId"
+            className={inputClass}
+            required
+            value={recipientSelection}
+            onChange={(event) => setRecipientSelection(event.target.value)}
+          >
             <option value="">Selecione</option>
-            {people
-              .filter(
-                (person) =>
-                  recipientRole.includes(person.role) &&
-                  person.id !== data.recipient_id,
-              )
-              .map((person) => (
-                <option key={person.id} value={person.id}>
-                  {person.name}
-                </option>
-              ))}
+            {recipientSelection && !selectedRecipient ? (
+              <option value={recipientSelection}>
+                Pessoa preservada indisponível para esta entrega
+              </option>
+            ) : null}
+            {eligibleRecipients.map((person) => (
+              <option key={person.id} value={person.id}>
+                {person.name}
+              </option>
+            ))}
           </select>
         </label>
       ) : null}
@@ -633,11 +707,20 @@ export function CommandEditorFields({
             Linha divergente
             <select
               className={inputClass}
+              name="lineId"
               value={selectedLine}
               onChange={(event) => setSelectedLine(event.target.value)}
               required
             >
               <option value="">Selecione</option>
+              {selectedLine &&
+              !data.lines.some(
+                (line) => line.id === selectedLine && line.metadata.issueOpen,
+              ) ? (
+                <option value={selectedLine}>
+                  Linha preservada indisponível para esta conciliação
+                </option>
+              ) : null}
               {data.lines
                 .filter((line) => line.metadata.issueOpen)
                 .map((line) => (
@@ -649,7 +732,21 @@ export function CommandEditorFields({
           </label>
           <label className="block text-sm font-semibold">
             Resolução
-            <select name="resolution" className={inputClass}>
+            <select
+              name="resolution"
+              className={inputClass}
+              value={resolutionSelection}
+              onChange={(event) => setResolutionSelection(event.target.value)}
+            >
+              {!["returned", "missing"].includes(resolutionSelection) &&
+              !(
+                resolutionSelection === "received" &&
+                data.recipient_id === context.userId
+              ) ? (
+                <option value={resolutionSelection}>
+                  Solução preservada indisponível para sua atuação
+                </option>
+              ) : null}
               {data.recipient_id === context.userId ? (
                 <option value="received">
                   Recebimento complementar confirmado por mim
@@ -667,6 +764,7 @@ export function CommandEditorFields({
               className={inputClass}
               type="text"
               name="quantity"
+              defaultValue={initialDraft?.fields.quantity ?? ""}
               inputMode="decimal"
               autoComplete="off"
               required

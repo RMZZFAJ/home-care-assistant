@@ -78,7 +78,7 @@ test("C-FINAL023 anexos ocultam lista recusada e recuperam leitura sem perder ar
     await expect(link).toBeVisible(); await expect(picker(page)).toBeEnabled(); await expect(refresh).toBeFocused();
   }
   expect(writes).toBe(0); expect(rows(f.doc.id)).toEqual(original); expect(facts(f.doc.id)).toBe(official);
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable attachment read " + width); }
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); /* Audit the resized composition from its start, without retained scroll clipping. */ await page.evaluate(() => window.scrollTo(0, 0)); await audit(page, "immutable attachment read " + width); }
 });
 
 test("anexo confirmado com resposta perdida congela escolha e GET recupera o mesmo arquivo sem outro upload", async ({ page }, info) => {

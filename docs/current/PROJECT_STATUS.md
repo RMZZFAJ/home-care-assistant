@@ -4,13 +4,14 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação fcf04fa: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
-cadeia limpa, evolução legada e integração. Browsers ainda em andamento na
-consulta. Isso não aprova o novo incremento; seu SHA publicado exige CI própria.
-A falha anterior de allowlist e sua correção permanecem em
+Observação56b445e: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
+cadeia limpa, evolução legada e integração. Browsers têm falhas de consumidores
+das abas, seletores, foco e auditoria em posição rolada; correção em andamento.
+Não há aprovação global da CI. Novo SHA exige validação própria. A observação
+anterior de allowlist permanece em
 [evidência histórica](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
-Estado atual:local168/remoto168, zero migrations pendentes. Matriz105x39: 56
+Estado atual:local169/remoto169, zero migrations pendentes. Matriz105x39: 56
 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
 sem redução de funções. D3.28 concluiu a retirada técnica do Fluent: seletores
@@ -31,8 +32,12 @@ continua pendente. D3.33 amplia os rascunhos privados às operações de
 aprovação, aquisição e chegada COM, com CAS, retomada entre sessões, revisão
 de referência e consumo único. Migration166 reconciliada. D3.34 completa os
 sete propósitos COM com preenchimento privado, parcela exata, referência
-oficial e confirmação desmarcada. Migrations167/168 reconciliadas; demais
-formulários contextuais continuam pendentes. Registro UI adicional 18
+oficial e confirmação desmarcada. Migrations167/168 reconciliadas. D3.35 amplia
+cinco decisões ENT: troca de destinatário, conciliação, cancelamento, recusa e
+retirada. Referências preservadas, indisponibilidade explícita, consumo único e
+descarte próprio após perda de escrita; migration169 reconciliada. Consentimento
+bilateral com consumo, regularização, transferência e decisões BAL/REQ continuam
+pendentes. Registro UI adicional 18
 requisitos; resultados funcionais anteriores não aprovam toda a nova
 aparência.
 [Contrato](../ui-ux/CANONICAL_MODEL.md),
@@ -43,6 +48,7 @@ aparência.
 [Ações principais e Mais](../audits/D/D-B/DOCUMENT_SECONDARY_ACTIONS.md).
 [Rascunhos das operações COM](../audits/D/D-B/COM_ACTION_DRAFTS.md).
 [Decisões COM e referências oficiais](../audits/D/D-B/COM_DECISION_DRAFTS.md).
+[Preenchimentos privados ENT](../audits/D/D-B/ENT_OPERATION_DRAFTS.md).
 
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das

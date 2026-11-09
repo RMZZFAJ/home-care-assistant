@@ -3,15 +3,15 @@ import { useRef, useState } from "react";
 import { Notice, buttonClass } from "@/components/workspace";
 import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import {
-  navigationForStep,
-  draftFlow,
-} from "@/lib/forms/draft-navigation";
+import { navigationForStep, draftFlow } from "@/lib/forms/draft-navigation";
 import {
   isComOperationPurpose,
+  isEntOperationPurpose,
+  type EntOperationPurpose,
   type ComOperationPurpose,
   type ReceiptDraftContent,
 } from "@/lib/validation/supply-drafts";
+import { deliveryRequestDraftFields } from "@/lib/forms/delivery-draft-reference";
 import { DraftReferenceComparison } from "./draft-reference-comparison";
 import {
   CommandEditorFields,
@@ -20,12 +20,11 @@ import {
 } from "./supply-command-fields";
 export type { DocumentAction } from "./supply-command-fields";
 
-type OperationPurpose = "receive" | "divergence" | ComOperationPurpose;
+type OperationPurpose = EntOperationPurpose | ComOperationPurpose;
 export function CommandEditor(props: CommandEditorProps) {
   const purpose = props.action;
   if (
-    (props.data.type === "ENT" &&
-      (purpose === "receive" || purpose === "divergence")) ||
+    (props.data.type === "ENT" && isEntOperationPurpose(purpose)) ||
     (props.data.type === "COM" && isComOperationPurpose(purpose))
   )
     return (
@@ -45,6 +44,10 @@ function PrivateOperationEditor(
   },
 ) {
   const com = props.kind === "COM";
+  const personalReceipt =
+    props.kind === "ENT" &&
+    (props.purpose === "receive" || props.purpose === "divergence");
+  const fullReference = !personalReceipt;
   const captureRef = useRef<ReceiptDraftHandle | null>(null);
   const [initial, setInitial] = useState<ReceiptDraftContent | undefined>();
   const [formRevision, setFormRevision] = useState(0),
@@ -94,7 +97,7 @@ function PrivateOperationEditor(
     const captured = captureRef.current!.snapshot();
     return {
       ...captured,
-      fields: com
+      fields: fullReference
         ? { ...baseline.fields, ...captured.fields }
         : captured.fields,
       documentVersion: baseline.documentVersion,
@@ -145,14 +148,16 @@ function PrivateOperationEditor(
     <section
       className="mt-4 space-y-4"
       aria-label={
-        com ? "Operação COM em preparação" : "Conferência pessoal em preparação"
+        personalReceipt
+          ? "Conferência pessoal em preparação"
+          : `Operação ${props.kind} em preparação`
       }
     >
       <CreationDraftPanel
         draft={draft}
         current={{
           ...current,
-          fields: com
+          fields: fullReference
             ? { ...baseline.fields, ...current.fields }
             : current.fields,
           documentVersion: baseline.documentVersion,
@@ -164,9 +169,9 @@ function PrivateOperationEditor(
         disabled={props.reviewDisabled}
       />
       <p>
-        {com
-          ? "Este preenchimento pertence somente a você, a esta COM e a este tipo de operação. Salvar não aprova, adquire, recebe ou movimenta estoque; a confirmação é uma etapa própria."
-          : "Este preenchimento pertence somente a você e a esta entrega. Recebimento exige confirmação própria."}
+        {personalReceipt
+          ? "Este preenchimento pertence somente a você e a esta entrega. Recebimento exige confirmação própria."
+          : `Este preenchimento pertence somente a você, a esta ${props.kind} e a este tipo de operação. Salvar não confirma decisões, recebimento ou movimentação de estoque; a confirmação é uma etapa própria.`}
       </p>
       {error ? <Notice error>{error}</Notice> : null}
       {confirmationReset ? (
@@ -184,7 +189,7 @@ function PrivateOperationEditor(
             className={buttonClass}
             onClick={() => setComparison(true)}
           >
-            {com
+            {fullReference
               ? "Comparar referência da operação"
               : "Comparar referência da conferência"}
           </button>
@@ -194,7 +199,7 @@ function PrivateOperationEditor(
         <section
           className="ui-card"
           aria-label={
-            com
+            fullReference
               ? "Comparação da referência da operação"
               : "Comparação da referência da entrega"
           }
@@ -230,7 +235,9 @@ function PrivateOperationEditor(
           <p>
             {com
               ? "Aprovação, aquisição, chegada e entrada no estoque são fatos distintos. Seus valores serão preservados; confira os limites vigentes antes da revisão. Nenhuma operação será confirmada nesta comparação."
-              : "Pessoa indicada e destino devem ser conferidos nos fatos da expedição. Seus valores preenchidos serão preservados; nenhum recebimento será confirmado aqui."}
+              : personalReceipt
+                ? "Pessoa indicada e destino devem ser conferidos nos fatos da expedição. Seus valores preenchidos serão preservados; nenhum recebimento será confirmado aqui."
+                : "Pessoa indicada, pedido de cancelamento e situação da linha pertencem à referência da entrega. Seus valores permanecem preservados; adotar a referência não troca destinatário, recebe, concilia ou cancela materiais."}
           </p>
           {removedValues.length ? (
             <Notice>
@@ -259,7 +266,7 @@ function PrivateOperationEditor(
               </button>
             </Notice>
           ) : null}
-          {com ? (
+          {fullReference ? (
             <DraftReferenceComparison
               id={props.data.id}
               fromVersion={baseline.documentVersion}
@@ -281,6 +288,16 @@ function PrivateOperationEditor(
                       documentVersion: props.data.version,
                       materials: empty.materials,
                     };
+                    if (
+                      props.kind === "ENT" &&
+                      ["refuse_cancellation", "withdraw_cancellation"].includes(
+                        props.purpose,
+                      )
+                    )
+                      Object.assign(
+                        content.fields,
+                        deliveryRequestDraftFields(props.data),
+                      );
                     if (props.purpose === "close_expectation") {
                       delete content.fields.confirmed;
                       setConfirmationReset(true);
@@ -324,9 +341,9 @@ function PrivateOperationEditor(
             className={buttonClass}
             onClick={() => void draft.save(snapshot())}
           >
-            {com
-              ? "Salvar preenchimento privado"
-              : "Salvar conferência privada"}
+            {personalReceipt
+              ? "Salvar conferência privada"
+              : "Salvar preenchimento privado"}
           </button>
           <CommandEditorFields
             key={formRevision}

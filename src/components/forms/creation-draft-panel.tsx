@@ -107,13 +107,22 @@ function DraftFieldsSummary({
   </div>;
   if ("fields" in content) {
     const name = (key: string) => content.materials.find(m => m.id === key)?.name ?? "Linha não disponível na referência atual";
-    const quantityLabel = kind === "COM" ? purpose === "approve" ? "quantidade em aprovação" : purpose === "purchase" ? "quantidade em aquisição" : "quantidade informada" : "recebido";
-    const labels: Record<string, string> = { reason: kind === "COM" ? "Motivo / justificativa" : "Observação", receiptId: "Parcela no preenchimento", confirmed: "Conferência do resumo" };
-    const display = (key: string, value: string) => key === "receiptId" ? content.fields.receiptLabel || "Referência da parcela preservada; confira a declaração ao continuar." : key === "confirmed" ? value === "on" ? "Marcada no preenchimento; a conclusão exige confirmação própria." : "Não marcada" : ({ shortage: "Quantidade menor", damaged: "Material avariado", wrong: "Produto divergente", other: "Outra diferença" } as Record<string, string>)[value] ?? (value || "Não preenchido");
+    const entDecision = kind === "ENT" && purpose !== "receive" && purpose !== "divergence";
+    const operation = kind === "COM" || entDecision;
+    const quantityLabel = kind === "COM" ? purpose === "approve" ? "quantidade em aprovação" : purpose === "purchase" ? "quantidade em aquisição" : "quantidade informada" : entDecision ? "quantidade em conciliação" : "recebido";
+    const labels: Record<string, string> = { reason: operation ? "Motivo / justificativa" : "Observação", receiptId: "Parcela no preenchimento", confirmed: "Conferência do resumo", recipientId: "Novo destinatário no preenchimento", lineId: "Material em conciliação", quantity: "Quantidade em conciliação", resolution: "Solução em preparação", requestId: "Pedido no preenchimento" };
+    const display = (key: string, value: string) => {
+      if (key === "receiptId") return content.fields.receiptLabel || "Referência da parcela preservada; confira a declaração ao continuar.";
+      if (key === "recipientId") return content.fields.recipientLabel || "Pessoa preservada; confira sua disponibilidade ao continuar.";
+      if (key === "lineId") return content.fields.lineLabel || "Material preservado; confira a linha vigente ao continuar.";
+      if (key === "requestId") return content.fields.requestLabel || "Pedido preservado; confira sua identidade ao continuar.";
+      if (key === "confirmed") return value === "on" ? "Marcada no preenchimento; a conclusão exige confirmação própria." : "Não marcada";
+      return ({ shortage: "Quantidade menor", damaged: "Material avariado", wrong: "Produto divergente", other: "Outra diferença", received: "Recebimento complementar confirmado por mim", returned: "Material voltou à custódia de origem", missing: "Falta / perda conciliada" } as Record<string, string>)[value] ?? (value || "Não preenchido");
+    };
     return <div className="hca-form-stack">
-      <p>{kind === "COM" ? `Preenchimento da operação COM · versão de referência ${content.documentVersion}. Salvar não confirma aprovação, aquisição, chegada, conferência ou encerramento.` : `Conferência pessoal · versão consultada ${content.documentVersion}. Salvar não aceita material.`}</p>
-      {content.divergentIds.length ? <ul>{content.divergentIds.map(id => <li key={id}>{name(id)} · divergência em preparação</li>)}</ul> : kind !== "COM" ? <p>Nenhuma linha divergente selecionada.</p> : null}
-      <dl>{Object.entries(content.fields).filter(([key]) => key !== "receiptLabel").map(([key, value]) => <div key={key}><dt>{labels[key] ?? (key.endsWith(":problem") ? name(key.slice(0, -8)) + " · diferença" : name(key) + " · " + quantityLabel)}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{display(key, value)}</dd></div>)}</dl>
+      <p>{operation ? `Preenchimento da operação ${kind} · versão de referência ${content.documentVersion}. Salvar não confirma decisões, recebimento ou movimentação de estoque.` : `Conferência pessoal · versão consultada ${content.documentVersion}. Salvar não aceita material.`}</p>
+      {content.divergentIds.length ? <ul>{content.divergentIds.map(id => <li key={id}>{name(id)} · divergência em preparação</li>)}</ul> : !operation ? <p>Nenhuma linha divergente selecionada.</p> : null}
+      <dl>{Object.entries(content.fields).filter(([key]) => !["receiptLabel", "recipientLabel", "lineLabel", "requestLabel"].includes(key)).map(([key, value]) => <div key={key}><dt>{labels[key] ?? (key.endsWith(":problem") ? name(key.slice(0, -8)) + " · diferença" : name(key) + " · " + quantityLabel)}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{display(key, value)}</dd></div>)}</dl>
     </div>;
   }
   return (

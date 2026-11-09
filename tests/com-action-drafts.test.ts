@@ -96,7 +96,7 @@ it.each(comOperationPurposes)(
       { navigation: { version: 1, stage: "receipt" } },
     ])
       expect(() => parsePrivateDraft({ ...row, ...change }, scope)).toThrow();
-    if (purpose !== "receive") {
+    if (!["receive", "cancel"].includes(purpose)) {
       expect(
         creationDraftCommandSchema.safeParse({ ...input, kind: "ENT" }).success,
       ).toBe(false);

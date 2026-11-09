@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { draftNavigationSchema } from "./draft-navigation";
 import { navigationAllowed } from "../forms/draft-navigation";
-import { draftPurpose,comOperationDraftPurpose,comOperationPurposes,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
+import { draftPurpose,comOperationDraftPurpose,comOperationPurposes,entOperationDraftPurpose,entOperationPurposes,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
 const id = z.uuid(),
   revision = z.number().int().positive().max(2147483647);
 const text = (max: number) =>
@@ -111,7 +111,7 @@ export const creationDraftCommandSchema = z
       .object({...scope,...navigation,kind:z.enum(["COM","ENT"]),purpose:z.enum(["create","revise"]),action:z.literal("save"),content:supplyDraftContent})
       .strict(),
     z
-      .object({...scope,...navigation,kind:z.literal("ENT"),purpose:z.enum(["receive","divergence"]),action:z.literal("save"),content:receiptDraftContent})
+      .object({...scope,...navigation,kind:z.literal("ENT"),purpose:entOperationDraftPurpose,action:z.literal("save"),content:receiptDraftContent})
       .strict(),
     z
       .object({...scope,...navigation,kind:z.literal("COM"),purpose:comOperationDraftPurpose,action:z.literal("save"),content:receiptDraftContent})
@@ -148,7 +148,7 @@ export const creationDraftCommandSchema = z
   .superRefine((value, ctx) => {
     if (value.action === "save" && !navigationAllowed(value.kind, "purpose" in value ? value.purpose : "create", value.navigation, value.content))
       ctx.addIssue({ code: "custom", path: ["navigation"], message: "A etapa salva não corresponde ao formulário de origem. Consulte o rascunho novamente." });
-    if ((value.kind==="COM"||value.kind==="ENT")&&((value.purpose==="create")!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise",...comOperationPurposes].includes(value.purpose)||value.kind==="ENT"&&!["create","revise","receive","divergence"].includes(value.purpose)))
+    if ((value.kind==="COM"||value.kind==="ENT")&&((value.purpose==="create")!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise",...comOperationPurposes].includes(value.purpose)||value.kind==="ENT"&&!["create","revise",...entOperationPurposes].includes(value.purpose)))
       ctx.addIssue({code:"custom",path:["targetDocumentId"],message:"Confira a intenção e o alvo deste preenchimento."});
     if ((value.kind==="COM"||value.kind==="ENT")&&value.action==="save"&&"form" in value.content&&value.content.context.documentId!==value.targetDocumentId)
       ctx.addIssue({code:"custom",path:["content","context"],message:"A ficha de referência precisa corresponder ao preenchimento."});

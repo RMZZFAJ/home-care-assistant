@@ -2574,3 +2574,44 @@ Demais formulários, paridade/66/171 e D-C/D6/humano/AT/aparelhos/provedores
 separados. Sonar adiado, PR7 Draft, produção NO-GO e meta ativa.
 [Dossiê](COM_DECISION_DRAFTS.md), [provas](COM_DECISION_DRAFTS_VALIDATION.json),
 [remoto](COM_DECISION_DRAFTS_REMOTE.json).
+
+## D3.35 — preenchimentos das decisões ENT — 09/11/2026
+
+Base56b445e. Cinco decisões usam o kernel privado: reassign, resolve, cancel,
+refuse_cancellation e withdraw_cancellation. Destinatário, linha/solução,
+quantidade incompleta, motivo e pedido voltam após retomada explícita em outra
+sessão. Referências indisponíveis permanecem identificadas; mudança de pedido
+exige comparação dos fatos oficiais e adoção expressa. Salvar/fechar revisão
+não altera documento, eventos ou estoque. Cancelar depois de aceite abre pedido
+bilateral, sem presumir devolução ou compensação de consumo.
+
+Commit vincula seleção e versão à revisão salva. Nova negativa prova que gestor
+não confirma recebimento pessoal por outra pessoa. Revogação real de papel no
+ato interno provoca rollback integral; trigger dirigido retirado no finally.
+Após perder a condição de receber, proprietário com leitura pode descartar seu
+preenchimento. Salvar permanece vedado, assim como descarte por outro admin ou
+usuário com leitura revogada. CAS, recuperação sem duplicação e reconhecimento
+do resultado preservados.
+
+28 unitários/API,42 Auth distintos e20 cenários Chromium/WebKit aprovados.
+As seis falhas iniciais de navegador vieram de fixture com status inválido e
+rótulos próprios dos formulários; somente os seis afetados foram repetidos.
+Axe e duas capturas de viewport inspecionadas; lint/tipos dirigidos aprovados.
+Fontes permaneceram estáveis por runner, sem suítes mutáveis paralelas.
+
+Migration169,20261109135205, aplicada oficialmente após preflight/dry-run único,
+seeds=[]/roles=[]. Local169/remoto169, digest, quatro corpos/config/ACL iguais.
+Achados de segurança iguais excluindo observed_at. Sem reset, fixtures remotas,
+Auth/Vault ou backup redundante. CI56b445e: Windows/Ubuntu/banco PASS e Preview
+READY; browsers revelaram regressões adicionais. Dez casos WebKit de
+consumidores existentes passaram após correções de abas, título e origem da
+auditoria responsiva. Demais falhas seguem explicitamente abertas.
+[Observação CI](CI_56B445E_OBSERVATION.json).
+Novo SHA requer CI própria; nenhuma aprovação global por resultado anterior.
+
+Matriz105x39 e primeiras30 colunas preservadas,56 PASS/49 PARTIAL. UI18 atualizada.
+Consentimento bilateral com consumo, regularização, transferência, BAL/REQ,
+paridade66/171, regressões CI e gates D-C/D6/humano/AT/aparelhos/provedores
+continuam. Sonar adiado, PR7 Draft, produção NO-GO e meta ativa.
+[Dossiê](ENT_OPERATION_DRAFTS.md), [provas](ENT_OPERATION_DRAFTS_VALIDATION.json),
+[remoto](ENT_OPERATION_DRAFTS_REMOTE.json).

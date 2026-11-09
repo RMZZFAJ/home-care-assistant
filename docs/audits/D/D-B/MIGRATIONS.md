@@ -556,3 +556,22 @@ somente observed_at, com avisos anteriores mantidos.23 unitários,30 Auth e20
 browsers distintos PASS. CI do novo SHA ainda precisa validar instalação
 limpa/evolução legada/integral. Sem promoção operacional.
 [Contrato](COM_DECISION_DRAFTS.md), [remoto](COM_DECISION_DRAFTS_REMOTE.json).
+
+## D3.35 — decisões ENT — 09/11/2026
+
+Aplicada20261109135205:169/169 local/remoto, última20261109135205. Cinco novos
+propósitos privados ENT e descarte próprio com leitura, preservando escrita,
+CAS, confirmação, recuperação e negativa a terceiros. Não altera84 SQLs
+históricos nem reescreve as migrations aplicadas dos lotes anteriores.
+Preflight de compatibilidade, quatro corpos anteriores, locks/transações e
+dry-run apenas da candidata, seeds=[]/roles=[]. Aplicação oficial no destino
+fixado; sem reset, fixtures, Auth/Vault, integração externa ou backup redundante.
+
+Pós-check: digest ordenado
+`694f6e8a1796476d6f4b342f30e6984ffc95b1e3b6b2e26b326e0061a924f0bc`,
+quatro corpos/configurações e ACL iguais entre local/remoto. Achados de segurança
+iguais excluindo somente observed_at; avisos anteriores mantidos.28 unitários,
+42 Auth distintos e20 browsers distintos PASS. CI56b445e aprovou instalação
+limpa/evolução/integral; browsers com regressões próprias ainda em correção.
+Isso não aprova a CI do novo SHA ou liberação operacional.
+[Contrato](ENT_OPERATION_DRAFTS.md), [remoto](ENT_OPERATION_DRAFTS_REMOTE.json).

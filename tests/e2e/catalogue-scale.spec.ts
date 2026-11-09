@@ -187,6 +187,9 @@ for (const count of [1, 5, 20, 100]) {
           );
           for (const width of [320, 390, 768, 1440]) {
             await page.setViewportSize({ width, height: 900 });
+            // Measure the responsive composition from its beginning; a retained
+            // offset can leave an unrelated control halfway under the header.
+            await page.evaluate(() => window.scrollTo(0, 0));
             await audit(page, `catalogue-${count}-${type}-${width}`);
           }
           mkdirSync("output/playwright/phase-d", { recursive: true });

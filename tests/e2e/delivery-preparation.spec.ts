@@ -166,6 +166,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
     ),
   ).toBe("1");
   await page.getByRole("link", { name: /Acompanhar ficha/ }).click();
+  await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("region", { name: "Indicação do recebedor", exact: true }),
   ).toContainText(reason);
