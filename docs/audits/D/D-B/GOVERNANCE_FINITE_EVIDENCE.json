@@ -1,0 +1,93 @@
+{
+  "at": "2026-11-09T04:18:46.082576+00:00",
+  "baseSha": "1b89ce9822f26d32fc503dd0ed06de031ea9d908",
+  "sourceLfSha256": {
+    "src/lib/governance-presentation.ts": "58dce329b280189e66330f3034381f6433312153b00b12258ab30ea2a60824c8",
+    "src/lib/notifications/event-labels.ts": "a86e277e3d31ffddb46a745faf790828d7ace5e17eb6c6be5bd7dd6200c29069",
+    "src/components/admin/governance-proposals.tsx": "3aeb8424a945cd6e6d50e55456e44f13dc4538e369e23d4013dbc921352601d8",
+    "tests/governance-presentation.test.ts": "747f2d8a7be56ba393403a90482504ccc891c7c81d23672109407380f3ae28a0",
+    "tests/e2e/governance-recovery.spec.ts": "fc6f1816e49bdff2ff48cf641f7b62f2fac8afa621cefbcfc2dc0803187cb13b"
+  },
+  "logLfSha256": {
+    "governance-finite-baseline.log": "921af6e1f2ae4c1dfcf8b5f51357d3356c29e226de73302ae1502b6adf8f9eb5",
+    "governance-finite-event-baseline.log": "c7f4224b0117885a3fe88eb8b4aed28e32c5128a33060701749ad466f80d5605",
+    "governance-finite-unit.log": "443d51fea1e7dd849cb1eee30b87abdb4da940d7aec40a6801df1864400d024b",
+    "governance-event-pdf-regression.log": "3de5efb8d2d4fc0422331d40f2a1208877bc32389a0c7134e725ff0f1982ed29",
+    "governance-finite-e2e.log": "9c23dc1141c657d9a9644f3040872b83437b68f573e95c8087e1550ea90340af",
+    "governance-finite-controls.log": "fcd4be6e102259a25aae023e18bca57f23dac55c80ee6b48537ff50626eb946a",
+    "governance-finite-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "governance-finite-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "standingControlSourceLfSha256": {
+    "tests/e2e/requisition-science.spec.ts": "7d7fc6cbb23abc14b0ce23375f76ecc2e53ab737f48b97558f0f9c756b2779a7",
+    "tests/e2e/purchase-receipts.spec.ts": "84e8d05d403be2aef8038b47bb1e2d5c749b84cab66238886ef1979b816e30ea",
+    "tests/e2e/consumption.spec.ts": "a91381eb74d59cf119b98affb6207037901c82621d21ab21fa495fb9dcd4299d",
+    "tests/e2e/field-validation.spec.ts": "e42306237552c42839294670e396cb31b12513bea9fb55fe2b564800fa33f4dd",
+    "src/components/profile/science-preference.tsx": "280e2d4ee7fe38e93f8e2e3310ce33f6a617eda3ed0da3def45ad51d6a2a47da",
+    "src/components/documents/supply-command-fields.tsx": "daab33e8b33c0adf6fef99719d408653844119fe1573742b1eb1679e58c94db2",
+    "src/components/stock/consumption-editor.tsx": "5688fd5637ba5efd6e6a172153422778b57bb06a5c728423b08e9138532d17c6",
+    "src/components/stock/consumption-decision.tsx": "6f5a5bb39165d7629fd07c7a849e15965b611c4a8ed42132e8f181f8e2cb4a7f",
+    "src/components/admin/policy-rules.tsx": "58f5766a4dd9f8edb6f1a9c51f961e907f1b7c4797e2aa1342e6ba052abf1b42"
+  },
+  "standingControlQualification": {
+    "sha": "3772fd049691814f30ff0813d145e52b2536557f",
+    "runId": 42548692266,
+    "allJobsSuccess": true,
+    "newLocalRunClaim": false,
+    "scope": "Unchanged preference/COM parcel/consumption/field/policy controls;new candidate still needs its own CI"
+  },
+  "validation": {
+    "unitPassed": 38,
+    "governanceUnitPassed": 34,
+    "existingFieldsPassed": 4,
+    "newUnitCases": 7,
+    "selectedPdfPassed": 7,
+    "legacyV4V5V6Goldens": 18,
+    "v9Goldens": 6,
+    "distinctQualifiedProductionChromium": 3,
+    "extendedCaseRecheck": 1,
+    "liveNativePermissionChoices": 3,
+    "localGlobalCreateDenied": 403,
+    "residenceCreatedByDeniedCall": false,
+    "ledgerChanged": false,
+    "originalProposalMutatedByReadOrUnknownResponse": false,
+    "approvalExactIdVersionAndChange": true,
+    "otherPatientReadDenied": 404,
+    "types": true,
+    "affectedLint": true,
+    "globalLocalSuitesRepeated": false,
+    "mutableDbParallelWithE2e": false
+  },
+  "counterproofs": {
+    "firstBaselineFailed": 6,
+    "eventPrototypeFailed": 1,
+    "thenCorrected": true,
+    "unknownReadOverlays": "Authenticated real GET with controlled response shape only;DB proposed JSON checked unchanged",
+    "freeTextPrototypeWordsRemainLiteral": true
+  },
+  "cohortQualification": "Runtime sources unchanged between Chromium cohorts. First two test bodies match parent exactly;three-case cohort passed then only third test gained native menu/denied creation/ledger assertions and passed directed recheck. PDF pattern selected7 discriminating regressions;remaining tests stay in CI,not disabled.",
+  "remote": {
+    "file": "GOVERNANCE_FINITE_REMOTE_OBSERVATION.json",
+    "versions": 164,
+    "pending": 0,
+    "mutations": false
+  },
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "canonicalFirst30Preserved": true,
+    "counts": {
+      "PARTIAL": 50,
+      "PASS": 53,
+      "NOT_STARTED": 2
+    }
+  },
+  "remainingGate": [
+    "Native global residence/account/subflow walkthrough in C-FINAL-AC-021",
+    "Own SHA CI and other browser projects",
+    "Human AT/physical/provider and D-C/D6 as specified"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "goalComplete": false,
+  "operationalGo": false
+}

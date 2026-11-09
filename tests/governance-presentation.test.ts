@@ -1,9 +1,31 @@
 import { describe, expect, it } from "vitest";
 import { governanceComparison, type GovernanceChange } from "@/lib/governance-presentation";
 import { governanceCommandConfirmed, governanceQuerySchema } from "@/lib/validation/governance";
+import { documentEventLabel } from "@/lib/notifications/event-labels";
 
 const base: GovernanceChange = { id: "reference", kind: "settings", proposed: {}, current: {}, proposed_by: "global", proposerName: "Autora fictícia", subjectName: "Pessoa fictícia", status: "pending", base_version: 1, created_at: "2026-11-06T12:00:00Z", decided_at: null };
 describe("governance comparisons use human fields without an editable transport payload", () => {
+  it.each(["constructor", "toString", "__proto__"])("refuses inherited dictionary member %s without throwing or returning a function", (value) => {
+    expect(documentEventLabel(value)).toBe("Atualização registrada"); expect(documentEventLabel(value, "donation")).toBe("Atualização registrada");
+    const kind = governanceComparison({ ...base, kind: value, proposed: { archiveDays: 8 } }, []);
+    expect(kind.supported).toBe(false); expect(kind.title).toBe("Tipo de proposta não reconhecido");
+    const operation = governanceComparison({ ...base, kind: "administration", proposed: { operation: value, args: { displayName: "Nome legítimo" } } }, []);
+    expect(operation.supported).toBe(false); expect(operation.title).toBe("Operação não reconhecida");
+    const field = governanceComparison({ ...base, proposed: { [value]: "Texto" } }, []);
+    expect(field.supported).toBe(false); expect(field.rows[0].label).toBe("Campo não reconhecido");
+    const free = governanceComparison({ ...base, kind: "administration", proposed: { operation: "product", args: { name: value } } }, []);
+    expect(free.supported).toBe(true); expect(free.rows[0].proposed).toBe(value);
+  });
+  it.each([
+    ["capability", { capability: "future.capability", subjectRole: "professional", enabled: true }],
+    ["membership", { userId: "person-id", role: "constructor" }],
+    ["notification_rule", { event: "req.issued", role: "family", channels: ["future_channel"] }],
+    ["notification_rule", { event: "constructor", role: "family", channels: ["internal"] }],
+  ])("refuses an unknown finite value in %s while retaining a readable comparison", (kind, proposed) => {
+    const comparison = governanceComparison({ ...base, kind, proposed }, []);
+    expect(comparison.supported).toBe(false); expect(comparison.rows.length).toBeGreaterThan(0);
+    expect(comparison.rows.every(row => typeof row.label === "string" && typeof row.proposed === "string")).toBe(true);
+  });
   it.each([
     ["settings", { archiveDays: 8 }, { archiveDays: 7 }, "Dias até arquivamento", "7", "8"],
     ["capability", { capability: "req.create", subjectRole: "professional", enabled: null }, { enabled: false }, "Permissão", "Não", "Herdar a regra da função"],

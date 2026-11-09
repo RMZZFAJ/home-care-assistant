@@ -10,12 +10,22 @@ grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
 não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
 Estado atual:local164/remoto164, zero migrations pendentes. Matriz105x39:
-51 PASS/52 PARTIAL/2 NOT_STARTED; contagens não equivalem à conclusão da fase.
+53 PASS/50 PARTIAL/2 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
+
+D3.23 corrigiu comparação de propostas que aceitava propriedades herdadas e
+valores finitos desconhecidos.38 unitários,7 regressões PDF selecionadas e
+três cenários distintos Chromium passaram, com um recheck dirigido do cenário
+estendido. Cinco tipos em leitura, ID/versão/conteúdo congelados, menu de três
+escolhas, recusa de outro paciente e criação global403 sem efeito conferidos.
+Nove testes/consumidores antigos foram qualificados por fonte igual à CI verde
+3772fd0, sem alegar nova execução. C011/C-FINAL-019 PASS local; C-FINAL-021
+parcial pelo walkthrough nativo global/conta/subfluxos. Sem SQL novo:164/164,
+zero pendências. CI própria continua obrigatória. [Provas](../audits/D/D-B/GOVERNANCE_FINITE_GROUPS.md).
 
 D3.22 alinhou Ordem do catálogo ao inteiro0–1.000.000 da API após baseline
 negativo real. Catálogo/unidade/apresentação, turno noturno720 minutos e login/

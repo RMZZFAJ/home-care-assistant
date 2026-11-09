@@ -112,6 +112,7 @@ test("D3 regra preserva a tentativa incerta e distingue confirmação de falha n
 
 test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por leitura ou vazar outro paciente", async ({ page }, info) => {
   const f = await setup(), global = await actor("global");
+  const ledger = sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   const proposals: { id: string }[] = [];
   const changes = [
     ["settings", { archiveDays: 9 }],
@@ -153,6 +154,33 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
   await login(page, "adminA", f.patient); await page.goto(`/configuracoes?area=people&proposalStatus=all&proposalQuery=${proposals[0].id}`);
   await expect(region.getByText("1 proposta encontrada · página 1 de 1", { exact: true })).toBeVisible();
   await expect(region.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeEnabled();
+  const frozen = sql(`select proposed::text from public.access_change_requests where id=${sqlLiteral(proposals[0].id)};`);
+  let future: Record<string, unknown> | null = null;
+  await page.route("**/api/patient-settings?**", async route => {
+    if (route.request().method() !== "GET") return route.continue();
+    const response = await route.fetch(), body = await response.json();
+    if (!future || !Array.isArray(body.changes)) return route.fulfill({ response });
+    return route.fulfill({ response, json: { ...body, changes: body.changes.map((change: { id: string }) => change.id === proposals[0].id ? { ...change, ...future } : change) } });
+  });
+  const proposal = region.getByRole("article", { name: "Proposta " + proposals[0].id.slice(0, 8), exact: true });
+  for (const unsupported of [
+    { kind: "constructor", proposed: { archiveDays: 9 } },
+    { kind: "administration", proposed: { operation: "constructor", args: { displayName: "Nome preservado" } } },
+    { kind: "capability", proposed: { capability: "future.capability", subjectRole: "professional", enabled: true } },
+    { kind: "notification_rule", proposed: { event: "req.issued", role: "family", channels: ["future_channel"] } },
+  ]) {
+    future = unsupported; await page.reload();
+    await expect(proposal.getByText("Esta proposta contém um tipo ou campo que esta versão não reconhece. Consulte a origem antes de aprovar.", { exact: true })).toBeVisible();
+    await proposal.locator("summary").click();
+    await expect(proposal.locator("textarea,input,select,pre")).toHaveCount(0);
+    await expect(proposal.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeDisabled();
+    expect(sql(`select proposed::text from public.access_change_requests where id=${sqlLiteral(proposals[0].id)};`)).toBe(frozen);
+  }
+  future = { status: "constructor" }; await page.reload();
+  await expect(proposal.getByText("Situação não reconhecida", { exact: false })).toBeVisible();
+  await expect(proposal.getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);
+  future = null; await page.unrouteAll({ behavior: "wait" }); await page.reload();
+  await expect(proposal.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeEnabled();
   const denied = await page.request.get(`/api/patient-settings?careRecipientId=${otherPatient.id}&changesOnly=true&status=all&query=${otherProposal.id}`);
   expect(denied.status()).toBe(404); expect((await denied.json()).code).toBe("NOT_FOUND");
   expect(await denied.text()).not.toContain("Conteúdo exclusivo fictício de outro paciente");
@@ -161,6 +189,7 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
   await region.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
   const approval = (await posted).postDataJSON();
   expect(approval.requestId).toBe(proposals[0].id); expect(approval.expectedVersion).toBe(1);
+  expect(approval.kind).toBe("settings"); expect(approval.change).toEqual({ archiveDays: 9 });
   await expect.poll(() => sql(`select status from public.access_change_requests where id=${sqlLiteral(proposals[0].id)};`)).toBe("applied");
   expect(sql(`select settings->>'archiveDays' from public.patient_settings where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("9");
   expect(count(f.patient)).toBe(55);
@@ -168,4 +197,16 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
   await expect(region.getByText("4 propostas encontradas · página 1 de 1", { exact: true })).toBeVisible();
   for (const button of await region.getByRole("button", { name: "Aprovar proposta", exact: true }).all()) await expect(button).toBeDisabled();
   expect(count(otherPatient.id)).toBe(1);
+  await page.goto("/configuracoes?area=permissions");
+  const matrix = page.getByRole("region", { name: "Matriz de permissões", exact: true });
+  const opener = matrix.getByRole("button", { name: /^Emitir REQ · Profissional ·/ });
+  await opener.click();
+  await expect(page.getByRole("menuitemradio")).toHaveCount(3);
+  for (const option of [/^Herdar/, /^Permitir$/, /^Restringir$/]) await expect(page.getByRole("menuitemradio", { name: option })).toBeVisible();
+  await expect(page.getByRole("menu").locator('input[type="search"],input[type="text"]')).toHaveCount(0);
+  await page.getByRole("menuitemradio", { name: /^Herdar/ }).press("Escape"); await expect(opener).toBeFocused();
+  const deniedName = "Residência negada " + randomUUID().slice(0, 8);
+  expect((await page.request.post("/api/admin", { data: { action: "recipient", id: null, displayName: deniedName, isActive: true, isDevelopment: true, initialAdministratorEmail: fixtures.adminA.email } })).status()).toBe(403);
+  expect(sql(`select count(*) from public.care_recipients where display_name=${sqlLiteral(deniedName)};`)).toBe("0");
+  expect(sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(ledger);
 });

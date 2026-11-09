@@ -58,7 +58,7 @@ export function GovernanceProposals({ context, directory, version, revision, bus
         return <article key={change.id} className="rounded-lg border border-(--line) p-3 space-y-3" aria-label={"Proposta " + change.id.slice(0, 8)}>
           <h3 className="font-semibold">{comparison.title}</h3>
           <p>Referência: <span className="break-all">{change.id}</span></p>
-          <p>{governanceStatusLabels[change.status] ?? "Situação não reconhecida"} · por {change.proposerName} · {formatBrazilDate(change.created_at)}</p>
+          <p>{Object.hasOwn(governanceStatusLabels, change.status) ? governanceStatusLabels[change.status] : "Situação não reconhecida"} · por {change.proposerName} · {formatBrazilDate(change.created_at)}</p>
           <p>Versão de origem: {change.base_version}. Configuração vigente: {version}.</p>
           {change.base_version !== version && change.status === "pending" ? <Notice error>A configuração mudou após esta proposta. Preserve a proposta original e prepare outra após revisar a configuração vigente.</Notice> : null}
           <details><summary className="cursor-pointer font-semibold">Comparar configuração vigente e proposta</summary>

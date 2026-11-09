@@ -1,5 +1,6 @@
 import { capabilityLabels } from "./capability-labels";
-import { documentEventLabel } from "./notifications/event-labels";
+import { roleLabels } from "./role-labels";
+import { documentEventLabel, isKnownDocumentEvent } from "./notifications/event-labels";
 
 export type GovernanceChange = {
   id: string; kind: string; proposed: Record<string, unknown>; current: Record<string, unknown> | null;
@@ -32,17 +33,27 @@ const operationFields: Record<string, string[]> = {
 };
 const subjectKeys = ["userId", "subjectUser", "recipientUserId"];
 const days = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+const own = <T,>(record: Record<string, T>, key: string): T | undefined => Object.hasOwn(record, key) ? record[key] : undefined;
+function finiteValueKnown(key: string, value: unknown) {
+  if (key === "capability") return typeof value === "string" && Object.hasOwn(capabilityLabels, value);
+  if (key === "event") return typeof value === "string" && isKnownDocumentEvent(value);
+  if (key === "role" || key === "subjectRole") return typeof value === "string" && Object.hasOwn(roleLabels, value);
+  if (key === "scienceRoles") return Array.isArray(value) && value.every(role => typeof role === "string" && Object.hasOwn(roleLabels, role));
+  if (key === "channels") return Array.isArray(value) && value.every(channel => ["internal", "email", "whatsapp"].includes(channel));
+  if (key === "balApprovers") return Array.isArray(value) && value.every(group => ["family", "supervisor"].includes(group));
+  return true;
+}
 function valueLabel(key: string, value: unknown, change: GovernanceChange, directory: { id: string; name: string }[]): string {
   if (key === "patientShortName" && (value == null || value === "")) return "Sem nome curto · usar o nome do cadastro";
   if (key === "enabled" && value === null) return "Herdar a regra da função" + (typeof change.current?._inheritedEnabled === "boolean" ? change.current._inheritedEnabled ? " (permitir)" : " (restringir)" : "");
   if (value === undefined || value === null) return "Não registrado";
   if (subjectKeys.includes(key)) return change.subjectName ?? directory.find(person => person.id === value)?.name ?? "Pessoa sem nome disponível neste registro";
   if (key === "productId") return typeof change.current?._productName === "string" ? change.current._productName : "Material sem nome disponível neste registro";
-  if (key === "capability" && typeof value === "string") return capabilityLabels[value] ?? "Capacidade não reconhecida";
+  if (key === "capability" && typeof value === "string") return own(capabilityLabels, value) ?? "Capacidade não reconhecida";
   if (key === "event" && typeof value === "string") return documentEventLabel(value);
   if (key === "balDay" && typeof value === "number") return days[value] ?? "Dia não reconhecido";
   if (typeof value === "boolean") return value ? "Sim" : "Não";
-  if (typeof value === "string") return translations[value] ?? value;
+  if (typeof value === "string") return own(translations, value) ?? value;
   if (typeof value === "number") return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 12 }).format(value);
   if (Array.isArray(value)) return value.length ? value.map(item => ["scienceUsers", "balReminderUsers"].includes(key) ? directory.find(person => person.id === item)?.name ?? "Pessoa sem nome disponível" : valueLabel(key, item, change, directory)).join(", ") : "Nenhum";
   if (key === "shiftReminder" && typeof value === "object") {
@@ -55,12 +66,12 @@ export function governanceComparison(change: GovernanceChange, directory: { id: 
   const operation = change.proposed.operation;
   const values = change.kind === "administration" && change.proposed.args && typeof change.proposed.args === "object" && !Array.isArray(change.proposed.args) ? change.proposed.args as Record<string, unknown> : change.proposed;
   const entries = Object.entries(values).filter(([key]) => !["action", "careRecipientId", "id"].includes(key));
-  const allowed = change.kind === "administration" && typeof operation === "string" ? operationFields[operation] : kindFields[change.kind];
-  const supported = Boolean(allowed) && entries.length > 0 && entries.every(([key]) => allowed?.includes(key))
+  const allowed = change.kind === "administration" && typeof operation === "string" ? own(operationFields, operation) : own(kindFields, change.kind);
+  const supported = Boolean(allowed) && entries.length > 0 && entries.every(([key, value]) => allowed?.includes(key) && finiteValueKnown(key, value))
     && (!entries.some(([key]) => key === "productId") || typeof change.current?._productName === "string");
   return {
     supported,
-    title: change.kind === "administration" && typeof operation === "string" ? operations[operation] ?? "Operação não reconhecida" : governanceKindLabels[change.kind] ?? "Tipo de proposta não reconhecido",
-    rows: entries.map(([key, value]) => ({ key, label: labels[key] ?? "Campo não reconhecido", current: valueLabel(key, change.current?.[key], change, directory), proposed: valueLabel(key, value, change, directory) })),
+    title: change.kind === "administration" && typeof operation === "string" ? own(operations, operation) ?? "Operação não reconhecida" : own(governanceKindLabels, change.kind) ?? "Tipo de proposta não reconhecido",
+    rows: entries.map(([key, value]) => ({ key, label: own(labels, key) ?? "Campo não reconhecido", current: valueLabel(key, change.current?.[key], change, directory), proposed: valueLabel(key, value, change, directory) })),
   };
 }

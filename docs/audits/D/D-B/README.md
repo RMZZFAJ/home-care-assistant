@@ -28,6 +28,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Fatos, recuperação e foco da ficha relacionada](RELATED_DOCUMENT_READ.md).
 - [Troca recuperável da foto e escopo da conta pessoal](AVATAR_RECOVERY.md).
 - [Inteiros, códigos, unidades, turno noturno e campos Auth](TYPED_FIELDS.md).
+- [Propostas congeladas, valores reconhecidos e grupos finitos](GOVERNANCE_FINITE_GROUPS.md).
 - [Consulta, anexos e foco na operação diária](DAILY_READ_RECOVERY.md).
 - [Comparação das versões e autoria histórica](DOCUMENT_VERSION_HISTORY.md).
 - [Instalação, atualização e privacidade PWA](PWA_RUNTIME.md).

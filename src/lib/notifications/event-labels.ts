@@ -75,14 +75,17 @@ const labels: Record<string, string> = {
   "bal.cancel": "Balanço cancelado",
   "attachment.bound": "Anexo vinculado",
 };
+export function isKnownDocumentEvent(action: string) {
+  return Object.hasOwn(labels, action);
+}
 export function documentEventLabel(action?: string, origin?: "purchase" | "donation") {
   if (!action) return "Atualização disponível";
   if (origin === "donation") {
     const donation: Record<string, string> = { "com.issued": "Ficha de doação emitida", "com.approve": "Itens da doação aprovados", "com.cancel": "Ficha de doação cancelada" };
-    if (donation[action]) return donation[action];
+    if (Object.hasOwn(donation, action)) return donation[action];
   }
   return (
-    labels[action] ??
+    (isKnownDocumentEvent(action) ? labels[action] : undefined) ??
     (action.endsWith(".draft")
       ? "Rascunho salvo"
       : action.endsWith(".submit")

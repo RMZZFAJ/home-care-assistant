@@ -2175,3 +2175,40 @@ o candidato novo. PR7 Draft, Sonar adiado, meta ativa.
 [Dossiê](TYPED_FIELDS.md), [provas](TYPED_FIELDS_EVIDENCE.json),
 [remoto](TYPED_FIELDS_REMOTE_OBSERVATION.json),
 [CI anterior](CI_9B8260E_OBSERVATION.json).
+
+## D3.23 — propostas congeladas e grupos finitos
+
+Base1b89ce9. Seis contraprovas iniciais FAIL e outra de evento FAIL preservadas:
+`constructor`/`toString`/`__proto__` atravessavam dicionários como membros herdados,
+e capacidade/função/canal desconhecidos ainda marcavam proposta como suportada.
+Leitura própria dos dicionários e reconhecimento dos valores finitos corrigidos;
+texto livre permanece literal. Estado desconhecido não oferece aprovação.
+Nenhuma autorização, schema ou aplicação transacional passou ao navegador.
+
+38 unitários PASS (34 governança/4 campos),7 testes PDF selecionados PASS
+(18 goldens V4–V6 e6 V9 das fontes controladas, estrutura V10 preservada).
+Três cenários distintos Chromium PASS e um recheck do terceiro estendido:
+intenção incerta/conflito nas duas APIs,55 propostas/cinco tipos/paginação,
+comparação sem edição, GETs com respostas desconhecidas recusadas e JSON
+proposto no banco igual, aprovação por outro ator com ID/versão/change exatos,
+quatro propostas antigas sem reaplicação, outro paciente404, menu de capacidade
+com três menuitemradio/Escape/foco e criação global local403/sem cadastro.
+Estoque igual antes/depois. Tipos/lint passaram; nenhuma suíte geral repetida.
+
+Nove testes/consumidores de consentimento, linhas, relato livre e revisão sem
+edição coincidem em LF com3772fd0, cuja CI completa foi verde. Essa qualificação
+complementa D3.22, sem alegar novos ensaios locais desses consumidores. As duas
+primeiras fontes de teste são iguais ao pai; produto foi congelado entre as
+coortes. Demais motores e integração final permanecem na CI própria.
+
+Local/remoto164/última20261109024515/hash de versões iguais; leitura apenas,
+zero SQL nova ou pendente. Sem reset, fixture/Auth remoto, transporte externo,
+produção ou backup redundante. Matriz53 PASS/50 PARTIAL/2 NOT_STARTED,105x39;
+29 colunas/complementos intactos. C011/C-FINAL-019 PASS local composto;
+C-FINAL-021 parcial por criação global nativa/conta alheia/subfluxos autorizados.
+CI1b89ce9:Windows/Ubuntu PASS e integração de banco confirmada em andamento na
+observação; não é aprovação global ou do candidato. PR7 Draft, Sonar adiado,
+meta ativa. [Dossiê](GOVERNANCE_FINITE_GROUPS.md),
+[provas](GOVERNANCE_FINITE_EVIDENCE.json),
+[remoto](GOVERNANCE_FINITE_REMOTE_OBSERVATION.json),
+[CI anterior](CI_1B89CE9_OBSERVATION.json).
