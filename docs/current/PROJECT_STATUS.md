@@ -4,16 +4,16 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação60c419b: Preview READY e Windows/Ubuntu/banco PASS; browsers em
-andamento na consulta. D3.40 amplia quatro atos da transferência com preparação
-privada, referência atual, revisão selada e recuperação pessoal.21 testes
-unitários/API,18 cenários Auth e14 de navegador aprovados. CI do novo SHA é
-independente. Declaração inicial,BAL/REQ contextuais e paridade integral pendentes.
-[Observação](../audits/D/D-B/CI_60C419B_OBSERVATION.json),
-[incremento](../audits/D/D-B/TRANSFER_DECISION_DRAFTS.md).
+Observação f233be9: Preview READY,Windows/Ubuntu/banco e demais navegadores
+PASS;WebKit ios-1 e agregado FAIL no caso REQ403. Falha em investigação;
+nenhuma aprovação global. D3.41 implementa declaração de transferência privada
+em duas direções,referência atual e confirmação selada.41 unitários/API,
+8 Auth e16 identidades de navegador aprovados. CI própria permanece gate.
+[Observação](../audits/D/D-B/CI_F233BE9_OBSERVATION.json),
+[incremento](../audits/D/D-B/TRANSFER_DECLARATION_DRAFTS.md).
 
-Estado atual:local173/remoto173, zero migrations pendentes. Matriz105x39: 56
-PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
+Estado atual:local174/remoto174,zero migrations pendentes. Matriz105x39:56
+PASS/49 PARTIAL/0 NOT_STARTED;contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
 sem redução de funções. D3.28 concluiu a retirada técnica do Fluent: seletores
 compostos, menus, popovers, tooltips, provider/Griffel e dependência. Shell e

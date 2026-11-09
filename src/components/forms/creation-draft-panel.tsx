@@ -105,6 +105,18 @@ function DraftFieldsSummary({
     {content.materials.filter(m=>Object.hasOwn(content.form.quantities,m.id)).map(m=><article className="hca-record min-w-0" key={m.id}><div className="hca-record-main min-w-0 wrap-anywhere"><strong>{m.name}</strong><p>Quantidade: {content.form.quantities[m.id]||"Não preenchida"} {m.unit}</p>{content.form.presentationSelections?.[m.id]?.map(p=><p key={p.id}>{p.packages||"Não preenchido"} embalagem(ns) · {p.name} · {p.baseQuantity} {p.unit} por embalagem · versão {p.version}</p>)}{content.form.sharedNeedReasons?.[m.id]?<p>{content.form.sharedNeedReasons[m.id]}</p>:null}<p>{content.links[m.id]?.length??0} vínculo(s) de necessidade; revalidados na confirmação.</p></div></article>)}
     {content.form.notes?<p className="whitespace-pre-wrap wrap-anywhere">{content.form.notes}</p>:null}{content.form.recipientReason?<p className="whitespace-pre-wrap wrap-anywhere">Justificativa da pessoa recebedora: {content.form.recipientReason}</p>:null}
   </div>;
+  if ("fields" in content && content.documentVersion === null) return <div className="hca-form-stack">
+    <p>Declaração privada em preparação, sem ficha oficial como base. Salvar não registra declaração, concordância, expedição ou recebimento.</p>
+    <dl>
+      <dt>Sentido da transferência</dt><dd>{content.fields.source === "FAMILY" ? "Família → Equipe" : "Equipe → Família"}</dd>
+      <dt>Contraparte preservada</dt><dd>{content.fields.counterpartyLabel || "Não escolhida ou indisponível"}</dd>
+      <dt>Recebedor físico preservado</dt><dd>{content.fields.recipientLabel || "Não escolhido ou indisponível"}</dd>
+      <dt>Origem documental preservada</dt><dd>{content.fields.originLabel || "Sem vínculo informado"}</dd>
+    </dl>
+    {content.materials.map(material=><p className="whitespace-pre-wrap wrap-anywhere" key={material.id}>{material.name} · quantidade no preenchimento: {content.fields[material.id+":transferQuantity"] || "Não informada"} {material.unit}</p>)}
+    {content.fields.reason ? <p className="whitespace-pre-wrap wrap-anywhere">Sua justificativa: {content.fields.reason}</p> : null}
+    {content.fields.query ? <p className="whitespace-pre-wrap wrap-anywhere">Busca preservada: {content.fields.query}</p> : null}
+  </div>;
   if ("fields" in content) {
     const name = (key: string) => content.materials.find(m => m.id === key)?.name ?? "Linha não disponível na referência atual";
     const entDecision = kind === "ENT" && purpose !== "receive" && purpose !== "divergence";

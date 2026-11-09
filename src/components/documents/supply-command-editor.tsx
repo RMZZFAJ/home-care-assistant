@@ -101,7 +101,7 @@ function PrivateOperationEditor(
     targetDocumentId: props.data.id,
     navigation: navigationForStep(flow, 0),
     onResume: (saved) => {
-      if (!saved.content || !("fields" in saved.content)) return false;
+      if (!saved.content || !("fields" in saved.content) || saved.content.documentVersion === null) return false;
       restore(saved.content);
       setConfirmationReset(false);
       return true;

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { draftNavigationSchema } from "./draft-navigation";
 import { navigationAllowed } from "../forms/draft-navigation";
-import { draftPurpose,comOperationDraftPurpose,comOperationPurposes,entDraftPurpose,entDraftPurposes,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
+import { draftPurpose,entDeclarationPurposes,entDeclarationDraftPurpose,transferDeclarationDraftContent,newSupplyDraftPurposes,declarationSourceForPurpose,comOperationDraftPurpose,comOperationPurposes,entDraftPurpose,entDraftPurposes,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
 const id = z.uuid(),
   revision = z.number().int().positive().max(2147483647);
 const text = (max: number) =>
@@ -111,7 +111,10 @@ export const creationDraftCommandSchema = z
       .object({...scope,...navigation,kind:z.enum(["COM","ENT"]),purpose:z.enum(["create","revise"]),action:z.literal("save"),content:supplyDraftContent})
       .strict(),
     z
-      .object({...scope,...navigation,kind:z.literal("ENT"),purpose:entDraftPurpose,action:z.literal("save"),content:receiptDraftContent})
+      .object({...scope,...navigation,kind:z.literal("ENT"),purpose:entDraftPurpose.exclude(entDeclarationPurposes),action:z.literal("save"),content:receiptDraftContent})
+      .strict(),
+    z
+      .object({...scope,...navigation,kind:z.literal("ENT"),purpose:entDeclarationDraftPurpose,action:z.literal("save"),content:transferDeclarationDraftContent})
       .strict(),
     z
       .object({...scope,...navigation,kind:z.literal("COM"),purpose:comOperationDraftPurpose,action:z.literal("save"),content:receiptDraftContent})
@@ -148,8 +151,10 @@ export const creationDraftCommandSchema = z
   .superRefine((value, ctx) => {
     if (value.action === "save" && !navigationAllowed(value.kind, "purpose" in value ? value.purpose : "create", value.navigation, value.content))
       ctx.addIssue({ code: "custom", path: ["navigation"], message: "A etapa salva não corresponde ao formulário de origem. Consulte o rascunho novamente." });
-    if ((value.kind==="COM"||value.kind==="ENT")&&((value.purpose==="create")!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise",...comOperationPurposes].includes(value.purpose)||value.kind==="ENT"&&!["create","revise",...entDraftPurposes].includes(value.purpose)))
+    if ((value.kind==="COM"||value.kind==="ENT")&&(newSupplyDraftPurposes.includes(value.purpose)!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise",...comOperationPurposes].includes(value.purpose)||value.kind==="ENT"&&!["create","revise",...entDraftPurposes].includes(value.purpose)))
       ctx.addIssue({code:"custom",path:["targetDocumentId"],message:"Confira a intenção e o alvo deste preenchimento."});
+    if (value.kind==="ENT" && value.action==="save" && declarationSourceForPurpose(value.purpose) && (!('fields' in value.content) || value.content.fields.source !== declarationSourceForPurpose(value.purpose) || value.content.documentVersion !== null || value.content.divergentIds.length))
+      ctx.addIssue({code:"custom",path:["content"],message:"Confira a custódia e as referências desta declaração privada."});
     if ((value.kind==="COM"||value.kind==="ENT")&&value.action==="save"&&"form" in value.content&&value.content.context.documentId!==value.targetDocumentId)
       ctx.addIssue({code:"custom",path:["content","context"],message:"A ficha de referência precisa corresponder ao preenchimento."});
     if (

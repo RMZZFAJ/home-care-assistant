@@ -9,7 +9,7 @@ import {
   uuid,
 } from "@/lib/server/api";
 import { creationDraftCommandSchema } from "@/lib/validation/creation-drafts";
-import { draftPurpose, comOperationPurposes, entDraftPurposes } from "@/lib/validation/supply-drafts";
+import { draftPurpose, newSupplyDraftPurposes, comOperationPurposes, entDraftPurposes } from "@/lib/validation/supply-drafts";
 export async function GET(request: Request) {
   return api("drafts.read", async () => {
     const params = new URL(request.url).searchParams,
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     if (
       !["REQ", "BAL","COM","ENT"].includes(kind ?? "") ||
       !draftPurpose.safeParse(purpose).success||(!extended&&purpose!=="create")||
-      (extended&&((purpose==="create")!==(target===null)||kind==="COM"&&!["create","revise",...comOperationPurposes].includes(purpose)||kind==="ENT"&&!["create","revise",...entDraftPurposes].includes(purpose)))||
+      (extended&&(newSupplyDraftPurposes.includes(purpose)!==(target===null)||kind==="COM"&&!["create","revise",...comOperationPurposes].includes(purpose)||kind==="ENT"&&!["create","revise",...entDraftPurposes].includes(purpose)))||
       (target !== null && !uuid.safeParse(target).success) ||
       (kind === "REQ" && target !== null)
     )

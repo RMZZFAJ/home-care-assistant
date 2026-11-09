@@ -2759,3 +2759,19 @@ CI própria segue gate. Declaração inicial,BAL/REQ contextuais,paridade66/171 
 externos pendentes;Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
 [Dossiê](TRANSFER_DECISION_DRAFTS.md),[provas](TRANSFER_DECISION_DRAFTS_VALIDATION.json),
 [remoto](TRANSFER_DECISION_DRAFTS_REMOTE.json),[CI](CI_60C419B_OBSERVATION.json).
+
+## D3.41 — preparação da declaração bilateral
+
+Duas direções privadas, alvo/versão nulos, campos próprios entre sessões,
+referência Auth explícita e confirmação selada. Sem efeito de estoque ao salvar.
+41 unitários/API,8 Auth e16 identidades Chromium/WebKit aprovados;14 sucessos
+reutilizados e apenas2 conflitos legados reforçados/repetidos.21 fontes
+conferidos,axe,quatro larguras/quatro capturas. Contraprovas de autoria174
+conservadas;remoto recebeu somente a versão final. Local174/remoto174,
+zero pendências,funções/ACL/constraint iguais e advisors inalterados.
+Matriz105x39/primeiras30,56 PASS/49 PARTIAL e18 linhas visuais preservadas.
+CI f233be9 falhou no REQ403 WebKit;anexo instável passou retry;sem aprovação
+global. Preview READY. BAL/REQ contextuais,paridade66/171 e CI própria pendentes.
+Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
+[Dossiê](TRANSFER_DECLARATION_DRAFTS.md),[provas](TRANSFER_DECLARATION_DRAFTS_VALIDATION.json),
+[remoto](TRANSFER_DECLARATION_DRAFTS_REMOTE.json),[CI](CI_F233BE9_OBSERVATION.json).

@@ -1,5 +1,10 @@
 "use client";
-import { FormField, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
+import {
+  FormField,
+  SelectField,
+  TextAreaField,
+  TextInput,
+} from "@/components/ui/controls";
 import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
@@ -19,6 +24,25 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
+import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import {
+  CreationDraftPanel,
+  DraftContentSummary,
+} from "@/components/forms/creation-draft-panel";
+import {
+  transferDeclarationPurpose,
+  emptyTransferDeclarationDraft,
+  transferDeclarationValues,
+  transferDeclarationDraftContent as declarationContent,
+  adoptTransferDeclarationReference,
+} from "@/lib/forms/transfer-declaration-draft";
+import { navigationForStep } from "@/lib/forms/draft-navigation";
+import {
+  parseTransferPreparation,
+  requireTransferDeclarationConfirmation,
+} from "@/lib/validation/transfer-preparation";
+import type { TransferDeclarationDraftContent } from "@/lib/validation/supply-drafts";
+import { quantity } from "@/lib/quantity";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import {
   createTransferSchema,
@@ -46,7 +70,8 @@ export function TransferConsole() {
 }
 function PatientTransfers({ context }: { context: WorkspaceContext }) {
   const [source, setSource] = useState<Custody | "">(""),
-    [editing, setEditing] = useState(false);
+    [editing, setEditing] = useState(false),
+    [consulting, setConsulting] = useState(false);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   return (
     <div className="mx-auto max-w-4xl space-y-5">
@@ -68,7 +93,10 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
             <FormField label="Custódia de origem" required>
               <SelectField
                 value={source}
-                onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSource(controlValue as Custody | ""); }}
+                onChange={(controlEvent) => {
+                  const controlValue = controlEvent.currentTarget.value;
+                  return setSource(controlValue as Custody | "");
+                }}
               >
                 <option value="">Escolha a origem</option>
                 {can(context, "stock.family.read") ? (
@@ -82,7 +110,10 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
             <ActionButton
               variant="primary"
               disabled={!source}
-              onClick={() => setEditing(true)}
+              onClick={() => {
+                setConsulting(false);
+                setEditing(true);
+              }}
             >
               Preparar declaração
             </ActionButton>
@@ -93,14 +124,38 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
             recebimentos designados continuam no acompanhamento.
           </Notice>
         )}
+        <details className="hca-form-stack">
+          <summary>Minhas declarações em preparação</summary>
+          <p>
+            Consulte somente seus preenchimentos e resultados, inclusive após
+            perder acesso à origem.
+          </p>
+          <div className="hca-form-stack">
+            {(["FAMILY", "CARE_TEAM"] as const).map((item) => (
+              <ActionButton
+                key={item}
+                onClick={() => {
+                  setSource(item);
+                  setConsulting(true);
+                  setEditing(true);
+                }}
+              >
+                Consultar preenchimento:{" "}
+                {item === "FAMILY" ? "Família → Equipe" : "Equipe → Família"}
+              </ActionButton>
+            ))}
+          </div>
+        </details>
         <Link className="ui-button ui-button-secondary" href="/entregas">
           Acompanhar entregas e decisões
         </Link>
       </section>
       {editing && source ? (
         <TransferDeclarationEditor
+          key={source + ":" + consulting}
           context={context}
           source={source}
+          consulting={consulting}
           onClose={() => setEditing(false)}
           headingRef={headingRef}
         />
@@ -111,11 +166,13 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
 function TransferDeclarationEditor({
   context,
   source,
+  consulting,
   onClose,
   headingRef,
 }: {
   context: WorkspaceContext;
   source: Custody;
+  consulting: boolean;
   onClose: () => void;
   headingRef: RefObject<HTMLHeadingElement | null>;
 }) {
@@ -141,48 +198,150 @@ function TransferDeclarationEditor({
     reasonFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
+  const restoredRef = useRef(false);
+  const returnFocusRef = useRef(false);
+  const [baseline, setBaseline] = useState<TransferDeclarationDraftContent>(
+    () => emptyTransferDeclarationDraft(source),
+  );
+  const [referenceUnavailable, setReferenceUnavailable] = useState(true);
+  const write =
+    can(context, "ent.create") &&
+    can(context, source === "FAMILY" ? "stock.family.read" : "stock.team.read");
+  const recoveryOnly = consulting || (!write && !uncertain);
+  const purpose = transferDeclarationPurpose(source);
+  const privateDraft = useCreationDraft({
+    userId: context.userId,
+    patientId,
+    kind: "ENT",
+    purpose,
+    targetDocumentId: null,
+    navigation: navigationForStep("TRANSFER_DECLARE", 0),
+    onResume(saved) {
+      if (
+        !saved.content ||
+        !("fields" in saved.content) ||
+        saved.content.documentVersion !== null ||
+        saved.content.fields.source !== source
+      )
+        return false;
+      const values = transferDeclarationValues(saved.content);
+      setBaseline(saved.content);
+      setCounterpartyId(values.counterpartyId);
+      setRecipientId(values.recipientId);
+      setOriginId(values.originId);
+      setReason(values.reason);
+      setQuery(values.query);
+      setLines(values.lines);
+      setPacket(null);
+      setResult(null);
+      setError("");
+      restoredRef.current = true;
+      setNeedsRefresh(true);
+      setReferenceUnavailable(true);
+      setComparison(null);
+      return true;
+    },
+    onDiscard() {
+      const empty = emptyTransferDeclarationDraft(source);
+      setBaseline(
+        reference && !referenceUnavailable
+          ? adoptTransferDeclarationReference(empty, reference)
+          : empty,
+      );
+      setCounterpartyId("");
+      setRecipientId("");
+      setOriginId("");
+      setReason("");
+      setQuery("");
+      setLines([]);
+      setPacket(null);
+    },
+  });
+  const privateReloadRef = useRef(privateDraft.reload);
   useEffect(() => {
+    privateReloadRef.current = privateDraft.reload;
+  }, [privateDraft.reload]);
+  useEffect(() => {
+    if (!busy && !privateDraft.busy && !packet && returnFocusRef.current) {
+      returnFocusRef.current = false;
+      reasonFieldRef.current?.focus();
+    }
+  }, [busy, privateDraft.busy, packet, referenceUnavailable]);
+  const currentContent = declarationContent(baseline, reference, {
+    counterpartyId,
+    recipientId,
+    originId,
+    reason,
+    query,
+    lines,
+  });
+  useEffect(() => {
+    if (recoveryOnly) return;
     const controller = new AbortController();
-    api<{ data: TransferPreparation }>(
+    api<unknown>(
       "/api/transfers/preparation?" +
         new URLSearchParams({ careRecipientId: patientId, source }),
       undefined,
       controller.signal,
     )
       .then((response) => {
-        if (!controller.signal.aborted) {
-          if (loadedRef.current) setComparison(response.data);
-          else {
-            loadedRef.current = true;
-            setReference(response.data);
-          }
-          setError("");
-        }
+        if (controller.signal.aborted) return;
+        const current = parseTransferPreparation(response, {
+          patientId,
+          userId: context.userId,
+          source,
+        });
+        if (!loadedRef.current && !restoredRef.current) {
+          setReference(current);
+          setBaseline((old) => adoptTransferDeclarationReference(old, current));
+          setReferenceUnavailable(false);
+        } else setComparison(current);
+        loadedRef.current = true;
+        setError("");
       })
       .catch((cause) => {
-        if (!controller.signal.aborted)
-          setError(
-            cause instanceof Error
-              ? cause.message
-              : "Não foi possível consultar a referência.",
-          );
+        if (controller.signal.aborted) return;
+        setReferenceUnavailable(true);
+        setNeedsRefresh(true);
+        setComparison(null);
+        setError(
+          cause instanceof Error
+            ? cause.message
+            : "Não foi possível consultar a referência.",
+        );
+        if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
+          privateReloadRef.current();
       })
       .finally(() => {
         if (!controller.signal.aborted) setRefreshing(false);
       });
     return () => controller.abort();
-  }, [patientId, source, attempt]);
+  }, [patientId, source, context.userId, attempt, recoveryOnly]);
   useEffect(() => {
     if (packet || result) reviewHeadingRef.current?.focus();
   }, [packet, result]);
   function close() {
-    if (!result && (reason || lines.length || counterpartyId || recipientId))
+    if (uncertain || privateDraft.pending || busy) return;
+    if (
+      !result &&
+      !recoveryOnly &&
+      (reason || lines.length || counterpartyId || recipientId)
+    )
       setDiscard(true);
     else onClose();
   }
-  function prepare(event: FormEvent) {
+  async function prepare(event: FormEvent) {
     event.preventDefault();
-    if (!reference || needsRefresh) return;
+    if (
+      !reference ||
+      needsRefresh ||
+      referenceUnavailable ||
+      privateDraft.blocked ||
+      busy ||
+      uncertain ||
+      recoveryOnly
+    )
+      return;
     if (
       ![counterpartyId, recipientId].every((id) =>
         reference.people.some((person) => person.id === id),
@@ -227,8 +386,63 @@ function TransferDeclarationEditor({
       );
       return;
     }
+    if (
+      parsed.data.declaration.lines.some(
+        (line) =>
+          quantity(line.quantity).decimalPlaces() >
+          (reference.products.find((product) => product.id === line.productId)
+            ?.quantityDecimals ?? 0),
+      )
+    ) {
+      setError(
+        "Revise as casas decimais permitidas na unidade de cada material.",
+      );
+      return;
+    }
+    setBusy(true);
     setError("");
-    setPacket(parsed.data);
+    try {
+      const fresh = parseTransferPreparation(
+        await api<unknown>(
+          "/api/transfers/preparation?" +
+            new URLSearchParams({ careRecipientId: patientId, source }),
+        ),
+        { patientId, userId: context.userId, source },
+      );
+      if (
+        fresh.referenceHash !== reference.referenceHash ||
+        currentContent.fields.referenceHash !== fresh.referenceHash
+      ) {
+        setBaseline(currentContent);
+        setComparison(fresh);
+        setNeedsRefresh(true);
+        setReferenceUnavailable(true);
+        setError(
+          "A origem mudou. Seus campos foram preservados; compare e adote a referência atual.",
+        );
+        returnFocusRef.current = true;
+        return;
+      }
+      const saved = await privateDraft.save(currentContent);
+      if (!saved) return;
+      setPacket({
+        ...parsed.data,
+        draftCommit: { id: saved.id, revision: saved.revision },
+      });
+    } catch (cause) {
+      setNeedsRefresh(true);
+      setReferenceUnavailable(true);
+      setComparison(null);
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Não foi possível conferir a referência atual.",
+      );
+      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
+        privateDraft.reload();
+    } finally {
+      setBusy(false);
+    }
   }
   async function submit() {
     if (!pendingRef.current) pendingRef.current = packet;
@@ -236,23 +450,33 @@ function TransferDeclarationEditor({
     setBusy(true);
     setError("");
     try {
-      const response = await api<{ data: SupplyDocument }>(
-        "/api/transfers",
-        pendingRef.current,
+      const response = await api<unknown>("/api/transfers", pendingRef.current);
+      setResult(
+        requireTransferDeclarationConfirmation(response, {
+          patientId,
+          userId: context.userId,
+          declaration: pendingRef.current.declaration,
+        }),
       );
-      setResult(response.data);
       pendingRef.current = null;
+      setPacket(null);
       setUncertain(false);
+      privateDraft.reload();
     } catch (cause) {
       const rejected =
         cause instanceof ApiError &&
-        [400, 403, 404, 409, 422].includes(cause.status);
+        [400, 401, 403, 404, 409, 422].includes(cause.status);
       setUncertain(!rejected);
       if (rejected) {
         pendingRef.current = null;
         setPacket(null);
         setNeedsRefresh(true);
-        requestAnimationFrame(() => reasonFieldRef.current?.focus());
+        setReferenceUnavailable(true);
+        setBaseline(currentContent);
+        if (cause.code === "DRAFT_VERSION_CONFLICT")
+          void privateDraft.reportConflict();
+        else if ([401, 403, 404].includes(cause.status)) privateDraft.reload();
+        returnFocusRef.current = true;
       }
       setError(
         cause instanceof Error
@@ -264,13 +488,143 @@ function TransferDeclarationEditor({
     }
   }
   const personName = (id: string, ref = reference) =>
-    ref?.people.find((person) => person.id === id)?.name ??
+    (referenceUnavailable && ref === reference
+      ? id === counterpartyId
+        ? currentContent.fields.counterpartyLabel
+        : id === recipientId
+          ? currentContent.fields.recipientLabel
+          : undefined
+      : ref?.people.find((person) => person.id === id)?.name) ??
     "Escolha anterior indisponível";
   const refresh = () => {
+    setBaseline(currentContent);
+    setNeedsRefresh(true);
+    setReferenceUnavailable(true);
     setComparison(null);
     setRefreshing(true);
     setAttempt((value) => value + 1);
   };
+  const privatePanel = (
+    <CreationDraftPanel
+      draft={privateDraft}
+      current={currentContent}
+      patientName={context.patient?.display_name ?? "Paciente selecionado"}
+      disabled={busy || uncertain || !!packet}
+      resumeLabel={recoveryOnly ? "Consultar preenchimento salvo" : undefined}
+      discardLabel={
+        recoveryOnly ? "Descartar preenchimento privado" : undefined
+      }
+      acknowledgeLabel="Reconhecer declaração registrada"
+    />
+  );
+  const referenceComparison = comparison ? (
+    <section
+      className="ui-card hca-form-stack"
+      aria-label="Comparação da referência da transferência"
+    >
+      <h3>Referência preservada e atual</h3>
+      <p>
+        Contraparte:{" "}
+        {currentContent.fields.counterpartyLabel || "Não escolhida"} →{" "}
+        {comparison.people.find((person) => person.id === counterpartyId)
+          ?.name ?? "Escolha indisponível"}
+        .
+      </p>
+      <p>
+        Recebedor: {currentContent.fields.recipientLabel || "Não escolhido"} →{" "}
+        {comparison.people.find((person) => person.id === recipientId)?.name ??
+          "Escolha indisponível"}
+        .
+      </p>
+      <p>
+        Origem documental:{" "}
+        {currentContent.fields.originLabel || "Sem vínculo informado"} →{" "}
+        {originId
+          ? (comparison.origins.find((origin) => origin.id === originId)
+              ?.code ?? "Vínculo fora da seleção atual ou indisponível")
+          : "Sem vínculo informado"}
+        .
+      </p>
+      {currentContent.materials.map((material) => (
+        <p key={material.id}>
+          {material.name} →{" "}
+          {comparison.products.find((product) => product.id === material.id)
+            ?.name ?? "Material indisponível"}
+          : quantidade preservada{" "}
+          {currentContent.fields[material.id + ":transferQuantity"] ||
+            "não informada"}{" "}
+          {material.unit}; atual{" "}
+          {comparison.products.find((product) => product.id === material.id)
+            ?.available ?? "indisponível"}{" "}
+          {comparison.products.find((product) => product.id === material.id)
+            ?.unit ?? ""}
+          .
+        </p>
+      ))}
+      <p>
+        O vínculo e os valores próprios são preservados. Materiais ou pessoas
+        indisponíveis exigem troca ou retirada explícita; a adoção não converte
+        unidades.
+      </p>
+      <ActionButton
+        disabled={busy || privateDraft.blocked}
+        onClick={() => {
+          setBaseline(
+            adoptTransferDeclarationReference(currentContent, comparison),
+          );
+          setReference(comparison);
+          setComparison(null);
+          setNeedsRefresh(false);
+          setReferenceUnavailable(false);
+          setError("");
+          requestAnimationFrame(() => reasonFieldRef.current?.focus());
+        }}
+      >
+        Adotar referência atual e revisar meus campos
+      </ActionButton>
+    </section>
+  ) : null;
+  if (
+    (recoveryOnly && !result) ||
+    privateDraft.readDenied ||
+    privateDraft.protectedReadPending
+  )
+    return (
+      <RecordDrawer
+        title="Minha declaração em preparação"
+        busy={privateDraft.busy}
+        preventClose={!!privateDraft.pending || uncertain}
+        onClose={close}
+        restoreFocusFallbackRef={headingRef}
+        trackChanges={false}
+      >
+        <Notice>
+          Consulta pessoal do preenchimento. Esta tela não registra nem repete
+          uma declaração oficial.
+        </Notice>
+        {privatePanel}
+        {privateDraft.base?.state === "active" &&
+        !privateDraft.offered &&
+        !privateDraft.readDenied &&
+        !privateDraft.protectedReadPending ? (
+          <DraftContentSummary
+            content={privateDraft.base.content}
+            kind="ENT"
+            purpose={purpose}
+          />
+        ) : null}
+        {!privateDraft.loading &&
+        !privateDraft.loadError &&
+        !privateDraft.base &&
+        !privateDraft.offered &&
+        !privateDraft.consumed ? (
+          <p>
+            Nenhum preenchimento ou resultado privado pendente para este sentido
+            neste perfil.
+          </p>
+        ) : null}
+      </RecordDrawer>
+    );
   return (
     <RecordDrawer
       title={
@@ -280,21 +634,51 @@ function TransferDeclarationEditor({
             ? "Revisar declaração da transferência"
             : "Preparar transferência física"
       }
-      busy={busy}
-      preventClose={uncertain}
+      busy={busy || privateDraft.busy}
+      preventClose={uncertain || !!privateDraft.pending}
       onClose={close}
       restoreFocusFallbackRef={headingRef}
       trackChanges={false}
     >
+      {privatePanel}
       {error ? <Notice error>{error}</Notice> : null}
+      {!packet && !result ? (
+        <>
+          <Notice>
+            Salvar preserva somente sua preparação. Registrar a declaração exige
+            revisão e confirmação próprias.
+          </Notice>
+          <ActionButton
+            disabled={busy || uncertain || privateDraft.blocked}
+            onClick={() => void privateDraft.save(currentContent)}
+          >
+            Salvar preenchimento privado
+          </ActionButton>
+        </>
+      ) : null}
       {discard ? (
         <Notice>
-          Há uma declaração ainda não registrada.
+          Esta declaração ainda não foi registrada. Fechar sem salvar mantém a
+          última cópia privada confirmada e descarta as alterações atuais.
           <div className="hca-toolbar">
             <ActionButton onClick={() => setDiscard(false)}>
               Continuar editando
             </ActionButton>
-            <ActionButton onClick={onClose}>Descartar declaração</ActionButton>
+            <ActionButton
+              disabled={busy || privateDraft.blocked}
+              onClick={async () => {
+                const saved = await privateDraft.save(currentContent);
+                if (saved) onClose();
+              }}
+            >
+              Salvar e fechar
+            </ActionButton>
+            <ActionButton
+              disabled={busy || !!privateDraft.pending}
+              onClick={onClose}
+            >
+              Fechar sem salvar estas alterações
+            </ActionButton>
           </div>
         </Notice>
       ) : null}
@@ -304,8 +688,8 @@ function TransferDeclarationEditor({
             Declaração confirmada
           </h3>
           <p>
-            A contraparte precisa decidir. Nenhum material foi expedido por este
-            registro.
+            Consulte a ficha atual para acompanhar a decisão da contraparte.
+            Este registro não comprova expedição ou recebimento.
           </p>
           <p>
             Declarante: {result.transfer?.declaration.actor.name}. Contraparte:{" "}
@@ -319,70 +703,90 @@ function TransferDeclarationEditor({
             Consultar a transferência registrada
           </Link>
         </div>
-      ) : !reference ? (
-        <>
-          {!error ? (
-            <LoadingIndicator label="Consultando pessoas e saldo da origem" />
-          ) : (
-            <ActionButton
-              onClick={() => {
-                setError("");
-                setRefreshing(true);
-                setAttempt((value) => value + 1);
-              }}
-            >
-              Tentar consultar novamente
+      ) : (!reference || referenceUnavailable) && !packet ? (
+        <div className="hca-form-stack">
+          <Notice>
+            Seus campos privados foram preservados. Consulte e adote uma
+            referência autorizada antes de editar a declaração.
+          </Notice>
+          <DraftContentSummary
+            content={currentContent}
+            kind="ENT"
+            purpose={purpose}
+          />
+          {referenceComparison}
+          <div
+            className="hca-form-stack"
+            aria-label="Meus campos preservados da declaração"
+          >
+            {currentContent.materials.map((material, index) => (
+              <fieldset className="ui-card hca-form-stack" key={material.id}>
+                <legend>
+                  {material.name} · {material.unit} no preenchimento
+                </legend>
+                <FormField label={"Quantidade de " + material.name} required>
+                  <TextInput
+                    inputMode="decimal"
+                    value={lines[index]?.quantity ?? ""}
+                    onChange={(event) => {
+                      const value = event.currentTarget.value;
+                      setLines((old) =>
+                        old.map((line) =>
+                          line.productId === material.id
+                            ? { ...line, quantity: value }
+                            : line,
+                        ),
+                      );
+                    }}
+                  />
+                </FormField>
+                <ActionButton
+                  onClick={() =>
+                    setLines((old) =>
+                      old.filter((line) => line.productId !== material.id),
+                    )
+                  }
+                >
+                  Remover {material.name}
+                </ActionButton>
+              </fieldset>
+            ))}
+            <FormField label="Sua justificativa para a transferência" required>
+              <TextAreaField
+                ref={reasonFieldRef}
+                minLength={3}
+                maxLength={1000}
+                value={reason}
+                onChange={(event) => setReason(event.currentTarget.value)}
+              />
+            </FormField>
+            <ActionButton disabled variant="primary">
+              Revisar declaração
             </ActionButton>
-          )}
-        </>
+          </div>
+          {refreshing ? (
+            <LoadingIndicator label="Consultando pessoas e saldo da origem" />
+          ) : null}
+          <ActionButton
+            disabled={refreshing || busy || privateDraft.blocked}
+            onClick={refresh}
+          >
+            Comparar referência atual
+          </ActionButton>
+        </div>
       ) : (
         <div className="space-y-4">
           <p>
             <strong>
-              {custodyName(source)} → {custodyName(reference.destination)}
+              {custodyName(source)} → {custodyName(reference!.destination)}
             </strong>{" "}
-            · Referência consultada em {formatBrazilDate(reference.checkedAt)}.
+            ·{" "}
+            {referenceUnavailable
+              ? "Referência indisponível; recupere a mesma confirmação anterior."
+              : "Referência consultada em " +
+                formatBrazilDate(reference!.checkedAt) +
+                "."}
           </p>
-          {comparison ? (
-            <section
-              className="ui-card space-y-3"
-              aria-label="Comparação da referência da transferência"
-            >
-              <h3>Referência anterior e atual</h3>
-              <p>
-                Contraparte: {personName(counterpartyId)} →{" "}
-                {personName(counterpartyId, comparison)}.
-              </p>
-              <p>
-                Recebedor: {personName(recipientId)} →{" "}
-                {personName(recipientId, comparison)}.
-              </p>
-              {lines.map((line) => (
-                <p key={line.productId}>
-                  {
-                    reference.products.find((p) => p.id === line.productId)
-                      ?.name
-                  }
-                  : saldo anterior{" "}
-                  {reference.products.find((p) => p.id === line.productId)
-                    ?.available ?? "indisponível"}
-                  ; atual{" "}
-                  {comparison.products.find((p) => p.id === line.productId)
-                    ?.available ?? "indisponível"}
-                  .
-                </p>
-              ))}
-              <ActionButton
-                onClick={() => {
-                  setReference(comparison);
-                  setComparison(null);
-                  setNeedsRefresh(false);
-                }}
-              >
-                Adotar referência atual e revisar meus campos
-              </ActionButton>
-            </section>
-          ) : null}
           {needsRefresh ? (
             <Notice>
               Seus campos foram preservados. Consulte, compare e adote a
@@ -396,7 +800,7 @@ function TransferDeclarationEditor({
                   ? "Consultando referência…"
                   : "Comparar referência atual"}
               </ActionButton>
-              {!reference.people.length ? (
+              {!reference!.people.length ? (
                 <Notice>
                   Não há pessoa habilitada na custódia de destino. A declaração
                   exige contraparte e recebedor elegíveis.
@@ -412,16 +816,21 @@ function TransferDeclarationEditor({
                   <SelectField
                     required
                     value={counterpartyId}
-                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setCounterpartyId(controlValue); }}
+                    onChange={(controlEvent) => {
+                      const controlValue = controlEvent.currentTarget.value;
+                      return setCounterpartyId(controlValue);
+                    }}
                   >
                     <option value="">Escolha quem decide a concordância</option>
                     {counterpartyId &&
-                    !reference.people.some((p) => p.id === counterpartyId) ? (
+                    !reference!.people.some((p) => p.id === counterpartyId) ? (
                       <option value={counterpartyId} disabled>
-                        Escolha anterior indisponível
+                        {currentContent.fields.counterpartyLabel ||
+                          "Escolha anterior indisponível"}{" "}
+                        · indisponível
                       </option>
                     ) : null}
-                    {reference.people.map((person) => (
+                    {reference!.people.map((person) => (
                       <option key={person.id} value={person.id}>
                         {person.name}
                       </option>
@@ -432,16 +841,21 @@ function TransferDeclarationEditor({
                   <SelectField
                     required
                     value={recipientId}
-                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setRecipientId(controlValue); }}
+                    onChange={(controlEvent) => {
+                      const controlValue = controlEvent.currentTarget.value;
+                      return setRecipientId(controlValue);
+                    }}
                   >
                     <option value="">Escolha quem recebe pessoalmente</option>
                     {recipientId &&
-                    !reference.people.some((p) => p.id === recipientId) ? (
+                    !reference!.people.some((p) => p.id === recipientId) ? (
                       <option value={recipientId} disabled>
-                        Escolha anterior indisponível
+                        {currentContent.fields.recipientLabel ||
+                          "Escolha anterior indisponível"}{" "}
+                        · indisponível
                       </option>
                     ) : null}
-                    {reference.people.map((person) => (
+                    {reference!.people.map((person) => (
                       <option key={person.id} value={person.id}>
                         {person.name}
                       </option>
@@ -453,13 +867,11 @@ function TransferDeclarationEditor({
                     query={query}
                     selectedIds={[]}
                     placeholder="Buscar material"
-                    onQueryChange={queryValue => setQuery(queryValue)}
-                    onSelectionChange={nextIds => {
+                    onQueryChange={(queryValue) => setQuery(queryValue)}
+                    onSelectionChange={(nextIds) => {
                       if (
                         nextIds[0] &&
-                        !lines.some(
-                          (line) => line.productId === nextIds[0],
-                        )
+                        !lines.some((line) => line.productId === nextIds[0])
                       )
                         setLines((previous) => [
                           ...previous,
@@ -467,23 +879,29 @@ function TransferDeclarationEditor({
                         ]);
                       setQuery("");
                     }}
-                    options={(reference.products
-                      .filter(
-                        (product) =>
-                          !lines.some(
-                            (line) => line.productId === product.id,
-                          ) &&
-                          `${product.name} ${product.category}`
-                            .toLocaleLowerCase("pt-BR")
-                            .includes(query.toLocaleLowerCase("pt-BR")),
-                      )
-                      .map((product) => (
-                        ({ value: product.id, label: product.name, content: <>
-                          {product.name} ·{" "}
-                          {product.active ? "Ativo" : "Inativo com saldo"} ·{" "}
-                          {formatQuantity(product.available)} {product.unit}
-                        </> })
-                      ))) ?? []}
+                    options={
+                      reference!.products
+                        .filter(
+                          (product) =>
+                            !lines.some(
+                              (line) => line.productId === product.id,
+                            ) &&
+                            `${product.name} ${product.category}`
+                              .toLocaleLowerCase("pt-BR")
+                              .includes(query.toLocaleLowerCase("pt-BR")),
+                        )
+                        .map((product) => ({
+                          value: product.id,
+                          label: product.name,
+                          content: (
+                            <>
+                              {product.name} ·{" "}
+                              {product.active ? "Ativo" : "Inativo com saldo"} ·{" "}
+                              {formatQuantity(product.available)} {product.unit}
+                            </>
+                          ),
+                        })) ?? []
+                    }
                   />
                 </FormField>
                 {!lines.length ? (
@@ -493,7 +911,7 @@ function TransferDeclarationEditor({
                   </p>
                 ) : (
                   lines.map((line, index) => {
-                    const product = reference.products.find(
+                    const product = reference!.products.find(
                       (p) => p.id === line.productId,
                     );
                     return (
@@ -502,7 +920,11 @@ function TransferDeclarationEditor({
                         className="ui-card space-y-3"
                       >
                         <legend>
-                          {product?.name ?? "Material indisponível"}
+                          {product?.name ??
+                            currentContent.materials.find(
+                              (material) => material.id === line.productId,
+                            )?.name ??
+                            "Material indisponível"}
                         </legend>
                         <p>
                           {product?.active === false
@@ -515,20 +937,31 @@ function TransferDeclarationEditor({
                           .
                         </p>
                         <FormField
-                          label={`Quantidade de ${product?.name ?? "material indisponível"}`}
+                          label={
+                            "Quantidade de " +
+                            (product?.name ??
+                              currentContent.materials.find(
+                                (material) => material.id === line.productId,
+                              )?.name ??
+                              "material indisponível")
+                          }
                           required
                         >
                           <TextInput
                             required
                             inputMode="decimal"
                             value={line.quantity}
-                            onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setLines((previous) =>
+                            onChange={(controlEvent) => {
+                              const controlValue =
+                                controlEvent.currentTarget.value;
+                              return setLines((previous) =>
                                 previous.map((row, i) =>
                                   i === index
                                     ? { ...row, quantity: controlValue }
                                     : row,
                                 ),
-                              ); }}
+                              );
+                            }}
                           />
                         </FormField>
                         <ActionButton
@@ -540,7 +973,12 @@ function TransferDeclarationEditor({
                             )
                           }
                         >
-                          Remover {product?.name ?? "material"}
+                          Remover{" "}
+                          {product?.name ??
+                            currentContent.materials.find(
+                              (material) => material.id === line.productId,
+                            )?.name ??
+                            "material"}
                         </ActionButton>
                       </fieldset>
                     );
@@ -549,10 +987,27 @@ function TransferDeclarationEditor({
                 <FormField label="ENT documental de origem, quando conhecida">
                   <SelectField
                     value={originId}
-                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setOriginId(controlValue); }}
+                    onChange={(controlEvent) => {
+                      const controlValue = controlEvent.currentTarget.value;
+                      return setOriginId(controlValue);
+                    }}
                   >
                     <option value="">Sem vínculo documental de origem</option>
-                    {reference.origins
+                    {originId &&
+                    !reference!.origins.some(
+                      (origin) =>
+                        origin.id === originId &&
+                        lines.every((line) =>
+                          origin.productIds.includes(line.productId),
+                        ),
+                    ) ? (
+                      <option value={originId} disabled>
+                        {currentContent.fields.originLabel ||
+                          "Vínculo preservado"}{" "}
+                        · indisponível para estes materiais
+                      </option>
+                    ) : null}
+                    {reference!.origins
                       .filter(
                         (origin) =>
                           lines.length &&
@@ -569,26 +1024,36 @@ function TransferDeclarationEditor({
                 </FormField>
                 <p className="text-sm">
                   A seleção contém até 100 ENT recentes com aceite na custódia
-                  de origem ({reference.originTotal} no total). O vínculo
+                  de origem ({reference!.originTotal} no total). O vínculo
                   documenta a origem conhecida; não identifica lotes ou presume
                   disponibilidade dessas unidades.
                 </p>
-                <FormField label="Sua justificativa para a transferência" required>
+                <FormField
+                  label="Sua justificativa para a transferência"
+                  required
+                >
                   <TextAreaField
                     ref={reasonFieldRef}
                     required
                     minLength={3}
                     maxLength={1000}
                     value={reason}
-                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setReason(controlValue); }}
-
+                    onChange={(controlEvent) => {
+                      const controlValue = controlEvent.currentTarget.value;
+                      return setReason(controlValue);
+                    }}
                   />
                 </FormField>
                 <ActionButton
                   type="submit"
                   variant="primary"
                   disabled={
-                    needsRefresh || !reference.people.length || !lines.length
+                    needsRefresh ||
+                    referenceUnavailable ||
+                    privateDraft.blocked ||
+                    busy ||
+                    !reference!.people.length ||
+                    !lines.length
                   }
                 >
                   Revisar declaração
@@ -611,7 +1076,7 @@ function TransferDeclarationEditor({
                 <strong>{personName(packet.declaration.recipientId)}</strong>.
               </p>
               {packet.declaration.lines.map((line) => {
-                const product = reference.products.find(
+                const product = reference!.products.find(
                   (p) => p.id === line.productId,
                 );
                 return (
@@ -624,7 +1089,7 @@ function TransferDeclarationEditor({
               })}
               <p>
                 Origem documental:{" "}
-                {reference.origins.find(
+                {reference!.origins.find(
                   (origin) => origin.id === packet.declaration.originDocumentId,
                 )?.code ?? "Sem vínculo informado"}
                 .

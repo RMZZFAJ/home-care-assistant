@@ -27,13 +27,14 @@ export const draftFlowStages = {
   REGULARIZATION_REJECT: [{ id: "ent_regularization_rejection", label: "Rejeição da proposta" }],
   REGULARIZATION_WITHDRAW: [{ id: "ent_regularization_withdrawal", label: "Retirada ou encerramento da proposta" }],
   REGULARIZATION_FINDING: [{ id: "ent_regularization_finding", label: "Apuração própria" }],
+  TRANSFER_DECLARE: [{ id: "ent_transfer_declaration", label: "Declaração da transferência" }],
   TRANSFER_AGREE: [{ id: "ent_transfer_agree", label: "Concordância da transferência" }],
   TRANSFER_DECLINE: [{ id: "ent_transfer_decline", label: "Recusa da transferência" }],
   TRANSFER_WITHDRAW: [{ id: "ent_transfer_withdraw", label: "Encerramento da transferência" }],
   TRANSFER_DISPATCH: [{ id: "ent_transfer_dispatch", label: "Expedição da transferência" }],
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
-export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal", "ent_cancellation_consent","ent_regularization_proposal","ent_regularization_approval","ent_regularization_rejection","ent_regularization_withdrawal","ent_regularization_finding","ent_transfer_agree","ent_transfer_decline","ent_transfer_withdraw","ent_transfer_dispatch"] as const;
+export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal", "ent_cancellation_consent","ent_regularization_proposal","ent_regularization_approval","ent_regularization_rejection","ent_regularization_withdrawal","ent_regularization_finding","ent_transfer_agree","ent_transfer_decline","ent_transfer_withdraw","ent_transfer_dispatch","ent_transfer_declaration"] as const;
 export type DraftFlow = keyof typeof draftFlowStages;
 export type DraftNavigation = { version: 1; stage: typeof draftStageIds[number] };
 export function draftFlow(kind: string, purpose = "create", content?: unknown): DraftFlow | null {
@@ -57,6 +58,7 @@ export function draftFlow(kind: string, purpose = "create", content?: unknown): 
   if (kind === "ENT" && purpose === "reject_regularization") return "REGULARIZATION_REJECT";
   if (kind === "ENT" && purpose === "withdraw_regularization") return "REGULARIZATION_WITHDRAW";
   if (kind === "ENT" && purpose === "record_regularization_finding") return "REGULARIZATION_FINDING";
+  if (kind === "ENT" && ["transfer_declare_family","transfer_declare_team"].includes(purpose)) return "TRANSFER_DECLARE";
   if (kind === "ENT" && purpose === "transfer_agree") return "TRANSFER_AGREE";
   if (kind === "ENT" && purpose === "transfer_decline") return "TRANSFER_DECLINE";
   if (kind === "ENT" && purpose === "transfer_withdraw") return "TRANSFER_WITHDRAW";

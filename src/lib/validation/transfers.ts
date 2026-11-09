@@ -15,6 +15,7 @@ const reason = z
   );
 export const createTransferSchema = z
   .object({
+    draftCommit: draftCommitSchema.optional(),
     careRecipientId: identifier,
     idempotencyKey: identifier,
     declaration: z

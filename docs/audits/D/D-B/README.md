@@ -5,6 +5,8 @@ NO-GO.** A ordem integral preservada em [OWNER_EXECUTION_ORDER.txt](OWNER_EXECUT
 atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitoramento.
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
+- [Declaração de transferência entre sessões](TRANSFER_DECLARATION_DRAFTS.md):
+  duas direções privadas,referência atual,confirmação única e migration174.
 - [Checkpoint incremental](CHECKPOINT.md).
 - [Controles nativos e feedback](UI_MODEL_STAGE_2.md):migração visual em execução.
 - [Seletores compostos, menus e shell](UI_MODEL_STAGE_3.md): retirada técnica

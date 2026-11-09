@@ -339,6 +339,14 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
   page,
 }) => {
   const f = await transferFixture();
+  const officialPosts: unknown[] = [];
+  page.on("request", (request) => {
+    if (
+      new URL(request.url()).pathname === "/api/transfers" &&
+      request.method() === "POST"
+    )
+      officialPosts.push(request.postDataJSON());
+  });
   await login(page, f.initiator.email, f.patient);
   let editor = await fillDeclaration(page, f);
   const report = await rpc(
@@ -360,16 +368,22 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
     p_key: crypto.randomUUID(),
     p_version: 1,
   });
-  const ledger = JSON.parse(transferState(f)).ledger;
+  let ledger = JSON.parse(transferState(f)).ledger;
   await editor
     .getByRole("button", { name: "Revisar declaração", exact: true })
     .click();
-  await page
-    .getByRole("button", {
+  // Fresh review rejects a stale source before any official declaration POST.
+  await expect(
+    page.getByRole("button", {
       name: "Registrar declaração sem expedir",
       exact: true,
-    })
-    .click();
+    }),
+  ).toHaveCount(0);
+  await expect(
+    editor.getByRole("alert").filter({ hasText: "A origem mudou" }),
+  ).toBeVisible();
+  expect(officialPosts).toHaveLength(0);
+  expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);
   editor = page.getByRole("dialog", {
     name: "Preparar transferência física",
     exact: true,
@@ -421,6 +435,74 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
   await editor
     .getByRole("button", { name: "Revisar declaração", exact: true })
     .click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Conferir declaração antes de registrar",
+      exact: true,
+    }),
+  ).toBeFocused();
+  const postReviewReport = await rpc(
+    f.initiator.client,
+    "report_extraordinary_consumption",
+    {
+      p_patient: f.patient,
+      p_kind: "consumption",
+      p_location: "CARE_TEAM",
+      p_text: "Mudança real após a revisão da declaração",
+      p_lines: [{ productId: f.products[0], quantity: "1" }],
+      p_key: crypto.randomUUID(),
+    },
+  );
+  await rpc(f.admin, "decide_consumption_report", {
+    p_id: postReviewReport,
+    p_accept: true,
+    p_reason: null,
+    p_key: crypto.randomUUID(),
+    p_version: 1,
+  });
+  ledger = JSON.parse(transferState(f)).ledger;
+  const beforeNativeConflict = transferState(f);
+  await page
+    .getByRole("button", {
+      name: "Registrar declaração sem expedir",
+      exact: true,
+    })
+    .click();
+  await expect(
+    editor.getByRole("button", { name: "Revisar declaração", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    editor.getByRole("textbox", {
+      name: /^Quantidade de Material fictício V4 0/,
+    }),
+  ).toHaveValue("5");
+  expect(officialPosts).toHaveLength(1);
+  expect(transferState(f)).toBe(beforeNativeConflict);
+  await editor
+    .getByRole("button", { name: "Comparar referência atual", exact: true })
+    .click();
+  await expect(
+    editor.getByRole("region", {
+      name: "Comparação da referência da transferência",
+      exact: true,
+    }),
+  ).toContainText("atual 8");
+  await editor
+    .getByRole("button", {
+      name: "Adotar referência atual e revisar meus campos",
+      exact: true,
+    })
+    .click();
+  await editor
+    .getByRole("button", { name: "Revisar declaração", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Conferir declaração antes de registrar",
+      exact: true,
+    }),
+  ).toBeFocused();
+
   await page
     .getByRole("button", {
       name: "Registrar declaração sem expedir",
@@ -431,6 +513,7 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
     page.getByRole("heading", { name: "Declaração confirmada", exact: true }),
   ).toBeVisible();
   expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);
+  expect(officialPosts).toHaveLength(2);
   const d = JSON.parse(transferState(f)).documents.find(
     (doc: SupplyDocument) => doc.status === "transfer_pending",
   ) as SupplyDocument;
@@ -462,11 +545,23 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
     .getByRole("button", { name: "Revisar meu ato", exact: true })
     .click();
   // The mandatory private save now detects the closed act before an official POST.
-  await expect(page.getByRole("button", { name: "Confirmar decisão", exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Confirmar decisão", exact: true }),
+  ).toHaveCount(0);
   await expect(reason).toHaveValue(/Parecer próprio preservado/);
   await expect(reason).toBeFocused();
-  await page.getByRole("button", { name: "Consultar e comparar transferência atual", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Adotar estado atual e revisar minha decisão", exact: true })).toBeDisabled();
+  await page
+    .getByRole("button", {
+      name: "Consultar e comparar transferência atual",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("button", {
+      name: "Adotar estado atual e revisar minha decisão",
+      exact: true,
+    }),
+  ).toBeDisabled();
   await expect(
     page.getByRole("button", { name: "Revisar meu ato", exact: true }),
   ).toBeDisabled();

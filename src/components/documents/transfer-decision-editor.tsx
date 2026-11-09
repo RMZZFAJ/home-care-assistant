@@ -80,7 +80,7 @@ export function TransferDecisionEditor({
     targetDocumentId: original.id,
     navigation: navigationForStep(draftFlow("ENT", purpose)!, 0),
     onResume(saved) {
-      if (!saved.content || !("fields" in saved.content)) return false;
+      if (!saved.content || !("fields" in saved.content) || saved.content.documentVersion === null) return false;
       restore(saved.content);
       setBlocked(true);
       setUnavailable(true);
