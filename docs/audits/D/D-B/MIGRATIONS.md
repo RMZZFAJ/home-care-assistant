@@ -540,3 +540,19 @@ Auth distintos,19 unitários/API e10 browsers distintos aprovados. Instalação
 limpa/evolução legada/integral do novo SHA continuam na CI própria; o sucesso
 da CI d52490d não aprova o candidato novo. Sem liberação operacional.
 [Contrato e limites](COM_ACTION_DRAFTS.md), [prova remota](COM_ACTION_DRAFTS_REMOTE.json).
+
+## D3.34 — decisões COM — 09/11/2026
+
+Aplicadas20261109125807 e20261109130033:168/168 local/remoto, última20261109130033.
+Propósitos privados COM, parcela exata e confirmação vinculada à revisão salva.
+Arquivos aplicados não foram reescritos. Preflight de compatibilidade e quatro
+corpos anteriores; dry-run só das duas pendências, seeds=[]/roles=[].
+Perfil/destino fixados, sem reset, fixtures, Auth/Vault ou backup redundante.
+
+Pós-check: digest ordenado
+`46f05b07cfa468ea52fd334f497faa0a0af9643f00e0b172f25512b26dc2a627`,
+quatro corpos e ACL iguais ao candidato. Achados de segurança iguais excluindo
+somente observed_at, com avisos anteriores mantidos.23 unitários,30 Auth e20
+browsers distintos PASS. CI do novo SHA ainda precisa validar instalação
+limpa/evolução legada/integral. Sem promoção operacional.
+[Contrato](COM_DECISION_DRAFTS.md), [remoto](COM_DECISION_DRAFTS_REMOTE.json).

@@ -8,14 +8,16 @@ import { Notice } from "@/components/workspace";
 import { RecordDrawer } from "./record-drawer";
 import { formatZonedDate } from "@/lib/schedules/time";
 import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
+import type { DraftPurpose } from "@/lib/validation/supply-drafts";
 import type { CreationDraftContent } from "@/types/creation-drafts";
 import type { CreationDraftController } from "./use-creation-draft";
 import { navigationLabel, type DraftNavigation } from "@/lib/forms/draft-navigation";
 
-export function DraftContentSummary({content,kind,navigation}: {
+export function DraftContentSummary({content,kind,navigation,purpose}: {
   content: CreationDraftContent | null;
   kind?: string | null;
   navigation?: DraftNavigation | null;
+  purpose?: DraftPurpose;
 }) {
   if (!content) return null;
   const version = "context" in content ? content.context.documentVersion : "documentVersion" in content ? content.documentVersion : null;
@@ -27,15 +29,16 @@ export function DraftContentSummary({content,kind,navigation}: {
       {kind === "BAL" ? <><dt>Referência de estoque preservada</dt><dd>{reference ?? "Não preservada neste rascunho"}</dd></> : null}
       <dt>Política base preservada</dt><dd>Não preservada neste rascunho; as regras vigentes serão conferidas na confirmação.</dd>
     </dl>
-    <DraftFieldsSummary content={content} kind={kind}/>
+    <DraftFieldsSummary content={content} kind={kind} purpose={purpose}/>
   </div>;
 }
 
 function DraftFieldsSummary({
-  content,kind,
+  content,kind,purpose,
 }: {
   content: CreationDraftContent | null;
   kind?: string | null;
+  purpose?: DraftPurpose;
 }) {
   if (!content) return null;
   if ("lines" in content)
@@ -102,7 +105,17 @@ function DraftFieldsSummary({
     {content.materials.filter(m=>Object.hasOwn(content.form.quantities,m.id)).map(m=><article className="hca-record min-w-0" key={m.id}><div className="hca-record-main min-w-0 wrap-anywhere"><strong>{m.name}</strong><p>Quantidade: {content.form.quantities[m.id]||"Não preenchida"} {m.unit}</p>{content.form.presentationSelections?.[m.id]?.map(p=><p key={p.id}>{p.packages||"Não preenchido"} embalagem(ns) · {p.name} · {p.baseQuantity} {p.unit} por embalagem · versão {p.version}</p>)}{content.form.sharedNeedReasons?.[m.id]?<p>{content.form.sharedNeedReasons[m.id]}</p>:null}<p>{content.links[m.id]?.length??0} vínculo(s) de necessidade; revalidados na confirmação.</p></div></article>)}
     {content.form.notes?<p className="whitespace-pre-wrap wrap-anywhere">{content.form.notes}</p>:null}{content.form.recipientReason?<p className="whitespace-pre-wrap wrap-anywhere">Justificativa da pessoa recebedora: {content.form.recipientReason}</p>:null}
   </div>;
-  if("fields" in content){const name=(key:string)=>content.materials.find(m=>m.id===key)?.name??"Linha não disponível na referência atual";return <div className="hca-form-stack"><p>Conferência pessoal · versão consultada {content.documentVersion}. Salvar não aceita material.</p>{content.divergentIds.length?<ul>{content.divergentIds.map(id=><li key={id}>{name(id)} · divergência em preparação</li>)}</ul>:<p>Nenhuma linha divergente selecionada.</p>}<dl>{Object.entries(content.fields).map(([key,value])=><div key={key}><dt>{key==="reason"?"Observação":key.endsWith(":problem")?name(key.slice(0,-8))+" · diferença":name(key)+" · recebido"}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{({shortage:"Quantidade menor",damaged:"Material avariado",wrong:"Produto divergente",other:"Outra diferença"} as Record<string,string>)[value]??(value||"Não preenchido")}</dd></div>)}</dl></div>;}
+  if ("fields" in content) {
+    const name = (key: string) => content.materials.find(m => m.id === key)?.name ?? "Linha não disponível na referência atual";
+    const quantityLabel = kind === "COM" ? purpose === "approve" ? "quantidade em aprovação" : purpose === "purchase" ? "quantidade em aquisição" : "quantidade informada" : "recebido";
+    const labels: Record<string, string> = { reason: kind === "COM" ? "Motivo / justificativa" : "Observação", receiptId: "Parcela no preenchimento", confirmed: "Conferência do resumo" };
+    const display = (key: string, value: string) => key === "receiptId" ? content.fields.receiptLabel || "Referência da parcela preservada; confira a declaração ao continuar." : key === "confirmed" ? value === "on" ? "Marcada no preenchimento; a conclusão exige confirmação própria." : "Não marcada" : ({ shortage: "Quantidade menor", damaged: "Material avariado", wrong: "Produto divergente", other: "Outra diferença" } as Record<string, string>)[value] ?? (value || "Não preenchido");
+    return <div className="hca-form-stack">
+      <p>{kind === "COM" ? `Preenchimento da operação COM · versão de referência ${content.documentVersion}. Salvar não confirma aprovação, aquisição, chegada, conferência ou encerramento.` : `Conferência pessoal · versão consultada ${content.documentVersion}. Salvar não aceita material.`}</p>
+      {content.divergentIds.length ? <ul>{content.divergentIds.map(id => <li key={id}>{name(id)} · divergência em preparação</li>)}</ul> : kind !== "COM" ? <p>Nenhuma linha divergente selecionada.</p> : null}
+      <dl>{Object.entries(content.fields).filter(([key]) => key !== "receiptLabel").map(([key, value]) => <div key={key}><dt>{labels[key] ?? (key.endsWith(":problem") ? name(key.slice(0, -8)) + " · diferença" : name(key) + " · " + quantityLabel)}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{display(key, value)}</dd></div>)}</dl>
+    </div>;
+  }
   return (
     <div className="hca-form-stack">
       <p>
@@ -196,7 +209,7 @@ export function CreationDraftPanel({
             mesmo comando antes de editar ou descartar.
           </Notice>
           {draft.pending.content ? (
-            <DraftContentSummary content={draft.pending.content} kind={draft.kind} navigation={draft.pending.navigation} />
+            <DraftContentSummary content={draft.pending.content} kind={draft.kind} purpose={draft.purpose} navigation={draft.pending.navigation} />
           ) : null}
           <ActionButton
             variant="primary"
@@ -233,7 +246,7 @@ export function CreationDraftPanel({
       ) : null}
       {draft.offered?.state === "active" && !draft.pending ? (
         <>
-          <DraftContentSummary content={draft.offered.content} kind={draft.kind} navigation={draft.offered.navigation} />
+          <DraftContentSummary content={draft.offered.content} kind={draft.kind} purpose={draft.purpose} navigation={draft.offered.navigation} />
           <div className="hca-toolbar">
             {resumeHref ? (
               <Link
@@ -264,7 +277,7 @@ export function CreationDraftPanel({
           <div className="grid min-w-0 gap-4 md:grid-cols-2">
             <section className="min-w-0" aria-label="Minha edição">
               <h3>Minha edição</h3>
-              <DraftContentSummary content={current} kind={draft.kind} navigation={draft.navigation} />
+              <DraftContentSummary content={current} kind={draft.kind} purpose={draft.purpose} navigation={draft.navigation} />
             </section>
             <section className="min-w-0" aria-label="Versão salva no servidor">
               <h3>Versão salva no servidor</h3>
@@ -278,7 +291,7 @@ export function CreationDraftPanel({
                         "America/Sao_Paulo",
                       )}
                     </p>
-                    <DraftContentSummary content={draft.comparison.content} kind={draft.kind} navigation={draft.comparison.navigation} />
+                    <DraftContentSummary content={draft.comparison.content} kind={draft.kind} purpose={draft.purpose} navigation={draft.comparison.navigation} />
                   </>
                 ) : (
                   <p>O rascunho foi descartado no servidor.</p>
@@ -355,7 +368,7 @@ export function CreationDraftPanel({
               Você está descartando somente seu preenchimento privado de{" "}
               {saved?.kind} para {patientName}.
             </p>
-            <DraftContentSummary content={saved?.content ?? null} kind={draft.kind} navigation={saved?.navigation} />
+            <DraftContentSummary content={saved?.content ?? null} kind={draft.kind} purpose={draft.purpose} navigation={saved?.navigation} />
             <Notice>
               Fichas emitidas, arquivos oficiais e seu histórico serão
               preservados.

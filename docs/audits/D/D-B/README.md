@@ -19,6 +19,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
   atos e permissões, retorno de foco e regressões operacionais.
 - [Rascunhos das operações COM](COM_ACTION_DRAFTS.md): aprovação, aquisição e
   chegada entre sessões, referência obsoleta e consumo único; migration166.
+- [Decisões COM e referências oficiais](COM_DECISION_DRAFTS.md): parcelas,
+  confirmação preservada, comparação autorizada e migrations167/168.
 - [Nova aparência canônica](../../../ui-ux/CANONICAL_MODEL.md) e
   [execução adicional UI](UI_MODEL_ACCEPTANCE.csv):migração integral em andamento.
 - [Roteiro técnico GUI-04 e recuperação de leitura](RECOVERY_RUNBOOK.md).

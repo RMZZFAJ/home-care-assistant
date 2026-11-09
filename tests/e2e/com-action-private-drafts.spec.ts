@@ -224,7 +224,7 @@ test("COM compara rascunho obsoleto preserva decimal e exige decisão explícita
     }),
   ).toBeVisible();
   await audit(page, "COM comparison with preserved missing material");
-  await info.attach("comparacao-operacao-com", { body: await page.screenshot({ fullPage: true, animations: "disabled" }), contentType: "image/png" });
+  await info.attach("comparacao-operacao-com", { body: await page.screenshot({ fullPage: false, animations: "disabled" }), contentType: "image/png" });
   const adopt = comparison.getByRole("button", {
     name: "Usar referência vigente e manter preenchimento",
     exact: true,

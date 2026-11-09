@@ -4,37 +4,37 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação d52490d: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
+Observação fcf04fa: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
 cadeia limpa, evolução legada e integração. Browsers ainda em andamento na
 consulta. Isso não aprova o novo incremento; seu SHA publicado exige CI própria.
 A falha anterior de allowlist e sua correção permanecem em
 [evidência histórica](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
-Estado atual:local166/remoto166, zero migrations pendentes. Matriz105x39:
-56 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
+Estado atual:local168/remoto168, zero migrations pendentes. Matriz105x39: 56
+PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
 sem redução de funções. D3.28 concluiu a retirada técnica do Fluent: seletores
 compostos, menus, popovers, tooltips, provider/Griffel e dependência. Shell e
 tokens compartilhados seguem o modelo; comparação de cabeçalho/navegação e
-modal em cinco larguras. 36 cenários distintos Chromium/iOS aprovados nos lotes
-dirigidos, com limites de reuso documentados. D3.29 integrou Andamentos persistidos
-às quatro fichas, com autoria do banco, recuperação após reload, referências
-autorizadas e cronologia paginada. Migration165 reconciliada. D3.30 implementa
-abas reais nas quatro fichas, marcos factuais e seleção por URL, preservando
-edição e versões acessíveis aos leitores. Restam paridade integral de todas as
-telas, cabeçalhos e listas/cartões. D3.31 integrou identificação, grade e
-progresso canônicos ao cabeçalho, com controles reais de PDF/Andamento na barra,
-foco e retirada de conteúdo em leitura recusada. D3.32 organiza ações principais
-e
-Mais com os mesmos atos e permissões, foco e14 regressões dirigidas aprovadas.
-Paridade das demais seções e telas continua pendente. D3.33 amplia os
-rascunhos
-privados às operações de aprovação, aquisição e chegada COM, com CAS, retomada
-entre sessões, revisão de referência e consumo único. Migration166
-reconciliada. Registro UI
-adicional
-18 requisitos; resultados
-funcionais anteriores não aprovam toda a nova aparência.
+modal em cinco larguras. 36 cenários distintos Chromium/iOS aprovados nos
+lotes dirigidos, com limites de reuso documentados. D3.29 integrou Andamentos
+persistidos às quatro fichas, com autoria do banco, recuperação após reload,
+referências autorizadas e cronologia paginada. Migration165 reconciliada.
+D3.30 implementa abas reais nas quatro fichas, marcos factuais e seleção por
+URL, preservando edição e versões acessíveis aos leitores. Restam paridade
+integral de todas as telas, cabeçalhos e listas/cartões. D3.31 integrou
+identificação, grade e progresso canônicos ao cabeçalho, com controles reais
+de PDF/Andamento na barra, foco e retirada de conteúdo em leitura recusada.
+D3.32 organiza ações principais e Mais com os mesmos atos e permissões, foco
+e14 regressões dirigidas aprovadas. Paridade das demais seções e telas
+continua pendente. D3.33 amplia os rascunhos privados às operações de
+aprovação, aquisição e chegada COM, com CAS, retomada entre sessões, revisão
+de referência e consumo único. Migration166 reconciliada. D3.34 completa os
+sete propósitos COM com preenchimento privado, parcela exata, referência
+oficial e confirmação desmarcada. Migrations167/168 reconciliadas; demais
+formulários contextuais continuam pendentes. Registro UI adicional 18
+requisitos; resultados funcionais anteriores não aprovam toda a nova
+aparência.
 [Contrato](../ui-ux/CANONICAL_MODEL.md),
 [provas atuais](../audits/D/D-B/UI_MODEL_STAGE_3.md).
 [Andamentos e provas do lote atual](../audits/D/D-B/DOCUMENT_PROGRESS.md).
@@ -42,6 +42,7 @@ funcionais anteriores não aprovam toda a nova aparência.
 [Cabeçalhos, ações e recuperação](../audits/D/D-B/DOCUMENT_HEADER.md).
 [Ações principais e Mais](../audits/D/D-B/DOCUMENT_SECONDARY_ACTIONS.md).
 [Rascunhos das operações COM](../audits/D/D-B/COM_ACTION_DRAFTS.md).
+[Decisões COM e referências oficiais](../audits/D/D-B/COM_DECISION_DRAFTS.md).
 
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das

@@ -2544,3 +2544,33 @@ Paridade restante,66/171, D-C/D6 e gates humanos/AT/aparelhos/provedores separad
 Sonar adiado, PR7 Draft, produção NO-GO e meta ativa.
 [Dossiê](COM_ACTION_DRAFTS.md), [provas](COM_ACTION_DRAFTS_VALIDATION.json),
 [reconciliação](COM_ACTION_DRAFTS_REMOTE.json).
+
+## D3.34 — decisões COM e referências oficiais — 09/11/2026
+
+Base fcf04fa. Validação/rejeição de parcela, encerramento e cancelamento
+completam sete propósitos COM privados. Parcela/motivo retomados, opção
+indisponível sem substituição silenciosa, opções distintas por número/data/autor.
+Commit vincula parcela e confirmação marcada à revisão salva. Comparação lê
+duas versões exatas com Auth e bloqueia adoção em erro/403/200 inválido.
+
+Falha real FormData/mescla reproduzida: desmarcação recuperava marcação anterior.
+Correção persiste o estado desmarcado; versão nova retira confirmação antiga.
+Resumo privado distingue operações e referências sem chaves técnicas. Oráculos
+de acessibilidade e captura WebKit corrigidos, sem excluir casos ou aumentar
+limites.23 unitários/API,30 Auth e20 browsers distintos PASS, com reuso
+qualificado. Axe, duas capturas inspecionadas, tipos/build, lint e84 SQLs
+históricos protegidos. Fontes permaneceram estáveis durante cada runner.
+
+Local168/remoto168:167/168 aplicadas oficialmente após preflight de compatibilidade,
+quatro corpos anteriores e dry-run de duas migrations, seeds=[]/roles=[].
+Pós-check de digest, quatro corpos e ACL; achados de segurança iguais excluindo
+só observed_at. Sem reset, fixtures, Auth/Vault ou backup redundante. CI fcf04fa
+Windows/Ubuntu/banco PASS, Preview READY; browsers em andamento na consulta.
+Novo SHA exige CI própria de instalação limpa/evolução/integral.
+
+Matriz105x39 e primeiras30 colunas preservadas,56 PASS/49 PARTIAL. Gate antigo
+Fluent56 corrigido para a paridade canônica pendente. UI adicional18 atualizada.
+Demais formulários, paridade/66/171 e D-C/D6/humano/AT/aparelhos/provedores
+separados. Sonar adiado, PR7 Draft, produção NO-GO e meta ativa.
+[Dossiê](COM_DECISION_DRAFTS.md), [provas](COM_DECISION_DRAFTS_VALIDATION.json),
+[remoto](COM_DECISION_DRAFTS_REMOTE.json).

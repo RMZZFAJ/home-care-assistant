@@ -1,18 +1,24 @@
 import { expect, it } from "vitest";
+import { comOperationPurposes } from "@/lib/validation/supply-drafts";
 import { creationDraftCommandSchema } from "@/lib/validation/creation-drafts";
 import { parsePrivateDraft } from "@/lib/validation/private-draft-results";
 import { draftFlow, navigationForStep } from "@/lib/forms/draft-navigation";
 const id = "10000000-0000-4000-8000-000000000001",
   target = "10000000-0000-4000-8000-000000000002";
-it.each(["approve", "purchase", "receive"] as const)(
+it.each(comOperationPurposes)(
   "preserves incomplete COM %s only in its owner target and navigation scope",
   (purpose) => {
-    const flow =
-      purpose === "approve"
-        ? "APPROVE"
-        : purpose === "purchase"
-          ? "PURCHASE"
-          : "ARRIVAL";
+    const flow = (
+      {
+        approve: "APPROVE",
+        purchase: "PURCHASE",
+        receive: "ARRIVAL",
+        validate_receipt: "VALIDATE_RECEIPT",
+        reject_receipt: "REJECT_RECEIPT",
+        close_expectation: "CLOSE_EXPECTATION",
+        cancel: "CANCEL_COM",
+      } as const
+    )[purpose];
     const content = {
       documentVersion: 3,
       fields: { [id]: "1,", reason: "" },

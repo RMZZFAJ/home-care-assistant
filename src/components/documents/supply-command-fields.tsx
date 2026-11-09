@@ -1,6 +1,15 @@
 "use client";
 
-import { useCallback,useEffect,useId,useImperativeHandle,useRef, useState, type FormEvent, type Ref } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type FormEvent,
+  type Ref,
+} from "react";
 import type { ReceiptDraftContent } from "@/lib/validation/supply-drafts";
 import {
   buttonClass,
@@ -37,8 +46,23 @@ export type DocumentAction =
   | "consent_cancel"
   | "refuse_cancellation"
   | "withdraw_cancellation";
-export type ReceiptDraftHandle={snapshot:()=>ReceiptDraftContent};
-export type CommandEditorProps={action:DocumentAction;data:SupplyDocument;people:PatientPerson[];context:WorkspaceContext;onCancel:()=>void;onReview:(action:string,body:unknown,summary:string,draftCommit?:{id:string;revision:number},expectedVersion?:number)=>void;formRef?:Ref<HTMLFormElement>;reviewDisabled?:boolean};
+export type ReceiptDraftHandle = { snapshot: () => ReceiptDraftContent };
+export type CommandEditorProps = {
+  action: DocumentAction;
+  data: SupplyDocument;
+  people: PatientPerson[];
+  context: WorkspaceContext;
+  onCancel: () => void;
+  onReview: (
+    action: string,
+    body: unknown,
+    summary: string,
+    draftCommit?: { id: string; revision: number },
+    expectedVersion?: number,
+  ) => void;
+  formRef?: Ref<HTMLFormElement>;
+  reviewDisabled?: boolean;
+};
 export function CommandEditorFields({
   action,
   data,
@@ -48,25 +72,73 @@ export function CommandEditorFields({
   onReview,
   formRef,
   reviewDisabled = false,
-  initialDraft,snapshotRef,onDraftChange,
-}:CommandEditorProps&{initialDraft?:ReceiptDraftContent;snapshotRef?:Ref<ReceiptDraftHandle>;onDraftChange?:(content:ReceiptDraftContent)=>void}) {
+  initialDraft,
+  snapshotRef,
+  onDraftChange,
+}: CommandEditorProps & {
+  initialDraft?: ReceiptDraftContent;
+  snapshotRef?: Ref<ReceiptDraftHandle>;
+  onDraftChange?: (content: ReceiptDraftContent) => void;
+}) {
   const [error, setError] = useState("");
   const instanceId = useId();
-  const [reasonText, setReasonText] = useState(initialDraft?.fields.reason??"");
+  const [reasonText, setReasonText] = useState(
+    initialDraft?.fields.reason ?? "",
+  );
   const [returns, setReturns] = useState<Record<string, string>>({});
   const [receiptId, setReceiptId] = useState(
-    data.receipts.find((receipt) => receipt.state === "pending")?.id ?? "",
+    initialDraft?.fields.receiptId ??
+      data.receipts.find((receipt) => receipt.state === "pending")?.id ??
+      "",
   );
   const selectedReceipt = data.receipts.find(
     (receipt) => receipt.id === receiptId && receipt.state === "pending",
   );
-  const [divergent, setDivergent] = useState<string[]>(initialDraft?.divergentIds??[]);
-  const formElementRef=useRef<HTMLFormElement|null>(null);
+  const [divergent, setDivergent] = useState<string[]>(
+    initialDraft?.divergentIds ?? [],
+  );
+  const formElementRef = useRef<HTMLFormElement | null>(null);
   useImperativeHandle(formRef, () => formElementRef.current!);
-  const [fieldRevision,setFieldRevision]=useState(0);
-  const captureSnapshot=useCallback(()=>({documentVersion:data.version,fields:Object.fromEntries([...new FormData(formElementRef.current!).entries()].filter((entry):entry is [string,string]=>typeof entry[1]==="string")),divergentIds:[...divergent],materials:data.lines.map(line=>({id:line.id,name:line.name_snapshot,unit:line.unit_snapshot,quantityDecimals:0}))}),[data,divergent]);
-  useImperativeHandle(snapshotRef,()=>({snapshot:captureSnapshot}),[captureSnapshot]);
-  useEffect(()=>{if(onDraftChange&&formElementRef.current)onDraftChange(captureSnapshot());},[onDraftChange,captureSnapshot,fieldRevision]);
+  const [fieldRevision, setFieldRevision] = useState(0);
+  const captureSnapshot = useCallback(() => {
+    const form = formElementRef.current!;
+    const fields: Record<string, string> = Object.fromEntries(
+      [...new FormData(form).entries()].filter(
+        (entry): entry is [string, string] => typeof entry[1] === "string",
+      ),
+    );
+    // An unchecked checkbox is absent from FormData. Persist the explicit off
+    // value so the private baseline merge cannot resurrect an earlier check.
+    if (action === "close_expectation")
+      fields.confirmed = (
+        form.elements.namedItem("confirmed") as HTMLInputElement | null
+      )?.checked
+        ? "on"
+        : "";
+    if (
+      (action === "validate_receipt" || action === "reject_receipt") &&
+      selectedReceipt
+    )
+      fields.receiptLabel = `Parcela ${data.receipts.indexOf(selectedReceipt) + 1} · ${selectedReceipt.submitted_name ?? "Nome histórico não preservado"} · ${formatBrazilDate(selectedReceipt.created_at)} · ${selectedReceipt.lines.length} produto(s)`;
+    return {
+      documentVersion: data.version,
+      fields,
+      divergentIds: [...divergent],
+      materials: data.lines.map((line) => ({
+        id: line.id,
+        name: line.name_snapshot,
+        unit: line.unit_snapshot,
+        quantityDecimals: 0,
+      })),
+    };
+  }, [data, divergent, action, selectedReceipt]);
+  useImperativeHandle(snapshotRef, () => ({ snapshot: captureSnapshot }), [
+    captureSnapshot,
+  ]);
+  useEffect(() => {
+    if (onDraftChange && formElementRef.current)
+      onDraftChange(captureSnapshot());
+  }, [onDraftChange, captureSnapshot, fieldRevision]);
   const [selectedLine, setSelectedLine] = useState(
     data.lines.find((line) => line.metadata.issueOpen)?.id ?? "",
   );
@@ -330,7 +402,7 @@ export function CommandEditorFields({
       ref={formElementRef}
       className="mt-5 space-y-4 border-t border-(--line) pt-5"
       onSubmit={submit}
-      onChange={()=>setFieldRevision(value=>value+1)}
+      onChange={() => setFieldRevision((value) => value + 1)}
     >
       {action === "receive" && data.type === "ENT" ? (
         <Notice>
@@ -362,7 +434,10 @@ export function CommandEditorFields({
                   type="text"
                   inputMode="decimal"
                   maxLength={64}
-                  defaultValue={initialDraft?.fields[line.id] ?? (action === "approve" ? remaining : "")}
+                  defaultValue={
+                    initialDraft?.fields[line.id] ??
+                    (action === "approve" ? remaining : "")
+                  }
                   required={action === "approve"}
                   aria-describedby={instanceId + line.id + "-help"}
                 />
@@ -410,7 +485,7 @@ export function CommandEditorFields({
                     <input
                       className={inputClass}
                       name={line.id}
-                      defaultValue={initialDraft?.fields[line.id]??""}
+                      defaultValue={initialDraft?.fields[line.id] ?? ""}
                       type="text"
                       inputMode="decimal"
                       maxLength={64}
@@ -419,7 +494,13 @@ export function CommandEditorFields({
                   </label>
                   <label className="text-sm">
                     Diferença encontrada
-                    <select className={inputClass} name={line.id + ":problem"} defaultValue={initialDraft?.fields[line.id+":problem"]??"shortage"}>
+                    <select
+                      className={inputClass}
+                      name={line.id + ":problem"}
+                      defaultValue={
+                        initialDraft?.fields[line.id + ":problem"] ?? "shortage"
+                      }
+                    >
                       <option value="shortage">Quantidade menor</option>
                       <option value="damaged">Material avariado</option>
                       <option value="wrong">Produto divergente</option>
@@ -442,12 +523,17 @@ export function CommandEditorFields({
               value={receiptId}
               onChange={(event) => setReceiptId(event.target.value)}
             >
+              {receiptId && !selectedReceipt ? (
+                <option value={receiptId}>
+                  Parcela preservada indisponível para esta decisão
+                </option>
+              ) : null}
               {data.receipts
                 .filter((receipt) => receipt.state === "pending")
                 .map((receipt) => (
                   <option key={receipt.id} value={receipt.id}>
-                    {receipt.lines.length} produto(s) ·{" "}
-                    {new Date(receipt.created_at).toLocaleString("pt-BR")}
+                    Parcela {data.receipts.indexOf(receipt) + 1} · {receipt.lines.length} produto(s) ·{" "}
+                    {new Date(receipt.created_at).toLocaleString("pt-BR")} · {receipt.submitted_name ?? "Nome histórico não preservado"}
                   </option>
                 ))}
             </select>
@@ -514,6 +600,7 @@ export function CommandEditorFields({
               key={data.version}
               type="checkbox"
               name="confirmed"
+              defaultChecked={initialDraft?.fields.confirmed === "on"}
               required
             />
             Conferi o resumo e confirmo dispensar somente a expectativa não

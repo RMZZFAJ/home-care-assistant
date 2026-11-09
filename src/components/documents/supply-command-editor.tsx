@@ -5,9 +5,14 @@ import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import {
   navigationForStep,
-  type DraftFlow,
+  draftFlow,
 } from "@/lib/forms/draft-navigation";
-import type { ReceiptDraftContent } from "@/lib/validation/supply-drafts";
+import {
+  isComOperationPurpose,
+  type ComOperationPurpose,
+  type ReceiptDraftContent,
+} from "@/lib/validation/supply-drafts";
+import { DraftReferenceComparison } from "./draft-reference-comparison";
 import {
   CommandEditorFields,
   type CommandEditorProps,
@@ -15,16 +20,13 @@ import {
 } from "./supply-command-fields";
 export type { DocumentAction } from "./supply-command-fields";
 
-type OperationPurpose = "receive" | "divergence" | "approve" | "purchase";
+type OperationPurpose = "receive" | "divergence" | ComOperationPurpose;
 export function CommandEditor(props: CommandEditorProps) {
   const purpose = props.action;
   if (
     (props.data.type === "ENT" &&
       (purpose === "receive" || purpose === "divergence")) ||
-    (props.data.type === "COM" &&
-      (purpose === "approve" ||
-        purpose === "purchase" ||
-        purpose === "receive"))
+    (props.data.type === "COM" && isComOperationPurpose(purpose))
   )
     return (
       <PrivateOperationEditor
@@ -61,15 +63,8 @@ function PrivateOperationEditor(
   const [baseline, setBaseline] = useState(empty),
     [comparison, setComparison] = useState(false),
     [current, setCurrent] = useState(empty);
-  const flow: DraftFlow = com
-    ? props.purpose === "approve"
-      ? "APPROVE"
-      : props.purpose === "purchase"
-        ? "PURCHASE"
-        : "ARRIVAL"
-    : props.purpose === "receive"
-      ? "RECEIVE"
-      : "DIVERGENCE";
+  const flow = draftFlow(props.kind, props.purpose)!;
+  const [confirmationReset, setConfirmationReset] = useState(false);
   function restore(content: ReceiptDraftContent) {
     setInitial(content);
     setBaseline(content);
@@ -87,10 +82,12 @@ function PrivateOperationEditor(
     onResume: (saved) => {
       if (!saved.content || !("fields" in saved.content)) return false;
       restore(saved.content);
+      setConfirmationReset(false);
       return true;
     },
     onDiscard: () => {
       restore(empty);
+      setConfirmationReset(false);
     },
   });
   const snapshot = () => {
@@ -172,6 +169,12 @@ function PrivateOperationEditor(
           : "Este preenchimento pertence somente a você e a esta entrega. Recebimento exige confirmação própria."}
       </p>
       {error ? <Notice error>{error}</Notice> : null}
+      {confirmationReset ? (
+        <Notice>
+          A confirmação anterior foi desmarcada porque a referência mudou.
+          Confira novamente a expectativa vigente antes de marcar a confirmação.
+        </Notice>
+      ) : null}
       {stale ? (
         <Notice>
           Este preenchimento usa a versão {baseline.documentVersion}; a ficha
@@ -256,23 +259,59 @@ function PrivateOperationEditor(
               </button>
             </Notice>
           ) : null}
-          <button
-            type="button"
-            className={buttonClass}
-            disabled={
-              draft.blocked || props.reviewDisabled || !!removedValues.length
-            }
-            onClick={() => {
-              setBaseline({
-                ...snapshot(),
-                documentVersion: props.data.version,
-                materials: empty.materials,
-              });
-              setComparison(false);
-            }}
-          >
-            Usar referência vigente e manter preenchimento
-          </button>
+          {com ? (
+            <DraftReferenceComparison
+              id={props.data.id}
+              fromVersion={baseline.documentVersion}
+              toVersion={props.data.version}
+            >
+              {(ready) => (
+                <button
+                  type="button"
+                  className={buttonClass}
+                  disabled={
+                    !ready ||
+                    draft.blocked ||
+                    props.reviewDisabled ||
+                    !!removedValues.length
+                  }
+                  onClick={() => {
+                    const content = {
+                      ...snapshot(),
+                      documentVersion: props.data.version,
+                      materials: empty.materials,
+                    };
+                    if (props.purpose === "close_expectation") {
+                      delete content.fields.confirmed;
+                      setConfirmationReset(true);
+                    }
+                    restore(content);
+                    setComparison(false);
+                  }}
+                >
+                  Usar referência vigente e manter preenchimento
+                </button>
+              )}
+            </DraftReferenceComparison>
+          ) : (
+            <button
+              type="button"
+              className={buttonClass}
+              disabled={
+                draft.blocked || props.reviewDisabled || !!removedValues.length
+              }
+              onClick={() => {
+                setBaseline({
+                  ...snapshot(),
+                  documentVersion: props.data.version,
+                  materials: empty.materials,
+                });
+                setComparison(false);
+              }}
+            >
+              Usar referência vigente e manter preenchimento
+            </button>
+          )}
         </section>
       ) : null}
       {!draft.readDenied ? (

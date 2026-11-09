@@ -12,15 +12,23 @@ export const draftFlowStages = {
   APPROVE: [{ id: "approval", label: "Decisão de aprovação" }],
   PURCHASE: [{ id: "acquisition", label: "Aquisição" }],
   ARRIVAL: [{ id: "arrival", label: "Chegada" }],
+  VALIDATE_RECEIPT: [{ id: "receipt_validation", label: "Validação da parcela" }],
+  REJECT_RECEIPT: [{ id: "receipt_rejection", label: "Rejeição da parcela" }],
+  CLOSE_EXPECTATION: [{ id: "expectation_closure", label: "Encerramento da expectativa" }],
+  CANCEL_COM: [{ id: "com_cancellation", label: "Cancelamento da COM" }],
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
-export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival"] as const;
+export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation"] as const;
 export type DraftFlow = keyof typeof draftFlowStages;
 export type DraftNavigation = { version: 1; stage: typeof draftStageIds[number] };
 export function draftFlow(kind: string, purpose = "create", content?: unknown): DraftFlow | null {
   if (kind === "COM" && purpose === "approve") return "APPROVE";
   if (kind === "COM" && purpose === "purchase") return "PURCHASE";
   if (kind === "COM" && purpose === "receive") return "ARRIVAL";
+  if (kind === "COM" && purpose === "validate_receipt") return "VALIDATE_RECEIPT";
+  if (kind === "COM" && purpose === "reject_receipt") return "REJECT_RECEIPT";
+  if (kind === "COM" && purpose === "close_expectation") return "CLOSE_EXPECTATION";
+  if (kind === "COM" && purpose === "cancel") return "CANCEL_COM";
   if (kind === "ENT" && purpose === "receive") return "RECEIVE";
   if (kind === "ENT" && purpose === "divergence") return "DIVERGENCE";
   if (!["create", "revise"].includes(purpose)) return null;

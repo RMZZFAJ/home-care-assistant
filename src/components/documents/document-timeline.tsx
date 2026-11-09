@@ -19,7 +19,7 @@ export type TimelineEvent = {
   actorId?: string;
   version?: number;
 };
-function VersionFacts({ version }: { version: DocumentVersion }) {
+export function VersionFacts({ version }: { version: DocumentVersion }) {
   return <article className="space-y-3" aria-label={`Conteúdo preservado da versão ${version.version}`}>
     <h3>Versão {version.version} · {versionEventLabel(version)}</h3>
     <p>{version.code} · Registro do evento: {formatBrazilDate(version.recordedAt)}</p>
