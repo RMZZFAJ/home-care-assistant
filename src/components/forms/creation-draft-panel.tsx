@@ -110,19 +110,22 @@ function DraftFieldsSummary({
     const entDecision = kind === "ENT" && purpose !== "receive" && purpose !== "divergence";
     const operation = kind === "COM" || entDecision;
     const quantityLabel = kind === "COM" ? purpose === "approve" ? "quantidade em aprovação" : purpose === "purchase" ? "quantidade em aquisição" : "quantidade informada" : entDecision ? "quantidade em conciliação" : "recebido";
-    const labels: Record<string, string> = { reason: operation ? "Motivo / justificativa" : "Observação", receiptId: "Parcela no preenchimento", confirmed: "Conferência do resumo", recipientId: "Novo destinatário no preenchimento", lineId: "Material em conciliação", quantity: "Quantidade em conciliação", resolution: "Solução em preparação", requestId: "Pedido no preenchimento" };
+    const labels: Record<string, string> = { reason: operation ? "Motivo / justificativa" : "Observação", receiptId: "Parcela no preenchimento", confirmed: "Conferência do resumo", recipientId: "Novo destinatário no preenchimento", lineId: "Material em conciliação", quantity: "Quantidade em conciliação", resolution: "Solução em preparação", requestId: "Pedido no preenchimento", caseId: "Proposta de regularização", basis: "Evidências e limites", reviewerId: "Conferente independente", followUpOwnerId: "Responsável pela apuração futura" };
     const display = (key: string, value: string) => {
       if (key === "receiptId") return content.fields.receiptLabel || "Referência da parcela preservada; confira a declaração ao continuar.";
       if (key === "recipientId") return content.fields.recipientLabel || "Pessoa preservada; confira sua disponibilidade ao continuar.";
       if (key === "lineId") return content.fields.lineLabel || "Material preservado; confira a linha vigente ao continuar.";
       if (key === "requestId") return content.fields.requestLabel || "Pedido preservado; confira sua identidade ao continuar.";
+      if (key === "caseId") return content.fields.caseLabel || "Sem proposta anterior";
+      if (key === "reviewerId") return content.fields.reviewerLabel || "Não escolhido ou indisponível";
+      if (key === "followUpOwnerId") return content.fields.followUpOwnerLabel || "Não escolhido ou indisponível";
       if (key === "confirmed") return value === "on" ? "Marcada no preenchimento; a conclusão exige confirmação própria." : "Não marcada";
       return ({ shortage: "Quantidade menor", damaged: "Material avariado", wrong: "Produto divergente", other: "Outra diferença", received: "Recebimento complementar confirmado por mim", returned: "Material voltou à custódia de origem", missing: "Falta / perda conciliada" } as Record<string, string>)[value] ?? (value || "Não preenchido");
     };
     return <div className="hca-form-stack">
       <p>{operation ? `Preenchimento da operação ${kind} · versão de referência ${content.documentVersion}. Salvar não confirma decisões, recebimento ou movimentação de estoque.` : `Conferência pessoal · versão consultada ${content.documentVersion}. Salvar não aceita material.`}</p>
       {content.divergentIds.length ? <ul>{content.divergentIds.map(id => <li key={id}>{name(id)} · divergência em preparação</li>)}</ul> : !operation ? <p>Nenhuma linha divergente selecionada.</p> : null}
-      <dl>{Object.entries(content.fields).filter(([key]) => !["receiptLabel", "recipientLabel", "lineLabel", "requestLabel", "referenceHash"].includes(key)).map(([key, value]) => <div key={key}><dt>{labels[key] ?? (key.endsWith(":return") ? name(key.slice(0, -7)) + " · devolução física em preparação" : key.endsWith(":problem") ? name(key.slice(0, -8)) + " · diferença" : name(key) + " · " + quantityLabel)}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{display(key, value)}</dd></div>)}</dl>
+      <dl>{Object.entries(content.fields).filter(([key]) => !["receiptLabel", "recipientLabel", "lineLabel", "requestLabel", "referenceHash", "caseLabel", "reviewerLabel", "followUpOwnerLabel"].includes(key)).map(([key, value]) => <div key={key}><dt>{labels[key] ?? (key.endsWith(":receivedQuantity") ? name(key.slice(0, -17)) + " · recebimento físico apurado" : key.endsWith(":returnedQuantity") ? name(key.slice(0, -17)) + " · devolução física apurada" : key.endsWith(":missingQuantity") ? name(key.slice(0, -16)) + " · falta apurada" : key.endsWith(":return") ? name(key.slice(0, -7)) + " · devolução física em preparação" : key.endsWith(":problem") ? name(key.slice(0, -8)) + " · diferença" : name(key) + " · " + quantityLabel)}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{display(key, value)}</dd></div>)}</dl>
     </div>;
   }
   return (

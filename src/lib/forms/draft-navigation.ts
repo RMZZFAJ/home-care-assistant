@@ -22,9 +22,14 @@ export const draftFlowStages = {
   REFUSE_ENT: [{ id: "ent_cancellation_refusal", label: "Recusa do cancelamento" }],
   WITHDRAW_ENT: [{ id: "ent_cancellation_withdrawal", label: "Retirada do meu pedido" }],
   CONSENT_ENT: [{ id: "ent_cancellation_consent", label: "Consentimento e conciliação" }],
+  REGULARIZATION_PROPOSE: [{ id: "ent_regularization_proposal", label: "Proposta de regularização" }],
+  REGULARIZATION_APPROVE: [{ id: "ent_regularization_approval", label: "Conferência administrativa" }],
+  REGULARIZATION_REJECT: [{ id: "ent_regularization_rejection", label: "Rejeição da proposta" }],
+  REGULARIZATION_WITHDRAW: [{ id: "ent_regularization_withdrawal", label: "Retirada ou encerramento da proposta" }],
+  REGULARIZATION_FINDING: [{ id: "ent_regularization_finding", label: "Apuração própria" }],
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
-export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal", "ent_cancellation_consent"] as const;
+export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal", "ent_cancellation_consent","ent_regularization_proposal","ent_regularization_approval","ent_regularization_rejection","ent_regularization_withdrawal","ent_regularization_finding"] as const;
 export type DraftFlow = keyof typeof draftFlowStages;
 export type DraftNavigation = { version: 1; stage: typeof draftStageIds[number] };
 export function draftFlow(kind: string, purpose = "create", content?: unknown): DraftFlow | null {
@@ -43,6 +48,11 @@ export function draftFlow(kind: string, purpose = "create", content?: unknown): 
   if (kind === "ENT" && purpose === "refuse_cancellation") return "REFUSE_ENT";
   if (kind === "ENT" && purpose === "withdraw_cancellation") return "WITHDRAW_ENT";
   if (kind === "ENT" && purpose === "consent_cancel") return "CONSENT_ENT";
+  if (kind === "ENT" && purpose === "propose_regularization") return "REGULARIZATION_PROPOSE";
+  if (kind === "ENT" && purpose === "approve_regularization") return "REGULARIZATION_APPROVE";
+  if (kind === "ENT" && purpose === "reject_regularization") return "REGULARIZATION_REJECT";
+  if (kind === "ENT" && purpose === "withdraw_regularization") return "REGULARIZATION_WITHDRAW";
+  if (kind === "ENT" && purpose === "record_regularization_finding") return "REGULARIZATION_FINDING";
   if (!["create", "revise"].includes(purpose)) return null;
   if (kind === "REQ") return purpose === "create" ? "REQ" : null;
   if (kind === "BAL") {

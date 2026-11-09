@@ -1,0 +1,168 @@
+{
+  "projectId": "qwfrqychokvhdzakibid",
+  "migrations": {
+    "supabase/migrations/20261109163324_phase_d3_regularization_private_drafts.sql": "1bc007871a8717801fece56cf9fc87f5b114fcdfecdff4d66c66e566750b9519",
+    "supabase/migrations/20261109170235_phase_d3_regularization_text_normalization.sql": "4260ce4a43d17a294c95cf86e290d650d3d7357e839283425eb73d97f017bb59"
+  },
+  "preflight": {
+    "versions": {
+      "last": "20261109151449",
+      "count": 170,
+      "sha256": "3fdee128262781b3b427dc0ea52803f280585b8b0e4835ebb69023e752afe1b7"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "2dbd724a7efda8d0da3eac4fdf8dab1095f70d25265420260e5a9386fc90dc4c",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_ent_consent_draft_intent",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "0920f7b894c253becfed4d5fbd73ab8171def789f0a68401aec094607821f5f1",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "6c87d13eacf95ba28de33cbc09a441d881ec368fdf1e347b33c4fac7c1abc041",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "049a1145e895d665662a8a95359b541d3bb6e9e09f496b585ed2598c5e0051c7",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      }
+    ],
+    "privateTable": {
+      "anon": false,
+      "authenticated": false
+    }
+  },
+  "baselineMatchesCapturedLocal170": true,
+  "incompatibleDrafts": 0,
+  "waitingLocks": 0,
+  "oldTransactions": 0,
+  "dryRunOnlyTwoCandidates": true,
+  "seeds": [],
+  "roles": [],
+  "post": {
+    "versions": {
+      "last": "20261109170235",
+      "count": 172,
+      "sha256": "c3997db7aea8dbbd002e040ba5b34057d4d6c9f94fc784e06deda18eca7932ae"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "1fb0836d6ab2e3441c85dc358f021e114806aa62cb9e7f3b1ab6ac01bad02393",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_regularization_draft_intent",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "3b26e761209db4741043ea3acfc049501cc0697d7c66b087812878dab2d6e8eb",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "df5c952e3b0a88bc773eb50bb212bf37a890be0d81d6eeef282cf90f6ce1482a",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "0e6de8788fd6582a065c5476271744770c91ec4bf492edacb18a44d6dcfa4421",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      }
+    ],
+    "privateTable": {
+      "anon": false,
+      "authenticated": false
+    },
+    "purposeConstraint": "CHECK ((((kind = ANY (ARRAY['REQ'::text, 'BAL'::text])) AND (purpose = 'create'::text) AND ((kind = 'BAL'::text) OR (target_document_id IS NULL))) OR ((kind = ANY (ARRAY['COM'::text, 'ENT'::text])) AND (((purpose = 'create'::text) AND (target_document_id IS NULL)) OR ((purpose = 'revise'::text) AND (target_document_id IS NOT NULL)))) OR ((kind = 'COM'::text) AND (purpose = ANY (ARRAY['approve'::text, 'purchase'::text, 'receive'::text, 'validate_receipt'::text, 'reject_receipt'::text, 'close_expectation'::text, 'cancel'::text])) AND (target_document_id IS NOT NULL)) OR ((kind = 'ENT'::text) AND (purpose = ANY (ARRAY['receive'::text, 'divergence'::text, 'reassign'::text, 'resolve'::text, 'cancel'::text, 'refuse_cancellation'::text, 'withdraw_cancellation'::text, 'consent_cancel'::text, 'propose_regularization'::text, 'approve_regularization'::text, 'reject_regularization'::text, 'withdraw_regularization'::text, 'record_regularization_finding'::text])) AND (target_document_id IS NOT NULL))))"
+  },
+  "postMatchesLocal172": true,
+  "pendingMigrations": 0,
+  "advisorsSameExcludingObservedAt": true,
+  "advisorsNormalizedSha256": "9e37a302db386639f1df2d874104b81a4048f2992c19eef5bffc6e83fe986531",
+  "advisorsKinds": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO"
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN"
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN"
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN"
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN"
+    }
+  ],
+  "limits": [
+    "No reset,remote fixtures,Auth,Vault,production or external activation",
+    "No redundant backup/restore per owner direction",
+    "Directed metadata check;not global security approval"
+  ]
+}

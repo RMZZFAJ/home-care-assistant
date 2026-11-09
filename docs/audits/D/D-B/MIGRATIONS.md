@@ -3,7 +3,17 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D3.37
+## Estado atual — D3.38
+
+Local172/remoto172, zero pendências. Migrations20261109163324 e20261109170235
+acrescentam cinco preparos privados e alinham o texto canônico a ECMAScript,
+preservando o bruto. Predecessores, compatibilidade e dry-run único conferidos;
+seeds=[]/roles=[]. Digest, funções/configurações, ACL e constraint iguais ao local;
+advisors iguais exceto observed_at. Aplicadas antes do commit, sem reset,
+fixtures/Auth/Vault remoto ou backup redundante. [Recibo](REGULARIZATION_DRAFTS_REMOTE.json),
+[dossiê](REGULARIZATION_DRAFTS.md). CI própria obrigatória; histórico abaixo.
+
+## D3.37 — registro histórico
 
 Local170/remoto170, zero pendências. Migration20261109151449 acrescenta
 consentimento ENT ao kernel privado, etapa de navegação e vínculo fechado de

@@ -2678,3 +2678,36 @@ Regularização,transferência,BAL/REQ contextuais,paridade66/171 e demais gates
 permanecem; Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
 [Dossiê](ENT_CONSENT_DRAFTS.md), [provas](ENT_CONSENT_DRAFTS_VALIDATION.json),
 [remoto](ENT_CONSENT_DRAFTS_REMOTE.json), [CI](CI_ADC4353_OBSERVATION.json).
+
+## D3.38 — preparações privadas da regularização
+
+Base5c4c470. Cinco modos usam kernel privado, CAS, retomada explícita e intenção
+vinculada a versão/caso/decisão/textos/quantidades. Valores incompletos e escolhas
+indisponíveis ficam identificados. Consulta pessoal após conclusão não oferece
+outro ato oficial. Leitura Auth valida alvo/versões;403/200 inválido bloqueiam
+adoção e ocultam fatos antigos. Transações oficiais e aceite pessoal preservados.
+
+33 unitários/API,21 Auth e14 browsers distintos PASS (7 por motor). Incluem
+papel inelegível com override, privacidade, slot observado, perda de autoridade
+após evento e após journal privado com rollback, replay/ack sem escrita e
+leitura revogada. Triggers retirados no finally.13/14 aprovações iniciais; falha
+móvel anterior à revisão preservada, causa não reproduzida. Proposta repetida
+nos dois motores com diagnóstico e texto Unicode, sem aumentar timeout.
+12 consumidores inalterados conservados. Tipos/lint/axe e capturas conferidos.
+
+Contraprova somente leitura demonstrou diferença entre btrim comum e trim do
+formulário. Migration172 corrige essa fronteira; dados brutos preservados,
+cinco modos revalidados com Auth e texto adulterado negado.171 não reescrita.
+Local172/remoto172, zero pendências: duas candidatas,predecessores,compatibilidade
+e dry-run conferidos. Digest,funções/ACL/constraint iguais; advisors inalterados
+exceto observed_at. Sem reset,fixtures/Auth/Vault remoto ou backup redundante.
+84 SQLs históricos,matriz105x39/primeiras30,56 PASS/49 PARTIAL e18 UI preservados.
+
+CI5c4c470:Windows/Ubuntu/banco eios-2 PASS;ios-1 reprovou alvo do onboarding
+obscurecido pelo sino em768px. Demais browsers em andamento; Preview READY.
+Correção da sobreposição e CI própria seguem como gates. Restam transferências,
+BAL/REQ contextuais,paridade66/171 e externos. Sonar adiado,PR7 Draft,
+sem merge/produção,meta ativa. Sem nova aprovação de assinatura,backup,
+monitoramento ou transportes.
+[Dossiê](REGULARIZATION_DRAFTS.md), [provas](REGULARIZATION_DRAFTS_VALIDATION.json),
+[remoto](REGULARIZATION_DRAFTS_REMOTE.json), [CI](CI_5C4C470_OBSERVATION.json).
