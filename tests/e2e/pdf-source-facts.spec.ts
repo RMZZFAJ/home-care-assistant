@@ -85,7 +85,7 @@ test("PDF atual assina fatos de rascunho e origens físicas conhecida e desconhe
     }
     expect(row).toMatchObject({
       state: "ready",
-      rendererRevision: 7,
+      rendererRevision: 10,
       validation: { accepted: true, profile: "PAdES-B-T", wholeFile: true },
     });
     await rpc(f.owner, "select_active_context", { p_patient: f.patient });
@@ -225,7 +225,7 @@ test("PDF atual recusa caractere sem representação antes de assinar ou persist
     step: "uncertain",
     lastError: "CONTENT_INVALID",
     sha256: null,
-    rendererRevision: 7,
+    rendererRevision: 10,
   });
   expect(
     sql(

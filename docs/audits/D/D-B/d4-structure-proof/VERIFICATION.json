@@ -1,0 +1,700 @@
+{
+  "unsigned": [
+    {
+      "file": "BAL-5.pdf",
+      "sha256": "10da6229bbfe812a424a7bab4f359c4d32c0104bbf81c8f97194ad14dac8b48a",
+      "pages": 3,
+      "elements": 135,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 40,
+        "/H2": 7,
+        "/Div": 7,
+        "/Table": 3,
+        "/TR": 17,
+        "/TH": 10,
+        "/TD": 48,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        62,
+        49,
+        17
+      ],
+      "paintedOperatorsCovered": 183,
+      "baselineTextAndPixelsUnchanged": true
+    },
+    {
+      "file": "COM-4.pdf",
+      "sha256": "0606d47e2747ad775dd5fe0479c36381c2f40b4cc4f8062df2bb5d1a1995790d",
+      "pages": 3,
+      "elements": 138,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 40,
+        "/H2": 7,
+        "/Div": 7,
+        "/Table": 3,
+        "/TR": 16,
+        "/TH": 11,
+        "/TD": 51,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        62,
+        52,
+        17
+      ],
+      "paintedOperatorsCovered": 186,
+      "baselineTextAndPixelsUnchanged": true
+    },
+    {
+      "file": "ENT-2.pdf",
+      "sha256": "b1b2b724ee6775026fcf0d5f1c294cf3f350d02841225d7128e5b5042697e8bf",
+      "pages": 4,
+      "elements": 142,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 43,
+        "/H2": 7,
+        "/Div": 8,
+        "/Table": 3,
+        "/TR": 16,
+        "/TH": 11,
+        "/TD": 51,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        64,
+        2,
+        60,
+        17
+      ],
+      "paintedOperatorsCovered": 209,
+      "baselineTextAndPixelsUnchanged": true
+    },
+    {
+      "file": "ENT-3.pdf",
+      "sha256": "aaaab1472f98e29966afac534ed4dc8a98a7ba157a69876c1b35412d49601d8c",
+      "pages": 4,
+      "elements": 146,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 43,
+        "/H2": 7,
+        "/Div": 8,
+        "/Table": 3,
+        "/TR": 17,
+        "/TH": 11,
+        "/TD": 54,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        64,
+        2,
+        64,
+        17
+      ],
+      "paintedOperatorsCovered": 213,
+      "baselineTextAndPixelsUnchanged": true
+    },
+    {
+      "file": "oversized.pdf",
+      "sha256": "aad5a6fc3547d5833bfae058064cd14ee45faef933cd8e9cebe0cca92b5efdac",
+      "pages": 14,
+      "elements": 142,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 43,
+        "/H2": 7,
+        "/Div": 8,
+        "/Table": 3,
+        "/TR": 16,
+        "/TH": 11,
+        "/TD": 51,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        54,
+        40,
+        49,
+        36,
+        48,
+        45,
+        45,
+        27,
+        9,
+        49,
+        45,
+        45,
+        66,
+        30
+      ],
+      "paintedOperatorsCovered": 784
+    },
+    {
+      "file": "REQ-0.pdf",
+      "sha256": "8d422b15b6cf5d8b8d88c4c031ed8b5c7d3cd3c3a7d514c5ead018d1c90003ab",
+      "pages": 4,
+      "elements": 117,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 52,
+        "/H2": 8,
+        "/Div": 9,
+        "/Table": 2,
+        "/TR": 9,
+        "/TH": 7,
+        "/TD": 27,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        57,
+        40,
+        25,
+        17
+      ],
+      "paintedOperatorsCovered": 208,
+      "baselineTextAndPixelsUnchanged": true
+    },
+    {
+      "file": "REQ-1.pdf",
+      "sha256": "863dfe2230bc026b1e112479b051ed6db6c415c5685d0e8cfd341ddc02b47a0a",
+      "pages": 4,
+      "elements": 129,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 51,
+        "/H2": 8,
+        "/Div": 9,
+        "/Table": 3,
+        "/TR": 12,
+        "/TH": 10,
+        "/TD": 33,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        57,
+        40,
+        34,
+        17
+      ],
+      "paintedOperatorsCovered": 219,
+      "baselineTextAndPixelsUnchanged": true
+    }
+  ],
+  "signed": [
+    {
+      "file": "BAL-5.pdf",
+      "sha256": "18f1e189eacd073f381b9a2955588451afc4603ef3b04ac2cb2e7223197e74c3",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 3,
+      "elements": 135,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 40,
+        "/H2": 7,
+        "/Div": 7,
+        "/Table": 3,
+        "/TR": 17,
+        "/TH": 10,
+        "/TD": 48,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        62,
+        49,
+        17
+      ],
+      "paintedOperatorsCovered": 183
+    },
+    {
+      "file": "COM-4.pdf",
+      "sha256": "96491422708a422d0a61c55f6f1175fe8639e5c7c66aab5e6a1e144519b3dc6c",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 3,
+      "elements": 138,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 40,
+        "/H2": 7,
+        "/Div": 7,
+        "/Table": 3,
+        "/TR": 16,
+        "/TH": 11,
+        "/TD": 51,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        62,
+        52,
+        17
+      ],
+      "paintedOperatorsCovered": 186
+    },
+    {
+      "file": "ENT-2.pdf",
+      "sha256": "fc6446a4abc09a635b9a84d9f231a11498fa6c147c6d76a95d43d80cd2ecea2c",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 142,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 43,
+        "/H2": 7,
+        "/Div": 8,
+        "/Table": 3,
+        "/TR": 16,
+        "/TH": 11,
+        "/TD": 51,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        64,
+        2,
+        60,
+        17
+      ],
+      "paintedOperatorsCovered": 209
+    },
+    {
+      "file": "ENT-3.pdf",
+      "sha256": "0b6663839cf33f62fb8018fa443e2b7bc703342c2f0d246e5cb4056d0ee48ed7",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 146,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 43,
+        "/H2": 7,
+        "/Div": 8,
+        "/Table": 3,
+        "/TR": 17,
+        "/TH": 11,
+        "/TD": 54,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        64,
+        2,
+        64,
+        17
+      ],
+      "paintedOperatorsCovered": 213
+    },
+    {
+      "file": "REQ-0.pdf",
+      "sha256": "148338a2b6a6777737000899509b062c4b956a24ba721e4e3da425ca7d8f0926",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 117,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 52,
+        "/H2": 8,
+        "/Div": 9,
+        "/Table": 2,
+        "/TR": 9,
+        "/TH": 7,
+        "/TD": 27,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        57,
+        40,
+        25,
+        17
+      ],
+      "paintedOperatorsCovered": 208
+    },
+    {
+      "file": "REQ-1.pdf",
+      "sha256": "48730366992c4fd7429404e1ab8143e1ed49b7e784f0cef9f698ce858b6a6e09",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 129,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 51,
+        "/H2": 8,
+        "/Div": 9,
+        "/Table": 3,
+        "/TR": 12,
+        "/TH": 10,
+        "/TD": 33,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        57,
+        40,
+        34,
+        17
+      ],
+      "paintedOperatorsCovered": 219
+    }
+  ],
+  "missingHeaderScopeRejected": true,
+  "externalTimeTrust": false,
+  "pdfUaApproval": false,
+  "humanAtApproval": false,
+  "productionApproval": false,
+  "applicationIssuances": [
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\req-before-acceptance-01fa2fc5-c2b9-4eef-b04c-2c994bc1906b.pdf",
+      "sha256": "5969629a1f163eea35fdde71a2db4d913e72ba4f56fd24eb23425c0a6b1132b6",
+      "issuance": "01fa2fc5-c2b9-4eef-b04c-2c994bc1906b",
+      "version": 1,
+      "revision": 10,
+      "family": "REQ",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 109,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 53,
+        "/H2": 8,
+        "/Div": 10,
+        "/Table": 2,
+        "/TR": 7,
+        "/TH": 7,
+        "/TD": 19,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        58,
+        29,
+        32,
+        17
+      ],
+      "paintedOperatorsCovered": 206
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\req-current-57f8f750-14ea-48ed-854a-5ef1a9464a88.pdf",
+      "sha256": "8d13587e8f31552464f039a1306066aaeab8ad1596bc030670b3091ca7a6a178",
+      "issuance": "57f8f750-14ea-48ed-854a-5ef1a9464a88",
+      "version": 4,
+      "revision": 10,
+      "family": "REQ",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 129,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 52,
+        "/H2": 8,
+        "/Div": 10,
+        "/Table": 3,
+        "/TR": 12,
+        "/TH": 10,
+        "/TD": 31,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        58,
+        29,
+        53,
+        17
+      ],
+      "paintedOperatorsCovered": 230
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\req-legacy-dcdde4d9-3b0c-485a-8fdd-3e10dfba5543.pdf",
+      "sha256": "2aa0c2b0698197e3577d2571072dedb3dccf8046a3005b000ba65cd5697596ae",
+      "issuance": "dcdde4d9-3b0c-485a-8fdd-3e10dfba5543",
+      "version": 1,
+      "revision": 10,
+      "family": "REQ",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 3,
+      "elements": 93,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 52,
+        "/H2": 8,
+        "/Div": 10,
+        "/Table": 2,
+        "/TR": 4,
+        "/TH": 7,
+        "/TD": 7,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        50,
+        41,
+        17
+      ],
+      "paintedOperatorsCovered": 163
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\ent-received-7e6d79e4-8117-4a12-bd8b-0289bc399150.pdf",
+      "sha256": "0531248fad1c7473d6992a6a75944153276d43b490bea8a73efb94d0777383a8",
+      "issuance": "7e6d79e4-8117-4a12-bd8b-0289bc399150",
+      "version": 2,
+      "revision": 10,
+      "family": "ENT",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 3,
+      "elements": 108,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 53,
+        "/H2": 9,
+        "/Div": 8,
+        "/Table": 3,
+        "/TR": 7,
+        "/TH": 11,
+        "/TD": 14,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        46,
+        46,
+        25
+      ],
+      "paintedOperatorsCovered": 170
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\ent-returned-906f3564-e123-46cd-861f-8cc90556563c.pdf",
+      "sha256": "bae5dd0f30fd789fd623db79476ceeb3c2a91686954567b84e9ae0c172e26b90",
+      "issuance": "906f3564-e123-46cd-861f-8cc90556563c",
+      "version": 3,
+      "revision": 10,
+      "family": "ENT",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 123,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 63,
+        "/H2": 10,
+        "/Div": 8,
+        "/Table": 3,
+        "/TR": 8,
+        "/TH": 11,
+        "/TD": 17,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        46,
+        38,
+        33,
+        17
+      ],
+      "paintedOperatorsCovered": 197
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\ent-missing-46cd6857-2586-4f50-9b05-65abbaa48a6e.pdf",
+      "sha256": "8eff58508f1e29e30ed3ed9c47034d9ef8e12c5d272df25b2947fded2d1e3a37",
+      "issuance": "46cd6857-2586-4f50-9b05-65abbaa48a6e",
+      "version": 4,
+      "revision": 10,
+      "family": "ENT",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 138,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 73,
+        "/H2": 11,
+        "/Div": 8,
+        "/Table": 3,
+        "/TR": 9,
+        "/TH": 11,
+        "/TD": 20,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        46,
+        39,
+        48,
+        17
+      ],
+      "paintedOperatorsCovered": 213
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\com-receipts-bcc7718e-065c-438a-a57c-0451ec6f4882.pdf",
+      "sha256": "08d7a5f1371006b4d4cdce548cf97d574e70edb9017e4442463ca20ff9277d76",
+      "issuance": "bcc7718e-065c-438a-a57c-0451ec6f4882",
+      "version": 7,
+      "revision": 10,
+      "family": "COM",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 186,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 69,
+        "/H2": 10,
+        "/Div": 7,
+        "/Table": 7,
+        "/TR": 20,
+        "/TH": 26,
+        "/TD": 44,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        42,
+        56,
+        56,
+        30
+      ],
+      "paintedOperatorsCovered": 255
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\com-donation-b446c06c-457b-4b09-ba59-695d376ce6d9.pdf",
+      "sha256": "2667d8a18d2d08685b1691c79f11be3e708a95cc296ba2dec530cd9ff78ad6a6",
+      "issuance": "b446c06c-457b-4b09-ba59-695d376ce6d9",
+      "version": 1,
+      "revision": 10,
+      "family": "COM",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 3,
+      "elements": 103,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 40,
+        "/H2": 7,
+        "/Div": 7,
+        "/Table": 4,
+        "/TR": 8,
+        "/TH": 17,
+        "/TD": 17,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        42,
+        45,
+        17
+      ],
+      "paintedOperatorsCovered": 157
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\bal-first-45d66ac4-bf52-45e6-8281-3a4064b06774.pdf",
+      "sha256": "3cd0271a9cc750825c5a16e241e93d32ed046bea1b332a15d98ef6a46d939e1b",
+      "issuance": "45d66ac4-bf52-45e6-8281-3a4064b06774",
+      "version": 1,
+      "revision": 10,
+      "family": "BAL",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 4,
+      "elements": 112,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 55,
+        "/H2": 9,
+        "/Div": 7,
+        "/Table": 3,
+        "/TR": 8,
+        "/TH": 10,
+        "/TD": 17,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        48,
+        6,
+        45,
+        17
+      ],
+      "paintedOperatorsCovered": 181
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\bal-recount-8242f3b7-3db6-4349-ad59-aa4ac0c3663a.pdf",
+      "sha256": "b4710958694939231dba676d91527b17fcba8b5ecdf0fc820b05ba614c2e0d8b",
+      "issuance": "8242f3b7-3db6-4349-ad59-aa4ac0c3663a",
+      "version": 3,
+      "revision": 10,
+      "family": "BAL",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 5,
+      "elements": 136,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 69,
+        "/H2": 11,
+        "/Div": 7,
+        "/Table": 3,
+        "/TR": 10,
+        "/TH": 10,
+        "/TD": 23,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        52,
+        1,
+        39,
+        33,
+        17
+      ],
+      "paintedOperatorsCovered": 212
+    },
+    {
+      "file": "output\\pdf\\phase-d\\fidelity\\bal-legacy-f4be0dc8-775f-4a74-9fbd-50c5f34f0190.pdf",
+      "sha256": "7437c8dca4c9b1a0814f2dd7e18a5819bcbfc93e2322c33237913985b4e3f15a",
+      "issuance": "f4be0dc8-775f-4a74-9fbd-50c5f34f0190",
+      "version": 1,
+      "revision": 10,
+      "family": "BAL",
+      "entireFileSignature": true,
+      "internalTimestamp": true,
+      "pages": 3,
+      "elements": 106,
+      "roles": {
+        "/Document": 1,
+        "/H1": 1,
+        "/P": 50,
+        "/H2": 8,
+        "/Div": 7,
+        "/Table": 3,
+        "/TR": 8,
+        "/TH": 10,
+        "/TD": 17,
+        "/Figure": 1
+      },
+      "markedContentPerPage": [
+        47,
+        44,
+        17
+      ],
+      "paintedOperatorsCovered": 159
+    }
+  ]
+}

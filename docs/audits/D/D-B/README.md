@@ -19,6 +19,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Fatos, execução e totais da regularização ENT V8](REGULARIZATION_PDF.md).
 - [Marcos temporais ENT e evento/arquivo exato](ENT_TEMPORAL.md).
 - [Estado terminal, versão preservada e tarefa no PDF ENT](ENT_TERMINAL.md).
+- [Estrutura de leitura, tabelas e compatibilidade PDF V10](PDF_STRUCTURE.md).
 - [Retorno de teclado e edição preservada no catálogo](DRAWER_FOCUS.md).
 - [Retenção, aba, sessão e titular do rascunho](DRAFT_LIFECYCLE.md).
 - [Declaração profissional e conferência familiar](PROFESSIONAL_CREDENTIALS.md).

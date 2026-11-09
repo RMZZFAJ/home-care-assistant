@@ -11,6 +11,7 @@ import {
 } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import QRCode from "qrcode";
+import { PdfStructure } from "./pdf-structure";
 import {
   documentStatuses,
   type DocumentType,
@@ -164,7 +165,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8 | 9;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -200,6 +201,7 @@ export async function renderDocumentPdf(
   if (emission && revision >= 7 && !fidelity)
     throw new Error("Frozen fidelity facts required");
   const pdf = await PDFDocument.create();
+  const structure = new PdfStructure(pdf, revision >= 10);
   pdf.registerFontkit(fontkit);
   const [regularBytes, boldBytes] = await Promise.all([
     readFile(path.join(process.cwd(), "public/fonts/NotoSans-Regular.ttf")),
@@ -242,6 +244,7 @@ export async function renderDocumentPdf(
   let page = pdf.addPage([pageWidth, pageHeight]),
     y = 736;
   let decoration = false;
+  let headerDecoration = false;
   let factGroup: string | undefined;
   let groupCounter = 0;
   const draw = (
@@ -268,31 +271,36 @@ export async function renderDocumentPdf(
       decoration,
       factGroup,
     });
-    page.drawText(text, {
+    const paint = () => page.drawText(text, {
       x,
       y: top - size,
       size,
       font: strong ? bold : font,
       color,
     });
+    if (headerDecoration) structure.artifact(page, paint);
+    else structure.paint(page, paint);
   };
+  const rectangle = (options: Parameters<typeof page.drawRectangle>[0]) =>
+    structure.artifact(page, () => page.drawRectangle(options));
   function header() {
     decoration = true;
-    page.drawRectangle({
+    headerDecoration = true;
+    rectangle({
       x: 0,
       y: pageHeight - 82,
       width: pageWidth,
       height: 82,
       color: navy,
     });
-    page.drawRectangle({
+    rectangle({
       x: 0,
       y: pageHeight - 86,
       width: pageWidth,
       height: 4,
       color: teal,
     });
-    page.drawCircle({ x: 58, y: pageHeight - 44, size: 19, color: teal });
+    structure.artifact(page, () => page.drawCircle({ x: 58, y: pageHeight - 44, size: 19, color: teal }));
     draw("HCA", 46, pageHeight - 35, 10, true, white);
     draw("HOME CARE ASSISTANT", 87, pageHeight - 26, 16, true, white);
     draw(
@@ -303,8 +311,8 @@ export async function renderDocumentPdf(
       false,
       rgb(0.74, 0.83, 0.86),
     );
-    if (snapshot.demo)
-      page.drawText("EXEMPLO FICTÍCIO", {
+    if (snapshot.demo) {
+      const watermark = () => page.drawText("EXEMPLO FICTÍCIO", {
         x: 90,
         y: 290,
         font: bold,
@@ -313,7 +321,11 @@ export async function renderDocumentPdf(
         opacity: 0.34,
         rotate: degrees(31),
       });
+      if (pdf.getPageCount() === 1) structure.paint(page, watermark);
+      else structure.artifact(page, watermark);
+    }
     decoration = false;
+    headerDecoration = false;
   }
   header();
   function nextPage() {
@@ -325,11 +337,13 @@ export async function renderDocumentPdf(
     if (y - height < 70) nextPage();
   }
   function text(value: unknown, size = 9, strong = false, color = navy) {
+    structure.paragraph(() => {
     for (const row of wrap(value, strong ? bold : font, size, width)) {
       ensure(size * 1.6);
       draw(row, margin, y, size, strong, color);
       y -= size * 1.6;
     }
+    });
   }
   function fidelityFact(key: string, label: string, value: string) {
     ensure(45);
@@ -341,12 +355,14 @@ export async function renderDocumentPdf(
   function section(title: string) {
     ensure(55);
     y -= 17;
-    text(title.toLocaleUpperCase("pt-BR"), 10, true);
+    structure.within(structure.element("H2"), () => text(title.toLocaleUpperCase("pt-BR"), 10, true));
     y -= 6;
   }
   function fields(entries: [string, unknown][]) {
     for (let i = 0; i < entries.length; i += 2) {
       const cells = entries.slice(i, i + 2);
+      const fieldGroup = structure.element("Div");
+      const fieldNodes = cells.map(() => structure.element("P", fieldGroup));
       const group = ++groupCounter;
       const rows = cells.map(([, value]) =>
         wrap(value, font, 9, width / 2 - 24),
@@ -368,7 +384,7 @@ export async function renderDocumentPdf(
           cells.forEach(([label], index) => {
             const x = margin + (index * width) / 2;
             decoration = true;
-            draw(
+            const labelText = () => draw(
               label.toLocaleUpperCase("pt-BR") +
                 (offset ? " (CONTINUAÇÃO)" : ""),
               x + 12,
@@ -377,11 +393,13 @@ export async function renderDocumentPdf(
               true,
               muted,
             );
+            if (offset) structure.artifact(page, labelText);
+            else structure.within(fieldNodes[index], labelText);
             decoration = false;
             factGroup = `${group}:${index}`;
-            fragment[index].forEach((row, n) =>
+            structure.within(fieldNodes[index], () => fragment[index].forEach((row, n) =>
               draw(row, x + 12, y - 21 - n * 12, 9),
-            );
+            ));
             factGroup = undefined;
           });
           y -= height;
@@ -392,7 +410,7 @@ export async function renderDocumentPdf(
       ensure(height);
       cells.forEach(([label], index) => {
         const x = margin + (index * width) / 2;
-        page.drawRectangle({
+        rectangle({
           x,
           y: y - height,
           width: width / 2,
@@ -401,9 +419,9 @@ export async function renderDocumentPdf(
           borderColor: lineColor,
           borderWidth: 0.5,
         });
-        draw(label.toLocaleUpperCase("pt-BR"), x + 12, y - 8, 7, true, muted);
+        structure.within(fieldNodes[index], () => draw(label.toLocaleUpperCase("pt-BR"), x + 12, y - 8, 7, true, muted));
         factGroup = `${group}:${index}`;
-        rows[index].forEach((row, n) => draw(row, x + 12, y - 21 - n * 12, 9));
+        structure.within(fieldNodes[index], () => rows[index].forEach((row, n) => draw(row, x + 12, y - 21 - n * 12, 9)));
         factGroup = undefined;
       });
       y -= height;
@@ -411,9 +429,13 @@ export async function renderDocumentPdf(
   }
   function table(headers: string[], fractions: number[], rows: string[][], rowKeys?: string[]) {
     const widths = fractions.map((fraction) => width * fraction);
+    const tableNode = structure.element("Table");
+    const headerRow = structure.element("TR", tableNode);
+    const headerNodes = headers.map(() => structure.element("TH", headerRow));
+    let repeatedHeader = false;
     const heading = () => {
       ensure(45);
-      page.drawRectangle({
+      rectangle({
         x: margin,
         y: y - 24,
         width,
@@ -423,14 +445,19 @@ export async function renderDocumentPdf(
       let x = margin;
       decoration = true;
       headers.forEach((title, i) => {
-        draw(title, x + 8, y - 7, 7, true, white);
+        const paint = () => draw(title, x + 8, y - 7, 7, true, white);
+        if (repeatedHeader) structure.artifact(page, paint);
+        else structure.within(headerNodes[i], paint);
         x += widths[i];
       });
       decoration = false;
+      repeatedHeader = true;
       y -= 24;
     };
     heading();
     rows.forEach((cells, index) => {
+      const rowNode = structure.element("TR", tableNode);
+      const cellNodes = cells.map(() => structure.element("TD", rowNode));
       const group = ++groupCounter;
       const cellGroup = (column: number) => rowKeys?.[index] ? `${rowKeys[index]}/${column}` : `${group}:${column}`;
       const lines = cells.map((cell, i) => wrap(cell, font, 8, widths[i] - 16));
@@ -448,7 +475,7 @@ export async function renderDocumentPdf(
           let x = margin;
           fragment.forEach((cell, i) => {
             factGroup = cellGroup(i);
-            cell.forEach((row, n) => draw(row, x + 8, y - 6 - n * 11, 8));
+            structure.within(cellNodes[i], () => cell.forEach((row, n) => draw(row, x + 8, y - 6 - n * 11, 8)));
             factGroup = undefined;
             x += widths[i];
           });
@@ -462,7 +489,7 @@ export async function renderDocumentPdf(
         heading();
       }
       if (index % 2 === 0)
-        page.drawRectangle({
+        rectangle({
           x: margin,
           y: y - height,
           width,
@@ -472,7 +499,7 @@ export async function renderDocumentPdf(
       let x = margin;
       lines.forEach((cell, i) => {
         factGroup = cellGroup(i);
-        cell.forEach((row, n) => draw(row, x + 8, y - 6 - n * 11, 8));
+        structure.within(cellNodes[i], () => cell.forEach((row, n) => draw(row, x + 8, y - 6 - n * 11, 8)));
         factGroup = undefined;
         x += widths[i];
       });
@@ -492,9 +519,9 @@ export async function renderDocumentPdf(
     ENT: "COMPROVANTE DE ENTREGA DE MATERIAIS",
     BAL: "BALANÇO DO ESTOQUE DA EQUIPE",
   }[snapshot.type];
-  text(fidelity && !(snapshot.type === "REQ" && sourceFacts?.historical)
+  structure.within(structure.element("H1"), () => text(fidelity && !(snapshot.type === "REQ" && sourceFacts?.historical)
     ? documentVariant(snapshot.type, snapshot.payload, snapshot.workflow).toLocaleUpperCase("pt-BR") : title,
-    snapshot.type === "ENT" ? 17 : 19, true);
+    snapshot.type === "ENT" ? 17 : 19, true));
   y -= 6;
   const familyAware =
     snapshot.sciencePolicy?.familyAware ??
@@ -614,7 +641,7 @@ export async function renderDocumentPdf(
   ensure(43);
   metrics.forEach(([value, label], i) => {
     const x = margin + (i * width) / 4;
-    page.drawRectangle({
+    rectangle({
       x,
       y: y - 42,
       width: width / 4,
@@ -1652,7 +1679,7 @@ export async function renderDocumentPdf(
         width: 180,
       }),
     );
-    page.drawImage(qr, { x: margin, y: y - 76, width: 76, height: 76 });
+    structure.within(structure.element("Figure", undefined, "QR Code para consultar a integridade deste exemplar; o código digitável consta no texto."), () => structure.paint(page, () => page.drawImage(qr, { x: margin, y: y - 76, width: 76, height: 76 })));
     draw("Verificação de integridade", margin + 88, y - 8, 9, true);
     for (const [index, row] of wrap(
       emission
@@ -1674,6 +1701,7 @@ export async function renderDocumentPdf(
     );
   }
   pdf.getPages().forEach((item, index) => {
+    structure.artifact(item, () => {
     item.drawLine({
       start: { x: margin, y: 52 },
       end: { x: pageWidth - margin, y: 52 },
@@ -1693,6 +1721,8 @@ export async function renderDocumentPdf(
       size: 7,
       color: muted,
     });
+    });
   });
+  structure.finish();
   return Buffer.from(await pdf.save({ useObjectStreams: true }));
 }

@@ -16,6 +16,7 @@ import {
   sourceNameLabels,
 } from "../documents/pdf-source-facts";
 import { pdfFidelitySchema } from "../documents/pdf-fidelity";
+import { validatePdfStructure } from "./pdf-structure-validation";
 import { formatStockObservation, formatStockObservationTime } from "../stock-observation";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 
@@ -271,6 +272,7 @@ export async function validateIssuanceContent(
     if (!plan.facts.length || missing !== -1)
       throw invalid("source-fact:" + missing);
     const parsed = await PDFDocument.load(bytes, { updateMetadata: false });
+    if (Number(plan.identity.rendererRevision) >= 10) validatePdfStructure(parsed);
     if (Number(plan.identity.rendererRevision) >= 7 && parsed.catalog.lookupMaybe(PDFName.of("Lang"), PDFString)?.decodeText() !== "pt-BR")
       throw invalid("language");
     const identity = JSON.parse(

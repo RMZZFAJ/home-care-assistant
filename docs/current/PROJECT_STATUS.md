@@ -4,11 +4,20 @@ Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Estado atual:local161/remoto161, zero migrations pendentes. Prioridade vigente:
+Estado atual:local162/remoto162, zero migrations pendentes. Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
+
+D4.11 acrescentou estrutura de leitura aos novos PDFs V10 sem redesenho:
+títulos, tabelas, campos, QR alternativo e ordem preservada entre páginas.
+44 testes PDF,12 Auth e18 cenários Chromium passaram;9 rechecks de reprodução.
+Verificação independente de7 PDFs,6 assinados e11 emissões do aplicativo;
+22 páginas pixel/texto idênticos à V9. Intenções e bytes anteriores preservados.
+Migration162 aplicada/pós-validada no remoto; zero pendências. Matriz48 PASS/
+53 PARTIAL/4 NOT_STARTED;C111 parcial por humano/AT. CI própria obrigatória,
+Sonar adiado, PR7 Draft, produção NO-GO. [Provas](../audits/D/D-B/PDF_STRUCTURE.md).
 
 D3.20 corrigiu a consulta de ENT vinculada: fatos/unidades do detalhe nativo,
 resposta vinculada a ID/tipo, retry seguro e retorno de foco. Quatro unitários,

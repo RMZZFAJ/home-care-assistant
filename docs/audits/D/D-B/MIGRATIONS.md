@@ -3,7 +3,18 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D3.17
+## Estado atual — D4.11
+
+Local162/remoto162, zero pendências. A migration20261109013649 acrescenta a
+reserva V10 para estrutura semântica dos novos PDFs, preserva V9 e intenções
+anteriores, e amplia somente os guards dos dois snapshots. Quatro definições,
+histórico SQL, grants e saúde pertinente conferidos;12 Auth e18 cenários do
+aplicativo passaram localmente, além das provas de conteúdo e assinatura.
+Dry-run restrito à migration162; sem reset, seed/Auth remoto, alteração de
+produção ou backup/restore integral redundante. [Recibo](PDF_STRUCTURE_REMOTE_MIGRATIONS.json)
+e [dossiê](PDF_STRUCTURE.md). As etapas abaixo são históricas.
+
+## D3.17 — registro histórico
 
 Local161/remoto161, zero pendências. Migrations158–161 acrescentam declaração
 versionada e conferência familiar privada, corrigem cast de enum e ciclo de

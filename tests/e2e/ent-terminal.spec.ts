@@ -22,14 +22,14 @@ test.afterEach(({browserName},info)=>{
 async function login(page:Page,patient:string){
  await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures.family.email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);
 }
-async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,revision=9){
+async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,revision=10){
  expect(response.status(),response.status()===200?label:(await response.text()).slice(0,100)).toBe(200);
  const bytes=await response.body(),pdf=await PDFDocument.load(bytes,{updateMetadata:false});
  const identity=JSON.parse(pdf.catalog.lookup(PDFName.of("HCAIssuance"),PDFHexString).decodeText());expect(identity.rendererRevision).toBe(revision);
  const frozen=await rpc(f.owner,"pdf_issuance",{p_id:identity.id});
  expect(frozen).toMatchObject({state:"ready",sha256:digest(bytes),validation:{accepted:true,profile:"PAdES-B-T",wholeFile:true,signerTrust:"internal",timestampTrust:"internal"}});
  const text=(await PDF.load(bytes)).extractText().flatMap(p=>p.lines.map(l=>l.spans.flatMap(s=>s.chars.map(c=>c.char)).join(""))).join(" ");
- if(revision===9){
+ if(revision>=9){
   expect(text).not.toContain("A pessoa designada deve conferir");expect(text).not.toContain("Aguardando conferência");
   if(frozen.representation==="derived")expect(text).toContain("Esta representação descreve uma versão preservada");
   else expect(text).toContain(f.kind==="cancelled"?"Documento cancelado. Este exemplar não solicita novo recebimento":"Encerramento administrativo não substitui aceite pessoal");
@@ -41,7 +41,7 @@ async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,rev
   mkdirSync(root,{recursive:true});const trustFile=process.env.HCA_PDF_TRUST_POLICY_FILE;if(!trustFile)throw new Error("Guarded test trust fixture required");
   const pem=JSON.parse(readFileSync(trustFile,"utf8")).roots[0].pem,publicRoot=`root-${digest(pem).slice(0,16)}.crt`,file=`${label}-${identity.id}.pdf`;
   writeFileSync(`${root}/${publicRoot}`,pem);writeFileSync(`${root}/${file}`,bytes,{flag:"wx"});
-  corpus.push({label,file,publicRoot,identity,sha256:digest(bytes),sourceHash:frozen.sourceHash,code:frozen.snapshot.code,sourceStatus:frozen.snapshot.status,sourceAcceptedAt:frozen.snapshot.workflow.acceptedAt??null,sourceAcceptedBy:frozen.snapshot.workflow.acceptedBy??null,sourceFacts:frozen.snapshot.sourceFacts,representation:frozen.representation,sourceLines:frozen.snapshot.lines,legacyIncorrectInstructionPreserved:revision!==9});
+  corpus.push({label,file,publicRoot,identity,sha256:digest(bytes),sourceHash:frozen.sourceHash,code:frozen.snapshot.code,sourceStatus:frozen.snapshot.status,sourceAcceptedAt:frozen.snapshot.workflow.acceptedAt??null,sourceAcceptedBy:frozen.snapshot.workflow.acceptedBy??null,sourceFacts:frozen.snapshot.sourceFacts,representation:frozen.representation,sourceLines:frozen.snapshot.lines,legacyIncorrectInstructionPreserved:revision<9});
  }
  return {identity,bytes,frozen};
 }

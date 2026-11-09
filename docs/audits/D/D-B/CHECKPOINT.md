@@ -2020,3 +2020,34 @@ AT/aparelho permanecem próprios. PR7 Draft, sem merge/promoção, Sonar adiado.
 Meta ativa. [Dossiê](RELATED_DOCUMENT_READ.md),
 [provas](RELATED_DOCUMENT_READ_EVIDENCE.json),
 [remoto](RELATED_READ_REMOTE_OBSERVATION.json).
+
+## D4.11 — estrutura técnica de leitura PDF V10
+
+Base059bce0. Novas emissões REQ/COM/ENT/BAL recebem Document/H1/H2/P,
+Table/TR/TH/TD com Scope e vínculos MCID/ParentTree. Campos em colunas e
+células fragmentadas preservam ordem; repetição visual vira Artifact e QR tem
+alternativa. Não há redesenho. Gate próprio do compositor confere árvore e
+conteúdo antes/depois da assinatura; não substitui o parser público.
+
+44 PDF dirigidos PASS (9 novos/35 anteriores),9 rechecks reproduzíveis,
+12 Auth PASS (5 novos/7 anteriores) e18 cenários de produção Chromium PASS.
+pypdf/PyMuPDF/pyHanko conferiram7 PDFs,6 assinados e11 emissões do aplicativo;
+seis goldens V9 intactos e22 páginas com pixels/texto iguais. Fixture extensa
+tem14 páginas; células lógicas atravessam páginas sem duplicar cabeçalhos.
+Quatro exemplares reais fictícios e raiz pública preservados. Negativas de
+estrutura e de código histórico do instrumento permanecem registradas; não
+se converteram tentativas falhas em aprovação. Tipos/lint passaram.
+
+Migration162 aplicada e pós-validada no remoto após local/Auth/dry-run.
+Local/remoto162, zero pendências; histórico SQL,4 funções e grants conferidos,
+V9 igual, sem bloqueios/índices inválidos. Sem reset, seed/Auth remoto,
+mudança de produção ou backup/restore redundante. Intenções antigas recuperam
+revisões anteriores e os bytes existentes; nova intenção usa10.
+
+Matriz48 PASS/53 PARTIAL/4 NOT_STARTED,105x39;29 colunas e complementos
+preservados. C111 parcial por tarefa humana/AT; não se aprova PDF/UA, físico,
+confiança externa ou D-C/D6. Aparência continua adiada. CI própria do novo SHA
+obrigatória; Sonar adiado, PR7 Draft, sem merge/promoção. Meta ativa.
+[Dossiê](PDF_STRUCTURE.md), [provas](PDF_STRUCTURE_EVIDENCE.json),
+[independente](d4-structure-proof/VERIFICATION.json),
+[remoto](PDF_STRUCTURE_REMOTE_MIGRATIONS.json).

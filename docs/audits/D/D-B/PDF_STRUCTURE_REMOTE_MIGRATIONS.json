@@ -1,0 +1,34 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED",
+  "at": "2026-11-09T01:48:54.491Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 161,
+  "after": 162,
+  "pending": 0,
+  "migration": "20261109013649_phase_d4_tagged_pdf_revision.sql",
+  "lfSha256": "a5f644576b82797646a07a5f50a3e9cc481e8365715e29e465383704f020bfe7",
+  "versionsMatched": 162,
+  "newSqlHistoryMatched": true,
+  "functionLfSha256": {
+    "private.freeze_pdf_fidelity_facts": "4dc67df2f24b2bc520113d89648ee3d9f9b28cda03ef0a9914d924dc61dccc57",
+    "private.freeze_pdf_source_facts": "ff304e2894e99373b2aae8f0aff419b9a5659f8fdb3d22a9ef8cbc7da42455c4",
+    "public.reserve_pdf_issuance_v10": "b3fe0e9b2967a3273a8cb26ddc3b004b348affdb839c710e7eaabdb9185469ee",
+    "public.reserve_pdf_issuance_v9": "b0430e5508677ee2826b5acd3c0b8f3dfebeadfd50f88c520a849236b80f7b9d"
+  },
+  "legacyV9DefinitionUnchanged": true,
+  "localRemoteDefinitionsMatched": 4,
+  "explicitPrivileges": {
+    "anon": false,
+    "serviceRole": false,
+    "sourceHelper": false,
+    "authenticated": true,
+    "fidelityHelper": false
+  },
+  "waitingLocks": 0,
+  "invalidIndexes": 0,
+  "compatibleWithCurrentV9Runtime": true,
+  "roleSeedVaultPush": false,
+  "reset": false,
+  "backupRestoreRepeated": false,
+  "dataRebuildOrComparison": false
+}
