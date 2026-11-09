@@ -9,12 +9,18 @@ export const draftFlowStages = {
   SUPPLY: [...common, { id: "notes", label: "Observações" }, { id: "review", label: "Revisão" }],
   BAL: [{ id: "count", label: "Contagem" }, { id: "review", label: "Revisão" }],
   RECEIVE: [{ id: "receipt", label: "Conferência pessoal" }],
+  APPROVE: [{ id: "approval", label: "Decisão de aprovação" }],
+  PURCHASE: [{ id: "acquisition", label: "Aquisição" }],
+  ARRIVAL: [{ id: "arrival", label: "Chegada" }],
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
-export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence"] as const;
+export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival"] as const;
 export type DraftFlow = keyof typeof draftFlowStages;
 export type DraftNavigation = { version: 1; stage: typeof draftStageIds[number] };
 export function draftFlow(kind: string, purpose = "create", content?: unknown): DraftFlow | null {
+  if (kind === "COM" && purpose === "approve") return "APPROVE";
+  if (kind === "COM" && purpose === "purchase") return "PURCHASE";
+  if (kind === "COM" && purpose === "receive") return "ARRIVAL";
   if (kind === "ENT" && purpose === "receive") return "RECEIVE";
   if (kind === "ENT" && purpose === "divergence") return "DIVERGENCE";
   if (!["create", "revise"].includes(purpose)) return null;

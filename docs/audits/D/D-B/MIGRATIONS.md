@@ -521,3 +521,22 @@ RPO/RTO/D6. [Preflight](PDF_FIDELITY_REMOTE_PREFLIGHT.json),
 [atividade qualificada](PDF_FIDELITY_REMOTE_ACTIVITY.json),
 [advisors](PDF_FIDELITY_REMOTE_ADVISORS.json) e
 [provas](PDF_FIDELITY_EVIDENCE.json).
+
+## D3.33 — preenchimentos operacionais COM — 09/11/2026
+
+Aplicada20261109122657:166/166 versões local/remoto, última20261109122657.
+Propósitos de aprovação, aquisição e chegada estendem o kernel privado, sem
+reescrever rascunhos, documentos ou migrations históricas. Pré-validação de
+compatibilidade e dos quatro corpos anteriores; dry-run de uma migration,
+seeds=[]/roles=[]; perfil/destino fixados e aplicação oficial sem reset,
+fixtures, Auth/Vault, integração externa ou backup redundante, conforme a
+instrução vigente para o banco remoto descartável de testes.
+
+Pós-check: digest ordenado
+`bdf830814fa964f87f4ab4b2954a615dcabb0466703cdc8a4b006ff0ca69a720`,
+quatro corpos candidatos e ACL conferidos. Achados de segurança idênticos após
+excluir apenas horários observed_at; avisos anteriores permanecem.23 cenários
+Auth distintos,19 unitários/API e10 browsers distintos aprovados. Instalação
+limpa/evolução legada/integral do novo SHA continuam na CI própria; o sucesso
+da CI d52490d não aprova o candidato novo. Sem liberação operacional.
+[Contrato e limites](COM_ACTION_DRAFTS.md), [prova remota](COM_ACTION_DRAFTS_REMOTE.json).

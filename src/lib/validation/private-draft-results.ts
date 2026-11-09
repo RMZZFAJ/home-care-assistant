@@ -13,7 +13,7 @@ export function parsePrivateDraft(value:unknown,scope:Scope):CreationDraft|null 
   if(!parsed.success)throw new Error("Não foi possível ler o rascunho privado. Consulte novamente.");
   const row=parsed.data;
   if(row.ownerId!==scope.userId||row.patientId!==scope.patientId||row.kind!==scope.kind||row.purpose!==scope.purpose||row.targetDocumentId!==scope.targetDocumentId)throw new Error("A resposta do rascunho não corresponde ao contexto consultado.");
-  const schema=row.kind==="REQ"?requisitionDraftContent:row.kind==="BAL"?balanceDraftContent:row.purpose==="receive"||row.purpose==="divergence"?receiptDraftContent:supplyDraftContent;
+  const schema=row.kind==="REQ"?requisitionDraftContent:row.kind==="BAL"?balanceDraftContent:["receive","divergence","approve","purchase"].includes(row.purpose)?receiptDraftContent:supplyDraftContent;
   const content=row.state==="active"?schema.safeParse(row.content):null;
   if (row.state === "active" && !navigationAllowed(row.kind,row.purpose,row.navigation,row.content) || row.state !== "active" && row.navigation !== null)
     throw new Error("Não foi possível conferir a etapa do rascunho. Consulte novamente.");

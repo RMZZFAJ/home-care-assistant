@@ -127,7 +127,8 @@ describe("private typed REQ/BAL draft boundary", () => {
     );
     for (const query of [
       `kind=UNKNOWN&careRecipientId=${patient}`,
-      `kind=COM&purpose=receive&targetDocumentId=${key}&careRecipientId=${patient}`,
+      `kind=COM&purpose=divergence&targetDocumentId=${key}&careRecipientId=${patient}`,
+      `kind=ENT&purpose=approve&targetDocumentId=${key}&careRecipientId=${patient}`,
       `kind=ENT&purpose=divergence&careRecipientId=${patient}`,
       `kind=REQ&careRecipientId=${patient}&targetDocumentId=${key}`,
       `kind=BAL&careRecipientId=${patient}&targetDocumentId=bad`,

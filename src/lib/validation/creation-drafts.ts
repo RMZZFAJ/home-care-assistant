@@ -114,6 +114,9 @@ export const creationDraftCommandSchema = z
       .object({...scope,...navigation,kind:z.literal("ENT"),purpose:z.enum(["receive","divergence"]),action:z.literal("save"),content:receiptDraftContent})
       .strict(),
     z
+      .object({...scope,...navigation,kind:z.literal("COM"),purpose:z.enum(["approve","purchase","receive"]),action:z.literal("save"),content:receiptDraftContent})
+      .strict(),
+    z
       .object({...scope,kind:z.enum(["COM","ENT"]),purpose:draftPurpose,action:z.enum(["discard","acknowledge"])})
       .strict(),
     z
@@ -145,7 +148,7 @@ export const creationDraftCommandSchema = z
   .superRefine((value, ctx) => {
     if (value.action === "save" && !navigationAllowed(value.kind, "purpose" in value ? value.purpose : "create", value.navigation, value.content))
       ctx.addIssue({ code: "custom", path: ["navigation"], message: "A etapa salva não corresponde ao formulário de origem. Consulte o rascunho novamente." });
-    if ((value.kind==="COM"||value.kind==="ENT")&&((value.purpose==="create")!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise"].includes(value.purpose)))
+    if ((value.kind==="COM"||value.kind==="ENT")&&((value.purpose==="create")!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise","approve","purchase","receive"].includes(value.purpose)||value.kind==="ENT"&&["approve","purchase"].includes(value.purpose)))
       ctx.addIssue({code:"custom",path:["targetDocumentId"],message:"Confira a intenção e o alvo deste preenchimento."});
     if ((value.kind==="COM"||value.kind==="ENT")&&value.action==="save"&&"form" in value.content&&value.content.context.documentId!==value.targetDocumentId)
       ctx.addIssue({code:"custom",path:["content","context"],message:"A ficha de referência precisa corresponder ao preenchimento."});

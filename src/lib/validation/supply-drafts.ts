@@ -1,7 +1,7 @@
 import { z } from "zod";
 const text=(max:number)=>z.string().max(max,`Este campo permite até ${max} caracteres.`);
 const entries=<T extends z.ZodType>(value:T,max=1000,keyLength=120)=>z.record(text(keyLength).min(1),value).refine(value=>Object.keys(value).length<=max,"Há campos demais neste preenchimento.");
-export const draftPurpose=z.enum(["create","revise","receive","divergence"]);
+export const draftPurpose=z.enum(["create","revise","receive","divergence","approve","purchase"]);
 export const draftMaterials=z.array(z.object({id:text(120).min(1),name:text(200),unit:text(80),quantityDecimals:z.number().int().min(0).max(6)}).strict()).max(1000);
 export const supplyDraftContent=z.object({
   form:z.object({

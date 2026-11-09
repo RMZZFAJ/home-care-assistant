@@ -17,6 +17,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
   controles reais reposicionados, foco, progresso parcial e leitura recusada.
 - [Ações principais e Mais nas fichas](DOCUMENT_SECONDARY_ACTIONS.md): mesmos
   atos e permissões, retorno de foco e regressões operacionais.
+- [Rascunhos das operações COM](COM_ACTION_DRAFTS.md): aprovação, aquisição e
+  chegada entre sessões, referência obsoleta e consumo único; migration166.
 - [Nova aparência canônica](../../../ui-ux/CANONICAL_MODEL.md) e
   [execução adicional UI](UI_MODEL_ACCEPTANCE.csv):migração integral em andamento.
 - [Roteiro técnico GUI-04 e recuperação de leitura](RECOVERY_RUNBOOK.md).

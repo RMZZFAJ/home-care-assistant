@@ -2510,3 +2510,37 @@ atualizada. Paridade restante e rascunhos contextuais continuam pendentes;
 66/171, D-C/D6, humano/AT/aparelhos/provedores separados. Sonar adiado, PR7 Draft,
 produção NO-GO e meta ativa. [Dossiê](DOCUMENT_SECONDARY_ACTIONS.md),
 [provas](DOCUMENT_SECONDARY_ACTIONS_VALIDATION.json).
+
+## D3.33 — rascunhos das operações COM — 09/11/2026
+
+Base d52490d. Aprovação, aquisição e chegada usam o kernel privado com slots
+por usuário/paciente/COM/propósito. Decimal incompleto, motivo, etapa e versão
+preservados; retomada explícita entre sessões. Salvar não altera ficha, eventos,
+estoque ou PDF. Revisão salva por CAS e confirmação consome a revisão exata,
+com autorização transacional, vínculo ao propósito e referência da ficha.
+Resposta perdida conserva payload/chave e recupera um resultado. Próxima
+operação parcial começa vazia após reconhecimento explícito do resultado.
+
+Comparação de versão obsoleta bloqueia a revisão e mantém os valores. Material
+ausente com valor permanece visível e exige decisão explícita antes da nova
+referência; retirada privada não altera fatos. Conferências ENT preservadas.
+19 unitários/API,23 Auth distintos e10 cenários Chromium/WebKit PASS; reuso
+qualificado e contraprovas registradas. Build/tipos, lint e84 SQLs históricos
+protegidos. Oráculos corrigidos: COM/receive virou contexto previsto, com novas
+negativas discriminantes; decimal comparado no banco; falha de transporte
+intercepta POST efetivo. Preflight somente de leitura corrigido antes do DDL.
+
+Migration166,20261109122657: dry-run único, preflight de compatibilidade/corpos,
+aplicação oficial remota e pós-validação completos. Local166/remoto166, digest
+igual, zero pendências. Quatro corpos novos e grants conferem; apontamentos de
+segurança iguais excluindo somente observed_at. Sem reset, backup redundante,
+fixtures remotas, Auth/Vault ou integração externa. CI d52490d aprovou
+Windows/Ubuntu/banco; browsers em andamento na consulta. Novo SHA exige CI
+própria, incluindo instalação limpa/evolução legada/integral.
+
+Matriz105x39 e primeiras30 colunas preservadas,56 PASS/49 PARTIAL; D-B-AC-001
+continua parcial por outros formulários contextuais. UI adicional18 atualizada.
+Paridade restante,66/171, D-C/D6 e gates humanos/AT/aparelhos/provedores separados.
+Sonar adiado, PR7 Draft, produção NO-GO e meta ativa.
+[Dossiê](COM_ACTION_DRAFTS.md), [provas](COM_ACTION_DRAFTS_VALIDATION.json),
+[reconciliação](COM_ACTION_DRAFTS_REMOTE.json).

@@ -362,7 +362,7 @@ export function CommandEditorFields({
                   type="text"
                   inputMode="decimal"
                   maxLength={64}
-                  defaultValue={action === "approve" ? remaining : ""}
+                  defaultValue={initialDraft?.fields[line.id] ?? (action === "approve" ? remaining : "")}
                   required={action === "approve"}
                   aria-describedby={instanceId + line.id + "-help"}
                 />

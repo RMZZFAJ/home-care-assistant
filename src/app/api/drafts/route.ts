@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     if (
       !["REQ", "BAL","COM","ENT"].includes(kind ?? "") ||
       !draftPurpose.safeParse(purpose).success||(!extended&&purpose!=="create")||
-      (extended&&((purpose==="create")!==(target===null)||kind==="COM"&&!["create","revise"].includes(purpose)))||
+      (extended&&((purpose==="create")!==(target===null)||kind==="COM"&&!["create","revise","approve","purchase","receive"].includes(purpose)||kind==="ENT"&&["approve","purchase"].includes(purpose)))||
       (target !== null && !uuid.safeParse(target).success) ||
       (kind === "REQ" && target !== null)
     )

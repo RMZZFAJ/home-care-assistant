@@ -4,13 +4,13 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação9bf18cf: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
+Observação d52490d: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
 cadeia limpa, evolução legada e integração. Browsers ainda em andamento na
 consulta. Isso não aprova o novo incremento; seu SHA publicado exige CI própria.
 A falha anterior de allowlist e sua correção permanecem em
 [evidência histórica](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
-Estado atual:local165/remoto165, zero migrations pendentes. Matriz105x39:
+Estado atual:local166/remoto166, zero migrations pendentes. Matriz105x39:
 56 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
 sem redução de funções. D3.28 concluiu a retirada técnica do Fluent: seletores
@@ -27,7 +27,11 @@ progresso canônicos ao cabeçalho, com controles reais de PDF/Andamento na barr
 foco e retirada de conteúdo em leitura recusada. D3.32 organiza ações principais
 e
 Mais com os mesmos atos e permissões, foco e14 regressões dirigidas aprovadas.
-Paridade das demais seções e telas continua pendente. Registro UI
+Paridade das demais seções e telas continua pendente. D3.33 amplia os
+rascunhos
+privados às operações de aprovação, aquisição e chegada COM, com CAS, retomada
+entre sessões, revisão de referência e consumo único. Migration166
+reconciliada. Registro UI
 adicional
 18 requisitos; resultados
 funcionais anteriores não aprovam toda a nova aparência.
@@ -37,6 +41,7 @@ funcionais anteriores não aprovam toda a nova aparência.
 [Abas, marcos e limites](../audits/D/D-B/DOCUMENT_TABS.md).
 [Cabeçalhos, ações e recuperação](../audits/D/D-B/DOCUMENT_HEADER.md).
 [Ações principais e Mais](../audits/D/D-B/DOCUMENT_SECONDARY_ACTIONS.md).
+[Rascunhos das operações COM](../audits/D/D-B/COM_ACTION_DRAFTS.md).
 
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
