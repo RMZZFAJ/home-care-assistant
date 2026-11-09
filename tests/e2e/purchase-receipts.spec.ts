@@ -1,4 +1,4 @@
-import { selectDocumentSection } from "./document-sections";
+import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -87,6 +87,7 @@ test("COM conflito compara a expectativa atual, preserva o motivo e exige nova c
   const initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
   await selectDocumentSection(page, "workflow");
+  await openDocumentMore(page);
   await page.getByRole("button", { name: "Encerrar expectativa restante", exact: true }).click();
   const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Revisar operação", exact: true }) });
   await form.getByRole("textbox", { name: "Motivo / justificativa", exact: true }).fill("Motivo fictício preservado depois da mudança de versão.");
@@ -124,6 +125,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   const receipt = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
   await selectDocumentSection(page, "workflow");
+  await openDocumentMore(page);
   await page.getByRole("button", { name: "Encerrar expectativa restante", exact: true }).click();
   const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Revisar operação", exact: true }) });
   await expect(form.getByRole("heading", { name: "Expectativa que não será adquirida", exact: true })).toBeVisible();
@@ -160,7 +162,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   expect(document.purchaseProgress.state).toBe("closed_pending_validation"); expect(Number(document.lines[0].waived_quantity)).toBe(8); expect(Number(document.lines[0].accepted_quantity)).toBe(0);
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);
   await expect(page.getByText("Expectativa encerrada · parcelas aguardam conferência", { exact: true })).toBeVisible();
-  await expect(page.locator(".hca-document-header .eyebrow")).toHaveText("Doação de insumos");
+  await expect(page.locator(".hca-document-name p")).toHaveText("Doação de insumos");
   expect(await page.locator(".hca-document-header").getByText("Expectativa encerrada · parcelas aguardam conferência", { exact: true }).evaluate(element => {
     const range = document.createRange(); range.selectNodeContents(element);
     const text = range.getBoundingClientRect(), badge = element.getBoundingClientRect();

@@ -1,4 +1,4 @@
-import { selectDocumentSection } from "./document-sections";
+import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
@@ -128,6 +128,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
   await login(page, f.patient, "adminA");
   await page.goto("/fichas/" + f.document.id);
   await selectDocumentSection(page, "workflow");
+  await openDocumentMore(page);
   await page
     .getByRole("button", { name: "Solicitar cancelamento", exact: true })
     .click();
@@ -414,6 +415,7 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
       cancellation(page).getByText("Recusado pelo recebedor", { exact: true }),
     ).toBeVisible();
     expect(ledger(f.patient)).toBe(before);
+    await openDocumentMore(page);
     await page
       .getByRole("button", { name: "Solicitar cancelamento", exact: true })
       .click();

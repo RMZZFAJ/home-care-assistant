@@ -241,3 +241,27 @@ test("PDF atual recusa caractere sem representação antes de assinar ou persist
     ),
   ).toBe(before);
 });
+
+test("REQ histórica apresenta origem desconhecida nas novas abas sem reimportar ou mudar fatos", async ({ page }) => {
+  const f = await historicalSourceFixture({ knownName: false });
+  const snapshot = () => sql(`select jsonb_build_object(
+    'requisition',(select to_jsonb(r) from public.requisitions r where id=${sqlLiteral(f.doc.id)}),
+    'items',(select jsonb_agg(to_jsonb(i) order by id) from public.requisition_items i where requisition_id=${sqlLiteral(f.doc.id)}),
+    'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}),
+    'pdf',(select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)}))::text;`);
+  const before = snapshot();
+  await login(page, f.patient);
+  await page.goto(`/documentos/${f.doc.id}`);
+  const detail = await (await page.request.get(`/api/requisitions/${f.doc.id}`)).json();
+  expect(detail.data).toMatchObject({ is_historical: true, created_at: null, requester_name_snapshot: null });
+  const meta = page.locator(".hca-document-meta > div");
+  await expect(meta.filter({ has: page.locator("dt", { hasText: /^Registro original$/ }) }).locator("dd")).toHaveText("Data original desconhecida");
+  await expect(meta.filter({ has: page.locator("dt", { hasText: /^Solicitante$/ }) }).locator("dd")).toHaveText("Solicitante desconhecido");
+  await expect(page.locator(".hca-document-tags").getByText(`Versão ${f.doc.version}`, { exact: true })).toBeVisible();
+  await selectDocumentSection(page, "materials");
+  await expect(page.getByText("Não informado no registro legado", { exact: false })).toHaveCount(detail.data.requisition_items.length);
+  await selectDocumentSection(page, "communications");
+  await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
+  await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
+  expect(snapshot()).toBe(before);
+});

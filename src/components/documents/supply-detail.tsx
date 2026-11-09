@@ -62,6 +62,12 @@ import {
   DeliveryCancellationComparison,
 } from "./delivery-cancellation";
 
+const secondaryDocumentActions = new Set<DocumentAction>([
+  "cancel",
+  "close_expectation",
+  "reassign",
+]);
+
 export function SupplyDocumentContent({
   id,
   context,
@@ -103,6 +109,8 @@ export function SupplyDocumentContent({
   const [comparison, setComparison] = useState<SupplyDocument | null>(null);
   const commandFormRef = useRef<HTMLFormElement | null>(null);
   const decisionFocusRef = useRef(false);
+  const moreTriggerRef = useRef<HTMLButtonElement>(null);
+  const operationOpenerRef = useRef<HTMLButtonElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
   const restoreRefreshFocusRef = useRef(false);
@@ -123,7 +131,7 @@ export function SupplyDocumentContent({
     if (decisionFocusRef.current) {
       decisionFocusRef.current = false;
       commandFormRef.current
-        ?.querySelector<HTMLElement>("input,textarea,select")
+        ?.querySelector<HTMLElement>("input,textarea,select,button")
         ?.focus();
     } else if (resultFocusRef.current) {
       resultFocusRef.current = false;
@@ -464,6 +472,28 @@ export function SupplyDocumentContent({
     )
       actions.push("cancel");
   }
+  function renderAction(item: DocumentAction) {
+    if (!data) return null;
+    return (
+      <button
+        key={item}
+        className={item === "receive" ? primaryClass : buttonClass}
+        disabled={loading || busy || uncertain}
+        onClick={(event) => {
+          operationOpenerRef.current = event.currentTarget;
+          decisionFocusRef.current = true;
+          setFocusRevision((value) => value + 1);
+          tabs.select("workflow");
+          setAction(item);
+          setReview(null);
+        }}
+      >
+        {data.type === "COM" && item === "receive"
+          ? "Informar nova chegada"
+          : actionLabels[item]}
+      </button>
+    );
+  }
   return (
     <div className="hca-record-detail space-y-5">
       {data ? (
@@ -657,6 +687,13 @@ export function SupplyDocumentContent({
                     Recontar com nova referência de estoque
                   </Link>
                 ) : null}
+                {actions
+                  .filter((item) => !secondaryDocumentActions.has(item))
+                  .map(renderAction)}
+              </>
+            }
+            secondaryActions={
+              <>
                 {data.type === "BAL" && data.payload.balanceContext ? (
                   <Link
                     href="/balancos"
@@ -666,30 +703,12 @@ export function SupplyDocumentContent({
                     Acompanhar plantão, revisão e reconto
                   </Link>
                 ) : null}
-                {actions.length ? (
-                  <>
-                    {actions.map((item) => (
-                      <button
-                        key={item}
-                        className={
-                          item === "receive" ? primaryClass : buttonClass
-                        }
-                        disabled={loading || busy || uncertain}
-                        onClick={() => {
-                          tabs.select("workflow");
-                          setAction(item);
-                          setReview(null);
-                        }}
-                      >
-                        {data.type === "COM" && item === "receive"
-                          ? "Informar nova chegada"
-                          : actionLabels[item]}
-                      </button>
-                    ))}
-                  </>
-                ) : null}
+                {actions
+                  .filter((item) => secondaryDocumentActions.has(item))
+                  .map(renderAction)}
               </>
             }
+            moreTriggerRef={moreTriggerRef}
             observedRef={headerRef}
             id={data.id}
             type={data.type}
@@ -969,6 +988,14 @@ export function SupplyDocumentContent({
                         setDeliveryConflict(false);
                         setComparison(null);
                         setAttempt((value) => value + 1);
+                        const opener = operationOpenerRef.current;
+                        if (
+                          opener?.isConnected &&
+                          opener.getClientRects().length &&
+                          !opener.matches(":disabled")
+                        )
+                          opener.focus();
+                        else moreTriggerRef.current?.focus();
                       }}
                       onReview={(
                         command,

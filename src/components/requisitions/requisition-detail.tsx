@@ -166,6 +166,7 @@ export function RequisitionDocumentContent({
     }
   }, [reading]);
   const [reason, setReason] = useState("");
+  const moreTriggerRef = useRef<HTMLButtonElement>(null);
   const [review, setReview] = useState<"archive" | "cancel" | null>(null);
   useEffect(() => {
     const controller = new AbortController();
@@ -319,6 +320,20 @@ export function RequisitionDocumentContent({
         actions={
           <>
             {!data.is_historical &&
+            !p.archivedAt &&
+            data.status !== "cancelled" ? (
+              <>
+                {can(context, "ent.create") ? (
+                  <Link
+                    className={primaryClass}
+                    href={`/fichas/ent?requisitionId=${id}`}
+                  >
+                    Expedir ENT vinculada
+                  </Link>
+                ) : null}
+              </>
+            ) : null}
+            {!data.is_historical &&
             p.eligible &&
             !p.archivedAt &&
             data.status !== "cancelled" &&
@@ -333,6 +348,24 @@ export function RequisitionDocumentContent({
               >
                 Li a requisição e confirmo minha ciência
               </button>
+            ) : null}
+          </>
+        }
+        secondaryActions={
+          <>
+            {!data.is_historical &&
+            !p.archivedAt &&
+            data.status !== "cancelled" ? (
+              <>
+                {can(context, "com.create") ? (
+                  <Link
+                    className={buttonClass}
+                    href={`/fichas/com?requisitionId=${id}`}
+                  >
+                    Abrir COM vinculada
+                  </Link>
+                ) : null}
+              </>
             ) : null}
             {p.completedAt && !p.archivedAt && can(context, "req.archive") ? (
               <button
@@ -369,30 +402,9 @@ export function RequisitionDocumentContent({
                 Declarar nova necessidade remanescente
               </Link>
             ) : null}
-            {!data.is_historical &&
-            !p.archivedAt &&
-            data.status !== "cancelled" ? (
-              <>
-                {can(context, "com.create") ? (
-                  <Link
-                    className={buttonClass}
-                    href={`/fichas/com?requisitionId=${id}`}
-                  >
-                    Abrir COM vinculada
-                  </Link>
-                ) : null}
-                {can(context, "ent.create") ? (
-                  <Link
-                    className={primaryClass}
-                    href={`/fichas/ent?requisitionId=${id}`}
-                  >
-                    Expedir ENT vinculada
-                  </Link>
-                ) : null}
-              </>
-            ) : null}
           </>
         }
+        moreTriggerRef={moreTriggerRef}
         id={id}
         type="REQ"
         code={data.code ?? data.protocol}
@@ -740,6 +752,7 @@ export function RequisitionDocumentContent({
         ) : null}
       </DocumentTabs>
       <Dialog
+        finalFocus={moreTriggerRef}
         open={review !== null}
         title={
           review === "cancel"

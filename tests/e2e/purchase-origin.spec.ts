@@ -82,7 +82,7 @@ test("COM começa sem compra presumida e emite doação explícita sem creditar 
     ),
   ).toBeVisible();
   await page.getByRole("link", { name: /Acompanhar ficha/ }).click();
-  await expect(page.locator(".hca-document-header .eyebrow")).toHaveText(
+  await expect(page.locator(".hca-document-name p")).toHaveText(
     "Doação de insumos",
   );
   for (const width of [1440, 768, 390, 320]) {

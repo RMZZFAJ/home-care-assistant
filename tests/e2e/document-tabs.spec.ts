@@ -13,7 +13,7 @@ import {
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDocumentSection } from "./document-sections";
+import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
@@ -522,9 +522,11 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
     );
     await refresh.focus();
     await refresh.press("Enter");
-    await expect(page.getByRole("alert").filter({ hasText: "Consulta REQ recusada ou indisponível fictícia" })).toContainText(
-      "Consulta REQ recusada ou indisponível fictícia",
-    );
+    await expect(
+      page
+        .getByRole("alert")
+        .filter({ hasText: "Consulta REQ recusada ou indisponível fictícia" }),
+    ).toContainText("Consulta REQ recusada ou indisponível fictícia");
     const retry =
       status === 403
         ? page.getByRole("button", {
@@ -541,9 +543,70 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
     await expect(retry).toBeFocused();
     await retry.press("Enter");
     await expect(
-      page.getByRole("heading", { level: 1, name: sql(`select code from public.operational_documents where id=${sqlLiteral(req.id)};`), exact: true }),
+      page.getByRole("heading", {
+        level: 1,
+        name: sql(
+          `select code from public.operational_documents where id=${sqlLiteral(req.id)};`,
+        ),
+        exact: true,
+      }),
     ).toBeVisible();
     await expect(refresh).toBeFocused();
   }
+  expect(official(req.id, f.patient)).toBe(before);
+});
+
+test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação real", async ({
+  page,
+}) => {
+  const f = await setup(),
+    req = await issue(f.patient, f.products);
+  sql(
+    `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'req.review',true);`,
+  );
+  await login(page, f.patient);
+  await page.goto(`/documentos/${req.id}`);
+  const more = page.getByRole("button", { name: "Mais", exact: true }),
+    before = official(req.id, f.patient);
+  await more.focus();
+  await more.press("Enter");
+  await page
+    .locator(".hca-document-more-actions")
+    .getByRole("button", { name: "Cancelar requisição", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Revisar cancelamento da REQ",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  await expect(page.locator(".hca-document-identifiers")).toHaveCount(0);
+  await expect(
+    dialog.getByRole("textbox", { name: "Justificativa", exact: true }),
+  ).toBeFocused();
+  await dialog
+    .getByRole("textbox", { name: "Justificativa", exact: true })
+    .fill("Motivo fictício ainda não confirmado");
+  await dialog.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(more).toBeFocused();
+  expect(official(req.id, f.patient)).toBe(before);
+  sql(
+    `update public.capability_overrides set enabled=false where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.family.id)} and capability='req.review';`,
+  );
+  await page.reload();
+  await openDocumentMore(page);
+  await expect(
+    page.getByRole("button", { name: "Cancelar requisição", exact: true }),
+  ).toHaveCount(0);
+  const denied = await page.request.patch(
+    `/api/requisitions/${req.id}/status`,
+    {
+      data: {
+        status: "cancelled",
+        reason: "Tentativa fictícia sem capacidade",
+      },
+    },
+  );
+  expect(denied.status()).toBe(403);
   expect(official(req.id, f.patient)).toBe(before);
 });

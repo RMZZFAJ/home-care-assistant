@@ -1,4 +1,4 @@
-import { selectDocumentSection } from "./document-sections";
+import { selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -458,12 +458,14 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     await expect(
       page.getByRole("heading", { name: req.code, exact: false }),
     ).toBeVisible();
+    await openDocumentMore(page);
     await expect(
       page.getByRole("button", {
         name: "Revisar arquivamento manual",
         exact: true,
       }),
     ).toHaveCount(0);
+    await closeDocumentMore(page);
     const forbiddenArchive = await page.request.post(
       "/api/requisitions/" + req.requisitionId + "/archive",
       { data: { reason: "Tentativa proibida por capacidade explícita" } },

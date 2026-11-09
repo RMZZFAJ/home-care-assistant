@@ -1,4 +1,4 @@
-import { selectDocumentSection } from "./document-sections";
+import { selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
@@ -223,9 +223,11 @@ test("transferência separa três autores, recupera declaração incerta com per
     expect(JSON.parse(transferState(f)).ledger.length).toBe(
       before.ledger.length + 1,
     );
+    await openDocumentMore(page);
     await expect(
       page.getByRole("button", { name: "Alterar destinatário", exact: true }),
     ).toHaveCount(0);
+    await closeDocumentMore(page);
     const bruno = await brunoContext.newPage();
     await login(bruno, f.recipient.email, f.patient);
     await bruno.goto("/entregas");

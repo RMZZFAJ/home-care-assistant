@@ -1,3 +1,4 @@
+import { openDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -40,6 +41,7 @@ async function prepare(
   await expect(
     page.getByText("1/2 itens atendidos", { exact: true }),
   ).toBeVisible();
+  await openDocumentMore(page);
   await page
     .getByRole("link", {
       name: "Declarar nova necessidade remanescente",

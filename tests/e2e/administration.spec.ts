@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { selectContext } from "./auth-context";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
@@ -543,12 +544,21 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("heading", { name: protocol, exact: true }),
     ).toBeVisible();
+    const metadata = page.locator(".hca-document-meta > div");
     await expect(
-      page.locator(".hca-document-date"),
-    ).toHaveText(/^Data original desconhecida · Versão \d+$/);
+      metadata
+        .filter({ has: page.locator("dt", { hasText: /^Registro original$/ }) })
+        .locator("dd"),
+    ).toHaveText("Data original desconhecida");
     await expect(
-      page.getByText("Solicitante: Solicitante desconhecido", { exact: true }),
+      page.locator(".hca-document-tags").getByText(/^Versão \d+$/),
     ).toBeVisible();
+    await expect(
+      metadata
+        .filter({ has: page.locator("dt", { hasText: /^Solicitante$/ }) })
+        .locator("dd"),
+    ).toHaveText("Solicitante desconhecido");
+    await selectDocumentSection(page, "materials");
     await expect(
       page
         .locator("strong")
@@ -557,6 +567,7 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByText("Não informado no registro legado", { exact: false }),
     ).toHaveCount(2);
+    await selectDocumentSection(page, "communications");
     await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
     await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
     const retry = await page.request.post("/api/admin", {

@@ -2480,3 +2480,33 @@ demais superfícies e66 composições/171 relações permanecem no gate de parid
 D-C/D6, humano/AT/aparelhos/provedores separados, Sonar adiado, PR7 Draft,
 produção NO-GO e meta ativa. [Dossiê](DOCUMENT_HEADER.md),
 [provas](DOCUMENT_HEADER_VALIDATION.json).
+
+## D3.32 — ações principais e Mais — 09/11/2026
+
+Base9bf18cf. REQ mantém expedição/ciência na barra; COM vinculada, arquivamento,
+cancelamento e necessidade remanescente ficam em Mais. COM/ENT/BAL distribuem
+atos operacionais e opções adicionais conservando condições/handlers. Decisões
+bilaterais ativas continuam principais. Escolha fecha Mais sem roubar foco do
+formulário/diálogo; Escape/cancelar devolvem foco ao acionador disponível.
+
+Quatorze cenários distintos Chromium/WebKit PASS, com reuso qualificado dos
+oito casos iniciais inalterados; quatro casos COM e dois históricos próprios.
+Nova negativa usa permissão realmente revogada e API403, sem alterar fatos.
+PDFs distintos, parcelas, estoque, bilateralidade, origem obsoleta, doação,
+abas/teclado e leitura histórica preservados. Build/tipos e lint dirigido PASS.
+
+Contraprovas: seletores antigos do tipo COM corrigidos mantendo texto esperado.
+Importação histórica completa bloqueada antes da leitura pelos onze protocolos
+já ocupados na stack local: dois resultados falhos preservados, sem reset,
+exclusão ou contrato flexibilizado. A execução completa depende da CI limpa.
+Caso adicional lê a origem sintética reconhecida pelo helper existente e prova
+metadados desconhecidos, abas e ausência de efeitos; não aprova a importação.
+
+Sem SQL/API/RPC/worker/assinatura novos. Local/remoto165, última20261109091550,
+digest igual e zero pendências. CI9bf18cf: Windows/Ubuntu/banco PASS e Preview
+READY; browsers em andamento na consulta. Novo SHA exige CI própria. Matriz
+105x39 e primeiras30 colunas preservadas,56 PASS/49 PARTIAL. UI adicional18
+atualizada. Paridade restante e rascunhos contextuais continuam pendentes;
+66/171, D-C/D6, humano/AT/aparelhos/provedores separados. Sonar adiado, PR7 Draft,
+produção NO-GO e meta ativa. [Dossiê](DOCUMENT_SECONDARY_ACTIONS.md),
+[provas](DOCUMENT_SECONDARY_ACTIONS_VALIDATION.json).

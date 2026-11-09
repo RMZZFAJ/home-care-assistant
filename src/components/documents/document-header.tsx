@@ -1,5 +1,5 @@
 "use client";
-import { useState, type ReactNode, type Ref } from "react";
+import { useRef, useState, type ReactNode, type Ref } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { StatusBadge, Icon } from "@/components/ui/primitives";
 import { ActionButton, Pill } from "@/components/ui/controls";
@@ -25,6 +25,8 @@ export function DocumentHeader({
   unissuedLabel,
   showFiles = true,
   actions,
+  secondaryActions,
+  moreTriggerRef,
   metadata = [],
   milestones,
   badges,
@@ -52,6 +54,8 @@ export function DocumentHeader({
   unissuedLabel?: string;
   showFiles?: boolean;
   actions?: ReactNode;
+  secondaryActions?: ReactNode;
+  moreTriggerRef?: Ref<HTMLButtonElement>;
   metadata?: { label: string; value: ReactNode }[];
   milestones?: ReactNode;
   badges?: ReactNode;
@@ -65,6 +69,8 @@ export function DocumentHeader({
 }) {
   const Heading = headingLevel === 1 ? "h1" : "h2";
   const [copyMessage, setCopyMessage] = useState("");
+  const [moreOpen, setMoreOpen] = useState(false);
+  const actionClosedRef = useRef(false);
   const facts = [
     ...metadata.slice(0, 1),
     { label: dateHeading, value: dateLabel ?? formatBrazilDate(createdAt) },
@@ -131,10 +137,16 @@ export function DocumentHeader({
               <Icon name="refresh" />
             </ActionButton>
           ) : null}
-          <Popover.Root>
+          <Popover.Root
+            open={moreOpen}
+            onOpenChange={(open) => {
+              if (open) actionClosedRef.current = false;
+              setMoreOpen(open);
+            }}
+          >
             <Popover.Trigger
               render={
-                <ActionButton>
+                <ActionButton ref={moreTriggerRef}>
                   <Icon name="more" />
                   Mais
                 </ActionButton>
@@ -143,7 +155,24 @@ export function DocumentHeader({
             <PopoverPopup
               className="hca-document-identifiers"
               aria-label="Mais opções da ficha"
+              finalFocus={() => (actionClosedRef.current ? false : true)}
             >
+              {secondaryActions ? (
+                <div
+                  className="hca-document-more-actions"
+                  onClick={(event) => {
+                    if (
+                      event.target instanceof Element &&
+                      event.target.closest("a,button:not(:disabled)")
+                    ) {
+                      actionClosedRef.current = true;
+                      setMoreOpen(false);
+                    }
+                  }}
+                >
+                  {secondaryActions}
+                </div>
+              ) : null}
               <h2>Protocolo e identificação</h2>
               <dl>
                 <div>
