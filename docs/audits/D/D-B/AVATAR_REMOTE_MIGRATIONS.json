@@ -1,0 +1,41 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED",
+  "at": "2026-11-09T03:17:40.927Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 162,
+  "after": 164,
+  "pending": 0,
+  "migrations": {
+    "20261109022429_phase_d3_avatar_recovery.sql": "66c1dc9e03ba6aa623fa0e58f68caed9dad02d1dd048426091f319b465b4e24f",
+    "20261109024515_phase_d3_avatar_business_conflicts.sql": "e97a4e0a2640122d9af455ac4400f9fdab47ad1cb78a3eed0fff0b06baf9f4f2"
+  },
+  "versionsMatched": 164,
+  "newSqlHistoriesMatched": 2,
+  "localRemoteFunctionsMatched": 12,
+  "functionLfSha256": {
+    "private.advance_avatar_revision": "cf96ec7f850009ee60ba023988076bcbb7b9f8edff952eb0fad1681a9ab7e9bc",
+    "private.avatar_change_view": "d152c1b5aabe459cd50397672329482de090c7dc21038ba6a7c7eba7826b6042",
+    "public.abandon_my_avatar_change": "b9cad7461bf501da7f763e7320abed388103a8e31b4bbb1d972d1891c3f224a6",
+    "public.ack_avatar_cleanup": "f9c615cb0facb2da64f37e0ef7854dabcff184560a5b09ef77b71c9c0e1798b3",
+    "public.avatar_cleanup_candidates": "fe0e7af0474c533d852c35f0b8d20a011bd54162c0b917718baa47565a0ea075",
+    "public.begin_my_avatar_change": "6c401850a515016e2b199e49f3660962c2fc876498c29a24ad46842912a4ad9a",
+    "public.finish_my_avatar_change": "1ceb8c41b75ca97ca212613b4cd37f82b57ec6e9b4580fdecbd2221ad11db08d",
+    "public.my_avatar_change": "ea6876d3ddf9aa3e149f484750195acd1604e46d2f01211d5f70ba23d3fba252",
+    "public.prepare_avatar_change": "aa7624fd109ab23f4c755f91c9d4b8c0ac243d6d096ffa065ad5b62fd4cfa114",
+    "public.reserve_pdf_issuance_v10": "b3fe0e9b2967a3273a8cb26ddc3b004b348affdb839c710e7eaabdb9185469ee",
+    "public.set_my_avatar": "8940134571c923ad2721d3c5efd51715ca9962559b4a2abce2971035d9cc6ddc",
+    "public.verify_avatar_change": "879325b7316c3ccbae4b44e7a7b2258918ffc3fb7fec4376a9b001f8065c1148"
+  },
+  "localRemoteTableColumnPolicyIndexesTriggerMatched": true,
+  "privateRlsNoDirectTableGrants": true,
+  "explicitAuthServiceFunctionGrantsMatched": true,
+  "authDirectAvatarUpdate": false,
+  "pdfV10Unchanged": true,
+  "businessConflictsNonTransient": true,
+  "waitingLocks": 0,
+  "invalidIndexes": 0,
+  "reset": false,
+  "remoteFixturesOrAuthWrites": false,
+  "roleSeedVaultPush": false,
+  "repeatedBackupRestoreOrDataComparison": false
+}

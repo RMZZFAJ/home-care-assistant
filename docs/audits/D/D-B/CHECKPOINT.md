@@ -2051,3 +2051,40 @@ obrigatória; Sonar adiado, PR7 Draft, sem merge/promoção. Meta ativa.
 [Dossiê](PDF_STRUCTURE.md), [provas](PDF_STRUCTURE_EVIDENCE.json),
 [independente](d4-structure-proof/VERIFICATION.json),
 [remoto](PDF_STRUCTURE_REMOTE_MIGRATIONS.json).
+
+## D3.21 — foto recuperável e conta pessoal
+
+Base3772fd0. Baseline real acumulou dois objetos após duas recusas de
+associação; nova intenção por conta conserva chave/arquivo/revisão e um caminho
+estável. Servidor normaliza e confere bytes/hash/ID do Storage antes de associar
+com sessão viva após espera. Replay não reaplica foto antiga; abandono e
+limpeza só atingem objetos gerenciados terminais que não sejam foto atual.
+Arquivo incerto fica congelado em memória; GET não escreve e não mascara erro.
+
+Meu perfil exigia um paciente para abrir a própria conta. Escolha estática da
+página agora permite contexto nulo, mantendo guardas clínicas/administrativas
+e identidade autorizada no backend. Edição do nome sobrevive à troca de foto.
+
+26 unitários PASS;3 Auth/Storage reais novos PASS e7 Auth anteriores preservados;
+15 cenários distintos de navegador qualificados nos três projetos (6 de avatar,
+9 regressões) e2 rechecks do envio nativo.24 inspeções Axe específicas da foto.
+Tipos/lint passaram. Preservadas falhas de baseline, escopo pessoal, conflito
+40001 repetido pelo PostgREST, replay multipart WebKit e asserção precoce do
+instrumento. Migration164 corrige os cinco RPCs novos para P0001; não se editou
+a163 aplicada. Contraprovas e limites constam no manifesto.
+
+Migrations163–164 aplicadas antes do commit e pós-validadas no remoto correto.
+Local/remoto164, zero pendências; dois históricos SQL e12 definições/grants,
+RLS/coluna/política/índices/trigger coincidem. V10 PDF preservado e saúde dirigida
+sem bloqueios/índices inválidos. Comparador de histórico ajustou remoção de
+comentários por statement, sem tolerância sobre SQL executável. Sem reset,
+fixture/Auth remoto ou backup/restore redundante.
+
+Matriz49 PASS/53 PARTIAL/3 NOT_STARTED,105x39 e29 colunas/complementos
+preservados. C080 agora aponta para prova de avatar; a evidência anterior de PDF
+era indevida. C-FINAL-AC-021 parcial só pelo escopo da conta própria, sem aprovar
+o conjunto global/familiar/proposta. CI completa anterior3772fd0 verde e Preview
+READY, registrados por SHA; CI própria do candidato continua obrigatória. PR7
+Draft, sem merge/promoção, Sonar adiado, meta ativa.
+[Dossiê](AVATAR_RECOVERY.md), [provas](AVATAR_RECOVERY_EVIDENCE.json),
+[remoto](AVATAR_REMOTE_MIGRATIONS.json), [CI anterior](CI_3772FD0_OBSERVATION.json).

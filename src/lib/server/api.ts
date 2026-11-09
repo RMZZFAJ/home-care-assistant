@@ -30,6 +30,10 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (error?.code === "P0001" && /^avatar intention differs$/i.test(message))
+    throw new ApiError("IDEMPOTENCY_CONFLICT", "Esta troca já identifica outro arquivo ou referência. Preserve a intenção original antes de iniciar outra.", 409);
+  if (error?.code === "P0001" && /^avatar /i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A troca de foto mudou ou ainda precisa ser conferida. Consulte o resultado e preserve o arquivo original; abandone a troca antes de escolher outra foto.", 409);
   if (/attachment attempt pending|attachment attempt terminal|legacy attachment attempt/i.test(message))
     throw new ApiError("ATTACHMENT_PENDING", "Esta tentativa ainda precisa ser consultada ou já foi concluída. Recupere seu resultado antes de escolher outro arquivo.");
   if (/attachment limit reached/i.test(message))

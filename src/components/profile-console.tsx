@@ -5,7 +5,6 @@ import {
   api,
   ApiError,
   buttonClass,
-  errorMessage,
   inputClass,
   Notice,
   primaryClass,
@@ -13,23 +12,22 @@ import {
 } from "./workspace";
 import { ContactSettings } from "./auth/contact-settings";
 import { MfaSettings } from "./auth/mfa-settings";
-import Image from "next/image";
 import { formatBrazilDate } from "@/lib/receipt";
 import { NewPasswordField } from "./auth/new-password-field";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { AvatarSettings } from "./profile/avatar-settings";
 import { SciencePreferenceSettings } from "./profile/science-preference";
 import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
 import { UserGuide } from "@/components/guides/user-guide";
 import { PwaSettings } from "./pwa/pwa-settings";
 import { PushSettings } from "./pwa/push-settings";
-import { requireRuntimeCommandsAvailable } from "@/lib/client/api";
 type Profile = ProfileRead["data"];
 type Membership = ProfileRead["memberships"][number];
 type Session = ProfileRead["sessions"][number];
 export function ProfileConsole() {
   return (
-    <Workspace title="Meu perfil e segurança">
+    <Workspace title="Meu perfil e segurança" account>
       {() => <ProfileContent />}
     </Workspace>
   );
@@ -71,7 +69,7 @@ function ProfileContent() {
   }, [readKey]);
   async function save(
     event: FormEvent<HTMLFormElement>,
-    action: "update" | "password" | "avatar",
+    action: "update" | "password",
   ) {
     event.preventDefault();
     const element = event.currentTarget;
@@ -84,19 +82,7 @@ function ProfileContent() {
     setError("");
     setMessage("");
     try {
-      if (action === "avatar") {
-        requireRuntimeCommandsAvailable();
-        const response = await fetch("/api/profile", {
-          method: "POST",
-          body: form,
-        });
-        const body = await response.json();
-        if (!response.ok)
-          throw new Error(
-            errorMessage(body, "Não foi possível salvar a foto."),
-          );
-      } else
-        await api(
+      await api(
           "/api/profile",
           action === "password"
             ? {
@@ -240,35 +226,7 @@ function ProfileContent() {
           </SettingsSection>
           <SciencePreferenceSettings />
           <SettingsSection title="Foto de perfil" summary="Imagem utilizada na identificação da sua conta">
-            
-            {profile.avatar ? (
-              <Image
-                className="mt-4 rounded-full object-cover"
-                src={profile.avatar}
-                width={88}
-                height={88}
-                unoptimized
-                alt="Sua foto de perfil"
-              />
-            ) : null}
-            <form
-              className="mt-4 space-y-3"
-              onSubmit={(event) => void save(event, "avatar")}
-            >
-              <label className="text-sm">
-                Nova foto
-                <input
-                  className={inputClass}
-                  type="file"
-                  name="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  required
-                />
-              </label>
-              <button className={buttonClass} disabled={busy}>
-                Salvar foto
-              </button>
-            </form>
+            <AvatarSettings />
           </SettingsSection>
           {profile.providers.includes("email") ? (
             <SettingsSection title="Alterar senha" summary="Proteja seu acesso com autenticação recente">

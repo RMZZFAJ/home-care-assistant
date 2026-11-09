@@ -3,7 +3,22 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D4.11
+## Estado atual — D3.21
+
+Local164/remoto164, zero pendências. Migrations20261109022429 e20261109024515
+acrescentam intenções privadas de avatar, revisão do ponteiro e RPCs com grants
+Auth/serviço separados; objetos gerenciados não são inseridos pelo navegador
+nem reaplicados pelo setter legado. A segunda migration corrige conflitos
+permanentes para P0001, evitando retry de serialização pelo PostgREST.
+
+Validação local/Auth/Storage e navegador precedeu o dry-run restrito às duas
+pendências. Aplicação antes do commit, com164 versões, dois históricos SQL,
+12 funções/grants, coluna, RLS, política, índices e trigger iguais ao local.
+PDF V10 anterior inalterado; sem bloqueios/índices inválidos. Sem reset, seeds,
+fixture/Auth remoto ou backup/restore repetido. [Recibo](AVATAR_REMOTE_MIGRATIONS.json)
+e [dossiê](AVATAR_RECOVERY.md). As etapas abaixo são históricas.
+
+## D4.11 — registro histórico
 
 Local162/remoto162, zero pendências. A migration20261109013649 acrescenta a
 reserva V10 para estrutura semântica dos novos PDFs, preserva V9 e intenções

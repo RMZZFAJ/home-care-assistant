@@ -1,14 +1,25 @@
 # Estado verificável do projeto
 
-Referência editorial:08/11/2026, America/Sao_Paulo. **Produção NO-GO.**
+Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Estado atual:local162/remoto162, zero migrations pendentes. Prioridade vigente:
+Estado atual:local164/remoto164, zero migrations pendentes. Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
+
+D3.21 corrigiu a troca de foto: intenção única, objeto estável, verificação
+real do Storage, recuperação/replay e limpeza restrita sem apagar o avatar
+atual. Meu perfil abre sem selecionar paciente, com edição pessoal preservada.
+26 unitários,3 novos Auth/Storage e15 cenários distintos de navegador
+qualificados passaram;7 Auth anteriores preservados. Migrations163–164
+aplicadas e pós-validadas. Matriz49 PASS/53 PARTIAL/3 NOT_STARTED;C080 tem
+agora prova de avatar, corrigindo a referência indevida ao pipeline PDF.
+C-FINAL-AC-021 permanece parcial pelo conjunto global/familiar/proposta.
+CI completa do SHA anterior3772fd0 verde, Preview READY; isso não aprova o
+novo SHA. PR7 Draft e Sonar adiado. [Provas](../audits/D/D-B/AVATAR_RECOVERY.md).
 
 D4.11 acrescentou estrutura de leitura aos novos PDFs V10 sem redesenho:
 títulos, tabelas, campos, QR alternativo e ordem preservada entre páginas.
