@@ -247,7 +247,7 @@ export function DeliveryRecipientFacts({
         {formatBrazilDate(selection.recordedAt)}
       </p>
       {selection.reason ? (
-        <p className="whitespace-pre-wrap break-words">
+        <p className="whitespace-pre-wrap wrap-break-word">
           Justificativa da escolha: {selection.reason}
         </p>
       ) : null}

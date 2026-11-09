@@ -169,7 +169,7 @@ export function MembershipManagement({
             {editor.row ? (
               <div>
                 <p className="text-sm font-semibold">Conta vinculada</p>
-                <p className="break-words">{name(editor.row)}</p>
+                <p className="wrap-break-word">{name(editor.row)}</p>
                 <p className="hca-field-hint">
                   A edição mantém esta pessoa. Para outra conta, use o fluxo de
                   vínculo ou convite.

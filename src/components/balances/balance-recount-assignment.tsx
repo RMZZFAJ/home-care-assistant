@@ -35,7 +35,7 @@ function targetLabel(target: ScheduledShift) {
 }
 function CountFacts({ source }: { source: BalanceRecountContext }) {
   return (
-    <div className="space-y-3 text-sm break-words">
+    <div className="space-y-3 text-sm wrap-break-word">
       <p>
         <strong>{source.code}</strong> · versão documental{" "}
         {source.documentVersion} · contagem{" "}
@@ -352,7 +352,7 @@ export function BalanceRecountAssignment({
       {result ? (
         <section
           aria-label="Resultado da designação"
-          className="space-y-4 break-words"
+          className="space-y-4 wrap-break-word"
         >
           <h2 ref={resultRef} tabIndex={-1}>
             Designação confirmada
@@ -422,13 +422,13 @@ export function BalanceRecountAssignment({
                 <h2>Referência atual consultada</h2>
                 <CountFacts source={comparison} />
                 {target ? (
-                  <p className="break-words">
+                  <p className="wrap-break-word">
                     Plantão escolhido na consulta anterior:{" "}
                     {targetLabel(target)}.
                   </p>
                 ) : null}
                 {targetId ? (
-                  <p className="break-words">
+                  <p className="wrap-break-word">
                     Mesmo plantão na consulta atual:{" "}
                     {comparedTarget
                       ? targetLabel(comparedTarget)
@@ -499,7 +499,7 @@ export function BalanceRecountAssignment({
                   ) : null}
                 </FormField>
                 {target ? (
-                  <p className="text-sm break-words">
+                  <p className="text-sm wrap-break-word">
                     Pessoa e período selecionados: {targetLabel(target)}.
                   </p>
                 ) : null}
@@ -542,7 +542,7 @@ export function BalanceRecountAssignment({
                 <CountFacts source={reference} />
               ) : null}
               {target && !inaccessible ? (
-                <p className="break-words">
+                <p className="wrap-break-word">
                   Reconto a ser realizado por{" "}
                   <strong>{target.professional_name}</strong> ·{" "}
                   {formatZonedDate(target.starts_at, target.timezone)} →{" "}
@@ -551,7 +551,7 @@ export function BalanceRecountAssignment({
               ) : null}
               <div>
                 <h3 className="font-semibold">Sua justificativa</h3>
-                <p className="whitespace-pre-wrap break-words">{reason}</p>
+                <p className="whitespace-pre-wrap wrap-break-word">{reason}</p>
               </div>
               <p>
                 A confirmação designa responsabilidade. A contagem física será

@@ -12,6 +12,13 @@ em duas direções,referência atual e confirmação selada.41 unitários/API,
 [Observação](../audits/D/D-B/CI_F233BE9_OBSERVATION.json),
 [incremento](../audits/D/D-B/TRANSFER_DECLARATION_DRAFTS.md).
 
+Complemento D3.41 corrige a sincronização do teste REQ403 e mantém a retirada
+obrigatória de dados recusados.6 regressões Chromium/WebKit PASS,sem retry;
+38 classes de quebra de texto atualizadas em16 fontes. Quadro temporário na
+raiz cobre105 critérios e estimativas visuais/funcionais,sem alterar os estados
+da matriz técnica. CI própria segue pendente.
+[Detalhe](../audits/D/D-B/PREVIEW_RECOVERY_AND_STATUS.md).
+
 Estado atual:local174/remoto174,zero migrations pendentes. Matriz105x39:56
 PASS/49 PARTIAL/0 NOT_STARTED;contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,

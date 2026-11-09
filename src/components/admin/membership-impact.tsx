@@ -161,7 +161,7 @@ export function MembershipImpact({
                 <p>{documentStatuses[item.status] ?? item.status}</p>
                 {item.lines.map((line) => (
                   <div key={line.id} className="mt-2">
-                    <p className="break-words">{line.name}</p>
+                    <p className="wrap-break-word">{line.name}</p>
                     <p>
                       Aceite pessoal preservado:{" "}
                       {formatQuantity(line.acceptedQuantity, line.unit)}

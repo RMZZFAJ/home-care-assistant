@@ -509,19 +509,32 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
     });
   for (const status of [503, 403]) {
     let refusing = true;
-    await page.route(
-      `**/api/requisitions/${req.id}`,
-      (route) =>
-        refusing ? route.fulfill({
+    let recovering = false;
+    let releaseRecovery!: () => void;
+    const recoveryGate = new Promise<void>((resolve) => {
+      releaseRecovery = resolve;
+    });
+    await page.route(`**/api/requisitions/${req.id}`, async (route) => {
+      if (refusing)
+        return route.fulfill({
           status,
           json: {
             error: "Consulta REQ recusada ou indisponível fictícia",
             code: "READ_UNAVAILABLE",
           },
-        }) : route.continue(),
+        });
+      recovering = true;
+      await recoveryGate;
+      return route.continue();
+    });
+    const rejection = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === `/api/requisitions/${req.id}` &&
+        response.status() === status,
     );
     await refresh.focus();
     await refresh.press("Enter");
+    await rejection;
     await expect(
       page
         .getByRole("alert")
@@ -542,7 +555,29 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
     }
     await expect(retry).toBeFocused();
     refusing = false;
-    await retry.press("Enter");
+    const recovered = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === `/api/requisitions/${req.id}` &&
+        response.ok(),
+    );
+    try {
+      await retry.press("Enter");
+      await expect.poll(() => recovering).toBe(true);
+      await expect(retry).toBeDisabled();
+      // A 503 retains the header while recovery is pending. Its presence alone
+      // cannot prove that recovery completed before the next refusal is tested.
+      await expect(page.locator(".hca-document-header")).toHaveCount(
+        status === 503 ? 1 : 0,
+      );
+    } finally {
+      releaseRecovery();
+    }
+    await recovered;
+    await expect(
+      page.getByRole("alert").filter({
+        hasText: "Consulta REQ recusada ou indisponível fictícia",
+      }),
+    ).toHaveCount(0);
     await expect(
       page.getByRole("heading", {
         level: 1,
@@ -552,6 +587,7 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
         exact: true,
       }),
     ).toBeVisible();
+    await expect(refresh).toBeEnabled();
     await expect(refresh).toBeFocused();
     await page.unroute(`**/api/requisitions/${req.id}`);
   }

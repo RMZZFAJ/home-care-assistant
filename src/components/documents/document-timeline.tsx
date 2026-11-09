@@ -27,7 +27,7 @@ export function VersionFacts({ version }: { version: DocumentVersion }) {
       : version.actorName ?? "Nome histórico não preservado"}.
       {version.actorSource === "event_snapshot" ? " Nome preservado no evento; não consultado no cadastro atual." : null}</p>
     {version.actorId ? <details><summary>Identidade vinculada ao evento</summary><p className="break-all">{version.actorId}</p></details> : null}
-    <dl className="space-y-3">{version.facts.map(fact => <div key={fact.key}><dt className="font-semibold">{fact.label}</dt><dd className="whitespace-pre-wrap break-words">{fact.value}</dd></div>)}</dl>
+    <dl className="space-y-3">{version.facts.map(fact => <div key={fact.key}><dt className="font-semibold">{fact.label}</dt><dd className="whitespace-pre-wrap wrap-break-word">{fact.value}</dd></div>)}</dl>
     <details><summary>Hash canônico desta versão</summary><code className="block break-all text-xs">{version.hash}</code></details>
   </article>;
 }
@@ -94,7 +94,7 @@ function TimelineContent({ id, version, events, title = "Linha do tempo" }: Time
           {comparison.before && comparison.selected.version !== comparison.before.version + 1 ? <Notice>As versões não são consecutivas. A comparação abrange somente as duas versões indicadas.</Notice> : null}
           <p role="status">{comparison.before ? `Comparação da versão ${comparison.before.version} com a versão ${comparison.selected.version}.` : "Primeira versão disponível; não há versão anterior nesta consulta."}</p>
           {changes.length ? <ol className="space-y-4">{changes.map(change => <li key={change.key} className="rounded-lg border border-(--line) p-3">
-            <h4 className="font-semibold">{change.label}</h4><dl className="grid gap-3 sm:grid-cols-2"><div><dt>Antes{comparison.before ? ` · versão ${comparison.before.version}` : " · sem versão anterior"}</dt><dd className="whitespace-pre-wrap break-words">{change.before}</dd></div><div><dt>Depois · versão {comparison.selected.version}</dt><dd className="whitespace-pre-wrap break-words">{change.after}</dd></div></dl>
+            <h4 className="font-semibold">{change.label}</h4><dl className="grid gap-3 sm:grid-cols-2"><div><dt>Antes{comparison.before ? ` · versão ${comparison.before.version}` : " · sem versão anterior"}</dt><dd className="whitespace-pre-wrap wrap-break-word">{change.before}</dd></div><div><dt>Depois · versão {comparison.selected.version}</dt><dd className="whitespace-pre-wrap wrap-break-word">{change.after}</dd></div></dl>
           </li>)}</ol> : <p>Não há mudança nos campos descritos nesta comparação. O evento e sua autoria continuam identificados abaixo.</p>}
           <VersionFacts version={comparison.selected} />
           {comparison.before ? <details><summary>Consultar todos os fatos da versão {comparison.before.version}</summary><VersionFacts version={comparison.before} /></details> : null}

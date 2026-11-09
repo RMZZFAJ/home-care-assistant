@@ -7,6 +7,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
 - [Declaração de transferência entre sessões](TRANSFER_DECLARATION_DRAFTS.md):
   duas direções privadas,referência atual,confirmação única e migration174.
+- [Recuperação dirigida e quadro de atualização](PREVIEW_RECOVERY_AND_STATUS.md):
+  sincronização REQ403,regressões de anexos e classe de quebra de texto.
 - [Checkpoint incremental](CHECKPOINT.md).
 - [Controles nativos e feedback](UI_MODEL_STAGE_2.md):migração visual em execução.
 - [Seletores compostos, menus e shell](UI_MODEL_STAGE_3.md): retirada técnica

@@ -202,7 +202,7 @@ export function ConsumptionEditor({
           <h3 className="font-semibold">
             Referência preservada · versão {baseline.version}
           </h3>
-          <p className="mt-2 whitespace-pre-wrap break-words">
+          <p className="mt-2 whitespace-pre-wrap wrap-break-word">
             {baseline.body}
           </p>
           <ConsumptionLines lines={baseline.current_lines} />
@@ -226,7 +226,7 @@ export function ConsumptionEditor({
               ? "Família"
               : "Equipe"}
           </p>
-          <p className="whitespace-pre-wrap break-words">{review.text}</p>
+          <p className="whitespace-pre-wrap wrap-break-word">{review.text}</p>
           <ul>
             {review.lines.map((line) => {
               const product = products.find(

@@ -121,7 +121,7 @@ export function ConsumptionDecision({
           Relato de {reference.reported_name ?? "nome não preservado"} ·{" "}
           {formatBrazilDate(reference.created_at)} · versão {reference.version}
         </p>
-        <p className="whitespace-pre-wrap break-words">{reference.body}</p>
+        <p className="whitespace-pre-wrap wrap-break-word">{reference.body}</p>
         <ConsumptionLines lines={reference.current_lines} />
         {reference.revisions.at(-1) ? (
           <p className="text-sm">

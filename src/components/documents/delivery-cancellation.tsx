@@ -65,7 +65,7 @@ function RequestFacts({
         Solicitado por {request.requestedName ?? "nome não preservado"} ·{" "}
         {formatBrazilDate(request.requestedAt)}
       </p>
-      <p className="whitespace-pre-wrap break-words">
+      <p className="whitespace-pre-wrap wrap-break-word">
         Motivo do pedido: {request.reason}
       </p>
       {request.outcome ? (
@@ -74,7 +74,7 @@ function RequestFacts({
             Decisão de {request.outcome.actorName ?? "nome não preservado"} ·{" "}
             {formatBrazilDate(request.outcome.recordedAt)}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className="whitespace-pre-wrap wrap-break-word">
             Justificativa da decisão: {request.outcome.reason}
           </p>
         </>

@@ -95,7 +95,7 @@ export function RegularizationLines({
           key={line.lineId}
           className="rounded-xl border border-(--line) p-3 text-sm"
         >
-          <h4 className="font-semibold break-words">{line.name}</h4>
+          <h4 className="font-semibold wrap-break-word">{line.name}</h4>
           <p>
             Expedido: {formatQuantity(line.expeditedQuantity, line.unit)} ·
             Aceite pessoal preservado:{" "}
@@ -164,10 +164,10 @@ export function RegularizationCaseFacts({
           : "Sem declaração pessoal registrada"}
         .
       </p>
-      <p className="whitespace-pre-wrap break-words">
+      <p className="whitespace-pre-wrap wrap-break-word">
         <strong>Motivo original:</strong> {item.proposal.reason}
       </p>
-      <p className="whitespace-pre-wrap break-words">
+      <p className="whitespace-pre-wrap wrap-break-word">
         <strong>Base da apuração:</strong> {item.proposal.basis}
       </p>
       <p>Conferência independente designada: {item.proposal.reviewerName}.</p>
@@ -186,7 +186,7 @@ export function RegularizationCaseFacts({
             {formatBrazilDate(item.decision.recordedAt)} · ficha v
             {item.decision.version}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className="whitespace-pre-wrap wrap-break-word">
             Motivo da decisão: {item.decision.reason}
           </p>
         </div>
@@ -209,7 +209,7 @@ export function RegularizationCaseFacts({
             Apuração própria de {f.actor_name} ·{" "}
             {formatBrazilDate(f.recorded_at)}
           </p>
-          <p className="whitespace-pre-wrap break-words">{f.body}</p>
+          <p className="whitespace-pre-wrap wrap-break-word">{f.body}</p>
         </div>
       ))}
       <details className="text-xs">
@@ -1000,10 +1000,10 @@ function RegularizationEditor({
             </h3>
             {mode === "propose" ? (
               <>
-                <p className="whitespace-pre-wrap break-words">
+                <p className="whitespace-pre-wrap wrap-break-word">
                   Motivo: {reason}
                 </p>
-                <p className="whitespace-pre-wrap break-words">
+                <p className="whitespace-pre-wrap wrap-break-word">
                   Base da apuração: {basis}
                 </p>
                 <p>
@@ -1021,7 +1021,7 @@ function RegularizationEditor({
                 ) : null}
               </>
             ) : (
-              <p className="whitespace-pre-wrap break-words">
+              <p className="whitespace-pre-wrap wrap-break-word">
                 Sua {mode === "finding" ? "apuração" : "justificativa"}:{" "}
                 {reason}
               </p>
@@ -1101,7 +1101,7 @@ function RegularizationEditor({
                       key={l.lineId}
                       className="space-y-3 rounded-xl border border-(--line) p-3"
                     >
-                      <h3 className="font-semibold break-words">{l.name}</h3>
+                      <h3 className="font-semibold wrap-break-word">{l.name}</h3>
                       {!referenceUnavailable ? (
                         <p className="text-sm">
                           Aceite pessoal preservado:{" "}

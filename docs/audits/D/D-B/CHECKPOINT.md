@@ -2775,3 +2775,24 @@ global. Preview READY. BAL/REQ contextuais,paridade66/171 e CI própria pendente
 Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
 [Dossiê](TRANSFER_DECLARATION_DRAFTS.md),[provas](TRANSFER_DECLARATION_DRAFTS_VALIDATION.json),
 [remoto](TRANSFER_DECLARATION_DRAFTS_REMOTE.json),[CI](CI_F233BE9_OBSERVATION.json).
+
+## Complemento D3.41 — recuperação e quadro ao responsável
+
+Base cb 83e 84. Corrida no teste REQ503→403:espera de resposta, recuperação
+retida, botão indisponível, erro antigo retirado e só depois próxima recusa.
+Sem alteração do consumidor, timeout ou exigência de apagar conteúdo recusado.
+6 cenários dirigidos PASS, sem retry, três por motor;anexo instável anterior
+não reproduziu. Saldo atual de comparação formatado, quantidade própria bruta
+preservada.38 classes em 16 fontes trocadas por wrap-break-word, com prova de
+alteração única e compilação Tailwind.21 fontes congelados, axe, quatro
+larguras,
+duas capturas inspecionadas, tipos/lint e build do runner PASS. Quadro
+temporário
+na raiz cobre 105 critérios, 56 concluídos internamente/49 parciais,
+estimativas,
+responsáveis, subtarefas 0% e sequência;visual≈60% é estimativa, não
+aprovação.
+Sem SQL novo;local/remoto 174 reconciliados. Matriz/primeiras 30/18 linhas
+preservadas. CI própria pendente;Sonar adiado;PR7 Draft, sem merge/produção.
+[Detalhe](PREVIEW_RECOVERY_AND_STATUS.md),
+[provas](PREVIEW_RECOVERY_AND_STATUS_VALIDATION.json).

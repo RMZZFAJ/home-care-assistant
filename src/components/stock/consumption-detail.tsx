@@ -159,7 +159,7 @@ export function ConsumptionDetail({
               {data.reported_name ?? "Nome não preservado no registro original"}{" "}
               · {formatBrazilDate(data.created_at)}
             </p>
-            <p className="my-2 whitespace-pre-wrap break-words">{data.body}</p>
+            <p className="my-2 whitespace-pre-wrap wrap-break-word">{data.body}</p>
             <ConsumptionLines lines={data.lines} />
           </section>
           {data.revisions.map((revision) => (
@@ -174,7 +174,7 @@ export function ConsumptionDetail({
                 {revision.actor_name ?? "Nome não preservado"} ·{" "}
                 {formatBrazilDate(revision.created_at)}
               </p>
-              <p className="my-2 whitespace-pre-wrap break-words">
+              <p className="my-2 whitespace-pre-wrap wrap-break-word">
                 {revision.body}
               </p>
               <ConsumptionLines lines={revision.lines} />
@@ -250,7 +250,7 @@ export function ConsumptionDetail({
               <h3 className="font-semibold">Movimentos desta confirmação</h3>
               <ul className="space-y-3">
                 {data.movements.map((movement) => (
-                  <li className="break-words text-sm" key={movement.id}>
+                  <li className="wrap-break-word text-sm" key={movement.id}>
                     {data.current_lines.find(
                       (line) => line.productId === movement.productId,
                     )?.name ?? "Nome não preservado"}{" "}

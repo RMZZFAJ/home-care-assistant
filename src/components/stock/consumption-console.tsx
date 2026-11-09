@@ -277,7 +277,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
         <ul className="space-y-3">
           {rows?.map((row) => (
             <li
-              className="rounded border border-(--line) p-4 break-words"
+              className="rounded border border-(--line) p-4 wrap-break-word"
               key={row.id}
             >
               <p className="font-semibold">

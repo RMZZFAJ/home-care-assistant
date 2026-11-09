@@ -4,7 +4,7 @@ export function ConsumptionLines({ lines }: { lines: ConsumptionLine[] }) {
   return lines.length ? (
     <ul className="my-3 space-y-2">
       {lines.map((line) => (
-        <li key={line.productId} className="break-words">
+        <li key={line.productId} className="wrap-break-word">
           <strong>{line.name ?? "Nome não preservado no relato"}</strong> ·{" "}
           {formatQuantity(line.quantity, line.unit)}
           {!line.name ? (

@@ -545,22 +545,22 @@ function TransferDeclarationEditor({
           : "Sem vínculo informado"}
         .
       </p>
-      {currentContent.materials.map((material) => (
-        <p key={material.id}>
-          {material.name} →{" "}
-          {comparison.products.find((product) => product.id === material.id)
-            ?.name ?? "Material indisponível"}
-          : quantidade preservada{" "}
-          {currentContent.fields[material.id + ":transferQuantity"] ||
-            "não informada"}{" "}
-          {material.unit}; atual{" "}
-          {comparison.products.find((product) => product.id === material.id)
-            ?.available ?? "indisponível"}{" "}
-          {comparison.products.find((product) => product.id === material.id)
-            ?.unit ?? ""}
-          .
-        </p>
-      ))}
+      {currentContent.materials.map((material) => {
+        const current = comparison.products.find(
+          (product) => product.id === material.id,
+        );
+        return (
+          <p key={material.id}>
+            {material.name} → {current?.name ?? "Material indisponível"}:
+            quantidade preservada{" "}
+            {currentContent.fields[material.id + ":transferQuantity"] ||
+              "não informada"}{" "}
+            {material.unit}; atual{" "}
+            {current ? formatQuantity(current.available) : "indisponível"}{" "}
+            {current?.unit ?? ""}.
+          </p>
+        );
+      })}
       <p>
         O vínculo e os valores próprios são preservados. Materiais ou pessoas
         indisponíveis exigem troca ou retirada explícita; a adoção não converte

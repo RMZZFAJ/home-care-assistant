@@ -203,7 +203,7 @@ export function OpeningHistory({
             {trail.data.map((row) => (
               <li
                 key={row.id}
-                className="rounded-lg border border-(--line) p-3 text-sm break-words"
+                className="rounded-lg border border-(--line) p-3 text-sm wrap-break-word"
               >
                 <strong>
                   {row.actor_name ?? "Nome não preservado no registro"}
