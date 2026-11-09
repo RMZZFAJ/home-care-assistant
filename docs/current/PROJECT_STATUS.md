@@ -4,14 +4,15 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação3109e83: Preview READY e Windows/Ubuntu/banco PASS; browsers em
-andamento na consulta. D3.39 corrige isolamento e reposicionamento do sino,
-com8 cenários distintos aprovados. O guia permanece montado, seu progresso e
-os efeitos oficiais são preservados. CI completa do novo SHA é independente.
-[Observação](../audits/D/D-B/CI_3109E83_OBSERVATION.json),
-[correção](../audits/D/D-B/NOTIFICATION_ISOLATION.md).
+Observação60c419b: Preview READY e Windows/Ubuntu/banco PASS; browsers em
+andamento na consulta. D3.40 amplia quatro atos da transferência com preparação
+privada, referência atual, revisão selada e recuperação pessoal.21 testes
+unitários/API,18 cenários Auth e14 de navegador aprovados. CI do novo SHA é
+independente. Declaração inicial,BAL/REQ contextuais e paridade integral pendentes.
+[Observação](../audits/D/D-B/CI_60C419B_OBSERVATION.json),
+[incremento](../audits/D/D-B/TRANSFER_DECISION_DRAFTS.md).
 
-Estado atual:local172/remoto172, zero migrations pendentes. Matriz105x39: 56
+Estado atual:local173/remoto173, zero migrations pendentes. Matriz105x39: 56
 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
 sem redução de funções. D3.28 concluiu a retirada técnica do Fluent: seletores

@@ -69,3 +69,5 @@
 "src/components/documents/document-actions.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
 "src/components/documents/document-progress.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
 "src/components/documents/document-viewer.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
+"src/components/documents/transfer-decision-editor.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","TRANSFER_DECISION_DRAFTS_VALIDATION.json;local directed proof only;own SHA CI and full visual parity remain"
+"src/components/documents/transfer-facts.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","TRANSFER_DECISION_DRAFTS_VALIDATION.json;local directed proof only;own SHA CI and full visual parity remain"

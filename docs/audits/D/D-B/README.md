@@ -32,6 +32,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
   consulta pessoal e intenção vinculada; migrations171/172 reconciliadas.
 - [Isolamento e posição do sino](NOTIFICATION_ISOLATION.md): Close registrado,
   foco, guia preservado e redução do viewport sem overflow.
+- [Atos privados da transferência](TRANSFER_DECISION_DRAFTS.md): quatro preparações,
+  comparação atual, recuperação pessoal e migration173 reconciliada.
 - [Nova aparência canônica](../../../ui-ux/CANONICAL_MODEL.md) e
   [execução adicional UI](UI_MODEL_ACCEPTANCE.csv):migração integral em andamento.
 - [Roteiro técnico GUI-04 e recuperação de leitura](RECOVERY_RUNBOOK.md).

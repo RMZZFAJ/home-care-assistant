@@ -461,17 +461,12 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
   await page
     .getByRole("button", { name: "Revisar meu ato", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Confirmar decisão", exact: true })
-    .click();
+  // The mandatory private save now detects the closed act before an official POST.
+  await expect(page.getByRole("button", { name: "Confirmar decisão", exact: true })).toHaveCount(0);
   await expect(reason).toHaveValue(/Parecer próprio preservado/);
   await expect(reason).toBeFocused();
-  await page
-    .getByRole("button", {
-      name: "Adotar estado atual e revisar minha decisão",
-      exact: true,
-    })
-    .click();
+  await page.getByRole("button", { name: "Consultar e comparar transferência atual", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Adotar estado atual e revisar minha decisão", exact: true })).toBeDisabled();
   await expect(
     page.getByRole("button", { name: "Revisar meu ato", exact: true }),
   ).toBeDisabled();

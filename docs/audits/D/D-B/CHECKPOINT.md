@@ -2739,3 +2739,23 @@ Sonar adiado, PR7 Draft, sem merge/produção, meta ativa; assinatura,backup e
 monitoramento sem nova aprovação.
 [Dossiê](NOTIFICATION_ISOLATION.md), [provas](NOTIFICATION_ISOLATION_VALIDATION.json),
 [CI](CI_3109E83_OBSERVATION.json).
+
+## D3.40 — atos privados da transferência
+
+Base60c419b. Quatro propósitos próprios:concordar,recusar,encerrar e expedir.
+Texto bruto,versão,etapa e nomes preservados entre sessões; CAS,descarte e
+consulta pessoal após encerramento/perda de escrita,sem confirmar outro ato.
+Revisão exige leitura Auth atual e adoção;403/200 inválido retiram fatos antigos.
+Commit sela ação/versão/texto;expedição não declara aceite ou divergência.
+Guarda de autoridade após journal,trim Unicode coerente e recuperação exata.
+21 unitários/API,18 cenários Auth e14 de navegador PASS. Quatro probes corrigidos
+no teste;falha real de foco corrigida;contraprovas preservadas. Dois fluxos
+antigos e cinco novos por motor;18 fontes congelados,axe e duas capturas.
+Local173/remoto173,zero pendências,digest/funções/ACL/constraint iguais;advisors
+inalterados exceto observed_at. Uma candidata no dry-run;sem reset,Auth/fixtures
+remotos ou backup redundante.84 históricos,105x39/primeiras30 e56 PASS/49 PARTIAL
+preservados. CI60c419b:Windows/Ubuntu/banco PASS,browsers em andamento,Preview READY.
+CI própria segue gate. Declaração inicial,BAL/REQ contextuais,paridade66/171 e
+externos pendentes;Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
+[Dossiê](TRANSFER_DECISION_DRAFTS.md),[provas](TRANSFER_DECISION_DRAFTS_VALIDATION.json),
+[remoto](TRANSFER_DECISION_DRAFTS_REMOTE.json),[CI](CI_60C419B_OBSERVATION.json).

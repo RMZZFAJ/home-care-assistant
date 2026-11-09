@@ -995,6 +995,7 @@ export function SupplyDocumentContent({
               {data.transfer ? (
                 <TransferDetails
                   data={data}
+                  context={context}
                   onUpdated={setData}
                   onEditingChange={setTransferEditing}
                 />

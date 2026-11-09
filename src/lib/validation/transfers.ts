@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { quantity } from "@/lib/quantity";
+import { draftCommitSchema } from "./creation-drafts";
 import { exactQuantity } from "./documents";
 
 const identifier = z.string().uuid();
@@ -49,6 +50,7 @@ export const createTransferSchema = z
   })
   .strict();
 const command = {
+  draftCommit: draftCommitSchema.optional(),
   idempotencyKey: identifier,
   expectedVersion: z.number().int().positive().max(2147483647),
 };

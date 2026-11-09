@@ -1,0 +1,186 @@
+{
+  "projectId": "qwfrqychokvhdzakibid",
+  "migration": "20261109175803_phase_d3_transfer_decision_private_drafts.sql",
+  "preflight": {
+    "versions": {
+      "last": "20261109170235",
+      "count": 172,
+      "sha256": "c3997db7aea8dbbd002e040ba5b34057d4d6c9f94fc784e06deda18eca7932ae"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "1fb0836d6ab2e3441c85dc358f021e114806aa62cb9e7f3b1ab6ac01bad02393",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_regularization_draft_intent",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "3b26e761209db4741043ea3acfc049501cc0697d7c66b087812878dab2d6e8eb",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "df5c952e3b0a88bc773eb50bb212bf37a890be0d81d6eeef282cf90f6ce1482a",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "0e6de8788fd6582a065c5476271744770c91ec4bf492edacb18a44d6dcfa4421",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      }
+    ],
+    "privateTable": {
+      "anon": false,
+      "authenticated": false
+    },
+    "purposeConstraint": "CHECK ((((kind = ANY (ARRAY['REQ'::text, 'BAL'::text])) AND (purpose = 'create'::text) AND ((kind = 'BAL'::text) OR (target_document_id IS NULL))) OR ((kind = ANY (ARRAY['COM'::text, 'ENT'::text])) AND (((purpose = 'create'::text) AND (target_document_id IS NULL)) OR ((purpose = 'revise'::text) AND (target_document_id IS NOT NULL)))) OR ((kind = 'COM'::text) AND (purpose = ANY (ARRAY['approve'::text, 'purchase'::text, 'receive'::text, 'validate_receipt'::text, 'reject_receipt'::text, 'close_expectation'::text, 'cancel'::text])) AND (target_document_id IS NOT NULL)) OR ((kind = 'ENT'::text) AND (purpose = ANY (ARRAY['receive'::text, 'divergence'::text, 'reassign'::text, 'resolve'::text, 'cancel'::text, 'refuse_cancellation'::text, 'withdraw_cancellation'::text, 'consent_cancel'::text, 'propose_regularization'::text, 'approve_regularization'::text, 'reject_regularization'::text, 'withdraw_regularization'::text, 'record_regularization_finding'::text])) AND (target_document_id IS NOT NULL))))"
+  },
+  "predecessorExactlyMatchesPublished172": true,
+  "safety": [
+    {
+      "waiting_locks": 0,
+      "old_transactions": 0,
+      "private_constraints_valid": true
+    }
+  ],
+  "constraintChange": "Additive superset; all existing private constraints validated",
+  "dryRunCandidates": [
+    "20261109175803_phase_d3_transfer_decision_private_drafts.sql"
+  ],
+  "seeds": [],
+  "roles": [],
+  "vaultUpdated": false,
+  "post": {
+    "versions": {
+      "last": "20261109175803",
+      "count": 173,
+      "sha256": "20b36c404f07a589537949e8bcbbc25d44d999ab3b136dd30b1253c6dd87f8e7"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "252f4a8cbdf7d1e5c0c7cba8a66737afe69f39e3cc1c7b04dab77eaa1f6cb22e",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_regularization_draft_intent",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "3b26e761209db4741043ea3acfc049501cc0697d7c66b087812878dab2d6e8eb",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "2937ed1a6efbac28ae83493fdea173ffab07d4e1f1839d7c881989a6cb8ecc52",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "require_transfer_draft_authority",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "9721cb78f18ddf130214afb86d84247302e31e931c8ff4a14e37566a1f24a94b",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "1bcd8f36367bd37ac1ab2e9b8700c0050cbe3ca8bfdadf097676be74cacba6fa",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      }
+    ],
+    "privateTable": {
+      "anon": false,
+      "authenticated": false
+    },
+    "purposeConstraint": "CHECK ((((kind = ANY (ARRAY['REQ'::text, 'BAL'::text])) AND (purpose = 'create'::text) AND ((kind = 'BAL'::text) OR (target_document_id IS NULL))) OR ((kind = ANY (ARRAY['COM'::text, 'ENT'::text])) AND (((purpose = 'create'::text) AND (target_document_id IS NULL)) OR ((purpose = 'revise'::text) AND (target_document_id IS NOT NULL)))) OR ((kind = 'COM'::text) AND (purpose = ANY (ARRAY['approve'::text, 'purchase'::text, 'receive'::text, 'validate_receipt'::text, 'reject_receipt'::text, 'close_expectation'::text, 'cancel'::text])) AND (target_document_id IS NOT NULL)) OR ((kind = 'ENT'::text) AND (purpose = ANY (ARRAY['receive'::text, 'divergence'::text, 'reassign'::text, 'resolve'::text, 'cancel'::text, 'refuse_cancellation'::text, 'withdraw_cancellation'::text, 'consent_cancel'::text, 'propose_regularization'::text, 'approve_regularization'::text, 'reject_regularization'::text, 'withdraw_regularization'::text, 'record_regularization_finding'::text, 'transfer_agree'::text, 'transfer_decline'::text, 'transfer_withdraw'::text, 'transfer_dispatch'::text])) AND (target_document_id IS NOT NULL))))"
+  },
+  "postMatchesLocal173": true,
+  "pendingMigrations": [],
+  "advisorsSameExcludingObservedAt": true,
+  "advisorsNormalizedSha256": "76a8217b5ba8c0de3b2e51cd39fd7497f8aec6712b7d5a9c436398af067a0c36",
+  "advisorsKinds": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO"
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN"
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN"
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN"
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN"
+    }
+  ],
+  "limits": [
+    "Remote disposable synthetic data by owner instruction; no redundant backup,reset,fixtures,Auth change or restore",
+    "Clean installation,legacy evolution and full integration require the published SHA CI",
+    "Metadata proof is not remote mutation testing or production approval"
+  ]
+}
