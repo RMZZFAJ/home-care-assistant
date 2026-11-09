@@ -1971,3 +1971,22 @@ GUI-01/02/03/adoção/delegação/contingência. Humano/AT/aparelho e D-C/D6 pr�
 PDF/TSA, backup e monitores mantêm limites. PR7 Draft, sem merge/promoção,
 meta ativa e prioridade diária. [Dossiê](DAILY_READ_RECOVERY.md),
 [provas](DAILY_READ_RECOVERY_EVIDENCE.json), [CI base](DAILY_READ_CI_BASE.json).
+
+## CI — barreira real de commit no teste de credenciais
+
+Após033b936, a CI da base3a6bdc9 apontou uma falha WebKit, repetida no retry:
+o painel de intenção preservada aparecia antes do POST terminar, e o teste
+exigia imediatamente um registro no banco. O oráculo foi corrigido, sem mudar
+produto: reter POST antes do envio, comprovar painel/zero registros, liberar em
+finally, esperar requestfailed após route.fetch200 e só então comprovar um
+registro. Reload/replay conservam a mesma chave e o mesmo registro.
+
+Três rechecks de produção PASS nos três motores, inclusive WebKit. Tipos/lint
+passaram. Auxiliares e segundo caso do arquivo permanecem textualmente iguais;
+fontes do produto pertinentes coincidem com a evidência anterior. A CI antiga
+não recebe aprovação retroativa; novo SHA exige CI própria. Sem delay fixo,
+aumento de timeout, redução de assertiva, código de produto ou migration nova.
+Sem nova operação remota. Matriz48 PASS/52 PARTIAL/5 NOT_STARTED e29 colunas/
+complementos preservados; somente prova de C7-AC-001/C-FINAL-AC-020 ampliada.
+PR7 Draft, sem merge/promoção, Sonar adiado, meta ativa.
+[Evidências](CREDENTIAL_COMMIT_BARRIER_EVIDENCE.json).

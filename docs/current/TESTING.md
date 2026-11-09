@@ -545,3 +545,13 @@ Crons pausados pela fixture de anexos são restaurados pelo afterAll; conferir
 estado final. Não rodar suíte mutável de banco simultaneamente. O teste do guia
 pessoal não substitui GUI-04 ou prova de restore operacional.
 [Coortes e contraprovas](../audits/D/D-B/DAILY_READ_RECOVERY_EVIDENCE.json).
+
+## Barreira de commit de credenciais
+
+O painel de tentativa preservada comprova intenção local, antes da conclusão
+do POST. O teste credencial familiar recupera resposta perdida deve reter a
+requisição, comprovar zero registros, liberar e esperar requestfailed depois
+do200 upstream antes de afirmar o commit. Não trocar por sleep ou timeout.
+Reexecutar esse caso nos três motores; replay precisa conservar pacote/chave
+e não duplicar a conferência.
+[Contraprova CI e correção](../audits/D/D-B/CREDENTIAL_COMMIT_BARRIER_EVIDENCE.json).

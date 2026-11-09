@@ -44,15 +44,24 @@ test("credencial familiar recupera resposta perdida após reload, pagina histór
   await drawer(page).getByRole("button", { name: "Continuar editando", exact: true }).click();
   await expect(note).toBeFocused(); await expect(note).toHaveValue("Conferência familiar fictícia");
   const packets: unknown[] = []; let dropped = false;
+  let release!: () => void, arrived!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  const entered = new Promise<void>(resolve => { arrived = resolve; });
   await page.route("**/api/admin/credentials", async route => {
     if (route.request().method() === "POST") {
       packets.push(route.request().postDataJSON());
-      if (!dropped) { const response = await route.fetch(); expect(response.status()).toBe(200); dropped = true; await route.abort("failed"); return; }
+      if (!dropped) { arrived(); await gate; const response = await route.fetch(); expect(response.status()).toBe(200); dropped = true; await route.abort("failed"); return; }
     }
     await route.continue();
   });
+  const lost = page.waitForEvent("requestfailed", { predicate: request => new URL(request.url()).pathname === "/api/admin/credentials" && request.method() === "POST" });
   await drawer(page).getByRole("button", { name: "Registrar conferência familiar", exact: true }).click();
-  await expect(drawer(page).getByRole("region", { name: "Tentativa de conferência preservada", exact: true })).toBeVisible();
+  await entered;
+  try {
+    await expect(drawer(page).getByRole("region", { name: "Tentativa de conferência preservada", exact: true })).toBeVisible();
+    expect(JSON.parse(credentialHistory(f))).toHaveLength(0);
+  } finally { release(); }
+  await lost; expect(dropped).toBe(true);
   const saved = credentialHistory(f);
   expect(JSON.parse(saved)).toHaveLength(1);
   await page.reload(); await open(page, f);
