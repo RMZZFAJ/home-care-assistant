@@ -1,0 +1,36 @@
+{
+  "at": "2026-11-09T03:54:55.245Z",
+  "sha": "9b8260e47a66a792f2e0cbb50f5894713c725646",
+  "runId": 42557312172,
+  "jobs": [
+    {
+      "id": 128965916475,
+      "name": "database",
+      "status": "in_progress",
+      "conclusion": null,
+      "failedSteps": []
+    },
+    {
+      "id": 128965916784,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "failedSteps": []
+    },
+    {
+      "id": 128965916815,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "failedSteps": []
+    }
+  ],
+  "preview": {
+    "id": "dpl_5uENacWrPg895nzbGphjNvpCyuye",
+    "state": "READY",
+    "sha": "9b8260e47a66a792f2e0cbb50f5894713c725646"
+  },
+  "scope": "Parent published SHA only; does not approve new typed-field changes",
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "globalApproval": false
+}

@@ -10,12 +10,22 @@ grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
 não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
 Estado atual:local164/remoto164, zero migrations pendentes. Matriz105x39:
-51 PASS/51 PARTIAL/3 NOT_STARTED; contagens não equivalem à conclusão da fase.
+51 PASS/52 PARTIAL/2 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
+
+D3.22 alinhou Ordem do catálogo ao inteiro0–1.000.000 da API após baseline
+negativo real. Catálogo/unidade/apresentação, turno noturno720 minutos e login/
+nova senha/MFA têm três cenários distintos Chromium qualificados e22 unitários
+PASS, além de tipos/lint. Unidade e barcode preservam zeros; Auth usa fator
+TOTP local criado/verificado/removido, sem guardar segredo/QR/OTP em artefato.
+C-FINAL-AC-019 parcial pelos demais grupos finitos; outros motores seguem na
+CI programada. Sem SQL novo:local/remoto164, zero pendências. Preview9b8260e
+READY; Windows/Ubuntu desse SHA PASS e banco em andamento na observação, sem
+aprovação do candidato seguinte. [Provas](../audits/D/D-B/TYPED_FIELDS.md).
 
 D4.12 fechou a prova local de C105/C106 com dez PDFs fictícios do compositor:
 cancelados, histórico desconhecido, parciais e quatro tipos extensos com120

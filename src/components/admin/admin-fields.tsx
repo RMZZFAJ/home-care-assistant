@@ -17,12 +17,18 @@ export function Field({
   value = "",
   type = "text",
   required = false,
+  min,
+  max,
+  step,
 }: {
   name: string;
   label: string;
   value?: string | number;
   type?: InputProps["type"];
   required?: boolean;
+  min?: number;
+  max?: number;
+  step?: number;
 }) {
   const id = useId();
   return (
@@ -33,6 +39,9 @@ export function Field({
         defaultValue={String(value)}
         type={type}
         required={required}
+        min={min}
+        max={max}
+        step={step}
       />
     </FluentField>
   );

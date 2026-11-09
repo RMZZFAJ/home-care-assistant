@@ -366,6 +366,10 @@ export function CatalogueManagement({
                     name="sortOrder"
                     label="Ordem"
                     type="number"
+                    min={0}
+                    max={1_000_000}
+                    step={1}
+                    required
                     value={editing ? Number(editing.sort_order ?? 0) : 0}
                   />
                   <Check

@@ -21,6 +21,10 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   const drawer = page.getByRole("dialog", { name: "Tipo de plantão", exact: true });
   await drawer.getByLabel("Nome do plantão", { exact: true }).fill(name);
   await drawer.getByLabel("Início local", { exact: true }).fill("19:00");
+  const duration = drawer.getByLabel("Duração em minutos", { exact: true });
+  await duration.fill("720.5"); expect(await duration.evaluate((element: HTMLInputElement) => element.checkValidity())).toBe(false);
+  await duration.fill("720"); expect(await duration.evaluate((element: HTMLInputElement) => element.checkValidity())).toBe(true);
+  expect(await drawer.locator('input[name="end"], input[name="endsLocal"]').count()).toBe(0);
   await audit(page,"shift type drawer");
   await expect(drawer.getByLabel("Nome do plantão", { exact: true })).toHaveValue(name);
   await drawer.getByRole("button", { name: "Revisar alteração", exact: true }).click();
@@ -44,6 +48,8 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   expect(stored.ok()).toBe(true);
   const data = (await stored.json()).data;
   const shift = data.shifts.find((s: { type_name: string }) => s.type_name === name);
+  expect(Date.parse(shift.ends_at) - Date.parse(shift.starts_at)).toBe(720 * 60_000);
+  expect(new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(shift.ends_at))).toBe(end.toISOString().slice(0, 10));
   const overlap = await page.request.post("/api/schedules", { data: { careRecipientId: patientA, idempotencyKey: randomUUID(), command: { action: "series", body: { professionalId: fixture.professional.id, shiftTypeId: shift.shift_type_id, timezone: "America/Sao_Paulo", recurrence: "once", weekdays: [], anchorDate: date, validUntil: date, notes: "Conflito deve ser recusado" } } } });
   expect(overlap.status()).toBe(409);
   await page.setViewportSize({ width: 1366, height: 900 });

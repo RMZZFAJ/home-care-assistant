@@ -2137,3 +2137,41 @@ meta ativa. [Dossiê](PDF_OPERATIONAL_CORPUS.md),
 [provas](PDF_OPERATIONAL_CORPUS_EVIDENCE.json),
 [independente](d4-operational-proof/VERIFICATION.json),
 [remoto](PDF_OPERATIONAL_REMOTE_OBSERVATION.json).
+
+## D3.22 — campos tipados e desafios de acesso
+
+Base9b8260e. Baseline nativo aceitou ordem -1 apesar do contrato de API.
+Field recebe min/max/step opcionais; somente Ordem passa0–1.000.000/1 e
+required. Não há ajuste de estilo, API, banco, permissão ou coerção de código.
+
+22 unitários PASS e três cenários distintos Chromium qualificados:catálogo/
+unidade/apresentação com HTTP/PostgreSQL, agenda noturna com intervalo/data
+persistidos e Auth com fator TOTP local real. Ordem12 e precisão0/6 aceitas;
+negativos, fração,7 casas, tipo textual/número em código/dimensão desconhecida
+e âmbito global indevido recusados. Código001234 mantém texto na entrada;
+apresentação válida00123456 é gravada/reconsultada com zeros. Estoque igual.
+Turno19:00/720 termina às07:00 seguinte; fim não é outro input editável.
+
+Login/current-password não recebem política de nova senha. New-password tem
+limite mínimo12; MFA vai à etapa adicional e campo one-time-code textual
+conserva zeros/recusa tamanho curto/descarta após reload. Fator próprio novo
+criado/verificado/removido; sem troca de senha ou segredo/QR/OTP real em
+navegador/evidência. Trace/vídeo/screenshots Auth desligados. Tipos/lint PASS.
+
+Logs preservam falha real de ordem e correções do instrumento:seletor de
+select, busca existente do material, paciente explícito na fixture e destino
+legítimo de step-up. Dois casos Chromium passaram antes do último ajuste; esse
+altera só o destino esperado quando stepUp=true. Caso MFA passou na fonte
+final. Outros motores permanecem na CI programada; não se alega reteste local.
+Não se repetiram checks gerais por rotina ou testes mutáveis junto do E2E.
+
+Remoto164/última20261109024515/hash de versões igual ao local, leitura apenas;
+zero SQL nova/pendente. Sem reset, Auth remoto, produção ou backup redundante.
+Matriz51 PASS/52 PARTIAL/2 NOT_STARTED,105x39;29 colunas e complementos intactos.
+C-FINAL-AC-019 parcial pelos demais grupos finitos de decisão/linhas/capacidades;
+CI própria e gates humanos/AT/aparelho/D-C/D6 separados. Preview9b8260e READY,
+Windows/Ubuntu PASS, banco ainda em andamento na observação; nada disso aprova
+o candidato novo. PR7 Draft, Sonar adiado, meta ativa.
+[Dossiê](TYPED_FIELDS.md), [provas](TYPED_FIELDS_EVIDENCE.json),
+[remoto](TYPED_FIELDS_REMOTE_OBSERVATION.json),
+[CI anterior](CI_9B8260E_OBSERVATION.json).
