@@ -22,8 +22,29 @@ select pg_temp.assert_ok(not exists(select 1 from pg_class c join pg_namespace n
 select pg_temp.assert_ok(not exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
   where n.nspname='public' and not exists(select 1 from pg_depend d where d.classid='pg_proc'::regclass and d.objid=p.oid and d.deptype='e')
     and has_function_privilege('service_role',p.oid,'EXECUTE')
-    and p.proname not in ('claim_notification_jobs','validate_notification_job','complete_notification_job','notification_webhook','notification_job_state','notification_document_payload','finalize_attachment','register_document_pdf','issue_whatsapp_challenge','accept_whatsapp_receipt','flow_exchange','inbound_report_context','ingest_whatsapp_report','notification_safe_failure','acknowledge_no_issues','bind_notification_template','configure_worker_schedule','confirm_whatsapp_science','issue_reminder_challenge','issue_science_challenge','notification_notice_payload','register_document_render','run_operational_schedule','claim_pdf_issuance','claim_pdf_verification','pdf_issuance_public','legacy_pdf_public','claim_web_push_deliveries','prepare_web_push_delivery','complete_web_push_delivery','record_operations_event','collect_operations_status','settle_attachment_upload','attest_attachment_source')),
+    and p.proname not in ('claim_notification_jobs','validate_notification_job','complete_notification_job','notification_webhook','notification_job_state','notification_document_payload','finalize_attachment','register_document_pdf','issue_whatsapp_challenge','accept_whatsapp_receipt','flow_exchange','inbound_report_context','ingest_whatsapp_report','notification_safe_failure','acknowledge_no_issues','bind_notification_template','configure_worker_schedule','confirm_whatsapp_science','issue_reminder_challenge','issue_science_challenge','notification_notice_payload','register_document_render','run_operational_schedule','claim_pdf_issuance','claim_pdf_verification','pdf_issuance_public','legacy_pdf_public','claim_web_push_deliveries','prepare_web_push_delivery','complete_web_push_delivery','record_operations_event','collect_operations_status','settle_attachment_upload','attest_attachment_source','prepare_avatar_change','verify_avatar_change','avatar_cleanup_candidates','ack_avatar_cleanup')),
   'service role executes only the worker application functions');
+
+select pg_temp.assert_ok(not exists(
+ select 1 from (values
+  ('public.my_avatar_change(uuid)',true,false),
+  ('public.begin_my_avatar_change(uuid,text,integer,text,integer)',true,false),
+  ('public.finish_my_avatar_change(uuid)',true,false),
+  ('public.abandon_my_avatar_change(uuid)',true,false),
+  ('public.prepare_avatar_change(uuid,text,integer)',false,true),
+  ('public.verify_avatar_change(uuid,text,integer,uuid)',false,true),
+  ('public.avatar_cleanup_candidates(uuid,integer)',false,true),
+  ('public.ack_avatar_cleanup(uuid)',false,true)
+ ) expected(signature,client,worker) join pg_proc p on p.oid=expected.signature::regprocedure
+ where has_function_privilege('anon',p.oid,'execute')
+ or has_function_privilege('authenticated',p.oid,'execute') is distinct from expected.client
+ or has_function_privilege('service_role',p.oid,'execute') is distinct from expected.worker
+ or not p.prosecdef or p.proconfig is distinct from array['search_path=""']::text[]
+),'avatar functions preserve exact Auth/service separation and empty search_path');
+select pg_temp.assert_ok(not has_table_privilege('anon','private.avatar_changes','SELECT,INSERT,UPDATE,DELETE,TRUNCATE')
+ and not has_table_privilege('authenticated','private.avatar_changes','SELECT,INSERT,UPDATE,DELETE,TRUNCATE')
+ and not has_table_privilege('service_role','private.avatar_changes','SELECT,INSERT,UPDATE,DELETE,TRUNCATE'),
+ 'avatar intention table has no direct client or worker privileges');
 
 select pg_temp.assert_ok(not exists(select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace
  where n.nspname='private' and c.relname like 'web_push_%' and

@@ -2088,3 +2088,17 @@ READY, registrados por SHA; CI própria do candidato continua obrigatória. PR7
 Draft, sem merge/promoção, Sonar adiado, meta ativa.
 [Dossiê](AVATAR_RECOVERY.md), [provas](AVATAR_RECOVERY_EVIDENCE.json),
 [remoto](AVATAR_REMOTE_MIGRATIONS.json), [CI anterior](CI_3772FD0_OBSERVATION.json).
+
+### D3.21 — regressão da allowlist na CI
+
+SHA a057c2c: Preview READY e validações Windows/Ubuntu PASS. A CI42555751630
+passou a instalação limpa, mas a regressão service-role.sql recusou os quatro
+RPCs de serviço de avatar, ausentes na lista esperada do teste. Banco FAIL e
+browsers SKIPPED; não há aprovação global. A correção inclui somente esses
+quatro nomes e reforça assinaturas, grants Auth/serviço, recusa anônima,
+SECURITY DEFINER, search_path vazio e ausência de grants diretos da tabela.
+
+Regressão PostgreSQL dirigida PASS, com Auth real do runner e rollback. Sem
+reset/replay local adicional, alteração de migration, runtime ou remoto164.
+Instalação limpa/legada e integração completa ficam na CI do SHA corretivo.
+[Observação por SHA](CI_A057C2C_OBSERVATION.json). Meta continua ativa.

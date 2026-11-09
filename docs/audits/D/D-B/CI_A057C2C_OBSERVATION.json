@@ -1,0 +1,65 @@
+{
+  "at": "2026-11-09T03:29:31.665Z",
+  "sha": "a057c2ca2f705c51716103fc768e153c471ecefd",
+  "runId": 42555751630,
+  "jobs": [
+    {
+      "id": 128960939374,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "failedSteps": []
+    },
+    {
+      "id": 128960939666,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "failedSteps": []
+    },
+    {
+      "id": 128960939777,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "failure",
+      "failedSteps": [
+        "Run npm run test:migrations -- --replay-local --backup \"$HCA_LOCAL_BACKUP\""
+      ]
+    },
+    {
+      "id": 128962263619,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "failure",
+      "failedSteps": [
+        "Require database and every browser project"
+      ]
+    },
+    {
+      "id": 128962264683,
+      "name": "browser (${{ matrix.artifact }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "failedSteps": []
+    }
+  ],
+  "preview": {
+    "id": "dpl_6puPiZm6JrjvmNhD4J2fT1uWQpQ2",
+    "state": "READY",
+    "sha": "a057c2ca2f705c51716103fc768e153c471ecefd"
+  },
+  "failure": "tests/database/service-role.sql omitted the four explicitly authorized new avatar service functions from the existing worker whitelist",
+  "excerpt": [
+    "2026-11-09T03:23:05.6089804Z PASS clean installation: complete migrations, real Auth and independent first code REQ-0001.",
+    "2026-11-09T03:23:50.5001530Z Error: Local SQL failed: ERROR:  ASSERTION FAILED: service role executes only the worker application functions",
+    "2026-11-09T03:23:50.5004340Z     at runSqlRegressions (file:///home/runner/work/home-care-assistant/home-care-assistant/scripts/test-migrations.mjs:245:20)"
+  ],
+  "correction": "Add only the four authorized avatar service functions and assert exact signatures/Auth-service separation, anonymous denial, SECURITY DEFINER, empty search_path and no direct intention table grants",
+  "localReplayResetRepeated": false,
+  "ownCorrectiveShaCiRequired": true,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "globalApproval": false,
+  "directedPostgresRegression": "PASS --sql-only --sql-file service-role.sql;Auth sessions real;rollback;no reset",
+  "regressionSourceLfSha256": "c92583fcc9110777bd1373250bd29f39a66c3fd3de4e019184e0bdd149ebe90c",
+  "directedLogLfSha256": "759997cdd3c022e0aeb90ffe4d02605e0b8bed403e07042650182e5dd8d420cd"
+}

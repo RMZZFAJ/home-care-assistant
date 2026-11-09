@@ -4,6 +4,11 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+Observação a057c2c: Preview READY; Windows/Ubuntu PASS, banco FAIL na allowlist
+SQL de funções de serviço e browsers SKIPPED. Lista do teste corrigida com
+grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
+não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
+
 Estado atual:local164/remoto164, zero migrations pendentes. Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
