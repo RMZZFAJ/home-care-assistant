@@ -3,8 +3,9 @@
 import { Suspense, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Avatar, Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, MenuDivider, MenuItem, MenuItemRadio, MenuList, Popover, PopoverSurface, PopoverTrigger, OverlayDrawer, Select, useRestoreFocusTarget, useRestoreFocusSource } from "@fluentui/react-components";
+import { Avatar, Button, MenuDivider, MenuItem, MenuItemRadio, MenuList, Popover, PopoverSurface, PopoverTrigger, Select } from "@fluentui/react-components";
 import { Icon } from "@/components/ui/primitives";
+import { Drawer } from "@/components/ui/overlays";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { GuideOnboarding } from "@/components/guides/user-guide";
@@ -51,7 +52,7 @@ function ProfileMenu() {
     <PopoverTrigger disableButtonEnhancement><Button ref={triggerRef} appearance="subtle" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data || selecting}>
       <Avatar name={data?.fullName} image={data?.avatarUrl ? { src: data.avatarUrl, alt: "" } : undefined} size={32} color="brand" />
       <span className="hca-profile-identity"><strong>{data?.fullName}</strong><small>{data?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role)}</small></span>
-      <Icon name="chevron" width={14} />
+      <Icon name="down" width={14} />
     </Button></PopoverTrigger>
     <PopoverSurface aria-label="Perfil e contexto" className={contexts ? "hca-context-menu" : undefined}>{contexts && selectionError ? <p role="alert">{selectionError}</p> : null}<MenuList ref={menuRef} aria-labelledby={undefined} aria-label={contexts ? "Contextos autorizados" : "Ações do usuário"} checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
       {contexts ? <>
@@ -76,15 +77,14 @@ export function WorkspaceShell({ children,showOnboarding=false }: { children: Re
   const desktop = useSyncExternalStore(subscribe, desktopSnapshot, serverSnapshot);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const restoreTarget = useRestoreFocusTarget();
-  const restoreSource = useRestoreFocusSource();
+  const navigationTriggerRef = useRef<HTMLButtonElement>(null);
   const operational = value?.activeContext?.mode === "patient" && ["professional", "supervisor"].includes(value.patient?.role ?? "");
   const expanded = desktop ? !collapsed : mobileOpen;
   const navigation = <Suspense fallback={null}><WorkspaceNavigation context={value} operational={operational} onNavigate={() => setMobileOpen(false)} /></Suspense>;
   return <div data-context-mode={value?.activeContext?.mode ?? ""} data-context-patient={value?.activeContext?.care_recipient_id ?? ""} className={`app-shell hca-workspace ${operational ? "hca-operations-shell" : "hca-management-shell"} ${desktop && !collapsed ? "hca-navigation-expanded" : ""}`}>
     <a href="#workspace-content" className="skip-link">Ir para o conteúdo</a>
     <header className="app-header print:hidden">
-      <Button {...restoreTarget} className="hca-navigation-toggle" appearance="subtle" icon={<Icon name="menu" />} aria-label={expanded ? "Recolher navegação" : "Abrir navegação"} aria-expanded={expanded} aria-controls="workspace-navigation" onClick={(event) => { event.currentTarget.focus(); if (desktop) setCollapsed((current) => !current); else setMobileOpen((current) => !current); }} />
+      <Button ref={navigationTriggerRef} className="hca-navigation-toggle" appearance="subtle" icon={<Icon name="menu" />} aria-label={expanded ? "Recolher navegação" : "Abrir navegação"} aria-expanded={expanded} aria-controls="workspace-navigation" onClick={(event) => { event.currentTarget.focus(); if (desktop) setCollapsed((current) => !current); else setMobileOpen((current) => !current); }} />
       <Link href="/" prefetch={false} className="app-brand" aria-label="Home Care Assistant — início"><span>HC</span><strong>Home Care Assistant<small>{operational ? "Operação assistencial" : "Gestão do cuidado"}</small></strong></Link>
       <div className="patient-picker">{data?.patients.length ? <Select aria-label="Pessoa assistida" value={value?.patient?.id ?? ""} disabled={selecting} onChange={(event) => void selectPatient(event.target.value)}>
         <option value="" disabled>Selecione um paciente</option>
@@ -94,10 +94,9 @@ export function WorkspaceShell({ children,showOnboarding=false }: { children: Re
       <ProfileMenu />
     </header>
     {desktop && !collapsed ? <aside id="workspace-navigation" className="hca-desktop-navigation print:hidden">{navigation}</aside> : null}
-    <OverlayDrawer {...restoreSource} className="hca-navigation-drawer" open={!desktop && mobileOpen} onOpenChange={(_, next) => setMobileOpen(next.open)} position="start" size="small" id={!desktop ? "workspace-navigation" : undefined}>
-      <DrawerHeader><DrawerHeaderTitle action={<Button appearance="subtle" icon={<Icon name="close" />} aria-label="Fechar menu" onClick={() => setMobileOpen(false)} />}>Home Care Assistant</DrawerHeaderTitle></DrawerHeader>
-      <DrawerBody>{navigation}</DrawerBody>
-    </OverlayDrawer>
+    <Drawer title="Home Care Assistant" open={!desktop && mobileOpen} onClose={() => setMobileOpen(false)} closeLabel="Fechar menu" side="start" finalFocus={navigationTriggerRef} id={!desktop ? "workspace-navigation" : undefined}>
+      {navigation}
+    </Drawer>
     <div className="hca-workspace-body">{showOnboarding&&value?.activeContext?<GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id??""}`}/>:null}{children}</div>
     {operational && value ? <BottomNavigation context={value} /> : null}
   </div>;

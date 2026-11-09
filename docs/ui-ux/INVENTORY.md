@@ -1,5 +1,9 @@
 # Inventário de interface
 
+**Regra visual vigente:**[Modelo Integral](CANONICAL_MODEL.md). Fluent UI foi
+descartado como aparência; o conteúdo AS_IS abaixo é histórico quando divergir
+da nova direção. Preservar funções e contratos durante a migração integral.
+
 Inventário gerado datado, mantido por compatibilidade do consumidor. Não foi
 regenerado em C e não representa aceite atual.
 Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:

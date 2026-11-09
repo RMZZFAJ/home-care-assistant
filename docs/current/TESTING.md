@@ -1,5 +1,10 @@
 # Testes e reprodução
 
+**Gate visual vigente:**[Modelo Integral](../ui-ux/CANONICAL_MODEL.md).
+Exigir paridade de todos os recursos, comparação em cinco viewports, teclado,
+foco/retorno, contraste/disabled e regressões dos consumidores. Prova da antiga
+aparência Fluent não aprova a nova; abas e Andamentos exigem provas próprias.
+
 Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
 C não executou testes funcionais. D-A iniciou a correção dos instrumentos
 de B8: NULL SQL, revisão axe, readiness e proteção de ferramentas/exportação.

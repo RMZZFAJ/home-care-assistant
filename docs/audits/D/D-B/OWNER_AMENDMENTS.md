@@ -100,3 +100,24 @@ Ensaios de backup/recuperação da infraestrutura continuam no critério própri
 RPO/RTO e recuperação operacional não recebem aprovação por este esclarecimento.
 Permanecem a branch atual, PR7 Draft, aplicação remota no fechamento do lote e
 os limites de publicação e transportes externos da missão.
+
+## Aparência canônica integral e Andamentos — 09/11/2026
+
+O responsável determinou que Home_Care_Assistant_Modelo_Integral.html passa a
+ser a nova aparência canônica de todo o sistema, substituindo Fluent UI.
+Aplicar a telas, recursos, diálogos, modais, botões, estados e fluxos existentes
+e futuros; criar os ausentes na mesma linguagem, com componentes reutilizáveis.
+Não remover, resumir, reduzir ou ocultar nenhuma função para caber no HTML.
+Sem mistura de aparência, temas prontos, pontes Fluent ou remendos visuais.
+
+Inclui fichas com abas e função real de Andamentos, conceitos dos componentes,
+textos de apoio, estrutura, avisos, status e faixa factual de pendências.
+Escolha das bibliotecas adequadas está delegada. Preservar autorização, banco,
+recuperação, rascunhos, PDFs técnicos, assinatura, PWA e notificações. Aparência
+dos PDFs continua adiada pela instrução específica anterior. A direção visual
+anterior fica superada, preservando sua evidência histórica e os contratos
+operacionais. Sem produção, merge ou ativação externa; PR7 sempre Draft.
+
+Contrato e precedência:[Modelo Integral](../../../ui-ux/CANONICAL_MODEL.md).
+[Registro adicional de execução](UI_MODEL_ACCEPTANCE.csv) acompanha o novo
+escopo junto aos105 critérios D-B, sem converter planejamento em implementação.

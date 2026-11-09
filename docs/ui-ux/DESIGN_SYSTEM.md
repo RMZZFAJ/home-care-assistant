@@ -1,57 +1,34 @@
-# Design system Fluent 2
+# Sistema visual canônico
 
-Guia da base funcional auditada e de seus contratos requeridos. Os desvios
-A/B e as mudanças futuras C não foram corrigidos por este documento.
-Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
-[projeto C3](../audits/C/C3-functional-specification/README.md).
+O [Modelo Integral](CANONICAL_MODEL.md) é a regra vigente desde 09/11/2026.
+Fluent UI foi descartado como aparência. O
+[HTML original](../../Home_Care_Assistant_Modelo_Integral.html) governa todo o
+sistema, sem misturar estilos ou reduzir funcionalidades.
 
-## Fundação
+Tokens e componentes devem reproduzir o modelo. A primeira migração introduz
+canonical-ui.css, ícones próprios do HTML, badges e etapas nativos, overlays
+Base UI sem tema e drawers compartilhados. Ainda há consumidores Fluent a
+migrar: trabalho pendente, não alternativa visual aprovada. Remover provider,
+Griffel, imports, estilos e dependência Fluent ao terminar a migração integral,
+com regressões dos consumidores. Não criar ponte que apenas reproduza sua API.
 
-Fluent UI React v9 e ícones oficiais são dependências exatas. O tema claro
-usa azul empresarial, superfícies neutras e tipografia do sistema, com Segoe UI
-quando disponível. Não há dependência de fonte externa para apresentar a tela.
+## Componentes e comportamento
 
-ThemeProvider mantém um renderer por montagem/renderização e emite os estilos
-Griffel uma única vez no head durante SSR. A suíte verifica o HTML sem
-JavaScript e a navegação: cópias no corpo não podem sobrescrever regras de
-estado e variante inseridas pelo renderer no head. Fronteiras client ficam nos componentes
-interativos; o layout e as verificações de sessão permanecem no servidor.
-Imports Fluent são otimizados pelo Next para carregar os módulos utilizados.
+Usar componentes reutilizáveis para botões, campos, badges, banners, cards,
+listas/tabelas móveis, modais, drawers, menus, navegação, abas, cabeçalhos de
+ficha, progresso e Andamentos. Recursos ausentes do HTML seguem a mesma
+linguagem. Comportamento acessível pode usar biblioteca sem aparência;
+não substituir a direção aprovada por tema pronto.
 
-## Tokens e densidade
+Estados conservam texto e cor semântica. Quantidades e estoque usam contratos
+exatos. Dados indisponíveis não viram zero, vazio ou aprovação. Leitura e
+escrita incerta têm recuperação própria, foco visível e autorização real.
+Revisões são leitura; validação aponta campos editáveis legítimos.
 
-tokens.css centraliza cores, espaçamento e medidas. As classes legadas são
-compatibilidade transitória durante a migração dos consumidores.
+## Aceite
 
-- Azul: ação principal e seleção, não indicação de sucesso.
-- Verde: sucesso ou conclusão efetivamente confirmada.
-- Âmbar: atenção, prazo ou pendência.
-- Vermelho: falha, risco ou divergência efetiva.
-- Cinza: informação secundária, previsão e estados neutros.
-- Escala de espaço: 4, 8, 12, 16, 24 e 32 px.
-- Campos gerenciais: 36 px; controles móveis: pelo menos 44 px.
-- Texto em campos móveis: 16 px para leitura e edição confortáveis.
-
-Cor deve acompanhar texto ou ícone. Estoque confirmado, trânsito e previsão
-não compartilham uma representação que sugira disponibilidade equivalente.
-
-## Controles compartilhados
-
-Os componentes existentes StatusBadge, Dialog e StepNavigator agora consomem
-Badge, Dialog e Button Fluent. Os ícones utilizam o conjunto oficial.
-Dialog mantém foco, Escape e restauração de foco por meio do Fluent.
-StepNavigator conserva a etapa atual visível e respeita movimento reduzido.
-
-Ao migrar módulos, priorizar lista/grade, barra de comandos e edição contextual.
-Campos de quantidade conservam strings decimais e a validação existente;
-não substituir quantidades exatas por arredondamentos de ponto flutuante.
-
-## Feedback e acessibilidade
-
-Toda leitura possui carregamento, vazio, erro e tentativa novamente. Mutações
-indicam processamento, conflito ou persistência confirmada. Comunicação externa
-tem seu próprio estado; gravação não é entrega de mensagem.
-
-Labels, foco visível, navegação por teclado, erros associados, leitura assistiva
-e contraste são critérios de aceite. Painéis e diálogos precisam funcionar
-com teclado e toque, sem cortes nem sobreposições em 320 a 1920 px.
+Comparar produto e modelo em cinco viewports; testar teclado, retorno de foco,
+contraste, disabled, zoom, mobile e movimento reduzido. Preservar todas as
+funções, recursos, dados, operações e contraprovas. Só aprovar com aparência
+coerente em todos os consumidores, paridade funcional e CI do SHA publicado.
+Consultar o [registro de execução](../audits/D/D-B/UI_MODEL_ACCEPTANCE.csv).

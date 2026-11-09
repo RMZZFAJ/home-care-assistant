@@ -70,7 +70,6 @@
 .hca-theme .fui-MessageBarBody, .hca-record-drawer .fui-MessageBarBody, .hca-dialog-surface .fui-MessageBarBody { min-width: 0; overflow-wrap: anywhere; }
 .hca-theme .wizard-navigation { margin-bottom: 20px; }
 .hca-theme .wizard-steps { padding-bottom: 6px; }
-.hca-theme .wizard-steps button { border-radius: 4px; }
 .hca-theme .document-row { min-height: 64px; border-radius: 0; }
 .hca-theme .document-type { width: 34px; height: 36px; border-radius: 5px; }
 .hca-theme .ui-empty { padding: 40px 20px; }

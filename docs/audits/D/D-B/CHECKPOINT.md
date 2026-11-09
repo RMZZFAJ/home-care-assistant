@@ -2278,3 +2278,35 @@ CI76fabb6 Windows/Ubuntu/banco e três grupos browsers PASS,iOS-2 FAIL;Preview
 READY. CI do novo SHA obrigatória. PR7 Draft,Sonar adiado,meta ativa,produção NO-GO.
 [Dossiê](RECOVERY_RUNBOOK.md),[provas](RECOVERY_RUNBOOK_EVIDENCE.json),
 [remoto](RECOVERY_RUNBOOK_REMOTE_OBSERVATION.json),[CI anterior](CI_76FABB6_OBSERVATION.json).
+
+## D3.26 — Modelo Integral e primeira fundação compartilhada — 09/11/2026
+
+O responsável substituiu Fluent pela aparência do HTML integral em todo o
+sistema,sem reduzir funções;fichas em abas e Andamentos reais incorporados
+à missão. Fonte original preservada;AGENTS e guias ativos atualizados,sem
+reescrever auditorias históricas. Registro adicional18 requisitos e ledger58
+consumidores acompanha a migração. Base25d1b70,sem SQL novo.
+
+Ícones do modelo,dependência direta Fluent-icons retirada,badges/etapas nativos,
+modal e drawers Base UI sem tema e sem ponte da API Fluent. Formulário montado,
+recuperação,descarte,foco e bloqueio de fechamento preservados.56 consumidores
+Fluent restantes;provider,menus,campos,shell,abas e Andamentos persistidos ainda
+não concluídos. Não há aprovação de aparência misturada ou paridade global.
+
+12 casos locais Chromium/iOS PASS:6 edição/consulta,2 comparação canônica e4
+REQ/COM com efeitos e PDFs. Modal comparado ao HTML em cinco larguras nos dois
+motores,20 imagens e10 scans Axe;teclado,contraste,Escape e retorno de foco.
+REQ descobriu colisão real:etapa com verde sobre fundo azul antigo,contraste1.11.
+Removidas seis regras legadas;4 consumidores passaram na repetição,sem reduzir
+Axe. Duas premissas de fixture do novo teste visual também foram corrigidas:
+modality/foreground para focus-visible e outra conta global para drawer móvel.
+Hashes das contraprovas preservados. Tipos/lint dirigidos PASS.
+
+C033 apenas PARTIAL de fundação;matriz56/49/0,105x39,primeiras30 intactas.
+UI adicional não está concluída. Local/remoto164/última20261109024515/digest
+iguais,zero pendências. CI25d1b70 Windows/Ubuntu/banco PASS;browsers em andamento
+na observação. CI do novo SHA obrigatória. PR7 Draft,produção NO-GO,Sonar adiado,
+meta ativa. Próximo:migrar controles/shell e fichas/Andamentos,com todos os
+recursos preservados,seguindo depois66 composições/171 relações e gates finais.
+[Contrato](../../../ui-ux/CANONICAL_MODEL.md),[provas](UI_MODEL_STAGE_1.json),
+[execução](UI_MODEL_ACCEPTANCE.csv),[consumidores](UI_COMPONENT_MIGRATION.csv).

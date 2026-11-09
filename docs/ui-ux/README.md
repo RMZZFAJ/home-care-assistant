@@ -1,5 +1,9 @@
 # Guias da fundação de interface
 
+**Regra visual vigente:**[Modelo Integral](CANONICAL_MODEL.md). Fluent UI foi
+descartado como aparência; o conteúdo AS_IS abaixo é histórico quando divergir
+da nova direção. Preservar funções e contratos durante a migração integral.
+
 Guias AS_IS/normativos da base funcional auditada; desvios A/B permanecem
 registrados. O [estado por SHA](../current/PROJECT_STATUS.md) é a fonte atual.
 O [projeto C3](../audits/C/C3-functional-specification/README.md) descreve como
@@ -15,7 +19,8 @@ deverá funcionar; não foi implementado nesta reorganização.
   [matriz histórica](../archive/ui-ux/ACCEPTANCE.md) e protótipos/capturas
   arquivados não constituem aceite atual de aparelho ou participante.
 
-Fluent, paciente, capacidades e fatos separados são preservados. Não executar
+Paciente, capacidades e fatos separados são preservados. Aparência segue o
+Modelo Integral; Fluent não é diretriz visual vigente. Não executar
 inventory-ui ou probes históricos para atualizar resultados sem destino/base
 e guardas D0: B8-M002 registrou risco de sobrescrita. Nenhum guia concede
 autorização de banco, envio, deploy ou merge.

@@ -1,0 +1,77 @@
+/* Canonical visual source: Home_Care_Assistant_Modelo_Integral.html. */
+:root {
+  --hca-bg: #f4f6f5;
+  --hca-paper: #fff;
+  --hca-ink: #193332;
+  --hca-muted: #617471;
+  --hca-line: #dce5e2;
+  --hca-teal: #156f66;
+  --hca-teal-hover: #0d514b;
+  --hca-tint: #e6f2ed;
+  --hca-green: #217349;
+  --hca-green-bg: #e8f4eb;
+  --hca-amber: #8b5c12;
+  --hca-amber-bg: #fff2d8;
+  --hca-red: #a33342;
+  --hca-red-bg: #fcebee;
+  --hca-blue: #275f99;
+  --hca-blue-bg: #eaf2fa;
+  --hca-font: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+body { position: relative; }
+.hca-app-root { isolation: isolate; }
+.hca-icon { flex: none; }
+.hca-status {
+  display: inline-flex; align-items: center; gap: 5px; max-width: 100%;
+  padding: 4px 8px; border-radius: 6px; font: 670 11px/1.35 var(--hca-font);
+  white-space: normal; overflow-wrap: anywhere;
+}
+.hca-status--success { color: var(--hca-green); background: var(--hca-green-bg); }
+.hca-status--pending { color: var(--hca-amber); background: var(--hca-amber-bg); }
+.hca-status--danger { color: var(--hca-red); background: var(--hca-red-bg); }
+.hca-status--neutral { color: #5c7065; background: #eef2ef; }
+.hca-control {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 41px; padding: 9px 13px; border: 1px solid #ccdcd3; border-radius: 9px;
+  font: 660 12px var(--hca-font); color: var(--hca-ink); background: var(--hca-paper);
+}
+.hca-control:hover:not(:disabled) { background: #f0f7f2; border-color: #95bdae; }
+.hca-control-icon { width: 41px; padding: 0; flex: none; }
+.hca-control:focus-visible, .hca-step-control:focus-visible, .hca-modal:focus-visible {
+  outline: 3px solid #5aa99a; outline-offset: 3px;
+}
+.hca-overlay { position: absolute; inset: 0; z-index: 80; }
+.hca-modal-backdrop { position: absolute; inset: 0; background: #0d241b70; backdrop-filter: blur(3px); }
+.hca-modal-viewport { position: fixed; inset: 0; z-index: 1; display: grid; place-items: center; padding: 12px; }
+.hca-drawer-viewport { position: fixed; inset: 0; z-index: 1; display: flex; justify-content: flex-end; }
+.hca-drawer-viewport[data-side="start"] { justify-content: flex-start; }
+.hca-drawer-viewport .hca-drawer { max-height: 100dvh; height: 100dvh; border-radius: 0; box-shadow: 0 4px 18px #16372e07; }
+.hca-drawer-viewport[data-side="start"] .hca-drawer { width: min(260px, 100%); }
+.hca-attention { padding: 14px 16px; margin: 15px 0; border: 1px solid #ecdbad; border-radius: 11px; color: var(--hca-amber); background: var(--hca-amber-bg); }
+.hca-attention p { margin: 0 0 9px; }
+.hca-modal {
+  display: flex; flex-direction: column; width: min(640px, 100%); min-width: 0;
+  max-height: 90dvh; padding: 0; overflow: hidden; border: 1px solid var(--hca-line);
+  border-radius: 18px; box-shadow: 0 35px 120px #0d241b55;
+  color: var(--hca-ink); background: var(--hca-paper); font: 14px/1.5 var(--hca-font);
+}
+.hca-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 21px; border-bottom: 1px solid var(--hca-line); flex: none; }
+.hca-modal-head h2 { margin: 0; font-size: 19px; line-height: 1.35; letter-spacing: -.35px; }
+.hca-modal-content { min-height: 0; padding: 22px; overflow: auto; overscroll-behavior: contain; }
+.wizard-steps .hca-step-control { display: inline-flex; align-items: center; gap: 8px; min-height: 41px; padding: 7px 9px; border: 0; background: transparent; color: var(--hca-muted); font: 12px var(--hca-font); border-radius: 8px; }
+.wizard-steps .hca-step-control > span { display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 50%; background: #e8eeea; color: var(--hca-muted); font-size: 11px; }
+.wizard-steps .hca-step-control[aria-current="step"] { color: var(--hca-teal); font-weight: 700; }
+.wizard-steps .hca-step-control[aria-current="step"] > span { background: var(--hca-teal); color: white; }
+@media (max-width: 500px) {
+  .hca-control { min-height: 43px; padding: 10px 11px; }
+  .hca-control-icon { min-width: 42px; padding: 0; }
+  .hca-modal-viewport { padding: 7px; }
+  .hca-modal { max-height: 94dvh; border-radius: 14px; }
+  .hca-modal-head { padding: 15px 17px; }
+  .hca-modal-head h2 { font-size: 18px; }
+  .hca-modal-content { padding: 17px; }
+}
+@media (forced-colors: active) {
+  .hca-status, .hca-modal, .hca-control { border: 1px solid CanvasText; }
+  .wizard-steps .hca-step-control[aria-current="step"] { outline: 2px solid Highlight; }
+}

@@ -156,7 +156,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);
   await expect(page.getByText("Expectativa encerrada · parcelas aguardam conferência", { exact: true })).toBeVisible();
   await expect(page.locator(".hca-document-header .eyebrow")).toHaveText("Doação de insumos");
-  expect(await page.locator(".hca-document-header .fui-Badge").evaluate(element => {
+  expect(await page.locator(".hca-document-header").getByText("Expectativa encerrada · parcelas aguardam conferência", { exact: true }).evaluate(element => {
     const range = document.createRange(); range.selectNodeContents(element);
     const text = range.getBoundingClientRect(), badge = element.getBoundingClientRect();
     return text.top >= badge.top - 1 && text.bottom <= badge.bottom + 1;

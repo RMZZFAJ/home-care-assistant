@@ -1,5 +1,9 @@
 # Arquitetura
 
+**Fundação visual vigente:**[Modelo Integral](../ui-ux/CANONICAL_MODEL.md).
+A migração retira Fluent/Griffel, usa componentes reutilizáveis e comportamento
+sem aparência, preservando fronteiras, autorização e funcionalidades reais.
+
 Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
 Riscos conhecidos incluem progresso REQ, autoridade após espera, frescor e
 semântica de ciência. Descrição de invariante não elimina os desvios A/B.

@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, MessageBar, MessageBarBody, OverlayDrawer } from "@fluentui/react-components";
-import { Icon } from "@/components/ui/primitives";
+import { Drawer } from "@/components/ui/overlays";
 
 /** Contextual editing keeps the list and its filters in place. */
 export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges }: {
@@ -35,12 +34,9 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
     // The form stays mounted. Move focus before removing the warning's button.
     (target ?? form)?.focus();
   };
-  return <OverlayDrawer open aria-label={title} position="end" size="medium" className="hca-record-drawer" onOpenChange={(_, data) => { if (!data.open) requestClose(); }}>
-    <DrawerHeader><DrawerHeaderTitle action={<Button appearance="subtle" icon={<Icon name="close" />} aria-label="Fechar edição" disabled={busy || preventClose} onClick={requestClose} />}>{title}</DrawerHeaderTitle></DrawerHeader>
-    <DrawerBody>
+  return <Drawer open title={title} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false}>
       {recovery}
-      {discard ? <MessageBar layout="multiline" intent="warning" role="alert"><MessageBarBody>Há alterações ainda não salvas.<div className="hca-toolbar"><Button disabled={busy || preventClose} onClick={continueEditing}>Continuar editando</Button><Button disabled={busy || preventClose} onClick={() => { if (!busy && !preventClose) onClose(); }}>Descartar alterações</Button></div></MessageBarBody></MessageBar> : null}
+      {discard ? <div className="hca-attention" role="alert"><p>Há alterações ainda não salvas.</p><div className="hca-toolbar"><button type="button" className="hca-control" disabled={busy || preventClose} onClick={continueEditing}>Continuar editando</button><button type="button" className="hca-control" disabled={busy || preventClose} onClick={() => { if (!busy && !preventClose) onClose(); }}>Descartar alterações</button></div></div> : null}
       <fieldset ref={formRef} tabIndex={-1} className="min-w-0" disabled={busy} onFocusCapture={event => { editFocusRef.current = event.target; }} onChange={() => { if (trackChanges) setDirty(true); }}>{children}</fieldset>
-    </DrawerBody>
-  </OverlayDrawer>;
+  </Drawer>;
 }

@@ -29,6 +29,22 @@ Autorização corrente vem da missão vigente; relatos históricos não a renova
 
 ## Convenções verificáveis
 
+### Aparência canônica e paridade funcional
+
+O responsável descartou Fluent UI como aparência em 09/11/2026.
+Home_Care_Assistant_Modelo_Integral.html é a referência canônica de UI/UX para
+todo o sistema, incluindo recursos existentes e futuros. Ler
+docs/ui-ux/CANONICAL_MODEL.md e docs/ui-ux/DESIGN_SYSTEM.md antes de alterar UI.
+Não misturar estilos, usar tema pronto ou apenas recobrir componentes Fluent.
+Usar componentes reutilizáveis coerentes com o modelo; criar os ausentes sem
+remover, resumir, ocultar ou reduzir funções. Migrar fichas para abas e
+implementar Andamentos reais, com autoria/instante, cronologia e referência
+de etapa separados do progresso operacional. Preservar contratos, autorização,
+histórico, rascunhos, recuperação, acessibilidade e todas as contraprovas.
+As auditorias e capturas anteriores são históricas, não aprovação da nova UI.
+
+### Contratos operacionais
+
 - Identidade global e papel por paciente são conceitos distintos.
 - Nunca derivar autorização de IDs, metadata, nomes ou flags do navegador.
 - Administradores locais só alteram recursos e vínculos do próprio paciente.

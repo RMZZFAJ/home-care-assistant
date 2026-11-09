@@ -5,6 +5,7 @@ import "./design-system.css";
 import { LiveSession } from "@/components/live-session";
 import { ThemeProvider } from "@/theme/providers";
 import "@/theme/tokens.css";
+import "./canonical-ui.css";
 import { WorkspaceProvider } from "@/components/layout/workspace-context";
 import { PwaProvider } from "@/components/pwa/pwa-provider";
 import { stablePreviewOrigin } from "@/lib/pwa/preview-origin";
@@ -23,12 +24,14 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
+        <div className="hca-app-root">
         <ThemeProvider>
           <Suspense fallback={<main className="p-6" role="status">Carregando seu espaço de cuidado…</main>}>
             <PwaProvider previewOrigin={stablePreviewOrigin(process.env.VERCEL_ENV, process.env.VERCEL_BRANCH_URL)}><WorkspaceProvider>{children}</WorkspaceProvider></PwaProvider>
           </Suspense>
           <LiveSession />
         </ThemeProvider>
+        </div>
       </body>
     </html>
   );

@@ -1,5 +1,9 @@
 # Home Care Assistant
 
+**Aparência vigente:**o [Modelo Integral](docs/ui-ux/CANONICAL_MODEL.md) substitui
+Fluent UI em todo o sistema, sem reduzir recursos. Migração visual e fichas com
+abas/Andamentos integram a D-B; ainda não estão integralmente concluídas.
+
 Gestão operacional por paciente com Next.js, React, TypeScript e Supabase.
 REQ, COM, ENT e BAL distinguem necessidade, aquisição, entrega, contagem,
 ciência e estoque por movimentos. O sistema não prescreve ou decide conduta

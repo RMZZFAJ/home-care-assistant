@@ -1,5 +1,9 @@
 # Contratos e orientação atuais
 
+**Direção visual posterior:**[Modelo Integral](../ui-ux/CANONICAL_MODEL.md).
+Fluent UI foi descartado como aparência. Contratos AS_IS continuam como prova
+funcional; não são aprovação da nova UI, das abas ou de Andamentos.
+
 AS_IS do candidato D-A na branch `feat/phase-d-implementation`, após a base
 integrada PR6 `8ec979a`. Auditorias A/B preservam a origem dos desvios.
 O [estado canônico](PROJECT_STATUS.md) identifica branch/SHA e limites. Não

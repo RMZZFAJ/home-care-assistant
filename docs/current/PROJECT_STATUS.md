@@ -10,7 +10,16 @@ grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
 não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
 Estado atual:local164/remoto164, zero migrations pendentes. Matriz105x39:
-56 PASS/48 PARTIAL/1 NOT_STARTED; contagens não equivalem à conclusão da fase.
+56 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
+Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
+sem redução de funções. Guias ativos e AGENTS atualizados;primeira fundação
+compartilhada implementada.12 casos Chromium/iOS PASS,comparação do modal em
+cinco larguras e remoção de colisão de contraste das etapas. Ainda restam56
+consumidores Fluent,shell/controles,abas e Andamentos persistidos. O registro
+UI adicional possui18 requisitos;resultados funcionais anteriores não aprovam
+a nova aparência. [Contrato](../ui-ux/CANONICAL_MODEL.md),
+[provas](../audits/D/D-B/UI_MODEL_STAGE_1.md).
+
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:

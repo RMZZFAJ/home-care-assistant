@@ -11,7 +11,7 @@ export function SettingsSection({ title, summary, initiallyOpen = false, childre
   const id = useId();
   return <section className="ui-card hca-settings-section" aria-labelledby={id + "-title"}>
     <h2 id={id + "-title"}><Button appearance="subtle" aria-expanded={open} aria-controls={id + "-content"} onClick={() => setOpen((current) => !current)}>
-      <span>{title}</span><Icon name="chevron" style={{ transform: open ? "rotate(180deg)" : undefined }} />
+      <span>{title}</span><Icon name="down" style={{ transform: open ? "rotate(180deg)" : undefined }} />
     </Button></h2>
     {summary ? <p className="hca-settings-summary">{summary}</p> : null}
     <div id={id + "-content"} hidden={!open} className="hca-settings-content">{children}</div>
