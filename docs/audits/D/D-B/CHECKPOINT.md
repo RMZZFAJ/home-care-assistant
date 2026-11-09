@@ -2212,3 +2212,40 @@ meta ativa. [Dossiê](GOVERNANCE_FINITE_GROUPS.md),
 [provas](GOVERNANCE_FINITE_EVIDENCE.json),
 [remoto](GOVERNANCE_FINITE_REMOTE_OBSERVATION.json),
 [CI anterior](CI_1B89CE9_OBSERVATION.json).
+
+## D3.24 — criação global e escopo das tarefas locais
+
+Base86025ba. Quatro cenários nativos Chromium PASS:preparação global,
+revogação de vínculo isolada por paciente, comunicação com manter/alterar/
+remover e conta alheia com revisão/save/restauração pela interface. Wizard
+salva antes de criar, reconcilia outra sessão, recupera criação inativa sem
+duplicar e não vincula automaticamente o autor. Família não entra no wizard
+global; paciente inativo não recebe documento operacional. Resumos de escala/
+BAL/comunicação não têm inputs e conservam links do paciente.
+
+Conta alheia usa editor/revisão globais e não Meu perfil. Nome do alvo muda e
+volta; papel/status/privilégio e conta do operador permanecem iguais. Local
+recebe403 para GET/POST de perfil global. Baseline FAIL dos rótulos crus
+preservado; cartão/select/revisão agora têm rótulos humanos, mesmos valores.
+Essa foi a única mudança de produto, sem autorização/API/schema/PDF alterados.
+
+Uma contraprova Auth nova PASS:fixture tinha vínculo explícito do global;
+administração local revogou esse vínculo por RPC. Global sem vínculo ativo
+recebe42501 para contexto e estoque, ledger igual. Restauração local explícita
+e seleção própria permitem operar. Nenhum teste mutável correu junto do E2E.
+Tipos/lint passaram. Proposta congelada/desconhecidos/ator distinto de D3.23,
+agenda D3.22, preparo e adoção delegada mantêm hashes/corpos qualificados;
+não são novas execuções locais. Compensação do teste só aceita sua renomeação
+fictícia exata, sem restaurar permissões por inferência.
+
+Local/remoto164/última20261109024515/hash de versões iguais, leitura apenas;
+zero SQL nova/pendente. Sem reset, Auth/fixture remoto, transporte externo,
+produção ou backup redundante. Matriz55 PASS/48 PARTIAL/2 NOT_STARTED,105x39;
+29 colunas/complementos intactos. C021/C7-006 PASS local de escopo; GUI-01/03,
+66 composições/171 relações e gates humano/AT/aparelho/abertura física/D-C/D6
+mantêm seus critérios. CI86025ba Windows/Ubuntu/banco SUCCESS, migrations e
+integração SUCCESS; browsers vivos e Preview READY na observação. Nada disso
+aprova o novo SHA. PR7 Draft, Sonar adiado, meta ativa.
+[Dossiê](SCOPE_WALKTHROUGH.md), [provas](SCOPE_WALKTHROUGH_EVIDENCE.json),
+[remoto](SCOPE_WALKTHROUGH_REMOTE_OBSERVATION.json),
+[CI anterior](CI_86025BA_OBSERVATION.json).

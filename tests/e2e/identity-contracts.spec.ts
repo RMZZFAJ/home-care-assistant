@@ -8,6 +8,51 @@ import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 
 const fixtures = () => JSON.parse(readFileSync(fixtureFile, "utf8"));
+test("CFinal021 conta alheia tem revisão global própria e não atravessa Meu perfil ou o escopo local", async ({ page }) => {
+  test.setTimeout(120_000);
+  const f = await setup(), target = fixtures().shared.id, own = fixtures().global.id;
+  const profile = (id: string) => JSON.parse(sql(`select jsonb_build_object('fullName',full_name,'role',role,'status',status,'globalScope',global_scope) from public.profiles where id=${sqlLiteral(id)};`));
+  const before = profile(target), ownBefore = profile(own), changedName = "Conta fictícia revisada " + randomUUID().slice(0, 8);
+  try {
+    await login(page, "global", null); await page.goto("/admin?section=profiles");
+    const search = page.getByRole("searchbox", { name: "Pesquisar contas globais", exact: true });
+    await search.fill(before.fullName);
+    await page.getByRole("button", { name: "Editar conta " + before.fullName, exact: true }).click();
+    const editor = page.getByRole("dialog", { name: "Editar conta global", exact: true });
+    await expect(editor.getByRole("heading", { name: "Meu perfil e segurança", exact: true })).toHaveCount(0);
+    const classification = editor.getByRole("combobox", { name: "Papel global", exact: true });
+    await expect(classification.locator("option")).toHaveText(["Administração", "Supervisão", "Profissional", "Leitura"]);
+    await expect(classification).toHaveValue(before.role);
+    await expect(editor.getByLabel("Nome da conta", { exact: true })).toHaveValue(before.fullName);
+    await editor.getByLabel("Nome da conta", { exact: true }).fill(changedName);
+    await editor.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+    const review = page.getByRole("dialog", { name: "Revisar conta global", exact: true });
+    await expect(review.locator("input,textarea,select")).toHaveCount(0);
+    await expect(review.getByText(changedName, { exact: true })).toBeVisible();
+    expect(profile(target)).toEqual(before);
+    const saved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin" && response.request().method() === "POST");
+    await review.getByRole("button", { name: "Confirmar conta global", exact: true }).click(); expect((await saved).ok()).toBe(true);
+    await expect.poll(() => profile(target)).toEqual({ ...before, fullName: changedName });
+    await expect(editor).toHaveCount(0); await expect(review).toHaveCount(0);
+    expect(profile(own)).toEqual(ownBefore);
+    await search.fill(changedName);
+    await page.getByRole("button", { name: "Editar conta " + changedName, exact: true }).click();
+    await editor.getByLabel("Nome da conta", { exact: true }).fill(before.fullName);
+    await editor.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+    const restored = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin" && response.request().method() === "POST");
+    await review.getByRole("button", { name: "Confirmar conta global", exact: true }).click(); expect((await restored).ok()).toBe(true);
+    await expect.poll(() => profile(target)).toEqual(before);
+    await page.goto("/perfil"); await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
+    await expect(page.getByLabel("Nome", { exact: true })).toHaveValue(ownBefore.fullName);
+    await login(page, "adminA", f.patient);
+    expect((await page.request.get("/api/admin?section=profiles")).status()).toBe(403);
+    expect((await page.request.post("/api/admin", { data: { action: "profile", userId: target, ...before, fullName: changedName } })).status()).toBe(403);
+    expect(profile(target)).toEqual(before); expect(profile(own)).toEqual(ownBefore);
+  } finally {
+    // Only the exact synthetic rename from this case can be compensated.
+    sql(`update public.profiles set full_name=${sqlLiteral(before.fullName)} where id=${sqlLiteral(target)} and full_name=${sqlLiteral(changedName)} and role=${sqlLiteral(before.role)} and status=${sqlLiteral(before.status)} and global_scope=${before.globalScope ? "true" : "false"};`);
+  }
+});
 async function enter(page: Page, name: string) {
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[name].email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);

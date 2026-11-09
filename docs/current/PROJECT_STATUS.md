@@ -10,12 +10,23 @@ grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
 não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
 Estado atual:local164/remoto164, zero migrations pendentes. Matriz105x39:
-53 PASS/50 PARTIAL/2 NOT_STARTED; contagens não equivalem à conclusão da fase.
+55 PASS/48 PARTIAL/2 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
+
+D3.24 concluiu a prova local de C021/C7-006:quatro cenários Chromium de criação
+global, conta alheia, vínculos locais e comunicação, mais uma contraprova Auth
+real de estoque/contexto sem vínculo. Resumos de escala/comunicação permanecem
+em leitura com links do paciente; criação inativa recupera a mesma intenção sem
+vínculo automático ao autor. Conta alheia tem revisão própria e nome restaurado,
+sem mudar permissões ou o perfil do operador. Rótulos globais corrigidos sem
+alterar valores. Tipos/lint passaram. SQL permanece164/164, zero pendências.
+CI do pai86025ba aprovou Windows/Ubuntu/banco, incluindo migrations e integração;
+Preview READY e browsers em andamento. CI própria ainda obrigatória.
+[Provas](../audits/D/D-B/SCOPE_WALKTHROUGH.md).
 
 D3.23 corrigiu comparação de propostas que aceitava propriedades herdadas e
 valores finitos desconhecidos.38 unitários,7 regressões PDF selecionadas e

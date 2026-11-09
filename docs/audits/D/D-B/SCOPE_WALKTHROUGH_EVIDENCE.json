@@ -1,0 +1,90 @@
+{
+  "at": "2026-11-09T04:44:44.424927+00:00",
+  "baseSha": "86025ba59e3367a6a16e15ccef6f70aad4bf04a5",
+  "sourceLfSha256": {
+    "src/components/admin/global-accounts.tsx": "97454698db7d6d39bc2bd18c68d6c1b7269bf9f31036686cf4749211890c3319",
+    "tests/e2e/identity-contracts.spec.ts": "2a96fce22ef918ac4bde0574508d04eac6954ec5b58ba03b759cacc2f102561a",
+    "tests/e2e/preparation-continuity.spec.ts": "1d9395294a4a4408d4a296419974f3fefd96edcbe3efa9dfdafdf71a2bd5a190",
+    "tests/integration/fluent-authority.test.mjs": "0e01d3f2f393097ffc5a342745626125b535eb92d60529820be8ddca17f65360"
+  },
+  "logLfSha256": {
+    "scope-walkthrough-baseline.log": "8d520781285e1325b14f030562bbc7624ed6a84064e5cdeb4df903fa3473032f",
+    "scope-walkthrough-e2e.log": "ff4e8c23be5edca5e36f8227e88c34c66a9360509b8e61ba35b41f9eaca86b57",
+    "scope-walkthrough-auth.log": "78da5c07357a03b7efe736f6d7f8567a5d756725050e738983170ee8315062b0",
+    "scope-walkthrough-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scope-walkthrough-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "unchangedBoundaryLfSha256": {
+    "tests/integration/preparation-guides.test.mjs": "522583cf8abf26c6cf9b6d6a35af8ffed5440353df345fd7b2a083f43e472b80",
+    "src/app/api/residence-preparations/route.ts": "dc6ff82305dc1a98c89fe46c021ba0c0b5da61010031f3d56ca16a027a54db65",
+    "src/lib/validation/residence-preparation.ts": "49a2f436e2f46b266d37d783d256d61acf4a0f55fb337c620de5e33cd0301104",
+    "src/components/guides/residence-preparation.tsx": "ffde465f580c3916295dc459191bcf532ea39da0ef9c7fb880fcddd6bdd9ff80",
+    "src/components/admin/policy-rules.tsx": "58f5766a4dd9f8edb6f1a9c51f961e907f1b7c4797e2aa1342e6ba052abf1b42",
+    "src/components/admin/policy-console.tsx": "20b85bf0e5e0918109aacd86cf59d71d6fb5456b7634e215ca13f7bfe79e4916",
+    "src/components/profile-console.tsx": "0b7119f81ae1dfdb2328b1f47758aeca0d3efdad293f2cfe0920cf6709a7c147",
+    "src/app/api/admin/route.ts": "5903b449bede762579f8cba08ec0365e1589a6f32400b9ac2035088c67cd52e8",
+    "tests/e2e/administration.spec.ts": "5836c19b7572e0124fad272cb8b26830f86c389ed771514993670a06b923f390",
+    "tests/e2e/field-validation.spec.ts": "e42306237552c42839294670e396cb31b12513bea9fb55fe2b564800fa33f4dd"
+  },
+  "standingDelegatedCatalogueTestBodyLfSha256": "f462e7de3d7d3e77742d5496a913b48223468d66e19264404bbca51f09fc2709",
+  "standingGovernanceSources": {
+    "src/lib/governance-presentation.ts": "58dce329b280189e66330f3034381f6433312153b00b12258ab30ea2a60824c8",
+    "src/lib/notifications/event-labels.ts": "a86e277e3d31ffddb46a745faf790828d7ace5e17eb6c6be5bd7dd6200c29069",
+    "src/components/admin/governance-proposals.tsx": "3aeb8424a945cd6e6d50e55456e44f13dc4538e369e23d4013dbc921352601d8",
+    "tests/governance-presentation.test.ts": "747f2d8a7be56ba393403a90482504ccc891c7c81d23672109407380f3ae28a0",
+    "tests/e2e/governance-recovery.spec.ts": "fc6f1816e49bdff2ff48cf641f7b62f2fac8afa621cefbcfc2dc0803187cb13b"
+  },
+  "standingScheduleSourceLfSha256": "af9cfd40f0e6eed4097951bc8720f0434e08635ef3c62208db2ee375204811e5",
+  "validation": {
+    "productionChromiumPassed": 4,
+    "newAccountCase": 1,
+    "extendedPreparationCase": 1,
+    "unchangedMembershipAndCommunicationCases": 2,
+    "newRealAuthGlobalLocalScopePassed": 1,
+    "globalStockAndContextDeniedCode": "42501",
+    "ledgerUnchangedOnDenial": true,
+    "explicitLocalRestorationRequired": true,
+    "globalCreationNoImplicitMembership": true,
+    "summaryEditableControls": 0,
+    "scopeLinksKeepPatient": true,
+    "globalProfileLocalReadWriteDenied": 403,
+    "otherAccountNameRestoredViaUi": true,
+    "ownAccountUnchanged": true,
+    "targetRoleStatusAndGlobalScopeUnchanged": true,
+    "types": true,
+    "affectedLint": true,
+    "mutableDbParallelWithE2e": false,
+    "globalSuitesRepeatedLocally": false
+  },
+  "counterproofs": {
+    "baselineHumanRoleLabelsFailed": true,
+    "transportRoleValuesChanged": false,
+    "fixtureGlobalMembershipAssumptionAvoided": "setup seeds a local admin link;real local RPC revokes it before denial proof,then explicitly restores it"
+  },
+  "qualification": "No authorization/schema/product changes except global role labels. Parent86025ba database SUCCESS includes unchanged preparation-guide and delegated-catalogue regressions. D3.23 proposal tests and D3.22 schedule case retain recorded source hashes;not new local runs. Four native scenarios and the new Auth case actually ran this stage.",
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "first30Preserved": true,
+    "counts": {
+      "PARTIAL": 48,
+      "PASS": 55,
+      "NOT_STARTED": 2
+    }
+  },
+  "remote": {
+    "file": "SCOPE_WALKTHROUGH_REMOTE_OBSERVATION.json",
+    "versions": 164,
+    "pending": 0,
+    "mutations": false
+  },
+  "remainingGate": [
+    "Own published SHA CI",
+    "GUI-01/03 role and contingency consolidation in their criteria",
+    "66-screen composition and171 relations in their criteria",
+    "Human AT/physical/provider and D-C/D6 as specified"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "goalComplete": false
+}

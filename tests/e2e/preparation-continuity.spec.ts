@@ -57,6 +57,14 @@ test("D3 preparação global salva antes do cadastro e recupera criação inativ
   await review.getByRole("button",{name:"Recuperar a mesma preparação",exact:true}).click();await expect(review).toHaveCount(0);expect(packets).toHaveLength(2);expect(packets[0]).toEqual(packets[1]);await expect(panel.getByRole("alert")).toHaveCount(0);
   const patient=sql(`select id from public.care_recipients where display_name=${sqlLiteral(name)};`);expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before+1);
   expect(sql(`select is_active from public.care_recipients where id=${sqlLiteral(patient)};`)).toBe("f");expect(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(patient)} and user_id=${sqlLiteral(fixtures.global.id)};`)).toBe("0");
+  await panel.getByRole("button",{name:"5. Escalas e BAL",exact:true}).click();
+  await expect(panel.locator("input,textarea,select")).toHaveCount(0);
+  await expect(panel.getByRole("link",{name:"Preparar escalas",exact:true})).toHaveAttribute("href","/escalas?careRecipientId="+patient);
+  await expect(panel.getByRole("link",{name:"Preparar regime BAL",exact:true})).toHaveAttribute("href","/balancos?careRecipientId="+patient);
+  await panel.getByRole("button",{name:"6. Comunicação e contingência",exact:true}).click();
+  await expect(panel.locator("input,textarea,select")).toHaveCount(0);
+  await expect(panel.getByRole("link",{name:"Abrir regras e comunicação",exact:true})).toHaveAttribute("href","/configuracoes?careRecipientId="+patient);
+  await expect(panel.getByRole("link",{name:"Consultar orientação de contingência",exact:true})).toHaveAttribute("href","/guias");
   await widths(page,"D3 residence preparation");
   const second=await browser.newContext();try{const family=await second.newPage();await login(family,"family",patient);expect((await family.request.get("/api/residence-preparations")).status()).toBe(403);const inactive=await family.request.post("/api/documents",{data:{careRecipientId:patient,type:"COM",payload:{origin:"purchase",lines:[{productId:"inactive-fixture-product",quantity:"1"}]},idempotencyKey:randomUUID(),draft:false}});expect(inactive.status()).toBe(409);expect(await inactive.json()).toMatchObject({code:"PATIENT_INACTIVE"});expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(patient)};`)).toBe("0");await family.goto("/preparar-residencia");await expect(family.getByText("Somente a administração global inicia uma preparação.",{exact:false})).toBeVisible();await expect(family.getByRole("button",{name:"Nova preparação",exact:true})).toHaveCount(0);}finally{await second.close();}
 });
