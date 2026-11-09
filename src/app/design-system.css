@@ -1,7 +1,7 @@
 :root { --success:#176545; --warning:#865a11; --danger:#a12b38; --brand-soft:#edf6f5; --app-header-height:72px; }
 button,input,select,textarea { max-width:100%; }
 a { text-underline-offset:3px; }
-button:disabled { cursor:not-allowed; opacity:.45; }
+button:disabled,button[aria-disabled="true"] { cursor:not-allowed; opacity:.45; }
 .app-shell { min-height:100dvh; }
 .app-header { height:var(--app-header-height); position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:12px; padding:12px 24px; background:#ffffffed; border-bottom:1px solid var(--line); backdrop-filter:blur(16px); }
 .app-brand { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }

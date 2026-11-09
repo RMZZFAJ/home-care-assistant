@@ -8,6 +8,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { pauseLocalAutomationForTests, sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { attachmentMaxBytes } from "../../src/lib/documents/attachment-attempt";
+import { audit } from "./accessibility-audit";
 
 test.setTimeout(150000);
 const owned = new Set<string>();
@@ -53,6 +54,31 @@ async function loseConfirmedResponse(page: Page, target: "upload" | "prepareAndA
   }, target);
 }
 
+test("C-FINAL023 anexos ocultam lista recusada e recuperam leitura sem perder arquivo escolhido", async ({ page }) => {
+  const f = await fixture(page);
+  await picker(page).setInputFiles(f.file); await submit(page).click();
+  const link = page.getByRole("link", { name: f.file.name, exact: true });
+  await expect(link).toBeVisible(); await expect(picker(page)).toBeEnabled();
+  const pending = { ...f.file, name: "nova-foto-ainda-nao-enviada.png" };
+  await picker(page).setInputFiles(pending);
+  const original = rows(f.doc.id), official = facts(f.doc.id);
+  let writes = 0;
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/attachments" && request.method() !== "GET") writes++; });
+  const refresh = page.getByRole("button", { name: "Atualizar anexos", exact: true });
+  for (const fault of [503, 403, 200]) {
+    await page.route("**/api/attachments?**", route => route.fulfill({ status: fault, contentType: "application/json", body: JSON.stringify(fault === 200 ? { data: [{}] } : { error: "Consulta fictícia de anexos indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
+    await refresh.focus(); await refresh.press("Enter");
+    await expect(page.getByRole("alert").filter({ hasText: /Consulta fictícia de anexos indisponível|A resposta da consulta não pôde ser conferida/ })).toBeVisible();
+    await expect(link).toHaveCount(0);
+    await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
+    expect(await picker(page).evaluate(element => (element as HTMLInputElement).files?.[0]?.name)).toBe(pending.name);
+    await expect(refresh).toBeFocused(); await refresh.press("Enter");
+    await expect(link).toBeVisible(); await expect(picker(page)).toBeEnabled(); await expect(refresh).toBeFocused();
+  }
+  expect(writes).toBe(0); expect(rows(f.doc.id)).toEqual(original); expect(facts(f.doc.id)).toBe(official);
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable attachment read " + width); }
+});
+
 test("anexo confirmado com resposta perdida congela escolha e GET recupera o mesmo arquivo sem outro upload", async ({ page }, info) => {
   const f = await fixture(page), before = facts(f.doc.id); let uploadPosts = 0;
   page.on("request", request => { const url = new URL(request.url()); if (url.pathname === "/api/attachments" && request.method() === "POST" && !url.searchParams.has("prepare")) uploadPosts++; });
@@ -65,6 +91,13 @@ test("anexo confirmado com resposta perdida congela escolha e GET recupera o mes
   const different = await sharp({ create: { width: 8, height: 4, channels: 3, background: "#abcdef" } }).png().toBuffer();
   const rejected = await page.request.post("/api/attachments", { headers: { origin: new URL(page.url()).origin }, multipart: { careRecipientId: f.patient, documentId: f.doc.id, idempotencyKey: stored.upload_key, file: { ...f.file, buffer: different } } });
   expect(rejected.status()).toBe(409);
+  for (const status of [503, 403]) {
+    await page.route("**/api/attachments?**attemptKey=**", route => route.fulfill({ status, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia da tentativa indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
+    await submit(page).focus(); await submit(page).press("Enter");
+    await expect(page.getByRole("alert").filter({ hasText: "Consulta fictícia da tentativa indisponível" })).toBeVisible();
+    await expect(picker(page)).toBeDisabled(); await expect(picker(page)).toHaveAttribute("aria-invalid", "false");
+    await expect(submit(page)).toBeFocused(); expect(uploadPosts).toBe(1); expect(rows(f.doc.id)).toHaveLength(1);
+  }
   await page.getByRole("button", { name: "Recuperar envio do anexo", exact: true }).click(); await expect(picker(page)).toBeEnabled();
   expect(uploadPosts).toBe(1); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].sha256).toBe(stored.sha256); expect(facts(f.doc.id)).toBe(before);
   const link = page.getByRole("link", { name: f.file.name, exact: true }), download = await page.request.get((await link.getAttribute("href"))!); expect(download.ok()).toBeTruthy(); expect(digest(await download.body())).toBe(stored.sha256);
@@ -105,7 +138,7 @@ test("PDF com ressalva é recusado com explicação e limite4MB é verificado an
   const annotated = await readFile("docs/audits/B/B6/2026-10-30-phase-b6-documents/evidence/attachments/annotation-source.pdf");
   await picker(page).setInputFiles({ name: "ficha-com-ressalva.pdf", mimeType: "application/pdf", buffer: annotated }); await submit(page).click(); await expect(page.getByText(/Este PDF contém anotações ou campos/)).toBeVisible(); await expect(picker(page)).toBeEnabled(); expect(rows(f.doc.id)).toHaveLength(0);
   expect(await picker(page).evaluate((element: HTMLInputElement) => element.files?.[0]?.name)).toBe("ficha-com-ressalva.pdf");
-  const sent = posts; await picker(page).setInputFiles({ ...f.file, buffer: Buffer.alloc(attachmentMaxBytes + 1) }); await submit(page).click(); await expect(page.getByText("Selecione um arquivo de até 4 MB.", { exact: true })).toBeVisible(); expect(posts).toBe(sent); expect(rows(f.doc.id)).toHaveLength(0);
+  const sent = posts; await picker(page).setInputFiles({ ...f.file, buffer: Buffer.alloc(attachmentMaxBytes + 1) }); await submit(page).click(); await expect(page.getByText("Selecione um arquivo de até 4 MB.", { exact: true })).toBeVisible(); await expect(picker(page)).toBeFocused(); await expect(picker(page)).toHaveAttribute("aria-invalid", "true"); expect(posts).toBe(sent); expect(rows(f.doc.id)).toHaveLength(0);
   const oversized = await page.request.post("/api/attachments?prepare=1", { headers: { origin: new URL(page.url()).origin }, multipart: { careRecipientId: f.patient, documentId: f.doc.id, idempotencyKey: randomUUID(), file: { ...f.file, buffer: Buffer.alloc(attachmentMaxBytes + 1) } } }); expect(oversized.status()).toBe(413); expect(rows(f.doc.id)).toHaveLength(0);
 });
 

@@ -419,8 +419,9 @@ export function SupplyDocumentContent({
         </Link>
         <button
           className={buttonClass}
-          disabled={loading || busy}
+          aria-disabled={loading || busy}
           onClick={() => {
+            if (loading || busy) return;
             setLoading(true);
             setAttempt((value) => value + 1);
           }}

@@ -84,6 +84,30 @@ async function login(page: Page, patient: string) {
   ).toBeVisible();
 }
 
+test("C-FINAL023 escala recupera leitura e preserva foco sem validar fuso proposto como input", async ({ page }) => {
+  test.setTimeout(120_000);
+  const f = await prepared(); await login(page, f.patient);
+  const original = sql(`select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`);
+  let writes = 0;
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/schedules" && request.method() !== "GET") writes++; });
+  await page.route("**/api/schedules?**", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia de escala indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
+  await page.getByRole("group", { name: "Período da escala", exact: true }).getByRole("button", { name: /Próxima semana|Próximo mês/ }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Consulta fictícia de escala indisponível" })).toBeVisible();
+  await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
+  const refresh = page.getByRole("button", { name: "Atualizar escala", exact: true });
+  await refresh.focus(); await refresh.press("Enter");
+  await expect(page.getByRole("heading", { name: "Propostas pendentes", exact: true })).toBeVisible(); await expect(refresh).toBeFocused();
+  await page.getByRole("button", { name: "Aprovar alteração", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Revisar escala", exact: true });
+  for (const title of ["Antes da alteração", "Depois da alteração proposta"]) {
+    const facts = dialog.getByRole("region", { name: title, exact: true });
+    await expect(facts).toContainText(f.shift.timezone); await expect(facts.locator("input,select,textarea,[aria-invalid]")).toHaveCount(0);
+  }
+  await dialog.getByLabel("Motivo desta decisão", { exact: true }).fill("Motivo próprio ainda não confirmado");
+  expect(writes).toBe(0); expect(sql(`select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`)).toBe(original);
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable schedule read " + width); }
+});
+
 test("decisão de escala mostra antes/depois completos e aplica a versão apresentada", async ({
   page,
 }, info) => {

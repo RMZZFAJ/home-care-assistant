@@ -1,4 +1,5 @@
 import { generatedPdf } from "./generated-pdf";
+import { historyHashes } from "../integration/version-history-fixtures.mjs";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
@@ -67,6 +68,29 @@ async function finish(page: Page) {
   expect(response.ok(), await response.text()).toBe(true);
   return (await response.json()).data as SupplyDocument;
 }
+
+test("C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida", async ({ page }) => {
+  const f = await setup();
+  const doc = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: crypto.randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Recebedor indicado para a consulta fictícia", lines: [{ productId: f.products[0], quantity: "2" }] } });
+  await open(page, f.patient); await page.goto(`/fichas/${doc.id}`);
+  const material = page.getByText(doc.lines[0].name_snapshot, { exact: true }).first();
+  await expect(material).toBeVisible();
+  const before = historyHashes(doc.id), stock = ledger(f.patient);
+  let writes = 0;
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/documents") && request.method() !== "GET") writes++; });
+  const refresh = page.getByRole("button", { name: "Atualizar", exact: true });
+  for (const status of [503, 403]) {
+    await page.route(`**/api/documents/${doc.id}`, route => route.fulfill({ status, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia da ENT indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
+    await refresh.focus(); await refresh.press("Enter");
+    await expect(page.getByRole("alert").filter({ hasText: "Consulta fictícia da ENT indisponível" })).toBeVisible();
+    await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
+    if (status === 403) await expect(material).toHaveCount(0);
+    await expect(refresh).toBeFocused(); await refresh.press("Enter");
+    await expect(refresh).toBeEnabled(); await expect(material).toBeVisible(); await expect(refresh).toBeFocused();
+  }
+  expect(writes).toBe(0); expect(historyHashes(doc.id)).toBe(before); expect(ledger(f.patient)).toBe(stock);
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable ENT read " + width); }
+});
 
 test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto", async ({
   page,

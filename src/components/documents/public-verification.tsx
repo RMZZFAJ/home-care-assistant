@@ -42,6 +42,8 @@ export function PublicVerification({
     ),
     [result, setResult] = useState<PublicPdfResult | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null),
+    codeInputRef = useRef<HTMLInputElement>(null),
+    fileInputRef = useRef<HTMLInputElement>(null),
     requestRef = useRef<AbortController | null>(null),
     sequenceRef = useRef(0),
     focusResultRef = useRef<number | null>(null);
@@ -52,7 +54,11 @@ export function PublicVerification({
       focusResultRef.current = null;
       headingRef.current?.focus();
     }
-  }, [result]);
+    if (error && !busy) {
+      if (errorField === "code") codeInputRef.current?.focus();
+      if (errorField === "file") fileInputRef.current?.focus();
+    }
+  }, [result, error, errorField, busy]);
   const cancel = useCallback(() => {
     requestRef.current?.abort();
     sequenceRef.current++;
@@ -74,6 +80,7 @@ export function PublicVerification({
     async (value: string, focus = true) => {
       const parsed = verificationCodeSchema.safeParse(value);
       if (!parsed.success) {
+        codeInputRef.current?.focus();
         setErrorField("code");
         setError(
           "Informe o código de verificação completo, com 32 caracteres após HCA.",
@@ -124,6 +131,7 @@ export function PublicVerification({
   async function upload() {
     setErrorField("file");
     if (!file) {
+      fileInputRef.current?.focus();
       setError("Selecione um arquivo PDF.");
       return;
     }
@@ -132,11 +140,13 @@ export function PublicVerification({
       file.size < 100 ||
       file.size > publicPdfLimit
     ) {
+      fileInputRef.current?.focus();
       setError("Selecione um PDF entre 100 bytes e 4 MB.");
       return;
     }
     const parsed = code.trim() ? verificationCodeSchema.safeParse(code) : null;
     if (parsed && !parsed.success) {
+      codeInputRef.current?.focus();
       setErrorField("code");
       setError(
         "Corrija o código completo ou limpe o campo para localizar o exemplar pelo arquivo.",
@@ -214,6 +224,7 @@ export function PublicVerification({
       >
         <label htmlFor={codeId}>Código de verificação</label>
         <input
+          ref={codeInputRef}
           id={codeId}
           className="ui-input w-full"
           value={code}
@@ -247,6 +258,7 @@ export function PublicVerification({
       >
         <label htmlFor={fileId}>Arquivo PDF para conferir</label>
         <input
+          ref={fileInputRef}
           id={fileId}
           type="file"
           disabled={busy}

@@ -532,3 +532,16 @@ consumidores existentes são preservados e reexecutados; nenhum teste mutável
 de banco corre em paralelo. Axe segue habilitado. Não se infere integridade
 criptográfica a partir da validação de uma projeção JSON.
 [Resultados e contraprovas](../audits/D/D-B/HISTORY_READ_BOUNDARY_EVIDENCE.json).
+
+## Leituras diárias D3.19
+
+O runner dirigido abrange attachment-attempts, delivery-preparation,
+preparation-continuity, public-verification e schedule-decisions. Executar
+apenas C-FINAL023 e os consumidores de recuperação/fingerprint/limite4MB,
+recebedor, preparação/guia e conflito discriminados no manifesto. A lista
+test-list-invert preservou dez PASS atuais e selecionou os29 restantes;
+coleção, identidade dos casos e logs vinculados, sem diminuir Axe.
+Crons pausados pela fixture de anexos são restaurados pelo afterAll; conferir
+estado final. Não rodar suíte mutável de banco simultaneamente. O teste do guia
+pessoal não substitui GUI-04 ou prova de restore operacional.
+[Coortes e contraprovas](../audits/D/D-B/DAILY_READ_RECOVERY_EVIDENCE.json).

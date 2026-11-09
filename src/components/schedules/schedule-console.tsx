@@ -551,13 +551,11 @@ function Agenda({ context }: { context: WorkspaceContext }) {
           {mode === "month" ? "Próximo mês" : "Próxima semana"}
         </Button>
       </div>
+      <Button aria-disabled={loading} onClick={() => { if (!loading) setAttempt(value => value + 1); }}>Atualizar escala</Button>
       {loading ? <Spinner label="Carregando escala" /> : null}
       {!loading && query.error ? (
         <Notice error>
           {query.error}
-          <Button onClick={() => setAttempt((value) => value + 1)}>
-            Atualizar escala
-          </Button>
         </Notice>
       ) : null}
       {!loading && currentData && !query.error ? (

@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
+import { PDFDocument } from "pdf-lib";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -46,6 +47,39 @@ async function prepare(page: Page) {
   expect((await page.request.get("/api/context")).status()).toBe(401);
   return { ...f, doc, a, b };
 }
+test("C-FINAL023 verificação separa falha do serviço de código digitado inválido sem produzir emissão", async ({ page }) => {
+  await page.goto("/verificar");
+  const code = page.getByRole("textbox", { name: "Código de verificação", exact: true });
+  const submit = page.getByRole("button", { name: "Consultar código", exact: true });
+  let reads = 0;
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/verification") reads++; });
+  await code.fill("incompleto"); await submit.click();
+  await expect(code).toHaveAttribute("aria-invalid", "true"); await expect(code).toBeFocused(); expect(reads).toBe(0);
+  const value = randomUUID().replaceAll("-", "").toUpperCase(); await code.fill(value);
+  await page.route("**/api/verification?**", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia do serviço indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
+  await submit.click(); await expect(page.getByRole("main").getByRole("alert")).toContainText("Consulta fictícia do serviço indisponível");
+  await expect(code).toHaveValue(value); await expect(code).toHaveAttribute("aria-invalid", "false");
+  await expect(page.getByRole("region", { name: "Resultado da verificação", exact: true })).toHaveCount(0);
+  await submit.click();
+  await expect(page.getByRole("heading", { name: "Emissão não localizada", exact: true })).toBeFocused();
+  await expect(code).toHaveValue(value); await expect(code).toHaveAttribute("aria-invalid", "false"); expect(reads).toBe(2);
+  const file = page.getByLabel("Arquivo PDF para conferir", { exact: true }), check = page.getByRole("button", { name: "Conferir PDF", exact: true });
+  const issued = sql("select count(*) from private.pdf_issuances;");
+  await file.setInputFiles({ name: "pequeno.pdf", mimeType: "application/pdf", buffer: Buffer.alloc(99) }); await check.click();
+  await expect(file).toHaveAttribute("aria-invalid", "true"); await expect(file).toBeFocused(); expect(reads).toBe(2);
+  const pdf = await PDFDocument.create(); pdf.addPage();
+  await file.setInputFiles({ name: "exemplar-escolhido.pdf", mimeType: "application/pdf", buffer: Buffer.from(await pdf.save()) });
+  await page.route("**/api/verification**", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Análise fictícia temporariamente indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
+  await check.click(); await expect(page.getByRole("main").getByRole("alert")).toContainText("Análise fictícia temporariamente indisponível");
+  await expect(file).toHaveAttribute("aria-invalid", "false");
+  expect(await file.evaluate(element => (element as HTMLInputElement).files?.[0]?.name)).toBe("exemplar-escolhido.pdf");
+  await expect(page.getByRole("region", { name: "Resultado da verificação", exact: true })).toHaveCount(0);
+  await check.click(); await expect(page.getByRole("region", { name: "Resultado da verificação", exact: true })).toContainText("Sem assinatura incorporada");
+  await expect(file).toHaveAttribute("aria-invalid", "false"); expect(reads).toBe(4); expect(sql("select count(*) from private.pdf_issuances;")).toBe(issued);
+  expect((await page.request.get("/api/context")).status()).toBe(401);
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable verification read " + width); }
+});
+
 test("verificação pública resolve QR e código sem conta e discrimina bytes de outra emissão", async ({
   page,
 }, info) => {

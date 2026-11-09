@@ -1936,3 +1936,38 @@ certificado/TSA, backup e monitoramento conservam seus limites. Meta ativa,
 prioridade diária. [Dossiê](HISTORY_READ_BOUNDARY.md),
 [evidências](HISTORY_READ_BOUNDARY_EVIDENCE.json),
 [CI base](CI_CCEBFCB_OBSERVATION.json).
+
+## D3.19 — leitura, anexos e foco nas tarefas diárias
+
+Base3a6bdc9. Cinco falhas reproduzidas: lista/guia antigos após erro/recusa,
+foco perdido ao atualizar ENT/escala e código inválido sem foco. Anexos ocultam
+links recusados inclusive na recuperação, preservando intenção/arquivo. Erro
+de consulta não marca arquivo inválido; tamanho/original divergente focam só o
+input legítimo após liberar o campo. Botões estáveis têm aria-disabled/guarda.
+Guia particiona consulta por titular/paciente/modo/papel/tentativa e oculta
+tarefas antigas; progresso confirmado permanece no servidor.
+
+39 casos atuais PASS nos três motores:15 novos/24 consumidores anteriores,
+com60 scans Axe novos. Reutilizados10 PASS da fonte atual e executados somente
+os29 restantes por lista oficial; nenhum pendente excluído.51 execuções totais:
+44 PASS/7 FAIL preservadas. Cinco FAIL baseline; duas do instrumento, por não
+esperar fim da leitura ENT e por anunciador interno do Next fora do main.
+Pacote original, hashes, arquivo escolhido, identidade e negativas Auth reais
+preservados; só configuração explícita do guia muda metadata no caso novo.
+PDF passivo real sem assinatura não gera emissão. Tipos/lint passaram.
+
+7 Auth de preparação/guia reaproveitados da CI database3a6bdc9,395/395 PASS;
+10 bindings antigos pertinentes coincidem, guia/browser alterados têm prova
+nova. Nove bindings do histórico D3.18 coincidem; não se conta sua coorte como
+nova. CI base com banco e validações Windows/Ubuntu SUCCESS, browsers ainda
+em andamento na observação. Novo SHA exige CI própria; Sonar adiado.
+
+Nenhuma migration/mutação remota ou backup/restore redundante. Local/remoto161,
+SQLs inalterados, crons locais observados ativos no pós-check. Matriz105x39:
+48 PASS/52 PARTIAL/5 NOT_STARTED,29 colunas/complementos preservados.
+C-FINAL-AC-023 continua parcial por GUI-04; guia pessoal não é runbook operacional.
+C-NEW-AC-027 agora parcial pela base existente, sem aprovar revisão completa
+GUI-01/02/03/adoção/delegação/contingência. Humano/AT/aparelho e D-C/D6 próprios.
+PDF/TSA, backup e monitores mantêm limites. PR7 Draft, sem merge/promoção,
+meta ativa e prioridade diária. [Dossiê](DAILY_READ_RECOVERY.md),
+[provas](DAILY_READ_RECOVERY_EVIDENCE.json), [CI base](DAILY_READ_CI_BASE.json).

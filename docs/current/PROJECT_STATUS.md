@@ -10,6 +10,15 @@ dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
 
+D3.19 corrigiu leitura obsoleta de anexos/guia e foco de recuperação ENT/escala/
+verificação pública.39 casos atuais passaram nos três motores, com15 novos,
+24 anteriores e60 scans Axe novos;10 PASS foram aproveitados e só29 restantes
+executados. Sete Auth de preparação/guia vieram da CI base atual395/395, com
+fontes qualificadas. Tipos/lint passaram. Sem migration nova: local/remoto161.
+Matriz48 PASS/52 PARTIAL/5 NOT_STARTED. Runbook GUI-04 e consolidação da
+preparação/guia continuam próprios; CI do novo SHA obrigatória. PR7 Draft,
+produção NO-GO. [Provas e limites](../audits/D/D-B/DAILY_READ_RECOVERY.md).
+
 D3.18 corrigiu crash da página por resposta200 malformada no histórico.
 Documento/versão/referência/autoria são conferidos antes de renderizar; falha
 permite atualizar a seção, sem pedir alteração do fato imutável.17 unitários

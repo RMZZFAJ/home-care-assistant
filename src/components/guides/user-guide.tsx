@@ -8,14 +8,16 @@ import { guideProgressConfirmed, guideConfigurationConfirmed, parseGuide, type G
 import { guideSteps } from "@/lib/guide-content";
 
 function useGuide() {
-  const {value}=useWorkspaceState(),scopeKey=`${value?.activeContext?.mode}:${value?.activeContext?.care_recipient_id??""}:${value?.patient?.role??""}`;
-  const [attempt,setAttempt]=useState(0),[result,setResult]=useState<{scope:string;data:GuideContext}|null>(null),[failure,setFailure]=useState<{scope:string;message:string}|null>(null);
+  const {value}=useWorkspaceState(),scopeKey=`${value?.userId??""}:${value?.activeContext?.mode}:${value?.activeContext?.care_recipient_id??""}:${value?.patient?.role??""}`;
+  const [attempt,setAttempt]=useState(0),[result,setResult]=useState<{key:string;data:GuideContext}|null>(null),[failure,setFailure]=useState<{key:string;message:string}|null>(null);
+  const key=JSON.stringify([scopeKey,attempt]);
   useEffect(()=>{
     const controller=new AbortController();
-    void api<{data:unknown}>("/api/guides",undefined,controller.signal).then(r=>parseGuide(r.data)).then(data=>{if(!controller.signal.aborted){setResult({scope:scopeKey,data});setFailure(null);}}).catch(reason=>{if(!controller.signal.aborted)setFailure({scope:scopeKey,message:reason instanceof Error?reason.message:"Não foi possível consultar o guia."});});
+    void api<{data:unknown}>("/api/guides",undefined,controller.signal).then(r=>parseGuide(r.data)).then(data=>{if(!controller.signal.aborted){setResult({key,data});setFailure(null);}}).catch(reason=>{if(!controller.signal.aborted)setFailure({key,message:reason instanceof Error?reason.message:"Não foi possível consultar o guia."});});
     return()=>controller.abort();
-  },[scopeKey,attempt]);
-  return {context:value,data:result?.scope===scopeKey?result.data:null,error:failure?.scope===scopeKey?failure.message:"",refresh:()=>setAttempt(v=>v+1),adopt:(data:GuideContext)=>{setResult({scope:scopeKey,data});setFailure(null);}};
+  },[scopeKey,key]);
+  const error=failure?.key===key?failure.message:"",loading=result?.key!==key&&failure?.key!==key;
+  return {context:value,data:result?.key===key&&!error?result.data:null,error,loading,refresh:()=>setAttempt(v=>v+1),adopt:(data:GuideContext)=>{setResult({key,data});setFailure(null);}};
 }
 export function GuideOnboarding() {
   const guide=useGuide(),[dismissed,setDismissed]=useState(false);
@@ -37,7 +39,8 @@ export function UserGuide() {
   }
   return <section aria-label="Guia do seu perfil" className="ui-card"><h2 className="font-semibold">{data?.role==="global"?"Administração global":roleLabel(data?.role)}</h2>
     <p className="mt-2 text-sm">Guia opcional · versão 2026-11-D3 · seu progresso não altera permissões, ciência ou recebimentos.</p>
-    {guide.error?<Notice error>{guide.error}<button type="button" className={buttonClass} onClick={guide.refresh}>Consultar guia novamente</button></Notice>:!data?<p role="status">Consultando seu guia…</p>:null}
+    {guide.error?<Notice error>{guide.error}</Notice>:!data?<p role="status">Consultando seu guia…</p>:null}
+    <button type="button" className={buttonClass} aria-disabled={guide.loading} onClick={()=>{if(!guide.loading)guide.refresh();}}>Consultar guia novamente</button>
     {error?<Notice error>{error}</Notice>:null}{message?<Notice>{message}</Notice>:null}
     {data?<><p className="mt-4 text-sm" aria-live="polite">Etapa {index+1} de {steps.length}</p><h3 className="mt-3 font-semibold">{steps[index].title}</h3><p className="mt-2 leading-7">{steps[index].text}</p>{steps[index].href?<Link className={buttonClass+" mt-3"} href={steps[index].href!}>{steps[index].action}</Link>:null}
       <div className="hca-toolbar mt-4"><button type="button" className={buttonClass} disabled={locked||index===0} onClick={()=>void save("started",index-1)}>Etapa anterior do guia</button><button type="button" className={primaryClass} disabled={locked} onClick={()=>void save(index===steps.length-1?"completed":"started",Math.min(index+1,steps.length-1))}>{index===steps.length-1?"Concluir guia":"Próxima etapa do guia"}</button><button type="button" className={buttonClass} disabled={locked} onClick={()=>void save("skipped")}>Pular e guardar progresso</button><button type="button" className={buttonClass} disabled={locked} onClick={()=>void save("started",0)}>Recomeçar guia</button></div>
