@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -24,6 +25,7 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
   document = await rpc(f.admin, "supply_document_command", { p_id: document.id, p_action: "receive", p_body: { lines: [{ lineId, quantity: "2" }] }, p_key: randomUUID(), p_version: document.version });
   const initialReceipt = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   await login(page, f.patient, "family"); await page.goto("/fichas/" + document.id);
+  await selectDocumentSection(page, "workflow");
   await page.getByRole("button", { name: /^(Confirmar recebimento|Informar nova chegada)$/ }).click();
   const field = page.locator(`input[name="${lineId}"]`);
   await expect(field).toHaveValue("");
@@ -53,6 +55,7 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
   expect(document.receipts).toHaveLength(2);
   const pending = document.receipts.find((receipt: { state: string }) => receipt.state === "pending"); expect(Number(pending.lines[0].quantity)).toBe(1);
   await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
+  await selectDocumentSection(page, "workflow");
   await page.getByRole("button", { name: "Validar recebimento", exact: true }).click();
   const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Revisar operação", exact: true }) });
   await expect(form.getByRole("heading", { name: "Parcela selecionada", exact: true })).toBeVisible();
@@ -83,6 +86,7 @@ test("COM conflito compara a expectativa atual, preserva o motivo e exige nova c
   for (const p_action of ["purchase", "receive"]) document = await rpc(family, "supply_document_command", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: "2" }] }, p_key: randomUUID(), p_version: document.version });
   const initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
+  await selectDocumentSection(page, "workflow");
   await page.getByRole("button", { name: "Encerrar expectativa restante", exact: true }).click();
   const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Revisar operação", exact: true }) });
   await form.getByRole("textbox", { name: "Motivo / justificativa", exact: true }).fill("Motivo fictício preservado depois da mudança de versão.");
@@ -119,6 +123,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   for (const p_action of ["purchase", "receive"]) document = await rpc(family, "supply_document_command", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: "2" }] }, p_key: randomUUID(), p_version: document.version });
   const receipt = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
+  await selectDocumentSection(page, "workflow");
   await page.getByRole("button", { name: "Encerrar expectativa restante", exact: true }).click();
   const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Revisar operação", exact: true }) });
   await expect(form.getByRole("heading", { name: "Expectativa que não será adquirida", exact: true })).toBeVisible();
@@ -191,6 +196,7 @@ test("COM rejeita a parcela identificada em leitura, preserva declaração e rec
   for (const p_action of ["purchase", "receive"]) document = await rpc(family, "supply_document_command", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: "2" }] }, p_key: randomUUID(), p_version: document.version });
   const original = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
+  await selectDocumentSection(page, "workflow");
   await page.getByRole("button", { name: "Rejeitar recebimento", exact: true }).click();
   const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Revisar operação", exact: true }) });
   await expect(form.getByRole("heading", { name: "Parcela selecionada", exact: true })).toBeVisible(); await expect(form.getByText("2 unidade", { exact: true })).toBeVisible(); await expect(form.locator("input")).toHaveCount(0);

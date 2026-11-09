@@ -4,10 +4,11 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação a057c2c: Preview READY; Windows/Ubuntu PASS, banco FAIL na allowlist
-SQL de funções de serviço e browsers SKIPPED. Lista do teste corrigida com
-grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
-não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
+Observação334b08c: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
+cadeia limpa, evolução legada e integração. Browsers ainda em andamento na
+consulta. Isso não aprova o novo incremento de abas; seu SHA publicado exige
+CI própria. A falha anterior de allowlist e sua correção permanecem em
+[evidência histórica](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
 Estado atual:local165/remoto165, zero migrations pendentes. Matriz105x39:
 56 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
@@ -18,14 +19,17 @@ tokens compartilhados seguem o modelo; comparação de cabeçalho/navegação e
 modal em cinco larguras. 36 cenários distintos Chromium/iOS aprovados nos lotes
 dirigidos, com limites de reuso documentados. D3.29 integrou Andamentos persistidos
 às quatro fichas, com autoria do banco, recuperação após reload, referências
-autorizadas e cronologia paginada. Migration165 reconciliada. Restam paridade de
-todas as telas, listas/cartões, fichas em abas e marcos do cabeçalho. Registro UI
+autorizadas e cronologia paginada. Migration165 reconciliada. D3.30 implementa
+abas reais nas quatro fichas, marcos factuais e seleção por URL, preservando
+edição e versões acessíveis aos leitores. Restam paridade integral de todas as
+telas, cabeçalhos e listas/cartões. Registro UI
 adicional
 18 requisitos; resultados
 funcionais anteriores não aprovam toda a nova aparência.
 [Contrato](../ui-ux/CANONICAL_MODEL.md),
 [provas atuais](../audits/D/D-B/UI_MODEL_STAGE_3.md).
 [Andamentos e provas do lote atual](../audits/D/D-B/DOCUMENT_PROGRESS.md).
+[Abas, marcos e limites](../audits/D/D-B/DOCUMENT_TABS.md).
 
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das

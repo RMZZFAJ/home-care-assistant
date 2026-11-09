@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { selectContext } from "./auth-context";
 import { selectDeliveryRecipient } from "./delivery-recipient";
@@ -300,6 +301,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   })
     .png()
     .toBuffer();
+  await selectDocumentSection(page, "attachments");
   await page
     .getByRole("button", { name: "Anexos e ficha física", exact: true })
     .click();

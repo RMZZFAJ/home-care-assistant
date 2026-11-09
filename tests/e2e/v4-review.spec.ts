@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -261,6 +262,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
         sqlLiteral(row),
     );
     await family.goto("/fichas/" + receipt.requisitionId);
+    await selectDocumentSection(family, "communications");
     const statuses = family.getByRole("region", {
       name: "Notificações da ficha",
       exact: true,

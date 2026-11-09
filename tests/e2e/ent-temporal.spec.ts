@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect,test,type Page } from "@playwright/test";
 import { createHash,randomUUID } from "node:crypto";
 import { mkdirSync,readFileSync,writeFileSync } from "node:fs";
@@ -19,6 +20,7 @@ async function login(page:Page,patient:string){
 for(const mode of ["prepared","private"] as const)test(`ENT ${mode} preserva marcos temporais e bytes de cada exemplar sem reemitir no download`,async({page},info)=>{
   const f=await entTemporalFixture({mode}),oracle=entTemporalOracle(f.doc.id),before=entTemporalLedger(f.patient),corpus=[];
   await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "files");
   const files=page.getByRole("region",{name:"Arquivos gerados",exact:true}),endpoint=`/api/documents/${f.doc.id}/issuances`;
   const expected=["Criação da ficha: "+formatBrazilDate(oracle.createdAt),"Emissão operacional registrada: "+formatBrazilDate(oracle.issuedAt)];
   if(oracle.draftCreatedAt)expected.push("Primeiro rascunho privado salvo: "+formatBrazilDate(oracle.draftCreatedAt));

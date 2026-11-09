@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
@@ -121,6 +122,7 @@ test("M1 mantém material e ciência após resolução de extra, atendimento e d
   );
   await login(page, f.patient);
   await page.goto("/historico/" + id);
+  await selectDocumentSection(page, "materials");
   await expect(
     page.getByText("Material extra original M1", { exact: false }).first(),
   ).toBeVisible();
@@ -326,6 +328,7 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
   for (const profile of ["family", "global"] as const) {
     await login(page, f.patient, fixtures[profile].email);
     await page.goto("/fichas/" + delivery.id);
+    await selectDocumentSection(page, "workflow");
     await readOnlyDispatch(page, codes);
     await expect(
       page.getByRole("button", {
@@ -346,6 +349,7 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
   }
   await login(page, f.patient, sheila.email);
   await page.goto("/fichas/" + delivery.id);
+    await selectDocumentSection(page, "workflow");
   await readOnlyDispatch(page, codes);
   await page
     .getByRole("button", { name: "Informar divergência", exact: true })

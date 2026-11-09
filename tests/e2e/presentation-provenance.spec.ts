@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -395,6 +396,7 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
     ),
   ).toBe("20.000000");
   await page.goto("/fichas/" + id);
+  await selectDocumentSection(page, "materials");
   await expect(
     page.getByText(/código 0123456789012.*2 × 10 unidade = 20 unidade.*v1/),
   ).toBeVisible();

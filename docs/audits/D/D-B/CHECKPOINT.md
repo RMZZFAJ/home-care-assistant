@@ -2406,3 +2406,38 @@ mantendo todos os recursos e a nova recuperação. Sonar adiado; D-C/D6 e gates
 humanos/físicos/externos separados. PR7 Draft, produção NO-GO, meta ativa.
 [Dossiê](DOCUMENT_PROGRESS.md), [provas](DOCUMENT_PROGRESS_VALIDATION.json),
 [remoto](DOCUMENT_PROGRESS_REMOTE.json), [advisors](DOCUMENT_PROGRESS_ADVISORS.json).
+
+## D3.30 — fichas em abas e marcos factuais — 09/11/2026
+
+Base334b08c. REQ/COM/ENT/BAL usam abas reais, painéis montados e seleção por
+URL, preservando paciente, versão e parâmetros anteriores. Materiais, operações,
+comunicações, PDFs, anexos, observações, vínculos e decisões continuam
+alcançáveis. Os18 blocos anteriores de cada detalhe foram redistribuídos sem
+eliminar funções. Versões e aberturas permanecem acessíveis aos leitores; a
+consulta administrativa de auditoria tem sua autorização e escopo próprios.
+Troca de aba conserva edição e tentativa incerta, sem novo ato documental.
+
+Marcos do cabeçalho distinguem desconhecido, dispensa e encerramento de etapas
+cumpridas. Conciliação, aprovação e reconto BAL são fatos distintos; quantidade
+é avaliada por linha. Visão geral reúne Andamentos e próxima providência.
+Abas fixas no celular respeitam o contexto real adicional de51px no cabeçalho.
+
+Quatro unitários e28 cenários distintos Chromium/WebKit aprovados, com reuso
+qualificado explícito. Comparação de abas ao HTML em cinco larguras, Axe,
+teclado, URL, autorização, versões, anexos, PDF, ciência, transferência,
+parcelas, estoque e recuperação. Build/tipos e lint dirigido PASS. Falhas e
+correções preservadas: fonte herdada da faixa, origem de rolagem e consumidores
+das novas abas. Falha real de mensagem COM corrigida: leitura ao vivo não
+substitui mais a confirmação de operação por um aviso de edição preservada.
+
+Sem API/RPC, assinatura, worker ou SQL novo. Local165/remoto165, última
+20261109091550 e digest ordenado iguais, zero pendências; reconciliação de
+leitura sem reset ou backup redundante. CI334b08c aprovou Windows/Ubuntu/banco,
+incluindo cadeia limpa, evolução legada e integração; browsers estavam em
+andamento na consulta. Preview334b08c READY. O novo SHA exige CI própria.
+
+Matriz105x39 e primeiras30 colunas preservadas,56 PASS/49 PARTIAL; registro UI
+adicional18 atualizado. Paridade integral de cabeçalhos, demais telas e
+listas/cartões,66 composições/171 relações, D-C/D6 e gates humanos/assistivos/
+físicos/externos continuam pendentes. Sonar adiado; PR7 Draft, produção NO-GO,
+meta ativa. [Dossiê](DOCUMENT_TABS.md), [provas](DOCUMENT_TABS_VALIDATION.json).

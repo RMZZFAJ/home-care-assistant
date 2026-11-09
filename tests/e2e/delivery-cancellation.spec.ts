@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
@@ -126,6 +127,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
     before = ledger(f.patient);
   await login(page, f.patient, "adminA");
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", { name: "Solicitar cancelamento", exact: true })
     .click();
@@ -198,6 +200,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
   try {
     await login(recipient, f.patient, "professional");
     await recipient.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(recipient, "workflow");
     await recipient
       .getByRole("button", {
         name: "Consentir e reconciliar cancelamento",
@@ -345,6 +348,7 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
     requestId = f.document.deliveryCancellation!.request.id;
   await login(page, f.patient, "adminA");
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", {
       name: "Retirar meu pedido de cancelamento",
@@ -363,6 +367,7 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
   try {
     await login(recipient, f.patient, "professional");
     await recipient.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(recipient, "workflow");
     await recipient
       .getByRole("button", {
         name: "Recusar pedido de cancelamento",
@@ -463,6 +468,7 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
   const f = await prepared({ request: true });
   await login(page, f.patient, "professional");
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", {
       name: "Consentir e reconciliar cancelamento",
@@ -551,6 +557,7 @@ test("ENT mantém pedido e trânsito parcial até conciliação real, sem oferec
     before = ledger(f.patient);
   await login(page, f.patient, "adminA");
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("button", {
       name: "Consentir e reconciliar cancelamento",
@@ -620,6 +627,7 @@ test("ENT atualiza uma fonte indisponível por consulta e comparação, preserva
   );
   await login(page, f.patient, "professional");
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await expect(
     cancellation(page).getByText(
       "As referências de consumo não estão disponíveis para o seu acesso atual.",

@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect,test,type Page,type APIResponse } from "@playwright/test";
 import { createHash,randomUUID } from "node:crypto";
 import { mkdirSync,readFileSync,writeFileSync } from "node:fs";
@@ -50,6 +51,7 @@ for(const options of [{kind:"cancelled",personal:false},{kind:"administrative",p
  let legacyKey:string|null=null;
  if(info.project.name==="chromium"&&options.kind==="administrative"&&!options.personal){legacyKey=randomUUID();await rpc(f.owner,"reserve_pdf_issuance_v8",{p_document:f.doc.id,p_version:f.doc.version,p_key:legacyKey});}
  await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "files");
  const current=await inspect(page,f,`${options.kind}-${options.personal}-current`,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.doc.version}`));
  await inspect(page,f,`${options.kind}-${options.personal}-prior`,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.original.version}`));
  if(legacyKey){

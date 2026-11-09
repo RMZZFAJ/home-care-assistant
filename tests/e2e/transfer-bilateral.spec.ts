@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
@@ -146,9 +147,11 @@ test("transferência separa três autores, recupera declaração incerta com per
       exact: true,
     })
     .click();
+  await selectDocumentSection(page, "materials");
   const id = document!.id;
   await expect(page.getByText("Declarado", { exact: true })).toBeVisible();
   await expect(page.getByText("Expedido", { exact: true })).toHaveCount(0);
+  await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("heading", {
       name: "Atos da transferência física",
@@ -172,6 +175,7 @@ test("transferência separa três autores, recupera declaração incerta com per
       .getByRole("link")
       .filter({ hasText: "Decidir concordância da transferência" })
       .click();
+    await selectDocumentSection(ana, "workflow");
     await ana
       .getByRole("button", {
         name: "Concordar com a transferência",
@@ -200,6 +204,7 @@ test("transferência separa três autores, recupera declaração incerta com per
     ).toHaveCount(0);
     expect(JSON.parse(transferState(f)).ledger).toEqual(before.ledger);
     await page.goto("/documentos/" + id);
+  await selectDocumentSection(page, "workflow");
     await page
       .getByRole("button", { name: "Expedir transferência", exact: true })
       .click();
@@ -228,6 +233,7 @@ test("transferência separa três autores, recupera declaração incerta com per
       .getByRole("link")
       .filter({ hasText: "Conferir meu recebimento" })
       .click();
+    await selectDocumentSection(bruno, "workflow");
     await bruno
       .getByRole("button", { name: "Informar divergência", exact: true })
       .click();
@@ -432,6 +438,7 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
   await page.context().clearCookies();
   await login(page, f.counterparty.email, f.patient);
   await page.goto("/documentos/" + d.id);
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", { name: "Concordar com a transferência", exact: true })
     .click();

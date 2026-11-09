@@ -5,6 +5,7 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { selectDocumentSection } from "./document-sections";
 
 test.setTimeout(150_000);
 async function login(page: Page, patient: string, role = "family") {
@@ -67,7 +68,9 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   await expect(editor.getByRole("button", { name: "Recuperar a mesma publicação", exact: true })).toBeEnabled();
   await expect(editor.getByRole("textbox", { name: "Texto do andamento", exact: true })).toBeDisabled();
   await editor.getByRole("button", { name: "Fechar guardando referência", exact: true }).click();
+  await selectDocumentSection(page, "materials");
   await page.reload();
+  await selectDocumentSection(page, "overview");
   await feed.getByRole("button", { name: "Recuperar publicação", exact: true }).click();
   editor = page.getByRole("dialog", { name: "Recuperar publicação de andamento", exact: true });
   await expect(editor.getByRole("textbox", { name: "Texto do andamento", exact: true })).toHaveValue(fullText);

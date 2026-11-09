@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
@@ -66,6 +67,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   const before = JSON.parse(recountState(f));
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("link", { name: "Designar reconto", exact: true })
     .click();
@@ -219,6 +221,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     `update public.capability_overrides set enabled=true where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.family.id)} and capability='bal.approve.family';`,
   );
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", { name: "Revisão da família", exact: true })
     .click();

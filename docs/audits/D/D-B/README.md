@@ -11,6 +11,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
   do Fluent, comparação dirigida ao HTML e paridade integral ainda pendente.
 - [Andamentos persistidos](DOCUMENT_PROGRESS.md): publicação recuperável,
   autoria do banco, cronologia, referências autorizadas e migration165.
+- [Fichas em abas e marcos factuais](DOCUMENT_TABS.md): navegação e preservação
+  dos recursos documentais; paridade integral continua pendente.
 - [Nova aparência canônica](../../../ui-ux/CANONICAL_MODEL.md) e
   [execução adicional UI](UI_MODEL_ACCEPTANCE.csv):migração integral em andamento.
 - [Roteiro técnico GUI-04 e recuperação de leitura](RECOVERY_RUNBOOK.md).

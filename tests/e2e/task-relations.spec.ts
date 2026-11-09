@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { remainingNeedFixture, physicalState, fixtures, rpc } from "../integration/remaining-need-fixtures.mjs";
@@ -24,6 +25,7 @@ test("relação REQ para ENT abre fatos de expedição em leitura, recupera cons
   // authorized action before measuring whether the related ENT is read-only.
   const sourceOpening = page.waitForResponse(response => new URL(response.url()).pathname === `/api/requisitions/${f.source.id}/openings` && response.request().method() === "POST");
   await page.goto(`/historico/${f.source.id}`);
+  await selectDocumentSection(page, "materials");
   expect((await sourceOpening).status()).toBe(200);
   const open = page.getByRole("button", { name: new RegExp("^" + f.ent.code + " · aceito") });
   await expect(open).toBeVisible();

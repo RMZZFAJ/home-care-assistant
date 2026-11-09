@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
@@ -41,6 +42,7 @@ test("PDF atual assina fatos de rascunho e origens físicas conhecida e desconhe
     ["historical-known", known],
   ] as const) {
     await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "files");
     await selectContext(page, f.patient);
     const files = page.getByRole("region", {
       name: "Arquivos gerados",
@@ -192,6 +194,7 @@ test("PDF atual recusa caractere sem representação antes de assinar ou persist
   });
   await login(page, f.patient);
   await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "files");
   const files = page.getByRole("region", {
       name: "Arquivos gerados",
       exact: true,

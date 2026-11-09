@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
@@ -41,6 +42,7 @@ async function fixture(page: Page) {
   ).toBeVisible();
   await selectContext(page, f.patient);
   await page.goto(`/historico/${doc.id}`);
+  await selectDocumentSection(page, "files");
   return { ...f, doc, owner };
 }
 test("PDF recupera intenção após resposta inválida, mantém bytes e permite nova emissão explícita", async ({
@@ -262,6 +264,7 @@ test("PDF em REQ, ENT e BAL conserva fonte e estoque e exige leitura privada atu
     ["BAL", bal],
   ] as const) {
     await page.goto(`/historico/${doc.id}`);
+  await selectDocumentSection(page, "files");
     const files = page.getByRole("region", {
       name: "Arquivos gerados",
       exact: true,

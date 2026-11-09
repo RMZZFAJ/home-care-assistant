@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID, createHash } from "node:crypto";
 import { actor, fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
@@ -33,7 +34,8 @@ const facts = (id: string) => sql(`select jsonb_build_object('document',(select 
 test("acompanhamento0 respeita configuração real e não continua polling nem confirma entrega", async ({ page }) => {
   const f = await fixture(page, 0); let requests = 0;
   page.on("request", request => { if (new URL(request.url()).pathname === `/api/documents/${f.doc.id}/notifications`) requests++; });
-  await page.goto(`/historico/${f.doc.id}`); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "manual");
+  await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "communications"); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "manual");
   await expect(tracking(page)).toContainText("Acompanhamento automático desativado");
   const count = requests, before = facts(f.doc.id); await page.clock.fastForward(30000);
   await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "manual"); expect(requests).toBe(count); expect(facts(f.doc.id)).toBe(before);
@@ -49,8 +51,10 @@ test("prazo5 encerra só o acompanhamento e preserva PDF lento com bytes confirm
     const response = await route.fetch(); expect(response.status()).toBe(200); issuance = await response.json(); entered(); await gate; return route.fulfill({ response });
   });
   try {
-    await page.goto(`/historico/${f.doc.id}`); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "pending");
+    await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "communications"); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "pending");
     const before = facts(f.doc.id), files = page.getByRole("region", { name: "Arquivos gerados", exact: true });
+    await selectDocumentSection(page, "files");
     await files.getByRole("button", { name: "Gerar PDF", exact: true }).click(); await first;
     await page.clock.fastForward(5000); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "elapsed");
     await expect(files.getByRole("button", { name: "Gerando PDF…", exact: true })).toBeDisabled(); expect(failed).toEqual([]);
@@ -62,7 +66,8 @@ test("prazo5 encerra só o acompanhamento e preserva PDF lento com bytes confirm
 });
 
 test("resultado terminal antes do prazo10 não regride depois do deadline", async ({ page }) => {
-  const f = await fixture(page, 10); await page.goto(`/historico/${f.doc.id}`); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "pending");
+  const f = await fixture(page, 10); await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "communications"); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "pending");
   // Controlled local transport outcome, never a real provider acknowledgement.
   sql(`update public.requisition_notifications set state='sent' where document_id=${sqlLiteral(f.doc.id)};`);
   const before = facts(f.doc.id); await page.clock.fastForward(1800); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "settled");

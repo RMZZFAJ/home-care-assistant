@@ -39,9 +39,12 @@ comportamento, sem substituir a direção visual.
 
 REQ/COM/ENT/BAL adotam cabeçalho e progresso próprios, ações legítimas e abas:
 Visão geral, Materiais, Atendimento/Aquisição/Contagem e revisão, Comunicações,
-Arquivos gerados, Anexos e Auditoria quando autorizada. Conteúdo adicional deve
-continuar completo e alcançável. Revisões não herdam inputs de criação. Troca
-de aba conserva contexto, versão, edição e tentativa incerta.
+Arquivos gerados, Anexos e Auditoria quando autorizada. A aba adicional Versões
+e integridade conserva o histórico documental e as aberturas da REQ para quem
+pode ler a ficha; não exige capacidade de auditoria administrativa. Auditoria
+usa sua autorização e seu escopo próprios. Conteúdo adicional deve continuar
+completo e alcançável. Revisões não herdam inputs de criação. Troca de aba
+conserva contexto, versão, edição e tentativa incerta.
 
 Visão geral reúne Andamentos e próxima providência factual. Linha cronológica
 do primeiro ao mais recente, filtro de fatos automáticos/registros humanos e
@@ -57,8 +60,9 @@ sem executar HTML. Referência não concede acesso a ficha/paciente alheio.
 Registro complementar não muda conteúdo original, estoque, atendimento, ciência,
 recebimento, snapshots, hashes ou arquivos/versões emitidos anteriormente.
 Implementação e provas: [Andamentos persistidos](../audits/D/D-B/DOCUMENT_PROGRESS.md).
-A composição final em abas, os marcos do cabeçalho e a paridade das demais
-superfícies continuam sujeitos à conclusão da migração visual.
+A composição em abas e os marcos factuais têm implementação incremental em
+[Fichas em abas](../audits/D/D-B/DOCUMENT_TABS.md). Paridade integral do
+cabeçalho e das demais superfícies continua sujeita à conclusão da migração.
 
 ## Preservação e aceite
 

@@ -33,6 +33,16 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { DocumentHeader } from "./document-header";
+import {
+  DocumentTabs,
+  DocumentPanel,
+  DocumentAuditAccess,
+  useDocumentTabs,
+} from "@/components/documents/document-tabs";
+import { DocumentActions } from "@/components/documents/document-actions";
+import { DocumentMilestones } from "@/components/documents/document-milestones";
+import { DocumentNextStep } from "@/components/documents/document-next-step";
+import { supplyMilestones } from "@/lib/documents/milestones";
 import { DocumentProgress } from "./document-progress";
 import {
   PurchaseDetails,
@@ -55,6 +65,7 @@ export function SupplyDocumentContent({
   context: WorkspaceContext;
 }) {
   const liveRevision = useLiveRevision();
+  const tabs = useDocumentTabs(can(context, "audit.read"));
   const editingRef = useRef(false);
   const [data, setData] = useState<SupplyDocument | null>(null);
   const [people, setPeople] = useState<PatientPerson[]>([]);
@@ -62,15 +73,16 @@ export function SupplyDocumentContent({
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
-  const [readDenied,setReadDenied]=useState(false);
+  const [readDenied, setReadDenied] = useState(false);
   const [message, setMessage] = useState("");
+  const [readNotice, setReadNotice] = useState("");
   const [action, setAction] = useState<DocumentAction | null>(null);
   const [review, setReview] = useState<{
     action: string;
     body: unknown;
     summary: string;
     expectedVersion: number;
-    draftCommit?:{id:string;revision:number};
+    draftCommit?: { id: string; revision: number };
   } | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [purchaseConflict, setPurchaseConflict] = useState(false);
@@ -98,11 +110,11 @@ export function SupplyDocumentContent({
   useEffect(() => {
     editingRef.current = Boolean(
       action ||
-      review ||
-      uncertain ||
-      regularizationEditing ||
-      balanceReviewEditing ||
-      transferEditing,
+        review ||
+        uncertain ||
+        regularizationEditing ||
+        balanceReviewEditing ||
+        transferEditing,
     );
   }, [
     action,
@@ -117,7 +129,7 @@ export function SupplyDocumentContent({
     body: unknown;
     expectedVersion: number;
     idempotencyKey: string;
-    draftCommit?:{id:string;revision:number};
+    draftCommit?: { id: string; revision: number };
   } | null>(null);
   const patientId = context.patient?.id;
   useEffect(() => {
@@ -135,9 +147,11 @@ export function SupplyDocumentContent({
       .then(async (result) => {
         if (controller.signal.aborted) return;
         setReadDenied(false);
-        setData(current=>!editingRef.current||current===null?result.data:current);
-        if(editingRef.current)
-          setMessage(
+        setData((current) =>
+          !editingRef.current || current === null ? result.data : current,
+        );
+        if (editingRef.current)
+          setReadNotice(
             "O acompanhamento foi atualizado. Sua operação permanece preservada e será validada contra a versão original ao confirmar.",
           );
         setError("");
@@ -152,13 +166,20 @@ export function SupplyDocumentContent({
         }
       })
       .catch((reason) => {
-        if (!controller.signal.aborted){
-          if(reason instanceof ApiError&&[401,403,404].includes(reason.status)){setReadDenied(true);setData(null);}
+        if (!controller.signal.aborted) {
+          if (
+            reason instanceof ApiError &&
+            [401, 403, 404].includes(reason.status)
+          ) {
+            setReadDenied(true);
+            setData(null);
+          }
           setError(
             reason instanceof Error
               ? reason.message
               : "Não foi possível carregar a ficha.",
-          );}
+          );
+        }
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
@@ -173,7 +194,7 @@ export function SupplyDocumentContent({
         body: review.body,
         expectedVersion: review.expectedVersion,
         idempotencyKey: crypto.randomUUID(),
-        ...(review.draftCommit?{draftCommit:review.draftCommit}:{}),
+        ...(review.draftCommit ? { draftCommit: review.draftCommit } : {}),
       };
     if (!pendingRef.current) return;
     setBusy(true);
@@ -184,7 +205,12 @@ export function SupplyDocumentContent({
         "/api/documents/" + id,
         intention,
       );
-      result.data=requireSupplyConfirmation(result,{patientId:data.care_recipient_id,type:data.type,id,minimumVersion:intention.expectedVersion});
+      result.data = requireSupplyConfirmation(result, {
+        patientId: data.care_recipient_id,
+        type: data.type,
+        id,
+        minimumVersion: intention.expectedVersion,
+      });
       resultFocusRef.current = true;
       setFocusRevision((value) => value + 1);
       setData(result.data);
@@ -195,6 +221,7 @@ export function SupplyDocumentContent({
       setPurchaseConflict(false);
       setDeliveryConflict(false);
       setComparison(null);
+      setReadNotice("");
       const receipt = result.data.receipts.find(
         (receipt) => receipt.submission_key === intention.idempotencyKey,
       );
@@ -251,7 +278,7 @@ export function SupplyDocumentContent({
       const rejected =
         reason instanceof ApiError &&
         [400, 403, 404, 409, 422].includes(reason.status);
-      if (rejected&&!uncertain) {
+      if (rejected && !uncertain) {
         if (
           data.type === "COM" &&
           reason instanceof ApiError &&
@@ -267,7 +294,7 @@ export function SupplyDocumentContent({
         pendingRef.current = null;
         setReview(null);
       }
-      setUncertain(uncertain||!rejected);
+      setUncertain(uncertain || !rejected);
       setError(
         reason instanceof Error
           ? reason.message
@@ -433,6 +460,15 @@ export function SupplyDocumentContent({
       {loading ? <Notice>Consultando documento persistido…</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
+      {readNotice &&
+      (action ||
+        review ||
+        uncertain ||
+        regularizationEditing ||
+        balanceReviewEditing ||
+        transferEditing) ? (
+        <Notice>{readNotice}</Notice>
+      ) : null}
       {purchaseConflict && data?.type === "COM" ? (
         <section className="ui-card space-y-3">
           <Notice error>
@@ -541,6 +577,74 @@ export function SupplyDocumentContent({
       {data ? (
         <>
           <DocumentHeader
+            showFiles={false}
+            actions={
+              <>
+                {activeContext &&
+                data.status === "draft" &&
+                allowed(
+                  data.type === "BAL"
+                    ? "bal.count"
+                    : data.type.toLowerCase() + ".create",
+                ) ? (
+                  <Link
+                    className={primaryClass}
+                    href={
+                      "/fichas/" +
+                      data.type.toLowerCase() +
+                      "?documentId=" +
+                      data.id
+                    }
+                  >
+                    Editar rascunho
+                  </Link>
+                ) : null}
+                {activeContext &&
+                data.type === "BAL" &&
+                data.status === "submitted" &&
+                allowed("bal.count") &&
+                !data.payload.balanceContext &&
+                !data.balanceRecount?.hasRecountCycle ? (
+                  <Link
+                    className={buttonClass}
+                    href={"/fichas/bal?documentId=" + data.id + "&recount=true"}
+                  >
+                    Recontar com nova referência de estoque
+                  </Link>
+                ) : null}
+                {data.type === "BAL" && data.payload.balanceContext ? (
+                  <Link
+                    href="/balancos"
+                    className={buttonClass}
+                    prefetch={false}
+                  >
+                    Acompanhar plantão, revisão e reconto
+                  </Link>
+                ) : null}
+                {actions.length ? (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {actions.map((item) => (
+                      <button
+                        key={item}
+                        className={
+                          item === "receive" ? primaryClass : buttonClass
+                        }
+                        disabled={loading || busy || uncertain}
+                        onClick={() => {
+                          tabs.select("workflow");
+                          setAction(item);
+                          setReview(null);
+                        }}
+                      >
+                        {data.type === "COM" && item === "receive"
+                          ? "Informar nova chegada"
+                          : actionLabels[item]}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </>
+            }
             observedRef={headerRef}
             id={data.id}
             type={data.type}
@@ -551,7 +655,9 @@ export function SupplyDocumentContent({
                   : data.payload.origin === "purchase"
                     ? "Compra de insumos"
                     : "Compra ou doação de insumos"
-                : data.type === "BAL" ? documentVariant(data.type, data.payload, data.workflow_data) : undefined
+                : data.type === "BAL"
+                  ? documentVariant(data.type, data.payload, data.workflow_data)
+                  : undefined
             }
             code={
               data.code ??
@@ -622,230 +728,276 @@ export function SupplyDocumentContent({
                 Abrir requisição
               </Link>
             ) : null}
+            <DocumentMilestones items={supplyMilestones(data)} />
           </DocumentHeader>
-          <DocumentProgress id={id} type={data.type} patientId={data.care_recipient_id} context={context} />
-          {data.type === "ENT" && data.protocol ? (
-            <section className="ui-card">
-              <DeliveryDispatchFacts data={data} />
-            </section>
-          ) : null}
-          {data.transfer ? (
-            <TransferDetails
-              data={data}
-              onUpdated={setData}
-              onEditingChange={setTransferEditing}
-            />
-          ) : null}
-          {data.type === "ENT" && data.workflow_data.recipientSelection ? (
-            <section className="ui-card space-y-4">
-              <DeliveryRecipientFacts
-                selection={data.workflow_data.recipientSelection}
+          <DocumentTabs
+            type={data.type}
+            value={tabs.value}
+            onSelect={tabs.select}
+            auditAllowed={can(context, "audit.read")}
+          >
+            <DocumentPanel value="overview">
+              <DocumentNextStep
+                label={
+                  data.type === "COM"
+                    ? "Aquisição e chegadas"
+                    : data.type === "BAL"
+                      ? "Contagem e revisão"
+                      : "Atendimento e decisões"
+                }
+                pending={
+                  data.status === "draft" ||
+                  data.status === "pending_receipt" ||
+                  data.status === "disputed" ||
+                  data.status === "cancellation_pending" ||
+                  Boolean(
+                    data.purchaseProgress?.expectationPending ||
+                      data.purchaseProgress?.physicalPending ||
+                      data.purchaseProgress?.validationPending,
+                  ) ||
+                  Boolean(
+                    data.balanceReview?.reviewRequired &&
+                      data.status !== "approved",
+                  ) ||
+                  Boolean(
+                    data.balanceRecount?.activeAssignment ||
+                      data.balanceRecount?.requiresDesignation,
+                  )
+                }
+                onOpen={() => tabs.select("workflow")}
               />
-              {data.workflow_data.recipientSelectionHistory?.length ? (
-                <details>
-                  <summary>Indicações anteriores preservadas</summary>
-                  <div className="mt-3 space-y-4">
-                    {data.workflow_data.recipientSelectionHistory.map(
-                      (selection) => (
-                        <DeliveryRecipientFacts
-                          key={
-                            selection.recordedAt + ":" + selection.recipientId
-                          }
-                          selection={selection}
-                        />
-                      ),
-                    )}
-                  </div>
-                </details>
+              <DocumentProgress
+                id={id}
+                type={data.type}
+                patientId={data.care_recipient_id}
+                context={context}
+              />
+            </DocumentPanel>
+            <DocumentPanel value="materials">
+              <section className="ui-card">
+                <h2 className="font-semibold">Produtos e quantidades</h2>
+                <div className="mt-4 space-y-3">
+                  {data.lines.map((line) => (
+                    <SupplyLineSummary
+                      key={line.id}
+                      line={line}
+                      type={data.type}
+                      status={data.status}
+                      declarationOnly={Boolean(
+                        data.transfer && data.transfer.state !== "dispatched",
+                      )}
+                      purchaseLine={data.purchaseProgress?.lines.find(
+                        (item) => item.lineId === line.id,
+                      )}
+                    />
+                  ))}{" "}
+                </div>
+                {data.payload.notes ? (
+                  <p className="mt-4 whitespace-pre-wrap text-sm">
+                    {data.payload.notes}
+                  </p>
+                ) : null}
+              </section>
+            </DocumentPanel>
+            <DocumentPanel value="workflow">
+              {data.type === "ENT" && data.protocol ? (
+                <section className="ui-card">
+                  <DeliveryDispatchFacts data={data} />
+                </section>
               ) : null}
-            </section>
-          ) : null}
-          {data.type === "ENT" ? (
-            <DeliveryRegularization
-              data={data}
-              context={context}
-              onEditingChange={setRegularizationEditing}
-              onUpdated={setData}
-            />
-          ) : null}
-          {data.type === "ENT" && data.deliveryCancellation ? (
-            <DeliveryCancellationDetails
-              context={data.deliveryCancellation}
-              onRefresh={() => {
-                if (editingRef.current) {
-                  setDeliveryConflict(true);
-                  setComparison(null);
-                  void comparePurchaseVersion();
-                } else setAttempt((value) => value + 1);
-              }}
-            />
-          ) : null}
-          {data.type === "COM" ? <PurchaseDetails data={data} /> : null}
-          {data.type === "BAL" && data.status !== "draft" ? (
-            <BalanceReview
-              data={data}
-              onUpdated={setData}
-              onEditingChange={setBalanceReviewEditing}
-            />
-          ) : null}
-          {data.type === "BAL" && data.payload.balanceContext ? (
-            <section className="ui-card">
-              <h2>Plantão e contagem física</h2>
-              <strong>
-                {data.payload.balanceContext.professionalName} ·{" "}
-                {data.payload.balanceContext.shiftType}
-              </strong>
-              <p>
-                {formatBrazilDate(data.payload.balanceContext.startsAt)} →{" "}
-                {formatBrazilDate(data.payload.balanceContext.endsAt)}
-              </p>
-              <p>
-                Contagem atual:{" "}
-                {formatBrazilDate(data.payload.balanceContext.countedAt)}
-              </p>
-              <p>
-                Semanas vinculadas:{" "}
-                {data.payload.balanceContext.weeks
-                  .map((week) => week.split("-").reverse().join("/"))
-                  .join(", ")}
-              </p>
-              <p className="hca-muted">
-                Semanas anteriores são regularizadas pela contagem atual,
-                preservando seus prazos e atrasos históricos.
-              </p>
-              {data.status === "draft" ? (
-                <Notice>Rascunho: a obrigação ainda não foi concluída.</Notice>
-              ) : null}
-            </section>
-          ) : null}
-          {activeContext &&
-          data.status === "draft" &&
-          allowed(
-            data.type === "BAL"
-              ? "bal.count"
-              : data.type.toLowerCase() + ".create",
-          ) ? (
-            <Link
-              className={primaryClass}
-              href={
-                "/fichas/" + data.type.toLowerCase() + "?documentId=" + data.id
-              }
-            >
-              Editar rascunho
-            </Link>
-          ) : null}
-          {activeContext &&
-          data.type === "BAL" &&
-          data.status === "submitted" &&
-          allowed("bal.count") &&
-          !data.payload.balanceContext &&
-          !data.balanceRecount?.hasRecountCycle ? (
-            <Link
-              className={buttonClass}
-              href={"/fichas/bal?documentId=" + data.id + "&recount=true"}
-            >
-              Recontar com nova referência de estoque
-            </Link>
-          ) : null}
-          {data.type === "BAL" && data.payload.balanceContext ? (
-            <Link href="/balancos" className={buttonClass} prefetch={false}>
-              Acompanhar plantão, revisão e reconto
-            </Link>
-          ) : null}
-          {actions.length ? (
-            <section className="ui-card">
-              <h2 className="font-semibold">Próxima ação</h2>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {actions.map((item) => (
-                  <button
-                    key={item}
-                    className={item === "receive" ? primaryClass : buttonClass}
-                    disabled={loading || busy || uncertain}
-                    onClick={() => {
-                      setAction(item);
-                      setReview(null);
-                    }}
-                  >
-                    {data.type === "COM" && item === "receive"
-                      ? "Informar nova chegada"
-                      : actionLabels[item]}
-                  </button>
-                ))}
-              </div>
-              {action ? (
-                <CommandEditor
-                  key={data.id + action}
-                  action={action}
+              {data.transfer ? (
+                <TransferDetails
                   data={data}
-                  people={people.filter(
-                    (person) => person.id !== data.created_by,
-                  )}
-                  context={context}
-                  formRef={commandFormRef}
-                  reviewDisabled={
-                    busy || uncertain || purchaseConflict || deliveryConflict
-                  }
-                  onCancel={() => {
-                    setAction(null);
-                    setPurchaseConflict(false);
-                    setDeliveryConflict(false);
-                    setComparison(null);
-                    setAttempt((value) => value + 1);
-                  }}
-                  onReview={(command, body, summary,draftCommit,expectedVersion) =>
-                    setReview({
-                      action: command,
-                      body,
-                      summary,
-                      expectedVersion: expectedVersion??data.version,
-                      ...(draftCommit?{draftCommit}:{}),
-                    })
-                  }
+                  onUpdated={setData}
+                  onEditingChange={setTransferEditing}
                 />
               ) : null}
-            </section>
-          ) : null}
-          <section className="ui-card">
-            <h2 className="font-semibold">Produtos e quantidades</h2>
-            <div className="mt-4 space-y-3">
-              {data.lines.map((line) => (
-                <SupplyLineSummary
-                  key={line.id}
-                  line={line}
-                  type={data.type}
-                  status={data.status}
-                  declarationOnly={Boolean(
-                    data.transfer && data.transfer.state !== "dispatched",
-                  )}
-                  purchaseLine={data.purchaseProgress?.lines.find(
-                    (item) => item.lineId === line.id,
-                  )}
+              {data.type === "ENT" && data.workflow_data.recipientSelection ? (
+                <section className="ui-card space-y-4">
+                  <DeliveryRecipientFacts
+                    selection={data.workflow_data.recipientSelection}
+                  />
+                  {data.workflow_data.recipientSelectionHistory?.length ? (
+                    <details>
+                      <summary>Indicações anteriores preservadas</summary>
+                      <div className="mt-3 space-y-4">
+                        {data.workflow_data.recipientSelectionHistory.map(
+                          (selection) => (
+                            <DeliveryRecipientFacts
+                              key={
+                                selection.recordedAt +
+                                ":" +
+                                selection.recipientId
+                              }
+                              selection={selection}
+                            />
+                          ),
+                        )}
+                      </div>
+                    </details>
+                  ) : null}
+                </section>
+              ) : null}
+              {data.type === "ENT" ? (
+                <DeliveryRegularization
+                  data={data}
+                  context={context}
+                  onEditingChange={setRegularizationEditing}
+                  onUpdated={setData}
                 />
-              ))}{" "}
-            </div>
-            {data.payload.notes ? (
-              <p className="mt-4 whitespace-pre-wrap text-sm">
-                {data.payload.notes}
-              </p>
+              ) : null}
+              {data.type === "ENT" && data.deliveryCancellation ? (
+                <DeliveryCancellationDetails
+                  context={data.deliveryCancellation}
+                  onRefresh={() => {
+                    if (editingRef.current) {
+                      setDeliveryConflict(true);
+                      setComparison(null);
+                      void comparePurchaseVersion();
+                    } else setAttempt((value) => value + 1);
+                  }}
+                />
+              ) : null}
+              {data.type === "COM" ? <PurchaseDetails data={data} /> : null}
+              {data.type === "BAL" && data.status !== "draft" ? (
+                <BalanceReview
+                  data={data}
+                  onUpdated={setData}
+                  onEditingChange={setBalanceReviewEditing}
+                />
+              ) : null}
+              {data.type === "BAL" && data.payload.balanceContext ? (
+                <section className="ui-card">
+                  <h2>Plantão e contagem física</h2>
+                  <strong>
+                    {data.payload.balanceContext.professionalName} ·{" "}
+                    {data.payload.balanceContext.shiftType}
+                  </strong>
+                  <p>
+                    {formatBrazilDate(data.payload.balanceContext.startsAt)} →{" "}
+                    {formatBrazilDate(data.payload.balanceContext.endsAt)}
+                  </p>
+                  <p>
+                    Contagem atual:{" "}
+                    {formatBrazilDate(data.payload.balanceContext.countedAt)}
+                  </p>
+                  <p>
+                    Semanas vinculadas:{" "}
+                    {data.payload.balanceContext.weeks
+                      .map((week) => week.split("-").reverse().join("/"))
+                      .join(", ")}
+                  </p>
+                  <p className="hca-muted">
+                    Semanas anteriores são regularizadas pela contagem atual,
+                    preservando seus prazos e atrasos históricos.
+                  </p>
+                  {data.status === "draft" ? (
+                    <Notice>
+                      Rascunho: a obrigação ainda não foi concluída.
+                    </Notice>
+                  ) : null}
+                </section>
+              ) : null}
+              {actions.length ? (
+                <section className="ui-card">
+                  <h2>Próxima ação</h2>
+                  {action ? (
+                    <CommandEditor
+                      key={data.id + action}
+                      action={action}
+                      data={data}
+                      people={people.filter(
+                        (person) => person.id !== data.created_by,
+                      )}
+                      context={context}
+                      formRef={commandFormRef}
+                      reviewDisabled={
+                        busy ||
+                        uncertain ||
+                        purchaseConflict ||
+                        deliveryConflict
+                      }
+                      onCancel={() => {
+                        setAction(null);
+                        setPurchaseConflict(false);
+                        setDeliveryConflict(false);
+                        setComparison(null);
+                        setAttempt((value) => value + 1);
+                      }}
+                      onReview={(
+                        command,
+                        body,
+                        summary,
+                        draftCommit,
+                        expectedVersion,
+                      ) =>
+                        setReview({
+                          action: command,
+                          body,
+                          summary,
+                          expectedVersion: expectedVersion ?? data.version,
+                          ...(draftCommit ? { draftCommit } : {}),
+                        })
+                      }
+                    />
+                  ) : null}
+                  {!action ? (
+                    <p className="hca-field-help">
+                      Escolha uma ação autorizada no cabeçalho. Consultar as
+                      etapas não confirma operações.
+                    </p>
+                  ) : null}
+                </section>
+              ) : null}
+            </DocumentPanel>
+            <DocumentPanel value="communications">
+              <DocumentDeliveryStatus id={data.id} version={data.version} />
+            </DocumentPanel>
+            <DocumentPanel value="files">
+              {data.protocol ? (
+                <DocumentActions
+                  id={id}
+                  code={data.code ?? "Ficha"}
+                  version={data.version}
+                />
+              ) : (
+                <Notice>
+                  Esta declaração ou rascunho ainda não tem emissão documental
+                  definitiva.
+                </Notice>
+              )}
+            </DocumentPanel>
+            <DocumentPanel value="attachments">
+              <Attachments
+                patientId={data.care_recipient_id}
+                documentId={data.id}
+                writable={
+                  activeContext &&
+                  (data.created_by === context.userId ||
+                    data.recipient_id === context.userId ||
+                    allowed("access.manage"))
+                }
+                onChange={() => setAttempt((value) => value + 1)}
+              />
+            </DocumentPanel>
+            <DocumentPanel value="history">
+              <DocumentTimeline
+                id={id}
+                version={data.version}
+                events={data.events}
+                title="Versões e integridade"
+              />
+            </DocumentPanel>
+            {can(context, "audit.read") ? (
+              <DocumentPanel value="audit">
+                <DocumentAuditAccess patientId={data.care_recipient_id} />
+              </DocumentPanel>
             ) : null}
-          </section>
-          <Attachments
-            patientId={data.care_recipient_id}
-            documentId={data.id}
-            writable={
-              activeContext &&
-              (data.created_by === context.userId ||
-                data.recipient_id === context.userId ||
-                allowed("access.manage"))
-            }
-            onChange={() => setAttempt((value) => value + 1)}
-          />
-          <DocumentDeliveryStatus id={data.id} version={data.version} />
-          <DocumentTimeline id={id} version={data.version} events={data.events} title="Versões e integridade" />
+          </DocumentTabs>
         </>
       ) : null}
       <Dialog
-        open={Boolean(review)&&!readDenied}
+        open={Boolean(review) && !readDenied}
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"

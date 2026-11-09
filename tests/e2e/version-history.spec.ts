@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -76,6 +77,7 @@ test("Histórico COM compara snapshots, não usa nome/catálogo posterior e cons
   const count = sql(`select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)};`), ledger = fidelityLedger(f.patient);
   const deniedWriter = await f.writer.client.from("document_events").select("id").eq("document_id", f.doc.id);
   expect(deniedWriter.error).toBeNull(); expect(deniedWriter.data).toEqual([]);
+  await selectDocumentSection(page, "history");
   await page.getByRole("button", { name: "Versões e integridade", exact: true }).click();
   await page.getByRole("button", { name: `Consultar versão ${f.approved.version}`, exact: true }).click();
   await expect(frozen(page, f.approved.version)).toContainText(f.oldName); await expect(frozen(page, f.approved.version)).toContainText(f.oldProduct);

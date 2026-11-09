@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
@@ -47,6 +48,7 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
     before = ledger(f.patient);
   await login(page, fixtures.adminA.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("heading", { name: "Contagem e revisão", exact: true }),
   ).toBeVisible();
@@ -60,6 +62,7 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
     const reviewer = await context.newPage();
     await login(reviewer, fixtures.family.email, f.patient);
     await reviewer.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(reviewer, "workflow");
     await reviewer
       .getByRole("button", { name: "Revisão da família", exact: true })
       .click();
@@ -168,6 +171,7 @@ test("BAL com referência alterada conserva o parecer e exige reconto, consulta 
     ownComment = "Meu parecer permanece durante a comparação e o reconto.";
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", { name: "Revisão da família", exact: true })
     .click();

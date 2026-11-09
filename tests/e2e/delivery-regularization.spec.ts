@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -136,6 +137,7 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
     before = ledger(f);
   await login(page, f.patient, "adminA");
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   const panel = page.getByRole("region", {
     name: "Regularização administrativa",
     exact: true,
@@ -443,6 +445,7 @@ test("P05 conflito preserva campos próprios e só permite nova proposta após c
   f.document = await unknownCase(f, fixtures.adminA.id);
   await login(page, f.patient, "adminA");
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", { name: "Preparar regularização", exact: true })
     .click();

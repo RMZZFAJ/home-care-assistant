@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect,test,type Page,type APIResponse } from "@playwright/test";
 import { createHash,randomUUID } from "node:crypto";
 import { mkdirSync,readFileSync,writeFileSync } from "node:fs";
@@ -55,6 +56,7 @@ test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva 
   const f=await regularizationPdfFixture(),before=regularizationLedger(f.patient),key=randomUUID();
   const old=await rpc(f.owner,"reserve_pdf_issuance_v7",{p_document:f.doc.id,p_version:f.doc.version,p_key:key});
   await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "files");
   const files=page.getByRole("region",{name:"Arquivos gerados",exact:true});
   const existing=await page.request.get(`/api/documents/${f.doc.id}/issuances`);expect((await existing.json()).data).toHaveLength(1);
   await files.getByRole("button",{name:"Gerar PDF",exact:true}).click();
@@ -89,6 +91,7 @@ test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva 
 for(const mode of ["unknown","rejected"] as const)test(`ENT ${mode} gera exemplar assinado sem atribuir execução ou aceite alheio`,async({page})=>{
   const f=await regularizationPdfFixture(mode==="unknown"?{unknownOnly:true}:{state:"rejected"}),before=regularizationLedger(f.patient);
   await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
+  await selectDocumentSection(page, "files");
   await inspect(page,f,mode,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.doc.version}`),10);
   expect(regularizationLedger(f.patient)).toBe(before);
   expect(sql(`select count(*) from public.stock_movements where reference_type='delivery_regularization' and reference_id=${sqlLiteral(f.item.id)};`)).toBe("0");

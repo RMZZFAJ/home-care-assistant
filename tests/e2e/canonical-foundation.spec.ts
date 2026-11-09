@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -17,7 +18,8 @@ test("UIR fundação compara modal ao HTML em cinco larguras e conserva foco e l
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, f.patient);
   const sourceOpening = page.waitForResponse(response => new URL(response.url()).pathname === `/api/requisitions/${f.source.id}/openings` && response.request().method() === "POST");
-  await page.goto(`/historico/${f.source.id}`); expect((await sourceOpening).status()).toBe(200);
+  await page.goto(`/historico/${f.source.id}`);
+  await selectDocumentSection(page, "materials"); expect((await sourceOpening).status()).toBe(200);
   const before = physicalState(f), writes: string[] = [];
   page.on("request", request => { if (/^\/api\/(documents|requisitions|stock|balances)/.test(new URL(request.url()).pathname) && request.method() !== "GET") writes.push(new URL(request.url()).pathname); });
   const opener = page.getByRole("button", { name: new RegExp("^" + f.ent.code + " · aceito") });

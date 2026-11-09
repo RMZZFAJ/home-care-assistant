@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -80,8 +81,11 @@ test("P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevi
     expect(count(req.id)).toBe(1); expect(reads).toBe(1); expect(openings(req.id)).toBe(0);
     await expect(page.getByText("Sua ciência foi registrada pela confirmação do diálogo.", { exact: false })).toBeVisible();
     await page.getByRole("button", { name: "Tentar carregar requisição", exact: true }).click();
+    await selectDocumentSection(page, "materials");
     await expect(page.getByText("Material fictício V4 0", { exact: false }).first()).toBeVisible();
+    await selectDocumentSection(page, "overview");
     await expect(page.getByText("Família ciente", { exact: true })).toBeVisible();
+    await selectDocumentSection(page, "workflow");
     await expect(page.getByText("Minha ciência: registrada.", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Recuperar registro desta abertura", exact: true })).toBeVisible();
     expect(openings(req.id)).toBe(1);
@@ -97,7 +101,7 @@ test("P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevi
     expect(count(req.id)).toBe(1);
     expect(openings(req.id), "PDF delivery must not fabricate another application opening").toBe(1);
     if (info.project.name === "chromium") { mkdirSync("output/pdf/phase-d", { recursive: true }); const path = `output/pdf/phase-d/p02-dialog-${req.id}.pdf`; writeFileSync(path, await pdf.body(), { flag: "wx" }); await info.attach("P02 dialogue PDF", { path, contentType: "application/pdf" }); }
-    await page.reload(); await expect(page.getByText("Família ciente", { exact: true })).toBeVisible();
+    await page.reload(); await selectDocumentSection(page, "overview"); await expect(page.getByText("Família ciente", { exact: true })).toBeVisible();
     await expect.poll(() => openings(req.id)).toBe(2); expect(count(req.id)).toBe(1);
   } finally { await prefer(family, "manual"); }
 });
@@ -116,7 +120,10 @@ test("P02 abertura exige conteúdo e sinal de primeiro plano; trilha pagina fato
   const technical = await page.request.get(`/api/requisitions/${req.id}`); expect(technical.ok()).toBe(true);
   const reference = (await technical.json()).data.progress;
   const before = sql(`select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(req.id)}),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}));`);
-  await page.goto("/historico/" + req.id); await expect(page.getByText("Material fictício V4 0", { exact: false }).first()).toBeVisible();
+  await page.goto("/historico/" + req.id);
+  await selectDocumentSection(page, "materials");
+  await expect(page.getByText("Material fictício V4 0", { exact: false }).first()).toBeVisible();
+  await selectDocumentSection(page, "history");
   const trail = page.locator("details").filter({ has: page.locator("summary", { hasText: "Aberturas informadas pelo aplicativo" }) });
   await trail.locator("summary").click(); await expect(trail.getByText("Nenhuma abertura informada neste histórico.", { exact: true })).toBeVisible();
   expect(openings(req.id)).toBe(0); expect(count(req.id)).toBe(0);

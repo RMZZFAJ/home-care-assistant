@@ -25,6 +25,16 @@ import { textRows } from "@/lib/text-rows";
 import { requisitionDocumentState } from "@/lib/documents/presentation";
 import { Attachments } from "@/components/documents/attachments";
 import { DocumentHeader } from "@/components/documents/document-header";
+import {
+  DocumentTabs,
+  DocumentPanel,
+  DocumentAuditAccess,
+  useDocumentTabs,
+} from "@/components/documents/document-tabs";
+import { DocumentActions } from "@/components/documents/document-actions";
+import { DocumentMilestones } from "@/components/documents/document-milestones";
+import { DocumentNextStep } from "@/components/documents/document-next-step";
+import { requisitionMilestones } from "@/lib/documents/milestones";
 import { DocumentProgress } from "@/components/documents/document-progress";
 import {
   DocumentTimeline,
@@ -33,7 +43,7 @@ import {
 import { RelatedDocument } from "@/components/documents/related-document";
 import { Dialog } from "@/components/ui/primitives";
 import { ResolveExtraItem } from "./resolve-extra-item";
-import { RequisitionDisplay } from "./requisition-display";
+import { RequisitionDisplay, OpeningHistory } from "./requisition-display";
 import {
   deliveryLabels,
   type DeliveryStatus,
@@ -125,6 +135,8 @@ export function RequisitionDocumentContent({
   context: WorkspaceContext;
 }) {
   const revision = useLiveRevision();
+  const tabs = useDocumentTabs(can(context, "audit.read"));
+  const [openingRevision, setOpeningRevision] = useState("initial");
   const [data, setData] = useState<Detail | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
@@ -221,6 +233,84 @@ export function RequisitionDocumentContent({
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       <DocumentHeader
+        showFiles={false}
+        actions={
+          <>
+            {!data.is_historical &&
+            p.eligible &&
+            !p.archivedAt &&
+            data.status !== "cancelled" &&
+            !p.science.some(
+              (row) => row.user_id === context.userId && row.mode === "express",
+            ) ? (
+              <button
+                type="button"
+                className={primaryClass + " mt-4"}
+                disabled={busy}
+                onClick={() => void action("science")}
+              >
+                Li a requisição e confirmo minha ciência
+              </button>
+            ) : null}
+            {p.completedAt && !p.archivedAt && can(context, "req.archive") ? (
+              <button
+                className={buttonClass + " mt-4"}
+                disabled={busy}
+                onClick={() => {
+                  setReason("");
+                  setReview("archive");
+                }}
+              >
+                Revisar arquivamento manual
+              </button>
+            ) : null}
+            {!data.is_historical &&
+            !p.archivedAt &&
+            data.status !== "cancelled" &&
+            can(context, "req.review") ? (
+              <button
+                className={buttonClass}
+                disabled={busy}
+                onClick={() => {
+                  setReason("");
+                  setReview("cancel");
+                }}
+              >
+                Cancelar requisição
+              </button>
+            ) : null}
+            {!data.is_historical && can(context, "req.create") ? (
+              <Link
+                className={buttonClass}
+                href={`/fichas/req?careRecipientId=${data.care_recipient_id}&sourceRequisitionId=${id}`}
+              >
+                Declarar nova necessidade remanescente
+              </Link>
+            ) : null}
+            {!data.is_historical &&
+            !p.archivedAt &&
+            data.status !== "cancelled" ? (
+              <div className="mt-4 flex flex-wrap gap-3">
+                {can(context, "com.create") ? (
+                  <Link
+                    className={buttonClass}
+                    href={`/fichas/com?requisitionId=${id}`}
+                  >
+                    Abrir COM vinculada
+                  </Link>
+                ) : null}
+                {can(context, "ent.create") ? (
+                  <Link
+                    className={primaryClass}
+                    href={`/fichas/ent?requisitionId=${id}`}
+                  >
+                    Expedir ENT vinculada
+                  </Link>
+                ) : null}
+              </div>
+            ) : null}
+          </>
+        }
         id={id}
         type="REQ"
         code={data.code ?? data.protocol}
@@ -246,276 +336,345 @@ export function RequisitionDocumentContent({
                 : "Solicitante registrado")}
           </span>
         </p>
-        <div className="my-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg bg-(--background) p-3">
-            <p className="text-xs text-(--muted)">Atendimento</p>
-            <strong>
-              {f.fulfilled}/{f.total} itens atendidos
-            </strong>
-            <p className="text-xs">
-              {f.total > 0 && f.fulfilled === f.total
-                ? "Completo"
-                : f.fulfilled
-                  ? "Parcial"
-                  : "Aguardando ENT aceita"}
-            </p>
-          </div>
-          <div className="rounded-lg bg-(--background) p-3">
-            <p className="text-xs text-(--muted)">Ciência familiar</p>
-            <strong>
-              {data.is_historical
-                ? "Não comprovada no original"
-                : p.familyAware
-                  ? "Família ciente"
-                  : p.designationPending
-                    ? "Pendente de designação"
-                    : "Ciência não registrada"}
-            </strong>
-            <p className="text-xs">Independente do recebimento</p>
-          </div>
-          <div className="rounded-lg bg-(--background) p-3">
-            <p className="text-xs text-(--muted)">Documento</p>
-            <strong>
-              {data.is_historical
-                ? "Registro histórico"
-                : p.archivedAt
-                  ? "Arquivado"
-                  : data.status === "cancelled"
-                    ? "Cancelado"
-                    : p.completedAt
-                      ? "Concluído operacionalmente"
-                      : "Em atendimento"}
-            </strong>
-          </div>
-        </div>
+
+        <DocumentMilestones
+          items={requisitionMilestones({
+            historical: Boolean(data.is_historical),
+            issued: Boolean(data.protocol && data.created_at),
+            scienceRequired: p.policy?.scienceRequired !== false,
+            scienceSatisfied: p.scienceSatisfied,
+            fulfilled: f.fulfilled,
+            total: f.total,
+            state: documentState,
+          })}
+        />
       </DocumentHeader>
-      {data.sourceRequisition ? (
-        <section
-          className="ui-card space-y-3"
-          aria-label="Origem da necessidade remanescente"
-        >
-          <h2>Origem da necessidade remanescente</h2>
-          <RelatedDocument
-            type="REQ"
-            id={data.sourceRequisition.id}
-            label={
-              data.sourceRequisition.code ?? data.sourceRequisition.protocol
+      <RequisitionDisplay
+        key={id}
+        id={id}
+        reference={p}
+        onRecorded={setOpeningRevision}
+      />
+      <DocumentTabs
+        type="REQ"
+        value={tabs.value}
+        onSelect={tabs.select}
+        auditAllowed={can(context, "audit.read")}
+      >
+        <DocumentPanel value="overview">
+          <DocumentNextStep
+            label="Ciência e atendimento"
+            pending={
+              !data.is_historical &&
+              !p.archivedAt &&
+              data.status !== "cancelled" &&
+              (f.fulfilled < f.total || !p.scienceSatisfied)
             }
+            onOpen={() => tabs.select("workflow")}
           />
-          <p>Referência na emissão: versão {data.sourceRequisition.version}.</p>
-          <p className="whitespace-pre-wrap">
-            Motivo próprio: {data.sourceRequisition.reason}
-          </p>
-          <p>
-            Esta requisição tem ciência e atendimento próprios; os aceites
-            anteriores pertencem à origem.
-          </p>
-        </section>
-      ) : null}
-      {data.remainingNeedTotal > 0 ? (
-        <section
-          className="ui-card space-y-3"
-          aria-label="Necessidades seguintes"
-        >
-          <h2>Necessidades seguintes</h2>
-          <p>
-            {data.remainingNeeds.length} de {data.remainingNeedTotal} registros,
-            mais recentes primeiro.
-          </p>
-          {data.remainingNeeds.map((row) => (
-            <article key={row.id}>
+          <section
+            className="ui-card"
+            aria-label="Dimensões independentes da requisição"
+          >
+            <div className="my-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg bg-(--background) p-3">
+                <p className="text-xs text-(--muted)">Atendimento</p>
+                <strong>
+                  {f.fulfilled}/{f.total} itens atendidos
+                </strong>
+                <p className="text-xs">
+                  {f.total > 0 && f.fulfilled === f.total
+                    ? "Completo"
+                    : f.fulfilled
+                      ? "Parcial"
+                      : "Aguardando ENT aceita"}
+                </p>
+              </div>
+              <div className="rounded-lg bg-(--background) p-3">
+                <p className="text-xs text-(--muted)">Ciência familiar</p>
+                <strong>
+                  {data.is_historical
+                    ? "Não comprovada no original"
+                    : p.familyAware
+                      ? "Família ciente"
+                      : p.designationPending
+                        ? "Pendente de designação"
+                        : "Ciência não registrada"}
+                </strong>
+                <p className="text-xs">Independente do recebimento</p>
+              </div>
+              <div className="rounded-lg bg-(--background) p-3">
+                <p className="text-xs text-(--muted)">Documento</p>
+                <strong>
+                  {data.is_historical
+                    ? "Registro histórico"
+                    : p.archivedAt
+                      ? "Arquivado"
+                      : data.status === "cancelled"
+                        ? "Cancelado"
+                        : p.completedAt
+                          ? "Concluído operacionalmente"
+                          : "Em atendimento"}
+                </strong>
+              </div>
+            </div>
+          </section>
+          {data.sourceRequisition ? (
+            <section
+              className="ui-card space-y-3"
+              aria-label="Origem da necessidade remanescente"
+            >
+              <h2>Origem da necessidade remanescente</h2>
               <RelatedDocument
                 type="REQ"
-                id={row.id}
-                label={row.code ?? row.protocol}
+                id={data.sourceRequisition.id}
+                label={
+                  data.sourceRequisition.code ?? data.sourceRequisition.protocol
+                }
               />
-              <p>{row.remaining_need_reason}</p>
-            </article>
-          ))}
-        </section>
-      ) : null}
-      {!data.is_historical && can(context, "req.create") ? (
-        <Link
-          className={buttonClass}
-          href={`/fichas/req?careRecipientId=${data.care_recipient_id}&sourceRequisitionId=${id}`}
-        >
-          Declarar nova necessidade remanescente
-        </Link>
-      ) : null}
-      <DocumentProgress id={id} type="REQ" patientId={data.care_recipient_id} context={context} />
-      <section className="ui-card">
-        <h2 className="font-semibold">Materiais requisitados</h2>
-        <p className="mt-2 text-xs text-(--muted)">
-          Uma linha é atendida após aceite positivo em ENT vinculada. Compras
-          não atendem itens da REQ.
-        </p>
-        <ul className="mt-4 space-y-3">
-          {data.requisition_items.map((item) => {
-            const line = f.lines.find((row) => row.id === item.id);
-            return (
-              <li
-                className="rounded-lg border border-(--line) p-3"
-                key={item.id}
-              >
-                <div className="flex flex-wrap justify-between gap-2">
-                  <strong className="text-sm">
-                    {item.product_name_snapshot ?? item.custom_name}
-                  </strong>
-                  <span
-                    className={
-                      "ui-badge ui-badge-" +
-                      (line?.attended ? "success" : "pending")
-                    }
-                  >
-                    {line?.attended ? "Atendido" : "Pendente"}
-                  </span>
-                  {item.urgent ? (
-                    <span className="ui-badge ui-badge-danger">Urgente</span>
-                  ) : null}
-                </div>
-                <p className="mt-2 text-xs text-(--muted)">
-                  Estoque da equipe informado:{" "}
-                  {formatStockObservation(
-                    item.current_stock,
-                    item.stock_observation,
-                    item.unit_snapshot,
-                  )}
-                  <span className="block text-xs text-(--muted)">
-                    {formatStockObservationTime(
-                      item.stock_observation_at,
-                      item.stock_observation_time_source,
-                    )}
-                  </span>
-                </p>
-                <div className="mt-2 flex flex-wrap gap-3">
-                  {line?.deliveries.map((delivery) => (
-                    <RelatedDocument
-                      key={delivery.id}
-                      id={delivery.id}
-                      type="ENT"
-                      label={`${delivery.code} · aceito ${delivery.acceptedQuantity}`}
-                    />
-                  ))}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-        {!data.is_historical && !p.archivedAt && data.status !== "cancelled" ? (
-          <div className="mt-4 flex flex-wrap gap-3">
-            {can(context, "com.create") ? (
-              <Link
-                className={buttonClass}
-                href={`/fichas/com?requisitionId=${id}`}
-              >
-                Abrir COM vinculada
-              </Link>
-            ) : null}
-            {can(context, "ent.create") ? (
-              <Link
-                className={primaryClass}
-                href={`/fichas/ent?requisitionId=${id}`}
-              >
-                Expedir ENT vinculada
-              </Link>
-            ) : null}
-          </div>
-        ) : null}
-      </section>
-      <section className="ui-card">
-        <h2 className="font-semibold">Ciência e responsáveis</h2>
-        <p className="mt-2 text-sm">
-          {data.is_historical
-            ? "A ciência original não foi comprovada. Nenhuma confirmação foi inferida na importação."
-            : p.familyAware
-              ? "Família ciente por uma pessoa habilitada. Cada pessoa mantém seu próprio registro."
-              : p.policy?.scienceRequired === false
-                ? "A exigência foi dispensada pela regra desta requisição. Isso não registra ciência em nome de ninguém."
-                : "A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente."}
-        </p>
-        {!data.is_historical ? (
-          <p className="mt-2 text-sm">
-            Minha ciência:{" "}
-            {p.personalScience
-              ? "registrada"
-              : p.eligible
-                ? "pendente"
-                : "sem habilitação neste paciente"}
-            .
-          </p>
-        ) : null}
-        <ul className="mt-3 space-y-2">
-          {p.science.map((row) => (
-            <li
-              className="rounded-lg border border-(--line) p-3 text-sm"
-              key={row.id}
-            >
-              <strong>{row.actor_name}</strong>
               <p>
-                {modes[row.mode] ?? row.mode} ·{" "}
-                {formatBrazilDate(row.created_at)}
+                Referência na emissão: versão {data.sourceRequisition.version}.
               </p>
-            </li>
-          ))}
-        </ul>
-        {!data.is_historical &&
-        p.eligible &&
-        !p.archivedAt &&
-        data.status !== "cancelled" &&
-        !p.science.some(
-          (row) => row.user_id === context.userId && row.mode === "express",
-        ) ? (
-          <button
-            type="button"
-            className={primaryClass + " mt-4"}
-            disabled={busy}
-            onClick={() => void action("science")}
+              <p className="whitespace-pre-wrap">
+                Motivo próprio: {data.sourceRequisition.reason}
+              </p>
+              <p>
+                Esta requisição tem ciência e atendimento próprios; os aceites
+                anteriores pertencem à origem.
+              </p>
+            </section>
+          ) : null}
+          {data.remainingNeedTotal > 0 ? (
+            <section
+              className="ui-card space-y-3"
+              aria-label="Necessidades seguintes"
+            >
+              <h2>Necessidades seguintes</h2>
+              <p>
+                {data.remainingNeeds.length} de {data.remainingNeedTotal}{" "}
+                registros, mais recentes primeiro.
+              </p>
+              {data.remainingNeeds.map((row) => (
+                <article key={row.id}>
+                  <RelatedDocument
+                    type="REQ"
+                    id={row.id}
+                    label={row.code ?? row.protocol}
+                  />
+                  <p>{row.remaining_need_reason}</p>
+                </article>
+              ))}
+            </section>
+          ) : null}
+          <section className="ui-card">
+            <h2 className="font-semibold">Observações</h2>
+            {data.requisition_observations.length ? (
+              textRows(
+                data.requisition_observations.map((row) => row.body),
+              ).map((row) => (
+                <p key={row.key} className="mt-2 text-sm">
+                  {row.value}
+                </p>
+              ))
+            ) : (
+              <p className="mt-2 text-sm text-(--muted)">Sem observações.</p>
+            )}
+          </section>
+          <DocumentProgress
+            id={id}
+            type="REQ"
+            patientId={data.care_recipient_id}
+            context={context}
+          />
+        </DocumentPanel>
+        <DocumentPanel value="materials">
+          <section className="ui-card">
+            <h2 className="font-semibold">Materiais requisitados</h2>
+            <p className="mt-2 text-xs text-(--muted)">
+              Uma linha é atendida após aceite positivo em ENT vinculada.
+              Compras não atendem itens da REQ.
+            </p>
+            <ul className="mt-4 space-y-3">
+              {data.requisition_items.map((item) => {
+                const line = f.lines.find((row) => row.id === item.id);
+                return (
+                  <li
+                    className="rounded-lg border border-(--line) p-3"
+                    key={item.id}
+                  >
+                    <div className="flex flex-wrap justify-between gap-2">
+                      <strong className="text-sm">
+                        {item.product_name_snapshot ?? item.custom_name}
+                      </strong>
+                      <span
+                        className={
+                          "ui-badge ui-badge-" +
+                          (line?.attended ? "success" : "pending")
+                        }
+                      >
+                        {line?.attended ? "Atendido" : "Pendente"}
+                      </span>
+                      {item.urgent ? (
+                        <span className="ui-badge ui-badge-danger">
+                          Urgente
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-2 text-xs text-(--muted)">
+                      Estoque da equipe informado:{" "}
+                      {formatStockObservation(
+                        item.current_stock,
+                        item.stock_observation,
+                        item.unit_snapshot,
+                      )}
+                      <span className="block text-xs text-(--muted)">
+                        {formatStockObservationTime(
+                          item.stock_observation_at,
+                          item.stock_observation_time_source,
+                        )}
+                      </span>
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-3">
+                      {line?.deliveries.map((delivery) => (
+                        <RelatedDocument
+                          key={delivery.id}
+                          id={delivery.id}
+                          type="ENT"
+                          label={`${delivery.code} · aceito ${delivery.acceptedQuantity}`}
+                        />
+                      ))}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+          {can(context, "catalog.manage") &&
+          can(context, "req.review") &&
+          data.requisition_items.some(
+            (item) => !item.product_id && !item.resolution,
+          ) ? (
+            <ResolveExtraItem
+              patientId={data.care_recipient_id}
+              requestId={id}
+              items={data.requisition_items
+                .filter((item) => !item.product_id && !item.resolution)
+                .map((item) => ({
+                  id: item.id,
+                  name:
+                    item.product_name_snapshot ??
+                    item.custom_name ??
+                    "Item extra",
+                }))}
+              onChange={() => setAttempt((value) => value + 1)}
+            />
+          ) : null}
+        </DocumentPanel>
+        <DocumentPanel value="workflow">
+          <section className="ui-card">
+            <h2 className="font-semibold">Ciência e responsáveis</h2>
+            <p className="mt-2 text-sm">
+              {data.is_historical
+                ? "A ciência original não foi comprovada. Nenhuma confirmação foi inferida na importação."
+                : p.familyAware
+                  ? "Família ciente por uma pessoa habilitada. Cada pessoa mantém seu próprio registro."
+                  : p.policy?.scienceRequired === false
+                    ? "A exigência foi dispensada pela regra desta requisição. Isso não registra ciência em nome de ninguém."
+                    : "A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente."}
+            </p>
+            {!data.is_historical ? (
+              <p className="mt-2 text-sm">
+                Minha ciência:{" "}
+                {p.personalScience
+                  ? "registrada"
+                  : p.eligible
+                    ? "pendente"
+                    : "sem habilitação neste paciente"}
+                .
+              </p>
+            ) : null}
+            <ul className="mt-3 space-y-2">
+              {p.science.map((row) => (
+                <li
+                  className="rounded-lg border border-(--line) p-3 text-sm"
+                  key={row.id}
+                >
+                  <strong>{row.actor_name}</strong>
+                  <p>
+                    {modes[row.mode] ?? row.mode} ·{" "}
+                    {formatBrazilDate(row.created_at)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+
+            {p.manualArchiveRequired ? (
+              <Notice>
+                Concluída com ciência obrigatória pendente. O arquivamento
+                automático está bloqueado; um responsável autorizado poderá
+                arquivar com justificativa, sem inventar ciência.
+              </Notice>
+            ) : null}
+
+            {p.archivedAt ? (
+              <p className="mt-3 text-sm">
+                Arquivado em {formatBrazilDate(p.archivedAt)} ·{" "}
+                {p.archiveReason}
+              </p>
+            ) : null}
+          </section>
+        </DocumentPanel>
+        <DocumentPanel value="communications">
+          <SettingsSection
+            title="Avisos e acompanhamento"
+            summary={
+              data.requisition_notifications.length +
+              " aviso(s) · estados do aplicativo e do provedor são independentes"
+            }
           >
-            Li a requisição e confirmo minha ciência
-          </button>
+            <p className="mt-2 text-xs text-(--muted)">
+              Enviado, entregue, lido e ciência são fatos independentes.
+            </p>
+            <ul className="mt-3 space-y-2">
+              {data.requisition_notifications.map((row) => (
+                <li
+                  key={row.id}
+                  className="rounded-lg border border-(--line) p-3 text-sm"
+                >
+                  {row.recipient_label} · {row.channel} ·{" "}
+                  {deliveryLabels[row.state] ?? row.state}
+                </li>
+              ))}
+            </ul>
+            {!data.requisition_notifications.length ? (
+              <p className="mt-3 text-sm">Nenhum aviso disponível.</p>
+            ) : null}
+          </SettingsSection>
+        </DocumentPanel>
+        <DocumentPanel value="files">
+          <DocumentActions
+            id={id}
+            code={data.code ?? data.protocol}
+            version={p.version}
+          />
+        </DocumentPanel>
+        <DocumentPanel value="attachments">
+          <Attachments
+            patientId={data.care_recipient_id}
+            documentId={id}
+            writable={can(context, "req.create")}
+          />
+        </DocumentPanel>
+        <DocumentPanel value="history">
+          <OpeningHistory id={id} refreshKey={openingRevision} />
+          <DocumentTimeline id={id} version={p.version} events={p.events} />
+        </DocumentPanel>
+        {can(context, "audit.read") ? (
+          <DocumentPanel value="audit">
+            <DocumentAuditAccess patientId={data.care_recipient_id} />
+          </DocumentPanel>
         ) : null}
-        {p.manualArchiveRequired ? (
-          <Notice>
-            Concluída com ciência obrigatória pendente. O arquivamento
-            automático está bloqueado; um responsável autorizado poderá arquivar
-            com justificativa, sem inventar ciência.
-          </Notice>
-        ) : null}
-        {p.completedAt && !p.archivedAt && can(context, "req.archive") ? (
-          <button
-            className={buttonClass + " mt-4"}
-            disabled={busy}
-            onClick={() => {
-              setReason("");
-              setReview("archive");
-            }}
-          >
-            Revisar arquivamento manual
-          </button>
-        ) : null}
-        {p.archivedAt ? (
-          <p className="mt-3 text-sm">
-            Arquivado em {formatBrazilDate(p.archivedAt)} · {p.archiveReason}
-          </p>
-        ) : null}
-      </section>
-      <RequisitionDisplay key={id} id={id} reference={p} showHistory />
-      <DocumentTimeline id={id} version={p.version} events={p.events} />
-      {!data.is_historical &&
-      !p.archivedAt &&
-      data.status !== "cancelled" &&
-      can(context, "req.review") ? (
-        <button
-          className={buttonClass}
-          disabled={busy}
-          onClick={() => {
-            setReason("");
-            setReview("cancel");
-          }}
-        >
-          Cancelar requisição
-        </button>
-      ) : null}
+      </DocumentTabs>
       <Dialog
         open={review !== null}
         title={
@@ -562,68 +721,6 @@ export function RequisitionDocumentContent({
           </button>
         </form>
       </Dialog>
-      <SettingsSection
-        title="Avisos e acompanhamento"
-        summary={
-          data.requisition_notifications.length +
-          " aviso(s) · estados do aplicativo e do provedor são independentes"
-        }
-      >
-        <p className="mt-2 text-xs text-(--muted)">
-          Enviado, entregue, lido e ciência são fatos independentes.
-        </p>
-        <ul className="mt-3 space-y-2">
-          {data.requisition_notifications.map((row) => (
-            <li
-              key={row.id}
-              className="rounded-lg border border-(--line) p-3 text-sm"
-            >
-              {row.recipient_label} · {row.channel} ·{" "}
-              {deliveryLabels[row.state] ?? row.state}
-            </li>
-          ))}
-        </ul>
-        {!data.requisition_notifications.length ? (
-          <p className="mt-3 text-sm">Nenhum aviso disponível.</p>
-        ) : null}
-      </SettingsSection>
-      <section className="ui-card">
-        <h2 className="font-semibold">Observações</h2>
-        {data.requisition_observations.length ? (
-          textRows(data.requisition_observations.map((row) => row.body)).map(
-            (row) => (
-              <p key={row.key} className="mt-2 text-sm">
-                {row.value}
-              </p>
-            ),
-          )
-        ) : (
-          <p className="mt-2 text-sm text-(--muted)">Sem observações.</p>
-        )}
-      </section>
-      {can(context, "catalog.manage") &&
-      can(context, "req.review") &&
-      data.requisition_items.some(
-        (item) => !item.product_id && !item.resolution,
-      ) ? (
-        <ResolveExtraItem
-          patientId={data.care_recipient_id}
-          requestId={id}
-          items={data.requisition_items
-            .filter((item) => !item.product_id && !item.resolution)
-            .map((item) => ({
-              id: item.id,
-              name:
-                item.product_name_snapshot ?? item.custom_name ?? "Item extra",
-            }))}
-          onChange={() => setAttempt((value) => value + 1)}
-        />
-      ) : null}
-      <Attachments
-        patientId={data.care_recipient_id}
-        documentId={id}
-        writable={can(context, "req.create")}
-      />
     </div>
   );
 }

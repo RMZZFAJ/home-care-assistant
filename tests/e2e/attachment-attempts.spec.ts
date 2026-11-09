@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -24,7 +25,8 @@ async function fixture(page: Page) {
   const doc = await rpc(owner, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "1" }] }, p_key: randomUUID(), p_draft: false });
   await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email); await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, f.patient);
-  await page.goto(`/historico/${doc.id}`); await page.getByRole("button", { name: "Anexos e ficha física", exact: true }).click(); await expect(page.getByText("Nenhum anexo registrado.", { exact: true })).toBeVisible();
+  await page.goto(`/historico/${doc.id}`);
+  await selectDocumentSection(page, "attachments"); await page.getByRole("button", { name: "Anexos e ficha física", exact: true }).click(); await expect(page.getByText("Nenhum anexo registrado.", { exact: true })).toBeVisible();
   const source = await sharp({ create: { width: 8, height: 4, channels: 3, background: "#123456" } }).png().toBuffer();
   return { ...f, owner, doc, source, file: { name: "ficha-fisica.png", mimeType: "image/png", buffer: source } };
 }

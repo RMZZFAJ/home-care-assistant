@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -353,6 +354,7 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   ).toBe(ledger);
   await page.unroute("**/api/requisitions");
   await page.goto("/historico/" + receipt.requisitionId);
+  await selectDocumentSection(page, "materials");
   for (const fact of [
     "0 unidade (observado)",
     "7 unidade (observado)",

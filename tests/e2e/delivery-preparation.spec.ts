@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { historyHashes } from "../integration/version-history-fixtures.mjs";
 import { expect, test, type Page } from "@playwright/test";
@@ -73,6 +74,7 @@ test("C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantid
   const f = await setup();
   const doc = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: crypto.randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Recebedor indicado para a consulta fictícia", lines: [{ productId: f.products[0], quantity: "2" }] } });
   await open(page, f.patient); await page.goto(`/fichas/${doc.id}`);
+  await selectDocumentSection(page, "materials");
   const material = page.getByText(doc.lines[0].name_snapshot, { exact: true }).first();
   await expect(material).toBeVisible();
   const before = historyHashes(doc.id), stock = ledger(f.patient);

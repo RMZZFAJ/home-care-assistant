@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
@@ -29,6 +30,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
     before = JSON.parse(recountState(f));
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   const versions = page.getByRole("region", {
     name: "Versões das contagens físicas",
     exact: true,
@@ -163,6 +165,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
     await context.close();
   }
   await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
   const document = (
     await (await page.request.get("/api/documents/" + f.document.id)).json()
   ).data as SupplyDocument;
