@@ -12,7 +12,7 @@ test("Perfil conserva o destino de teclado quando callbacks de foco chegam depoi
   await selectContext(page, patientA);
   await page.evaluate(() => {
     // Delay ordinary frame callbacks uniformly, reproducing a busy frame queue.
-    // Keyboard events and Fluent's actual focus management remain real.
+    // Keyboard events and the menu's actual focus management remain real.
     const native = window.requestAnimationFrame.bind(window);
     window.requestAnimationFrame = callback => native(() => native(callback));
   });

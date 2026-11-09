@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback,useEffect,useId,useImperativeHandle,useRef, useState, type FormEvent, type Ref } from "react";
-import { useMergedRefs } from "@fluentui/react-components";
 import type { ReceiptDraftContent } from "@/lib/validation/supply-drafts";
 import {
   buttonClass,
@@ -63,7 +62,7 @@ export function CommandEditorFields({
   );
   const [divergent, setDivergent] = useState<string[]>(initialDraft?.divergentIds??[]);
   const formElementRef=useRef<HTMLFormElement|null>(null);
-  const mergedFormRef=useMergedRefs(formElementRef,formRef);
+  useImperativeHandle(formRef, () => formElementRef.current!);
   const [fieldRevision,setFieldRevision]=useState(0);
   const captureSnapshot=useCallback(()=>({documentVersion:data.version,fields:Object.fromEntries([...new FormData(formElementRef.current!).entries()].filter((entry):entry is [string,string]=>typeof entry[1]==="string")),divergentIds:[...divergent],materials:data.lines.map(line=>({id:line.id,name:line.name_snapshot,unit:line.unit_snapshot,quantityDecimals:0}))}),[data,divergent]);
   useImperativeHandle(snapshotRef,()=>({snapshot:captureSnapshot}),[captureSnapshot]);
@@ -328,7 +327,7 @@ export function CommandEditorFields({
       : ["admin", "professional", "supervisor"];
   return (
     <form
-      ref={mergedFormRef}
+      ref={formElementRef}
       className="mt-5 space-y-4 border-t border-(--line) pt-5"
       onSubmit={submit}
       onChange={()=>setFieldRevision(value=>value+1)}

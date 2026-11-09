@@ -2339,3 +2339,33 @@ CI própria. PR7 Draft,produção NO-GO,Sonar adiado,meta ativa. Próximo:seleto
 compostos/menus/provider/shell,fichas em abas/Andamentos e paridade integral.
 [Dossiê](UI_MODEL_STAGE_2.md),[provas](UI_MODEL_STAGE_2.json),
 [observação](UI_MODEL_NATIVE_OBSERVATION.json),[ledger](UI_COMPONENT_MIGRATION.csv).
+
+## D3.28 — seletores compostos, menus e shell — 09/11/2026
+
+Base 47be435. SearchSelect mantém IDs, consulta, busca própria, opções ricas,
+múltipla seleção, elegibilidade, required, erro e ref do input. Menus, perfil,
+contextos, saída, notificações e tooltips migrados. Provider/Griffel, imports,
+regras Fluent e dependência retirados. Shell e tokens compartilhados seguem o
+modelo: cabeçalho escuro, sidebar 226/195px, breakpoint 850px; contexto móvel
+em linha própria de 51px para preservar a operação. Nenhuma rota retirada.
+
+36 cenários distintos aprovados em Chromium/iOS nos lotes dirigidos; comparações
+de shell e modal em cinco larguras, acessibilidade, recuperação, negativos,
+estoque, autoria, PDFs e foco. Build do runner com tipos e lint dirigido PASS.
+Contraprova funcional: input-clear interno apagava o fuso escolhido ao fechar
+o popup; só input-change agora altera a consulta do consumidor. Contraprovas
+de teste: classe privada de drawer substituída por diálogo nomeado; identificação
+de modal conserva inert/aria-hidden e confinamento real do foco, sem depender
+apenas do atributo aria-modal. Nenhuma regra Axe ou asserção de negócio reduzida.
+
+CI 47be435: Windows/Ubuntu/banco PASS; iOS-2 FAIL em dois alvos Fluent de 20px e
+no oráculo de modal, demais browsers em andamento na observação. Casos repetidos
+com os componentes atuais passaram localmente. Isso não aprova a CI do novo SHA.
+Local/remoto 164, última 20261109024515, digest igual e zero SQL nova/pendente.
+Sem API/RPC, assinatura ou worker alterados, sem transporte externo. Matriz
+105x39 preservada, 56 PASS/49 PARTIAL; registro UI adicional atualizado.
+
+Paridade integral, listas/cartões, fichas em abas, Andamentos persistidos e gates
+D-C/D6/humanos/físicos/externos continuam pendentes. Sonar adiado, PR7 Draft,
+produção NO-GO, meta ativa. [Dossiê](UI_MODEL_STAGE_3.md),
+[fontes](UI_MODEL_STAGE_3.json), [casos](UI_MODEL_COMPOSED_BROWSER.json).

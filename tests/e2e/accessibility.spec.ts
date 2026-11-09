@@ -80,7 +80,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(
     page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("dialog",{name:"Perfil e contexto",exact:true})).toBeVisible();
+  await expect(page.getByRole("menu",{name:"Ações do usuário",exact:true})).toBeVisible();
   await expect(page.getByRole("menuitem",{name:"Meu perfil e segurança",exact:true})).toBeFocused();
   await page.keyboard.press("ArrowDown");
   await expect(page.getByRole("menuitem",{name:"Mudar perfil",exact:true})).toBeFocused();
@@ -90,7 +90,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await page.getByLabel("Menu do usuário",{exact:true}).click();
   await page.getByRole("menuitem",{name:"Central de notificações",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Central de notificações",exact:true})).toBeVisible();
-  await expect(page.getByRole("dialog",{name:"Perfil e contexto",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("menu",{name:"Ações do usuário",exact:true})).toHaveCount(0);
   await page
     .getByRole("combobox", { name: "Pessoa assistida", exact: true })
     .selectOption(patientB);
@@ -103,7 +103,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(page).toHaveURL(new RegExp("careRecipientId=" + patientB));
   await expect(page.getByRole("region", { name: "Acompanhamento pessoal", exact: true })).toBeVisible();
   await selectContext(page,patientA);
-  await expect(page.getByRole("dialog",{name:"Perfil e contexto",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("menu",{name:"Ações do usuário",exact:true})).toHaveCount(0);
   await expect(page.getByLabel("Menu do usuário",{exact:true})).toBeFocused();
   await expect(page.getByRole("main")).toBeVisible();
   await audit(page,"profile context return");

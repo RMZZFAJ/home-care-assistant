@@ -13,7 +13,6 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     globalNotFound: true,
-    optimizePackageImports: ["@fluentui/react-components"],
   },
   turbopack: {
     rules: {

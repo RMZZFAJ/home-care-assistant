@@ -1,7 +1,8 @@
 "use client";
+import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Combobox, Option } from "@fluentui/react-components";
+
 import {
   api,
   ApiError,
@@ -384,34 +385,33 @@ export function ConsumptionEditor({
           >
             Adicionar material
           </label>
-          <Combobox
+          <SearchSelect
             id="consumption-material"
-            expandIcon={{ "aria-label": "Abrir ou fechar opções de material" }}
-            value={search}
-            selectedOptions={[]}
+            triggerLabel={"Abrir ou fechar opções de material"}
+            query={search}
+            selectedIds={[]}
             placeholder="Busque e selecione um material"
             disabled={
               catalogLoading ||
               Boolean(catalogError) ||
               Object.keys(lines).length >= 100
             }
-            onChange={(event) => setSearch(event.target.value)}
-            onOptionSelect={(_, data) => {
+            onQueryChange={queryValue => setSearch(queryValue)}
+            onSelectionChange={nextIds => {
               if (
-                data.optionValue &&
-                products.some((product) => product.id === data.optionValue)
+                nextIds[0] &&
+                products.some((product) => product.id === nextIds[0])
               ) {
-                setLines((values) => ({ ...values, [data.optionValue!]: "" }));
+                setLines((values) => ({ ...values, [nextIds[0]!]: "" }));
                 setSearch("");
               }
             }}
-          >
-            {choices.map((product) => (
-              <Option key={product.id} value={product.id} text={product.name}>
+            options={(choices.map((product) => (
+              ({ value: product.id, label: product.name, content: <>
                 {product.name} · {product.unit}
-              </Option>
-            ))}
-          </Combobox>
+              </> })
+            ))) ?? []}
+          />
           <p className="hca-field-hint">
             O texto livre pode ser registrado sem quantidade. Para confirmar
             consumo, inclua materiais e quantidades exatas. Materiais inativos

@@ -34,7 +34,7 @@ export function FormField({ label, htmlFor, helpText, error, required, children 
   </FieldContext>;
 }
 
-function useFieldAttributes(props: { id?: string; required?: boolean; "aria-invalid"?: ComponentProps<"input">["aria-invalid"]; "aria-describedby"?: string; "aria-errormessage"?: string }) {
+export function useFieldAttributes(props: { id?: string; required?: boolean; "aria-invalid"?: ComponentProps<"input">["aria-invalid"]; "aria-describedby"?: string; "aria-errormessage"?: string }) {
   const field = use(FieldContext);
   const describedBy = [...new Set([props["aria-describedby"], field?.helpId, field?.errorId].filter(Boolean))].join(" ") || undefined;
   return {

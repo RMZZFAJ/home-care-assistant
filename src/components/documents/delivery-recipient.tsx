@@ -1,6 +1,7 @@
 "use client";
+import { SearchSelect } from "@/components/ui/search-select";
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { Combobox, Option } from "@fluentui/react-components";
+
 import { inputClass, Notice, buttonClass } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import type {
@@ -126,10 +127,10 @@ export function DeliveryRecipientField({
         >
           Destinatário designado
         </label>
-        <Combobox
+        <SearchSelect
           id="delivery-recipient"
-          value={search ?? chosen?.name ?? ""}
-          selectedOptions={chosen ? [chosen.id] : []}
+          query={search ?? chosen?.name ?? ""}
+          selectedIds={chosen ? [chosen.id] : []}
           disabled={
             loading ||
             Boolean(error) ||
@@ -143,25 +144,24 @@ export function DeliveryRecipientField({
               ? "delivery-recipient-help delivery-recipient-error"
               : "delivery-recipient-help"
           }
-          expandIcon={{ "aria-label": "Abrir opções de recebedor" }}
+          triggerLabel={"Abrir opções de recebedor"}
           placeholder="Busque e selecione quem receberá"
-          onChange={(event) => {
-            setSearch(event.target.value);
+          onQueryChange={queryValue => {
+            setSearch(queryValue);
             setForm((current) => ({ ...current, recipientId: "" }));
           }}
-          onOptionSelect={(_, option) => {
+          onSelectionChange={nextIds => {
             if (
-              data?.people.some((person) => person.id === option.optionValue)
+              data?.people.some((person) => person.id === nextIds[0])
             ) {
               setForm((current) => ({
                 ...current,
-                recipientId: option.optionValue!,
+                recipientId: nextIds[0]!,
               }));
               setSearch(null);
             }
           }}
-        >
-          {data?.people
+          options={(data?.people
             .filter(
               (person) =>
                 !search ||
@@ -170,11 +170,11 @@ export function DeliveryRecipientField({
                   .includes(search.toLocaleLowerCase("pt-BR")),
             )
             .map((person) => (
-              <Option key={person.id} value={person.id} text={person.name}>
+              ({ value: person.id, label: person.name, content: <>
                 {person.name}
-              </Option>
-            ))}
-        </Combobox>
+              </> })
+            ))) ?? []}
+        />
         <p id="delivery-recipient-help" className="hca-field-hint">
           Somente a pessoa que receber fisicamente poderá confirmar o aceite. A
           escolha não transfere essa autoria.

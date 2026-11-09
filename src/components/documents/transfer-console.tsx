@@ -1,4 +1,6 @@
 "use client";
+import { FormField, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
+import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import {
@@ -8,7 +10,7 @@ import {
   type FormEvent,
   type RefObject,
 } from "react";
-import { Combobox, Field, Input, Option, Select, Textarea } from "@fluentui/react-components";
+
 import {
   api,
   ApiError,
@@ -63,10 +65,10 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
         </p>
         {can(context, "ent.create") ? (
           <>
-            <Field label="Custódia de origem" required>
-              <Select
+            <FormField label="Custódia de origem" required>
+              <SelectField
                 value={source}
-                onChange={(_, data) => setSource(data.value as Custody | "")}
+                onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSource(controlValue as Custody | ""); }}
               >
                 <option value="">Escolha a origem</option>
                 {can(context, "stock.family.read") ? (
@@ -75,8 +77,8 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
                 {can(context, "stock.team.read") ? (
                   <option value="CARE_TEAM">Equipe → Família</option>
                 ) : null}
-              </Select>
-            </Field>
+              </SelectField>
+            </FormField>
             <ActionButton
               variant="primary"
               disabled={!source}
@@ -406,11 +408,11 @@ function TransferDeclarationEditor({
                   recebedor são escolhas separadas. A mesma pessoa pode exercer
                   os dois atos, registrando cada um pessoalmente.
                 </p>
-                <Field label="Contraparte para concordância" required>
-                  <Select
+                <FormField label="Contraparte para concordância" required>
+                  <SelectField
                     required
                     value={counterpartyId}
-                    onChange={(_, data) => setCounterpartyId(data.value)}
+                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setCounterpartyId(controlValue); }}
                   >
                     <option value="">Escolha quem decide a concordância</option>
                     {counterpartyId &&
@@ -424,13 +426,13 @@ function TransferDeclarationEditor({
                         {person.name}
                       </option>
                     ))}
-                  </Select>
-                </Field>
-                <Field label="Recebedor físico designado" required>
-                  <Select
+                  </SelectField>
+                </FormField>
+                <FormField label="Recebedor físico designado" required>
+                  <SelectField
                     required
                     value={recipientId}
-                    onChange={(_, data) => setRecipientId(data.value)}
+                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setRecipientId(controlValue); }}
                   >
                     <option value="">Escolha quem recebe pessoalmente</option>
                     {recipientId &&
@@ -444,29 +446,28 @@ function TransferDeclarationEditor({
                         {person.name}
                       </option>
                     ))}
-                  </Select>
-                </Field>
-                <Field label="Adicionar material da origem">
-                  <Combobox
-                    value={query}
-                    selectedOptions={[]}
+                  </SelectField>
+                </FormField>
+                <FormField label="Adicionar material da origem">
+                  <SearchSelect
+                    query={query}
+                    selectedIds={[]}
                     placeholder="Buscar material"
-                    onChange={(event) => setQuery(event.target.value)}
-                    onOptionSelect={(_, data) => {
+                    onQueryChange={queryValue => setQuery(queryValue)}
+                    onSelectionChange={nextIds => {
                       if (
-                        data.optionValue &&
+                        nextIds[0] &&
                         !lines.some(
-                          (line) => line.productId === data.optionValue,
+                          (line) => line.productId === nextIds[0],
                         )
                       )
                         setLines((previous) => [
                           ...previous,
-                          { productId: data.optionValue!, quantity: "" },
+                          { productId: nextIds[0]!, quantity: "" },
                         ]);
                       setQuery("");
                     }}
-                  >
-                    {reference.products
+                    options={(reference.products
                       .filter(
                         (product) =>
                           !lines.some(
@@ -477,18 +478,14 @@ function TransferDeclarationEditor({
                             .includes(query.toLocaleLowerCase("pt-BR")),
                       )
                       .map((product) => (
-                        <Option
-                          key={product.id}
-                          value={product.id}
-                          text={product.name}
-                        >
+                        ({ value: product.id, label: product.name, content: <>
                           {product.name} ·{" "}
                           {product.active ? "Ativo" : "Inativo com saldo"} ·{" "}
                           {formatQuantity(product.available)} {product.unit}
-                        </Option>
-                      ))}
-                  </Combobox>
-                </Field>
+                        </> })
+                      ))) ?? []}
+                  />
+                </FormField>
                 {!lines.length ? (
                   <p>
                     Nenhum material selecionado. Informe as quantidades na
@@ -517,25 +514,23 @@ function TransferDeclarationEditor({
                             : "indisponível"}
                           .
                         </p>
-                        <Field
+                        <FormField
                           label={`Quantidade de ${product?.name ?? "material indisponível"}`}
                           required
                         >
-                          <Input
+                          <TextInput
                             required
                             inputMode="decimal"
                             value={line.quantity}
-                            onChange={(_, data) =>
-                              setLines((previous) =>
+                            onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setLines((previous) =>
                                 previous.map((row, i) =>
                                   i === index
-                                    ? { ...row, quantity: data.value }
+                                    ? { ...row, quantity: controlValue }
                                     : row,
                                 ),
-                              )
-                            }
+                              ); }}
                           />
-                        </Field>
+                        </FormField>
                         <ActionButton
                           onClick={() =>
                             setLines((previous) =>
@@ -551,10 +546,10 @@ function TransferDeclarationEditor({
                     );
                   })
                 )}
-                <Field label="ENT documental de origem, quando conhecida">
-                  <Select
+                <FormField label="ENT documental de origem, quando conhecida">
+                  <SelectField
                     value={originId}
-                    onChange={(_, data) => setOriginId(data.value)}
+                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setOriginId(controlValue); }}
                   >
                     <option value="">Sem vínculo documental de origem</option>
                     {reference.origins
@@ -570,25 +565,25 @@ function TransferDeclarationEditor({
                           {origin.code} · {formatBrazilDate(origin.createdAt)}
                         </option>
                       ))}
-                  </Select>
-                </Field>
+                  </SelectField>
+                </FormField>
                 <p className="text-sm">
                   A seleção contém até 100 ENT recentes com aceite na custódia
                   de origem ({reference.originTotal} no total). O vínculo
                   documenta a origem conhecida; não identifica lotes ou presume
                   disponibilidade dessas unidades.
                 </p>
-                <Field label="Sua justificativa para a transferência" required>
-                  <Textarea
+                <FormField label="Sua justificativa para a transferência" required>
+                  <TextAreaField
                     ref={reasonFieldRef}
                     required
                     minLength={3}
                     maxLength={1000}
                     value={reason}
-                    onChange={(_, data) => setReason(data.value)}
-                    resize="vertical"
+                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setReason(controlValue); }}
+
                   />
-                </Field>
+                </FormField>
                 <ActionButton
                   type="submit"
                   variant="primary"

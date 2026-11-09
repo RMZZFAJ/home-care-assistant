@@ -1,7 +1,8 @@
 "use client";
+import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton } from "@/components/ui/controls";
 import { useEffect,useRef,useState } from "react";
-import { Combobox, Option } from "@fluentui/react-components";
+
 import { api,ApiError } from "@/lib/client/api";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { Notice,inputClass } from "@/components/workspace";
@@ -89,9 +90,15 @@ export function RecurringSelection({userId,patientId,catalogue,lines,disabled,ca
         {error?<Notice error>{error}</Notice>:null}{message?<p role="status">{message}</p>:null}
         {pending?<section aria-label="Salvamento de lista pendente"><p>O resultado desta tentativa ainda não foi confirmado. Recupere o mesmo comando antes de salvar outra lista.</p><dl><dt>Nome preservado</dt><dd>{pending.name}</dd><dt>Materiais preservados</dt><dd>{pending.productIds.length}</dd></dl><ActionButton onClick={()=>void transmit(pending,true)}>Recuperar salvamento da lista</ActionButton></section>:null}
         <label className="hca-form-stack"><span>Buscar lista frequente</span>
-          <Combobox value={query} selectedOptions={chosen?[chosen]:[]} onChange={event=>{setQuery(event.target.value);setChosen(null);setChecked([]);}} onOptionSelect={(_,data)=>{setChosen(data.optionValue??null);setQuery(data.optionText??"");setChecked([]);}} placeholder="Nome da lista" aria-label="Buscar lista frequente">
-            {visible.map(row=><Option key={row.id} value={row.id}>{row.name}</Option>)}
-          </Combobox>
+          <SearchSelect
+            query={query}
+            selectedIds={chosen?[chosen]:[]}
+            onQueryChange={queryValue => {setQuery(queryValue);setChosen(null);setChecked([]);}}
+            onSelectionChange={nextIds => {setChosen(nextIds[0]??null);setQuery(visible.find(row => row.id === nextIds[0])?.name??"");setChecked([]);}}
+            placeholder="Nome da lista"
+            aria-label="Buscar lista frequente"
+            options={(visible.map(row=>({ value: row.id, label: row.name, content: <>{row.name}</> }))) ?? []}
+          />
         </label>
         <p role="status">{visible.length} lista(s) encontrada(s).</p>
         {!rows.length?<p>Você ainda não tem uma lista frequente neste paciente. Selecione materiais na requisição para salvar uma lista.</p>:null}

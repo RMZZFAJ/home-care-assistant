@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Popover, PopoverSurface, PopoverTrigger } from "@fluentui/react-components";
+import { Popover } from "@base-ui/react/popover";
+import { PopoverPopup } from "@/components/ui/floating";
 import { api } from "@/components/workspace";
 import { Icon } from "@/components/ui/primitives";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
@@ -17,10 +18,8 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
   const rows = inbox.data?.data ?? [], unread = inbox.data?.unreadCount;
   return (
     <div className="notification-bell">
-      <Popover open={open} onOpenChange={(_, next) => setOpen(next.open)} trapFocus positioning={{ position: "below", align: "end" }}>
-      <PopoverTrigger disableButtonEnhancement>
-      <button
-        className="ui-icon-button"
+      <Popover.Root modal="trap-focus" open={open} onOpenChange={setOpen}>
+      <Popover.Trigger render={<button className="ui-icon-button"
         type="button"
         disabled={disabled}
         aria-label={
@@ -28,15 +27,13 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
         }
         aria-expanded={open}
         aria-controls="notification-panel"
-        onClick={event => event.currentTarget.focus()}
-      >
+        onClick={event => event.currentTarget.focus()} />}>
         <Icon name="bell" />
         {inbox.fresh && unread ? (
           <span className="notification-dot">{unread > 9 ? "9+" : unread}</span>
         ) : null}
-      </button>
-      </PopoverTrigger>
-      <PopoverSurface className="hca-notification-surface" aria-label="Notificações" >
+      </Popover.Trigger>
+      <PopoverPopup id="notification-panel" className="hca-notification-surface" aria-label="Notificações" >
         <section
           id="notification-panel"
           className="notification-panel"
@@ -104,8 +101,8 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
             Consultar histórico completo <Icon name="arrow" width="16" />
           </Link>
         </section>
-      </PopoverSurface>
-      </Popover>
+      </PopoverPopup>
+      </Popover.Root>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
+import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useId, useRef, useState } from "react";
-import { Combobox, Option } from "@fluentui/react-components";
+
 import { api, ApiError, inputClass, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { EmptyState } from "@/components/ui/primitives";
@@ -399,25 +400,24 @@ function PresentationEditor({
         ) : (
           <label className="block text-sm font-semibold">
             Material
-            <Combobox
+            <SearchSelect
               ref={node => { fieldRefsRef.current.productId = node?.querySelector<HTMLInputElement>("input") ?? node; }}
               aria-invalid={Boolean(fieldErrors.productId)}
               aria-describedby={fieldErrors.productId ? fieldId + "-productId" : undefined}
               style={{ minWidth: 0, width: "100%" }}
               aria-label="Material da apresentação"
-              value={productSearch || product?.name || ""}
-              selectedOptions={productId ? [productId] : []}
+              query={productSearch || product?.name || ""}
+              selectedIds={productId ? [productId] : []}
               disabled={disabled || review}
-              onChange={(event) => {
-                setProductSearch(event.target.value);
+              onQueryChange={queryValue => {
+                setProductSearch(queryValue);
                 setProductId("");
               }}
-              onOptionSelect={(_, data) => {
-                setProductId(data.optionValue ?? "");
+              onSelectionChange={nextIds => {
+                setProductId(nextIds[0] ?? "");
                 setProductSearch("");
               }}
-            >
-              {products
+              options={(products
                 .filter(
                   (p) =>
                     p.active !== false &&
@@ -427,11 +427,11 @@ function PresentationEditor({
                       .includes(productSearch.toLocaleLowerCase("pt-BR")),
                 )
                 .map((p) => (
-                  <Option key={p.id} value={p.id} text={p.name}>
+                  ({ value: p.id, label: p.name, content: <>
                     {p.name} · {p.unit}
-                  </Option>
-                ))}
-            </Combobox>
+                  </> })
+                ))) ?? []}
+            />
             {fieldErrors.productId ? <span id={fieldId + "-productId"} className="ui-field-error">{fieldErrors.productId}</span> : null}
           </label>
         )}

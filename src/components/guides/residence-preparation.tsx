@@ -1,7 +1,8 @@
 "use client";
+import { SearchSelect } from "@/components/ui/search-select";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Combobox, Option } from "@fluentui/react-components";
+
 import { z } from "zod";
 import { api, ApiError, buttonClass, inputClass, Notice, primaryClass, Workspace, type WorkspaceContext } from "@/components/workspace";
 import { Dialog } from "@/components/ui/primitives";
@@ -80,9 +81,30 @@ function PreparationEditor({context}:{context:WorkspaceContext}) {
 }
 function PersonChoice({label,field,invalid=false,people,value,change,multiple=false,values=[],changeMany}:{label:string;field?:string;invalid?:boolean;people:Person[];value?:string;change?:(id:string|undefined)=>void;multiple?:boolean;values?:string[];changeMany?:(ids:string[])=>void}) {
   const [query,setQuery]=useState<string|null>(null),name=people.find(p=>p.id===value)?.full_name??"";
-  return <div><label className="block font-semibold" id={label.replaceAll(" ","-")}>{label}</label><Combobox id={field?"preparation-"+field:undefined} aria-invalid={invalid} aria-describedby={invalid?"preparation-validation-error":undefined} aria-labelledby={label.replaceAll(" ","-")} multiselect={multiple} value={query??(multiple?"":name)} selectedOptions={multiple?values:value?[value]:[]} onChange={e=>{setQuery(e.target.value);if(!multiple)change?.(undefined);}} onOptionSelect={(_,data)=>{if(multiple)changeMany?.(data.selectedOptions);else change?.(data.optionValue);setQuery(null);}}>{people.filter(p=>!query||p.full_name.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR"))).map(p=><Option key={p.id} value={p.id}>{p.full_name}</Option>)}</Combobox>{multiple?<ul className="hca-toolbar">{values.map(id=><li key={id}><span>{people.find(p=>p.id===id)?.full_name??"Identidade não disponível"}</span><button type="button" className={buttonClass} aria-label={"Remover "+(people.find(p=>p.id===id)?.full_name??"identidade")} onClick={()=>changeMany?.(values.filter(v=>v!==id))}>Remover</button></li>)}</ul>:null}</div>;
+  return <div><label className="block font-semibold" id={label.replaceAll(" ","-")}>{label}</label><SearchSelect
+    id={field?"preparation-"+field:undefined}
+    aria-invalid={invalid}
+    aria-describedby={invalid?"preparation-validation-error":undefined}
+    aria-labelledby={label.replaceAll(" ","-")}
+    multiple={multiple}
+    query={query??(multiple?"":name)}
+    selectedIds={multiple?values:value?[value]:[]}
+    onQueryChange={queryValue => {setQuery(queryValue);if(!multiple)change?.(undefined);}}
+    onSelectionChange={nextIds => {if(multiple)changeMany?.(nextIds);else change?.(nextIds[0]);setQuery(null);}}
+    options={(people.filter(p=>!query||p.full_name.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR"))).map(p=>({ value: p.id, label: p.full_name, content: <>{p.full_name}</> }))) ?? []}
+  />{multiple?<ul className="hca-toolbar">{values.map(id=><li key={id}><span>{people.find(p=>p.id===id)?.full_name??"Identidade não disponível"}</span><button type="button" className={buttonClass} aria-label={"Remover "+(people.find(p=>p.id===id)?.full_name??"identidade")} onClick={()=>changeMany?.(values.filter(v=>v!==id))}>Remover</button></li>)}</ul>:null}</div>;
 }
 function ZoneChoice({value,change,invalid=false}:{value?:string;change:(zone:string|undefined)=>void;invalid?:boolean}) {
   const [query,setQuery]=useState<string|null>(null),zones=[...Intl.supportedValuesOf("timeZone"),"UTC"];
-  return <div><label id="preparation-zone">Fuso de referência da residência</label><Combobox id="preparation-timeZone" aria-invalid={invalid} aria-describedby={invalid?"preparation-validation-error":undefined} aria-labelledby="preparation-zone" value={query??value??""} selectedOptions={value?[value]:[]} onChange={e=>{setQuery(e.target.value);change(undefined);}} onOptionSelect={(_,data)=>{change(data.optionValue);setQuery(null);}}>{zones.filter(z=>!query||z.toLowerCase().includes(query.toLowerCase())).slice(0,40).map(z=><Option key={z} value={z}>{z}</Option>)}</Combobox><p className="text-sm">Escolha explicitamente uma zona IANA; o fuso do aparelho não será herdado. Cada plantão conserva seu próprio fuso.</p></div>;
+  return <div><label id="preparation-zone">Fuso de referência da residência</label><SearchSelect
+    id="preparation-timeZone"
+    aria-invalid={invalid}
+    aria-describedby={invalid?"preparation-validation-error":undefined}
+    aria-labelledby="preparation-zone"
+    query={query??value??""}
+    selectedIds={value?[value]:[]}
+    onQueryChange={queryValue => {setQuery(queryValue);change(undefined);}}
+    onSelectionChange={nextIds => {change(nextIds[0]);setQuery(null);}}
+    options={(zones.filter(z=>!query||z.toLowerCase().includes(query.toLowerCase())).slice(0,40).map(z=>({ value: z, label: z, content: <>{z}</> }))) ?? []}
+  /><p className="text-sm">Escolha explicitamente uma zona IANA; o fuso do aparelho não será herdado. Cada plantão conserva seu próprio fuso.</p></div>;
 }

@@ -43,7 +43,7 @@ async function withinDrawer(drawer: Locator, label: string) {
     const edge = root.getBoundingClientRect();
     return Array.from(
       root.querySelectorAll<HTMLElement>(
-        "button,input,select,textarea,.hca-date-grid,.fui-Field,dl,li,p",
+        "button,input,select,textarea,.hca-date-grid,.hca-field,dl,li,p",
       ),
     )
       .filter((element) => {

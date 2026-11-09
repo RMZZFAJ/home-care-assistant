@@ -17,23 +17,26 @@ async function noOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 }
 async function capture(page: Page, name: string, project: string) {
-  mkdirSync("output/playwright/fluent", { recursive: true });
+  mkdirSync("output/playwright/canonical", { recursive: true });
   await page.waitForFunction(() => document.getAnimations().every((animation) => animation.playState !== "running" || animation.effect?.getComputedTiming().iterations === Infinity));
   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  await page.screenshot({ path: `output/playwright/fluent/${name}-${project}.png`, fullPage: await page.getByRole("dialog").count() === 0, animations: "disabled" });
+  await page.screenshot({ path: `output/playwright/canonical/${name}-${project}.png`, fullPage: await page.getByRole("dialog").count() === 0, animations: "disabled" });
 }
 
-test.describe("registro SSR Fluent", () => {
+test.describe("estilo canônico SSR", () => {
   test.use({ javaScriptEnabled: false });
   test("estilos do streaming permanecem no head sem cópias no corpo", async ({ page }) => {
     const response = await page.goto("/login?error=AUTHENTICATION_FAILED");
     expect(response?.ok()).toBe(true);
-    await expect(page.locator("head style[data-make-styles-rehydration]")).not.toHaveCount(0);
+    await expect(page.locator("head link[rel=stylesheet]")).not.toHaveCount(0);
+    await expect(page.locator(".hca-app-root")).toHaveCSS("background-color", "rgb(244, 246, 245)");
+    await expect(page.locator("[class*=fui-]")).toHaveCount(0);
+    await expect(page.locator("head style[data-make-styles-rehydration]")).toHaveCount(0);
     await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
   });
 });
 
-test("gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda", async ({ page }, info) => {
+test("gestão canônica troca contexto no submenu, mantém navegação e edita perfil sob demanda", async ({ page }, info) => {
   const failures: string[] = [];
   page.on("pageerror", (error) => failures.push(error.message));
   await login(page, "shared");

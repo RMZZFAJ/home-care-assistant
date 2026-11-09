@@ -6,7 +6,10 @@ export async function assertKeyboardEntry(page: Page, label: string) {
   // then require a keyboard move into
   // a different accessible element. Never accept merely focusing the origin.
   await page.bringToFront();
-  const modal = page.getByRole("dialog").and(page.locator('[aria-modal="true"]')).filter({ visible: true }).last();
+  // Product dialogs are modal Base UI roots. Their background isolation and
+  // focus trap do not depend on an aria-modal attribute on the popup. Require
+  // the real visible dialog and keep the inert and focus-containment checks.
+  const modal = page.getByRole("dialog").filter({ visible: true }).last();
   const hasModal = await modal.count() > 0;
   const skip = page.getByRole("link", { name: "Ir para o conteúdo", exact: true });
   const readinessScope = hasModal ? modal : page.getByRole("main", { includeHidden: true }).filter({ visible: true });

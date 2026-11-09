@@ -66,7 +66,7 @@ export function WorkspaceNavigation({ context, operational = false, onNavigate }
     { label: "Contas globais", href: "/admin?section=profiles", icon: "user" },
     { label: "Unidades globais", href: "/unidades", icon: "stock" },
   ] });
-  return <nav aria-label="Navegação principal" className="hca-side-navigation">{sections.filter((group) => group.items.length).map((group) => <details key={group.label} open={group.label === "Área de trabalho" || group.label === "Seu plantão" || group.items.some(selected)}>
+  return <nav aria-label="Navegação principal" className="hca-side-navigation">{sections.filter((group) => group.items.length).map((group) => <details key={group.label} open>
     <summary><h2>{group.label}</h2><Icon name="down" width={14} /></summary>
     {group.items.map((item) => <Link key={item.href} href={item.href} prefetch={false} onClick={onNavigate} aria-current={selected(item) ? "page" : undefined}>
       {item.icon ? <Icon name={item.icon} /> : null}<span>{item.label}</span>

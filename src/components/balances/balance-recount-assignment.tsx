@@ -1,4 +1,6 @@
 "use client";
+import { FormField, TextAreaField } from "@/components/ui/controls";
+import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import {
@@ -8,7 +10,7 @@ import {
   type FormEvent,
   type RefObject,
 } from "react";
-import { Combobox, Field, Option, Textarea } from "@fluentui/react-components";
+
 import { api, ApiError, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { formatZonedDate } from "@/lib/schedules/time";
@@ -456,71 +458,66 @@ export function BalanceRecountAssignment({
             ) : null}
             {reference ? (
               <form onSubmit={prepare} className="hca-form-stack">
-                <Field
+                <FormField
                   label="Plantão para o reconto"
                   required
-                  hint="Escolha uma pessoa e um plantão reais. Não há escolha automática."
+                  helpText="Escolha uma pessoa e um plantão reais. Não há escolha automática."
                 >
-                  <Combobox
-                    value={query}
-                    selectedOptions={targetId ? [targetId] : []}
+                  <SearchSelect
+                    query={query}
+                    selectedIds={targetId ? [targetId] : []}
                     disabled={blocked}
-                    onChange={(event) => {
-                      setQuery(event.target.value);
+                    onQueryChange={queryValue => {
+                      setQuery(queryValue);
                       setTargetId("");
                     }}
-                    onOptionSelect={(_, selection) => {
+                    onSelectionChange={nextIds => {
                       const selected = reference.targets?.find(
-                        (row) => row.id === selection.optionValue,
+                        (row) => row.id === nextIds[0],
                       );
                       setTargetId(selected?.id ?? "");
                       setQuery(selected ? targetLabel(selected) : "");
                     }}
                     placeholder="Buscar profissional ou plantão"
-                  >
-                    {(reference.targets ?? [])
+                    options={((reference.targets ?? [])
                       .filter((row) =>
                         targetLabel(row)
                           .toLocaleLowerCase("pt-BR")
                           .includes(query.toLocaleLowerCase("pt-BR")),
                       )
                       .map((row) => (
-                        <Option
-                          key={row.id}
-                          value={row.id}
-                          text={targetLabel(row)}
-                        >
+                        ({ value: row.id, label: targetLabel(row), content: <>
                           {targetLabel(row)}
-                        </Option>
-                      ))}
-                  </Combobox>
+                        </> })
+                      ))) ?? []}
+                  />
                   {!reference.targets?.length ? (
                     <p>
                       Nenhum plantão elegível disponível. Consulte ou ajuste a
                       escala antes de designar.
                     </p>
                   ) : null}
-                </Field>
+                </FormField>
                 {target ? (
                   <p className="text-sm break-words">
                     Pessoa e período selecionados: {targetLabel(target)}.
                   </p>
                 ) : null}
-                <Field
+                <FormField
                   label="Sua justificativa para o reconto"
                   required
-                  hint={`${reason.length}/1000 caracteres. As observações de quem contou permanecem preservadas.`}
+                  helpText={`${reason.length}/1000 caracteres. As observações de quem contou permanecem preservadas.`}
                 >
-                  <Textarea
+                  <TextAreaField
                     ref={reasonRef}
                     value={reason}
-                    onChange={(_, value) => setReason(value.value)}
+                    onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setReason(controlValue); }}
                     minLength={3}
                     maxLength={1000}
                     required
                     disabled={busy || querying || uncertain}
                   />
-                </Field>
+                </FormField>
                 <p>
                   O reconto gera uma nova contagem com autoria própria.
                   Pareceres da contagem anterior permanecem históricos e não

@@ -1,10 +1,12 @@
 "use client";
 import { ActionButton, SelectField } from "@/components/ui/controls";
 
-import { Suspense, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Suspense, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Avatar, MenuDivider, MenuItem, MenuItemRadio, MenuList, Popover, PopoverSurface, PopoverTrigger } from "@fluentui/react-components";
+import { Menu } from "@base-ui/react/menu";
+import { MenuPopup } from "@/components/ui/floating";
+import { ProfileAvatar } from "@/components/ui/avatar";
 import { Icon } from "@/components/ui/primitives";
 import { Drawer } from "@/components/ui/overlays";
 import { NotificationBell } from "@/components/notifications/notification-bell";
@@ -14,11 +16,11 @@ import { BottomNavigation, WorkspaceNavigation } from "@/components/navigation/w
 import { roleLabel, useWorkspaceState } from "./workspace-context";
 
 const subscribe = (callback: () => void) => {
-  const media = window.matchMedia("(min-width: 1024px)");
+  const media = window.matchMedia("(min-width: 851px)");
   media.addEventListener("change", callback);
   return () => media.removeEventListener("change", callback);
 };
-const desktopSnapshot = () => window.matchMedia("(min-width: 1024px)").matches;
+const desktopSnapshot = () => window.matchMedia("(min-width: 851px)").matches;
 const serverSnapshot = () => false;
 
 function ProfileMenu() {
@@ -28,11 +30,12 @@ function ProfileMenu() {
   const [contexts, setContexts] = useState(false);
   const [restoreAfterSelection,setRestoreAfterSelection]=useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuLabelId = useId();
   const triggerRef=useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!open) return;
     const frame = requestAnimationFrame(() => {
-      // Fluent may already have focused the menu, and the user can navigate
+      // The menu may already have focus, and the user can navigate
       // before this frame runs. Initial focus must not undo that navigation.
       if (!contexts && menuRef.current?.contains(document.activeElement)) return;
       const target = contexts ? menuRef.current?.querySelector<HTMLElement>('[role="menuitemradio"][aria-checked="true"]') : null;
@@ -49,28 +52,32 @@ function ProfileMenu() {
     return ()=>cancelAnimationFrame(frame);
   },[restoreAfterSelection,open,selecting,data]);
   const choose = async (id: string | null) => { if (await selectProfile(id)) { setOpen(false); setContexts(false); } setRestoreAfterSelection(true); };
-  return <Popover open={open} trapFocus positioning={{position:"below",align:"end"}} onOpenChange={(_, next) => { setOpen(next.open); if (!next.open) setContexts(false); }}>
-    <PopoverTrigger disableButtonEnhancement><ActionButton ref={triggerRef} variant="quiet" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data || selecting}>
-      <Avatar name={data?.fullName} image={data?.avatarUrl ? { src: data.avatarUrl, alt: "" } : undefined} size={32} color="brand" />
+  return <Menu.Root open={open} onOpenChange={next => { setOpen(next); if (!next) setContexts(false); }}>
+    <Menu.Trigger render={<ActionButton ref={triggerRef} variant="quiet" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data || selecting} />}>
+      <ProfileAvatar name={data?.fullName} imageUrl={data?.avatarUrl} />
       <span className="hca-profile-identity"><strong>{data?.fullName}</strong><small>{data?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role)}</small></span>
       <Icon name="down" width={14} />
-    </ActionButton></PopoverTrigger>
-    <PopoverSurface aria-label="Perfil e contexto" className={contexts ? "hca-context-menu" : undefined}>{contexts && selectionError ? <p role="alert">{selectionError}</p> : null}<MenuList ref={menuRef} aria-labelledby={undefined} aria-label={contexts ? "Contextos autorizados" : "Ações do usuário"} checkedValues={{ context: [data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""] }}>
+    </Menu.Trigger>
+    <MenuPopup ref={menuRef} aria-labelledby={menuLabelId} className={contexts ? "hca-context-menu" : undefined}>
+      <span id={menuLabelId} className="sr-only">{contexts ? "Contextos autorizados" : "Ações do usuário"}</span>
+      {contexts && selectionError ? <p role="alert">{selectionError}</p> : null}
       {contexts ? <>
-        <MenuItem persistOnClick onClick={() => setContexts(false)}>← Voltar ao menu</MenuItem>
-        {data?.isGlobalAdmin ? <MenuItemRadio persistOnClick name="context" value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</MenuItemRadio> : null}
-        {data?.patients.filter((patient) => patient.hasMembership).map((patient) => <MenuItemRadio persistOnClick key={patient.id} name="context" value={patient.id} disabled={selecting} onClick={() => void choose(patient.id)}>
-          {patient.display_name} · {roleLabel(patient.role)}
-        </MenuItemRadio>)}
+        <Menu.Item className="hca-menu-item" closeOnClick={false} onClick={() => setContexts(false)}>← Voltar ao menu</Menu.Item>
+        <Menu.RadioGroup value={data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""}>
+          {data?.isGlobalAdmin ? <Menu.RadioItem className="hca-menu-item" closeOnClick={false} value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</Menu.RadioItem> : null}
+          {data?.patients.filter(patient => patient.hasMembership).map(patient => <Menu.RadioItem className="hca-menu-item" closeOnClick={false} key={patient.id} value={patient.id} disabled={selecting} onClick={() => void choose(patient.id)}>
+            {patient.display_name} · {roleLabel(patient.role)}
+          </Menu.RadioItem>)}
+        </Menu.RadioGroup>
       </> : <>
-      <MenuItem icon={<Icon name="user" />} onClick={() => {setOpen(false);router.push("/perfil");}}>Meu perfil e segurança</MenuItem>
-      <MenuItem persistOnClick icon={<Icon name="team" />} onClick={() => setContexts(true)}>Mudar perfil</MenuItem>
-      <MenuItem icon={<Icon name="bell" />} onClick={() => {setOpen(false);router.push("/notificacoes");}}>Central de notificações</MenuItem>
-      <MenuDivider />
-      <LogoutButton />
+        <Menu.Item className="hca-menu-item" onClick={() => { setOpen(false); router.push("/perfil"); }}><Icon name="user" />Meu perfil e segurança</Menu.Item>
+        <Menu.Item className="hca-menu-item" closeOnClick={false} onClick={() => setContexts(true)}><Icon name="team" />Mudar perfil</Menu.Item>
+        <Menu.Item className="hca-menu-item" onClick={() => { setOpen(false); router.push("/notificacoes"); }}><Icon name="bell" />Central de notificações</Menu.Item>
+        <Menu.Separator className="hca-menu-separator" />
+        <LogoutButton />
       </>}
-    </MenuList></PopoverSurface>
-  </Popover>;
+    </MenuPopup>
+  </Menu.Root>;
 }
 
 export function WorkspaceShell({ children,showOnboarding=false }: { children: ReactNode;showOnboarding?:boolean }) {
@@ -86,7 +93,7 @@ export function WorkspaceShell({ children,showOnboarding=false }: { children: Re
     <a href="#workspace-content" className="skip-link">Ir para o conteúdo</a>
     <header className="app-header print:hidden">
       <ActionButton ref={navigationTriggerRef} className="hca-navigation-toggle" variant="quiet"  aria-label={expanded ? "Recolher navegação" : "Abrir navegação"} aria-expanded={expanded} aria-controls="workspace-navigation" onClick={(event) => { event.currentTarget.focus(); if (desktop) setCollapsed((current) => !current); else setMobileOpen((current) => !current); }} >{<Icon name="menu" />}</ActionButton>
-      <Link href="/" prefetch={false} className="app-brand" aria-label="Home Care Assistant — início"><span>HC</span><strong>Home Care Assistant<small>{operational ? "Operação assistencial" : "Gestão do cuidado"}</small></strong></Link>
+      <Link href="/" prefetch={false} className="app-brand" aria-label="Home Care Assistant — início"><span><Icon name="home" /></span><strong>Home Care Assistant<small>Insumos, família e equipe</small></strong></Link>
       <div className="patient-picker">{data?.patients.length ? <SelectField aria-label="Pessoa assistida" value={value?.patient?.id ?? ""} disabled={selecting} onChange={(event) => void selectPatient(event.target.value)}>
         <option value="" disabled>Selecione um paciente</option>
         {data.patients.filter((patient) => data.activeContext?.mode !== "patient" || patient.hasMembership).map((patient) => <option key={patient.id} value={patient.id}>{patient.display_name}{patient.is_active === false ? " (inativo)" : ""}</option>)}

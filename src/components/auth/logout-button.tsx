@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { MenuItem } from "@fluentui/react-components";
+import { Menu } from "@base-ui/react/menu";
 import { detachPushForLogout } from "@/lib/push/logout";
 
 export function LogoutButton() {
@@ -30,5 +30,5 @@ export function LogoutButton() {
     } catch { setError("Não foi possível conectar para encerrar a sessão. Tente novamente."); }
     finally { setLoading(false); }
   }
-  return <MenuItem persistOnClick onClick={logout} disabled={loading}>{loading ? "Saindo..." : "Sair"}{error ? <span role="alert">{error}</span> : null}</MenuItem>;
+  return <Menu.Item className="hca-menu-item" closeOnClick={false} onClick={logout} disabled={loading}>{loading ? "Saindo..." : "Sair"}{error ? <span role="alert">{error}</span> : null}</Menu.Item>;
 }

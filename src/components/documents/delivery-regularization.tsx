@@ -1,7 +1,8 @@
 "use client";
+import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useId, useRef, useState } from "react";
-import { Combobox, Option } from "@fluentui/react-components";
+
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import {
   api,
@@ -220,28 +221,25 @@ function PersonChoice({
       <label htmlFor={id} className="block text-sm font-semibold">
         {label}
       </label>
-      <Combobox
+      <SearchSelect
         id={id}
-        value={search ?? chosen?.name ?? ""}
-        selectedOptions={chosen ? [chosen.id] : []}
+        query={search ?? chosen?.name ?? ""}
+        selectedIds={chosen ? [chosen.id] : []}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? id + "-error" : undefined}
         placeholder="Busque e selecione uma pessoa"
-        expandIcon={{
-          "aria-label": "Abrir opções de " + label.toLocaleLowerCase("pt-BR"),
-        }}
-        onChange={(e) => {
-          setSearch(e.target.value);
+        triggerLabel={"Abrir opções de " + label.toLocaleLowerCase("pt-BR")}
+        onQueryChange={queryValue => {
+          setSearch(queryValue);
           onChange("");
         }}
-        onOptionSelect={(_, data) => {
-          if (people.some((p) => p.id === data.optionValue)) {
-            onChange(data.optionValue!);
+        onSelectionChange={nextIds => {
+          if (people.some((p) => p.id === nextIds[0])) {
+            onChange(nextIds[0]!);
             setSearch(null);
           }
         }}
-      >
-        {people
+        options={(people
           .filter(
             (p) =>
               !search ||
@@ -250,11 +248,11 @@ function PersonChoice({
                 .includes(search.toLocaleLowerCase("pt-BR")),
           )
           .map((p) => (
-            <Option key={p.id} value={p.id} text={p.name}>
+            ({ value: p.id, label: p.name, content: <>
               {p.name}
-            </Option>
-          ))}
-      </Combobox>
+            </> })
+          ))) ?? []}
+      />
       {error ? (
         <p id={id + "-error"} className="ui-field-error">
           {error}

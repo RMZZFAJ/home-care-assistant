@@ -261,8 +261,8 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
       ),
     ).toBeGreaterThan(previousInjections);
     if (failure === "unavailable") {
-      const menu = page.getByRole("dialog", {
-        name: "Perfil e contexto",
+      const menu = page.getByRole("menu", {
+        name: "Contextos autorizados",
         exact: true,
       });
       await menu.getByRole("menuitemradio", { checked: true }).click();

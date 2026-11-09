@@ -1,7 +1,8 @@
 "use client";
+import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton } from "@/components/ui/controls";
 import { useId, useState } from "react";
-import { Combobox, Option } from "@fluentui/react-components";
+
 import { inputClass, Notice } from "@/components/workspace";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import type { CatalogProduct } from "@/types/documents";
@@ -194,23 +195,22 @@ export function PresentationQuantity({
       ) : null}
       <label className="block">
         Escolher apresentação de {product.name}
-        <Combobox
+        <SearchSelect
           style={{ minWidth: 0, width: "100%" }}
           aria-label={`Apresentação de ${product.name}`}
-          value={
+          query={
             search || available.find((row) => row.id === chosen)?.name || ""
           }
-          selectedOptions={chosen ? [chosen] : []}
-          onChange={(event) => {
-            setSearch(event.target.value);
+          selectedIds={chosen ? [chosen] : []}
+          onQueryChange={queryValue => {
+            setSearch(queryValue);
             setChosen("");
           }}
-          onOptionSelect={(_, data) => {
-            setChosen(data.optionValue ?? "");
+          onSelectionChange={nextIds => {
+            setChosen(nextIds[0] ?? "");
             setSearch("");
           }}
-        >
-          {available
+          options={(available
             .filter(
               (row) =>
                 !selections.some((s) => s.id === row.id) &&
@@ -219,12 +219,12 @@ export function PresentationQuantity({
                   .includes(search.toLocaleLowerCase("pt-BR")),
             )
             .map((row) => (
-              <Option value={row.id} key={row.id} text={row.name}>
+              ({ value: row.id, label: row.name, content: <>
                 {row.name} · {formatQuantity(row.base_quantity, product.unit)} ·{" "}
                 {row.barcode}
-              </Option>
-            ))}
-        </Combobox>
+              </> })
+            ))) ?? []}
+        />
       </label>
       <ActionButton
         aria-label={"Adicionar embalagem de " + product.name}

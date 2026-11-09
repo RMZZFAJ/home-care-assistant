@@ -5,12 +5,12 @@ Fluent UI foi descartado como aparência. O
 [HTML original](../../Home_Care_Assistant_Modelo_Integral.html) governa todo o
 sistema, sem misturar estilos ou reduzir funcionalidades.
 
-Tokens e componentes devem reproduzir o modelo. A primeira migração introduz
-canonical-ui.css, ícones próprios do HTML, badges e etapas nativos, overlays
-Base UI sem tema e drawers compartilhados. Ainda há consumidores Fluent a
-migrar: trabalho pendente, não alternativa visual aprovada. Remover provider,
-Griffel, imports, estilos e dependência Fluent ao terminar a migração integral,
-com regressões dos consumidores. Não criar ponte que apenas reproduza sua API.
+Tokens e componentes devem reproduzir o modelo. canonical-ui.css concentra a
+paleta, os componentes compartilhados e o shell. Ícones próprios do HTML,
+badges e etapas nativos acompanham overlays Base UI sem tema. Fluent, seu
+provider, Griffel e a dependência foram retirados. Não reintroduzir a biblioteca
+ou criar ponte que reproduza sua API. A remoção técnica não aprova por si só a
+paridade visual de todas as telas, estados e recursos.
 
 Controles nativos compartilham ActionButton/ActionLink, FormField, TextInput,
 SelectField, TextAreaField, CheckboxField, Pill, LoadingIndicator e DataTable.
@@ -18,8 +18,16 @@ Usam props/eventos HTML:capturar valor/checked antes de updater adiado,sem
 callback Fluent de dois argumentos. FormField associa label,ajuda e erro ao
 ID do controle;outputs não recebem validação de input. FeedbackBanner e
 ProgressMeter representam fatos sem confundir persistência,ciência ou entrega.
-Ainda restam17 arquivos com controles compostos/provider Fluent a retirar.
-[Prova local](../audits/D/D-B/UI_MODEL_STAGE_2.md).
+Seletores compostos usam SearchSelect, com IDs e consulta separados. Só a edição
+real do texto invalida a seleção; a limpeza interna da busca ao fechar o popup
+não altera o valor escolhido. Menus, popovers e tooltips usam comportamento
+Base UI e aparência própria. [Provas e gates](../audits/D/D-B/UI_MODEL_ACCEPTANCE.csv).
+
+O shell usa o breakpoint de 850px do modelo. No celular, uma linha de contexto
+de 51px mantém o seletor real de paciente abaixo do cabeçalho de 59px. Esse
+recurso operacional, ausente da demonstração, não pode ser ocultado para copiar
+sua composição. Todas as rotas e permissões continuam disponíveis; grupos da
+navegação começam abertos e podem ser recolhidos.
 
 ## Componentes e comportamento
 

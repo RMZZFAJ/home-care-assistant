@@ -236,7 +236,7 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
   await page
     .getByRole("button", { name: "Registrar ocorrência", exact: true })
     .click();
-  const drawer = page.locator(".hca-record-drawer");
+  const drawer = page.getByRole("dialog", { name: "Registrar relato", exact: true });
   await expect(
     page.getByRole("dialog", { name: "Registrar relato", exact: true }),
   ).toBeVisible();
