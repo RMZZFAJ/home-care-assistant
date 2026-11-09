@@ -9,11 +9,22 @@ SQL de funções de serviço e browsers SKIPPED. Lista do teste corrigida com
 grants exatos; regressão SQL dirigida PASS. CI do SHA corretivo obrigatória;
 não se trata de novo SQL ou mudança no remoto164. [Evidência](../audits/D/D-B/CI_A057C2C_OBSERVATION.json).
 
-Estado atual:local164/remoto164, zero migrations pendentes. Prioridade vigente:
+Estado atual:local164/remoto164, zero migrations pendentes. Matriz105x39:
+51 PASS/51 PARTIAL/3 NOT_STARTED; contagens não equivalem à conclusão da fase.
+Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das
 dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
+
+D4.12 fechou a prova local de C105/C106 com dez PDFs fictícios do compositor:
+cancelados, histórico desconhecido, parciais e quatro tipos extensos com120
+materiais, nome160 LF, URL contínua300 e anexo/hash.87 páginas verificadas por
+extração, limites úteis, rodapé, raster, estrutura e assinatura/TSA interna;
+23 recortes preservados. Dois testes novos, tipos/lint/Python passaram. Sem
+mudança no produto, aparência ou SQL; emissões Auth reais anteriores permanecem
+qualificadas separadamente. C111/C-NEW-AC-018 conservam humano/AT/impressão/
+aparelhos/D-C/D6. [Provas](../audits/D/D-B/PDF_OPERATIONAL_CORPUS.md).
 
 D3.21 corrigiu a troca de foto: intenção única, objeto estável, verificação
 real do Storage, recuperação/replay e limpeza restrita sem apagar o avatar

@@ -2102,3 +2102,38 @@ Regressão PostgreSQL dirigida PASS, com Auth real do runner e rollback. Sem
 reset/replay local adicional, alteração de migration, runtime ou remoto164.
 Instalação limpa/legada e integração completa ficam na CI do SHA corretivo.
 [Observação por SHA](CI_A057C2C_OBSERVATION.json). Meta continua ativa.
+
+## D4.12 — estados e conteúdo extenso do PDF
+
+Base f24d0da. Sem mudança de produto, aparência ou SQL. Reutilizados
+renderizador, gate, assinatura, origem, estado terminal e estrutura V10 cujas
+fontes coincidem com o pacote3772fd0 de CI completa PASS. Dois novos testes
+geram dez exemplares controlados:REQ/COM/ENT canceladas, REQ histórica
+desconhecida, REQ/ENT parciais e quatro tipos com120 materiais comuns, nome160
+com LF, URL300 contínua, notas longas e anexo/hash. Conteúdo não representável
+é recusado antes de assinar. Não são novas emissões Auth do aplicativo.
+
+Inspeção independente PASS das87 páginas: texto, associação de campos REQ,
+quantidades ENT, limites úteis, rodapé, raster, estrutura de tabelas/MCIDs e
+assinatura inteira/token sob raiz interna. Casos extensos20/15/15/15 páginas;
+23 recortes preservados e quatro marcadores finais de materiais inspecionados
+visualmente. Dez PDFs fictícios, raiz pública e manifesto reduzido versionados;
+sem chave privada. Tipos/lint e compilação Python passaram.
+
+Leitura linear de colunas com dois pontos/hash contínuo e localizador SHA-256
+sem escopo falharam no instrumento. Campos/coluna próprios e cabeçalho pareado
+foram conferidos independentemente; não houve ajuste de runtime para obter
+aprovação. Logs anteriores e qualificações preservados. Retirada final de casts
+TypeScript não muda o objeto executado. Nenhuma suíte geral repetida por rotina.
+
+Local/remoto164 confirmado read-only por contagem, última versão e SHA-256 do
+conjunto ordenado de versões; zero pendências/bloqueios/índices inválidos. Sem
+reset, seed/Auth remoto, publicação de produção ou backup/restore redundante.
+Matriz51 PASS/51 PARTIAL/3 NOT_STARTED,105x39;29 colunas e complementos intactos.
+C105/C106 PASS local dos casos canônicos; C111/C-NEW-AC-018 conservam tarefa
+humana/AT/impressão/aparelhos e D-C/D6. Não há PDF/UA, ICP ou independência de
+tempo externa aprovada. CI própria obrigatória; Sonar adiado, PR7 Draft,
+meta ativa. [Dossiê](PDF_OPERATIONAL_CORPUS.md),
+[provas](PDF_OPERATIONAL_CORPUS_EVIDENCE.json),
+[independente](d4-operational-proof/VERIFICATION.json),
+[remoto](PDF_OPERATIONAL_REMOTE_OBSERVATION.json).

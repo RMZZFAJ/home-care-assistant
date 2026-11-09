@@ -1,0 +1,121 @@
+{
+  "at": "2026-11-09T03:34:19.097157+00:00",
+  "baseSha": "f24d0da0244894c39f3574d7e89894f110a5fc0f",
+  "sourceLfSha256": {
+    "tests/pdf-operational-corpus.test.ts": "99a598d32b8abaf49e78dd0bfd1adc26ebf074eec823bdabfdafb956567a91da",
+    "docs/audits/D/D-B/d4-operational-proof/verify.py": "f506767777b724306c3f5387e7110c56469dd936382700151dd607ae0c61cbd7"
+  },
+  "unchangedV10SourceLfSha256": {
+    "src/lib/server/pdf-structure.ts": "0c02f758f8c735a2495d85377d2afbf4bbe686bddf6b5c463e55a3241d4e1aec",
+    "src/lib/server/pdf-structure-validation.ts": "7f247399acfe429c600bc46651c553144ec3b1496ac27bb1a8a6c5e219d87c42",
+    "src/lib/server/operational-pdf.ts": "c322d9934f722ed0c026404843b28981211d84255a3919152315918bdc7874e3",
+    "src/lib/server/pdf-content.ts": "eaf4d286b16ee255699c8be01c056f45e9866d29edb054330d5f60eedb106dda",
+    "src/lib/server/pdf-issuance.ts": "ab0497f107b789f65d88279d1a2db4fcb2ee27a9dbaf91f252c07ee1b6a97ba6",
+    "tests/pdf-structure.test.ts": "c052a391d17b9ab10f78583c509061201db7a522845976b481836e8c846afa01",
+    "tests/support/pdf-v9-structure-baseline.json": "aa533546b4c2e70f88860d9e723b34c31869661c76e638f8a2efa64d63db361f",
+    "tests/integration/pdf-structure.test.mjs": "653d7bb2677802408c8f55ab4f46463d745097a1be05cfd7144c69d0d9bfc09d",
+    "tests/e2e/pdf-source-facts.spec.ts": "0be299d036d4cf8e5bf6c2f0f911875c2f748ff596ad46e36189f593556a4e7f",
+    "tests/e2e/ent-temporal.spec.ts": "15197665164883a697dbef456d829038589fc1deaf1dca26607e8a203710f065",
+    "tests/e2e/ent-terminal.spec.ts": "d70179e1afed7e6872d2ed7ad3f538e234eb6f55569ad455ff3128e5488ebf3a",
+    "tests/e2e/pdf-regularization.spec.ts": "096cd30e24fcbba3c025e0543455c304a93fa511a9baac688e206c0c3db5ced2"
+  },
+  "logLfSha256": {
+    "pdf-operational-corpus-field-instrument.log": "10ea901ab4da5daafb3a7f622020faf5dc8672967189732ba20572afd47abded",
+    "pdf-operational-corpus-hash-instrument.log": "bdc0a3ef4b0c11c841abadf77653952206845ef5ac73e74fb61ad6f08318a0da",
+    "pdf-operational-corpus.log": "2626b1fec984845eb2e6a768b59ab39cb58b26a05cf586aa9160972dba93bc4f",
+    "pdf-operational-independent.log": "b58549e8a94bd8316d57fef475d58ec42bda6fcfead8d427c88399d0127a445c",
+    "pdf-operational-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pdf-operational-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "artifactSha256": {
+    "d4-operational-proof/BAL-long-FIM_B6_ANEXO-15.png": "7ffedf73ba9b2250942f5d2523325de99ed7a7054bbfe51dd882e7edd8f0a438",
+    "d4-operational-proof/BAL-long-FIM_B6_MATERIAIS_BAL-14.png": "eb6bf2b852dfc2d2f7ad8cb0977a1a3835862d85f9516a1f071fff99387b2aff",
+    "d4-operational-proof/BAL-long-FIM_B6_MATERIAIS_BAL-6.png": "4622bb8d0c13723561854e723306e63a30b94077afa09564f3328491390f7cd7",
+    "d4-operational-proof/BAL-long-FIM_B6_NOTAS_BAL-9.png": "5f41ba23c3a96c4ee2f65f9dbfde044e4ad467af1e9c36b43a6ec7e480190822",
+    "d4-operational-proof/BAL-long-FIM_NOME_160-1.png": "db8d69036d7e9b18b0bb52047c008d1970ba45d895be77a7be8f7954219d4e12",
+    "d4-operational-proof/BAL-long.pdf": "9be5cc6ae16d808ddd1f34989187c8177ffd568e2089b2217eff823d44e5b3c9",
+    "d4-operational-proof/COM-cancelled.pdf": "abfc9844a09d7993f66eb2992e9feff3effefd65184db47ee81da6f84a4e8f58",
+    "d4-operational-proof/COM-long-FIM_B6_ANEXO-15.png": "7ffedf73ba9b2250942f5d2523325de99ed7a7054bbfe51dd882e7edd8f0a438",
+    "d4-operational-proof/COM-long-FIM_B6_MATERIAIS_COM-14.png": "edb9d936e82f20e8dc6b71718d52d0da29efc67da9f1fc19f65becca70c8e836",
+    "d4-operational-proof/COM-long-FIM_B6_MATERIAIS_COM-6.png": "49b8d19d2ee32df2b4f2af42919889b57c435257941266537b60956161987cca",
+    "d4-operational-proof/COM-long-FIM_B6_NOTAS_COM-9.png": "afc31ee972b6ca96e22f73eef288781c19fec872833858abfea6d76b4676397c",
+    "d4-operational-proof/COM-long-FIM_NOME_160-1.png": "db8d69036d7e9b18b0bb52047c008d1970ba45d895be77a7be8f7954219d4e12",
+    "d4-operational-proof/COM-long.pdf": "292e0c0d2a6717a044a430df2a9317057b578218f5472da7c94d62a89c646664",
+    "d4-operational-proof/CORPUS.json": "c86191245b5eaf80cfd9cfb5506304cdb5c50923680a613fa6d6ad7f354d250b",
+    "d4-operational-proof/ENT-cancelled.pdf": "c280b6f32170ad6b52b7eff326c30be9273b8fa4fe86eb68acbee406167cc9b2",
+    "d4-operational-proof/ENT-long-FIM_B6_ANEXO-15.png": "7ffedf73ba9b2250942f5d2523325de99ed7a7054bbfe51dd882e7edd8f0a438",
+    "d4-operational-proof/ENT-long-FIM_B6_MATERIAIS_ENT-14.png": "23482dc01898a0d2b52a1115add6d7d1748804e48a2fd530c05370b1fd818d61",
+    "d4-operational-proof/ENT-long-FIM_B6_MATERIAIS_ENT-6.png": "73f057b7081d8c222ddb38bd0d28d33b83727fd1b9d292d8cbf75fa8d3376cc3",
+    "d4-operational-proof/ENT-long-FIM_B6_NOTAS_ENT-9.png": "50d8f9d2066d470d4ba840a0fb8b14f5533e0c8195695b144ea35e2b77668001",
+    "d4-operational-proof/ENT-long-FIM_NOME_160-1.png": "db8d69036d7e9b18b0bb52047c008d1970ba45d895be77a7be8f7954219d4e12",
+    "d4-operational-proof/ENT-long.pdf": "6b3ccf65d5e78bed5f401d10b922e944693ea668d0c802588c5d758b39a2cedd",
+    "d4-operational-proof/ENT-partial.pdf": "497cc96b661b8e1c5ae13ace63055aef6a1f73c097be0002a83e315ed0b50ab8",
+    "d4-operational-proof/REQ-cancelled.pdf": "62aa807cb07fc10b3e53ab5628a1eedc067c7d7ec15433d6a43a6a6631018f47",
+    "d4-operational-proof/REQ-historical-unknown.pdf": "c6f7da89c6a302ef542db65dfa8ecf38b407535070998b6c2865b178561d3697",
+    "d4-operational-proof/REQ-long-FIM_B6_ANEXO-20.png": "7ffedf73ba9b2250942f5d2523325de99ed7a7054bbfe51dd882e7edd8f0a438",
+    "d4-operational-proof/REQ-long-FIM_B6_MATERIAIS_REQ-12.png": "d9ea38d9e4f9f934737fa0ace121ffaf716ee68a4134cc4a15f73cb3ea45aa26",
+    "d4-operational-proof/REQ-long-FIM_B6_NOTAS_REQ-17.png": "41bbe36e02bc0795ef94a581afd3633f1acddb6c0130f10067f4e7db249a1ec1",
+    "d4-operational-proof/REQ-long-FIM_NOME_160-1.png": "db8d69036d7e9b18b0bb52047c008d1970ba45d895be77a7be8f7954219d4e12",
+    "d4-operational-proof/REQ-long.pdf": "da40b9fa618dfc61b65d7c8bd974791de9ad35d5d3849f91bf4f58d2443e37ea",
+    "d4-operational-proof/REQ-partial.pdf": "d31e52f669ab9c59eab54567ac769e95e0824f3eff6f1740e87eb3b7dd26ad11",
+    "d4-operational-proof/root-public.pem": "f0bb76edcd37da1cbf317239d9173ab1568114d955bae0d482c92908f1a81709",
+    "d4-operational-proof/VERIFICATION.json": "3f993c4f51cf0a75fd66a4b3134ce0edbf634bb42735211a12b68ac03c609109",
+    "d4-operational-proof/verify.py": "f506767777b724306c3f5387e7110c56469dd936382700151dd607ae0c61cbd7"
+  },
+  "validation": {
+    "newTestsPassed": 2,
+    "signedControlledProbes": 10,
+    "independentPages": 87,
+    "longDocumentPages": {
+      "REQ": 20,
+      "COM": 15,
+      "ENT": 15,
+      "BAL": 15
+    },
+    "longOrdinaryRowsPerType": 120,
+    "nameCharactersIncludingLf": 160,
+    "contiguousUrlCharacters": 300,
+    "markerRasters": 23,
+    "inspectedFinalMaterialRasters": 4,
+    "allPagesExtractedAndRasterized": true,
+    "wholeFileInternalSignatureAndTimestamp": true,
+    "tableStructureAndScope": true,
+    "independentReqFieldAssociations": true,
+    "independentEntPartialQuantities": true,
+    "attachmentFullHashInOwnColumn": true,
+    "unsupportedGlyphRefused": true,
+    "types": true,
+    "affectedLint": true,
+    "pythonCompiled": true,
+    "globalSuitesRepeated": false
+  },
+  "cohortQualification": "No runtime or SQL changes. Final test removes only erased TypeScript object casts after the executed corpus;data/expectations are unchanged. Actual earlier Auth-issued corpus remains separate from these10 controlled compositor probes. Existing V10/source/consumer hashes matched the recorded3772fd0 package with full CI success.",
+  "counterproofs": {
+    "linearColonAndHashAssumptions": "Two original FAIL logs retained;independent scoped geometry confirms fields and full hash",
+    "unscopedShaLocator": "First Python FAIL in tool transcript;read-only diagnosis found explanatory paragraph plus actual table header;final requires paired ARQUIVO header",
+    "unsupportedGlyph": "V10 CONTENT_INVALID nonretryable before signing"
+  },
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "canonicalFirst30Preserved": true,
+    "counts": {
+      "PARTIAL": 51,
+      "PASS": 51,
+      "NOT_STARTED": 3
+    }
+  },
+  "remote": {
+    "observation": "PDF_OPERATIONAL_REMOTE_OBSERVATION.json",
+    "versions": 164,
+    "pending": 0,
+    "mutations": false
+  },
+  "ownShaCiRequired": true,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "actualApplicationIssuancesAdded": false,
+  "humanAt": false,
+  "physicalPrint": false,
+  "externalTrust": false,
+  "goalComplete": false
+}
