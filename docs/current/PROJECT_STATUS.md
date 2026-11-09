@@ -4,13 +4,14 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação27d2a06: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
-cadeia limpa, evolução legada e integração. Browsers em andamento na consulta.
-D3.36 corrigiu regressões de consumidores, adoção COM e foco, com20 cenários
-dirigidos aprovados; novo SHA exige CI completa própria. Não há aprovação global.
-[Observação](../audits/D/D-B/CI_27D2A06_OBSERVATION.json).
+Observaçãoadc4353: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
+cadeia limpa, evolução legada e integração. ios-2 PASS; ios-1/Chromium falharam,
+mobile cancelado. D3.37 acrescenta consentimento privado ENT e recuperação
+pessoal após encerramento; validação dirigida e contraprovas próprias no dossiê.
+A CI completa do novo SHA continua sendo gate independente.
+[Observação](../audits/D/D-B/CI_ADC4353_OBSERVATION.json).
 
-Estado atual:local169/remoto169, zero migrations pendentes. Matriz105x39: 56
+Estado atual:local170/remoto170, zero migrations pendentes. Matriz105x39: 56
 PASS/49 PARTIAL/0 NOT_STARTED; contagens não equivalem à conclusão da fase.
 Nova ordem visual de09/11:Modelo Integral substitui Fluent em todo o sistema,
 sem redução de funções. D3.28 concluiu a retirada técnica do Fluent: seletores
@@ -34,9 +35,12 @@ sete propósitos COM com preenchimento privado, parcela exata, referência
 oficial e confirmação desmarcada. Migrations167/168 reconciliadas. D3.35 amplia
 cinco decisões ENT: troca de destinatário, conciliação, cancelamento, recusa e
 retirada. Referências preservadas, indisponibilidade explícita, consumo único e
-descarte próprio após perda de escrita; migration169 reconciliada. Consentimento
-bilateral com consumo, regularização, transferência e decisões BAL/REQ continuam
-pendentes. Registro UI adicional 18
+descarte próprio após perda de escrita; migration169 reconciliada. D3.37 acrescenta
+consentimento bilateral privado com fonte de consumo selada, comparação Auth
+atual e recuperação pessoal das operações COM/ENT mesmo após encerramento.
+Migration170 reconciliada. Regularização, transferência e decisões contextuais
+BAL/REQ continuam pendentes. [Provas](../audits/D/D-B/ENT_CONSENT_DRAFTS.md).
+Registro UI adicional18
 requisitos; resultados funcionais anteriores não aprovam toda a nova
 aparência.
 [Contrato](../ui-ux/CANONICAL_MODEL.md),

@@ -3,7 +3,19 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D3.21
+## Estado atual — D3.37
+
+Local170/remoto170, zero pendências. Migration20261109151449 acrescenta
+consentimento ENT ao kernel privado, etapa de navegação e vínculo fechado de
+pedido/hash/devoluções. Não altera o RPC de estoque/consumo existente. Três
+corpos anteriores conferidos, dry-run único, locks/transações antigos zero e
+aplicação oficial antes do commit, seeds=[]/roles=[]. Quatro funções/configurações/
+ACL e digest iguais ao local; advisors iguais excluindo somente observed_at.
+Sem reset, fixtures, Auth/Vault ou backup redundante. [Recibo](ENT_CONSENT_DRAFTS_REMOTE.json),
+[dossiê](ENT_CONSENT_DRAFTS.md). Instalação limpa/evolução/integral continuam
+na CI do novo SHA. As etapas abaixo são históricas.
+
+## D3.21 — registro histórico
 
 Local164/remoto164, zero pendências. Migrations20261109022429 e20261109024515
 acrescentam intenções privadas de avatar, revisão do ponteiro e RPCs com grants

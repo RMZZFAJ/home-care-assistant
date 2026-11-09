@@ -508,17 +508,17 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
       exact: true,
     });
   for (const status of [503, 403]) {
+    let refusing = true;
     await page.route(
       `**/api/requisitions/${req.id}`,
       (route) =>
-        route.fulfill({
+        refusing ? route.fulfill({
           status,
           json: {
             error: "Consulta REQ recusada ou indisponível fictícia",
             code: "READ_UNAVAILABLE",
           },
-        }),
-      { times: 1 },
+        }) : route.continue(),
     );
     await refresh.focus();
     await refresh.press("Enter");
@@ -541,6 +541,7 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
       ).toHaveCount(0);
     }
     await expect(retry).toBeFocused();
+    refusing = false;
     await retry.press("Enter");
     await expect(
       page.getByRole("heading", {
@@ -552,6 +553,7 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
       }),
     ).toBeVisible();
     await expect(refresh).toBeFocused();
+    await page.unroute(`**/api/requisitions/${req.id}`);
   }
   expect(official(req.id, f.patient)).toBe(before);
 });

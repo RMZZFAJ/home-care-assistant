@@ -1,0 +1,100 @@
+{
+  "observedAt": "2026-11-09 16:14:30 UTC",
+  "sha": "adc4353677f3c58e162b3ae8ad9cbf5eda6679db",
+  "runId": 42641005847,
+  "runUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42641005847",
+  "jobs": [
+    {
+      "id": 129242035542,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129242036230,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129242036402,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129252626916,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129252627027,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129252627055,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129252627084,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    {
+      "id": 129276483052,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "preview": {
+    "state": "READY",
+    "deploymentId": "dpl_7n7nLg3FwNwfdje2AJMTtNUPP7bW",
+    "url": "https://home-care-assistant-hc8vxw9op-rmzzfajs-projects.vercel.app"
+  },
+  "failures": [
+    {
+      "file": "delivery-cancellation.spec.ts",
+      "line": 342,
+      "reason": "Old personal withdrawal draft remained offered; test tried to fill disabled form of new request without explicit resume/reference comparison."
+    },
+    {
+      "file": "document-tabs.spec.ts",
+      "line": 497,
+      "reason": "One-shot REQ failure intercept nondeterministic; first attempt no alert,retry stale header remained after403."
+    },
+    {
+      "file": "requisition-observation.spec.ts",
+      "line": 159,
+      "reason": "Axe target-size on viewport768; draft discard partially obscured by fixed header patient select."
+    },
+    {
+      "file": "version-history.spec.ts",
+      "line": 26,
+      "reason": "Axe target-size viewport320; document control partially obscured by fixed header."
+    }
+  ],
+  "flaky": [
+    {
+      "file": "catalogue-identities.spec.ts",
+      "line": 99,
+      "reason": "WebKit keyboard entry did not reach different accessible content;passedretry."
+    },
+    {
+      "file": "notification-read-states.spec.ts",
+      "line": 28,
+      "reason": "WebKit axe target-size bell768 close button partially obscured;passedretry."
+    }
+  ],
+  "limits": [
+    "Observation of adc4353 only;not approval of the next SHA",
+    "SonarCloud owner-deferred",
+    "PR7 remains Draft;no merge or production release"
+  ]
+}

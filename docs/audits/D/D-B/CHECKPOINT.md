@@ -2645,3 +2645,36 @@ paridade66/171, CI e gates D-C/D6/humano/AT/aparelhos/provedores continuam.
 Sonar adiado, PR7 Draft, sem merge/produção, meta ativa.
 [Dossiê](CONSUMER_REGRESSIONS.md), [provas](CONSUMER_REGRESSIONS_VALIDATION.json),
 [CI observada](CI_27D2A06_OBSERVATION.json).
+
+## D3.37 — consentimento privado e recuperação após encerramento
+
+Baseadc4353. Consentimento ENT preserva devoluções incompletas, motivo, pedido e
+hash da fonte sem copiar movimentos de consumo. Fonte pode mudar sem versão
+nova: confirmação vincula pedido/hash/devoluções à revisão privada, mantendo o
+RPC oficial transacional. Consulta Auth atual valida alvo, versão e campos;
+403/erro/200 inválido/fonte restrita suprimem fatos e impedem adoção.
+Consulta pessoal em Mais serve às operações COM7/ENT8, inclusive após término:
+retomada, descarte próprio ou reconhecimento, sem outro ato oficial.
+
+35 unitários/API,23 Auth e20 browsers distintos PASS:4 Chromium desktop,
+7 Chromium móvel e9 WebKit. CAS, mesma versão com outra fonte, locks observados,
+revogação real após evento com rollback, replay/ack sem escrita e negativas
+de leitura/terceiros. Dois oráculos corrigidos para P0001 de fonte obsoleta;
+parser corrigido para identidade textual real de produto. Contraprovas mantidas.
+Recusa/retirada antiga exige retomar e comparar antes de trocar o pedido;
+REQ mantém interceptação até retry; auditorias responsivas partem do topo.
+Três falhas locais adicionais de disponibilidade/SQL/PDF foram preservadas e
+repetidas isoladamente, com fontes/limites inalterados. Reuso discriminado;
+sem suítes mutáveis de banco paralelas. Tipos/lint e capturas móveis conferidos.
+
+Migration170 aplicada no remoto antes do commit:170/170 e zero pendências,
+digest,quatro funções/configurações e ACL iguais. Predecessores e dry-run único
+conferidos,seeds=[]/roles=[]. Advisors iguais exceto observed_at; sem reset,
+fixtures/Auth/Vault remotos ou backup redundante.84 SQLs históricos preservados.
+Matriz105x39, primeiras30 colunas,56 PASS/49 PARTIAL e18 UI preservados.
+CIadc4353:Windows/Ubuntu/banco eios-2 PASS;ios-1/Chromium falhos,mobile cancelado;
+Preview READY. CI completa própria do novo SHA continua obrigatória.
+Regularização,transferência,BAL/REQ contextuais,paridade66/171 e demais gates
+permanecem; Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
+[Dossiê](ENT_CONSENT_DRAFTS.md), [provas](ENT_CONSENT_DRAFTS_VALIDATION.json),
+[remoto](ENT_CONSENT_DRAFTS_REMOTE.json), [CI](CI_ADC4353_OBSERVATION.json).

@@ -289,6 +289,7 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   ).toHaveCount(4);
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(() => window.scrollTo(0, 0));
     await audit(page, "REQ observation review " + width);
   }
   mkdirSync("output/playwright/phase-d", { recursive: true });

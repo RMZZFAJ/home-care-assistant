@@ -14,3 +14,22 @@ export function deliveryRequestDraftFields(data: SupplyDocument) {
         requestLabel: "Pedido indisponível na referência consultada",
       };
 }
+
+/** Only the sealed reference and user's inputs are private; consumption facts stay in Auth reads. */
+export function deliveryConsentDraftFields(data: SupplyDocument) {
+  return {
+    ...deliveryRequestDraftFields(data),
+    referenceHash: data.deliveryCancellation?.referenceHash ?? "",
+  };
+}
+export function consentReferenceReady(data: SupplyDocument) {
+  const reference = data.deliveryCancellation;
+  return (
+    data.type === "ENT" &&
+    reference?.request.status === "pending" &&
+    reference.sourceReady === true &&
+    reference.sourceAccess !== false &&
+    typeof reference.referenceHash === "string" &&
+    /^[a-f0-9]{64}$/.test(reference.referenceHash)
+  );
+}

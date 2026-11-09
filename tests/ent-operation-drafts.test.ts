@@ -10,6 +10,7 @@ const stages = {
   cancel: "CANCEL_ENT",
   refuse_cancellation: "REFUSE_ENT",
   withdraw_cancellation: "WITHDRAW_ENT",
+  consent_cancel: "CONSENT_ENT",
 } as const;
 it.each(Object.keys(stages) as (keyof typeof stages)[])(
   "ENT %s retains incomplete selection only in the exact owner, patient, purpose and document",

@@ -2,7 +2,10 @@
 import { useImperativeHandle, useRef, useState, type RefObject } from "react";
 import type { SupplyDocument } from "@/types/documents";
 import { Notice, buttonClass } from "@/components/workspace";
-import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
+import {
+  CreationDraftPanel,
+  DraftContentSummary,
+} from "@/components/forms/creation-draft-panel";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { navigationForStep, draftFlow } from "@/lib/forms/draft-navigation";
 import {
@@ -12,7 +15,11 @@ import {
   type ComOperationPurpose,
   type ReceiptDraftContent,
 } from "@/lib/validation/supply-drafts";
-import { deliveryRequestDraftFields } from "@/lib/forms/delivery-draft-reference";
+import {
+  deliveryRequestDraftFields,
+  deliveryConsentDraftFields,
+  consentReferenceReady,
+} from "@/lib/forms/delivery-draft-reference";
 import { DraftReferenceComparison } from "./draft-reference-comparison";
 import {
   CommandEditorFields,
@@ -24,9 +31,12 @@ export type { DocumentAction } from "./supply-command-fields";
 type OperationPurpose = EntOperationPurpose | ComOperationPurpose;
 export type OperationReferenceHandle = {
   adoptClosingReference: (official: SupplyDocument) => boolean;
+  adoptCancellationReference: (official: SupplyDocument) => boolean;
 };
 type OperationEditorProps = CommandEditorProps & {
   referenceAdoptionRef?: RefObject<OperationReferenceHandle | null>;
+  onCompareCancellationReference?: () => void;
+  recoveryOnly?: boolean;
 };
 export function CommandEditor(props: OperationEditorProps) {
   const purpose = props.action;
@@ -51,6 +61,7 @@ function PrivateOperationEditor(
   },
 ) {
   const com = props.kind === "COM";
+  const consent = props.kind === "ENT" && props.purpose === "consent_cancel";
   const personalReceipt =
     props.kind === "ENT" &&
     (props.purpose === "receive" || props.purpose === "divergence");
@@ -61,7 +72,7 @@ function PrivateOperationEditor(
     [error, setError] = useState("");
   const empty: ReceiptDraftContent = {
     documentVersion: props.data.version,
-    fields: {},
+    fields: consent ? deliveryConsentDraftFields(props.data) : {},
     divergentIds: [],
     materials: props.data.lines.map((line) => ({
       id: line.id,
@@ -115,6 +126,8 @@ function PrivateOperationEditor(
     adoptClosingReference(official) {
       if (
         props.kind !== "COM" ||
+        props.recoveryOnly ||
+        !captureRef.current ||
         props.purpose !== "close_expectation" ||
         official.type !== "COM" ||
         official.id !== props.data.id ||
@@ -146,8 +159,44 @@ function PrivateOperationEditor(
       setComparison(false);
       return true;
     },
+    adoptCancellationReference(official) {
+      if (
+        !consent ||
+        props.recoveryOnly ||
+        !captureRef.current ||
+        official.id !== props.data.id ||
+        official.care_recipient_id !== props.data.care_recipient_id ||
+        official.version < baseline.documentVersion ||
+        !consentReferenceReady(official) ||
+        draft.blocked
+      )
+        return false;
+      const content = snapshot();
+      restore({
+        ...content,
+        documentVersion: official.version,
+        fields: {
+          ...content.fields,
+          ...current.fields,
+          ...deliveryConsentDraftFields(official),
+        },
+        materials: official.lines.map((line) => ({
+          id: line.id,
+          name: line.name_snapshot,
+          unit: line.unit_snapshot,
+          quantityDecimals: 0,
+        })),
+      });
+      setComparison(false);
+      return true;
+    },
   }));
-  const stale = baseline.documentVersion !== props.data.version;
+  const reference = deliveryConsentDraftFields(props.data);
+  const stale =
+    baseline.documentVersion !== props.data.version ||
+    (consent &&
+      (baseline.fields.referenceHash !== reference.referenceHash ||
+        baseline.fields.requestId !== reference.requestId));
   const currentIds = new Set(props.data.lines.map((line) => line.id));
   const removedValues = com
     ? baseline.materials.filter(
@@ -178,18 +227,68 @@ function PrivateOperationEditor(
   }
   if (draft.readDenied || draft.protectedReadPending)
     return (
-      <CreationDraftPanel
-        draft={draft}
-        current={baseline}
-        patientName={
-          props.context.patient?.display_name ?? "Paciente selecionado"
-        }
-        disabled={props.reviewDisabled}
-      />
+      <section tabIndex={-1} data-private-operation-recovery>
+        <CreationDraftPanel
+          draft={draft}
+          current={baseline}
+          patientName={
+            props.context.patient?.display_name ?? "Paciente selecionado"
+          }
+          disabled={props.reviewDisabled}
+        />
+      </section>
+    );
+  if (props.recoveryOnly)
+    return (
+      <section
+        className="hca-form-stack"
+        tabIndex={-1}
+        data-private-operation-recovery
+      >
+        <Notice>
+          A operação oficial não está disponível neste estado ou perfil. Você
+          pode consultar seu preenchimento, descartá-lo ou reconhecer um
+          resultado já aplicado, sem repetir o ato.
+        </Notice>
+        <CreationDraftPanel
+          draft={draft}
+          current={baseline}
+          patientName={
+            props.context.patient?.display_name ?? "Paciente selecionado"
+          }
+          resumeLabel="Consultar preenchimento salvo"
+          discardLabel="Descartar preenchimento privado"
+          acknowledgeLabel="Reconhecer resultado aplicado"
+        />
+        {draft.base?.state === "active" && !draft.offered ? (
+          <DraftContentSummary
+            content={draft.base.content}
+            kind={props.kind}
+            purpose={props.purpose}
+            navigation={draft.base.navigation}
+          />
+        ) : null}
+        {!draft.loading &&
+        !draft.loadError &&
+        !draft.offered &&
+        !draft.base &&
+        !draft.consumed &&
+        !draft.pending ? (
+          <p>
+            Nenhum preenchimento ou resultado privado pendente para esta
+            operação neste perfil.
+          </p>
+        ) : null}
+        <button type="button" className={buttonClass} onClick={props.onCancel}>
+          Fechar consulta do preenchimento
+        </button>
+      </section>
     );
   return (
     <section
       className="mt-4 space-y-4"
+      tabIndex={-1}
+      data-private-operation-recovery
       aria-label={
         personalReceipt
           ? "Conferência pessoal em preparação"
@@ -217,6 +316,16 @@ function PrivateOperationEditor(
           : `Este preenchimento pertence somente a você, a esta ${props.kind} e a este tipo de operação. Salvar não confirma decisões, recebimento ou movimentação de estoque; a confirmação é uma etapa própria.`}
       </p>
       {error ? <Notice error>{error}</Notice> : null}
+      {consent && !stale && props.onCompareCancellationReference ? (
+        <button
+          type="button"
+          className={buttonClass}
+          disabled={draft.blocked || props.reviewDisabled}
+          onClick={props.onCompareCancellationReference}
+        >
+          Conferir fontes atuais da conciliação
+        </button>
+      ) : null}
       {confirmationReset ? (
         <Notice>
           A confirmação anterior foi desmarcada porque a referência mudou.
@@ -227,10 +336,21 @@ function PrivateOperationEditor(
         <Notice>
           Este preenchimento usa a versão {baseline.documentVersion}; a ficha
           vigente está na versão {props.data.version}.
+          {consent ? (
+            <p>
+              O pedido ou a fonte de consumo consultada mudou. A versão da ficha
+              pode continuar igual. Suas devoluções digitadas e seu motivo
+              permanecem preservados.
+            </p>
+          ) : null}
           <button
             type="button"
             className={buttonClass}
-            onClick={() => setComparison(true)}
+            onClick={() => {
+              if (consent && props.onCompareCancellationReference)
+                props.onCompareCancellationReference();
+              else setComparison(true);
+            }}
           >
             {fullReference
               ? "Comparar referência da operação"

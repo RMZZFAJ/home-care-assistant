@@ -21,9 +21,10 @@ export const draftFlowStages = {
   CANCEL_ENT: [{ id: "ent_cancellation", label: "Pedido de cancelamento da ENT" }],
   REFUSE_ENT: [{ id: "ent_cancellation_refusal", label: "Recusa do cancelamento" }],
   WITHDRAW_ENT: [{ id: "ent_cancellation_withdrawal", label: "Retirada do meu pedido" }],
+  CONSENT_ENT: [{ id: "ent_cancellation_consent", label: "Consentimento e conciliação" }],
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
-export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal"] as const;
+export const draftStageIds = ["identification", "medicamentos", "higiene", "dieta", "extras", "notes", "review", "count", "receipt", "divergence", "approval", "acquisition", "arrival", "receipt_validation", "receipt_rejection", "expectation_closure", "com_cancellation", "ent_reassignment", "ent_resolution", "ent_cancellation", "ent_cancellation_refusal", "ent_cancellation_withdrawal", "ent_cancellation_consent"] as const;
 export type DraftFlow = keyof typeof draftFlowStages;
 export type DraftNavigation = { version: 1; stage: typeof draftStageIds[number] };
 export function draftFlow(kind: string, purpose = "create", content?: unknown): DraftFlow | null {
@@ -41,6 +42,7 @@ export function draftFlow(kind: string, purpose = "create", content?: unknown): 
   if (kind === "ENT" && purpose === "cancel") return "CANCEL_ENT";
   if (kind === "ENT" && purpose === "refuse_cancellation") return "REFUSE_ENT";
   if (kind === "ENT" && purpose === "withdraw_cancellation") return "WITHDRAW_ENT";
+  if (kind === "ENT" && purpose === "consent_cancel") return "CONSENT_ENT";
   if (!["create", "revise"].includes(purpose)) return null;
   if (kind === "REQ") return purpose === "create" ? "REQ" : null;
   if (kind === "BAL") {

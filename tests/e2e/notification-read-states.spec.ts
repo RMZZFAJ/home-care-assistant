@@ -48,7 +48,7 @@ test("D3 sino distingue demora falha e conteúdo e recupera por consulta sem reg
     await expect(bell(page).getByText("Última consulta confirmada; aguardando atualização.", { exact: true })).toHaveCount(0);
     await expect(bell(page).getByText(f.doc.code, { exact: true })).toBeVisible();
     await test.info().attach("notification-panel-focusable-elements", { body: JSON.stringify(await bell(page).locator("a,button").evaluateAll(elements => elements.map(element => ({ tag: element.tagName, tabIndex: (element as HTMLElement).tabIndex, explicitTabIndex: element.getAttribute("tabindex"), hidden: Boolean(element.closest('[aria-hidden="true"]')), box: { width: element.getBoundingClientRect().width, height: element.getBoundingClientRect().height } }))), null, 2), contentType: "application/json" });
-    for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "D3 notification bell " + width); }
+    for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await page.evaluate(() => window.scrollTo(0, 0)); await audit(page, "D3 notification bell " + width); }
     await page.setViewportSize({ width: 390, height: 900 }); await bell(page).screenshot({ path: `output/playwright/phase-d/d3-notification-panel-${test.info().project.name}.png` });
     expect(sql(`select jsonb_build_object('events',(select count(*) from public.document_events where document_id=${sqlLiteral(f.doc.id)}),'seen',(select seen_at from public.requisition_notifications where id=${sqlLiteral(f.notification)}));`)).toBe(before);
     await page.keyboard.press("Escape"); await expect(page.getByRole("button", { name: /^Notificações/ })).toBeFocused();

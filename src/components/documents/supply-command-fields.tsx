@@ -26,7 +26,10 @@ import {
   acquisitionRemaining,
   arrivalRemaining,
 } from "@/lib/documents/purchase";
-import { deliveryRequestDraftFields } from "@/lib/forms/delivery-draft-reference";
+import {
+  deliveryRequestDraftFields,
+  deliveryConsentDraftFields,
+} from "@/lib/forms/delivery-draft-reference";
 import { formatBrazilDate } from "@/lib/receipt";
 import { PurchaseReceiptContent } from "./purchase-details";
 import { DeliveryConsumptionReferences } from "./delivery-cancellation";
@@ -87,7 +90,14 @@ export function CommandEditorFields({
   const [reasonText, setReasonText] = useState(
     initialDraft?.fields.reason ?? "",
   );
-  const [returns, setReturns] = useState<Record<string, string>>({});
+  const [returns, setReturns] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      data.lines.map((line) => [
+        line.id,
+        initialDraft?.fields[line.id + ":return"] ?? "",
+      ]),
+    ),
+  );
   const [receiptId, setReceiptId] = useState(
     initialDraft?.fields.receiptId ??
       data.receipts.find((receipt) => receipt.state === "pending")?.id ??
@@ -107,7 +117,12 @@ export function CommandEditorFields({
       (data.recipient_id === context.userId ? "received" : "returned"),
   );
   const [frozenRequest] = useState(() => ({
-    ...deliveryRequestDraftFields(data),
+    ...(action === "consent_cancel"
+      ? deliveryConsentDraftFields(data)
+      : deliveryRequestDraftFields(data)),
+    ...(initialDraft?.fields.referenceHash !== undefined
+      ? { referenceHash: initialDraft.fields.referenceHash }
+      : {}),
     ...(initialDraft?.fields.requestId !== undefined
       ? { requestId: initialDraft.fields.requestId }
       : {}),
@@ -160,8 +175,19 @@ export function CommandEditorFields({
       if (line)
         fields.lineLabel = `${line.name_snapshot} · ${line.unit_snapshot}`;
     }
-    if (action === "refuse_cancellation" || action === "withdraw_cancellation")
+    if (
+      [
+        "refuse_cancellation",
+        "withdraw_cancellation",
+        "consent_cancel",
+      ].includes(action)
+    )
       Object.assign(fields, frozenRequest);
+    if (action === "consent_cancel")
+      for (const line of data.lines)
+        fields[line.id + ":return"] = quantity(line.accepted_quantity).isZero()
+          ? "0"
+          : (returns[line.id] ?? "");
     return {
       documentVersion: data.version,
       fields,
@@ -180,6 +206,7 @@ export function CommandEditorFields({
     selectedReceipt,
     selectedRecipient,
     frozenRequest,
+    returns,
   ]);
   useImperativeHandle(snapshotRef, () => ({ snapshot: captureSnapshot }), [
     captureSnapshot,
@@ -401,6 +428,14 @@ export function CommandEditorFields({
         )
           throw new Error(
             "Atualize as referências da conciliação. Os dados de origem não podem ser editados aqui.",
+          );
+        if (
+          frozenRequest.requestId !== reference.request.id ||
+          !("referenceHash" in frozenRequest) ||
+          frozenRequest.referenceHash !== reference.referenceHash
+        )
+          throw new Error(
+            "O pedido ou as referências de consumo deste preenchimento mudaram. Compare e adote a referência vigente antes de revisar.",
           );
         if (quantity(reference.unresolvedTransit ?? "0").gt(0))
           throw new Error(
@@ -806,26 +841,36 @@ export function CommandEditorFields({
                 {formatQuantity(line.accepted_quantity)}
               </legend>
               <div>
-                <p>
-                  Consumo já confirmado disponível:{" "}
-                  {formatQuantity(
-                    data.deliveryCancellation?.lines.find(
+                {reviewDisabled ||
+                data.deliveryCancellation?.sourceAccess === false ? (
+                  <p>
+                    As fontes estão em conferência ou indisponíveis. Consulte as
+                    referências autorizadas atuais antes de decidir.
+                  </p>
+                ) : (
+                  <>
+                    <p>
+                      Consumo já confirmado disponível:{" "}
+                      {formatQuantity(
+                        data.deliveryCancellation?.lines.find(
+                          (item) => item.lineId === line.id,
+                        )?.availableConsumedQuantity,
+                        line.unit_snapshot,
+                      )}
+                    </p>
+                    {data.deliveryCancellation?.lines.find(
                       (item) => item.lineId === line.id,
-                    )?.availableConsumedQuantity,
-                    line.unit_snapshot,
-                  )}
-                </p>
-                {data.deliveryCancellation?.lines.find(
-                  (item) => item.lineId === line.id,
-                ) ? (
-                  <DeliveryConsumptionReferences
-                    line={
-                      data.deliveryCancellation.lines.find(
-                        (item) => item.lineId === line.id,
-                      )!
-                    }
-                  />
-                ) : null}
+                    ) ? (
+                      <DeliveryConsumptionReferences
+                        line={
+                          data.deliveryCancellation.lines.find(
+                            (item) => item.lineId === line.id,
+                          )!
+                        }
+                      />
+                    ) : null}
+                  </>
+                )}
               </div>
               {quantity(line.accepted_quantity).gt(0) ? (
                 <label className="text-sm">

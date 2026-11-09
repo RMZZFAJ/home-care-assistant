@@ -122,7 +122,7 @@ function DraftFieldsSummary({
     return <div className="hca-form-stack">
       <p>{operation ? `Preenchimento da operação ${kind} · versão de referência ${content.documentVersion}. Salvar não confirma decisões, recebimento ou movimentação de estoque.` : `Conferência pessoal · versão consultada ${content.documentVersion}. Salvar não aceita material.`}</p>
       {content.divergentIds.length ? <ul>{content.divergentIds.map(id => <li key={id}>{name(id)} · divergência em preparação</li>)}</ul> : !operation ? <p>Nenhuma linha divergente selecionada.</p> : null}
-      <dl>{Object.entries(content.fields).filter(([key]) => !["receiptLabel", "recipientLabel", "lineLabel", "requestLabel"].includes(key)).map(([key, value]) => <div key={key}><dt>{labels[key] ?? (key.endsWith(":problem") ? name(key.slice(0, -8)) + " · diferença" : name(key) + " · " + quantityLabel)}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{display(key, value)}</dd></div>)}</dl>
+      <dl>{Object.entries(content.fields).filter(([key]) => !["receiptLabel", "recipientLabel", "lineLabel", "requestLabel", "referenceHash"].includes(key)).map(([key, value]) => <div key={key}><dt>{labels[key] ?? (key.endsWith(":return") ? name(key.slice(0, -7)) + " · devolução física em preparação" : key.endsWith(":problem") ? name(key.slice(0, -8)) + " · diferença" : name(key) + " · " + quantityLabel)}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{display(key, value)}</dd></div>)}</dl>
     </div>;
   }
   return (
@@ -164,12 +164,18 @@ export function CreationDraftPanel({
   current,
   patientName,
   resumeHref,
+  resumeLabel = "Continuar rascunho",
+  discardLabel = "Descartar e começar nova",
+  acknowledgeLabel = "Confirmar resultado e começar novo preenchimento",
   disabled = false,
 }: {
   draft: CreationDraftController;
   current: CreationDraftContent;
   patientName: string;
   resumeHref?: string;
+  resumeLabel?: string;
+  discardLabel?: string;
+  acknowledgeLabel?: string;
   disabled?: boolean;
 }) {
   const [confirmDiscard, setConfirmDiscard] = useState(false);
@@ -249,7 +255,7 @@ export function CreationDraftPanel({
             disabled={draft.busy || !!draft.pending || disabled}
             onClick={() => void draft.acknowledge()}
           >
-            Confirmar resultado e começar novo preenchimento
+            {acknowledgeLabel}
           </ActionButton>
         </>
       ) : null}
@@ -263,7 +269,7 @@ export function CreationDraftPanel({
                 href={resumeHref}
                 prefetch={false}
               >
-                Continuar rascunho
+                {resumeLabel}
               </Link>
             ) : (
               <ActionButton
@@ -271,7 +277,7 @@ export function CreationDraftPanel({
                 disabled={draft.busy || disabled}
                 onClick={() => draft.resume()}
               >
-                Continuar rascunho
+                {resumeLabel}
               </ActionButton>
             )}
           </div>
@@ -346,7 +352,7 @@ export function CreationDraftPanel({
             setConfirmDiscard(true);
           }}
         >
-          Descartar e começar nova
+          {discardLabel}
         </ActionButton>
       ) : null}
       {confirmDiscard ? (

@@ -433,9 +433,32 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
         exact: true,
       })
       .click();
-    await editor(page)
-      .getByRole("textbox", { name: "Motivo da retirada", exact: true })
-      .fill("Solicitante retirou somente o pedido novo");
+    // The failed first intention remains a personal draft. Reopening must not
+    // silently discard it or bind its request to the new cancellation request.
+    await expect(reason).toBeDisabled();
+    await page
+      .getByRole("button", { name: "Continuar rascunho", exact: true })
+      .click();
+    await expect(reason).toHaveValue(
+      "Justificativa própria preservada para retirar o pedido",
+    );
+    await expect(
+      editor(page).getByRole("button", { name: "Revisar operação", exact: true }),
+    ).toBeDisabled();
+    await page
+      .getByRole("button", { name: "Comparar referência da operação", exact: true })
+      .click();
+    await page
+      .getByRole("button", {
+        name: "Usar referência vigente e manter preenchimento",
+        exact: true,
+      })
+      .click();
+    await expect(reason).toHaveValue(
+      "Justificativa própria preservada para retirar o pedido",
+    );
+    expect(ledger(f.patient)).toBe(before);
+    await reason.fill("Solicitante retirou somente o pedido novo");
     const current = await review(page);
     await current
       .getByRole("button", { name: "Confirmar operação", exact: true })

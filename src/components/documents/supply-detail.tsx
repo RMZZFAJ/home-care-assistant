@@ -37,6 +37,8 @@ import {
   type OperationReferenceHandle,
 } from "./supply-command-editor";
 import { DraftReferenceComparison } from "./draft-reference-comparison";
+import { ConsentReferenceComparison } from "./consent-reference-comparison";
+import { PrivateOperationRecoveryActions } from "./private-operation-recovery-actions";
 import { type PatientPerson, type SupplyDocument } from "@/types/documents";
 import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -136,9 +138,14 @@ export function SupplyDocumentContent({
   useEffect(() => {
     if (decisionFocusRef.current) {
       decisionFocusRef.current = false;
-      commandFormRef.current
-        ?.querySelector<HTMLElement>("input,textarea,select,button")
-        ?.focus();
+      const target =
+        commandFormRef.current?.querySelector<HTMLElement>(
+          "input,textarea,select,button",
+        ) ??
+        headerRef.current
+          ?.closest(".hca-record-detail")
+          ?.querySelector<HTMLElement>("[data-private-operation-recovery]");
+      target?.focus();
     } else if (resultFocusRef.current) {
       resultFocusRef.current = false;
       headerRef.current
@@ -330,6 +337,13 @@ export function SupplyDocumentContent({
           reason.code === "VERSION_CONFLICT"
         )
           setDeliveryConflict(true);
+        if (
+          data.type === "ENT" &&
+          intention.action === "consent_cancel" &&
+          reason instanceof ApiError &&
+          reason.status === 403
+        )
+          setDeliveryConflict(true);
         pendingRef.current = null;
         setReview(null);
       }
@@ -344,6 +358,8 @@ export function SupplyDocumentContent({
     }
   }
   async function comparePurchaseVersion() {
+    if (data?.type === "ENT" && action === "consent_cancel")
+      setComparison(null);
     setBusy(true);
     setError("");
     try {
@@ -478,6 +494,75 @@ export function SupplyDocumentContent({
     )
       actions.push("cancel");
   }
+  function renderDeliveryComparison(ready: boolean) {
+    if (!data || !comparison) return null;
+    return (
+      <>
+        {ready ? (
+          <DeliveryCancellationComparison
+            original={
+              comparison.deliveryCancellation?.sourceAccess === false &&
+              data.deliveryCancellation
+                ? {
+                    ...data,
+                    deliveryCancellation: {
+                      ...data.deliveryCancellation,
+                      lines: [],
+                    },
+                  }
+                : data
+            }
+            current={comparison}
+          />
+        ) : null}
+        <button
+          type="button"
+          className={primaryClass}
+          disabled={busy || !ready}
+          onClick={() => {
+            const pending = comparison.status === "cancellation_pending";
+            if (
+              pending &&
+              action === "consent_cancel" &&
+              !referenceAdoptionRef.current?.adoptCancellationReference(
+                comparison,
+              )
+            ) {
+              setError(
+                "Não foi possível atualizar a referência privada da conciliação. Consulte novamente.",
+              );
+              return;
+            }
+            decisionFocusRef.current = pending;
+            resultFocusRef.current = !pending;
+            setData(comparison);
+            setComparison(null);
+            setDeliveryConflict(false);
+            setReview(null);
+            if (!pending) setAction(null);
+            setFocusRevision((value) => value + 1);
+            setMessage(
+              pending
+                ? "Referência atual carregada. Confira os valores preservados e prepare uma nova revisão antes de decidir."
+                : "Resultado atual carregado. O primeiro ato e sua autoria permanecem preservados.",
+            );
+          }}
+        >
+          {comparison.status === "cancellation_pending"
+            ? "Usar referência atual e revisar novamente"
+            : "Mostrar resultado atual do pedido"}
+        </button>
+        <button
+          type="button"
+          className={buttonClass}
+          disabled={busy}
+          onClick={() => void comparePurchaseVersion()}
+        >
+          Consultar pedido e referências atuais novamente
+        </button>
+      </>
+    );
+  }
   function renderAction(item: DocumentAction) {
     if (!data) return null;
     return (
@@ -604,37 +689,32 @@ export function SupplyDocumentContent({
             campos continuam preservados para comparação.
           </Notice>
           {comparison ? (
-            <>
-              <DeliveryCancellationComparison
-                original={data}
-                current={comparison}
-              />
-              <button
-                type="button"
-                className={primaryClass}
-                disabled={busy}
-                onClick={() => {
-                  const pending = comparison.status === "cancellation_pending";
-                  decisionFocusRef.current = pending;
-                  resultFocusRef.current = !pending;
-                  setData(comparison);
-                  setComparison(null);
-                  setDeliveryConflict(false);
-                  setReview(null);
-                  if (!pending) setAction(null);
-                  setFocusRevision((value) => value + 1);
-                  setMessage(
-                    pending
-                      ? "Referência atual carregada. Confira os valores preservados e prepare uma nova revisão antes de decidir."
-                      : "Resultado atual carregado. O primeiro ato e sua autoria permanecem preservados.",
-                  );
+            action === "consent_cancel" &&
+            comparison.status === "cancellation_pending" ? (
+              <ConsentReferenceComparison
+                expected={{
+                  id: data.id,
+                  patientId: data.care_recipient_id,
+                  version: comparison.version,
+                  requestId: comparison.deliveryCancellation?.request.id,
+                  referenceHash: comparison.deliveryCancellation?.referenceHash,
+                  lineIds: Array.isArray(comparison.lines)
+                    ? comparison.lines.map((line) => line.id)
+                    : [],
                 }}
               >
-                {comparison.status === "cancellation_pending"
-                  ? "Usar referência atual e revisar novamente"
-                  : "Mostrar resultado atual do pedido"}
-              </button>
-            </>
+                {(ready) => renderDeliveryComparison(ready)}
+              </ConsentReferenceComparison>
+            ) : (
+              renderDeliveryComparison(
+                Boolean(
+                  comparison.id === data.id &&
+                    comparison.care_recipient_id === data.care_recipient_id &&
+                    comparison.type === "ENT" &&
+                    comparison.version,
+                ),
+              )
+            )
           ) : (
             <button
               type="button"
@@ -727,6 +807,23 @@ export function SupplyDocumentContent({
                   >
                     Acompanhar plantão, revisão e reconto
                   </Link>
+                ) : null}
+                {activeContext &&
+                (data.type === "COM" || data.type === "ENT") ? (
+                  <PrivateOperationRecoveryActions
+                    kind={data.type}
+                    onSelect={(purpose) => {
+                      operationOpenerRef.current = moreTriggerRef.current;
+                      decisionFocusRef.current = true;
+                      setFocusRevision((value) => value + 1);
+                      tabs.select("workflow");
+                      setAction(purpose);
+                      setReview(null);
+                      setPurchaseConflict(false);
+                      setDeliveryConflict(false);
+                      setComparison(null);
+                    }}
+                  />
                 ) : null}
                 {actions
                   .filter((item) => secondaryDocumentActions.has(item))
@@ -938,7 +1035,22 @@ export function SupplyDocumentContent({
               ) : null}
               {data.type === "ENT" && data.deliveryCancellation ? (
                 <DeliveryCancellationDetails
-                  context={data.deliveryCancellation}
+                  sourceChecking={
+                    action === "consent_cancel" &&
+                    (deliveryConflict || busy || uncertain)
+                  }
+                  context={
+                    action === "consent_cancel" &&
+                    (deliveryConflict || busy || uncertain)
+                      ? {
+                          ...data.deliveryCancellation,
+                          lines: [],
+                          sourceReady: false,
+                          sourceAccess: undefined,
+                          referenceHash: null,
+                        }
+                      : data.deliveryCancellation
+                  }
                   onRefresh={() => {
                     if (editingRef.current) {
                       setDeliveryConflict(true);
@@ -988,13 +1100,22 @@ export function SupplyDocumentContent({
                   ) : null}
                 </section>
               ) : null}
-              {actions.length ? (
+              {actions.length || action ? (
                 <section className="ui-card">
-                  <h2>Próxima ação</h2>
+                  <h2>
+                    {action && !actions.includes(action)
+                      ? "Seu preenchimento preservado"
+                      : "Próxima ação"}
+                  </h2>
                   {action ? (
                     <CommandEditor
                       key={data.id + action}
                       referenceAdoptionRef={referenceAdoptionRef}
+                      recoveryOnly={!actions.includes(action)}
+                      onCompareCancellationReference={() => {
+                        setDeliveryConflict(true);
+                        void comparePurchaseVersion();
+                      }}
                       action={action}
                       data={data}
                       people={people.filter(

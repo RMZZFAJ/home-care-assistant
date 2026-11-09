@@ -60,7 +60,7 @@ test("Histórico rejeita resposta200 inválida ou de outra versão como falha de
     await expect(frozen(page, f.approved.version)).toContainText(f.oldName);
     await expect(retry).toBeFocused();
   }
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "history read recovery " + width); }
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await page.evaluate(() => window.scrollTo(0, 0)); await audit(page, "history read recovery " + width); }
   expect(pageErrors).toEqual([]); expect(commands).toBe(0);
   expect(historyHashes(f.doc.id)).toBe(hashes); expect(fidelityLedger(f.patient)).toBe(ledger);
   expect(sql(`select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)};`)).toBe(issuanceCount);

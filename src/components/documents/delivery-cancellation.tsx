@@ -47,8 +47,17 @@ export function DeliveryConsumptionReferences({
     </p>
   );
 }
-function RequestFacts({ request,historical=false }: { request: DeliveryCancellationRequest;historical?:boolean }) {
-  const status = historical&&request.status==="pending"?"Pedido anterior sem decisão pessoal":cancellationStatuses[request.status];
+function RequestFacts({
+  request,
+  historical = false,
+}: {
+  request: DeliveryCancellationRequest;
+  historical?: boolean;
+}) {
+  const status =
+    historical && request.status === "pending"
+      ? "Pedido anterior sem decisão pessoal"
+      : cancellationStatuses[request.status];
   return (
     <div className="space-y-2">
       <p className="font-semibold">{status}</p>
@@ -76,30 +85,42 @@ function RequestFacts({ request,historical=false }: { request: DeliveryCancellat
 export function DeliveryCancellationDetails({
   context,
   onRefresh,
+  sourceChecking = false,
 }: {
   context: DeliveryCancellationContext;
   onRefresh: () => void;
+  sourceChecking?: boolean;
 }) {
   return (
     <section className="ui-card space-y-4" aria-label="Cancelamento da entrega">
       <h2 className="font-semibold">
-        {context.historical?"Pedido anterior preservado":context.request.status === "pending"
-          ? "Pedido de cancelamento vigente"
-          : "Resultado do pedido de cancelamento"}
+        {context.historical
+          ? "Pedido anterior preservado"
+          : context.request.status === "pending"
+            ? "Pedido de cancelamento vigente"
+            : "Resultado do pedido de cancelamento"}
       </h2>
-      <RequestFacts request={context.request} historical={context.historical}/>
-      {context.historical?<Notice>O pedido não recebeu consentimento pessoal. A regularização administrativa tem decisão e autoria próprias; consulte seu dossiê nesta ficha.</Notice>:null}
-      {context.request.status === "pending"&&!context.historical ? (
+      <RequestFacts request={context.request} historical={context.historical} />
+      {context.historical ? (
+        <Notice>
+          O pedido não recebeu consentimento pessoal. A regularização
+          administrativa tem decisão e autoria próprias; consulte seu dossiê
+          nesta ficha.
+        </Notice>
+      ) : null}
+      {context.request.status === "pending" && !context.historical ? (
         <>
           <Notice>
             O pedido mantém os fatos de recebimento e o estoque. O recebedor
             decide pessoalmente; o solicitante pode retirar seu pedido.
           </Notice>
           {!context.sourceReady ? (
-            <Notice error>
-              {context.sourceAccess === false
-                ? "As referências de consumo não estão disponíveis para o seu acesso atual."
-                : "Não foi possível comprovar as referências históricas desta conciliação."}{" "}
+            <Notice error={!sourceChecking}>
+              {sourceChecking
+                ? "Referências em conferência. Os dados da consulta anterior não serão usados para esta decisão."
+                : context.sourceAccess === false
+                  ? "As referências de consumo não estão disponíveis para o seu acesso atual."
+                  : "Não foi possível comprovar as referências históricas desta conciliação."}{" "}
               <button
                 type="button"
                 className="ui-button ui-button-secondary"
