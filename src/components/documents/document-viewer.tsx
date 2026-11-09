@@ -8,6 +8,37 @@ import { RequisitionOpening } from "@/components/requisitions/requisition-openin
 /** All document URLs use the same frame; adapters retain their domain contracts. */
 export function DocumentViewer({ id }: { id: string }) {
   const { data, loading } = useWorkspaceState();
-  const document = data?.documentContext?.id === id ? data.documentContext : null;
-  return <Workspace title={document?.type === "REQ" ? "Requisição e acompanhamento" : "Acompanhamento da ficha"}>{(context) => document ? document.type === "REQ" ? <RequisitionOpening key={id} id={id}><RequisitionDocumentContent id={id} context={context} /></RequisitionOpening> : <SupplyDocumentContent key={id} id={id} context={context} /> : <Notice error={!loading}>{loading ? "Identificando documento autorizado…" : "Documento não encontrado ou indisponível neste contexto."}</Notice>}</Workspace>;
+  const document =
+    data?.documentContext?.id === id ? data.documentContext : null;
+  return (
+    <Workspace
+      documentPage
+      title={
+        document?.type === "REQ"
+          ? "Requisição e acompanhamento"
+          : "Acompanhamento da ficha"
+      }
+    >
+      {(context) =>
+        document ? (
+          document.type === "REQ" ? (
+            <RequisitionOpening standalone key={id} id={id}>
+              <RequisitionDocumentContent id={id} context={context} />
+            </RequisitionOpening>
+          ) : (
+            <SupplyDocumentContent key={id} id={id} context={context} />
+          )
+        ) : (
+          <>
+            <h1>Acompanhamento da ficha</h1>
+            <Notice error={!loading}>
+              {loading
+                ? "Identificando documento autorizado…"
+                : "Documento não encontrado ou indisponível neste contexto."}
+            </Notice>
+          </>
+        )
+      }
+    </Workspace>
+  );
 }

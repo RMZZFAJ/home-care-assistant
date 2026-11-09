@@ -4,7 +4,14 @@ export type DocumentMilestone = {
   label: string;
   state: "done" | "pending" | "unknown" | "waived" | "closed";
   detail: string;
+  percent?: number;
 };
+
+function linePercent(completed: number, total: number) {
+  return Number.isFinite(completed) && total > 0
+    ? Math.max(0, Math.min(100, (completed / total) * 100))
+    : undefined;
+}
 type MilestoneFacts = Pick<
   SupplyDocument,
   | "type"
@@ -63,6 +70,9 @@ export function requisitionMilestones(input: {
     },
     {
       label: "Atendimento",
+      percent: input.historical
+        ? undefined
+        : linePercent(input.fulfilled, input.total),
       state: input.historical
         ? "unknown"
         : input.total > 0 && input.fulfilled === input.total
@@ -135,6 +145,9 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
       issued,
       {
         label: "Aquisição",
+        percent: progress
+          ? linePercent(acquired, progress.lines.length)
+          : undefined,
         state: progress
           ? acquired === progress.lines.length && acquired > 0
             ? "done"
@@ -197,6 +210,9 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
         state:
           data.status === "confirmed" ? "done" : closed ? "unknown" : "pending",
         detail: `${data.fullyCheckedLines}/${data.totalLines} linhas integralmente conferidas${closed ? "; histórico físico preservado" : ""}`,
+        percent: closed
+          ? undefined
+          : linePercent(data.fullyCheckedLines, data.totalLines),
       },
       {
         label: "Conclusão",

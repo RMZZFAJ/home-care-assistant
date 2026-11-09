@@ -4,7 +4,7 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-Observação334b08c: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
+Observação9ad124b: Preview READY e CI Windows/Ubuntu/banco PASS, incluindo
 cadeia limpa, evolução legada e integração. Browsers ainda em andamento na
 consulta. Isso não aprova o novo incremento de abas; seu SHA publicado exige
 CI própria. A falha anterior de allowlist e sua correção permanecem em
@@ -22,7 +22,10 @@ dirigidos, com limites de reuso documentados. D3.29 integrou Andamentos persisti
 autorizadas e cronologia paginada. Migration165 reconciliada. D3.30 implementa
 abas reais nas quatro fichas, marcos factuais e seleção por URL, preservando
 edição e versões acessíveis aos leitores. Restam paridade integral de todas as
-telas, cabeçalhos e listas/cartões. Registro UI
+telas, cabeçalhos e listas/cartões. D3.31 integrou identificação, grade e
+progresso canônicos ao cabeçalho, com controles reais de PDF/Andamento na barra,
+foco e retirada de conteúdo em leitura recusada. Organização final das ações
+secundárias e demais composições continua pendente. Registro UI
 adicional
 18 requisitos; resultados
 funcionais anteriores não aprovam toda a nova aparência.
@@ -30,6 +33,7 @@ funcionais anteriores não aprovam toda a nova aparência.
 [provas atuais](../audits/D/D-B/UI_MODEL_STAGE_3.md).
 [Andamentos e provas do lote atual](../audits/D/D-B/DOCUMENT_PROGRESS.md).
 [Abas, marcos e limites](../audits/D/D-B/DOCUMENT_TABS.md).
+[Cabeçalhos, ações e recuperação](../audits/D/D-B/DOCUMENT_HEADER.md).
 
 Prioridade vigente:
 fichas REQ/COM/ENT/BAL, PDFs técnicos, estoque e recuperação; apoio depois das

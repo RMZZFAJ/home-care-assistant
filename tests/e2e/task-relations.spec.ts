@@ -27,6 +27,7 @@ test("relação REQ para ENT abre fatos de expedição em leitura, recupera cons
   await page.goto(`/historico/${f.source.id}`);
   await selectDocumentSection(page, "materials");
   expect((await sourceOpening).status()).toBe(200);
+  await expect(page.locator(".hca-document-milestones > li").filter({has:page.getByText("Atendimento",{exact:true})}).locator(".hca-milestone-track > span")).toHaveAttribute("style", "width: 50%;");
   const open = page.getByRole("button", { name: new RegExp("^" + f.ent.code + " · aceito") });
   await expect(open).toBeVisible();
   const response = await page.request.get(`/api/documents/${f.ent.id}`); expect(response.status()).toBe(200);

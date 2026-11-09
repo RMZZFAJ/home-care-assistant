@@ -80,7 +80,7 @@ test("C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantid
   const before = historyHashes(doc.id), stock = ledger(f.patient);
   let writes = 0;
   page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/documents") && request.method() !== "GET") writes++; });
-  const refresh = page.getByRole("button", { name: "Atualizar", exact: true });
+  const refresh = page.getByRole("button", { name: "Atualizar ficha", exact: true });
   for (const status of [503, 403]) {
     await page.route(`**/api/documents/${doc.id}`, route => route.fulfill({ status, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia da ENT indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
     await refresh.focus(); await refresh.press("Enter");

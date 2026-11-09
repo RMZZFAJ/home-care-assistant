@@ -77,6 +77,142 @@ test("Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônic
           .getByRole("tab", { name: /^Materiais/ })
           .evaluate(properties),
       );
+      const styleProperties = (element: Element, keys: string[]) =>
+        Object.fromEntries(
+          keys.map((key) => [
+            key,
+            getComputedStyle(element).getPropertyValue(key),
+          ]),
+        );
+      const pairs: [string, string, string[]][] = [
+        [
+          ".hca-document-header",
+          ".doc-hero",
+          [
+            "background-color",
+            "border",
+            "border-radius",
+            "box-shadow",
+            "overflow",
+            "font-size",
+            "line-height",
+          ],
+        ],
+        [
+          ".hca-document-identity",
+          ".hero-id",
+          ["display", "gap", "align-items", "justify-content", "padding"],
+        ],
+        [
+          ".hca-document-name",
+          ".hero-name",
+          ["display", "gap", "align-items", "min-width"],
+        ],
+        [
+          "[data-document-heading]",
+          ".hero-name h1",
+          [
+            "font-family",
+            "font-size",
+            "font-weight",
+            "line-height",
+            "letter-spacing",
+            "color",
+          ],
+        ],
+        [
+          ".hca-document-type",
+          ".doctype",
+          [
+            "display",
+            "width",
+            "height",
+            "border-radius",
+            "background-color",
+            "color",
+            "font-size",
+            "font-weight",
+          ],
+        ],
+        [
+          ".hca-document-meta",
+          ".hero-meta",
+          ["display", "gap", "padding", "margin", "grid-template-columns"],
+        ],
+        [
+          ".hca-document-meta dt",
+          ".hero-meta dt",
+          [
+            "font-size",
+            "text-transform",
+            "letter-spacing",
+            "color",
+            "margin-bottom",
+          ],
+        ],
+        [
+          ".hca-document-meta dd",
+          ".hero-meta dd",
+          ["font-size", "font-weight", "line-height", "margin"],
+        ],
+        [
+          ".hca-document-macro",
+          ".macro",
+          ["background-color", "border-top", "padding"],
+        ],
+        [
+          ".hca-document-macro-heading",
+          ".macro-top",
+          [
+            "display",
+            "justify-content",
+            "align-items",
+            "gap",
+            "font-size",
+            "margin-bottom",
+          ],
+        ],
+        [
+          ".hca-milestone-track",
+          ".step-track",
+          ["height", "border-radius", "background-color", "margin-bottom"],
+        ],
+        [
+          ".hca-milestone-title",
+          ".step-title",
+          ["display", "font-size", "font-weight", "gap"],
+        ],
+        [
+          ".hca-document-milestones li > p",
+          ".step-sub",
+          ["font-size", "line-height", "color", "margin-top", "margin-left"],
+        ],
+        [
+          ".hca-document-action-bar",
+          ".doc-actions",
+          [
+            "display",
+            "gap",
+            "align-items",
+            "justify-content",
+            "flex-wrap",
+            "margin-top",
+          ],
+        ],
+      ];
+      for (const [actualSelector, modelSelector, keys] of pairs)
+        expect(
+          await page
+            .locator(actualSelector)
+            .first()
+            .evaluate(styleProperties, keys),
+          actualSelector + " " + width,
+        ).toEqual(
+          await model
+            .locator(modelSelector)
+            .first()
+            .evaluate(styleProperties, keys),
+        );
       const expected = await model.getByRole("tablist").evaluate(properties);
       // The real mobile patient selector is an approved additional 51px row.
       if (width <= 850)
@@ -179,6 +315,47 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
         writes.push(r.method() + " " + new URL(r.url()).pathname);
     };
     page.on("request", record);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    const more = page.getByRole("button", { name: "Mais", exact: true });
+    await more.click();
+    const identifiers = page.locator(".hca-document-identifiers");
+    await expect(identifiers).toContainText(id);
+    await expect(
+      identifiers.getByRole("heading", {
+        name: "Protocolo e identificação",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page.evaluate(() =>
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: async (value: string) => {
+            (window as unknown as { copiedReference: string }).copiedReference =
+              value;
+          },
+        },
+      }),
+    );
+    await identifiers
+      .getByRole("button", { name: "Copiar referência", exact: true })
+      .click();
+    await expect(identifiers.getByRole("status")).toHaveText(
+      "Referência copiada.",
+    );
+    expect(
+      await page.evaluate(
+        () =>
+          (window as unknown as { copiedReference: string }).copiedReference,
+      ),
+    ).toBe(
+      sql(
+        `select code from public.operational_documents where id=${sqlLiteral(id)};`,
+      ),
+    );
+    await identifiers.press("Escape");
+    await expect(identifiers).toHaveCount(0);
+    await expect(more).toBeFocused();
     await selectDocumentSection(page, "materials");
     await expect(page.getByRole("tabpanel")).toContainText(
       "Material fictício V4 0",
@@ -226,6 +403,7 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
     await expect(
       page.getByRole("tab", { name: "Materiais", exact: true }),
     ).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("tabpanel")).toHaveCount(1);
     await page.keyboard.press("Tab");
     await expect(page.getByRole("tabpanel")).toBeFocused();
     expect(new URL(page.url()).searchParams.get("careRecipientId")).toBe(
@@ -314,4 +492,58 @@ test("Abas conservam conferência ENT não salva e recuperam seleção por URL e
       exact: true,
     }),
   ).toBeVisible();
+});
+
+test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais", async ({
+  page,
+}) => {
+  const f = await setup(),
+    req = await issue(f.patient, f.products);
+  await login(page, f.patient);
+  await page.goto(`/documentos/${req.id}`);
+  await selectDocumentSection(page, "materials");
+  const before = official(req.id, f.patient),
+    refresh = page.getByRole("button", {
+      name: "Atualizar ficha",
+      exact: true,
+    });
+  for (const status of [503, 403]) {
+    await page.route(
+      `**/api/requisitions/${req.id}`,
+      (route) =>
+        route.fulfill({
+          status,
+          json: {
+            error: "Consulta REQ recusada ou indisponível fictícia",
+            code: "READ_UNAVAILABLE",
+          },
+        }),
+      { times: 1 },
+    );
+    await refresh.focus();
+    await refresh.press("Enter");
+    await expect(page.getByRole("alert").filter({ hasText: "Consulta REQ recusada ou indisponível fictícia" })).toContainText(
+      "Consulta REQ recusada ou indisponível fictícia",
+    );
+    const retry =
+      status === 403
+        ? page.getByRole("button", {
+            name: "Tentar carregar requisição",
+            exact: true,
+          })
+        : refresh;
+    if (status === 403) {
+      await expect(page.locator(".hca-document-header")).toHaveCount(0);
+      await expect(
+        page.getByText("Material fictício V4 0", { exact: false }),
+      ).toHaveCount(0);
+    }
+    await expect(retry).toBeFocused();
+    await retry.press("Enter");
+    await expect(
+      page.getByRole("heading", { level: 1, name: sql(`select code from public.operational_documents where id=${sqlLiteral(req.id)};`), exact: true }),
+    ).toBeVisible();
+    await expect(refresh).toBeFocused();
+  }
+  expect(official(req.id, f.patient)).toBe(before);
 });

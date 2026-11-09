@@ -42,6 +42,12 @@ exatos. Dados indisponíveis não viram zero, vazio ou aprovação. Leitura e
 escrita incerta têm recuperação própria, foco visível e autorização real.
 Revisões são leitura; validação aponta campos editáveis legítimos.
 
+DocumentHeader compartilha identificação, grade de dados e progresso separado
+da cronologia. O cabeçalho completo é h1; a consulta embutida mantém h2.
+DocumentActionSlot posiciona os controles reais de PDF e Andamento na barra,
+conservando estado, autorização e intenção no consumidor original. Atualização
+preserva foco; leitura recusada retira os dados e oferece retomada legítima.
+
 ## Aceite
 
 Comparar produto e modelo em cinco viewports; testar teclado, retorno de foco,

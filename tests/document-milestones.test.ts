@@ -124,3 +124,60 @@ it("does not turn purchase waivers into acquisition or receipt", () => {
     })[3].state,
   ).toBe("pending");
 });
+
+it("shows partial progress by completed lines without aggregating different units", () => {
+  expect(requisitionMilestones(req)[2].percent).toBe(50);
+  expect(
+    requisitionMilestones({ ...req, historical: true })[2].percent,
+  ).toBeUndefined();
+  expect(
+    supplyMilestones({
+      ...facts,
+      type: "ENT",
+      status: "disputed",
+      fullyCheckedLines: 1,
+      totalLines: 2,
+    })[2].percent,
+  ).toBe(50);
+  const line = {
+    lineId: "a",
+    name: "Solução",
+    unit: "mL",
+    plannedQuantity: "1000",
+    approvedQuantity: "1000",
+    purchasedQuantity: "1000",
+    validatedQuantity: "0",
+    pendingValidationQuantity: "0",
+    unarrivedQuantity: "1000",
+    waivedQuantity: "0",
+    waivableQuantity: "0",
+    remainingExpectation: "0",
+  };
+  const progress = {
+    state: "acquisition_partial",
+    expectationClosed: false,
+    expectationPending: true,
+    physicalPending: true,
+    validationPending: false,
+    closure: null,
+    lines: [
+      line,
+      {
+        ...line,
+        lineId: "b",
+        name: "Compressa",
+        unit: "unidade",
+        plannedQuantity: "1",
+        approvedQuantity: "1",
+        purchasedQuantity: "0",
+      },
+    ],
+  };
+  const acquisition = supplyMilestones({
+    ...facts,
+    type: "COM",
+    purchaseProgress: progress,
+  })[1];
+  expect(acquisition.percent).toBe(50);
+  expect(acquisition.detail).toContain("1/2 linhas integralmente adquiridas");
+});

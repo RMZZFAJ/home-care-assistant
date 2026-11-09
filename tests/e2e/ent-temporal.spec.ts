@@ -26,7 +26,7 @@ for(const mode of ["prepared","private"] as const)test(`ENT ${mode} preserva mar
   if(oracle.draftCreatedAt)expected.push("Primeiro rascunho privado salvo: "+formatBrazilDate(oracle.draftCreatedAt));
   let first:{id:string;bytes:Buffer;requestedAt:string}|null=null;
   for(let count=1;count<=2;count++){
-    await files.getByRole("button",{name:"Gerar PDF",exact:true}).click();
+    await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
     await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(count);
     const rows=(await(await page.request.get(endpoint)).json()).data;
     expect(rows).toHaveLength(count);const row=rows.find((r:{id:string})=>r.id!==first?.id);

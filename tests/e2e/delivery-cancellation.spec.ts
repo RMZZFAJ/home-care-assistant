@@ -273,7 +273,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
     await expect(consentReview).toHaveCount(0);
     expect(payloads).toHaveLength(2);
     expect(payloads[0]).toEqual(payloads[1]);
-    await expect(recipient.locator(".hca-document-header h2")).toBeFocused();
+    await expect(recipient.locator(".hca-document-header [data-document-heading]")).toBeFocused();
     await expect(
       cancellation(recipient).getByText("Consentido e conciliado", {
         exact: true,

@@ -30,7 +30,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   const com = await rpc(family, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false, p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "1" }] } });
   await login(page, f.patient); await open(page, req.id);
   const feed = page.getByRole("region", { name: "Andamentos da ficha", exact: true });
-  await feed.getByRole("button", { name: "Registrar andamento", exact: true }).click();
+  await page.getByRole("button", { name: "Registrar andamento", exact: true }).click();
   let editor = page.getByRole("dialog", { name: "Registrar andamento", exact: true });
   const text = "Registro fictício <img src=x onerror=alert(1)> sem HTML executável";
   await editor.getByRole("textbox", { name: "Texto do andamento", exact: true }).fill(text);
@@ -38,7 +38,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   await editor.getByRole("combobox", { name: "Etapa relacionada (opcional)", exact: true }).selectOption("family_science");
   await editor.getByRole("button", { name: "Guardar rascunho e fechar", exact: true }).click();
   await page.reload();
-  await feed.getByRole("button", { name: "Registrar andamento", exact: true }).click();
+  await page.getByRole("button", { name: "Registrar andamento", exact: true }).click();
   editor = page.getByRole("dialog", { name: "Registrar andamento", exact: true });
   await expect(editor.getByRole("textbox", { name: "Texto do andamento", exact: true })).toHaveValue(text);
   await expect(editor.getByRole("combobox", { name: "Categoria", exact: true })).toHaveValue("contact");
@@ -71,7 +71,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   await selectDocumentSection(page, "materials");
   await page.reload();
   await selectDocumentSection(page, "overview");
-  await feed.getByRole("button", { name: "Recuperar publicação", exact: true }).click();
+  await page.getByRole("button", { name: "Recuperar publicação", exact: true }).click();
   editor = page.getByRole("dialog", { name: "Recuperar publicação de andamento", exact: true });
   await expect(editor.getByRole("textbox", { name: "Texto do andamento", exact: true })).toHaveValue(fullText);
   await editor.getByRole("button", { name: "Recuperar a mesma publicação", exact: true }).click();
@@ -108,7 +108,7 @@ test("Andamentos alcançam todos os registros, separam fatos e ocultam consulta 
   await feed.getByRole("combobox", { name: "Mostrar Andamentos", exact: true }).selectOption("automatic");
   await expect(feed.getByText("Registro fictício 0", { exact: true })).toHaveCount(0);
   await expect(feed.getByText("Requisição emitida", { exact: true })).toBeVisible();
-  await feed.getByRole("button", { name: "Registrar andamento", exact: true }).click();
+  await page.getByRole("button", { name: "Registrar andamento", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "Registrar andamento", exact: true });
   await editor.getByRole("textbox", { name: "Texto do andamento", exact: true }).fill("Texto próprio preservado durante recusa");
   await editor.getByRole("button", { name: "Guardar rascunho e fechar", exact: true }).click();
@@ -118,7 +118,7 @@ test("Andamentos alcançam todos os registros, separam fatos e ocultam consulta 
   await expect(feed.getByText("Requisição emitida", { exact: true })).toHaveCount(0);
   await page.unroute(`**/api/documents/${req.id}/progress?*`);
   await feed.getByRole("button", { name: "Atualizar Andamentos", exact: true }).click();
-  await feed.getByRole("button", { name: "Registrar andamento", exact: true }).click();
+  await page.getByRole("button", { name: "Registrar andamento", exact: true }).click();
   await expect(editor.getByRole("textbox", { name: "Texto do andamento", exact: true })).toHaveValue("Texto próprio preservado durante recusa");
 });
 
@@ -132,7 +132,7 @@ test("Andamentos funcionam em REQ COM ENT e BAL sem modificar versões ou movime
   for (const [type, id] of [["REQ", req.id], ["COM", com.id], ["ENT", ent.id], ["BAL", bal.id]]) {
     await open(page, id, type);
     const before = state(id, f.patient), feed = page.getByRole("region", { name: "Andamentos da ficha", exact: true });
-    await feed.getByRole("button", { name: "Registrar andamento", exact: true }).click();
+    await page.getByRole("button", { name: "Registrar andamento", exact: true }).click();
     const editor = page.getByRole("dialog", { name: "Registrar andamento", exact: true });
     await editor.getByRole("textbox", { name: "Texto do andamento", exact: true }).fill("Registro complementar fictício " + type);
     await editor.getByRole("button", { name: "Publicar andamento", exact: true }).click();

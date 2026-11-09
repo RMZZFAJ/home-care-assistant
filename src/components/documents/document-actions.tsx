@@ -2,6 +2,8 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { buttonClass, Notice } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
+import { DocumentActionSlot } from "./document-action-slot";
+import { Icon } from "@/components/ui/primitives";
 import { api, ApiError, TransportError } from "@/lib/client/api";
 import {
   pdfIssuanceSchema,
@@ -13,7 +15,11 @@ import {
   type PdfArchiveCursor,
 } from "@/lib/documents/pdf-archive";
 import { formatBrazilDate } from "@/lib/receipt";
-import { initialNoticeMessage, startInitialNoticeTracking, type InitialNoticeState } from "@/lib/notifications/initial-tracking";
+import {
+  initialNoticeMessage,
+  startInitialNoticeTracking,
+  type InitialNoticeState,
+} from "@/lib/notifications/initial-tracking";
 
 type Props = {
   id: string;
@@ -21,6 +27,8 @@ type Props = {
   version?: number;
   archiveVersion?: number;
   trackNotices?: boolean;
+  actionTarget?: HTMLElement | null;
+  onAction?: () => void;
 };
 type Intention = { key: string; version?: number };
 const steps = {
@@ -39,7 +47,10 @@ export function DocumentActions(props: Props) {
       key={`${data.userId}:${props.id}`}
       {...props}
       userId={data.userId}
-      entDocument={data.documentContext?.id===props.id&&data.documentContext.type==="ENT"}
+      entDocument={
+        data.documentContext?.id === props.id &&
+        data.documentContext.type === "ENT"
+      }
     />
   ) : (
     <p role="status">Validando acesso aos arquivos…</p>
@@ -47,11 +58,24 @@ export function DocumentActions(props: Props) {
 }
 function InitialNoticeTracking({ id }: { id: string }) {
   const [state, setState] = useState<InitialNoticeState>({ kind: "checking" });
-  useEffect(() => startInitialNoticeTracking(
-    signal => api<unknown>(`/api/documents/${id}/notifications`, undefined, signal),
-    setState,
-  ), [id]);
-  return <p className="text-xs text-(--muted)" role="status" data-notice-tracking={state.kind}>{initialNoticeMessage(state)}</p>;
+  useEffect(
+    () =>
+      startInitialNoticeTracking(
+        (signal) =>
+          api<unknown>(`/api/documents/${id}/notifications`, undefined, signal),
+        setState,
+      ),
+    [id],
+  );
+  return (
+    <p
+      className="text-xs text-(--muted)"
+      role="status"
+      data-notice-tracking={state.kind}
+    >
+      {initialNoticeMessage(state)}
+    </p>
+  );
 }
 
 function GeneratedFiles({
@@ -62,7 +86,9 @@ function GeneratedFiles({
   archiveVersion,
   trackNotices = true,
   entDocument,
-}: Props & { userId: string;entDocument:boolean }) {
+  actionTarget,
+  onAction,
+}: Props & { userId: string; entDocument: boolean }) {
   const headingId = useId(),
     scope = `hca:pdf-intention:${userId}:${id}`,
     endpoint = `/api/documents/${id}/issuances`;
@@ -266,14 +292,24 @@ function GeneratedFiles({
         Arquivos gerados
       </h3>
       <div className="flex flex-wrap gap-3">
-        <button
-          className={buttonClass}
-          type="button"
-          disabled={busy}
-          onClick={() => void generate()}
-        >
-          {busy ? "Gerando PDF…" : pending ? "Recuperar emissão" : "Gerar PDF"}
-        </button>
+        <DocumentActionSlot target={actionTarget}>
+          <button
+            className={buttonClass}
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              onAction?.();
+              void generate();
+            }}
+          >
+            <Icon name="file" />
+            {busy
+              ? "Gerando PDF…"
+              : pending
+                ? "Recuperar emissão"
+                : "Gerar PDF"}
+          </button>
+        </DocumentActionSlot>
         <button
           className={buttonClass}
           type="button"
@@ -328,7 +364,14 @@ function GeneratedFiles({
                   Assinatura técnica e carimbo internos
                 </p>
               ) : null}
-              {entDocument&&row.rendererRevision<9?<p className="ui-notice text-sm" role="note">Este arquivo preserva orientações de uma emissão anterior. Consulte a ficha no aplicativo para saber se há tarefa atual. Você pode gerar um novo PDF para obter a representação atualizada; o arquivo original permanece preservado.</p>:null}
+              {entDocument && row.rendererRevision < 9 ? (
+                <p className="ui-notice text-sm" role="note">
+                  Este arquivo preserva orientações de uma emissão anterior.
+                  Consulte a ficha no aplicativo para saber se há tarefa atual.
+                  Você pode gerar um novo PDF para obter a representação
+                  atualizada; o arquivo original permanece preservado.
+                </p>
+              ) : null}
               {row.representation === "derived" ? (
                 <p className="text-sm">
                   Nova representação de uma versão histórica, gerada no momento

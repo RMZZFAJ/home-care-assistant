@@ -68,19 +68,21 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
       await route.fulfill({ status: 200, json: { state: "ready" } });
     } else await route.fulfill({ response });
   });
-  await files.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await selectDocumentSection(page, "overview");
+  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await expect(page.getByRole("tab", {name:"Arquivos gerados",exact:true})).toHaveAttribute("aria-selected","true");
   await expect(
-    files.getByRole("button", { name: "Recuperar emissão", exact: true }),
+    page.getByRole("button", { name: "Recuperar emissão", exact: true }),
   ).toBeEnabled();
   await page.reload();
   await expect(
-    files.getByRole("button", { name: "Recuperar emissão", exact: true }),
+    page.getByRole("button", { name: "Recuperar emissão", exact: true }),
   ).toBeEnabled();
-  await files
+  await page
     .getByRole("button", { name: "Recuperar emissão", exact: true })
     .click();
   await expect(
-    files.getByRole("button", { name: "Gerar PDF", exact: true }),
+    page.getByRole("button", { name: "Gerar PDF", exact: true }),
   ).toBeEnabled();
   expect(keys).toHaveLength(2);
   expect(keys[1]).toBe(keys[0]);
@@ -105,7 +107,7 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
     b = await download(first.id);
   expect(hash(a)).toBe(first.sha256);
   expect(a.equals(b)).toBe(true);
-  await files.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
   await expect(
     files.getByRole("link", { name: "Baixar PDF", exact: true }),
   ).toHaveCount(2);
@@ -270,10 +272,10 @@ test("PDF em REQ, ENT e BAL conserva fonte e estoque e exige leitura privada atu
       exact: true,
     });
     await expect(
-      files.getByRole("button", { name: "Gerar PDF", exact: true }),
+      page.getByRole("button", { name: "Gerar PDF", exact: true }),
     ).toBeEnabled();
     const before = source(doc.id);
-    await files.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+    await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
     await expect(
       files.getByRole("link", { name: "Baixar PDF", exact: true }),
     ).toHaveCount(1);
@@ -405,7 +407,7 @@ test("Acervo preserva originais e V4, recusa bytes divergentes e emite versão h
   await expect(
     files.getByRole("link", { name: "Baixar PDF", exact: true }),
   ).toHaveCount(0);
-  await files.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
   await expect(
     files.getByRole("link", { name: "Baixar PDF", exact: true }),
   ).toHaveCount(1);

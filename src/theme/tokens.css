@@ -99,20 +99,12 @@
 .hca-quick-action { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; padding: 20px 14px; min-height: 100px; background: white; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; text-align: center; font-size: 14px; }
 .hca-quick-action-primary { background: var(--brand); color: white; border-color: var(--brand); }
 .hca-admin-destination { display: block; color: inherit; text-decoration: none; }
-.hca-document-header { padding: 20px; }
 .hca-compact-workspace .wizard-navigation { padding: 8px 0; margin-bottom: 12px; }
 .hca-wizard-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
 .hca-wizard-actions > div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .hca-notification-list { display: grid; gap: 10px; }
 .hca-notification-row { padding: 16px; background: white; border: 1px solid var(--line); border-radius: 6px; border-left: 3px solid var(--line); }
 .hca-notification-unread { border-left-color: var(--brand); background: #f4f9fe; }
-.hca-document-identity { display: flex; align-items: center; gap: 14px; }
-.hca-document-identity h2 { font-size: 22px; font-weight: 600; margin-top: 3px; }
-.hca-document-date { font-size: 12px; color: var(--muted); margin-top: 12px; }
-.hca-document-header-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
-.hca-document-header-footer summary { cursor: pointer; font-size: 12px; color: var(--muted); min-height: 36px; display: flex; align-items: center; }
-.hca-document-header-footer dl { display: grid; gap: 8px; font-size: 12px; margin-top: 12px; }
-.hca-document-header-footer dd { overflow-wrap: anywhere; }
 .hca-stock-mobile { display: none; }
 .hca-stock-desktop { overflow: auto; }
 .hca-stock-desktop th, .hca-stock-desktop td { overflow-wrap: anywhere; }
@@ -135,8 +127,6 @@
   .hca-stock-mobile-row .hca-stock-estimate { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
   .hca-stock-mobile-row .hca-toolbar { margin-bottom: 0; }
   .hca-stock-mobile-row .hca-toolbar > button:last-child { margin-left: auto; }
-  .hca-document-identity { flex-wrap: wrap; gap: 10px; }
-  .hca-document-header-footer { align-items: stretch; }
 }
 .hca-admin-destination > svg { color: var(--brand); }
 .hca-admin-destination h2 { font-size: 16px; font-weight: 600; margin-top: 14px; }

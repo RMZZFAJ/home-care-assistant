@@ -2441,3 +2441,42 @@ adicional18 atualizado. Paridade integral de cabeçalhos, demais telas e
 listas/cartões,66 composições/171 relações, D-C/D6 e gates humanos/assistivos/
 físicos/externos continuam pendentes. Sonar adiado; PR7 Draft, produção NO-GO,
 meta ativa. [Dossiê](DOCUMENT_TABS.md), [provas](DOCUMENT_TABS_VALIDATION.json).
+
+## D3.31 — cabeçalho e ações documentais — 09/11/2026
+
+Base9ad124b. Cabeçalho compartilhado nas quatro fichas e na consulta de origem
+documental do estoque: identificação, tipo, situação, versão, perfil, dados em
+grade e faixa própria de progresso. Código h1 na ficha completa, h2 na consulta
+embutida. Títulos de carregamento/erro/contexto preservados. Nome histórico não
+é inferido de ID/diretório; criação de ficha não vira emissão de COM/ENT/BAL.
+
+Barra externa ao cartão posiciona os próprios controles PDF e Andamento por
+slot React, conservando handlers, permissões, estado, rascunho e intenção.
+Gerar/recuperar PDF mostra Arquivos gerados; Andamento mostra Visão geral.
+Mais mantém protocolo, identificador e cópia com resultado/foco. Progresso
+parcial usa linhas cumpridas, sem somar unidades incompatíveis. Painel inativo
+fica oculto já em inert, mantendo instâncias e edição.
+
+Sete unitários e22 cenários distintos Chromium/WebKit aprovados, com reuso
+qualificado. Comparação de14 partes do cabeçalho/ações, mais abas, ao HTML em
+cinco larguras; teclado/Axe, foco, recuperação, ciência, PDFs, parcelas,
+Andamentos, origem de estoque e efeitos. Contraprovas preservadas: disabled
+retirava foco na consulta e o nó mudava ao ocultar dados recusados; corrigidos
+guarda/retorno de foco. Estado intermediário de Tabs expunha dois painéis no
+WebKit; CSS agora esconde o inativo sem desmontar. REQ também retira conteúdo
+anterior em401/403/404 e permite retomada com foco. Negativas de interface
+controladas não substituem provas reais de Auth/RLS já existentes.
+
+Build/tipos, lint e documentação PASS. Erros de tipo no oráculo de código de
+fixture interromperam o build e não foram contados como testes de navegador.
+CI9ad124b: Windows/Ubuntu/banco PASS e Preview READY; browsers em andamento na
+consulta. Novo SHA exige CI própria. Local/remoto165, última20261109091550,
+digest igual e zero SQL novo/pendente. Sem reset, fixtures remotas ou backup
+redundante; sem mudar assinatura, worker, cache ou transportes externos.
+
+Matriz105x39 e primeiras30 colunas preservadas,56 PASS/49 PARTIAL. UI adicional
+18 atualizada. Organização final de ações secundárias, seções, listas/cartões,
+demais superfícies e66 composições/171 relações permanecem no gate de paridade.
+D-C/D6, humano/AT/aparelhos/provedores separados, Sonar adiado, PR7 Draft,
+produção NO-GO e meta ativa. [Dossiê](DOCUMENT_HEADER.md),
+[provas](DOCUMENT_HEADER_VALIDATION.json).

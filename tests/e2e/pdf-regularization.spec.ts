@@ -59,7 +59,7 @@ test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva 
   await selectDocumentSection(page, "files");
   const files=page.getByRole("region",{name:"Arquivos gerados",exact:true});
   const existing=await page.request.get(`/api/documents/${f.doc.id}/issuances`);expect((await existing.json()).data).toHaveLength(1);
-  await files.getByRole("button",{name:"Gerar PDF",exact:true}).click();
+  await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
   await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
   const link=await files.getByRole("link",{name:"Baixar PDF",exact:true}).getAttribute("href");expect(link).toBeTruthy();
   const current=await inspect(page,f,"approved-current",await page.request.get(link!),10);

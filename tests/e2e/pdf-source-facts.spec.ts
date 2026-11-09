@@ -66,7 +66,7 @@ test("PDF atual assina fatos de rascunho e origens físicas conhecida e desconhe
             `/api/documents/${f.doc.id}/issuances` &&
           response.request().method() === "POST",
       );
-      await files
+      await page
         .getByRole("button", { name: "Gerar PDF", exact: true })
         .click();
       const result = await generated;
@@ -206,7 +206,7 @@ test("PDF atual recusa caractere sem representação antes de assinar ou persist
   const sent = page.waitForResponse(
     (r) => r.url().endsWith(endpoint) && r.request().method() === "POST",
   );
-  await files.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
   const response = await sent;
   expect(response.status()).toBe(503);
   expect(await response.json()).toMatchObject({

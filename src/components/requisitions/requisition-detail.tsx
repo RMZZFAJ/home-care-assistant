@@ -1,9 +1,13 @@
 "use client";
+import { roleLabel } from "@/components/layout/workspace-context";
+import { Pill } from "@/components/ui/controls";
+import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
 import Link from "next/link";
 import { SettingsSection } from "@/components/forms/settings-section";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   api,
+  ApiError,
   buttonClass,
   can,
   inputClass,
@@ -136,16 +140,38 @@ export function RequisitionDocumentContent({
 }) {
   const revision = useLiveRevision();
   const tabs = useDocumentTabs(can(context, "audit.read"));
+  const [progressActionTarget, setProgressActionTarget] =
+    useState<HTMLDivElement | null>(null);
+  const [fileActionTarget, setFileActionTarget] =
+    useState<HTMLDivElement | null>(null);
   const [openingRevision, setOpeningRevision] = useState("initial");
   const [data, setData] = useState<Detail | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [reading, setReading] = useState(true);
+  const refreshButtonRef = useRef<HTMLButtonElement>(null);
+  const restoreRefreshFocusRef = useRef(false);
+  function refreshDocument() {
+    if (reading || busy) return;
+    restoreRefreshFocusRef.current = true;
+    setReading(true);
+    setAttempt((value) => value + 1);
+  }
+  useEffect(() => {
+    if (!reading && restoreRefreshFocusRef.current) {
+      restoreRefreshFocusRef.current = false;
+      refreshButtonRef.current?.focus();
+    }
+  }, [reading]);
   const [reason, setReason] = useState("");
   const [review, setReview] = useState<"archive" | "cancel" | null>(null);
   useEffect(() => {
     const controller = new AbortController();
+    queueMicrotask(() => {
+      if (!controller.signal.aborted) setReading(true);
+    });
     void api<{ data: Detail }>(
       `/api/requisitions/${id}`,
       undefined,
@@ -158,7 +184,17 @@ export function RequisitionDocumentContent({
         }
       })
       .catch((cause) => {
-        if (!controller.signal.aborted) setError(cause.message);
+        if (!controller.signal.aborted) {
+          if (
+            cause instanceof ApiError &&
+            [401, 403, 404].includes(cause.status)
+          )
+            setData(null);
+          setError(cause.message);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setReading(false);
       });
     return () => controller.abort();
   }, [id, attempt, revision]);
@@ -202,6 +238,7 @@ export function RequisitionDocumentContent({
   if (!data)
     return (
       <div className="space-y-3">
+        <h1>Requisição e acompanhamento</h1>
         <Notice error={Boolean(error)}>
           {error || "Carregando requisição…"}
         </Notice>
@@ -209,7 +246,9 @@ export function RequisitionDocumentContent({
           <button
             type="button"
             className={buttonClass}
-            onClick={() => setAttempt((value) => value + 1)}
+            ref={refreshButtonRef}
+            disabled={reading || busy}
+            onClick={refreshDocument}
           >
             Tentar carregar requisição
           </button>
@@ -226,13 +265,56 @@ export function RequisitionDocumentContent({
     fulfilled: f.fulfilled,
   });
   return (
-    <div className="mx-auto max-w-4xl space-y-5">
-      <Link className={buttonClass} href="/historico">
-        ← Histórico
-      </Link>
+    <div className="hca-record-detail space-y-5">
+      <DocumentBreadcrumb code={data.code ?? data.protocol} />
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       <DocumentHeader
+        headingLevel={1}
+        progressActionRef={setProgressActionTarget}
+        fileActionRef={setFileActionTarget}
+        contextLabel={roleLabel(context.patient?.role)}
+        onRefresh={refreshDocument}
+        refreshButtonRef={refreshButtonRef}
+        refreshDisabled={reading || busy}
+        dateHeading={data.is_historical ? "Registro original" : "Emissão"}
+        metadata={[
+          {
+            label: "Solicitante",
+            value:
+              data.requester_name_snapshot ??
+              (data.is_historical
+                ? "Solicitante desconhecido"
+                : "Solicitante registrado"),
+          },
+          {
+            label: "Materiais",
+            value: data.requisition_items.length + " itens",
+          },
+        ]}
+        milestones={
+          <DocumentMilestones
+            items={requisitionMilestones({
+              historical: Boolean(data.is_historical),
+              issued: Boolean(data.protocol && data.created_at),
+              scienceRequired: p.policy?.scienceRequired !== false,
+              scienceSatisfied: p.scienceSatisfied,
+              fulfilled: f.fulfilled,
+              total: f.total,
+              state: documentState,
+            })}
+          />
+        }
+        badges={
+          data.requisition_items.some((item) => item.urgent) ? (
+            <Pill tone="danger">
+              {data.requisition_items.filter((item) => item.urgent).length}{" "}
+              {data.requisition_items.filter((item) => item.urgent).length === 1
+                ? "item urgente"
+                : "itens urgentes"}
+            </Pill>
+          ) : null
+        }
         showFiles={false}
         actions={
           <>
@@ -245,7 +327,7 @@ export function RequisitionDocumentContent({
             ) ? (
               <button
                 type="button"
-                className={primaryClass + " mt-4"}
+                className={primaryClass}
                 disabled={busy}
                 onClick={() => void action("science")}
               >
@@ -254,7 +336,7 @@ export function RequisitionDocumentContent({
             ) : null}
             {p.completedAt && !p.archivedAt && can(context, "req.archive") ? (
               <button
-                className={buttonClass + " mt-4"}
+                className={buttonClass}
                 disabled={busy}
                 onClick={() => {
                   setReason("");
@@ -290,7 +372,7 @@ export function RequisitionDocumentContent({
             {!data.is_historical &&
             !p.archivedAt &&
             data.status !== "cancelled" ? (
-              <div className="mt-4 flex flex-wrap gap-3">
+              <>
                 {can(context, "com.create") ? (
                   <Link
                     className={buttonClass}
@@ -307,7 +389,7 @@ export function RequisitionDocumentContent({
                     Expedir ENT vinculada
                   </Link>
                 ) : null}
-              </div>
+              </>
             ) : null}
           </>
         }
@@ -326,29 +408,7 @@ export function RequisitionDocumentContent({
         patientName={
           data.recipient_name_snapshot ?? context.patient?.display_name
         }
-      >
-        <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          <span>
-            Solicitante:{" "}
-            {data.requester_name_snapshot ??
-              (data.is_historical
-                ? "Solicitante desconhecido"
-                : "Solicitante registrado")}
-          </span>
-        </p>
-
-        <DocumentMilestones
-          items={requisitionMilestones({
-            historical: Boolean(data.is_historical),
-            issued: Boolean(data.protocol && data.created_at),
-            scienceRequired: p.policy?.scienceRequired !== false,
-            scienceSatisfied: p.scienceSatisfied,
-            fulfilled: f.fulfilled,
-            total: f.total,
-            state: documentState,
-          })}
-        />
-      </DocumentHeader>
+      ></DocumentHeader>
       <RequisitionDisplay
         key={id}
         id={id}
@@ -481,6 +541,8 @@ export function RequisitionDocumentContent({
             )}
           </section>
           <DocumentProgress
+            actionTarget={progressActionTarget}
+            onAction={() => tabs.select("overview")}
             id={id}
             type="REQ"
             patientId={data.care_recipient_id}
@@ -653,6 +715,8 @@ export function RequisitionDocumentContent({
         </DocumentPanel>
         <DocumentPanel value="files">
           <DocumentActions
+            actionTarget={fileActionTarget}
+            onAction={() => tabs.select("files")}
             id={id}
             code={data.code ?? data.protocol}
             version={p.version}

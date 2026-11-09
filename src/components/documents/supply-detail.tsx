@@ -1,10 +1,15 @@
 "use client";
+import { roleLabel } from "@/components/layout/workspace-context";
+import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
 import { DocumentTimeline } from "./document-timeline";
 import { DeliveryRecipientFacts } from "./delivery-recipient";
 import { DeliveryRegularization } from "./delivery-regularization";
 import { BalanceReview } from "./balance-review";
 import { TransferDetails } from "./transfer-details";
-import { documentPatientName } from "@/lib/documents/presentation";
+import {
+  documentPatientName,
+  documentIssuerName,
+} from "@/lib/documents/presentation";
 import { documentVariant } from "@/lib/documents/variant";
 import { SupplyLineSummary } from "./supply-line-summary";
 import {
@@ -66,6 +71,10 @@ export function SupplyDocumentContent({
 }) {
   const liveRevision = useLiveRevision();
   const tabs = useDocumentTabs(can(context, "audit.read"));
+  const [progressActionTarget, setProgressActionTarget] =
+    useState<HTMLDivElement | null>(null);
+  const [fileActionTarget, setFileActionTarget] =
+    useState<HTMLDivElement | null>(null);
   const editingRef = useRef(false);
   const [data, setData] = useState<SupplyDocument | null>(null);
   const [people, setPeople] = useState<PatientPerson[]>([]);
@@ -95,6 +104,20 @@ export function SupplyDocumentContent({
   const commandFormRef = useRef<HTMLFormElement | null>(null);
   const decisionFocusRef = useRef(false);
   const headerRef = useRef<HTMLElement | null>(null);
+  const refreshButtonRef = useRef<HTMLButtonElement>(null);
+  const restoreRefreshFocusRef = useRef(false);
+  function refreshDocument() {
+    if (loading || busy) return;
+    restoreRefreshFocusRef.current = true;
+    setLoading(true);
+    setAttempt((value) => value + 1);
+  }
+  useEffect(() => {
+    if (!loading && restoreRefreshFocusRef.current) {
+      restoreRefreshFocusRef.current = false;
+      refreshButtonRef.current?.focus();
+    }
+  }, [loading]);
   const resultFocusRef = useRef(false);
   useEffect(() => {
     if (decisionFocusRef.current) {
@@ -104,7 +127,9 @@ export function SupplyDocumentContent({
         ?.focus();
     } else if (resultFocusRef.current) {
       resultFocusRef.current = false;
-      headerRef.current?.querySelector<HTMLElement>("h2")?.focus();
+      headerRef.current
+        ?.querySelector<HTMLElement>("[data-document-heading]")
+        ?.focus();
     }
   }, [data?.version, focusRevision]);
   useEffect(() => {
@@ -440,23 +465,28 @@ export function SupplyDocumentContent({
       actions.push("cancel");
   }
   return (
-    <div className="mx-auto max-w-5xl space-y-5">
-      <div className="flex flex-wrap gap-3">
-        <Link className={buttonClass} href="/historico">
-          ← Histórico
-        </Link>
-        <button
-          className={buttonClass}
-          aria-disabled={loading || busy}
-          onClick={() => {
-            if (loading || busy) return;
-            setLoading(true);
-            setAttempt((value) => value + 1);
-          }}
-        >
-          Atualizar
-        </button>
-      </div>
+    <div className="hca-record-detail space-y-5">
+      {data ? (
+        <DocumentBreadcrumb
+          code={
+            data.code ??
+            (data.transfer ? "Declaração sem expedição" : "Rascunho")
+          }
+        />
+      ) : (
+        <div className="space-y-3">
+          <h1>Acompanhamento da ficha</h1>
+          <button
+            type="button"
+            className={buttonClass}
+            disabled={loading || busy}
+            onClick={refreshDocument}
+            ref={refreshButtonRef}
+          >
+            Atualizar ficha
+          </button>
+        </div>
+      )}
       {loading ? <Notice>Consultando documento persistido…</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
@@ -577,6 +607,21 @@ export function SupplyDocumentContent({
       {data ? (
         <>
           <DocumentHeader
+            headingLevel={1}
+            progressActionRef={setProgressActionTarget}
+            fileActionRef={setFileActionTarget}
+            contextLabel={roleLabel(context.patient?.role)}
+            onRefresh={refreshDocument}
+            refreshButtonRef={refreshButtonRef}
+            refreshDisabled={loading || busy}
+            metadata={[
+              {
+                label: "Registrada por",
+                value: documentIssuerName(data.canonical_snapshot),
+              },
+              { label: "Materiais", value: data.lines.length + " itens" },
+            ]}
+            milestones={<DocumentMilestones items={supplyMilestones(data)} />}
             showFiles={false}
             actions={
               <>
@@ -622,7 +667,7 @@ export function SupplyDocumentContent({
                   </Link>
                 ) : null}
                 {actions.length ? (
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <>
                     {actions.map((item) => (
                       <button
                         key={item}
@@ -641,7 +686,7 @@ export function SupplyDocumentContent({
                           : actionLabels[item]}
                       </button>
                     ))}
-                  </div>
+                  </>
                 ) : null}
               </>
             }
@@ -728,7 +773,6 @@ export function SupplyDocumentContent({
                 Abrir requisição
               </Link>
             ) : null}
-            <DocumentMilestones items={supplyMilestones(data)} />
           </DocumentHeader>
           <DocumentTabs
             type={data.type}
@@ -767,6 +811,8 @@ export function SupplyDocumentContent({
                 onOpen={() => tabs.select("workflow")}
               />
               <DocumentProgress
+                actionTarget={progressActionTarget}
+                onAction={() => tabs.select("overview")}
                 id={id}
                 type={data.type}
                 patientId={data.care_recipient_id}
@@ -956,6 +1002,8 @@ export function SupplyDocumentContent({
             <DocumentPanel value="files">
               {data.protocol ? (
                 <DocumentActions
+                  actionTarget={fileActionTarget}
+                  onAction={() => tabs.select("files")}
                   id={id}
                   code={data.code ?? "Ficha"}
                   version={data.version}

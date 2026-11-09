@@ -63,6 +63,9 @@ Implementação e provas: [Andamentos persistidos](../audits/D/D-B/DOCUMENT_PROG
 A composição em abas e os marcos factuais têm implementação incremental em
 [Fichas em abas](../audits/D/D-B/DOCUMENT_TABS.md). Paridade integral do
 cabeçalho e das demais superfícies continua sujeita à conclusão da migração.
+O [incremento de cabeçalhos](../audits/D/D-B/DOCUMENT_HEADER.md) implementa
+identificação, grade, faixa de progresso e controles reais na barra de ações;
+não substitui o aceite das composições e superfícies restantes.
 
 ## Preservação e aceite
 

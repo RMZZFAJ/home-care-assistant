@@ -14,6 +14,14 @@ export function documentPatientName(snapshot: Record<string, unknown>, fallback:
   if (patient && typeof patient === "object" && typeof (patient as Record<string, unknown>).name === "string") return (patient as { name: string }).name;
   return typeof snapshot.patientName === "string" ? snapshot.patientName : fallback;
 }
+
+/** A historical actor is never replaced by today's directory name. */
+export function documentIssuerName(snapshot: Record<string, unknown>) {
+  const actors = snapshot.actors;
+  const issuer = actors && typeof actors === "object" ? (actors as Record<string, unknown>).issuer : null;
+  const name = issuer && typeof issuer === "object" ? (issuer as Record<string, unknown>).name : null;
+  return typeof name === "string" && name.trim() ? name : "Nome histórico não preservado";
+}
 import { documentLabels, documentStatuses } from "@/types/documents";
 
 export const historyStatusLabels: Record<string,string> = {
