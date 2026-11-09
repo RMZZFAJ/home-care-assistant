@@ -23,6 +23,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Retenção, aba, sessão e titular do rascunho](DRAFT_LIFECYCLE.md).
 - [Declaração profissional e conferência familiar](PROFESSIONAL_CREDENTIALS.md).
 - [Resposta tipada e recuperação da leitura histórica](HISTORY_READ_BOUNDARY.md).
+- [Fatos, recuperação e foco da ficha relacionada](RELATED_DOCUMENT_READ.md).
 - [Consulta, anexos e foco na operação diária](DAILY_READ_RECOVERY.md).
 - [Comparação das versões e autoria histórica](DOCUMENT_VERSION_HISTORY.md).
 - [Instalação, atualização e privacidade PWA](PWA_RUNTIME.md).

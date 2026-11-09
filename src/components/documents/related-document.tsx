@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Dialog } from "@/components/ui/primitives";
 import { api, Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -7,6 +7,10 @@ import { RequisitionOpening } from "@/components/requisitions/requisition-openin
 import { RequisitionDisplay } from "@/components/requisitions/requisition-display";
 import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
+import type { DocumentType, SupplyType } from "@/types/documents";
+import { SupplyLineSummary } from "./supply-line-summary";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import { parseRelatedSupplyRead } from "@/lib/validation/related-document";
 
 export function RelatedDocument({
   id,
@@ -14,26 +18,45 @@ export function RelatedDocument({
   label,
 }: {
   id: string;
-  type?: string;
+  type?: DocumentType;
   label: string;
 }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const close = () => {
+    setOpen(false);
+    requestAnimationFrame(() => triggerRef.current?.focus());
+  };
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         className="min-h-11 text-left font-semibold underline"
-        onClick={() => setOpen(true)}
+        onClick={(event) => { event.currentTarget.focus(); setOpen(true); }}
       >
         {label}
       </button>
-      <Dialog open={open} title={label} onClose={() => setOpen(false)}>
-        {open ? type === "REQ" ? <RequisitionOpening id={id} withinDialog onCancel={() => setOpen(false)}><RelatedContent id={id} type={type} /></RequisitionOpening> : <RelatedContent id={id} type={type} /> : null}
-      </Dialog>
+      {open ? <Dialog open title={label} onClose={close}>
+        {type === "REQ" ? <RequisitionOpening id={id} withinDialog onCancel={close}><RelatedContent id={id} type={type} /></RequisitionOpening> : <RelatedSupplyContent key={id + type} id={id} type={type} />}
+      </Dialog> : null}
     </>
   );
 }
-function RelatedContent({ id, type }: { id: string; type: string }) {
+function RelatedSupplyContent({ id, type }: { id: string; type: SupplyType }) {
+  const decode = useCallback((value: unknown) => parseRelatedSupplyRead(value, id, type), [id, type]);
+  const read = useScopedRead(`/api/documents/${id}`, "", decode);
+  const data = !read.loading && !read.error ? read.data?.data : null;
+  return <div className="space-y-4" aria-busy={read.loading}>
+    <button type="button" className="min-h-11 font-semibold underline" aria-disabled={read.loading} onClick={() => { if (!read.loading) read.refresh(); }}>Atualizar consulta</button>
+    {read.loading ? <Notice>Consultando documento autorizado…</Notice> : read.error ? <Notice error>{read.error}</Notice> : data ? <>
+      <p>{data.code} · {formatBrazilDate(data.created_at)}</p>
+      {data.lines.map(line => <SupplyLineSummary key={line.id} line={line} type={type} status={data.status} declarationOnly={Boolean(data.transfer && data.transfer.state !== "dispatched")} />)}
+    </> : null}
+    <p className="text-xs text-(--muted)">Feche esta consulta para continuar de onde parou.</p>
+  </div>;
+}
+function RelatedContent({ id, type }: { id: string; type: "REQ" }) {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
@@ -78,12 +101,6 @@ function RelatedContent({ id, type }: { id: string; type: string }) {
             )}
             {line.urgent ? " · Urgente" : ""}
             {type === "REQ" ? <><p>Estoque da equipe: {formatStockObservation(typeof line.current_stock === "number" || typeof line.current_stock === "string" ? line.current_stock : null, line.stock_observation as StockObservation, typeof line.unit_snapshot === "string" ? line.unit_snapshot : undefined)}</p><p className="text-xs text-(--muted)">{formatStockObservationTime(typeof line.stock_observation_at === "string" ? line.stock_observation_at : null, line.stock_observation_time_source as StockObservationTimeSource)}</p></> : null}
-            {line.quantity !== undefined
-              ? " · Expedido/proposto " + String(line.quantity)
-              : ""}
-            {line.accepted_quantity !== undefined
-              ? " · Aceito " + String(line.accepted_quantity)
-              : ""}
           </li>
         ))}
       </ul>

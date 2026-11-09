@@ -1990,3 +1990,33 @@ Sem nova operação remota. Matriz48 PASS/52 PARTIAL/5 NOT_STARTED e29 colunas/
 complementos preservados; somente prova de C7-AC-001/C-FINAL-AC-020 ampliada.
 PR7 Draft, sem merge/promoção, Sonar adiado, meta ativa.
 [Evidências](CREDENTIAL_COMMIT_BARRIER_EVIDENCE.json).
+
+## D3.20 — consulta de ficha relacionada
+
+Basec8e2f8e. A ENT vinculada à REQ mostrava “Expedido/proposto” sem unidade.
+Contraprova falhou; após corrigir os fatos, outra falha expôs retorno de foco.
+Consulta agora reutiliza SupplyLineSummary, confere ID/tipo/fatos da resposta,
+retira resultado antigo em falha e oferece retry com foco/guarda. Declaração
+de transferência não vira expedição. Nenhum controle de edição/emissão; REQ
+mantém sua abertura/ciência separadas. Nove pontos de chamada preservados.
+
+Quatro unitários e21 casos distintos de produção qualificados nos três motores:
+três novos na fonte final e18 consumidores de ciência/origem do estoque
+preservados da coorte anterior;12 scans Axe novos. A mudança entre coortes
+apenas altera o ciclo/foco do contêiner: consulta retirada antes de restaurar
+foco no frame seguinte, com referência explícita ao botão. Os dois leitores
+internos permanecem textualmente iguais; abertura/retorno repetidos nos três
+motores. Focar apenas antes de abrir falhou no WebKit e não foi aceito.
+GET503 recuperado, tipo errado em200 recusado, outro paciente403, nenhum POST
+operacional e fatos SQL iguais antes/depois. Quatro contraprovas FAIL preservadas.
+Tipos/lint passaram; suítes gerais ficam na CI própria do SHA publicado.
+
+Remoto161 versões coincide com local, zero pendências/SQL nova ou mutação.
+Metadados confirmam segredos de assinatura no Preview; valores não lidos,
+chaves não alteradas, sem alegar nova emissão. Sem backup/restore redundante.
+Matriz48 PASS/53 PARTIAL/4 NOT_STARTED;105x39,29 colunas e complementos
+preservados. C-FINAL-AC-024 parcial; demais relações/variantes e gates humano,
+AT/aparelho permanecem próprios. PR7 Draft, sem merge/promoção, Sonar adiado.
+Meta ativa. [Dossiê](RELATED_DOCUMENT_READ.md),
+[provas](RELATED_DOCUMENT_READ_EVIDENCE.json),
+[remoto](RELATED_READ_REMOTE_OBSERVATION.json).

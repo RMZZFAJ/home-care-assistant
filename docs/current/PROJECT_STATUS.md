@@ -10,6 +10,15 @@ dependências necessárias. Remoto confirmado como desenvolvimento com testes:
 validação local/histórico/dry-run/pós-verificação dirigida, sem repetir backup,
 restore e comparação integral por rotina.
 
+D3.20 corrigiu a consulta de ENT vinculada: fatos/unidades do detalhe nativo,
+resposta vinculada a ID/tipo, retry seguro e retorno de foco. Quatro unitários,
+21 casos distintos de produção qualificados nos três motores e12 scans Axe
+novos passaram (3 finais e18 consumidores preservados). Nove
+chamadas preservadas; SQL antes/depois igual, outro paciente403 e nenhum
+comando operacional. Local/remoto161 sem SQL nova. Matriz48 PASS/53 PARTIAL/
+4 NOT_STARTED; relações restantes e CI própria seguem pendentes. PR7 Draft,
+produção NO-GO. [Provas](../audits/D/D-B/RELATED_DOCUMENT_READ.md).
+
 D3.19 corrigiu leitura obsoleta de anexos/guia e foco de recuperação ENT/escala/
 verificação pública.39 casos atuais passaram nos três motores, com15 novos,
 24 anteriores e60 scans Axe novos;10 PASS foram aproveitados e só29 restantes
