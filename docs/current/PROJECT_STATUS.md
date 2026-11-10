@@ -4,6 +4,34 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.50 implementa preenchimento privado de Andamentos por conta/paciente/ficha
+real:save incompleto,CAS,retomada entre sessões,comparação e publicação nativa
+com consumo atômico. Recuperação aguarda a trava original,confere o pacote
+exato e distingue resultado desconhecido de tentativa comprovadamente não
+aplicada. Outra conclusão não apaga edição própria;carry explícito sobrevive
+à perda do reconhecimento. Leitura própria sem escrita/inativa preservada,
+revogação protege conteúdo e referências atuais;sem cache privado/replay.
+35 unitários/API e11Auth reais aprovados;28 identidades browser de produção
+local qualificadas,com cinco larguras/axe e captura320 inspecionada. Reteste
+dirigido Flow3/3 em produção local;CI própria é gate separado. Diagnóstico
+anterior2/3 teve contexto503 antes do fluxo Chromium;contraprova preservada.
+
+Remoto190→192 reconciliado:duas migrations,sete funções novas,seis dependências
+legadas inalteradas,duas tabelas RLS fechadas e sete índices;metadados/digest
+iguais ao local,dry-run vazio,probes0. Sem reset,fixtures/Auth remoto ou backup
+pesado redundante. Advisors anteriores não aprovados. CI264dd84 falhou nos
+browsers;banco/Ubuntu/Windows passaram. Correções de revisão obsoleta da agenda
+e foco editável do balanço passaram dirigidas nas três engines;intermitências
+dos demais consumidores continuam gates da nova CI. Sonar adiado,PR7 Draft.
+
+105 critérios56PASS/49PARTIAL e18 estados UI preservados;visual≈60%,formulários
+≈90%,recuperação≈85%. Quadro temporário atualizado antes de avançar. Andamentos
+privados concluídos no escopo comprovado;agenda privada,contagens e cadastros
+continuam com Codex. Depois:fichas/estoque,PDF técnico e demais critérios.
+Produção NO-GO,meta ativa. [Incremento](../audits/D/D-B/PROGRESS_NOTE_DRAFTS.md).
+
+## Incremento anterior D3.49
+
 D3.49 corrige a perda da intenção de escala ao recarregar:pacote por conta/
 paciente,consulta somente do próprio diário nativo,conferência exata e reenvio
 somente explícito. Resultado obsoleto não é aprovação. Resposta200 divergente,

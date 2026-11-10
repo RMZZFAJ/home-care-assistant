@@ -1,4 +1,8 @@
 import {
+  progressPreparationSaveSchema,
+  progressPreparationMutationSchema,
+} from "./progress-preparations";
+import {
   flowPreparationSaveSchema,
   flowPreparationMutationSchema,
 } from "./flow-preparations";
@@ -143,6 +147,8 @@ const scope = {
 const navigation = { navigation: draftNavigationSchema.optional() };
 export const creationDraftCommandSchema = z
   .union([
+    progressPreparationSaveSchema,
+    progressPreparationMutationSchema,
     flowPreparationSaveSchema,
     flowPreparationMutationSchema,
     consumptionPreparationSaveSchema,

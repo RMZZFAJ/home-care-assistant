@@ -32,6 +32,12 @@ ampliar a identificação de lacunas;formulários visuais≈90%,globalvisual≈6
 
 ## Correção efetiva deste lote:confirmação da agenda
 
+Atualização posterior D3.50:as preparações privadas de Andamentos foram
+[implementadas](PROGRESS_NOTE_DRAFTS.md). O inventário acompanha esse consumidor
+e os hashes atuais;os números e a validação D3.49 acima são históricos. Agenda
+incompleta,contagens e demais lacunas continuam pendentes. Essa conclusão de
+recurso não aprova todas as composições ou o critério amplo de recuperação.
+
 A intenção nativa antes existia somente em pendingRef. Agora o pacote exato
 fica em sessionStorage por conta/paciente antes do POST. Recarregar não envia.
 GET /api/schedules/confirmation consulta exclusivamente o diário nativo do

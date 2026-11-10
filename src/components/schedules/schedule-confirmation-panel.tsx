@@ -2,6 +2,7 @@
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Notice } from "@/components/workspace";
 import type { ScheduleRecovery } from "./use-schedule-confirmation";
+import type { ScheduleConfirmation } from "@/lib/schedules/confirmation";
 const labels: Record<string, string> = {
   type: "Tipo de plantão",
   series: "Nova programação",
@@ -19,13 +20,14 @@ export function ScheduleConfirmationPanel({
   onConfirmed,
 }: {
   recovery: ScheduleRecovery;
-  onConfirmed?: () => void;
+  onConfirmed?: (result: ScheduleConfirmation) => void;
 }) {
   const { pending, receipt } = recovery;
   if (!pending && !receipt && !recovery.error) return null;
   async function act(action: "recover" | "retry") {
     try {
-      if (await recovery[action]()) onConfirmed?.();
+      const result = await recovery[action]();
+      if (result) onConfirmed?.(result);
     } catch {
       /* Controller presents the safe error and retains the packet. */
     }

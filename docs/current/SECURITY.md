@@ -285,3 +285,13 @@ retorna somente seu comando e identidade/estado/versão do resultado. Outro
 ator não encontra a chave. Envelope/200 divergente não é limpo;consulta/online/
 reload não enviam POST. Perda de acesso retira os dados do painel. Senhas,OTP,
 MFA e capacidades de convite ficam fora de rascunhos comuns do inventário.
+
+Andamentos incompletos usam preparação privada por auth.uid()/paciente/ficha,
+sem acesso direto às duas tabelas. Leitura exige vínculo vivo e leitura da
+ficha;perda de publicação/paciente inativo não apaga histórico pessoal. Commit
+revalida escrita nativa e escopo ao concluir;revogação tardia reverte fato,
+consumo,diário e auditoria. Rótulos referenciados dependem da leitura atual.
+Recuperação por consulta espera a trava original,revalida acesso e não escreve.
+Somente prova correspondente ao pacote exato permite limpeza local;outro
+envelope permanece. Nova preparação após concorrência exige decisão explícita
+e preserva texto próprio. Sem cache privado,envio automático ou replay offline.

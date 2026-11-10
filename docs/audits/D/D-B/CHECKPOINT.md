@@ -3079,3 +3079,45 @@ Sonar adiado,PR7 Draft,produção NO-GO,meta ativa.
 
 [Incremento](FORM_CONTINUITY.md),[inventário](FORM_CONTINUITY_INVENTORY.csv),
 [validação e remoto](FORM_CONTINUITY_VALIDATION.json).
+
+## D3.50 — Andamentos privados e regressões dos consumidores
+
+Edição incompleta,categoria,etapa e referências agora têm save privado,CAS,
+retomada entre sessões e comparação. Alvo é a ficha real;resultado é o
+andamento nativo. Publicação consome a preparação atomicamente e congela
+autoria/instante no banco. Leitura própria sem escrita/inativa e referências
+sob capacidades atuais preservadas. Revogação tardia reverte todos os efeitos.
+
+Consulta espera a trava original,revalida acesso e não publica. Ausência de
+diário não é rejeição;CAS avançado/chave imutável comprovam não aplicação.
+Envelope exato,formato legado e edição local separada de outra conclusão são
+preservados. Escolha explícita de carry sobrevive ao reconhecimento perdido.
+Resumos de oferta,comparação,consumo e resultado incerto são somente leitura.
+
+35 unitários/API,11Auth reais e28 identidades browser de produção local
+qualificadas;cinco larguras,axe e capturas320 inspecionadas. Reteste dirigido
+Flow3/3 em produção local;diagnóstico anterior2/3 teve contexto503 no setup
+Chromium. Contraprovas:UTF-16 versus pontos de
+código,test reload anterior ao save,comparação já carregada e404 seguro após
+revogação. Sem relaxar cache privado,replay offline ou autorização.
+
+Remoto190→192 reconciliado antes do commit:duas migrations,sete funções novas,
+seis nativas inalteradas,duas tabelas fechadas e sete índices iguais ao local;
+digest/config/ACL iguais,probes0,dry-run vazio. Advisors com cinco classes de
+segurança/três performance;achados antigos não aprovados. Sem reset,fixtures/
+Auth remoto ou backup pesado redundante no banco sintético.
+
+CI264dd84 terminou:core3SUCCESS,browsers5FAIL/1SUCCESS,agregadoFAIL. Revisão
+congelada da agenda e foco do balanço corrigidos e aprovados nas três engines.
+Teste Flow mantém contexto anterior somente na tela para comprovar recusa da
+API filha com autorização real. Intermitências WebKit de administração/logout
+não viram aprovação;CI própria integral exigida para o SHA publicado.
+
+105×39,56PASS/49PARTIAL e18 estados UI preservados;visual≈60%,formulários≈90%,
+recuperação≈85%. Inventário49/51 atualizado somente nos consumidores alterados.
+Quadro temporário atualizado antes de avançar. Próximo:agenda privada,contagens,
+cadastros,integração diária;depois fichas/estoque e PDF técnico. Sonar adiado,
+PR7 Draft,sem merge/produção,meta ativa.
+
+[Incremento](PROGRESS_NOTE_DRAFTS.md),
+[validação e remoto](PROGRESS_NOTE_DRAFTS_VALIDATION.json).

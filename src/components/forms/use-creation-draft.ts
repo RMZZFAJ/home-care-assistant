@@ -36,7 +36,8 @@ type Options = {
   readScopeRevision?: string;
   navigation?: DraftNavigation;
   onResume: (draft: CreationDraft) => boolean;
-  onDiscard: () => void;
+  onDiscard: (action?: "discard" | "acknowledge", id?: string) => void;
+  onRead?: (draft: CreationDraft | null) => void;
 };
 
 /** Only explicit commands write to the server. A lost response keeps its exact key. */
@@ -52,7 +53,12 @@ export function useCreationDraft({
   navigation,
   onResume,
   onDiscard,
+  onRead,
 }: Options) {
+  const onReadRef = useRef(onRead);
+  useEffect(() => {
+    onReadRef.current = onRead;
+  }, [onRead]);
   const [base, setBase] = useState<CreationDraft | null>(null);
   const [offered, setOffered] = useState<CreationDraft | null>(null);
   const [comparison, setComparison] = useState<CreationDraft | null>(null);
@@ -78,17 +84,20 @@ export function useCreationDraft({
     (kind === "BAL" && isBalancePreparationPurpose(purpose)) ||
     (kind === "STOCK" && purpose === "family_movement") ||
     kind === "CONSUMPTION" ||
-    kind === "FLOW";
+    kind === "FLOW" ||
+    kind === "PROGRESS";
   const commandUrl =
-    kind === "FLOW"
-      ? "/api/whatsapp/flows/preparations"
-      : kind === "CONSUMPTION"
-        ? "/api/consumption/preparations"
-        : kind === "STOCK"
-          ? "/api/stock/preparations"
-          : resourcePreparation
-            ? "/api/balances/preparations"
-            : "/api/drafts";
+    kind === "PROGRESS"
+      ? "/api/documents/progress-preparations"
+      : kind === "FLOW"
+        ? "/api/whatsapp/flows/preparations"
+        : kind === "CONSUMPTION"
+          ? "/api/consumption/preparations"
+          : kind === "STOCK"
+            ? "/api/stock/preparations"
+            : resourcePreparation
+              ? "/api/balances/preparations"
+              : "/api/drafts";
   const storageKey =
     `hca:private-draft-command:${userId}:${patientId}:${kind}:${targetDocumentId ?? "new"}` +
     (extended || resourcePreparation ? ":" + purpose : "") +
@@ -164,6 +173,7 @@ export function useCreationDraft({
         );
         if (current === generationRef.current && !controller.signal.aborted) {
           const row = parseRead(result.data);
+          onReadRef.current?.(row);
           setProtectedReadPending(false);
           if (!restorePendingRef.current) setOffered(row);
         }
@@ -211,6 +221,7 @@ export function useCreationDraft({
       const result = await api<{ data: CreationDraft | null }>(url);
       if (current !== generationRef.current) return false;
       const row = parseRead(result.data);
+      onReadRef.current?.(row);
       setReadDenied(false);
       setProtectedReadPending(false);
       // Rechecking access cannot silently replace an acknowledged working copy.
@@ -258,7 +269,9 @@ export function useCreationDraft({
     try {
       const result = await api<{ data: CreationDraft | null }>(url);
       if (current !== generationRef.current) return;
-      setComparison(parseRead(result.data));
+      const row = parseRead(result.data);
+      onReadRef.current?.(row);
+      setComparison(row);
       setCompared(true);
     } catch (reason) {
       if (current === generationRef.current) {
@@ -348,6 +361,7 @@ export function useCreationDraft({
               (await api<{ data: CreationDraft | null }>(url)).data,
             );
             if (current !== generationRef.current) return;
+            onReadRef.current?.(live);
             if (live?.state === "consumed") {
               setBase(null);
               setOffered(live);
@@ -386,7 +400,7 @@ export function useCreationDraft({
             ? "Rascunho privado descartado. Você pode começar um novo preenchimento."
             : "Resultado confirmado. Você pode começar um novo preenchimento.",
         );
-        onDiscard();
+        onDiscard(packet.action, result.id);
         setAttempt((value) => value + 1);
       }
       return result;

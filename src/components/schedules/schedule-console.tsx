@@ -39,6 +39,7 @@ import {
   type ScheduleRecovery,
 } from "./use-schedule-confirmation";
 import { ScheduleConfirmationPanel } from "./schedule-confirmation-panel";
+import type { ScheduleConfirmation } from "@/lib/schedules/confirmation";
 
 const today = () =>
   new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(
@@ -214,7 +215,15 @@ function Agenda({
     // Hold the exact displayed object while live queries receive newer data.
     setReview({ command, version, workspace });
   }
-  function confirmed() {
+  function confirmed(result: ScheduleConfirmation | null = recovery.receipt) {
+    if (review && result?.result.status === "obsolete") {
+      setConflict(true);
+      setError(
+        "A proposta foi encerrada como obsoleta. A revisão exibida foi preservada; nenhuma aprovação foi feita.",
+      );
+      setAttempt((value) => value + 1);
+      return;
+    }
     setConflict(false);
     setReview(null);
     setEditor(null);
@@ -234,7 +243,7 @@ function Agenda({
         expectedVersion: review.version ?? null,
         idempotencyKey: crypto.randomUUID(),
       });
-      if (result) confirmed();
+      if (result) confirmed(result);
     } catch (reason) {
       if (
         reason instanceof ApiError &&

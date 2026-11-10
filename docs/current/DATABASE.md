@@ -632,3 +632,20 @@ do diário privado existente por auth.uid()/paciente/chave. Execute Auth,
 search_path vazio,sem novos grants de tabela. Comando nativo,diário e tipos
 existentes permanecem inalterados. Recuperação histórica própria exige vínculo
 vivo;novo ato conserva a autorização ativa do motor.
+
+## Preparação privada de Andamentos
+
+Migrations191–192 adicionam private.progress_preparations e seu diário fechado,
+com RLS,sem políticas/grants diretos. Três helpers privados e quatro RPCs Auth
+usam search_path vazio. O slot próprio é conta/paciente/ficha real;revisão CAS,
+chave e conteúdo congelam cada ato. Salvar aceita preenchimento incompleto.
+Commit verifica a revisão/conteúdo,chama document_progress_publish sem alterar
+o motor e consome o privado com diário/auditoria na mesma transação. Recusa
+tardia reverte também a publicação. Autor e instante vêm do fato nativo.
+
+O recibo conserva a identidade do andamento e reconstrói suas referências sob
+permissões vivas,sem congelar nomes protegidos no diário privado. A consulta de
+recuperação aguarda a mesma trava e revalida acesso após a espera. Não grava
+atos;revisão monotônica/chave imutável distinguem tentativa não aplicada de
+resultado ainda desconhecido. Publicação nativa e seis dependências permanecem
+inalteradas;instalação limpa/evolução legada e integração integral exigem CI.

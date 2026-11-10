@@ -422,8 +422,23 @@ test("Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativ
   await expect(drawer(page)).toContainText(
     "Sugestão original fictícia do Flow",
   );
+  // Hold only the previously authorized shell snapshot so the child must
+  // enforce the real revocation itself, before a live parent refresh unmounts it.
+  const shellBeforeRevocation = await (
+    await page.request.get("/api/context")
+  ).json();
+  await page.route("**/api/context", (route) =>
+    route.request().method() === "GET"
+      ? route.fulfill({ json: shellBeforeRevocation })
+      : route.continue(),
+  );
   sql(
     `update public.care_recipient_memberships set status='revoked' where care_recipient_id=${q(f.patient)} and user_id=${q(fixtures.adminA.id)};`,
+  );
+  const revokedRead = page.waitForResponse(
+    (response) =>
+      response.request().method() === "GET" &&
+      new URL(response.url()).pathname === "/api/whatsapp/flows/preparations",
   );
   await drawer(page)
     .getByRole("button", {
@@ -431,6 +446,9 @@ test("Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativ
       exact: true,
     })
     .click();
+  const denied = await revokedRead;
+  expect(denied.status()).toBe(404);
+  expect((await denied.json()).code).toBe("NOT_FOUND");
   await expect(
     drawer(page).getByText("Sugestão original fictícia do Flow", {
       exact: true,
@@ -444,4 +462,5 @@ test("Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativ
   ).toHaveCount(0);
   expect(facts(f.patient)).toEqual(before);
   expect(commands).toHaveLength(1);
+  await page.unroute("**/api/context");
 });

@@ -717,3 +717,21 @@ Sem reset,fixtures/Auth ou backup pesado redundante no banco sintético. Advisor
 globais não repetidos para esta adição de leitura;achados prévios permanecem.
 Instalação limpa/legada e integração integral exigem CI própria do novo SHA.
 [Reconciliação](FORM_CONTINUITY_VALIDATION.json).
+
+## D3.50 — preparação privada de Andamentos
+
+Migrations191/192 geradas pelo CLI e aplicadas uma vez no remoto autorizado,
+190→192,antes do commit. Preflight:projeto saudável,histórico190/digest igual ao
+prefixo local,seis dependências nativas idênticas e dois novos recursos ausentes;
+dry-run apenas191/192,sem seeds/roles/Vault. Pós-check:192versões/digest,
+13definições/configurações/ACL,duas tabelas e sete índices iguais ao local,
+probes0,dry-run vazio. Sete funções novas e seis nativas inalteradas.
+
+Duas tabelas RLS/sem políticas ou grants diretos,quatro RPCs Auth e três
+helpers privados. Advisors mantêm cinco classes de segurança e três de
+performance:54 tabelas fechadas,191RPCs Auth e44índices sem uso. Novos achados
+correspondem às duas tabelas fechadas,quatro RPCs intencionais e quatro índices
+FK ainda sem uso;nenhum novo FK sem índice. Achados anteriores não aprovados.
+Sem reset,fixtures/Auth remoto ou backup pesado redundante no banco sintético.
+Instalação limpa/legada e integração integral exigem CI própria do novo SHA.
+[Reconciliação](PROGRESS_NOTE_DRAFTS_VALIDATION.json).

@@ -192,3 +192,13 @@ Consulta pessoal ao diário comprova a mesma decisão;ausência permite somente
 reenvio explícito da mesma chave. Esse ciclo é distinto do save de edição
 incompleta entre aparelhos,que ainda será integrado. Inventário49/51 inicial
 separa rascunhos privados,contagens compartilhadas,arquivos,consultas e Auth.
+
+Andamentos agora compõem o controlador privado com alvo na ficha real e
+resultado no andamento nativo. Edição incompleta,CAS e retomada entre sessões
+ficam separados da publicação atômica. O callback onRead recebe apenas leitura
+tipada do escopo vigente e permite reconciliar o pacote exato sem novo POST.
+Resumos de oferta,comparação,resultado e tentativa incerta são somente leitura;
+o editor aparece apenas após a escolha correspondente. Consulta sob a trava
+original distingue conclusão própria,outra conclusão e resultado desconhecido.
+Reconhecer o resultado de outra sessão conserva a edição local somente por
+escolha explícita,inclusive após perda da resposta desse reconhecimento.

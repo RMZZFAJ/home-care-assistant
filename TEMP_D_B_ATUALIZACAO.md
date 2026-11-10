@@ -25,19 +25,26 @@ responsabilidade. “Você” indica decisão, configuração, participação em
 ou liberação que depende de você. “Participantes/equipe” são pessoas que
 usarão ou avaliarão o sistema; “serviço externo” depende também do fornecedor.
 
-Este lote passou pelas verificações locais dirigidas. A rodada completa da
-versão publicada ainda precisa ser concluída. O banco remoto já recebeu todas
-as atualizações deste lote, sem pendências. A fase continua em execução.
+Os testes completos da próxima versão publicada ainda precisam ser concluídos.
+O banco remoto já recebeu todas as atualizações deste lote, sem pendências.
+A fase continua em execução.
 
 A agenda agora preserva neste aparelho a tentativa enviada: depois de uma
 resposta perdida ou de recarregar, é possível consultar o resultado antes de
 decidir reenviar a mesma tentativa. A consulta não cria outra programação.
 Uma falha inicial de acesso também pode ser recuperada sem perder a referência.
 
-O levantamento ampliado encontrou trabalho restante em agenda, Andamentos,
-contagens, cadastros e administração. Por isso, revisei a estimativa de
-recuperação entre aparelhos para 85%. Guardar os preenchimentos incompletos
-da agenda e de Andamentos no servidor continua sendo minha responsabilidade.
+**Preenchimento privado de Andamentos: concluído · 100% deste recurso.**
+Agora é possível guardar o preenchimento privado no servidor e
+retomá-lo em outra sessão ou aparelho. É possível comparar duas edições e
+manter seu texto quando outra sessão conclui o andamento, inclusive após
+perder a resposta do reconhecimento desse resultado.
+
+O levantamento ampliado encontrou trabalho restante em agenda, contagens,
+cadastros e administração. A estimativa de recuperação entre aparelhos continua
+em 85%, pois essas outras lacunas ainda precisam ser fechadas. Guardar os
+preenchimentos incompletos da agenda no servidor continua sendo minha
+responsabilidade; essa parte de Andamentos foi concluída.
 Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
@@ -76,11 +83,12 @@ A troca das classes de quebra de texto já foi concluída.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈85%. Falta: Guardar a edição incompleta da agenda e de Andamentos
+  execução · ≈85%. Falta: Guardar a edição incompleta da agenda
   entre aparelhos; conferir os demais formulários e completar as lacunas.
   Revisões de fluxo, relatos e decisões de consumo, movimentação familiar,
   programação do balanço, atribuição, adiamentos, pareceres,
-  reconto e decisões de requisição estão implementados. Responsável: Codex.
+  reconto, decisões de requisição e Andamentos privados estão implementados.
+  Responsável: Codex.
 - **Preservar edição durante falha, conflito e perda de contexto** — Em
   execução · ≈85%. Falta: Conferir em conjunto as combinações restantes de
   falha e mudança de contexto. Responsável: Codex.
@@ -381,7 +389,8 @@ incluídos.
 - **Formulários, apoio, avisos e recuperação** — 90%. Já aplicado: Criação,
   atos de compra, entrega e transferência, decisões de requisição, pareceres,
   reconto, programação, atribuição e adiamentos do balanço, movimentação
-  familiar, relatos, complementos e decisões de consumo, revisões de fluxo.
+  familiar, relatos, complementos e decisões de consumo, revisões de fluxo e
+  preparação privada de Andamentos com comparação e recuperação.
   Falta: Conferir demais variações, lacunas de continuidade e apresentação
   conjunta. Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 55%. Já aplicado: Base,
@@ -392,7 +401,9 @@ incluídos.
   aplicado: Abas, cabeçalho, ações e painéis reais integrados. Falta:
   Completar cada composição e variante. Responsável: Codex.
 - **Andamentos nas quatro fichas** — 80%. Já aplicado: Registro salvo,
-  autoria, data, categoria, etapa e retomada. Falta: Fechar aparência de todos
+  autoria, data, categoria, etapa, preenchimento privado entre aparelhos,
+  comparação e recuperação, com resumos próprios para cada situação.
+  Falta: Fechar aparência de todos
   os estados e vínculos. Responsável: Codex.
 - **Cronologia, fatos automáticos e referências** — 70%. Já aplicado:
   Histórico integrado e vínculos autorizados. Falta: Completar combinações e
@@ -458,9 +469,6 @@ independentes.
 
 - **Preenchimento privado da agenda entre aparelhos:**0% dessa preparação.
   A consulta da tentativa já enviada foi implementada. Responsável: Codex.
-- **Preenchimento privado de Andamentos entre aparelhos:**0% desse salvamento.
-  A edição no aparelho e a publicação existente estão preservadas.
-  Responsável: Codex.
 - **Aceite final das tarefas com usuários reais:**0%. Responsáveis: você e
   participantes; preparo e eventuais correções pelo Codex.
 - **Homologação de acessibilidade com pessoas e tecnologia assistiva:**0%.
@@ -482,11 +490,12 @@ funcionalidade, sem representar ordem de execução. Tudo que já está 100% ser
 preservado e incluído na revisão final; não será refeito sem motivo.
 
 1. **Revisar e completar a continuidade dos formulários da operação diária.**
-   Completar os preenchimentos privados da agenda e de Andamentos; revisar
+   Completar os preenchimentos privados da agenda; revisar
    contagens, cadastros e administração, completar as lacunas e conferir
    mensagens, conflitos e recuperação em conjunto. Preservar as revisões de
    fluxo, os relatos, complementos e
-   decisões de consumo, a movimentação familiar, os seis atos de balanço,
+   decisões de consumo, Andamentos privados, a movimentação familiar, os seis
+   atos de balanço,
    pareceres, reconto, decisões de requisição e as demais preparações concluídas.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas

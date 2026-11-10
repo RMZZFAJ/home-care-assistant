@@ -1158,3 +1158,24 @@ Sem POST,replay ou mudança do motor. A leitura pessoal admite paciente inativo
 e perda de escrita sob vínculo vivo;não concede consulta operacional nem novo
 ato. Cliente confere conta,paciente,chave,comando,versão e alvo antes da limpeza.
 Ausência não prova rejeição;reenvio da mesma chave é sempre escolha explícita.
+
+## Preenchimento privado de Andamentos
+
+GET /api/documents/progress-preparations exige careRecipientId,purpose e
+targetResourceId únicos,Auth,contexto e leitura atual da ficha real. POST no
+mesmo caminho salva edição incompleta,descarta ou reconhece o resultado por
+revisão/chave. POST /commit sela a revisão privada e chama a publicação nativa
+na mesma transação. O recurso publicado é o andamento;seu alvo é a ficha.
+Salvar não publica texto nem altera protocolo,versão,estoque ou PDF.
+
+POST /recovery consulta somente a tentativa própria após aguardar sua trava.
+Confirma o pacote exato,localiza publicação nativa ou distingue estado incerto
+de impossibilidade comprovada por revisão avançada/chave incompatível. Ausência
+de diário não comprova falha. A consulta não publica. Nova edição após tentativa
+não aplicada exige escolha explícita e preserva o texto separado do resultado
+de outra sessão. Recuperação mantém Origin,Auth,escopo e private,no-store.
+
+Leitura,descarte e reconhecimento próprios admitem perda de escrita/paciente
+inativo sob vínculo vivo e leitura atual da ficha. Nova publicação conserva a
+capacidade ativa nativa. Rótulos de fichas referenciadas são reavaliados conforme
+a autorização atual. Texto usa o limite UTF-16 do banco e dos controles HTML.

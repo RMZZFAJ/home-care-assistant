@@ -1,4 +1,5 @@
 "use client";
+import { ProgressPreparationSummary } from "@/components/documents/progress-preparation-summary";
 import { FlowPreparationSummary } from "@/components/stock/flow-preparation-summary";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 
@@ -33,6 +34,8 @@ export function DraftContentSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("note" in content)
+    return <ProgressPreparationSummary content={content} />;
   if ("review" in content) return <FlowPreparationSummary content={content} />;
   if ("consumption" in content)
     return (
@@ -175,6 +178,8 @@ function DraftFieldsSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("note" in content)
+    return <ProgressPreparationSummary content={content} />;
   if ("review" in content) return <FlowPreparationSummary content={content} />;
   if ("consumption" in content)
     return (
@@ -745,7 +750,9 @@ export function CreationDraftPanel({
       {!draft.consumed && !draft.pending ? (
         <p className="hca-field-hint">
           Para retomar em outra aba, sessão ou aparelho, use{" "}
-          {draft.kind === "CONSUMPTION" || draft.kind === "FLOW"
+          {draft.kind === "PROGRESS" ||
+          draft.kind === "CONSUMPTION" ||
+          draft.kind === "FLOW"
             ? "Salvar preenchimento privado"
             : "Salvar rascunho"}
           . O preenchimento ainda não salvo pode ficar apenas nesta aba.
@@ -766,13 +773,15 @@ export function CreationDraftPanel({
       {draft.message ? <Notice>{draft.message}</Notice> : null}
       {saved ? (
         <p>
-          {saved.kind === "FLOW"
-            ? "Revisão do Flow"
-            : saved.kind === "CONSUMPTION"
-              ? "Relato e conferência"
-              : saved.kind === "STOCK"
-                ? "Movimentação familiar"
-                : saved.kind}{" "}
+          {saved.kind === "PROGRESS"
+            ? "Registro de andamento"
+            : saved.kind === "FLOW"
+              ? "Revisão do Flow"
+              : saved.kind === "CONSUMPTION"
+                ? "Relato e conferência"
+                : saved.kind === "STOCK"
+                  ? "Movimentação familiar"
+                  : saved.kind}{" "}
           · Revisão {saved.revision} · salvo no servidor em{" "}
           {formatZonedDate(saved.savedAt, "America/Sao_Paulo")} ·
           America/Sao_Paulo
@@ -797,20 +806,24 @@ export function CreationDraftPanel({
             disabled={draft.busy || disabled}
             onClick={() => void draft.recover()}
           >
-            Recuperar salvamento ou descarte
+            {draft.kind === "PROGRESS" && draft.pending.action === "acknowledge"
+              ? "Recuperar reconhecimento do resultado"
+              : "Recuperar salvamento ou descarte"}
           </ActionButton>
         </>
       ) : null}
       {draft.consumed ? (
         <>
           <Notice>
-            {draft.kind === "CONSUMPTION"
-              ? "Este preenchimento já registrou seu resultado. O resumo preservado descreve aquele instante; consulte o relato para a situação atual."
-              : draft.kind === "STOCK"
-                ? "Este preenchimento já registrou uma movimentação. O resultado preservado descreve aquele instante; consulte o histórico para a situação atual."
-                : isBalancePreparationPurpose(draft.purpose)
-                  ? "Este preenchimento já registrou uma decisão. O resultado preservado descreve aquele instante; consulte o acompanhamento para a situação atual."
-                  : "Este rascunho já foi usado em uma ficha. Consulte o resultado antes de iniciar outro preenchimento."}
+            {draft.kind === "PROGRESS"
+              ? "Este preenchimento publicou um andamento. O registro e sua autoria permanecem no histórico."
+              : draft.kind === "CONSUMPTION"
+                ? "Este preenchimento já registrou seu resultado. O resumo preservado descreve aquele instante; consulte o relato para a situação atual."
+                : draft.kind === "STOCK"
+                  ? "Este preenchimento já registrou uma movimentação. O resultado preservado descreve aquele instante; consulte o histórico para a situação atual."
+                  : isBalancePreparationPurpose(draft.purpose)
+                    ? "Este preenchimento já registrou uma decisão. O resultado preservado descreve aquele instante; consulte o acompanhamento para a situação atual."
+                    : "Este rascunho já foi usado em uma ficha. Consulte o resultado antes de iniciar outro preenchimento."}
           </Notice>
           {draft.kind === "CONSUMPTION" &&
           draft.consumed.consumedResult &&
@@ -872,6 +885,30 @@ export function CreationDraftPanel({
                   referenceHash: draft.consumed.consumedResult.referenceHash,
                 }}
               />
+            </div>
+          ) : draft.consumed.kind === "PROGRESS" &&
+            draft.consumed.consumedResult &&
+            "documentType" in draft.consumed.consumedResult ? (
+            <div className="hca-form-stack">
+              <p>
+                Andamento publicado por{" "}
+                {draft.consumed.consumedResult.nativeResult.note.authorName} em{" "}
+                {formatZonedDate(
+                  draft.consumed.consumedResult.recordedAt,
+                  "America/Sao_Paulo",
+                )}
+                .
+              </p>
+              <ProgressPreparationSummary
+                content={{
+                  documentType: draft.consumed.consumedResult.documentType,
+                  note: draft.consumed.consumedResult.command.content,
+                }}
+              />
+              <p>
+                Reconhecer este resultado limpa somente a preparação pessoal. O
+                andamento publicado permanece no histórico.
+              </p>
             </div>
           ) : draft.consumed.kind === "FLOW" &&
             draft.consumed.consumedResult &&
@@ -1019,7 +1056,10 @@ export function CreationDraftPanel({
                     />
                   </>
                 ) : (
-                  <p>O rascunho foi descartado no servidor.</p>
+                  <p>
+                    Não há um preenchimento ativo no servidor. Compare sua
+                    edição antes de iniciar outro.
+                  </p>
                 )
               ) : (
                 <ActionButton
@@ -1092,7 +1132,8 @@ export function CreationDraftPanel({
             ) : null}
             <p>
               Você está descartando somente seu preenchimento privado de{" "}
-              {saved?.kind} para {patientName}.
+              {saved?.kind === "PROGRESS" ? "andamento" : saved?.kind} para{" "}
+              {patientName}.
             </p>
             <DraftContentSummary
               content={saved?.content ?? null}

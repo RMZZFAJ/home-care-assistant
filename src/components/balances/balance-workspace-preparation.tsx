@@ -99,6 +99,7 @@ export function BalanceWorkspacePreparation({
     resultRef = useRef<HTMLHeadingElement>(null),
     readRecoveryRef = useRef<HTMLButtonElement>(null),
     queryRef = useRef<HTMLButtonElement>(null);
+  const restoreEditingFocusRef = useRef(false);
   const storageKey = `hca:bal-preparation-confirmation:${context.userId}:${patientId}:${purpose}:${targetResourceId}`;
   const referenceUrl =
     "/api/balances/preparations/reference?" +
@@ -276,6 +277,20 @@ export function BalanceWorkspacePreparation({
   useEffect(() => {
     if (protectedView) readRecoveryRef.current?.focus();
   }, [protectedView]);
+  useEffect(() => {
+    if (!restoreEditingFocusRef.current || busy || draft.busy || review) return;
+    const frame = requestAnimationFrame(() => {
+      restoreEditingFocusRef.current = false;
+      if (protectedView) {
+        readRecoveryRef.current?.focus();
+        return;
+      }
+      const reason = reasonRef.current;
+      if (reason && !reason.matches(":disabled")) reason.focus();
+      else queryRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [busy, draft.busy, draft.blocked, review, protectedView]);
   async function queryReference() {
     try {
       const current = parseBalancePreparationReference(
@@ -485,12 +500,8 @@ export function BalanceWorkspacePreparation({
         }
         setNeedsAdoption(true);
         setComparing(true);
+        restoreEditingFocusRef.current = true;
         if (e.code === "DRAFT_VERSION_CONFLICT") await draft.reportConflict();
-        requestAnimationFrame(() => {
-          const reason = reasonRef.current;
-          if (reason && !reason.matches(":disabled")) reason.focus();
-          else queryRef.current?.focus();
-        });
       }
       if (e instanceof ApiError && [401, 403, 404].includes(e.status)) {
         setReferenceForbidden(true);
@@ -623,8 +634,8 @@ export function BalanceWorkspacePreparation({
               disabled={busy || uncertain}
               onClick={() => {
                 packetRef.current = null;
+                restoreEditingFocusRef.current = true;
                 setReview(null);
-                requestAnimationFrame(() => reasonRef.current?.focus());
               }}
             >
               Voltar
