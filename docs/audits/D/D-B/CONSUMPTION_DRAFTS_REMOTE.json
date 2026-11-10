@@ -1,0 +1,778 @@
+{
+  "increment": "D3.47",
+  "baseSha": "14fdd284f9962104063e83616725cff02d9c96d0",
+  "projectId": "qwfrqychokvhdzakibid",
+  "project": {
+    "name": "home-care-assistant",
+    "status": "ACTIVE_HEALTHY",
+    "postgres": "17.11.0.003"
+  },
+  "status": "APPLIED_ONCE_RECONCILED_181_TO_187",
+  "preflight": {
+    "legacy": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "bal_comment_units",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "d3345dd50396252acf827694607d41cd5dc1eee40370fab2a1dd94ebba639845"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "can",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "7a689c297f9d7a220966e1b6aecb6800096c4321244235eebe2a52eaccc0020d"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_current_lines",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "f260729a944fd71eaf75337bf11e1172c8ac8505e8c17531fe513f2369d55855"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_input",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "9cf9078be98184847d150d71b7e582c1f74365fdbae4da7e23442b1037ece4e8"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_lines",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "ff74e634112aa3df1d89e6f617fa243d82c1883796cf1276d4924adf973777a1"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "move_stock",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "9806b5e706f331f5b49d10b48a9cc8e4e40e09f792ed29e25f4c922cd240a0ad"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_cap",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "69acf858bc9c834ecb3670417680cc48a7572375a7eb95c490772954f28bedcf"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_read",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "3b191d1ff1b4685705edf3f4e8dca897444a9136070ebba6eea1081c0efc6c2a"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "1906e622ac361ae08aa359b2cfea87f47d43ca43706e59401c1766d59eae51f9"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "shift_reminder_for_actor",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "db4214e32c5a6196cdbdd809e07dbbf3fc2eeec39118acb82b986db8ac17f37b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "857ed91c915c4c2c5d3ad2b4caea52a4203e8d4165a338dd3af4283804de49c3"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "decide_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "4025c9c6b7bbce73d6e65c0509c48956c9d398d677a44adfaef9cbd31ae78c24"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "notification_reference",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "433a6ff67ee435e7ec8d920b41707259894a0603e3bc829041d52336e51f13a9"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "report_consumption_from_reminder",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "58906ee027434d114d2bc5ebf7bb6aa156be1831c001efb2c4cadeadc893440b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "report_extraordinary_consumption",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "6d376baadfd6800f832492f1ebc2a3c3a673d90b7e3dcf555ab1720136d3921d"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "supplement_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "0821831829ca1ad37cc7d5375c0b44b618dc358d2e30f1458dfb351bfc047888"
+      }
+    ],
+    "tables": [],
+    "versions": {
+      "count": 181,
+      "latest": "20261110052011",
+      "linesSha256": "9394980ce48f98f254230193805e8a2d25b77c5dbeae5d92870dd8fac39bbcbd"
+    },
+    "functions": [],
+    "temporaryProbes": 0,
+    "invalidProductConstraints": []
+  },
+  "postflight": {
+    "legacy": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "bal_comment_units",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "d3345dd50396252acf827694607d41cd5dc1eee40370fab2a1dd94ebba639845"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "can",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "7a689c297f9d7a220966e1b6aecb6800096c4321244235eebe2a52eaccc0020d"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_current_lines",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "f260729a944fd71eaf75337bf11e1172c8ac8505e8c17531fe513f2369d55855"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_input",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "9cf9078be98184847d150d71b7e582c1f74365fdbae4da7e23442b1037ece4e8"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_lines",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "ff74e634112aa3df1d89e6f617fa243d82c1883796cf1276d4924adf973777a1"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "move_stock",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "9806b5e706f331f5b49d10b48a9cc8e4e40e09f792ed29e25f4c922cd240a0ad"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_cap",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "69acf858bc9c834ecb3670417680cc48a7572375a7eb95c490772954f28bedcf"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_read",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "3b191d1ff1b4685705edf3f4e8dca897444a9136070ebba6eea1081c0efc6c2a"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "1906e622ac361ae08aa359b2cfea87f47d43ca43706e59401c1766d59eae51f9"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "shift_reminder_for_actor",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "db4214e32c5a6196cdbdd809e07dbbf3fc2eeec39118acb82b986db8ac17f37b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "857ed91c915c4c2c5d3ad2b4caea52a4203e8d4165a338dd3af4283804de49c3"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "decide_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "4025c9c6b7bbce73d6e65c0509c48956c9d398d677a44adfaef9cbd31ae78c24"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "notification_reference",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "433a6ff67ee435e7ec8d920b41707259894a0603e3bc829041d52336e51f13a9"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "report_consumption_from_reminder",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "58906ee027434d114d2bc5ebf7bb6aa156be1831c001efb2c4cadeadc893440b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "report_extraordinary_consumption",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "6d376baadfd6800f832492f1ebc2a3c3a673d90b7e3dcf555ab1720136d3921d"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "supplement_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "0821831829ca1ad37cc7d5375c0b44b618dc358d2e30f1458dfb351bfc047888"
+      }
+    ],
+    "tables": [
+      {
+        "rls": true,
+        "anon": false,
+        "auth": false,
+        "name": "consumption_preparation_commands",
+        "force": false,
+        "service": false,
+        "policies": 0,
+        "invalidConstraints": 0
+      },
+      {
+        "rls": true,
+        "anon": false,
+        "auth": false,
+        "name": "consumption_preparations",
+        "force": false,
+        "service": false,
+        "policies": 0,
+        "invalidConstraints": 0
+      }
+    ],
+    "versions": {
+      "count": 187,
+      "latest": "20261110084108",
+      "linesSha256": "b4dc6648b8d778e8778bce8a01870b67e348348a3048d205dbdd1fcae3fcfe2c"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_preparation_snapshot",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_fields jsonb",
+        "bodyLfSha256": "4f91d45d864d73b0b3b97c40600649b8c6d23e9f8b631f825dade36d394290a5",
+        "definitionLfSha256": "b08e1cf85e5e7c80bd13501c2a4cada6cdc465c16f9e4d681f42620ad0d247de"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_preparation_view",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": false,
+        "service": false,
+        "identity": "d private.consumption_preparations",
+        "bodyLfSha256": "566a851b09a6b564c7ed05cb83f5fc955d1d10f960e4705e93fc59e891606b0e",
+        "definitionLfSha256": "5985c4f087aebf0b21c543f5324fd1e54144b5b95b5a846a986c09e19999db62"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_preparation_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_write boolean",
+        "bodyLfSha256": "c24c42f99415f8923d1499b5cb1644e2897f2fbfb06265525f35e3335daa74ab",
+        "definitionLfSha256": "3028e9adcb0bca9277f6250f3b93831314974b0b76ed90fa5ae002eb61df0ccf"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "validate_consumption_preparation",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": false,
+        "service": false,
+        "identity": "p_content jsonb, p_navigation jsonb, p_purpose text",
+        "bodyLfSha256": "8e4d0ec0321f3ed50334404797849b151af9268a17ee1d957674c5879836804b",
+        "definitionLfSha256": "28b771c39ea5cc4bae8232444c775906f3d52d56fd07d7a3c591da682e43c6d0"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "commit_consumption_preparation",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+        "bodyLfSha256": "effcebf3f1b3fa8acee7053ccd4c91c784d80a45e51ff3d2c1bceecc594e53b0",
+        "definitionLfSha256": "185d8f75e2fa6f4bce660266974d02beb3f769598e6874572ccdeee8c3e42563"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "consumption_preparation_command",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+        "bodyLfSha256": "345f210dcd4f8447821425b657538f6830cfe70277d35635962d839e99e374a8",
+        "definitionLfSha256": "c5741ebcd8f0c5c1e350d4d36367a6bd852beef4b5982ae71cb5ed369400ea4c"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "consumption_preparation_context",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid",
+        "bodyLfSha256": "5bd4021a9d4e431b7d5d0853c6c5b2a977506691623b527280b62337e5952375",
+        "definitionLfSha256": "55928b7464f3f71d278a91f01af5b69fc28d9bcdb576f90edaa508c88a6c3bf9"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "consumption_preparation_reference",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_fields jsonb",
+        "bodyLfSha256": "8908c1e1095771074b65d2248ad2dac67f48a4e946438395cf3b135ee3c932b8",
+        "definitionLfSha256": "1e604e62c80d96b27e676d90448b79bef61773a6ceb186b368f5db95f7fbbc68"
+      }
+    ],
+    "temporaryProbes": 0,
+    "invalidProductConstraints": []
+  },
+  "verification": {
+    "exactSixPendingBefore": true,
+    "exactApplyOnce": true,
+    "finalDryRunEmpty": true,
+    "localRemoteVersionsAndDigestEqual": true,
+    "eightFunctionsDefinitionsConfigAndAclEqual": true,
+    "twoClosedRlsTablesEqual": true,
+    "sixteenLegacyFunctionsUnchanged": true,
+    "noTemporaryProbes": true,
+    "remoteProductConstraintsValidated": true,
+    "localKnownHistoricalConstraint": "public.product_presentations.presentation_finite_factor",
+    "remoteProviderConstraintPreviouslyObserved": "realtime.messages;not altered or globally approved"
+  },
+  "advisors": {
+    "security": {
+      "before": [
+        {
+          "name": "rls_enabled_no_policy",
+          "count": 48,
+          "level": "INFO"
+        },
+        {
+          "name": "extension_in_public",
+          "count": 1,
+          "level": "WARN"
+        },
+        {
+          "name": "anon_security_definer_function_executable",
+          "count": 3,
+          "level": "WARN"
+        },
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "count": 177,
+          "level": "WARN"
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "count": 1,
+          "level": "WARN"
+        }
+      ],
+      "after": [
+        {
+          "name": "rls_enabled_no_policy",
+          "count": 50,
+          "level": "INFO"
+        },
+        {
+          "name": "extension_in_public",
+          "count": 1,
+          "level": "WARN"
+        },
+        {
+          "name": "anon_security_definer_function_executable",
+          "count": 3,
+          "level": "WARN"
+        },
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "count": 181,
+          "level": "WARN"
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "count": 1,
+          "level": "WARN"
+        }
+      ],
+      "added": [
+        {
+          "class": "rls_enabled_no_policy",
+          "detail": "Table \\`private.consumption_preparation_commands\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "consumption_preparation_commands",
+            "type": "table",
+            "schema": "private"
+          }
+        },
+        {
+          "class": "rls_enabled_no_policy",
+          "detail": "Table \\`private.consumption_preparations\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "consumption_preparations",
+            "type": "table",
+            "schema": "private"
+          }
+        },
+        {
+          "class": "authenticated_security_definer_function_executable",
+          "detail": "Function `public.commit_consumption_preparation(p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/commit_consumption_preparation`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "commit_consumption_preparation",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+            "security_definer": true
+          }
+        },
+        {
+          "class": "authenticated_security_definer_function_executable",
+          "detail": "Function `public.consumption_preparation_command(p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/consumption_preparation_command`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "consumption_preparation_command",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+            "security_definer": true
+          }
+        },
+        {
+          "class": "authenticated_security_definer_function_executable",
+          "detail": "Function `public.consumption_preparation_context(p_patient uuid, p_purpose text, p_target uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/consumption_preparation_context`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "consumption_preparation_context",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "p_patient uuid, p_purpose text, p_target uuid",
+            "security_definer": true
+          }
+        },
+        {
+          "class": "authenticated_security_definer_function_executable",
+          "detail": "Function `public.consumption_preparation_reference(p_patient uuid, p_purpose text, p_target uuid, p_fields jsonb)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/consumption_preparation_reference`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "consumption_preparation_reference",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_fields jsonb",
+            "security_definer": true
+          }
+        }
+      ],
+      "removed": []
+    },
+    "performance": {
+      "before": [
+        {
+          "name": "unindexed_foreign_keys",
+          "count": 124,
+          "level": "INFO"
+        },
+        {
+          "name": "auth_rls_initplan",
+          "count": 11,
+          "level": "WARN"
+        },
+        {
+          "name": "unused_index",
+          "count": 36,
+          "level": "INFO"
+        }
+      ],
+      "after": [
+        {
+          "name": "unindexed_foreign_keys",
+          "count": 124,
+          "level": "INFO"
+        },
+        {
+          "name": "auth_rls_initplan",
+          "count": 11,
+          "level": "WARN"
+        },
+        {
+          "name": "unused_index",
+          "count": 38,
+          "level": "INFO"
+        }
+      ],
+      "added": [
+        {
+          "class": "unused_index",
+          "detail": "Index \\`consumption_preparation_patient_fk\\` on table \\`private.consumption_preparations\\` has not been used",
+          "metadata": {
+            "name": "consumption_preparations",
+            "type": "table",
+            "schema": "private"
+          }
+        },
+        {
+          "class": "unused_index",
+          "detail": "Index \\`consumption_preparation_command_fk\\` on table \\`private.consumption_preparation_commands\\` has not been used",
+          "metadata": {
+            "name": "consumption_preparation_commands",
+            "type": "table",
+            "schema": "private"
+          }
+        }
+      ],
+      "removed": []
+    }
+  },
+  "limits": [
+    "No remote reset,seeds,Auth mutation,role/Vault changes or production deployment",
+    "No redundant heavy backup/reconstruction of synthetic remote database;owner amendment applies",
+    "Metadata comparison is not operational restore,provider,physical device or human proof",
+    "Existing advisor classes preserved;no global security/performance approval"
+  ],
+  "migrations": [
+    {
+      "file": "supabase/migrations/20261110064238_phase_d3_consumption_private_preparations.sql",
+      "lfSha256": "64d4e0ea87b0dc8bceacd0588fa2f791109e380db42ec4984f62b62e9ebd1c1d"
+    },
+    {
+      "file": "supabase/migrations/20261110070130_phase_d3_consumption_preparation_alias.sql",
+      "lfSha256": "64096983e8ef9264b581260808041e5a2fb95ad6b258c1dc3852d5db6410597f"
+    },
+    {
+      "file": "supabase/migrations/20261110070459_phase_d3_consumption_preparation_read_recovery.sql",
+      "lfSha256": "26d9c8f9e91b5fddd58d5c1aada22240364b4bc7939f4ea4d8819680e570d253"
+    },
+    {
+      "file": "supabase/migrations/20261110075731_phase_d3_consumption_preparation_catalogue_locks.sql",
+      "lfSha256": "d29cc6db2436fce368bfabef00e2fa9a25cdd18c5db94c00b884507cc03de041"
+    },
+    {
+      "file": "supabase/migrations/20261110080730_phase_d3_consumption_preparation_text_normalization.sql",
+      "lfSha256": "9127b20d92c91b62891209dd3b0cd73c0942f75aab9fd170ec9a8fd917b5c6b6"
+    },
+    {
+      "file": "supabase/migrations/20261110084108_phase_d3_consumption_preparation_reference_scope.sql",
+      "lfSha256": "361f73066920ad333237e9cc96e9d01db1df6d06c5b52955a8595e447ad95d13"
+    }
+  ],
+  "logSha256": {
+    "consumption-remote-dry-before.log": "5f68fd66eb9e8fdb3af4d0f592d3e38e5156654eb9d64af664001d5e5d0545ef",
+    "consumption-remote-apply.log": "7cedff12406e62a2315ee71e454403013c15d684874eaba52f773b1539cfe449",
+    "consumption-remote-dry-after.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf"
+  },
+  "postApplyAuthoringFormatting": {
+    "reason": "Staged diff --check sees new files and found extra empty EOF lines in three authoring migrations;working diff before staging did not include untracked files",
+    "changes": [
+      {
+        "file": "supabase/migrations/20261110070130_phase_d3_consumption_preparation_alias.sql",
+        "browserFrozenLfSha256": "0d16c1c2f26a27b194f8516671b7c467f2bf2d8f43db653e27cadca98c5cf230",
+        "finalLfSha256": "64096983e8ef9264b581260808041e5a2fb95ad6b258c1dc3852d5db6410597f"
+      },
+      {
+        "file": "supabase/migrations/20261110075731_phase_d3_consumption_preparation_catalogue_locks.sql",
+        "browserFrozenLfSha256": "980ef151d50e1955a84628d1b3893455c76d33e60d12dd097d74fe8b2c9d04a8",
+        "finalLfSha256": "d29cc6db2436fce368bfabef00e2fa9a25cdd18c5db94c00b884507cc03de041"
+      },
+      {
+        "file": "supabase/migrations/20261110080730_phase_d3_consumption_preparation_text_normalization.sql",
+        "browserFrozenLfSha256": "8d8e1bc9fe5c718b14e3c8237f84f79c32e3169ba573d183477837950b4d8e00",
+        "finalLfSha256": "9127b20d92c91b62891209dd3b0cd73c0942f75aab9fd170ec9a8fd917b5c6b6"
+      }
+    ],
+    "onlyTrailingEmptyLineRemoved": true,
+    "sqlTokensIdentical": true,
+    "noRuntimeSourceChange": true,
+    "databaseDefinitionsAndAppliedStatementsUnchanged": true,
+    "functionalRetestRequired": false
+  }
+}

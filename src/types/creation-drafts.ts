@@ -17,7 +17,11 @@ import type {
   BalancePreparationContent,
   BalancePreparationReceipt,
 } from "@/lib/validation/balance-preparations";
-export type DraftKind = "REQ" | "BAL" | "COM" | "ENT" | "STOCK";
+import type {
+  ConsumptionPreparationContent,
+  ConsumptionPreparationReceipt,
+} from "@/lib/validation/consumption-preparations";
+export type DraftKind = "REQ" | "BAL" | "COM" | "ENT" | "STOCK" | "CONSUMPTION";
 export type CreationDraftContent =
   | RequisitionDraftContent
   | BalanceDraftContent
@@ -25,7 +29,8 @@ export type CreationDraftContent =
   | ReceiptDraftContent
   | TransferDeclarationDraftContent
   | BalancePreparationContent
-  | StockPreparationContent;
+  | StockPreparationContent
+  | ConsumptionPreparationContent;
 export type CreationDraft = {
   id: string;
   ownerId: string;
@@ -44,7 +49,11 @@ export type CreationDraft = {
   navigation?: DraftNavigation | null;
   consumedDocumentId: string | null;
   consumedResourceId?: string | null;
-  consumedResult?: BalancePreparationReceipt | StockPreparationReceipt | null;
+  consumedResult?:
+    | BalancePreparationReceipt
+    | StockPreparationReceipt
+    | ConsumptionPreparationReceipt
+    | null;
 };
 export type CreationDraftResult = Pick<
   CreationDraft,
@@ -52,5 +61,9 @@ export type CreationDraftResult = Pick<
 > & {
   replayed: boolean;
   consumedResourceId?: string | null;
-  consumedResult?: BalancePreparationReceipt | StockPreparationReceipt | null;
+  consumedResult?:
+    | BalancePreparationReceipt
+    | StockPreparationReceipt
+    | ConsumptionPreparationReceipt
+    | null;
 };

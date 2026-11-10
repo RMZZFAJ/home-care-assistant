@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { consumptionPreparationPurposes } from "../forms/consumption-preparation-purposes";
 import { balancePreparationPurposes } from "../forms/balance-preparation-purposes";
 const text = (max: number) =>
   z.string().max(max, `Este campo permite até ${max} caracteres.`);
@@ -108,6 +109,7 @@ export const entDraftPurposes = [
 ] as const;
 export const entDraftPurpose = z.enum(entDraftPurposes);
 export const draftPurpose = z.enum([
+  ...consumptionPreparationPurposes,
   "family_movement",
   "create",
   "revise",

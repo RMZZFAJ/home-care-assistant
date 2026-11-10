@@ -247,3 +247,18 @@ mascarados quando necessário. O pacote original de recuperação é preservado,
 sem reaplicação offline. Revogação tardia e rollback são exercitados com Auth
 real. Resultado próprio pode ser recuperado com paciente inativo;nenhum novo
 movimento é autorizado por isso. [Provas](../audits/D/D-B/FAMILY_STOCK_DRAFTS.md).
+
+## Preenchimentos privados de consumo
+
+Custódia,dono,propósito e alvo são conferidos no banco;metadata/nomes do
+cliente não autorizam leitura ou decisão. Duas tabelas/helpers fechados e
+quatro RPCs Auth mantêm RLS/grants/search_path explícitos. Nova confirmação
+revalida autoridade,referência e intenção após locks. Revogação tardia reverte
+o ato nativo e seus registros privados/auditoria/journal.
+
+Recuperação própria de histórico inativo não abre a consulta operacional
+atual. Perda conhecida de escopo e atualização pessoal ocultam conteúdo até
+revalidação,sem confundir erro de consulta com revogação definitiva. Pacote
+pendente divergente não é apagado nem autoriza reconhecimento. Cache privado,
+replay offline e envio automático permanecem ausentes.
+[Contraprovas Auth e limites](../audits/D/D-B/CONSUMPTION_DRAFTS.md).

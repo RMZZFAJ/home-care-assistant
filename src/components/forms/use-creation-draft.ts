@@ -76,13 +76,16 @@ export function useCreationDraft({
   const extended = usesSupplyDraftTransport(kind, purpose);
   const resourcePreparation =
     (kind === "BAL" && isBalancePreparationPurpose(purpose)) ||
-    (kind === "STOCK" && purpose === "family_movement");
+    (kind === "STOCK" && purpose === "family_movement") ||
+    kind === "CONSUMPTION";
   const commandUrl =
-    kind === "STOCK"
-      ? "/api/stock/preparations"
-      : resourcePreparation
-        ? "/api/balances/preparations"
-        : "/api/drafts";
+    kind === "CONSUMPTION"
+      ? "/api/consumption/preparations"
+      : kind === "STOCK"
+        ? "/api/stock/preparations"
+        : resourcePreparation
+          ? "/api/balances/preparations"
+          : "/api/drafts";
   const storageKey =
     `hca:private-draft-command:${userId}:${patientId}:${kind}:${targetDocumentId ?? "new"}` +
     (extended || resourcePreparation ? ":" + purpose : "") +

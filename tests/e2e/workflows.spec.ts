@@ -1218,6 +1218,7 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
     name: "Revisar confirmação do consumo",
     exact: true,
   });
+  await decision.getByRole("button",{name:"Revisar confirmação",exact:true}).click();
   await expect(decision.locator("input,textarea,select")).toHaveCount(0);
   await decision
     .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })

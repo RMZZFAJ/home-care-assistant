@@ -32,6 +32,85 @@ export function DraftContentSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("consumption" in content)
+    return (
+      <div className="hca-form-stack">
+        <p>
+          Preenchimento privado de relato ou conferência. Salvar não registra
+          relato, decisão ou desconto de estoque.
+        </p>
+        <DefinitionGrid
+          items={[
+            {
+              label: "Tipo",
+              value:
+                content.consumption.kind === "shortage"
+                  ? "Falta de material"
+                  : content.consumption.kind === "consumption"
+                    ? "Consumo extraordinário"
+                    : "Não preenchido",
+            },
+            {
+              label: "Custódia",
+              value:
+                content.consumption.location === "FAMILY"
+                  ? "Família"
+                  : "Equipe",
+            },
+            {
+              label: "Versão preservada",
+              value: content.reference?.report?.version ?? "Novo relato",
+            },
+            {
+              label: "Texto preservado",
+              value: (
+                <span className="whitespace-pre-wrap">
+                  {content.consumption.text || "Não preenchido"}
+                </span>
+              ),
+              wide: true,
+            },
+            {
+              label: "Motivo da decisão",
+              value: (
+                <span className="whitespace-pre-wrap">
+                  {content.consumption.reason || "Sem motivo novo"}
+                </span>
+              ),
+              wide: true,
+            },
+            {
+              label: "Origem do lembrete",
+              value: content.consumption.reminderId || "Sem lembrete de origem",
+              wide: true,
+            },
+          ]}
+        />
+        <ul>
+          {content.consumption.lines.map((l) => (
+            <li className="wrap-anywhere" key={l.productId}>
+              {l.name} · {l.quantity || "Quantidade não preenchida"} {l.unit}
+            </li>
+          ))}
+        </ul>
+        {content.reference?.report ? (
+          <section>
+            <h4>Estrutura preservada do relato</h4>
+            <p className="whitespace-pre-wrap">
+              {content.reference.report.body}
+            </p>
+            <ul>
+              {content.reference.report.lines.map((l) => (
+                <li className="wrap-anywhere" key={l.productId}>
+                  {l.name ?? l.productId} · {l.quantity} {l.unit}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+      </div>
+    );
+
   if ("movement" in content)
     return (
       <div className="hca-form-stack">
@@ -94,6 +173,10 @@ function DraftFieldsSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("consumption" in content)
+    return (
+      <DraftContentSummary content={content} kind={kind} purpose={purpose} />
+    );
   if ("movement" in content) {
     const m = content.movement;
     const labels = {
@@ -658,8 +741,11 @@ export function CreationDraftPanel({
       </p>
       {!draft.consumed && !draft.pending ? (
         <p className="hca-field-hint">
-          Para retomar em outra aba, sessão ou aparelho, use Salvar rascunho. O
-          preenchimento ainda não salvo pode ficar apenas nesta aba.
+          Para retomar em outra aba, sessão ou aparelho, use{" "}
+          {draft.kind === "CONSUMPTION"
+            ? "Salvar preenchimento privado"
+            : "Salvar rascunho"}
+          . O preenchimento ainda não salvo pode ficar apenas nesta aba.
         </p>
       ) : null}
       {draft.loading ? (
@@ -677,8 +763,12 @@ export function CreationDraftPanel({
       {draft.message ? <Notice>{draft.message}</Notice> : null}
       {saved ? (
         <p>
-          {saved.kind === "STOCK" ? "Movimentação familiar" : saved.kind} ·
-          Revisão {saved.revision} · salvo no servidor em{" "}
+          {saved.kind === "CONSUMPTION"
+            ? "Relato e conferência"
+            : saved.kind === "STOCK"
+              ? "Movimentação familiar"
+              : saved.kind}{" "}
+          · Revisão {saved.revision} · salvo no servidor em{" "}
           {formatZonedDate(saved.savedAt, "America/Sao_Paulo")} ·
           America/Sao_Paulo
         </p>
@@ -709,15 +799,53 @@ export function CreationDraftPanel({
       {draft.consumed ? (
         <>
           <Notice>
-            {draft.kind === "STOCK"
-              ? "Este preenchimento já registrou uma movimentação. O resultado preservado descreve aquele instante; consulte o histórico para a situação atual."
-              : isBalancePreparationPurpose(draft.purpose)
-                ? "Este preenchimento já registrou uma decisão. O resultado preservado descreve aquele instante; consulte o acompanhamento para a situação atual."
-                : "Este rascunho já foi usado em uma ficha. Consulte o resultado antes de iniciar outro preenchimento."}
+            {draft.kind === "CONSUMPTION"
+              ? "Este preenchimento já registrou seu resultado. O resumo preservado descreve aquele instante; consulte o relato para a situação atual."
+              : draft.kind === "STOCK"
+                ? "Este preenchimento já registrou uma movimentação. O resultado preservado descreve aquele instante; consulte o histórico para a situação atual."
+                : isBalancePreparationPurpose(draft.purpose)
+                  ? "Este preenchimento já registrou uma decisão. O resultado preservado descreve aquele instante; consulte o acompanhamento para a situação atual."
+                  : "Este rascunho já foi usado em uma ficha. Consulte o resultado antes de iniciar outro preenchimento."}
           </Notice>
-          {draft.kind === "STOCK" &&
+          {draft.kind === "CONSUMPTION" &&
           draft.consumed.consumedResult &&
-          "preparedMovement" in draft.consumed.consumedResult ? (
+          "preparedConsumption" in draft.consumed.consumedResult ? (
+            <div className="hca-form-stack">
+              <p>
+                Registrado em{" "}
+                {formatZonedDate(
+                  draft.consumed.consumedResult.recordedAt,
+                  "America/Sao_Paulo",
+                )}
+                .
+              </p>
+              <DraftContentSummary
+                kind="CONSUMPTION"
+                purpose={draft.purpose}
+                content={{
+                  consumption:
+                    draft.consumed.consumedResult.preparedConsumption,
+                  reference: draft.consumed.consumedResult.preparedReference,
+                  referenceHash: draft.consumed.consumedResult.referenceHash,
+                }}
+              />
+              <Link
+                className="ui-button"
+                href={
+                  "/consumo?" +
+                  new URLSearchParams({
+                    careRecipientId: draft.consumed.patientId,
+                    ref: draft.consumed.consumedResult.resourceId,
+                    refKind: "report",
+                  })
+                }
+              >
+                Consultar relato registrado
+              </Link>
+            </div>
+          ) : draft.kind === "STOCK" &&
+            draft.consumed.consumedResult &&
+            "preparedMovement" in draft.consumed.consumedResult ? (
             <div className="wrap-anywhere">
               <p>
                 Movimentação registrada em{" "}

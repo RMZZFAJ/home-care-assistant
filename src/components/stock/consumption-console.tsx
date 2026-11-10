@@ -20,8 +20,11 @@ import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDetail } from "./consumption-detail";
 import { FlowReviews } from "./flow-reviews";
 import { parseConsumptionPage } from "@/lib/validation/consumption";
-import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
-import {NotificationReference,type ReminderOrigin} from "@/components/notifications/notification-reference";
+import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
+import {
+  NotificationReference,
+  type ReminderOrigin,
+} from "@/components/notifications/notification-reference";
 
 type Cursor = { at: string; id: string };
 export function ConsumptionConsole() {
@@ -46,16 +49,32 @@ function Reports({ context }: { context: WorkspaceContext }) {
     [query, setQuery] = useState(() =>
       new URLSearchParams(
         [...params].filter(([key]) =>
-          ["q", "kind", "status", "from", "to","sourceReminder"].includes(key),
+          ["q", "kind", "status", "from", "to", "sourceReminder"].includes(key),
         ),
       ).toString(),
     );
-  const explicitReport=params.get("refKind")==="report",notice=useNotificationReference(patient,"consumption",explicitReport?null:selected??params.get("sourceReminder"),params.get("refKind")??"auto");
-  const [read, setRead] = useState<{ query: string; key: string; rows: ConsumptionSummary[] | null; next: Cursor | null; error: string } | null>(null);
+  const explicitReport = params.get("refKind") === "report",
+    notice = useNotificationReference(
+      patient,
+      "consumption",
+      explicitReport ? null : (selected ?? params.get("sourceReminder")),
+      params.get("refKind") ?? "auto",
+    );
+  const [read, setRead] = useState<{
+    query: string;
+    key: string;
+    rows: ConsumptionSummary[] | null;
+    next: Cursor | null;
+    error: string;
+  } | null>(null);
   const [attempt, setAttempt] = useState(0),
     [moreBusy, setMoreBusy] = useState(false);
-  const readKey = JSON.stringify([patient, query, live, attempt]), current = read?.query === query ? read : null;
-  const rows = current?.rows ?? null, next = current?.next ?? null, error = current?.error ?? "", reading = current?.key !== readKey;
+  const readKey = JSON.stringify([patient, query, live, attempt]),
+    current = read?.query === query ? read : null;
+  const rows = current?.rows ?? null,
+    next = current?.next ?? null,
+    error = current?.error ?? "",
+    reading = current?.key !== readKey;
   const [products, setProducts] = useState<CatalogProduct[]>([]),
     [catalogError, setCatalogError] = useState(""),
     [catalogLoading, setCatalogLoading] = useState(true),
@@ -63,7 +82,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [editor, setEditor] = useState<HTMLElement | null>(null),
     [message, setMessage] = useState(""),
     [referenceError, setReferenceError] = useState("");
-  const [editorOrigin,setEditorOrigin]=useState<ReminderOrigin|null>(null);
+  const [editorOrigin, setEditorOrigin] = useState<ReminderOrigin | null>(null);
   const listHeadingRef = useRef<HTMLHeadingElement>(null),
     triggerRef = useRef<HTMLElement | null>(null),
     generationRef = useRef(0);
@@ -75,15 +94,35 @@ function Reports({ context }: { context: WorkspaceContext }) {
       undefined,
       controller.signal,
     )
-      .then(value => parseConsumptionPage(value, patient)).then((result) => {
+      .then((value) => parseConsumptionPage(value, patient))
+      .then((result) => {
         if (!controller.signal.aborted) {
-          setRead({ query, key: readKey, rows: result.data, next: result.next, error: "" });
+          setRead({
+            query,
+            key: readKey,
+            rows: result.data,
+            next: result.next,
+            error: "",
+          });
         }
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {
-          const unavailable = reason instanceof ApiError && [401, 403, 404, 409].includes(reason.status);
-          setRead(previous => ({ query, key: readKey, rows: !unavailable && previous?.query === query ? previous.rows : null, next: !unavailable && previous?.query === query ? previous.next : null, error: reason instanceof Error ? reason.message : "Não foi possível consultar os relatos." }));
+          const unavailable =
+            reason instanceof ApiError &&
+            [401, 403, 404, 409].includes(reason.status);
+          setRead((previous) => ({
+            query,
+            key: readKey,
+            rows:
+              !unavailable && previous?.query === query ? previous.rows : null,
+            next:
+              !unavailable && previous?.query === query ? previous.next : null,
+            error:
+              reason instanceof Error
+                ? reason.message
+                : "Não foi possível consultar os relatos.",
+          }));
         }
       });
     return () => controller.abort();
@@ -112,8 +151,11 @@ function Reports({ context }: { context: WorkspaceContext }) {
   }, [patient, catalogAttempt]);
   function open(id: string | null) {
     const values = new URLSearchParams(query);
-    values.set("careRecipientId",patient);
-    if (id){values.set("ref", id);values.set("refKind","report");}
+    values.set("careRecipientId", patient);
+    if (id) {
+      values.set("ref", id);
+      values.set("refKind", "report");
+    }
     router.replace("/consumo" + (values.size ? "?" + values : ""), {
       scroll: false,
     });
@@ -121,13 +163,19 @@ function Reports({ context }: { context: WorkspaceContext }) {
   function filter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = new URLSearchParams();
-    values.set("careRecipientId",patient);
-    const source=new URLSearchParams(query).get("sourceReminder");if(source)values.set("sourceReminder",source);
+    values.set("careRecipientId", patient);
+    const source = new URLSearchParams(query).get("sourceReminder");
+    if (source) values.set("sourceReminder", source);
     for (const [key, value] of new FormData(event.currentTarget))
       if (typeof value === "string" && value.trim())
         values.set(key, value.trim());
-    const applied=new URLSearchParams(values);applied.delete("careRecipientId");setQuery(applied.toString());
-    if (selected){values.set("ref", selected);if(params.get("refKind"))values.set("refKind",params.get("refKind")!);}
+    const applied = new URLSearchParams(values);
+    applied.delete("careRecipientId");
+    setQuery(applied.toString());
+    if (selected) {
+      values.set("ref", selected);
+      if (params.get("refKind")) values.set("refKind", params.get("refKind")!);
+    }
     router.replace("/consumo" + (values.size ? "?" + values : ""), {
       scroll: false,
     });
@@ -143,11 +191,37 @@ function Reports({ context }: { context: WorkspaceContext }) {
       );
       const result = parseConsumptionPage(response, patient);
       if (snapshot === generationRef.current) {
-        setRead(previous => previous?.query === query ? { ...previous, rows: [...new Map([...(previous.rows ?? []), ...result.data].map(row => [row.id, row])).values()], next: result.next, error: "" } : previous);
+        setRead((previous) =>
+          previous?.query === query
+            ? {
+                ...previous,
+                rows: [
+                  ...new Map(
+                    [...(previous.rows ?? []), ...result.data].map((row) => [
+                      row.id,
+                      row,
+                    ]),
+                  ).values(),
+                ],
+                next: result.next,
+                error: "",
+              }
+            : previous,
+        );
       }
     } catch (reason) {
       if (snapshot === generationRef.current)
-        setRead(previous => previous?.query === query ? { ...previous, error: reason instanceof Error ? reason.message : "Não foi possível carregar outra página." } : previous);
+        setRead((previous) =>
+          previous?.query === query
+            ? {
+                ...previous,
+                error:
+                  reason instanceof Error
+                    ? reason.message
+                    : "Não foi possível carregar outra página.",
+              }
+            : previous,
+        );
     } finally {
       setMoreBusy(false);
     }
@@ -158,15 +232,37 @@ function Reports({ context }: { context: WorkspaceContext }) {
   };
   return (
     <div className="space-y-5">
-      <NotificationReference key={patient+":"+notice.reference} read={notice} context={context} onReport={(origin,opener)=>{setEditorOrigin(origin);setEditor(opener);}}/>
+      <NotificationReference
+        key={patient + ":" + notice.reference}
+        read={notice}
+        context={context}
+        onReport={(origin, opener) => {
+          setEditorOrigin(origin);
+          setEditor(opener);
+        }}
+      />
       {message ? <Notice>{message}</Notice> : null}
       <div className="hca-toolbar">
         {can(context, "consumption.report") ? (
           <ActionButton
             variant="primary"
-            onClick={(event) => {setEditorOrigin(null);setEditor(event.currentTarget);}}
+            onClick={(event) => {
+              setEditorOrigin(null);
+              setEditor(event.currentTarget);
+            }}
           >
             Registrar ocorrência
+          </ActionButton>
+        ) : null}
+        {can(context, "stock.family.read") ||
+        can(context, "stock.team.read") ? (
+          <ActionButton
+            onClick={(e) => {
+              setEditorOrigin(null);
+              setEditor(e.currentTarget);
+            }}
+          >
+            Meu preenchimento de relato
           </ActionButton>
         ) : null}
         <ActionButton onClick={() => setAttempt((value) => value + 1)}>
@@ -273,7 +369,11 @@ function Reports({ context }: { context: WorkspaceContext }) {
           </Notice>
         ) : null}
         {reading ? <Notice>Carregando relatos…</Notice> : null}
-        {rows && rows.length > 0 && (reading || error) ? <p className="my-3 text-sm text-(--muted)">Última consulta confirmada; aguardando atualização.</p> : null}
+        {rows && rows.length > 0 && (reading || error) ? (
+          <p className="my-3 text-sm text-(--muted)">
+            Última consulta confirmada; aguardando atualização.
+          </p>
+        ) : null}
         <ul className="space-y-3">
           {rows?.map((row) => (
             <li
@@ -319,7 +419,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           </ActionButton>
         ) : null}
       </section>
-      {selected&&(explicitReport||notice.data?.kind==="report") ? (
+      {selected && (explicitReport || notice.data?.kind === "report") ? (
         <ConsumptionDetail
           key={selected}
           id={selected}
@@ -340,8 +440,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
       ) : null}
       {editor ? (
         <ConsumptionEditor
-          key={editorOrigin?.id??"standalone"}
-          sourceReminder={editorOrigin??undefined}
+          key={editorOrigin?.id ?? "standalone"}
+          sourceReminder={editorOrigin ?? undefined}
           context={context}
           products={products}
           catalogError={catalogError}

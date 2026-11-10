@@ -4,6 +4,29 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.47 implementa cinco preenchimentos privados CONSUMPTION:relatos família/
+equipe,complemento,aceite e recusa,com CAS,retomada entre sessões,referência
+selada e confirmação nativa atômica. Recuperação pessoal inativa preservada;
+consulta operacional atual/nova escrita continuam ativas e autorizadas.
+Envelope divergente não é apagado;leitura autoritativa só reconcilia a tentativa
+exata. Editor/revisão/erros e recuperação seguem componentes canônicos.
+53 unitários/API,20 Auth reais e22 identidades browser de produção local
+qualificados,com12 sucessos inalterados retidos+10/10 rechecks finais;tipos/lint
+PASS,39fontes LF estáveis. Rodada22 inicial21/22 e contraprovas preservadas.
+Local/remoto187 reconciliados:seis migrations,oito funções/ACL,duas tabelas,
+16 dependências legadas/digest iguais;dry-run vazio,sem reset/fixtures/Auth.
+CI14fdd28 aprovou nove jobs;Preview READY. Isso valida o lote anterior181;
+novo candidato exige CI própria limpa/legada/integral. Quadro105critérios,
+56PASS/49PARTIAL preservados;visual≈60%,formulários≈85%,recuperação≈90%.
+Preparações privadas Flow,composição EST-01,decoder saldos200,66/171 e demais
+critérios continuam pendentes. Sonar adiado,PR7 Draft,produção NO-GO,meta ativa.
+[Incremento](../audits/D/D-B/CONSUMPTION_DRAFTS.md),
+[validação](../audits/D/D-B/CONSUMPTION_DRAFTS_VALIDATION.json),
+[remoto](../audits/D/D-B/CONSUMPTION_DRAFTS_REMOTE.json),
+[CI histórica](../audits/D/D-B/CI_14FDD28_OBSERVATION.json).
+
+As observações anteriores abaixo são históricas;não aprovam o novo candidato.
+
 D3.46 implementa quatro preparações familiares privadas STOCK,referência do
 ledger e confirmação nativa atômica. Escrita/leitura independentes preservadas,
 com mascaramento de saldo/origem/recibo e recuperação própria com paciente

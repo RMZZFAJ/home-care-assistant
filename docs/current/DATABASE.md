@@ -588,3 +588,23 @@ familiar;escrita nova exige gestão e paciente ativo. Sem leitura,o retorno
 mascara saldo e detalhes da origem,sem modificar a referência selada interna.
 Recuperação própria já vinculada permanece possível com paciente inativo,
 sem conceder novo ato. Helpers de apresentação também mascaram recibo/contexto.
+
+## Preenchimentos privados de consumo
+
+Migrations182–187 adicionam private.consumption_preparations e
+private.consumption_preparation_commands,dono/paciente/propósito/alvo,CAS,
+conteúdo,hash,journal e recibo pessoal. Ambas têm RLS fechado e nenhum acesso
+direto de anon,authenticated ou service_role. Oito funções com search_path
+vazio:quatro helpers e quatro RPCs authenticated. Não se fabrica documento.
+
+Snapshot inclui materiais selecionados e do relato,versão/complemento,origem
+e fingerprint físico no aceite. Commit bloqueia estoque,relato e catálogo,
+revalida autoridade após espera e liga a intenção exata ao motor nativo.
+Colisão com chave nativa antiga não consome nova preparação. Fato,privado,
+journal e auditoria revertem juntos na recusa.16 dependências legadas
+conservam corpo/configuração/grants.
+
+Leitura privada histórica exige permissão viva da custódia,sem reativar
+paciente. Referência operacional atual e toda escrita nova exigem paciente
+ativo. Texto privado permanece original;comando usa trim Unicode equivalente
+ao cliente. Linhas do snapshot mantêm quantidade textual vinculada ao hash.

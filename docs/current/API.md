@@ -1102,3 +1102,25 @@ retiram valores históricos protegidos. Ter gestão sem leitura continua
 permitindo o comando nativo autorizado. A variante de divulgação é revalidada
 sem alterar o pacote/chave original. A API não exige paciente ativo para
 consultar,descartar,reconhecer ou recuperar resultado pessoal já vinculado.
+
+## Preenchimentos privados de consumo
+
+GET/POST /api/consumption/preparations usa careRecipientId,purpose e
+targetResourceId. Tipo CONSUMPTION,alvo paciente nos relatos family/team
+e UUID do relato nos propósitos supplement/accept/reject;documentId NULL.
+Save aceita edição incompleta,CAS e chave própria;discard/acknowledge não
+publicam nem desfazem fatos. A rota genérica de rascunhos recusa esse tipo.
+
+POST /api/consumption/preparations/reference é consulta sem mutação,com até100
+identidades fora da URL. Devolve referência/hash autorizados do banco e exige
+paciente ativo como a leitura nativa. Referência preservada mantém a grafia
+numérica e campos históricos;normalização semântica só vale para o comando.
+POST /api/consumption/preparations/commit confirma draftCommit,referenceHash,
+comando e chave exatos na transação nativa. Decoders validam inclusive200.
+Origin,Auth,contexto explícito,erros seguros e no-store permanecem obrigatórios.
+
+Consulta pessoal,descarte,reconhecimento e replay já vinculado admitem paciente
+inativo sob leitura viva;isso não permite nova consulta operacional ou ato.
+Envelope local só é removido por confirmação tipada do pacote exato,em leitura
+autoritativa ou recuperação manual. Nenhum POST offline/automático. As rotas
+nativas de consumo continuam disponíveis e inalteradas.

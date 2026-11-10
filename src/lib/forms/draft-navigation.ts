@@ -5,6 +5,9 @@ const common = [
   { id: "dieta", label: "Dieta" },
 ] as const;
 export const draftFlowStages = {
+  CONSUMPTION: [
+    { id: "consumption_preparation", label: "Relato e conferência" },
+  ],
   STOCK_FAMILY_MOVEMENT: [
     { id: "stock_family_movement", label: "Movimentação familiar" },
   ],
@@ -115,6 +118,7 @@ export const draftFlowStages = {
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
 export const draftStageIds = [
+  "consumption_preparation",
   "stock_family_movement",
   "bal_configure",
   "bal_assign",
@@ -172,6 +176,17 @@ export function draftFlow(
   purpose = "create",
   content?: unknown,
 ): DraftFlow | null {
+  if (
+    kind === "CONSUMPTION" &&
+    [
+      "consumption_report_family",
+      "consumption_report_team",
+      "consumption_supplement",
+      "consumption_accept",
+      "consumption_reject",
+    ].includes(purpose)
+  )
+    return "CONSUMPTION";
   if (kind === "STOCK" && purpose === "family_movement")
     return "STOCK_FAMILY_MOVEMENT";
   if (kind === "BAL" && purpose === "configure") return "BAL_CONFIGURE";

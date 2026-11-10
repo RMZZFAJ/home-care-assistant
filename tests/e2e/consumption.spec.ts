@@ -1,4 +1,10 @@
-import { expect, test, type Page, type APIResponse } from "@playwright/test";
+import {
+  expect,
+  test,
+  type Page,
+  type APIResponse,
+  type Locator,
+} from "@playwright/test";
 import { readFileSync, mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
@@ -29,6 +35,14 @@ async function login(
 const detail = (page: Page) =>
   page.locator('section[aria-label="Detalhe do relato"]');
 
+async function prepareDecision(dialog: Locator) {
+  await dialog
+    .getByRole("button", { name: "Revisar confirmação", exact: true })
+    .click();
+  await expect(
+    dialog.getByRole("heading", { name: "Resumo da decisão", exact: true }),
+  ).toBeVisible();
+}
 test("consumo recupera a própria confirmação após perder escrita, mas nova decisão e perda de leitura continuam bloqueadas", async ({
   page,
 }) => {
@@ -44,7 +58,8 @@ test("consumo recupera a própria confirmação após perder escrita, mas nova d
       exact: true,
     }),
     attempts: Record<string, unknown>[] = [];
-  await page.route("**/api/consumption", async (route) => {
+  await prepareDecision(decision);
+  await page.route("**/api/consumption/preparations/commit", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
     if (attempts.length === 1) {
@@ -63,7 +78,7 @@ test("consumo recupera a própria confirmação após perder escrita, mas nova d
     decision.getByRole("button", { name: "Voltar sem decidir", exact: true }),
   ).toBeDisabled();
   await expect(
-    decision.getByRole("button", { name: "Fechar diálogo", exact: true }),
+    decision.getByRole("button", { name: "Fechar edição", exact: true }),
   ).toBeDisabled();
   await expect(
     decision.getByRole("button", { name: "Recuperar decisão", exact: true }),
@@ -94,7 +109,10 @@ test("consumo recupera a própria confirmação após perder escrita, mas nova d
   expect(data.movements).toHaveLength(1);
   expect(data.decision.actor_id).toBe(fixtures.adminA.id);
   const fresh = await page.request.post("/api/consumption", {
-    data: { ...attempts[0], idempotencyKey: randomUUID() },
+    data: {
+      ...(attempts[0].command as Record<string, unknown>),
+      idempotencyKey: randomUUID(),
+    },
   });
   expect(fresh.status()).toBe(403);
   expect(
@@ -112,7 +130,7 @@ test("consumo recupera a própria confirmação após perder escrita, mas nova d
   );
   expect(
     (
-      await page.request.post("/api/consumption", { data: attempts[0] })
+      await page.request.post("/api/consumption", { data: attempts[0].command })
     ).status(),
   ).toBe(403);
 });
@@ -136,13 +154,13 @@ test("consumo recupera complemento próprio já conferido por outra pessoa sem r
     .getByRole("button", { name: "Revisar complemento", exact: true })
     .click();
   const attempts: Record<string, unknown>[] = [];
-  await page.route("**/api/consumption", async (route) => {
+  await page.route("**/api/consumption/preparations/commit", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
     if (attempts.length === 1) {
       const response = await route.fetch();
       expect(response.ok(), await response.text()).toBe(true);
-      const saved = (await response.json()).data;
+      const saved = (await response.json()).data.consumedResult.report;
       await rpc(reviewer, "decide_consumption_report", {
         p_id: id,
         p_accept: true,
@@ -236,7 +254,10 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
   await page
     .getByRole("button", { name: "Registrar ocorrência", exact: true })
     .click();
-  const drawer = page.getByRole("dialog", { name: "Registrar relato", exact: true });
+  const drawer = page.getByRole("dialog", {
+    name: "Registrar relato",
+    exact: true,
+  });
   await expect(
     page.getByRole("dialog", { name: "Registrar relato", exact: true }),
   ).toBeVisible();
@@ -265,7 +286,7 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
   });
   await expect(review.locator("input,textarea,select")).toHaveCount(0);
   const reportPayloads: unknown[] = [];
-  await page.route("**/api/consumption", async (route) => {
+  await page.route("**/api/consumption/preparations/commit", async (route) => {
     if (route.request().method() !== "POST") {
       await route.continue();
       return;
@@ -288,7 +309,7 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
   await review
     .getByRole("button", { name: "Recuperar tentativa", exact: true })
     .click();
-  await page.unroute("**/api/consumption");
+  await page.unroute("**/api/consumption/preparations/commit");
   expect(reportPayloads).toHaveLength(2);
   expect(reportPayloads[0]).toEqual(reportPayloads[1]);
   await expect(
@@ -408,22 +429,26 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
       name: "Revisar confirmação do consumo",
       exact: true,
     });
+    await prepareDecision(decision);
     await expect(decision.locator("input,textarea,select")).toHaveCount(0);
     await expect(
       decision.getByText("Material fictício V4 0", { exact: true }),
     ).toBeVisible();
     const decisions: unknown[] = [];
-    await adminPage.route("**/api/consumption", async (route) => {
-      if (route.request().method() !== "POST") {
-        await route.continue();
-        return;
-      }
-      decisions.push(route.request().postDataJSON());
-      if (decisions.length === 1) {
-        await route.fetch();
-        await route.abort("failed");
-      } else await route.continue();
-    });
+    await adminPage.route(
+      "**/api/consumption/preparations/commit",
+      async (route) => {
+        if (route.request().method() !== "POST") {
+          await route.continue();
+          return;
+        }
+        decisions.push(route.request().postDataJSON());
+        if (decisions.length === 1) {
+          await route.fetch();
+          await route.abort("failed");
+        } else await route.continue();
+      },
+    );
     await decision
       .getByRole("button", {
         name: "Confirmar consumo e descontar",
@@ -434,7 +459,7 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
       decision.getByRole("button", { name: "Voltar sem decidir", exact: true }),
     ).toBeDisabled();
     await expect(
-      decision.getByRole("button", { name: "Fechar diálogo", exact: true }),
+      decision.getByRole("button", { name: "Fechar edição", exact: true }),
     ).toBeDisabled();
     await decision
       .getByRole("button", { name: "Recuperar decisão", exact: true })
@@ -494,6 +519,30 @@ test("consumo compara complemento concorrente e só decide após nova revisão d
     family = await actor("family", f.patient);
   await login(page, f.patient, "adminA");
   await page.goto("/consumo?ref=" + id);
+  // Controlled stale client:the reviewed response stays visible while native facts change.
+  // This proves the database guard even when the UI has not received a newer reference.
+  let reviewedReference: unknown = null,
+    holdReviewedReference = true;
+  await page.route(
+    "**/api/consumption/preparations/reference",
+    async (route) => {
+      try {
+        if (holdReviewedReference && reviewedReference)
+          return await route.fulfill({
+            status: 200,
+            headers: { "Cache-Control": "no-store" },
+            json: reviewedReference,
+          });
+        const response = await route.fetch();
+        expect(response.ok(), await response.text()).toBe(true);
+        const body = await response.json();
+        reviewedReference ??= body;
+        await route.fulfill({ response, json: body });
+      } catch {
+        /* Superseded reads can be aborted;accepted UI state and native effects remain the oracles. */
+      }
+    },
+  );
   await detail(page)
     .getByRole("button", { name: "Conferir consumo", exact: true })
     .click();
@@ -501,18 +550,30 @@ test("consumo compara complemento concorrente e só decide após nova revisão d
     name: "Revisar confirmação do consumo",
     exact: true,
   });
+  await prepareDecision(dialog);
+  await expect(
+    dialog.getByRole("button", {
+      name: "Confirmar consumo e descontar",
+      exact: true,
+    }),
+  ).toBeEnabled();
   await rpc(family, "supplement_consumption_report", {
     p_id: id,
     p_text: "Outro familiar esclareceu duas unidades",
-    p_lines: [{ productId: f.products[0], quantity: "2" }],
+    p_lines: [{ productId: f.products[0], quantity: "2.000000" }],
     p_version: 1,
     p_key: randomUUID(),
   });
-  const payloads: { expectedVersion: number; idempotencyKey: string }[] = [];
-  await page.route("**/api/consumption", async (route) => {
+  const payloads: {
+    command: { expectedVersion: number };
+    idempotencyKey: string;
+  }[] = [];
+  await page.route("**/api/consumption/preparations/commit", async (route) => {
     if (route.request().method() === "POST")
       payloads.push(route.request().postDataJSON());
-    await route.continue();
+    const response = await route.fetch();
+    holdReviewedReference = false;
+    await route.fulfill({ response });
   });
   await dialog
     .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })
@@ -537,20 +598,31 @@ test("consumo compara complemento concorrente e só decide após nova revisão d
       exact: true,
     })
     .click();
+  const comparison = dialog.getByRole("region", {
+    name: "Comparação de referência do relato",
+    exact: true,
+  });
   await expect(
-    dialog.getByText("Versão atual: 2 · Aguardando conferência", {
-      exact: true,
-    }),
+    comparison
+      .getByText("Versão atual", { exact: true })
+      .locator("..")
+      .getByText("2", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    comparison.getByText("Aguardando conferência", { exact: true }),
   ).toBeVisible();
   await dialog
     .getByRole("button", { name: "Revisar versão atual", exact: true })
     .click();
+  await prepareDecision(dialog);
   await expect(dialog.locator("input,textarea,select")).toHaveCount(0);
   await dialog
     .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })
     .click();
   await expect(dialog).toHaveCount(0);
-  expect(payloads.map((payload) => payload.expectedVersion)).toEqual([1, 2]);
+  expect(payloads.map((payload) => payload.command.expectedVersion)).toEqual([
+    1, 2,
+  ]);
   expect(payloads[0].idempotencyKey).not.toBe(payloads[1].idempotencyKey);
   const result = await rpc(f.admin, "consumption_report", { p_id: id });
   expect(result.decision.version).toBe(2);
@@ -558,6 +630,8 @@ test("consumo compara complemento concorrente e só decide após nova revisão d
   expect(result.movements).toHaveLength(1);
   const opposed = await seedReport(f),
     other = await actor("global", f.patient);
+  reviewedReference = null;
+  holdReviewedReference = true;
   await page.goto("/consumo?ref=" + opposed);
   await detail(page)
     .getByRole("button", { name: "Rejeitar relato", exact: true })
@@ -572,6 +646,12 @@ test("consumo compara complemento concorrente e só decide após nova revisão d
   await rejection
     .getByRole("button", { name: "Revisar rejeição", exact: true })
     .click();
+  await expect(
+    rejection.getByRole("button", {
+      name: "Confirmar rejeição sem desconto",
+      exact: true,
+    }),
+  ).toBeEnabled();
   await rpc(other, "decide_consumption_report", {
     p_id: opposed,
     p_accept: true,
@@ -596,9 +676,17 @@ test("consumo compara complemento concorrente e só decide após nova revisão d
       exact: true,
     })
     .click();
+  const decided = rejection.getByRole("region", {
+    name: "Comparação de referência do relato",
+    exact: true,
+  });
   await expect(
-    rejection.getByText("Versão atual: 1 · Confirmado", { exact: true }),
+    decided
+      .getByText("Versão atual", { exact: true })
+      .locator("..")
+      .getByText("1", { exact: true }),
   ).toBeVisible();
+  await expect(decided.getByText("Confirmado", { exact: true })).toBeVisible();
   await rejection
     .getByRole("button", { name: "Abrir resultado registrado", exact: true })
     .click();
@@ -626,6 +714,7 @@ test("falta conferida e rejeição motivada têm revisões próprias e nenhuma b
     name: "Revisar confirmação da falta",
     exact: true,
   });
+  await prepareDecision(shortageDialog);
   await expect(
     shortageDialog.getByText(
       "Confirmar esta falta registra a conferência da necessidade, sem descontar estoque.",

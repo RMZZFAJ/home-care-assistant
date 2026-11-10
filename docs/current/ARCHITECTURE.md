@@ -171,3 +171,11 @@ explícita. O snapshot interno usa saldo autoritativo;representação pública e
 privada exibida respeitam a leitura independente da autorização de movimentar.
 Recuperar ato próprio já vinculado não exige reativar o paciente nem concede
 escrita nova. A variante de leitura revalida a superfície sem mudar a intenção.
+
+Preparação CONSUMPTION separa relato family/team,complemento,aceite e recusa
+em recursos reais. O editor compartilhado compõe o núcleo privado com os
+motores nativos,sem duplicar fatos ou inventar documentos. Referência atual
+não substitui declaração preservada;comando selado e consumo privado são
+atômicos. Recuperação pessoal histórica tem escopo distinto da consulta
+operacional ativa. Envelope incerto só é reapresentado por ação explícita;
+a leitura autoritativa pode reconciliar apenas o pacote exato já confirmado.

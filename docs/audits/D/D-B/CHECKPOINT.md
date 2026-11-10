@@ -3000,3 +3000,34 @@ corrigidas no lote anterior;nenhum break-words ativo. Próximo lote começa por
 consumo/Flow. Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
 [Incremento](FAMILY_STOCK_DRAFTS.md),[validação](FAMILY_STOCK_DRAFTS_VALIDATION.json),
 [remoto](FAMILY_STOCK_DRAFTS_REMOTE.json),[CI histórica](CI_6E1A10F_OBSERVATION.json).
+
+## D3.47 — preenchimentos privados de consumo
+
+D3.47 implementa cinco preenchimentos privados CONSUMPTION:relatos família/
+equipe,complemento,aceite e recusa,com CAS,retomada entre sessões,referência
+selada e confirmação nativa atômica. Recuperação pessoal inativa preservada;
+consulta operacional atual/nova escrita continuam ativas e autorizadas.
+Envelope divergente não é apagado;leitura autoritativa só reconcilia a tentativa
+exata. Editor/revisão/erros e recuperação seguem componentes canônicos.
+53 unitários/API,20 Auth reais e22 identidades browser de produção local
+qualificados,com12 sucessos inalterados retidos+10/10 rechecks finais;tipos/lint
+PASS,39fontes LF estáveis. Rodada22 inicial21/22 e contraprovas preservadas.
+Local/remoto187 reconciliados:seis migrations,oito funções/ACL,duas tabelas,
+16 dependências legadas/digest iguais;dry-run vazio,sem reset/fixtures/Auth.
+CI14fdd28 aprovou nove jobs;Preview READY. Isso valida o lote anterior181;
+novo candidato exige CI própria limpa/legada/integral. Quadro105critérios,
+56PASS/49PARTIAL preservados;visual≈60%,formulários≈85%,recuperação≈90%.
+Preparações privadas Flow,composição EST-01,decoder saldos200,66/171 e demais
+critérios continuam pendentes. Sonar adiado,PR7 Draft,produção NO-GO,meta ativa.
+
+Contraprovas:alias42702,trim Unicode,normalização indevida de referência
+vinculada ao hash,inativo recuperável vs consulta operacional proibida,
+revogação tardia com rollback e espera real no catálogo. iOS fora do viewport
+foi corrigido no teste com interação real/hit-test,sem force/timeout maior.
+Envelope errado impede limpeza;perda de leitura oculta histórico privado
+após Atualizar relato,sem reload. Cache privado/replay offline não mudaram.
+Nenhuma promoção dos105x39/primeiras30 ou18 estados UI. Classes antigas de
+quebra de texto não aparecem nos fontes ativos;quadro temporário atualizado
+antes de avançar para Flow. Emulação/local não homologam pessoa/aparelho.
+[Incremento](CONSUMPTION_DRAFTS.md),[validação](CONSUMPTION_DRAFTS_VALIDATION.json),
+[remoto](CONSUMPTION_DRAFTS_REMOTE.json),[CI histórica](CI_14FDD28_OBSERVATION.json).

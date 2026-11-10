@@ -1,4 +1,8 @@
 import {
+  consumptionPreparationSaveSchema,
+  consumptionPreparationMutationSchema,
+} from "./consumption-preparations";
+import {
   stockPreparationSaveSchema,
   stockPreparationMutationSchema,
 } from "./stock-preparations";
@@ -135,6 +139,8 @@ const scope = {
 const navigation = { navigation: draftNavigationSchema.optional() };
 export const creationDraftCommandSchema = z
   .union([
+    consumptionPreparationSaveSchema,
+    consumptionPreparationMutationSchema,
     stockPreparationSaveSchema,
     stockPreparationMutationSchema,
     balancePreparationSaveSchema.strict(),

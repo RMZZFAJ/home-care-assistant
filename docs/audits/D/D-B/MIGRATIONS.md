@@ -654,3 +654,28 @@ legado local presentation_finite_factor continua não validado. A constraint
 preexistente do provedor realtime.messages não é alterada. Instalação limpa,
 evolução legada e integração completa são gates da CI própria do novo SHA.
 [Conferência](FAMILY_STOCK_DRAFTS_REMOTE.json).
+
+## D3.47 — preenchimentos privados de consumo
+
+Seis migrations182–187 aplicadas uma vez no remoto autorizado,181→187,antes
+do commit. Preflight confirmou projeto saudável,versões/digest e16 motores/
+dependências legados iguais ao local. Dry-run indicou somente os seis arquivos,
+sem seeds/roles/Vault;aplicação sem reset,fixtures ou Auth remoto. Pós-check:
+187 versões/digest,oito definições/configurações/grants,duas tabelas RLS fechadas
+e16 dependências iguais ao local;dry-run vazio,probes0. Sem backup pesado
+redundante de banco sintético,conforme complemento do responsável.
+
+182 implementa cinco propósitos privados;183 corrige alias42702;184 separa
+leitura própria inativa;185 inclui materiais do relato no lock de catálogo;
+186 alinha trim Unicode;187 mantém leitura operacional ativa na referência
+atual. Novos atos continuam sob guardas nativos. Nenhum motor legado mudou.
+53 unitários/API,20 Auth e22 browsers distintos qualificados;CI própria ainda
+precisa instalação limpa/evolução legada/integral. Rodadas e reutilização
+proporcionais estão no artefato de validação.
+
+Advisors conservam cinco classes de segurança/três de performance:duas novas
+tabelas fechadas,quatro RPCs Auth e dois índices sem uso nos grupos esperados.
+Demais avisos permanecem,sem aprovação global. Constraint local legada
+presentation_finite_factor não validada preservada;produto remoto sem inválida.
+Constraint realtime.messages do provedor previamente observada não foi alterada.
+[Conferência](CONSUMPTION_DRAFTS_REMOTE.json).

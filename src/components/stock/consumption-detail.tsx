@@ -15,6 +15,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { CatalogProduct } from "@/types/documents";
 import type { ConsumptionReport } from "@/types/consumption";
+import { ConsumptionPrivateResults } from "./consumption-private-results";
 import { ConsumptionLines } from "./consumption-lines";
 import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDecision } from "./consumption-decision";
@@ -136,6 +137,16 @@ export function ConsumptionDetail({
         </Notice>
       ) : null}
       {!data && !error ? <Notice>Carregando relato…</Notice> : null}
+      {!data &&
+      error &&
+      (context.patient?.is_active === false ||
+        context.patient?.active === false) ? (
+        <ConsumptionPrivateResults
+          context={context}
+          target={id}
+          refreshRevision={JSON.stringify([attempt, live])}
+        />
+      ) : null}
       {message ? <Notice>{message}</Notice> : null}
       {data ? (
         <>
@@ -152,14 +163,29 @@ export function ConsumptionDetail({
             · versão {data.version}
           </p>
           <p className="text-xs break-all">Referência: {data.id}</p>
-          {data.source_reminder_id?<Link href={"/consumo?"+new URLSearchParams({careRecipientId:context.patient!.id,ref:data.source_reminder_id,refKind:"reminder"})}>Consultar lembrete de origem</Link>:null}
+          {data.source_reminder_id ? (
+            <Link
+              href={
+                "/consumo?" +
+                new URLSearchParams({
+                  careRecipientId: context.patient!.id,
+                  ref: data.source_reminder_id,
+                  refKind: "reminder",
+                })
+              }
+            >
+              Consultar lembrete de origem
+            </Link>
+          ) : null}
           <section>
             <h3 className="font-semibold">Relato original · versão 1</h3>
             <p className="text-sm">
               {data.reported_name ?? "Nome não preservado no registro original"}{" "}
               · {formatBrazilDate(data.created_at)}
             </p>
-            <p className="my-2 whitespace-pre-wrap wrap-break-word">{data.body}</p>
+            <p className="my-2 whitespace-pre-wrap wrap-break-word">
+              {data.body}
+            </p>
             <ConsumptionLines lines={data.lines} />
           </section>
           {data.revisions.map((revision) => (
@@ -190,7 +216,9 @@ export function ConsumptionDetail({
               </p>
               <div className="hca-toolbar">
                 {supplement ? (
-                  <ActionButton onClick={(event) => setEditor(event.currentTarget)}>
+                  <ActionButton
+                    onClick={(event) => setEditor(event.currentTarget)}
+                  >
                     Adicionar complemento
                   </ActionButton>
                 ) : null}
@@ -273,6 +301,31 @@ export function ConsumptionDetail({
               </ul>
             </section>
           ) : null}
+          <section
+            className="hca-form-stack"
+            aria-label="Meus preenchimentos privados do relato"
+          >
+            <h3>Meus preenchimentos privados</h3>
+            <p>
+              Consulte, continue ou reconheça o seu resultado preservado. Abrir
+              esta consulta não registra complemento ou decisão.
+            </p>
+            <div className="hca-toolbar">
+              <ActionButton onClick={(e) => setEditor(e.currentTarget)}>
+                Meu complemento preservado
+              </ActionButton>
+              <ActionButton
+                onClick={() => setDecision({ report: data, accept: true })}
+              >
+                Minha conferência preservada
+              </ActionButton>
+              <ActionButton
+                onClick={() => setDecision({ report: data, accept: false })}
+              >
+                Minha rejeição preservada
+              </ActionButton>
+            </div>
+          </section>
           {editor ? (
             <ConsumptionEditor
               context={context}
@@ -290,6 +343,8 @@ export function ConsumptionDetail({
           ) : null}
           {decision ? (
             <ConsumptionDecision
+              context={context}
+              products={products}
               report={decision.report}
               accept={decision.accept}
               onClose={() => setDecision(null)}

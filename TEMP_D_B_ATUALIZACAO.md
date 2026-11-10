@@ -25,21 +25,22 @@ responsabilidade. “Você” indica decisão, configuração, participação em
 ou liberação que depende de você. “Participantes/equipe” são pessoas que
 usarão ou avaliarão o sistema; “serviço externo” depende também do fornecedor.
 
-A rodada completa de testes do lote anterior foi aprovada. Este novo lote
-passou pelas verificações locais dirigidas e ainda precisará da sua própria
-rodada completa após a publicação. O banco remoto está atualizado, com 181
-atualizações aplicadas, sem pendências deste lote. A fase continua em execução.
+A rodada completa de testes do lote anterior foi aprovada. Este lote passou
+pelas verificações locais dirigidas e ainda precisará da sua própria rodada
+completa após a publicação. O banco remoto já recebeu todas as atualizações
+deste lote, sem pendências. A fase continua em execução.
 
-Neste lote, o preenchimento dos quatro tipos de movimentação familiar passou
-a ser salvo de forma privada e retomado em outra sessão. A confirmação perdida
-pode ser recuperada sem registrar o movimento duas vezes. Comparação dos dados,
-permissões e o novo editor seguem a mesma aparência do modelo. A consulta de
-saldos, as fichas e os atos de balanço dos lotes anteriores permanecem
+Neste lote, relatos de consumo da família e da equipe, complementos, aceites
+e recusas passaram a guardar o preenchimento privado e retomá-lo em outra
+sessão. Campos incompletos são preservados, a comparação exige uma escolha
+explícita e a confirmação perdida pode ser recuperada sem registrar o ato duas
+vezes. Salvar o preenchimento não publica relato nem desconta estoque. O novo
+editor, a revisão e os resultados pessoais seguem a aparência do modelo.
+
+A continuidade privada das revisões de fluxo ainda falta. Está incluída nas
+estimativas e na sequência abaixo; não foi transferida para você. Movimentação
+familiar, fichas, saldos e atos de balanço dos lotes anteriores permanecem
 implementados. A troca das classes de quebra de texto já foi concluída.
-
-A continuidade privada de relatos, complementos e decisões de consumo e das
-revisões de fluxo ainda falta. Está incluída nas estimativas e na sequência
-abaixo; não foi transferida para você.
 
 ## Funcionalidades e critérios da D-B
 
@@ -75,10 +76,9 @@ abaixo; não foi transferida para você.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈85%. Falta: Completar relato, complemento e decisões de consumo e
-  revisões de fluxo; conferir os demais
-  preenchimentos em conjunto. Movimentação familiar, programação, atribuição,
-  adiamentos, pareceres,
+  execução · ≈90%. Falta: Completar revisões de fluxo e conferir os demais
+  preenchimentos em conjunto. Relatos, complementos e decisões de consumo,
+  movimentação familiar, programação, atribuição, adiamentos, pareceres,
   reconto e decisões de requisição estão implementados. Responsável: Codex.
 - **Preservar edição durante falha, conflito e perda de contexto** — Em
   execução · ≈85%. Falta: Conferir em conjunto as combinações restantes de
@@ -377,11 +377,11 @@ incluídos.
 - **Cabeçalho, menu lateral, paciente e navegação móvel** — 80%. Já aplicado:
   Estrutura e navegação do modelo. Falta: Fechar comparação de todos os
   estados e larguras. Responsável: Codex.
-- **Formulários, apoio, avisos e recuperação** — 80%. Já aplicado: Criação,
+- **Formulários, apoio, avisos e recuperação** — 85%. Já aplicado: Criação,
   atos de compra, entrega e transferência, decisões de requisição, pareceres,
-  reconto, programação, atribuição e adiamentos do balanço e movimentação
-  familiar. Falta: Conferir
-  todas as variações e sua apresentação conjunta. Responsável: Codex.
+  reconto, programação, atribuição e adiamentos do balanço, movimentação
+  familiar, relatos, complementos e decisões de consumo. Falta: Revisões de
+  fluxo, demais variações e apresentação conjunta. Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 55%. Já aplicado: Base,
   vários consumidores e a consulta de saldos com mínimo, situação, unidades e
   filtro. Falta: Completar as outras listas e verificar todas as variações.
@@ -403,8 +403,8 @@ incluídos.
   dessas áreas. Responsável: Codex.
 - **Estoque, consumo, transferências e variantes de balanço** — 70%. Já
   aplicado: Consulta de saldos em tabela e cartões, mínimos, situação, filtros
-  e detalhes; movimentação familiar com preparação, revisão e recuperação
-  privadas; fluxos reais preservados. Falta: Concluir a composição geral,
+  e detalhes; movimentação familiar e consumo com preparação, revisão e
+  recuperação privadas; fluxos reais preservados. Falta: Concluir a composição geral,
   trânsito, histórico, formulários e os estados restantes. Responsável: Codex.
 - **Central de avisos, aplicativo e suporte** — 50%. Já aplicado: Recursos
   existentes usam a base compartilhada. Falta: Completar composição e
@@ -454,9 +454,6 @@ estar parcialmente pronta, como mostrado nos blocos anteriores. Incluem implemen
 validação e ativação operacional; não são motivos para parar os trabalhos
 independentes.
 
-- **Preparação privada dos formulários e decisões de consumo:**0% dessa
-  preparação. Relatos, complementos e decisões já existem; falta a continuidade
-  completa do preenchimento entre sessões. Responsável: Codex.
 - **Preparação privada das revisões de fluxo:**0% dessa preparação. A revisão
   operacional existente precisa também guardar e retomar o preenchimento
   incompleto entre sessões. Responsável: Codex.
@@ -481,10 +478,10 @@ funcionalidade, sem representar ordem de execução. Tudo que já está 100% ser
 preservado e incluído na revisão final; não será refeito sem motivo.
 
 1. **Completar a continuidade dos formulários da operação diária.** Fazer os
-   preenchimentos privados de consumo e revisões de fluxo; conferir mensagens,
-   conflitos e recuperação em conjunto. Preservar
-   a movimentação familiar, os seis atos de balanço, os pareceres e reconto,
-   as decisões de requisição e as demais preparações já concluídas.
+   preenchimentos privados das revisões de fluxo; conferir mensagens,
+   conflitos e recuperação em conjunto. Preservar os relatos, complementos e
+   decisões de consumo, a movimentação familiar, os seis atos de balanço,
+   pareceres, reconto, decisões de requisição e as demais preparações concluídas.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.
