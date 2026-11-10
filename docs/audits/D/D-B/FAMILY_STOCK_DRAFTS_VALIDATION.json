@@ -1,0 +1,503 @@
+{
+  "increment": "D3.46",
+  "baseSha": "6e1a10f4ad2c13f57ab75b5085fac41221697a0a",
+  "status": "DIRECTED_LOCAL_IMPLEMENTATION_VALIDATED_OWN_SHA_CI_REQUIRED",
+  "sourceLfSha256": {
+    "src/app/api/drafts/route.ts": "905262a987da0414c3ea7834631852307c9545ae6dcf52bb658609d6674a6377",
+    "src/app/api/stock/preparations/commit/route.ts": "4cd9b42f020e70229728e03be2259c7c3224f0b7f8d1127ba63f0132522ec91c",
+    "src/app/api/stock/preparations/reference/route.ts": "a310c1a07132e8cebde360ec12f830524c2d8376e5a03216addd8ea1d51e6256",
+    "src/app/api/stock/preparations/route.ts": "e63d3f7ef59b6960dca9e7bf0ee57552490b377129a27558ff7b4ee504bbe474",
+    "src/app/canonical-ui.css": "e8a4735c4f8bcd417a68a8cf5a96cd70bda2ca3dac37e1d400e1e70af86a15cb",
+    "src/components/forms/creation-draft-panel.tsx": "d3066142ae47b1477422dd3aa89522604d495f546e18a0b6689895208ecdf375",
+    "src/components/forms/record-drawer.tsx": "936d7e5a2bb1c409aa6479284933ddab0696a5edc30fbc1dd5dac4d78e8691d7",
+    "src/components/forms/use-creation-draft.ts": "6f68e5c2046bc190b2b9772d4b8cccf78ab8de409906c1474016aef78f1b8f7f",
+    "src/components/stock/family-stock-preparation.tsx": "aa090499c03f7745ba8b5dc2e2b594b436983ba9c63ef3802e814009f53190cc",
+    "src/components/stock/stock-console.tsx": "cad5e4d29159de4a6a586ffcf57ff4e1b287a71d817123c9b7ef20d0c167d0a2",
+    "src/components/ui/controls.tsx": "5349cf4a23f43f4887c8c9ac85b8442b10475ef69934a8645146f4bbe1752959",
+    "src/lib/forms/draft-navigation.ts": "4f81f53a0360d47decf3e63f346fc799e90cbf67ef97088de7750889978f46c8",
+    "src/lib/forms/stock-preparation-display.ts": "e6c10e42fad997fdbc114c862c024abe3429908d3b8c9184621253b8e07635c7",
+    "src/lib/quantity.ts": "afe8fcaf09d9388d7f40f65c5a9904a25c53ec31a0bc8183f13ce1f330325601",
+    "src/lib/server/stock-preparation.ts": "086c8437d36c320fffd683d94e916e3f3958aeadc3c88b0957fe51734d4f8bed",
+    "src/lib/validation/creation-drafts.ts": "edb65e43b3ee8c69fe170a4ad7385e0543f2c2caba535bc3f858ffb9303cbe9b",
+    "src/lib/validation/documents.ts": "a00ada78a520dfe282e84f15fd4c35f59e81e160005cf62a0f69d2b3d7d3e9ea",
+    "src/lib/validation/exact-quantity.ts": "1fae593be2d354680ad57b30be9a2c6bfa46736f84916a63ab55e9f4675936a2",
+    "src/lib/validation/private-draft-results.ts": "1b76785929ab7978b742c36711fd866b59e772d16767337a17d62c4a6753da71",
+    "src/lib/validation/stock-preparations.ts": "40916a5305c36273c97327b79cb0936bc6569553ef7a28365ed858767c92635f",
+    "src/lib/validation/stock.ts": "4da8ed052779ea89de2cf5da077accb7cd158d004f7969dca0d9ee3cf353a808",
+    "src/lib/validation/supply-drafts.ts": "062236c56fefda2db959b2244c5654247ccc8b388dd609ce3211a81ea4d8a774",
+    "src/types/creation-drafts.ts": "adf43feb611b9af2504816c0eff95542408f6052813102185c61ef7d17988a29",
+    "supabase/migrations/20261110041201_phase_d3_private_family_stock_preparation.sql": "d26435a081fbeb8b4fd47a74af88320a3f5dc3fd7a9a0a827c0d9cef2329ccdd",
+    "supabase/migrations/20261110042956_phase_d3_stock_preparation_reference_summary.sql": "9e4a4d0955f951f94b86bb1198e0ddd43162a9ae7c0583e2c1a5e764ec7a9b37",
+    "supabase/migrations/20261110050900_phase_d3_stock_write_without_balance_read.sql": "0428dcbf5004a1f52f35f3254ffd3efdc4e12a4f9ee062fcbf002bf3698637b4",
+    "supabase/migrations/20261110052011_phase_d3_stock_reference_ledger_authority.sql": "26c6466763f49e928ba93be1325855cc466f2197dec37b8f113939da10e43a3f",
+    "tests/api/stock-preparations-contract.test.ts": "c42d2de57266f7c0b65c48db476defdf9c0427e11ce051899992e5b2b024c95b",
+    "tests/e2e/balance-workspace-private-drafts.spec.ts": "39e1d8554bf2af725f951e4bb8e92c6fd56d8f3e316a99d92e30edee86579d35",
+    "tests/e2e/catalogue-identities.spec.ts": "df86c5de27d6e334c8353e8b8d85c99ed64aafa7073eaa873fd2490c75ecd5af",
+    "tests/e2e/requisition-pdf-personal-receipt.spec.ts": "80f1519845a8464a7af7ba5091b4d29f65d40139b834c93bcc6f6fa88d979b0e",
+    "tests/e2e/stock-private-preparation.spec.ts": "1da82905e52d76588df7acb38dfab15e79b3599f41a129fb20219ba2d1c181d9",
+    "tests/e2e/workflows.spec.ts": "3ddc6e6564beb7c47f084dd6a6193a5710bb22c7c8e34676e8124369b6704355",
+    "tests/integration/stock-preparation-fixtures.mjs": "3b75da9a42361c6c5806e0ef67b92bf6fc6e7c34fac60f58d3b2cf38a2955745",
+    "tests/integration/stock-preparations.test.mjs": "de818ba3e4274f4717c654bd8bf5dae5234f3d6d670760df3b2b6d458abf572b",
+    "tests/stock-preparations.test.ts": "7478396c7b264e0b57a921a5a8ddff65e68c968ab9bb9cd1c11b8d45640f9453"
+  },
+  "unitApi": {
+    "qualifiedDistinct": 66,
+    "reusedUnchangedConsumers": 55,
+    "latestRepeated": 11,
+    "latestExitCode": 0,
+    "qualification": "Initial64 cases had63 passes and one UTF16 failure. Keep55 unrelated passed consumers;replace stock/model and API cohorts with latest11/11 including two added mask cases. No partial cohort called globally green."
+  },
+  "realAuth": {
+    "qualifiedDistinct": 13,
+    "stock-write-only-auth-ledger.log": {
+      "pass": 12,
+      "fail": 0
+    },
+    "stock-inactive-auth.log": {
+      "pass": 1,
+      "fail": 0
+    },
+    "stack": "home-care-assistant;API127.0.0.1:54321;DB127.0.0.1:54322",
+    "temporaryProbesRemoved": true,
+    "coverage": [
+      "four native operations",
+      "CAS and patient/owner isolation",
+      "partial save/discard",
+      "same-balance changed ledger",
+      "native-key collision",
+      "write loss and late-journal rollback",
+      "read/write independent and delegated professional",
+      "late read loss masks receipt",
+      "inactive patient own recovery/cleanup with new write denied"
+    ]
+  },
+  "typecheck": 0,
+  "directedLint": 0,
+  "browser": {
+    "qualifiedDistinct": 18,
+    "buildMode": "production",
+    "qualifiedCases": [
+      {
+        "title": "BAL por plantão configure:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "balance-workspace-private-drafts.spec.ts",
+          "line": 62,
+          "column": 7
+        },
+        "duration": 28616,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "BAL por plantão configure:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "balance-workspace-private-drafts.spec.ts",
+          "line": 62,
+          "column": 7
+        },
+        "duration": 35807,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "compensação de inativo mantém a referência visível e usa uma única superfície de revisão",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "catalogue-identities.spec.ts",
+          "line": 363,
+          "column": 5
+        },
+        "duration": 11337,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "compensação de inativo mantém a referência visível e usa uma única superfície de revisão",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "catalogue-identities.spec.ts",
+          "line": 363,
+          "column": 5
+        },
+        "duration": 14998,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em leitura, com efeitos distintos",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "requisition-pdf-personal-receipt.spec.ts",
+          "line": 448,
+          "column": 5
+        },
+        "duration": 12743,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "movimentação privada retoma em outra sessão,compara saldo e recupera uma única entrada após resposta perdida",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 65,
+          "column": 5
+        },
+        "duration": 23436,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "compensação privada preserva referência fora da página,retoma sem replay e confirma uma única entrada histórica",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 248,
+          "column": 5
+        },
+        "duration": 11814,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "gestão familiar sem leitura do saldo mantém preparação e ato nativo com respostas e recibo restritos",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 492,
+          "column": 5
+        },
+        "duration": 8739,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "movimentação privada retoma em outra sessão,compara saldo e recupera uma única entrada após resposta perdida",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 65,
+          "column": 5
+        },
+        "duration": 35244,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "compensação privada preserva referência fora da página,retoma sem replay e confirma uma única entrada histórica",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 248,
+          "column": 5
+        },
+        "duration": 14255,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "gestão familiar sem leitura do saldo mantém preparação e ato nativo com respostas e recibo restritos",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 492,
+          "column": 5
+        },
+        "duration": 10008,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "estoque familiar: revisão, paginação, filtro e correção compensatória auditável",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 612,
+          "column": 5
+        },
+        "duration": 17737,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "estoque familiar: revisão, paginação, filtro e correção compensatória auditável",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 612,
+          "column": 5
+        },
+        "duration": 25789,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-first"
+      },
+      {
+        "title": "salvar antes da referência conserva a ausência explícita e exige adoção manual após a consulta tardia",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 409,
+          "column": 5
+        },
+        "duration": 12917,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-recheck-pass"
+      },
+      {
+        "title": "salvar antes da referência conserva a ausência explícita e exige adoção manual após a consulta tardia",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 409,
+          "column": 5
+        },
+        "duration": 11298,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-recheck-pass"
+      },
+      {
+        "title": "confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em leitura, com efeitos distintos",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "requisition-pdf-personal-receipt.spec.ts",
+          "line": 448,
+          "column": 5
+        },
+        "duration": 16422,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-permissions-recheck-pass"
+      },
+      {
+        "title": "resultado familiar privado sobrevive à perda de escrita e revalida leitura sem expor o preenchimento recusado",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 323,
+          "column": 5
+        },
+        "duration": 19674,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-inactive-final-pass"
+      },
+      {
+        "title": "resultado familiar privado sobrevive à perda de escrita e revalida leitura sem expor o preenchimento recusado",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "stock-private-preparation.spec.ts",
+          "line": 323,
+          "column": 5
+        },
+        "duration": 18310,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "stock-inactive-final-pass"
+      }
+    ],
+    "cohorts": {
+      "stock-permissions-first": {
+        "stats": {
+          "total": 18,
+          "expected": 16,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "ab34199928c72d267d75fa60544b73fe326ac58f0ee7828c13221e96121e5930"
+      },
+      "stock-permissions-recheck-pass": {
+        "stats": {
+          "total": 3,
+          "expected": 3,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "6a92695cd751a72554422979a97940ebc217dc9cece9251bc70da08576b691d3"
+      },
+      "stock-inactive-final-pass": {
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "00de245ff5cc15133a1ff21720f2f032799ed8d4b6274c6fba10d8c1e9afc663"
+      }
+    },
+    "qualification": "13 successes retained from first18;three directed rechecks;two extended inactive cases supersede original recovery cases. First18 was16/18,not green. Later runtime changes affect inactive gating;retained cases use active patients. Only aborted-reference fixture changed for held-reference rechecks;old iOS consumer body unchanged.",
+    "firstToFinalChangedSources": [
+      "src/app/api/stock/preparations/commit/route.ts",
+      "src/app/api/stock/preparations/route.ts",
+      "src/components/stock/family-stock-preparation.tsx",
+      "src/lib/server/stock-preparation.ts",
+      "tests/e2e/stock-private-preparation.spec.ts",
+      "tests/integration/stock-preparations.test.mjs"
+    ],
+    "recheckToFinalChangedSources": [
+      "src/app/api/stock/preparations/commit/route.ts",
+      "src/app/api/stock/preparations/route.ts",
+      "src/components/stock/family-stock-preparation.tsx",
+      "src/lib/server/stock-preparation.ts",
+      "tests/e2e/stock-private-preparation.spec.ts",
+      "tests/integration/stock-preparations.test.mjs"
+    ],
+    "sameGuardedLocalStack": true,
+    "noConcurrentMutableDbSuite": true,
+    "sourceFrozenDuringEachRun": true,
+    "noRuleOrAssertionDisabled": true
+  },
+  "visualReview": {
+    "viewed": [
+      {
+        "archive": "stock-permissions-first",
+        "image": "2d358701ed2908626be959d756eae005d76d08d0.png",
+        "viewport": 1440,
+        "surface": "canonical private stock editor"
+      },
+      {
+        "archive": "stock-permissions-first",
+        "image": "7f38b9f004db5770acebf4721c6f5c015082a4b2.png",
+        "viewport": 320,
+        "surface": "canonical private stock editor"
+      },
+      {
+        "archive": "stock-permissions-first",
+        "image": "97dedbfa4592200590cf0c746d942ce22159ed07.png",
+        "viewport": 320,
+        "surface": "readonly recovered stock receipt with DefinitionGrid;scrollable viewport capture"
+      }
+    ],
+    "exercisedWidths": [
+      320,
+      500,
+      850,
+      1150,
+      1440
+    ],
+    "qualification": "Directed editor/review Axe,geometry and readonly assertions;not all66 compositions,171 relations or human/device homologation."
+  },
+  "counterproofs": [
+    "New UTF16 case rejected501emojis after matching browser/database length units.",
+    "Initial14 browser pass preceded independent read/write discovery;cannot substitute final scope proof.",
+    "Grid-first cohort11/12 found reference not yet loaded at save;explicit saved-NULL guard added and delayed-reference case created.",
+    "Native write succeeded once for manage-only actor while preparation denied42501;180removed erroneous read requirement.",
+    "After180two Auth cases detected permission-filtered view giving falsezero;181uses existing authoritative private.stock_quantity;12/12passed.",
+    "Final permission cohort16/18 retained both failures:old iOS Entrar stability timeout before stock and fixture waiting on correctly aborted GET. Recheck3/3 after fixture synchronization;no claim of global login fix.",
+    "Inactive recovery added after scope review;Auth1/1 and browser2/2pass with new-write denial intact."
+  ],
+  "remote": "FAMILY_STOCK_DRAFTS_REMOTE.json",
+  "matrix": {
+    "criteria": 105,
+    "columns": 39,
+    "protectedFirstColumns": 30,
+    "pass": 56,
+    "partial": 49,
+    "notStarted": 0,
+    "uiRows": 18,
+    "statusPromotions": 0
+  },
+  "historicalCi": "CI_6E1A10F_OBSERVATION.json",
+  "remaining": [
+    "Consumption report/supplement/decision and Flow-review private continuity",
+    "Integrated form/failure review",
+    "EST-01 full composition and stock200response defensive decoding",
+    "All66/171 canonical parity and human/device/provider gates",
+    "Own-SHA clean-install,legacy-upgrade,full integration and consumer CI"
+  ],
+  "boundaries": [
+    "PR7 Draft,no merge,no production deployment",
+    "No private cache or offline replay changes",
+    "No new external notification activation",
+    "Sonar configuration/remediation owner-deferred"
+  ],
+  "artifactRawSha256": {
+    "output/phase-d-work/ui-canonical/stock-draft-unit-first.log": "63d2eefa7268f55286a13c2d95290f1bd6ec29a3832805eadc8c62f676fe1ebb",
+    "output/phase-d-work/ui-canonical/stock-permissions-unit.log": "36404610d815f08ba52c04409fb0e75d38b2899741dd3dafbbf40aa49fcf1569",
+    "output/phase-d-work/ui-canonical/stock-write-only-auth-ledger.log": "ef4c101d15e2e3fc2f70238e5b9ea7432ab9fde53c5c836e77c67aa5343e4ba5",
+    "output/phase-d-work/ui-canonical/stock-inactive-auth.log": "56eedf177c33e225349ec0ccb6228477fb2656ea667cf66bd1316bb306e87a46",
+    "output/phase-d-work/ui-canonical/stock-inactive-static.json": "9c03e7bcab06e013da5fb6a6bd86749278fe3d2c9ac24a36a11ce8c31eb11ab4",
+    "output/phase-d-work/ui-canonical/stock-inactive-auth-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output/phase-d-work/ui-canonical/stock-permissions-recheck-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output/phase-d-work/ui-canonical/stock-inactive-frozen.json": "a5547b1dc2a93532fc0c74b19a05db97f16e3e716515050ca452eb6ad1e70420",
+    "output/phase-d-work/ui-canonical/stock-private-first-pass/manifest.json": "d88a85feee1ec8a7c1ba29b8e85afdea724cccb01f1adbffbee584786341dbd2",
+    "output/phase-d-work/ui-canonical/stock-private-first-pass/report.html": "d5594b3fcd42821edb0d5613a6c8a5e220c0476cb644f129a5199fe7009ebba5",
+    "output/phase-d-work/ui-canonical/stock-private-grid-first/manifest.json": "c605ce88528a4798afdaace3115dea3b4f37b1e67cceb668c70fc9d1910e557b",
+    "output/phase-d-work/ui-canonical/stock-private-grid-first/report.html": "bb779aa80ef3f5404f1caa2948790226a65e4595907d523309070231222c6315",
+    "output/phase-d-work/ui-canonical/stock-permissions-first/manifest.json": "49c06729cfc311b4aaeb19768eb6d700775a7f59f4ab7e82308433e7c48868e6",
+    "output/phase-d-work/ui-canonical/stock-permissions-first/report.html": "ab34199928c72d267d75fa60544b73fe326ac58f0ee7828c13221e96121e5930",
+    "output/phase-d-work/ui-canonical/stock-permissions-recheck-pass/manifest.json": "204b3e409ccd77d743d7e312d4d838909abed6c673f508102192f3acd263e3f0",
+    "output/phase-d-work/ui-canonical/stock-permissions-recheck-pass/report.html": "6a92695cd751a72554422979a97940ebc217dc9cece9251bc70da08576b691d3",
+    "output/phase-d-work/ui-canonical/stock-inactive-final-pass/manifest.json": "63f42f73cd80291100363cfb0c418395277ee9929cfec66a79317ca92579aed7",
+    "output/phase-d-work/ui-canonical/stock-inactive-final-pass/report.html": "00de245ff5cc15133a1ff21720f2f032799ed8d4b6274c6fba10d8c1e9afc663"
+  },
+  "documentaryValidation": {
+    "markdownFiles": 11,
+    "markdownlintIssues": 0,
+    "changedMarkdownLocalLinks": "PASS",
+    "historicalMigrations": 84,
+    "historicalLfHashes": "PASS",
+    "ownerReportCriteria": 105,
+    "ownerReportCompleted": 56,
+    "ownerReportPartial": 49,
+    "activeLegacyUtilityOccurrences": 0
+  }
+}

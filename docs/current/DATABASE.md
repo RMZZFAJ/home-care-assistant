@@ -565,3 +565,26 @@ nativo;mudança tardia após journal reverte ato e consumo. A referência inclui
 o alvo exato mesmo fora da página;lista própria obtém total/itens no mesmo
 snapshot e pagina por criação/ID. Tabelas/helper privados ficam fechados a
 clientes;somente os cinco RPCs públicos recebem EXECUTE authenticated.
+
+## Preparação privada de estoque familiar
+
+private.stock_movement_preparations e private.stock_movement_preparation_commands
+guardam o preenchimento familiar,com dono,paciente,propósito,alvo real,CAS e
+journal. O alvo é o paciente,tipo STOCK,sem documento artificial. Guardas de
+leitura/escrita são revalidadas após locks;RLS e revogação de acesso direto
+fecham ambas as tabelas. Nove funções têm search_path explícito;somente quatro
+entrypoints públicos recebem EXECUTE authenticated.
+
+O snapshot combina catálogo,saldo familiar,histórico físico e origem exata da
+compensação. Confirmar vincula também nome,unidade e saldo preservados;somente
+family_stock_movement produz o movimento. A mesma transação consome o privado
+e congela o recibo pessoal. Replay próprio não executa o motor novamente;
+descarte ou reconhecimento não apagam o ledger. As migrations178–181 não
+alteram o comando nativo,Auth,documentos ou saldos existentes.
+
+A referência interna usa private.stock_quantity,com autoridade independente
+da view filtrada por leitura. O escopo aceita leitura ou gestão do estoque
+familiar;escrita nova exige gestão e paciente ativo. Sem leitura,o retorno
+mascara saldo e detalhes da origem,sem modificar a referência selada interna.
+Recuperação própria já vinculada permanece possível com paciente inativo,
+sem conceder novo ato. Helpers de apresentação também mascaram recibo/contexto.

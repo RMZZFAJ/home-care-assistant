@@ -60,6 +60,11 @@ tabela é local e acessível por teclado; valores permanecem íntegros.
 Breadcrumbs interativos conservam alvo mínimo de24px. Títulos longos de
 diálogo quebram sem expulsar seu controle de fechamento.
 
+DefinitionGrid reproduz a composição kv do Modelo Integral:duas colunas,
+rótulo de11px,texto de13px,intervalo14px (13px no celular),sem corte de valores.
+Notas e referências extensas podem ocupar a linha inteira. O resumo privado
+de estoque compartilha essa composição na oferta,revisão e consulta do resultado.
+
 ## Aceite
 
 Comparar produto e modelo em cinco viewports; testar teclado, retorno de foco,

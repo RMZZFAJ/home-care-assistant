@@ -235,3 +235,15 @@ O envelope incerto usa prefixo hca e escopo por conta/paciente/propósito/
 recurso,é validado antes de exibir e segue a limpeza de logout. Retomada local
 não faz POST automático;sessionStorage não concede permissão. Respostas não
 são armazenadas pelo Service Worker e mutações não são reproduzidas offline.
+
+## Preparação privada de movimentação familiar
+
+O escopo pessoal STOCK admite leitura ou gestão familiar;somente escrita nova
+exige gestão e paciente ativo. Tabelas/helpers permanecem sem grants diretos;
+quatro RPCs Auth têm search_path vazio e guardas no banco. O snapshot interno
+usa o ledger autoritativo. Leitura e gestão independentes não autorizam revelar
+saldo ou origem:referência,contexto,recibo,replay e apresentação pendente são
+mascarados quando necessário. O pacote original de recuperação é preservado,
+sem reaplicação offline. Revogação tardia e rollback são exercitados com Auth
+real. Resultado próprio pode ser recuperado com paciente inativo;nenhum novo
+movimento é autorizado por isso. [Provas](../audits/D/D-B/FAMILY_STOCK_DRAFTS.md).

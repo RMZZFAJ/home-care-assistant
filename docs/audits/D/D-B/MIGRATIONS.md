@@ -630,3 +630,27 @@ final. Hashes finais normalizam LF explicitamente. Sem reset,fixtures/Auth
 remotos ou backup pesado redundante,no banco sintético conforme complemento
 do responsável. Instalação limpa/evolução legada/integral continuam na CI do
 próprio SHA. [Conferência](BAL_WORKSPACE_DRAFTS_REMOTE.json).
+
+## D3.46 — preparação privada do estoque familiar
+
+Quatro migrations178–181 aplicadas uma vez no remoto autorizado,177→181,antes
+do commit. Pré-check confirmou projeto,177versões e compatibilidade dos cinco
+helpers/comando legados. Dry-run listou exatamente os quatro arquivos esperados;
+aplicação não recebeu seeds,roles ou Vault. Pós-check:181versões/digest,nove
+funções/corpos LF/configuração/ACL,duas tabelas RLS fechadas e cinco dependências
+iguais ao local;dry-run vazio e probes0. Não houve reset,fixtures/Auth remoto ou
+backup pesado redundante no banco sintético,conforme complemento do responsável.
+
+178 teve CASE corrigido antes da primeira aplicação local bem-sucedida.179,
+180 e181 preservam autoria incremental e corrigem resumo,independência entre
+leitura/gestão e fonte autoritativa do saldo. Nenhuma migration aplicada foi
+reescrita. Arquivo178 foi nomeado manualmente;as três posteriores foram geradas
+pelo CLI migration new. Hashes normalizam LF explicitamente.
+
+Advisors mantêm cinco classes de segurança e três de performance. As novas
+tabelas fechadas,quatro RPCs Auth e dois índices aparecem nos grupos esperados;
+isso não sana os achados anteriores. Constraints de produto remotas válidas;
+legado local presentation_finite_factor continua não validado. A constraint
+preexistente do provedor realtime.messages não é alterada. Instalação limpa,
+evolução legada e integração completa são gates da CI própria do novo SHA.
+[Conferência](FAMILY_STOCK_DRAFTS_REMOTE.json).

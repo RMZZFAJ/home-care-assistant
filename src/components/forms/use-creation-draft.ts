@@ -33,6 +33,7 @@ type Options = {
   targetDocumentId?: string | null;
   targetResourceId?: string | null;
   enabled?: boolean;
+  readScopeRevision?: string;
   navigation?: DraftNavigation;
   onResume: (draft: CreationDraft) => boolean;
   onDiscard: () => void;
@@ -47,6 +48,7 @@ export function useCreationDraft({
   targetDocumentId = null,
   targetResourceId = null,
   enabled = true,
+  readScopeRevision = "",
   navigation,
   onResume,
   onDiscard,
@@ -73,10 +75,14 @@ export function useCreationDraft({
   const active = enabled && kind !== null;
   const extended = usesSupplyDraftTransport(kind, purpose);
   const resourcePreparation =
-    kind === "BAL" && isBalancePreparationPurpose(purpose);
-  const commandUrl = resourcePreparation
-    ? "/api/balances/preparations"
-    : "/api/drafts";
+    (kind === "BAL" && isBalancePreparationPurpose(purpose)) ||
+    (kind === "STOCK" && purpose === "family_movement");
+  const commandUrl =
+    kind === "STOCK"
+      ? "/api/stock/preparations"
+      : resourcePreparation
+        ? "/api/balances/preparations"
+        : "/api/drafts";
   const storageKey =
     `hca:private-draft-command:${userId}:${patientId}:${kind}:${targetDocumentId ?? "new"}` +
     (extended || resourcePreparation ? ":" + purpose : "") +
@@ -86,6 +92,7 @@ export function useCreationDraft({
     : `/api/drafts?careRecipientId=${patientId}&kind=${kind}` +
       (targetDocumentId ? `&targetDocumentId=${targetDocumentId}` : "") +
       (extended ? "&purpose=" + purpose : "");
+  const readScope = storageKey + ":" + readScopeRevision;
   const parseRead = useCallback(
     (value: unknown) =>
       parsePrivateDraft(value, {
@@ -164,7 +171,7 @@ export function useCreationDraft({
         }
       } finally {
         if (!controller.signal.aborted) {
-          setReadyScope(storageKey);
+          setReadyScope(readScope);
           setLoading(false);
         }
       }
@@ -180,6 +187,7 @@ export function useCreationDraft({
     patientId,
     purpose,
     storageKey,
+    readScope,
     targetDocumentId,
     targetResourceId,
     resourcePreparation,
@@ -459,7 +467,7 @@ export function useCreationDraft({
   const blocked =
     active &&
     (loading ||
-      readyScope !== storageKey ||
+      readyScope !== readScope ||
       busy ||
       !!loadError ||
       !!offered ||
@@ -477,13 +485,18 @@ export function useCreationDraft({
     consumed,
     conflict,
     compared,
-    loading: active && (loading || readyScope !== storageKey),
+    loading: active && (loading || readyScope !== readScope),
     busy,
     pending,
     error,
     loadError,
     readDenied,
-    protectedReadPending,
+    protectedReadPending:
+      protectedReadPending ||
+      (active &&
+        readScopeRevision !== "" &&
+        readyScope !== "" &&
+        readyScope !== readScope),
     message,
     blocked,
     draftCommit:

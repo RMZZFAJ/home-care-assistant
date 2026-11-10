@@ -162,3 +162,12 @@ conserva linhas durante atualização do mesmo escopo,com indicação de consult
 recusa de leitura remove registros protegidos. Paciente/titular não
 compartilham estado. Retorno de foco mantém o iniciador conectado durante
 atualização ou usa fallback acessível quando ele deixa de estar disponível.
+
+Preparação STOCK usa o paciente como recurso e family_movement como propósito,
+sem documento artificial. Um slot pessoal compõe os quatro movimentos nativos
+da família com CAS,referência do ledger e intenção selada. Confirmação física e
+consumo privado são atômicos. Salvar antes da referência exige adoção posterior
+explícita. O snapshot interno usa saldo autoritativo;representação pública e
+privada exibida respeitam a leitura independente da autorização de movimentar.
+Recuperar ato próprio já vinculado não exige reativar o paciente nem concede
+escrita nova. A variante de leitura revalida a superfície sem mudar a intenção.

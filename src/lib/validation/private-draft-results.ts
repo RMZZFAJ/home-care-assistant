@@ -1,4 +1,8 @@
 import {
+  stockPreparationContentSchema,
+  parseStockPreparationReceipt,
+} from "./stock-preparations";
+import {
   isBalanceDocumentPurpose,
   balanceDocumentDraftContent,
 } from "./supply-drafts";
@@ -50,7 +54,7 @@ const resultSchema = z.object({
 const readSchema = resultSchema.omit({ replayed: true }).extend({
   ownerId: z.uuid(),
   patientId: z.uuid(),
-  kind: z.enum(["REQ", "BAL", "COM", "ENT"]),
+  kind: z.enum(["REQ", "BAL", "COM", "ENT", "STOCK"]),
   purpose: draftPurpose.default("create"),
   targetDocumentId: z.uuid().nullable(),
   schemaVersion: z.literal(1),
@@ -84,7 +88,8 @@ export function parsePrivateDraft(
       "A resposta do rascunho não corresponde ao contexto consultado.",
     );
   const resource =
-    row.kind === "BAL" && isBalancePreparationPurpose(row.purpose);
+    (row.kind === "BAL" && isBalancePreparationPurpose(row.purpose)) ||
+    (row.kind === "STOCK" && row.purpose === "family_movement");
   if (
     resource
       ? row.targetResourceId !== scope.targetResourceId ||
@@ -96,21 +101,24 @@ export function parsePrivateDraft(
     throw new Error(
       "O alvo do preenchimento não corresponde ao contexto consultado.",
     );
-  const schema = resource
-    ? balancePreparationContentSchema
-    : row.kind === "REQ" && isRequisitionOperationPurpose(row.purpose)
-      ? requisitionOperationDraftContent
-      : row.kind === "REQ"
-        ? requisitionDraftContent
-        : row.kind === "BAL" && isBalanceDocumentPurpose(row.purpose)
-          ? balanceDocumentDraftContent
-          : row.kind === "BAL"
-            ? balanceDraftContent
-            : declarationSourceForPurpose(row.purpose)
-              ? transferDeclarationDraftContent
-              : !["create", "revise"].includes(row.purpose)
-                ? receiptDraftContent
-                : supplyDraftContent;
+  const schema =
+    row.kind === "STOCK"
+      ? stockPreparationContentSchema
+      : resource
+        ? balancePreparationContentSchema
+        : row.kind === "REQ" && isRequisitionOperationPurpose(row.purpose)
+          ? requisitionOperationDraftContent
+          : row.kind === "REQ"
+            ? requisitionDraftContent
+            : row.kind === "BAL" && isBalanceDocumentPurpose(row.purpose)
+              ? balanceDocumentDraftContent
+              : row.kind === "BAL"
+                ? balanceDraftContent
+                : declarationSourceForPurpose(row.purpose)
+                  ? transferDeclarationDraftContent
+                  : !["create", "revise"].includes(row.purpose)
+                    ? receiptDraftContent
+                    : supplyDraftContent;
   const content = row.state === "active" ? schema.safeParse(row.content) : null;
   if (
     (row.state === "active" &&
@@ -147,7 +155,9 @@ export function parsePrivateDraft(
     );
   const consumedResult =
     resource && consumed
-      ? parseBalancePreparationReceipt(row.consumedResult, {
+      ? (row.kind === "STOCK"
+          ? parseStockPreparationReceipt
+          : parseBalancePreparationReceipt)(row.consumedResult, {
           ...scope,
           targetResourceId: scope.targetResourceId!,
         })
@@ -182,9 +192,10 @@ export function parsePrivateDraftResult(
           ? "discarded"
           : "completed";
   const resource =
-    intent.kind === "BAL" &&
-    typeof intent.purpose === "string" &&
-    isBalancePreparationPurpose(intent.purpose);
+    (intent.kind === "BAL" &&
+      typeof intent.purpose === "string" &&
+      isBalancePreparationPurpose(intent.purpose)) ||
+    (intent.kind === "STOCK" && intent.purpose === "family_movement");
   if (
     (intent.id !== null && row.id !== intent.id) ||
     row.revision !== Number(intent.expectedRevision ?? 0) + 1 ||
@@ -211,7 +222,9 @@ export function parsePrivateDraftResult(
     );
   const consumedResult =
     resource && expected === "completed"
-      ? parseBalancePreparationReceipt(row.consumedResult, {
+      ? (intent.kind === "STOCK"
+          ? parseStockPreparationReceipt
+          : parseBalancePreparationReceipt)(row.consumedResult, {
           patientId: String(intent.careRecipientId),
           purpose: String(intent.purpose),
           targetResourceId: String(intent.targetResourceId),

@@ -5,6 +5,8 @@ NO-GO.** A ordem integral preservada em [OWNER_EXECUTION_ORDER.txt](OWNER_EXECUT
 atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitoramento.
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
+- [Preparação familiar privada](FAMILY_STOCK_DRAFTS.md): quatro movimentos,
+  continuidade entre sessões,recuperação própria e migrations178–181 reconciliadas.
 - [Consulta canônica de estoque](STOCK_CANONICAL_LIST.md): tabela/cartões únicos,
   situação exata,filtros,101 materiais e consumidores da CI46 reconciliados.
 - [Programação e plantões BAL recuperáveis](BAL_WORKSPACE_DRAFTS.md): seis

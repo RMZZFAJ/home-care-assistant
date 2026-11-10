@@ -1,3 +1,7 @@
+import {
+  stockPreparationSaveSchema,
+  stockPreparationMutationSchema,
+} from "./stock-preparations";
 import { z } from "zod";
 import {
   balancePreparationSaveSchema,
@@ -131,6 +135,8 @@ const scope = {
 const navigation = { navigation: draftNavigationSchema.optional() };
 export const creationDraftCommandSchema = z
   .union([
+    stockPreparationSaveSchema,
+    stockPreparationMutationSchema,
     balancePreparationSaveSchema.strict(),
     balancePreparationMutationSchema,
     z
@@ -244,6 +250,15 @@ export const creationDraftCommandSchema = z
       .strict(),
   ])
   .superRefine((value, ctx) => {
+    if (
+      value.kind === "STOCK" &&
+      value.targetResourceId !== value.careRecipientId
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["targetResourceId"],
+        message: "O preenchimento pertence ao paciente selecionado.",
+      });
     if (
       value.kind === "BAL" &&
       "purpose" in value &&

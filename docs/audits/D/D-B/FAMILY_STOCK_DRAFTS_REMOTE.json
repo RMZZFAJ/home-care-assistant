@@ -1,0 +1,502 @@
+{
+  "increment": "D3.46",
+  "projectId": "qwfrqychokvhdzakibid",
+  "baseSha": "6e1a10f4ad2c13f57ab75b5085fac41221697a0a",
+  "migrations": [
+    {
+      "file": "supabase/migrations/20261110041201_phase_d3_private_family_stock_preparation.sql",
+      "lfSha256": "d26435a081fbeb8b4fd47a74af88320a3f5dc3fd7a9a0a827c0d9cef2329ccdd"
+    },
+    {
+      "file": "supabase/migrations/20261110042956_phase_d3_stock_preparation_reference_summary.sql",
+      "lfSha256": "9e4a4d0955f951f94b86bb1198e0ddd43162a9ae7c0583e2c1a5e764ec7a9b37"
+    },
+    {
+      "file": "supabase/migrations/20261110050900_phase_d3_stock_write_without_balance_read.sql",
+      "lfSha256": "0428dcbf5004a1f52f35f3254ffd3efdc4e12a4f9ee062fcbf002bf3698637b4"
+    },
+    {
+      "file": "supabase/migrations/20261110052011_phase_d3_stock_reference_ledger_authority.sql",
+      "lfSha256": "26c6466763f49e928ba93be1325855cc466f2197dec37b8f113939da10e43a3f"
+    }
+  ],
+  "preflight": {
+    "legacy": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "bal_comment_units",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "d3345dd50396252acf827694607d41cd5dc1eee40370fab2a1dd94ebba639845"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "can",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "7a689c297f9d7a220966e1b6aecb6800096c4321244235eebe2a52eaccc0020d"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_cap",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "69acf858bc9c834ecb3670417680cc48a7572375a7eb95c490772954f28bedcf"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "stock_quantity",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "371633cfc7b1cd356ce7c719de8ddf273ea225d53d2afdbbad0f77743c1a94c3"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "family_stock_movement",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "84e62359c5fc2e9e7ab52acc4202d936c0dc2cad6d9183ddefd18243972e73b4"
+      }
+    ],
+    "tables": [],
+    "versions": {
+      "count": 177,
+      "latest": "20261110001316",
+      "linesSha256": "8561230e7f4a618a9de5c4e1c874d10d9f2e75189b54c3a80ac93e2dc6ad8ee8"
+    },
+    "functions": [],
+    "temporaryProbes": 0,
+    "invalidProductConstraints": []
+  },
+  "postflight": {
+    "legacy": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "bal_comment_units",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "d3345dd50396252acf827694607d41cd5dc1eee40370fab2a1dd94ebba639845"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "can",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "7a689c297f9d7a220966e1b6aecb6800096c4321244235eebe2a52eaccc0020d"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_cap",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "69acf858bc9c834ecb3670417680cc48a7572375a7eb95c490772954f28bedcf"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "stock_quantity",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "371633cfc7b1cd356ce7c719de8ddf273ea225d53d2afdbbad0f77743c1a94c3"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "family_stock_movement",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "84e62359c5fc2e9e7ab52acc4202d936c0dc2cad6d9183ddefd18243972e73b4"
+      }
+    ],
+    "tables": [
+      {
+        "rls": true,
+        "anon": false,
+        "auth": false,
+        "name": "stock_movement_preparation_commands",
+        "force": false,
+        "service": false,
+        "policies": 0,
+        "invalidConstraints": 0
+      },
+      {
+        "rls": true,
+        "anon": false,
+        "auth": false,
+        "name": "stock_movement_preparations",
+        "force": false,
+        "service": false,
+        "policies": 0,
+        "invalidConstraints": 0
+      }
+    ],
+    "versions": {
+      "count": 181,
+      "latest": "20261110052011",
+      "linesSha256": "9394980ce48f98f254230193805e8a2d25b77c5dbeae5d92870dd8fac39bbcbd"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_stock_movement_preparation_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_write boolean",
+        "bodyLfSha256": "483cc6869013937aa2cdf9c121b0981d66209fa39eb3949c0d6505cf5bb9d705",
+        "definitionLfSha256": "624e680f5f6a3b23663f045aa7ee9fa4aae26a7902fd20583865ca9352d66c9f"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "stock_movement_preparation_output",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": true,
+        "service": false,
+        "identity": "p_result jsonb, p_patient uuid",
+        "bodyLfSha256": "b2eda83dc232d2631d2febb3ea6e48f6e10b68e6c5458b054f65c7bb7c9f92ad",
+        "definitionLfSha256": "a9c36c57332723b9f70d52ed964ed9d2c570dcf983d53e812e010abf9e407ce6"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "stock_movement_preparation_snapshot",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_product text, p_reference uuid",
+        "bodyLfSha256": "4a38eee9e575d5cd53cbbf8ee7f210c2fe69e26afa5d047b16e7630639800fcc",
+        "definitionLfSha256": "c7571c17089a18d0c3fc1dac55e3d6290eeeb0fbbdbed7a2282eea78258f6458"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "stock_movement_preparation_view",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": false,
+        "service": false,
+        "identity": "d private.stock_movement_preparations",
+        "bodyLfSha256": "2cef1628cb48110833789925b9c8cc351ac7188cebb6edd0fe2c200e9b0e7ccf",
+        "definitionLfSha256": "0c79eb4683f5aa670a209c9ae7569e8bfbfe0276aef174561cfd9be10d13bd7e"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "validate_stock_movement_preparation",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": false,
+        "service": false,
+        "identity": "p_content jsonb, p_navigation jsonb, p_purpose text",
+        "bodyLfSha256": "2f0dd99515281a372b48f66604ec56bd443067cc38362c3af12f7f5f14472be7",
+        "definitionLfSha256": "5066c78ed1140e3972ce46e0a6d4759e091783039e8853025f459854a1447aa7"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "commit_stock_movement_preparation",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+        "bodyLfSha256": "c82589ac665b42256394ddb463f6e10131954d2b859db64ec644fc80227860e4",
+        "definitionLfSha256": "d596257e40c1f6a3288aa228354368a69a683a14ad33930392312af14f8b91a1"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "stock_movement_preparation_command",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+        "bodyLfSha256": "51d4ddd74ac62113cca4a1ad8fbbb7b160b0f03c03e3f516fc1f225459626c7a",
+        "definitionLfSha256": "706efd90171ca7dd66853d776bbc499dd511d42cf63a1c763758946e34497292"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "stock_movement_preparation_context",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid",
+        "bodyLfSha256": "45e04613f4d9e70347254f6c7a1056a976c848faf00a749901df27887c8c2f79",
+        "definitionLfSha256": "b20dcf456d9ee66dcbec5e4d5f49be9a7b3884a4befe8619e734ecb3ad2c0662"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "stock_movement_preparation_reference",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_product text, p_reference uuid",
+        "bodyLfSha256": "33bee869768ba85780599d947e73f6c9f06cf234d39922134499c56b99467e03",
+        "definitionLfSha256": "9aed0b282a4774405852cfac1c3fe9809253017e054b6e9cb7cc716ff455ee2e"
+      }
+    ],
+    "temporaryProbes": 0,
+    "invalidProductConstraints": []
+  },
+  "localMatch": {
+    "versions": true,
+    "functionsDefinitionBodySignatureConfigAcl": true,
+    "closedTables": true,
+    "legacyDependenciesUnchanged": true,
+    "temporaryProbes": 0
+  },
+  "localLegacyConstraintQualification": [
+    "public.product_presentations.presentation_finite_factor"
+  ],
+  "providerConstraintQualification": "Preflight all-schema query found the pre-existing realtime.messages.messages_payload_exclusive provider constraint;product-only postflight is not a claim that provider schemas were repaired.",
+  "application": {
+    "exitCode": 0,
+    "count": 4,
+    "once": true,
+    "beforeCommit": true,
+    "command": "node scripts/supabase-project.mjs db push --linked --skip-vault --yes",
+    "dryBeforeExactlyExpected": true,
+    "dryAfterUpToDate": true,
+    "dryAfterMigrations": [],
+    "seeds": [],
+    "roles": [],
+    "remoteReset": false,
+    "remoteAuthMutation": false,
+    "remoteFixtures": false,
+    "redundantHeavyBackup": false,
+    "backupQualification": "Owner-authorized synthetic disposable remote;identity/history/compatibility/dry-run and pre/post definitions retained instead of repetitive heavy backups."
+  },
+  "localAuthoring": [
+    "178 CASE syntax corrected before its first successful application.",
+    "179,180,181 are incremental authoring fixes;applied historical files were not rewritten.",
+    "178 filename was manually authored;later three created with Supabase CLI migration new.",
+    "Normalized LF hashes distinguish local statement-line endings without rewriting applied history."
+  ],
+  "advisors": {
+    "security": {
+      "aggregateClasses": 5,
+      "groups": [
+        {
+          "name": "rls_enabled_no_policy",
+          "level": "INFO",
+          "count": 48,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+          "newStockFindings": [
+            {
+              "detail": "Table \\`private.stock_movement_preparation_commands\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "stock_movement_preparation_commands",
+                "type": "table",
+                "schema": "private"
+              }
+            },
+            {
+              "detail": "Table \\`private.stock_movement_preparations\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "stock_movement_preparations",
+                "type": "table",
+                "schema": "private"
+              }
+            }
+          ]
+        },
+        {
+          "name": "extension_in_public",
+          "level": "WARN",
+          "count": 1,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public",
+          "newStockFindings": []
+        },
+        {
+          "name": "anon_security_definer_function_executable",
+          "level": "WARN",
+          "count": 3,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable",
+          "newStockFindings": []
+        },
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "level": "WARN",
+          "count": 177,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+          "newStockFindings": [
+            {
+              "detail": "Function `public.commit_stock_movement_preparation(p_patient uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/commit_stock_movement_preparation`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "commit_stock_movement_preparation",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_patient uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+                "security_definer": true
+              }
+            },
+            {
+              "detail": "Function `public.stock_movement_preparation_command(p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/stock_movement_preparation_command`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "stock_movement_preparation_command",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+                "security_definer": true
+              }
+            },
+            {
+              "detail": "Function `public.stock_movement_preparation_context(p_patient uuid, p_purpose text, p_target uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/stock_movement_preparation_context`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "stock_movement_preparation_context",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_patient uuid, p_purpose text, p_target uuid",
+                "security_definer": true
+              }
+            },
+            {
+              "detail": "Function `public.stock_movement_preparation_reference(p_patient uuid, p_product text, p_reference uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/stock_movement_preparation_reference`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "stock_movement_preparation_reference",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_patient uuid, p_product text, p_reference uuid",
+                "security_definer": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "level": "WARN",
+          "count": 1,
+          "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+          "newStockFindings": []
+        }
+      ],
+      "qualification": "Provider lints are aggregated classes;existing findings remain unresolved. New private RLS tables/Auth RPCs are intentional guarded objects;unused indexes have no operational-use proof."
+    },
+    "performance": {
+      "aggregateClasses": 3,
+      "groups": [
+        {
+          "name": "unindexed_foreign_keys",
+          "level": "INFO",
+          "count": 124,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys",
+          "newStockFindings": []
+        },
+        {
+          "name": "auth_rls_initplan",
+          "level": "WARN",
+          "count": 11,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0003_auth_rls_initplan",
+          "newStockFindings": []
+        },
+        {
+          "name": "unused_index",
+          "level": "INFO",
+          "count": 36,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index",
+          "newStockFindings": [
+            {
+              "detail": "Index \\`stock_movement_preparation_patient_fk\\` on table \\`private.stock_movement_preparations\\` has not been used",
+              "metadata": {
+                "name": "stock_movement_preparations",
+                "type": "table",
+                "schema": "private"
+              }
+            },
+            {
+              "detail": "Index \\`stock_movement_preparation_command_fk\\` on table \\`private.stock_movement_preparation_commands\\` has not been used",
+              "metadata": {
+                "name": "stock_movement_preparation_commands",
+                "type": "table",
+                "schema": "private"
+              }
+            }
+          ]
+        }
+      ],
+      "qualification": "Provider lints are aggregated classes;existing findings remain unresolved. New private RLS tables/Auth RPCs are intentional guarded objects;unused indexes have no operational-use proof."
+    }
+  },
+  "artifactRawSha256": {
+    "output/phase-d-work/ui-canonical/stock-final-metadata.sql": "a39af4d364efddc9005b78d70086a6312cedf690a72b9f2639f93ebd849a0582",
+    "output/phase-d-work/ui-canonical/stock-final-remote-before.json": "b1309d3ca6f9db33dda80f8bc25464447b12f8f17749da2423a62a7f00593bd0",
+    "output/phase-d-work/ui-canonical/stock-final-remote-after.json": "28553afa3f714597f789aea9befa2f715c07d72a0c80898d29d162a32b5bd1bd",
+    "output/phase-d-work/ui-canonical/stock-final-local-metadata.json": "8681b52e28f9498b764325e2af889fb1c55d4123d1fcfb0088828ace24975d21",
+    "output/phase-d-work/ui-canonical/stock-remote-final-dry-before.log": "20d0c7bae82dd5fc089c37986864b433f51692160b4e0abdd01c25d8cde08a16",
+    "output/phase-d-work/ui-canonical/stock-remote-apply.log": "ba56975f6b0f5950350df4409efd9d9a30066d98705dbf01b89e1bd6da864860",
+    "output/phase-d-work/ui-canonical/stock-remote-final-dry-after.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf",
+    "output/phase-d-work/ui-canonical/stock-advisors-security.json": "b85e3ab1e467ffb36b972f6bc9fbeeef720c3e0b2f155557cd43245ac1974d1a",
+    "output/phase-d-work/ui-canonical/stock-advisors-performance.json": "c21605eaa07148d89b110985a302b1b7eca9f759c19b392b4293d38a6e8876e4"
+  },
+  "limits": [
+    "No remote functional fixtures or synthetic Auth replay. Real Auth regressions ran on the guarded local stack.",
+    "Clean install,legacy upgrade and full integration require own-published-SHA CI.",
+    "No production release,provider delivery,restore SLA or global security/performance approval."
+  ]
+}

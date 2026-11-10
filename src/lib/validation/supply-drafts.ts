@@ -108,6 +108,7 @@ export const entDraftPurposes = [
 ] as const;
 export const entDraftPurpose = z.enum(entDraftPurposes);
 export const draftPurpose = z.enum([
+  "family_movement",
   "create",
   "revise",
   "receive",

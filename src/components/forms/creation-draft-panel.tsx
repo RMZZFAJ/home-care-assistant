@@ -1,5 +1,5 @@
 "use client";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 
 import Link from "next/link";
 import { useState, type RefObject } from "react";
@@ -32,6 +32,16 @@ export function DraftContentSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("movement" in content)
+    return (
+      <div className="hca-form-stack">
+        <p>
+          Preenchimento privado de movimentação familiar. Salvar não altera
+          saldo nem registra movimento.
+        </p>
+        <DraftFieldsSummary content={content} kind={kind} purpose={purpose} />
+      </div>
+    );
   if ("values" in content)
     return (
       <div className="hca-form-stack">
@@ -84,6 +94,65 @@ function DraftFieldsSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("movement" in content) {
+    const m = content.movement;
+    const labels = {
+      inbound: "Entrada avulsa",
+      outbound: "Retirada",
+      correction_in: "Correção compensatória de entrada",
+      correction_out: "Correção compensatória de saída",
+    };
+    return (
+      <DefinitionGrid
+        items={[
+          {
+            label: "Operação preservada",
+            value: m.action ? labels[m.action] : "Não escolhida",
+          },
+          {
+            label: "Material preservado",
+            value: m.productLabel || m.productId || "Não escolhido",
+          },
+          {
+            label: "Quantidade preservada",
+            value: (
+              <>
+                {m.quantity || "Não preenchida"} {m.unit}
+              </>
+            ),
+          },
+          {
+            label: "Saldo consultado na preparação",
+            value:
+              m.observedBalance != null && m.observedBalance !== "" ? (
+                <>
+                  {m.observedBalance} {m.unit}
+                </>
+              ) : (
+                "Não disponível neste preenchimento"
+              ),
+          },
+          {
+            label: "Movimento original",
+            value: m.referenceLabel || m.referenceId || "Sem compensação",
+            wide: true,
+          },
+          {
+            label: "Seu motivo",
+            value: m.reason || "Não preenchido",
+            wide: true,
+          },
+          {
+            label: "Referência de estoque",
+            value: content.referenceHash
+              ? "Preservada; confira a situação atual antes de confirmar."
+              : "Ainda não preservada.",
+            wide: true,
+          },
+        ]}
+      />
+    );
+  }
   if ("values" in content) {
     const labels: Record<string, string> = {
       reason: "Sua justificativa",
@@ -608,7 +677,8 @@ export function CreationDraftPanel({
       {draft.message ? <Notice>{draft.message}</Notice> : null}
       {saved ? (
         <p>
-          {saved.kind} · Revisão {saved.revision} · salvo no servidor em{" "}
+          {saved.kind === "STOCK" ? "Movimentação familiar" : saved.kind} ·
+          Revisão {saved.revision} · salvo no servidor em{" "}
           {formatZonedDate(saved.savedAt, "America/Sao_Paulo")} ·
           America/Sao_Paulo
         </p>
@@ -639,12 +709,40 @@ export function CreationDraftPanel({
       {draft.consumed ? (
         <>
           <Notice>
-            {isBalancePreparationPurpose(draft.purpose)
-              ? "Este preenchimento já registrou uma decisão. O resultado preservado descreve aquele instante; consulte o acompanhamento para a situação atual."
-              : "Este rascunho já foi usado em uma ficha. Consulte o resultado antes de iniciar outro preenchimento."}
+            {draft.kind === "STOCK"
+              ? "Este preenchimento já registrou uma movimentação. O resultado preservado descreve aquele instante; consulte o histórico para a situação atual."
+              : isBalancePreparationPurpose(draft.purpose)
+                ? "Este preenchimento já registrou uma decisão. O resultado preservado descreve aquele instante; consulte o acompanhamento para a situação atual."
+                : "Este rascunho já foi usado em uma ficha. Consulte o resultado antes de iniciar outro preenchimento."}
           </Notice>
-          {isBalancePreparationPurpose(draft.purpose) &&
-          draft.consumed.consumedResult ? (
+          {draft.kind === "STOCK" &&
+          draft.consumed.consumedResult &&
+          "preparedMovement" in draft.consumed.consumedResult ? (
+            <div className="wrap-anywhere">
+              <p>
+                Movimentação registrada em{" "}
+                {formatZonedDate(
+                  draft.consumed.consumedResult.recordedAt,
+                  "America/Sao_Paulo",
+                )}
+                .
+              </p>
+              <p>Referência: {draft.consumed.consumedResult.resourceId}</p>
+              <p className="whitespace-pre-wrap">
+                {draft.consumed.consumedResult.command.reason}
+              </p>
+              <DraftContentSummary
+                kind="STOCK"
+                purpose="family_movement"
+                content={{
+                  movement: draft.consumed.consumedResult.preparedMovement,
+                  referenceHash: draft.consumed.consumedResult.referenceHash,
+                }}
+              />
+            </div>
+          ) : isBalancePreparationPurpose(draft.purpose) &&
+            draft.consumed.consumedResult &&
+            "nativeResult" in draft.consumed.consumedResult ? (
             <div>
               <p>
                 {balancePreparationTitles[draft.purpose]} · registrada em{" "}

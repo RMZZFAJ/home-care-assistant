@@ -1,4 +1,5 @@
 "use client";
+import { FamilyStockPreparation } from "./family-stock-preparation";
 import {
   ActionButton,
   FormField,
@@ -9,10 +10,8 @@ import type { StockBalanceFilter } from "@/lib/stock-presentation";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRef, useState } from "react";
 import {
-  api,
-  ApiError,
   buttonClass,
   can,
   inputClass,
@@ -33,7 +32,6 @@ import type {
   StockMovement as Movement,
 } from "@/types/stock";
 import { StockOverview } from "./stock-overview";
-import { RecordDrawer } from "@/components/forms/record-drawer";
 
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { MovementOrigin } from "./movement-origin";
@@ -70,8 +68,6 @@ function PatientStock({
   context: WorkspaceContext;
   initialCustody: string;
 }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
   const liveRevision = useLiveRevision();
@@ -87,29 +83,14 @@ function PatientStock({
   );
   const [movementProductId, setMovementProductId] = useState("");
   const [referenceId, setReferenceId] = useState("");
-  const [review, setReview] = useState<Record<string, unknown> | null>(null);
-  const [uncertain, setUncertain] = useState(false);
   const [savedMovement, setSavedMovement] = useState<string | null>(null);
   const [origin, setOrigin] = useState<{
     id: string;
     opener: HTMLElement;
   } | null>(null);
   const historyHeadingRef = useRef<HTMLHeadingElement | null>(null);
-  const reviewHeadingRef = useRef<HTMLHeadingElement | null>(null);
-  const reasonInputRef = useRef<HTMLTextAreaElement | null>(null);
-  const focusAfterReviewRef = useRef(false);
-  useEffect(() => {
-    if (review) reviewHeadingRef.current?.focus();
-  }, [review]);
-  useEffect(() => {
-    if (!review && !busy && focusAfterReviewRef.current) {
-      focusAfterReviewRef.current = false;
-      reasonInputRef.current?.focus();
-    }
-  }, [review, busy]);
   const hasStock =
     can(context, "stock.family.read") || can(context, "stock.team.read");
-  const frozenRef = useRef<Record<string, unknown> | null>(null);
   const patient = context.patient!.id;
   const params = useSearchParams(),
     notice = useNotificationReference(
@@ -145,57 +126,6 @@ function PatientStock({
   const products = stock.data?.overview ?? [];
   const movements = history.data?.data ?? [];
   const total = history.data?.total ?? 0;
-  function prepare(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    setReview({
-      careRecipientId: context.patient!.id,
-      productId: form.get("productId"),
-      quantity: form.get("quantity"),
-      action: operation,
-      reason: form.get("reason"),
-      idempotencyKey: crypto.randomUUID(),
-      ...(form.get("referenceId")
-        ? { referenceId: form.get("referenceId") }
-        : {}),
-    });
-  }
-  async function save() {
-    if (!frozenRef.current) frozenRef.current = review;
-    if (!frozenRef.current) return;
-    setBusy(true);
-    setError("");
-    try {
-      const result = await api<{ id: string }>(
-        "/api/stock/movements",
-        frozenRef.current,
-      );
-      frozenRef.current = null;
-      setUncertain(false);
-      setReview(null);
-      setSavedMovement(result.id);
-      setMovementEditor(null);
-      setMessage(
-        "Movimentação familiar confirmada. O histórico original foi preservado.",
-      );
-      setAttempt((value) => value + 1);
-    } catch (reason) {
-      const rejected =
-        reason instanceof ApiError &&
-        [400, 403, 404, 409, 422].includes(reason.status);
-      if (rejected) {
-        frozenRef.current = null;
-        setReview(null);
-        focusAfterReviewRef.current = true;
-      }
-      setUncertain(!rejected);
-      setError(
-        reason instanceof Error ? reason.message : "Resultado não confirmado.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
   const name = (id: string) =>
     products.find((product) => product.productId === id)?.name ?? "Produto";
   const hasFamily = can(context, "stock.family.read");
@@ -223,7 +153,6 @@ function PatientStock({
           Transferir materiais entre família e equipe
         </Link>
       ) : null}
-      {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {origin ? (
         <MovementOrigin
@@ -354,256 +283,55 @@ function PatientStock({
           </ActionButton>
         </div>
       ) : null}
+      {(hasFamily || can(context, "stock.family.manage")) &&
+      custody !== "TRANSIT" ? (
+        <ActionButton
+          onClick={(event) => {
+            setOperation("inbound");
+            setMovementProductId("");
+            setReferenceId("");
+            setMovementEditor(event.currentTarget);
+          }}
+        >
+          Consultar meu preenchimento familiar
+        </ActionButton>
+      ) : null}
       {movementEditor &&
       custody !== "TRANSIT" &&
-      can(context, "stock.family.manage") ? (
-        <RecordDrawer
-          title={
-            review
-              ? "Confirmar movimentação familiar"
-              : "Movimentar estoque familiar"
-          }
-          busy={busy}
-          preventClose={uncertain}
-          onClose={() => {
-            setMovementEditor(null);
-            setReview(null);
-            frozenRef.current = null;
+      (hasFamily || can(context, "stock.family.manage")) ? (
+        <FamilyStockPreparation
+          context={context}
+          initialValues={{
+            action: operation as
+              | "inbound"
+              | "outbound"
+              | "correction_in"
+              | "correction_out",
+            productId: movementProductId,
+            productLabel:
+              products.find((p) => p.productId === movementProductId)?.name ??
+              "",
+            unit:
+              products.find((p) => p.productId === movementProductId)?.unit ??
+              "",
+            referenceId,
+            quantity: "",
+            reason: "",
           }}
+          products={products}
+          movements={movements}
           restoreFocusTo={movementEditor}
           restoreFocusFallbackRef={historyHeadingRef}
-        >
-          {error ? <Notice error>{error}</Notice> : null}
-          {review ? (
-            <section
-              aria-label="Revisão da movimentação familiar"
-              className="space-y-3"
-            >
-              <h3 ref={reviewHeadingRef} tabIndex={-1}>
-                Confira o movimento e sua referência
-              </h3>
-              <p>Produto: {name(String(review.productId))}</p>
-              <p>
-                Quantidade:{" "}
-                {formatQuantity(
-                  String(review.quantity ?? ""),
-                  products.find(
-                    (product) => product.productId === review.productId,
-                  )?.unit,
-                )}
-              </p>
-              <p>
-                Operação:{" "}
-                {review.action === "inbound"
-                  ? "Entrada avulsa"
-                  : review.action === "outbound"
-                    ? "Retirada"
-                    : review.action === "correction_in"
-                      ? "Correção compensatória de entrada"
-                      : "Correção compensatória de saída"}
-                .
-              </p>
-              {review.referenceId ? (
-                <details>
-                  <summary>Movimento histórico compensado</summary>
-                  <p className="break-all">{String(review.referenceId)}</p>
-                </details>
-              ) : null}
-              <p className="whitespace-pre-wrap">
-                Motivo: {String(review.reason ?? "")}
-              </p>
-              <p>
-                Apenas o saldo familiar deste material será atualizado. A
-                operação original permanecerá no histórico; não há transferência
-                nem consumo inferido.
-              </p>
-              {uncertain ? (
-                <Notice>
-                  Resultado ainda não confirmado. Os campos e a chave estão
-                  congelados até recuperar a mesma tentativa.
-                </Notice>
-              ) : null}
-              <div className="ui-form-actions">
-                <button
-                  className={buttonClass}
-                  disabled={busy || uncertain}
-                  onClick={() => {
-                    focusAfterReviewRef.current = true;
-                    setReview(null);
-                  }}
-                >
-                  Voltar
-                </button>
-                <button
-                  className={primaryClass}
-                  disabled={busy}
-                  onClick={() => void save()}
-                >
-                  {busy
-                    ? "Confirmando…"
-                    : uncertain
-                      ? "Recuperar tentativa"
-                      : "Confirmar"}
-                </button>
-              </div>
-            </section>
-          ) : null}
-          <form
-            hidden={Boolean(review)}
-            className={review ? "hidden" : "mt-4 space-y-4"}
-            onSubmit={prepare}
-          >
-            <fieldset
-              disabled={busy || uncertain}
-              className="grid min-w-0 gap-4 sm:grid-cols-2"
-            >
-              <label className="text-sm font-semibold">
-                Operação
-                <select
-                  aria-label="Operação"
-                  className={inputClass}
-                  value={operation}
-                  onChange={(event) => {
-                    setOperation(event.target.value);
-                    setReferenceId("");
-                  }}
-                >
-                  <option value="inbound">Entrada avulsa</option>
-                  <option value="outbound">Retirada</option>
-                  <option value="correction_in">
-                    Correção compensatória de entrada
-                  </option>
-                  <option value="correction_out">
-                    Correção compensatória de saída
-                  </option>
-                </select>
-              </label>
-              <label className="text-sm font-semibold">
-                Produto
-                <select
-                  aria-label="Produto"
-                  className={inputClass}
-                  name="productId"
-                  required
-                  value={movementProductId}
-                  onChange={(event) => {
-                    setMovementProductId(event.target.value);
-                    setReferenceId("");
-                  }}
-                >
-                  <option value="">Selecione</option>
-                  {products
-                    .filter(
-                      (product) =>
-                        product.active ||
-                        (operation.startsWith("correction") &&
-                          Boolean(referenceId) &&
-                          product.productId === movementProductId),
-                    )
-                    .map((product) => (
-                      <option key={product.productId} value={product.productId}>
-                        {product.name} · {product.unit}
-                        {product.active
-                          ? ""
-                          : " · Inativo, somente compensação referenciada"}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              {operation.startsWith("correction") &&
-              referenceId &&
-              products.some(
-                (product) =>
-                  product.productId === movementProductId && !product.active,
-              ) ? (
-                <div className="sm:col-span-2">
-                  <Notice>
-                    Material inativo. Esta ação compensa somente o movimento
-                    histórico indicado, preservando sua identidade e sua
-                    custódia. Não reativa o cadastro nem transfere o saldo.
-                  </Notice>
-                </div>
-              ) : null}
-              <label className="text-sm font-semibold">
-                Quantidade
-                <input
-                  className={inputClass}
-                  name="quantity"
-                  type="number"
-                  inputMode="decimal"
-                  min="0.000001"
-                  step="any"
-                  max="1000000000"
-                  required
-                />
-              </label>
-              {operation.startsWith("correction") ? (
-                <label className="text-sm font-semibold">
-                  Movimento original a compensar
-                  <select
-                    className={inputClass}
-                    name="referenceId"
-                    required
-                    value={referenceId}
-                    onChange={(event) => {
-                      setReferenceId(event.target.value);
-                      const original = movements.find(
-                        (row) => row.id === event.target.value,
-                      );
-                      if (original) setMovementProductId(original.product_id);
-                    }}
-                  >
-                    <option value="">
-                      Selecione uma movimentação do histórico
-                    </option>
-                    {movements
-                      .filter(
-                        (row) =>
-                          row.reference_type === "family_manual" &&
-                          (!movementProductId ||
-                            row.product_id === movementProductId) &&
-                          (operation === "correction_in"
-                            ? row.source_location === "FAMILY" &&
-                              !row.destination_location
-                            : row.destination_location === "FAMILY" &&
-                              !row.source_location),
-                      )
-                      .map((row) => (
-                        <option key={row.id} value={row.id}>
-                          {name(row.product_id)} ·{" "}
-                          {formatBrazilDate(row.created_at)} ·{" "}
-                          {formatQuantity(row.quantity)} ·{" "}
-                          {row.source_location === "FAMILY"
-                            ? "Retirada"
-                            : "Entrada"}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-              ) : null}
-              <label className="text-sm font-semibold sm:col-span-2">
-                Motivo
-                <textarea
-                  ref={reasonInputRef}
-                  className={inputClass}
-                  name="reason"
-                  minLength={3}
-                  maxLength={1000}
-                  rows={3}
-                  required
-                />
-              </label>
-            </fieldset>
-            <button className={primaryClass} disabled={busy || uncertain}>
-              Revisar movimentação
-            </button>
-          </form>
-          {savedMovement ? (
-            <p className="mt-4 break-all text-xs text-(--muted)">
-              Movimentação registrada: {savedMovement}
-            </p>
-          ) : null}
-        </RecordDrawer>
+          onClose={() => setMovementEditor(null)}
+          onCommitted={(id) => {
+            setSavedMovement(id);
+            setMovementEditor(null);
+            setMessage(
+              "Movimentação familiar confirmada. O histórico original foi preservado.",
+            );
+            setAttempt((n) => n + 1);
+          }}
+        />
       ) : null}
       {savedMovement ? (
         <Attachments

@@ -373,3 +373,12 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 
 .hca-stock-console { overflow-wrap: anywhere; }
 .hca-modal-head > .hca-control-icon { flex: none; }
+
+.hca-form-grid { display: grid; min-width: 0; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.hca-definition-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin: 0; }
+.hca-definition-grid > div { min-width: 0; }
+.hca-definition-grid .hca-definition-wide { grid-column: 1 / -1; }
+.hca-definition-grid dt { font-size: 11px; color: var(--hca-muted); margin-bottom: 4px; }
+.hca-definition-grid dd { margin: 0; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; white-space: pre-wrap; }
+@media (max-width: 500px) { .hca-form-grid { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 500px) { .hca-definition-grid { gap: 13px; } }

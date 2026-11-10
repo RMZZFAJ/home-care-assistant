@@ -2955,3 +2955,48 @@ sem SQL novo/mutação/reset/fixtures/Auth remoto. Sem suíte mutável paralela.
 Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
 [Incremento](STOCK_CANONICAL_LIST.md),[validação](STOCK_CANONICAL_LIST_VALIDATION.json),
 [CI histórica](CI_46A3D3C_OBSERVATION.json).
+
+## D3.46 — preparação familiar privada e encerramento do lote
+
+Base6e1a10f. Quatro operações familiares agora usam slot privado STOCK por
+paciente,com CAS,referência do ledger,adoção explícita e confirmação nativa
+atômica/recuperável. Sessão nova retoma valores;chave nativa antiga não consome
+rascunho novo. Quantidade UTF16/exata e recibo tipado rejeitam conteúdo inválido.
+O editor/resumo usa componentes canônicos e DefinitionGrid;histórico,anexos,
+paginação,filtros e compensação de inativo preservam suas permissões.
+
+Escrita sem leitura familiar foi contraprova real:nativo funcionava e privado
+negava.180 separa leitura/gestão e mascara retornos;181 troca view filtrada
+pelo helper autoritativo na referência interna. Permissão de leitura também
+mascara contexto/recibo/comparação/pacote exibido,sem alterar intenção original.
+Paciente inativo permite recuperação própria já vinculada e limpeza,sem nova
+escrita. Salvar antes de consultar conserva NULL até adoção manual posterior.
+
+66 unitários/API distintos qualificados(55reusados+11repetidos),13 Auth reais
+(12completos+1inativo) e18 identidades browser de produção local qualificadas
+(13sucessos retidos+3rechecks+2casos inativos ampliados). Tipos/lint PASS;
+36 fontes finais LF congelados. Primeira rodada18 foi16/18;falha Entrar iOS
+antes do estoque passou recheck inalterado,sem prova de intermitência global
+resolvida. Fixture de referência tardia aguardava GET corretamente abortado;
+passou após sincronizar consultas ativas. Contraprovas e rodadas parciais
+preservadas,sem retirar assert/regra. Editor1440/320 inspecionado,cinco larguras
+exercitadas;emulação não homologa aparelhos/pessoas. Sem suíte mutável paralela.
+
+Remoto autorizado177→181 aplicado uma vez antes do commit. Quatro migrations,
+nove funções/ACL/configurações,duas tabelas RLS fechadas,cinco dependências e
+versões/digest coincidem com local;dry-run final vazio,probes0. Nenhum reset,
+fixture/Auth remoto ou backup pesado redundante. Advisors:cinco classes de
+segurança/três de performance;novos objetos somente nos grupos esperados de
+RLS fechado,RPCs Auth e índices sem uso. Legado local presentation_finite_factor
+não validado permanece;produto remoto sem constraint inválida.
+
+CI6e1a10f/42753777648 terminou SUCCESS nos nove jobs;Preview READY. Não aprova
+este candidato181,que exige CI própria limpa/legada/integral. Matriz105x39,
+primeiras30/statuses56PASS49PARTIAL e18 estados UI preservados. Quadro temporário
+por funcionalidades atualizado:visualglobal≈60%,estoque≈70%,recuperação≈85%
+são estimativas editoriais. Preparações de consumo/Flow,EST-01,decoder200,
+66/171 e demais critérios permanecem pendentes. Classes de quebra de texto já
+corrigidas no lote anterior;nenhum break-words ativo. Próximo lote começa por
+consumo/Flow. Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
+[Incremento](FAMILY_STOCK_DRAFTS.md),[validação](FAMILY_STOCK_DRAFTS_VALIDATION.json),
+[remoto](FAMILY_STOCK_DRAFTS_REMOTE.json),[CI histórica](CI_6E1A10F_OBSERVATION.json).

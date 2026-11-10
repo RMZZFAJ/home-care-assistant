@@ -4,6 +4,26 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.46 implementa quatro preparações familiares privadas STOCK,referência do
+ledger e confirmação nativa atômica. Escrita/leitura independentes preservadas,
+com mascaramento de saldo/origem/recibo e recuperação própria com paciente
+inativo. Editor/resumo canônicos.66 unitários/API,13 Auth reais e18 identidades
+browser de produção local qualificados;tipos/lint PASS,36fontes LF congelados.
+Rodada18 inicial16/18 e rechecks3/3+2/2 discriminados,sem aprovação global de
+intermitência. Local/remoto181 reconciliados:nove funções/ACL,duas tabelas,
+cinco dependências e digest iguais;dry-run vazio,sem reset/fixtures/Auth remoto.
+CI6e1a10f aprovou nove jobs;Preview READY. Novo candidato exige CI própria,
+inclusive instalação limpa/evolução legada/integral. Quadro temporário105
+critérios atualizado:56PASS/49PARTIAL,visual≈60%,estoque≈70%,recuperação≈85%.
+Preparações consumo/Flow,composição EST-01,decoder saldos200,66/171 e demais
+critérios continuam pendentes. Sonar adiado,PR7 Draft,produção NO-GO,meta ativa.
+[Incremento](../audits/D/D-B/FAMILY_STOCK_DRAFTS.md),
+[validação](../audits/D/D-B/FAMILY_STOCK_DRAFTS_VALIDATION.json),
+[remoto](../audits/D/D-B/FAMILY_STOCK_DRAFTS_REMOTE.json),
+[CI histórica](../audits/D/D-B/CI_6E1A10F_OBSERVATION.json).
+
+As observações anteriores abaixo são históricas;não aprovam o novo candidato.
+
 D3.45 implementa saldos em tabela/cartões únicos,mínimo/situação exatos,
 filtro de saldo confirmado e detalhe completo.7 unitários,tipos/lint PASS;
 16 identidades browser qualificadas,8 de estoque em produção final e8

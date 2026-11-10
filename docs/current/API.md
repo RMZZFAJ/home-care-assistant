@@ -1070,3 +1070,35 @@ nativa anterior não pode consumir um preenchimento novo. Resposta200 inválida
 não confirma sucesso. Resultado preservado descreve o ato original,não a
 situação atual,presença ou contagem física. As rotas mantêm Origin,correlação,
 erros seguros e no-store. O caminho nativo /api/balances permanece compatível.
+
+## Preparação privada da movimentação familiar
+
+GET/POST /api/stock/preparations usa careRecipientId,purpose family_movement,
+targetResourceId igual ao paciente,kind STOCK e targetDocumentId NULL. Um
+slot pessoal ativo conserva operação,material,unidade,saldo consultado,
+quantidade,motivo,referência histórica e hash,admitindo campos incompletos.
+CAS,journal,descarte e reconhecimento seguem o núcleo de rascunhos,com rota
+própria;POST /api/drafts rejeita preparações por recurso.
+
+GET /api/stock/preparations/reference recebe productId e referenceId opcional.
+Devolve catálogo,saldo confirmado,origem autorizada e hash calculado no banco.
+O fingerprint físico detecta histórico novo mesmo com saldo numericamente igual.
+POST /api/stock/preparations/commit vincula draftCommit,referenceHash,comando
+completo e chave. O banco valida referências e campos,executa o comando nativo
+family_stock_movement e consome o rascunho atomicamente. Chave nativa anterior
+não cria vínculo privado retroativo. Nova execução exige escrita atual;
+recuperação própria exige escopo vivo de leitura ou gestão e conserva a
+intenção original,inclusive com paciente inativo. Nova escrita exige paciente
+ativo no banco. Consulta não concede autoridade de confirmação.
+
+As respostas são no-store,com Origin/sessão/correlação e erros seguros. O recibo
+pessoal informa o movimento original,sem prometer saldo atual. Resposta200
+incompatível não confirma sucesso. O caminho nativo /api/stock/movements
+permanece compatível. Não há emissão documental ou replay offline.
+
+Sem leitura do saldo familiar,a referência devolve canReadBalance false e
+balance NULL,e oculta detalhes da origem. Contexto,replay e recibo pessoal
+retiram valores históricos protegidos. Ter gestão sem leitura continua
+permitindo o comando nativo autorizado. A variante de divulgação é revalidada
+sem alterar o pacote/chave original. A API não exige paciente ativo para
+consultar,descartar,reconhecer ou recuperar resultado pessoal já vinculado.
