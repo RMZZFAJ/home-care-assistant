@@ -37,7 +37,12 @@ for (const width of [390, 1440]) test(`RecordDrawer ${width}: continuar, descart
   await expect(name).toBeFocused();
   await expect(name).toHaveValue(value);
   expect(count()).toBe(before);
+  await expect(warning).toHaveCount(0);
   await page.keyboard.press("Escape");
+  const continueEditing = warning.getByRole("button", { name: "Continuar editando", exact: true });
+  await expect(continueEditing).toBeVisible();
+  await continueEditing.focus();
+  await expect(continueEditing).toBeFocused();
   // Controlled UI change: the former control becomes unavailable while the
   // warning is open. Returning must choose visible editable content.
   await name.evaluate(element => { element.setAttribute("hidden", ""); });
@@ -46,7 +51,7 @@ for (const width of [390, 1440]) test(`RecordDrawer ${width}: continuar, descart
   const form = drawer.locator("fieldset").first();
   await form.focus();
   await expect(form).toBeFocused();
-  await keyboard(warning.getByRole("button", { name: "Continuar editando", exact: true }));
+  await keyboard(continueEditing);
   await expect(drawer.getByRole("combobox", { name: "Categoria", exact: true })).toBeFocused();
   await name.evaluate(element => { element.removeAttribute("hidden"); });
   await expect(name).toHaveValue(value);

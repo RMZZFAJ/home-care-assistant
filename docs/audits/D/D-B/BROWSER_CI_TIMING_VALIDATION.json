@@ -1,0 +1,49 @@
+{
+  "increment": "D3.57",
+  "base": "2e9762a64ab500602b46f3832221d3b635e41024",
+  "failingCi": 42908042331,
+  "localBaseline": {
+    "total": 4,
+    "expected": 3,
+    "unexpected": 1,
+    "flaky": 0,
+    "skipped": 0,
+    "ok": false
+  },
+  "qualifiedBrowser": {
+    "total": 15,
+    "expected": 15,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "ok": true
+  },
+  "sourceHashes": {
+    "tests/e2e/record-drawer-focus.spec.ts": "7b134b9c5f6ac82e3c3a97ffc3c010b5a20cae7c6e18ec33dc451497ecdcc620",
+    "tests/e2e/progress-private-preparation.spec.ts": "1d9b9eb50c1f2fd4cc548b2d72f0b2dc7c08b1de51cfe9e136ddb575f579b47c",
+    "tests/e2e/requisition-pdf-personal-receipt.spec.ts": "80f1519845a8464a7af7ba5091b4d29f65d40139b834c93bcc6f6fa88d979b0e",
+    "tests/e2e/schedule-resource-preparations.spec.ts": "b1a3317dcd1593235ba6e387e11c22b92f6542c0ce3630ce9d160b0590f880dd"
+  },
+  "confirmedChanges": {
+    "schedule": "capture only after the original response was aborted, check exactly one native event and command, verify unchanged state on recovery",
+    "progress": "wait for editor close and check published result in the overview tab",
+    "drawer": "wait for the warning and move focus before hiding the active input"
+  },
+  "delivery": {
+    "priorWebKitIntermittenceOpen": true,
+    "unchangedTestAndProduct": true,
+    "localBaselinePass": true,
+    "localQualifiedPassAllEngines": true
+  },
+  "migration": {
+    "new": 0,
+    "remoteDryRunEmpty": true
+  },
+  "criteria": {
+    "total": 105,
+    "localPass": 56,
+    "partial": 49,
+    "visualStates": 18
+  },
+  "ownCi": "required"
+}

@@ -4,6 +4,15 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.57 corrigiu a sincronização dos testes de agenda, Andamentos e foco do
+editor. Os 15 cenários locais foram aprovados nas três engines. A seleção
+intermitente de aba no recebimento segue aberta para contraprova na CI.
+Dry-run do remoto sem pendências. A matriz continua em 56 critérios
+aprovados localmente e 49 parciais.
+[Verificações](../audits/D/D-B/BROWSER_CI_TIMING.md).
+
+## Incremento anterior D3.56
+
 D3.56 permite retomar quantidades, notas e datas anteriores do BAL após
 mudanças de estoque, ficha ou plantão. As observações anteriores ficam no
 rascunho privado e a nova conferência começa com quantidades vazias.

@@ -90,6 +90,11 @@ combinações de acesso e recuperação ainda indicadas neste quadro.
 A revisão de uma programação também conserva o mês aberto, as datas e o foco
 quando há conflito. É possível percorrer a revisão longa pelo teclado.
 
+As verificações de agenda, Andamentos e foco do editor foram ajustadas e
+passaram na rodada local. O recebimento também passou. A seleção intermitente
+da aba de recebimento ainda precisa de contraprova na CI. Responsável pelo
+acompanhamento: Codex.
+
 ## Funcionalidades e critérios da D-B
 
 ### Formulários, rascunhos e recuperação
@@ -533,8 +538,9 @@ Esta é a ordem do trabalho restante. Os quadros anteriores estão agrupados por
 funcionalidade, sem representar ordem de execução. Tudo que já está 100% será
 preservado e incluído na revisão final; não será refeito sem motivo.
 
-1. **Completar a continuidade dos formulários diários.** Investigar as falhas
-   automáticas de agenda, navegação, Andamentos e recebimento. Completar os
+1. **Completar a continuidade dos formulários diários.** Conferir na CI a
+   sincronização de agenda, foco e Andamentos. Investigar a seleção da aba no
+   recebimento se a falha se repetir. Completar os
    cadastros necessários à operação e conferir as mensagens de recuperação
    e conflito. As contagens, preparações da agenda e revisões de fluxo já
    implementadas serão incluídas na revisão conjunta.

@@ -1,5 +1,11 @@
 # Checkpoint D-B
 
+D3.57 corrigiu as esperas de três testes da CI. A agenda foi reproduzida
+localmente. A nova rodada aprovou 15 cenários nos três navegadores. A falha
+intermitente de seleção de aba no recebimento segue aberta. O remoto ficou
+sem migrations pendentes no dry-run. A CI própria permanece pendente.
+[Verificações](BROWSER_CI_TIMING.md).
+
 D3.56 qualificado localmente nos dois modos de BAL. A retomada preserva
 observações anteriores quando muda a referência e exige nova conferência
 física. A abertura antiga recupera a chave original antes de atualizar a

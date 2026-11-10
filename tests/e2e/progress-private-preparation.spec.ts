@@ -396,7 +396,12 @@ test("outra sessão conclui a preparação durante resultado incerto e a ediçã
     await editor(peer)
       .getByRole("button", { name: "Publicar andamento", exact: true })
       .click();
-    await expect(privatePanel(peer)).toContainText("Andamento publicado por");
+    await expect(editor(peer)).toHaveCount(0);
+    await expect(
+      peer
+        .getByRole("tabpanel", { name: "Visão geral", exact: true })
+        .getByRole("region", { name: "Rascunho privado", exact: true }),
+    ).toContainText("Andamento publicado por");
     expect(notes(f.id)).toBe(1);
     await frozen
       .getByRole("button", {

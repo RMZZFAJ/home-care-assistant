@@ -239,7 +239,9 @@ test("resource lost native reply is recovered after reload without another opera
   await open(page, purpose);
   await fill(page, purpose);
   await review(page);
+  const before = JSON.parse(nativeFacts(f));
   let writes = 0;
+  let nativeStatus: number | undefined;
   page.on("request", (r) => {
     if (
       new URL(r.url()).pathname ===
@@ -252,8 +254,8 @@ test("resource lost native reply is recovered after reload without another opera
     "**/api/schedules/resource-preparations/commit",
     async (route) => {
       const result = await route.fetch();
-      expect(result.status()).toBe(200);
       await route.abort("failed");
+      nativeStatus = result.status();
     },
     { times: 1 },
   );
@@ -268,7 +270,16 @@ test("resource lost native reply is recovered after reload without another opera
   expect(
     await page.evaluate((k) => sessionStorage.getItem(k), key),
   ).not.toBeNull();
+  // The recovery panel can appear before the original native write completes.
+  await expect.poll(() => nativeStatus).toBe(200);
   const after = nativeFacts(f);
+  expect(JSON.parse(after)).toMatchObject({
+    events: before.events + 1,
+    commands: before.commands + 1,
+    changes: expect.arrayContaining([
+      expect.objectContaining({ id: f.target, status: "rejected" }),
+    ]),
+  });
   await page.reload();
   await page
     .getByText("Meus preenchimentos privados da agenda", { exact: true })

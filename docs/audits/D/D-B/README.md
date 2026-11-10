@@ -114,6 +114,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
 [Continuidade das observações físicas do BAL](BAL_OBSERVATION_CONTINUITY.md).
 
+[Verificações de navegador após falhas da CI](BROWSER_CI_TIMING.md).
+
 Branch única `feat/phase-d-implementation`; [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7)
 permanece Draft, sem merge ou promoção operacional. Evidência local, CI,
 verificação remota e homologação externa têm estados distintos.
