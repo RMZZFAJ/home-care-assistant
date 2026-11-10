@@ -82,3 +82,13 @@ atuais e sem fonte form fora do levantamento. Contagens,cadastros,administraçã
 perfil e paridade66/171 continuam pendentes com Codex;nenhuma dispensa genérica.
 Recuperação estimada≈90%,visual≈60%,formulários≈90%. CI própria e gates externos
 seguem separados. [Incremento](SCHEDULE_RESOURCE_DRAFTS.md).
+
+## Atualização D3.55
+
+A classificação do inventory-console foi corrigida:legado sem importador UI,
+escrita aposentada410,consulta histórica preservada. Não é fluxo de contagem
+a reconstruir. O levantamento conserva50 fontes/52 tags,incluindo esse legado
+e os controladores delegados;isso não representa50 consumidores ativos.
+Contagens reais usam BAL agendado ou sem regime. O transporte da tentativa
+agendada recebeu validação e proteção de cópia,mas a continuidade sob mudança
+de referência ainda é parcial. [Incremento](BAL_COUNT_RECOVERY.md).

@@ -4,6 +4,21 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.55 valida o recibo e a cópia local da tentativa da contagem BAL agendada
+antes de exibir sucesso ou limpar. Preserve o pacote original após resposta
+perdida ou divergente;armazenamento recusado impede envio nativo e descarte
+privado não apaga outra tentativa.18unit/API e21cenários de produção local
+com Auth real qualificados;tipos e lint aprovados. Nenhuma migration nova.
+Remoto197 conferido; dry-run sem pendências. CI própria ainda pendente.
+
+O inventário antigo é legado sem consumidor UI e escrita410. A contagem ativa
+já usa a ficha BAL e rascunho privado;continuidade sob mudança de referência
+ainda é parcial e permanece com Codex. Matriz56 PASS locais/49 PARTIAL,
+visual≈60%,formulários≈90%,recuperação≈90%. PR7 Draft,Sonar adiado,meta ativa.
+[Incremento atual](../audits/D/D-B/BAL_COUNT_RECOVERY.md).
+
+## Incremento anterior D3.54
+
 D3.54 conclui a preparação privada das oito finalidades sobre recursos
 existentes da agenda. Campos parciais,retomada em outra sessão,CAS,referência
 selada,decisão nativa atômica,histórico e recuperação/resolução permanecem

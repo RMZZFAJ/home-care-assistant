@@ -1,5 +1,5 @@
 "use client";
-import { ProgressMeter } from '@/components/ui/feedback';
+import { ProgressMeter } from "@/components/ui/feedback";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +16,11 @@ import {
 import { StepNavigator } from "@/components/ui/primitives";
 import { PatientSupplyWizard } from "@/components/documents/supply-wizard";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
+import {
+  draftFlowStages,
+  navigationForStep,
+  stepForNavigation,
+} from "@/lib/forms/draft-navigation";
 import {
   CreationDraftPanel,
   BalanceObservationTimes,
@@ -24,7 +28,7 @@ import {
 import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { DocumentActions } from "@/components/documents/document-actions";
-import {BalanceNotice} from "@/components/notifications/balance-notice";
+import { BalanceNotice } from "@/components/notifications/balance-notice";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
 import { formatZonedDate } from "@/lib/schedules/time";
@@ -38,20 +42,37 @@ import type { BalanceWorkspace } from "@/types/balances";
 import type { ProductStock } from "@/types/stock";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import { BalanceCountFields, BalanceReviewRows } from "./balance-count-fields";
+import {
+  preserveCountCache,
+  clearCountCache,
+  clearIdleCountCache,
+  checkCountAttempt,
+  countAttemptTarget,
+  parseCountCache,
+  requireCountConfirmation,
+  type CountAttempt,
+} from "@/lib/balances/count-attempt";
 
-type Attempt = { url: string; body: object; draft: boolean };
+type Attempt = CountAttempt;
 export function BalanceEntry() {
   const params = useSearchParams();
   return (
     <Workspace title="Balanço de estoque" compact>
       {(context) =>
         context.patient && can(context, "bal.read") ? (
-          params.get("ref")?<BalanceNotice key={context.patient.id+params.toString()} context={context}/>:<Mode
-            key={context.userId + context.patient.id + params.toString()}
-            context={context}
-            documentId={params.get("documentId")}
-            recount={params.get("recount") === "true"}
-          />
+          params.get("ref") ? (
+            <BalanceNotice
+              key={context.patient.id + params.toString()}
+              context={context}
+            />
+          ) : (
+            <Mode
+              key={context.userId + context.patient.id + params.toString()}
+              context={context}
+              documentId={params.get("documentId")}
+              recount={params.get("recount") === "true"}
+            />
+          )
         ) : (
           <Notice>
             Selecione um paciente com autorização para consultar o balanço.
@@ -83,10 +104,7 @@ function Mode({
             `hca:v2:bal-count:${context.userId}:${context.patient!.id}:${documentId ?? "new"}`,
           ) ?? "null",
         );
-        if (active)
-          setRecoverable(
-            Boolean(cache?.pending),
-          );
+        if (active) setRecoverable(Boolean(cache?.pending));
       } catch {
         if (active) setRecoverable(false);
       }
@@ -102,7 +120,8 @@ function Mode({
         <ActionButton onClick={reload}>Tentar novamente</ActionButton>
       </Notice>
     );
-  if (!data) return <LoadingIndicator label="Verificando plantão e disponibilidade" />;
+  if (!data)
+    return <LoadingIndicator label="Verificando plantão e disponibilidade" />;
   if (
     !data.regime?.activated_at &&
     !data.eligibility.assignment &&
@@ -152,6 +171,7 @@ function ScheduledCount({
     [uncertain, setUncertain] = useState(false),
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
+  const [cacheError, setCacheError] = useState("");
   const [attempt, setAttempt] = useState(0),
     [referenceRevision, setReferenceRevision] = useState(
       initial.referenceRevision,
@@ -162,6 +182,31 @@ function ScheduledCount({
   const formatBrazilDate = (value: string | null) =>
     formatZonedDate(value, initial.regime?.timezone);
   const storageKey = `hca:v2:bal-count:${context.userId}:${context.patient!.id}:${documentId ?? "new"}`;
+  function scopeFor(intent: Attempt | null) {
+    return {
+      userId: context.userId,
+      patientId: context.patient!.id,
+      documentId: intent
+        ? countAttemptTarget(intent)
+        : (editing?.id ?? documentId),
+    };
+  }
+  function retain(intent: Attempt | null, expected: Attempt | null = intent) {
+    preserveCountCache(
+      sessionStorage,
+      storageKey,
+      scopeFor(expected),
+      {
+        assignmentId: assignment?.id ?? null,
+        referenceRevision,
+        counts,
+        notes,
+        observationTimes,
+      },
+      intent,
+      expected,
+    );
+  }
   const eligible =
     balance.eligibility.available &&
     balance.eligibility.assignment?.id === assignment?.id &&
@@ -223,12 +268,24 @@ function ScheduledCount({
       setObservationTimes(content.observationTimes);
       setNotes(content.notes);
       setDraftMaterials(content.materials);
-      setStep(stepForNavigation("BAL",draft.navigation));
+      setStep(stepForNavigation("BAL", draft.navigation));
       setError("");
       setFieldErrors({});
       return true;
     },
     onDiscard: () => {
+      try {
+        clearIdleCountCache(sessionStorage, storageKey, {
+          userId: context.userId,
+          patientId: context.patient!.id,
+          documentId: editing?.id ?? documentId,
+        });
+      } catch {
+        setCacheError(
+          "Há outra tentativa de contagem preservada neste aparelho. O descarte privado não a apagou; consulte a referência original antes de continuar.",
+        );
+        return;
+      }
       setCounts({});
       setObservationTimes({});
       setNotes("");
@@ -236,7 +293,6 @@ function ScheduledCount({
       setStep(0);
       setError("");
       setFieldErrors({});
-      sessionStorage.removeItem(storageKey);
     },
   });
   const missingMaterials = Object.keys(counts).filter(
@@ -257,7 +313,23 @@ function ScheduledCount({
           controller.signal,
         ),
       ]);
-      const id = documentId ?? state.data.eligibility.documentId;
+      let raw: string | null,
+        cachedTarget: string | null = null;
+      try {
+        raw = sessionStorage.getItem(storageKey);
+        if (raw) {
+          const candidate = JSON.parse(raw);
+          if (candidate?.pending)
+            cachedTarget = countAttemptTarget(candidate.pending);
+        }
+      } catch {
+        setCacheError(
+          "Não foi possível conferir a cópia desta contagem. Ela foi preservada; nenhum envio foi realizado.",
+        );
+        return;
+      }
+      const id =
+        documentId ?? cachedTarget ?? state.data.eligibility.documentId;
       const doc = id
         ? (
             await api<{ data: SupplyDocument }>(
@@ -288,38 +360,34 @@ function ScheduledCount({
         );
         setNotes(doc.payload.notes ?? "");
       }
-      const raw = sessionStorage.getItem(storageKey);
       if (raw && attempt === 0) {
-        const cache = JSON.parse(raw) as {
-          savedAt: number;
-          assignmentId?: string;
-          referenceRevision?: string;
-          counts?: Record<string, string>;
-          notes?: string;
-          observationTimes?: Record<string, string | null>;
-          pending?: Attempt;
-        };
-        if (cache && typeof cache === "object") {
+        try {
+          const cache = parseCountCache(raw, {
+            userId: context.userId,
+            patientId: context.patient!.id,
+            documentId: doc?.id ?? null,
+          });
           if (
-            cache.assignmentId === state.data.eligibility.assignment?.id &&
-            cache.referenceRevision === state.data.referenceRevision
+            cache.pending ||
+            (cache.assignmentId === state.data.eligibility.assignment?.id &&
+              cache.referenceRevision === state.data.referenceRevision)
           ) {
             setCounts(cache.counts ?? {});
             setNotes(cache.notes ?? "");
             setObservationTimes(cache.observationTimes ?? {});
           }
-          if (
-            cache.pending &&
-            /^\/api\/documents(?:\/[0-9a-f-]{36}\/revise)?$/.test(
-              cache.pending.url,
-            )
-          ) {
+          if (cache.pending) {
             pendingRef.current = cache.pending;
             setUncertain(true);
             setMessage(
               "Há uma tentativa pendente. Recupere o resultado antes de continuar.",
             );
           }
+          setCacheError("");
+        } catch {
+          setCacheError(
+            "Não foi possível conferir a cópia desta contagem. Ela foi preservada; nenhum envio foi realizado.",
+          );
         }
       }
     };
@@ -331,24 +399,33 @@ function ScheduledCount({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [context.patient, documentId, storageKey, attempt]);
+  }, [context.patient, context.userId, documentId, storageKey, attempt]);
   useEffect(() => {
-    if (!loading && !saved)
+    if (!loading && !saved && !cacheError)
       try {
-        sessionStorage.setItem(
+        const intent = pendingRef.current;
+        preserveCountCache(
+          sessionStorage,
           storageKey,
-          JSON.stringify({
-            savedAt: Date.now(),
-            assignmentId: assignment?.id,
+          {
+            userId: context.userId,
+            patientId: context.patient!.id,
+            documentId: intent
+              ? countAttemptTarget(intent)
+              : (editing?.id ?? documentId),
+          },
+          {
+            assignmentId: assignment?.id ?? null,
             referenceRevision,
             counts,
             notes,
             observationTimes,
-            pending: pendingRef.current,
-          }),
+          },
+          intent,
         );
       } catch {
-        /* In-memory editing remains available. */
+        // Unsaved editing remains available. The command path separately
+        // requires a verified durable packet before sending an operation.
       }
   }, [
     loading,
@@ -359,6 +436,11 @@ function ScheduledCount({
     counts,
     notes,
     observationTimes,
+    cacheError,
+    context.userId,
+    context.patient,
+    editing?.id,
+    documentId,
   ]);
   function validate() {
     const errors: Record<string, string> = {};
@@ -430,6 +512,7 @@ function ScheduledCount({
     }
   }
   async function save(draft: boolean) {
+    if (cacheError) return;
     if (draft && !pendingRef.current) {
       await privateDraft.save(balanceContent);
       return;
@@ -462,72 +545,74 @@ function ScheduledCount({
       const commit = privateDraft.draftCommit
         ? { draftCommit: privateDraft.draftCommit }
         : {};
-      pendingRef.current = {
-        url: editing ? `/api/documents/${editing.id}/revise` : "/api/documents",
-        body: editing
-          ? {
-              ...commit,
-              payload,
-              idempotencyKey: crypto.randomUUID(),
-              submissionKey: crypto.randomUUID(),
-              expectedVersion: editing.version,
-              recount: assignment.kind === "recount",
-              submit: !draft,
-            }
-          : {
-              ...commit,
-              careRecipientId: context.patient!.id,
-              type: "BAL",
-              payload,
-              idempotencyKey: crypto.randomUUID(),
-              draft,
-            },
-        draft,
-      };
+      pendingRef.current = checkCountAttempt(
+        {
+          url: editing
+            ? `/api/documents/${editing.id}/revise`
+            : "/api/documents",
+          body: editing
+            ? {
+                ...commit,
+                payload,
+                idempotencyKey: crypto.randomUUID(),
+                submissionKey: crypto.randomUUID(),
+                expectedVersion: editing.version,
+                recount: assignment.kind === "recount",
+                submit: !draft,
+              }
+            : {
+                ...commit,
+                careRecipientId: context.patient!.id,
+                type: "BAL",
+                payload,
+                idempotencyKey: crypto.randomUUID(),
+                draft,
+              },
+          draft,
+        },
+        {
+          userId: context.userId,
+          patientId: context.patient!.id,
+          documentId: editing?.id ?? null,
+        },
+      );
     }
     setBusy(true);
     setError("");
     const intent = pendingRef.current;
     try {
-      try {
-        sessionStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            savedAt: Date.now(),
-            assignmentId: assignment?.id,
-            referenceRevision,
-            counts,
-            notes,
-            observationTimes,
-            pending: intent,
-          }),
-        );
-      } catch {
-        /* The same attempt remains in memory. */
-      }
-      const result = await api<{ data: SupplyDocument }>(
-        intent.url,
-        intent.body,
+      retain(intent);
+      const response = await api<unknown>(intent.url, intent.body);
+      const confirmed = requireCountConfirmation(
+        response,
+        intent,
+        scopeFor(intent),
       );
+      clearCountCache(sessionStorage, storageKey, scopeFor(intent), intent);
       pendingRef.current = null;
       setUncertain(false);
-      sessionStorage.removeItem(storageKey);
       if (intent.draft) {
-        setEditing(result.data);
+        setEditing(confirmed);
         setMessage(
           "Rascunho gravado no sistema. A obrigação continua pendente.",
         );
       } else {
-        setSaved(result.data);
+        setSaved(confirmed);
         reload();
       }
     } catch (reason) {
       if (
         reason instanceof ApiError &&
-        [400, 403, 404, 409, 422].includes(reason.status) && !uncertain
+        [400, 403, 404, 409, 422].includes(reason.status) &&
+        !uncertain
       ) {
-        pendingRef.current = null;
-        setUncertain(false);
+        try {
+          retain(null, intent);
+          pendingRef.current = null;
+          setUncertain(false);
+        } catch {
+          setUncertain(true);
+        }
         if (
           ["INVENTORY_CONFLICT", "VERSION_CONFLICT"].includes(reason.code ?? "")
         )
@@ -639,13 +724,14 @@ function ScheduledCount({
       draft={privateDraft}
       current={balanceContent}
       patientName={context.patient!.display_name}
-      disabled={busy || uncertain}
+      disabled={busy || uncertain || Boolean(cacheError)}
     />
   );
   if (!initial.eligibility.available && !uncertain)
     return (
       <div className="hca-form-stack">
         {draftPanel}
+        {cacheError ? <Notice error>{cacheError}</Notice> : null}
         <section className="ui-card hca-form-stack">
           {error ? <Notice error>{error}</Notice> : null}
           <Notice>
@@ -675,6 +761,7 @@ function ScheduledCount({
   return (
     <div className="hca-form-stack">
       {draftPanel}
+      {cacheError ? <Notice error>{cacheError}</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       <section className="hca-bal-context">
@@ -726,13 +813,21 @@ function ScheduledCount({
         </Notice>
       ) : null}
       <StepNavigator
-        steps={draftFlowStages.BAL.map(stage => stage.label)}
+        steps={draftFlowStages.BAL.map((stage) => stage.label)}
         active={step}
-        disabled={busy || uncertain || privateDraft.blocked}
+        disabled={
+          busy || uncertain || privateDraft.blocked || Boolean(cacheError)
+        }
         onChange={setStep}
       />
       <fieldset
-        disabled={busy || uncertain || !eligible || privateDraft.blocked}
+        disabled={
+          busy ||
+          uncertain ||
+          !eligible ||
+          privateDraft.blocked ||
+          Boolean(cacheError)
+        }
         className="min-w-0 hca-form-stack"
       >
         {step === 0 ? (
@@ -795,27 +890,38 @@ function ScheduledCount({
           </>
         )}
       </fieldset>
-      <WizardActions
-        step={step}
-        total={2}
-        saving={
-          busy || privateDraft.busy || (privateDraft.blocked && !uncertain)
-        }
-        uncertain={uncertain}
-        blocked={!eligible || !products.length || missingMaterials.length > 0}
-        onBack={() => setStep(0)}
-        onDraft={() => void save(true)}
-        onNext={() => void review()}
-        onFinish={() => void save(false)}
-        finishLabel={
-          assignment?.kind === "recount"
-            ? "Confirmar reconto"
-            : "Confirmar contagem"
-        }
-      />
+      <fieldset
+        disabled={Boolean(cacheError)}
+        className="min-w-0"
+        aria-label="Ações da contagem"
+      >
+        <WizardActions
+          step={step}
+          total={2}
+          saving={
+            busy || privateDraft.busy || (privateDraft.blocked && !uncertain)
+          }
+          uncertain={uncertain}
+          blocked={
+            !eligible ||
+            !products.length ||
+            missingMaterials.length > 0 ||
+            Boolean(cacheError)
+          }
+          onBack={() => setStep(0)}
+          onDraft={() => void save(true)}
+          onNext={() => void review()}
+          onFinish={() => void save(false)}
+          finishLabel={
+            assignment?.kind === "recount"
+              ? "Confirmar reconto"
+              : "Confirmar contagem"
+          }
+        />
+      </fieldset>
       {uncertain && step === 0 ? (
         <ActionButton
-          disabled={busy}
+          disabled={busy || Boolean(cacheError)}
           variant="primary"
           onClick={() => void save(false)}
         >
@@ -824,7 +930,7 @@ function ScheduledCount({
       ) : null}
       {needsRecount && !uncertain ? (
         <ActionButton
-          disabled={busy}
+          disabled={busy || Boolean(cacheError)}
           onClick={() => {
             setCounts({});
             setObservationTimes({});

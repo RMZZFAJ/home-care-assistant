@@ -1232,3 +1232,15 @@ encerrar como obsoleta. A resolução explícita retira a revisão privada de
 circulação e conserva os campos. Resultado e chave de resolução são
 idempotentes, inclusive se sua resposta se perder. Origin e private,no-store
 permanecem em todas essas rotas; a API genérica de documentos não as aceita.
+
+## Recibo de criação/revisão de ficha
+
+POST /api/documents e /api/documents/:id/revise conservam data/persistence e
+acrescentam confirmation após o RPC nativo:actorId,idempotencyKey,
+targetDocumentId,expectedVersion e submissionKey. Criação usa os três últimos
+campos nulos. É recibo da requisição,não assinatura/hash documental nem nova
+permissão. Revise compartilha reviseSupplySchema,com mesmos defaults e campos.
+ScheduledCount exige esse recibo,persistence confirmado,ficha/paciente/tipo,
+identidade da criação e valores/notas antes de limpar sua tentativa.
+Clientes anteriores continuam compatíveis;suas provas específicas não foram
+substituídas pela validação do consumidor BAL.

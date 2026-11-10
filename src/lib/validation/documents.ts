@@ -67,6 +67,18 @@ export const supplyPayload = z
     balanceReferenceRevision: z.string().regex(/^\d+$/).max(20).optional(),
   })
   .strict();
+export const reviseSupplySchema = z
+  .object({
+    payload: supplyPayload,
+    idempotencyKey: identifier,
+    submissionKey: identifier,
+    expectedVersion: z.number().int().positive(),
+    recount: z.boolean(),
+    submit: z.boolean(),
+    draftCommit: draftCommitSchema.optional(),
+    draftKind: z.enum(["COM", "ENT", "BAL"]).default("BAL"),
+  })
+  .strict();
 export const createSupplySchema = z
   .object({
     careRecipientId: identifier,

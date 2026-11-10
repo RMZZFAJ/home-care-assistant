@@ -10,6 +10,7 @@ import {
   saoPauloDateBoundary,
 } from "@/lib/server/api";
 import { createSupplySchema } from "@/lib/validation/documents";
+import { supplyWriteConfirmation } from "@/lib/supply/write-confirmation";
 
 export async function GET(request: Request) {
   return api("documents.list", async () => {
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
       auth,
       input.careRecipientId,
       input.draftCommit
-        ? input.type.toLowerCase()+".read"
+        ? input.type.toLowerCase() + ".read"
         : input.type === "COM"
           ? "com.create"
           : input.type === "ENT"
@@ -61,13 +62,22 @@ export async function POST(request: Request) {
     );
     const data = input.draftCommit
       ? (
-          (await rpc(auth.client, input.type==="BAL"?"commit_creation_draft":"commit_supply_draft", {
-            p_id: input.draftCommit.id,
-            p_expected: input.draftCommit.revision,
-            p_target: null,
-            p_key: input.idempotencyKey,
-            p_body: { action: input.type==="BAL"?"create_bal":"create", payload: input.payload },
-          })) as { result: unknown }
+          (await rpc(
+            auth.client,
+            input.type === "BAL"
+              ? "commit_creation_draft"
+              : "commit_supply_draft",
+            {
+              p_id: input.draftCommit.id,
+              p_expected: input.draftCommit.revision,
+              p_target: null,
+              p_key: input.idempotencyKey,
+              p_body: {
+                action: input.type === "BAL" ? "create_bal" : "create",
+                payload: input.payload,
+              },
+            },
+          )) as { result: unknown }
         ).result
       : await rpc(auth.client, "create_supply_document", {
           p_patient: input.careRecipientId,
@@ -77,7 +87,11 @@ export async function POST(request: Request) {
           p_draft: input.draft,
         });
     return NextResponse.json(
-      { data, persistence: "confirmed" },
+      {
+        data,
+        persistence: "confirmed",
+        confirmation: supplyWriteConfirmation(auth.userId, input),
+      },
       { status: 201 },
     );
   });

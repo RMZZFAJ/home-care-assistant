@@ -40,7 +40,8 @@ retomá-lo em outra sessão ou aparelho. É possível comparar duas edições e
 manter seu texto quando outra sessão conclui o andamento, inclusive após
 perder a resposta do reconhecimento desse resultado.
 
-**Novos tipos de plantão e novas programações: concluídos · 100% deste recurso.**
+**Novos tipos de plantão e novas programações: concluídos · 100% deste
+recurso.**
 É possível guardar o preenchimento incompleto no servidor, retomar em outro
 aparelho, comparar edições e recuperar uma confirmação perdida. Mudanças do
 tipo de plantão exigem sua escolha antes de continuar, preservando os outros
@@ -61,9 +62,17 @@ campos próprios mesmo após perda de resposta ou outra conclusão. As
 verificações deste recurso e a atualização do banco foram concluídas; a
 revisão geral da fase continua pendente. Responsável: Codex.
 
-O levantamento ampliado também encontrou trabalho em contagens, cadastros e
-administração. A estimativa geral de recuperação entre aparelhos continua em
-90%; concluir essas lacunas continua sendo minha responsabilidade.
+**Recuperação do envio da contagem agendada: concluída · 100% deste ajuste.**
+A resposta só é aceita quando corresponde à ficha e à tentativa enviada.
+Falha, recarga ou resposta divergente mantêm a referência para recuperação;
+o descarte privado não apaga outra tentativa. Responsável: Codex.
+
+O levantamento foi corrigido: a contagem atual é feita na ficha BAL e já tinha
+preenchimento privado. Ainda falta concluir a retomada quando o estoque,
+plantão ou ficha muda, sem tratar quantidades anteriores como observações
+novas. Cadastros e administração também continuam pendentes. A estimativa
+geral de recuperação entre aparelhos continua em 90%; concluir essas lacunas
+continua sendo minha responsabilidade.
 Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
@@ -111,8 +120,8 @@ quando há conflito. É possível percorrer a revisão longa pelo teclado.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈90%. Falta: Conferir campos ainda não salvos nas contagens,
-  cadastros e administração, e completar as lacunas aplicáveis. As preparações
+  execução · ≈90%. Falta: Concluir a retomada das contagens após mudanças de
+  estoque, plantão ou ficha; concluir cadastros e administração. As preparações
   privadas da agenda estão concluídas no escopo interno deste recurso.
   Revisões de fluxo, relatos e decisões de consumo, movimentação familiar,
   programação do balanço, atribuição, adiamentos, pareceres,
@@ -370,8 +379,8 @@ quando há conflito. É possível percorrer a revisão longa pelo teclado.
   participantes, canais e responsáveis. Responsável: Codex; você e equipe.
 - **Concluir verificações automáticas e tratar qualidade do código** — Em
   execução · ≈65%. Falta: Fechar verificações do candidato final; Sonar aguarda
-  configuração por sua decisão. Responsável: Codex; você para configuração do
-  Sonar.
+  configuração por sua decisão. Responsável: Codex; você para liberar acesso ao
+  Sonar, se necessário.
 
 ### Nova aparência do sistema
 
@@ -494,7 +503,8 @@ são motivo para interromper os trabalhos independentes da D-B.
 ## Subtarefas operacionais ainda não executadas
 
 O 0% abaixo se refere somente à tarefa indicada. A preparação do recurso pode
-estar parcialmente pronta, como mostrado nos blocos anteriores. Incluem implementação,
+estar parcialmente pronta, como mostrado nos blocos anteriores. Incluem
+implementação,
 validação e ativação operacional; não são motivos para parar os trabalhos
 independentes.
 
@@ -519,8 +529,9 @@ funcionalidade, sem representar ordem de execução. Tudo que já está 100% ser
 preservado e incluído na revisão final; não será refeito sem motivo.
 
 1. **Completar a continuidade das contagens e dos formulários diários.**
-   Conferir valores ainda não salvos nas contagens de estoque, completar as
-   lacunas de recuperação e os cadastros necessários à operação. Conferir
+   Concluir a retomada das contagens quando muda o estoque, plantão ou ficha,
+   mantendo observações e distinguindo valores antigos de nova verificação.
+   Completar os cadastros necessários à operação. Conferir
    mensagens e conflitos em conjunto. Preservar a agenda privada, as revisões de
    fluxo, os relatos, complementos e
    decisões de consumo, Andamentos privados, a movimentação familiar, os seis

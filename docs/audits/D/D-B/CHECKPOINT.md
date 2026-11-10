@@ -1,6 +1,15 @@
 # Checkpoint D-B
 
-Checkpoint corrente:D3.54 concluído no escopo local e remoto,com CI própria
+Checkpoint corrente:D3.55 qualificado localmente:recibo e cópia da tentativa
+de contagem BAL agendada conferidos antes da limpeza;descarte privado preserva
+outra tentativa.18unit/API e21browser com Auth real nas três engines,tipos e
+lint aprovados. Classificação do inventário legado corrigida:sem consumidor UI,
+POST410 mantido. Sem migration nova; remoto197 conferido e dry-run vazio. Critério
+amplo de continuidade das contagens segue parcial,com referência obsoleta como
+próximo trabalho. [Incremento](BAL_COUNT_RECOVERY.md). PR7 Draft,CI própria
+pendente,Sonar adiado e meta ativa.
+
+Checkpoint anterior:D3.54 concluído no escopo local e remoto,com CI própria
 pendente. Oito preparações de recursos existentes da agenda implementadas,
 58 unit/API,23 Auth e40 cenários de navegador distintos qualificados;coorte
 final13/13 após ajuste de estado salvo/descarte. Remoto197 reconciliado,dry-run

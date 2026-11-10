@@ -331,3 +331,13 @@ após alteração concorrente; a guarda posterior ao comando reverte qualquer
 resultado incompatível. Ausência de diário não apaga tentativa. Resolução
 explícita avança CAS sob a chave original e bloqueia aplicação tardia. Nenhum
 reenvio offline, cache privado ou autorização por sessionStorage foi criado.
+
+## Tentativa da contagem BAL agendada
+
+Cópia local v2 declara autor/paciente e mantém pacote original tipado. Legado
+continua submetido às guardas nativas e ao alvo lido com autorização. Metadata
+não autoriza. O recibo das APIs é produzido após o RPC com o ator autenticado,
+sem usar o criador da ficha como ator de revisão. O cliente confere escopo,
+chaves,versão e valores antes de aceitar sucesso. Falha de persistência impede
+o POST;recibo divergente não limpa a tentativa. Descarte privado não remove
+outra cópia operacional. Sem replay automático,cache privado ou mudança de RLS.
