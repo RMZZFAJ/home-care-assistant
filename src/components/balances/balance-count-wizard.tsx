@@ -2,7 +2,7 @@
 import { ProgressMeter } from "@/components/ui/feedback";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import {
@@ -52,6 +52,15 @@ import {
   requireCountConfirmation,
   type CountAttempt,
 } from "@/lib/balances/count-attempt";
+
+import {
+  beginBalanceObservation,
+  sameBalanceContext,
+} from "@/lib/balances/observation-continuity";
+import {
+  BalancePreviousObservations,
+  BalanceReferenceReview,
+} from "./observation-continuity";
 
 type Attempt = CountAttempt;
 export function BalanceEntry() {
@@ -104,7 +113,17 @@ function Mode({
             `hca:v2:bal-count:${context.userId}:${context.patient!.id}:${documentId ?? "new"}`,
           ) ?? "null",
         );
-        if (active) setRecoverable(Boolean(cache?.pending));
+        if (active)
+          setRecoverable(
+            Boolean(
+              cache?.pending ||
+                cache?.content ||
+                cache?.notes ||
+                Object.values(cache?.counts ?? {}).some(
+                  (value) => value !== "",
+                ),
+            ),
+          );
       } catch {
         if (active) setRecoverable(false);
       }
@@ -178,35 +197,16 @@ function ScheduledCount({
     ),
     [assignment, setAssignment] = useState(initial.eligibility.assignment);
   const [needsRecount, setNeedsRecount] = useState(false);
+  const [sourceReady, setSourceReady] = useState(false);
+  const [preservedContext, setPreservedContext] = useState<
+    BalanceDraftContent["context"] | null
+  >(null);
+  const [previousObservations, setPreviousObservations] =
+    useState<BalanceDraftContent["previousObservations"]>(undefined);
   const pendingRef = useRef<Attempt | null>(null);
   const formatBrazilDate = (value: string | null) =>
     formatZonedDate(value, initial.regime?.timezone);
   const storageKey = `hca:v2:bal-count:${context.userId}:${context.patient!.id}:${documentId ?? "new"}`;
-  function scopeFor(intent: Attempt | null) {
-    return {
-      userId: context.userId,
-      patientId: context.patient!.id,
-      documentId: intent
-        ? countAttemptTarget(intent)
-        : (editing?.id ?? documentId),
-    };
-  }
-  function retain(intent: Attempt | null, expected: Attempt | null = intent) {
-    preserveCountCache(
-      sessionStorage,
-      storageKey,
-      scopeFor(expected),
-      {
-        assignmentId: assignment?.id ?? null,
-        referenceRevision,
-        counts,
-        notes,
-        observationTimes,
-      },
-      intent,
-      expected,
-    );
-  }
   const eligible =
     balance.eligibility.available &&
     balance.eligibility.assignment?.id === assignment?.id &&
@@ -217,30 +217,59 @@ function ScheduledCount({
   const [draftMaterials, setDraftMaterials] = useState<
     BalanceDraftContent["materials"]
   >([]);
-  const balanceContent: BalanceDraftContent = {
-    counts,
-    observationTimes,
-    notes,
-    materials: [
-      ...products.map((product) => ({
-        id: product.id,
-        name: product.name,
-        unit: product.unit,
-        quantityDecimals: product.quantity_decimals ?? 0,
-      })),
-      ...draftMaterials.filter(
-        (material) => !products.some((product) => product.id === material.id),
-      ),
-    ],
-    context: {
+  const currentContext = useMemo<BalanceDraftContent["context"]>(
+    () => ({
       mode: "scheduled",
       documentId: editing?.id ?? null,
       documentVersion: editing?.version ?? null,
       assignmentId: assignment?.id ?? null,
       assignmentVersion: assignment?.version ?? null,
       referenceRevision,
-    },
-  };
+    }),
+    [
+      editing?.id,
+      editing?.version,
+      assignment?.id,
+      assignment?.version,
+      referenceRevision,
+    ],
+  );
+  const needsReferenceReview =
+    needsRecount ||
+    (preservedContext !== null &&
+      !sameBalanceContext(preservedContext, currentContext)) ||
+    balance.referenceRevision !== referenceRevision ||
+    !eligible;
+  const balanceContent = useMemo<BalanceDraftContent>(
+    () => ({
+      counts,
+      observationTimes,
+      notes,
+      materials: [
+        ...draftMaterials,
+        ...products
+          .filter((product) => !draftMaterials.some((m) => m.id === product.id))
+          .map((product) => ({
+            id: product.id,
+            name: product.name,
+            unit: product.unit,
+            quantityDecimals: product.quantity_decimals ?? 0,
+          })),
+      ],
+      context: preservedContext ?? currentContext,
+      ...(previousObservations ? { previousObservations } : {}),
+    }),
+    [
+      counts,
+      observationTimes,
+      notes,
+      draftMaterials,
+      products,
+      preservedContext,
+      currentContext,
+      previousObservations,
+    ],
+  );
   const privateDraft = useCreationDraft({
     userId: context.userId,
     patientId: context.patient!.id,
@@ -251,19 +280,12 @@ function ScheduledCount({
     onResume: (draft) => {
       const content = draft.content;
       if (!content || !("counts" in content)) return false;
-      if (
-        content.context.mode !== "scheduled" ||
-        content.context.documentId !== (editing?.id ?? null) ||
-        content.context.documentVersion !== (editing?.version ?? null) ||
-        content.context.assignmentId !== (assignment?.id ?? null) ||
-        content.context.assignmentVersion !== (assignment?.version ?? null) ||
-        content.context.referenceRevision !== referenceRevision
-      ) {
-        setError(
-          "O plantão, a ficha ou o estoque mudou desde este rascunho. Os valores antigos permanecem no resumo. Confira o acompanhamento e descarte somente o rascunho privado antes de iniciar uma nova conferência.",
-        );
+      if (content.context.documentId !== (editing?.id ?? null)) {
+        setError("Abra a ficha original para recuperar este preenchimento.");
         return false;
       }
+      setPreservedContext(content.context);
+      setPreviousObservations(content.previousObservations);
       setCounts(content.counts);
       setObservationTimes(content.observationTimes);
       setNotes(content.notes);
@@ -290,6 +312,9 @@ function ScheduledCount({
       setObservationTimes({});
       setNotes("");
       setDraftMaterials([]);
+      setPreservedContext(null);
+      setPreviousObservations(undefined);
+      setNeedsRecount(false);
       setStep(0);
       setError("");
       setFieldErrors({});
@@ -339,7 +364,10 @@ function ScheduledCount({
             )
           ).data
         : null;
-      if (doc && doc.care_recipient_id !== context.patient!.id)
+      if (
+        doc &&
+        (doc.care_recipient_id !== context.patient!.id || doc.type !== "BAL")
+      )
         throw new Error(
           "A ficha pertence a outro paciente. Selecione o vínculo correspondente.",
         );
@@ -348,34 +376,48 @@ function ScheduledCount({
       setEditing(doc);
       setAssignment(state.data.eligibility.assignment);
       setReferenceRevision(state.data.referenceRevision);
-      if (
-        doc?.status === "draft" &&
-        doc.payload.balanceAssignment?.id ===
-          state.data.eligibility.assignment?.id &&
-        doc.payload.balanceAssignment?.referenceRevision ===
-          state.data.referenceRevision
-      ) {
+      if (doc?.status === "draft") {
         setCounts(
           Object.fromEntries(doc.lines.map((l) => [l.product_id, l.quantity])),
         );
         setNotes(doc.payload.notes ?? "");
+        setPreservedContext({
+          mode: "scheduled",
+          documentId: doc.id,
+          documentVersion: doc.version,
+          assignmentId: doc.payload.balanceAssignment?.id ?? null,
+          assignmentVersion: doc.payload.balanceAssignment?.version ?? null,
+          referenceRevision:
+            doc.payload.balanceAssignment?.referenceRevision ?? null,
+        });
       }
-      if (raw && attempt === 0) {
+      if (raw) {
         try {
           const cache = parseCountCache(raw, {
             userId: context.userId,
             patientId: context.patient!.id,
             documentId: doc?.id ?? null,
           });
-          if (
-            cache.pending ||
-            (cache.assignmentId === state.data.eligibility.assignment?.id &&
-              cache.referenceRevision === state.data.referenceRevision)
-          ) {
-            setCounts(cache.counts ?? {});
-            setNotes(cache.notes ?? "");
-            setObservationTimes(cache.observationTimes ?? {});
-          }
+          setCounts(cache.counts ?? {});
+          setNotes(cache.notes ?? "");
+          setObservationTimes(cache.observationTimes ?? {});
+          setPreservedContext(
+            cache.content?.context ?? {
+              mode: "scheduled",
+              documentId: cache.pending
+                ? countAttemptTarget(cache.pending)
+                : (doc?.id ?? null),
+              documentVersion:
+                cache.pending && countAttemptTarget(cache.pending) === null
+                  ? null
+                  : (doc?.version ?? null),
+              assignmentId: cache.assignmentId ?? null,
+              assignmentVersion: null,
+              referenceRevision: cache.referenceRevision ?? null,
+            },
+          );
+          setDraftMaterials(cache.content?.materials ?? []);
+          setPreviousObservations(cache.content?.previousObservations);
           if (cache.pending) {
             pendingRef.current = cache.pending;
             setUncertain(true);
@@ -390,6 +432,7 @@ function ScheduledCount({
           );
         }
       }
+      setSourceReady(true);
     };
     load()
       .catch((reason) => {
@@ -401,7 +444,7 @@ function ScheduledCount({
     return () => controller.abort();
   }, [context.patient, context.userId, documentId, storageKey, attempt]);
   useEffect(() => {
-    if (!loading && !saved && !cacheError)
+    if (sourceReady && !loading && !saved && !cacheError)
       try {
         const intent = pendingRef.current;
         preserveCountCache(
@@ -420,6 +463,7 @@ function ScheduledCount({
             counts,
             notes,
             observationTimes,
+            content: balanceContent,
           },
           intent,
         );
@@ -441,7 +485,35 @@ function ScheduledCount({
     context.patient,
     editing?.id,
     documentId,
+    sourceReady,
+    balanceContent,
   ]);
+  function scopeFor(intent: Attempt | null) {
+    return {
+      userId: context.userId,
+      patientId: context.patient!.id,
+      documentId: intent
+        ? countAttemptTarget(intent)
+        : (editing?.id ?? documentId),
+    };
+  }
+  function retain(intent: Attempt | null, expected: Attempt | null = intent) {
+    preserveCountCache(
+      sessionStorage,
+      storageKey,
+      scopeFor(expected),
+      {
+        assignmentId: assignment?.id ?? null,
+        referenceRevision,
+        counts,
+        notes,
+        observationTimes,
+        content: balanceContent,
+      },
+      intent,
+      expected,
+    );
+  }
   function validate() {
     const errors: Record<string, string> = {};
     for (const p of products)
@@ -475,7 +547,7 @@ function ScheduledCount({
     }
   }
   async function review() {
-    if (!validate()) return;
+    if (needsReferenceReview || !sourceReady || !validate()) return;
     setBusy(true);
     setError("");
     try {
@@ -512,7 +584,7 @@ function ScheduledCount({
     }
   }
   async function save(draft: boolean) {
-    if (cacheError) return;
+    if (cacheError || !sourceReady) return;
     if (draft && !pendingRef.current) {
       await privateDraft.save(balanceContent);
       return;
@@ -523,7 +595,7 @@ function ScheduledCount({
     )
       return;
     if (!pendingRef.current) {
-      if (!validate()) return;
+      if (needsReferenceReview || !validate()) return;
       if (!eligible || !assignment) {
         setError(
           "A contagem exige o plantão ativo e a profissional designada.",
@@ -630,6 +702,101 @@ function ScheduledCount({
       setBusy(false);
     }
   }
+  async function adoptReference() {
+    if (busy || uncertain || cacheError || privateDraft.blocked) return;
+    setBusy(true);
+    setError("");
+    try {
+      const [catalog, state, documentRead] = await Promise.all([
+        api<{ data: CatalogProduct[] }>(
+          "/api/catalog?careRecipientId=" + context.patient!.id,
+        ),
+        api<{ data: BalanceWorkspace }>(
+          "/api/balances?careRecipientId=" + context.patient!.id,
+        ),
+        editing
+          ? api<{ data: SupplyDocument }>("/api/documents/" + editing.id)
+          : Promise.resolve(null),
+      ]);
+      if (
+        !state.data.eligibility.available ||
+        !state.data.eligibility.assignment
+      )
+        throw Error(
+          "O plantão não está disponível para você. Os valores anteriores foram mantidos.",
+        );
+      if (
+        documentRead &&
+        (documentRead.data.type !== "BAL" ||
+          documentRead.data.care_recipient_id !== context.patient!.id ||
+          !["draft", "submitted"].includes(documentRead.data.status))
+      )
+        throw Error(
+          "Esta ficha não permite outra contagem. Consulte seu acompanhamento; o preenchimento foi preservado.",
+        );
+      const target = documentRead?.data ?? null;
+      const nextContext: BalanceDraftContent["context"] = {
+        mode: "scheduled",
+        documentId: target?.id ?? null,
+        documentVersion: target?.version ?? null,
+        assignmentId: state.data.eligibility.assignment.id,
+        assignmentVersion: state.data.eligibility.assignment.version,
+        referenceRevision: state.data.referenceRevision,
+      };
+      const next = beginBalanceObservation(
+        balanceContent,
+        nextContext,
+        catalog.data.map((p) => ({
+          id: p.id,
+          name: p.name,
+          unit: p.unit,
+          quantityDecimals: p.quantity_decimals ?? 0,
+        })),
+      );
+      preserveCountCache(
+        sessionStorage,
+        storageKey,
+        {
+          userId: context.userId,
+          patientId: context.patient!.id,
+          documentId: nextContext.documentId,
+        },
+        {
+          assignmentId: nextContext.assignmentId,
+          referenceRevision: nextContext.referenceRevision,
+          counts: next.counts,
+          notes: next.notes,
+          observationTimes: next.observationTimes,
+          content: next,
+        },
+        null,
+      );
+      setProducts(catalog.data);
+      setEditing(target);
+      setAssignment(state.data.eligibility.assignment);
+      setReferenceRevision(state.data.referenceRevision);
+      setCounts(next.counts);
+      setObservationTimes(next.observationTimes);
+      setNotes(next.notes);
+      setDraftMaterials(next.materials);
+      setPreservedContext(next.context);
+      setPreviousObservations(next.previousObservations);
+      setNeedsRecount(false);
+      setFieldErrors({});
+      setStep(0);
+      setMessage(
+        "Referência atualizada. Confira fisicamente cada material; as observações anteriores continuam preservadas.",
+      );
+      reload();
+      requestAnimationFrame(() =>
+        document.querySelector<HTMLElement>("[data-product] input")?.focus(),
+      );
+    } catch (reason) {
+      setError((reason as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
   async function scan(code: string) {
     const result = await api<{
       data: { product_id: string; name: string; base_quantity: string }[];
@@ -719,6 +886,33 @@ function ScheduledCount({
       </section>
     );
   if (loading) return <LoadingIndicator label="Preparando contagem física" />;
+  if (!sourceReady && !cacheError)
+    return (
+      <Notice error>
+        {error ||
+          "Não foi possível consultar a referência da contagem. Os dados preservados não foram substituídos."}
+        <ActionButton
+          onClick={() => {
+            setLoading(true);
+            setAttempt((v) => v + 1);
+          }}
+        >
+          Consultar referência novamente
+        </ActionButton>
+      </Notice>
+    );
+  const referencePanel =
+    needsReferenceReview && !uncertain && !cacheError ? (
+      <BalanceReferenceReview
+        source={balanceContent}
+        current={currentContext}
+        disabled={busy || privateDraft.blocked}
+        onAdopt={() => void adoptReference()}
+      />
+    ) : null;
+  const previousPanel = (
+    <BalancePreviousObservations content={balanceContent} />
+  );
   const draftPanel = (
     <CreationDraftPanel
       draft={privateDraft}
@@ -731,6 +925,8 @@ function ScheduledCount({
     return (
       <div className="hca-form-stack">
         {draftPanel}
+        {referencePanel}
+        {previousPanel}
         {cacheError ? <Notice error>{cacheError}</Notice> : null}
         <section className="ui-card hca-form-stack">
           {error ? <Notice error>{error}</Notice> : null}
@@ -761,6 +957,8 @@ function ScheduledCount({
   return (
     <div className="hca-form-stack">
       {draftPanel}
+      {referencePanel}
+      {previousPanel}
       {cacheError ? <Notice error>{cacheError}</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
@@ -825,6 +1023,7 @@ function ScheduledCount({
           busy ||
           uncertain ||
           !eligible ||
+          needsReferenceReview ||
           privateDraft.blocked ||
           Boolean(cacheError)
         }
@@ -904,6 +1103,8 @@ function ScheduledCount({
           uncertain={uncertain}
           blocked={
             !eligible ||
+            needsReferenceReview ||
+            !sourceReady ||
             !products.length ||
             missingMaterials.length > 0 ||
             Boolean(cacheError)
@@ -926,23 +1127,6 @@ function ScheduledCount({
           onClick={() => void save(false)}
         >
           Recuperar a mesma tentativa
-        </ActionButton>
-      ) : null}
-      {needsRecount && !uncertain ? (
-        <ActionButton
-          disabled={busy || Boolean(cacheError)}
-          onClick={() => {
-            setCounts({});
-            setObservationTimes({});
-            setNotes("");
-            setError("");
-            setNeedsRecount(false);
-            setStep(0);
-            setAttempt((v) => v + 1);
-            reload();
-          }}
-        >
-          Iniciar nova conferência e atualizar referência
         </ActionButton>
       ) : null}
     </div>

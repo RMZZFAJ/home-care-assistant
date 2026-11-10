@@ -109,7 +109,7 @@ export const requisitionDraftContent = z
       .optional(),
   })
   .strict();
-export const balanceDraftContent = z
+export const balanceObservationSnapshot = z
   .object({
     counts: z
       .record(text(120).min(1), text(64))
@@ -145,6 +145,9 @@ export const balanceDraftContent = z
       .strict(),
   })
   .strict();
+export const balanceDraftContent = balanceObservationSnapshot.extend({
+  previousObservations: z.array(balanceObservationSnapshot).max(10).optional(),
+});
 const scope = {
   careRecipientId: id,
   targetDocumentId: id.nullable(),

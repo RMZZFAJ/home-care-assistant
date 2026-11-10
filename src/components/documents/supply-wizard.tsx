@@ -4,7 +4,13 @@ import { RequisitionOpening } from "@/components/requisitions/requisition-openin
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type SetStateAction } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type SetStateAction,
+} from "react";
 import {
   api,
   ApiError,
@@ -17,14 +23,29 @@ import {
 } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
+import {
+  draftFlowStages,
+  navigationForStep,
+  stepForNavigation,
+} from "@/lib/forms/draft-navigation";
 import {
   CreationDraftPanel,
   BalanceObservationTimes,
 } from "@/components/forms/creation-draft-panel";
 import type { BalanceCountReference } from "@/types/balances";
 import { BalanceReviewRows } from "@/components/balances/balance-count-fields";
-import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
+import {
+  balanceDraftContent,
+  type BalanceDraftContent,
+} from "@/lib/validation/creation-drafts";
+import {
+  beginBalanceObservation,
+  sameBalanceContext,
+} from "@/lib/balances/observation-continuity";
+import {
+  BalancePreviousObservations,
+  BalanceReferenceReview,
+} from "@/components/balances/observation-continuity";
 import type { SupplyDraftContent } from "@/lib/validation/supply-drafts";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
@@ -47,7 +68,7 @@ import {
   type DeliveryPreparation,
 } from "@/types/documents";
 
-const steps = draftFlowStages.SUPPLY.map(stage => stage.label);
+const steps = draftFlowStages.SUPPLY.map((stage) => stage.label);
 type SourceRequest = {
   care_recipient_id: string;
   is_historical?: boolean;
@@ -169,61 +190,103 @@ export function PatientSupplyWizard({
   const [legacyReference, setLegacyReference] =
     useState<BalanceCountReference | null>(null);
   const [staleLegacyReference, setStaleLegacyReference] = useState(false);
+  const [legacyOpeningKey, setLegacyOpeningKey] = useState<string | null>(null);
   const [draftMaterials, setDraftMaterials] = useState<
     BalanceDraftContent["materials"]
   >([]);
-  const balanceContent: BalanceDraftContent = {
-    counts: form.quantities,
-    observationTimes: form.observationTimes ?? {},
-    notes: form.notes,
-    materials: [
-      ...catalog.map((product) => ({
-        id: product.id,
-        name: product.name,
-        unit: product.unit,
-        quantityDecimals: product.quantity_decimals ?? 0,
-      })),
-      ...draftMaterials.filter(
-        (material) => !catalog.some((product) => product.id === material.id),
-      ),
-    ],
-    context: {
+  const [preservedBalanceContext, setPreservedBalanceContext] = useState<
+    BalanceDraftContent["context"] | null
+  >(null);
+  const [previousObservations, setPreviousObservations] =
+    useState<BalanceDraftContent["previousObservations"]>(undefined);
+  const currentBalanceContext = useMemo<BalanceDraftContent["context"]>(
+    () => ({
       mode: "legacy",
       documentId: editing?.id ?? null,
       documentVersion: editing?.version ?? null,
       assignmentId: null,
       assignmentVersion: null,
       referenceRevision: legacyReference?.revision ?? null,
-    },
-  };
+    }),
+    [editing?.id, editing?.version, legacyReference?.revision],
+  );
+  const needsBalanceReview =
+    type === "BAL" &&
+    (staleLegacyReference ||
+      (preservedBalanceContext !== null &&
+        !sameBalanceContext(preservedBalanceContext, currentBalanceContext)));
+  const balanceContent = useMemo<BalanceDraftContent>(
+    () => ({
+      counts: form.quantities,
+      observationTimes: form.observationTimes ?? {},
+      notes: form.notes,
+      materials: [
+        ...draftMaterials,
+        ...catalog
+          .filter((product) => !draftMaterials.some((m) => m.id === product.id))
+          .map((product) => ({
+            id: product.id,
+            name: product.name,
+            unit: product.unit,
+            quantityDecimals: product.quantity_decimals ?? 0,
+          })),
+      ],
+      context: preservedBalanceContext ?? currentBalanceContext,
+      ...(previousObservations ? { previousObservations } : {}),
+    }),
+    [
+      form.quantities,
+      form.observationTimes,
+      form.notes,
+      draftMaterials,
+      catalog,
+      preservedBalanceContext,
+      currentBalanceContext,
+      previousObservations,
+    ],
+  );
   const privateDraft = useCreationDraft({
     userId: context.userId,
     patientId,
     kind: type,
     navigation: navigationForStep("SUPPLY", step),
-    purpose:type==="BAL"?"create":editing?.id||documentId?"revise":"create",
+    purpose:
+      type === "BAL"
+        ? "create"
+        : editing?.id || documentId
+          ? "revise"
+          : "create",
     targetDocumentId: editing?.id ?? documentId,
     enabled:
-      !loading && !loadError && can(context, type.toLowerCase()+".read"),
+      !loading && !loadError && can(context, type.toLowerCase() + ".read"),
     onResume: (draft) => {
       const content = draft.content;
-      if(content&&"form" in content){
-        if(content.context.documentId!==(editing?.id??null)||content.context.documentVersion!==(editing?.version??null)||content.context.requisitionId!==requisitionId){setError("O contexto deste preenchimento mudou. Abra o alvo original ou compare com a ficha vigente antes de continuar.");return false;}
-        setForm(content.form);setLinks(content.links);setDraftMaterials(content.materials);setStep(stepForNavigation("SUPPLY",draft.navigation));setError("");setFieldErrors({});return true;
+      if (content && "form" in content) {
+        if (
+          content.context.documentId !== (editing?.id ?? null) ||
+          content.context.documentVersion !== (editing?.version ?? null) ||
+          content.context.requisitionId !== requisitionId
+        ) {
+          setError(
+            "O contexto deste preenchimento mudou. Abra o alvo original ou compare com a ficha vigente antes de continuar.",
+          );
+          return false;
+        }
+        setForm(content.form);
+        setLinks(content.links);
+        setDraftMaterials(content.materials);
+        setStep(stepForNavigation("SUPPLY", draft.navigation));
+        setError("");
+        setFieldErrors({});
+        return true;
       }
       if (!content || !("counts" in content)) return false;
-      if (
-        content.context.mode !== "legacy" ||
-        content.context.documentId !== (editing?.id ?? null) ||
-        content.context.documentVersion !== (editing?.version ?? null) ||
-        content.context.referenceRevision !==
-          (legacyReference?.revision ?? null)
-      ) {
-        setError(
-          "O contexto deste balanço mudou. Preserve os dados do rascunho para comparar ou descarte somente o preenchimento privado antes de começar outra contagem.",
-        );
+      if (content.context.documentId !== (editing?.id ?? null)) {
+        setError("Abra a ficha original para recuperar este preenchimento.");
         return false;
       }
+      setPreservedBalanceContext(content.context);
+      setPreviousObservations(content.previousObservations);
       setForm((current) => ({
         ...current,
         quantities: content.counts,
@@ -231,7 +294,7 @@ export function PatientSupplyWizard({
         notes: content.notes,
       }));
       setDraftMaterials(content.materials);
-      setStep(stepForNavigation("SUPPLY",draft.navigation));
+      setStep(stepForNavigation("SUPPLY", draft.navigation));
       setError("");
       setFieldErrors({});
       return true;
@@ -242,27 +305,66 @@ export function PatientSupplyWizard({
         quantities: Object.fromEntries(
           catalog.map((product) => [product.id, ""]),
         ),
-        ...(type!=="BAL"?{origin:"" as const,source:"FAMILY" as const,recipientId:"",recipientReason:"",sharedNeedReasons:{},presentationSelections:{},manualQuantities:{}}:{}),
+        ...(type !== "BAL"
+          ? {
+              origin: "" as const,
+              source: "FAMILY" as const,
+              recipientId: "",
+              recipientReason: "",
+              sharedNeedReasons: {},
+              presentationSelections: {},
+              manualQuantities: {},
+            }
+          : {}),
         observationTimes: {},
         notes: "",
       }));
       setDraftMaterials([]);
+      setPreservedBalanceContext(null);
+      setPreviousObservations(undefined);
+      setStaleLegacyReference(false);
       setStep(0);
       setError("");
       setFieldErrors({});
       sessionStorage.removeItem(storageKey);
     },
   });
-  const supplyContent:SupplyDraftContent={form:{quantities:form.quantities,notes:form.notes,origin:form.origin,source:form.source,recipientId:form.recipientId,recipientReason:form.recipientReason,sharedNeedReasons:form.sharedNeedReasons,presentationSelections:form.presentationSelections,manualQuantities:form.manualQuantities},links,materials:balanceContent.materials,context:{documentId:editing?.id??null,documentVersion:editing?.version??null,requisitionId,recipientName:people.find(p=>p.id===form.recipientId)?.name??""}};
-  const privateContent=type==="BAL"?balanceContent:supplyContent;
-  const offeredContent=privateDraft.offered?.content;
-  const originalSource=offeredContent&&"form" in offeredContent?offeredContent.context.requisitionId:null;
-  const resumeHref=originalSource!==requisitionId&&offeredContent&&"form" in offeredContent?`/fichas/${type.toLowerCase()}?careRecipientId=${patientId}${originalSource?"&requisitionId="+originalSource:""}`:undefined;
-  const missingBalanceMaterials =
-    Object.keys(form.quantities).filter(
-          (id) => !catalog.some((product) => product.id === id),
-        )
-      ;
+  const supplyContent: SupplyDraftContent = {
+    form: {
+      quantities: form.quantities,
+      notes: form.notes,
+      origin: form.origin,
+      source: form.source,
+      recipientId: form.recipientId,
+      recipientReason: form.recipientReason,
+      sharedNeedReasons: form.sharedNeedReasons,
+      presentationSelections: form.presentationSelections,
+      manualQuantities: form.manualQuantities,
+    },
+    links,
+    materials: balanceContent.materials,
+    context: {
+      documentId: editing?.id ?? null,
+      documentVersion: editing?.version ?? null,
+      requisitionId,
+      recipientName: people.find((p) => p.id === form.recipientId)?.name ?? "",
+    },
+  };
+  const privateContent = type === "BAL" ? balanceContent : supplyContent;
+  const offeredContent = privateDraft.offered?.content;
+  const originalSource =
+    offeredContent && "form" in offeredContent
+      ? offeredContent.context.requisitionId
+      : null;
+  const resumeHref =
+    originalSource !== requisitionId &&
+    offeredContent &&
+    "form" in offeredContent
+      ? `/fichas/${type.toLowerCase()}?careRecipientId=${patientId}${originalSource ? "&requisitionId=" + originalSource : ""}`
+      : undefined;
+  const missingBalanceMaterials = Object.keys(form.quantities).filter(
+    (id) => !catalog.some((product) => product.id === id),
+  );
   function updateForm(value: SetStateAction<WizardState>) {
     setForm((current) => {
       const next = typeof value === "function" ? value(current) : value;
@@ -337,25 +439,47 @@ export function PatientSupplyWizard({
         }
         setLinks(sourceLinks);
         let restored: WizardState | undefined;
+        let restoredBalance: BalanceDraftContent | undefined;
         let preserved: typeof frozenRef.current = null;
         let recoveredId: string | undefined;
         try {
           const raw = sessionStorage.getItem(storageKey);
           if (raw) {
             const envelope = JSON.parse(raw);
-            if (
-              envelope.form &&
-              typeof envelope.form.quantities === "object"
-            ) {
+            if (envelope.form && typeof envelope.form.quantities === "object") {
               restored = envelope.form;
+              if (type === "BAL") {
+                restoredBalance = balanceDraftContent.parse(
+                  envelope.balanceContent ?? {
+                    counts: restored!.quantities,
+                    observationTimes: restored!.observationTimes ?? {},
+                    notes: restored!.notes,
+                    materials: [],
+                    context: {
+                      mode: "legacy",
+                      documentId: envelope.editingId ?? null,
+                      documentVersion: null,
+                      assignmentId: null,
+                      assignmentVersion: null,
+                      referenceRevision: null,
+                    },
+                  },
+                );
+              }
               if (envelope.links && typeof envelope.links === "object")
                 setLinks(envelope.links);
               recoveredId = envelope.editingId;
               if (envelope.intent?.key && envelope.intent?.payload)
                 preserved = envelope.intent;
-            } else sessionStorage.removeItem(storageKey);
+            } else if (type === "BAL")
+              throw Error("Invalid saved balance fields");
+            else sessionStorage.removeItem(storageKey);
           }
         } catch {
+          if (type === "BAL")
+            throw Error(
+              "Não foi possível conferir a cópia local do balanço. Ela foi preservada; nenhum envio foi realizado.",
+            );
           /* A damaged optional draft cannot change authority or catalogue data. */
         }
         if (documentId || recoveredId) {
@@ -377,6 +501,19 @@ export function PatientSupplyWizard({
           )
             throw new Error("Esta ficha não permite edição neste contexto.");
           setEditing(existing);
+          if (type === "BAL" && !recount)
+            setPreservedBalanceContext({
+              mode: existing.payload.balanceAssignment ? "scheduled" : "legacy",
+              documentId: existing.id,
+              documentVersion: existing.version,
+              assignmentId: existing.payload.balanceAssignment?.id ?? null,
+              assignmentVersion:
+                existing.payload.balanceAssignment?.version ?? null,
+              referenceRevision:
+                existing.payload.balanceAssignment?.referenceRevision ??
+                existing.payload.balanceReferenceRevision ??
+                null,
+            });
           setLinks(
             Object.fromEntries(
               existing.lines.map((line) => [
@@ -416,7 +553,8 @@ export function PatientSupplyWizard({
               ]),
             ),
           });
-          if (restored && (preserved || !documentId)) setForm(restored);
+          if (restored && (preserved || !documentId || type === "BAL"))
+            setForm(restored);
           if (preserved) {
             frozenRef.current = preserved;
             setUncertain(true);
@@ -444,6 +582,18 @@ export function PatientSupplyWizard({
               Object.keys(sourceLinks).map((id) => [id, ""]),
             ),
           }));
+        if (type === "BAL") {
+          setLegacyOpeningKey(
+            documentId || recoveredId || preserved
+              ? null
+              : sessionStorage.getItem(storageKey + ":start"),
+          );
+        }
+        if (restoredBalance) {
+          setPreservedBalanceContext(restoredBalance.context);
+          setPreviousObservations(restoredBalance.previousObservations);
+          setDraftMaterials(restoredBalance.materials);
+        }
         setLoading(false);
         setError("");
       })
@@ -535,6 +685,7 @@ export function PatientSupplyWizard({
             form,
             links,
             editingId: editing?.id,
+            ...(type === "BAL" ? { balanceContent } : {}),
           }),
         );
       } catch {
@@ -552,6 +703,8 @@ export function PatientSupplyWizard({
     storageKey,
     uncertain,
     busy,
+    type,
+    balanceContent,
   ]);
   function validate(all = false) {
     const errors: Record<string, string> = {};
@@ -636,20 +789,14 @@ export function PatientSupplyWizard({
     return true;
   }
   async function next() {
-    if (!validate()) return;
+    const openingKey = step === 0 && !editing ? legacyOpeningKey : null;
+    if (!openingKey && (needsBalanceReview || !validate())) return;
     // Retain recovery of an old, already-started documentary opening. New
     // entry never creates this key or an operational draft.
-    if (
-      type === "BAL" &&
-      step === 0 &&
-      !editing &&
-      sessionStorage.getItem(storageKey + ":start")
-    ) {
+    if (openingKey) {
       setBusy(true);
       try {
-        const key = storageKey + ":start";
-        const idempotencyKey = sessionStorage.getItem(key);
-        const result = await api<{ data: SupplyDocument }>("/api/documents", {
+        const result = await api<unknown>("/api/documents", {
           careRecipientId: context.patient!.id,
           type: "BAL",
           payload: {
@@ -659,10 +806,50 @@ export function PatientSupplyWizard({
             })),
             notes: "",
           },
-          idempotencyKey,
+          idempotencyKey: openingKey,
           draft: true,
         });
-        setEditing(result.data);
+        const confirmed = requireSupplyConfirmation(result, {
+          patientId,
+          type: "BAL",
+        });
+        if (
+          confirmed.created_by !== context.userId ||
+          !("idempotency_key" in confirmed) ||
+          confirmed.idempotency_key !== openingKey ||
+          confirmed.status !== "draft"
+        ) {
+          throw Error(
+            "A resposta não confirmou a abertura original desta ficha em edição.",
+          );
+        }
+        const hasObservations =
+          Object.values(balanceContent.counts).some((value) => value !== "") ||
+          Object.values(balanceContent.observationTimes).some(
+            (value) => value !== null,
+          ) ||
+          balanceContent.notes !== "" ||
+          Boolean(balanceContent.previousObservations?.length);
+        const sourceContext = {
+          ...(hasObservations ? balanceContent.context : currentBalanceContext),
+          documentId: confirmed.id,
+          documentVersion: confirmed.version,
+        };
+        sessionStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            savedAt: Date.now(),
+            form,
+            links,
+            editingId: confirmed.id,
+            balanceContent: { ...balanceContent, context: sourceContext },
+          }),
+        );
+        setEditing(confirmed);
+        setPreservedBalanceContext(sourceContext);
+        setLegacyOpeningKey(null);
+        setError("");
+        if (hasObservations && needsBalanceReview) return;
       } catch (reason) {
         setError(
           reason instanceof Error
@@ -697,6 +884,13 @@ export function PatientSupplyWizard({
       }
     }
     setStep((current) => Math.min(steps.length - 1, current + 1));
+    if (type === "BAL" && step === 4) {
+      requestAnimationFrame(() => {
+        const heading = document.getElementById("supply-wizard-heading");
+        heading?.focus({ preventScroll: true });
+        heading?.scrollIntoView({ block: "start", behavior: "instant" });
+      });
+    }
   }
   async function persist(draft: boolean) {
     if (draft && !frozenRef.current) {
@@ -709,7 +903,7 @@ export function PatientSupplyWizard({
     )
       return;
     if (!frozenRef.current) {
-      if (type === "BAL" && (staleLegacyReference || !legacyReference)) return;
+      if (type === "BAL" && (needsBalanceReview || !legacyReference)) return;
       if (
         type === "BAL" &&
         !editing &&
@@ -785,16 +979,23 @@ export function PatientSupplyWizard({
               }
             : {}),
       };
-      const privateCommit=type!=="BAL"?await privateDraft.save(structuredClone(privateContent)):undefined;
-      if(type!=="BAL"&&!privateCommit)return;
+      const privateCommit =
+        type !== "BAL"
+          ? await privateDraft.save(structuredClone(privateContent))
+          : undefined;
+      if (type !== "BAL" && !privateCommit) return;
       frozenRef.current = {
         payload,
         key: crypto.randomUUID(),
         submissionKey: crypto.randomUUID(),
         draft,
         expectedVersion: editing?.version,
-        ...(privateCommit||privateDraft.draftCommit
-          ? { draftCommit: privateCommit?{id:privateCommit.id,revision:privateCommit.revision}:privateDraft.draftCommit }
+        ...(privateCommit || privateDraft.draftCommit
+          ? {
+              draftCommit: privateCommit
+                ? { id: privateCommit.id, revision: privateCommit.revision }
+                : privateDraft.draftCommit,
+            }
           : {}),
       };
     }
@@ -809,6 +1010,7 @@ export function PatientSupplyWizard({
           links,
           editingId: editing?.id,
           intent: frozenRef.current,
+          ...(type === "BAL" ? { balanceContent } : {}),
         }),
       );
     } catch {
@@ -825,7 +1027,10 @@ export function PatientSupplyWizard({
               expectedVersion: frozenRef.current.expectedVersion,
               recount,
               ...(frozenRef.current.draftCommit
-                ? { draftCommit: frozenRef.current.draftCommit,...(type!=="BAL"?{draftKind:type}:{}) }
+                ? {
+                    draftCommit: frozenRef.current.draftCommit,
+                    ...(type !== "BAL" ? { draftKind: type } : {}),
+                  }
                 : {}),
               submit: !frozenRef.current.draft,
             }
@@ -840,7 +1045,19 @@ export function PatientSupplyWizard({
                 : {}),
             },
       );
-      setSaved(requireSupplyConfirmation(result,{patientId,type,id:editing?.id,minimumVersion:frozenRef.current.expectedVersion!==undefined?frozenRef.current.expectedVersion+1:editing?editing.version+1:1}));
+      setSaved(
+        requireSupplyConfirmation(result, {
+          patientId,
+          type,
+          id: editing?.id,
+          minimumVersion:
+            frozenRef.current.expectedVersion !== undefined
+              ? frozenRef.current.expectedVersion + 1
+              : editing
+                ? editing.version + 1
+                : 1,
+        }),
+      );
       sessionStorage.removeItem(storageKey);
       sessionStorage.removeItem(storageKey + ":start");
       setUncertain(false);
@@ -848,7 +1065,7 @@ export function PatientSupplyWizard({
       const known =
         reason instanceof ApiError &&
         [400, 403, 404, 409, 413, 422].includes(reason.status);
-      if (known&&!uncertain) frozenRef.current = null;
+      if (known && !uncertain) frozenRef.current = null;
       if (
         type === "BAL" &&
         reason instanceof ApiError &&
@@ -857,7 +1074,8 @@ export function PatientSupplyWizard({
         setStaleLegacyReference(true);
       if (
         reason instanceof ApiError &&
-        reason.code === "DRAFT_VERSION_CONFLICT" && !uncertain
+        reason.code === "DRAFT_VERSION_CONFLICT" &&
+        !uncertain
       ) {
         await privateDraft.reportConflict();
         setStep(0);
@@ -865,18 +1083,110 @@ export function PatientSupplyWizard({
       if (
         type === "ENT" &&
         reason instanceof ApiError &&
-        reason.status === 409 && !uncertain
+        reason.status === 409 &&
+        !uncertain
       ) {
         setRecipientPending(true);
         setRecipientAttempt((value) => value + 1);
         setStep(0);
       }
-      setUncertain(uncertain||!known);
+      setUncertain(uncertain || !known);
       setError(
         reason instanceof Error
           ? reason.message
           : "Não foi possível confirmar a gravação.",
       );
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function adoptBalanceReference() {
+    if (
+      busy ||
+      uncertain ||
+      privateDraft.blocked ||
+      type !== "BAL" ||
+      legacyOpeningKey
+    )
+      return;
+    setBusy(true);
+    setError("");
+    try {
+      const [stock, products, documentRead] = await Promise.all([
+        api<{ data: BalanceCountReference }>(
+          `/api/balances?careRecipientId=${patientId}&reference=true`,
+        ),
+        api<{ data: CatalogProduct[] }>(
+          `/api/catalog?careRecipientId=${patientId}`,
+        ),
+        editing
+          ? api<{ data: SupplyDocument }>("/api/documents/" + editing.id)
+          : Promise.resolve(null),
+      ]);
+      if (
+        documentRead &&
+        (documentRead.data.type !== "BAL" ||
+          documentRead.data.care_recipient_id !== patientId ||
+          !(
+            documentRead.data.status === "draft" ||
+            (recount && documentRead.data.status === "submitted")
+          ))
+      )
+        throw Error(
+          "Esta ficha não permite outra contagem. Consulte o acompanhamento; os valores foram preservados.",
+        );
+      const target = documentRead?.data ?? null;
+      const next = beginBalanceObservation(
+        balanceContent,
+        {
+          mode: "legacy",
+          documentId: target?.id ?? null,
+          documentVersion: target?.version ?? null,
+          assignmentId: null,
+          assignmentVersion: null,
+          referenceRevision: stock.data.revision,
+        },
+        products.data.map((p) => ({
+          id: p.id,
+          name: p.name,
+          unit: p.unit,
+          quantityDecimals: p.quantity_decimals ?? 0,
+        })),
+      );
+      const nextForm = {
+        ...form,
+        quantities: next.counts,
+        notes: next.notes,
+        observationTimes: next.observationTimes,
+      };
+      sessionStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          savedAt: Date.now(),
+          form: nextForm,
+          links,
+          editingId: target?.id,
+          balanceContent: next,
+        }),
+      );
+      setCatalog(products.data);
+      setEditing(target);
+      setLegacyReference(stock.data);
+      setStaleLegacyReference(false);
+      setPreservedBalanceContext(next.context);
+      setPreviousObservations(next.previousObservations);
+      setDraftMaterials(next.materials);
+      setForm(nextForm);
+      setFieldErrors({});
+      setStep(0);
+      setMessage(
+        "Referência atualizada. Confira fisicamente cada material; as observações anteriores continuam preservadas.",
+      );
+      requestAnimationFrame(() =>
+        document.getElementById("supply-wizard-heading")?.focus(),
+      );
+    } catch (reason) {
+      setError((reason as Error).message);
     } finally {
       setBusy(false);
     }
@@ -963,15 +1273,27 @@ export function PatientSupplyWizard({
         ["medicamentos", "higiene", "dieta"].indexOf(product.category) + 1,
       );
   }
-  if (privateDraft.readDenied||privateDraft.protectedReadPending)
+  if (privateDraft.readDenied || privateDraft.protectedReadPending)
     return (
       <Notice error>
-        Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada.
-        <button type="button" className={buttonClass} onClick={privateDraft.reload}>Revalidar acesso ao rascunho</button>
+        Revalide o acesso antes de exibir o preenchimento preservado. A
+        tentativa original continua guardada.
+        <button
+          type="button"
+          className={buttonClass}
+          onClick={privateDraft.reload}
+        >
+          Revalidar acesso ao rascunho
+        </button>
       </Notice>
     );
-  if (!can(context, type.toLowerCase()+".read"))
-    return <Notice>Seu vínculo atual não permite consultar este preenchimento. A tentativa original continua preservada.</Notice>;
+  if (!can(context, type.toLowerCase() + ".read"))
+    return (
+      <Notice>
+        Seu vínculo atual não permite consultar este preenchimento. A tentativa
+        original continua preservada.
+      </Notice>
+    );
   if (!allowed && !uncertain && !privateDraft.active)
     return (
       <Notice>
@@ -1037,45 +1359,27 @@ export function PatientSupplyWizard({
           disabled={busy || uncertain || loading}
         />
       ) : null}
-      {type === "BAL" && staleLegacyReference ? (
-        <Notice error>
-          Esta contagem conserva uma referência de estoque anterior.
-          {!editing ? (
-            <button
-              className={buttonClass}
-              disabled={busy || uncertain || privateDraft.blocked}
-              onClick={async () => {
-                setBusy(true);
-                try {
-                  const result = await api<{ data: BalanceCountReference }>(
-                    `/api/balances?careRecipientId=${patientId}&reference=true`,
-                  );
-                  setLegacyReference(result.data);
-                  setForm((current) => ({
-                    ...current,
-                    quantities: Object.fromEntries(
-                      catalog.map((p) => [p.id, ""]),
-                    ),
-                    observationTimes: {},
-                  }));
-                  setStaleLegacyReference(false);
-                  setStep(0);
-                  setError("");
-                } catch (reason) {
-                  setError((reason as Error).message);
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              Iniciar nova conferência e limpar as quantidades
-            </button>
-          ) : (
-            <Link className={buttonClass} href={"/documentos/" + editing.id}>
-              Consultar referência da ficha e solicitar reconto
-            </Link>
-          )}
+      {legacyOpeningKey && !loading && !loadError ? (
+        <Notice>
+          Na etapa Identificação, use Avançar para recuperar a abertura anterior
+          desta ficha.
         </Notice>
+      ) : null}
+      {needsBalanceReview && !uncertain && !loading && !loadError ? (
+        <BalanceReferenceReview
+          source={balanceContent}
+          current={currentBalanceContext}
+          disabled={
+            busy ||
+            privateDraft.blocked ||
+            !allowed ||
+            Boolean(legacyOpeningKey)
+          }
+          onAdopt={() => void adoptBalanceReference()}
+        />
+      ) : null}
+      {type === "BAL" && !loading && !loadError ? (
+        <BalancePreviousObservations content={balanceContent} />
       ) : null}
       {missingBalanceMaterials.length ? (
         <Notice error>
@@ -1159,10 +1463,22 @@ export function PatientSupplyWizard({
                 <p className="eyebrow">
                   {type} · {context.patient?.display_name}
                 </p>
-                <h2 className="mt-2 text-xl font-semibold">{steps[step]}</h2>
+                <h2
+                  id="supply-wizard-heading"
+                  tabIndex={-1}
+                  className="mt-2 text-xl font-semibold"
+                >
+                  {steps[step]}
+                </h2>
               </div>
               <fieldset
-                disabled={busy || uncertain || privateDraft.blocked || !allowed}
+                disabled={
+                  busy ||
+                  uncertain ||
+                  privateDraft.blocked ||
+                  !allowed ||
+                  needsBalanceReview
+                }
                 className="min-w-0 space-y-5"
               >
                 <SupplyWizardStep
@@ -1233,8 +1549,9 @@ export function PatientSupplyWizard({
                 }
                 uncertain={uncertain}
                 blocked={
-                  staleLegacyReference ||
-                  missingBalanceMaterials.length > 0 ||
+                  (!(step === 0 && legacyOpeningKey) &&
+                    (needsBalanceReview ||
+                      missingBalanceMaterials.length > 0)) ||
                   (type === "ENT" && step === 0 && recipientLoading)
                 }
                 onBack={() => {

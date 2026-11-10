@@ -1,4 +1,5 @@
 "use client";
+import { BalancePreviousObservations } from "@/components/balances/observation-continuity";
 import { ScheduleResourceSummary } from "@/components/schedules/schedule-resource-summary";
 import {
   scheduleResourceOutcomeLabel,
@@ -694,6 +695,7 @@ function DraftFieldsSummary({
           </article>
         ))}
       {content.notes ? <p className="wrap-anywhere">{content.notes}</p> : null}
+      <BalancePreviousObservations content={content} />
     </div>
   );
 }

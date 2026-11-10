@@ -1,6 +1,14 @@
 # Checkpoint D-B
 
-Checkpoint corrente:D3.55 qualificado localmente:recibo e cópia da tentativa
+D3.56 qualificado localmente nos dois modos de BAL. A retomada preserva
+observações anteriores quando muda a referência e exige nova conferência
+física. A abertura antiga recupera a chave original antes de atualizar a
+referência. Foram aprovados 31 testes de modelos, três com Auth real e 45
+cenários distintos de navegador. Remoto reconciliado em 198 migrations com
+função e ACL conferidas e dry-run final vazio. CI própria pendente. Matriz
+56 PASS locais e 49 PARTIAL, sem promoção ampla. [Incremento](BAL_OBSERVATION_CONTINUITY.md).
+
+Checkpoint anterior:D3.55 qualificado localmente:recibo e cópia da tentativa
 de contagem BAL agendada conferidos antes da limpeza;descarte privado preserva
 outra tentativa.18unit/API e21browser com Auth real nas três engines,tipos e
 lint aprovados. Classificação do inventário legado corrigida:sem consumidor UI,

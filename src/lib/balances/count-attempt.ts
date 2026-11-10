@@ -77,6 +77,7 @@ export function checkCountAttempt(
 }
 const cache = z
   .object({
+    content: balanceDraftContent.optional(),
     version: z.literal(2).optional(),
     userId: z.uuid().optional(),
     patientId: z.uuid().optional(),
@@ -91,6 +92,15 @@ const cache = z
   .strict();
 export function parseCountCache(raw: string, scope: CountScope) {
   const v = cache.parse(JSON.parse(raw));
+  if (
+    v.content &&
+    (v.content.context.documentId !==
+      (v.pending ? countAttemptTarget(v.pending) : scope.documentId) ||
+      !sameAttempt(v.content.counts, v.counts ?? {}) ||
+      v.content.notes !== (v.notes ?? "") ||
+      !sameAttempt(v.content.observationTimes, v.observationTimes ?? {}))
+  )
+    throw Error("Preserved balance content differs from its fields");
   if (
     (v.version === 2 || v.userId !== undefined || v.patientId !== undefined) &&
     (v.version !== 2 ||
@@ -125,7 +135,12 @@ export function parseCountCache(raw: string, scope: CountScope) {
 }
 type CountFields = Pick<
   z.infer<typeof cache>,
-  "assignmentId" | "referenceRevision" | "counts" | "notes" | "observationTimes"
+  | "assignmentId"
+  | "referenceRevision"
+  | "counts"
+  | "notes"
+  | "observationTimes"
+  | "content"
 >;
 export function preserveCountCache(
   storage: Pick<Storage, "getItem" | "setItem">,

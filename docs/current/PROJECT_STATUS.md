@@ -4,6 +4,16 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.56 permite retomar quantidades, notas e datas anteriores do BAL após
+mudanças de estoque, ficha ou plantão. As observações anteriores ficam no
+rascunho privado e a nova conferência começa com quantidades vazias.
+Aprovados 31 testes de modelos, três com Auth real e 45 cenários distintos
+de navegador. Remoto com 198 migrations reconciliadas. CI própria pendente.
+A matriz conserva 56 critérios locais aprovados e 49 parciais.
+[Incremento atual](../audits/D/D-B/BAL_OBSERVATION_CONTINUITY.md).
+
+## Incremento anterior D3.55
+
 D3.55 valida o recibo e a cópia local da tentativa da contagem BAL agendada
 antes de exibir sucesso ou limpar. Preserve o pacote original após resposta
 perdida ou divergente;armazenamento recusado impede envio nativo e descarte

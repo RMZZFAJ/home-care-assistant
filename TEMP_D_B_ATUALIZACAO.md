@@ -67,12 +67,16 @@ A resposta só é aceita quando corresponde à ficha e à tentativa enviada.
 Falha, recarga ou resposta divergente mantêm a referência para recuperação;
 o descarte privado não apaga outra tentativa. Responsável: Codex.
 
-O levantamento foi corrigido: a contagem atual é feita na ficha BAL e já tinha
-preenchimento privado. Ainda falta concluir a retomada quando o estoque,
-plantão ou ficha muda, sem tratar quantidades anteriores como observações
-novas. Cadastros e administração também continuam pendentes. A estimativa
-geral de recuperação entre aparelhos continua em 90%; concluir essas lacunas
-continua sendo minha responsabilidade.
+**Retomada da contagem após mudança de referência · 100% deste ajuste.**
+Quando o estoque, o plantão ou a ficha muda, os valores anteriores continuam
+consultáveis com suas datas. A nova conferência começa com quantidades vazias
+para registrar o que existe no momento. As notas ficam disponíveis, inclusive
+em outro aparelho após salvar o rascunho privado. A recuperação da abertura
+de fichas antigas também foi conferida. Responsável pelo ajuste: Codex.
+
+A recuperação entre aparelhos continua estimada em 90% no sistema inteiro.
+Ainda faltam formulários de cadastro e administração e combinações de edição
+em algumas telas. Essas pendências são do Codex.
 Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
@@ -120,8 +124,9 @@ quando há conflito. É possível percorrer a revisão longa pelo teclado.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈90%. Falta: Concluir a retomada das contagens após mudanças de
-  estoque, plantão ou ficha; concluir cadastros e administração. As preparações
+  execução · ≈90%. Falta: Concluir cadastros, administração e as combinações
+  restantes de edição. As contagens preservam observações após mudanças de
+  estoque, plantão ou ficha. As preparações
   privadas da agenda estão concluídas no escopo interno deste recurso.
   Revisões de fluxo, relatos e decisões de consumo, movimentação familiar,
   programação do balanço, atribuição, adiamentos, pareceres,
@@ -528,15 +533,11 @@ Esta é a ordem do trabalho restante. Os quadros anteriores estão agrupados por
 funcionalidade, sem representar ordem de execução. Tudo que já está 100% será
 preservado e incluído na revisão final; não será refeito sem motivo.
 
-1. **Completar a continuidade das contagens e dos formulários diários.**
-   Concluir a retomada das contagens quando muda o estoque, plantão ou ficha,
-   mantendo observações e distinguindo valores antigos de nova verificação.
-   Completar os cadastros necessários à operação. Conferir
-   mensagens e conflitos em conjunto. Preservar a agenda privada, as revisões de
-   fluxo, os relatos, complementos e
-   decisões de consumo, Andamentos privados, a movimentação familiar, os seis
-   atos de balanço,
-   pareceres, reconto, decisões de requisição e as demais preparações concluídas.
+1. **Completar a continuidade dos formulários diários.** Investigar as falhas
+   automáticas de agenda, navegação, Andamentos e recebimento. Completar os
+   cadastros necessários à operação e conferir as mensagens de recuperação
+   e conflito. As contagens, preparações da agenda e revisões de fluxo já
+   implementadas serão incluídas na revisão conjunta.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.

@@ -92,3 +92,13 @@ e os controladores delegados;isso não representa50 consumidores ativos.
 Contagens reais usam BAL agendado ou sem regime. O transporte da tentativa
 agendada recebeu validação e proteção de cópia,mas a continuidade sob mudança
 de referência ainda é parcial. [Incremento](BAL_COUNT_RECOVERY.md).
+
+## Atualização D3.56
+
+A retomada privada e local do BAL agendado e sem regime conserva os valores
+anteriores quando a referência de estoque, a versão da ficha ou a atribuição
+muda. A nova conferência física tem campos próprios. As notas e datas ficam
+no rascunho privado e podem ser retomadas em outra sessão. A abertura antiga
+mantém a recuperação pela chave original. Cadastro, administração, perfil e
+as composições restantes continuam sob responsabilidade do Codex.
+[Incremento](BAL_OBSERVATION_CONTINUITY.md).

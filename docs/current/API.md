@@ -1244,3 +1244,12 @@ ScheduledCount exige esse recibo,persistence confirmado,ficha/paciente/tipo,
 identidade da criação e valores/notas antes de limpar sua tentativa.
 Clientes anteriores continuam compatíveis;suas provas específicas não foram
 substituídas pela validação do consumidor BAL.
+
+## Conferências anteriores no rascunho BAL
+
+O conteúdo privado BAL aceita previousObservations como campo opcional com
+até dez cópias de quantidades brutas, notas, materiais, datas e contexto de
+origem. Cada cópia pertence ao alvo do rascunho e o conteúdo completo segue
+o limite de 200000 bytes. O campo circula na revisão privada e os comandos
+operacionais continuam recebendo os campos explícitos da nova contagem.
+[Continuidade de observações](../audits/D/D-B/BAL_OBSERVATION_CONTINUITY.md).
