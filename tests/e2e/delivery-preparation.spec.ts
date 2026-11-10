@@ -13,7 +13,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDeliveryRecipient } from "./delivery-recipient";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 import type { SupplyDocument } from "../../src/types/documents";
 
 test.setTimeout(150_000);
@@ -172,7 +172,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   ).toContainText(reason);
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
-    await audit(page, "P06 selected recipient " + width);
+    await auditFromTop(page, "P06 selected recipient " + width);
   }
   await page.screenshot({
     path: `output/playwright/phase-d/delivery-preparation-${info.project.name}.png`,

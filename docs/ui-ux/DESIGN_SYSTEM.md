@@ -48,6 +48,18 @@ DocumentActionSlot posiciona os controles reais de PDF e Andamento na barra,
 conservando estado, autorização e intenção no consumidor original. Atualização
 preserva foco; leitura recusada retira os dados e oferece retomada legítima.
 
+A consulta de saldos usa DataTable com uma única estrutura semântica para
+cada linha. hca-mobile-records transforma a linha em cartão no breakpoint
+canônico de850px,com cabeçalhos acessíveis e rótulos visuais. Números conservam
+unidade e precisão; mínimo ausente,zero,igualdade e valor abaixo são distintos.
+Projeções não viram disponível. Filtros reiniciam a paginação do conjunto de
+saldos sem apagar outros editores ou consultas da página.
+Nomes extensos não comprimem as colunas: custódia acompanha o material;
+trânsito e projeção têm rótulos completos na coluna Previsões. Rolagem de
+tabela é local e acessível por teclado; valores permanecem íntegros.
+Breadcrumbs interativos conservam alvo mínimo de24px. Títulos longos de
+diálogo quebram sem expulsar seu controle de fechamento.
+
 ## Aceite
 
 Comparar produto e modelo em cinco viewports; testar teclado, retorno de foco,

@@ -131,7 +131,9 @@ test("M1 mantém material e ciência após resolução de extra, atendimento e d
   ).toHaveCount(0);
   const beforePdf = await pdf(page, id, firstVersion);
   expect(sciences(id)).toEqual(science);
-  await page.getByRole("button", { name: "Identificar item extra", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Identificar item extra", exact: true })
+    .click();
   await page
     .getByRole("combobox", { name: "Produto correspondente", exact: true })
     .selectOption(f.products[0]);
@@ -350,7 +352,7 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
   }
   await login(page, f.patient, sheila.email);
   await page.goto("/fichas/" + delivery.id);
-    await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "workflow");
   await readOnlyDispatch(page, codes);
   await page
     .getByRole("button", { name: "Informar divergência", exact: true })
@@ -505,7 +507,7 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
     .getByRole("button", { name: "Configurar dia e plantão", exact: true })
     .click();
   const form = page.getByRole("dialog", {
-    name: "Programação do BAL",
+    name: "Programação do balanço",
     exact: true,
   });
   await form
@@ -514,16 +516,18 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
       exact: true,
     })
     .check();
-  await form.getByLabel("Dia do balanço", { exact: true }).selectOption("5");
   await form
-    .getByLabel("Plantão responsável", { exact: true })
+    .getByRole("combobox", { name: "Dia do balanço", exact: true })
+    .selectOption("5");
+  await form
+    .getByRole("combobox", { name: "Plantão responsável", exact: true })
     .selectOption(type.id);
   await form
-    .getByLabel("Fuso do paciente", { exact: true })
+    .getByRole("combobox", { name: "Fuso do paciente", exact: true })
     .selectOption("America/Sao_Paulo");
-  await form.getByLabel("Vigente a partir de", { exact: true }).fill(today);
+  await form.getByLabel("Vigente a partir de", { exact: false }).fill(today);
   await form
-    .getByLabel("Justificativa", { exact: true })
+    .getByRole("textbox", { name: "Justificativa", exact: true })
     .fill("Programação noturna de sexta conforme responsabilidade familiar");
   await form
     .getByRole("button", { name: "Revisar decisão", exact: true })

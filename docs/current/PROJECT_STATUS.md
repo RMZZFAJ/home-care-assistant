@@ -1,8 +1,25 @@
 # Estado verificável do projeto
 
-Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
+Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
+
+D3.45 implementa saldos em tabela/cartões únicos,mínimo/situação exatos,
+filtro de saldo confirmado e detalhe completo.7 unitários,tipos/lint PASS;
+16 identidades browser qualificadas,8 de estoque em produção final e8
+consumidores CI/PDF/foco reutilizados fora do escopo alterado. Corrigidos glifos
+longos do histórico,contraste e colunas comprimidas;capturas finais conferidas.
+CI46 terminou FAIL em quatro projetos e agregado;consumidores BAL/breadcrumb
+corrigidos e rechecados. Intermitências ainda exigem CI própria;sem aprovação
+global. Local/remoto177,versões/digest iguais,dry-run vazio,sem SQL novo/mutação.
+Quadro temporário105 critérios atualizado:visual≈60%,recuperação≈85%.
+Preparações privadas de movimento familiar/consumo/revisões de fluxo,
+composição EST-01 e66/171 continuam pendentes. Sonar adiado,PR7 Draft,NO-GO.
+[Incremento](../audits/D/D-B/STOCK_CANONICAL_LIST.md),
+[validação](../audits/D/D-B/STOCK_CANONICAL_LIST_VALIDATION.json),
+[CI histórica](../audits/D/D-B/CI_46A3D3C_OBSERVATION.json).
+
+As observações anteriores abaixo são históricas;não aprovam o novo candidato.
 
 D3.44 implementa seis preparações privadas de programação/plantão BAL por
 recurso real,confirmação atômica,lista pessoal e recuperação sem nova leitura

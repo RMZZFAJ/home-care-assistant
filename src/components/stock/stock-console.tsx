@@ -1,5 +1,11 @@
 "use client";
-import { ActionButton } from "@/components/ui/controls";
+import {
+  ActionButton,
+  FormField,
+  SelectField,
+  TextInput,
+} from "@/components/ui/controls";
+import type { StockBalanceFilter } from "@/lib/stock-presentation";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -31,8 +37,8 @@ import { RecordDrawer } from "@/components/forms/record-drawer";
 
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { MovementOrigin } from "./movement-origin";
-import {useNotificationReference} from "@/lib/notifications/use-notification-reference";
-import {NotificationReference} from "@/components/notifications/notification-reference";
+import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
+import { NotificationReference } from "@/components/notifications/notification-reference";
 
 const locationLabels: Record<string, string> = {
   FAMILY: "Família",
@@ -71,6 +77,7 @@ function PatientStock({
   const liveRevision = useLiveRevision();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [balanceFilter, setBalanceFilter] = useState<StockBalanceFilter>("all");
   const [custody, setCustody] = useState(initialCustody);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({ productId: "", from: "", to: "" });
@@ -104,7 +111,13 @@ function PatientStock({
     can(context, "stock.family.read") || can(context, "stock.team.read");
   const frozenRef = useRef<Record<string, unknown> | null>(null);
   const patient = context.patient!.id;
-  const params=useSearchParams(),notice=useNotificationReference(patient,"stock",params.get("ref"),params.get("refKind")??"auto");
+  const params = useSearchParams(),
+    notice = useNotificationReference(
+      patient,
+      "stock",
+      params.get("ref"),
+      params.get("refKind") ?? "auto",
+    );
   const revision = `${attempt}:${liveRevision}`;
   const stock = useScopedRead<{
     overview: ProductStock[];
@@ -193,8 +206,18 @@ function PatientStock({
       .includes(search.toLocaleLowerCase("pt-BR")),
   );
   return (
-    <div className="space-y-5">
-      <NotificationReference key={patient+":"+notice.reference} read={notice} context={context} onStockFilter={(productId,location)=>{setCustody(location);setFilters(current=>({...current,productId}));setPage(1);historyHeadingRef.current?.focus();}}/>
+    <div className="hca-stock-console space-y-5">
+      <NotificationReference
+        key={patient + ":" + notice.reference}
+        read={notice}
+        context={context}
+        onStockFilter={(productId, location) => {
+          setCustody(location);
+          setFilters((current) => ({ ...current, productId }));
+          setPage(1);
+          historyHeadingRef.current?.focus();
+        }}
+      />
       {can(context, "ent.create") && hasStock ? (
         <Link className={buttonClass} href="/transferencias">
           Transferir materiais entre família e equipe
@@ -245,19 +268,16 @@ function PatientStock({
         ) : !stock.loading ? (
           <Notice>Saldos ainda não consultados com sucesso.</Notice>
         ) : null}
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <label className="text-sm font-semibold">
-            Buscar produto
-            <input
-              className={inputClass}
+        <div className="hca-stock-filters">
+          <FormField label="Buscar produto">
+            <TextInput
+              leading={<Icon name="search" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
-          </label>
-          <label className="text-sm font-semibold">
-            Custódia
-            <select
-              className={inputClass}
+          </FormField>
+          <FormField label="Custódia">
+            <SelectField
               aria-label="Custódia"
               value={custody}
               onChange={(event) => {
@@ -271,8 +291,25 @@ function PatientStock({
               {can(context, "ent.read") ? (
                 <option value="TRANSIT">Materiais em trânsito</option>
               ) : null}
-            </select>
-          </label>
+            </SelectField>
+          </FormField>
+          {custody !== "TRANSIT" ? (
+            <FormField
+              label="Filtro de saldo"
+              helpText="Considera somente o saldo confirmado de cada custódia."
+            >
+              <SelectField
+                value={balanceFilter}
+                onChange={(event) =>
+                  setBalanceFilter(event.target.value as StockBalanceFilter)
+                }
+              >
+                <option value="all">Todos os saldos</option>
+                <option value="low">No mínimo ou abaixo</option>
+                <option value="zero">Saldo zero</option>
+              </SelectField>
+            </FormField>
+          ) : null}
         </div>
         <p className="mt-4 text-xs leading-5 text-(--muted)">
           Saldo confirmado está disponível na custódia. Trânsito e compras
@@ -288,6 +325,7 @@ function PatientStock({
         ) : null}
         {custody !== "TRANSIT" && stock.data ? (
           <StockOverview
+            key={JSON.stringify([custody, search, balanceFilter])}
             products={visible}
             custody={custody}
             allowedCustodies={[
@@ -295,30 +333,23 @@ function PatientStock({
               ...(hasTeam ? ["CARE_TEAM"] : []),
             ]}
             metrics={stock.data.metrics}
+            filter={balanceFilter}
+            showEmpty={!stock.loading && !stock.error}
           />
-        ) : null}
-        {custody !== "TRANSIT" &&
-        stock.data &&
-        !stock.loading &&
-        !stock.error &&
-        !visible.length ? (
-          <EmptyState title="Nenhum produto encontrado">
-            Consulte o catálogo ou ajuste a busca.
-          </EmptyState>
         ) : null}
       </section>
       {custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
         <div className="hca-toolbar">
           <ActionButton
             variant="primary"
-
             onClick={(event) => {
               setOperation("inbound");
               setMovementProductId("");
               setReferenceId("");
               setMovementEditor(event.currentTarget);
             }}
-          >{<Icon name="plus" />}
+          >
+            {<Icon name="plus" />}
             Movimentar estoque familiar
           </ActionButton>
         </div>

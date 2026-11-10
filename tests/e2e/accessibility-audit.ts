@@ -2,6 +2,15 @@ import {expect, test} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { accessibilityEvidence } from "../support/accessibility-results";
 import { assertKeyboardEntry } from "./keyboard-entry";
+/** Whole-page composition checks start at a known scroll/focus origin after resize. */
+export async function auditFromTop(page: import("@playwright/test").Page, label: string, expectedTitle = "Home Care Assistant") {
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    window.scrollTo({ top: 0, behavior: "instant" });
+    return new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  });
+  await audit(page, label, expectedTitle);
+}
 export async function audit(page: import("@playwright/test").Page, label: string, expectedTitle = "Home Care Assistant") {
   await expect(page).toHaveTitle(expectedTitle);
   if (label === "login") await expect(page.getByLabel("E-mail", { exact: true })).toBeEnabled();
@@ -76,10 +85,34 @@ export async function audit(page: import("@playwright/test").Page, label: string
           overflow: getComputedStyle(element).overflowX,
         })),
     );
+    // Text can overflow while its parent's box still fits. Capture geometry,
+    // never the text itself, so a clipped header cannot mask the actual cause.
+    const overflowingText = await page.evaluate(() => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const results: { tag: string; class: string; textLength: number; left: number; right: number; width: number; clippedBy: string | null }[] = [];
+      let node: Node | null;
+      while ((node = walker.nextNode()) && results.length < 40) {
+        const parent = node.parentElement;
+        if (!parent || !node.textContent?.trim() || parent.closest('script,style,textarea,option,[hidden],[aria-hidden="true"],[inert]') || !parent.getClientRects().length) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        const box = range.getBoundingClientRect();
+        if (box.left >= 0 && box.right <= document.documentElement.clientWidth) continue;
+        let clippedBy: string | null = null;
+        for (let ancestor: HTMLElement | null = parent; ancestor; ancestor = ancestor.parentElement) {
+          if (["auto", "scroll", "hidden", "clip"].includes(getComputedStyle(ancestor).overflowX)) {
+            clippedBy = ancestor.tagName + "." + ancestor.className;
+            break;
+          }
+        }
+        results.push({ tag: parent.tagName, class: parent.className, textLength: node.textContent.length, left: box.left, right: box.right, width: box.width, clippedBy });
+      }
+      return results;
+    });
     await test
       .info()
       .attach("horizontal-overflow-" + label.replaceAll(/[^a-z0-9-]/gi, "-"), {
-        body: JSON.stringify({ ...size, elements: overflow }, null, 2),
+        body: JSON.stringify({ ...size, elements: overflow, overflowingText }, null, 2),
         contentType: "application/json",
       });
   }

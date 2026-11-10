@@ -448,7 +448,9 @@ export function useCreationDraft({
     setComparison(null);
     setError("");
     setMessage(
-      "Rascunho retomado. Revise o catálogo e as referências antes de concluir.",
+      targetResourceId
+        ? "Rascunho retomado. Revise as referências antes de concluir."
+        : "Rascunho retomado. Revise o catálogo e as referências antes de concluir.",
     );
   }
   const consumed =

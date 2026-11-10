@@ -2917,3 +2917,41 @@ critérios continuam pendentes;texto genérico de retomada também requer revis�
 por finalidade. Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
 [Detalhe](BAL_WORKSPACE_DRAFTS.md),[provas](BAL_WORKSPACE_DRAFTS_VALIDATION.json),
 [remoto](BAL_WORKSPACE_DRAFTS_REMOTE.json),[CI](CI_33BF6B8_OBSERVATION.json).
+
+## D3.45 — saldos canônicos e consumidores da CI46
+
+Base46a3d3c. Tabela única/cartões a850px,mínimo/situação/unidades,filtro de
+saldo confirmado e detalhe completo. Seis colunas conservam custódia e cada
+previsão identificadas;rolagem só local. Filtros reiniciam a página dos saldos
+sem apagar outros editores.7 unitários,tipos/lint PASS;16 identidades browser
+qualificadas:8 de estoque repetidas em produção final,8 consumidores CI/PDF/foco
+reutilizados fora do escopo alterado. Diferenças CRLF discriminadas dos hashes
+normalizados. Nenhuma rodada parcial vira aprovação global.
+
+O defeito real500→691 vinha de glifos longos do histórico,com caixas que cabiam.
+Probes de cabeçalho eram inconclusivos;variantes removidas. Quebra corrigida,
+prova isolada discriminante e fluxo Auth completo em cinco larguras nos dois
+motores. Contraste do detalhe corrigido. Capturas após testes verdes revelaram
+colunas comprimidas;composição corrigida e oito casos afetados repetidos.
+Capturas finais desktop e cartão inteiro320px conferidas.
+
+CI46 terminou FAIL em quatro projetos e agregado;banco,Windows,Ubuntu,ios-1
+PASS,Preview READY. Consumidor BAL atualizou título/locators;breadcrumb agora
+mínimo24px;auditoria após resize normaliza origem sem desabilitar regra.
+P06 e confirmador BAL passam nos dois motores. Quatro definições flaky da CI
+passam no recheck local;isso não comprova intermitência global resolvida.
+CI do novo SHA obrigatória,com os demais consumidores de estoque localizados.
+
+Quadro temporário105 critérios atualizado por funcionalidades,responsáveis e
+sequência;visual≈60%,formulários≈80%,recuperação≈85% são estimativas editoriais.
+Movimento familiar,consumo e revisões de fluxo ainda precisam de preparação
+privada entre sessões;comandos existentes não a comprovam. Inventory-console
+legado sem consumidor ativo encontrado,preservado. Decoder de saldos200,
+composição EST-01,66/171 e demais critérios continuam pendentes.
+
+Matriz105x39,primeiras30/statuses56PASS49PARTIAL e18 linhas UI preservados.
+16 fontes congelados. Local/remoto177:versões/digest iguais,dry-run vazio,
+sem SQL novo/mutação/reset/fixtures/Auth remoto. Sem suíte mutável paralela.
+Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
+[Incremento](STOCK_CANONICAL_LIST.md),[validação](STOCK_CANONICAL_LIST_VALIDATION.json),
+[CI histórica](CI_46A3D3C_OBSERVATION.json).
