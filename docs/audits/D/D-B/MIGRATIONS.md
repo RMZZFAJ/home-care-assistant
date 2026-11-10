@@ -612,3 +612,21 @@ reset,fixtures/Auth remotos ou repetição de backup pesado no banco descartáve
 Correção de trim da autoria local176 e normalização LF antecedem aplicação
 remota;statements locais intermediários não foram reescritos ou reexecutados.
 [Conferência](BAL_DOCUMENT_DRAFTS_REMOTE.json).
+
+## D3.44 — programação e plantões BAL
+
+20261110001316 foi aplicada uma vez no remoto autorizado,176→177,antes do
+commit. Duas tabelas privadas RLS sem grants diretos e cinco RPCs Auth
+suplementam o núcleo existente;os dois comandos nativos e permissões não
+mudaram. Corpos LF das dez funções,configurações,grants,tabelas e digest177
+coincidem com local. Pré/pós-check sem locks/constraints remotas inválidas;
+dry-run final vazio. Advisors preservam todos os achados anteriores e somam
+somente duas tabelas fechadas e cinco entrypoints Auth esperados.
+
+Autoria local corrigiu precedência JSON,enriquecimento do alvo,recibo,listagem
+e colisão de chave nativa antes dos testes finais. Statements intermediários
+locais não foram reexecutados ou reescritos. O remoto recebeu somente a versão
+final. Hashes finais normalizam LF explicitamente. Sem reset,fixtures/Auth
+remotos ou backup pesado redundante,no banco sintético conforme complemento
+do responsável. Instalação limpa/evolução legada/integral continuam na CI do
+próprio SHA. [Conferência](BAL_WORKSPACE_DRAFTS_REMOTE.json).

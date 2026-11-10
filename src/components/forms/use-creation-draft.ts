@@ -1,10 +1,17 @@
 "use client";
 
-import { useCallback,useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/client/api";
 import { creationDraftCommandSchema } from "@/lib/validation/creation-drafts";
-import { parsePrivateDraft,parsePrivateDraftResult } from "@/lib/validation/private-draft-results";
-import { usesSupplyDraftTransport, type DraftPurpose } from "@/lib/validation/supply-drafts";
+import {
+  parsePrivateDraft,
+  parsePrivateDraftResult,
+} from "@/lib/validation/private-draft-results";
+import {
+  usesSupplyDraftTransport,
+  type DraftPurpose,
+} from "@/lib/validation/supply-drafts";
+import { isBalancePreparationPurpose } from "@/lib/forms/balance-preparation-purposes";
 import type { DraftNavigation } from "@/lib/forms/draft-navigation";
 import type {
   CreationDraft,
@@ -24,6 +31,7 @@ type Options = {
   kind: DraftKind | null;
   purpose?: DraftPurpose;
   targetDocumentId?: string | null;
+  targetResourceId?: string | null;
   enabled?: boolean;
   navigation?: DraftNavigation;
   onResume: (draft: CreationDraft) => boolean;
@@ -37,6 +45,7 @@ export function useCreationDraft({
   kind,
   purpose = "create",
   targetDocumentId = null,
+  targetResourceId = null,
   enabled = true,
   navigation,
   onResume,
@@ -52,7 +61,7 @@ export function useCreationDraft({
   const [busy, setBusy] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [readDenied, setReadDenied] = useState(false);
-  const [protectedReadPending,setProtectedReadPending]=useState(false);
+  const [protectedReadPending, setProtectedReadPending] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [pending, setPending] = useState<Packet | null>(null);
@@ -62,12 +71,33 @@ export function useCreationDraft({
   const unresolvedRef = useRef(false);
   const generationRef = useRef(0);
   const active = enabled && kind !== null;
-  const extended=usesSupplyDraftTransport(kind,purpose);
-  const storageKey = `hca:private-draft-command:${userId}:${patientId}:${kind}:${targetDocumentId ?? "new"}`+(extended?":"+purpose:"");
-  const url =
-    `/api/drafts?careRecipientId=${patientId}&kind=${kind}` +
-    (targetDocumentId ? `&targetDocumentId=${targetDocumentId}` : "")+(extended?"&purpose="+purpose:"");
-  const parseRead=useCallback((value:unknown)=>parsePrivateDraft(value,{userId,patientId,kind,targetDocumentId,purpose}),[userId,patientId,kind,targetDocumentId,purpose]);
+  const extended = usesSupplyDraftTransport(kind, purpose);
+  const resourcePreparation =
+    kind === "BAL" && isBalancePreparationPurpose(purpose);
+  const commandUrl = resourcePreparation
+    ? "/api/balances/preparations"
+    : "/api/drafts";
+  const storageKey =
+    `hca:private-draft-command:${userId}:${patientId}:${kind}:${targetDocumentId ?? "new"}` +
+    (extended || resourcePreparation ? ":" + purpose : "") +
+    (resourcePreparation ? ":" + targetResourceId : "");
+  const url = resourcePreparation
+    ? `${commandUrl}?careRecipientId=${patientId}&purpose=${purpose}&targetResourceId=${targetResourceId}`
+    : `/api/drafts?careRecipientId=${patientId}&kind=${kind}` +
+      (targetDocumentId ? `&targetDocumentId=${targetDocumentId}` : "") +
+      (extended ? "&purpose=" + purpose : "");
+  const parseRead = useCallback(
+    (value: unknown) =>
+      parsePrivateDraft(value, {
+        userId,
+        patientId,
+        kind,
+        targetDocumentId,
+        targetResourceId,
+        purpose,
+      }),
+    [userId, patientId, kind, targetDocumentId, targetResourceId, purpose],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -99,8 +129,11 @@ export function useCreationDraft({
           parsed?.success &&
           parsed.data.careRecipientId === patientId &&
           parsed.data.kind === kind &&
-          parsed.data.targetDocumentId === targetDocumentId
-          && (!("purpose" in parsed.data)||parsed.data.purpose===purpose)
+          parsed.data.targetDocumentId === targetDocumentId &&
+          (!resourcePreparation ||
+            ("targetResourceId" in parsed.data &&
+              parsed.data.targetResourceId === targetResourceId)) &&
+          (!("purpose" in parsed.data) || parsed.data.purpose === purpose)
         ) {
           restorePendingRef.current = true;
           unresolvedRef.current = true;
@@ -116,9 +149,10 @@ export function useCreationDraft({
           undefined,
           controller.signal,
         );
-        if (current === generationRef.current && !controller.signal.aborted){
-          const row=parseRead(result.data);setProtectedReadPending(false);
-          if(!restorePendingRef.current)setOffered(row);
+        if (current === generationRef.current && !controller.signal.aborted) {
+          const row = parseRead(result.data);
+          setProtectedReadPending(false);
+          if (!restorePendingRef.current) setOffered(row);
         }
       } catch (reason) {
         if (!controller.signal.aborted) {
@@ -139,7 +173,19 @@ export function useCreationDraft({
       controller.abort();
       generationRef.current = current + 1;
     };
-  }, [active, attempt, kind, patientId, purpose,storageKey, targetDocumentId, url,parseRead]);
+  }, [
+    active,
+    attempt,
+    kind,
+    patientId,
+    purpose,
+    storageKey,
+    targetDocumentId,
+    targetResourceId,
+    resourcePreparation,
+    url,
+    parseRead,
+  ]);
 
   async function revalidateRead() {
     if (!active || inFlightRef.current) return false;
@@ -157,7 +203,13 @@ export function useCreationDraft({
       // A changed revision still needs the existing explicit CAS comparison.
       if (!restorePendingRef.current && !unresolvedRef.current) {
         // Save replies confirm the immutable revision without returning its hash.
-        const unchanged = (!base && !row) || (base?.state === "active" && row?.state === "active" && base.id === row.id && base.revision === row.revision && (!base.contentHash || base.contentHash === row.contentHash));
+        const unchanged =
+          (!base && !row) ||
+          (base?.state === "active" &&
+            row?.state === "active" &&
+            base.id === row.id &&
+            base.revision === row.revision &&
+            (!base.contentHash || base.contentHash === row.contentHash));
         if (unchanged) setBase(row);
         else {
           setComparison(row);
@@ -169,8 +221,14 @@ export function useCreationDraft({
       return true;
     } catch (cause) {
       if (current !== generationRef.current) return false;
-      setLoadError(cause instanceof Error ? cause.message : "Não foi possível revalidar o preenchimento privado.");
-      setReadDenied(cause instanceof ApiError && [401, 403, 404].includes(cause.status));
+      setLoadError(
+        cause instanceof Error
+          ? cause.message
+          : "Não foi possível revalidar o preenchimento privado.",
+      );
+      setReadDenied(
+        cause instanceof ApiError && [401, 403, 404].includes(cause.status),
+      );
       // Keep the private view protected until a valid scoped read succeeds.
       return false;
     } finally {
@@ -222,9 +280,11 @@ export function useCreationDraft({
       /* Retained in memory. */
     }
     try {
-      const result = parsePrivateDraftResult((
-        await api<{ data: CreationDraftResult }>("/api/drafts", packet)
-      ).data,packet);
+      const result = parsePrivateDraftResult(
+        (await api<{ data: CreationDraftResult }>(commandUrl, packet)).data,
+        packet,
+        userId,
+      );
       if (current !== generationRef.current) return;
       forgetPending();
       unresolvedRef.current = false;
@@ -238,6 +298,7 @@ export function useCreationDraft({
           kind: kind!,
           purpose,
           targetDocumentId,
+          ...(resourcePreparation ? { targetResourceId } : {}),
           schemaVersion: 1,
           revision: result.revision,
           state: result.state,
@@ -247,6 +308,12 @@ export function useCreationDraft({
           content: packet.content!,
           navigation: packet.navigation ?? null,
           consumedDocumentId: result.consumedDocumentId,
+          ...(resourcePreparation
+            ? {
+                consumedResourceId: result.consumedResourceId,
+                consumedResult: result.consumedResult,
+              }
+            : {}),
         };
         if (restorePendingRef.current && !onResume(savedDraft)) {
           setBase(null);
@@ -257,17 +324,23 @@ export function useCreationDraft({
         }
         restorePendingRef.current = false;
         setMessage(
-          "Salvo no servidor. Este preenchimento ainda não foi emitido.",
+          resourcePreparation
+            ? "Salvo no servidor. Este preenchimento ainda não registrou uma decisão."
+            : "Salvo no servidor. Este preenchimento ainda não foi emitido.",
         );
         if (result.replayed) {
           try {
-            const live = parseRead((await api<{ data: CreationDraft | null }>(url)).data);
+            const live = parseRead(
+              (await api<{ data: CreationDraft | null }>(url)).data,
+            );
             if (current !== generationRef.current) return;
             if (live?.state === "consumed") {
               setBase(null);
               setOffered(live);
               setMessage(
-                "O salvamento foi confirmado e o rascunho já foi usado em uma ficha.",
+                resourcePreparation
+                  ? "O salvamento foi confirmado e o preenchimento já foi utilizado em uma decisão."
+                  : "O salvamento foi confirmado e o rascunho já foi usado em uma ficha.",
               );
             } else if (
               live?.id !== result.id ||
@@ -308,8 +381,8 @@ export function useCreationDraft({
       const known =
         reason instanceof ApiError &&
         [400, 401, 403, 404, 409, 413, 422].includes(reason.status);
-      const recovering=unresolvedRef.current;
-      if (known&&!recovering) {
+      const recovering = unresolvedRef.current;
+      if (known && !recovering) {
         forgetPending();
         setPending(null);
         if (reason.code === "DRAFT_VERSION_CONFLICT") {
@@ -326,9 +399,22 @@ export function useCreationDraft({
           setReadDenied(true);
         }
       }
-      if(!known||recovering)unresolvedRef.current=true;
-      if(recovering&&reason instanceof ApiError&&[401,403,404].includes(reason.status)){setBase(null);setOffered(null);setComparison(null);setReadDenied(true);}
-      setError(recovering?"A recuperação ainda não confirmou a tentativa original. Preserve esta referência e consulte novamente quando o acesso estiver disponível.":(reason as Error).message);
+      if (!known || recovering) unresolvedRef.current = true;
+      if (
+        recovering &&
+        reason instanceof ApiError &&
+        [401, 403, 404].includes(reason.status)
+      ) {
+        setBase(null);
+        setOffered(null);
+        setComparison(null);
+        setReadDenied(true);
+      }
+      setError(
+        recovering
+          ? "A recuperação ainda não confirmou a tentativa original. Preserve esta referência e consulte novamente quando o acesso estiver disponível."
+          : (reason as Error).message,
+      );
     } finally {
       inFlightRef.current = false;
       if (current === generationRef.current) setBusy(false);
@@ -343,8 +429,9 @@ export function useCreationDraft({
     return {
       careRecipientId: patientId,
       kind,
-      ...(extended?{purpose}:{}),
+      ...(extended || resourcePreparation ? { purpose } : {}),
       targetDocumentId,
+      ...(resourcePreparation ? { targetResourceId } : {}),
       id: draft?.id ?? null,
       expectedRevision: draft?.revision ?? null,
       idempotencyKey: crypto.randomUUID(),

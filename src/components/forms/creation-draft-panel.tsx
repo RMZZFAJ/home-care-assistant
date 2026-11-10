@@ -11,36 +11,122 @@ import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
 import type { DraftPurpose } from "@/lib/validation/supply-drafts";
 import type { CreationDraftContent } from "@/types/creation-drafts";
 import type { CreationDraftController } from "./use-creation-draft";
-import { navigationLabel, type DraftNavigation } from "@/lib/forms/draft-navigation";
+import {
+  navigationLabel,
+  type DraftNavigation,
+} from "@/lib/forms/draft-navigation";
+import {
+  isBalancePreparationPurpose,
+  balancePreparationTitles,
+} from "@/lib/forms/balance-preparation-purposes";
 
-export function DraftContentSummary({content,kind,navigation,purpose}: {
+export function DraftContentSummary({
+  content,
+  kind,
+  navigation,
+  purpose,
+}: {
   content: CreationDraftContent | null;
   kind?: string | null;
   navigation?: DraftNavigation | null;
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
-  const version = "context" in content ? content.context.documentVersion : "documentVersion" in content ? content.documentVersion : null;
-  const reference = "counts" in content ? content.context.referenceRevision : null;
-  return <div className="hca-form-stack">
-    <dl aria-label="Referências do preenchimento preservado">
-      <dt>Etapa do preenchimento</dt><dd>{navigationLabel(navigation)}</dd>
-      <dt>Versão base da ficha</dt><dd>{version ?? "Sem ficha oficial como base"}</dd>
-      {kind === "BAL" ? <><dt>Referência de estoque preservada</dt><dd>{reference ?? "Não preservada neste rascunho"}</dd></> : null}
-      <dt>Política base preservada</dt><dd>Não preservada neste rascunho; as regras vigentes serão conferidas na confirmação.</dd>
-    </dl>
-    <DraftFieldsSummary content={content} kind={kind} purpose={purpose}/>
-  </div>;
+  if ("values" in content)
+    return (
+      <div className="hca-form-stack">
+        <p>
+          Preenchimento de programação ou plantão. Não representa contagem
+          física nem emissão de ficha.
+        </p>
+        <DraftFieldsSummary content={content} kind={kind} purpose={purpose} />
+      </div>
+    );
+  const version =
+    "context" in content
+      ? content.context.documentVersion
+      : "documentVersion" in content
+        ? content.documentVersion
+        : null;
+  const reference =
+    "counts" in content ? content.context.referenceRevision : null;
+  return (
+    <div className="hca-form-stack">
+      <dl aria-label="Referências do preenchimento preservado">
+        <dt>Etapa do preenchimento</dt>
+        <dd>{navigationLabel(navigation)}</dd>
+        <dt>Versão base da ficha</dt>
+        <dd>{version ?? "Sem ficha oficial como base"}</dd>
+        {kind === "BAL" ? (
+          <>
+            <dt>Referência de estoque preservada</dt>
+            <dd>{reference ?? "Não preservada neste rascunho"}</dd>
+          </>
+        ) : null}
+        <dt>Política base preservada</dt>
+        <dd>
+          Não preservada neste rascunho; as regras vigentes serão conferidas na
+          confirmação.
+        </dd>
+      </dl>
+      <DraftFieldsSummary content={content} kind={kind} purpose={purpose} />
+    </div>
+  );
 }
 
 function DraftFieldsSummary({
-  content,kind,purpose,
+  content,
+  kind,
+  purpose,
 }: {
   content: CreationDraftContent | null;
   kind?: string | null;
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("values" in content) {
+    const labels: Record<string, string> = {
+      reason: "Sua justificativa",
+      enabled: "Processamento automático",
+      weekday: "Dia do balanço",
+      shiftTypeLabel: "Tipo de plantão preservado",
+      professionalLabel: "Pessoa preservada",
+      timezone: "Fuso do paciente",
+      startsOn: "Vigente a partir de",
+      targetShiftLabel: "Plantão de destino preservado",
+      targetShiftQuery: "Busca preservada",
+    };
+    return (
+      <dl>
+        {Object.entries(content.values)
+          .filter(([key]) => key in labels)
+          .map(([key, value]) => (
+            <div key={key}>
+              <dt>{labels[key]}</dt>
+              <dd className="whitespace-pre-wrap wrap-anywhere">
+                {key === "enabled"
+                  ? value === "true"
+                    ? "Ativado"
+                    : value === "false"
+                      ? "Pausado"
+                      : "Não escolhido"
+                  : key === "weekday" && /^[0-6]$/.test(value ?? "")
+                    ? ([
+                        "Domingo",
+                        "Segunda-feira",
+                        "Terça-feira",
+                        "Quarta-feira",
+                        "Quinta-feira",
+                        "Sexta-feira",
+                        "Sábado",
+                      ][Number(value)] ?? "Não escolhido")
+                    : value || "Não preenchido"}
+              </dd>
+            </div>
+          ))}
+      </dl>
+    );
+  }
   if ("lines" in content)
     return (
       <div className="hca-form-stack">
@@ -99,50 +185,309 @@ function DraftFieldsSummary({
         ) : null}
       </div>
     );
-  if("form" in content)return <div className="hca-form-stack">
-    <p>{content.context.documentId?"Revisão de ficha existente":"Criação de nova ficha"}{content.context.documentVersion?` · versão ${content.context.documentVersion}`:""}</p>
-    <dl>{kind==="COM"?<><dt>Origem da aquisição</dt><dd>{content.form.origin==="donation"?"Doação":content.form.origin==="purchase"?"Compra":"Não escolhida"}</dd></>:<><dt>Custódia de origem da entrega</dt><dd>{content.form.source==="FAMILY"?"Família":"Equipe"}</dd><dt>Pessoa recebedora</dt><dd>{content.context.recipientName||"Não escolhida ou indisponível no diretório atual"}</dd></>}</dl>
-    {content.materials.filter(m=>Object.hasOwn(content.form.quantities,m.id)).map(m=><article className="hca-record min-w-0" key={m.id}><div className="hca-record-main min-w-0 wrap-anywhere"><strong>{m.name}</strong><p>Quantidade: {content.form.quantities[m.id]||"Não preenchida"} {m.unit}</p>{content.form.presentationSelections?.[m.id]?.map(p=><p key={p.id}>{p.packages||"Não preenchido"} embalagem(ns) · {p.name} · {p.baseQuantity} {p.unit} por embalagem · versão {p.version}</p>)}{content.form.sharedNeedReasons?.[m.id]?<p>{content.form.sharedNeedReasons[m.id]}</p>:null}<p>{content.links[m.id]?.length??0} vínculo(s) de necessidade; revalidados na confirmação.</p></div></article>)}
-    {content.form.notes?<p className="whitespace-pre-wrap wrap-anywhere">{content.form.notes}</p>:null}{content.form.recipientReason?<p className="whitespace-pre-wrap wrap-anywhere">Justificativa da pessoa recebedora: {content.form.recipientReason}</p>:null}
-  </div>;
-  if ("fields" in content && content.documentVersion === null) return <div className="hca-form-stack">
-    <p>Declaração privada em preparação, sem ficha oficial como base. Salvar não registra declaração, concordância, expedição ou recebimento.</p>
-    <dl>
-      <dt>Sentido da transferência</dt><dd>{content.fields.source === "FAMILY" ? "Família → Equipe" : "Equipe → Família"}</dd>
-      <dt>Contraparte preservada</dt><dd>{content.fields.counterpartyLabel || "Não escolhida ou indisponível"}</dd>
-      <dt>Recebedor físico preservado</dt><dd>{content.fields.recipientLabel || "Não escolhido ou indisponível"}</dd>
-      <dt>Origem documental preservada</dt><dd>{content.fields.originLabel || "Sem vínculo informado"}</dd>
-    </dl>
-    {content.materials.map(material=><p className="whitespace-pre-wrap wrap-anywhere" key={material.id}>{material.name} · quantidade no preenchimento: {content.fields[material.id+":transferQuantity"] || "Não informada"} {material.unit}</p>)}
-    {content.fields.reason ? <p className="whitespace-pre-wrap wrap-anywhere">Sua justificativa: {content.fields.reason}</p> : null}
-    {content.fields.query ? <p className="whitespace-pre-wrap wrap-anywhere">Busca preservada: {content.fields.query}</p> : null}
-  </div>;
-  if ("fields" in content && kind === "REQ") return <dl className="hca-form-stack">
-    <div><dt>Justificativa própria</dt><dd className="whitespace-pre-wrap wrap-anywhere">{content.fields.reason || "Não preenchida"}</dd></div>
-    {purpose === "resolve_extra" ? <><div><dt>Item extra preservado</dt><dd>{content.fields.itemLabel || "Não escolhido"}</dd></div><div><dt>Produto correspondente preservado</dt><dd>{content.fields.productLabel || "Não escolhido"}{content.fields.productUnit ? ` · ${content.fields.productUnit}` : ""}</dd></div></> : null}
-  </dl>;
+  if ("form" in content)
+    return (
+      <div className="hca-form-stack">
+        <p>
+          {content.context.documentId
+            ? "Revisão de ficha existente"
+            : "Criação de nova ficha"}
+          {content.context.documentVersion
+            ? ` · versão ${content.context.documentVersion}`
+            : ""}
+        </p>
+        <dl>
+          {kind === "COM" ? (
+            <>
+              <dt>Origem da aquisição</dt>
+              <dd>
+                {content.form.origin === "donation"
+                  ? "Doação"
+                  : content.form.origin === "purchase"
+                    ? "Compra"
+                    : "Não escolhida"}
+              </dd>
+            </>
+          ) : (
+            <>
+              <dt>Custódia de origem da entrega</dt>
+              <dd>{content.form.source === "FAMILY" ? "Família" : "Equipe"}</dd>
+              <dt>Pessoa recebedora</dt>
+              <dd>
+                {content.context.recipientName ||
+                  "Não escolhida ou indisponível no diretório atual"}
+              </dd>
+            </>
+          )}
+        </dl>
+        {content.materials
+          .filter((m) => Object.hasOwn(content.form.quantities, m.id))
+          .map((m) => (
+            <article className="hca-record min-w-0" key={m.id}>
+              <div className="hca-record-main min-w-0 wrap-anywhere">
+                <strong>{m.name}</strong>
+                <p>
+                  Quantidade:{" "}
+                  {content.form.quantities[m.id] || "Não preenchida"} {m.unit}
+                </p>
+                {content.form.presentationSelections?.[m.id]?.map((p) => (
+                  <p key={p.id}>
+                    {p.packages || "Não preenchido"} embalagem(ns) · {p.name} ·{" "}
+                    {p.baseQuantity} {p.unit} por embalagem · versão {p.version}
+                  </p>
+                ))}
+                {content.form.sharedNeedReasons?.[m.id] ? (
+                  <p>{content.form.sharedNeedReasons[m.id]}</p>
+                ) : null}
+                <p>
+                  {content.links[m.id]?.length ?? 0} vínculo(s) de necessidade;
+                  revalidados na confirmação.
+                </p>
+              </div>
+            </article>
+          ))}
+        {content.form.notes ? (
+          <p className="whitespace-pre-wrap wrap-anywhere">
+            {content.form.notes}
+          </p>
+        ) : null}
+        {content.form.recipientReason ? (
+          <p className="whitespace-pre-wrap wrap-anywhere">
+            Justificativa da pessoa recebedora: {content.form.recipientReason}
+          </p>
+        ) : null}
+      </div>
+    );
+  if ("fields" in content && content.documentVersion === null)
+    return (
+      <div className="hca-form-stack">
+        <p>
+          Declaração privada em preparação, sem ficha oficial como base. Salvar
+          não registra declaração, concordância, expedição ou recebimento.
+        </p>
+        <dl>
+          <dt>Sentido da transferência</dt>
+          <dd>
+            {content.fields.source === "FAMILY"
+              ? "Família → Equipe"
+              : "Equipe → Família"}
+          </dd>
+          <dt>Contraparte preservada</dt>
+          <dd>
+            {content.fields.counterpartyLabel ||
+              "Não escolhida ou indisponível"}
+          </dd>
+          <dt>Recebedor físico preservado</dt>
+          <dd>
+            {content.fields.recipientLabel || "Não escolhido ou indisponível"}
+          </dd>
+          <dt>Origem documental preservada</dt>
+          <dd>{content.fields.originLabel || "Sem vínculo informado"}</dd>
+        </dl>
+        {content.materials.map((material) => (
+          <p className="whitespace-pre-wrap wrap-anywhere" key={material.id}>
+            {material.name} · quantidade no preenchimento:{" "}
+            {content.fields[material.id + ":transferQuantity"] ||
+              "Não informada"}{" "}
+            {material.unit}
+          </p>
+        ))}
+        {content.fields.reason ? (
+          <p className="whitespace-pre-wrap wrap-anywhere">
+            Sua justificativa: {content.fields.reason}
+          </p>
+        ) : null}
+        {content.fields.query ? (
+          <p className="whitespace-pre-wrap wrap-anywhere">
+            Busca preservada: {content.fields.query}
+          </p>
+        ) : null}
+      </div>
+    );
+  if ("fields" in content && kind === "REQ")
+    return (
+      <dl className="hca-form-stack">
+        <div>
+          <dt>Justificativa própria</dt>
+          <dd className="whitespace-pre-wrap wrap-anywhere">
+            {content.fields.reason || "Não preenchida"}
+          </dd>
+        </div>
+        {purpose === "resolve_extra" ? (
+          <>
+            <div>
+              <dt>Item extra preservado</dt>
+              <dd>{content.fields.itemLabel || "Não escolhido"}</dd>
+            </div>
+            <div>
+              <dt>Produto correspondente preservado</dt>
+              <dd>
+                {content.fields.productLabel || "Não escolhido"}
+                {content.fields.productUnit
+                  ? ` · ${content.fields.productUnit}`
+                  : ""}
+              </dd>
+            </div>
+          </>
+        ) : null}
+      </dl>
+    );
   if ("fields" in content) {
-    const name = (key: string) => content.materials.find(m => m.id === key)?.name ?? "Linha não disponível na referência atual";
-    const entDecision = kind === "ENT" && purpose !== "receive" && purpose !== "divergence";
+    const name = (key: string) =>
+      content.materials.find((m) => m.id === key)?.name ??
+      "Linha não disponível na referência atual";
+    const entDecision =
+      kind === "ENT" && purpose !== "receive" && purpose !== "divergence";
     const operation = kind === "COM" || kind === "BAL" || entDecision;
-    const quantityLabel = kind === "COM" ? purpose === "approve" ? "quantidade em aprovação" : purpose === "purchase" ? "quantidade em aquisição" : "quantidade informada" : entDecision ? "quantidade em conciliação" : "recebido";
-    const labels: Record<string, string> = { comment: "Seu parecer", targetShiftId: "Plantão escolhido", targetLabel: "Pessoa e período preservados", query: "Texto da busca de plantão", transferState: "Estado da transferência na referência", transferSource: "Custódia de origem", transferDestination: "Custódia de destino", transferInitiator: "Declarante", transferCounterparty: "Contraparte", transferRecipient: "Recebedor físico", reason: operation ? "Motivo / justificativa" : "Observação", receiptId: "Parcela no preenchimento", confirmed: "Conferência do resumo", recipientId: "Novo destinatário no preenchimento", lineId: "Material em conciliação", quantity: "Quantidade em conciliação", resolution: "Solução em preparação", requestId: "Pedido no preenchimento", caseId: "Proposta de regularização", basis: "Evidências e limites", reviewerId: "Conferente independente", followUpOwnerId: "Responsável pela apuração futura" };
-    const display = (key: string, value: string) => {
-      if (key === "receiptId") return content.fields.receiptLabel || "Referência da parcela preservada; confira a declaração ao continuar.";
-      if (key === "recipientId") return content.fields.recipientLabel || "Pessoa preservada; confira sua disponibilidade ao continuar.";
-      if (key === "lineId") return content.fields.lineLabel || "Material preservado; confira a linha vigente ao continuar.";
-      if (key === "requestId") return content.fields.requestLabel || "Pedido preservado; confira sua identidade ao continuar.";
-      if (key === "caseId") return content.fields.caseLabel || "Sem proposta anterior";
-      if (key === "reviewerId") return content.fields.reviewerLabel || "Não escolhido ou indisponível";
-      if (key === "followUpOwnerId") return content.fields.followUpOwnerLabel || "Não escolhido ou indisponível";
-      if (key === "confirmed") return value === "on" ? "Marcada no preenchimento; a conclusão exige confirmação própria." : "Não marcada";
-      return ({ FAMILY: "Família", CARE_TEAM: "Equipe", pending: "Aguardando contraparte", agreed: "Concordância registrada, sem expedição", declined: "Transferência recusada", withdrawn: "Declaração encerrada", dispatched: "Expedição registrada", shortage: "Quantidade menor", damaged: "Material avariado", wrong: "Produto divergente", other: "Outra diferença", received: "Recebimento complementar confirmado por mim", returned: "Material voltou à custódia de origem", missing: "Falta / perda conciliada" } as Record<string, string>)[value] ?? (value || "Não preenchido");
+    const quantityLabel =
+      kind === "COM"
+        ? purpose === "approve"
+          ? "quantidade em aprovação"
+          : purpose === "purchase"
+            ? "quantidade em aquisição"
+            : "quantidade informada"
+        : entDecision
+          ? "quantidade em conciliação"
+          : "recebido";
+    const labels: Record<string, string> = {
+      comment: "Seu parecer",
+      targetShiftId: "Plantão escolhido",
+      targetLabel: "Pessoa e período preservados",
+      query: "Texto da busca de plantão",
+      transferState: "Estado da transferência na referência",
+      transferSource: "Custódia de origem",
+      transferDestination: "Custódia de destino",
+      transferInitiator: "Declarante",
+      transferCounterparty: "Contraparte",
+      transferRecipient: "Recebedor físico",
+      reason: operation ? "Motivo / justificativa" : "Observação",
+      receiptId: "Parcela no preenchimento",
+      confirmed: "Conferência do resumo",
+      recipientId: "Novo destinatário no preenchimento",
+      lineId: "Material em conciliação",
+      quantity: "Quantidade em conciliação",
+      resolution: "Solução em preparação",
+      requestId: "Pedido no preenchimento",
+      caseId: "Proposta de regularização",
+      basis: "Evidências e limites",
+      reviewerId: "Conferente independente",
+      followUpOwnerId: "Responsável pela apuração futura",
     };
-    return <div className="hca-form-stack">
-      <p>{operation ? `Preenchimento da operação ${kind} · versão de referência ${content.documentVersion}. Salvar não confirma decisões, recebimento ou movimentação de estoque.` : `Conferência pessoal · versão consultada ${content.documentVersion}. Salvar não aceita material.`}</p>
-      {content.divergentIds.length ? <ul>{content.divergentIds.map(id => <li key={id}>{name(id)} · divergência em preparação</li>)}</ul> : !operation ? <p>Nenhuma linha divergente selecionada.</p> : null}
-      <dl>{Object.entries(content.fields).filter(([key]) => !["targetShiftVersion", "targetShiftId", "receiptLabel", "recipientLabel", "lineLabel", "requestLabel", "referenceHash", "caseLabel", "reviewerLabel", "followUpOwnerLabel"].includes(key)).map(([key, value]) => <div key={key}><dt>{labels[key] ?? (key.endsWith(":receivedQuantity") ? name(key.slice(0, -17)) + " · recebimento físico apurado" : key.endsWith(":returnedQuantity") ? name(key.slice(0, -17)) + " · devolução física apurada" : key.endsWith(":missingQuantity") ? name(key.slice(0, -16)) + " · falta apurada" : key.endsWith(":return") ? name(key.slice(0, -7)) + " · devolução física em preparação" : key.endsWith(":problem") ? name(key.slice(0, -8)) + " · diferença" : name(key) + " · " + quantityLabel)}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{display(key, value)}</dd></div>)}</dl>
-    </div>;
+    const display = (key: string, value: string) => {
+      if (key === "receiptId")
+        return (
+          content.fields.receiptLabel ||
+          "Referência da parcela preservada; confira a declaração ao continuar."
+        );
+      if (key === "recipientId")
+        return (
+          content.fields.recipientLabel ||
+          "Pessoa preservada; confira sua disponibilidade ao continuar."
+        );
+      if (key === "lineId")
+        return (
+          content.fields.lineLabel ||
+          "Material preservado; confira a linha vigente ao continuar."
+        );
+      if (key === "requestId")
+        return (
+          content.fields.requestLabel ||
+          "Pedido preservado; confira sua identidade ao continuar."
+        );
+      if (key === "caseId")
+        return content.fields.caseLabel || "Sem proposta anterior";
+      if (key === "reviewerId")
+        return content.fields.reviewerLabel || "Não escolhido ou indisponível";
+      if (key === "followUpOwnerId")
+        return (
+          content.fields.followUpOwnerLabel || "Não escolhido ou indisponível"
+        );
+      if (key === "confirmed")
+        return value === "on"
+          ? "Marcada no preenchimento; a conclusão exige confirmação própria."
+          : "Não marcada";
+      return (
+        (
+          {
+            FAMILY: "Família",
+            CARE_TEAM: "Equipe",
+            pending: "Aguardando contraparte",
+            agreed: "Concordância registrada, sem expedição",
+            declined: "Transferência recusada",
+            withdrawn: "Declaração encerrada",
+            dispatched: "Expedição registrada",
+            shortage: "Quantidade menor",
+            damaged: "Material avariado",
+            wrong: "Produto divergente",
+            other: "Outra diferença",
+            received: "Recebimento complementar confirmado por mim",
+            returned: "Material voltou à custódia de origem",
+            missing: "Falta / perda conciliada",
+          } as Record<string, string>
+        )[value] ??
+        (value || "Não preenchido")
+      );
+    };
+    return (
+      <div className="hca-form-stack">
+        <p>
+          {operation
+            ? `Preenchimento da operação ${kind} · versão de referência ${content.documentVersion}. Salvar não confirma decisões, recebimento ou movimentação de estoque.`
+            : `Conferência pessoal · versão consultada ${content.documentVersion}. Salvar não aceita material.`}
+        </p>
+        {content.divergentIds.length ? (
+          <ul>
+            {content.divergentIds.map((id) => (
+              <li key={id}>{name(id)} · divergência em preparação</li>
+            ))}
+          </ul>
+        ) : !operation ? (
+          <p>Nenhuma linha divergente selecionada.</p>
+        ) : null}
+        <dl>
+          {Object.entries(content.fields)
+            .filter(
+              ([key]) =>
+                ![
+                  "targetShiftVersion",
+                  "targetShiftId",
+                  "receiptLabel",
+                  "recipientLabel",
+                  "lineLabel",
+                  "requestLabel",
+                  "referenceHash",
+                  "caseLabel",
+                  "reviewerLabel",
+                  "followUpOwnerLabel",
+                ].includes(key),
+            )
+            .map(([key, value]) => (
+              <div key={key}>
+                <dt>
+                  {labels[key] ??
+                    (key.endsWith(":receivedQuantity")
+                      ? name(key.slice(0, -17)) +
+                        " · recebimento físico apurado"
+                      : key.endsWith(":returnedQuantity")
+                        ? name(key.slice(0, -17)) +
+                          " · devolução física apurada"
+                        : key.endsWith(":missingQuantity")
+                          ? name(key.slice(0, -16)) + " · falta apurada"
+                          : key.endsWith(":return")
+                            ? name(key.slice(0, -7)) +
+                              " · devolução física em preparação"
+                            : key.endsWith(":problem")
+                              ? name(key.slice(0, -8)) + " · diferença"
+                              : name(key) + " · " + quantityLabel)}
+                </dt>
+                <dd className="whitespace-pre-wrap wrap-anywhere">
+                  {display(key, value)}
+                </dd>
+              </div>
+            ))}
+        </dl>
+      </div>
+    );
   }
   return (
     <div className="hca-form-stack">
@@ -205,7 +550,30 @@ export function CreationDraftPanel({
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
   if (!draft.active) return null;
   const saved = draft.offered ?? draft.base;
-  if(draft.readDenied||draft.protectedReadPending)return <section className="ui-card hca-form-stack" aria-label="Rascunho privado"><Notice error>{draft.loadError||"Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada."}</Notice><ActionButton ref={revalidationRef} disabled={draft.busy} onClick={onRevalidateRead ?? draft.reload}>Revalidar acesso ao rascunho</ActionButton>{draft.pending?<ActionButton disabled={draft.busy} onClick={()=>void draft.recover()}>Recuperar mesma tentativa preservada</ActionButton>:null}</section>;
+  if (draft.readDenied || draft.protectedReadPending)
+    return (
+      <section className="ui-card hca-form-stack" aria-label="Rascunho privado">
+        <Notice error>
+          {draft.loadError ||
+            "Revalide o acesso antes de exibir o preenchimento preservado. A tentativa original continua guardada."}
+        </Notice>
+        <ActionButton
+          ref={revalidationRef}
+          disabled={draft.busy}
+          onClick={onRevalidateRead ?? draft.reload}
+        >
+          Revalidar acesso ao rascunho
+        </ActionButton>
+        {draft.pending ? (
+          <ActionButton
+            disabled={draft.busy}
+            onClick={() => void draft.recover()}
+          >
+            Recuperar mesma tentativa preservada
+          </ActionButton>
+        ) : null}
+      </section>
+    );
   return (
     <section
       className="ui-card hca-form-stack hca-draft-panel min-w-0"
@@ -219,7 +587,12 @@ export function CreationDraftPanel({
           ? "O resultado oficial deste preenchimento já está disponível."
           : "Salvar este preenchimento não gera protocolo, ciência ou movimentação de estoque."}
       </p>
-      {!draft.consumed && !draft.pending ? <p className="hca-field-hint">Para retomar em outra aba, sessão ou aparelho, use Salvar rascunho. O preenchimento ainda não salvo pode ficar apenas nesta aba.</p> : null}
+      {!draft.consumed && !draft.pending ? (
+        <p className="hca-field-hint">
+          Para retomar em outra aba, sessão ou aparelho, use Salvar rascunho. O
+          preenchimento ainda não salvo pode ficar apenas nesta aba.
+        </p>
+      ) : null}
       {draft.loading ? (
         <Notice>Consultando seu rascunho no servidor…</Notice>
       ) : null}
@@ -247,7 +620,12 @@ export function CreationDraftPanel({
             mesmo comando antes de editar ou descartar.
           </Notice>
           {draft.pending.content ? (
-            <DraftContentSummary content={draft.pending.content} kind={draft.kind} purpose={draft.purpose} navigation={draft.pending.navigation} />
+            <DraftContentSummary
+              content={draft.pending.content}
+              kind={draft.kind}
+              purpose={draft.purpose}
+              navigation={draft.pending.navigation}
+            />
           ) : null}
           <ActionButton
             variant="primary"
@@ -261,19 +639,40 @@ export function CreationDraftPanel({
       {draft.consumed ? (
         <>
           <Notice>
-            Este rascunho já foi usado em uma ficha. Consulte o resultado antes
-            de iniciar outro preenchimento.
+            {isBalancePreparationPurpose(draft.purpose)
+              ? "Este preenchimento já registrou uma decisão. O resultado preservado descreve aquele instante; consulte o acompanhamento para a situação atual."
+              : "Este rascunho já foi usado em uma ficha. Consulte o resultado antes de iniciar outro preenchimento."}
           </Notice>
-          <Link
-            className="ui-button ui-button-primary"
-            prefetch={false}
-            href={
-              (draft.consumed.kind === "REQ" ? "/historico/" : "/documentos/") +
-              draft.consumed.consumedDocumentId
-            }
-          >
-            Abrir ficha concluída
-          </Link>
+          {isBalancePreparationPurpose(draft.purpose) &&
+          draft.consumed.consumedResult ? (
+            <div>
+              <p>
+                {balancePreparationTitles[draft.purpose]} · registrada em{" "}
+                {formatZonedDate(
+                  draft.consumed.consumedResult.recordedAt,
+                  "America/Sao_Paulo",
+                )}
+                .
+              </p>
+              <p className="whitespace-pre-wrap wrap-anywhere">
+                {"reason" in draft.consumed.consumedResult.command.body
+                  ? draft.consumed.consumedResult.command.body.reason
+                  : null}
+              </p>
+            </div>
+          ) : (
+            <Link
+              className="ui-button ui-button-primary"
+              prefetch={false}
+              href={
+                (draft.consumed.kind === "REQ"
+                  ? "/historico/"
+                  : "/documentos/") + draft.consumed.consumedDocumentId
+              }
+            >
+              Abrir ficha concluída
+            </Link>
+          )}
           <ActionButton
             disabled={draft.busy || !!draft.pending || disabled}
             onClick={() => void draft.acknowledge()}
@@ -284,7 +683,12 @@ export function CreationDraftPanel({
       ) : null}
       {draft.offered?.state === "active" && !draft.pending ? (
         <>
-          <DraftContentSummary content={draft.offered.content} kind={draft.kind} purpose={draft.purpose} navigation={draft.offered.navigation} />
+          <DraftContentSummary
+            content={draft.offered.content}
+            kind={draft.kind}
+            purpose={draft.purpose}
+            navigation={draft.offered.navigation}
+          />
           <div className="hca-toolbar">
             {resumeHref ? (
               <Link
@@ -315,7 +719,12 @@ export function CreationDraftPanel({
           <div className="grid min-w-0 gap-4 md:grid-cols-2">
             <section className="min-w-0" aria-label="Minha edição">
               <h3>Minha edição</h3>
-              <DraftContentSummary content={current} kind={draft.kind} purpose={draft.purpose} navigation={draft.navigation} />
+              <DraftContentSummary
+                content={current}
+                kind={draft.kind}
+                purpose={draft.purpose}
+                navigation={draft.navigation}
+              />
             </section>
             <section className="min-w-0" aria-label="Versão salva no servidor">
               <h3>Versão salva no servidor</h3>
@@ -329,7 +738,12 @@ export function CreationDraftPanel({
                         "America/Sao_Paulo",
                       )}
                     </p>
-                    <DraftContentSummary content={draft.comparison.content} kind={draft.kind} purpose={draft.purpose} navigation={draft.comparison.navigation} />
+                    <DraftContentSummary
+                      content={draft.comparison.content}
+                      kind={draft.kind}
+                      purpose={draft.purpose}
+                      navigation={draft.comparison.navigation}
+                    />
                   </>
                 ) : (
                   <p>O rascunho foi descartado no servidor.</p>
@@ -362,7 +776,8 @@ export function CreationDraftPanel({
           </div>
         </>
       ) : null}
-      {current && draft.base?.state === "active" &&
+      {current &&
+      draft.base?.state === "active" &&
       !draft.blocked &&
       JSON.stringify(current) !== JSON.stringify(draft.base.content) ? (
         <p>Sua edição atual ainda não foi salva no servidor.</p>
@@ -406,7 +821,12 @@ export function CreationDraftPanel({
               Você está descartando somente seu preenchimento privado de{" "}
               {saved?.kind} para {patientName}.
             </p>
-            <DraftContentSummary content={saved?.content ?? null} kind={draft.kind} purpose={draft.purpose} navigation={saved?.navigation} />
+            <DraftContentSummary
+              content={saved?.content ?? null}
+              kind={draft.kind}
+              purpose={draft.purpose}
+              navigation={saved?.navigation}
+            />
             <Notice>
               Fichas emitidas, arquivos oficiais e seu histórico serão
               preservados.

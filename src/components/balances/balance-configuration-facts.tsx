@@ -7,7 +7,13 @@ export function BalanceConfigurationFacts({
   data,
 }: {
   command: Extract<BalanceCommand, { action: "configure" }>;
-  data: BalanceWorkspace;
+  data: {
+    types: Pick<
+      BalanceWorkspace["types"][number],
+      "id" | "name" | "starts_local" | "duration_minutes"
+    >[];
+    professionals: BalanceWorkspace["professionals"];
+  };
 }) {
   const body = command.body,
     type = data.types.find((t) => t.id === body.shiftTypeId);

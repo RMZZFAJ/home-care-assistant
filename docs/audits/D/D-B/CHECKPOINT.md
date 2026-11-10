@@ -2869,3 +2869,51 @@ paridade66/171,CI do novo SHA e gates humanos/físicos/externos. Sonar adiado,
 PR7 Draft,sem merge/produção,meta ativa.
 [Detalhe](BAL_DOCUMENT_DRAFTS.md),[provas](BAL_DOCUMENT_DRAFTS_VALIDATION.json),
 [remoto](BAL_DOCUMENT_DRAFTS_REMOTE.json),[CI](CI_6CE4D35_OBSERVATION.json).
+
+## D3.44 — programação e plantões BAL recuperáveis
+
+Base33bf6b8. Seis atos usam preparações privadas com paciente,ciclo,atribuição
+ou pedido reais:configurar,atribuir,solicitar adiamento,adiar,aprovar e rejeitar.
+Editor canônico,campos próprios,duas sessões,CAS,referência exata além da página
+nativa,confirmação selada e resultado pessoal após perda de escrita. Salvar
+não executa ato operacional;consumo privado e comando nativo são atômicos.
+Leitura recusada remove conteúdo protegido;pacote incerto só tem POST manual.
+
+36 unitários/API e13 Auth reais distintos PASS;atribuição repetida uma vez
+após distinguir nomes de duas profissionais fictícias,sem mudar autoridade.
+Contraprova real encontrou chave nativa antiga consumindo preparação nova sem
+novo efeito. Guarda permanente recusa a colisão e conserva replay privado.
+Revogação ou fonte alterada após journal fazem rollback integral. Dez funções
+e duas tabelas privadas fechadas;zero sondas/triggers temporários restantes.
+
+22 identidades browser aprovadas por reuso qualificado,11 por motor. Rodada
+final de produção12/12,sem flaky/retry,repete os seis propósitos em ambos.
+Dez consumidores legados diagnósticos inalterados reutilizados. Rodadas com
+falha não aprovam conjuntos:label obrigatório,corrida antes da revisão,opener
+removido na atualização,nomes fictícios iguais e botão transitório na retomada
+foram discriminados. Linhas mantidas corrigem foco;403 continua retirando-as.
+Produção reproduziu o botão temporário;controle persistente permanece visível.
+Teste final espera a perda injetada e a leitura consumida antes de recuperar.
+Caso legado com duas sessões esgotou30s totais;usa120s como seu precedente,
+com ações/assertions15s intactos,passou56s. Nenhum timeout de produto ampliado.
+
+30 fontes congelados,tipos/lint PASS,axe,quatro larguras e duas capturas de
+sucesso conferidos;sem suíte mutável paralela. A CI própria ainda precisa
+validar instalação limpa,evolução legada e integração completa. Local177 e
+remoto177 reconciliados antes do commit:dez corpos LF/grants/configurações,
+duas tabelas RLS fechadas,digest e comandos nativos coincidem;dry-run vazio.
+Advisors preservam cinco classes e todos os achados anteriores:44→46 tabelas
+privadas sem políticas diretas e168→173 RPCs Auth correspondem somente aos
+objetos novos esperados. Não houve reset,fixtures/Auth remoto ou backup pesado
+redundante. Autoria local conserva statements intermediários,sem replay ou
+reescrita;registro final corrige a qualificação CRLF de hashes anteriores.
+
+CI33bf6b8/42725958901 concluiu os nove jobs SUCCESS;Preview READY. Esse SHA
+anterior não aprova o candidato novo. Matriz105x39/primeiras30,56 PASS/49 PARTIAL
+e18 linhas visuais preservados. Quadro temporário atualizado:visual≈60%,
+formulários≈80%,recuperação entre sessões≈90% são estimativas editoriais.
+Revisão integrada dos formulários,paridade66/171,fichas/estoque e demais
+critérios continuam pendentes;texto genérico de retomada também requer revisão
+por finalidade. Sonar adiado,PR7 Draft,sem merge/produção,meta ativa.
+[Detalhe](BAL_WORKSPACE_DRAFTS.md),[provas](BAL_WORKSPACE_DRAFTS_VALIDATION.json),
+[remoto](BAL_WORKSPACE_DRAFTS_REMOTE.json),[CI](CI_33BF6B8_OBSERVATION.json).

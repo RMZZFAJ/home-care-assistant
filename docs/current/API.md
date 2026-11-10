@@ -1048,3 +1048,25 @@ outcome checked/not_confirmed, note e idempotencyKey. Auth/CSRF, limite8k e
 schema estrito; autor/instante não são entradas. Revisão/intenção obsoleta409;
 replay conserva registro. Nenhum papel ou validação externa é concedido.
 [Contrato e provas](../audits/D/D-B/PROFESSIONAL_CREDENTIALS.md).
+
+## Preparações de programação e plantões BAL
+
+GET/POST /api/balances/preparations consultam e alteram apenas o preenchimento
+próprio. Escopo:careRecipientId,purpose,targetResourceId;kind BAL e
+targetDocumentId NULL. Save conserva values,referenceHash e versão nativa
+ou NULL;discard e acknowledge não registram decisão operacional.
+
+Configure usa o paciente como alvo;assign usa ciclo;request_deferral/defer
+usam atribuição;approve_deferral/reject_deferral usam pedido real. GET
+/api/balances/preparations/reference devolve referência autorizada tipada e
+hash do banco,incluindo o alvo exato fora da página operacional. GET
+/api/balances/preparations/list usa cursor before/beforeId pareado,limit
+padrão20,máximo50,e não expõe conteúdo de outro titular.
+
+POST /api/balances/preparations/commit sela draftCommit,comando nativo,
+referência,versão e chave. Nova decisão exige autoridade atual;consulta,
+descarte,reconhecimento e replay já vinculado exigem leitura viva. Uma chave
+nativa anterior não pode consumir um preenchimento novo. Resposta200 inválida
+não confirma sucesso. Resultado preservado descreve o ato original,não a
+situação atual,presença ou contagem física. As rotas mantêm Origin,correlação,
+erros seguros e no-store. O caminho nativo /api/balances permanece compatível.

@@ -25,18 +25,17 @@ responsabilidade. “Você” indica decisão, configuração, participação em
 ou liberação que depende de você. “Participantes/equipe” são pessoas que
 usarão ou avaliarão o sistema; “serviço externo” depende também do fornecedor.
 
-Pendência comum: as verificações dirigidas deste lote passaram; a rodada
-completa do novo código publicado ainda precisa ser concluída. A rodada
-anterior parou no limite de tempo dos testes de celular. Esses testes foram
-divididos em duas partes, mantendo todos os casos. O banco remoto está
-atualizado, com 176 atualizações aplicadas. A fase continua em execução.
+Pendência comum: a rodada completa do código publicado anteriormente passou.
+O novo lote ainda terá sua própria rodada automática após a publicação.
+O banco remoto já está atualizado, com 177 atualizações aplicadas. As
+verificações dirigidas deste lote passaram. A fase continua em execução.
 
-Neste lote, os pareceres da família e da supervisão sobre o balanço e a
-designação de reconto ganharam preenchimento privado recuperável entre
-sessões, comparação antes de confirmar e recuperação após perda de resposta.
-As três decisões de requisição do lote anterior e a troca das classes de
-quebra de texto também estão concluídas. Os demais pontos pendentes continuam
-abaixo.
+Neste lote, a programação dos balanços, a atribuição de responsável e os
+pedidos, decisões e aprovações de adiamento ganharam preenchimento privado
+recuperável entre sessões, comparação antes de confirmar e recuperação após
+perda de resposta. Os pareceres, o reconto e as decisões de requisição dos
+lotes anteriores foram preservados. A troca das classes de quebra de texto
+já foi concluída. Os demais pontos pendentes continuam abaixo.
 
 ## Funcionalidades e critérios da D-B
 
@@ -72,13 +71,12 @@ abaixo.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈85%. Falta: Completar programação, atribuição e adiamentos do
-  balanço por plantão e revisão transversal. Pareceres da família e da
-  supervisão, designação de reconto e as três decisões de requisição estão
-  implementados e verificados localmente. Responsável: Codex.
+  execução · ≈90%. Falta: Revisar em conjunto os preenchimentos e combinações
+  restantes. Programação, atribuição, adiamentos, pareceres, reconto e as três
+  decisões de requisição estão implementados. Responsável: Codex.
 - **Preservar edição durante falha, conflito e perda de contexto** — Em
-  execução · ≈80%. Falta: Completar fluxos restantes de balanço e combinações
-  transversais de falha. Responsável: Codex.
+  execução · ≈85%. Falta: Conferir em conjunto as combinações restantes de
+  falha e mudança de contexto. Responsável: Codex.
 
 ### Fichas e Andamentos
 
@@ -318,8 +316,8 @@ abaixo.
 - **Aplicar atualizações pendentes da fase D-A no banco remoto** — Concluído ·
   100%.
 - **Manter as atualizações D-B aplicadas no remoto** — Em execução · ≈90%.
-  Falta: Atual 174 sincronizada; aplicar as que surgirem e fechar conferência
-  final. Responsável: Codex.
+  Falta: Aplicar as atualizações que surgirem nos próximos lotes e fechar a
+  conferência final. Responsável: Codex.
 
 ### Piloto, qualidade e encerramento
 
@@ -373,11 +371,10 @@ incluídos.
 - **Cabeçalho, menu lateral, paciente e navegação móvel** — 80%. Já aplicado:
   Estrutura e navegação do modelo. Falta: Fechar comparação de todos os
   estados e larguras. Responsável: Codex.
-- **Formulários, apoio, avisos e recuperação** — 75%. Já aplicado: Criação,
-  vários atos de compra, entrega e transferência, três decisões de
-  requisição, pareceres do balanço e designação de reconto. Falta: Programação,
-  atribuição e adiamentos do balanço por plantão e variações restantes.
-  Responsável: Codex.
+- **Formulários, apoio, avisos e recuperação** — 80%. Já aplicado: Criação,
+  atos de compra, entrega e transferência, decisões de requisição, pareceres,
+  reconto, programação, atribuição e adiamentos do balanço. Falta: Conferir
+  todas as variações e sua apresentação conjunta. Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 50%. Já aplicado: Base e
   vários consumidores migrados. Falta: Completar páginas e verificar textos e
   quantidades inteiros. Responsável: Codex.
@@ -466,12 +463,11 @@ Esta é a ordem do trabalho restante. Os quadros anteriores estão agrupados por
 funcionalidade, sem representar ordem de execução. Tudo que já está 100% será
 preservado e incluído na revisão final; não será refeito sem motivo.
 
-1. **Completar formulários da operação diária.** Terminar programação,
-   atribuição e adiamentos do balanço por plantão, incluindo rascunhos,
-   conflitos, retomada e mensagens de cada etapa; conferir em conjunto os
-   formulários já concluídos. Os pareceres e a designação de reconto deste
-   lote, as decisões de requisição anteriores e a troca das classes de quebra
-   de texto ficam concluídos antes do próximo lote.
+1. **Revisar em conjunto os formulários da operação diária.** Conferir
+   mensagens, comparação, conflitos e recuperação nas combinações restantes.
+   Os seis atos de programação e plantão deste lote, os pareceres e reconto,
+   as decisões de requisição e a troca das classes de quebra de texto ficam
+   preservados; só serão refeitos se uma falha ou mudança exigir.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.

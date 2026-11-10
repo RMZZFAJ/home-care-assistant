@@ -547,3 +547,21 @@ autoconferência/global sem contexto, preservam replay e paginam por tupla.
 Índice do sujeito cobre FK; metadata sem histórico acompanha exclusão do
 perfil, enquanto conferências mantêm referências. Local/remoto161 reconciliado.
 [Recibo](../audits/D/D-B/CREDENTIAL_REMOTE_MIGRATIONS.json).
+
+## Preparações BAL por recurso
+
+private.balance_preparations e private.balance_preparation_commands guardam
+configure,assign,request_deferral,defer,approve_deferral e reject_deferral.
+O slot ativo/consumido pertence a titular,paciente,propósito e recurso real:
+paciente da programação,ciclo,atribuição ou pedido. Não se inventa documento
+ou versão documental. Conteúdo parcial v1 tem values e referência/versão
+nativa ou NULL,com CAS,mutex e journal próprios. Não há TTL novo.
+
+commit_balance_preparation revalida intenção e referência,compõe os motores
+balance_command/resolve_balance_assignment e consome a preparação na mesma
+transação. Chave nativa anterior não pode criar vínculo privado retroativo.
+O resultado congela recurso,ator,instante,comando,campos próprios e retorno
+nativo;mudança tardia após journal reverte ato e consumo. A referência inclui
+o alvo exato mesmo fora da página;lista própria obtém total/itens no mesmo
+snapshot e pagina por criação/ID. Tabelas/helper privados ficam fechados a
+clientes;somente os cinco RPCs públicos recebem EXECUTE authenticated.

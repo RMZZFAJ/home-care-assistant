@@ -1,8 +1,31 @@
 import { z } from "zod";
+import {
+  balancePreparationSaveSchema,
+  balancePreparationMutationSchema,
+} from "./balance-preparations";
+import { isBalancePreparationPurpose } from "../forms/balance-preparation-purposes";
 import { draftNavigationSchema } from "./draft-navigation";
-import { balanceDocumentPurpose, balanceDocumentDraftContent } from "./supply-drafts";
+import {
+  balanceDocumentPurpose,
+  balanceDocumentDraftContent,
+} from "./supply-drafts";
 import { navigationAllowed } from "../forms/draft-navigation";
-import { requisitionOperationPurpose,requisitionOperationDraftContent,draftPurpose,entDeclarationPurposes,entDeclarationDraftPurpose,transferDeclarationDraftContent,newSupplyDraftPurposes,declarationSourceForPurpose,comOperationDraftPurpose,comOperationPurposes,entDraftPurpose,entDraftPurposes,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
+import {
+  requisitionOperationPurpose,
+  requisitionOperationDraftContent,
+  draftPurpose,
+  entDeclarationPurposes,
+  entDeclarationDraftPurpose,
+  transferDeclarationDraftContent,
+  newSupplyDraftPurposes,
+  declarationSourceForPurpose,
+  comOperationDraftPurpose,
+  comOperationPurposes,
+  entDraftPurpose,
+  entDraftPurposes,
+  receiptDraftContent,
+  supplyDraftContent,
+} from "./supply-drafts";
 const id = z.uuid(),
   revision = z.number().int().positive().max(2147483647);
 const text = (max: number) =>
@@ -108,24 +131,91 @@ const scope = {
 const navigation = { navigation: draftNavigationSchema.optional() };
 export const creationDraftCommandSchema = z
   .union([
-    z.object({...scope,...navigation,kind:z.literal("BAL"),purpose:balanceDocumentPurpose,action:z.literal("save"),content:balanceDocumentDraftContent}).strict(),
-    z.object({...scope,kind:z.literal("BAL"),purpose:balanceDocumentPurpose,action:z.enum(["discard","acknowledge"])}).strict(),
-    z.object({...scope,...navigation,kind:z.literal("REQ"),purpose:requisitionOperationPurpose,action:z.literal("save"),content:requisitionOperationDraftContent}).strict(),
-    z.object({...scope,kind:z.literal("REQ"),purpose:requisitionOperationPurpose,action:z.enum(["discard","acknowledge"])}).strict(),
+    balancePreparationSaveSchema.strict(),
+    balancePreparationMutationSchema,
     z
-      .object({...scope,...navigation,kind:z.enum(["COM","ENT"]),purpose:z.enum(["create","revise"]),action:z.literal("save"),content:supplyDraftContent})
+      .object({
+        ...scope,
+        ...navigation,
+        kind: z.literal("BAL"),
+        purpose: balanceDocumentPurpose,
+        action: z.literal("save"),
+        content: balanceDocumentDraftContent,
+      })
       .strict(),
     z
-      .object({...scope,...navigation,kind:z.literal("ENT"),purpose:entDraftPurpose.exclude(entDeclarationPurposes),action:z.literal("save"),content:receiptDraftContent})
+      .object({
+        ...scope,
+        kind: z.literal("BAL"),
+        purpose: balanceDocumentPurpose,
+        action: z.enum(["discard", "acknowledge"]),
+      })
       .strict(),
     z
-      .object({...scope,...navigation,kind:z.literal("ENT"),purpose:entDeclarationDraftPurpose,action:z.literal("save"),content:transferDeclarationDraftContent})
+      .object({
+        ...scope,
+        ...navigation,
+        kind: z.literal("REQ"),
+        purpose: requisitionOperationPurpose,
+        action: z.literal("save"),
+        content: requisitionOperationDraftContent,
+      })
       .strict(),
     z
-      .object({...scope,...navigation,kind:z.literal("COM"),purpose:comOperationDraftPurpose,action:z.literal("save"),content:receiptDraftContent})
+      .object({
+        ...scope,
+        kind: z.literal("REQ"),
+        purpose: requisitionOperationPurpose,
+        action: z.enum(["discard", "acknowledge"]),
+      })
       .strict(),
     z
-      .object({...scope,kind:z.enum(["COM","ENT"]),purpose:draftPurpose,action:z.enum(["discard","acknowledge"])})
+      .object({
+        ...scope,
+        ...navigation,
+        kind: z.enum(["COM", "ENT"]),
+        purpose: z.enum(["create", "revise"]),
+        action: z.literal("save"),
+        content: supplyDraftContent,
+      })
+      .strict(),
+    z
+      .object({
+        ...scope,
+        ...navigation,
+        kind: z.literal("ENT"),
+        purpose: entDraftPurpose.exclude(entDeclarationPurposes),
+        action: z.literal("save"),
+        content: receiptDraftContent,
+      })
+      .strict(),
+    z
+      .object({
+        ...scope,
+        ...navigation,
+        kind: z.literal("ENT"),
+        purpose: entDeclarationDraftPurpose,
+        action: z.literal("save"),
+        content: transferDeclarationDraftContent,
+      })
+      .strict(),
+    z
+      .object({
+        ...scope,
+        ...navigation,
+        kind: z.literal("COM"),
+        purpose: comOperationDraftPurpose,
+        action: z.literal("save"),
+        content: receiptDraftContent,
+      })
+      .strict(),
+    z
+      .object({
+        ...scope,
+        kind: z.enum(["COM", "ENT"]),
+        purpose: draftPurpose,
+        action: z.enum(["discard", "acknowledge"]),
+      })
       .strict(),
     z
       .object({
@@ -154,19 +244,88 @@ export const creationDraftCommandSchema = z
       .strict(),
   ])
   .superRefine((value, ctx) => {
-    if (value.action === "save" && !navigationAllowed(value.kind, "purpose" in value ? value.purpose : "create", value.navigation, value.content))
-      ctx.addIssue({ code: "custom", path: ["navigation"], message: "A etapa salva não corresponde ao formulário de origem. Consulte o rascunho novamente." });
-    if ((value.kind==="COM"||value.kind==="ENT")&&(newSupplyDraftPurposes.includes(value.purpose)!==(value.targetDocumentId===null)||value.kind==="COM"&&!["create","revise",...comOperationPurposes].includes(value.purpose)||value.kind==="ENT"&&!["create","revise",...entDraftPurposes].includes(value.purpose)))
-      ctx.addIssue({code:"custom",path:["targetDocumentId"],message:"Confira a intenção e o alvo deste preenchimento."});
-    if (value.kind==="ENT" && value.action==="save" && declarationSourceForPurpose(value.purpose) && (!('fields' in value.content) || value.content.fields.source !== declarationSourceForPurpose(value.purpose) || value.content.documentVersion !== null || value.content.divergentIds.length))
-      ctx.addIssue({code:"custom",path:["content"],message:"Confira a custódia e as referências desta declaração privada."});
-    if ((value.kind==="COM"||value.kind==="ENT")&&value.action==="save"&&"form" in value.content&&value.content.context.documentId!==value.targetDocumentId)
-      ctx.addIssue({code:"custom",path:["content","context"],message:"A ficha de referência precisa corresponder ao preenchimento."});
+    if (
+      value.kind === "BAL" &&
+      "purpose" in value &&
+      isBalancePreparationPurpose(value.purpose) &&
+      "targetResourceId" in value &&
+      value.purpose === "configure" &&
+      value.targetResourceId !== value.careRecipientId
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["targetResourceId"],
+        message: "A programação pertence ao paciente selecionado.",
+      });
+    if (
+      value.action === "save" &&
+      !navigationAllowed(
+        value.kind,
+        "purpose" in value ? value.purpose : "create",
+        value.navigation,
+        value.content,
+      )
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["navigation"],
+        message:
+          "A etapa salva não corresponde ao formulário de origem. Consulte o rascunho novamente.",
+      });
+    if (
+      (value.kind === "COM" || value.kind === "ENT") &&
+      (newSupplyDraftPurposes.includes(value.purpose) !==
+        (value.targetDocumentId === null) ||
+        (value.kind === "COM" &&
+          !["create", "revise", ...comOperationPurposes].includes(
+            value.purpose,
+          )) ||
+        (value.kind === "ENT" &&
+          !["create", "revise", ...entDraftPurposes].includes(value.purpose)))
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["targetDocumentId"],
+        message: "Confira a intenção e o alvo deste preenchimento.",
+      });
+    if (
+      value.kind === "ENT" &&
+      value.action === "save" &&
+      declarationSourceForPurpose(value.purpose) &&
+      (!("fields" in value.content) ||
+        value.content.fields.source !==
+          declarationSourceForPurpose(value.purpose) ||
+        value.content.documentVersion !== null ||
+        value.content.divergentIds.length)
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["content"],
+        message:
+          "Confira a custódia e as referências desta declaração privada.",
+      });
+    if (
+      (value.kind === "COM" || value.kind === "ENT") &&
+      value.action === "save" &&
+      "form" in value.content &&
+      value.content.context.documentId !== value.targetDocumentId
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["content", "context"],
+        message: "A ficha de referência precisa corresponder ao preenchimento.",
+      });
     if (
       (value.id === null) !== (value.expectedRevision === null) ||
       (value.action !== "save" && value.id === null) ||
-      (value.kind === "REQ" && ("purpose" in value ? value.targetDocumentId === null : value.targetDocumentId !== null)) ||
-      (value.kind === "BAL" && "purpose" in value && value.targetDocumentId === null)
+      (value.kind === "REQ" &&
+        ("purpose" in value
+          ? value.targetDocumentId === null
+          : value.targetDocumentId !== null)) ||
+      (value.kind === "BAL" &&
+        "purpose" in value &&
+        !isBalancePreparationPurpose(value.purpose) &&
+        value.targetDocumentId === null)
     )
       ctx.addIssue({
         code: "custom",

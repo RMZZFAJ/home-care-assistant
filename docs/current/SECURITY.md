@@ -221,3 +221,17 @@ revisão obsoleta e revalida após espera. Tabelas/helper privados não recebem
 acesso direto; RPCs guardadas têm grants explícitos. Negativas com Auth real
 incluem revogação de vínculo e sessão durante locks, sem efeito parcial.
 [Provas e limites](../audits/D/D-B/PROFESSIONAL_CREDENTIALS.md).
+
+## Preparação privada de programação e plantões
+
+As preparações BAL por recurso resolvem titular pelo Auth e revalidam
+paciente,propósito e alvo reais no banco. Salvar/confirmar exige autoridade
+do ato;descarte próprio,consulta e reconhecimento não concedem escrita
+operacional. Só um pacote já vinculado recupera seu resultado após perda da
+capacidade de decidir. Chave nativa antiga não cria esse vínculo retroativo.
+Helpers e tabelas não oferecem grants aos clientes ou service_role.
+
+O envelope incerto usa prefixo hca e escopo por conta/paciente/propósito/
+recurso,é validado antes de exibir e segue a limpeza de logout. Retomada local
+não faz POST automático;sessionStorage não concede permissão. Respostas não
+são armazenadas pelo Service Worker e mutações não são reproduzidas offline.

@@ -147,3 +147,18 @@ autorização.
 Não inferir configuração ou release do relato datado em
 [Execução histórica](../archive/evolution/EXECUTION.md). Estado corrente em
 [PROJECT_STATUS](PROJECT_STATUS.md).
+
+## Preenchimentos documentais e decisões por recurso
+
+O controlador de preenchimento compartilha apresentação,conflito,retomada
+e recuperação explícita. Programação e plantões BAL usam recursos reais e
+tabelas privadas próprias,sem representar ciclo,atribuição ou pedido como
+documento. A confirmação compõe os motores existentes com intenção e
+referência seladas no banco. Valores próprios e fatos oficiais têm ciclos
+separados;consulta não substitui escolhas e adoção exige ação explícita.
+
+Resultado preservado descreve o ato original,não o estado atual. Lista pessoal
+conserva linhas durante atualização do mesmo escopo,com indicação de consulta;
+recusa de leitura remove registros protegidos. Paciente/titular não
+compartilham estado. Retorno de foco mantém o iniciador conectado durante
+atualização ou usa fallback acessível quando ele deixa de estar disponível.

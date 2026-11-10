@@ -24,7 +24,9 @@ async function login(page: Page, patient: string) {
   await page.goto("/balancos");
 }
 const form = (page: Page) =>
-  page.getByRole("dialog", { name: "Decisão familiar", exact: true });
+  page.getByRole("dialog", {
+    name: /^(Aprovar adiamento|Rejeitar adiamento)$/,
+  });
 const review = (page: Page) =>
   page.getByRole("dialog", { name: "Revisar decisão do balanço", exact: true });
 test("BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria própria e recuperação sem mudar prazo", async ({
@@ -59,7 +61,10 @@ test("BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria p
     .click();
   await expect(form(page).getByRole("combobox")).toHaveCount(0);
   await expect(form(page).getByRole("textbox")).toHaveCount(1);
-  const reason = form(page).getByLabel("Justificativa", { exact: true });
+  const reason = form(page).getByRole("textbox", {
+    name: "Justificativa",
+    exact: true,
+  });
   await expect(reason).toHaveValue("");
   await expect(reason).toHaveAttribute("maxlength", "1000");
   const ownReason =
@@ -95,7 +100,7 @@ test("BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria p
       .getByText("Versão proposta: 1.", { exact: true }),
   ).toBeVisible();
   const attempts: unknown[] = [];
-  await page.route("**/api/balances", async (route) => {
+  await page.route("**/api/balances/preparations/commit", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
     if (attempts.length === 1) {
@@ -159,7 +164,10 @@ test("mudança do alvo durante a aprovação conserva a justificativa e o destin
   await page
     .getByRole("button", { name: "Aprovar adiamento", exact: true })
     .click();
-  const reason = form(page).getByLabel("Justificativa", { exact: true }),
+  const reason = form(page).getByRole("textbox", {
+      name: "Justificativa",
+      exact: true,
+    }),
     ownReason =
       "Minha justificativa é preservada ao detectar a mudança do plantão.";
   await reason.fill(ownReason);
@@ -169,6 +177,15 @@ test("mudança do alvo durante a aprovação conserva a justificativa e o destin
     if (route.request().method() === "GET") await route.abort("failed");
     else await route.continue();
   });
+  await form(page)
+    .getByRole("button", { name: "Revisar decisão", exact: true })
+    .click();
+  await expect(
+    review(page).getByRole("heading", {
+      name: "Confira a decisão do balanço",
+      exact: true,
+    }),
+  ).toBeFocused();
   await shiftCommand(
     f.admin,
     f.patient,
@@ -179,9 +196,6 @@ test("mudança do alvo durante a aprovação conserva a justificativa e o destin
     },
     f.target.version,
   );
-  await form(page)
-    .getByRole("button", { name: "Revisar decisão", exact: true })
-    .click();
   await review(page)
     .getByRole("button", { name: "Confirmar decisão", exact: true })
     .click();
@@ -212,21 +226,42 @@ test("mudança do alvo durante a aprovação conserva a justificativa e o destin
       (e: { action: string }) => e.action === "bal.cycle.deferred",
     ),
   ).toHaveLength(0);
+  await expect(
+    page.getByRole("button", {
+      name: "Aprovar adiamento",
+      exact: true,
+      includeHidden: true,
+    }),
+  ).toBeDisabled();
   await form(page)
     .getByRole("button", { name: "Fechar edição", exact: true })
     .click();
-  await form(page)
-    .getByRole("button", { name: "Continuar editando", exact: true })
+  await expect(
+    page.getByText("Há alterações ainda não salvas.", { exact: true }),
+  ).toHaveCount(0);
+  await page
+    .locator("summary")
+    .filter({
+      hasText: "Meus preenchimentos privados de programação e plantões",
+    })
     .click();
-  await expect(reason).toHaveValue(ownReason);
+  await page
+    .getByRole("button", { name: "Retomar meu preenchimento", exact: true })
+    .click();
+  await form(page)
+    .getByRole("button", { name: "Continuar rascunho", exact: true })
+    .click();
+  await expect(
+    form(page).getByRole("textbox", { name: "Justificativa", exact: true }),
+  ).toHaveValue(ownReason);
   await form(page)
     .getByRole("button", { name: "Fechar edição", exact: true })
-    .click();
-  await form(page)
-    .getByRole("button", { name: "Descartar alterações", exact: true })
     .click();
   await expect(form(page)).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "Programação do balanço", exact: true }),
+    page.getByRole("button", {
+      name: "Retomar meu preenchimento",
+      exact: true,
+    }),
   ).toBeFocused();
 });

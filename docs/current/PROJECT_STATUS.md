@@ -4,6 +4,22 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.44 implementa seis preparações privadas de programação/plantão BAL por
+recurso real,confirmação atômica,lista pessoal e recuperação sem nova leitura
+da referência consumida.36 unitários/API,13 Auth reais e22 identidades browser
+aprovados por reuso qualificado;rodada final de produção12/12,depois de corrigir
+sincronização do teste de recuperação.30 fontes congelados,tipos/lint PASS.
+Local/remoto177 reconciliados:dez corpos/permissões,duas tabelas RLS fechadas
+e digest iguais;comandos nativos preservados,dry-run vazio. Advisors só somam
+os sete objetos esperados,sem perder achados anteriores. Sem reset/fixtures/
+Auth remoto. CI33bf6b8 aprovou nove jobs;Preview READY. O novo SHA exige CI
+própria. Formulários integrados,paridade66/171 e demais critérios D-B continuam
+parciais;quadro temporário na raiz atualizado. Sonar adiado,PR7 Draft,NO-GO.
+[Incremento](../audits/D/D-B/BAL_WORKSPACE_DRAFTS.md),
+[CI observada](../audits/D/D-B/CI_33BF6B8_OBSERVATION.json).
+
+As observações dos SHAs anteriores abaixo são históricas;não aprovam o atual.
+
 D3.43 implementa pareceres familiar/supervisão e reconto BAL com rascunho
 privado,comparação e confirmação recuperável.34 unitários/API,10 Auth reais
 e18 identidades de navegador aprovados por reuso qualificado;rodadas finais
@@ -15,8 +31,6 @@ elevar timeout. Preview desse SHA READY;novo SHA ainda precisa ser validado.
 Programação,atribuição e adiamentos BAL por plantão permanecem pendentes.
 [Incremento](../audits/D/D-B/BAL_DOCUMENT_DRAFTS.md),
 [CI observada](../audits/D/D-B/CI_6CE4D35_OBSERVATION.json).
-
-As observações dos SHAs anteriores abaixo são históricas;não aprovam o atual.
 
 Observação f233be9: Preview READY,Windows/Ubuntu/banco e demais navegadores
 PASS;WebKit ios-1 e agregado FAIL no caso REQ403. Falha em investigação;
