@@ -234,7 +234,7 @@ Auth/HTTP reais: A vazia tardia não substitui B com201 registros. A retomada fo
 sincronizada com o clique real no CTA, preservando o sinal de atualização e
 eliminando a troca prematura do modo de transporte no teste. Foco no filtro,
 320/390/768/1440 e axe conferidos; cartão390 inspecionado. Primeiras falhas e
-logs mantidos em output/playwright/phase-d/d3-history-*. Não houve teste mutável
+logs mantidos em output/playwright/phase-d/d3-history-\*. Não houve teste mutável
 de banco em paralelo com o runner nem mudança de fonte durante cada execução.
 
 Um erro DATABASE_UNAVAILABLE do sino foi observado no log Chromium do recheck,
@@ -414,7 +414,7 @@ A falha inicial era instrumento: profissional não possui com.read; a negativa
 ficou explícita, e ENT continua verificando ausência de rascunho alheio. Casos
 incluem CAS, dois aparelhos Auth, dois alvos ENT, propósito separado, consumo/
 descarte, grants, entrada legada fechada e rollback após espera observada com
-troca de paciente. Logs d3-supply-drafts-auth-* preservados em output/phase-d-work.
+troca de paciente. Logs d3-supply-drafts-auth-\* preservados em output/phase-d-work.
 
 Onze unitários/modelos/API passaram após atualizar expectativas antigas que
 limitavam o contrato a REQ/BAL, mantendo negativas de tipos/intenção/alvo.
@@ -2831,3 +2831,41 @@ Preview anterior READY. CI do próximo SHA é gate separado. Sonar adiado,
 PR7 Draft,sem merge/produção,meta ativa.
 [Detalhe](REQ_DECISION_DRAFTS.md),[provas](REQ_DECISION_DRAFTS_VALIDATION.json),
 [remoto](REQ_DECISION_DRAFTS_REMOTE.json),[CI](CI_88A4B5B_OBSERVATION.json).
+
+## D3.43 — decisões documentais BAL e recuperação privada
+
+Base6ce4d35. Parecer familiar,parecer da supervisão e reconto têm preparação
+privada com referência nativa,duas sessões,CAS,comparação,confirmação selada e
+replay exato após perda de escrita. Material,histórico,PDFs e autoria física
+preservados. Programação,atribuição e adiamentos por plantão continuam pendentes.
+Consulta inicial conserva digitação própria;salvamento incerto bloqueia edição
+até recuperar exatamente a cópia;retomada idêntica fecha sem falso aviso.
+Fonte recusada retira fatos protegidos,sem apagar edição própria. API liga
+paciente/ficha real;contraprova anterior já era403 sem efeitos,não bypass.
+
+34 unitários/API distintos por reuso24+10;10 Auth reais em rodada completa;
+18 browsers distintos,nove por motor,com reuso qualificado. Rodada inicial
+8 PASS/1 FAIL/9 não executados não aprova conjunto;finais iOS9,mobile2 e
+recuperação familiar2 cobrem últimas versões afetadas. Runners diagnósticos,
+20 fontes congelados,sem suíte mutável paralela. Tipos/lint,axe,quatro larguras
+e duas capturas de sucesso conferidos. CI de produção própria continua gate.
+
+Contraprovas preservadas:trim inexistente na autoria176,limite UTF16,fixtures
+de supervisão/fully_checked,Auth504 antes do app,reconto ainda em consulta,
+leitura inicial apagando texto e incerteza de salvamento privado. Nenhum teste
+ou timeout afrouxado. Código legado NULL explicitado em recuperação controlada.
+Migration176 final recebida uma vez no remoto;176 versões,sete funções/ACL,
+constraint e corpos LF coincidem;dry-run vazio. Advisors mantêm cinco classes
+e identidades,168 funções Auth sinalizadas. Sem reset/fixtures/Auth remoto.
+Correções de autoria não reexecutaram migration nem reescreveram statements
+locais intermediários;LF normalizado antes da aplicação final remota.
+
+CI6ce4d35 FAIL:mobile cancelado após limite comprovado40min;demais seis jobs
+prévios PASS. Mobile dividido em dois shards completos e disjuntos302=155+147;
+mesmo timeout/retry/casos. Coleta não é execução. Preview anterior READY.
+Matriz105x39/primeiras30,56 PASS/49 PARTIAL e18 linhas visuais preservados.
+Quadro temporário atualizado;visual≈60% estimado. Restam BAL por plantão,
+paridade66/171,CI do novo SHA e gates humanos/físicos/externos. Sonar adiado,
+PR7 Draft,sem merge/produção,meta ativa.
+[Detalhe](BAL_DOCUMENT_DRAFTS.md),[provas](BAL_DOCUMENT_DRAFTS_VALIDATION.json),
+[remoto](BAL_DOCUMENT_DRAFTS_REMOTE.json),[CI](CI_6CE4D35_OBSERVATION.json).

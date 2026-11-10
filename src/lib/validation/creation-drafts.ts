@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { draftNavigationSchema } from "./draft-navigation";
+import { balanceDocumentPurpose, balanceDocumentDraftContent } from "./supply-drafts";
 import { navigationAllowed } from "../forms/draft-navigation";
 import { requisitionOperationPurpose,requisitionOperationDraftContent,draftPurpose,entDeclarationPurposes,entDeclarationDraftPurpose,transferDeclarationDraftContent,newSupplyDraftPurposes,declarationSourceForPurpose,comOperationDraftPurpose,comOperationPurposes,entDraftPurpose,entDraftPurposes,receiptDraftContent,supplyDraftContent } from "./supply-drafts";
 const id = z.uuid(),
@@ -107,6 +108,8 @@ const scope = {
 const navigation = { navigation: draftNavigationSchema.optional() };
 export const creationDraftCommandSchema = z
   .union([
+    z.object({...scope,...navigation,kind:z.literal("BAL"),purpose:balanceDocumentPurpose,action:z.literal("save"),content:balanceDocumentDraftContent}).strict(),
+    z.object({...scope,kind:z.literal("BAL"),purpose:balanceDocumentPurpose,action:z.enum(["discard","acknowledge"])}).strict(),
     z.object({...scope,...navigation,kind:z.literal("REQ"),purpose:requisitionOperationPurpose,action:z.literal("save"),content:requisitionOperationDraftContent}).strict(),
     z.object({...scope,kind:z.literal("REQ"),purpose:requisitionOperationPurpose,action:z.enum(["discard","acknowledge"])}).strict(),
     z
@@ -162,7 +165,8 @@ export const creationDraftCommandSchema = z
     if (
       (value.id === null) !== (value.expectedRevision === null) ||
       (value.action !== "save" && value.id === null) ||
-      (value.kind === "REQ" && ("purpose" in value ? value.targetDocumentId === null : value.targetDocumentId !== null))
+      (value.kind === "REQ" && ("purpose" in value ? value.targetDocumentId === null : value.targetDocumentId !== null)) ||
+      (value.kind === "BAL" && "purpose" in value && value.targetDocumentId === null)
     )
       ctx.addIssue({
         code: "custom",
@@ -170,6 +174,7 @@ export const creationDraftCommandSchema = z
       });
     if (
       value.kind === "BAL" &&
+      !("purpose" in value) &&
       value.action === "save" &&
       value.content.context.documentId !== value.targetDocumentId
     )

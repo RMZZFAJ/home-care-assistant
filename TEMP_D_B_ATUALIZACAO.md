@@ -27,14 +27,16 @@ usarão ou avaliarão o sistema; “serviço externo” depende também do forne
 
 Pendência comum: as verificações dirigidas deste lote passaram; a rodada
 completa do novo código publicado ainda precisa ser concluída. A rodada
-anterior encontrou uma falha de foco, já corrigida e verificada localmente.
-O banco remoto está atualizado, com 175 atualizações aplicadas. A fase
-continua em execução.
+anterior parou no limite de tempo dos testes de celular. Esses testes foram
+divididos em duas partes, mantendo todos os casos. O banco remoto está
+atualizado, com 176 atualizações aplicadas. A fase continua em execução.
 
-Neste lote, arquivar, cancelar e identificar item extra na requisição ganharam
-preenchimento privado recuperável entre sessões, comparação antes de confirmar
-e recuperação após perda de resposta. A troca das classes de quebra de texto
-também está concluída. Os demais pontos pendentes continuam abaixo.
+Neste lote, os pareceres da família e da supervisão sobre o balanço e a
+designação de reconto ganharam preenchimento privado recuperável entre
+sessões, comparação antes de confirmar e recuperação após perda de resposta.
+As três decisões de requisição do lote anterior e a troca das classes de
+quebra de texto também estão concluídas. Os demais pontos pendentes continuam
+abaixo.
 
 ## Funcionalidades e critérios da D-B
 
@@ -70,9 +72,10 @@ também está concluída. Os demais pontos pendentes continuam abaixo.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈85%. Falta: Completar decisões contextuais de balanço e revisão
-  transversal. As três decisões de requisição deste lote estão implementadas
-  e verificadas localmente. Responsável: Codex.
+  execução · ≈85%. Falta: Completar programação, atribuição e adiamentos do
+  balanço por plantão e revisão transversal. Pareceres da família e da
+  supervisão, designação de reconto e as três decisões de requisição estão
+  implementados e verificados localmente. Responsável: Codex.
 - **Preservar edição durante falha, conflito e perda de contexto** — Em
   execução · ≈80%. Falta: Completar fluxos restantes de balanço e combinações
   transversais de falha. Responsável: Codex.
@@ -371,8 +374,10 @@ incluídos.
   Estrutura e navegação do modelo. Falta: Fechar comparação de todos os
   estados e larguras. Responsável: Codex.
 - **Formulários, apoio, avisos e recuperação** — 75%. Já aplicado: Criação,
-  vários atos COM/ENT/transferência e as três decisões de requisição deste
-  lote. Falta: Balanço e variações restantes. Responsável: Codex.
+  vários atos de compra, entrega e transferência, três decisões de
+  requisição, pareceres do balanço e designação de reconto. Falta: Programação,
+  atribuição e adiamentos do balanço por plantão e variações restantes.
+  Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 50%. Já aplicado: Base e
   vários consumidores migrados. Falta: Completar páginas e verificar textos e
   quantidades inteiros. Responsável: Codex.
@@ -461,10 +466,12 @@ Esta é a ordem do trabalho restante. Os quadros anteriores estão agrupados por
 funcionalidade, sem representar ordem de execução. Tudo que já está 100% será
 preservado e incluído na revisão final; não será refeito sem motivo.
 
-1. **Completar formulários da operação diária.** Terminar decisões contextuais
-   de balanço, rascunhos, conflitos, retomada e mensagens de cada etapa;
-   conferir em conjunto os formulários já concluídos. Este lote de requisição,
-   o quadro e as classes de quebra de texto ficam encerrados antes disso.
+1. **Completar formulários da operação diária.** Terminar programação,
+   atribuição e adiamentos do balanço por plantão, incluindo rascunhos,
+   conflitos, retomada e mensagens de cada etapa; conferir em conjunto os
+   formulários já concluídos. Os pareceres e a designação de reconto deste
+   lote, as decisões de requisição anteriores e a troca das classes de quebra
+   de texto ficam concluídos antes do próximo lote.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.

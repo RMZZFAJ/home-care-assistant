@@ -4,8 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { recountHref } from "@/components/balances/balance-recount-assignment";
 
-import { api, ApiError, inputClass, Notice } from "@/components/workspace";
-import { RecordDrawer } from "@/components/forms/record-drawer";
+import { Notice, type WorkspaceContext } from "@/components/workspace";
+import { BalanceDocumentPreparation } from "@/components/balances/balance-document-preparation";
+import { balanceDocumentLabels } from "@/lib/forms/balance-document-draft";
+import {
+  balanceDocumentPurposes,
+  type BalanceDocumentPurpose,
+} from "@/lib/validation/supply-drafts";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { BalanceReviewContext, SupplyDocument } from "@/types/documents";
@@ -73,57 +78,37 @@ function CountFacts({ data }: { data: SupplyDocument }) {
 }
 export function BalanceReview({
   data,
-  onUpdated,
+  onRefresh,
   onEditingChange,
+  context: workspace,
 }: {
   data: SupplyDocument;
-  onUpdated: (data: SupplyDocument) => void;
+  onRefresh: () => void;
+  context: WorkspaceContext;
   onEditingChange: (editing: boolean) => void;
 }) {
   const [editor, setEditor] = useState<{
-    group: "family" | "supervisor";
-    reference: SupplyDocument;
+    purpose: BalanceDocumentPurpose;
+    consulting?: boolean;
     opener: HTMLElement;
   } | null>(null);
-  const [comment, setComment] = useState("");
-  const [reviewing, setReviewing] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [uncertain, setUncertain] = useState(false);
-  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [comparison, setComparison] = useState<SupplyDocument | null>(null);
-  const packetRef = useRef<{
-    action: "approve";
-    body: {
-      group: "family" | "supervisor";
-      comment: string;
-      reviewReference: string;
-    };
-    expectedVersion: number;
-    idempotencyKey: string;
-  } | null>(null);
-  const commentRef = useRef<HTMLTextAreaElement>(null);
-  const resultRef = useRef<HTMLHeadingElement>(null);
-  const queryRef = useRef<HTMLButtonElement>(null);
-  const focusAfterRejectionRef = useRef(false),
-    focusAfterSuccessRef = useRef(false),
-    focusAfterQueryRef = useRef(false);
+  const resultRef = useRef<HTMLHeadingElement>(null),
+    focusAfterSuccessRef = useRef(false);
   useEffect(() => {
-    if (!busy && focusAfterQueryRef.current) {
-      focusAfterQueryRef.current = false;
-      queryRef.current?.focus();
-    }
-    if (!busy && !reviewing && focusAfterRejectionRef.current) {
-      focusAfterRejectionRef.current = false;
-      commentRef.current?.focus();
-    }
     if (!editor && focusAfterSuccessRef.current) {
       focusAfterSuccessRef.current = false;
-      resultRef.current?.focus();
+      // Finish the drawer's focus handoff before selecting the confirmed result.
+      const frame = requestAnimationFrame(() => resultRef.current?.focus());
+      return () => cancelAnimationFrame(frame);
     }
-  }, [busy, reviewing, editor]);
+  }, [editor]);
   const context = data.balanceReview;
-  const countEvents = data.events.filter(event => ["bal.issued","bal.submit","bal.recount"].includes(event.action)).sort((a,b)=>a.version-b.version);
+  const countEvents = data.events
+    .filter((event) =>
+      ["bal.issued", "bal.submit", "bal.recount"].includes(event.action),
+    )
+    .sort((a, b) => a.version - b.version);
   if (!context)
     return (
       <Notice>
@@ -133,105 +118,8 @@ export function BalanceReview({
     );
   function close() {
     setEditor(null);
-    setReviewing(false);
-    setComparison(null);
-    packetRef.current = null;
     onEditingChange(false);
-  }
-  function prepare() {
-    if (
-      !editor ||
-      comparison ||
-      (editor.reference.status === "submitted" &&
-        editor.reference.balanceReview?.referenceState !== "current")
-    )
-      return;
-    if (comment.length > 2000) {
-      setError("O parecer permite até 2.000 caracteres.");
-      commentRef.current?.focus();
-      return;
-    }
-    packetRef.current = {
-      action: "approve",
-      body: {
-        group: editor.group,
-        comment,
-        reviewReference: editor.reference.balanceReview!.referenceHash,
-      },
-      expectedVersion: editor.reference.version,
-      idempotencyKey: crypto.randomUUID(),
-    };
-    setError("");
-    setReviewing(true);
-  }
-  async function consult() {
-    setBusy(true);
-    setError("");
-    try {
-      const fresh = await api<{ data: SupplyDocument }>(
-        `/api/documents/${data.id}`,
-      );
-      setComparison(fresh.data);
-    } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Não foi possível consultar a referência atual. Seu parecer e a última consulta foram preservados.",
-      );
-    } finally {
-      focusAfterQueryRef.current = true;
-      setBusy(false);
-    }
-  }
-  async function save() {
-    if (!packetRef.current) return;
-    setBusy(true);
-    setError("");
-    const recovering = uncertain;
-    try {
-      const response = await api<{ data: SupplyDocument }>(
-        `/api/documents/${data.id}`,
-        packetRef.current,
-      );
-      onUpdated(response.data);
-      setMessage(
-        "Parecer registrado com autoria própria. As observações da contagem foram preservadas.",
-      );
-      setUncertain(false);
-      focusAfterSuccessRef.current = true;
-      close();
-    } catch (reason) {
-      const rejected =
-        reason instanceof ApiError &&
-        [400, 403, 404, 409, 422].includes(reason.status);
-      setError(
-        reason instanceof Error ? reason.message : "Resultado não confirmado.",
-      );
-      const inaccessibleRecovery =
-        recovering &&
-        reason instanceof ApiError &&
-        [403, 404].includes(reason.status);
-      setUncertain(!rejected || inaccessibleRecovery);
-      if (rejected && !inaccessibleRecovery) {
-        packetRef.current = null;
-        setReviewing(false);
-        focusAfterRejectionRef.current = true;
-      }
-      if (reason instanceof ApiError && reason.status === 409) {
-        try {
-          const fresh = await api<{ data: SupplyDocument }>(
-            `/api/documents/${data.id}`,
-          );
-          setComparison(fresh.data);
-        } catch {
-          setError(
-            "Conflito confirmado. A referência atual está indisponível; seu parecer foi preservado.",
-          );
-        }
-      }
-    } finally {
-      setBusy(false);
-    }
+    onRefresh();
   }
   return (
     <section
@@ -243,14 +131,63 @@ export function BalanceReview({
       </h2>
       {message ? <Notice>{message}</Notice> : null}
       <CountFacts data={data} />
-      {data.balanceRecount?.canAssign ? <Link href={recountHref(data.balanceRecount.patientId,data.id)} className="ui-button ui-button-secondary" prefetch={false}>Designar reconto</Link> : data.balanceRecount?.requiresDesignation ? <Notice>O reconto aguarda nova designação da família ou supervisão habilitada no acompanhamento de balanços.</Notice> : null}
+      {data.balanceRecount?.canAssign ? (
+        <Link
+          href={recountHref(data.balanceRecount.patientId, data.id)}
+          className="ui-button ui-button-secondary"
+          prefetch={false}
+        >
+          Designar reconto
+        </Link>
+      ) : data.balanceRecount?.requiresDesignation ? (
+        <Notice>
+          O reconto aguarda nova designação da família ou supervisão habilitada
+          no acompanhamento de balanços.
+        </Notice>
+      ) : null}
       <section aria-label="Versões das contagens físicas" className="space-y-3">
         <h3 className="font-semibold">Contagens físicas preservadas</h3>
-        {!countEvents.length ? <p>Nenhuma contagem oficial preservada neste histórico.</p> : null}
-        {countEvents.map(event => {
-          const captured = Array.isArray(data.canonical_snapshot.history) ? data.canonical_snapshot.history.find((row:unknown)=>row && typeof row === "object" && "version" in row && row.version===event.version) : null;
-          const name = captured && typeof captured === "object" && "actorName" in captured && typeof captured.actorName === "string" ? captured.actorName : "Nome não preservado neste histórico";
-          return <article className="rounded-lg border border-(--line) p-3 text-sm space-y-2" key={event.id}><p><strong>Contagem na versão documental {event.version}</strong> · {name} · {formatBrazilDate(event.createdAt)}</p><p>Consulte os materiais, quantidades e observações congelados nessa versão.</p><Link href={`/documentos/${data.id}/arquivos?version=${event.version}`} className="ui-button ui-button-secondary">Consultar PDF da contagem na versão {event.version}</Link></article>;
+        {!countEvents.length ? (
+          <p>Nenhuma contagem oficial preservada neste histórico.</p>
+        ) : null}
+        {countEvents.map((event) => {
+          const captured = Array.isArray(data.canonical_snapshot.history)
+            ? data.canonical_snapshot.history.find(
+                (row: unknown) =>
+                  row &&
+                  typeof row === "object" &&
+                  "version" in row &&
+                  row.version === event.version,
+              )
+            : null;
+          const name =
+            captured &&
+            typeof captured === "object" &&
+            "actorName" in captured &&
+            typeof captured.actorName === "string"
+              ? captured.actorName
+              : "Nome não preservado neste histórico";
+          return (
+            <article
+              className="rounded-lg border border-(--line) p-3 text-sm space-y-2"
+              key={event.id}
+            >
+              <p>
+                <strong>Contagem na versão documental {event.version}</strong> ·{" "}
+                {name} · {formatBrazilDate(event.createdAt)}
+              </p>
+              <p>
+                Consulte os materiais, quantidades e observações congelados
+                nessa versão.
+              </p>
+              <Link
+                href={`/documentos/${data.id}/arquivos?version=${event.version}`}
+                className="ui-button ui-button-secondary"
+              >
+                Consultar PDF da contagem na versão {event.version}
+              </Link>
+            </article>
+          );
         })}
       </section>
       <Notice>
@@ -260,18 +197,39 @@ export function BalanceReview({
             ? "Este balanço usa a revisão configurada para concluir a conciliação. Cada pessoa revisa uma vez, em grupo autorizado e distinto de quem contou."
             : "Revisão facultativa. A contagem válida não entra em uma fila universal de aprovação."}
       </Notice>
+      <details className="ui-card">
+        <summary>Minhas decisões em preparação</summary>
+        <p>
+          Consulte o próprio preenchimento ou resultado, inclusive após perder
+          permissão para uma nova decisão.
+        </p>
+        <div className="hca-toolbar">
+          {balanceDocumentPurposes.map((purpose) => (
+            <ActionButton
+              key={purpose}
+              onClick={(event) => {
+                setEditor({
+                  purpose,
+                  consulting: true,
+                  opener: event.currentTarget,
+                });
+                onEditingChange(true);
+              }}
+            >
+              Consultar preparação: {balanceDocumentLabels[purpose]}
+            </ActionButton>
+          ))}
+        </div>
+      </details>
       {context.eligibleGroups.length ? (
         <div className="hca-toolbar">
           {context.eligibleGroups.map((group) => (
             <ActionButton
               key={group}
               onClick={(event) => {
-                setComment("");
-                setError("");
-                setComparison(null);
                 setEditor({
-                  group,
-                  reference: data,
+                  purpose:
+                    group === "family" ? "review_family" : "review_supervisor",
                   opener: event.currentTarget,
                 });
                 onEditingChange(true);
@@ -355,138 +313,34 @@ export function BalanceReview({
         ) : null}
       </section>
       {editor ? (
-        <RecordDrawer
-          title="Revisar contagem do balanço"
-          busy={busy}
-          preventClose={uncertain}
-          onClose={close}
+        <BalanceDocumentPreparation
+          key={
+            workspace.userId +
+            ":" +
+            data.care_recipient_id +
+            ":" +
+            data.id +
+            ":" +
+            editor.purpose +
+            ":" +
+            Boolean(editor.consulting)
+          }
+          context={workspace}
+          patientId={data.care_recipient_id}
+          documentId={data.id}
+          purpose={editor.purpose}
+          consulting={editor.consulting}
           restoreFocusTo={editor.opener}
-        >
-          <div className="space-y-4">
-            {error ? <Notice error>{error}</Notice> : null}
-            <p className="text-sm">
-              Grupo autorizado: <strong>{groupLabel[editor.group]}</strong>. O
-              parecer é seu; não substitui a contagem.
-            </p>
-            <CountFacts data={editor.reference} />
-            {!reviewing ? (
-              <ActionButton
-                ref={queryRef}
-                disabled={busy || uncertain}
-                onClick={() => void consult()}
-              >
-                {busy
-                  ? "Consultando referência…"
-                  : "Consultar referência atual"}
-              </ActionButton>
-            ) : null}
-            {comparison?.balanceReview ? (
-              <section
-                className="space-y-3 rounded-lg border border-(--line) p-3"
-                aria-label="Comparação da contagem atual"
-              >
-                <h3 className="font-semibold">Referência atual</h3>
-                <CountFacts data={comparison} />
-                <ActionButton
-                  className="max-w-full"
-                  disabled={
-                    busy ||
-                    uncertain ||
-                    (comparison.status === "submitted" &&
-                      comparison.balanceReview.referenceState !== "current") ||
-                    !comparison.balanceReview.eligibleGroups.includes(
-                      editor.group,
-                    )
-                  }
-                  onClick={() => {
-                    setEditor({ ...editor, reference: comparison });
-                    onUpdated(comparison);
-                    setComparison(null);
-                    setError("");
-                    packetRef.current = null;
-                    focusAfterRejectionRef.current = true;
-                    commentRef.current?.focus();
-                  }}
-                >
-                  Adotar referência atual e manter meu parecer
-                </ActionButton>
-                <p className="text-sm">
-                  Adotar não envia a revisão. Confira novamente antes de
-                  confirmar.
-                </p>
-              </section>
-            ) : null}
-            {reviewing ? (
-              <div className="space-y-3">
-                <h3 className="font-semibold">Parecer a registrar</h3>
-                <p className="whitespace-pre-wrap wrap-break-word text-sm">
-                  {comment || "Sem comentário adicional."}
-                </p>
-                <div className="hca-toolbar">
-                  <ActionButton
-                    disabled={busy || uncertain}
-                    onClick={() => {
-                      setReviewing(false);
-                      packetRef.current = null;
-                    }}
-                  >
-                    Voltar ao parecer
-                  </ActionButton>
-                  <ActionButton
-                    variant="primary"
-                    disabled={busy}
-                    onClick={() => void save()}
-                  >
-                    {busy
-                      ? "Registrando…"
-                      : uncertain
-                        ? "Recuperar revisão"
-                        : "Confirmar revisão"}
-                  </ActionButton>
-                </div>
-              </div>
-            ) : (
-              <form
-                className="space-y-4"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  prepare();
-                }}
-              >
-                <label className="block text-sm font-semibold">
-                  Seu parecer sobre a contagem
-                  <textarea
-                    ref={commentRef}
-                    className={inputClass}
-                    value={comment}
-                    onChange={(event) => setComment(event.target.value)}
-                    maxLength={2000}
-                    rows={5}
-                    disabled={busy || uncertain}
-                  />
-                  <span className="block text-xs font-normal">
-                    {comment.length}/2000. Não altera as observações de quem
-                    contou.
-                  </span>
-                </label>
-                <ActionButton
-                  type="submit"
-                  variant="primary"
-                  disabled={
-                    busy ||
-                    uncertain ||
-                    Boolean(comparison) ||
-                    (editor.reference.status === "submitted" &&
-                      editor.reference.balanceReview?.referenceState !==
-                        "current")
-                  }
-                >
-                  Revisar parecer
-                </ActionButton>
-              </form>
-            )}
-          </div>
-        </RecordDrawer>
+          restoreFocusFallbackRef={resultRef}
+          onClose={close}
+          onCommitted={() => {
+            setMessage(
+              "Parecer registrado com autoria própria. As observações da contagem foram preservadas.",
+            );
+            focusAfterSuccessRef.current = true;
+            close();
+          }}
+        />
       ) : null}
     </section>
   );

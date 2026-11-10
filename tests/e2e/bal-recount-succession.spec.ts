@@ -93,7 +93,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     animations: "disabled",
   });
   const attempts: unknown[] = [];
-  await page.route("**/api/balances", async (route) => {
+  await page.route("**/api/balances/document-preparation", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
     if (attempts.length === 1) {
@@ -127,13 +127,12 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   expect(attempts[0]).toEqual(attempts[1]);
   expect(attempts[0]).toMatchObject({
     expectedVersion: f.document.version,
-    command: {
-      action: "assign_recount",
-      body: {
-        targetShiftId: f.assignment.shift_id,
-        targetShiftVersion: target.version,
-        reason,
-      },
+    purpose: "assign_recount",
+    draftCommit: { id: expect.any(String), revision: expect.any(Number) },
+    body: {
+      targetShiftId: f.assignment.shift_id,
+      targetShiftVersion: target.version,
+      reason,
     },
   });
   await action(page, "Consultar acompanhamento atual").click();
@@ -399,7 +398,7 @@ test("BAL reconto sem contador mostra recuperação, preserva motivo no conflito
     selected.version,
   );
   let failRead = true;
-  await page.route("**/api/balances/recount?**", async (route) => {
+  await page.route("**/api/balances/document-preparation?**", async (route) => {
     if (failRead) {
       failRead = false;
       return route.abort("failed");
@@ -407,8 +406,18 @@ test("BAL reconto sem contador mostra recuperação, preserva motivo no conflito
     return route.continue();
   });
   const before = recountState(f);
+  let officialPosts = 0;
+  page.on("request", (request) => {
+    if (
+      new URL(request.url()).pathname ===
+        "/api/balances/document-preparation" &&
+      request.method() === "POST"
+    )
+      officialPosts++;
+  });
   await action(page, "Revisar designação").click();
-  await action(page, "Confirmar designação").click();
+  await expect(action(page, "Confirmar designação")).toHaveCount(0);
+  expect(officialPosts).toBe(0);
   await expect(ownReason(page)).toHaveValue(reason);
   await expect(ownReason(page)).toBeFocused();
   await expect(action(page, "Revisar designação")).toBeDisabled();

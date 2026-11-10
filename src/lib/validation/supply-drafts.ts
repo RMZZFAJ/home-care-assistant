@@ -17,12 +17,16 @@ export const requisitionOperationPurposes = ["archive", "cancel", "resolve_extra
 export const requisitionOperationPurpose = z.enum(requisitionOperationPurposes);
 export type RequisitionOperationPurpose = z.infer<typeof requisitionOperationPurpose>;
 export const isRequisitionOperationPurpose = (value: string): value is RequisitionOperationPurpose => requisitionOperationPurpose.safeParse(value).success;
-export const usesSupplyDraftTransport = (kind: string | null, purpose = "create") => kind === "COM" || kind === "ENT" || kind === "REQ" && isRequisitionOperationPurpose(purpose);
+export const balanceDocumentPurposes = ["review_family", "review_supervisor", "assign_recount"] as const;
+export const balanceDocumentPurpose = z.enum(balanceDocumentPurposes);
+export type BalanceDocumentPurpose = z.infer<typeof balanceDocumentPurpose>;
+export const isBalanceDocumentPurpose = (value: string): value is BalanceDocumentPurpose => balanceDocumentPurpose.safeParse(value).success;
+export const usesSupplyDraftTransport = (kind: string | null, purpose = "create") => kind === "COM" || kind === "ENT" || kind === "REQ" && isRequisitionOperationPurpose(purpose) || kind === "BAL" && isBalanceDocumentPurpose(purpose);
 export const newSupplyDraftPurposes: readonly string[] = ["create",...entDeclarationPurposes];
 export const declarationSourceForPurpose = (purpose:string) => purpose === "transfer_declare_family" ? "FAMILY" : purpose === "transfer_declare_team" ? "CARE_TEAM" : undefined;
 export const entDraftPurposes = [...entOperationPurposes, ...entRegularizationPurposes, ...entTransferPurposes,...entDeclarationPurposes] as const;
 export const entDraftPurpose = z.enum(entDraftPurposes);
-export const draftPurpose=z.enum(["create","revise","receive","divergence","approve","purchase","validate_receipt","reject_receipt","close_expectation","cancel","reassign","resolve","refuse_cancellation","withdraw_cancellation","consent_cancel","archive","resolve_extra",...entRegularizationPurposes,...entTransferPurposes,...entDeclarationPurposes]);
+export const draftPurpose=z.enum(["create","revise","receive","divergence","approve","purchase","validate_receipt","reject_receipt","close_expectation","cancel","reassign","resolve","refuse_cancellation","withdraw_cancellation","consent_cancel","archive","resolve_extra",...entRegularizationPurposes,...entTransferPurposes,...entDeclarationPurposes,...balanceDocumentPurposes]);
 export const draftMaterials=z.array(z.object({id:text(120).min(1),name:text(200),unit:text(80),quantityDecimals:z.number().int().min(0).max(6)}).strict()).max(1000);
 export const supplyDraftContent=z.object({
   form:z.object({
@@ -35,6 +39,7 @@ export const supplyDraftContent=z.object({
 }).strict();
 export const receiptDraftContent=z.object({documentVersion:z.number().int().positive(),fields:entries(text(3000),3000,160),divergentIds:z.array(z.uuid()).max(1000),materials:draftMaterials}).strict();
 export const requisitionOperationDraftContent = receiptDraftContent.refine(value => value.materials.length === 0 && value.divergentIds.length === 0, "O preenchimento da decisão REQ não contém estoque ou recebimento.");
+export const balanceDocumentDraftContent = receiptDraftContent.refine(value => value.materials.length === 0 && value.divergentIds.length === 0, "O preparo de parecer ou designação não contém uma nova contagem física.");
 export const transferDeclarationDraftContent = receiptDraftContent.extend({documentVersion:z.null()}).refine(value=>new Set(value.materials.map(item=>item.id)).size===value.materials.length,"Não repita materiais no preenchimento da declaração.");
 export type TransferDeclarationDraftContent=z.infer<typeof transferDeclarationDraftContent>;
 export type SupplyDraftContent=z.infer<typeof supplyDraftContent>;

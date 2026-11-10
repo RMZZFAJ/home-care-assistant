@@ -597,3 +597,18 @@ iguais excluindo somente observed_at; avisos anteriores mantidos.28 unitários,
 limpa/evolução/integral; browsers com regressões próprias ainda em correção.
 Isso não aprova a CI do novo SHA ou liberação operacional.
 [Contrato](ENT_OPERATION_DRAFTS.md), [remoto](ENT_OPERATION_DRAFTS_REMOTE.json).
+
+## D3.43 — decisões documentais BAL
+
+Migration20261109222649 incrementa175→176 no projeto remoto autorizado.
+Dry-run isolou somente o candidato final;aplicação única e dry-run final vazio.
+Sete corpos normalizados LF,grants,search_path,SECURITY DEFINER,constraint e
+digest176 coincidem com local. Helpers e tabela privada continuam fechados a
+anon/Auth;somente commit_supply_draft público mantém execução Auth existente.
+Advisors preservam cinco classes e mesmas identidades,168 RPCs Auth sinalizados.
+Constraint histórica presentation_finite_factor permanece não validada no
+legado local e validada no remoto;nenhuma constraint remota inválida. Não há
+reset,fixtures/Auth remotos ou repetição de backup pesado no banco descartável.
+Correção de trim da autoria local176 e normalização LF antecedem aplicação
+remota;statements locais intermediários não foram reescritos ou reexecutados.
+[Conferência](BAL_DOCUMENT_DRAFTS_REMOTE.json).

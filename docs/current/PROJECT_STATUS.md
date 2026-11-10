@@ -4,6 +4,20 @@ Referência editorial:09/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.43 implementa pareceres familiar/supervisão e reconto BAL com rascunho
+privado,comparação e confirmação recuperável.34 unitários/API,10 Auth reais
+e18 identidades de navegador aprovados por reuso qualificado;rodadas finais
+diagnósticas,CI própria de produção obrigatória.20 fontes congelados,tipos/lint
+PASS. Remoto176 reconciliado,sete funções/grants/corpos LF coincidentes e
+dry-run vazio. CI6ce4d35 terminou FAIL por limite40min do mobile;demais seis
+jobs prévios PASS. Mobile dividido em dois shards,sem retirar testes ou
+elevar timeout. Preview desse SHA READY;novo SHA ainda precisa ser validado.
+Programação,atribuição e adiamentos BAL por plantão permanecem pendentes.
+[Incremento](../audits/D/D-B/BAL_DOCUMENT_DRAFTS.md),
+[CI observada](../audits/D/D-B/CI_6CE4D35_OBSERVATION.json).
+
+As observações dos SHAs anteriores abaixo são históricas;não aprovam o atual.
+
 Observação f233be9: Preview READY,Windows/Ubuntu/banco e demais navegadores
 PASS;WebKit ios-1 e agregado FAIL no caso REQ403. Falha em investigação;
 nenhuma aprovação global. D3.41 implementa declaração de transferência privada
@@ -57,7 +71,8 @@ consentimento bilateral privado com fonte de consumo selada, comparação Auth
 atual e recuperação pessoal das operações COM/ENT mesmo após encerramento.
 Migration170 reconciliada. D3.38 acrescenta cinco preparos privados da
 regularização e consulta pessoal após conclusão; migrations171/172 reconciliadas.
-Transferência e decisões contextuais BAL/REQ continuam pendentes. [Provas](../audits/D/D-B/ENT_CONSENT_DRAFTS.md).
+Transferência e decisões REQ/BAL documentais foram ampliadas nos lotes posteriores;
+programação,atribuição e adiamentos BAL por plantão continuam pendentes. [Provas](../audits/D/D-B/ENT_CONSENT_DRAFTS.md).
 [Regularização](../audits/D/D-B/REGULARIZATION_DRAFTS.md).
 Registro UI adicional18
 requisitos; resultados funcionais anteriores não aprovam toda a nova

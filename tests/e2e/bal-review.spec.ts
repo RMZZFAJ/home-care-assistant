@@ -62,7 +62,7 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
     const reviewer = await context.newPage();
     await login(reviewer, fixtures.family.email, f.patient);
     await reviewer.goto("/fichas/" + f.document.id);
-  await selectDocumentSection(reviewer, "workflow");
+    await selectDocumentSection(reviewer, "workflow");
     await reviewer
       .getByRole("button", { name: "Revisão da família", exact: true })
       .click();
@@ -89,18 +89,21 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
       animations: "disabled",
     });
     const attempts: unknown[] = [];
-    await reviewer.route("**/api/documents/" + f.document.id, async (route) => {
-      if (route.request().method() !== "POST") return route.continue();
-      attempts.push(route.request().postDataJSON());
-      if (attempts.length === 1) {
-        const response = await route.fetch();
-        expect(response.ok(), await response.text()).toBe(true);
-        sql(
-          `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'bal.approve.family',false);`,
-        );
-        await route.abort("failed");
-      } else await route.continue();
-    });
+    await reviewer.route(
+      "**/api/balances/document-preparation",
+      async (route) => {
+        if (route.request().method() !== "POST") return route.continue();
+        attempts.push(route.request().postDataJSON());
+        if (attempts.length === 1) {
+          const response = await route.fetch();
+          expect(response.ok(), await response.text()).toBe(true);
+          sql(
+            `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'bal.approve.family',false);`,
+          );
+          await route.abort("failed");
+        } else await route.continue();
+      },
+    );
     await button(reviewer, "Revisar parecer").click();
     await button(reviewer, "Confirmar revisão").click();
     await expect(button(reviewer, "Recuperar revisão")).toBeVisible();
@@ -172,13 +175,49 @@ test("BAL com referência alterada conserva o parecer e exige reconto, consulta 
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
   await selectDocumentSection(page, "workflow");
+  let releaseInitial!: () => void;
+  const initialHeld = new Promise<void>((resolve) => {
+    releaseInitial = resolve;
+  });
+  let firstReference = true;
+  await page.route("**/api/balances/document-preparation?**", async (route) => {
+    if (firstReference) {
+      firstReference = false;
+      await initialHeld;
+    }
+    return route.continue();
+  });
+  const initialReference = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname ===
+        "/api/balances/document-preparation" &&
+      response.request().method() === "GET",
+  );
   await page
     .getByRole("button", { name: "Revisão da família", exact: true })
     .click();
-  await commentField(page).fill(ownComment);
+  try {
+    await commentField(page).fill(ownComment);
+  } finally {
+    releaseInitial();
+  }
+  expect((await initialReference).status()).toBe(200);
+  await expect(button(page, "Revisar parecer")).toBeEnabled();
+  await expect(commentField(page)).toHaveValue(ownComment);
+  let officialPosts = 0;
+  page.on("request", (request) => {
+    if (
+      new URL(request.url()).pathname ===
+        "/api/balances/document-preparation" &&
+      request.method() === "POST"
+    )
+      officialPosts++;
+  });
   await receiveBalanceMaterials(f);
   await button(page, "Revisar parecer").click();
-  await button(page, "Confirmar revisão").click();
+  // The fresh pre-review read now catches this conflict before any official POST.
+  await expect(button(page, "Confirmar revisão")).toHaveCount(0);
+  expect(officialPosts).toBe(0);
   await expect(commentField(page)).toHaveValue(ownComment);
   await expect(commentField(page)).toBeFocused();
   const comparison = drawer(page).getByRole("region", {

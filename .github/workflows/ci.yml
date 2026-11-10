@@ -75,8 +75,12 @@ jobs:
             artifact: chromium
           - project: mobile
             engine: chromium
-            shard: 1/1
-            artifact: mobile
+            shard: 1/2
+            artifact: mobile-1
+          - project: mobile
+            engine: chromium
+            shard: 2/2
+            artifact: mobile-2
           - project: ios
             engine: webkit
             shard: 1/2

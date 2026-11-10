@@ -1065,7 +1065,8 @@ export function SupplyDocumentContent({
               {data.type === "BAL" && data.status !== "draft" ? (
                 <BalanceReview
                   data={data}
-                  onUpdated={setData}
+                  context={context}
+                  onRefresh={() => setAttempt(value => value + 1)}
                   onEditingChange={setBalanceReviewEditing}
                 />
               ) : null}
