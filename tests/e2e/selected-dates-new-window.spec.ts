@@ -309,7 +309,8 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
   const f = await selectedDatesFixture(),
     series = await rpc(f.admin, "schedule_command", datePacket(f));
   await begin(page, f.patient);
-  const before = JSON.parse(datesState(f));
+  const beforeState = datesState(f),
+    before = JSON.parse(beforeState);
   const first = page
     .getByRole("article", { name: f.type.name + " · " + f.name, exact: true })
     .filter({ hasText: "15/01/2100" })
@@ -333,11 +334,72 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
   await editor
     .getByLabel("Justificativa", { exact: true })
     .fill("Alteração pontual que não reescreve as outras onze datas");
+  // The cancel branch unmounts the editable interval and notes. Switching back
+  // must keep the human edition, without publishing either operation.
+  const originalPerson = await editor
+    .getByLabel("Profissional de destino", { exact: true })
+    .inputValue();
+  const alternative = await editor
+    .getByLabel("Profissional de destino", { exact: true })
+    .locator("option")
+    .evaluateAll(
+      (options, original) =>
+        options
+          .find((option) => (option as HTMLOptionElement).value !== original)
+          ?.getAttribute("value"),
+      originalPerson,
+    );
+  expect(alternative).toBeTruthy();
+  await editor
+    .getByLabel("Profissional de destino", { exact: true })
+    .selectOption(alternative!);
+  await editor.getByLabel("Operação", { exact: true }).selectOption("cancel");
+  await expect(editor.getByLabel("Observações", { exact: true })).toHaveCount(
+    0,
+  );
+  expect(datesState(f)).toBe(beforeState);
+  await editor.getByLabel("Operação", { exact: true }).selectOption("change");
+  await expect(
+    editor.getByLabel("Profissional de destino", { exact: true }),
+  ).toHaveValue(alternative!);
+  await expect(
+    editor.getByLabel("Início do plantão", { exact: true }),
+  ).toHaveValue("2100-01-15T20:00");
+  await expect(
+    editor.getByLabel("Fim do plantão", { exact: true }),
+  ).toHaveValue("2100-01-16T08:00");
+  await expect(editor.getByLabel("Observações", { exact: true })).toHaveValue(
+    "Exceção somente em15/01",
+  );
+  await expect(editor.getByLabel("Justificativa", { exact: true })).toHaveValue(
+    "Alteração pontual que não reescreve as outras onze datas",
+  );
+  await editor
+    .getByLabel("Profissional de destino", { exact: true })
+    .selectOption(originalPerson);
   await editor
     .getByRole("button", { name: "Revisar alteração", exact: true })
     .click();
   await expect(review(page)).toContainText("somente este plantão");
   await expect(review(page).getByRole("textbox")).toHaveCount(0);
+  await review(page)
+    .getByRole("button", { name: "Voltar", exact: true })
+    .click();
+  await expect(
+    editor.getByRole("button", { name: "Revisar alteração", exact: true }),
+  ).toBeFocused();
+  await expect(editor.getByLabel("Observações", { exact: true })).toHaveValue(
+    "Exceção somente em15/01",
+  );
+  await editor
+    .getByRole("button", { name: "Revisar alteração", exact: true })
+    .click();
+  await expect(
+    review(page).getByRole("heading", {
+      name: "Conferência da escala",
+      exact: true,
+    }),
+  ).toBeFocused();
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 950 });
     await audit(page, `selected-date-exception-${width}`);
@@ -411,6 +473,68 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
     expect(shift.status).toBe(
       shift.starts_at.slice(0, 10) >= "2100-02-15" ? "cancelled" : "published",
     );
+});
+
+test("edição de observações conserva segundos e microssegundos do intervalo nativo", async ({
+  page,
+}) => {
+  const f = await selectedDatesFixture();
+  await rpc(f.admin, "schedule_command", datePacket(f));
+  const source = await rpc(f.admin, "schedule_workspace", {
+    p_patient: f.patient,
+    p_from: "2100-01-15",
+    p_until: "2100-01-15",
+  });
+  const target = source.shifts[0];
+  const startsAt = "2100-01-15T22:00:37.123456Z",
+    endsAt = "2100-01-16T10:00:49.654321Z";
+  const prepared = await rpc(f.admin, "schedule_command", {
+    p_patient: f.patient,
+    p_action: "change",
+    p_version: target.version,
+    p_key: crypto.randomUUID(),
+    p_body: {
+      id: target.id,
+      startsAt,
+      endsAt,
+      reason: "Intervalo nativo preciso para regressão de edição",
+    },
+  });
+  await begin(page, f.patient);
+  await page
+    .getByRole("article", { name: f.type.name + " · " + f.name, exact: true })
+    .filter({ hasText: "15/01/2100" })
+    .filter({ visible: true })
+    .getByRole("button", { name: "Alterar plantão", exact: true })
+    .click();
+  const editor = page.getByRole("dialog", {
+    name: "Alteração pontual",
+    exact: true,
+  });
+  await expect(
+    editor.getByLabel("Início do plantão", { exact: true }),
+  ).toHaveValue("2100-01-15T19:00");
+  await expect(
+    editor.getByLabel("Fim do plantão", { exact: true }),
+  ).toHaveValue("2100-01-16T07:00");
+  await editor
+    .getByLabel("Observações", { exact: true })
+    .fill("Somente observações alteradas; intervalo preservado");
+  await editor
+    .getByLabel("Justificativa", { exact: true })
+    .fill("Complementar observações sem alterar os horários");
+  await editor
+    .getByRole("button", { name: "Revisar alteração", exact: true })
+    .click();
+  await review(page)
+    .getByRole("button", { name: "Confirmar gravação", exact: true })
+    .click();
+  await expect(review(page)).toHaveCount(0);
+  expect(
+    sql(
+      `select count(*) from public.scheduled_shifts where id=${q(target.id)} and care_recipient_id=${q(f.patient)} and starts_at=${q(startsAt)}::timestamptz and ends_at=${q(endsAt)}::timestamptz and version=${prepared.version + 1} and notes='Somente observações alteradas; intervalo preservado'`,
+    ),
+  ).toBe("1");
 });
 
 test("BAL em janela nova mostra a contagem de Sheila17 e conserva Juliana18 e seus pareceres anteriores", async ({

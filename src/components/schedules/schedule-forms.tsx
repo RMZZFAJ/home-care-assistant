@@ -23,7 +23,7 @@ import {
   type ScheduleCreationFields as CreationFields,
 } from "@/lib/schedules/creation";
 import { Notice } from "@/components/workspace";
-import { civilInstant, localMinute } from "@/lib/schedules/time";
+import { editedCivilInstant, localMinute } from "@/lib/schedules/time";
 export type ScheduleEditor =
   | { kind: "type"; type?: ShiftType }
   | { kind: "series" }
@@ -66,6 +66,23 @@ export function ScheduleForm({
   const changeCreation = onCreationChange ?? setLocalCreation;
   const [creationError, setCreationError] = useState("");
   const [shiftAction, setShiftAction] = useState("change");
+  // These fields survive the conditional cancel view. Native authorization and
+  // the frozen source version are still checked when the command is submitted.
+  const [shiftFields, setShiftFields] = useState(() => ({
+    person: editor.kind === "shift" ? editor.shift.professional_id : "",
+    start:
+      editor.kind === "shift"
+        ? localMinute(editor.shift.starts_at, editor.shift.timezone)
+        : "",
+    end:
+      editor.kind === "shift"
+        ? localMinute(editor.shift.ends_at, editor.shift.timezone)
+        : "",
+    notes: editor.kind === "shift" ? editor.shift.notes : "",
+  }));
+  function changeShift(field: keyof typeof shiftFields, value: string) {
+    setShiftFields((previous) => ({ ...previous, [field]: value }));
+  }
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget),
@@ -148,12 +165,22 @@ export function ScheduleForm({
         );
       else {
         let startsAt: string, endsAt: string;
+        let timeField = "start";
         try {
-          startsAt = civilInstant(value("start"), editor.shift.timezone);
-          endsAt = civilInstant(value("end"), editor.shift.timezone);
+          startsAt = editedCivilInstant(
+            shiftFields.start,
+            editor.shift.starts_at,
+            editor.shift.timezone,
+          );
+          timeField = "end";
+          endsAt = editedCivilInstant(
+            shiftFields.end,
+            editor.shift.ends_at,
+            editor.shift.timezone,
+          );
         } catch (error) {
           const input = event.currentTarget.elements.namedItem(
-            "start",
+            timeField,
           ) as HTMLInputElement;
           input.setCustomValidity((error as Error).message);
           input.reportValidity();
@@ -165,11 +192,11 @@ export function ScheduleForm({
             action: team || publishOwn ? "change" : "propose_change",
             body: {
               id: editor.shift.id,
-              professionalId: value("person"),
+              professionalId: shiftFields.person,
               startsAt,
               endsAt,
               reason: value("reason"),
-              notes: value("notes"),
+              notes: shiftFields.notes,
             },
           },
           editor.shift.version,
@@ -252,7 +279,8 @@ export function ScheduleForm({
               <FormField label="Profissional de destino">
                 <SelectField
                   name="person"
-                  defaultValue={editor.shift.professional_id}
+                  value={shiftFields.person}
+                  onChange={(e) => changeShift("person", e.currentTarget.value)}
                 >
                   {data.professionals
                     .filter((p) => team || !publishOwn || p.id === ownId)
@@ -267,10 +295,8 @@ export function ScheduleForm({
                 <TextInput
                   name="start"
                   type="datetime-local"
-                  defaultValue={localMinute(
-                    editor.shift.starts_at,
-                    editor.shift.timezone,
-                  )}
+                  value={shiftFields.start}
+                  onChange={(e) => changeShift("start", e.currentTarget.value)}
                   required
                 />
               </FormField>
@@ -278,10 +304,8 @@ export function ScheduleForm({
                 <TextInput
                   name="end"
                   type="datetime-local"
-                  defaultValue={localMinute(
-                    editor.shift.ends_at,
-                    editor.shift.timezone,
-                  )}
+                  value={shiftFields.end}
+                  onChange={(e) => changeShift("end", e.currentTarget.value)}
                   required
                 />
               </FormField>
@@ -289,7 +313,8 @@ export function ScheduleForm({
               <FormField label="Observações">
                 <TextAreaField
                   name="notes"
-                  defaultValue={editor.shift.notes}
+                  value={shiftFields.notes}
+                  onChange={(e) => changeShift("notes", e.currentTarget.value)}
                   maxLength={2000}
                 />
               </FormField>

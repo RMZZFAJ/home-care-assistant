@@ -66,6 +66,25 @@ const fields = {
   duration: "720",
   active: false,
 };
+it.each(["07:00", "07:00:00", "07:00:37"])(
+  "keeps a type's native time when editing another field (%s)",
+  (starts_local) => {
+    const initial = initialScheduleType({
+      ...workspace.types[0],
+      starts_local,
+    });
+    if (initial.form !== "type") throw new Error("Expected a type editor");
+    const command = scheduleCreationCommand({
+      ...initial,
+      name: "Nome alterado",
+    });
+    expect(command.action).toBe("type");
+    if (command.action === "type")
+      expect(command.body.startsLocal).toBe(
+        starts_local === "07:00:00" ? "07:00" : starts_local,
+      );
+  },
+);
 const scope = {
   userId: actor,
   patientId: patient,

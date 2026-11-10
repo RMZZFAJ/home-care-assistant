@@ -3198,3 +3198,30 @@ contagens,cadastros e demais D-B. Sonar adiado,PR7 Draft,produção NO-GO,meta a
 
 [Incremento](WORKSPACE_CONTEXT_PERFORMANCE.md),
 [validação](WORKSPACE_CONTEXT_PERFORMANCE_VALIDATION.json).
+
+## D3.53 — edição de plantão sem perda e precisão temporal
+
+Base6f36ea1/PR7 Draft conferida. Alternância alterar/cancelar conserva
+profissional,início,fim,observações e justificativa;nenhum envio ao alternar.
+A revisão já mantinha o formulário montado,agora com regressão de retorno.
+Instante cujo minuto não mudou permanece nativo:segundos,frações e lado da
+hora repetida preservados. Tipo editado conserva segundos;controle aceita
+essa precisão. Erro temporal aponta o início/fim efetivamente inválido.
+
+34 unitários,tipos e lint dirigidos PASS. Coorte10/12 revelou disputa entre
+foco da revisão e recuperação do controle oculto em Chromium/Android.
+Ancoragem antes de ocultar corrigida;recheck3/3 nas três engines.12 identidades
+qualificadas:9 preservadas+3 finais,sem duplicar repetições. Quatro larguras,
+axe,readonly,retorno/foco,12 ocorrências,corte,precisão em banco,recuperação
+após reload e negativas de recibo/envelope preservadas. Fontes congeladas e
+relatórios arquivados;sem suíte mutável de banco simultânea ou reset.
+
+Sem migration nova;remoto196/última20261110154616 e dry-run vazio conferidos.
+CI6f36ea1:core3 e quatro shards aprovados;WebKit ainda em execução na
+observação. CI própria do novo SHA continua gate independente.105×39,
+56PASS/49PARTIAL,18estadosUI,inventário49/51 e percentuais preservados.
+Quadro temporário atualizado antes de avançar;private agenda≈35% continua
+parcial. Próximo:preparações de recursos existentes,contagens e cadastros.
+PR7 Draft,Sonar adiado,sem merge/produção,meta ativa.
+
+[Incremento e limites](SCHEDULE_EDIT_CONTINUITY.md).

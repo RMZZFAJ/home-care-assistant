@@ -24,7 +24,7 @@ async function prepare(page: Page) {
       idempotencyKey: randomUUID(),
       command: {
         action: "type",
-        body: { name, startsLocal: "19:00", durationMinutes: 720 },
+        body: { name, startsLocal: "19:00:37", durationMinutes: 720 },
       },
     },
   });
@@ -39,6 +39,9 @@ async function prepare(page: Page) {
     name: "Tipo de plantão",
     exact: true,
   });
+  await expect(form.getByLabel("Início local", { exact: true })).toHaveValue(
+    "19:00:37",
+  );
   await form
     .getByLabel("Nome do plantão", { exact: true })
     .fill(name + " alterado");
@@ -77,6 +80,11 @@ test("agenda recupera a confirmação após recarregar sem reenviar a alteraçã
     }),
   ).toBeVisible();
   expect(facts(f.patient)).toBe(1);
+  expect(
+    sql(
+      `select starts_local::text from public.shift_types where care_recipient_id=${q(f.patient)}`,
+    ),
+  ).toBe("19:00:37");
   await page.reload();
   await expect(panel(page)).toContainText("Tentativa de escala preservada");
   await expect(

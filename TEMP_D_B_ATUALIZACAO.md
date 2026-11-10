@@ -46,6 +46,13 @@ aparelho, comparar edições e recuperar uma confirmação perdida. Mudanças do
 tipo de plantão exigem sua escolha antes de continuar, preservando os outros
 campos. O tipo cadastrado como indisponível agora respeita essa escolha.
 
+**Alternar a operação de um plantão sem perder os campos:** concluído · 100%
+deste ajuste.
+Profissional, horários e observações são mantidos ao trocar entre alterar e
+cancelar. Editar só o nome do tipo ou as observações do plantão também conserva
+os horários registrados. Responsável pelo ajuste: Codex. Essa continuidade
+local não substitui a retomada entre aparelhos.
+
 **Continuidade privada de toda a agenda: em execução · ≈35%.** Novos tipos e
 programações estão concluídos; guardar alterações, cancelamentos e decisões
 sobre escalas existentes ainda falta. Responsável: Codex.

@@ -301,6 +301,12 @@ function Agenda({
     const workspace = target ? data : (editorWorkspace ?? data);
     if (!workspace) return;
     if (target) setOpener(target);
+    else {
+      // Keep focus inside the dialog before hiding its submitting form.
+      // Otherwise Base UI's removed-control recovery can override the heading.
+      const trigger = document.getElementById("schedule-review-button");
+      if (trigger) holdDialogFocus(trigger);
+    }
     setError("");
     setConflict(false);
     // Hold the exact displayed object while live queries receive newer data.

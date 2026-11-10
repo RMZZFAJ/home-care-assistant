@@ -4,6 +4,23 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.53 corrige perda de profissional, início, fim e observações ao alternar
+alteração/cancelamento de plantão. Minuto não editado conserva o instante
+nativo, incluindo segundos/frações e a hora repetida; edição de tipo conserva
+segundos. Foco ancorado antes de ocultar o formulário impede a disputa com a
+recuperação do diálogo. Sem mudança de autorização, comando ou confirmação.
+
+34 unitários, tipos e lint aprovados. São12 cenários distintos de navegador
+qualificados:9 preservados e3 do recheck final. Primeira coorte10/12 revelou
+foco;recheck3/3 após correção. Mantidas as contraprovas,axe,quatro larguras,
+precisão no banco,12 ocorrências e recuperação nativa. Sem migration nova;
+196 reconciliadas e dry-run vazio. Quadro temporário atualizado;estados e
+percentuais globais preservados. Alterações/decisões remotas de agenda seguem
+pendentes. PR7 Draft,Sonar adiado,produção NO-GO,meta ativa.
+[Incremento](../audits/D/D-B/SCHEDULE_EDIT_CONTINUITY.md).
+
+## Incremento anterior D3.52
+
 D3.52 reduz a leitura de contexto de segundos para118–139ms na conta local
 e47–51ms na global em medições locais com milhares de pacientes fictícios.
 Diretório completo,papéis,vínculos,capacidades e contrato preservados;autoridade

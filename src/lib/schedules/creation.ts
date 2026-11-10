@@ -66,7 +66,7 @@ export function initialScheduleType(type?: ShiftType): ScheduleCreationFields {
   return {
     form: "type",
     name: type?.name ?? "",
-    start: type?.starts_local.slice(0, 5) ?? "07:00",
+    start: type?.starts_local.replace(/^(\d{2}:\d{2}):00$/, "$1") ?? "07:00",
     duration: String(type?.duration_minutes ?? 720),
     active: type?.is_active ?? true,
   };

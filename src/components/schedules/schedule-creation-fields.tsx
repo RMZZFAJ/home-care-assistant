@@ -48,6 +48,7 @@ export function ScheduleCreationFields({
           <TextInput
             name="start"
             type="time"
+            step={1}
             required
             value={value.start}
             onChange={(e) => patch({ start: e.currentTarget.value })}
