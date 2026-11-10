@@ -62,3 +62,12 @@ Regressões,contraprovas,metadados remotos e limites estão registrados em
 [validação](FORM_CONTINUITY_VALIDATION.json). CI própria do SHA publicado,
 instalação limpa/legada e integração integral continuam gates. PR7 Draft,
 Sonar adiado,produção NO-GO,meta ativa.
+
+## Atualização posterior D3.51
+
+Novos tipos e novas programações agora têm preparação privada,CAS,retomada
+entre sessões e consumo nativo atômico. A correção active=false altera apenas
+a criação do tipo no motor;outros atos/dependências permanecem iguais. A
+recuperação própria distingue chave/revisão/tipo avançado de ausência incerta.
+Alterações e decisões existentes continuam pendentes;inventário49/51 e
+estimativas globais não foram promovidos. [Incremento](SCHEDULE_CREATION_DRAFTS.md).

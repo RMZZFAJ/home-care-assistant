@@ -1,4 +1,9 @@
 import {
+  scheduleCreationContent,
+  schedulePurpose,
+} from "@/lib/schedules/creation";
+import { parseSchedulePreparationReceipt } from "./schedule-preparations";
+import {
   progressPreparationContentSchema,
   parseProgressPreparationReceipt,
 } from "./progress-preparations";
@@ -75,6 +80,7 @@ const readSchema = resultSchema.omit({ replayed: true }).extend({
     "CONSUMPTION",
     "FLOW",
     "PROGRESS",
+    "SCHEDULE",
   ]),
   purpose: draftPurpose.default("create"),
   targetDocumentId: z.uuid().nullable(),
@@ -113,7 +119,8 @@ export function parsePrivateDraft(
     (row.kind === "STOCK" && row.purpose === "family_movement") ||
     row.kind === "CONSUMPTION" ||
     row.kind === "FLOW" ||
-    row.kind === "PROGRESS";
+    row.kind === "PROGRESS" ||
+    row.kind === "SCHEDULE";
   if (
     resource
       ? row.targetResourceId !== scope.targetResourceId ||
@@ -126,30 +133,43 @@ export function parsePrivateDraft(
       "O alvo do preenchimento não corresponde ao contexto consultado.",
     );
   const schema =
-    row.kind === "PROGRESS"
-      ? progressPreparationContentSchema
-      : row.kind === "FLOW"
-        ? flowPreparationContentSchema
-        : row.kind === "CONSUMPTION"
-          ? consumptionPreparationContentSchema
-          : row.kind === "STOCK"
-            ? stockPreparationContentSchema
-            : resource
-              ? balancePreparationContentSchema
-              : row.kind === "REQ" && isRequisitionOperationPurpose(row.purpose)
-                ? requisitionOperationDraftContent
-                : row.kind === "REQ"
-                  ? requisitionDraftContent
-                  : row.kind === "BAL" && isBalanceDocumentPurpose(row.purpose)
-                    ? balanceDocumentDraftContent
-                    : row.kind === "BAL"
-                      ? balanceDraftContent
-                      : declarationSourceForPurpose(row.purpose)
-                        ? transferDeclarationDraftContent
-                        : !["create", "revise"].includes(row.purpose)
-                          ? receiptDraftContent
-                          : supplyDraftContent;
+    row.kind === "SCHEDULE"
+      ? scheduleCreationContent
+      : row.kind === "PROGRESS"
+        ? progressPreparationContentSchema
+        : row.kind === "FLOW"
+          ? flowPreparationContentSchema
+          : row.kind === "CONSUMPTION"
+            ? consumptionPreparationContentSchema
+            : row.kind === "STOCK"
+              ? stockPreparationContentSchema
+              : resource
+                ? balancePreparationContentSchema
+                : row.kind === "REQ" &&
+                    isRequisitionOperationPurpose(row.purpose)
+                  ? requisitionOperationDraftContent
+                  : row.kind === "REQ"
+                    ? requisitionDraftContent
+                    : row.kind === "BAL" &&
+                        isBalanceDocumentPurpose(row.purpose)
+                      ? balanceDocumentDraftContent
+                      : row.kind === "BAL"
+                        ? balanceDraftContent
+                        : declarationSourceForPurpose(row.purpose)
+                          ? transferDeclarationDraftContent
+                          : !["create", "revise"].includes(row.purpose)
+                            ? receiptDraftContent
+                            : supplyDraftContent;
   const content = row.state === "active" ? schema.safeParse(row.content) : null;
+  if (
+    row.kind === "SCHEDULE" &&
+    content?.success &&
+    (!("schedule" in content.data) ||
+      schedulePurpose(content.data.schedule) !== row.purpose)
+  )
+    throw new Error(
+      "O preenchimento da escala não corresponde à finalidade consultada.",
+    );
   if (
     (row.state === "active" &&
       !navigationAllowed(row.kind, row.purpose, row.navigation, row.content)) ||
@@ -185,18 +205,25 @@ export function parsePrivateDraft(
     );
   const consumedResult =
     resource && consumed
-      ? (row.kind === "PROGRESS"
-          ? parseProgressPreparationReceipt
-          : row.kind === "FLOW"
-            ? parseFlowPreparationReceipt
-            : row.kind === "CONSUMPTION"
-              ? parseConsumptionPreparationReceipt
-              : row.kind === "STOCK"
-                ? parseStockPreparationReceipt
-                : parseBalancePreparationReceipt)(row.consumedResult, {
-          ...scope,
-          targetResourceId: scope.targetResourceId!,
-        })
+      ? row.kind === "SCHEDULE"
+        ? parseSchedulePreparationReceipt(row.consumedResult, {
+            patientId: scope.patientId,
+            purpose: scope.purpose,
+            userId: scope.userId,
+            targetResourceId: null,
+          })
+        : (row.kind === "PROGRESS"
+            ? parseProgressPreparationReceipt
+            : row.kind === "FLOW"
+              ? parseFlowPreparationReceipt
+              : row.kind === "CONSUMPTION"
+                ? parseConsumptionPreparationReceipt
+                : row.kind === "STOCK"
+                  ? parseStockPreparationReceipt
+                  : parseBalancePreparationReceipt)(row.consumedResult, {
+            ...scope,
+            targetResourceId: scope.targetResourceId!,
+          })
       : null;
   if (
     resource &&
@@ -234,7 +261,8 @@ export function parsePrivateDraftResult(
     (intent.kind === "STOCK" && intent.purpose === "family_movement") ||
     intent.kind === "CONSUMPTION" ||
     intent.kind === "FLOW" ||
-    intent.kind === "PROGRESS";
+    intent.kind === "PROGRESS" ||
+    intent.kind === "SCHEDULE";
   if (
     (intent.id !== null && row.id !== intent.id) ||
     row.revision !== Number(intent.expectedRevision ?? 0) + 1 ||
@@ -261,20 +289,27 @@ export function parsePrivateDraftResult(
     );
   const consumedResult =
     resource && expected === "completed"
-      ? (intent.kind === "PROGRESS"
-          ? parseProgressPreparationReceipt
-          : intent.kind === "FLOW"
-            ? parseFlowPreparationReceipt
-            : intent.kind === "CONSUMPTION"
-              ? parseConsumptionPreparationReceipt
-              : intent.kind === "STOCK"
-                ? parseStockPreparationReceipt
-                : parseBalancePreparationReceipt)(row.consumedResult, {
-          patientId: String(intent.careRecipientId),
-          purpose: String(intent.purpose),
-          targetResourceId: String(intent.targetResourceId),
-          userId: userId!,
-        })
+      ? intent.kind === "SCHEDULE"
+        ? parseSchedulePreparationReceipt(row.consumedResult, {
+            patientId: String(intent.careRecipientId),
+            purpose: String(intent.purpose),
+            userId: userId!,
+            targetResourceId: null,
+          })
+        : (intent.kind === "PROGRESS"
+            ? parseProgressPreparationReceipt
+            : intent.kind === "FLOW"
+              ? parseFlowPreparationReceipt
+              : intent.kind === "CONSUMPTION"
+                ? parseConsumptionPreparationReceipt
+                : intent.kind === "STOCK"
+                  ? parseStockPreparationReceipt
+                  : parseBalancePreparationReceipt)(row.consumedResult, {
+            patientId: String(intent.careRecipientId),
+            purpose: String(intent.purpose),
+            targetResourceId: String(intent.targetResourceId),
+            userId: userId!,
+          })
       : null;
   if (
     resource &&

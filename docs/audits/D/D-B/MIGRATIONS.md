@@ -735,3 +735,22 @@ FK ainda sem uso;nenhum novo FK sem índice. Achados anteriores não aprovados.
 Sem reset,fixtures/Auth remoto ou backup pesado redundante no banco sintético.
 Instalação limpa/legada e integração integral exigem CI própria do novo SHA.
 [Reconciliação](PROGRESS_NOTE_DRAFTS_VALIDATION.json).
+
+## D3.51 — novos tipos e programações privados
+
+Migrations193–195 aplicadas uma vez no remoto autorizado,192→195,antes do
+commit. Projeto saudável,histórico192/digest e cinco dependências iguais ao
+local. Única mudança nativa:schedule_command passa a respeitar active=false
+na criação do tipo,por marcador único;hash esperado conferido antes da escrita.
+Dry-run somente193/194/195,sem seeds/roles/Vault. Compatibilidade anterior
+conserva default true e contratos das alterações/decisões existentes.
+
+Pós-check:195versões/digest,14definições/config/ACL,duas tabelas e sete índices
+iguais ao local,probes0,dry-run vazio. Oito funções novas:quatro helpers e
+quatro RPCs Auth. Duas tabelas RLS fechadas sem políticas/grants diretos.
+Advisors mantêm cinco classes de segurança/três performance;56 tabelas
+fechadas,195RPCs Auth,48índices sem uso. As adições correspondem ao novo
+recurso;nenhum novo FK sem índice,achados anteriores não aprovados.
+Sem reset,fixtures/Auth remoto ou backup pesado redundante no banco sintético.
+Instalação limpa/legada e integração integral exigem CI própria do novo SHA.
+[Reconciliação](SCHEDULE_CREATION_DRAFTS_VALIDATION.json).

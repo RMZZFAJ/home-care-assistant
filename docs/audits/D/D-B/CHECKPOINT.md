@@ -3121,3 +3121,37 @@ PR7 Draft,sem merge/produção,meta ativa.
 
 [Incremento](PROGRESS_NOTE_DRAFTS.md),
 [validação e remoto](PROGRESS_NOTE_DRAFTS_VALIDATION.json).
+
+## D3.51 — preparação privada de novos tipos e programações
+
+Base86f8f6e/PR7 Draft conferida. Dois propósitos sem alvo artificial,save
+incompleto,CAS,retomada entre sessões e publicação nativa atômica. Controles
+canônicos compartilhados,resumos somente leitura,quatro regimes conservados
+e versão do tipo adotada explicitamente. Criação respeita active=false.
+Consulta sob trava original comprova chave/revisão/tipo avançado;ausência
+continua desconhecida. Outra conclusão e reconhecimento perdido conservam
+edição própria por escolha explícita. Perda de escrita/inatividade não impede
+consulta/descarte/reconhecimento próprios;só vínculo vivo autoriza leitura.
+
+43 unitários/API,13Auth reais e12 identidades browser de produção local
+qualificadas. Primeira coorte8/12;recheck8/8 após corrigir espera real e
+isolamento de paciente dos consumidores. Auditoria COM usa origem de página
+conhecida,com todas as regras. Cinco larguras/axe/capturas320 inspecionadas.
+Contexto503 com base local3659 pacientes/17675 vínculos permanece registrado
+como pendência de desempenho Codex,sem aumentar timeout nem apagar dados.
+
+Remoto192→195 reconciliado:três migrations,oito funções novas e mudança nativa
+única delimitada;cinco dependências preservadas,duas tabelas fechadas,sete
+índices/metadados iguais,dry-run vazio,probes0,saúde normal. Advisors antigos
+não aprovados;sem reset,fixtures/Auth remoto ou backup pesado redundante.
+CI86f8f6e:core3 e cinco shards passaram;iOS2 falhou na auditoria COM e teve
+três intermitências. CI própria integral continua gate independente.
+
+105×39,56PASS/49PARTIAL e18 estados UI preservados;inventário49/51 atualizado
+no consumidor de agenda. Visual≈60%,formulários≈90%,recuperação≈85%. Quadro
+atualizado antes de avançar. Novos tipos/programações privados concluídos;
+alterações/decisões,contagens,cadastros e demais critérios continuam com Codex.
+PR7 Draft,Sonar adiado,sem merge/produção,meta ativa.
+
+[Incremento](SCHEDULE_CREATION_DRAFTS.md),
+[validação](SCHEDULE_CREATION_DRAFTS_VALIDATION.json).

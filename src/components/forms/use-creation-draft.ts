@@ -85,28 +85,34 @@ export function useCreationDraft({
     (kind === "STOCK" && purpose === "family_movement") ||
     kind === "CONSUMPTION" ||
     kind === "FLOW" ||
-    kind === "PROGRESS";
+    kind === "PROGRESS" ||
+    kind === "SCHEDULE";
   const commandUrl =
-    kind === "PROGRESS"
-      ? "/api/documents/progress-preparations"
-      : kind === "FLOW"
-        ? "/api/whatsapp/flows/preparations"
-        : kind === "CONSUMPTION"
-          ? "/api/consumption/preparations"
-          : kind === "STOCK"
-            ? "/api/stock/preparations"
-            : resourcePreparation
-              ? "/api/balances/preparations"
-              : "/api/drafts";
+    kind === "SCHEDULE"
+      ? "/api/schedules/preparations"
+      : kind === "PROGRESS"
+        ? "/api/documents/progress-preparations"
+        : kind === "FLOW"
+          ? "/api/whatsapp/flows/preparations"
+          : kind === "CONSUMPTION"
+            ? "/api/consumption/preparations"
+            : kind === "STOCK"
+              ? "/api/stock/preparations"
+              : resourcePreparation
+                ? "/api/balances/preparations"
+                : "/api/drafts";
   const storageKey =
     `hca:private-draft-command:${userId}:${patientId}:${kind}:${targetDocumentId ?? "new"}` +
     (extended || resourcePreparation ? ":" + purpose : "") +
     (resourcePreparation ? ":" + targetResourceId : "");
-  const url = resourcePreparation
-    ? `${commandUrl}?careRecipientId=${patientId}&purpose=${purpose}&targetResourceId=${targetResourceId}`
-    : `/api/drafts?careRecipientId=${patientId}&kind=${kind}` +
-      (targetDocumentId ? `&targetDocumentId=${targetDocumentId}` : "") +
-      (extended ? "&purpose=" + purpose : "");
+  const url =
+    kind === "SCHEDULE"
+      ? `${commandUrl}?careRecipientId=${patientId}&purpose=${purpose}`
+      : resourcePreparation
+        ? `${commandUrl}?careRecipientId=${patientId}&purpose=${purpose}&targetResourceId=${targetResourceId}`
+        : `/api/drafts?careRecipientId=${patientId}&kind=${kind}` +
+          (targetDocumentId ? `&targetDocumentId=${targetDocumentId}` : "") +
+          (extended ? "&purpose=" + purpose : "");
   const readScope = storageKey + ":" + readScopeRevision;
   const parseRead = useCallback(
     (value: unknown) =>

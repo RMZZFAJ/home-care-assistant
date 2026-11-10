@@ -7,7 +7,7 @@ import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { fixtureFile, sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 
 async function login(page: Page, patient: string, role: "family" | "adminA") {
   const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
@@ -206,7 +206,9 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   const finalPdf = await generatedPdf(page, `/api/documents/${final.id}/pdf`); expect(finalPdf.ok()).toBe(true);
   expect((await finalPdf.body()).equals(await pendingPdf.body())).toBe(false);
   if (info.project.name === "chromium") writeFileSync(`output/pdf/phase-d/purchase-expectation-${final.id}-v${final.version}-closed.pdf`, await finalPdf.body(), { flag: "wx" });
-  await audit(page, "COM closed below quantity 320"); await page.screenshot({ path: `output/playwright/phase-d/purchase-closed-${info.project.name}.png`, fullPage: true, animations: "disabled" });
+  // This is a whole-page check. WebKit's retained scroll after focus restoration
+  // can otherwise leave an ordinary link partially behind the sticky header.
+  await auditFromTop(page, "COM closed below quantity 320"); await page.screenshot({ path: `output/playwright/phase-d/purchase-closed-${info.project.name}.png`, fullPage: true, animations: "disabled" });
 });
 
 test("COM rejeita a parcela identificada em leitura, preserva declaração e recupera a decisão sem entrada de estoque", async ({ page }) => {

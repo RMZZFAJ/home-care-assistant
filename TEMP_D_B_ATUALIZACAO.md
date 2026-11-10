@@ -40,11 +40,19 @@ retomá-lo em outra sessão ou aparelho. É possível comparar duas edições e
 manter seu texto quando outra sessão conclui o andamento, inclusive após
 perder a resposta do reconhecimento desse resultado.
 
-O levantamento ampliado encontrou trabalho restante em agenda, contagens,
-cadastros e administração. A estimativa de recuperação entre aparelhos continua
-em 85%, pois essas outras lacunas ainda precisam ser fechadas. Guardar os
-preenchimentos incompletos da agenda no servidor continua sendo minha
-responsabilidade; essa parte de Andamentos foi concluída.
+**Novos tipos de plantão e novas programações: concluídos · 100% deste recurso.**
+É possível guardar o preenchimento incompleto no servidor, retomar em outro
+aparelho, comparar edições e recuperar uma confirmação perdida. Mudanças do
+tipo de plantão exigem sua escolha antes de continuar, preservando os outros
+campos. O tipo cadastrado como indisponível agora respeita essa escolha.
+
+**Continuidade privada de toda a agenda: em execução · ≈35%.** Novos tipos e
+programações estão concluídos; guardar alterações, cancelamentos e decisões
+sobre escalas existentes ainda falta. Responsável: Codex.
+
+O levantamento ampliado também encontrou trabalho em contagens, cadastros e
+administração. A estimativa geral de recuperação entre aparelhos continua em
+85%; concluir essas lacunas continua sendo minha responsabilidade.
 Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
@@ -83,8 +91,10 @@ A troca das classes de quebra de texto já foi concluída.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈85%. Falta: Guardar a edição incompleta da agenda
-  entre aparelhos; conferir os demais formulários e completar as lacunas.
+  execução · ≈85%. Falta: Guardar alterações e decisões sobre escalas
+  existentes; conferir contagens e demais formulários e completar as lacunas.
+  Novos tipos de plantão e novas programações já podem ser retomados em outro
+  aparelho.
   Revisões de fluxo, relatos e decisões de consumo, movimentação familiar,
   programação do balanço, atribuição, adiamentos, pareceres,
   reconto, decisões de requisição e Andamentos privados estão implementados.
@@ -390,7 +400,8 @@ incluídos.
   atos de compra, entrega e transferência, decisões de requisição, pareceres,
   reconto, programação, atribuição e adiamentos do balanço, movimentação
   familiar, relatos, complementos e decisões de consumo, revisões de fluxo e
-  preparação privada de Andamentos com comparação e recuperação.
+  preparação privada de Andamentos, novos tipos de plantão e novas
+  programações da agenda com comparação e recuperação.
   Falta: Conferir demais variações, lacunas de continuidade e apresentação
   conjunta. Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 55%. Já aplicado: Base,
@@ -467,8 +478,13 @@ estar parcialmente pronta, como mostrado nos blocos anteriores. Incluem implemen
 validação e ativação operacional; não são motivos para parar os trabalhos
 independentes.
 
-- **Preenchimento privado da agenda entre aparelhos:**0% dessa preparação.
-  A consulta da tentativa já enviada foi implementada. Responsável: Codex.
+- **Guardar alterações e decisões sobre escalas existentes entre aparelhos:**
+  0% dessas preparações. Novos tipos de plantão e novas programações estão
+  concluídos; a continuidade de toda a agenda está em ≈35%. Responsável: Codex.
+- **Melhorar a leitura de contexto em bases locais muito grandes:**0% desta
+  correção.
+  Os testes encontraram lentidão e falhas intermitentes com milhares de
+  pacientes fictícios acumulados. Responsável: Codex.
 - **Aceite final das tarefas com usuários reais:**0%. Responsáveis: você e
   participantes; preparo e eventuais correções pelo Codex.
 - **Homologação de acessibilidade com pessoas e tecnologia assistiva:**0%.
@@ -490,8 +506,9 @@ funcionalidade, sem representar ordem de execução. Tudo que já está 100% ser
 preservado e incluído na revisão final; não será refeito sem motivo.
 
 1. **Revisar e completar a continuidade dos formulários da operação diária.**
-   Completar os preenchimentos privados da agenda; revisar
-   contagens, cadastros e administração, completar as lacunas e conferir
+   Completar os preenchimentos privados das alterações e decisões da agenda;
+   corrigir a lentidão de leitura em bases muito grandes; revisar contagens,
+   cadastros e administração, completar as lacunas e conferir
    mensagens, conflitos e recuperação em conjunto. Preservar as revisões de
    fluxo, os relatos, complementos e
    decisões de consumo, Andamentos privados, a movimentação familiar, os seis

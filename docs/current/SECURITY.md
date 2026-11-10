@@ -295,3 +295,14 @@ Recuperação por consulta espera a trava original,revalida acesso e não escrev
 Somente prova correspondente ao pacote exato permite limpeza local;outro
 envelope permanece. Nova preparação após concorrência exige decisão explícita
 e preserva texto próprio. Sem cache privado,envio automático ou replay offline.
+
+Preparações de novos tipos/séries usam duas tabelas privadas RLS fechadas,
+quatro helpers sem execute público e quatro RPCs Auth com search_path vazio.
+Vínculo vivo autoriza somente leitura,descarte e reconhecimento próprios;
+publicação exige capacidade nativa atual/paciente ativo. Propor somente para
+si conserva aprovação posterior. Referências atuais não divulgam rótulos sem
+leitura operacional. O alvo ainda inexistente fica nulo,sem IDs artificiais.
+Chave nativa anterior não pode ser reaproveitada como consumo privado. Recusa
+tardia reverte a transação inteira. Prova de não aplicação exige vínculo
+imutável de chave ou avanço monotônico da revisão privada/tipo selecionado.
+Não há limpeza por ausência,publicação automática,cache privado ou replay offline.

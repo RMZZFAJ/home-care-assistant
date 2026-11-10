@@ -1179,3 +1179,21 @@ Leitura,descarte e reconhecimento próprios admitem perda de escrita/paciente
 inativo sob vínculo vivo e leitura atual da ficha. Nova publicação conserva a
 capacidade ativa nativa. Rótulos de fichas referenciadas são reavaliados conforme
 a autorização atual. Texto usa o limite UTF-16 do banco e dos controles HTML.
+
+## Novos tipos e programações com preparação privada
+
+GET /api/schedules/preparations exige somente careRecipientId e purpose únicos,
+Auth e contexto vigente. Os propósitos são shift_type_create e
+schedule_series_create;ambos sem alvo documental ou recurso preexistente.
+POST salva conteúdo incompleto por CAS/chave,descarta ou reconhece o resultado.
+POST /commit confere a intenção nativa derivada dos campos salvos e consome
+a preparação atomicamente com o novo tipo/série. Versão escolhida do tipo é
+conferida nos quatro regimes. Criação respeita active=false.
+
+POST /recovery consulta a tentativa própria sob a trava original. Ausência
+continua desconhecida;revisão privada avançada,chave incompatível ou versão
+monotônica do tipo avançada podem comprovar não aplicação. Resultado conhecido
+tem precedência sobre mudanças posteriores. Consulta não envia programação.
+Leitura,descarte e reconhecimento próprios admitem perda de escrita/paciente
+inativo sob vínculo vivo;novos atos conservam autorização nativa. Origin e
+private,no-store permanecem. Alterações/decisões existentes mantêm a API nativa.

@@ -649,3 +649,20 @@ recuperação aguarda a mesma trava e revalida acesso após a espera. Não grava
 atos;revisão monotônica/chave imutável distinguem tentativa não aplicada de
 resultado ainda desconhecido. Publicação nativa e seis dependências permanecem
 inalteradas;instalação limpa/evolução legada e integração integral exigem CI.
+
+## Preparação privada de novos tipos e programações
+
+Migrations193–195 adicionam private.schedule_preparations e seu diário com RLS
+fechada,sem políticas/grants diretos,sete índices,quatro helpers e quatro RPCs
+Auth. Slot por auth.uid()/paciente/propósito,sem documento artificial. Recibo
+identifica o tipo/série nativo e congela campos,comando,chave,autor e instante.
+Save incompleto não altera agenda,documentos ou estoque. Commit confere CAS,
+comando exato e versão do tipo em todos os regimes e consome na transação
+nativa;revogação tardia reverte fato,privado,diário e auditoria.
+
+Recuperação espera a chave original,revalida vínculo e distingue desconhecido
+de prova monotônica de não aplicação;publicação histórica conhecida permanece
+válida. A alteração nativa única é respeitar is_active na criação do tipo,
+com default true para clientes anteriores;marcador de definição único conferido.
+Outras dependências nativas/configurações/ACL não mudam. Instalação limpa,
+evolução legada e integração completa continuam gates da CI do próprio SHA.

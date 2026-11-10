@@ -110,6 +110,8 @@ export const entDraftPurposes = [
 export const entDraftPurpose = z.enum(entDraftPurposes);
 export const draftPurpose = z.enum([
   "progress_note",
+  "shift_type_create",
+  "schedule_series_create",
   "flow_review",
   ...consumptionPreparationPurposes,
   "family_movement",

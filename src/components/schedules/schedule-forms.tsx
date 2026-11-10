@@ -1,6 +1,13 @@
 "use client";
-import { ActionButton, CheckboxField, FormField, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
+import {
+  ActionButton,
+  FormField,
+  SelectField,
+  TextAreaField,
+  TextInput,
+} from "@/components/ui/controls";
 import { useState, type FormEvent } from "react";
+import { z } from "zod";
 
 import type { ScheduleCommand } from "@/lib/validation/schedules";
 import type {
@@ -8,7 +15,13 @@ import type {
   ScheduledShift,
   ShiftType,
 } from "@/types/schedules";
-import { SelectedShiftDates } from "./selected-shift-dates";
+import { ScheduleCreationFields } from "./schedule-creation-fields";
+import {
+  initialScheduleType,
+  initialScheduleSeries,
+  scheduleCreationCommand,
+  type ScheduleCreationFields as CreationFields,
+} from "@/lib/schedules/creation";
 import { Notice } from "@/components/workspace";
 import { civilInstant, localMinute } from "@/lib/schedules/time";
 export type ScheduleEditor =
@@ -25,6 +38,8 @@ export function ScheduleForm({
   publishOwn = false,
   today,
   onReview,
+  creationFields,
+  onCreationChange,
 }: {
   editor: ScheduleEditor;
   data: ScheduleWorkspace;
@@ -33,69 +48,63 @@ export function ScheduleForm({
   publishOwn?: boolean;
   today: string;
   onReview: (command: ScheduleCommand, version?: number) => void;
+  creationFields?: CreationFields;
+  onCreationChange?: (fields: CreationFields) => void;
 }) {
-  const [recurrence, setRecurrence] = useState("weekly"),
-    [cycle, setCycle] = useState("12x36");
+  const [localCreation, setLocalCreation] = useState<CreationFields>(() =>
+    editor.kind === "series"
+      ? initialScheduleSeries(data, ownId, team, today)
+      : initialScheduleType(editor.kind === "type" ? editor.type : undefined),
+  );
+  const creation = creationFields ?? localCreation;
+  const changeCreation = onCreationChange ?? setLocalCreation;
+  const [creationError, setCreationError] = useState("");
   const [shiftAction, setShiftAction] = useState("change");
-  const [fromDate, setFromDate] = useState(today),
-    [untilDate, setUntilDate] = useState(() => addDays(today, 28)),
-    [dates, setDates] = useState<string[]>([]),
-    [dateError, setDateError] = useState("");
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget),
       value = (key: string) => String(form.get(key) ?? "");
-    if (editor.kind === "type")
-      onReview(
-        {
-          action: "type",
-          body: {
-            ...(editor.type ? { id: editor.type.id } : {}),
-            name: value("name"),
-            startsLocal: value("start"),
-            durationMinutes: Number(value("duration")),
-            active: value("active") === "on",
-          },
-        },
-        editor.type?.version,
-      );
-    if (editor.kind === "series") {
-      const type = data.types.find((row) => row.id === value("type"));
-      if (
-        recurrence === "dates" &&
-        (!dates.length ||
-          dates.some((date) => date < fromDate || date > untilDate) ||
-          !type)
-      ) {
-        setDateError(
-          "Selecione ao menos uma data dentro do período escolhido.",
+    if (editor.kind === "type" || editor.kind === "series") {
+      try {
+        if (creation.form === "series") {
+          if (
+            !data.professionals.some(
+              (person) => person.id === creation.professionalId,
+            )
+          )
+            throw new Error(
+              "Confira se o profissional selecionado está disponível para esta programação.",
+            );
+          const selected = data.types.find(
+            (t) => t.id === creation.shiftTypeId,
+          );
+          if (
+            !selected?.is_active ||
+            selected.version !== creation.shiftTypeVersion
+          )
+            throw new Error(
+              "Compare e adote a versão atual do tipo de plantão antes de revisar.",
+            );
+        }
+        const command = scheduleCreationCommand(creation);
+        setCreationError("");
+        if (editor.kind === "type" && editor.type && command.action === "type")
+          onReview(
+            { ...command, body: { ...command.body, id: editor.type.id } },
+            editor.type.version,
+          );
+        else onReview(command);
+      } catch (cause) {
+        setCreationError(
+          cause instanceof z.ZodError
+            ? (cause.issues.find((issue) => issue.code === "custom")?.message ??
+                "Confira os campos e as datas da programação. Seu preenchimento foi preservado.")
+            : cause instanceof Error
+              ? cause.message
+              : "Confira o preenchimento antes de revisar.",
         );
-        return;
       }
-      setDateError("");
-      onReview({
-        action: "series",
-        body: {
-          professionalId: value("person"),
-          shiftTypeId: value("type"),
-          timezone: value("zone"),
-          recurrence: recurrence as "once" | "weekly" | "cycle" | "dates",
-          weekdays: form.getAll("day").map(Number),
-          ...(recurrence === "cycle"
-            ? {
-                workHours: Number(cycle.split("x")[0]) as 12 | 24,
-                restHours: Number(cycle.split("x")[1]) as 24 | 36 | 48,
-              }
-            : {}),
-          ...(recurrence === "dates"
-            ? { dates, shiftTypeVersion: type!.version }
-            : {}),
-          anchorDate: value("from"),
-          validUntil: recurrence === "once" ? value("from") : value("until"),
-          notes: value("notes"),
-          ...(value("reason") ? { reason: value("reason") } : {}),
-        },
-      });
+      return;
     }
     if (editor.kind === "end")
       onReview(
@@ -167,179 +176,22 @@ export function ScheduleForm({
       onSubmit={submit}
       className="hca-form-stack hca-schedule-form min-w-0"
     >
-      {editor.kind === "type" ? (
+      {editor.kind === "type" || editor.kind === "series" ? (
         <>
-          <FormField label="Nome do plantão">
-            <TextInput
-              name="name"
-              required
-              minLength={2}
-              maxLength={100}
-              defaultValue={editor.type?.name}
-            />
-          </FormField>
-          <FormField label="Início local">
-            <TextInput
-              name="start"
-              type="time"
-              required
-              defaultValue={editor.type?.starts_local.slice(0, 5) ?? "07:00"}
-            />
-          </FormField>
-          <FormField label="Duração em minutos">
-            <TextInput
-              name="duration"
-              type="number"
-              min={15}
-              max={1440}
-              step={1}
-              defaultValue={String(editor.type?.duration_minutes ?? 720)}
-              required
-            />
-            <small>720 minutos = 12 horas; 1440 minutos = 24 horas.</small>
-          </FormField>
-          <CheckboxField
-            name="active"
-            label="Disponível para novas escalas"
-            defaultChecked={editor.type?.is_active ?? true}
+          <ScheduleCreationFields
+            value={creation}
+            onChange={changeCreation}
+            data={data}
+            ownId={ownId}
+            team={team}
+            publishOwn={publishOwn}
           />
-          {editor.type ? (
+          {editor.kind === "type" && editor.type ? (
             <p className="hca-muted">
               Plantões já programados conservam seus intervalos originais.
             </p>
           ) : null}
-        </>
-      ) : null}
-      {editor.kind === "series" ? (
-        <>
-          <FormField label="Profissional">
-            <SelectField
-              name="person"
-              defaultValue={team ? data.professionals[0]?.id : ownId}
-              required
-            >
-              {data.professionals
-                .filter((p) => team || p.id === ownId)
-                .map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-            </SelectField>
-          </FormField>
-          <FormField label="Tipo de plantão">
-            <SelectField name="type" required>
-              {data.types
-                .filter((t) => t.is_active)
-                .map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name} · {t.starts_local.slice(0, 5)} ·{" "}
-                    {t.duration_minutes / 60}h
-                  </option>
-                ))}
-            </SelectField>
-          </FormField>
-          <FormField label="Repetição">
-            <SelectField
-              value={recurrence}
-              onChange={(e) => setRecurrence(e.target.value)}
-            >
-              <option value="weekly">Dias da semana</option>
-              <option value="once">Data específica</option>
-              <option value="dates">Datas escolhidas</option>
-              <option value="cycle">Ciclo de trabalho e descanso</option>
-            </SelectField>
-          </FormField>
-          {recurrence === "weekly" ? (
-            <fieldset className="hca-weekdays">
-              <legend>Dias da semana</legend>
-              {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d, n) => (
-                <CheckboxField
-                  key={d}
-                  label={d}
-                  name="day"
-                  value={String(n)}
-                  defaultChecked={n === 1}
-                />
-              ))}
-            </fieldset>
-          ) : null}
-          {recurrence === "cycle" ? (
-            <FormField label="Regime">
-              <SelectField value={cycle} onChange={(e) => setCycle(e.target.value)}>
-                {["12x36", "24x48", "24x24"].map((c) => (
-                  <option key={c}>{c}</option>
-                ))}
-              </SelectField>
-              <small>
-                Use um tipo com a mesma duração de trabalho. O ciclo mantém
-                horas corridas a partir da data de início.
-              </small>
-            </FormField>
-          ) : null}
-          <FormField label="Primeiro dia / âncora">
-            <TextInput
-              name="from"
-              type="date"
-              value={fromDate}
-              onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setFromDate(controlValue); }}
-              required
-            />
-          </FormField>
-          {recurrence !== "once" ? (
-            <FormField label="Válida até">
-              <TextInput
-                name="until"
-                type="date"
-                value={untilDate}
-                onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setUntilDate(controlValue); }}
-                required
-              />
-              <small>
-                Até 366 dias após a âncora. Todas as ocorrências são verificadas
-                antes da gravação.
-              </small>
-            </FormField>
-          ) : null}
-          {recurrence === "dates" &&
-          /^\d{4}-\d{2}-\d{2}$/.test(fromDate) &&
-          /^\d{4}-\d{2}-\d{2}$/.test(untilDate) ? (
-            <SelectedShiftDates
-              key={fromDate.slice(0, 7)}
-              from={fromDate}
-              until={untilDate}
-              selected={dates}
-              onChange={setDates}
-            />
-          ) : null}
-          {dateError ? <Notice error>{dateError}</Notice> : null}
-          <FormField label="Fuso horário">
-            <SelectField name="zone" defaultValue="America/Sao_Paulo">
-              {[
-                "America/Sao_Paulo",
-                "America/Manaus",
-                "America/Belem",
-                "America/Fortaleza",
-                "America/Cuiaba",
-                "America/Rio_Branco",
-                "America/Noronha",
-                "UTC",
-              ].map((z) => (
-                <option key={z}>{z}</option>
-              ))}
-            </SelectField>
-          </FormField>
-          <FormField label="Observações">
-            <TextAreaField name="notes" maxLength={2000} />
-          </FormField>
-          <FormField label="Motivo de registro retroativo, quando necessário">
-            <TextInput name="reason" maxLength={1000} />
-          </FormField>
-          {!team && !publishOwn ? (
-            <p className="hca-muted">
-              Sua programação será proposta para aprovação.
-            </p>
-          ) : null}
+          {creationError ? <Notice error>{creationError}</Notice> : null}
         </>
       ) : null}
       {editor.kind === "end" ? (
@@ -352,13 +204,23 @@ export function ScheduleForm({
             <TextInput name="from" type="date" defaultValue={today} required />
           </FormField>
           <FormField label="Justificativa">
-            <TextAreaField name="reason" required minLength={3} maxLength={1000} />
+            <TextAreaField
+              name="reason"
+              required
+              minLength={3}
+              maxLength={1000}
+            />
           </FormField>
         </>
       ) : null}
       {editor.kind === "reject" || editor.kind === "reject_change" ? (
         <FormField label="Motivo da rejeição">
-          <TextAreaField name="reason" minLength={3} maxLength={1000} required />
+          <TextAreaField
+            name="reason"
+            minLength={3}
+            maxLength={1000}
+            required
+          />
         </FormField>
       ) : null}
       {editor.kind === "shift" ? (
@@ -426,7 +288,12 @@ export function ScheduleForm({
             </>
           ) : null}
           <FormField label="Justificativa">
-            <TextAreaField name="reason" minLength={3} maxLength={1000} required />
+            <TextAreaField
+              name="reason"
+              minLength={3}
+              maxLength={1000}
+              required
+            />
           </FormField>
           {!team && !publishOwn ? (
             <p>

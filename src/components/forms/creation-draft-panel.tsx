@@ -1,4 +1,5 @@
 "use client";
+import { SchedulePreparationSummary } from "@/components/schedules/schedule-preparation-summary";
 import { ProgressPreparationSummary } from "@/components/documents/progress-preparation-summary";
 import { FlowPreparationSummary } from "@/components/stock/flow-preparation-summary";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
@@ -34,6 +35,8 @@ export function DraftContentSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("schedule" in content)
+    return <SchedulePreparationSummary content={content} />;
   if ("note" in content)
     return <ProgressPreparationSummary content={content} />;
   if ("review" in content) return <FlowPreparationSummary content={content} />;
@@ -178,6 +181,8 @@ function DraftFieldsSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("schedule" in content)
+    return <SchedulePreparationSummary content={content} />;
   if ("note" in content)
     return <ProgressPreparationSummary content={content} />;
   if ("review" in content) return <FlowPreparationSummary content={content} />;
@@ -694,6 +699,7 @@ export function CreationDraftPanel({
   onRevalidateRead,
   revalidationRef,
   disabled = false,
+  canResume = true,
 }: {
   draft: CreationDraftController;
   current: CreationDraftContent | null;
@@ -705,6 +711,7 @@ export function CreationDraftPanel({
   onRevalidateRead?: () => void;
   revalidationRef?: RefObject<HTMLButtonElement | null>;
   disabled?: boolean;
+  canResume?: boolean;
 }) {
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
@@ -751,6 +758,7 @@ export function CreationDraftPanel({
         <p className="hca-field-hint">
           Para retomar em outra aba, sessão ou aparelho, use{" "}
           {draft.kind === "PROGRESS" ||
+          draft.kind === "SCHEDULE" ||
           draft.kind === "CONSUMPTION" ||
           draft.kind === "FLOW"
             ? "Salvar preenchimento privado"
@@ -773,15 +781,19 @@ export function CreationDraftPanel({
       {draft.message ? <Notice>{draft.message}</Notice> : null}
       {saved ? (
         <p>
-          {saved.kind === "PROGRESS"
-            ? "Registro de andamento"
-            : saved.kind === "FLOW"
-              ? "Revisão do Flow"
-              : saved.kind === "CONSUMPTION"
-                ? "Relato e conferência"
-                : saved.kind === "STOCK"
-                  ? "Movimentação familiar"
-                  : saved.kind}{" "}
+          {saved.kind === "SCHEDULE"
+            ? saved.purpose === "shift_type_create"
+              ? "Tipo de plantão"
+              : "Programação de plantões"
+            : saved.kind === "PROGRESS"
+              ? "Registro de andamento"
+              : saved.kind === "FLOW"
+                ? "Revisão do Flow"
+                : saved.kind === "CONSUMPTION"
+                  ? "Relato e conferência"
+                  : saved.kind === "STOCK"
+                    ? "Movimentação familiar"
+                    : saved.kind}{" "}
           · Revisão {saved.revision} · salvo no servidor em{" "}
           {formatZonedDate(saved.savedAt, "America/Sao_Paulo")} ·
           America/Sao_Paulo
@@ -806,7 +818,8 @@ export function CreationDraftPanel({
             disabled={draft.busy || disabled}
             onClick={() => void draft.recover()}
           >
-            {draft.kind === "PROGRESS" && draft.pending.action === "acknowledge"
+            {(draft.kind === "PROGRESS" || draft.kind === "SCHEDULE") &&
+            draft.pending.action === "acknowledge"
               ? "Recuperar reconhecimento do resultado"
               : "Recuperar salvamento ou descarte"}
           </ActionButton>
@@ -885,6 +898,26 @@ export function CreationDraftPanel({
                   referenceHash: draft.consumed.consumedResult.referenceHash,
                 }}
               />
+            </div>
+          ) : draft.consumed.kind === "SCHEDULE" &&
+            draft.consumed.consumedResult &&
+            "fields" in draft.consumed.consumedResult ? (
+            <div className="hca-form-stack">
+              <p>
+                Resultado da escala registrado em{" "}
+                {formatZonedDate(
+                  draft.consumed.consumedResult.recordedAt,
+                  "America/Sao_Paulo",
+                )}
+                .
+              </p>
+              <SchedulePreparationSummary
+                content={{ schedule: draft.consumed.consumedResult.fields }}
+              />
+              <p>
+                Reconhecer limpa somente a preparação privada. O tipo ou a
+                programação confirmados permanecem no histórico.
+              </p>
             </div>
           ) : draft.consumed.kind === "PROGRESS" &&
             draft.consumed.consumedResult &&
@@ -1011,7 +1044,7 @@ export function CreationDraftPanel({
             ) : (
               <ActionButton
                 variant="primary"
-                disabled={draft.busy || disabled}
+                disabled={draft.busy || disabled || !canResume}
                 onClick={() => draft.resume()}
               >
                 {resumeLabel}
@@ -1023,8 +1056,8 @@ export function CreationDraftPanel({
       {draft.conflict && !draft.consumed ? (
         <>
           <Notice>
-            Outra edição mudou o rascunho. Sua edição foi preservada. Compare os
-            valores antes de escolher.
+            Sua edição foi preservada. Compare os valores salvos antes de
+            escolher como continuar.
           </Notice>
           <div className="grid min-w-0 gap-4 md:grid-cols-2">
             <section className="min-w-0" aria-label="Minha edição">
@@ -1080,7 +1113,7 @@ export function CreationDraftPanel({
             </ActionButton>
             {draft.comparison?.state === "active" ? (
               <ActionButton
-                disabled={draft.busy || disabled}
+                disabled={draft.busy || disabled || !canResume}
                 onClick={() => draft.resume(draft.comparison)}
               >
                 Usar versão salva no servidor
@@ -1132,8 +1165,14 @@ export function CreationDraftPanel({
             ) : null}
             <p>
               Você está descartando somente seu preenchimento privado de{" "}
-              {saved?.kind === "PROGRESS" ? "andamento" : saved?.kind} para{" "}
-              {patientName}.
+              {saved?.kind === "PROGRESS"
+                ? "andamento"
+                : saved?.kind === "SCHEDULE"
+                  ? draft.purpose === "shift_type_create"
+                    ? "tipo de plantão"
+                    : "programação"
+                  : saved?.kind}{" "}
+              para {patientName}.
             </p>
             <DraftContentSummary
               content={saved?.content ?? null}

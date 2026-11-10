@@ -190,7 +190,7 @@ referência atual e resultado confirmado têm representações distintas.
 A agenda preserva a tentativa nativa por conta/paciente antes de transmitir.
 Consulta pessoal ao diário comprova a mesma decisão;ausência permite somente
 reenvio explícito da mesma chave. Esse ciclo é distinto do save de edição
-incompleta entre aparelhos,que ainda será integrado. Inventário49/51 inicial
+incompleta entre aparelhos. Inventário49/51 inicial
 separa rascunhos privados,contagens compartilhadas,arquivos,consultas e Auth.
 
 Andamentos agora compõem o controlador privado com alvo na ficha real e
@@ -202,3 +202,13 @@ o editor aparece apenas após a escolha correspondente. Consulta sob a trava
 original distingue conclusão própria,outra conclusão e resultado desconhecido.
 Reconhecer o resultado de outra sessão conserva a edição local somente por
 escolha explícita,inclusive após perda da resposta desse reconhecimento.
+
+Novos tipos e novas séries agora compõem ScheduleCreationPreparation com o
+mesmo controlador privado e ScheduleForm/controles canônicos compartilhados.
+Conteúdo próprio,referências atuais e recibo nativo são distintos. Quatro
+regimes preservam escolhas latentes;adotar nova versão não limpa o restante.
+Resumos são somente leitura. Edição própria de outra conclusão requer escolha
+explícita antes do reconhecimento e pode sobreviver à perda desse resultado.
+Envelope local congela a tentativa;leitura autorizada reconcilia apenas a
+confirmação exata. Alterar/decidir sobre recursos existentes continua no motor
+anterior e ainda exige continuidade privada;inventário49/51 não é paridade66/171.

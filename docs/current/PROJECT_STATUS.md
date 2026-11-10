@@ -4,6 +4,30 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.51 implementa preparação privada de novos tipos de plantão e novas
+programações:edição incompleta,CAS,retomada entre aparelhos,confirmação nativa
+atômica e recuperação própria. Mudança do tipo exige adoção explícita sem
+perder os outros campos;criação respeita active=false. Outra conclusão e
+reconhecimento perdido preservam edição própria. Sem cache privado/replay.
+43 unitários/API,13Auth reais e12 identidades browser de produção local
+qualificadas;recheck8/8,cinco larguras/axe/capturas320 inspecionadas.
+
+Remoto192→195 reconciliado:três migrations,oito funções novas,correção nativa
+única delimitada e cinco dependências preservadas;duas tabelas/sete índices
+iguais ao local,probes0,dry-run vazio,saúde normal. Sem reset,fixtures/Auth
+remoto ou backup pesado redundante. CI86f8f6e:core3/cinco shards aprovados,
+iOS2 falhou na auditoria COM;origem da auditoria corrigida,CI própria exigida.
+Contexto intermitente com milhares de pacientes fictícios locais permanece
+pendência de desempenho Codex,sem alteração de timeout ou exclusão de dados.
+
+105 critérios56PASS/49PARTIAL e18estados UI preservados;visual≈60%,formulários
+≈90%,recuperação≈85%. Quadro temporário atualizado antes de avançar. Novos
+tipos/programações privados concluídos;alterações/decisões,contagens,cadastros
+e demais D-B continuam com Codex. Sonar adiado,PR7 Draft,produção NO-GO,
+meta ativa. [Incremento](../audits/D/D-B/SCHEDULE_CREATION_DRAFTS.md).
+
+## Incremento anterior D3.50
+
 D3.50 implementa preenchimento privado de Andamentos por conta/paciente/ficha
 real:save incompleto,CAS,retomada entre sessões,comparação e publicação nativa
 com consumo atômico. Recuperação aguarda a trava original,confere o pacote

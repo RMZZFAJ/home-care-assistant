@@ -1,4 +1,6 @@
 "use client";
+import { ScheduleCreationPreparation } from "./schedule-creation-preparation";
+import type { ScheduleCreationPurpose } from "@/lib/schedules/creation";
 import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import {
   ActionButton,
@@ -72,26 +74,105 @@ export function ScheduleConsole() {
   );
 }
 function PatientSchedule({ context }: { context: WorkspaceContext }) {
+  const [creationMessage, setCreationMessage] = useState("");
+  const ownSummaryRef = useRef<HTMLElement>(null);
   const recovery = useScheduleConfirmation(context.userId, context.patient!.id);
-  return can(context, "schedule.read.team") ||
-    can(context, "schedule.read.own") ? (
-    <Agenda context={context} recovery={recovery} />
-  ) : (
+  const [preparation, setPreparation] = useState<{
+    purpose: ScheduleCreationPurpose;
+    day: string;
+    opener: HTMLElement;
+  } | null>(null);
+  const create = (
+    purpose: ScheduleCreationPurpose,
+    day: string,
+    opener: HTMLElement,
+  ) => {
+    if (!recovery.ready || recovery.busy || recovery.pending) return;
+    setPreparation({ purpose, day, opener });
+  };
+  return (
     <>
-      <ScheduleConfirmationPanel recovery={recovery} />
-      <Notice error>
-        Seu vínculo não permite consultar a agenda. A recuperação acima consulta
-        somente sua tentativa anterior; não publica nova programação.
-      </Notice>
+      {creationMessage ? <Notice>{creationMessage}</Notice> : null}
+      {can(context, "schedule.read.team") ||
+      can(context, "schedule.read.own") ? (
+        <Agenda context={context} recovery={recovery} onCreate={create} />
+      ) : (
+        <>
+          <ScheduleConfirmationPanel recovery={recovery} />
+          <Notice error>
+            Seu vínculo não permite consultar a agenda. A recuperação consulta
+            somente suas tentativas e preenchimentos próprios; não publica nova
+            programação.
+          </Notice>
+        </>
+      )}
+      <details className="ui-card">
+        <summary ref={ownSummaryRef}>
+          Meus preenchimentos privados da agenda
+        </summary>
+        <p>
+          Consulte, retome, descarte ou reconheça somente seus preenchimentos.
+          Uma nova confirmação depende da permissão atual.
+        </p>
+        <div className="hca-toolbar">
+          <ActionButton
+            disabled={
+              !recovery.ready || recovery.busy || Boolean(recovery.pending)
+            }
+            onClick={(e) =>
+              create("shift_type_create", today(), e.currentTarget)
+            }
+          >
+            Retomar meu tipo de plantão
+          </ActionButton>
+          <ActionButton
+            disabled={
+              !recovery.ready || recovery.busy || Boolean(recovery.pending)
+            }
+            onClick={(e) =>
+              create("schedule_series_create", today(), e.currentTarget)
+            }
+          >
+            Retomar minha programação
+          </ActionButton>
+        </div>
+      </details>
+      {preparation ? (
+        <ScheduleCreationPreparation
+          key={preparation.purpose}
+          context={context}
+          purpose={preparation.purpose}
+          today={preparation.day}
+          opener={preparation.opener}
+          fallbackFocus={ownSummaryRef}
+          onClose={() => setPreparation(null)}
+          onCommitted={(receipt) => {
+            setCreationMessage(
+              receipt.nativeResult.status === "proposed"
+                ? "Programação enviada como proposta; aguarda aprovação."
+                : preparation.purpose === "shift_type_create"
+                  ? "Tipo de plantão registrado."
+                  : "Programação de plantões registrada.",
+            );
+            window.dispatchEvent(new Event("hca:data-changed"));
+          }}
+        />
+      ) : null}
     </>
   );
 }
 function Agenda({
   context,
   recovery,
+  onCreate,
 }: {
   context: WorkspaceContext;
   recovery: ScheduleRecovery;
+  onCreate: (
+    purpose: ScheduleCreationPurpose,
+    day: string,
+    opener: HTMLElement,
+  ) => void;
 }) {
   const patient = context.patient!,
     team = can(context, "schedule.manage.team"),
@@ -194,6 +275,16 @@ function Agenda({
   }, [patient.id, period.from, period.until, queryKey, rangeKey]);
   function open(value: ScheduleEditor, target: HTMLElement) {
     if (busy || uncertain) return;
+    if (value.kind === "series" || (value.kind === "type" && !value.type)) {
+      onCreate(
+        value.kind === "series"
+          ? "schedule_series_create"
+          : "shift_type_create",
+        day,
+        target,
+      );
+      return;
+    }
     setDay(day);
     setOpener(target);
     setEditorWorkspace(data);

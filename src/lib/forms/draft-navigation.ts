@@ -5,6 +5,7 @@ const common = [
   { id: "dieta", label: "Dieta" },
 ] as const;
 export const draftFlowStages = {
+  SCHEDULE: [{ id: "schedule_creation", label: "Preparação de escala" }],
   PROGRESS: [{ id: "progress_note", label: "Registro de andamento" }],
   FLOW: [{ id: "flow_review", label: "Revisão do Flow" }],
   CONSUMPTION: [
@@ -121,6 +122,7 @@ export const draftFlowStages = {
 } as const;
 export const draftStageIds = [
   "progress_note",
+  "schedule_creation",
   "flow_review",
   "consumption_preparation",
   "stock_family_movement",
@@ -181,6 +183,11 @@ export function draftFlow(
   content?: unknown,
 ): DraftFlow | null {
   if (kind === "FLOW" && purpose === "flow_review") return "FLOW";
+  if (
+    kind === "SCHEDULE" &&
+    ["shift_type_create", "schedule_series_create"].includes(purpose)
+  )
+    return "SCHEDULE";
   if (kind === "PROGRESS" && purpose === "progress_note") return "PROGRESS";
   if (
     kind === "CONSUMPTION" &&

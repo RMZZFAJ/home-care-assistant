@@ -1,3 +1,5 @@
+import type { ScheduleCreationContent } from "@/lib/schedules/creation";
+import type { SchedulePreparationReceipt } from "@/lib/validation/schedule-preparations";
 import type {
   ProgressPreparationContent,
   ProgressPreparationReceipt,
@@ -37,7 +39,8 @@ export type DraftKind =
   | "STOCK"
   | "CONSUMPTION"
   | "FLOW"
-  | "PROGRESS";
+  | "PROGRESS"
+  | "SCHEDULE";
 export type CreationDraftContent =
   | RequisitionDraftContent
   | BalanceDraftContent
@@ -48,7 +51,8 @@ export type CreationDraftContent =
   | StockPreparationContent
   | ConsumptionPreparationContent
   | FlowPreparationContent
-  | ProgressPreparationContent;
+  | ProgressPreparationContent
+  | ScheduleCreationContent;
 export type CreationDraft = {
   id: string;
   ownerId: string;
@@ -73,6 +77,7 @@ export type CreationDraft = {
     | FlowPreparationReceipt
     | ConsumptionPreparationReceipt
     | ProgressPreparationReceipt
+    | SchedulePreparationReceipt
     | null;
 };
 export type CreationDraftResult = Pick<
@@ -87,5 +92,6 @@ export type CreationDraftResult = Pick<
     | ConsumptionPreparationReceipt
     | FlowPreparationReceipt
     | ProgressPreparationReceipt
+    | SchedulePreparationReceipt
     | null;
 };

@@ -2,11 +2,15 @@ import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
-import { fixturePassword, patientA } from "../../scripts/test-constants.mjs";
+import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { setup } from "../integration/v4-fixtures.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 
 test("agenda publica uma programação real, recusa conflito e preserva contexto no mobile", async ({ page }, info) => {
+  // A private creator slot belongs to the account/patient across devices.
+  // Each engine must start with its own patient, without erasing another result.
+  const patientA = (await setup()).patient;
   const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixture.adminA.email);
