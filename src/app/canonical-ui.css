@@ -308,6 +308,7 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 .hca-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 21px; border-bottom: 1px solid var(--hca-line); flex: none; }
 .hca-modal-head h2 { min-width: 0; overflow-wrap: anywhere; margin: 0; font-size: 19px; line-height: 1.35; letter-spacing: -.35px; }
 .hca-modal-content { min-height: 0; padding: 22px; overflow: auto; overscroll-behavior: contain; }
+.hca-scroll-content:focus-visible { outline: 3px solid #5aa99a; outline-offset: -3px; }
 .wizard-steps .hca-step-control { display: inline-flex; align-items: center; gap: 8px; min-height: 41px; padding: 7px 9px; border: 0; background: transparent; color: var(--hca-muted); font: 12px var(--hca-font); border-radius: 8px; }
 .wizard-steps .hca-step-control > span { display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 50%; background: #e8eeea; color: var(--hca-muted); font-size: 11px; }
 .wizard-steps .hca-step-control[aria-current="step"] { color: var(--hca-teal); font-weight: 700; }

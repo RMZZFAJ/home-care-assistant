@@ -1197,3 +1197,13 @@ tem precedência sobre mudanças posteriores. Consulta não envia programação.
 Leitura,descarte e reconhecimento próprios admitem perda de escrita/paciente
 inativo sob vínculo vivo;novos atos conservam autorização nativa. Origin e
 private,no-store permanecem. Alterações/decisões existentes mantêm a API nativa.
+
+## Custo da leitura de contexto
+
+GET /api/context conserva o contrato completo de my_workspace. A migration196
+reduz verificações repetidas por paciente sem limitar o diretório,alterar
+campos ou delegar autorização ao cliente. Capacidades usam as mesmas guardas
+nativas para candidatos da sessão e da autoridade interna transacional. Não
+há cache de autoridade entre requisições;revogação/sessão expirada continuam
+recusadas. Nova programação privada mantém revisão após recusa conhecida e
+exige voltar ao preenchimento antes de preparar outra confirmação.

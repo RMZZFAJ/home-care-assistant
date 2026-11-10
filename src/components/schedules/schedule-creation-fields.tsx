@@ -18,6 +18,8 @@ export function ScheduleCreationFields({
   ownId,
   team,
   publishOwn = false,
+  datesMonth,
+  onDatesMonthChange,
 }: {
   value: Fields;
   onChange: (value: Fields) => void;
@@ -25,6 +27,8 @@ export function ScheduleCreationFields({
   ownId: string;
   team: boolean;
   publishOwn?: boolean;
+  datesMonth?: string | null;
+  onDatesMonthChange?: (month: string) => void;
 }) {
   if (value.form === "type") {
     const patch = (p: Partial<typeof value>) => onChange({ ...value, ...p });
@@ -245,6 +249,8 @@ export function ScheduleCreationFields({
           from={value.from}
           until={value.until}
           selected={value.dates}
+          month={datesMonth}
+          onMonthChange={onDatesMonthChange}
           onChange={(dates) => patch({ dates })}
         />
       ) : null}

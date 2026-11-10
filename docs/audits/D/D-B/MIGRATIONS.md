@@ -754,3 +754,19 @@ recurso;nenhum novo FK sem índice,achados anteriores não aprovados.
 Sem reset,fixtures/Auth remoto ou backup pesado redundante no banco sintético.
 Instalação limpa/legada e integração integral exigem CI própria do novo SHA.
 [Reconciliação](SCHEDULE_CREATION_DRAFTS_VALIDATION.json).
+
+## D3.52 — leitura eficiente do contexto
+
+Migration196 aplicada uma vez no remoto autorizado,195→196,antes do commit.
+Preflight:projeto saudável,prefixo195/digest,nove dependências/config/grants
+idênticos ao local e my_workspace com assinatura/config/ACL preservadas.
+Preflight reconfirmado antes da escrita;dry-run somente196,sem seeds/roles/Vault.
+Compatibilidade:resposta completa e ordenação iguais ao contrato anterior,
+capacidades ainda nativas e autoridade interna transacional preservada.
+
+Pós-check:196versões/digest,dez definições/config/grants iguais ao local,probes0,
+0worker probes e dry-run vazio. Mudou somente o corpo de my_workspace;nenhuma
+tabela,index,assinatura,ACL ou timeout novo. Advisors globais não repetidos por
+essa razão;achados anteriores permanecem sem aprovação. Sem reset,fixtures/Auth
+remoto ou backup pesado redundante. Instalação limpa/legado/integração integral
+continuam gates da CI própria. [Reconciliação](WORKSPACE_CONTEXT_PERFORMANCE_VALIDATION.json).

@@ -666,3 +666,14 @@ válida. A alteração nativa única é respeitar is_active na criação do tipo
 com default true para clientes anteriores;marcador de definição único conferido.
 Outras dependências nativas/configurações/ACL não mudam. Instalação limpa,
 evolução legada e integração completa continuam gates da CI do próprio SHA.
+
+## Leitura eficiente do contexto
+
+Migration196 substitui somente o corpo de public.my_workspace(),preservando
+assinatura,STABLE,SECURITY DEFINER,search_path vazio e grants. Candidatos vêm
+de private.authority_sessions e private.worker_authority no escopo corrente;
+can_access_recipient/patient_capabilities ainda decidem cada capacidade. O
+diretório completo usa a mesma visibilidade global/vínculo e mesma ordenação.
+Sessão é revalidada antes do retorno. Não há tabela,index,grant ou timeout novo.
+Nove dependências nativas permanecem iguais;nenhuma autoridade é reutilizada
+entre chamadas. Instalação limpa/legado/integração integral exigem CI própria.

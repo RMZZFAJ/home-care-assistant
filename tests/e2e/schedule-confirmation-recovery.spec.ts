@@ -1,7 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { fixtures, setup } from "../integration/v4-fixtures.mjs";
-import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -9,8 +8,7 @@ import { auditFromTop } from "./accessibility-audit";
 import type { SchedulePacket } from "@/lib/schedules/confirmation";
 test.setTimeout(120_000);
 async function prepare(page: Page) {
-  const f = await setup(),
-    worker = await shiftWorker(f.patient);
+  const f = await setup();
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
@@ -31,23 +29,19 @@ async function prepare(page: Page) {
     },
   });
   expect(type.ok()).toBe(true);
-  const id = (await type.json()).data.id;
+  expect((await type.json()).data.version).toBe(1);
   await page.goto("/escalas");
-  await page
-    .getByRole("button", { name: "Nova programação", exact: true })
-    .click();
+  // Creation now uses private preparations. Existing type edits retain the
+  // native packet and recovery contract exercised by these legacy regressions.
+  await page.getByText("Tipos e programações", { exact: true }).click();
+  await page.getByRole("button", { name: "Editar tipo", exact: true }).click();
   const form = page.getByRole("dialog", {
-    name: "Programação de plantões",
+    name: "Tipo de plantão",
     exact: true,
   });
   await form
-    .getByLabel("Profissional", { exact: true })
-    .selectOption(worker.id);
-  await form.getByLabel("Tipo de plantão", { exact: true }).selectOption(id);
-  await form.getByLabel("Repetição", { exact: true }).selectOption("once");
-  await form
-    .getByLabel("Primeiro dia / âncora", { exact: true })
-    .fill("2100-06-01");
+    .getByLabel("Nome do plantão", { exact: true })
+    .fill(name + " alterado");
   await form
     .getByRole("button", { name: "Revisar alteração", exact: true })
     .click();
@@ -58,10 +52,10 @@ const panel = (page: Page) =>
 const facts = (patient: string) =>
   Number(
     sql(
-      `select count(*) from public.shift_series where care_recipient_id=${q(patient)}`,
+      `select count(*) from public.shift_events where care_recipient_id=${q(patient)} and action='schedule.type' and (after_state->>'version')::integer>1`,
     ),
   );
-test("agenda recupera a confirmação após recarregar sem reenviar a programação e recusa recibo de outra intenção", async ({
+test("agenda recupera a confirmação após recarregar sem reenviar a alteração e recusa recibo de outra intenção", async ({
   page,
 }, info) => {
   const f = await prepare(page);

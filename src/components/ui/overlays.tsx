@@ -13,9 +13,10 @@ type OverlayProps = {
   closeLabel?: string;
   finalFocus?: ComponentProps<typeof BaseDialog.Popup>["finalFocus"];
   id?: string;
+  keyboardScrollable?: boolean;
 };
 
-function Overlay({ open, title, children, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side }: OverlayProps & { side?: "start" | "end" }) {
+function Overlay({ open, title, children, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false }: OverlayProps & { side?: "start" | "end" }) {
   return <BaseDialog.Root open={open} disablePointerDismissal={closeDisabled} onOpenChange={(next, details) => {
     if (next) return;
     if (closeDisabled) details.cancel(); else onClose();
@@ -29,7 +30,7 @@ function Overlay({ open, title, children, onClose, closeDisabled = false, closeL
               <BaseDialog.Title>{title}</BaseDialog.Title>
               <button type="button" className="hca-control hca-control-icon" aria-label={closeLabel} disabled={closeDisabled} onClick={onClose}><Icon name="close" /></button>
             </header>
-            <div className="hca-modal-content">{children}</div>
+            <div className={keyboardScrollable ? "hca-modal-content hca-scroll-content" : "hca-modal-content"} tabIndex={keyboardScrollable ? 0 : undefined} role={keyboardScrollable ? "region" : undefined} aria-label={keyboardScrollable ? `Conteúdo de ${title}` : undefined}>{children}</div>
           </BaseDialog.Popup>
         </BaseDialog.Viewport>
       </div>

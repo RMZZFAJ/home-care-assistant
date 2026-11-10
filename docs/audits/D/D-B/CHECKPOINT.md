@@ -3155,3 +3155,46 @@ PR7 Draft,Sonar adiado,sem merge/produção,meta ativa.
 
 [Incremento](SCHEDULE_CREATION_DRAFTS.md),
 [validação](SCHEDULE_CREATION_DRAFTS_VALIDATION.json).
+
+## D3.52 — contexto eficiente e consumidores da agenda
+
+Base19a2397/PR7 Draft conferida. Gargalo de my_workspace medido em Auth real:
+7700ms/3241 pacientes locais e6456ms/3664 globais. Migration196 calcula apenas
+candidatos de autoridade da sessão/backend/transação,com guardas nativas ainda
+responsáveis por capacidades. Diretório completo,ordem,papéis,vínculos e
+campos preservados por comparação com a resposta anterior;contexto ativo
+conferido contra a RPC nativa. Sem cache de autoridade entre chamadas.
+Medições RPC posteriores118–139ms/3252 e47–51ms/3675,sem ampliar timeout ou
+excluir dados. São medições locais,não SLA nem homologação de produção.
+
+Sete Auth distintos aprovados:cinco novos e dois consumidores nativos. Recheck
+2/2 após correção somente de variável de teste não usada;não conta como nove
+identidades. Inclui revogação,inatividade,overrides,anon/service,sessão real
+expirada,global sem vínculo e autoridade interna válida/divergente. Ponte SQL
+usa sessão Auth emitida e rollback,com0registros internos de teste restantes.
+
+CI19a2397:core3SUCCESS,browsers3SUCCESS/3FAIL,agregadoFAIL. Recuperação nativa
+agora exercita edição real de tipo existente;criação privada mantém regressão
+própria. Datas escolhidas usa o commit privado e confere recibo/série reais.
+Corrigidos revisão mantida após recusa conhecida,retorno de foco,mês aberto e
+rolagem por teclado com região nomeada/focável optativa. Sem retirar regras.
+
+15 identidades browser de produção local qualificadas:12 preservadas e3do
+recheck final. Coortes12/15,0/3por axe scroll-region e3/3após correção real.
+Quatro larguras,PageDown,axe e capturas móveis inspecionadas. Execução antiga
+interrompida2skipped e erro de build em JSON gerado93bytes foram preservados,
+sem aprovação;somente o artefato gerado foi regenerado. Fontes congeladas.
+
+Remoto195→196 reconciliado:histórico/digest,dez definições/config/grants iguais
+ao local,nove dependências preservadas,probes0,dry-run vazio,projeto saudável.
+Nenhuma tabela/index/assinatura/ACL nova;advisors globais não repetidos e antigos
+não aprovados. Sem reset,fixtures/Auth remoto ou backup pesado redundante.
+CI própria com instalação limpa/legado/integração integral continua gate.
+
+105×39,56PASS/49PARTIAL e18estados UI preservados;inventário49/51 atualizado por
+hash,visual≈60%,formulários≈90%,recuperação≈85%. Quadro temporário atualizado
+antes de avançar. Próximo:preparações privadas de alterações/decisões da agenda,
+contagens,cadastros e demais D-B. Sonar adiado,PR7 Draft,produção NO-GO,meta ativa.
+
+[Incremento](WORKSPACE_CONTEXT_PERFORMANCE.md),
+[validação](WORKSPACE_CONTEXT_PERFORMANCE_VALIDATION.json).

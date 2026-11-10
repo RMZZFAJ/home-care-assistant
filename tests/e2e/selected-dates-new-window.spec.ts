@@ -18,6 +18,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 import type { ScheduledShift } from "../../src/types/schedules";
+import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
 test.setTimeout(180_000);
 mkdirSync("output/playwright/phase-d", { recursive: true });
@@ -187,7 +188,8 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   );
   const rejected = page.waitForResponse(
     (response) =>
-      new URL(response.url()).pathname === "/api/schedules" &&
+      new URL(response.url()).pathname ===
+        "/api/schedules/preparations/commit" &&
       response.request().method() === "POST",
   );
   await review(page)
@@ -221,6 +223,9 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   ).toHaveValue(
     "Datas preservadas entre meses e depois da recusa; nenhum dado de outro paciente",
   );
+  await expect(
+    edit(page).getByRole("heading", { name: "fevereiro de 2100", exact: true }),
+  ).toBeVisible();
   await edit(page)
     .getByRole("button", { name: "Remover data 11/02/2100", exact: true })
     .click();
@@ -230,8 +235,29 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await edit(page)
     .getByRole("button", { name: "Revisar alteração", exact: true })
     .click();
+  await expect(review(page)).toBeVisible();
+  await expect(
+    review(page).getByRole("button", {
+      name: "Confirmar gravação",
+      exact: true,
+    }),
+  ).toBeEnabled();
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 950 });
+    if (width === 320) {
+      const content = page.getByRole("region", {
+        name: "Conteúdo de Revisar escala",
+        exact: true,
+      });
+      await content.evaluate((element) => {
+        element.scrollTop = 0;
+      });
+      await content.focus();
+      await page.keyboard.press("PageDown");
+      await expect
+        .poll(() => content.evaluate((element) => element.scrollTop))
+        .toBeGreaterThan(0);
+    }
     await audit(page, `selected-dates-review-${width}`);
     await withinDrawer(review(page), `selected-dates-review-${width}`);
   }
@@ -242,7 +268,8 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   });
   const confirmation = page.waitForResponse(
     (response) =>
-      new URL(response.url()).pathname === "/api/schedules" &&
+      new URL(response.url()).pathname ===
+        "/api/schedules/preparations/commit" &&
       response.request().method() === "POST",
   );
   await review(page)
@@ -250,7 +277,14 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
     .click();
   const result = await confirmation;
   expect(result.ok(), await result.text()).toBe(true);
-  const series = (await result.json()).data;
+  const receipt = (await result.json()).data.receipt;
+  expect(receipt.patientId).toBe(f.patient);
+  expect(receipt.purpose).toBe("schedule_series_create");
+  const series = JSON.parse(
+    sql(
+      `select to_jsonb(s)::text from public.shift_series s where id=${q(receipt.resourceId)} and care_recipient_id=${q(f.patient)}`,
+    ),
+  );
   const expected = chosenDates.map((day) =>
     day === "2100-02-11" ? "2100-02-12" : day,
   );

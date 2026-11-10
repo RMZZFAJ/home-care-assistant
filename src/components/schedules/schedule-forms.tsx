@@ -6,7 +6,7 @@ import {
   TextAreaField,
   TextInput,
 } from "@/components/ui/controls";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type RefObject } from "react";
 import { z } from "zod";
 
 import type { ScheduleCommand } from "@/lib/validation/schedules";
@@ -40,6 +40,9 @@ export function ScheduleForm({
   onReview,
   creationFields,
   onCreationChange,
+  reviewTriggerRef,
+  datesMonth,
+  onDatesMonthChange,
 }: {
   editor: ScheduleEditor;
   data: ScheduleWorkspace;
@@ -50,6 +53,9 @@ export function ScheduleForm({
   onReview: (command: ScheduleCommand, version?: number) => void;
   creationFields?: CreationFields;
   onCreationChange?: (fields: CreationFields) => void;
+  reviewTriggerRef?: RefObject<HTMLButtonElement | null>;
+  datesMonth?: string | null;
+  onDatesMonthChange?: (month: string) => void;
 }) {
   const [localCreation, setLocalCreation] = useState<CreationFields>(() =>
     editor.kind === "series"
@@ -179,6 +185,8 @@ export function ScheduleForm({
       {editor.kind === "type" || editor.kind === "series" ? (
         <>
           <ScheduleCreationFields
+            datesMonth={datesMonth}
+            onDatesMonthChange={onDatesMonthChange}
             value={creation}
             onChange={changeCreation}
             data={data}
@@ -302,7 +310,12 @@ export function ScheduleForm({
           ) : null}
         </>
       ) : null}
-      <ActionButton id="schedule-review-button" variant="primary" type="submit">
+      <ActionButton
+        ref={reviewTriggerRef}
+        id="schedule-review-button"
+        variant="primary"
+        type="submit"
+      >
         Revisar alteração
       </ActionButton>
     </form>

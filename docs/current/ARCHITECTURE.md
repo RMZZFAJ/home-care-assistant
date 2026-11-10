@@ -212,3 +212,11 @@ explícita antes do reconhecimento e pode sobreviver à perda desse resultado.
 Envelope local congela a tentativa;leitura autorizada reconcilia apenas a
 confirmação exata. Alterar/decidir sobre recursos existentes continua no motor
 anterior e ainda exige continuidade privada;inventário49/51 não é paridade66/171.
+
+A leitura do contexto agrega o diretório completo após calcular capacidades
+somente dos candidatos de autoridade da sessão e do backend/transação. As
+guardas nativas permanecem a fonte de decisão;nenhuma autoridade é mantida
+entre requisições. Esse cálculo preserva os consumidores de administração,
+operação e processos internos. Recusa conhecida da criação de escala mantém
+revisão somente leitura até Voltar,com foco no controle de revisão ao retornar.
+Recuperação incerta continua distinta da revisão recusada e do preenchimento.

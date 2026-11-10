@@ -57,6 +57,15 @@ Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
 
+**Lentidão demonstrada na leitura de contexto: correção concluída · 100% deste
+problema.** Nos ensaios locais com milhares de pacientes fictícios, a consulta
+passou a responder em menos de um segundo, preservando a lista completa e as
+permissões. Responsável pela correção: Codex. Isso não encerra as outras
+combinações de acesso e recuperação ainda indicadas neste quadro.
+
+A revisão de uma programação também conserva o mês aberto, as datas e o foco
+quando há conflito. É possível percorrer a revisão longa pelo teclado.
+
 ## Funcionalidades e critérios da D-B
 
 ### Formulários, rascunhos e recuperação
@@ -481,10 +490,6 @@ independentes.
 - **Guardar alterações e decisões sobre escalas existentes entre aparelhos:**
   0% dessas preparações. Novos tipos de plantão e novas programações estão
   concluídos; a continuidade de toda a agenda está em ≈35%. Responsável: Codex.
-- **Melhorar a leitura de contexto em bases locais muito grandes:**0% desta
-  correção.
-  Os testes encontraram lentidão e falhas intermitentes com milhares de
-  pacientes fictícios acumulados. Responsável: Codex.
 - **Aceite final das tarefas com usuários reais:**0%. Responsáveis: você e
   participantes; preparo e eventuais correções pelo Codex.
 - **Homologação de acessibilidade com pessoas e tecnologia assistiva:**0%.
@@ -507,8 +512,7 @@ preservado e incluído na revisão final; não será refeito sem motivo.
 
 1. **Revisar e completar a continuidade dos formulários da operação diária.**
    Completar os preenchimentos privados das alterações e decisões da agenda;
-   corrigir a lentidão de leitura em bases muito grandes; revisar contagens,
-   cadastros e administração, completar as lacunas e conferir
+   revisar contagens, cadastros e administração, completar as lacunas e conferir
    mensagens, conflitos e recuperação em conjunto. Preservar as revisões de
    fluxo, os relatos, complementos e
    decisões de consumo, Andamentos privados, a movimentação familiar, os seis

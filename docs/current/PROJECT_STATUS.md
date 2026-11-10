@@ -4,6 +4,32 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.52 reduz a leitura de contexto de segundos para118–139ms na conta local
+e47–51ms na global em medições locais com milhares de pacientes fictícios.
+Diretório completo,papéis,vínculos,capacidades e contrato preservados;autoridade
+interna por backend/transação incluída,sem cache entre chamadas. Sete Auth
+reais qualificados,incluindo revogação,sessão expirada e isolamento de contexto.
+
+A agenda mantém revisão após recusa conhecida,foco,mês aberto e rolagem por
+teclado. Consumidores antigos exercitam confirmação nativa em alterações;
+criações usam preparação privada e recibo/série reais. São15 identidades de
+navegador de produção local qualificadas;recheck final3/3,quatro larguras/axe
+e capturas móveis inspecionadas. Contraprovas12/15,0/3,interrupção e JSON de
+build inválido preservadas,sem reset ou regras reduzidas.
+
+Remoto195→196 reconciliado:dez definições/config/grants iguais ao local,nove
+nativas preservadas,probes0,dry-run vazio e saúde normal. Sem tabela/index/ACL
+nova,fixtures/Auth remoto ou backup pesado redundante. CI19a2397 passou core
+e três shards,mas falhou nos outros três;consumidores corrigidos,CI própria
+integral exigida. Sonar adiado,PR7 Draft,produção NO-GO e meta ativa.
+
+105critérios56PASS/49PARTIAL e18estados UI preservados. Visual≈60%,formulários
+≈90%,recuperação≈85%. Quadro temporário atualizado antes de avançar;alterações/
+decisões privadas da agenda,contagens,cadastros e demais D-B continuam.
+[Incremento](../audits/D/D-B/WORKSPACE_CONTEXT_PERFORMANCE.md).
+
+## Incremento anterior D3.51
+
 D3.51 implementa preparação privada de novos tipos de plantão e novas
 programações:edição incompleta,CAS,retomada entre aparelhos,confirmação nativa
 atômica e recuperação própria. Mudança do tipo exige adoção explícita sem

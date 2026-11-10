@@ -5,6 +5,8 @@ NO-GO.** A ordem integral preservada em [OWNER_EXECUTION_ORDER.txt](OWNER_EXECUT
 atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitoramento.
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
+- [Contexto eficiente e recuperação da agenda](WORKSPACE_CONTEXT_PERFORMANCE.md):
+  diretório completo,autoridade preservada,teclado/calendário e migration196.
 - [Novos tipos e programações privados](SCHEDULE_CREATION_DRAFTS.md):save
   incompleto,CAS,recuperação e migrations193–195 reconciliadas.
 - [Andamentos privados entre sessões](PROGRESS_NOTE_DRAFTS.md):salvamento,

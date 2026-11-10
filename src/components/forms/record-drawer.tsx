@@ -3,10 +3,11 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from "rea
 import { Drawer } from "@/components/ui/overlays";
 
 /** Contextual editing keeps the list and its filters in place. */
-export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges }: {
+export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
   recovery?: ReactNode;
   hasUnsavedChanges?: boolean;
+  keyboardScrollable?: boolean;
 }) {
   const [dirty, setDirty] = useState(false);
   const [discard, setDiscard] = useState(false);
@@ -34,7 +35,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
     // The form stays mounted. Move focus before removing the warning's button.
     (target ?? form)?.focus();
   };
-  return <Drawer open title={title} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false}>
+  return <Drawer open title={title} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false} keyboardScrollable={keyboardScrollable}>
       {recovery}
       {discard ? <div className="hca-attention" role="alert"><p>Há alterações ainda não salvas.</p><div className="hca-toolbar"><button type="button" className="hca-control" disabled={busy || preventClose} onClick={continueEditing}>Continuar editando</button><button type="button" className="hca-control" disabled={busy || preventClose} onClick={() => { if (!busy && !preventClose) onClose(); }}>Descartar alterações</button></div></div> : null}
       <fieldset ref={formRef} tabIndex={-1} className="min-w-0" disabled={busy} onFocusCapture={event => { editFocusRef.current = event.target; }} onChange={() => { if (trackChanges) setDirty(true); }}>{children}</fieldset>

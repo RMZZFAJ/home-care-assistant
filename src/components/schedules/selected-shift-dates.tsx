@@ -11,13 +11,18 @@ export function SelectedShiftDates({
   until,
   selected,
   onChange,
+  month: controlledMonth,
+  onMonthChange,
 }: {
   from: string;
   until: string;
   selected: string[];
   onChange: (dates: string[]) => void;
+  month?: string | null;
+  onMonthChange?: (month: string) => void;
 }) {
-  const [month, setMonth] = useState(from.slice(0, 7));
+  const [localMonth, setLocalMonth] = useState(from.slice(0, 7));
+  const month = controlledMonth ?? localMonth;
   const first = new Date(month + "-01T12:00:00Z");
   const days = new Date(
     Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0),
@@ -30,7 +35,9 @@ export function SelectedShiftDates({
   function move(delta: number) {
     const date = new Date(first);
     date.setUTCMonth(date.getUTCMonth() + delta);
-    setMonth(date.toISOString().slice(0, 7));
+    const next = date.toISOString().slice(0, 7);
+    if (onMonthChange) onMonthChange(next);
+    else setLocalMonth(next);
   }
   function toggle(date: string) {
     onChange(

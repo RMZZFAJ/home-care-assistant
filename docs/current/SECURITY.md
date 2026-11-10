@@ -306,3 +306,11 @@ Chave nativa anterior não pode ser reaproveitada como consumo privado. Recusa
 tardia reverte a transação inteira. Prova de não aplicação exige vínculo
 imutável de chave ou avanço monotônico da revisão privada/tipo selecionado.
 Não há limpeza por ausência,publicação automática,cache privado ou replay offline.
+
+my_workspace limita trabalho aos candidatos de autoridade guardada no banco,
+incluindo backend/transação/usuário da autoridade interna. IDs apenas limitam
+a consulta;can_access_recipient/patient_capabilities conservam a decisão. Não
+se reduz a autoridade interna à seleção da UI nem se concede capacidade pela
+presença no diretório global. Guardas/grants nativos permanecem e a sessão é
+revalidada no retorno,sem cache entre chamadas. Testes reais negam vínculo
+revogado,sessão expirada,anon/service e escopo interno divergente.

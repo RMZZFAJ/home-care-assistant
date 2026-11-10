@@ -14,6 +14,7 @@ import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import { calendarPeriod } from "@/lib/schedules/calendar";
 import {
   initialScheduleSeries,
@@ -148,6 +149,7 @@ export function ScheduleCreationPreparation({
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
   const [packet, setPacket] = useState<SchedulePreparationPacket | null>(null),
+    [reviewRejected, setReviewRejected] = useState(false),
     [publishing, setPublishing] = useState(false),
     [proof, setProof] = useState<ScheduleRecovery | null>(null);
   const mountedRef = useRef(false),
@@ -191,6 +193,7 @@ export function ScheduleCreationPreparation({
         : initialScheduleSeries(empty, userId, team, today)),
   );
   const [working, setWorking] = useState(Boolean(initial.value));
+  const [datesMonth, setDatesMonth] = useState<string | null>(null);
   const [discardChoice, setDiscardChoice] = useState<{
     draftId: string;
     fields: ScheduleCreationFields;
@@ -270,6 +273,7 @@ export function ScheduleCreationPreparation({
         return false;
       try {
         setFields(row.content.schedule);
+        setDatesMonth(null);
         setWorking(true);
         setPacket(null);
         setError("");
@@ -298,6 +302,7 @@ export function ScheduleCreationPreparation({
           );
           return;
         }
+        setDatesMonth(null);
         setFields(
           purpose === "shift_type_create"
             ? initialScheduleType()
@@ -322,6 +327,28 @@ export function ScheduleCreationPreparation({
     Boolean(packet) ||
     Boolean(integrityError);
   const snapshot = { schedule: fields };
+  const reviewHeadingRef = useRef<HTMLHeadingElement>(null),
+    reviewTriggerRef = useRef<HTMLButtonElement>(null),
+    previousReviewRef = useRef(false);
+  const showReview =
+    !protectedView &&
+    !pending &&
+    Boolean(packet) &&
+    !draft.consumed &&
+    !draft.conflict &&
+    !draft.offered &&
+    !draft.pending;
+  useEffect(() => {
+    if (publishing || draft.busy) return;
+    const returning = previousReviewRef.current && !showReview;
+    previousReviewRef.current = showReview;
+    if (!showReview && !returning) return;
+    const frame = requestAnimationFrame(() => {
+      if (showReview) reviewHeadingRef.current?.focus();
+      else reviewTriggerRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [showReview, publishing, draft.busy]);
   const consumedReceipt = draft.consumed?.consumedResult;
   const localDifference = Boolean(
     working &&
@@ -377,6 +404,7 @@ export function ScheduleCreationPreparation({
       if (!mountedRef.current || !saved) return;
       if (localRef.current?.mode === "carry" && !saved.replayed)
         writeLocal(null);
+      setReviewRejected(false);
       setPacket(
         schedulePreparationCommitSchema.parse({
           careRecipientId: patient.id,
@@ -415,7 +443,13 @@ export function ScheduleCreationPreparation({
     onCommitted(receipt);
   }
   async function send() {
-    if (busyRef.current || protectedView || integrityError) return;
+    if (
+      busyRef.current ||
+      protectedView ||
+      integrityError ||
+      (!pending && reviewRejected)
+    )
+      return;
     const original =
       pending ??
       (packet ? { mode: "pending" as const, userId, packet, fields } : null);
@@ -446,7 +480,12 @@ export function ScheduleCreationPreparation({
       if (rejected) {
         try {
           writeLocal(null, original);
-          setPacket(null);
+          if (
+            e.code === "DRAFT_VERSION_CONFLICT" ||
+            [401, 403, 404].includes(e.status)
+          )
+            setPacket(null);
+          else setReviewRejected(true);
         } catch (c) {
           setIntegrityError(
             c instanceof Error ? c.message : "A referência foi preservada.",
@@ -575,6 +614,7 @@ export function ScheduleCreationPreparation({
   return (
     <ScheduleSummaryContext value={data}>
       <RecordDrawer
+        keyboardScrollable
         title={
           pending
             ? "Recuperar confirmação da escala"
@@ -730,24 +770,31 @@ export function ScheduleCreationPreparation({
               ) : null}
             </section>
           ) : null}
-          {!protectedView &&
-          !pending &&
-          packet &&
-          !draft.consumed &&
-          !draft.conflict &&
-          !draft.offered ? (
+          {showReview && packet ? (
             <section
               className="hca-form-stack"
               aria-label="Conferência da nova escala"
             >
-              <h3>Confira antes de confirmar</h3>
+              <h3 ref={reviewHeadingRef} tabIndex={-1}>
+                Confira antes de confirmar
+              </h3>
+              {reviewRejected ? (
+                <Notice error>
+                  A gravação foi recusada. Volte ao preenchimento e confira os
+                  dados antes de preparar outra confirmação.
+                </Notice>
+              ) : null}
               <ScheduleReviewDetails
                 review={{ command: packet.command, workspace: data ?? empty }}
               />
               <div className="hca-toolbar">
                 <ActionButton
                   disabled={publishing}
-                  onClick={() => setPacket(null)}
+                  onClick={(event) => {
+                    holdDialogFocus(event.currentTarget);
+                    setPacket(null);
+                    setReviewRejected(false);
+                  }}
                 >
                   Voltar
                 </ActionButton>
@@ -757,6 +804,7 @@ export function ScheduleCreationPreparation({
                     publishing ||
                     draft.blocked ||
                     !writable ||
+                    reviewRejected ||
                     (purpose === "schedule_series_create" && !data) ||
                     Boolean(integrityError)
                   }
@@ -798,7 +846,16 @@ export function ScheduleCreationPreparation({
                   publishOwn={publishOwn}
                   today={today}
                   creationFields={fields}
+                  reviewTriggerRef={reviewTriggerRef}
+                  datesMonth={datesMonth}
+                  onDatesMonthChange={setDatesMonth}
                   onCreationChange={(value) => {
+                    if (
+                      value.form === "series" &&
+                      fields.form === "series" &&
+                      value.from.slice(0, 7) !== fields.from.slice(0, 7)
+                    )
+                      setDatesMonth(null);
                     setFields(value);
                     setWorking(true);
                     setError("");
