@@ -186,3 +186,9 @@ review_flow_submission:salvar não registra revisão,cria relato ou debita
 estoque. Lista pessoal mantém recuperação mesmo após sair da fila pendente,
 sem depender da consulta do catálogo. Origem preservada,declaração própria,
 referência atual e resultado confirmado têm representações distintas.
+
+A agenda preserva a tentativa nativa por conta/paciente antes de transmitir.
+Consulta pessoal ao diário comprova a mesma decisão;ausência permite somente
+reenvio explícito da mesma chave. Esse ciclo é distinto do save de edição
+incompleta entre aparelhos,que ainda será integrado. Inventário49/51 inicial
+separa rascunhos privados,contagens compartilhadas,arquivos,consultas e Auth.

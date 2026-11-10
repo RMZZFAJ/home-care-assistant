@@ -1148,3 +1148,13 @@ consumption.report/paciente ativo;registro também exige leitura da equipe.
 Recusa não concede catálogo a quem perdeu essa leitura.200 inválido não
 confirma sucesso;envelope divergente não é apagado. Consulta/online não
 reapresentam o POST. A API nativa /submissions permanece compatível.
+
+## Consulta da confirmação da agenda
+
+GET /api/schedules/confirmation exige careRecipientId/idempotencyKey únicos,
+Auth e contexto explícito. Responde found=false ou confirmação do próprio
+diário nativo,com comando/versão/resultado reduzido. No-store obrigatório.
+Sem POST,replay ou mudança do motor. A leitura pessoal admite paciente inativo
+e perda de escrita sob vínculo vivo;não concede consulta operacional nem novo
+ato. Cliente confere conta,paciente,chave,comando,versão e alvo antes da limpeza.
+Ausência não prova rejeição;reenvio da mesma chave é sempre escolha explícita.

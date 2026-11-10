@@ -3054,3 +3054,28 @@ seguem pendentes. Sonar adiado,PR7 Draft,sem merge/produção;meta ativa.
 
 [Incremento](FLOW_REVIEW_DRAFTS.md),[validação](FLOW_REVIEW_DRAFTS_VALIDATION.json),
 [remoto](FLOW_REVIEW_DRAFTS_REMOTE.json),[CI anterior](CI_E2E99D2_OBSERVATION.json).
+
+## D3.49 — inventário e confirmação da agenda
+
+D3.49 corrige a perda da intenção de escala ao recarregar:pacote por conta/
+paciente,consulta somente do próprio diário nativo,conferência exata e reenvio
+somente explícito. Resultado obsoleto não é aprovação. Resposta200 divergente,
+outro envelope,perda de leitura e contexto503 preservam a tentativa;recuperação
+própria funciona sem escrita/com paciente inativo. Sem cache privado ou replay.
+15 unitários/API,7 Auth distintos e9 browser de produção local qualificados;
+último recheck3/3,14fontes LF estáveis. Tipos/lint passam. Contraprovas de
+fixtures,reescrita desnecessária de envelope e contexto indisponível preservadas.
+Remoto189→190 reconciliado:uma RPC somente leitura Auth,quatro dependências
+legadas inalteradas,definições/configuração/ACL/digest iguais ao local,dry-run
+vazio,probes0. Sem reset,fixtures/Auth remoto ou backup pesado redundante.
+Inventário inicial49 consumidores/51 formulários identifica lacunas de agenda,
+Andamentos,contagem e cadastros;presença de hook não aprova todas as variantes.
+105 critérios56PASS/49PARTIAL e18 estados UI preservados;visual≈60%,formulários
+≈90%,recuperação revisada≈85% por ampliação das lacunas identificadas. Quadro
+temporário atualizado antes de avançar;private agenda/Andamentos continuam com
+Codex. Próximo:completar esses editores,contagens e revisão dos demais campos;
+depois fichas/estoque,PDF técnico e demais critérios. CI própria exigida,
+Sonar adiado,PR7 Draft,produção NO-GO,meta ativa.
+
+[Incremento](FORM_CONTINUITY.md),[inventário](FORM_CONTINUITY_INVENTORY.csv),
+[validação e remoto](FORM_CONTINUITY_VALIDATION.json).

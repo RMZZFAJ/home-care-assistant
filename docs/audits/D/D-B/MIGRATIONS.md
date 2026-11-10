@@ -701,3 +701,19 @@ mudam50→52 tabelas RLS fechadas,181→186 RPCs Auth e38→40 índices sem uso;
 demais contagens preservadas. Isso não aprova achados anteriores. Legado local
 presentation_finite_factor e qualificação preexistente realtime.messages do
 provedor permanecem. [Conferência](FLOW_REVIEW_DRAFTS_REMOTE.json).
+
+## D3.49 — consulta da própria confirmação da agenda
+
+Migration190 gerada pelo CLI e aplicada uma vez no remoto autorizado,189→190,
+antes do commit. Preflight:projeto saudável,histórico189/digest e quatro
+dependências iguais ao local;dry-run somente190,sem seeds/roles/Vault.
+Pós-check:190versões/digest,cinco definições/configurações/ACL iguais ao local,
+probes0,dry-run vazio. Novas tabelas0;RPC nova somente leitura,execute apenas
+Auth,search_path vazio,consulta por ator autenticado/paciente/chave.
+
+Motores schedule_command/workspace,can_access_recipient e guarda privada não
+mudaram. Leitura própria não cria ato nem libera escrita com paciente inativo.
+Sem reset,fixtures/Auth ou backup pesado redundante no banco sintético. Advisors
+globais não repetidos para esta adição de leitura;achados prévios permanecem.
+Instalação limpa/legada e integração integral exigem CI própria do novo SHA.
+[Reconciliação](FORM_CONTINUITY_VALIDATION.json).

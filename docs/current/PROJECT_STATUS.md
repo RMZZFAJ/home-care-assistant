@@ -4,6 +4,28 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.49 corrige a perda da intenção de escala ao recarregar:pacote por conta/
+paciente,consulta somente do próprio diário nativo,conferência exata e reenvio
+somente explícito. Resultado obsoleto não é aprovação. Resposta200 divergente,
+outro envelope,perda de leitura e contexto503 preservam a tentativa;recuperação
+própria funciona sem escrita/com paciente inativo. Sem cache privado ou replay.
+15 unitários/API,7 Auth distintos e9 browser de produção local qualificados;
+último recheck3/3,14fontes LF estáveis. Tipos/lint passam. Contraprovas de
+fixtures,reescrita desnecessária de envelope e contexto indisponível preservadas.
+Remoto189→190 reconciliado:uma RPC somente leitura Auth,quatro dependências
+legadas inalteradas,definições/configuração/ACL/digest iguais ao local,dry-run
+vazio,probes0. Sem reset,fixtures/Auth remoto ou backup pesado redundante.
+Inventário inicial49 consumidores/51 formulários identifica lacunas de agenda,
+Andamentos,contagem e cadastros;presença de hook não aprova todas as variantes.
+105 critérios56PASS/49PARTIAL e18 estados UI preservados;visual≈60%,formulários
+≈90%,recuperação revisada≈85% por ampliação das lacunas identificadas. Quadro
+temporário atualizado antes de avançar;private agenda/Andamentos continuam com
+Codex. Próximo:completar esses editores,contagens e revisão dos demais campos;
+depois fichas/estoque,PDF técnico e demais critérios. CI própria exigida,
+Sonar adiado,PR7 Draft,produção NO-GO,meta ativa.
+
+## Incremento anterior D3.48
+
 D3.48 implementa revisão FLOW privada por sugestão real:edição incompleta,
 CAS,retomada entre sessões,referência original separada e confirmação nativa
 atômica. Histórico pessoal inativo/sem escrita,envelope exato e revogação

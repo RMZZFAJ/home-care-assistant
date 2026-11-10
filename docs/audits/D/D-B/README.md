@@ -5,6 +5,8 @@ NO-GO.** A ordem integral preservada em [OWNER_EXECUTION_ORDER.txt](OWNER_EXECUT
 atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitoramento.
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
+- [Continuidade integrada e confirmação da agenda](FORM_CONTINUITY.md):
+  inventário inicial49 consumidores,recuperação após reload e migration190.
 - [Revisões Flow entre sessões](FLOW_REVIEW_DRAFTS.md): preenchimento próprio,
   comparação explícita,confirmação nativa e migrations188/189 reconciliadas.
 - [Preenchimentos privados de consumo](CONSUMPTION_DRAFTS.md): relatos,

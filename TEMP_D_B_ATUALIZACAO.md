@@ -25,21 +25,21 @@ responsabilidade. “Você” indica decisão, configuração, participação em
 ou liberação que depende de você. “Participantes/equipe” são pessoas que
 usarão ou avaliarão o sistema; “serviço externo” depende também do fornecedor.
 
-A última rodada completa encontrou falhas. As correções deste lote passaram
-pelos testes dirigidos, mas uma nova rodada completa ainda precisa validar a
-versão publicada. O banco remoto já recebeu todas as atualizações deste lote,
-sem pendências. A fase continua em execução.
+Este lote passou pelas verificações locais dirigidas. A rodada completa da
+versão publicada ainda precisa ser concluída. O banco remoto já recebeu todas
+as atualizações deste lote, sem pendências. A fase continua em execução.
 
-Neste lote, revisões de sugestões recebidas por Flow passaram a guardar o
-preenchimento privado e retomá-lo em outra sessão. Campos incompletos são
-preservados; mudar a referência exige comparação e escolha explícitas. Uma
-confirmação perdida pode ser recuperada sem registrar a decisão duas vezes.
-Salvar não cria relato nem desconta estoque. A revisão, os resultados e a
-lista pessoal seguem a aparência do modelo.
+A agenda agora preserva neste aparelho a tentativa enviada: depois de uma
+resposta perdida ou de recarregar, é possível consultar o resultado antes de
+decidir reenviar a mesma tentativa. A consulta não cria outra programação.
+Uma falha inicial de acesso também pode ser recuperada sem perder a referência.
 
-Relatos e decisões de consumo, movimentação familiar, fichas e atos de balanço
-dos lotes anteriores permanecem implementados. Ainda farei uma revisão
-integrada dos formulários para localizar e completar as lacunas restantes.
+O levantamento ampliado encontrou trabalho restante em agenda, Andamentos,
+contagens, cadastros e administração. Por isso, revisei a estimativa de
+recuperação entre aparelhos para 85%. Guardar os preenchimentos incompletos
+da agenda e de Andamentos no servidor continua sendo minha responsabilidade.
+Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
+fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
 
 ## Funcionalidades e critérios da D-B
@@ -76,9 +76,10 @@ A troca das classes de quebra de texto já foi concluída.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈90%. Falta: Conferir todos os formulários em conjunto e completar
-  as lacunas restantes. Revisões de fluxo, relatos e decisões de consumo,
-  movimentação familiar, programação, atribuição, adiamentos, pareceres,
+  execução · ≈85%. Falta: Guardar a edição incompleta da agenda e de Andamentos
+  entre aparelhos; conferir os demais formulários e completar as lacunas.
+  Revisões de fluxo, relatos e decisões de consumo, movimentação familiar,
+  programação do balanço, atribuição, adiamentos, pareceres,
   reconto e decisões de requisição estão implementados. Responsável: Codex.
 - **Preservar edição durante falha, conflito e perda de contexto** — Em
   execução · ≈85%. Falta: Conferir em conjunto as combinações restantes de
@@ -455,6 +456,11 @@ estar parcialmente pronta, como mostrado nos blocos anteriores. Incluem implemen
 validação e ativação operacional; não são motivos para parar os trabalhos
 independentes.
 
+- **Preenchimento privado da agenda entre aparelhos:**0% dessa preparação.
+  A consulta da tentativa já enviada foi implementada. Responsável: Codex.
+- **Preenchimento privado de Andamentos entre aparelhos:**0% desse salvamento.
+  A edição no aparelho e a publicação existente estão preservadas.
+  Responsável: Codex.
 - **Aceite final das tarefas com usuários reais:**0%. Responsáveis: você e
   participantes; preparo e eventuais correções pelo Codex.
 - **Homologação de acessibilidade com pessoas e tecnologia assistiva:**0%.
@@ -476,9 +482,10 @@ funcionalidade, sem representar ordem de execução. Tudo que já está 100% ser
 preservado e incluído na revisão final; não será refeito sem motivo.
 
 1. **Revisar e completar a continuidade dos formulários da operação diária.**
-   Conferir todos os formulários, inclusive agenda, cadastros e administração;
-   completar as lacunas encontradas e revisar mensagens, conflitos e recuperação
-   em conjunto. Preservar as revisões de fluxo, os relatos, complementos e
+   Completar os preenchimentos privados da agenda e de Andamentos; revisar
+   contagens, cadastros e administração, completar as lacunas e conferir
+   mensagens, conflitos e recuperação em conjunto. Preservar as revisões de
+   fluxo, os relatos, complementos e
    decisões de consumo, a movimentação familiar, os seis atos de balanço,
    pareceres, reconto, decisões de requisição e as demais preparações concluídas.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,

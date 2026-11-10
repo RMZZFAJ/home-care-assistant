@@ -624,3 +624,11 @@ escopo independente de saldo/leitura de estoque. Somente o ato confirmado
 consome o privado. Fato,auditoria,journal e resultado revertem juntos na recusa.
 189 vincula a chave privada ao recibo e restringe a divulgação do catálogo,
 sem alterar motores nativos. Dezoito dependências legadas comparadas.
+
+## Confirmação pessoal da agenda
+
+Migration190 adiciona somente public.schedule_confirmation(uuid,uuid),leitura
+do diário privado existente por auth.uid()/paciente/chave. Execute Auth,
+search_path vazio,sem novos grants de tabela. Comando nativo,diário e tipos
+existentes permanecem inalterados. Recuperação histórica própria exige vínculo
+vivo;novo ato conserva a autorização ativa do motor.

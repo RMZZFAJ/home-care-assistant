@@ -34,6 +34,11 @@ import {
 } from "./schedule-review";
 import type { ScheduleCommand } from "@/lib/validation/schedules";
 import type { ScheduleWorkspace, ScheduledShift } from "@/types/schedules";
+import {
+  useScheduleConfirmation,
+  type ScheduleRecovery,
+} from "./use-schedule-confirmation";
+import { ScheduleConfirmationPanel } from "./schedule-confirmation-panel";
 
 const today = () =>
   new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(
@@ -51,10 +56,11 @@ export function ScheduleConsole() {
   return (
     <Workspace title="Escalas e plantões">
       {(context) =>
-        context.patient &&
-        (can(context, "schedule.read.team") ||
-          can(context, "schedule.read.own")) ? (
-          <Agenda key={context.patient.id} context={context} />
+        context.patient ? (
+          <PatientSchedule
+            key={context.userId + ":" + context.patient.id}
+            context={context}
+          />
         ) : (
           <Notice error>
             Selecione um vínculo com permissão para consultar escalas.
@@ -64,7 +70,28 @@ export function ScheduleConsole() {
     </Workspace>
   );
 }
-function Agenda({ context }: { context: WorkspaceContext }) {
+function PatientSchedule({ context }: { context: WorkspaceContext }) {
+  const recovery = useScheduleConfirmation(context.userId, context.patient!.id);
+  return can(context, "schedule.read.team") ||
+    can(context, "schedule.read.own") ? (
+    <Agenda context={context} recovery={recovery} />
+  ) : (
+    <>
+      <ScheduleConfirmationPanel recovery={recovery} />
+      <Notice error>
+        Seu vínculo não permite consultar a agenda. A recuperação acima consulta
+        somente sua tentativa anterior; não publica nova programação.
+      </Notice>
+    </>
+  );
+}
+function Agenda({
+  context,
+  recovery,
+}: {
+  context: WorkspaceContext;
+  recovery: ScheduleRecovery;
+}) {
   const patient = context.patient!,
     team = can(context, "schedule.manage.team"),
     publishOwn = can(context, "schedule.manage.own");
@@ -101,15 +128,14 @@ function Agenda({ context }: { context: WorkspaceContext }) {
   }>({ key: "", range: "", data: null, error: "" });
   const [error, setError] = useState(""),
     [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false),
-    [uncertain, setUncertain] = useState(false),
-    [conflict, setConflict] = useState(false);
+  const busy = recovery.busy || !recovery.ready,
+    uncertain = recovery.pending !== null;
+  const [conflict, setConflict] = useState(false);
   const [editor, setEditor] = useState<ScheduleEditor | null>(null),
     [review, setReview] = useState<ScheduleReview | null>(null);
   const [editorWorkspace, setEditorWorkspace] =
     useState<ScheduleWorkspace | null>(null);
   const [opener, setOpener] = useState<HTMLElement | null>(null);
-  const pendingRef = useRef<object | null>(null);
   const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const reviewOpen = Boolean(review);
   const previousReviewOpenRef = useRef(false);
@@ -166,6 +192,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
     return () => controller.abort();
   }, [patient.id, period.from, period.until, queryKey, rangeKey]);
   function open(value: ScheduleEditor, target: HTMLElement) {
+    if (busy || uncertain) return;
     setDay(day);
     setOpener(target);
     setEditorWorkspace(data);
@@ -178,6 +205,7 @@ function Agenda({ context }: { context: WorkspaceContext }) {
     version?: number,
     target?: HTMLElement,
   ) {
+    if (busy || uncertain) return;
     const workspace = target ? data : (editorWorkspace ?? data);
     if (!workspace) return;
     if (target) setOpener(target);
@@ -186,48 +214,38 @@ function Agenda({ context }: { context: WorkspaceContext }) {
     // Hold the exact displayed object while live queries receive newer data.
     setReview({ command, version, workspace });
   }
+  function confirmed() {
+    setConflict(false);
+    setReview(null);
+    setEditor(null);
+    setError("");
+    setMessage(
+      "Resultado da escala conferido. As responsabilidades documentais anteriores foram preservadas.",
+    );
+    setAttempt((value) => value + 1);
+  }
   async function send() {
-    if (!pendingRef.current && review)
-      pendingRef.current = {
+    if (busy || uncertain || !review) return;
+    setError("");
+    try {
+      const result = await recovery.submit({
         careRecipientId: patient.id,
         command: review.command,
         expectedVersion: review.version ?? null,
         idempotencyKey: crypto.randomUUID(),
-      };
-    if (!pendingRef.current) return;
-    setBusy(true);
-    setError("");
-    try {
-      await api("/api/schedules", pendingRef.current);
-      pendingRef.current = null;
-      setUncertain(false);
-      setConflict(false);
-      setReview(null);
-      setEditor(null);
-      setMessage(
-        review?.command.action === "close_obsolete"
-          ? "Proposta encerrada como obsoleta. A programação atual foi preservada."
-          : review?.command.action === "propose_change" ||
-              (review?.command.action === "series" && !team && !publishOwn)
-            ? "Proposta registrada. A programação publicada será alterada somente após aprovação."
-            : "Escala gravada. As responsabilidades documentais anteriores foram preservadas.",
-      );
-      setAttempt((value) => value + 1);
+      });
+      if (result) confirmed();
     } catch (reason) {
       if (
         reason instanceof ApiError &&
         [400, 401, 403, 404, 409, 422].includes(reason.status)
       ) {
-        pendingRef.current = null;
-        setUncertain(false);
         if (reason.status === 409 && reason.code !== "SCHEDULE_OVERLAP")
           setConflict(true);
-      } else setUncertain(true);
+      }
       setError(
         reason instanceof Error ? reason.message : "Não foi possível gravar.",
       );
-    } finally {
-      setBusy(false);
     }
   }
   const visible =
@@ -424,6 +442,12 @@ function Agenda({ context }: { context: WorkspaceContext }) {
         </FormField>
       ) : null}
       {errors}
+      {uncertain ? (
+        <ScheduleConfirmationPanel
+          recovery={recovery}
+          onConfirmed={confirmed}
+        />
+      ) : null}
       {conflict ? (
         <Notice error>
           A versão ou uma condição necessária mudou. A revisão exibida foi
@@ -449,33 +473,39 @@ function Agenda({ context }: { context: WorkspaceContext }) {
         </Notice>
       ) : null}
       <div className="hca-toolbar hca-schedule-decision-actions">
-        <ActionButton
-          disabled={busy || uncertain}
-          onClick={(event) => {
-            holdDialogFocus(event.currentTarget);
-            setReview(null);
-          }}
-        >
-          Voltar
-        </ActionButton>
-        <ActionButton
-          variant="primary"
-          disabled={
-            busy ||
-            conflict ||
-            invalidReason ||
-            blockedApproval ||
-            blockedSeries ||
-            !canConfirm
-          }
-          onClick={() => void send()}
-        >
-          {uncertain ? "Recuperar confirmação" : confirmLabel}
-        </ActionButton>
+        {!uncertain ? (
+          <>
+            <ActionButton
+              disabled={busy || uncertain}
+              onClick={(event) => {
+                holdDialogFocus(event.currentTarget);
+                setReview(null);
+              }}
+            >
+              Voltar
+            </ActionButton>
+            <ActionButton
+              variant="primary"
+              disabled={
+                busy ||
+                conflict ||
+                invalidReason ||
+                blockedApproval ||
+                blockedSeries ||
+                !canConfirm
+              }
+              onClick={() => void send()}
+            >
+              {confirmLabel}
+            </ActionButton>
+          </>
+        ) : null}
       </div>
     </div>
   ) : null;
-  return (
+  return recovery.readDenied ? (
+    <ScheduleConfirmationPanel recovery={recovery} onConfirmed={confirmed} />
+  ) : (
     <div className="hca-form-stack hca-schedule-agenda">
       <NotificationReference
         key={patient.id + ":" + reference}
@@ -507,6 +537,12 @@ function Agenda({ context }: { context: WorkspaceContext }) {
         ) : null}
       </div>
       {!editor && !review ? errors : null}
+      {!review ? (
+        <ScheduleConfirmationPanel
+          recovery={recovery}
+          onConfirmed={confirmed}
+        />
+      ) : null}
       {message ? <Notice>{message}</Notice> : null}
       <div className="hca-toolbar">
         <FormField label="Data de referência">

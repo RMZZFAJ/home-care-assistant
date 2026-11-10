@@ -276,3 +276,12 @@ Pacote incerto conserva a mesma chave;somente resultado autoritativo do pacote
 exato reconcilia a leitura. Outro envelope tipado permanece preservado e
 bloqueia reconhecimento. Perda de vínculo protege o conteúdo após revalidação.
 Cache privado/replay offline continuam ausentes;nenhum canal Meta foi ativado.
+
+## Recuperação pessoal da agenda
+
+A referência local de escala é separada por conta/paciente e nunca autoriza
+comando. RPC de consulta usa auth.uid(),vínculo vivo e diário do próprio ator;
+retorna somente seu comando e identidade/estado/versão do resultado. Outro
+ator não encontra a chave. Envelope/200 divergente não é limpo;consulta/online/
+reload não enviam POST. Perda de acesso retira os dados do painel. Senhas,OTP,
+MFA e capacidades de convite ficam fora de rascunhos comuns do inventário.
