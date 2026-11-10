@@ -1,0 +1,684 @@
+{
+  "increment": "D3.48",
+  "baseSha": "e2e99d2ee0fa6f4de22910adb097087de12588b2",
+  "projectId": "qwfrqychokvhdzakibid",
+  "project": {
+    "name": "home-care-assistant",
+    "status": "ACTIVE_HEALTHY",
+    "postgres": "17.11.0.003"
+  },
+  "status": "APPLIED_ONCE_RECONCILED_187_TO_189",
+  "preflight": {
+    "legacy": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "bal_comment_units",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "d3345dd50396252acf827694607d41cd5dc1eee40370fab2a1dd94ebba639845"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "can",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "7a689c297f9d7a220966e1b6aecb6800096c4321244235eebe2a52eaccc0020d"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_current_lines",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "f260729a944fd71eaf75337bf11e1172c8ac8505e8c17531fe513f2369d55855"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_input",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "9cf9078be98184847d150d71b7e582c1f74365fdbae4da7e23442b1037ece4e8"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_lines",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "ff74e634112aa3df1d89e6f617fa243d82c1883796cf1276d4924adf973777a1"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "move_stock",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "9806b5e706f331f5b49d10b48a9cc8e4e40e09f792ed29e25f4c922cd240a0ad"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_cap",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "69acf858bc9c834ecb3670417680cc48a7572375a7eb95c490772954f28bedcf"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_read",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "3b191d1ff1b4685705edf3f4e8dca897444a9136070ebba6eea1081c0efc6c2a"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "1906e622ac361ae08aa359b2cfea87f47d43ca43706e59401c1766d59eae51f9"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "shift_reminder_for_actor",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "db4214e32c5a6196cdbdd809e07dbbf3fc2eeec39118acb82b986db8ac17f37b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "can_access_recipient",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "09e0658ff3dd74bf1420e6a3f4c402095b625e9f98c8b79becc5b1759c6b1e15"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "857ed91c915c4c2c5d3ad2b4caea52a4203e8d4165a338dd3af4283804de49c3"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "decide_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "4025c9c6b7bbce73d6e65c0509c48956c9d398d677a44adfaef9cbd31ae78c24"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "notification_reference",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "433a6ff67ee435e7ec8d920b41707259894a0603e3bc829041d52336e51f13a9"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "report_consumption_from_reminder",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "58906ee027434d114d2bc5ebf7bb6aa156be1831c001efb2c4cadeadc893440b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "report_extraordinary_consumption",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "6d376baadfd6800f832492f1ebc2a3c3a673d90b7e3dcf555ab1720136d3921d"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "review_flow_submission",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "4217954c3d06903b4cbfbef0888b61eec90f8dcf39aa1665217cc05c2ad83b74"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "supplement_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "0821831829ca1ad37cc7d5375c0b44b618dc358d2e30f1458dfb351bfc047888"
+      }
+    ],
+    "tables": [],
+    "versions": {
+      "count": 187,
+      "latest": "20261110084108",
+      "linesSha256": "b4dc6648b8d778e8778bce8a01870b67e348348a3048d205dbdd1fcae3fcfe2c"
+    },
+    "functions": [],
+    "temporaryProbes": 0,
+    "invalidProductConstraints": []
+  },
+  "postflight": {
+    "legacy": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "bal_comment_units",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "d3345dd50396252acf827694607d41cd5dc1eee40370fab2a1dd94ebba639845"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "can",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "7a689c297f9d7a220966e1b6aecb6800096c4321244235eebe2a52eaccc0020d"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_current_lines",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "f260729a944fd71eaf75337bf11e1172c8ac8505e8c17531fe513f2369d55855"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_input",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "9cf9078be98184847d150d71b7e582c1f74365fdbae4da7e23442b1037ece4e8"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "consumption_lines",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "ff74e634112aa3df1d89e6f617fa243d82c1883796cf1276d4924adf973777a1"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "move_stock",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "9806b5e706f331f5b49d10b48a9cc8e4e40e09f792ed29e25f4c922cd240a0ad"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_cap",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "69acf858bc9c834ecb3670417680cc48a7572375a7eb95c490772954f28bedcf"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_read",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "3b191d1ff1b4685705edf3f4e8dca897444a9136070ebba6eea1081c0efc6c2a"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "1906e622ac361ae08aa359b2cfea87f47d43ca43706e59401c1766d59eae51f9"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "shift_reminder_for_actor",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "service": false,
+        "bodyLfSha256": "db4214e32c5a6196cdbdd809e07dbbf3fc2eeec39118acb82b986db8ac17f37b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "can_access_recipient",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "09e0658ff3dd74bf1420e6a3f4c402095b625e9f98c8b79becc5b1759c6b1e15"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "857ed91c915c4c2c5d3ad2b4caea52a4203e8d4165a338dd3af4283804de49c3"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "decide_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "4025c9c6b7bbce73d6e65c0509c48956c9d398d677a44adfaef9cbd31ae78c24"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "notification_reference",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "433a6ff67ee435e7ec8d920b41707259894a0603e3bc829041d52336e51f13a9"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "report_consumption_from_reminder",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "58906ee027434d114d2bc5ebf7bb6aa156be1831c001efb2c4cadeadc893440b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "report_extraordinary_consumption",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "6d376baadfd6800f832492f1ebc2a3c3a673d90b7e3dcf555ab1720136d3921d"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "review_flow_submission",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "4217954c3d06903b4cbfbef0888b61eec90f8dcf39aa1665217cc05c2ad83b74"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "supplement_consumption_report",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "service": false,
+        "bodyLfSha256": "0821831829ca1ad37cc7d5375c0b44b618dc358d2e30f1458dfb351bfc047888"
+      }
+    ],
+    "tables": [
+      {
+        "rls": true,
+        "anon": false,
+        "auth": false,
+        "name": "flow_preparation_commands",
+        "force": false,
+        "service": false,
+        "policies": 0,
+        "invalidConstraints": 0
+      },
+      {
+        "rls": true,
+        "anon": false,
+        "auth": false,
+        "name": "flow_preparations",
+        "force": false,
+        "service": false,
+        "policies": 0,
+        "invalidConstraints": 0
+      }
+    ],
+    "versions": {
+      "count": 189,
+      "latest": "20261110091038",
+      "linesSha256": "127c8d22eea22a591e15ebe9d5d0b4922784b05e88198e73fd3e48b04cc33414"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "auth": false,
+        "name": "flow_preparation_snapshot",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_fields jsonb",
+        "bodyLfSha256": "2297a46e0f5811146b984f8f27124626386a493c45bfbedb901f1ec2e3287d20",
+        "definitionLfSha256": "73dca4b77af05ef159c1c1c68a7ba9549f6f7e1c216a67bae54bdca9807dfdaf"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "flow_preparation_view",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": false,
+        "service": false,
+        "identity": "d private.flow_preparations",
+        "bodyLfSha256": "b4985b0ceddcec88a64adcfc8f093307edb9d0bc7ac0f3341376584d0cf7df5a",
+        "definitionLfSha256": "bcb0fff64271303cab24a3152a334a25f81dea9b5d050b5510790b39692739cb"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "require_flow_preparation_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_write boolean",
+        "bodyLfSha256": "ef725271472a9c702065db7004fe95a50f078642e5eb18f4940db5b89402e811",
+        "definitionLfSha256": "9f4d2825100a94a92654f7b6f525ccc2a9ada227e4dcc9bf4093aad84fcc8759"
+      },
+      {
+        "anon": false,
+        "auth": false,
+        "name": "validate_flow_preparation",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "definer": false,
+        "service": false,
+        "identity": "p_content jsonb, p_navigation jsonb, p_purpose text",
+        "bodyLfSha256": "bca545b385693a647824099928915b41e8343082d3520e2113984897133c3830",
+        "definitionLfSha256": "55a5f11ad85b6957d28ab699dfb28d9f638cbbe0f90c034c8e862b474a71c6ed"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "commit_flow_preparation",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+        "bodyLfSha256": "162e09f2280e751ae0f048d1fda1c1bce15bcd971465e54b2eab169c2f3b1388",
+        "definitionLfSha256": "9dbdcea2b98f666f390fcff38d8d6af50e0dc82a46456b93608d711919684fe1"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "flow_preparation_command",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+        "bodyLfSha256": "11d78a9d1d3e2a654cb9179a272e0d9608566e3aeeef1998e237c8887a7eb4fa",
+        "definitionLfSha256": "cd5c7062417ee5d62a899e2989254ff09cff308caf4479adbc6431bcd9f70f6a"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "flow_preparation_context",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid",
+        "bodyLfSha256": "7b805d789cdab7e7fda10e6bc8bea8992b32c9f1e8c6314961695eece1ce134b",
+        "definitionLfSha256": "bec4a8da3e8bfa276258c0b5fd93dcf0360e804030cd0270abb373aef9c6e28b"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "flow_preparation_list",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_before timestamp with time zone, p_before_id uuid, p_limit integer",
+        "bodyLfSha256": "baae6bba1f48d5b68a58ccea2fe29278dc28d58fa721dc60cdce7bd14c4926ef",
+        "definitionLfSha256": "92810d3b5a0e0e02aed47cd4c9aac191135a95e036bc41202d891a2cae8df042"
+      },
+      {
+        "anon": false,
+        "auth": true,
+        "name": "flow_preparation_reference",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "definer": true,
+        "service": false,
+        "identity": "p_patient uuid, p_purpose text, p_target uuid, p_fields jsonb",
+        "bodyLfSha256": "fdfa3bc5d6a90b5a956cf0d94d94a43df0ad7dc2ecb99e70e1fff9dc8d2ce70f",
+        "definitionLfSha256": "c67f36526d62a02b7afff0d0c31190290db44e6696be2aa56afa22c8d32ee237"
+      }
+    ],
+    "temporaryProbes": 0,
+    "invalidProductConstraints": []
+  },
+  "verification": {
+    "localRemoteVersionsDefinitionsConfigAclTablesAndLegacyEqual": true,
+    "legacy18Unchanged": true,
+    "pendingDryRunExactlyTwo": true,
+    "finalDryRunEmpty": true,
+    "temporaryProbes": 0,
+    "resetFixturesAuthMutation": false,
+    "vaultRolesSeeds": false,
+    "lightweightSyntheticDatabaseProcedure": true,
+    "localPreexistingInvalidConstraint": [
+      "public.product_presentations.presentation_finite_factor"
+    ]
+  },
+  "advisors": {
+    "db48_pre_parsed_3": [
+      {
+        "name": "rls_enabled_no_policy",
+        "count": 50
+      },
+      {
+        "name": "extension_in_public",
+        "count": 1
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "count": 3
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "count": 181
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "count": 1
+      }
+    ],
+    "db48_pre_parsed_4": [
+      {
+        "name": "unindexed_foreign_keys",
+        "count": 124
+      },
+      {
+        "name": "auth_rls_initplan",
+        "count": 11
+      },
+      {
+        "name": "unused_index",
+        "count": 38
+      }
+    ],
+    "db48_post_1": [
+      {
+        "name": "rls_enabled_no_policy",
+        "count": 52
+      },
+      {
+        "name": "extension_in_public",
+        "count": 1
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "count": 3
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "count": 186
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "count": 1
+      }
+    ],
+    "db48_post_2": [
+      {
+        "name": "unindexed_foreign_keys",
+        "count": 124
+      },
+      {
+        "name": "auth_rls_initplan",
+        "count": 11
+      },
+      {
+        "name": "unused_index",
+        "count": 40
+      }
+    ]
+  },
+  "advisorsQualification": "Five security/three performance classes unchanged. Counts add two closed RLS tables,five authenticated RPCs,two unused indexes;other existing findings remain. No global advisor approval.",
+  "migrations": {
+    "supabase/migrations/20261110090251_phase_d3_private_flow_review_preparation.sql": "9ba8406b0fb096d871d1ab1142a565ff7a0bf7a4916aa998971700007af8b795",
+    "supabase/migrations/20261110091038_phase_d3_flow_preparation_receipt_and_catalogue_scope.sql": "2922959499460d5f899ab6dabd3472ca082de58b55d2d75c019a1a3e93b10ecc"
+  },
+  "logSha256": {
+    "flow-remote-apply.log": "a4537ad404f0627e22afc45c5bea9537f76f3e06e9ba848cdd320afd92ebd44d",
+    "flow-remote-dry-after.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf",
+    "flow-remote-dry-before.log": "92d70d576b6df1d918e1c5f7ed89271f78258999fec05867cb0b1cb2a6c8425f"
+  },
+  "limits": [
+    "Clean/legacy/full integration required in own SHA CI.",
+    "No remote reset,fixtures,Auth changes or redundant heavy backup on disposable synthetic database.",
+    "Private tables closed to client roles;native functions unchanged;no production release.",
+    "Provider realtime.messages preexisting qualification remains outside product constraints."
+  ]
+}

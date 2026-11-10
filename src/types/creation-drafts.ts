@@ -1,4 +1,8 @@
 import type {
+  FlowPreparationContent,
+  FlowPreparationReceipt,
+} from "@/lib/validation/flow-preparations";
+import type {
   StockPreparationContent,
   StockPreparationReceipt,
 } from "@/lib/validation/stock-preparations";
@@ -21,7 +25,14 @@ import type {
   ConsumptionPreparationContent,
   ConsumptionPreparationReceipt,
 } from "@/lib/validation/consumption-preparations";
-export type DraftKind = "REQ" | "BAL" | "COM" | "ENT" | "STOCK" | "CONSUMPTION";
+export type DraftKind =
+  | "REQ"
+  | "BAL"
+  | "COM"
+  | "ENT"
+  | "STOCK"
+  | "CONSUMPTION"
+  | "FLOW";
 export type CreationDraftContent =
   | RequisitionDraftContent
   | BalanceDraftContent
@@ -30,7 +41,8 @@ export type CreationDraftContent =
   | TransferDeclarationDraftContent
   | BalancePreparationContent
   | StockPreparationContent
-  | ConsumptionPreparationContent;
+  | ConsumptionPreparationContent
+  | FlowPreparationContent;
 export type CreationDraft = {
   id: string;
   ownerId: string;
@@ -52,6 +64,7 @@ export type CreationDraft = {
   consumedResult?:
     | BalancePreparationReceipt
     | StockPreparationReceipt
+    | FlowPreparationReceipt
     | ConsumptionPreparationReceipt
     | null;
 };

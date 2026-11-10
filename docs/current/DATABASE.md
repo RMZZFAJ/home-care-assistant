@@ -608,3 +608,19 @@ Leitura privada histórica exige permissão viva da custódia,sem reativar
 paciente. Referência operacional atual e toda escrita nova exigem paciente
 ativo. Texto privado permanece original;comando usa trim Unicode equivalente
 ao cliente. Linhas do snapshot mantêm quantidade textual vinculada ao hash.
+
+## Revisão privada do Flow
+
+Migrations188–189 adicionam private.flow_preparations e
+private.flow_preparation_commands,RLS fechado,nenhum grant direto de
+anon/authenticated/service_role. Nove funções:quatro helpers e cinco RPCs Auth,
+com search_path vazio. Slot pessoal por paciente/sugestão,propósito flow_review,
+CAS,journal,conteúdo,referência e recibo;sem documento ou movimento artificial.
+
+Commit segue a ordem nativa:trava sugestão,catálogo selecionado,revalida escopo
+e referência e executa review_flow_submission. Novo registro não pode consumir
+uma preparação usando chave nativa de relato anterior. Recusa preserva seu
+escopo independente de saldo/leitura de estoque. Somente o ato confirmado
+consome o privado. Fato,auditoria,journal e resultado revertem juntos na recusa.
+189 vincula a chave privada ao recibo e restringe a divulgação do catálogo,
+sem alterar motores nativos. Dezoito dependências legadas comparadas.

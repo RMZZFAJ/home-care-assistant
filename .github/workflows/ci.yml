@@ -71,8 +71,12 @@ jobs:
         include:
           - project: chromium
             engine: chromium
-            shard: 1/1
-            artifact: chromium
+            shard: 1/2
+            artifact: chromium-1
+          - project: chromium
+            engine: chromium
+            shard: 2/2
+            artifact: chromium-2
           - project: mobile
             engine: chromium
             shard: 1/2

@@ -262,3 +262,17 @@ revalidação,sem confundir erro de consulta com revogação definitiva. Pacote
 pendente divergente não é apagado nem autoriza reconhecimento. Cache privado,
 replay offline e envio automático permanecem ausentes.
 [Contraprovas Auth e limites](../audits/D/D-B/CONSUMPTION_DRAFTS.md).
+
+## Revisão privada do Flow
+
+A sugestão,preenchimento e resultado pertencem ao titular autenticado com
+vínculo vivo no paciente. Administração alheia não concede acesso ao privado.
+Nova escrita exige autoridade atual e paciente ativo;recuperação própria não
+concede nova revisão. Registro exige leitura da equipe;recusa não revela
+catálogo a quem não tem essa leitura. Duas tabelas/helpers fechados e cinco
+RPCs Auth não alteram o escopo nativo do provedor.
+
+Pacote incerto conserva a mesma chave;somente resultado autoritativo do pacote
+exato reconcilia a leitura. Outro envelope tipado permanece preservado e
+bloqueia reconhecimento. Perda de vínculo protege o conteúdo após revalidação.
+Cache privado/replay offline continuam ausentes;nenhum canal Meta foi ativado.

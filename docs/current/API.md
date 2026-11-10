@@ -1124,3 +1124,27 @@ inativo sob leitura viva;isso não permite nova consulta operacional ou ato.
 Envelope local só é removido por confirmação tipada do pacote exato,em leitura
 autoritativa ou recuperação manual. Nenhum POST offline/automático. As rotas
 nativas de consumo continuam disponíveis e inalteradas.
+
+## Preenchimentos privados da revisão do Flow
+
+GET/POST /api/whatsapp/flows/preparations usa careRecipientId,purpose
+flow_review e targetResourceId igual à sugestão real;kind FLOW,documentId NULL.
+Save permite campos incompletos,CAS e intenção própria. Descarte privado não
+recusa a sugestão;reconhecimento não desfaz o ato confirmado. A rota documental
+genérica rejeita este recurso.
+
+POST /reference consulta a sugestão própria e catálogo autorizado,com hash do
+banco,sem registrar revisão. POST /commit sela a revisão privada,referência,
+comando e chave;chama review_flow_submission e consome o privado atomicamente.
+A chave nativa do relato é o UUID da sugestão;a chave privada da confirmação
+fica distinta no recibo. GET /list usa before/beforeId pareados,limit padrão20
+e intervalo1–50,
+retornando somente preparações próprias ativas/resultados não reconhecidos.
+Todos os caminhos mantêm Auth,contexto,Origin quando POST e no-store.
+
+Leitura própria e recuperação já vinculada continuam com paciente inativo ou
+perda de escrita,sob vínculo vivo. Referência atual e nova revisão exigem
+consumption.report/paciente ativo;registro também exige leitura da equipe.
+Recusa não concede catálogo a quem perdeu essa leitura.200 inválido não
+confirma sucesso;envelope divergente não é apagado. Consulta/online não
+reapresentam o POST. A API nativa /submissions permanece compatível.

@@ -3031,3 +3031,26 @@ quebra de texto não aparecem nos fontes ativos;quadro temporário atualizado
 antes de avançar para Flow. Emulação/local não homologam pessoa/aparelho.
 [Incremento](CONSUMPTION_DRAFTS.md),[validação](CONSUMPTION_DRAFTS_VALIDATION.json),
 [remoto](CONSUMPTION_DRAFTS_REMOTE.json),[CI histórica](CI_14FDD28_OBSERVATION.json).
+
+## D3.48 — revisão Flow entre sessões
+
+D3.48 implementa revisão FLOW privada por sugestão real:edição incompleta,
+CAS,retomada entre sessões,referência original separada e confirmação nativa
+atômica. Histórico pessoal inativo/sem escrita,envelope exato e revogação
+preservados;nenhum débito no save/review,cache privado ou replay offline.
+67 unitários/API,8 Auth reais e22 identidades browser de produção local
+qualificados;última rodada4/4,34fontes LF estáveis. Tipos/lint dirigidos passam.
+Remoto187→189 reconciliado:duas migrations,nove funções/ACL,duas tabelas e18
+dependências legadas iguais ao local;dry-run vazio,probes0,sem reset/fixtures/Auth.
+CI e2e99d2 falhou;custódia nos consumidores foi corrigida,agenda inalterada
+passou dirigida em ambas as engines. Chromium dividido161+160/321 casos,união
+exata,sem aumentar40min. Novo SHA exige CI própria integral;sem aprovação de
+intermitências WebKit/agenda. Preview anterior READY não prova este candidato.
+105critérios56PASS/49PARTIAL e18 estados UI preservados;visual≈60%,formulários
+≈90%,recuperação≈90%. Quadro temporário atualizado antes de avançar. Próximo:
+inventário integrado de formulários/recuperação e correção das lacunas;depois
+fichas/estoque e PDF técnico. EST-01,decoder saldos200,66/171 e demais critérios
+seguem pendentes. Sonar adiado,PR7 Draft,sem merge/produção;meta ativa.
+
+[Incremento](FLOW_REVIEW_DRAFTS.md),[validação](FLOW_REVIEW_DRAFTS_VALIDATION.json),
+[remoto](FLOW_REVIEW_DRAFTS_REMOTE.json),[CI anterior](CI_E2E99D2_OBSERVATION.json).

@@ -4,6 +4,26 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.48 implementa revisão FLOW privada por sugestão real:edição incompleta,
+CAS,retomada entre sessões,referência original separada e confirmação nativa
+atômica. Histórico pessoal inativo/sem escrita,envelope exato e revogação
+preservados;nenhum débito no save/review,cache privado ou replay offline.
+67 unitários/API,8 Auth reais e22 identidades browser de produção local
+qualificados;última rodada4/4,34fontes LF estáveis. Tipos/lint dirigidos passam.
+Remoto187→189 reconciliado:duas migrations,nove funções/ACL,duas tabelas e18
+dependências legadas iguais ao local;dry-run vazio,probes0,sem reset/fixtures/Auth.
+CI e2e99d2 falhou;custódia nos consumidores foi corrigida,agenda inalterada
+passou dirigida em ambas as engines. Chromium dividido161+160/321 casos,união
+exata,sem aumentar40min. Novo SHA exige CI própria integral;sem aprovação de
+intermitências WebKit/agenda. Preview anterior READY não prova este candidato.
+105critérios56PASS/49PARTIAL e18 estados UI preservados;visual≈60%,formulários
+≈90%,recuperação≈90%. Quadro temporário atualizado antes de avançar. Próximo:
+inventário integrado de formulários/recuperação e correção das lacunas;depois
+fichas/estoque e PDF técnico. EST-01,decoder saldos200,66/171 e demais critérios
+seguem pendentes. Sonar adiado,PR7 Draft,sem merge/produção;meta ativa.
+
+## Incremento anterior D3.47
+
 D3.47 implementa cinco preenchimentos privados CONSUMPTION:relatos família/
 equipe,complemento,aceite e recusa,com CAS,retomada entre sessões,referência
 selada e confirmação nativa atômica. Recuperação pessoal inativa preservada;

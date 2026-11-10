@@ -459,15 +459,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
           }}
         />
       ) : null}
-      {can(context, "consumption.report") &&
-      !catalogLoading &&
-      !catalogError ? (
-        <FlowReviews
-          patientId={patient}
-          products={products}
-          onChange={() => setAttempt((value) => value + 1)}
-        />
-      ) : null}
+      <FlowReviews
+        key={context.userId}
+        context={context}
+        products={catalogError ? [] : products}
+        catalogReady={!catalogLoading && !catalogError}
+        onChange={() => setAttempt((value) => value + 1)}
+      />
     </div>
   );
 }

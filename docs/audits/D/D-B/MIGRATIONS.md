@@ -679,3 +679,25 @@ Demais avisos permanecem,sem aprovação global. Constraint local legada
 presentation_finite_factor não validada preservada;produto remoto sem inválida.
 Constraint realtime.messages do provedor previamente observada não foi alterada.
 [Conferência](CONSUMPTION_DRAFTS_REMOTE.json).
+
+## D3.48 — revisão Flow privada
+
+Migrations188/189 geradas pelo CLI e aplicadas uma vez no remoto autorizado,
+187→189,antes do commit. Preflight confirmou projeto saudável,versões/digest
+e18 dependências legadas;dry-run listou exatamente dois arquivos,sem seeds,
+roles ou Vault. Pós-check:nove funções/corpos/configurações/ACL,duas tabelas RLS
+fechadas,189versões/digest e18 dependências iguais ao local;dry-run vazio,
+probes0 e produto remoto sem constraint inválida. Sem reset,fixtures/Auth ou
+backup pesado redundante no banco sintético. Histórico84 preservado.
+
+188 introduz estado privado,CAS,cursor por sugestão e consumo nativo atômico.
+189 congela chave privada no recibo,mascara catálogo sem leitura da equipe e
+mantém recusa independente de colisão anterior de chave nativa. Nenhum dos18
+motores/dependências legados mudou. Auth8/8 e regressões dirigidas qualificadas;
+instalação limpa,legada e integração completa aguardam CI própria do novo SHA.
+
+Advisors mantêm cinco classes de segurança e três de performance. Contagens
+mudam50→52 tabelas RLS fechadas,181→186 RPCs Auth e38→40 índices sem uso;
+demais contagens preservadas. Isso não aprova achados anteriores. Legado local
+presentation_finite_factor e qualificação preexistente realtime.messages do
+provedor permanecem. [Conferência](FLOW_REVIEW_DRAFTS_REMOTE.json).

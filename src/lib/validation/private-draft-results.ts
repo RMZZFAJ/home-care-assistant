@@ -1,4 +1,8 @@
 import {
+  flowPreparationContentSchema,
+  parseFlowPreparationReceipt,
+} from "./flow-preparations";
+import {
   consumptionPreparationContentSchema,
   parseConsumptionPreparationReceipt,
 } from "./consumption-preparations";
@@ -58,7 +62,7 @@ const resultSchema = z.object({
 const readSchema = resultSchema.omit({ replayed: true }).extend({
   ownerId: z.uuid(),
   patientId: z.uuid(),
-  kind: z.enum(["REQ", "BAL", "COM", "ENT", "STOCK", "CONSUMPTION"]),
+  kind: z.enum(["REQ", "BAL", "COM", "ENT", "STOCK", "CONSUMPTION", "FLOW"]),
   purpose: draftPurpose.default("create"),
   targetDocumentId: z.uuid().nullable(),
   schemaVersion: z.literal(1),
@@ -94,7 +98,8 @@ export function parsePrivateDraft(
   const resource =
     (row.kind === "BAL" && isBalancePreparationPurpose(row.purpose)) ||
     (row.kind === "STOCK" && row.purpose === "family_movement") ||
-    row.kind === "CONSUMPTION";
+    row.kind === "CONSUMPTION" ||
+    row.kind === "FLOW";
   if (
     resource
       ? row.targetResourceId !== scope.targetResourceId ||
@@ -107,25 +112,27 @@ export function parsePrivateDraft(
       "O alvo do preenchimento não corresponde ao contexto consultado.",
     );
   const schema =
-    row.kind === "CONSUMPTION"
-      ? consumptionPreparationContentSchema
-      : row.kind === "STOCK"
-        ? stockPreparationContentSchema
-        : resource
-          ? balancePreparationContentSchema
-          : row.kind === "REQ" && isRequisitionOperationPurpose(row.purpose)
-            ? requisitionOperationDraftContent
-            : row.kind === "REQ"
-              ? requisitionDraftContent
-              : row.kind === "BAL" && isBalanceDocumentPurpose(row.purpose)
-                ? balanceDocumentDraftContent
-                : row.kind === "BAL"
-                  ? balanceDraftContent
-                  : declarationSourceForPurpose(row.purpose)
-                    ? transferDeclarationDraftContent
-                    : !["create", "revise"].includes(row.purpose)
-                      ? receiptDraftContent
-                      : supplyDraftContent;
+    row.kind === "FLOW"
+      ? flowPreparationContentSchema
+      : row.kind === "CONSUMPTION"
+        ? consumptionPreparationContentSchema
+        : row.kind === "STOCK"
+          ? stockPreparationContentSchema
+          : resource
+            ? balancePreparationContentSchema
+            : row.kind === "REQ" && isRequisitionOperationPurpose(row.purpose)
+              ? requisitionOperationDraftContent
+              : row.kind === "REQ"
+                ? requisitionDraftContent
+                : row.kind === "BAL" && isBalanceDocumentPurpose(row.purpose)
+                  ? balanceDocumentDraftContent
+                  : row.kind === "BAL"
+                    ? balanceDraftContent
+                    : declarationSourceForPurpose(row.purpose)
+                      ? transferDeclarationDraftContent
+                      : !["create", "revise"].includes(row.purpose)
+                        ? receiptDraftContent
+                        : supplyDraftContent;
   const content = row.state === "active" ? schema.safeParse(row.content) : null;
   if (
     (row.state === "active" &&
@@ -162,11 +169,13 @@ export function parsePrivateDraft(
     );
   const consumedResult =
     resource && consumed
-      ? (row.kind === "CONSUMPTION"
-          ? parseConsumptionPreparationReceipt
-          : row.kind === "STOCK"
-            ? parseStockPreparationReceipt
-            : parseBalancePreparationReceipt)(row.consumedResult, {
+      ? (row.kind === "FLOW"
+          ? parseFlowPreparationReceipt
+          : row.kind === "CONSUMPTION"
+            ? parseConsumptionPreparationReceipt
+            : row.kind === "STOCK"
+              ? parseStockPreparationReceipt
+              : parseBalancePreparationReceipt)(row.consumedResult, {
           ...scope,
           targetResourceId: scope.targetResourceId!,
         })
@@ -205,7 +214,8 @@ export function parsePrivateDraftResult(
       typeof intent.purpose === "string" &&
       isBalancePreparationPurpose(intent.purpose)) ||
     (intent.kind === "STOCK" && intent.purpose === "family_movement") ||
-    intent.kind === "CONSUMPTION";
+    intent.kind === "CONSUMPTION" ||
+    intent.kind === "FLOW";
   if (
     (intent.id !== null && row.id !== intent.id) ||
     row.revision !== Number(intent.expectedRevision ?? 0) + 1 ||
@@ -232,11 +242,13 @@ export function parsePrivateDraftResult(
     );
   const consumedResult =
     resource && expected === "completed"
-      ? (intent.kind === "CONSUMPTION"
-          ? parseConsumptionPreparationReceipt
-          : intent.kind === "STOCK"
-            ? parseStockPreparationReceipt
-            : parseBalancePreparationReceipt)(row.consumedResult, {
+      ? (intent.kind === "FLOW"
+          ? parseFlowPreparationReceipt
+          : intent.kind === "CONSUMPTION"
+            ? parseConsumptionPreparationReceipt
+            : intent.kind === "STOCK"
+              ? parseStockPreparationReceipt
+              : parseBalancePreparationReceipt)(row.consumedResult, {
           patientId: String(intent.careRecipientId),
           purpose: String(intent.purpose),
           targetResourceId: String(intent.targetResourceId),

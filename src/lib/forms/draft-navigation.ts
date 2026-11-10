@@ -5,6 +5,7 @@ const common = [
   { id: "dieta", label: "Dieta" },
 ] as const;
 export const draftFlowStages = {
+  FLOW: [{ id: "flow_review", label: "Revisão do Flow" }],
   CONSUMPTION: [
     { id: "consumption_preparation", label: "Relato e conferência" },
   ],
@@ -118,6 +119,7 @@ export const draftFlowStages = {
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
 export const draftStageIds = [
+  "flow_review",
   "consumption_preparation",
   "stock_family_movement",
   "bal_configure",
@@ -176,6 +178,7 @@ export function draftFlow(
   purpose = "create",
   content?: unknown,
 ): DraftFlow | null {
+  if (kind === "FLOW" && purpose === "flow_review") return "FLOW";
   if (
     kind === "CONSUMPTION" &&
     [

@@ -179,3 +179,10 @@ não substitui declaração preservada;comando selado e consumo privado são
 atômicos. Recuperação pessoal histórica tem escopo distinto da consulta
 operacional ativa. Envelope incerto só é reapresentado por ação explícita;
 a leitura autoritativa pode reconciliar apenas o pacote exato já confirmado.
+
+Revisão FLOW usa a sugestão real como alvo e mantém o documento resultante
+separado. O componente próprio compõe o mesmo controlador privado com
+review_flow_submission:salvar não registra revisão,cria relato ou debita
+estoque. Lista pessoal mantém recuperação mesmo após sair da fila pendente,
+sem depender da consulta do catálogo. Origem preservada,declaração própria,
+referência atual e resultado confirmado têm representações distintas.

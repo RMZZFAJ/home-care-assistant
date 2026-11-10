@@ -30,6 +30,27 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (
+    error?.code === "PT409" &&
+    /^(stale flow reference|flow already reviewed|flow private intent mismatch)$/i.test(
+      message,
+    )
+  )
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "Confira a situação atual da sugestão e compare com seu preenchimento antes de confirmar. Sua declaração foi preservada.",
+      409,
+    );
+  if (
+    error?.code === "PT409" &&
+    /^native flow (result|report|rejection) mismatch$/i.test(message)
+  )
+    throw new ApiError(
+      "INTERNAL_ERROR",
+      "Não foi possível conferir o resultado da revisão. Preserve esta tentativa e consulte seu resultado antes de reenviar.",
+      500,
+      true,
+    );
   if (error?.code === "P0001" && /^avatar intention differs$/i.test(message))
     throw new ApiError(
       "IDEMPOTENCY_CONFLICT",

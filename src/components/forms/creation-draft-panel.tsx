@@ -1,4 +1,5 @@
 "use client";
+import { FlowPreparationSummary } from "@/components/stock/flow-preparation-summary";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 
 import Link from "next/link";
@@ -32,6 +33,7 @@ export function DraftContentSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("review" in content) return <FlowPreparationSummary content={content} />;
   if ("consumption" in content)
     return (
       <div className="hca-form-stack">
@@ -173,6 +175,7 @@ function DraftFieldsSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("review" in content) return <FlowPreparationSummary content={content} />;
   if ("consumption" in content)
     return (
       <DraftContentSummary content={content} kind={kind} purpose={purpose} />
@@ -742,7 +745,7 @@ export function CreationDraftPanel({
       {!draft.consumed && !draft.pending ? (
         <p className="hca-field-hint">
           Para retomar em outra aba, sessão ou aparelho, use{" "}
-          {draft.kind === "CONSUMPTION"
+          {draft.kind === "CONSUMPTION" || draft.kind === "FLOW"
             ? "Salvar preenchimento privado"
             : "Salvar rascunho"}
           . O preenchimento ainda não salvo pode ficar apenas nesta aba.
@@ -763,11 +766,13 @@ export function CreationDraftPanel({
       {draft.message ? <Notice>{draft.message}</Notice> : null}
       {saved ? (
         <p>
-          {saved.kind === "CONSUMPTION"
-            ? "Relato e conferência"
-            : saved.kind === "STOCK"
-              ? "Movimentação familiar"
-              : saved.kind}{" "}
+          {saved.kind === "FLOW"
+            ? "Revisão do Flow"
+            : saved.kind === "CONSUMPTION"
+              ? "Relato e conferência"
+              : saved.kind === "STOCK"
+                ? "Movimentação familiar"
+                : saved.kind}{" "}
           · Revisão {saved.revision} · salvo no servidor em{" "}
           {formatZonedDate(saved.savedAt, "America/Sao_Paulo")} ·
           America/Sao_Paulo
@@ -868,9 +873,51 @@ export function CreationDraftPanel({
                 }}
               />
             </div>
+          ) : draft.consumed.kind === "FLOW" &&
+            draft.consumed.consumedResult &&
+            "preparedReview" in draft.consumed.consumedResult ? (
+            <div className="hca-form-stack">
+              <p>
+                Revisão do Flow registrada em{" "}
+                {formatZonedDate(
+                  draft.consumed.consumedResult.recordedAt,
+                  "America/Sao_Paulo",
+                )}
+                .
+              </p>
+              <p>
+                {draft.consumed.consumedResult.nativeResult.status ===
+                "confirmed"
+                  ? "Relato encaminhado à conferência autorizada. O estoque não foi descontado por esta revisão."
+                  : "Sugestão descartada pelo próprio autor. Nenhum relato ou desconto foi criado."}
+              </p>
+              <FlowPreparationSummary
+                content={{
+                  review: draft.consumed.consumedResult.preparedReview,
+                  reference: draft.consumed.consumedResult.preparedReference,
+                  referenceHash: draft.consumed.consumedResult.referenceHash,
+                }}
+              />
+              {draft.consumed.consumedResult.nativeResult.reportId ? (
+                <Link
+                  className="ui-button"
+                  prefetch={false}
+                  href={
+                    "/consumo?careRecipientId=" +
+                    draft.consumed.patientId +
+                    "&ref=" +
+                    draft.consumed.consumedResult.nativeResult.reportId +
+                    "&refKind=report"
+                  }
+                >
+                  Abrir relato resultante
+                </Link>
+              ) : null}
+            </div>
           ) : isBalancePreparationPurpose(draft.purpose) &&
             draft.consumed.consumedResult &&
-            "nativeResult" in draft.consumed.consumedResult ? (
+            "nativeResult" in draft.consumed.consumedResult &&
+            "body" in draft.consumed.consumedResult.command ? (
             <div>
               <p>
                 {balancePreparationTitles[draft.purpose]} · registrada em{" "}
