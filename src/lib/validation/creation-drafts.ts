@@ -1,4 +1,8 @@
 import {
+  scheduleResourceSaveSchema,
+  scheduleResourceMutationSchema,
+} from "./schedule-resource-preparations";
+import {
   schedulePreparationSaveSchema,
   schedulePreparationMutationSchema,
 } from "./schedule-preparations";
@@ -153,6 +157,8 @@ export const creationDraftCommandSchema = z
   .union([
     schedulePreparationSaveSchema,
     schedulePreparationMutationSchema,
+    scheduleResourceSaveSchema,
+    scheduleResourceMutationSchema,
     progressPreparationSaveSchema,
     progressPreparationMutationSchema,
     flowPreparationSaveSchema,

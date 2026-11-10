@@ -1,6 +1,90 @@
-export type ShiftType = { id: string; name: string; starts_local: string; duration_minutes: number; is_active: boolean; version: number };
-export type ScheduledShift = { id: string; series_id: string; professional_id: string; professional_name: string; shift_type_id: string; type_name: string; starts_at: string; ends_at: string; timezone: string; status: string; version: number; notes: string; is_exception: boolean };
-export type ShiftSeries = { id: string; professional_id: string; professional_name: string; shift_type_id: string; type_name: string; timezone: string; recurrence: string; specific_dates?: string[]; weekdays: number[]; anchor_date: string; valid_until: string; ended_on: string | null; status: string; version: number; notes: string; occurrences: ScheduledShift[]; publication_blocked: boolean };
-export type ShiftSnapshot = Pick<ScheduledShift, "professional_id" | "starts_at" | "ends_at" | "timezone" | "notes"> & { professional_name?: string | null; type_name?: string | null; snapshot_source?: string };
-export type ShiftChange = { id: string; shift_id: string; professional_id: string; proposed_professional_id: string; starts_at: string; ends_at: string; reason: string; status: string; shift_version: number; version: number; created_by: string | null; source_snapshot: ShiftSnapshot | null; proposed_snapshot: ShiftSnapshot | null; notes: string | null; is_stale: boolean; current_professional_name: string; current_proposed_professional_name: string; bal_impact: { has_assignment: boolean; changes_window: boolean; requires_family_decision: boolean; assignment_deadline: string | null } };
-export type ScheduleWorkspace = { types: ShiftType[]; shifts: ScheduledShift[]; professionals: { id: string; name: string }[]; series: ShiftSeries[]; changes: ShiftChange[]; events: { id: string; action: string; reason: string; created_at: string; actor_name_snapshot: string | null }[] };
+export type ShiftType = {
+  id: string;
+  name: string;
+  starts_local: string;
+  duration_minutes: number;
+  is_active: boolean;
+  version: number;
+};
+export type ScheduledShift = {
+  id: string;
+  series_id: string;
+  professional_id: string;
+  professional_name: string;
+  shift_type_id: string;
+  type_name: string;
+  starts_at: string;
+  ends_at: string;
+  timezone: string;
+  status: string;
+  version: number;
+  notes: string;
+  is_exception: boolean;
+};
+export type ShiftSeries = {
+  id: string;
+  professional_id: string;
+  professional_name: string;
+  shift_type_id: string;
+  type_name: string;
+  timezone: string;
+  recurrence: string;
+  specific_dates?: string[];
+  weekdays: number[];
+  anchor_date: string;
+  valid_until: string;
+  ended_on: string | null;
+  status: string;
+  version: number;
+  notes: string;
+  occurrences: ScheduledShift[];
+  publication_blocked: boolean;
+};
+export type ShiftSnapshot = Pick<
+  ScheduledShift,
+  "professional_id" | "starts_at" | "ends_at" | "timezone"
+> & {
+  notes: string | null;
+  professional_name?: string | null;
+  type_name?: string | null;
+  snapshot_source?: string;
+};
+export type ShiftChange = {
+  id: string;
+  shift_id: string;
+  professional_id: string;
+  proposed_professional_id: string;
+  starts_at: string;
+  ends_at: string;
+  reason: string;
+  status: string;
+  shift_version: number;
+  version: number;
+  created_by: string | null;
+  source_snapshot: ShiftSnapshot | null;
+  proposed_snapshot: ShiftSnapshot | null;
+  notes: string | null;
+  is_stale: boolean;
+  current_professional_name: string;
+  current_proposed_professional_name: string;
+  bal_impact: {
+    has_assignment: boolean;
+    changes_window: boolean;
+    requires_family_decision: boolean;
+    assignment_deadline: string | null;
+  };
+};
+export type ScheduleWorkspace = {
+  types: ShiftType[];
+  shifts: ScheduledShift[];
+  professionals: { id: string; name: string }[];
+  series: ShiftSeries[];
+  changes: ShiftChange[];
+  events: {
+    id: string;
+    action: string;
+    reason: string;
+    created_at: string;
+    actor_name_snapshot: string | null;
+  }[];
+};

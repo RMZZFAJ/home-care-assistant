@@ -1,5 +1,15 @@
 # Checkpoint D-B
 
+Checkpoint corrente:D3.54 concluído no escopo local e remoto,com CI própria
+pendente. Oito preparações de recursos existentes da agenda implementadas,
+58 unit/API,23 Auth e40 cenários de navegador distintos qualificados;coorte
+final13/13 após ajuste de estado salvo/descarte. Remoto197 reconciliado,dry-run
+vazio,cinco negativas com rollback,sem Auth/fixtures/reset remoto. Matriz
+105×39 permanece56 PASS locais/49 PARTIAL;18 estados UI. Inventário50/52;
+visual≈60%,formulários≈90%,recuperação≈90%,agenda privada100% deste recurso.
+Quadro temporário atualizado antes do próximo lote. PR7 Draft,Sonar adiado,
+produção NO-GO e meta ativa. [Detalhes](SCHEDULE_RESOURCE_DRAFTS.md).
+
 ## DB.0 — autoridade, baseline e sequência
 
 Ordem integral lida antes de intervenções. Meta persistente ativa. Base local e

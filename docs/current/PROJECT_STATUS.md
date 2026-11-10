@@ -4,6 +4,24 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+D3.54 conclui a preparação privada das oito finalidades sobre recursos
+existentes da agenda. Campos parciais,retomada em outra sessão,CAS,referência
+selada,decisão nativa atômica,histórico e recuperação/resolução permanecem
+separados. Resultado obsoleto não aparenta aprovação;nenhum replay automático.
+58 unit/API,23 Auth e40 cenários distintos de navegador local qualificados,
+incluindo13 verificações finais nas três engines. Instalação limpa,legado,
+integração completa e demais navegadores continuam gates da CI própria.
+
+Remoto197 reconciliado com catálogo local,cinco negativas com rollback e
+dry-run vazio. Sem fixtures/Auth/reset remoto,backup pesado redundante ou
+deploy manual. Matriz56 PASS locais/49 PARTIAL;visual≈60%,formulários≈90%,
+recuperação≈90%. Agenda privada100% deste recurso,sem encerrar os critérios
+amplos de contagens,cadastros/administração ou paridade66/171. Quadro temporário
+atualizado;PR7 Draft,Sonar adiado,produção NO-GO,meta ativa.
+[Incremento atual](../audits/D/D-B/SCHEDULE_RESOURCE_DRAFTS.md).
+
+## Incremento anterior D3.53
+
 D3.53 corrige perda de profissional, início, fim e observações ao alternar
 alteração/cancelamento de plantão. Minuto não editado conserva o instante
 nativo, incluindo segundos/frações e a hora repetida; edição de tipo conserva

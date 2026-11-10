@@ -314,3 +314,20 @@ se reduz a autoridade interna à seleção da UI nem se concede capacidade pela
 presença no diretório global. Guardas/grants nativos permanecem e a sessão é
 revalidada no retorno,sem cache entre chamadas. Testes reais negam vínculo
 revogado,sessão expirada,anon/service e escopo interno divergente.
+
+## Continuidade de alterações existentes da agenda
+
+As preparações D3.54 não recebem owner nem referência operacional do cliente.
+IDs selecionam o recurso; Auth vivo, vínculo atual, visibilidade e capacidades
+nativas decidem o acesso. Leitura privada, consulta de resultado, descarte e
+reconhecimento próprios admitem perda de escrita/paciente inativo sob vínculo
+vivo. Snapshot operacional é redigido quando a leitura nativa deixa de ser
+permitida; campos e recibos próprios não incluem o snapshot de terceiros.
+
+Salvar campos com hash antigo não sela autoridade. Commit exige snapshot
+selado pelo servidor, revisão privada, intenção exata e versão nativa. O
+resultado obsolete preserva o comportamento nativo sem permitir aprovação
+após alteração concorrente; a guarda posterior ao comando reverte qualquer
+resultado incompatível. Ausência de diário não apaga tentativa. Resolução
+explícita avança CAS sob a chave original e bloqueia aplicação tardia. Nenhum
+reenvio offline, cache privado ou autorização por sessionStorage foi criado.

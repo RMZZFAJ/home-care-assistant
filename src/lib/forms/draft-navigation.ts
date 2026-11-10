@@ -1,3 +1,4 @@
+import { isScheduleResourcePurpose } from "../schedules/resource-preparations";
 const common = [
   { id: "identification", label: "Identificação" },
   { id: "medicamentos", label: "Medicamentos" },
@@ -5,6 +6,9 @@ const common = [
   { id: "dieta", label: "Dieta" },
 ] as const;
 export const draftFlowStages = {
+  SCHEDULE_RESOURCE: [
+    { id: "schedule_resource", label: "Alteração ou decisão de agenda" },
+  ],
   SCHEDULE: [{ id: "schedule_creation", label: "Preparação de escala" }],
   PROGRESS: [{ id: "progress_note", label: "Registro de andamento" }],
   FLOW: [{ id: "flow_review", label: "Revisão do Flow" }],
@@ -121,6 +125,7 @@ export const draftFlowStages = {
   DIVERGENCE: [{ id: "divergence", label: "Resolução da divergência" }],
 } as const;
 export const draftStageIds = [
+  "schedule_resource",
   "progress_note",
   "schedule_creation",
   "flow_review",
@@ -183,6 +188,8 @@ export function draftFlow(
   content?: unknown,
 ): DraftFlow | null {
   if (kind === "FLOW" && purpose === "flow_review") return "FLOW";
+  if (kind === "SCHEDULE" && isScheduleResourcePurpose(purpose))
+    return "SCHEDULE_RESOURCE";
   if (
     kind === "SCHEDULE" &&
     ["shift_type_create", "schedule_series_create"].includes(purpose)

@@ -1,11 +1,5 @@
 "use client";
-import {
-  ActionButton,
-  FormField,
-  SelectField,
-  TextAreaField,
-  TextInput,
-} from "@/components/ui/controls";
+import { ActionButton } from "@/components/ui/controls";
 import { useState, type FormEvent, type RefObject } from "react";
 import { z } from "zod";
 
@@ -23,7 +17,6 @@ import {
   type ScheduleCreationFields as CreationFields,
 } from "@/lib/schedules/creation";
 import { Notice } from "@/components/workspace";
-import { editedCivilInstant, localMinute } from "@/lib/schedules/time";
 export type ScheduleEditor =
   | { kind: "type"; type?: ShiftType }
   | { kind: "series" }
@@ -44,7 +37,7 @@ export function ScheduleForm({
   datesMonth,
   onDatesMonthChange,
 }: {
-  editor: ScheduleEditor;
+  editor: Extract<ScheduleEditor, { kind: "type" | "series" }>;
   data: ScheduleWorkspace;
   ownId: string;
   team: boolean;
@@ -65,28 +58,8 @@ export function ScheduleForm({
   const creation = creationFields ?? localCreation;
   const changeCreation = onCreationChange ?? setLocalCreation;
   const [creationError, setCreationError] = useState("");
-  const [shiftAction, setShiftAction] = useState("change");
-  // These fields survive the conditional cancel view. Native authorization and
-  // the frozen source version are still checked when the command is submitted.
-  const [shiftFields, setShiftFields] = useState(() => ({
-    person: editor.kind === "shift" ? editor.shift.professional_id : "",
-    start:
-      editor.kind === "shift"
-        ? localMinute(editor.shift.starts_at, editor.shift.timezone)
-        : "",
-    end:
-      editor.kind === "shift"
-        ? localMinute(editor.shift.ends_at, editor.shift.timezone)
-        : "",
-    notes: editor.kind === "shift" ? editor.shift.notes : "",
-  }));
-  function changeShift(field: keyof typeof shiftFields, value: string) {
-    setShiftFields((previous) => ({ ...previous, [field]: value }));
-  }
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget),
-      value = (key: string) => String(form.get(key) ?? "");
     if (editor.kind === "type" || editor.kind === "series") {
       try {
         if (creation.form === "series") {
@@ -129,81 +102,8 @@ export function ScheduleForm({
       }
       return;
     }
-    if (editor.kind === "end")
-      onReview(
-        {
-          action: "end_series",
-          body: {
-            id: editor.id,
-            fromDate: value("from"),
-            reason: value("reason"),
-          },
-        },
-        editor.version,
-      );
-    if (editor.kind === "reject")
-      onReview(
-        { action: "reject", body: { id: editor.id, reason: value("reason") } },
-        editor.version,
-      );
-    if (editor.kind === "reject_change")
-      onReview(
-        {
-          action: "decide_change",
-          body: { id: editor.id, approve: false, reason: value("reason") },
-        },
-        editor.version,
-      );
-    if (editor.kind === "shift") {
-      if (shiftAction === "cancel")
-        onReview(
-          {
-            action: "cancel",
-            body: { id: editor.shift.id, reason: value("reason") },
-          },
-          editor.shift.version,
-        );
-      else {
-        let startsAt: string, endsAt: string;
-        let timeField = "start";
-        try {
-          startsAt = editedCivilInstant(
-            shiftFields.start,
-            editor.shift.starts_at,
-            editor.shift.timezone,
-          );
-          timeField = "end";
-          endsAt = editedCivilInstant(
-            shiftFields.end,
-            editor.shift.ends_at,
-            editor.shift.timezone,
-          );
-        } catch (error) {
-          const input = event.currentTarget.elements.namedItem(
-            timeField,
-          ) as HTMLInputElement;
-          input.setCustomValidity((error as Error).message);
-          input.reportValidity();
-          input.oninput = () => input.setCustomValidity("");
-          return;
-        }
-        onReview(
-          {
-            action: team || publishOwn ? "change" : "propose_change",
-            body: {
-              id: editor.shift.id,
-              professionalId: shiftFields.person,
-              startsAt,
-              endsAt,
-              reason: value("reason"),
-              notes: shiftFields.notes,
-            },
-          },
-          editor.shift.version,
-        );
-      }
-    }
   }
+
   return (
     <form
       onSubmit={submit}
@@ -227,112 +127,6 @@ export function ScheduleForm({
             </p>
           ) : null}
           {creationError ? <Notice error>{creationError}</Notice> : null}
-        </>
-      ) : null}
-      {editor.kind === "end" ? (
-        <>
-          <p>
-            As ocorrências a partir da data escolhida serão canceladas. O
-            histórico e os documentos permanecem preservados.
-          </p>
-          <FormField label="Encerrar a partir de">
-            <TextInput name="from" type="date" defaultValue={today} required />
-          </FormField>
-          <FormField label="Justificativa">
-            <TextAreaField
-              name="reason"
-              required
-              minLength={3}
-              maxLength={1000}
-            />
-          </FormField>
-        </>
-      ) : null}
-      {editor.kind === "reject" || editor.kind === "reject_change" ? (
-        <FormField label="Motivo da rejeição">
-          <TextAreaField
-            name="reason"
-            minLength={3}
-            maxLength={1000}
-            required
-          />
-        </FormField>
-      ) : null}
-      {editor.kind === "shift" ? (
-        <>
-          <p>
-            {editor.shift.type_name} · {editor.shift.professional_name}
-          </p>
-          {team || publishOwn ? (
-            <FormField label="Operação">
-              <SelectField
-                value={shiftAction}
-                onChange={(e) => setShiftAction(e.target.value)}
-              >
-                <option value="change">Alterar / substituir</option>
-                <option value="cancel">Cancelar por ausência</option>
-              </SelectField>
-            </FormField>
-          ) : null}
-          {shiftAction !== "cancel" ? (
-            <>
-              <FormField label="Profissional de destino">
-                <SelectField
-                  name="person"
-                  value={shiftFields.person}
-                  onChange={(e) => changeShift("person", e.currentTarget.value)}
-                >
-                  {data.professionals
-                    .filter((p) => team || !publishOwn || p.id === ownId)
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </SelectField>
-              </FormField>
-              <FormField label="Início do plantão">
-                <TextInput
-                  name="start"
-                  type="datetime-local"
-                  value={shiftFields.start}
-                  onChange={(e) => changeShift("start", e.currentTarget.value)}
-                  required
-                />
-              </FormField>
-              <FormField label="Fim do plantão">
-                <TextInput
-                  name="end"
-                  type="datetime-local"
-                  value={shiftFields.end}
-                  onChange={(e) => changeShift("end", e.currentTarget.value)}
-                  required
-                />
-              </FormField>
-              <p className="hca-muted">Horários em {editor.shift.timezone}.</p>
-              <FormField label="Observações">
-                <TextAreaField
-                  name="notes"
-                  value={shiftFields.notes}
-                  onChange={(e) => changeShift("notes", e.currentTarget.value)}
-                  maxLength={2000}
-                />
-              </FormField>
-            </>
-          ) : null}
-          <FormField label="Justificativa">
-            <TextAreaField
-              name="reason"
-              minLength={3}
-              maxLength={1000}
-              required
-            />
-          </FormField>
-          {!team && !publishOwn ? (
-            <p>
-              A proposta depende de aprovação; o plantão atual permanece válido.
-            </p>
-          ) : null}
         </>
       ) : null}
       <ActionButton

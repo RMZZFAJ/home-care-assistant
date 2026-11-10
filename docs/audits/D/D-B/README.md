@@ -108,6 +108,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
   e tratamento específico do SonarCloud adiados expressamente; reconciliação
   remota antecipada para o fechamento de D5.1.
 
+[Preparações de recursos existentes da agenda](SCHEDULE_RESOURCE_DRAFTS.md).
+
 Branch única `feat/phase-d-implementation`; [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7)
 permanece Draft, sem merge ou promoção operacional. Evidência local, CI,
 verificação remota e homologação externa têm estados distintos.

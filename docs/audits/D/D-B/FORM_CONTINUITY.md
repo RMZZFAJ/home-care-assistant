@@ -71,3 +71,14 @@ a criação do tipo no motor;outros atos/dependências permanecem iguais. A
 recuperação própria distingue chave/revisão/tipo avançado de ausência incerta.
 Alterações e decisões existentes continuam pendentes;inventário49/51 e
 estimativas globais não foram promovidos. [Incremento](SCHEDULE_CREATION_DRAFTS.md).
+
+## Atualização D3.54
+
+As oito preparações sobre recursos existentes da agenda estão implementadas
+e qualificadas localmente/remotamente. Incluem aprovação com motivo opcional,
+campos incompletos,CAS,outra sessão,histórico,resultado incerto e resolução
+explícita sem replay. Inventário atual:50 consumidores/52 tags form,com hashes
+atuais e sem fonte form fora do levantamento. Contagens,cadastros,administração,
+perfil e paridade66/171 continuam pendentes com Codex;nenhuma dispensa genérica.
+Recuperação estimada≈90%,visual≈60%,formulários≈90%. CI própria e gates externos
+seguem separados. [Incremento](SCHEDULE_RESOURCE_DRAFTS.md).

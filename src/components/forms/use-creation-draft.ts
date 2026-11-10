@@ -12,6 +12,7 @@ import {
   type DraftPurpose,
 } from "@/lib/validation/supply-drafts";
 import { isBalancePreparationPurpose } from "@/lib/forms/balance-preparation-purposes";
+import { isScheduleResourcePurpose } from "@/lib/schedules/resource-preparations";
 import type { DraftNavigation } from "@/lib/forms/draft-navigation";
 import type {
   CreationDraft,
@@ -89,7 +90,9 @@ export function useCreationDraft({
     kind === "SCHEDULE";
   const commandUrl =
     kind === "SCHEDULE"
-      ? "/api/schedules/preparations"
+      ? isScheduleResourcePurpose(purpose)
+        ? "/api/schedules/resource-preparations"
+        : "/api/schedules/preparations"
       : kind === "PROGRESS"
         ? "/api/documents/progress-preparations"
         : kind === "FLOW"
@@ -106,7 +109,7 @@ export function useCreationDraft({
     (extended || resourcePreparation ? ":" + purpose : "") +
     (resourcePreparation ? ":" + targetResourceId : "");
   const url =
-    kind === "SCHEDULE"
+    kind === "SCHEDULE" && !isScheduleResourcePurpose(purpose)
       ? `${commandUrl}?careRecipientId=${patientId}&purpose=${purpose}`
       : resourcePreparation
         ? `${commandUrl}?careRecipientId=${patientId}&purpose=${purpose}&targetResourceId=${targetResourceId}`

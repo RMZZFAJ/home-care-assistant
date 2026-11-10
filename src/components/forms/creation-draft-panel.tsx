@@ -1,4 +1,10 @@
 "use client";
+import { ScheduleResourceSummary } from "@/components/schedules/schedule-resource-summary";
+import {
+  scheduleResourceOutcomeLabel,
+  isScheduleResourcePurpose,
+  scheduleResourceLabels,
+} from "@/lib/schedules/resource-preparations";
 import { SchedulePreparationSummary } from "@/components/schedules/schedule-preparation-summary";
 import { ProgressPreparationSummary } from "@/components/documents/progress-preparation-summary";
 import { FlowPreparationSummary } from "@/components/stock/flow-preparation-summary";
@@ -35,6 +41,8 @@ export function DraftContentSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("scheduleAction" in content)
+    return <ScheduleResourceSummary content={content} />;
   if ("schedule" in content)
     return <SchedulePreparationSummary content={content} />;
   if ("note" in content)
@@ -181,6 +189,8 @@ function DraftFieldsSummary({
   purpose?: DraftPurpose;
 }) {
   if (!content) return null;
+  if ("scheduleAction" in content)
+    return <ScheduleResourceSummary content={content} />;
   if ("schedule" in content)
     return <SchedulePreparationSummary content={content} />;
   if ("note" in content)
@@ -700,6 +710,7 @@ export function CreationDraftPanel({
   revalidationRef,
   disabled = false,
   canResume = true,
+  hasUnsavedChanges,
 }: {
   draft: CreationDraftController;
   current: CreationDraftContent | null;
@@ -712,6 +723,7 @@ export function CreationDraftPanel({
   revalidationRef?: RefObject<HTMLButtonElement | null>;
   disabled?: boolean;
   canResume?: boolean;
+  hasUnsavedChanges?: boolean;
 }) {
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
@@ -757,12 +769,14 @@ export function CreationDraftPanel({
       {!draft.consumed && !draft.pending ? (
         <p className="hca-field-hint">
           Para retomar em outra aba, sessão ou aparelho, use{" "}
-          {draft.kind === "PROGRESS" ||
-          draft.kind === "SCHEDULE" ||
-          draft.kind === "CONSUMPTION" ||
-          draft.kind === "FLOW"
-            ? "Salvar preenchimento privado"
-            : "Salvar rascunho"}
+          {draft.kind === "SCHEDULE" && isScheduleResourcePurpose(draft.purpose)
+            ? "Guardar preenchimento privado"
+            : draft.kind === "PROGRESS" ||
+                draft.kind === "SCHEDULE" ||
+                draft.kind === "CONSUMPTION" ||
+                draft.kind === "FLOW"
+              ? "Salvar preenchimento privado"
+              : "Salvar rascunho"}
           . O preenchimento ainda não salvo pode ficar apenas nesta aba.
         </p>
       ) : null}
@@ -782,9 +796,12 @@ export function CreationDraftPanel({
       {saved ? (
         <p>
           {saved.kind === "SCHEDULE"
-            ? saved.purpose === "shift_type_create"
-              ? "Tipo de plantão"
-              : "Programação de plantões"
+            ? typeof saved.purpose === "string" &&
+              isScheduleResourcePurpose(saved.purpose)
+              ? scheduleResourceLabels[saved.purpose]
+              : saved.purpose === "shift_type_create"
+                ? "Tipo de plantão"
+                : "Programação de plantões"
             : saved.kind === "PROGRESS"
               ? "Registro de andamento"
               : saved.kind === "FLOW"
@@ -911,12 +928,30 @@ export function CreationDraftPanel({
                 )}
                 .
               </p>
-              <SchedulePreparationSummary
-                content={{ schedule: draft.consumed.consumedResult.fields }}
-              />
               <p>
-                Reconhecer limpa somente a preparação privada. O tipo ou a
-                programação confirmados permanecem no histórico.
+                Resultado registrado:{" "}
+                {scheduleResourceOutcomeLabel(
+                  draft.consumed.consumedResult.nativeResult,
+                )}
+                .
+              </p>
+              {"expectedVersion" in draft.consumed.consumedResult ? (
+                <ScheduleResourceSummary
+                  content={{
+                    scheduleAction: draft.consumed.consumedResult.fields,
+                    referenceHash: draft.consumed.consumedResult.referenceHash,
+                    referenceVersion:
+                      draft.consumed.consumedResult.expectedVersion,
+                  }}
+                />
+              ) : (
+                <SchedulePreparationSummary
+                  content={{ schedule: draft.consumed.consumedResult.fields }}
+                />
+              )}
+              <p>
+                Reconhecer limpa somente a preparação privada. A operação
+                confirmada permanece no histórico.
               </p>
             </div>
           ) : draft.consumed.kind === "PROGRESS" &&
@@ -1125,7 +1160,8 @@ export function CreationDraftPanel({
       {current &&
       draft.base?.state === "active" &&
       !draft.blocked &&
-      JSON.stringify(current) !== JSON.stringify(draft.base.content) ? (
+      (hasUnsavedChanges ??
+        JSON.stringify(current) !== JSON.stringify(draft.base.content)) ? (
         <p>Sua edição atual ainda não foi salva no servidor.</p>
       ) : null}
       {saved?.state === "active" && !draft.pending && !draft.conflict ? (

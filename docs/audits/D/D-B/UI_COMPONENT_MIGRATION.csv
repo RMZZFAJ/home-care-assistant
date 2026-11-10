@@ -1,73 +1,78 @@
-"consumer","remaining_imports","implementation_status","gate"
-"src/components/admin/admin-fields.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/administration-navigation.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/admin/audit-history.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/catalogue-management.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/credential-review.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/global-accounts.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/governance-proposals.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/membership-impact.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/membership-management.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/notification-matrix.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/admin/permission-matrix.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/admin/policy-console.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/admin/policy-rules.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/app-shell.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/auth/login-form.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/auth/logout-button.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/balances/balance-console.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/balances/balance-count-fields.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/balances/balance-count-wizard.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/balances/balance-forms.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/balances/balance-recount-assignment.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/catalog/catalogue-identity-management.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/catalog/presentation-management.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/catalog/unit-console.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/dashboard/dashboard-summary.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/dashboard/task-list.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/dashboard.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/documents/balance-review.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/documents/delivery-inbox.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/documents/delivery-recipient.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/documents/delivery-regularization.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/documents/presentation-quantity.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/documents/supply-command-fields.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/documents/transfer-console.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/documents/transfer-details.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/forms/creation-draft-panel.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/forms/settings-section.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/forms/wizard-actions.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/guides/residence-preparation.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/layout/workspace-shell.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/notifications/notification-bell.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/notifications/notification-center.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/notifications/notification-reference.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/requisitions/recurring-selection.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/requisitions/remaining-need-reference.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/schedules/schedule-console.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/schedules/schedule-forms.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/schedules/selected-shift-dates.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/stock/consumption-console.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/stock/consumption-decision.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/stock/consumption-detail.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/stock/consumption-editor.tsx","","MIGRATED_COMPOSED_CONTROLS","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/stock/movement-origin.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/stock/stock-console.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/stock/stock-overview.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/theme/providers.tsx","","REMOVED_PROVIDER","UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain"
-"src/components/ui/primitives.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/forms/record-drawer.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain"
-"src/components/documents/document-tabs.tsx","","IMPLEMENTED_CANONICAL_RECORD_TABS_AND_FACTS","DOCUMENT_TABS_VALIDATION.json;directed local proof;full visual parity and own SHA CI remain"
-"src/components/documents/document-milestones.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/documents/document-next-step.tsx","","IMPLEMENTED_CANONICAL_RECORD_TABS_AND_FACTS","DOCUMENT_TABS_VALIDATION.json;directed local proof;full visual parity and own SHA CI remain"
-"src/components/documents/document-header.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/documents/supply-detail.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/requisitions/requisition-detail.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/requisitions/requisition-display.tsx","","IMPLEMENTED_CANONICAL_RECORD_TABS_AND_FACTS","DOCUMENT_TABS_VALIDATION.json;directed local proof;full visual parity and own SHA CI remain"
-"src/components/documents/document-action-slot.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/documents/document-breadcrumb.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/documents/document-actions.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/documents/document-progress.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/documents/document-viewer.tsx","","INTEGRATED_CANONICAL_DOCUMENT_FRAME","DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain"
-"src/components/documents/transfer-decision-editor.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","TRANSFER_DECISION_DRAFTS_VALIDATION.json;local directed proof only;own SHA CI and full visual parity remain"
-"src/components/documents/transfer-facts.tsx","","MIGRATED_SHARED_NATIVE_CONTROLS","TRANSFER_DECISION_DRAFTS_VALIDATION.json;local directed proof only;own SHA CI and full visual parity remain"
+consumer,remaining_imports,implementation_status,gate
+src/components/admin/admin-fields.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/administration-navigation.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/admin/audit-history.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/catalogue-management.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/credential-review.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/global-accounts.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/governance-proposals.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/membership-impact.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/membership-management.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/notification-matrix.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/admin/permission-matrix.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/admin/policy-console.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/admin/policy-rules.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/app-shell.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/auth/login-form.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/auth/logout-button.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/balances/balance-console.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/balances/balance-count-fields.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/balances/balance-count-wizard.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/balances/balance-forms.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/balances/balance-recount-assignment.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/catalog/catalogue-identity-management.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/catalog/presentation-management.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/catalog/unit-console.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/dashboard/dashboard-summary.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/dashboard/task-list.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/dashboard.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/documents/balance-review.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/documents/delivery-inbox.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/documents/delivery-recipient.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/documents/delivery-regularization.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/documents/presentation-quantity.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/documents/supply-command-fields.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/documents/transfer-console.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/documents/transfer-details.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/forms/creation-draft-panel.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/forms/settings-section.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/forms/wizard-actions.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/guides/residence-preparation.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/layout/workspace-shell.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/notifications/notification-bell.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/notifications/notification-center.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/notifications/notification-reference.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/requisitions/recurring-selection.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/requisitions/remaining-need-reference.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/schedules/schedule-console.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/schedules/schedule-forms.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/schedules/selected-shift-dates.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/stock/consumption-console.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/stock/consumption-decision.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/stock/consumption-detail.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/stock/consumption-editor.tsx,,MIGRATED_COMPOSED_CONTROLS,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/stock/movement-origin.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/stock/stock-console.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/stock/stock-overview.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/theme/providers.tsx,,REMOVED_PROVIDER,UI_MODEL_STAGE_3.json;local consumer proof;own SHA CI and full visual parity remain
+src/components/ui/primitives.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/forms/record-drawer.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,UI_MODEL_STAGE_2.json;local proof only;own SHA CI and full visual parity remain
+src/components/documents/document-tabs.tsx,,IMPLEMENTED_CANONICAL_RECORD_TABS_AND_FACTS,DOCUMENT_TABS_VALIDATION.json;directed local proof;full visual parity and own SHA CI remain
+src/components/documents/document-milestones.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/documents/document-next-step.tsx,,IMPLEMENTED_CANONICAL_RECORD_TABS_AND_FACTS,DOCUMENT_TABS_VALIDATION.json;directed local proof;full visual parity and own SHA CI remain
+src/components/documents/document-header.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/documents/supply-detail.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/requisitions/requisition-detail.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/requisitions/requisition-display.tsx,,IMPLEMENTED_CANONICAL_RECORD_TABS_AND_FACTS,DOCUMENT_TABS_VALIDATION.json;directed local proof;full visual parity and own SHA CI remain
+src/components/documents/document-action-slot.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/documents/document-breadcrumb.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/documents/document-actions.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/documents/document-progress.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/documents/document-viewer.tsx,,INTEGRATED_CANONICAL_DOCUMENT_FRAME,DOCUMENT_HEADER_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/documents/transfer-decision-editor.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,TRANSFER_DECISION_DRAFTS_VALIDATION.json;local directed proof only;own SHA CI and full visual parity remain
+src/components/documents/transfer-facts.tsx,,MIGRATED_SHARED_NATIVE_CONTROLS,TRANSFER_DECISION_DRAFTS_VALIDATION.json;local directed proof only;own SHA CI and full visual parity remain
+src/components/schedules/schedule-resource-fields.tsx,,INTEGRATED_CANONICAL_PRIVATE_RESOURCE_CONTROLS,SCHEDULE_RESOURCE_DRAFTS_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/schedules/schedule-resource-list.tsx,,INTEGRATED_CANONICAL_PRIVATE_RESOURCE_CONTROLS,SCHEDULE_RESOURCE_DRAFTS_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/schedules/schedule-resource-preparation.tsx,,INTEGRATED_CANONICAL_PRIVATE_RESOURCE_CONTROLS,SCHEDULE_RESOURCE_DRAFTS_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/schedules/schedule-resource-reference.tsx,,INTEGRATED_CANONICAL_PRIVATE_RESOURCE_CONTROLS,SCHEDULE_RESOURCE_DRAFTS_VALIDATION.json;directed local proof;full parity and own SHA CI remain
+src/components/schedules/schedule-resource-summary.tsx,,INTEGRATED_CANONICAL_PRIVATE_RESOURCE_CONTROLS,SCHEDULE_RESOURCE_DRAFTS_VALIDATION.json;directed local proof;full parity and own SHA CI remain

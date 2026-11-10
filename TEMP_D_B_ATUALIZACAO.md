@@ -26,7 +26,7 @@ ou liberação que depende de você. “Participantes/equipe” são pessoas que
 usarão ou avaliarão o sistema; “serviço externo” depende também do fornecedor.
 
 Os testes completos da próxima versão publicada ainda precisam ser concluídos.
-O banco remoto já recebeu todas as atualizações deste lote, sem pendências.
+O banco remoto já recebeu as atualizações desta etapa, sem pendências.
 A fase continua em execução.
 
 A agenda agora preserva neste aparelho a tentativa enviada: depois de uma
@@ -53,13 +53,17 @@ cancelar. Editar só o nome do tipo ou as observações do plantão também cons
 os horários registrados. Responsável pelo ajuste: Codex. Essa continuidade
 local não substitui a retomada entre aparelhos.
 
-**Continuidade privada de toda a agenda: em execução · ≈35%.** Novos tipos e
-programações estão concluídos; guardar alterações, cancelamentos e decisões
-sobre escalas existentes ainda falta. Responsável: Codex.
+**Continuidade privada de toda a agenda: concluída · 100% deste recurso.**
+Já é possível
+guardar e retomar alterações de tipos, plantões e programações, cancelamentos,
+aprovações, rejeições e encerramentos de propostas. A recuperação mantém os
+campos próprios mesmo após perda de resposta ou outra conclusão. As
+verificações deste recurso e a atualização do banco foram concluídas; a
+revisão geral da fase continua pendente. Responsável: Codex.
 
 O levantamento ampliado também encontrou trabalho em contagens, cadastros e
 administração. A estimativa geral de recuperação entre aparelhos continua em
-85%; concluir essas lacunas continua sendo minha responsabilidade.
+90%; concluir essas lacunas continua sendo minha responsabilidade.
 Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
@@ -107,10 +111,9 @@ quando há conflito. É possível percorrer a revisão longa pelo teclado.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈85%. Falta: Guardar alterações e decisões sobre escalas
-  existentes; conferir contagens e demais formulários e completar as lacunas.
-  Novos tipos de plantão e novas programações já podem ser retomados em outro
-  aparelho.
+  execução · ≈90%. Falta: Conferir campos ainda não salvos nas contagens,
+  cadastros e administração, e completar as lacunas aplicáveis. As preparações
+  privadas da agenda estão concluídas no escopo interno deste recurso.
   Revisões de fluxo, relatos e decisões de consumo, movimentação familiar,
   programação do balanço, atribuição, adiamentos, pareceres,
   reconto, decisões de requisição e Andamentos privados estão implementados.
@@ -416,8 +419,9 @@ incluídos.
   atos de compra, entrega e transferência, decisões de requisição, pareceres,
   reconto, programação, atribuição e adiamentos do balanço, movimentação
   familiar, relatos, complementos e decisões de consumo, revisões de fluxo e
-  preparação privada de Andamentos, novos tipos de plantão e novas
-  programações da agenda com comparação e recuperação.
+  preparação privada de Andamentos e agenda, incluindo alterações,
+  cancelamentos e decisões sobre recursos existentes, com comparação e
+  recuperação.
   Falta: Conferir demais variações, lacunas de continuidade e apresentação
   conjunta. Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 55%. Já aplicado: Base,
@@ -494,9 +498,6 @@ estar parcialmente pronta, como mostrado nos blocos anteriores. Incluem implemen
 validação e ativação operacional; não são motivos para parar os trabalhos
 independentes.
 
-- **Guardar alterações e decisões sobre escalas existentes entre aparelhos:**
-  0% dessas preparações. Novos tipos de plantão e novas programações estão
-  concluídos; a continuidade de toda a agenda está em ≈35%. Responsável: Codex.
 - **Aceite final das tarefas com usuários reais:**0%. Responsáveis: você e
   participantes; preparo e eventuais correções pelo Codex.
 - **Homologação de acessibilidade com pessoas e tecnologia assistiva:**0%.
@@ -517,10 +518,10 @@ Esta é a ordem do trabalho restante. Os quadros anteriores estão agrupados por
 funcionalidade, sem representar ordem de execução. Tudo que já está 100% será
 preservado e incluído na revisão final; não será refeito sem motivo.
 
-1. **Revisar e completar a continuidade dos formulários da operação diária.**
-   Completar os preenchimentos privados das alterações e decisões da agenda;
-   revisar contagens, cadastros e administração, completar as lacunas e conferir
-   mensagens, conflitos e recuperação em conjunto. Preservar as revisões de
+1. **Completar a continuidade das contagens e dos formulários diários.**
+   Conferir valores ainda não salvos nas contagens de estoque, completar as
+   lacunas de recuperação e os cadastros necessários à operação. Conferir
+   mensagens e conflitos em conjunto. Preservar a agenda privada, as revisões de
    fluxo, os relatos, complementos e
    decisões de consumo, Andamentos privados, a movimentação familiar, os seis
    atos de balanço,

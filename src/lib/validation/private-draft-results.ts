@@ -1,4 +1,11 @@
 import {
+  isScheduleResourcePurpose,
+  checkScheduleResourceReference,
+  scheduleResourceReadContentSchema,
+  scheduleResourcePurpose,
+} from "../schedules/resource-preparations";
+import { parseScheduleResourceReceipt } from "./schedule-resource-preparations";
+import {
   scheduleCreationContent,
   schedulePurpose,
 } from "@/lib/schedules/creation";
@@ -134,7 +141,9 @@ export function parsePrivateDraft(
     );
   const schema =
     row.kind === "SCHEDULE"
-      ? scheduleCreationContent
+      ? isScheduleResourcePurpose(row.purpose)
+        ? scheduleResourceReadContentSchema
+        : scheduleCreationContent
       : row.kind === "PROGRESS"
         ? progressPreparationContentSchema
         : row.kind === "FLOW"
@@ -164,8 +173,11 @@ export function parsePrivateDraft(
   if (
     row.kind === "SCHEDULE" &&
     content?.success &&
-    (!("schedule" in content.data) ||
-      schedulePurpose(content.data.schedule) !== row.purpose)
+    (isScheduleResourcePurpose(row.purpose)
+      ? !("scheduleAction" in content.data) ||
+        scheduleResourcePurpose(content.data.scheduleAction) !== row.purpose
+      : !("schedule" in content.data) ||
+        schedulePurpose(content.data.schedule) !== row.purpose)
   )
     throw new Error(
       "O preenchimento da escala não corresponde à finalidade consultada.",
@@ -178,6 +190,24 @@ export function parsePrivateDraft(
     throw new Error(
       "Não foi possível conferir a etapa do rascunho. Consulte novamente.",
     );
+  if (
+    row.kind === "SCHEDULE" &&
+    isScheduleResourcePurpose(row.purpose) &&
+    content?.success &&
+    "scheduleAction" in content.data &&
+    content.data.reference
+  ) {
+    const ref = checkScheduleResourceReference(content.data.reference, {
+      patientId: scope.patientId,
+      purpose: row.purpose,
+      targetResourceId: scope.targetResourceId!,
+    });
+    if (
+      ref.hash !== content.data.referenceHash ||
+      ref.version !== content.data.referenceVersion
+    )
+      throw Error("A referência não corresponde ao preenchimento salvo.");
+  }
   const consumed = ["consumed", "completed"].includes(row.state);
   if (
     (content && !content.success) ||
@@ -206,11 +236,13 @@ export function parsePrivateDraft(
   const consumedResult =
     resource && consumed
       ? row.kind === "SCHEDULE"
-        ? parseSchedulePreparationReceipt(row.consumedResult, {
+        ? (isScheduleResourcePurpose(scope.purpose)
+            ? parseScheduleResourceReceipt
+            : parseSchedulePreparationReceipt)(row.consumedResult, {
             patientId: scope.patientId,
             purpose: scope.purpose,
             userId: scope.userId,
-            targetResourceId: null,
+            targetResourceId: scope.targetResourceId,
           })
         : (row.kind === "PROGRESS"
             ? parseProgressPreparationReceipt
@@ -290,11 +322,16 @@ export function parsePrivateDraftResult(
   const consumedResult =
     resource && expected === "completed"
       ? intent.kind === "SCHEDULE"
-        ? parseSchedulePreparationReceipt(row.consumedResult, {
+        ? (isScheduleResourcePurpose(String(intent.purpose))
+            ? parseScheduleResourceReceipt
+            : parseSchedulePreparationReceipt)(row.consumedResult, {
             patientId: String(intent.careRecipientId),
             purpose: String(intent.purpose),
             userId: userId!,
-            targetResourceId: null,
+            targetResourceId:
+              intent.targetResourceId == null
+                ? null
+                : String(intent.targetResourceId),
           })
         : (intent.kind === "PROGRESS"
             ? parseProgressPreparationReceipt

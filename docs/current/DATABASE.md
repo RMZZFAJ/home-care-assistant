@@ -677,3 +677,20 @@ diretório completo usa a mesma visibilidade global/vínculo e mesma ordenação
 Sessão é revalidada antes do retorno. Não há tabela,index,grant ou timeout novo.
 Nove dependências nativas permanecem iguais;nenhuma autoridade é reutilizada
 entre chamadas. Instalação limpa/legado/integração integral exigem CI própria.
+
+## Preparações de recursos existentes de escala
+
+Migration197 adiciona private.schedule_resource_preparations e seu diário
+schedule_resource_preparation_commands. São oito finalidades com FKs reais
+para tipo, série, plantão ou proposta, além do resultado de proposta criada.
+O slot ativo/consumido é único por autor, paciente, finalidade e alvo. RLS
+fechada e grants explícitos permitem somente as sete RPCs públicas Auth;
+não há acesso direto às tabelas por anon,authenticated ou service_role.
+
+Salvar campos próprios não cria escala nem documento. Referência antiga ou
+inacessível pode ser preservada como indicação sem snapshot selado; commit
+recusa esse estado. Ato oficial usa CAS, referência selada, guarda nativa e
+journal do ator efetivo, sem inferir autoria pelo criador do recurso. A
+recusa posterior às esperas reverte toda a transação. Recuperação e resolução
+serializam com a chave original; histórico próprio permanece paginado mesmo
+após reconhecimento. Funções nativas e migrations anteriores não mudam.

@@ -1,14 +1,15 @@
 "use client";
 import { ScheduleCreationPreparation } from "./schedule-creation-preparation";
+import { ScheduleResourcePreparation } from "./schedule-resource-preparation";
+import { ScheduleResourcePreparationsList } from "./schedule-resource-list";
+import type { ScheduleResourcePurpose } from "@/lib/schedules/resource-preparations";
 import type { ScheduleCreationPurpose } from "@/lib/schedules/creation";
-import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import {
   ActionButton,
   FormField,
   LoadingIndicator,
   Pill,
   SelectField,
-  TextAreaField,
   TextInput,
 } from "@/components/ui/controls";
 import { useEffect, useRef, useState } from "react";
@@ -18,30 +19,21 @@ import { NotificationReference } from "@/components/notifications/notification-r
 
 import {
   api,
-  ApiError,
   can,
   Notice,
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
-import { RecordDrawer } from "@/components/forms/record-drawer";
-import { Dialog } from "@/components/ui/primitives";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { adjacentPeriod, calendarPeriod } from "@/lib/schedules/calendar";
-import { ScheduleForm, type ScheduleEditor } from "./schedule-forms";
-import {
-  ScheduleReviewDetails,
-  scheduleStamp as stamp,
-  type ScheduleReview,
-} from "./schedule-review";
-import type { ScheduleCommand } from "@/lib/validation/schedules";
+import type { ScheduleEditor } from "./schedule-forms";
+import { scheduleStamp as stamp } from "./schedule-review";
 import type { ScheduleWorkspace, ScheduledShift } from "@/types/schedules";
 import {
   useScheduleConfirmation,
   type ScheduleRecovery,
 } from "./use-schedule-confirmation";
 import { ScheduleConfirmationPanel } from "./schedule-confirmation-panel";
-import type { ScheduleConfirmation } from "@/lib/schedules/confirmation";
 
 const today = () =>
   new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(
@@ -75,6 +67,7 @@ export function ScheduleConsole() {
 }
 function PatientSchedule({ context }: { context: WorkspaceContext }) {
   const [creationMessage, setCreationMessage] = useState("");
+  const [privateRefresh, setPrivateRefresh] = useState(0);
   const ownSummaryRef = useRef<HTMLElement>(null);
   const recovery = useScheduleConfirmation(context.userId, context.patient!.id);
   const [preparation, setPreparation] = useState<{
@@ -82,12 +75,29 @@ function PatientSchedule({ context }: { context: WorkspaceContext }) {
     day: string;
     opener: HTMLElement;
   } | null>(null);
+  const [resource, setResource] = useState<{
+    purpose: ScheduleResourcePurpose;
+    target: string;
+    day: string;
+    opener: HTMLElement;
+  } | null>(null);
+  const openResource = (
+    purpose: ScheduleResourcePurpose,
+    target: string,
+    day: string,
+    opener: HTMLElement,
+  ) => {
+    if (!recovery.ready || recovery.busy || recovery.pending || preparation)
+      return;
+    setResource({ purpose, target, day, opener });
+  };
   const create = (
     purpose: ScheduleCreationPurpose,
     day: string,
     opener: HTMLElement,
   ) => {
-    if (!recovery.ready || recovery.busy || recovery.pending) return;
+    if (!recovery.ready || recovery.busy || recovery.pending || resource)
+      return;
     setPreparation({ purpose, day, opener });
   };
   return (
@@ -95,7 +105,12 @@ function PatientSchedule({ context }: { context: WorkspaceContext }) {
       {creationMessage ? <Notice>{creationMessage}</Notice> : null}
       {can(context, "schedule.read.team") ||
       can(context, "schedule.read.own") ? (
-        <Agenda context={context} recovery={recovery} onCreate={create} />
+        <Agenda
+          context={context}
+          recovery={recovery}
+          onCreate={create}
+          onResource={openResource}
+        />
       ) : (
         <>
           <ScheduleConfirmationPanel recovery={recovery} />
@@ -136,6 +151,17 @@ function PatientSchedule({ context }: { context: WorkspaceContext }) {
             Retomar minha programação
           </ActionButton>
         </div>
+        <ScheduleResourcePreparationsList
+          context={context}
+          refreshToken={privateRefresh}
+          disabled={
+            !recovery.ready ||
+            recovery.busy ||
+            Boolean(recovery.pending) ||
+            Boolean(preparation)
+          }
+          onOpen={openResource}
+        />
       </details>
       {preparation ? (
         <ScheduleCreationPreparation
@@ -158,6 +184,31 @@ function PatientSchedule({ context }: { context: WorkspaceContext }) {
           }}
         />
       ) : null}
+      {resource ? (
+        <ScheduleResourcePreparation
+          key={resource.purpose + ":" + resource.target}
+          context={context}
+          purpose={resource.purpose}
+          targetResourceId={resource.target}
+          today={resource.day}
+          opener={resource.opener}
+          fallbackFocus={ownSummaryRef}
+          onClose={() => {
+            setResource(null);
+            setPrivateRefresh((value) => value + 1);
+          }}
+          onCommitted={(receipt) => {
+            setCreationMessage(
+              receipt.nativeResult.status === "obsolete"
+                ? "Proposta encerrada como obsoleta; nenhuma aprovação foi realizada."
+                : receipt.nativeResult.status === "pending"
+                  ? "Proposta de alteração enviada; aguarda decisão autorizada."
+                  : "Operação da agenda registrada e conferida.",
+            );
+            window.dispatchEvent(new Event("hca:data-changed"));
+          }}
+        />
+      ) : null}
     </>
   );
 }
@@ -165,11 +216,18 @@ function Agenda({
   context,
   recovery,
   onCreate,
+  onResource,
 }: {
   context: WorkspaceContext;
   recovery: ScheduleRecovery;
   onCreate: (
     purpose: ScheduleCreationPurpose,
+    day: string,
+    opener: HTMLElement,
+  ) => void;
+  onResource: (
+    purpose: ScheduleResourcePurpose,
+    target: string,
     day: string,
     opener: HTMLElement,
   ) => void;
@@ -208,30 +266,9 @@ function Agenda({
     data: ScheduleWorkspace | null;
     error: string;
   }>({ key: "", range: "", data: null, error: "" });
-  const [error, setError] = useState(""),
-    [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const busy = recovery.busy || !recovery.ready,
     uncertain = recovery.pending !== null;
-  const [conflict, setConflict] = useState(false);
-  const [editor, setEditor] = useState<ScheduleEditor | null>(null),
-    [review, setReview] = useState<ScheduleReview | null>(null);
-  const [editorWorkspace, setEditorWorkspace] =
-    useState<ScheduleWorkspace | null>(null);
-  const [opener, setOpener] = useState<HTMLElement | null>(null);
-  const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
-  const reviewOpen = Boolean(review);
-  const previousReviewOpenRef = useRef(false);
-  useEffect(() => {
-    const returnToForm = previousReviewOpenRef.current && !reviewOpen;
-    previousReviewOpenRef.current = reviewOpen;
-    if (!reviewOpen && !returnToForm) return;
-    // Queue after the DOM commit so the dialog's removed-control recovery runs first.
-    const frame = requestAnimationFrame(() => {
-      if (reviewOpen) reviewHeadingRef.current?.focus();
-      else document.getElementById("schedule-review-button")?.focus();
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [reviewOpen]);
   const live = useLiveRevision(),
     period = calendarPeriod(day, mode);
   const rangeKey = patient.id + ":" + period.from + ":" + period.until;
@@ -285,74 +322,31 @@ function Agenda({
       );
       return;
     }
-    setDay(day);
-    setOpener(target);
-    setEditorWorkspace(data);
-    setEditor(value);
-    setError("");
-    setConflict(false);
-  }
-  function openReview(
-    command: ScheduleCommand,
-    version?: number,
-    target?: HTMLElement,
-  ) {
-    if (busy || uncertain) return;
-    const workspace = target ? data : (editorWorkspace ?? data);
-    if (!workspace) return;
-    if (target) setOpener(target);
-    else {
-      // Keep focus inside the dialog before hiding its submitting form.
-      // Otherwise Base UI's removed-control recovery can override the heading.
-      const trigger = document.getElementById("schedule-review-button");
-      if (trigger) holdDialogFocus(trigger);
-    }
-    setError("");
-    setConflict(false);
-    // Hold the exact displayed object while live queries receive newer data.
-    setReview({ command, version, workspace });
-  }
-  function confirmed(result: ScheduleConfirmation | null = recovery.receipt) {
-    if (review && result?.result.status === "obsolete") {
-      setConflict(true);
-      setError(
-        "A proposta foi encerrada como obsoleta. A revisão exibida foi preservada; nenhuma aprovação foi feita.",
+    if (value.kind === "type" && value.type)
+      onResource("shift_type_edit", value.type.id, day, target);
+    else if (value.kind === "shift")
+      onResource("schedule_shift_edit", value.shift.id, day, target);
+    else if (
+      value.kind === "end" ||
+      value.kind === "reject" ||
+      value.kind === "reject_change"
+    )
+      onResource(
+        value.kind === "end"
+          ? "schedule_series_end"
+          : value.kind === "reject"
+            ? "schedule_series_reject"
+            : "schedule_change_reject",
+        value.id,
+        day,
+        target,
       );
-      setAttempt((value) => value + 1);
-      return;
-    }
-    setConflict(false);
-    setReview(null);
-    setEditor(null);
-    setError("");
+  }
+  function confirmed() {
     setMessage(
       "Resultado da escala conferido. As responsabilidades documentais anteriores foram preservadas.",
     );
     setAttempt((value) => value + 1);
-  }
-  async function send() {
-    if (busy || uncertain || !review) return;
-    setError("");
-    try {
-      const result = await recovery.submit({
-        careRecipientId: patient.id,
-        command: review.command,
-        expectedVersion: review.version ?? null,
-        idempotencyKey: crypto.randomUUID(),
-      });
-      if (result) confirmed(result);
-    } catch (reason) {
-      if (
-        reason instanceof ApiError &&
-        [400, 401, 403, 404, 409, 422].includes(reason.status)
-      ) {
-        if (reason.status === 409 && reason.code !== "SCHEDULE_OVERLAP")
-          setConflict(true);
-      }
-      setError(
-        reason instanceof Error ? reason.message : "Não foi possível gravar.",
-      );
-    }
   }
   const visible =
     currentData?.shifts.filter(
@@ -420,195 +414,6 @@ function Agenda({
       </section>
     );
   };
-  const errors = (
-    <>
-      {error ? <Notice error>{error}</Notice> : null}
-      {uncertain ? (
-        <Notice>
-          A confirmação não foi recebida. A mesma intenção está preservada;
-          recupere o resultado antes de preparar outra ação.
-        </Notice>
-      ) : null}
-    </>
-  );
-  const reviewId =
-    review && "id" in review.command.body ? review.command.body.id : undefined;
-  const proposal =
-    review &&
-    (review.command.action === "decide_change" ||
-      review.command.action === "close_obsolete")
-      ? review.workspace.changes.find((change) => change.id === reviewId)
-      : undefined;
-  const decision =
-    review?.command.action === "decide_change" ||
-    review?.command.action === "close_obsolete";
-  const decisionReason =
-    review && decision && "reason" in review.command.body
-      ? (review.command.body.reason ?? "")
-      : "";
-  const reasonRequired =
-    review?.command.action === "close_obsolete" ||
-    (review?.command.action === "decide_change" &&
-      !review.command.body.approve);
-  const invalidReason =
-    decision &&
-    (reasonRequired
-      ? decisionReason.trim().length < 3
-      : decisionReason.length > 0 && decisionReason.trim().length < 3);
-  const blockedApproval =
-    review?.command.action === "decide_change" &&
-    review.command.body.approve &&
-    (!proposal?.source_snapshot ||
-      !proposal.proposed_snapshot ||
-      proposal.is_stale ||
-      proposal.bal_impact.requires_family_decision);
-  const blockedSeries =
-    review?.command.action === "approve" &&
-    review.workspace.series.find((series) => series.id === reviewId)
-      ?.publication_blocked;
-  const commandOwner =
-    review?.workspace.series.find((series) => series.id === reviewId)
-      ?.professional_id ??
-    review?.workspace.shifts.find((shift) => shift.id === reviewId)
-      ?.professional_id;
-  const canConfirm = !review
-    ? false
-    : decision
-      ? team
-      : review.command.action === "type"
-        ? can(context, "schedule.types.manage")
-        : review.command.action === "series"
-          ? team ||
-            (review.command.body.professionalId === context.userId &&
-              (publishOwn || can(context, "schedule.propose")))
-          : review.command.action === "propose_change"
-            ? can(context, "schedule.propose")
-            : team || (commandOwner === context.userId && publishOwn);
-  const confirmLabel =
-    review?.command.action === "close_obsolete"
-      ? "Encerrar proposta obsoleta"
-      : review?.command.action === "decide_change"
-        ? review.command.body.approve
-          ? "Aprovar proposta"
-          : "Confirmar rejeição"
-        : review?.command.action === "approve"
-          ? "Aprovar proposta"
-          : review?.command.action === "reject"
-            ? "Confirmar rejeição"
-            : "Confirmar gravação";
-  const reviewContents = review ? (
-    <div className="hca-schedule-review min-w-0 space-y-3">
-      <h3 tabIndex={-1} ref={reviewHeadingRef}>
-        Conferência da escala
-      </h3>
-      <ScheduleReviewDetails review={review} />
-      {blockedSeries ? (
-        <Notice error>
-          O profissional não está apto para esta publicação ou a série já foi
-          encerrada. Recuse a proposta com motivo ou prepare uma programação
-          válida.
-        </Notice>
-      ) : null}
-      {decision ? (
-        <FormField label="Motivo desta decisão" required={reasonRequired}>
-          <TextAreaField
-            value={decisionReason}
-            minLength={3}
-            maxLength={1000}
-            disabled={busy || uncertain || conflict}
-            onChange={(event) => {
-              const value = event.target.value;
-              setReview((previous) => {
-                if (previous?.command.action === "close_obsolete")
-                  return {
-                    ...previous,
-                    command: {
-                      ...previous.command,
-                      body: { ...previous.command.body, reason: value },
-                    },
-                  };
-                if (previous?.command.action === "decide_change")
-                  return {
-                    ...previous,
-                    command: {
-                      ...previous.command,
-                      body: {
-                        ...previous.command.body,
-                        reason: value || undefined,
-                      },
-                    },
-                  };
-                return previous;
-              });
-            }}
-          />
-          <small>
-            O motivo de quem propôs e as notas acima são preservados.
-          </small>
-        </FormField>
-      ) : null}
-      {errors}
-      {uncertain ? (
-        <ScheduleConfirmationPanel
-          recovery={recovery}
-          onConfirmed={confirmed}
-        />
-      ) : null}
-      {conflict ? (
-        <Notice error>
-          A versão ou uma condição necessária mudou. A revisão exibida foi
-          preservada e não será aprovada automaticamente com dados novos.
-          <ActionButton
-            disabled={busy}
-            onClick={() => {
-              setReview(null);
-              setEditor(null);
-              setConflict(false);
-              setError("");
-              setAttempt((value) => value + 1);
-            }}
-          >
-            Fechar revisão e atualizar
-          </ActionButton>
-        </Notice>
-      ) : null}
-      {!canConfirm ? (
-        <Notice error>
-          Seu vínculo não permite mais esta decisão. Nenhuma aprovação pode ser
-          realizada por este perfil.
-        </Notice>
-      ) : null}
-      <div className="hca-toolbar hca-schedule-decision-actions">
-        {!uncertain ? (
-          <>
-            <ActionButton
-              disabled={busy || uncertain}
-              onClick={(event) => {
-                holdDialogFocus(event.currentTarget);
-                setReview(null);
-              }}
-            >
-              Voltar
-            </ActionButton>
-            <ActionButton
-              variant="primary"
-              disabled={
-                busy ||
-                conflict ||
-                invalidReason ||
-                blockedApproval ||
-                blockedSeries ||
-                !canConfirm
-              }
-              onClick={() => void send()}
-            >
-              {confirmLabel}
-            </ActionButton>
-          </>
-        ) : null}
-      </div>
-    </div>
-  ) : null;
   return recovery.readDenied ? (
     <ScheduleConfirmationPanel recovery={recovery} onConfirmed={confirmed} />
   ) : (
@@ -642,13 +447,13 @@ function Agenda({
           </ActionButton>
         ) : null}
       </div>
-      {!editor && !review ? errors : null}
-      {!review ? (
-        <ScheduleConfirmationPanel
-          recovery={recovery}
-          onConfirmed={confirmed}
-        />
+      {uncertain ? (
+        <Notice>
+          A confirmação não foi recebida. A mesma intenção está preservada;
+          recupere o resultado antes de preparar outra ação.
+        </Notice>
       ) : null}
+      <ScheduleConfirmationPanel recovery={recovery} onConfirmed={confirmed} />
       {message ? <Notice>{message}</Notice> : null}
       <div className="hca-toolbar">
         <FormField label="Data de referência">
@@ -750,9 +555,10 @@ function Agenda({
                     </span>
                     <ActionButton
                       onClick={(event) =>
-                        openReview(
-                          { action: "approve", body: { id: series.id } },
-                          series.version,
+                        onResource(
+                          "schedule_series_approve",
+                          series.id,
+                          day,
                           event.currentTarget,
                         )
                       }
@@ -790,17 +596,12 @@ function Agenda({
                   </div>
                   <ActionButton
                     onClick={(event) =>
-                      openReview(
+                      onResource(
                         change.is_stale
-                          ? {
-                              action: "close_obsolete",
-                              body: { id: change.id, reason: "" },
-                            }
-                          : {
-                              action: "decide_change",
-                              body: { id: change.id, approve: true },
-                            },
-                        change.version,
+                          ? "schedule_change_close"
+                          : "schedule_change_approve",
+                        change.id,
+                        day,
                         event.currentTarget,
                       )
                     }
@@ -902,55 +703,6 @@ function Agenda({
             ))}
           </details>
         </>
-      ) : null}
-      {editor && editorWorkspace ? (
-        <RecordDrawer
-          title={
-            review
-              ? "Revisar escala"
-              : editor.kind === "type"
-                ? "Tipo de plantão"
-                : editor.kind === "series"
-                  ? "Programação de plantões"
-                  : editor.kind === "end"
-                    ? "Encerrar programação"
-                    : "Alteração pontual"
-          }
-          onClose={() => {
-            setEditor(null);
-            setReview(null);
-          }}
-          busy={busy}
-          preventClose={uncertain}
-          restoreFocusTo={opener}
-        >
-          <div hidden={Boolean(review)} inert={Boolean(review)}>
-            <fieldset className="min-w-0" disabled={Boolean(review)}>
-              {!review ? errors : null}
-              <ScheduleForm
-                editor={editor}
-                data={editorWorkspace}
-                ownId={context.userId}
-                team={team}
-                publishOwn={publishOwn}
-                today={day}
-                onReview={openReview}
-              />
-            </fieldset>
-          </div>
-          {review ? reviewContents : null}
-        </RecordDrawer>
-      ) : null}
-      {review && !editor ? (
-        <Dialog
-          open
-          title="Revisar escala"
-          onClose={() => {
-            if (!busy && !uncertain) setReview(null);
-          }}
-        >
-          {reviewContents}
-        </Dialog>
       ) : null}
     </div>
   );

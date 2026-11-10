@@ -1196,7 +1196,9 @@ monotônica do tipo avançada podem comprovar não aplicação. Resultado conhec
 tem precedência sobre mudanças posteriores. Consulta não envia programação.
 Leitura,descarte e reconhecimento próprios admitem perda de escrita/paciente
 inativo sob vínculo vivo;novos atos conservam autorização nativa. Origin e
-private,no-store permanecem. Alterações/decisões existentes mantêm a API nativa.
+private,no-store permanecem. Alterações/decisões existentes também admitem
+a preparação D3.54 abaixo;
+a API nativa continua compatível.
 
 ## Custo da leitura de contexto
 
@@ -1207,3 +1209,26 @@ nativas para candidatos da sessão e da autoridade interna transacional. Não
 há cache de autoridade entre requisições;revogação/sessão expirada continuam
 recusadas. Nova programação privada mantém revisão após recusa conhecida e
 exige voltar ao preenchimento antes de preparar outra confirmação.
+
+## Preparações de alterações e decisões da agenda
+
+/api/schedules/resource-preparations tem GET de contexto próprio e POST de
+save/discard/acknowledge. O escopo inclui paciente, finalidade e alvo real.
+/reference lê apenas a referência operacional desse alvo e os profissionais
+legitimamente disponíveis; /list pagina todos os estados privados próprios,
+incluindo resultados reconhecidos e descartes, com cursor de instante/ID.
+O cliente não fornece owner nem snapshots de autoridade.
+
+POST /commit recebe draftCommit, comando, versão do alvo, sourceVersion
+quando houver origem de proposta, referenceHash e chave idempotente. Devolve
+{data:{draft,receipt,replayed}}; o recibo é validado contra o pacote exato.
+A aprovação cuja origem ficou obsoleta só pode registrar o resultado nativo
+obsolete; não pode aprovar uma alteração diferente da revisão apresentada.
+
+POST /recovery recebe packet e opcional resolutionKey distinta. Consulta sob
+a trava da chave original; ausência no diário permanece unknown. O avanço
+monotônico de origem não prova não aplicação da aprovação, que ainda poderia
+encerrar como obsoleta. A resolução explícita retira a revisão privada de
+circulação e conserva os campos. Resultado e chave de resolução são
+idempotentes, inclusive se sua resposta se perder. Origin e private,no-store
+permanecem em todas essas rotas; a API genérica de documentos não as aceita.

@@ -218,7 +218,8 @@ export function ScheduleCreationPreparation({
       !mountedRef.current ||
       row?.state !== "consumed" ||
       !row.consumedResult ||
-      !("fields" in row.consumedResult)
+      !("fields" in row.consumedResult) ||
+      row.consumedResult.targetResourceId !== null
     )
       return;
     const original = localRef.current;

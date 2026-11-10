@@ -84,28 +84,83 @@ async function login(page: Page, patient: string) {
   ).toBeVisible();
 }
 
-test("C-FINAL023 escala recupera leitura e preserva foco sem validar fuso proposto como input", async ({ page }) => {
+test("C-FINAL023 escala recupera leitura e preserva foco sem validar fuso proposto como input", async ({
+  page,
+}) => {
   test.setTimeout(120_000);
-  const f = await prepared(); await login(page, f.patient);
-  const original = sql(`select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`);
+  const f = await prepared();
+  await login(page, f.patient);
+  const original = sql(
+    `select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`,
+  );
   let writes = 0;
-  page.on("request", request => { if (new URL(request.url()).pathname === "/api/schedules" && request.method() !== "GET") writes++; });
-  await page.route("**/api/schedules?**", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia de escala indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
-  await page.getByRole("group", { name: "Período da escala", exact: true }).getByRole("button", { name: /Próxima semana|Próximo mês/ }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "Consulta fictícia de escala indisponível" })).toBeVisible();
+  page.on("request", (request) => {
+    if (
+      new URL(request.url()).pathname === "/api/schedules" &&
+      request.method() !== "GET"
+    )
+      writes++;
+  });
+  await page.route(
+    "**/api/schedules?**",
+    (route) =>
+      route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({
+          error: "Consulta fictícia de escala indisponível",
+          code: "READ_UNAVAILABLE",
+        }),
+      }),
+    { times: 1 },
+  );
+  await page
+    .getByRole("group", { name: "Período da escala", exact: true })
+    .getByRole("button", { name: /Próxima semana|Próximo mês/ })
+    .click();
+  await expect(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "Consulta fictícia de escala indisponível" }),
+  ).toBeVisible();
   await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
-  const refresh = page.getByRole("button", { name: "Atualizar escala", exact: true });
-  await refresh.focus(); await refresh.press("Enter");
-  await expect(page.getByRole("heading", { name: "Propostas pendentes", exact: true })).toBeVisible(); await expect(refresh).toBeFocused();
-  await page.getByRole("button", { name: "Aprovar alteração", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "Revisar escala", exact: true });
+  const refresh = page.getByRole("button", {
+    name: "Atualizar escala",
+    exact: true,
+  });
+  await refresh.focus();
+  await refresh.press("Enter");
+  await expect(
+    page.getByRole("heading", { name: "Propostas pendentes", exact: true }),
+  ).toBeVisible();
+  await expect(refresh).toBeFocused();
+  await page
+    .getByRole("button", { name: "Aprovar alteração", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Aprovação de alteração",
+    exact: true,
+  });
   for (const title of ["Antes da alteração", "Depois da alteração proposta"]) {
     const facts = dialog.getByRole("region", { name: title, exact: true });
-    await expect(facts).toContainText(f.shift.timezone); await expect(facts.locator("input,select,textarea,[aria-invalid]")).toHaveCount(0);
+    await expect(facts).toContainText(f.shift.timezone);
+    await expect(
+      facts.locator("input,select,textarea,[aria-invalid]"),
+    ).toHaveCount(0);
   }
-  await dialog.getByLabel("Motivo desta decisão", { exact: true }).fill("Motivo próprio ainda não confirmado");
-  expect(writes).toBe(0); expect(sql(`select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`)).toBe(original);
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable schedule read " + width); }
+  await dialog
+    .getByLabel("Motivo desta decisão", { exact: true })
+    .fill("Motivo próprio ainda não confirmado");
+  expect(writes).toBe(0);
+  expect(
+    sql(
+      `select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`,
+    ),
+  ).toBe(original);
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await audit(page, "immutable schedule read " + width);
+  }
 });
 
 test("decisão de escala mostra antes/depois completos e aplica a versão apresentada", async ({
@@ -118,7 +173,7 @@ test("decisão de escala mostra antes/depois completos e aplica a versão aprese
     .getByRole("button", { name: "Aprovar alteração", exact: true })
     .click();
   const dialog = page.getByRole("dialog", {
-    name: "Revisar escala",
+    name: "Aprovação de alteração",
     exact: true,
   });
   const ownDecisionReason =
@@ -126,13 +181,20 @@ test("decisão de escala mostra antes/depois completos e aplica a versão aprese
   await dialog
     .getByLabel("Motivo desta decisão", { exact: true })
     .fill(ownDecisionReason);
+  await dialog
+    .getByRole("button", { name: "Revisar alteração", exact: true })
+    .click();
+  const review = page.getByRole("dialog", {
+    name: "Revisar escala",
+    exact: true,
+  });
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     await expect(
-      dialog.getByRole("region", { name: "Antes da alteração" }),
+      review.getByRole("region", { name: "Antes da alteração" }),
     ).toContainText(f.names.first);
     await expect(
-      dialog.getByRole("region", { name: "Depois da alteração proposta" }),
+      review.getByRole("region", { name: "Depois da alteração proposta" }),
     ).toContainText(f.names.second);
     for (const fact of [
       "01/06/2100",
@@ -146,8 +208,8 @@ test("decisão de escala mostra antes/depois completos e aplica a versão aprese
       "Nota própria da proposta",
       "Não há atribuição de BAL ativa",
     ])
-      await expect(dialog).toContainText(fact);
-    await expect(dialog.locator("input,select")).toHaveCount(0);
+      await expect(review).toContainText(fact);
+    await expect(review.locator("input,select")).toHaveCount(0);
     await audit(page, "D1 schedule decision " + width);
     expect(
       await page.evaluate(
@@ -157,7 +219,7 @@ test("decisão de escala mostra antes/depois completos e aplica a versão aprese
       ),
     ).toBe(true);
     await expect(
-      dialog.getByRole("button", { name: "Aprovar proposta", exact: true }),
+      review.getByRole("button", { name: "Aprovar proposta", exact: true }),
     ).toBeInViewport({ ratio: 1 });
   }
   mkdirSync("output/playwright/phase-d", { recursive: true });
@@ -168,11 +230,23 @@ test("decisão de escala mostra antes/depois completos e aplica a versão aprese
   const posted = page.waitForRequest(
     (request) =>
       request.method() === "POST" &&
-      new URL(request.url()).pathname === "/api/schedules",
+      new URL(request.url()).pathname ===
+        "/api/schedules/resource-preparations/commit",
   );
-  await dialog
+  const completed = page.waitForResponse(
+    (r) =>
+      r.request().method() === "POST" &&
+      new URL(r.url()).pathname ===
+        "/api/schedules/resource-preparations/commit",
+  );
+  await review
     .getByRole("button", { name: "Aprovar proposta", exact: true })
     .click();
+  const confirmation = await completed;
+  expect(confirmation.status()).toBe(200);
+  expect((await confirmation.json()).data.receipt.nativeResult.status).toBe(
+    "approved",
+  );
   const payload = (await posted).postDataJSON();
   expect(payload.expectedVersion).toBe(f.proposal.version);
   expect(Object.keys(payload.command.body).sort()).toEqual([
@@ -181,7 +255,7 @@ test("decisão de escala mostra antes/depois completos e aplica a versão aprese
     "reason",
   ]);
   expect(payload.command.body.reason).toBe(ownDecisionReason);
-  await expect(dialog).not.toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(
     sql(
       `select professional_id::text from public.scheduled_shifts where id=${sqlLiteral(f.shift.id)};`,
@@ -230,30 +304,52 @@ test("conflito mantém a revisão visível e não aprova a nova versão automati
   await page
     .getByRole("button", { name: "Aprovar alteração", exact: true })
     .click();
+  await page
+    .getByRole("dialog", { name: "Aprovação de alteração", exact: true })
+    .getByRole("button", { name: "Revisar alteração", exact: true })
+    .click();
   const dialog = page.getByRole("dialog", {
     name: "Revisar escala",
     exact: true,
   });
-  const changed = await shiftCommand(
-    f.admin,
-    f.patient,
-    "change",
-    {
-      id: f.shift.id,
-      reason: "Alteração concorrente após abertura da revisão",
-      notes: "Nota da alteração concorrente válida",
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Aprovar proposta", exact: true }),
+  ).toBeEnabled();
+  let changedVersion = 0;
+  await page.route(
+    "**/api/schedules/resource-preparations/commit",
+    async (route) => {
+      const changed = await shiftCommand(
+        f.admin,
+        f.patient,
+        "change",
+        {
+          id: f.shift.id,
+          reason: "Alteração concorrente após abertura da revisão",
+          notes: "Nota da alteração concorrente válida",
+        },
+        f.shift.version,
+      );
+      changedVersion = changed.version;
+      await route.continue();
     },
-    f.shift.version,
+    { times: 1 },
   );
   const response = page.waitForResponse(
     (result) =>
       result.request().method() === "POST" &&
-      new URL(result.url()).pathname === "/api/schedules",
+      new URL(result.url()).pathname ===
+        "/api/schedules/resource-preparations/commit",
   );
   await dialog
     .getByRole("button", { name: "Aprovar proposta", exact: true })
     .click();
-  expect((await response).status()).toBe(409);
+  const recorded = await response;
+  expect(recorded.status()).toBe(200);
+  expect((await recorded.json()).data.receipt.nativeResult.status).toBe(
+    "obsolete",
+  );
   await expect(dialog).toBeVisible();
   await expect(dialog).toContainText("Nota original da programação");
   await expect(dialog).toContainText("Nota própria da proposta");
@@ -276,7 +372,7 @@ test("conflito mantém a revisão visível e não aprova a nova versão automati
       `select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`,
     ),
   );
-  expect(after.version).toBe(changed.version);
+  expect(after.version).toBe(changedVersion);
   expect(after.professional_id).toBe(f.first.id);
 });
 
@@ -351,6 +447,10 @@ test("a decisão expõe o BAL vigente e exige o processo familiar antes de mudar
   await login(page, f.patient);
   await page
     .getByRole("button", { name: "Aprovar alteração", exact: true })
+    .click();
+  await page
+    .getByRole("dialog", { name: "Aprovação de alteração", exact: true })
+    .getByRole("button", { name: "Revisar alteração", exact: true })
     .click();
   const dialog = page.getByRole("dialog", {
     name: "Revisar escala",

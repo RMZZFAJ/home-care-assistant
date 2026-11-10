@@ -29,26 +29,50 @@ async function prepare(page: Page) {
     },
   });
   expect(type.ok()).toBe(true);
-  expect((await type.json()).data.version).toBe(1);
+  const row = (await type.json()).data;
+  expect(row.version).toBe(1);
+  const legacy: SchedulePacket = {
+    careRecipientId: f.patient,
+    idempotencyKey: randomUUID(),
+    expectedVersion: 1,
+    command: {
+      action: "type",
+      body: {
+        id: row.id,
+        name: name + " alterado",
+        startsLocal: "19:00:37",
+        durationMinutes: 720,
+        active: true,
+      },
+    },
+  };
   await page.goto("/escalas");
-  // Creation now uses private preparations. Existing type edits retain the
-  // native packet and recovery contract exercised by these legacy regressions.
-  await page.getByText("Tipos e programações", { exact: true }).click();
-  await page.getByRole("button", { name: "Editar tipo", exact: true }).click();
-  const form = page.getByRole("dialog", {
-    name: "Tipo de plantão",
-    exact: true,
-  });
-  await expect(form.getByLabel("Início local", { exact: true })).toHaveValue(
-    "19:00:37",
+  return { ...f, legacy };
+}
+// Explicit fixture of a packet produced by the earlier UI. Current editors use
+// private resource preparations. The native HTTP call and lost-response probes
+// stay real, and the current recovery panel must consume that older envelope.
+async function submitLegacy(page: Page, packet: SchedulePacket) {
+  await page.evaluate(
+    async ({ packet, userId }) => {
+      sessionStorage.setItem(
+        `hca:schedule-confirmation:${userId}:${packet.careRecipientId}`,
+        JSON.stringify({ version: 1, userId, packet }),
+      );
+      try {
+        await fetch("/api/schedules", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(packet),
+        });
+      } catch {
+        /* The fixture deliberately loses the native response. */
+      }
+    },
+    { packet, userId: fixtures.adminA.id },
   );
-  await form
-    .getByLabel("Nome do plantão", { exact: true })
-    .fill(name + " alterado");
-  await form
-    .getByRole("button", { name: "Revisar alteração", exact: true })
-    .click();
-  return f;
+  await page.reload();
 }
 const panel = (page: Page) =>
   page.getByRole("region", { name: "Confirmação de escala", exact: true });
@@ -69,10 +93,7 @@ test("agenda recupera a confirmação após recarregar sem reenviar a alteraçã
     expect(response.ok()).toBe(true);
     await route.abort("failed");
   });
-  await page
-    .getByRole("dialog", { name: "Revisar escala", exact: true })
-    .getByRole("button", { name: "Confirmar gravação", exact: true })
-    .click();
+  await submitLegacy(page, f.legacy);
   await expect(
     page.getByRole("button", {
       name: "Consultar confirmação da escala",
@@ -180,10 +201,7 @@ test("agenda só reenvia explicitamente a tentativa não encontrada e preserva e
     packets.push(route.request().postDataJSON());
     await route.abort("failed");
   });
-  await page
-    .getByRole("dialog", { name: "Revisar escala", exact: true })
-    .getByRole("button", { name: "Confirmar gravação", exact: true })
-    .click();
+  await submitLegacy(page, f.legacy);
   await expect(
     page.getByRole("button", {
       name: "Consultar confirmação da escala",

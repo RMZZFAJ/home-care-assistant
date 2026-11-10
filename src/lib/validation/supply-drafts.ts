@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { scheduleResourcePurposes } from "../schedules/resource-preparations";
 import { consumptionPreparationPurposes } from "../forms/consumption-preparation-purposes";
 import { balancePreparationPurposes } from "../forms/balance-preparation-purposes";
 const text = (max: number) =>
@@ -109,6 +110,7 @@ export const entDraftPurposes = [
 ] as const;
 export const entDraftPurpose = z.enum(entDraftPurposes);
 export const draftPurpose = z.enum([
+  ...scheduleResourcePurposes,
   "progress_note",
   "shift_type_create",
   "schedule_series_create",

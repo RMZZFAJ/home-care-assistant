@@ -770,3 +770,18 @@ tabela,index,assinatura,ACL ou timeout novo. Advisors globais não repetidos por
 essa razão;achados anteriores permanecem sem aprovação. Sem reset,fixtures/Auth
 remoto ou backup pesado redundante. Instalação limpa/legado/integração integral
 continuam gates da CI própria. [Reconciliação](WORKSPACE_CONTEXT_PERFORMANCE_VALIDATION.json).
+
+## D3.54 — preparações de recursos existentes da agenda
+
+Migration197 aplicada uma vez antes do commit:196→197. Projeto saudável,
+digest196/dez dependências iguais,dry-run exclusivo197,sem seeds/roles/Vault.
+Somente objetos novos;nenhuma função ou migration nativa anterior alterada.
+Pós-check197/digest,24 definições/config/grants,duas tabelas/RLS/FKs e11 índices
+iguais ao local. Cinco negativas remotas com rollback,zero probes e dry-run
+vazio. Índice autor/cursor cobre histórico e FK;nenhuma FK nova sem índice.
+
+Advisors:cinco classes de segurança/três performance mantidas;58 tabelas
+fechadas,202 RPCs Auth,124 FKs anteriores sem índice e55 índices sem uso.
+As adições previstas não aprovam achados anteriores. Sem reset,fixtures/Auth
+remoto ou backup pesado redundante. Clean/legado/integração integral exigem CI
+própria. [Reconciliação](SCHEDULE_RESOURCE_DRAFTS_VALIDATION.json).

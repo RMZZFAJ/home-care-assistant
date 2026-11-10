@@ -2,7 +2,12 @@
 import { Notice } from "@/components/workspace";
 import { civilInstant } from "@/lib/schedules/time";
 import type { ScheduleCommand } from "@/lib/validation/schedules";
-import type { ScheduleWorkspace, ShiftSnapshot } from "@/types/schedules";
+import type {
+  ScheduleWorkspace,
+  ShiftSnapshot,
+  ShiftChange,
+  ShiftSeries,
+} from "@/types/schedules";
 
 export type ScheduleReview = {
   command: ScheduleCommand;
@@ -16,7 +21,7 @@ export const scheduleStamp = (date: string, timezone: string) =>
     timeStyle: "short",
   }).format(new Date(date));
 
-function ShiftFacts({
+export function ShiftFacts({
   title,
   value,
   currentName,
@@ -61,6 +66,100 @@ function ShiftFacts({
   );
 }
 
+export function ScheduleChangeFacts({ proposal }: { proposal: ShiftChange }) {
+  const impact = proposal.bal_impact;
+  return (
+    <div className="hca-form-stack">
+      <p>
+        Proposta, versão {proposal.version}. A decisão usa esta versão e
+        preserva a autoria de quem propôs.
+      </p>
+      <ShiftFacts
+        title="Antes da alteração"
+        value={proposal.source_snapshot}
+        currentName={proposal.current_professional_name}
+      />
+      <ShiftFacts
+        title="Depois da alteração proposta"
+        value={proposal.proposed_snapshot}
+        currentName={proposal.current_proposed_professional_name}
+      />
+      <section aria-label="Motivo da proposta">
+        <h3>Motivo de quem propôs</h3>
+        <p className="whitespace-pre-wrap">{proposal.reason}</p>
+      </section>
+      <section aria-label="Consequências para o BAL">
+        <h3>Consequências para o BAL</h3>
+        {impact.requires_family_decision ? (
+          <Notice error>
+            Existe BAL designado com janela vigente. A alteração do período
+            exige decisão familiar no acompanhamento do balanço; esta aprovação
+            não pode adiar o prazo.
+          </Notice>
+        ) : impact.has_assignment ? (
+          <p>
+            A janela e o prazo do BAL permanecem. A substituição transfere a
+            tarefa futura para a pessoa autorizada e preserva a autoria das
+            contagens anteriores.
+          </p>
+        ) : (
+          <p>
+            Não há atribuição de BAL ativa neste plantão. A proposta altera a
+            programação e não comprova presença ou contagem.
+          </p>
+        )}
+        {impact.assignment_deadline && proposal.source_snapshot ? (
+          <p>
+            Prazo da atribuição:{" "}
+            {scheduleStamp(
+              impact.assignment_deadline,
+              proposal.source_snapshot.timezone,
+            )}
+            .
+          </p>
+        ) : null}
+      </section>
+      {proposal.status !== "pending" ? (
+        <Notice>
+          Esta proposta já foi{" "}
+          {proposal.status === "approved"
+            ? "aprovada"
+            : proposal.status === "rejected"
+              ? "rejeitada"
+              : proposal.status === "obsolete"
+                ? "encerrada como obsoleta"
+                : proposal.status}
+          . O histórico e a autoria permanecem preservados.
+        </Notice>
+      ) : proposal.is_stale ? (
+        <Notice error>
+          O plantão ou o vínculo mudou desde a proposta. Encerre como obsoleta
+          ou prepare uma nova proposta; a programação atual será preservada.
+        </Notice>
+      ) : null}
+    </div>
+  );
+}
+
+export function ScheduleSeriesOccurrences({ series }: { series: ShiftSeries }) {
+  return (
+    <details open>
+      <summary>
+        {series.occurrences.length} plantões na programação completa
+      </summary>
+      <ul>
+        {series.occurrences.map((shift) => (
+          <li key={shift.id}>
+            {shift.professional_name} ·{" "}
+            {scheduleStamp(shift.starts_at, shift.timezone)} →{" "}
+            {scheduleStamp(shift.ends_at, shift.timezone)}
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
 export function ScheduleReviewDetails({ review }: { review: ScheduleReview }) {
   const { command, workspace: data } = review,
     body = command.body;
@@ -77,66 +176,7 @@ export function ScheduleReviewDetails({ review }: { review: ScheduleReview }) {
           decidir.
         </Notice>
       );
-    const impact = proposal.bal_impact;
-    return (
-      <div className="hca-form-stack">
-        <p>
-          Proposta, versão {proposal.version}. A decisão usa esta versão e
-          preserva a autoria de quem propôs.
-        </p>
-        <ShiftFacts
-          title="Antes da alteração"
-          value={proposal.source_snapshot}
-          currentName={proposal.current_professional_name}
-        />
-        <ShiftFacts
-          title="Depois da alteração proposta"
-          value={proposal.proposed_snapshot}
-          currentName={proposal.current_proposed_professional_name}
-        />
-        <section aria-label="Motivo da proposta">
-          <h3>Motivo de quem propôs</h3>
-          <p className="whitespace-pre-wrap">{proposal.reason}</p>
-        </section>
-        <section aria-label="Consequências para o BAL">
-          <h3>Consequências para o BAL</h3>
-          {impact.requires_family_decision ? (
-            <Notice error>
-              Existe BAL designado com janela vigente. A alteração do período
-              exige decisão familiar no acompanhamento do balanço; esta
-              aprovação não pode adiar o prazo.
-            </Notice>
-          ) : impact.has_assignment ? (
-            <p>
-              A janela e o prazo do BAL permanecem. A substituição transfere a
-              tarefa futura para a pessoa autorizada e preserva a autoria das
-              contagens anteriores.
-            </p>
-          ) : (
-            <p>
-              Não há atribuição de BAL ativa neste plantão. A proposta altera a
-              programação e não comprova presença ou contagem.
-            </p>
-          )}
-          {impact.assignment_deadline && proposal.source_snapshot ? (
-            <p>
-              Prazo da atribuição:{" "}
-              {scheduleStamp(
-                impact.assignment_deadline,
-                proposal.source_snapshot.timezone,
-              )}
-              .
-            </p>
-          ) : null}
-        </section>
-        {proposal.is_stale ? (
-          <Notice error>
-            O plantão ou o vínculo mudou desde a proposta. Encerre como obsoleta
-            ou prepare uma nova proposta; a programação atual será preservada.
-          </Notice>
-        ) : null}
-      </div>
-    );
+    return <ScheduleChangeFacts proposal={proposal} />;
   }
   if (command.action === "type")
     return (
@@ -265,20 +305,7 @@ export function ScheduleReviewDetails({ review }: { review: ScheduleReview }) {
         <p className="whitespace-pre-wrap">
           Notas: {series.notes || "Sem notas"}
         </p>
-        <details open>
-          <summary>
-            {series.occurrences.length} plantões na programação completa
-          </summary>
-          <ul>
-            {series.occurrences.map((shift) => (
-              <li key={shift.id}>
-                {shift.professional_name} ·{" "}
-                {scheduleStamp(shift.starts_at, shift.timezone)} →{" "}
-                {scheduleStamp(shift.ends_at, shift.timezone)}
-              </li>
-            ))}
-          </ul>
-        </details>
+        <ScheduleSeriesOccurrences series={series} />
         {"reason" in body && body.reason ? (
           <p>Motivo desta decisão: {body.reason}</p>
         ) : null}
@@ -302,7 +329,11 @@ export function ScheduleReviewDetails({ review }: { review: ScheduleReview }) {
               (person) =>
                 person.id ===
                 (command.body.professionalId ?? before.professional_id),
-            )?.name ?? before.professional_name,
+            )?.name ??
+            ((command.body.professionalId ?? before.professional_id) ===
+            before.professional_id
+              ? before.professional_name
+              : "Profissional de destino indisponível na consulta atual"),
           starts_at: command.body.startsAt ?? before.starts_at,
           ends_at: command.body.endsAt ?? before.ends_at,
           notes: command.body.notes ?? before.notes,

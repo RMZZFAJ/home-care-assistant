@@ -10,20 +10,21 @@ export const scheduleCreationPurpose = z.enum([
   "shift_type_create",
   "schedule_series_create",
 ]);
+export const scheduleTypeFields = z
+  .object({
+    form: z.literal("type"),
+    name: text(100),
+    start: text(8).refine((v) =>
+      /^(?:|(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?)$/.test(v),
+    ),
+    duration: text(32).refine((v) =>
+      /^(?:|-?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)$/.test(v),
+    ),
+    active: z.boolean(),
+  })
+  .strict();
 export const scheduleCreationFields = z.discriminatedUnion("form", [
-  z
-    .object({
-      form: z.literal("type"),
-      name: text(100),
-      start: text(8).refine((v) =>
-        /^(?:|(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?)$/.test(v),
-      ),
-      duration: text(32).refine((v) =>
-        /^(?:|-?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)$/.test(v),
-      ),
-      active: z.boolean(),
-    })
-    .strict(),
+  scheduleTypeFields,
   z
     .object({
       form: z.literal("series"),
@@ -62,7 +63,9 @@ export function schedulePurpose(
     ? "shift_type_create"
     : "schedule_series_create";
 }
-export function initialScheduleType(type?: ShiftType): ScheduleCreationFields {
+export function initialScheduleType(
+  type?: ShiftType,
+): Extract<ScheduleCreationFields, { form: "type" }> {
   return {
     form: "type",
     name: type?.name ?? "",

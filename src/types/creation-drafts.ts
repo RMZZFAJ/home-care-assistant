@@ -31,6 +31,8 @@ import type {
   ConsumptionPreparationContent,
   ConsumptionPreparationReceipt,
 } from "@/lib/validation/consumption-preparations";
+import type { ScheduleResourceContent } from "@/lib/schedules/resource-preparations";
+import type { ScheduleResourceReceipt } from "@/lib/validation/schedule-resource-preparations";
 export type DraftKind =
   | "REQ"
   | "BAL"
@@ -52,7 +54,8 @@ export type CreationDraftContent =
   | ConsumptionPreparationContent
   | FlowPreparationContent
   | ProgressPreparationContent
-  | ScheduleCreationContent;
+  | ScheduleCreationContent
+  | ScheduleResourceContent;
 export type CreationDraft = {
   id: string;
   ownerId: string;
@@ -78,6 +81,7 @@ export type CreationDraft = {
     | ConsumptionPreparationReceipt
     | ProgressPreparationReceipt
     | SchedulePreparationReceipt
+    | ScheduleResourceReceipt
     | null;
 };
 export type CreationDraftResult = Pick<
@@ -93,5 +97,6 @@ export type CreationDraftResult = Pick<
     | FlowPreparationReceipt
     | ProgressPreparationReceipt
     | SchedulePreparationReceipt
+    | ScheduleResourceReceipt
     | null;
 };

@@ -332,7 +332,7 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
     .getByLabel("Observações", { exact: true })
     .fill("Exceção somente em15/01");
   await editor
-    .getByLabel("Justificativa", { exact: true })
+    .getByRole("textbox", { name: "Justificativa", exact: true })
     .fill("Alteração pontual que não reescreve as outras onze datas");
   // The cancel branch unmounts the editable interval and notes. Switching back
   // must keep the human edition, without publishing either operation.
@@ -345,7 +345,12 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
     .evaluateAll(
       (options, original) =>
         options
-          .find((option) => (option as HTMLOptionElement).value !== original)
+          .find(
+            (option) =>
+              Boolean((option as HTMLOptionElement).value) &&
+              !(option as HTMLOptionElement).disabled &&
+              (option as HTMLOptionElement).value !== original,
+          )
           ?.getAttribute("value"),
       originalPerson,
     );
@@ -371,9 +376,9 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
   await expect(editor.getByLabel("Observações", { exact: true })).toHaveValue(
     "Exceção somente em15/01",
   );
-  await expect(editor.getByLabel("Justificativa", { exact: true })).toHaveValue(
-    "Alteração pontual que não reescreve as outras onze datas",
-  );
+  await expect(
+    editor.getByRole("textbox", { name: "Justificativa", exact: true }),
+  ).toHaveValue("Alteração pontual que não reescreve as outras onze datas");
   await editor
     .getByLabel("Profissional de destino", { exact: true })
     .selectOption(originalPerson);
@@ -412,7 +417,7 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
   await review(page)
     .getByRole("button", { name: "Confirmar gravação", exact: true })
     .click();
-  await expect(review(page)).toHaveCount(0);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   const changed = JSON.parse(datesState(f)),
     original = before.shifts.find(
       (row: ScheduledShift) => row.starts_at.slice(0, 10) === "2100-01-15",
@@ -450,7 +455,7 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
     .getByLabel("Encerrar a partir de", { exact: true })
     .fill("2100-02-15");
   await end
-    .getByLabel("Justificativa", { exact: true })
+    .getByRole("textbox", { name: "Justificativa", exact: true })
     .fill("Corte definitivo das datas futuras desta programação");
   await end
     .getByRole("button", { name: "Revisar alteração", exact: true })
@@ -463,7 +468,7 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
   await review(page)
     .getByRole("button", { name: "Confirmar gravação", exact: true })
     .click();
-  await expect(review(page)).toHaveCount(0);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   const ended = JSON.parse(datesState(f));
   expect(
     ended.series.find((row: { id: string }) => row.id === series.id).ended_on,
@@ -521,7 +526,7 @@ test("edição de observações conserva segundos e microssegundos do intervalo 
     .getByLabel("Observações", { exact: true })
     .fill("Somente observações alteradas; intervalo preservado");
   await editor
-    .getByLabel("Justificativa", { exact: true })
+    .getByRole("textbox", { name: "Justificativa", exact: true })
     .fill("Complementar observações sem alterar os horários");
   await editor
     .getByRole("button", { name: "Revisar alteração", exact: true })
@@ -529,7 +534,7 @@ test("edição de observações conserva segundos e microssegundos do intervalo 
   await review(page)
     .getByRole("button", { name: "Confirmar gravação", exact: true })
     .click();
-  await expect(review(page)).toHaveCount(0);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(
     sql(
       `select count(*) from public.scheduled_shifts where id=${q(target.id)} and care_recipient_id=${q(f.patient)} and starts_at=${q(startsAt)}::timestamptz and ends_at=${q(endsAt)}::timestamptz and version=${prepared.version + 1} and notes='Somente observações alteradas; intervalo preservado'`,

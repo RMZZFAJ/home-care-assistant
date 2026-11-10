@@ -210,8 +210,10 @@ regimes preservam escolhas latentes;adotar nova versão não limpa o restante.
 Resumos são somente leitura. Edição própria de outra conclusão requer escolha
 explícita antes do reconhecimento e pode sobreviver à perda desse resultado.
 Envelope local congela a tentativa;leitura autorizada reconcilia apenas a
-confirmação exata. Alterar/decidir sobre recursos existentes continua no motor
-anterior e ainda exige continuidade privada;inventário49/51 não é paridade66/171.
+confirmação exata. Alterar/decidir sobre recursos existentes usa agora a
+preparação privada
+D3.54 e continua delegando o ato ao motor nativo. Inventário de formulários
+não é prova de paridade das66 composições/171 relações.
 
 A leitura do contexto agrega o diretório completo após calcular capacidades
 somente dos candidatos de autoridade da sessão e do backend/transação. As
@@ -220,3 +222,19 @@ entre requisições. Esse cálculo preserva os consumidores de administração,
 operação e processos internos. Recusa conhecida da criação de escala mantém
 revisão somente leitura até Voltar,com foco no controle de revisão ao retornar.
 Recuperação incerta continua distinta da revisão recusada e do preenchimento.
+
+## Preparações de recursos existentes da agenda
+
+ScheduleResourcePreparation reúne oito finalidades em quatro conjuntos de
+campos reutilizáveis. A referência operacional é lida para o alvo concreto,
+separada dos campos próprios. Guardar preserva inclusive preenchimento parcial
+ou uma referência que ficou antiga; uma referência não conferida nunca autoriza
+confirmar. Revisar relê a preparação salva e exige referência selada pelo banco.
+Adotar a referência atual é escolha explícita e não limpa os campos próprios.
+
+Uma única transação vincula a preparação, sua revisão e o pacote exato ao
+comando nativo e ao recibo. O estado desconhecido permanece distinto da recusa
+conhecida. Encerrar explicitamente uma tentativa incerta avança somente sua
+revisão privada, sob as mesmas travas, impedindo aplicação tardia do pacote.
+Não existe replay automático. Inventário local de referências oferece acesso
+à recuperação sem exibir campos privados antes da leitura autorizada.
