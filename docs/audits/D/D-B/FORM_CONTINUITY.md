@@ -128,3 +128,13 @@ e por Mais opções. Recupera confirmações de outra sessão e mantém a consul
 quando a leitura está autorizada após a perda de escrita. O inventário
 registra o novo consumidor de leitura. Formulários administrativos e de
 perfil seguem na revisão. [Incremento](CATALOGUE_RECEIPT_DISCOVERY.md).
+
+## Atualização D3.61
+
+Alertas, destinatários, vínculos e sua situação compartilham o controlador
+de preparação com o catálogo. Meu perfil consulta tentativas ainda
+guardadas na aba, inclusive o comprovante de uma transição deliberada do
+próprio vínculo na sessão original. O inventário registra 54 fontes e 48
+tags de formulário, incluindo os controladores delegados. Demais formulários
+administrativos, perfil e combinações completas seguem sob revisão.
+[Incremento](ADMINISTRATIVE_PREPARATIONS.md).

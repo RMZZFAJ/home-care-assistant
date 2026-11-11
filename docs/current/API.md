@@ -1253,3 +1253,28 @@ origem. Cada cópia pertence ao alvo do rascunho e o conteúdo completo segue
 o limite de 200000 bytes. O campo circula na revisão privada e os comandos
 operacionais continuam recebendo os campos explícitos da nova contagem.
 [Continuidade de observações](../audits/D/D-B/BAL_OBSERVATION_CONTINUITY.md).
+
+## Preenchimentos administrativos privados
+
+GET /api/admin/preparations exige patientId, mode e purpose. targetId
+identifica o vínculo existente quando aplicável. selection e option
+consultam a referência atual. key consulta exclusivamente um comprovante
+próprio no mesmo âmbito. Parâmetros duplicados e campos adicionais são
+recusados. A resposta usa private,no-store.
+
+POST nessa rota aceita save, discard e acknowledge com revisão privada,
+chave e campos próprios. A confirmação usa POST /api/admin com action e
+administrativePreparation, cuja action interna deve ser commit. Os
+comandos administrativos anteriores continuam válidos. O banco confirma
+a alteração nativa ou a proposta global e o consumo privado atomicamente.
+
+O comprovante contém titular, paciente, contexto, finalidade, alvo,
+chave, revisão, estado e identidade do resultado. Uma transição deliberada
+do próprio vínculo admite recuperação da tentativa original na mesma
+sessão autenticada, mesmo se ela retirou o acesso administrativo. Essa
+exceção não autoriza nova alteração nem consulta em outra sessão.
+
+GET /api/admin?section=profiles&profilePage=1&query=nome oferece a seleção
+global em páginas de 30 contas, com total e ordenação por nome e ID.
+Exige administração global ativa. A consulta sem profilePage preserva
+o contrato anterior. [Implementação](../audits/D/D-B/ADMINISTRATIVE_PREPARATIONS.md).

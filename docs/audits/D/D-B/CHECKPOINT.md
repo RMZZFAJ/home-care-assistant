@@ -1,5 +1,16 @@
 # Checkpoint D-B
 
+D3.61 integrou preenchimentos privados, comparação e confirmação nativa
+a alertas, destinatários, vínculos e sua situação. Meu perfil consulta a
+tentativa original inclusive após transição deliberada do próprio vínculo,
+limitada à sessão original. Passaram 23 unit/API, seis Auth e 33 cenários
+distintos de navegador entre as rodadas. Coorte final 18/18 e cinco larguras
+do editor de destinatário qualificadas. Remoto 202→205 reconciliado,
+duas negativas com rollback e dry-run vazio. Matriz 56 PASS locais/49
+PARTIAL, visual estimado em 60%. Inventário 54 fontes/48 formulários.
+CI própria, paridade integral e os demais critérios continuam pendentes.
+[Incremento](ADMINISTRATIVE_PREPARATIONS.md).
+
 D3.60 disponibilizou comprovantes do catálogo em outra sessão e após
 perda de escrita com leitura autorizada. Onze cenários Auth, 13 cenários
 distintos de navegador e paginação com 106 confirmações passaram.

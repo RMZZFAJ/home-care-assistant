@@ -1,84 +1,27 @@
 "use client";
-import type { FormEvent } from "react";
-import { inputClass, panelClass, primaryClass } from "@/components/workspace";
-import { Check, text, bool, type Row } from "./admin-fields";
+import { panelClass } from "@/components/workspace";
+import { text, bool, type Row } from "./admin-fields";
+
+import { AdministrativePreparationEditor } from "./administrative-preparation-editor";
+import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
 
 export function AlertSettings({
   rows,
   products,
-  handle,
+  patientId, userId, globalMode, onConfirmed,
 }: {
   rows: Row[];
   products: Row[];
-  handle: (
-    event: FormEvent<HTMLFormElement>,
-    payload: (data: FormData) => Row,
-    success?: string,
-  ) => void;
+  patientId: string; userId: string; globalMode: boolean;
+  onConfirmed: (outcome: AdministrativeOutcome) => void;
 }) {
   return (
     <section className={panelClass}>
       <h2 className="mb-4 font-bold">Limites de estoque por item e custódia</h2>
-      <form
-        className="grid gap-4 sm:grid-cols-2"
-        onSubmit={(event) =>
-          handle(event, (data) => ({
-            action: "alertRule",
-            productId: data.get("productId"),
-            location: data.get("location"),
-            lowThreshold: String(data.get("lowThreshold")),
-            criticalThreshold: String(data.get("criticalThreshold")),
-            isEnabled: data.has("isEnabled"),
-          }))
-        }
-      >
-        <label className="text-sm font-semibold">
-          Item do catálogo
-          <select name="productId" required className={inputClass}>
-            <option value="">Selecione</option>
-            {products
-              .filter((product) => product.is_active !== false)
-              .map((product) => (
-                <option key={text(product, "id")} value={text(product, "id")}>
-                  {text(product, "name")}
-                </option>
-              ))}
-          </select>
-        </label>
-        <label className="text-sm font-semibold">
-          Custódia
-          <select className={inputClass} name="location">
-            <option value="CARE_TEAM">Equipe de cuidado</option>
-            <option value="FAMILY">Família</option>
-          </select>
-        </label>
-        <label className="text-sm font-semibold">
-          Limite baixo
-          <input
-            className={inputClass}
-            name="lowThreshold"
-            inputMode="decimal"
-            defaultValue="0"
-            required
-            pattern="[0-9]+([.,][0-9]{1,6})?"
-          />
-        </label>
-        <label className="text-sm font-semibold">
-          Limite crítico
-          <input
-            className={inputClass}
-            name="criticalThreshold"
-            inputMode="decimal"
-            defaultValue="0"
-            required
-            pattern="[0-9]+([.,][0-9]{1,6})?"
-          />
-        </label>
-        <Check name="isEnabled" label="Regra habilitada" />
-        <button className={primaryClass} type="submit">
-          Salvar regra
-        </button>
-      </form>
+      <AdministrativePreparationEditor
+        scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"alertRule",targetId:null}}
+        userId={userId} products={products} onConfirmed={onConfirmed}
+      />
       <ul className="mt-5 space-y-2">
         {rows.map((row) => (
           <li

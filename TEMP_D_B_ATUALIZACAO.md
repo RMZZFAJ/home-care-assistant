@@ -29,6 +29,13 @@ Os testes completos da próxima versão publicada ainda precisam ser concluídos
 O banco remoto já recebeu as atualizações desta etapa, sem pendências.
 A fase continua em execução.
 
+**Preenchimentos de alertas, destinatários e vínculos · 100% deste recurso.**
+É possível guardar campos incompletos, retomá-los, comparar duas edições e
+recuperar uma confirmação perdida. Meu perfil permite consultar a tentativa
+guardada nesta aba. Se a própria alteração encerrar seu vínculo, essa consulta
+exige continuar na mesma sessão em que você fez a alteração. A seleção global
+de contas agora tem busca e páginas. Responsável pela implementação: Codex.
+
 A agenda agora preserva neste aparelho a tentativa enviada: depois de uma
 resposta perdida ou de recarregar, é possível consultar o resultado antes de
 decidir reenviar a mesma tentativa. A consulta não cria outra programação.
@@ -559,10 +566,11 @@ preservado e incluído na revisão final; não será refeito sem motivo.
 
 1. **Completar a continuidade dos formulários diários.** Conferir na CI a
    sincronização de agenda, foco e Andamentos. Investigar a seleção da aba no
-   recebimento se a falha se repetir. Completar os formulários administrativos
-   de uso diário, com prioridade para regras de alerta, destinatários e
-   vínculos. As contagens, a agenda, as revisões de fluxo e o catálogo
-   serão incluídos na revisão conjunta.
+   recebimento se a falha se repetir. Alertas, destinatários e vínculos já
+   receberam os preenchimentos privados e entram na revisão conjunta com
+   contagens, agenda, revisões de fluxo e catálogo. As combinações restantes
+   de fichas e estoque têm prioridade. Formulários pessoais e administrativos
+   restantes serão completados junto à revisão dessas áreas.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.

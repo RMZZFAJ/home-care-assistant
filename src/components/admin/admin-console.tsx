@@ -22,6 +22,8 @@ import {
 } from "./notification-settings";
 import { formatBrazilDate } from "@/lib/receipt";
 import { Field, RoleSelect, text, type Row } from "./admin-fields";
+import { administrativeOutcomeText } from "./administrative-preparation-editor";
+import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
 import { AlertSettings } from "./alert-settings";
 import { PatientRegistration } from "./patient-registration";
 import {
@@ -212,6 +214,15 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     catch (reason) { setError("A ação foi confirmada. A consulta posterior falhou: " + (reason instanceof Error ? reason.message : "Atualize esta seção.")); }
     return result;
   }
+  function preparationConfirmed(outcome: AdministrativeOutcome) {
+    setMessage(["alerts", "notificationRecipients"].includes(section) ? "" : administrativeOutcomeText(outcome));
+    setConfirmationRevision(value => value + 1);
+    void (async () => {
+      if (outcome.kind==="local" && ["membership","membershipStatus"].includes(outcome.action)) await context.refresh();
+      await load();
+      setVersionAttempt(value => value + 1);
+    })().catch(reason => setError("A alteração foi confirmada. A consulta posterior falhou. " + (reason instanceof Error ? reason.message : "")));
+  }
   function failed(reason: unknown) {
     if (reason instanceof ApiError && reason.status === 409 && globalMode) setConflict(true);
     setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.");
@@ -304,7 +315,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           Comprovantes do catálogo
         </Link>
       ) : null}
-      {section === "memberships" ? (
+      {section === "memberships" && patientId ? (
         <Link className={buttonClass} href="/configuracoes?area=people">
           Permissões e alterações com dupla aprovação
         </Link>
@@ -367,16 +378,13 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             }}
           />
         ) : null}
-        {section === "memberships" ? (
+        {section === "memberships" && patientId ? (
           <MembershipManagement
+            userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed}
             credentialReviewAllowed={!globalMode}
-            recovery={recovery}
             confirmationRevision={confirmationRevision}
             rows={rows}
             directory={directory}
-            save={execute}
-            busy={busy}
-            error={error}
             patientId={patientId}
           />
         ) : null}
@@ -474,7 +482,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           <NotificationSettings
             rows={rows}
             members={directory}
-            save={execute}
+            patientId={patientId!} userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed}
           />
         )}
         {section === "notifications" && (
@@ -518,7 +526,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           </>
         )}
         {section === "alerts" && (
-          <AlertSettings rows={rows} products={catalog} handle={handle} />
+          <AlertSettings rows={rows} products={catalog} patientId={patientId!} userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed} />
         )}
         {section === "audit" ? <AuditHistory patientId={patientId!} /> : null}
         {section === "operations" && globalMode ? <OperationsConsole key={context.userId} /> : null}

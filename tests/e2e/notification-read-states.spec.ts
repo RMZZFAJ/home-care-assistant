@@ -40,7 +40,8 @@ test("D3 sino distingue demora falha e conteúdo e recupera por consulta sem reg
     await page.reload(); await first; await page.getByRole("button", { name: /^Notificações/ }).click();
     await expect(bell(page).getByRole("status")).toHaveText("Consultando notificações…");
     await expect(bell(page).getByText("Você está em dia.", { exact: false })).toHaveCount(0);
-    mode = "error"; release(); await expect(bell(page).getByText(f.doc.code, { exact: true })).toBeVisible();
+    release(); await expect(bell(page).getByText(f.doc.code, { exact: true })).toBeVisible();
+    mode = "error";
     await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await expect(bell(page).getByRole("alert")).toContainText("Falha controlada na leitura do sino");
     await expect(bell(page).getByText("Você está em dia.", { exact: false })).toHaveCount(0);

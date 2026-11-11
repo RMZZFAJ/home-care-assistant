@@ -22,13 +22,14 @@ import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
 import { UserGuide } from "@/components/guides/user-guide";
 import { PwaSettings } from "./pwa/pwa-settings";
 import { PushSettings } from "./pwa/push-settings";
+import { AdministrativePendingRecovery } from "./admin/administrative-pending-recovery";
 type Profile = ProfileRead["data"];
 type Membership = ProfileRead["memberships"][number];
 type Session = ProfileRead["sessions"][number];
 export function ProfileConsole() {
   return (
     <Workspace title="Meu perfil e segurança" account>
-      {() => <ProfileContent />}
+      {context => <><AdministrativePendingRecovery key={context.userId} userId={context.userId} /><ProfileContent /></>}
     </Workspace>
   );
 }

@@ -1,34 +1,29 @@
 "use client";
-import { ActionButton, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
+import { ActionButton, Pill, TextInput } from "@/components/ui/controls";
 import {roleLabel} from "@/lib/role-labels";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 
-import { RecordDrawer } from "@/components/forms/record-drawer";
-import { MembershipImpact } from "./membership-impact";
 import { CredentialReview } from "./credential-review";
-import { Dialog, EmptyState, Icon } from "@/components/ui/primitives";
-import { Notice } from "@/components/workspace";
-import { RoleSelect, text, bool, type Row } from "./admin-fields";
+import { EmptyState, Icon } from "@/components/ui/primitives";
+import { text, type Row } from "./admin-fields";
+
+import { AdministrativePreparationEditor } from "./administrative-preparation-editor";
+import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
 
 export function MembershipManagement({
   rows,
   directory,
-  save,
-  busy,
-  error,
-  recovery,
+  userId, globalMode, onConfirmed,
   confirmationRevision = 0,
   patientId,
   credentialReviewAllowed = false,
 }: {
   rows: Row[];
   directory: Row[];
-  save: (payload: Row, message: string, refresh?: boolean) => Promise<unknown>;
-  busy: boolean;
-  error: string;
-  recovery?: ReactNode;
+  userId: string; globalMode: boolean;
+  onConfirmed: (outcome: AdministrativeOutcome) => void;
   confirmationRevision?: number;
-  patientId?: string;
+  patientId: string;
   credentialReviewAllowed?: boolean;
 }) {
   const [search, setSearch] = useState("");
@@ -131,136 +126,17 @@ export function MembershipManagement({
         ) : null}
       </div>
       {credential && patientId ? <CredentialReview patientId={patientId} subjectId={credential.subjectId} opener={credential.opener} onClose={() => setCredential(null)}/> : null}
-      {editor ? (
-        <RecordDrawer
-          title={editor.row ? "Editar vínculo" : "Vincular conta existente"}
-          busy={busy}
-          recovery={recovery}
-          restoreFocusTo={editor.opener}
-          onClose={() => setEditor(null)}
-        >
-          {error ? <Notice error>{error}</Notice> : null}
-          <form
-            className="hca-form"
-            onSubmit={async (event) => {
-              event.preventDefault();
-              const form = new FormData(event.currentTarget);
-              const role = form.get("role");
-              const result = await save(
-                {
-                  action: "membership",
-                  userId: editor.row
-                    ? text(editor.row, "user_id")
-                    : form.get("userId"),
-                  role,
-                  canManageStock: editor.row
-                    ? bool(editor.row, "can_manage_stock")
-                    : role === "admin",
-                  canCountStock: editor.row
-                    ? bool(editor.row, "can_count_stock")
-                    : false,
-                },
-                "Vínculo salvo e auditado.",
-                true,
-              );
-              if (result) setEditorState(current => current === editor ? null : current);
-            }}
-          >
-            {editor.row ? (
-              <div>
-                <p className="text-sm font-semibold">Conta vinculada</p>
-                <p className="wrap-break-word">{name(editor.row)}</p>
-                <p className="hca-field-hint">
-                  A edição mantém esta pessoa. Para outra conta, use o fluxo de
-                  vínculo ou convite.
-                </p>
-              </div>
-            ) : (
-              <FormField label="Conta vinculada">
-                <SelectField
-                  name="userId"
-                  defaultValue={editor.row ? text(editor.row, "user_id") : ""}
-                  required
-                >
-                  <option value="">Selecione uma conta</option>
-                  {directory.map((person) => (
-                    <option
-                      key={text(person, "user_id") || text(person, "id")}
-                      value={text(person, "user_id") || text(person, "id")}
-                    >
-                      {text(person, "full_name")}
-                    </option>
-                  ))}
-                </SelectField>
-              </FormField>
-            )}
-            <RoleSelect
-              value={editor.row ? text(editor.row, "role") : "professional"}
-            />
-            <p className="hca-field-hint">
-              Permissões específicas ficam na matriz. Uma conta nova deve ser
-              convidada pelo e-mail e aceitar o convite.
-            </p>
-            <ActionButton variant="primary" disabled={busy} type="submit">
-              Salvar vínculo
-            </ActionButton>
-          </form>
-        </RecordDrawer>
-      ) : null}
-      <Dialog
-        open={Boolean(change)}
-        title={
-          change?.status === "revoked" ? "Reativar vínculo" : "Revogar vínculo"
-        }
-        closeDisabled={busy}
-        onClose={() => {
-          if (!busy) setChange(null);
-        }}
-      >
-        <p>
-          Confirmar a alteração do vínculo de{" "}
-          <strong>{change ? name(change) : ""}</strong> neste paciente?
-        </p>
-        <p className="hca-field-hint">
-          A mudança será auditada e as permissões serão reavaliadas nas próximas
-          operações.
-        </p>
-        {error ? <Notice error>{error}</Notice> : null}
-        {recovery}
-        <div className="hca-toolbar">
-          <ActionButton disabled={busy} onClick={() => setChange(null)}>
-            Voltar
-          </ActionButton>
-          <ActionButton
-            variant="primary"
-            disabled={busy}
-            onClick={async () => {
-              if (!change) return;
-              const result = await save(
-                {
-                  action: "membershipStatus",
-                  userId: change.user_id,
-                  status: change.status === "revoked" ? "active" : "revoked",
-                },
-                "Estado do vínculo atualizado.",
-                true,
-              );
-              if (result) setChangeState(current => current === changeState ? null : current);
-            }}
-          >
-            {change?.status === "revoked"
-              ? "Confirmar alteração"
-              : "Revogar agora"}
-          </ActionButton>
-        </div>
-        {change && change.status !== "revoked" && patientId ? (
-          <MembershipImpact
-            key={patientId + ":" + text(change, "user_id")}
-            patientId={patientId}
-            userId={text(change, "user_id")}
-          />
-        ) : null}
-      </Dialog>
+      {editor ? <AdministrativePreparationEditor
+        key={text(editor.row ?? {}, "user_id") || "new"}
+        scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"membership",targetId:editor.row ? text(editor.row,"user_id") : null}}
+        userId={userId} people={directory} opener={editor.opener}
+        onClose={() => setEditor(null)} onConfirmed={onConfirmed}
+      /> : null}
+      {change ? <AdministrativePreparationEditor
+        key={text(change,"user_id")}
+        scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"membershipStatus",targetId:text(change,"user_id")}}
+        userId={userId} people={rows} onClose={() => setChange(null)} onConfirmed={onConfirmed}
+      /> : null}
     </section>
   );
 }

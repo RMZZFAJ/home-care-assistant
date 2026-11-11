@@ -6,6 +6,7 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import type { AdministrativeAttempt } from "../../src/lib/validation/administrative-preparation";
 
 test.setTimeout(180_000);
 mkdirSync("output/playwright/phase-d", { recursive: true });
@@ -36,9 +37,11 @@ test("D3 proposta administrativa recupera a mesma intenção e ambas as entradas
   await page.goto(`/admin?careRecipientId=${f.patient}&section=memberships`);
   await page.getByRole("button", { name: "Vincular conta", exact: true }).click();
   const drawer = page.getByRole("dialog", { name: "Vincular conta existente", exact: true });
+  await drawer.getByLabel("Buscar conta pelo nome", { exact: true }).fill("Teste professional");
+  await drawer.getByRole("button", { name: "Buscar contas", exact: true }).click();
   await drawer.getByLabel("Conta vinculada", { exact: true }).selectOption(fixtures.professional.id);
   await drawer.getByLabel("Função neste paciente", { exact: true }).selectOption("family");
-  const packets: Record<string, unknown>[] = [];
+  const packets: { action: string; administrativePreparation: AdministrativeAttempt }[] = [];
   let first = true;
   await page.route("**/api/admin", async route => {
     if (route.request().method() !== "POST") return route.continue();
@@ -66,17 +69,19 @@ test("D3 proposta administrativa recupera a mesma intenção e ambas as entradas
   await expect(page.getByRole("status").filter({ hasText: "Proposta global registrada." })).toBeVisible();
   expect(packets).toHaveLength(4); for (const replay of packets.slice(1)) expect(replay).toEqual(packets[0]); expect(count(f.patient)).toBe(1);
   const row = JSON.parse(sql(`select to_jsonb(c) from public.access_change_requests c where care_recipient_id=${sqlLiteral(f.patient)};`));
-  const settingsPacket = { careRecipientId: f.patient, kind: "membership", change: { userId: fixtures.professional.id, role: "family" }, idempotencyKey: packets[0].idempotencyKey, expectedVersion: packets[0].expectedVersion };
+  const original = packets[0].administrativePreparation;
+  const settingsPacket = { careRecipientId: f.patient, kind: "membership", change: { userId: fixtures.professional.id, role: "family" }, idempotencyKey: original.key, expectedVersion: row.base_version };
   const replay = await page.request.post("/api/patient-settings", { data: settingsPacket });
   expect(replay.status()).toBe(200); expect((await replay.json()).data.id).toBe(row.id);
   for (const [path, body] of [
-    ["/api/admin", { ...packets[0], role: "reader" }],
-    ["/api/admin", { ...packets[0], expectedVersion: Number(packets[0].expectedVersion) + 1 }],
+    ["/api/admin", { ...packets[0], administrativePreparation: { ...original, fields: { ...original.fields, role: "reader" } } }],
+    ["/api/admin", { ...packets[0], administrativePreparation: { ...original, referenceHash: "0".repeat(64) } }],
     ["/api/patient-settings", { ...settingsPacket, change: { ...settingsPacket.change, role: "reader" } }],
     ["/api/patient-settings", { ...settingsPacket, expectedVersion: Number(settingsPacket.expectedVersion) + 1 }],
   ] as const) expect((await page.request.post(path, { data: body })).status()).toBe(409);
-  const noIntent = { ...packets[0] }; delete noIntent.idempotencyKey;
-  expect((await page.request.post("/api/admin", { data: noIntent })).status()).toBe(400);
+  const { key: removedKey, ...noIntent } = original;
+  expect(removedKey).toBeTruthy();
+  expect((await page.request.post("/api/admin", { data: { ...packets[0], administrativePreparation: noIntent } })).status()).toBe(400);
   expect(count(f.patient)).toBe(1);
   expect(sql(`select role from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.professional.id)};`)).toBe("professional");
   await widths(page, "D3 recovered administrative proposal");

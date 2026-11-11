@@ -1,14 +1,32 @@
 "use client";
 
 import { formatBrazilDate } from "@/lib/receipt";
-import { type FormEvent } from "react";
-import { buttonClass, inputClass, panelClass, primaryClass } from "@/components/workspace";
+import { buttonClass, panelClass } from "@/components/workspace";
+
+import { AdministrativePreparationEditor } from "./administrative-preparation-editor";
+import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
 
 type Row = Record<string,unknown>;
 type Execute = (payload: Row, success: string) => Promise<unknown>;
-export function NotificationSettings({ rows, members, save }: { rows: Row[]; members: Row[]; save: Execute }) {
-  function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const form = new FormData(event.currentTarget); void save({ action:"notificationRecipient",recipientUserId:form.get("recipientUserId"),recipientGroup:form.get("recipientGroup"),channel:form.get("channel"),destination:form.get("destination"),isEnabled:form.has("isEnabled"),includeTeamAlerts:form.has("includeTeamAlerts") },"Destinatário de notificações salvo."); }
-  return <section className={panelClass}><h2 className="font-bold">Destinatários de notificações</h2><p className="mt-2 text-sm">Selecione contas com vínculo autorizado neste paciente. Canais externos dependem de configuração do provedor.</p><form onSubmit={submit} className="mt-4 grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold">Conta destinatária<select name="recipientUserId" required className={inputClass}><option value="">Selecione</option>{members.filter((member) => member.status === "active").map((member) => <option key={String(member.user_id)} value={String(member.user_id)}>{String(member.full_name)}</option>)}</select></label><label className="text-sm font-semibold">Grupo<select name="recipientGroup" className={inputClass}><option value="supervision">Supervisão</option><option value="care_team">Equipe de cuidado</option><option value="family">Família</option><option value="other">Outro</option></select></label><label className="text-sm font-semibold">Canal<select name="channel" className={inputClass}><option value="internal">Interno</option><option value="whatsapp">WhatsApp</option><option value="email">E-mail</option></select></label><label className="text-sm font-semibold">Destino externo (vazio para interno)<input name="destination" className={inputClass} /></label><label className="flex items-center gap-2 text-sm"><input className="h-5 w-5" type="checkbox" name="isEnabled" defaultChecked />Destinatário habilitado</label><label className="flex items-center gap-2 text-sm"><input className="h-5 w-5" type="checkbox" name="includeTeamAlerts" />Família: receber também alertas da equipe</label><button type="submit" className={primaryClass}>Salvar destinatário</button></form><ul className="mt-5 space-y-3">{rows.map((row,index) => <li key={String(row.id ?? index)} className="rounded border border-(--line) p-3 text-sm"><p className="break-all">{String(members.find((member) => member.user_id === row.recipient_user_id)?.full_name ?? "Conta autorizada")} · {String(row.recipient_group)} · {String(row.channel)}</p><p>{String(row.destination ?? "Interno")} · {row.is_enabled ? "Habilitado" : "Desabilitado"}</p></li>)}</ul>{rows.length === 0 && <p className="mt-3 text-sm">Nenhum destinatário configurado.</p>}</section>;
+export function NotificationSettings({ rows, members, patientId, userId, globalMode, onConfirmed }: {
+  rows: Row[]; members: Row[]; patientId: string; userId: string; globalMode: boolean;
+  onConfirmed: (outcome: AdministrativeOutcome) => void;
+}) {
+  return <section className={panelClass}>
+    <h2 className="font-bold">Destinatários de notificações</h2>
+    <p className="mt-2 text-sm">Selecione contas com vínculo autorizado neste paciente. Canais externos dependem de configuração do provedor.</p>
+    <AdministrativePreparationEditor
+      scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"notificationRecipient",targetId:null}}
+      userId={userId} people={members} onConfirmed={onConfirmed}
+    />
+    <ul className="mt-5 space-y-3">
+      {rows.map((row,index) => <li key={String(row.id ?? index)} className="ui-card p-3 text-sm">
+        <p className="wrap-anywhere">{String(members.find(member => member.user_id===row.recipient_user_id)?.full_name ?? "Conta autorizada")} · {String(row.recipient_group)} · {String(row.channel)}</p>
+        <p>{String(row.destination ?? "Interno")} · {row.is_enabled ? "Habilitado" : "Desabilitado"}</p>
+      </li>)}
+    </ul>
+    {rows.length===0 ? <p className="mt-3 text-sm">Nenhum destinatário configurado.</p> : null}
+  </section>;
 }
 
 export function NotificationQueue({ rows, execute, isGlobalAdmin, queried = true }: { rows: Row[]; execute: Execute; isGlobalAdmin: boolean; queried?: boolean }) {

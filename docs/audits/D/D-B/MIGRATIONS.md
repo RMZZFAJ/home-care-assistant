@@ -3,7 +3,32 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D3.38
+## Estado atual — D3.61
+
+Local e remoto com 205 versões. As migrations 20261111010628,
+20261111012930 e 20261111013009 foram aplicadas uma vez, após seis
+cenários Auth e validação dos consumidores. O dry-run isolou as três
+pendências e terminou vazio após a aplicação. Os tokens das 205 migrations
+remotas conferem com a branch. Dez dependências nativas foram preservadas
+e 16 funções, configurações e ACL coincidem com o local. Duas tabelas
+privadas com RLS e acesso direto vedado foram acrescentadas.
+
+Controles anteriores e posteriores preservam nove usuários, sete perfis,
+15 fichas, 11 movimentos e 34 objetos. Duas chamadas sem sessão foram
+recusadas em transação revertida. Não foram carregadas fixtures remotas.
+Os metadados de 19 aplicações locais antigas divergem dos arquivos atuais.
+O histórico remoto coincide integralmente e esses metadados locais não
+foram reescritos. A CI própria ainda precisa validar instalação limpa e
+evolução legada. Os 84 arquivos históricos protegidos mantêm seus hashes.
+
+Advisors mantêm cinco classes de segurança e três de performance. As
+adições correspondem às duas tabelas fechadas, duas RPCs autenticadas e
+três índices novos sem uso. FKs sem índice permanecem em 124 e nenhum
+achado anterior recebe aprovação. O banco remoto de testes segue a
+dispensa de backups pesados repetitivos aprovada pelo responsável.
+[Reconciliação](ADMINISTRATIVE_PREPARATIONS_VALIDATION.json).
+
+## D3.38 — registro histórico
 
 Local172/remoto172, zero pendências. Migrations20261109163324 e20261109170235
 acrescentam cinco preparos privados e alinham o texto canônico a ECMAScript,

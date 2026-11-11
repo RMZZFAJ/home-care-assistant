@@ -110,6 +110,18 @@ export function databaseError(
       "A programação, o plantão ou o pedido de adiamento mudou. Preserve seu preenchimento e compare a situação atual antes de confirmar.",
       409,
     );
+  if (error?.code === "PT409" && message === "stale administrative preparation reference")
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "A referência administrativa mudou. Compare os dados atuais antes de confirmar. Seu preenchimento foi preservado.",
+      409,
+    );
+  if (error?.code === "23505" && message === "administrative preparation intent differs")
+    throw new ApiError(
+      "IDEMPOTENCY_CONFLICT",
+      "Esta tentativa já identifica outra alteração. Consulte o resultado antes de continuar.",
+      409,
+    );
   if (error?.code === "PT409" && message === "stale catalogue preparation reference")
     throw new ApiError(
       "VERSION_CONFLICT",
@@ -122,7 +134,7 @@ export function databaseError(
       "Esta tentativa já identifica outra ação. Consulte o resultado antes de continuar.",
       409,
     );
-  if (/stale private draft revision|stale catalogue preparation revision/i.test(message))
+  if (/stale private draft revision|stale catalogue preparation revision|stale administrative preparation revision/i.test(message))
     throw new ApiError(
       "DRAFT_VERSION_CONFLICT",
       "O rascunho mudou em outro editor ou já foi concluído. Seu preenchimento foi preservado; compare a revisão salva antes de continuar.",

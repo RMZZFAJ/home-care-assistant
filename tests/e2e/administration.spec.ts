@@ -112,7 +112,8 @@ test.describe("administração integrada no ambiente local", () => {
       .getByLabel("Nomes alternativos, separados por vírgula", { exact: true })
       .fill("Material auxiliar, Apoio operacional");
     const created = await submit(page, "Salvar item", "product");
-    const productId = created.data.product_id as string;
+    expect(created).toMatchObject({ action: "commit", state: "consumed", purpose: "create" });
+    const productId = created.outcome.productId as string;
     expect(productId).toBeTruthy();
     await expect(
       page.getByRole("cell", { name: originalName, exact: true }),

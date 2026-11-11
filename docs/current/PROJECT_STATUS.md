@@ -4,6 +4,24 @@ Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
+## Incremento atual D3.61
+
+Alertas, destinatários e vínculos têm campos incompletos privados, retomada,
+comparação concorrente e confirmação nativa recuperável. Meu perfil
+consulta tentativas guardadas na aba. Recuperar o comprovante após uma
+transição deliberada do próprio vínculo exige a sessão original. O
+seletor global de contas passou a ter busca e paginação.
+
+Passaram 23 unit/API, seis Auth e 33 cenários distintos de navegador nas
+rodadas dirigidas. A coorte final aprovou 18 casos nas três engines.
+Remoto com 205 migrations reconciliadas e dry-run sem pendências. Matriz
+56 critérios locais aprovados/49 parciais. Visual estimado em 60% e
+continuidade geral em 90%. Instalação limpa, legado e integração completa
+exigem CI própria. Sonar permanece adiado. PR7 Draft e meta ativa.
+[Incremento](../audits/D/D-B/ADMINISTRATIVE_PREPARATIONS.md).
+
+## Incremento anterior D3.57
+
 D3.57 corrigiu a sincronização dos testes de agenda, Andamentos e foco do
 editor. Os 15 cenários locais foram aprovados nas três engines. A seleção
 intermitente de aba no recebimento segue aberta para contraprova na CI.

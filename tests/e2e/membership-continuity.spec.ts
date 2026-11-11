@@ -77,7 +77,7 @@ test("C030 editar função fixa a mesma pessoa e conserva o vínculo de outra co
     .click();
   const saved = await response;
   expect(saved.ok(), await saved.text()).toBe(true);
-  expect(saved.request().postDataJSON().userId).toBe(fixtures.professional.id);
+  expect(saved.request().postDataJSON().administrativePreparation.fields.userId).toBe(fixtures.professional.id);
   await expect(editor).toHaveCount(0);
   expect(member(f.patient, fixtures.reader.id)).toBe(other);
   const changed = JSON.parse(member(f.patient, fixtures.professional.id));

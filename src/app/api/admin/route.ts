@@ -5,6 +5,8 @@ import { governanceIntentFields } from "@/lib/validation/governance";
 import { auditQuerySchema } from "@/lib/validation/audit";
 import { catalogueAttempt } from "@/lib/validation/catalogue-preparation";
 import { runCatalogueAttempt } from "@/lib/server/catalogue-preparation";
+import { administrativeAttempt, administrativeScope } from "@/lib/validation/administrative-preparation";
+import { runAdministrativePreparation } from "@/lib/server/administrative-preparation";
 import { appOrigin } from "@/lib/server/app-origin";
 import { exactQuantity } from "@/lib/validation/documents";
 import { quantity } from "@/lib/quantity";
@@ -215,6 +217,19 @@ export async function GET(request: Request) {
     const section = params.get("section") ?? "recipients";
     if (section === "profiles") {
       requireGlobal(auth);
+      if (params.has("profilePage")) {
+        const query = parseQuery(z.strictObject({
+          profilePage: z.coerce.number().int().min(1).max(100_000),
+          query: z.string().trim().max(160),
+        }), { profilePage: params.get("profilePage"), query: params.get("query") ?? "" });
+        const pageSize = 30;
+        let profiles = auth.client.rpc("admin_list_profiles", {}, { count: "exact" })
+          .order("full_name").order("id");
+        if (query.query) profiles = profiles.ilike("full_name", "%" + query.query.replace(/[\\%_]/g, "\\$&") + "%");
+        const { data, error, count } = await profiles.range((query.profilePage - 1) * pageSize, query.profilePage * pageSize - 1);
+        if (error) databaseError(error);
+        return NextResponse.json({ data: data ?? [], total: count ?? 0, profilePage: query.profilePage, pageSize });
+      }
       return NextResponse.json({
         data: (await rpc(auth.client, "admin_list_profiles")) ?? [],
       });
@@ -332,10 +347,19 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   return api("admin.write", async () => {
     const input = await readJson(request, z.union([z.strictObject({
+      action: administrativeScope.shape.purpose,
+      administrativePreparation: administrativeAttempt,
+    }), z.strictObject({
       action: z.enum(["product", "adoptProduct"]),
       cataloguePreparation: catalogueAttempt,
     }), schema]), 2_000_000);
     const auth = await authenticate();
+    if ("administrativePreparation" in input) {
+      const attempt = input.administrativePreparation;
+      if (attempt.action !== "commit" || attempt.purpose !== input.action)
+        throw new ApiError("VALIDATION_ERROR", "Confira a confirmação administrativa.", 400);
+      return NextResponse.json(await runAdministrativePreparation(auth, attempt));
+    }
     if ("cataloguePreparation" in input) {
       const attempt = input.cataloguePreparation;
       if (attempt.action !== "commit" || !["create", "edit", "adopt"].includes(attempt.purpose)
