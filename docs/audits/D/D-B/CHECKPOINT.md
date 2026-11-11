@@ -1,5 +1,15 @@
 # Checkpoint D-B
 
+D3.69 fechou05.1 sem alteração de produto. Conferidos os fontes e dependências
+do estoque desde90f832d;18 cenários anteriores reaproveitados, sem nova execução.
+Três casos novos passaram nos três perfis com mais de100 movimentos nativos,
+percurso de todas as páginas, ordem por SQL independente, filtro com50+,
+período, resposta antiga entregue depois da seleção atual e vazio verdadeiro.
+Leitura sem POST e snapshots oficiais preservados. Tipos e lint passaram.
+Sem SQL novo; dry-run remoto vazio em205. Próximo05.2; estágio05 parcial75%.
+Matriz56/49, complemento documental e gates gerais preservados; CI própria
+necessária. [Resultados](STOCK_READ_VALIDATION.json).
+
 D3.68 fechou localmente04.6 e os seis pontos fixos da etapa04 no escopo anterior.
 O BAL distingue revisão, referência, conciliação e reconto; atribuição ordinária
 ou de outro ciclo não gera pendência nesta ficha. Aprovação sem emissão/efeito

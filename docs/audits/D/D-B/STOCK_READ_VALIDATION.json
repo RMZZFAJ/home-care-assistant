@@ -137,5 +137,76 @@
     "tests/e2e/catalogue-identities.spec.ts": "df2afcb597d806441fc27e99f871ccc92ee7957310ba2197e4aeaf680e64ab42",
     "tests/e2e/stock-read-validation.spec.ts": "335ff9b3b7d74ca91084b17e75042cc77d8562dcc3e25c0b3c86567018236ae0",
     "tests/stock-reads.test.ts": "5bfc2afb34ea589b14ac9f8611f6eded531f534d7fea6d96b573c08a9b18c172"
+  },
+  "D3.69": {
+    "baseSha": "4de848c4cc55d5ab5132bca5f8423678cc2e1dd1",
+    "scope": "05.1 stock balances,transit and history completeness;no product change",
+    "reuse": {
+      "sourcePackageCommit": "90f832df3b61b77bd0fbfcdb56f9bfed930ddee7",
+      "priorStockBrowserPassed": 18,
+      "rerun": false,
+      "compatibility": "All17 pre-existing LF source fingerprints match;consumer/API/parser/shared scoped reader/auth/quantity/migrations/package and4old browser files have no git diff since source package.Uses existing checks only,no new manifest.",
+      "priorReport": "output/phase-d-work/ui-canonical/stock-read-validation.json",
+      "limits": "Prior results are reused,not fresh executions;no additional BAL/catalogue cases counted."
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "newCohort": {
+        "startTime": "2026-11-11T07:29:05.771Z",
+        "duration": 102715.83700000001,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "freshPassed": 3,
+      "priorReused": 18,
+      "qualifiedStockCases": 21,
+      "report": "output/phase-d-work/ui-canonical/stock-history-completeness.json",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "frozenSources": true
+    },
+    "proofs": [
+      "101native family inbound operations plus setup create more than100 real movements;UI traverses all pages in exact independent SQL order created_atDESC,idDESC without losses or duplicates",
+      "Product filter with at least50rows and SaoPaulo same-day boundaries resets pagination;all its pages match raw SQL",
+      "Real old product response held until after another product and page are current;test disables only client abort for stock history to prove stale delivery is ignored;production unchanged",
+      "Future date filter produces genuine empty;clearing filters returns first20 original rows",
+      "Read/navigation/filtering emit no operational POST and preserve complete raw ledger/document snapshots",
+      "Prior18 retain101products,5widths/axe,team privacy,late custody,error/empty,malformed200 and foreign history scope/total/page checks"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedEslint": "PASS",
+      "freshUnitTests": 0,
+      "reason": "Only discriminating browser coverage added;no runtime contract change or duplicate unit suite"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "stage05": "EM_EXECUCAO",
+      "completedCheckpoints": [
+        "05.1"
+      ],
+      "nextCheckpoint": "05.2"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "Other9list checkpoints and full phase gates remain",
+      "No new PDF acceptance,merge,production or external activation",
+      "DOC-A/B/C/D remain as before;Sonar owner-deferred"
+    ]
   }
 }

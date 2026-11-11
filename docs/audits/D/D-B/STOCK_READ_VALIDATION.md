@@ -86,3 +86,41 @@ foi fechada neste incremento. A próxima execução é a 04, com seis pontos
 de conferência das fichas. Os nove formulários restantes têm lista própria
 na etapa 14. [Registro fixo](EXECUTION_STAGES.csv) e
 [quadro funcional](../../../../TEMP_D_B_ATUALIZACAO.md).
+
+## D3.69 — listas de estoque e histórico acima de100 movimentos
+
+Base4de848c. O ponto05.1 foi conferido sem mudança no produto. Os17 fontes
+registrados no pacote anterior continuam idênticos. A comparação Git com
+90f832d também confirmou os consumidores de estoque, APIs, leitor compartilhado,
+autorização, quantidades, migrations, dependências e quatro arquivos de testes
+anteriores sem alterações. Os18 cenários de estoque da coorte D3.62 são
+reaproveitados explicitamente; não foram executados novamente. Os demais casos
+BAL e catálogo daquele pacote não entram nessa contagem.
+
+A lacuna era o volume do histórico: o caso anterior percorria23 movimentos.
+O novo caso cria101 entradas pelo comando nativo com Auth real e percorre a
+lista com mais de100 registros, página por página. A sequência completa de
+IDs deve coincidir com SQL independente sobre o ledger, por data e ID em ordem
+decrescente. O teste recusa perda, duplicação e interrupção na primeira página.
+
+O filtro de produto percorre mais de50 registros e o período usa os limites
+do dia em São Paulo, reiniciando a paginação. Uma resposta real do produto
+anterior é retida e entregue depois de mudar produto e página; a tela conserva
+a seleção atual. Somente o teste retira o sinal de abort desse GET para
+comprovar a resposta tardia, sem mudança no fetch de produção. Há liberação
+garantida da resposta retida. Período futuro produz vazio verdadeiro; limpar
+os filtros retorna à primeira página original. Nenhum POST operacional parte
+da leitura; snapshots completos de documentos e movimentos permanecem iguais.
+
+Passaram três execuções novas, uma por perfil, com build de produção e fontes
+congelados, sem falhas, repetições ou casos ignorados. Tipos e lint dirigido
+passaram. São21 cenários de estoque qualificados:18 anteriores reaproveitados
+e3 novos. A aparência, cinco larguras/axe, autorização da equipe, resposta
+invertida de custódia e validação de respostas corrompidas mantêm as provas
+anteriores, pois seus consumidores e dependências estão intactos.
+
+Sem SQL novo; dry-run remoto vazio em205. Ponto05.1 fechado localmente;
+próximo05.2, fichas e requisições. Restam os outros nove pontos de listas,
+validação conjunta e CI do SHA publicado. Os105 critérios mantêm56 PASS locais
+e49 PARTIAL. O complemento DOC-A/B/C/D permanece separado e não recebe nova
+aprovação por esta conferência.

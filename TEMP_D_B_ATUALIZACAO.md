@@ -36,7 +36,8 @@ A fase continua em execução.
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03, 04 e 07 estão concluídas localmente.
 Os seis pontos da etapa 04 estão fechados no escopo anterior. A próxima etapa
-é a 05, busca, filtros e históricos, começando por estoques e movimentos.
+é a 05, busca, filtros e históricos. O ponto 05.1, estoques e movimentos,
+também está concluído localmente; o próximo é 05.2, fichas e requisições.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -673,7 +674,7 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    complemento continuam nos blocos DOC-A a DOC-D; a revisão geral permanece.
    Responsável — Codex.
 
-5. **05 — Busca, filtros e históricos.** Em execução · 70%.
+5. **05 — Busca, filtros e históricos.** Em execução · 75%.
 
    Para concluir — Todas as listas previstas alcançam os registros permitidos,
    inclusive listas grandes e pendências antigas, com ordenação e resposta
@@ -832,11 +833,15 @@ documentais continuam identificadas em DOC-A a DOC-D.
 ### Próxima etapa — 05, busca, filtros e históricos
 
 Estes são os dez pontos já previstos no plano fixo. O bloco está em execução,
-com estimativa de70%; seu fechamento ainda está pendente. Vou reaproveitar
-verificações anteriores válidas e corrigir as lacunas de cada lista.
+com estimativa de75%; seu fechamento ainda está pendente. O ponto05.1 está
+concluído; o próximo é05.2. Vou reaproveitar verificações anteriores válidas
+e corrigir as lacunas de cada lista.
 Responsável por todos os pontos — Codex.
 
-1. **05.1 — Estoques e movimentos.** Conferir páginas, filtros e histórico.
+1. **05.1 — Estoques e movimentos.** Concluído localmente · 100% deste ponto.
+   Foram conferidos os materiais e o histórico com mais de100 movimentos,
+   páginas completas, ordem, filtros, falha, vazio e resposta antiga, sem
+   alteração do estoque. Reaproveitadas as verificações anteriores válidas.
 2. **05.2 — Fichas e requisições.** Alcançar também fichas e pendências antigas.
 3. **05.3 — Compras e parcelas.** Conferir a busca e todas as parcelas.
 4. **05.4 — Entregas e transferências.** Percorrer as duas direções e estados.

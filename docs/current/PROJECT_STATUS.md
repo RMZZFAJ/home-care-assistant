@@ -4,7 +4,19 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.68
+## Incremento atual D3.69
+
+O ponto05.1 de listas foi fechado localmente sem mudança no produto.
+Fontes, contratos e dependências de estoque conferidos permitiram reaproveitar
+18 cenários anteriores. Três execuções novas passaram nos três perfis com
+mais de100 movimentos, páginas completas em ordem, filtros e resposta tardia
+sem substituir a seleção atual. Não houve POST de leitura ou alteração de
+fatos oficiais. Tipos e lint passaram. Sem SQL novo; dry-run remoto vazio em205.
+Próximo05.2, fichas e requisições; estágio05 parcial75%. Matriz56/49 e demais
+pendências preservadas, incluindo DOC-A/B/C/D e CI do novo SHA.
+[Implementação e limites](../audits/D/D-B/STOCK_READ_VALIDATION.md).
+
+## Incremento anterior D3.68
 
 O BAL tem orientação própria para revisão, referência alterada, conciliação e
 reconto. Uma atribuição de outro ciclo não aparece como pendência desta ficha;
