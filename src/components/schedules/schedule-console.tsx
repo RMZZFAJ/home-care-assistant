@@ -12,23 +12,25 @@ import {
   SelectField,
   TextInput,
 } from "@/components/ui/controls";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
 import { NotificationReference } from "@/components/notifications/notification-reference";
 
 import {
-  api,
   can,
   Notice,
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
-import { adjacentPeriod, calendarPeriod } from "@/lib/schedules/calendar";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import { parseScheduleListRead } from "@/lib/validation/schedule-list";
+import { formatBrazilDate } from "@/lib/receipt";
+import { adjacentPeriod, calendarPeriod, scheduleDisplayDay } from "@/lib/schedules/calendar";
 import type { ScheduleEditor } from "./schedule-forms";
 import { scheduleStamp as stamp } from "./schedule-review";
-import type { ScheduleWorkspace, ScheduledShift } from "@/types/schedules";
+import type { ScheduledShift } from "@/types/schedules";
 import {
   useScheduleConfirmation,
   type ScheduleRecovery,
@@ -260,56 +262,17 @@ function Agenda({
   const [person, setPerson] = useState(""),
     [status, setStatus] = useState(""),
     [attempt, setAttempt] = useState(0);
-  const [query, setQuery] = useState<{
-    key: string;
-    range: string;
-    data: ScheduleWorkspace | null;
-    error: string;
-  }>({ key: "", range: "", data: null, error: "" });
   const [message, setMessage] = useState("");
-  const busy = recovery.busy || !recovery.ready,
+  const live = useLiveRevision(), period = useMemo(() => calendarPeriod(day, mode), [day, mode]);
+  const decode = useCallback((value: unknown) => parseScheduleListRead(value, {
+    careRecipientId: patient.id, from: period.from, until: period.until,
+  }), [patient.id, period.from, period.until]);
+  const read = useScopedRead("/api/schedules?" + new URLSearchParams({
+    careRecipientId: patient.id, from: period.from, until: period.until,
+  }), String(live) + ":" + attempt, decode);
+  const data = read.data?.data ?? null, currentData = data, loading = read.loading;
+  const busy = recovery.busy || !recovery.ready || loading || Boolean(read.error),
     uncertain = recovery.pending !== null;
-  const live = useLiveRevision(),
-    period = calendarPeriod(day, mode);
-  const rangeKey = patient.id + ":" + period.from + ":" + period.until;
-  const queryKey = rangeKey + ":" + live + ":" + attempt;
-  const data = query.data,
-    loading = query.key !== queryKey;
-  const currentData = query.range === rangeKey ? data : null;
-  useEffect(() => {
-    const controller = new AbortController();
-    api<{ data: ScheduleWorkspace }>(
-      "/api/schedules?" +
-        new URLSearchParams({
-          careRecipientId: patient.id,
-          from: period.from,
-          until: period.until,
-        }),
-      undefined,
-      controller.signal,
-    )
-      .then((result) => {
-        if (!controller.signal.aborted)
-          setQuery({
-            key: queryKey,
-            range: rangeKey,
-            data: result.data,
-            error: "",
-          });
-      })
-      .catch((reason) => {
-        if (!controller.signal.aborted)
-          setQuery((previous) => ({
-            ...previous,
-            key: queryKey,
-            error:
-              reason instanceof Error
-                ? reason.message
-                : "Não foi possível consultar a escala.",
-          }));
-      });
-    return () => controller.abort();
-  }, [patient.id, period.from, period.until, queryKey, rangeKey]);
   function open(value: ScheduleEditor, target: HTMLElement) {
     if (busy || uncertain) return;
     if (value.kind === "series" || (value.kind === "type" && !value.type)) {
@@ -348,15 +311,19 @@ function Agenda({
     );
     setAttempt((value) => value + 1);
   }
-  const visible =
-    currentData?.shifts.filter(
-      (shift) =>
-        (!person || shift.professional_id === person) &&
-        (!status || shift.status === status),
-    ) ?? [];
+  const selectedPerson = can(context, "schedule.read.team") ? person : "";
+  const visible = useMemo(() => currentData?.shifts.filter(
+    shift => (!selectedPerson || shift.professional_id === selectedPerson) && (!status || shift.status === status),
+  ) ?? [], [currentData, selectedPerson, status]);
+  const byDay = useMemo(() => {
+    const result = new Map(period.dates.map(date => [date, [] as ScheduledShift[]]));
+    for (const shift of visible) result.get(scheduleDisplayDay(shift.starts_at, shift.timezone, period.from))?.push(shift);
+    return result;
+  }, [visible, period]);
   const renderShift = (shift: ScheduledShift) => (
     <article
       key={shift.id}
+      data-shift-id={shift.id}
       className="hca-shift-card"
       aria-label={`${shift.type_name} · ${shift.professional_name}`}
     >
@@ -367,6 +334,7 @@ function Agenda({
         </Pill>
       </div>
       <p>{shift.professional_name}</p>
+      {new Intl.DateTimeFormat("sv-SE", { timeZone: shift.timezone }).format(new Date(shift.starts_at)) < period.from ? <p className="text-sm text-(--muted)">Iniciado no período anterior.</p> : null}
       <p>
         {stamp(shift.starts_at, shift.timezone)} →{" "}
         {stamp(shift.ends_at, shift.timezone)}
@@ -391,12 +359,7 @@ function Agenda({
     </article>
   );
   const renderDay = (date: string) => {
-    const shifts = visible.filter(
-      (shift) =>
-        new Intl.DateTimeFormat("sv-SE", { timeZone: shift.timezone }).format(
-          new Date(shift.starts_at),
-        ) === date,
-    );
+    const shifts = byDay.get(date) ?? [];
     return (
       <section key={date} className="hca-agenda-day">
         <h2>
@@ -529,8 +492,9 @@ function Agenda({
         Atualizar escala
       </ActionButton>
       {loading ? <LoadingIndicator label="Carregando escala" /> : null}
-      {!loading && query.error ? <Notice error>{query.error}</Notice> : null}
-      {!loading && currentData && !query.error ? (
+      {read.error ? <Notice error>{read.error} Atualize a escala para repetir a consulta.</Notice> : null}
+      {read.queriedAt ? <p className="hca-muted">{loading || read.error ? "Última consulta preservada; ações aguardam atualização." : "Escala consultada:"} {formatBrazilDate(read.queriedAt)}.</p> : null}
+      {currentData ? (
         <>
           <p className="hca-muted">
             Programação prevista, sem registro de presença. O mesmo período
@@ -554,6 +518,7 @@ function Agenda({
                       {series.anchor_date} a {series.valid_until}
                     </span>
                     <ActionButton
+                      disabled={busy || uncertain}
                       onClick={(event) =>
                         onResource(
                           "schedule_series_approve",
@@ -566,6 +531,7 @@ function Agenda({
                       Aprovar programação
                     </ActionButton>
                     <ActionButton
+                      disabled={busy || uncertain}
                       onClick={(event) =>
                         open(
                           {
@@ -595,6 +561,7 @@ function Agenda({
                     {change.is_stale ? <p>Proposta desatualizada</p> : null}
                   </div>
                   <ActionButton
+                    disabled={busy || uncertain}
                     onClick={(event) =>
                       onResource(
                         change.is_stale
@@ -611,6 +578,7 @@ function Agenda({
                       : "Aprovar alteração"}
                   </ActionButton>
                   <ActionButton
+                    disabled={busy || uncertain}
                     onClick={(event) =>
                       open(
                         {
@@ -651,6 +619,7 @@ function Agenda({
                 </strong>
                 {can(context, "schedule.types.manage") ? (
                   <ActionButton
+                    disabled={busy || uncertain}
                     onClick={(event) =>
                       open({ kind: "type", type }, event.currentTarget)
                     }
@@ -673,6 +642,7 @@ function Agenda({
                   {team ||
                   (publishOwn && series.professional_id === context.userId) ? (
                     <ActionButton
+                      disabled={busy || uncertain}
                       onClick={(event) =>
                         open(
                           {

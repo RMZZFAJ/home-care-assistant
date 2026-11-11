@@ -1,3 +1,11 @@
+import { localMinute } from "./time";
+
+/** An overnight shift carried into the range remains one occurrence in the view. */
+export function scheduleDisplayDay(startsAt: string, timezone: string, from: string) {
+  const day = localMinute(startsAt, timezone).slice(0, 10);
+  return day < from ? from : day;
+}
+
 export function calendarPeriod(day: string, mode: "week" | "month") {
   const reference = new Date(day + "T12:00:00Z");
   const start = new Date(reference), end = new Date(reference);

@@ -1,5 +1,21 @@
 # Checkpoint D-B
 
+D3.74 fechou 05.6. Um plantão que começa antes do período e continua nele
+agora aparece uma vez no primeiro dia, com aviso e horários originais. A
+contraprova mostrou 122 plantões na API e ausência do noturno na tela.
+Servidor e consumidor reutilizam o schema completo da agenda e conferem
+paciente, período, coleções e horários. Falha preserva somente a consulta
+válida do mesmo período, com instante e ações suspensas; recusa retira dados.
+Passaram 28 unitários e 15 cenários distintos nos três perfis, por 12
+aprovações iniciais e três finais. Três apontamentos do axe após rolagem foram
+preservados; a repetição usou auditFromTop existente, com todas as regras.
+Auth real, 122 ocorrências por SQL/API/UI, filtros, resposta tardia, escopo
+pessoal, 403/404/400 e fatos oficiais preservados. Tipos, lint e inspeção
+a320px passaram. Sem SQL novo; remoto205 com dry-run vazio. Próximo05.7;
+seis de dez pontos conferidos, etapa05 parcial90%. Histórico nativo de eventos
+limitado100 continua05.10. Matriz56/49 e DOC-A/B/C/D preservados; CI própria
+necessária. [Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
 D3.73 fechou05.5. A lista de consumo confere âmbito, ordem e cursor, sem
 mesclar IDs repetidos ou aceitar página que não avança. Falha preserva apenas
 a seleção válida anterior, com instante; recusa na continuação retira também

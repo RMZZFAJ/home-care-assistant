@@ -393,5 +393,116 @@
       "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
       "No SQL,merge,production or external activation"
     ]
+  },
+  "D3.74": {
+    "baseSha": "24376c606553e7a6b5213ba3f3fe7c982f31e10e",
+    "scope": "05.6 authorized schedule periods,complete shift collections and calendar filters",
+    "baseline": {
+      "stats": {
+        "startTime": "2026-11-11T09:32:00.394Z",
+        "duration": 83664.241,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "report": "schedule-list-baseline.json",
+      "failureDirectory": "schedule-list-baseline-failed",
+      "cause": "API returned all122 native shifts in exact independent SQL order;UI omitted the overnight shift beginning before the month."
+    },
+    "implementation": [
+      "Reuse existing complete scheduleResourceWorkspaceSchema;GET preserves native data and adds patient/period;server/client check required collections,unique identities,native patient fields,requested period and compatible time zones/windows",
+      "Period validation follows native42-day difference inclusive and returns400 for bad/reversed/oversized ranges",
+      "A carry-in shift appears once on first day with original timestamps and prior-period label;other shifts retain start-day placement;memoized filtered/day grouping avoids formatting every occurrence for every day",
+      "useScopedRead retains only valid same-period data with timestamp and disabled actions during refresh/error;new period never adopts old rows;401/403/404 clear content;native authority unchanged",
+      "Filters remain query-only;hidden team-person filter cannot narrow remaining personal view"
+    ],
+    "unit": {
+      "passed": 28,
+      "files": [
+        "tests/schedule-list.test.ts",
+        "tests/schedule-decisions.test.ts",
+        "tests/schedule-resource-preparations.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T09:41:37.866Z",
+        "duration": 240060.874,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "volumeFinal": {
+        "startTime": "2026-11-11T09:46:35.352Z",
+        "duration": 92930.994,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 15,
+      "executionsAfterFix": 18,
+      "initialAxeOriginFailures": 3,
+      "qualifiedBy": "Twelve initial passes retained;three volume cases repeated using existing auditFromTop after pointer/viewport/scroll changes.Runtime unchanged after initial cohort.All axe rules and assertions retained.",
+      "reports": [
+        "schedule-list-first.json",
+        "schedule-list-volume-final.json"
+      ],
+      "failureDirectory": "schedule-list-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "counterproofs": [
+      "122 native occurrences in month exactly match independent SQL and API order/identities;carry-in appears once;next-month occurrence excluded then reachable;person/status filters and return to month preserve complete collection",
+      "Seven corrupt successful reads rejected:incomplete,patient,period,native nested patient,duplicate,window,zone;prior valid same-period rows remain identified and all edition controls disabled",
+      "Real retained old-month response delivered after current month cannot replace it;new-period503 shows neither old rows nor false empty;valid empty is separate",
+      "Controlled403 clears content;actual schedule.read.team/own revocation returns403 and reload hides agenda;real own Auth returns only own occurrences;foreign patient404;invalid ranges400",
+      "Read/navigation preserve full native shifts,series,types,change requests,events andBAL assignments;no operational schedule POST in query case",
+      "Existing original creation,overnight duration,overlap409,mobile context,503 recovery,keyboard focus,immutable before/after review and four widths retain assertions"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS without suppression",
+      "visual": "Fresh Chromium320 carry-in card inspected;original date range and label legible",
+      "axe": "Fresh month from known top origin320 and unchanged old four-width review checks",
+      "testOnlyAdjustment": "After card screenshot and viewport/filter interaction,the initial axe scan saw a partially clipped month button beneath sticky header.Existing auditFromTop restores known scroll/focus origin;no rule,selector assertion or product source removed."
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6"
+      ],
+      "next": "05.7"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "05.7–05.10 and full visual/joint/human/physical/provider gates remain",
+      "Native workspace events remain limited100;complete event history belongs to05.10 and is not approved here",
+      "No new SQL,authorization engine,PDF/signing,stock or decision change",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
+      "No merge,production or external activation"
+    ]
   }
 }

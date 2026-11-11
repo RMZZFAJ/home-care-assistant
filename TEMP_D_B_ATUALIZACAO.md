@@ -864,7 +864,12 @@ Responsável por todos os pontos — Codex.
    original, filtros e retorno pelo navegador. Consulta com falha não inventa
    vazio. Uma página atrasada não entra em outra seleção; perda de acesso
    retira o conteúdo daquela custódia. Consultar não confirma nem desconta.
-6. **05.6 — Agenda.** Conferir períodos e listagens permitidas.
+6. **05.6 — Agenda.** Concluído localmente · 100% deste ponto.
+   O mês completo e os filtros foram conferidos com mais de 100 plantões.
+   Um plantão iniciado antes do período continua visível quando ainda o
+   alcança, sem duplicação. Falha identifica a consulta anterior e suspende
+   alterações; perda de acesso retira os dados. O histórico completo de
+   mudanças permanece no ponto 05.10.
 7. **05.7 — Catálogo e contas.** Conferir também o diretório global de contas.
 8. **05.8 — Notificações.** Alcançar avisos antigos e suas pendências.
 9. **05.9 — Propostas antigas.** Localizar propostas ainda sem decisão.

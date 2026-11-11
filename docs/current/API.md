@@ -708,6 +708,25 @@ Toda escrita usa careRecipientId, idempotencyKey e expectedVersion quando o
 registro já existe. Sobreposição retorna SCHEDULE_OVERLAP sem revelar o outro
 paciente. Não há escrita direta em agenda ou operação de check-in.
 
+GET conserva o workspace nativo em data e acrescenta careRecipientId e
+period(from,until). A diferença entre datas admite até42 dias, inclusive,
+como a RPC; datas inválidas, invertidas ou mais extensas recebem400 antes da
+consulta nativa. Servidor e consumidor reutilizam o schema completo já usado
+na referência da agenda, conferindo coleções, identidades únicas, paciente,
+período e horários compatíveis. As ocorrências da série podem ultrapassar o
+período da grade, pois continuam necessárias à revisão da programação.
+
+Um plantão que começou antes da grade e ainda alcança seu período aparece
+uma vez no primeiro dia, identificado como iniciado no período anterior,
+com horários originais preservados. Os demais continuam no dia de início.
+A consulta usa useScopedRead: somente a leitura válida do mesmo período pode
+ser preservada, com instante e ações suspensas durante falha/atualização.
+Outro período não herda linhas anteriores e401/403/404 retiram os dados.
+Filtros de pessoa/situação continuam locais sobre a coleção autorizada;
+um filtro de equipe oculto por perda de capacidade não restringe a consulta
+pessoal restante. O histórico resumido de eventos da RPC ainda tem o limite
+nativo100; sua completude permanece no ponto05.10, sem aprovação nesta etapa.
+
 Proposta de alteração tem versão própria e snapshots antes/depois. Decisão
 envia expectedVersion da proposta exibida; motivo do decisor não substitui
 motivo/notas do proponente. close_obsolete encerra uma proposta desatualizada

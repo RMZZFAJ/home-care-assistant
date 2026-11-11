@@ -213,3 +213,63 @@ mantida90%, sem inferir avanço geral pela contagem dos pontos. Os105 critérios
 mantêm56 PASS locais e49 PARTIAL. Restam05.6–05.10 e gates conjuntos/visuais.
 DOC-B permanece10% e DOC-A/C/D pendentes, incluindo os novos PDFs aprovados.
 CI do SHA publicado continua necessária.
+
+## D3.74 — agenda, ponto 05.6
+
+Base24376c6. A reprodução do baseline mostrou 122 plantões autorizados na API,
+em ordem exata por SQL independente, enquanto o noturno iniciado antes do mês
+não aparecia na tela. Ele agora aparece uma vez no primeiro dia do período,
+identificado como iniciado anteriormente, com seus horários preservados.
+Os demais continuam no dia de início, sem duplicação de plantões noturnos.
+A grade usa agrupamento derivado por dia e conserva filtros de pessoa/situação.
+Um filtro de equipe oculto por perda da capacidade não limita a visão pessoal.
+
+O envelope preserva data e acrescenta paciente/período. Servidor e consumidor
+reutilizam o schema completo da referência da agenda, sem duplicar seu contrato.
+São conferidos coleções, identidades únicas, campos nativos de paciente e
+horários compatíveis com o período. As ocorrências completas da série continuam
+admitidas fora da grade, pois são necessárias à revisão. O limite nativo entre
+datas é mantido: diferença até 42 dias inclusive. Datas inválidas, invertidas
+ou mais extensas recebem400 antes de chamar a RPC.
+
+O consumidor usa useScopedRead. Só preserva consulta válida do mesmo período,
+com instante; ações da agenda ficam suspensas durante atualização ou falha.
+Outro período não herda linhas anteriores e recusas401/403/404 retiram dados.
+A consulta não ganha rascunho de negócio, persistência ou autoridade própria.
+A autorização permanece na RPC nativa, com escopos pessoal e de equipe.
+
+Passaram 28 unitários, tipos e lint dirigido. São 15 cenários distintos
+qualificados nos três perfis: 12 aprovações iniciais e três finais. As 18
+execuções após a correção incluem três apontamentos do axe: depois da captura
+do cartão e mudança de viewport/filtro, o botão de mês estava parcialmente
+recortado sob o cabeçalho fixo. A repetição exclusiva dos três casos de volume
+usou auditFromTop já existente para estabelecer origem de rolagem/foco. Todas
+as regras, controles, asserções e verificações de teclado permaneceram ativas.
+O produto não mudou depois da coorte inicial. Relatórios, contextos, capturas
+e geometria das falhas ficaram preservados. A falha real do baseline está
+registrada separadamente.
+
+Com Auth real, as 122 ocorrências nativas do mês corresponderam exatamente aos
+IDs e à ordem por SQL independente, na API e na interface. Filtros de pessoa
+e situação, troca/retorno de mês e o plantão do mês seguinte foram conferidos.
+Sete respostas200 inconsistentes foram recusadas.503 do mesmo período mantém
+leitura identificada e ações suspensas; em outro período não mostra dados
+anteriores nem vazio falso. Uma resposta mensal real retida foi entregue
+após a seleção atual e não a substituiu. Recusa403 limpa o conteúdo.
+
+A retirada real de leitura pessoal/equipe retorna403 e a recarga não expõe
+agenda. A identidade profissional real vê somente seus plantões; paciente
+sem vínculo retorna404 e períodos inválidos400. Consultar/navegar não envia
+POST de agenda e preserva plantões, séries, tipos, propostas, eventos e
+atribuições BAL completos. Os consumidores antigos mantiveram publicação,
+conflito409, duração noturna, contexto móvel, recuperação503, foco pelo teclado
+e revisão imutável antes/depois nas quatro larguras. Axe a320px passou e o
+cartão do plantão anterior foi inspecionado, com aviso e datas legíveis.
+
+Sem SQL novo; dry-run remoto vazio em205. Ponto05.6 fechado localmente;
+próximo05.7, catálogo e contas. Seis dos dez pontos de listas conferidos;
+estimativa da etapa05 mantida90%. O resumo de eventos ainda tem limite nativo100:
+histórico completo continua no ponto05.10 e não é aprovado por este fechamento.
+Os105 critérios mantêm56 PASS locais e49 PARTIAL. Restam05.7–05.10 e gates
+conjuntos/visuais. DOC-B permanece10% e DOC-A/C/D pendentes, incluindo os novos
+PDFs aprovados. CI do SHA publicado continua necessária.
