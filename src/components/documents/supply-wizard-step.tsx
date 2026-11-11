@@ -198,9 +198,9 @@ export function SupplyWizardStep({
                     })
                   }
                 >
-                  <option value="FAMILY">Família → Equipe</option>
+                  <option value="FAMILY">Entrega de materiais · Família → Equipe</option>
                   <option value="CARE_TEAM">
-                    Equipe → Família (devolução)
+                    Devolução de materiais · Equipe → Família
                   </option>
                 </select>
               </label>

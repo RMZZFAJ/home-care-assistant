@@ -210,6 +210,12 @@ sem reaproveitar processo desconhecido. Os projetos Chromium desktop, Pixel 7
 e WebKit/iPhone 13 usam dados fictícios. Relatórios não são versionados;
 traces ficam desabilitados para evitar registrar credenciais de Auth.
 
+Depois da coleta, o runner executa um build de produção novo antes de iniciar
+o Playwright. Falha de compilação impede a abertura dos casos; o prazo de
+prontidão HTTP mede a inicialização do servidor já compilado. Os limites de
+prontidão e das asserções continuam próprios, sem aumento para acomodar a
+compilação.
+
 A extensão Playwright do VS Code pode descobrir testes sem banco ou variáveis
 do runner. Ao executar, tanto o servidor quanto o globalSetup verificam a
 stack

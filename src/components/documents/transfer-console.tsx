@@ -56,12 +56,12 @@ import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 
 export const custodyName = (source: Custody) =>
   source === "FAMILY" ? "Família" : "Equipe";
-export function TransferConsole() {
+export function TransferConsole({ source }: { source?: Custody } = {}) {
   return (
-    <Workspace title="Entregas e devoluções de materiais">
+    <Workspace title={source === "CARE_TEAM" ? "Devolução de materiais" : "Entregas e devoluções de materiais"}>
       {(context) =>
         context.patient && can(context, "ent.read") ? (
-          <PatientTransfers key={context.patient.id} context={context} />
+          <PatientTransfers key={context.patient.id} context={context} fixedSource={source} />
         ) : (
           <Notice>Selecione um paciente com acesso às entregas.</Notice>
         )
@@ -69,16 +69,18 @@ export function TransferConsole() {
     </Workspace>
   );
 }
-function PatientTransfers({ context }: { context: WorkspaceContext }) {
-  const [source, setSource] = useState<Custody | "">(""),
+function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext; fixedSource?: Custody }) {
+  const [source, setSource] = useState<Custody | "">(fixedSource ?? ""),
     [editing, setEditing] = useState(false),
     [consulting, setConsulting] = useState(false);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const returnOnly = fixedSource === "CARE_TEAM";
+  const canPrepare = can(context, "ent.create") && (!fixedSource || can(context, fixedSource === "CARE_TEAM" ? "stock.team.read" : "stock.family.read"));
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <section className="ui-card space-y-4">
         <h2 ref={headingRef} tabIndex={-1}>
-          Declarar entrega ou devolução de materiais
+          {returnOnly ? "Declarar devolução de materiais" : "Declarar entrega ou devolução de materiais"}
         </h2>
         <p>
           A entrega segue da família para a equipe. A devolução de materiais
@@ -90,9 +92,9 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
         <p>
           Consumo, descarte e correção de estoque têm seus próprios registros.
         </p>
-        {can(context, "ent.create") ? (
+        {canPrepare ? (
           <>
-            <FormField label="Custódia de origem" required>
+            {fixedSource ? <p><strong>Percurso:</strong> {custodyName(fixedSource)} → {custodyName(fixedSource === "CARE_TEAM" ? "FAMILY" : "CARE_TEAM")}</p> : <FormField label="Custódia de origem" required>
               <SelectField
                 value={source}
                 onChange={(controlEvent) => {
@@ -108,7 +110,7 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
                   <option value="CARE_TEAM">Devolução de materiais · Equipe → Família</option>
                 ) : null}
               </SelectField>
-            </FormField>
+            </FormField>}
             <ActionButton
               variant="primary"
               disabled={!source}
@@ -117,7 +119,7 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
                 setEditing(true);
               }}
             >
-              Preparar declaração
+              {returnOnly ? "Preparar devolução" : "Preparar declaração"}
             </ActionButton>
           </>
         ) : (
@@ -133,7 +135,7 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
             perder acesso à origem.
           </p>
           <div className="hca-form-stack">
-            {(["FAMILY", "CARE_TEAM"] as const).map((item) => (
+            {(fixedSource ? [fixedSource] : ["FAMILY", "CARE_TEAM"] as const).map((item) => (
               <ActionButton
                 key={item}
                 onClick={() => {
@@ -149,8 +151,9 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
           </div>
         </details>
         <Link className="ui-button ui-button-secondary" href="/entregas">
-          Acompanhar entregas e decisões
+          Acompanhar entregas e devoluções
         </Link>
+        {returnOnly ? <Link className="ui-button ui-button-secondary" href="/transferencias">Consultar os dois percursos de materiais</Link> : null}
       </section>
       {editing && source ? (
         <TransferDeclarationEditor

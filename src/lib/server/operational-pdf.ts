@@ -43,6 +43,7 @@ import type {
   StockObservationTimeSource,
 } from "@/types/requisition";
 import { documentVariant } from "@/lib/documents/variant";
+import { materialTransferDirection } from "@/lib/documents/transfer-follow-up";
 import type { PdfFidelityFacts } from "@/lib/documents/pdf-fidelity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
 import { balanceApplicationFacts } from "@/lib/validation/balance-application";
@@ -171,7 +172,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -198,6 +199,9 @@ export async function renderDocumentPdf(
   emission?: PdfEmissionContext,
 ) {
   const revision = emission?.rendererRevision ?? 5;
+  const direction = snapshot.type === "ENT" ? materialTransferDirection(String(snapshot.payload.source ?? ""), String(snapshot.payload.destination ?? "")) : null;
+  const movementNoun = direction === "return" ? "devolução" : direction === "delivery" ? "entrega" : "movimentação";
+  const variantTitle = snapshot.type === "ENT" && revision < 14 ? "Comprovante de entrega de materiais" : documentVariant(snapshot.type, snapshot.payload, snapshot.workflow);
   const sourceFacts = revision >= 6 ? emission?.sourceFacts : undefined;
   const fidelity = revision >= 7 ? emission?.fidelityFacts : undefined;
   const corrections = revision >= 12 && snapshot.type === "BAL" ? balanceCorrectionFacts.parse(snapshot.balanceReviewCorrections) : undefined;
@@ -226,7 +230,7 @@ export async function renderDocumentPdf(
   const date = new Date(
     emission?.requestedAt ?? snapshot.createdAt ?? "2000-01-01T00:00:00Z",
   );
-  pdf.setTitle(`${fidelity ? documentVariant(snapshot.type, snapshot.payload, snapshot.workflow) + " · " : ""}${snapshot.code} - Home Care Assistant`);
+  pdf.setTitle(`${fidelity ? variantTitle + " · " : ""}${snapshot.code} - Home Care Assistant`);
   pdf.setAuthor("Home Care Assistant");
   pdf.setCreationDate(date);
   pdf.setModificationDate(date);
@@ -528,7 +532,7 @@ export async function renderDocumentPdf(
     BAL: "BALANÇO DO ESTOQUE DA EQUIPE",
   }[snapshot.type];
   structure.within(structure.element("H1"), () => text(fidelity && !(snapshot.type === "REQ" && sourceFacts?.historical)
-    ? documentVariant(snapshot.type, snapshot.payload, snapshot.workflow).toLocaleUpperCase("pt-BR") : title,
+    ? variantTitle.toLocaleUpperCase("pt-BR") : title,
     snapshot.type === "ENT" ? 17 : 19, true));
   y -= 6;
   const familyAware =
@@ -664,7 +668,7 @@ export async function renderDocumentPdf(
   y -= 42;
   section(
     snapshot.type === "ENT"
-      ? "Identificação da entrega"
+      ? revision >= 14 ? "Identificação da " + movementNoun : "Identificação da entrega"
       : "Identificação e responsáveis",
   );
   const who = snapshot.actors?.issuer,
@@ -691,13 +695,13 @@ export async function renderDocumentPdf(
             "Origem",
             snapshot.payload.source === "FAMILY"
               ? "Estoque da família"
-              : "Estoque da equipe",
+              : revision >= 14 && snapshot.payload.source !== "CARE_TEAM" ? "Custódia não preservada" : "Estoque da equipe",
           ],
           [
             "Destino",
             snapshot.payload.destination === "FAMILY"
               ? "Estoque da família"
-              : "Estoque da equipe",
+              : revision >= 14 && snapshot.payload.destination !== "CARE_TEAM" ? "Custódia não preservada" : "Estoque da equipe",
           ],
           [
             "Recebedor designado",
@@ -1039,11 +1043,16 @@ export async function renderDocumentPdf(
         "Nenhuma ciência foi registrada até esta versão. Emissão, envio ou disponibilização do PDF não comprovam ciência.",
       );
   } else if (snapshot.type === "ENT") {
+    if (revision >= 14) {
+      fidelityFact("transfer/nature", "Natureza do documento", variantTitle);
+      fidelityFact("transfer/route", "Percurso dos materiais", direction === "return" ? "Equipe para Família" : direction === "delivery" ? "Família para Equipe" : "Percurso não preservado neste registro");
+      if (direction === "return") text("A devolução de materiais é um processo próprio da equipe para a família. Não exige uma entrega de origem vinculada e não desfaz o histórico de outra ficha.", 8);
+    }
     if (snapshot.transfer) {
       const transfer = snapshot.transfer,
         declaration = transfer.declaration;
       ensure(150);
-      section("Declaração e concordância da transferência");
+      section(revision >= 14 && direction === "return" ? "Declaração e concordância da devolução" : "Declaração e concordância da transferência");
       const custody = (source: string) =>
         source === "FAMILY" ? "Família" : "Equipe";
       text(
@@ -1075,12 +1084,8 @@ export async function renderDocumentPdf(
           : "Sem expedição registrada nesta versão.",
         9,
       );
-      text(
-        transfer.originDocumentId
-          ? "ENT documental de origem: " + transfer.originDocumentId
-          : "Origem documental não informada.",
-        8,
-      );
+      if (revision >= 14) fidelityFact("transfer/origin", "Vínculo documental de origem", transfer.originDocumentId ? "ENT documental de origem: " + transfer.originDocumentId : direction === "return" ? "Sem entrega de origem vinculada a esta devolução." : "Origem documental não informada.");
+      else text(transfer.originDocumentId ? "ENT documental de origem: " + transfer.originDocumentId : "Origem documental não informada.", 8);
       text(
         "A concordância não comprova recebimento nem credita o destino. O vínculo documental não individualiza lotes.",
         8,

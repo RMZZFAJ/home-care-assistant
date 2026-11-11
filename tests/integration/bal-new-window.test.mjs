@@ -84,7 +84,17 @@ test("a distinct count window preserves Juliana18 as count1 and attributes Sheil
     (await review(supervisor.client, "supervisor")).status,
     "submitted",
   );
-  const closed = await review(f.family, "family");
+  const reviewed = await review(f.family, "family");
+  assert.equal(reviewed.status, "submitted");
+  assert.deepEqual(JSON.parse(recountState(f)).ledger, before.ledger,
+    "Independent opinions on count two must not apply stock");
+  const closed = await rpc(f.family, "supply_document_command", {
+    p_id: reviewed.id,
+    p_action: "apply_balance",
+    p_body: { group: "family", reviewReference: reviewed.balanceReview.referenceHash },
+    p_key: randomUUID(),
+    p_version: reviewed.version,
+  });
   assert.equal(closed.status, "approved");
   assert.equal(
     closed.balanceReview.reviews.filter((r) => r.count_version === 2).length,

@@ -37,19 +37,24 @@ O Modelo Integral continua sendo a aparência da aplicação. Fluent foi
 descartado. Os PDFs têm sua própria aparência aprovada; essa referência não muda
 o Modelo Integral da aplicação.
 
-**Como acompanhar:** a seção 2 mostra a posição atual; a seção 3 reúne os
-recursos, critérios, percentuais e pendências por função; a seção 4 separa sua
-participação e as atividades externas; a seção 5 conserva as entregas
-encerradas; a seção 6 contém a única sequência do trabalho restante.
+**Como acompanhar:** a seção 2 mostra o ponto atual; a seção 3 reúne os
+recursos por função, com critérios, entregas e pendências; a seção 4 separa sua
+participação e as atividades externas; a seção 5 registra os marcos já
+encerrados; a seção 6 é a única ordem de execução do restante.
 
-Os números 01 a 20 e os nomes DOC-A a DOC-D permanecem estáveis. Cada novo lote
-atualizará o ponto correspondente, indicando o que fechou e o que falta. Um
-acréscimo de escopo será identificado como acréscimo; não será incluído
-silenciosamente no primeiro item nem mudará uma conclusão anterior.
+Os números 01 a 20 e os nomes DOC-A a DOC-D são identificadores estáveis das
+etapas e dos acréscimos. Eles permitem comparar uma atualização com a seguinte.
+A ordem atual está na seção 6; DOC-A a DOC-D entram antes da retomada da etapa
+08, sem renumerar as etapas anteriores.
 
-Os 105 critérios aparecem uma vez, nos grupos funcionais. Os detalhes do que foi
-encerrado ficam no histórico; os pontos para fechar o restante ficam na
-sequência final. Os percentuais desses níveis medem escopos diferentes.
+Os 105 critérios aparecem uma vez, nos grupos funcionais. Cada etapa concluída
+fica detalhada no grupo da função correspondente; o histórico resume seus
+marcos. A sequência final informa os pontos e as condições para fechar o
+restante. Esses níveis medem escopos diferentes.
+
+Cada lote deve atualizar o ponto correspondente, registrando o que fechou e o
+que falta. Acréscimos de escopo devem ser identificados; não entram
+silenciosamente no primeiro item nem alteram uma conclusão anterior.
 
 ## 2. Posição atual
 
@@ -60,30 +65,37 @@ sequência final. Os percentuais desses níveis medem escopos diferentes.
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
-| Complemento documental | DOC-B ≈50%; DOC-A, DOC-C e DOC-D em 0% do acréscimo |
-| Próximo ponto | DOC-B.3: devolução autônoma cotidiana |
+| Complemento documental | DOC-B ≈75%; DOC-A, DOC-C e DOC-D em 0% do acréscimo |
+| Próximo ponto | DOC-B.4: cancelamento e complemento de fichas |
 
-**Última entrega encerrada:** DOC-B.2, saldo histórico por material da COM.
-A ficha e o PDF mostram o saldo após a última entrada validada daquele material,
-com parcela, data e responsável próprios. Os totais adquirido e validado ficam
-separados da quantidade da última parcela. As novas regras do BAL também estão
-concluídas no fluxo atual, conforme o histórico e o grupo 3.3.
+**Última entrega encerrada:** DOC-B.3, devolução autônoma cotidiana. Há uma
+entrada própria para devolver materiais da equipe à família, sem exigir uma
+entrega de origem. Declaração, concordância, expedição e recebimento mantêm seus
+atos e responsáveis. O PDF identifica a devolução e preserva as divergências.
+Os resultados anteriores do BAL e da COM continuam no grupo 3.3 e no histórico.
 
-**O que falta em DOC-B:** criação cotidiana de devolução autônoma e preservação
-de fichas com cancelamento/complemento e confirmações próprias. O complemento
-permanece parcial, estimado em ≈50%; a nova aparência dos PDFs segue em DOC-A.
+**O que falta em DOC-B:** preservar fichas emitidas e suas ciências ao cancelar
+ou complementar, com nova ficha vinculada e confirmação própria do cancelamento.
+O complemento permanece parcial, estimado em ≈75%; a nova aparência dos PDFs
+segue em DOC-A.
 
-**Banco e validações:** as duas atualizações da COM foram aplicadas no remoto;
-o histórico está igual ao local, com 217 atualizações e sem pendências deste
-lote. As verificações locais passaram nos três perfis de navegador. A validação
-automática do novo commit e a revisão final da fase continuam separadas. Sonar
-permanece adiado por sua decisão.
+**Banco e validações do último lote encerrado:** a atualização da devolução foi
+aplicada no remoto, totalizando 218 atualizações reconciliadas com o local e sem
+pendências deste lote. As verificações locais passaram nos três perfis de
+navegador. A validação automática do commit publicado e a revisão final da fase
+continuam separadas. Sonar permanece adiado por sua decisão.
+
+A validação automática do commit anterior encontrou dois testes antigos de
+reconto incompatíveis com a aplicação separada do parecer. Foram corrigidos e
+passaram localmente; isso ainda depende da validação do novo commit publicado.
 
 ## 3. Funcionalidades e critérios
 
 ### 3.1 Formulários, rascunhos e recuperação
 
 **Critérios deste grupo: 9 concluídos localmente; 6 parciais.**
+
+**Etapas relacionadas:** 01; DOC-C; 14.
 
 **Já entregue no escopo anterior:** guardar e retomar preenchimentos privados,
 comparar edições e recuperar a mesma confirmação. Isso inclui as fichas,
@@ -98,6 +110,23 @@ A nova retomada simples está em DOC-C: um rascunho ativo por usuário, paciente
 tipo, com Continuar ou Descartar e começar novo. Não será criada persistência
 para todo campo. Recuperar uma confirmação ainda incerta continua sendo parte do
 próprio processo, separada de um rascunho comum.
+
+#### 01 — Rascunhos das fichas e atos operacionais
+
+**Estado: concluído localmente · 100%. Responsável: Codex.**
+
+**Escopo encerrado:** REQ, COM, ENT, BAL, transferências, movimentação familiar,
+consumo, revisões de fluxo, agenda e Andamentos.
+
+**Pontos encerrados:**
+
+- 01.1 Criação e revisão das fichas.
+- 01.2 Decisões REQ/COM/ENT/BAL.
+- 01.3 Transferências e movimentação familiar.
+- 01.4 Relatos e decisões de consumo.
+- 01.5 Revisões de fluxo.
+- 01.6 Agenda e decisões de plantões.
+- 01.7 Andamentos privados.
 
 #### Critérios — Formulários, rascunhos e recuperação
 
@@ -146,6 +175,22 @@ próprio processo, separada de um rascunho comum.
 
 **Critérios deste grupo: 2 concluídos localmente; 0 parciais.**
 
+**Etapas relacionadas:** 02; 03; 04.5; 14.
+
+#### 03 — Leitura confiável do estoque e revisão do BAL
+
+**Estado: concluído localmente · 100%. Responsável: Codex.**
+
+**Escopo encerrado:** Saldos, trânsito, histórico de movimentos e referência da
+contagem BAL.
+
+**Pontos encerrados:**
+
+- 03.1 Saldos e trânsito válidos ou erro compreensível.
+- 03.2 Histórico, página e filtro correspondentes.
+- 03.3 Revisão BAL com valores e campos preservados.
+- 03.4 Chave estável das colunas e aviso do editor corrigido.
+
 #### Estoque e contagens — recursos concluídos localmente
 
 Consultas incompletas ou de outro paciente, custódia, página ou filtro recebem
@@ -160,6 +205,24 @@ continuam consultáveis. Uma nova conferência começa com quantidades vazias. A
 notas ficam disponíveis, inclusive em outro aparelho depois de salvar. A
 abertura e a recuperação de fichas antigas também foram conferidas. A nova regra
 do parecer BAL está no complemento documental abaixo.
+
+#### 02 — Catálogo e administração diária
+
+**Estado: concluído localmente · 100%. Responsável: Codex.**
+
+**Escopo encerrado:** Itens, adoção, unidades, precisão, apresentações,
+sucessores, alertas, destinatários, vínculos e seus comprovantes.
+
+**Pontos encerrados:**
+
+- 02.1 Criar, editar e adotar materiais.
+- 02.2 Unidades e precisão.
+- 02.3 Apresentações.
+- 02.4 Situação e sucessores.
+- 02.5 Alertas de estoque.
+- 02.6 Destinatários.
+- 02.7 Vínculos e revogação.
+- 02.8 Consulta dos comprovantes próprios.
 
 #### Catálogo e administração diária — recursos concluídos localmente
 
@@ -200,6 +263,17 @@ criar outra programação. Falha inicial de acesso permite recuperação da
 referência. As verificações desse recurso e a atualização do banco foram
 concluídas; a revisão geral da fase continua pendente.
 
+#### Consumo — resultado da etapa 04.5
+
+**Estado: concluído localmente · 100%. Responsável: Codex.**
+
+- **04.5 — Consumo — relato, complemento, decisão e origem do desconto.** Uma
+  leitura antiga não apaga complemento nem reabre uma confirmação. Durante
+  atualização ou falha, a leitura anterior fica identificada e novas operações
+  aguardam consulta válida. Origem do desconto, falta/rejeição sem baixa,
+  original preservado e recuperação após perda de resposta ou permissão foram
+  conferidos.
+
 #### Critérios — Estoque, catálogo, consumo e agenda
 
 - **Distinguir aprovações antigas das atuais após recontagem** — Concluído ·
@@ -211,10 +285,12 @@ concluídas; a revisão geral da fase continua pendente.
 
 **Critérios deste grupo: 26 concluídos localmente; 15 parciais.**
 
-Este é o único grupo de acompanhamento documental. Reúne conteúdo das fichas,
-arquivos gerados, assinatura, verificação, anexos e o complemento aprovado. A
-etapa 07, no histórico, e as etapas 09/10, na sequência final, apontam para
-estes mesmos resultados.
+**Etapas relacionadas:** 04; 07; DOC-A a DOC-D; 08 a 10.
+
+Este grupo reúne todo o acompanhamento de fichas, Andamentos, PDFs,
+assinatura, verificação, anexos e complemento aprovado. O detalhamento dessas
+funções fica aqui; o histórico conserva os marcos e a seção 6 ordena as próximas
+entregas.
 
 #### Andamentos privados — concluídos no escopo anterior
 
@@ -222,6 +298,48 @@ O preenchimento pode ser salvo no servidor, retomado em outra sessão ou aparelh
 e comparado com outra edição. O texto é mantido quando outra sessão conclui o
 andamento, inclusive após perda da resposta de reconhecimento. Isso não conclui
 as menções, referências e destaques novos de DOC-C.
+
+#### 04 — Estados, próximas providências e vínculos das fichas
+
+**Estado: concluído localmente · 100%. Responsável: Codex.**
+
+**Escopo encerrado:** estados, próximas providências e vínculos das fichas. As
+novas regras permanecem identificadas em DOC-A a DOC-D.
+
+O ponto 04.5, sobre consumo, está no grupo 3.2.
+
+**Pontos encerrados:**
+
+- **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.** A
+  orientação abre a seção correta; vínculos, falhas de consulta e registros
+  encerrados foram conferidos. O novo aviso e pedido de confirmação do
+  cancelamento pertencem ao complemento DOC-B/DOC-C e ainda precisam de
+  execução.
+- **04.2 — Compra e doação — aquisição, parcelas, chegada e encerramento.**
+  Preparação e aprovação pendente não aparecem como conclusão. A orientação
+  distingue aquisição, chegada, conferência e encerramento; parcelas rejeitadas
+  continuam no histórico. Recuperação, doação, permissões e ausência de entrada
+  duplicada foram conferidas. Os novos PDFs e regras do complemento continuam
+  nos blocos DOC-A a DOC-D.
+- **04.3 — Entrega — conferência, divergência, devolução e regularização.**
+  Encerrar a conferência com uma diferença não aparece como recebimento
+  integral. Cancelamento, divergência, regularização e material ainda
+  desconhecido têm orientações distintas. Quantidades aceitas, autoria, vínculos
+  e recuperação foram conferidos. A nova devolução autônoma e os novos atos do
+  complemento continuam no bloco DOC-B.
+
+- **04.4 — Transferências — origem, destino, aceite e encerramento.** A
+  preparação bilateral identifica entrega e devolução, aceita vínculo de origem
+  opcional e separa declaração, concordância, expedição e recebimento. Recusa e
+  retirada não movimentam materiais. Recuperação, conflitos e autorias foram
+  conferidos. As demais telas e os novos arquivos de devolução continuam em
+  DOC-B/DOC-D.
+- **04.6 — BAL — agendado, sem regime, revisão, reconto e contagens.** A
+  orientação distingue revisão, mudança de referência, efeito registrado,
+  reconto e falta de contador. Outra atribuição ativa não cria uma pendência
+  nesta ficha. Recuperação, autoria, contagem anterior e ausência de desconto
+  repetido foram conferidas. Esse escopo anterior não incluía a nova separação
+  entre parecer e estoque, posteriormente concluída no BAL de DOC-B.
 
 #### Fichas e Andamentos — critérios originais
 
@@ -233,6 +351,26 @@ as menções, referências e destaques novos de DOC-C.
 - **Todas as relações entre telas terem sentido e acesso correto** — Em
   execução · ≈60%. Falta: Conferir todas as 171 relações, incluindo variantes de
   balanço e cancelamento. Responsável: Codex.
+
+#### 07 — Dados e histórico dos PDFs
+
+**Estado: concluído localmente · 100%. Responsável: Codex.**
+
+**Escopo encerrado:** Conteúdo técnico e histórico já qualificados de REQ, COM,
+ENT e BAL, incluindo legado, parcelas, regularização, datas e autores.
+
+**Pontos encerrados:**
+
+- 07.1 Fatos, autoria e datas.
+- 07.2 REQ nova e histórica.
+- 07.3 Compra, doação e parcelas.
+- 07.4 ENT e regularização.
+- 07.5 BAL e reconto.
+- 07.6 Conteúdo extenso, versões e exemplares preservados.
+
+A geração anterior preserva fatos, autores, datas, conteúdo extenso e arquivos
+antigos de REQ, COM, ENT e BAL. A nova aparência e as regras acrescidas
+permanecem separadas nos resultados DOC-A a DOC-D.
 
 #### Conteúdo, geração e histórico dos PDFs — critérios originais
 
@@ -347,7 +485,7 @@ Modelo Integral da aplicação.
 
 ##### DOC-B — Fatos, saldos e atos específicos
 
-**Em execução · ≈50% do acréscimo. Responsável: Codex.**
+**Em execução · ≈75% do acréscimo. Responsável: Codex.**
 
 **Concluído no BAL, no fluxo atual:** parecer por material e aplicação ao
 estoque são atos separados. A aplicação tem confirmação, autoria e momento
@@ -365,12 +503,17 @@ separados da quantidade da última parcela. Movimentos posteriores preservam ess
 saldo; dados antigos indisponíveis e Acesso restrito recebem indicação própria.
 Respostas divergentes permitem consultar novamente, sem movimentar estoque.
 
-**Preparação de entrega/devolução já existente:** no fluxo bilateral, os dois
-sentidos têm nomes próprios; devolução não exige entrega de origem.
-Concordância, expedição e recebimento foram conferidos separadamente. **Falta:**
-concluir as outras telas e a criação cotidiana de devolução autônoma, e
-preservar conteúdo emitido e ciências anteriores em cancelamentos e complementos
-vinculados. O cancelamento terá aviso e pedido de confirmação próprios.
+**Concluído na devolução autônoma, no fluxo atual:** há uma entrada cotidiana
+própria para equipe → família, sem exigir uma entrega de origem. Os dois sentidos
+mantêm seus nomes e a preparação bilateral continua disponível. Declaração,
+concordância, expedição e recebimento são separados; concordar não movimenta
+estoque. O recebimento credita somente o que foi aceito e mantém a diferença
+pendente. A ficha e o PDF identificam a devolução, seus responsáveis e a ausência
+de origem vinculada. Exemplares anteriores ficam preservados.
+
+**Falta em DOC-B:** preservar conteúdo emitido e ciências anteriores em
+cancelamentos e complementos vinculados. O cancelamento terá aviso e pedido de
+confirmação próprios.
 
 ##### DOC-C — Modalidades, Andamentos e consulta
 
@@ -402,14 +545,75 @@ testes com pessoas continuam separados das implementações de Codex.
 
 **Critérios deste grupo: 10 concluídos localmente; 1 parcial.**
 
+**Etapas relacionadas:** 05; 19.
+
 Os dez grupos de listas foram conferidos, incluindo registros antigos e
-históricos extensos. Seu detalhamento está no histórico da etapa 05, na seção 5.
-A conferência conjunta entre sessões permanece na etapa 19.
+históricos extensos. Estão detalhados abaixo, na etapa 05. A conferência
+conjunta entre sessões permanece na etapa 19.
 
 As verificações locais de agenda, Andamentos, foco do editor e recebimento
 passaram. A seleção intermitente da aba de recebimento continua sujeita à
 contraprova na validação automática da versão publicada, sob responsabilidade de
 Codex.
+
+#### 05 — Busca, filtros, listas e históricos completos
+
+**Estado: concluído localmente · 100%. Responsável: Codex.**
+
+**Escopo encerrado:** os dez grupos de consulta abaixo.
+
+**Pontos encerrados:**
+
+1. **05.1 — Estoques e movimentos.** Foram conferidos os materiais e o
+   histórico com mais de 100 movimentos, páginas completas, ordem, filtros,
+   falha, vazio e resposta antiga, sem alteração do estoque. Reaproveitadas as
+   verificações anteriores válidas.
+2. **05.2 — Fichas e requisições.** Conferidas mais de 100 requisições, todas
+   as páginas e a pendência mais antiga. Resposta incompleta não aparece como
+   lista vazia; falhas conservam a leitura anterior identificada. Filtros, foco,
+   recarga e Voltar foram conferidos, sem registrar ciência ou movimentar
+   estoque.
+3. **05.3 — Compras e parcelas.** Conferidas 101 compras e 101 parcelas, com
+   todas as páginas e busca da mais antiga. As parcelas têm busca e filtro por
+   situação, sem mudar sua identificação ao filtrar. Falha de consulta conserva
+   os campos e não repete crédito de estoque. São filtros simples, sem novo
+   rascunho.
+4. **05.4 — Entregas e transferências.** Todas as páginas permitem alcançar as
+   tarefas pessoais e o histórico autorizado, incluindo devoluções. Uma consulta
+   incompleta recebe erro recuperável; trocar filtros não mostra a seleção
+   anterior como atual. Consultar não confirma recebimento nem altera estoque.
+5. **05.5 — Consumo.** Todas as páginas permitem alcançar relatos antigos, com
+   busca no texto original, filtros e retorno pelo navegador. Consulta com falha
+   não inventa vazio. Uma página atrasada não entra em outra seleção; perda de
+   acesso retira o conteúdo daquela custódia. Consultar não confirma nem
+   desconta.
+6. **05.6 — Agenda.** O mês completo e os filtros foram conferidos com mais de
+   100 plantões. Um plantão iniciado antes do período continua visível quando
+   ainda o alcança, sem duplicação. Falha identifica a consulta anterior e
+   suspende alterações; perda de acesso retira os dados. O histórico completo de
+   mudanças foi concluído no ponto 05.10.
+7. **05.7 — Catálogo e contas.** O catálogo completo e as contas globais
+   alcançam registros além do limite antigo de 1.000 linhas. Foram conferidos
+   busca, todas as páginas dos resultados tardios e preservação dos registros.
+   Uma falha não inventa vazio e a perda de acesso retira o conteúdo. A tabela
+   estreita foi conferida na etapa 06; os outros ajustes do editor global
+   continuam na etapa 14.
+8. **05.8 — Notificações.** Foram conferidos 102 avisos, todas as páginas e o
+   mais antigo. Página e filtro são mantidos ao recarregar e usar Voltar.
+   Consulta com falha não inventa vazio; uma resposta atrasada não troca o
+   filtro atual. Consultar não marca avisos nem registra ciência. Só a marcação
+   escolhida altera o aviso correspondente.
+9. **05.9 — Propostas antigas.** Todas as 101 pendências e 202 propostas do
+   histórico ficaram alcançáveis, incluindo a mais antiga. Busca, foco, recarga
+   e Voltar foram conferidos. Falha mantém apenas a consulta válida da mesma
+   seleção, identificada e com decisões suspensas. Consultar não aprova nem
+   altera configurações.
+10. **05.10 — Auditoria e históricos.** O histórico da agenda permite alcançar
+    todos os registros autorizados, incluindo os anteriores ao limite antigo de
+    100. A visão pessoal fica restrita ao próprio profissional. Auditoria e
+    agenda mantêm campos, filtros, recarga e Voltar. Falhas não inventam
+    vazio; perda de acesso retira o conteúdo. Consultar não altera
+    registros nem estoque.
 
 #### Critérios — Navegação, listas e mensagens
 
@@ -439,6 +643,8 @@ Codex.
 ### 3.5 Administração, permissões, entrada e orientação
 
 **Critérios deste grupo: 9 concluídos localmente; 3 parciais.**
+
+**Etapas relacionadas:** 02; 14; 16.
 
 A lentidão demonstrada na consulta de contexto foi corrigida: nos ensaios locais
 com milhares de pacientes fictícios, a consulta passou a responder em menos de
@@ -492,6 +698,8 @@ necessária e os campos comuns desses grupos. Responsável: Codex.
 
 **Critérios deste grupo: 0 concluídos localmente; 9 parciais.**
 
+**Etapas relacionadas:** 11 a 13; 20.
+
 #### Instalação e uso sem conexão — critérios originais
 
 - **Indicar conexão e atualização dos dados sem enviar ações antigas** — Em
@@ -529,6 +737,8 @@ necessária e os campos comuns desses grupos. Responsável: Codex.
 
 **Critérios deste grupo: 0 concluídos localmente; 7 parciais.**
 
+**Etapas relacionadas:** 17; 18; 20.
+
 #### Backup e recuperação — critérios originais
 
 - **Copiar banco e arquivos de forma protegida e conferível** — Em execução ·
@@ -560,6 +770,8 @@ necessária e os campos comuns desses grupos. Responsável: Codex.
 
 **Critérios deste grupo: 1 concluído localmente; 3 parciais.**
 
+**Etapas relacionadas:** 19; 20.
+
 #### Banco e sincronização do Preview — critérios originais
 
 - **Aplicar atualizações pendentes da fase D-A no banco remoto** — Concluído ·
@@ -582,6 +794,8 @@ necessária e os campos comuns desses grupos. Responsável: Codex.
 
 **Critérios deste grupo: 0 concluídos localmente; 4 parciais.**
 
+**Etapas relacionadas:** 06; 15; 20.
+
 **Estimativa global da aplicação: 85%.** Inclui telas, estados e funções; não
 significa que 85% das telas estejam individualmente aprovadas. As 46 composições
 da etapa 06 foram fechadas localmente. Restam outras 20 e a conferência completa
@@ -591,6 +805,45 @@ O alvo é uma aparência única do Modelo Integral, incluindo recursos ausentes 
 HTML de referência. A dependência Fluent foi removida e a base compartilhada e
 as fichas em abas foram implementadas. Isso não conclui toda a migração. Os PDFs
 têm sua referência própria e estão no grupo 3.3.
+
+#### 06 — Aparência completa das áreas de operação
+
+**Estado: concluído localmente · 100%. Responsável: Codex.**
+
+**Escopo encerrado:** as 46 composições originais de operação diária e sua
+conferência conjunta local.
+
+**Pontos encerrados:**
+
+- **06.1 — Requisição e compra.** As nove composições de requisição e compra:
+  seleção, revisão, consulta, ciência, lista frequente, aquisição, parcelas e
+  encerramento da expectativa, com funções e dados preservados.
+
+- **06.2 — Entregas e transferências.** As sete composições foram conferidas:
+  preparação, revisão, caixa de tarefas, materiais, recebimento pessoal,
+  cancelamento, apuração e fatos da transferência, sem confundir declaração com
+  entrega realizada.
+
+- **06.3 — Balanços e agenda.** As nove composições foram conferidas, com
+  contagem e referência separadas, pareceres com autoria própria, reconto,
+  adiamento, horários e comparação das alterações. A separação adicional entre
+  parecer e alteração de estoque foi concluída posteriormente no BAL de DOC-B.
+
+- **06.4 — Estoque, catálogo e consumo.** As 12 composições mantêm saldos,
+  quantidades em trânsito, histórico, correção familiar, origem autorizada,
+  nomes alternativos, precisão, embalagens, sucessores, relatos, complementos e
+  decisões. Os registros preservam os fatos antigos e identificam o cadastro
+  atual.
+
+- **06.5 — Arquivos, resumos e seções documentais.** As nove composições
+  preservam versões, exemplares, anexos, consultas, recuperação e comparações. O
+  novo diálogo de abandono tem retorno seguro; as novas regras de retomada
+  simples continuam no complemento DOC-C.
+
+- **06.6 — Conferência conjunta local.** Incluiu larguras, textos longos,
+  teclado, foco e formas de leitura. O grupo mantém suas 46 composições
+  originais. Ampliação nativa, leitor de tela e aparelho real continuam nos
+  testes finais com participantes; a fase ainda não está liberada.
 
 #### Critérios originais da aparência
 
@@ -709,236 +962,49 @@ autorização. O ensaio operacional completo depende também dos responsáveis
 reais. Contratação ICP-Brasil não bloqueia a assinatura interna da D-B.
 Integrações externas ainda não autorizadas permanecem desligadas.
 
-## 5. Histórico das entregas encerradas
+## 5. Histórico consolidado das entregas
 
-Este histórico registra o que já foi entregue; não é outra fila de execução.
-Todas as etapas abaixo estão em **100% do escopo local indicado**, sob
-responsabilidade de Codex. A revisão conjunta final continua na etapa 19.
+Este é um registro de marcos, sem outra fila de execução. As etapas 01 a 07
+estão em **100% do escopo local indicado**, sob responsabilidade de Codex.
+Seus pontos completos estão nos grupos funcionais indicados abaixo. A revisão
+conjunta final continua na etapa 19.
 
-| Etapa | Entrega encerrada |
-| --- | --- |
-| 01 | Rascunhos das fichas e atos operacionais |
-| 02 | Catálogo e administração diária |
-| 03 | Leitura confiável do estoque e revisão do BAL |
-| 04 | Estados, próximas providências e vínculos das fichas |
-| 05 | Busca, filtros, listas e históricos completos |
-| 06 | Aparência das 46 composições de operação e conferência conjunta |
-| 07 | Dados e histórico dos PDFs no escopo anterior |
+| Etapa | Entrega encerrada | Detalhamento funcional |
+| --- | --- | --- |
+| 01 | Rascunhos das fichas e atos operacionais | 3.1 |
+| 02 | Catálogo e administração diária | 3.2 |
+| 03 | Leitura confiável do estoque e revisão do BAL | 3.2 |
+| 04 | Estados, próximas providências e vínculos | 3.3; consumo em 3.2 |
+| 05 | Busca, filtros, listas e históricos completos | 3.4 |
+| 06 | Aparência das 46 composições de operação | 3.9 |
+| 07 | Dados e histórico dos PDFs no escopo anterior | 3.3 |
 
-As datas individuais dos fechamentos anteriores não foram reconstruídas. Em
-11/11/2026, o complemento documental foi incorporado. O fechamento de 06.6
-consolidou a etapa 06 com 47 cenários distintos qualificados. Foco, links e
-rolagem identificados nesse lote foram corrigidos. A troca das classes de quebra
-de texto também está concluída.
+As datas individuais dos fechamentos anteriores não foram reconstruídas.
+O fechamento de 06.6 consolidou a etapa 06 com 47 cenários distintos
+qualificados. Foco, links e rolagem identificados nesse lote foram corrigidos.
+A troca das classes de quebra de texto também está concluída.
 
-Depois, o núcleo do parecer/aplicação do BAL foi encerrado e, na entrega mais
-recente do BAL, seus vínculos posteriores também. Depois foi concluído o saldo
-histórico por material da COM, na ficha e no PDF. Essas entregas pertencem a
-DOC-B, que continua parcial. Novos formulários seguem na etapa 14 e a retomada
-simples segue em
-DOC-C; esses acréscimos não reabrem silenciosamente as etapas anteriores.
+**Acréscimo de 11/11/2026:** o complemento documental foi incorporado como
+DOC-A, DOC-B, DOC-C e DOC-D. Preserva o que já havia sido entregue nas etapas
+anteriores. Sua situação e todas as regras estão reunidas no grupo 3.3.
 
-Os pontos abaixo conservam o conteúdo de cada fechamento. Novas regras e
-pendências estão identificadas no grupo funcional correspondente e na seção 6.
+**Marcos seguintes do complemento, na ordem registrada:**
 
-### 01 — Rascunhos das fichas e atos operacionais
+| Marco | Resultado | Estado |
+| --- | --- | --- |
+| DOC-B.1 — núcleo BAL | Parecer separado da aplicação | Concluído local |
+| DOC-B.1 — vínculos | Atos posteriores na ficha e no PDF | Concluído local |
+| DOC-B.2 — COM | Saldo por material na ficha e no PDF | Concluído local |
+| DOC-B.3 — devolução | Percurso autônomo cotidiano | Concluído local |
 
-**Escopo encerrado:** REQ, COM, ENT, BAL, transferências, movimentação familiar,
-consumo, revisões de fluxo, agenda e Andamentos.
+DOC-B continua parcial. Novos formulários seguem na etapa 14 e a retomada
+simples segue em DOC-C. Esses acréscimos não reabrem silenciosamente etapas
+anteriores. A etapa 07 continua encerrada somente em seu escopo anterior.
 
-**Pontos encerrados:**
-
-- 01.1 Criação e revisão das fichas.
-- 01.2 Decisões REQ/COM/ENT/BAL.
-- 01.3 Transferências e movimentação familiar.
-- 01.4 Relatos e decisões de consumo.
-- 01.5 Revisões de fluxo.
-- 01.6 Agenda e decisões de plantões.
-- 01.7 Andamentos privados.
-
-### 02 — Catálogo e administração diária
-
-**Escopo encerrado:** Itens, adoção, unidades, precisão, apresentações,
-sucessores, alertas, destinatários, vínculos e seus comprovantes.
-
-**Pontos encerrados:**
-
-- 02.1 Criar, editar e adotar materiais.
-- 02.2 Unidades e precisão.
-- 02.3 Apresentações.
-- 02.4 Situação e sucessores.
-- 02.5 Alertas de estoque.
-- 02.6 Destinatários.
-- 02.7 Vínculos e revogação.
-- 02.8 Consulta dos comprovantes próprios.
-
-### 03 — Leitura confiável do estoque e revisão do BAL
-
-**Escopo encerrado:** Saldos, trânsito, histórico de movimentos e referência da
-contagem BAL.
-
-**Pontos encerrados:**
-
-- 03.1 Saldos e trânsito válidos ou erro compreensível.
-- 03.2 Histórico, página e filtro correspondentes.
-- 03.3 Revisão BAL com valores e campos preservados.
-- 03.4 Chave estável das colunas e aviso do editor corrigido.
-
-### 04 — Estados, próximas providências e vínculos das fichas
-
-**Escopo encerrado:** estados, próximas providências e vínculos das fichas. As
-novas regras permanecem identificadas em DOC-A a DOC-D.
-
-**Pontos encerrados:**
-
-- **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.** A
-  orientação abre a seção correta; vínculos, falhas de consulta e registros
-  encerrados foram conferidos. O novo aviso e pedido de confirmação do
-  cancelamento pertencem ao complemento DOC-B/DOC-C e ainda precisam de
-  execução.
-- **04.2 — Compra e doação — aquisição, parcelas, chegada e encerramento.**
-  Preparação e aprovação pendente não aparecem como conclusão. A orientação
-  distingue aquisição, chegada, conferência e encerramento; parcelas rejeitadas
-  continuam no histórico. Recuperação, doação, permissões e ausência de entrada
-  duplicada foram conferidas. Os novos PDFs e regras do complemento continuam
-  nos blocos DOC-A a DOC-D.
-- **04.3 — Entrega — conferência, divergência, devolução e regularização.**
-  Encerrar a conferência com uma diferença não aparece como recebimento
-  integral. Cancelamento, divergência, regularização e material ainda
-  desconhecido têm orientações distintas. Quantidades aceitas, autoria, vínculos
-  e recuperação foram conferidos. A nova devolução autônoma e os novos atos do
-  complemento continuam no bloco DOC-B.
-
-- **04.4 — Transferências — origem, destino, aceite e encerramento.** A
-  preparação bilateral identifica entrega e devolução, aceita vínculo de origem
-  opcional e separa declaração, concordância, expedição e recebimento. Recusa e
-  retirada não movimentam materiais. Recuperação, conflitos e autorias foram
-  conferidos. As demais telas e os novos arquivos de devolução continuam em
-  DOC-B/DOC-D.
-- **04.5 — Consumo — relato, complemento, decisão e origem do desconto.** Uma
-  leitura antiga não apaga complemento nem reabre uma confirmação. Durante
-  atualização ou falha, a leitura anterior fica identificada e novas operações
-  aguardam consulta válida. Origem do desconto, falta/rejeição sem baixa,
-  original preservado e recuperação após perda de resposta ou permissão foram
-  conferidos.
-- **04.6 — BAL — agendado, sem regime, revisão, reconto e contagens.** A
-  orientação distingue revisão, mudança de referência, efeito registrado,
-  reconto e falta de contador. Outra atribuição ativa não cria uma pendência
-  nesta ficha. Recuperação, autoria, contagem anterior e ausência de desconto
-  repetido foram conferidas. Esse escopo anterior não incluía a nova separação
-  entre parecer e estoque, posteriormente concluída no BAL de DOC-B.
-
-### 05 — Busca, filtros, listas e históricos completos
-
-**Escopo encerrado:** os dez grupos de consulta abaixo.
-
-**Pontos encerrados:**
-
-1. **05.1 — Estoques e movimentos.** Foram conferidos os materiais e o
-   histórico com mais de 100 movimentos, páginas completas, ordem, filtros,
-   falha, vazio e resposta antiga, sem alteração do estoque. Reaproveitadas as
-   verificações anteriores válidas.
-2. **05.2 — Fichas e requisições.** Conferidas mais de 100 requisições, todas
-   as páginas e a pendência mais antiga. Resposta incompleta não aparece como
-   lista vazia; falhas conservam a leitura anterior identificada. Filtros, foco,
-   recarga e Voltar foram conferidos, sem registrar ciência ou movimentar
-   estoque.
-3. **05.3 — Compras e parcelas.** Conferidas 101 compras e 101 parcelas, com
-   todas as páginas e busca da mais antiga. As parcelas têm busca e filtro por
-   situação, sem mudar sua identificação ao filtrar. Falha de consulta conserva
-   os campos e não repete crédito de estoque. São filtros simples, sem novo
-   rascunho.
-4. **05.4 — Entregas e transferências.** Todas as páginas permitem alcançar as
-   tarefas pessoais e o histórico autorizado, incluindo devoluções. Uma consulta
-   incompleta recebe erro recuperável; trocar filtros não mostra a seleção
-   anterior como atual. Consultar não confirma recebimento nem altera estoque.
-5. **05.5 — Consumo.** Todas as páginas permitem alcançar relatos antigos, com
-   busca no texto original, filtros e retorno pelo navegador. Consulta com falha
-   não inventa vazio. Uma página atrasada não entra em outra seleção; perda de
-   acesso retira o conteúdo daquela custódia. Consultar não confirma nem
-   desconta.
-6. **05.6 — Agenda.** O mês completo e os filtros foram conferidos com mais de
-   100 plantões. Um plantão iniciado antes do período continua visível quando
-   ainda o alcança, sem duplicação. Falha identifica a consulta anterior e
-   suspende alterações; perda de acesso retira os dados. O histórico completo de
-   mudanças foi concluído no ponto 05.10.
-7. **05.7 — Catálogo e contas.** O catálogo completo e as contas globais
-   alcançam registros além do limite antigo de 1.000 linhas. Foram conferidos
-   busca, todas as páginas dos resultados tardios e preservação dos registros.
-   Uma falha não inventa vazio e a perda de acesso retira o conteúdo. A tabela
-   estreita foi conferida na etapa 06; os outros ajustes do editor global
-   continuam na etapa 14.
-8. **05.8 — Notificações.** Foram conferidos 102 avisos, todas as páginas e o
-   mais antigo. Página e filtro são mantidos ao recarregar e usar Voltar.
-   Consulta com falha não inventa vazio; uma resposta atrasada não troca o
-   filtro atual. Consultar não marca avisos nem registra ciência. Só a marcação
-   escolhida altera o aviso correspondente.
-9. **05.9 — Propostas antigas.** Todas as 101 pendências e 202 propostas do
-   histórico ficaram alcançáveis, incluindo a mais antiga. Busca, foco, recarga
-   e Voltar foram conferidos. Falha mantém apenas a consulta válida da mesma
-   seleção, identificada e com decisões suspensas. Consultar não aprova nem
-   altera configurações.
-10. **05.10 — Auditoria e históricos.** O histórico da agenda permite alcançar
-    todos os registros autorizados, incluindo os anteriores ao limite antigo de
-    100. A visão pessoal fica restrita ao próprio profissional. Auditoria e
-         agenda mantêm campos, filtros, recarga e Voltar. Falhas não inventam
-         vazio; perda de acesso retira o conteúdo. Consultar não altera
-         registros nem estoque.
-
-### 06 — Aparência completa das áreas de operação
-
-**Escopo encerrado:** as 46 composições originais de operação diária e sua
-conferência conjunta local.
-
-**Pontos encerrados:**
-
-- **06.1 — Requisição e compra.** As nove composições de requisição e compra:
-  seleção, revisão, consulta, ciência, lista frequente, aquisição, parcelas e
-  encerramento da expectativa, com funções e dados preservados.
-
-- **06.2 — Entregas e transferências.** As sete composições foram conferidas:
-  preparação, revisão, caixa de tarefas, materiais, recebimento pessoal,
-  cancelamento, apuração e fatos da transferência, sem confundir declaração com
-  entrega realizada.
-
-- **06.3 — Balanços e agenda.** As nove composições foram conferidas, com
-  contagem e referência separadas, pareceres com autoria própria, reconto,
-  adiamento, horários e comparação das alterações. A separação adicional entre
-  parecer e alteração de estoque foi concluída posteriormente no BAL de DOC-B.
-
-- **06.4 — Estoque, catálogo e consumo.** As 12 composições mantêm saldos,
-  quantidades em trânsito, histórico, correção familiar, origem autorizada,
-  nomes alternativos, precisão, embalagens, sucessores, relatos, complementos e
-  decisões. Os registros preservam os fatos antigos e identificam o cadastro
-  atual.
-
-- **06.5 — Arquivos, resumos e seções documentais.** As nove composições
-  preservam versões, exemplares, anexos, consultas, recuperação e comparações. O
-  novo diálogo de abandono tem retorno seguro; as novas regras de retomada
-  simples continuam no complemento DOC-C.
-
-- **06.6 — Conferência conjunta local.** Incluiu larguras, textos longos,
-  teclado, foco e formas de leitura. O grupo mantém suas 46 composições
-  originais. Ampliação nativa, leitor de tela e aparelho real continuam nos
-  testes finais com participantes; a fase ainda não está liberada.
-
-### 07 — Dados e histórico dos PDFs
-
-**Escopo encerrado:** Conteúdo técnico e histórico já qualificados de REQ, COM,
-ENT e BAL, incluindo legado, parcelas, regularização, datas e autores.
-
-**Pontos encerrados:**
-
-- 07.1 Fatos, autoria e datas.
-- 07.2 REQ nova e histórica.
-- 07.3 Compra, doação e parcelas.
-- 07.4 ENT e regularização.
-- 07.5 BAL e reconto.
-- 07.6 Conteúdo extenso, versões e exemplares preservados.
-
-A geração anterior preserva fatos, autores, datas, conteúdo extenso e arquivos
-antigos de REQ, COM, ENT e BAL. A nova aparência e as regras acrescidas
-permanecem separadas nos resultados DOC-A a DOC-D.
+**Revisão deste acompanhamento em 11/11/2026:** os detalhes das etapas 01 a 07
+foram reunidos nos grupos funcionais; o histórico passou a conservar os marcos e
+sua localização. A sequência do restante ficou concentrada na seção 6. Os 105
+critérios, seus estados e percentuais foram preservados.
 
 ## 6. Sequência única do trabalho restante
 
@@ -947,10 +1013,33 @@ nos blocos 07/09/10 e em suas dependências diretas. Mantêm-se as 20 etapas, os
 105 critérios, as 66 composições e as 171 relações; DOC-A a DOC-D são os
 acréscimos identificados, sem substituir os resultados anteriores.
 
-**Ordem:** terminar DOC-B; executar DOC-A, DOC-C e DOC-D; depois concluir as
-etapas 08 a 19, na ordem numérica abaixo. A etapa 20 reúne atividades externas
-que podem ser preparadas quando independentes e autorizadas. O trabalho já
-encerrado das etapas 01 a 07 está somente no histórico da seção 5.
+Esta é a ordem atual. As etapas 01 a 07 já encerradas estão resumidas no
+histórico da seção 5 e detalhadas por função na seção 3. A etapa 20 reúne
+atividades externas que podem ser preparadas quando independentes e
+autorizadas.
+
+| Ordem atual | Etapa ou resultado | Situação registrada |
+| --- | --- | --- |
+| 1 — agora | DOC-B: concluir o ponto DOC-B.4 | Em execução · ≈75% |
+| 2 | DOC-A: aparência dos documentos | A iniciar · 0% |
+| 3 | DOC-C: modalidades, Andamentos e consulta | A iniciar · 0% |
+| 4 | DOC-D: geração integrada e exemplos | A iniciar · 0% |
+| 5 | 08 — Assinatura e ciclo das chaves | Em execução · 80% |
+| 6 | 09 — Emissão e recuperação de PDFs | Em execução · 85% |
+| 7 | 10 — Verificação por QR, código e arquivo | Em execução · 85% |
+| 8 | 11 — Aplicativo, atualização e offline | Em execução · 80% |
+| 9 | 12 — Notificações internas e Push | Em execução · 80% |
+| 10 | 13 — Lembretes e retorno após parada | Em execução · 75% |
+| 11 | 14 — Retomada dos formulários restantes | A iniciar neste escopo · 0% |
+| 12 | 15 — Demais áreas visuais e relações | Em execução · 50% |
+| 13 | 16 — Entrada, guias e primeira residência | Em execução · 70% |
+| 14 | 17 — Monitoramento e suporte | Em execução · 85% |
+| 15 | 18 — Backup e recuperação | Em execução · 75% |
+| 16 | 19 — Validação final, banco e encerramento | Em execução · 50% |
+| Externa | 20 — Participação e gates D-C/D6 | Pendente externo · 0% |
+
+Os percentuais acima pertencem aos escopos já definidos. A numeração da coluna
+Ordem indica a prioridade atual; a identificação da etapa permanece estável.
 
 Cada bloco abaixo tem pontos definidos de entrega. Em uma etapa parcial, a lista
 não significa que todos os pontos estejam sem início, nem que cada ponto esteja
@@ -958,23 +1047,18 @@ concluído. Só há conclusão individual quando ela está expressamente registr
 Não foram criados percentuais para subtarefas que ainda não tinham estimativa
 própria.
 
-### Primeiro — DOC-B: fatos, saldos e atos específicos
+### DOC-B — prioridade atual: fatos, saldos e atos específicos
 
-**Em execução · ≈50% do acréscimo. Responsável: Codex.** Grupo funcional: 3.3 —
+**Em execução · ≈75% do acréscimo. Responsável: Codex.** Grupo funcional: 3.3 —
 complemento de fichas e PDFs.
 
-1. **DOC-B.1 — BAL: concluído localmente no fluxo atual.** Parecer por
-   material, aplicação separada, recuperação, saldo histórico e vínculos
-   posteriores na ficha e no PDF. A aparência nova continua em DOC-A.
-2. **DOC-B.2 — COM: concluído localmente no fluxo atual.** Saldo autorizado
-   por material na ficha e no PDF, com última entrada validada, parcela, data e
-   responsável próprios. Quantidade da parcela e total validado continuam
-   distintos; a nova aparência documental permanece em DOC-A.
-3. **DOC-B.3 — Devolução autônoma: próximo ponto.** Concluir criação cotidiana e
-   demais telas do percurso equipe para família, sem exigir entrega de origem.
-   Preservar os atos distintos de concordância, expedição e recebimento já
-   existentes na preparação bilateral.
-4. **DOC-B.4 — Cancelamento e complemento: restante.** Preservar a ficha
+1. **DOC-B.1 — BAL: concluído localmente no fluxo atual.** Resultado completo
+   no grupo 3.3.
+2. **DOC-B.2 — COM: concluído localmente no fluxo atual.** Resultado completo
+   no grupo 3.3.
+3. **DOC-B.3 — Devolução autônoma: concluído localmente no fluxo atual.**
+   Resultado completo no grupo 3.3.
+4. **DOC-B.4 — Cancelamento e complemento: próximo ponto.** Preservar a ficha
    emitida e as ciências anteriores; complementar por nova ficha vinculada. O
    cancelamento terá aviso e pedido de confirmação próprios.
 
@@ -982,7 +1066,7 @@ complemento de fichas e PDFs.
 fatos preservados na ficha e no PDF, respeitando as permissões. Não basta a
 preparação isolada de uma parte do percurso.
 
-### Depois — DOC-A: aparência dos documentos
+### DOC-A — aparência dos documentos
 
 **A iniciar · 0% do acréscimo. Responsável: Codex.** Grupo funcional: 3.3 —
 complemento de fichas e PDFs.
@@ -999,7 +1083,7 @@ Pontos de entrega:
 **Condição para fechar:** os tipos de ficha usam a aparência aprovada com todo o
 conteúdo preservado. As regras visuais completas estão no grupo 3.3.
 
-### Depois — DOC-C: modalidades, Andamentos e consulta
+### DOC-C — modalidades, Andamentos e consulta
 
 **A iniciar · 0% do acréscimo. Responsável: Codex.** Grupo funcional: 3.3 —
 complemento; dependência de rascunhos no grupo 3.1.
@@ -1016,7 +1100,7 @@ Pontos de entrega:
 arquivos correspondentes, mantendo cronologia, autoria, acesso e recuperação
 própria das confirmações incertas.
 
-### Depois — DOC-D: geração integrada e exemplos reais
+### DOC-D — geração integrada e exemplos reais
 
 **A iniciar · 0% do acréscimo. Responsável: Codex; você avalia as amostras.**
 Grupo funcional: 3.3 — complemento de fichas e PDFs.

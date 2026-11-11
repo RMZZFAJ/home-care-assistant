@@ -3,7 +3,34 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — DOC-B_COM
+## Estado atual — DOC-B_RETURN
+
+Local e remoto com218 versões, sem pendências. A migration20261111222925
+acrescenta a reserva V14 e permite a nova revisão nas fontes e fatos documentais.
+ENT nova usa14; COM13, BAL12 e REQ10 permanecem. Intenções e exemplares anteriores
+mantêm revisão, identidade e fonte. Sem tabela nova, alterações de estoque,
+políticas, dados de Auth ou migrations históricas.
+
+O preflight confirmou217 versões como prefixo exato e comparou as três funções
+de origem com o local. Dry-run isolou somente a migration218. Preparo local sem
+reset, Auth real, oráculo PDF e três perfis de navegador precederam a aplicação
+linked/skip-vault. Depois,218 versões, definições e grants coincidem exatamente
+com o local e o dry-run está vazio. V14 SECURITY DEFINER mantém search_path
+vazio e somente authenticated pode executar; anon/service sem EXECUTE.
+As84 migrations protegidas continuam inalteradas. Sem reset, fixtures/Auth
+remotos, produção, transporte externo ou backup redundante do banco descartável.
+
+Advisors de segurança:64 INFO sem política, extensão1 WARN, definer anon3 WARN,
+definer authenticated213 WARN e senhas1 WARN. O acréscimo é a reserva V14
+pessoal(+1), com autorização, revogação e negativas locais conferidas. A regra
+sobre [funções definidoras autenticadas](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable)
+continua registrada; os alertas antigos não recebem aprovação genérica.
+Performance:124 FKs sem índice INFO,11 initplan WARN e64 índices sem uso INFO;
+esta migration não acrescenta tabela, FK, política ou índice. Instalação limpa,
+evolução legada e integração completa permanecem na CI do SHA publicado.
+[Resultados e limites](AUTONOMOUS_RETURNS.md).
+
+## DOC-B_COM — registro histórico
 
 Local e remoto com217 versões, sem pendências. As migrations20261111210737 e
 20261111212303 acrescentam captura privada imutável do saldo FAMILY na transição

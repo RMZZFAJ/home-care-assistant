@@ -25,7 +25,8 @@ const groups: { label: string; items: Item[] }[] = [
   { label: "Fichas", items: [
     { label: "REQ · Requisição", href: "/fichas/req", icon: "forms", capability: "req.create" },
     { label: "COM · Compra da família", href: "/fichas/com", icon: "stock", capability: "com.create" },
-    { label: "ENT · Entrega / Entrada", href: "/fichas/ent", icon: "truck", capability: "ent.create" },
+    { label: "ENT · Entrega de materiais", href: "/fichas/ent", icon: "truck", capability: "ent.create" },
+    { label: "Devolução de materiais", href: "/fichas/devolucao", icon: "truck", capability: "ent.create" },
     { label: "BAL · Balanços e plantões", href: "/balancos", icon: "forms", capability: "bal.read" },
     { label: "Entregas e recebimentos", href: "/entregas", icon: "truck", capability: "ent.read" },
   ] },
@@ -59,7 +60,7 @@ export function WorkspaceNavigation({ context, operational = false, onNavigate }
   };
   const filtered = (items: Item[]) => items.filter((item) => (!item.capability || context && can(context, item.capability)) && (!item.capabilities || context && item.capabilities.some(capability => can(context, capability))));
   const sections = operational ? [{ label: "Seu plantão", items: filtered(operationalDestinations) },
-    { label: "Ações rápidas", items: filtered(groups.flatMap((group) => group.items).filter((item) => ["/fichas/req", "/balancos", "/consumo", "/escalas"].includes(item.href))) },
+    { label: "Ações rápidas", items: filtered(groups.flatMap((group) => group.items).filter((item) => ["/fichas/req", "/fichas/devolucao", "/balancos", "/consumo", "/escalas"].includes(item.href))) },
     { label: "Gestão autorizada", items: filtered(groups.find((group) => group.label === "Gestão do paciente")!.items) }] : groups.map((group) => ({ ...group, items: filtered(group.items) }));
   if (context?.activeContext?.mode === "global" && context.globalAdministrationAllowed) sections.push({ label: "Administração global", items: [
     { label: "Pacientes", href: "/admin?section=patient", icon: "team" },

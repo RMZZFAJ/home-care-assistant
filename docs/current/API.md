@@ -25,8 +25,9 @@ recupera a mesma intenção; mudança de seletor documental conflita. Cada nova
 chave explícita cria outra emissão, sem alterar documento, SCI ou estoque.
 Resposta200 exige ready;202 representa processamento ainda não concluído.
 
-A reserva atual usa reserve_pdf_issuance_v13: COM nova recebe revisão13, BAL
-recebe12 e REQ/ENT recebem10. Além da fonte canônica preservada,
+A reserva atual usa reserve_pdf_issuance_v14: ENT nova recebe revisão14, COM
+recebe13, BAL12 e REQ10. Intenções anteriores mantêm revisão, fonte e identidade.
+Além da fonte canônica preservada,
 balanceApplication congela
 o ato correspondente à contagem e ao corte de versão escolhidos. not_applied,
 unavailable e applied com linhas known/restricted são distintos; quantidade
@@ -51,6 +52,15 @@ stock.family.read impede obter emissão antiga com linha known, inclusive pelas
 entradas anteriores de recuperação. Outra emissão pode congelar o mascaramento;
 ganho posterior de acesso não altera os bytes ou a fonte já preservados.
 [Implementação e limites](../audits/D/D-B/PURCHASE_ENTRY_BALANCES.md).
+
+Na ENT V14, natureza e percurso vêm da origem/destino congelados. A declaração
+bilateral precisa concordar com esse par; contradição é recusada. Entrega segue
+FAMILY→CARE_TEAM; devolução segue CARE_TEAM→FAMILY, com origem documental
+opcional e sem desfazer outra entrada. Ausência histórica do percurso fica
+explícita. V10 conserva seu título original e os exemplares já emitidos não
+mudam. A entrada autenticada /fichas/devolucao reaproveita os comandos e a
+recuperação existentes; não confere autoridade por selecionar uma rota.
+[Implementação e limites](../audits/D/D-B/AUTONOMOUS_RETURNS.md).
 
 A orquestração obtém claim de serviço com lease de cinco minutos e token
 aleatório que nunca vai ao navegador. Composição/oráculo precedem assinatura

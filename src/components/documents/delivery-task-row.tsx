@@ -14,7 +14,7 @@ export function DeliveryTaskRow({ row, fresh }: { row: DeliveryListItem; fresh: 
     <span className="hca-delivery-task-icon"><Icon name="truck" /></span>
     <div className="hca-delivery-task-main">
       <Link href={href} prefetch={false} className="hca-delivery-code">{row.code ?? (row.status === "draft" ? "Rascunho" : "Registro sem expedição")}</Link>
-      <small>ENT · {hasDirection ? materialTransferLabel(facts.source!, facts.destination!) : "Entrega / Entrada"} · {formatBrazilDate(row.created_at)}</small>
+      <small>ENT · {hasDirection ? materialTransferLabel(facts.source!, facts.destination!) : "Movimentação com percurso não preservado"} · {formatBrazilDate(row.created_at)}</small>
       <small>{hasDirection ? `${custody[facts.source!]} → ${custody[facts.destination!]}` : "Percurso não preservado neste registro"}</small>
       <small>Registrado por: {facts.recordedByName ?? "Nome não preservado neste registro"}</small>
       <small>Recebedor designado: {facts.recipientName ?? "Nome não preservado neste registro"}</small>

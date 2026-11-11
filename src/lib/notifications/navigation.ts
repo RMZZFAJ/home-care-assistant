@@ -22,7 +22,7 @@ function notificationDestination(row: NotificationTarget) {
   if(row.document_id){
     const kind=row.operational_documents?.type;
     path=(kind==="REQ"?"/historico/":"/fichas/")+row.document_id;
-    label=kind==="REQ"?"Abrir requisição":kind==="COM"?"Abrir compra ou doação":kind==="ENT"?"Abrir entrega":kind==="BAL"?"Abrir balanço":"Abrir ficha";
+    label=kind==="REQ"?"Abrir requisição":kind==="COM"?"Abrir compra ou doação":kind==="ENT"?"Abrir entrega ou devolução":kind==="BAL"?"Abrir balanço":"Abrir ficha";
   }else if(row.requisition_id){path="/historico/"+row.requisition_id;label="Abrir requisição";}
   else if(row.event_key?.startsWith("schedule.")){path="/escalas";label="Abrir escalas e plantões";}
   else if(row.event_key?.startsWith("bal.cycle.")){path="/balancos";label="Abrir balanços e plantões";}

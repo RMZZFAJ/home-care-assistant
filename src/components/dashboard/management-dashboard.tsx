@@ -12,6 +12,7 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
   return <div className="hca-dashboard">
     <div className="hca-dashboard-intro"><div><h2>O que precisa da sua atenção</h2><p>Decisões e acompanhamento de {context.patient?.display_name}.</p></div><div className="hca-toolbar">
       {can(context, "ent.create") ? <Link href="/fichas/ent" className="ui-button ui-button-primary" prefetch={false}><Icon name="plus" />Nova entrega</Link> : null}
+      {can(context, "ent.create") ? <Link href="/fichas/devolucao" className="ui-button ui-button-secondary" prefetch={false}>Nova devolução de materiais</Link> : null}
       {can(context, "com.create") ? <Link href="/fichas/com" className="ui-button ui-button-secondary" prefetch={false}>Organizar compra</Link> : null}
     </div></div>
     <div className="hca-dashboard-metrics">

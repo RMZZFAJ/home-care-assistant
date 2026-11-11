@@ -37,7 +37,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     ["/fichas", "Central de fichas"],
     ["/fichas/req", "Requisição de insumos"],
     ["/fichas/com", "Compra de insumos"],
-    ["/fichas/ent", "Entrega / Entrada"],
+    ["/fichas/ent", "Entrega e devolução de materiais"],
     ["/fichas/bal", "Balanço de estoque"],
     ["/escalas", "Escalas e plantões"],
     ["/balancos", "Balanços e plantões"],

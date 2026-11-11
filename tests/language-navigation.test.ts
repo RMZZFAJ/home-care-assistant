@@ -44,7 +44,7 @@ describe("notification names describe the resolved destination and retain scope"
   [{document_id:target,operational_documents:{type:"REQ"}},"/historico/"+target,"Abrir requisição"],
   [{requisition_id:target},"/historico/"+target,"Abrir requisição"],
   [{document_id:target,operational_documents:{type:"COM"}},"/fichas/"+target,"Abrir compra ou doação"],
-  [{document_id:target,operational_documents:{type:"ENT"}},"/fichas/"+target,"Abrir entrega"],
+  [{document_id:target,operational_documents:{type:"ENT"}},"/fichas/"+target,"Abrir entrega ou devolução"],
   [{document_id:target,operational_documents:{type:"BAL"}},"/fichas/"+target,"Abrir balanço"],
   [{document_id:target},"/fichas/"+target,"Abrir ficha"],
   [{reminder_id:target,event_key:"schedule.published"},"/escalas","Abrir escalas e plantões"],

@@ -862,6 +862,8 @@ export function SupplyDocumentContent({
                     : "Compra ou doação de insumos"
                 : data.transfer
                   ? materialTransferLabel(data.transfer.declaration.source, data.transfer.declaration.destination)
+                : data.type === "ENT"
+                  ? documentVariant(data.type, data.payload, data.workflow_data)
                 : data.type === "BAL"
                   ? documentVariant(data.type, data.payload, data.workflow_data)
                   : undefined

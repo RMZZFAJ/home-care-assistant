@@ -20,7 +20,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 
 export function DeliveryInbox() {
   return (
-    <Workspace title="Entregas e recebimentos">
+    <Workspace title="Entregas, devoluções e recebimentos">
       {(context) =>
         context.patient && can(context, "ent.read") ? (
           <Inbox key={context.patient.id} context={context} />
@@ -73,6 +73,7 @@ function Inbox({ context }: { context: WorkspaceContext }) {
         recebimento.
       </p>
       {can(context, "ent.create") ? <Link href="/transferencias" className="ui-button ui-button-secondary">Declarar transferência entre custódias</Link> : null}
+      {can(context, "ent.create") ? <Link href="/fichas/devolucao" className="ui-button ui-button-secondary">Nova devolução de materiais</Link> : null}
       <nav className="hca-delivery-views" aria-label="Visões das entregas">
         {presets.map(view => <Link key={view.id} href={deliveryInboxHref(urlParams.toString(), patientId, { scope: view.scope, status: view.status, page: 1 })}
           prefetch={false} aria-current={activeView === view.id ? "page" : undefined}

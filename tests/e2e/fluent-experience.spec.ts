@@ -137,7 +137,7 @@ test("operação móvel oferece cinco destinos e caixa de entregas autorizada", 
   for (const label of ["Início", "Histórico", "Entregas", "Estoque", "Mais"]) await expect(navigation.getByRole("link", { name: label, exact: true })).toBeVisible();
   await capture(page, "inicio-equipe-mobile", info.project.name);
   await navigation.getByRole("link", { name: "Entregas", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Entregas e recebimentos", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entregas, devoluções e recebimentos", exact: true })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Responsável pelas entregas", exact: true })).toHaveValue("own");
   await noOverflow(page);
   const response = await page.request.get(`/api/deliveries?careRecipientId=${patientA}&scope=own&status=pending_receipt`);

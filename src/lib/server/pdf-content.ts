@@ -10,6 +10,7 @@ import {
 import { formatQuantity, quantity } from "../quantity";
 import { documentStatuses } from "@/types/documents";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
+import { materialTransferDirection } from "@/lib/documents/transfer-follow-up";
 import { formatBrazilDate } from "../receipt";
 import {
   pdfSourceFactsSchema,
@@ -82,6 +83,11 @@ export async function composeIssuance(
     }
   }
   let entries: PurchaseEntryBalances | undefined;
+  if (revision >= 14 && snapshot.type === "ENT" && snapshot.transfer
+    && (snapshot.payload.source !== snapshot.transfer.declaration.source
+      || snapshot.payload.destination !== snapshot.transfer.declaration.destination
+      || !materialTransferDirection(snapshot.transfer.declaration.source, snapshot.transfer.declaration.destination)))
+    throw invalid("transfer-direction-source");
   if (revision >= 13 && snapshot.type === "COM") {
     try {
       entries = requirePurchaseEntryBalances(snapshot.purchaseEntryBalances, {
@@ -149,6 +155,12 @@ export async function composeIssuance(
     ]),
   ];
   const semanticFacts: Record<string, string> = {};
+  if (revision >= 14 && snapshot.type === "ENT") {
+    const direction = materialTransferDirection(String(snapshot.payload.source ?? ""), String(snapshot.payload.destination ?? ""));
+    semanticFacts["fidelity/transfer/nature"] = direction === "return" ? "Devolução de materiais" : direction === "delivery" ? "Entrega de materiais" : "Movimentação de materiais · percurso não preservado";
+    semanticFacts["fidelity/transfer/route"] = direction === "return" ? "Equipe para Família" : direction === "delivery" ? "Família para Equipe" : "Percurso não preservado neste registro";
+    if (snapshot.transfer) semanticFacts["fidelity/transfer/origin"] = snapshot.transfer.originDocumentId ? "ENT documental de origem: " + snapshot.transfer.originDocumentId : direction === "return" ? "Sem entrega de origem vinculada a esta devolução." : "Origem documental não informada.";
+  }
   if (entries) for (const fact of entries) {
     const source = snapshot.lines.find(item => item.id === fact.lineId)!;
     const unit = String(source.unit_snapshot ?? "");

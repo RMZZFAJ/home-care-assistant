@@ -1,4 +1,5 @@
 import type { DocumentType } from "@/types/documents";
+import { materialTransferDirection } from "./transfer-follow-up";
 
 /** Describe only the variant preserved by the authoritative document payload. */
 export function documentVariant(type: DocumentType, payload: Record<string, unknown>, workflow?: Record<string, unknown>) {
@@ -12,5 +13,7 @@ export function documentVariant(type: DocumentType, payload: Record<string, unkn
       return workflow?.countVersion === 1 ? "Balanço do estoque da equipe · primeira contagem desta ficha" : "Balanço do estoque da equipe · contagem de plantão";
     return "Balanço do estoque da equipe · contexto de plantão não preservado";
   }
-  return type === "REQ" ? "Requisição de materiais" : "Comprovante de entrega de materiais";
+  if (type === "REQ") return "Requisição de materiais";
+  const direction = materialTransferDirection(String(payload.source ?? ""), String(payload.destination ?? ""));
+  return direction === "return" ? "Devolução de materiais" : direction === "delivery" ? "Entrega de materiais" : "Movimentação de materiais · percurso não preservado";
 }

@@ -1,5 +1,44 @@
 # Checkpoint D-B
 
+DOC-B_RETURN conclui localmente o ponto DOC-B.3: devolução autônoma cotidiana,
+com entrada própria, origem fixa equipe→família e vínculo de entrega opcional.
+A preparação bilateral existente preserva declaração, concordância, expedição e
+recebimento pessoal distintos. Declaração/concordância não movimentam estoque;
+expedição forma trânsito e o recebimento credita somente a quantidade aceita.
+Sem quinto tipo técnico, reescrita de histórico ou concessão de acesso pela UI.
+
+Novas emissões ENT usam V14, com natureza, percurso e origem opcionais explícitos.
+Contradição entre declaração e payload é recusada. Intenções anteriores mantêm
+revisão/fonte; V10 conserva o título original. COM13, BAL12 e REQ10 permanecem.
+A aparência documental nova continua em DOC-A.
+
+Qualificados dois cenários Auth reais,39 testes unitários/PDF do recurso e cinco
+do runner, além de três casos completos nos três perfis de navegador, com
+cinco larguras, axe e teclado. Três páginas controladas e quatro nativas foram
+inspecionadas. A compilação de produção agora precede a prontidão HTTP do
+Playwright: build novo obrigatório, limites inalterados e falha impede os casos.
+A primeira expiração ocorreu antes dos casos e foi preservada.
+
+A CI do baseline40f7588 terminou com652 testes integrados aprovados e dois
+oráculos BAL antigos reprovados: esperavam aplicação de estoque pelo parecer.
+Ambos foram reproduzidos localmente e corrigidos para provar parecer sem
+movimento e aplicação explícita subsequente. Os dois casos dirigidos passaram,
+preservando autoria, pareceres anteriores, obrigações e quantidade ajustada.
+Não foi alterado o produto para recuperar o comportamento antigo.
+
+A migration20261111222925 foi aplicada no remoto autorizado:218 versões iguais
+às locais, funções e grants conferidos, dry-run vazio. Reserva V14 somente
+authenticated; anon/service sem EXECUTE. Sem tabela nova, reset, fixtures/Auth
+remotos, produção, transportes ou backup redundante. As84 migrations protegidas
+não mudaram. CI do SHA publicado, instalação limpa, evolução legada e integração
+completa continuam gates próprios; Sonar adiado.
+
+DOC-B está parcial, estimado75%; próximo ponto DOC-B.4, preservação da ficha,
+cancelamento/complemento e confirmações próprias. DOC-A/C/D,105 estados
+originais(57PASS/48PARTIAL),18 UI e visual global85% permanecem. Humanos, AT,
+aparelhos reais e liberação operacional continuam pendentes.
+[Resultados e limites](AUTONOMOUS_RETURNS.md).
+
 DOC-B_COM conclui localmente o ponto DOC-B.2: saldo FAMILY de cada material
 imediatamente após sua última entrada validada naquela COM, com parcela,
 validação, autoria e instante próprios. Aquisição, total validado e quantidade

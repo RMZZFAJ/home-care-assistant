@@ -424,7 +424,7 @@ export type CatalogProduct = {
 export const documentLabels: Record<DocumentType, string> = {
   REQ: "Requisição",
   COM: "Compra de insumos",
-  ENT: "Entrega / Entrada",
+  ENT: "Entrega e devolução de materiais",
   BAL: "Balanço de estoque",
 };
 export const documentStatuses: Record<string, string> = {

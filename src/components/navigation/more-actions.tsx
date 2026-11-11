@@ -8,6 +8,7 @@ const actions: { label: string; description: string; href: string; icon: IconNam
   { label: "Nova requisição", description: "Solicitar os materiais necessários", href: "/fichas/req", icon: "forms", capability: "req.create" },
   { label: "Nova compra", description: "Organizar aquisição ou doação da família", href: "/fichas/com", icon: "stock", capability: "com.create" },
   { label: "Nova entrega", description: "Expedir materiais entre custódias", href: "/fichas/ent", icon: "truck", capability: "ent.create" },
+  { label: "Nova devolução de materiais", description: "Devolver materiais da equipe à família, com vínculo de origem opcional", href: "/fichas/devolucao", icon: "truck", capability: "ent.create" },
   { label: "Balanços e plantões", description: "Consultar programação, contagens, revisões e adiamentos", href: "/balancos", icon: "forms", capability: "bal.read" },
   { label: "Ocorrências e consumo", description: "Registrar faltas ou situações extraordinárias", href: "/consumo", icon: "forms", capability: "consumption.report" },
   { label: "Notificações", description: "Avisos e tarefas relacionados ao cuidado", href: "/notificacoes", icon: "bell" },

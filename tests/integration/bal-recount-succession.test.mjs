@@ -139,7 +139,17 @@ test("a same-window replacement keeps one executable recount on a counted cycle 
   const familySource = await rpc(f.family, "operational_document", {
     p_id: f.document.id,
   });
-  const approved = await review(f.family, familySource, "family");
+  const reviewed = await review(f.family, familySource, "family");
+  assert.equal(reviewed.status, "submitted");
+  assert.deepEqual(JSON.parse(recountState(f)).ledger, before.ledger,
+    "Independent opinions on the replacement count must not apply stock");
+  const approved = await rpc(f.family, "supply_document_command", {
+    p_id: reviewed.id,
+    p_action: "apply_balance",
+    p_body: { group: "family", reviewReference: reviewed.balanceReview.referenceHash },
+    p_key: randomUUID(),
+    p_version: reviewed.version,
+  });
   assert.equal(approved.status, "approved");
   assert.equal(
     approved.balanceReview.reviews.filter((r) => r.count_version === 2).length,
