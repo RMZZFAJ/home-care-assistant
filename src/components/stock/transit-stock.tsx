@@ -3,33 +3,19 @@ import Link from "next/link";
 import { EmptyState, StatusBadge } from "@/components/ui/primitives";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
+import type { TransitDocument } from "@/types/stock";
 
-export type TransitDocument = {
-  id: string;
-  code: string;
-  status: string;
-  source: string;
-  destination: string;
-  createdAt: string;
-  lines: {
-    productId: string;
-    name: string;
-    unit: string;
-    dispatched: string;
-    accepted: string;
-    reconciled: string;
-    pending: string;
-    disputed: boolean;
-  }[];
-};
+export type { TransitDocument } from "@/types/stock";
 export function TransitStock({
   documents,
   search,
   loading,
+  showEmpty = true,
 }: {
   documents: TransitDocument[];
   search: string;
   loading: boolean;
+  showEmpty?: boolean;
 }) {
   const visible = documents.filter((doc) =>
     doc.lines.some((line) =>
@@ -92,7 +78,7 @@ export function TransitStock({
           </ul>
         </article>
       ))}
-      {!loading && !visible.length ? (
+      {!loading && showEmpty && !visible.length ? (
         <EmptyState title="Nenhuma entrega em trânsito">
           As conferências pendentes deste paciente aparecerão aqui.
         </EmptyState>

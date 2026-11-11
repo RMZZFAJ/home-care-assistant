@@ -477,6 +477,10 @@ test("gestor delegado conserva somente recuperação própria ao perder a últim
   const before = identityPhysicalState(f);
   const packets: { cataloguePreparation: CatalogueAttempt }[] = [];
   let lost = true;
+  let confirmLostResponse!: () => void;
+  const lostResponse = new Promise<void>((resolve) => {
+    confirmLostResponse = resolve;
+  });
   await page.route("**/api/catalog/identities**", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     packets.push(route.request().postDataJSON());
@@ -485,6 +489,7 @@ test("gestor delegado conserva somente recuperação própria ao perder a últim
     const response = await route.fetch();
     expect(response.ok(), await response.text()).toBe(true);
     await route.abort("failed");
+    confirmLostResponse();
   });
   await modal(page)
     .getByRole("button", { name: "Confirmar mudança no catálogo", exact: true })
@@ -492,6 +497,9 @@ test("gestor delegado conserva somente recuperação própria ao perder a últim
   await expect(
     modal(page).getByText(/A escolha, o motivo e a chave estão congelados/),
   ).toBeVisible();
+  // The pending UI freezes before the server finishes. Revoke only after the
+  // committed response is lost, so this case exercises receipt recovery.
+  await lostResponse;
   sql(
     `update public.capability_overrides set enabled=false where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.professional.id)} and capability='catalog.manage';`,
   );

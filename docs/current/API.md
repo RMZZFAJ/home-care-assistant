@@ -1278,3 +1278,17 @@ GET /api/admin?section=profiles&profilePage=1&query=nome oferece a seleção
 global em páginas de 30 contas, com total e ordenação por nome e ID.
 Exige administração global ativa. A consulta sem profilePage preserva
 o contrato anterior. [Implementação](../audits/D/D-B/ADMINISTRATIVE_PREPARATIONS.md).
+
+## Âmbito das leituras de estoque e contagem
+
+GET /api/stock/balances acrescenta careRecipientId e custody aos campos
+existentes. custody aceita vazio, FAMILY, CARE_TEAM ou TRANSIT. A seleção
+inválida recebe 400. GET /api/stock/movements acrescenta careRecipientId
+e filters com productId, location, from e to, usando null para seleção
+ausente. page, pageSize e total conservam seus contratos anteriores.
+
+GET /api/balances acrescenta careRecipientId. reference=true continua
+chamando balance_count_reference com sua autorização nativa bal.read.
+As revisões de contagem conferem paciente, revisão e quantidades antes de
+adotar o resultado. A contagem agendada compara ainda o estado atual da
+atribuição e do catálogo. [Consumidores](../audits/D/D-B/STOCK_READ_VALIDATION.md).

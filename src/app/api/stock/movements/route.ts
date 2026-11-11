@@ -37,6 +37,8 @@ export async function GET(request: Request) {
     if (balances.error) databaseError(balances.error);
     return NextResponse.json({
       ...history,
+      careRecipientId: patient.id,
+      filters: { productId: params.get("productId") || null, location: params.get("location") || null, from: from || null, to: to || null },
       balances: balances.data ?? [],
       page,
       pageSize,

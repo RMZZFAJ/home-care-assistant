@@ -1,10 +1,28 @@
 # Estado verificável do projeto
 
-Referência editorial:10/11/2026, America/Sao_Paulo. **Produção NO-GO.**
+Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.61
+## Incremento atual D3.62
+
+As consultas de estoque validam a estrutura e o âmbito da resposta e
+preservam a última leitura válida após falha. A revisão BAL usa sua
+referência própria e conserva a contagem física quando a consulta falha.
+O apontamento de chave por índice nas colunas foi corrigido. Passaram
+47 unit/API e 30 cenários de navegador, tipos e lint dirigido. Remoto 205
+com dry-run vazio. A CI do novo SHA permanece necessária.
+
+Também passaram seis cenários dirigidos do catálogo. A espera do teste
+foi corrigida para retirar a permissão depois da confirmação cuja resposta
+foi perdida. O total do lote é de 36 cenários de navegador distintos.
+
+O plano fixo tem 20 etapas ligadas aos 105 critérios, com quatro etapas
+concluídas localmente e a 04 como próxima execução. Seus seis pontos de
+fichas estão definidos. A matriz conserva 56 PASS locais e 49 parciais.
+[Incremento e plano](../audits/D/D-B/STOCK_READ_VALIDATION.md).
+
+## Incremento anterior D3.61
 
 Alertas, destinatários e vínculos têm campos incompletos privados, retomada,
 comparação concorrente e confirmação nativa recuperável. Meu perfil

@@ -39,7 +39,7 @@ import type {
   SupplyPayload,
 } from "@/types/documents";
 import type { BalanceWorkspace } from "@/types/balances";
-import type { ProductStock } from "@/types/stock";
+import { parseBalanceCountReference, parseBalanceCountReview } from "@/lib/validation/balances";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import { BalanceCountFields, BalanceReviewRows } from "./balance-count-fields";
 import {
@@ -552,33 +552,37 @@ function ScheduledCount({
     setError("");
     try {
       const [stock, state] = await Promise.all([
-        api<{ overview: ProductStock[] }>(
-          "/api/stock/balances?careRecipientId=" + context.patient!.id,
-        ),
-        api<{ data: BalanceWorkspace }>(
+        api<unknown>(
+          "/api/balances?careRecipientId=" + context.patient!.id + "&reference=true",
+        ).then(value => parseBalanceCountReference(value, context.patient!.id)),
+        api<unknown>(
           "/api/balances?careRecipientId=" + context.patient!.id,
-        ),
+        ).then(value => parseBalanceCountReview(value, context.patient!.id)),
       ]);
-      if (state.data.referenceRevision !== referenceRevision)
+      if (stock.data.revision !== referenceRevision || state.data.referenceRevision !== referenceRevision) {
+        setNeedsRecount(true);
         throw new Error(
           "O estoque mudou durante a contagem. Inicie uma nova conferência antes de concluir.",
         );
+      }
       if (
         !state.data.eligibility.available ||
         state.data.eligibility.assignment?.id !== assignment?.id
-      )
+      ) {
+        setNeedsRecount(true);
         throw new Error(
           "O plantão ou a responsabilidade mudou. Consulte o acompanhamento antes de concluir.",
         );
-      setReference(
-        Object.fromEntries(
-          stock.overview.map((p) => [p.productId, p.team?.confirmed ?? "0"]),
-        ),
-      );
+      }
+      if (Object.keys(stock.data.quantities).length !== products.length
+        || products.some(product => !Object.hasOwn(stock.data.quantities, product.id))) {
+        setNeedsRecount(true);
+        throw new Error("O catálogo mudou durante a contagem. Atualize a referência antes de concluir.");
+      }
+      setReference(stock.data.quantities);
       setStep(1);
     } catch (reason) {
       setError((reason as Error).message);
-      setNeedsRecount(true);
     } finally {
       setBusy(false);
     }

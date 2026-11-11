@@ -22,7 +22,7 @@ export async function GET(request: Request) {
       reference ? "balance_count_reference" : "balance_workspace",
       { p_patient: patient.id },
     )) as Record<string, unknown>;
-    return NextResponse.json({ data });
+    return NextResponse.json({ data, careRecipientId: patient.id });
   });
 }
 export async function POST(request: Request) {

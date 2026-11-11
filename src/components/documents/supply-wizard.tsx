@@ -33,6 +33,7 @@ import {
   BalanceObservationTimes,
 } from "@/components/forms/creation-draft-panel";
 import type { BalanceCountReference } from "@/types/balances";
+import { parseBalanceCountReference } from "@/lib/validation/balances";
 import { BalanceReviewRows } from "@/components/balances/balance-count-fields";
 import {
   balanceDraftContent,
@@ -397,11 +398,11 @@ export function PatientSupplyWizard({
           )
         : Promise.resolve(null),
       type === "BAL"
-        ? api<{ data: BalanceCountReference }>(
+        ? api<unknown>(
             `/api/balances?careRecipientId=${patientId}&reference=true`,
             undefined,
             controller.signal,
-          )
+          ).then(value => parseBalanceCountReference(value, patientId))
         : Promise.resolve(null),
     ])
       .then(async ([products, settings, source, stockReference]) => {
@@ -865,9 +866,9 @@ export function PatientSupplyWizard({
       setBusy(true);
       try {
         const current = (
-          await api<{ data: BalanceCountReference }>(
+          await api<unknown>(
             `/api/balances?careRecipientId=${patientId}&reference=true`,
-          )
+          ).then(value => parseBalanceCountReference(value, patientId))
         ).data;
         if (!legacyReference || current.revision !== legacyReference.revision) {
           setStaleLegacyReference(true);
@@ -1113,9 +1114,9 @@ export function PatientSupplyWizard({
     setError("");
     try {
       const [stock, products, documentRead] = await Promise.all([
-        api<{ data: BalanceCountReference }>(
+        api<unknown>(
           `/api/balances?careRecipientId=${patientId}&reference=true`,
-        ),
+        ).then(value => parseBalanceCountReference(value, patientId)),
         api<{ data: CatalogProduct[] }>(
           `/api/catalog?careRecipientId=${patientId}`,
         ),

@@ -94,8 +94,8 @@ export function StockOverview({
             aria-label="Saldos por produto e custódia"
           >
             <colgroup>
-              {[29, 14, 14, 17, 17, 9].map((width, index) => (
-                <col key={index} style={{ width: `${width}%` }} />
+              {Object.entries({ material: 29, confirmed: 14, minimum: 14, situation: 17, forecasts: 17, details: 9 }).map(([column, width]) => (
+                <col key={column} style={{ width: `${width}%` }} />
               ))}
             </colgroup>
             <DataTableHead role="rowgroup">

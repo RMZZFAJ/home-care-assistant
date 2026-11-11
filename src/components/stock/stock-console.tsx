@@ -10,7 +10,7 @@ import type { StockBalanceFilter } from "@/lib/stock-presentation";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   buttonClass,
   can,
@@ -22,15 +22,11 @@ import {
 } from "@/components/workspace";
 import { Attachments } from "@/components/documents/attachments";
 import { EmptyState, Icon } from "@/components/ui/primitives";
-import { TransitStock, type TransitDocument } from "./transit-stock";
+import { TransitStock } from "./transit-stock";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 
-import type {
-  ProductStock,
-  StockMetric,
-  StockMovement as Movement,
-} from "@/types/stock";
+import { parseStockBalances, parseStockHistory } from "@/lib/validation/stock-reads";
 import { StockOverview } from "./stock-overview";
 
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -100,18 +96,19 @@ function PatientStock({
       params.get("refKind") ?? "auto",
     );
   const revision = `${attempt}:${liveRevision}`;
-  const stock = useScopedRead<{
-    overview: ProductStock[];
-    transit: TransitDocument[];
-    metrics: StockMetric[];
-  }>(
+  const decodeBalances = useCallback((value: unknown) => parseStockBalances(value, { careRecipientId: patient, custody }), [patient, custody]);
+  const decodeHistory = useCallback((value: unknown) => parseStockHistory(value, {
+    careRecipientId: patient, page, pageSize: 20, location: custody, ...filters,
+  }), [patient, page, custody, filters]);
+  const stock = useScopedRead(
     hasStock || (custody === "TRANSIT" && can(context, "ent.read"))
       ? "/api/stock/balances?" +
           new URLSearchParams({ careRecipientId: patient, custody })
       : null,
     revision,
+    decodeBalances,
   );
-  const history = useScopedRead<{ data: Movement[]; total: number }>(
+  const history = useScopedRead(
     hasStock
       ? "/api/stock/movements?" +
           new URLSearchParams({
@@ -122,6 +119,7 @@ function PatientStock({
           })
       : null,
     revision,
+    decodeHistory,
   );
   const products = stock.data?.overview ?? [];
   const movements = history.data?.data ?? [];
@@ -250,6 +248,7 @@ function PatientStock({
             documents={stock.data.transit}
             search={search}
             loading={stock.loading}
+            showEmpty={!stock.error}
           />
         ) : null}
         {custody !== "TRANSIT" && stock.data ? (

@@ -1,5 +1,19 @@
 # Checkpoint D-B
 
+D3.62 fechou a etapa 03 do plano fixo. Saldo, trânsito e histórico validam
+estrutura e âmbito da resposta. BAL usa a referência própria com bal.read
+e preserva campos após falha de consulta. Chaves semânticas corrigem o aviso
+do colgroup solicitado. Passaram 47 unit/API e 30 cenários de navegador
+nos três perfis, tipos e lint dirigido. Dry-run remoto vazio em 205.
+Outros seis cenários do catálogo passaram após a espera explícita pela
+confirmação e perda da resposta antes de retirar a permissão no teste.
+Total dirigido: 36 cenários de navegador distintos.
+O plano agora vincula 20 etapas e seus pontos aos 75 critérios originais
+e 30 complementos. Etapas 01/02/03/07 concluídas localmente, próxima 04
+com seis pontos fixos. Os estados da matriz continuam 56 PASS locais e
+49 PARTIAL. A CI própria e os gates externos seguem identificados.
+[Incremento](STOCK_READ_VALIDATION.md) e [plano](EXECUTION_STAGES.csv).
+
 D3.61 integrou preenchimentos privados, comparação e confirmação nativa
 a alertas, destinatários, vínculos e sua situação. Meu perfil consulta a
 tentativa original inclusive após transição deliberada do próprio vínculo,

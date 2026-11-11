@@ -9,3 +9,33 @@ export const balanceCommandSchema = z.object({ careRecipientId: id, idempotencyK
   z.object({ action: z.literal("assign"), body: z.object({ cycleId: id, targetShiftId: id, reason }).strict() }).strict(),
 ]) }).strict();
 export type BalanceCommand = z.infer<typeof balanceCommandSchema>["command"];
+
+const revision = z.string().regex(/^\d{1,20}$/);
+const countReferenceRead = z.object({
+  careRecipientId: id,
+  data: z.object({
+    revision,
+    quantities: z.record(z.string().min(1), z.string().regex(/^-?\d+(?:\.\d+)?$/)),
+  }),
+});
+const countReviewRead = z.object({
+  careRecipientId: id,
+  data: z.object({
+    referenceRevision: revision,
+    eligibility: z.object({ available: z.boolean(), assignment: z.object({ id }).nullable() }),
+  }),
+});
+export function parseBalanceCountReference(value: unknown, patientId: string) {
+  const result = countReferenceRead.safeParse(value);
+  if (!result.success || result.data.careRecipientId !== patientId) {
+    throw new Error("A referência de estoque da contagem não pôde ser conferida. Consulte novamente; seus campos foram preservados.");
+  }
+  return result.data;
+}
+export function parseBalanceCountReview(value: unknown, patientId: string) {
+  const result = countReviewRead.safeParse(value);
+  if (!result.success || result.data.careRecipientId !== patientId) {
+    throw new Error("A disponibilidade da contagem não pôde ser conferida. Consulte novamente; seus campos foram preservados.");
+  }
+  return result.data;
+}

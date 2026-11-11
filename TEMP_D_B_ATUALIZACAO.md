@@ -1,6 +1,6 @@
 # D-B — atualização temporária por funcionalidades
 
-Atualizado em 10 de novembro de 2026. Inclui a mudança integral de aparência
+Atualizado em 11 de novembro de 2026. Inclui a mudança integral de aparência
 solicitada. A fase continua em execução e ainda não está liberada para
 produção.
 
@@ -28,6 +28,18 @@ usarão ou avaliarão o sistema; “serviço externo” depende também do forne
 Os testes completos da próxima versão publicada ainda precisam ser concluídos.
 O banco remoto já recebeu as atualizações desta etapa, sem pendências.
 A fase continua em execução.
+
+**Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
+conclusão definidos. As etapas 01, 02, 03 e 07 estão concluídas localmente.
+A 03 foi fechada neste lote. A próxima é a 04, dividida em seis verificações
+das fichas. Os nove formulários que ainda precisam de retomada estão
+enumerados na etapa 14. A sequência e os pontos individuais estão ao final.
+
+**Consultar estoque e revisar contagens · 100% deste bloco.** Consultas
+incompletas ou de outro paciente, custódia, página ou filtro recebem erro
+recuperável. A leitura anterior fica identificada. O BAL mantém a contagem
+física quando a consulta falha e usa sua referência própria para revisão.
+Responsável pela implementação e verificações locais — Codex.
 
 **Preenchimentos de alertas, destinatários e vínculos · 100% deste recurso.**
 É possível guardar campos incompletos, retomá-los, comparar duas edições e
@@ -493,7 +505,8 @@ incluídos.
 - **Estoque, consumo, transferências e variantes de balanço** — 70%. Já
   aplicado: Consulta de saldos em tabela e cartões, mínimos, situação, filtros
   e detalhes; movimentação familiar e consumo com preparação, revisão e
-  recuperação privadas; fluxos reais preservados. Falta: Concluir a composição geral,
+  recuperação privadas; fluxos reais preservados. Falta: Concluir a composição
+  geral,
   trânsito, histórico, formulários e os estados restantes. Responsável: Codex.
 - **Central de avisos, aplicativo e suporte** — 50%. Já aplicado: Recursos
   existentes usam a base compartilhada. Falta: Completar composição e
@@ -558,49 +571,211 @@ independentes.
 - **Liberação de piloto ou produção:**0%; fora da autorização deste trabalho.
   Responsável: você, depois das implementações e validações necessárias.
 
-## Sequência que pretendo executar depois deste lote
+## Etapas fixadas para concluir a D-B
 
-Esta é a ordem do trabalho restante. Os quadros anteriores estão agrupados por
-funcionalidade, sem representar ordem de execução. Tudo que já está 100% será
-preservado e incluído na revisão final; não será refeito sem motivo.
+A sequência anterior agrupava trabalho demais no primeiro item e recebia
+novos subfluxos a cada lote. Esse item foi desdobrado. A retomada das
+operações está na etapa 01, os cadastros diários na 02 e os nove formulários
+restantes na 14. Os dois primeiros blocos já estão concluídos localmente.
+A etapa 03 foi fechada neste lote. A etapa 07 também já tem sua parte técnica
+qualificada. São quatro blocos fechados localmente nesta organização.
 
-1. **Completar a continuidade dos formulários diários.** Conferir na CI a
-   sincronização de agenda, foco e Andamentos. Investigar a seleção da aba no
-   recebimento se a falha se repetir. Alertas, destinatários e vínculos já
-   receberam os preenchimentos privados e entram na revisão conjunta com
-   contagens, agenda, revisões de fluxo e catálogo. As combinações restantes
-   de fichas e estoque têm prioridade. Formulários pessoais e administrativos
-   restantes serão completados junto à revisão dessas áreas.
-2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
-   transferência, consumo e variantes de balanço; concluir avisos, próximas
-   providências, Andamentos, vínculos, listas e filtros dessas tarefas.
-3. **Fechar a parte técnica dos PDFs e da assinatura.** Completar os casos
-   restantes de dados, longos, regularização, acessibilidade, recuperação,
-   verificação, confiança, troca e recuperação de chaves. Sem redesenhar a
-   aparência dos PDFs.
-4. **Concluir a nova aparência nas demais áreas.** Administração, cadastros,
-   perfil, guias, avisos e aplicativo; conferir todas as 66 composições e 171
-   relações. A aparência das áreas dos passos 2 a 4 será trabalhada junto com
-   esses passos, sem deixar uma camada visual incompatível para o final.
-5. **Fechar entrada e orientação por papel.** Completar adoção de materiais,
-   preparação física e guias; a liberação real fica com as pessoas
-   responsáveis.
-6. **Fechar aplicativo e avisos.** Concluir atualização, perda de sessão,
-   troca de paciente, recuperação e preparação de entrega; organizar o reteste
-   no S24 Ultra e nos serviços externos somente dentro da autorização vigente.
-7. **Completar suporte, monitoramento e backups.** Fechar cobertura,
-   ocorrências, retenção, recuperação de chaves e preparação da operação.
-   Agenda permanente, destino externo e liberação dependem das decisões
-   identificadas acima.
-8. **Consolidar a D-B.** Rever todos os critérios, executar as verificações
-   finais, corrigir falhas, reconciliar as últimas atualizações do banco e
-   atualizar este quadro. Acompanhar a configuração do Sonar sem fingir sua
-   aprovação.
-9. **Entregar o fechamento e as próximas validações.** Separar o que ficou
-   pronto do que depende de você, participantes, fornecedores ou da próxima
-   fase. Manter a PR7 em Draft, sem merge e sem alteração de produção.
+O plano cobre os 75 critérios originais e os 30 complementos da Ordem Mestre.
+Um critério pode depender de mais de uma etapa. Por isso, fechar uma etapa
+pode aumentar o trabalho concluído enquanto o critério completo ainda fica
+parcial. As 66 composições e 171 relações da refatoração visual estão
+delimitadas nas etapas 06 e 15, junto às respectivas funções.
 
-As atualizações necessárias do banco remoto e os commits serão feitos ao longo
-dos lotes. Não haverá reset remoto nem repetição de backups pesados a cada
-alteração do banco de testes. A ordem pode ajustar dependências comprovadas,
-preservando a prioridade da operação diária.
+Cada etapa tem escopo, pontos de verificação e condição de fechamento
+registrados. Nos próximos lotes, a atualização indicará a etapa e o ponto
+encerrado. Falhas encontradas entram na etapa correspondente. Alterações
+dessa lista serão identificadas com sua origem e efeito no plano.
+
+Os percentuais parciais são estimativas do bloco. A validação final conjunta
+está na etapa 19. As atividades externas da etapa 20 têm seus próprios
+responsáveis e gates. Esta sequência fixa substitui a anterior.
+
+1. **01 — Rascunhos das fichas e operações.** Concluída localmente · 100%.
+
+   Concluído — REQ, COM, ENT, BAL, transferências, estoque familiar, consumo,
+   agenda, revisões de fluxo e Andamentos retomam seus preenchimentos e
+   recuperam a confirmação.
+   Responsável — Codex.
+
+2. **02 — Materiais e administração diária.** Concluída localmente · 100%.
+
+   Concluído — Itens, unidades, apresentações, sucessores, alertas,
+   destinatários e vínculos guardam campos e recuperam alterações simultâneas ou
+   confirmações perdidas.
+   Responsável — Codex.
+
+3. **03 — Consultar estoque e revisar contagens.** Concluída localmente · 100%.
+
+   Concluído — Saldos, trânsito, histórico e revisão do BAL conferem a consulta;
+   falhas preservam a leitura anterior e o preenchimento físico.
+   Responsável — Codex.
+
+4. **04 — Estados e vínculos das fichas.** Em execução · 80%.
+
+   Para concluir — As seis verificações detalhadas abaixo estão fechadas,
+   incluindo
+   próxima providência, Andamentos e navegação entre os registros.
+   Responsável — Codex.
+
+5. **05 — Busca, filtros e históricos.** Em execução · 70%.
+
+   Para concluir — Todas as listas previstas alcançam os registros permitidos,
+   inclusive listas grandes e pendências antigas, com ordenação e resposta
+   corretas.
+   Responsável — Codex.
+
+6. **06 — Aparência da operação diária.** Em execução · 70%.
+
+   Para concluir — As 46 composições das áreas operacionais e suas variações
+   estão
+   conferidas no Modelo Integral, em cinco larguras e pelo teclado.
+   Responsável — Codex.
+
+7. **07 — Dados e histórico dos PDFs.** Concluída localmente · 100%.
+
+   Concluído — Os casos previstos de REQ, COM, ENT e BAL preservam fatos,
+   autores, datas, conteúdo extenso e arquivos antigos.
+   Responsável — Codex.
+
+8. **08 — Assinatura e ciclo dos certificados.** Em execução · 80%.
+
+   Para concluir — Assinatura interna, carimbo de tempo, troca, renovação,
+   incidente
+   e recuperação das chaves foram demonstrados.
+   Responsável — Codex.
+
+9. **09 — Geração e recuperação dos PDFs.** Em execução · 85%.
+
+   Para concluir — As quatro fichas geram, guardam e recuperam o arquivo
+   correto,
+   incluindo as falhas e tentativas simultâneas previstas.
+   Responsável — Codex.
+
+10. **10 — Conferir PDF por QR, código e upload.** Em execução · 85%.
+
+    Para concluir — Originais, alterações no arquivo, outro exemplar e
+    certificados/carimbos inválidos ou desconhecidos recebem os resultados
+    corretos.
+    Responsável — Codex.
+
+11. **11 — Aplicativo e atualização.** Em execução · 80%.
+
+    Para concluir — Instalação, atualização com edição aberta, uso sem conexão,
+    mudança de paciente e perda de sessão estão conferidos nos testes
+    automatizáveis.
+    Responsável — Codex.
+
+12. **12 — Notificações e avisos no aparelho.** Em execução · 80%.
+
+    Para concluir — Ativação, revogação, preferências, troca de conta, destino e
+    recuperação dos avisos estão conferidos no transporte controlado.
+    Responsável — Codex.
+
+13. **13 — Lembretes e retorno após parada.** Em execução · 75%.
+
+    Para concluir — As rotinas antigas estão conciliadas e todas as
+    configurações
+    previstas são alcançadas, com tratamento único do período perdido.
+    Responsável — Codex.
+
+14. **14 — Formulários restantes.** A iniciar neste escopo · 0%.
+
+    Para concluir — Os nove formulários detalhados abaixo têm a retomada dos
+    campos
+    comuns e a recuperação da confirmação concluídas.
+    Responsável — Codex.
+
+15. **15 — Aparência das demais áreas.** Em execução · 50%.
+
+    Para concluir — As 20 composições restantes estão conferidas; junto à etapa
+    06,
+    completam as 66 composições e as 171 relações previstas.
+    Responsável — Codex.
+
+16. **16 — Entrada, guias e primeira residência.** Em execução · 70%.
+
+    Para concluir — Os papéis percorrem os guias, recebem tarefas permitidas e
+    conseguem preparar materiais e a residência.
+    Responsável — Codex.
+
+17. **17 — Acompanhamento de falhas e suporte.** Em execução · 85%.
+
+    Para concluir — As falhas previstas são registradas e podem ser
+    reconhecidas,
+    tratadas e consultadas pelas pessoas autorizadas.
+    Responsável — Codex.
+
+18. **18 — Backup e recuperação.** Em execução · 75%.
+
+    Para concluir — Banco e arquivos têm cópia cifrada, verificação de
+    integridade,
+    retenção diária/semanal e recuperação isolada demonstradas.
+    Responsável — Codex.
+
+19. **19 — Testes finais e encerramento D-B.** Em execução · 50%.
+
+    Para concluir — O conjunto final está validado, o remoto corresponde à
+    branch, e
+    o relatório identifica cada pendência externa e seu responsável.
+    Responsável — Codex.
+
+20. **20 — Participação externa e próximas fases.** Pendente externo · 0%.
+
+    Para concluir — Você, participantes e fornecedores realizam as atividades
+    que
+    dependem de uso real, aparelhos, serviços ou autorização operacional.
+    Responsável — Você, equipe e fornecedores.
+
+### Próxima etapa — 04, estados e vínculos das fichas
+
+As funções já estão implementadas. O fechamento conjunto desta etapa ainda
+precisa ser concluído para os seis pontos abaixo. Cada ponto receberá seu
+próprio estado de conclusão, mantendo esta lista.
+
+- **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.**
+  Implementado; conferência conjunta pendente. Responsável — Codex.
+- **04.2 — Compra e doação — aquisição, parcelas, chegada e encerramento.**
+  Implementado; conferência conjunta pendente. Responsável — Codex.
+- **04.3 — Entrega — conferência, divergência, devolução e regularização.**
+  Implementado; conferência conjunta pendente. Responsável — Codex.
+- **04.4 — Transferências — origem, destino, aceite e encerramento.**
+  Implementado; conferência conjunta pendente. Responsável — Codex.
+- **04.5 — Consumo — relato, complemento, decisão e origem do desconto.**
+  Implementado; conferência conjunta pendente. Responsável — Codex.
+- **04.6 — BAL — agendado, sem regime, revisão, reconto e contagens.**
+  Implementado; conferência conjunta pendente. Responsável — Codex.
+
+### Escopo restante dos formulários — etapa 14
+
+Esta etapa inclui os nove grupos abaixo. Ela está depois dos blocos
+operacionais e dos PDFs por sua prioridade. Os campos e fluxos de acesso
+continuam seguindo sua recuperação própria.
+
+- **14.1 — Convites.** Retomada dos campos comuns ainda a concluir. Responsável
+  — Codex.
+- **14.2 — Conferência profissional.** Retomada dos campos comuns ainda a
+  concluir. Responsável — Codex.
+- **14.3 — Contas globais.** Retomada dos campos comuns ainda a concluir.
+  Responsável — Codex.
+- **14.4 — Cadastro do paciente.** Retomada dos campos comuns ainda a concluir.
+  Responsável — Codex.
+- **14.5 — Configurações do paciente.** Retomada dos campos comuns ainda a
+  concluir. Responsável — Codex.
+- **14.6 — Regras de comunicação e permissões.** Retomada dos campos comuns
+  ainda a concluir. Responsável — Codex.
+- **14.7 — Campos comuns do perfil.** Retomada dos campos comuns ainda a
+  concluir. Responsável — Codex.
+- **14.8 — Preferência de ciência.** Retomada dos campos comuns ainda a
+  concluir. Responsável — Codex.
+- **14.9 — Políticas de suporte.** Retomada dos campos comuns ainda a concluir.
+  Responsável — Codex.
+
+A próxima etapa de implementação é a 04. O quadro será atualizado pelos
+pontos encerrados dessa lista. O fechamento técnico da D-B exige as etapas
+executáveis 01 a 19 e o registro correto das pendências da etapa 20. A decisão
+de liberação real continua com os responsáveis e os gates de D-C/D6.
