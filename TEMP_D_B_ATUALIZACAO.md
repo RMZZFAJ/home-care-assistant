@@ -45,9 +45,10 @@ visual do sistema inteiro permanece estimada em 85%; restam outras 20
 composições e a conferência completa das 171 relações.
 
 **Trabalho atual:** DOC-B, começando pela separação entre parecer BAL e
-aplicação ao estoque. A implementação dessa mudança foi iniciada, mas ainda não
-foi concluída nem aplicada ao banco. Não foi atribuído novo percentual por esse
-início. A ordem completa do trabalho restante está somente na seção 5, ao final.
+aplicação ao estoque. A mudança está em implementação e testes locais; ainda
+não foi concluída nem publicada no banco remoto. Não foi atribuído novo
+percentual por esse início. A ordem completa do trabalho restante está somente
+na seção 5, ao final.
 
 O banco remoto recebeu todas as atualizações publicadas até este ponto.
 Atualizações novas continuam sob responsabilidade de Codex. A validação
@@ -303,7 +304,7 @@ as menções, referências e destaques novos de DOC-C.
 #### Complemento aprovado de fichas e PDFs
 
 Acrescentado em 11/11/2026. Reutiliza o gerador, a assinatura e os documentos
-existentes. A etapa07 continua concluída somente em seu escopo anterior; isso
+existentes. A etapa 07 continua concluída somente em seu escopo anterior; isso
 não transforma os quatro resultados novos em concluídos.
 
 - **DOC-A — Aparência dos documentos.** A iniciar · 0% do acréscimo. REQ,
@@ -654,8 +655,7 @@ incluídos silenciosamente no primeiro item.
 Os fechamentos anteriores continuam sujeitos à revisão conjunta da etapa 19.
 Novos formulários seguem na etapa 14; a retomada simples adicional segue em
 DOC-C. As datas individuais das conclusões anteriores não são reconstruídas
-aqui. O
-estado abaixo preserva os fechamentos já registrados. Em 11/11/2026, o
+aqui. O estado abaixo preserva os fechamentos já registrados. Em 11/11/2026, o
 complemento documental foi incorporado; o fechamento de 06.6 consolidou a etapa
 06 com 47 cenários distintos qualificados. Foco, links e rolagem identificados
 nesse lote foram corrigidos. A atualização das classes de quebra de texto também
@@ -879,7 +879,8 @@ paralelo quando independentes.
 **Agora — DOC-B · 10%, começando pelo BAL.** Separar parecer e estoque; depois
 saldo histórico autorizado da COM, devolução autônoma cotidiana e preservação de
 fichas com cancelamento/complemento e confirmações próprias. A mudança do BAL
-foi iniciada, ainda sem conclusão nem aplicação ao banco.
+está em implementação e testes locais, ainda sem conclusão nem publicação no
+banco remoto.
 
 **Depois — DOC-A · 0%.** Composição documental compartilhada; requisição;
 compra/doação; entrega/devolução; BAL; conteúdo longo.
