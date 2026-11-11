@@ -78,11 +78,17 @@ de fichas antigas também foi conferida. Responsável pelo ajuste: Codex.
 É possível salvar campos incompletos, retomar em outra sessão, comparar
 edições, descartar o preenchimento privado e consultar uma confirmação
 perdida. Uma proposta enviada pela administração global continua a depender
-da aprovação de outro administrador no paciente. Unidades, apresentações,
-situações e sucessores seguem na revisão. Responsável pelo restante: Codex.
+da aprovação de outro administrador no paciente.
+
+**Preenchimentos de unidades, precisão, apresentações e sucessores · 100%
+dos editores.** Os campos incompletos podem ser retomados. O cadastro
+preserva zeros à esquerda, o fator das embalagens e o motivo de uma mudança
+de situação. O comprovante pode ser recuperado no editor se a permissão de
+gravar for retirada e a leitura continuar autorizada. Falta um atalho para
+encontrá-lo depois de fechar o editor nesse caso. Responsável: Codex.
 
 A recuperação entre aparelhos continua estimada em 90% no sistema inteiro.
-Ainda faltam cadastros complementares do catálogo, outras áreas de
+Ainda faltam o atalho de recuperação do catálogo, outros formulários de
 administração, perfil e combinações de edição. Essas pendências são do Codex.
 Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
@@ -136,7 +142,7 @@ acompanhamento: Codex.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈90%. Falta: Concluir cadastros complementares do catálogo,
+  execução · ≈90%. Falta: Concluir a retomada em outros formulários de
   administração, perfil e as combinações restantes de edição. As contagens
   preservam observações após mudanças de
   estoque, plantão ou ficha. As preparações
@@ -447,8 +453,8 @@ incluídos.
   reconto, programação, atribuição e adiamentos do balanço, movimentação
   familiar, relatos, complementos e decisões de consumo, revisões de fluxo e
   preparação privada de Andamentos e agenda, incluindo alterações,
-  cancelamentos e decisões sobre recursos existentes, e criação, edição e
-  adoção de itens do catálogo, com comparação e recuperação.
+  cancelamentos e decisões sobre recursos existentes, e os editores de itens,
+  unidades, precisão, apresentações, situações e sucessores do catálogo.
   Falta: Conferir demais variações, lacunas de continuidade e apresentação
   conjunta. Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 55%. Já aplicado: Base,
@@ -548,11 +554,11 @@ preservado e incluído na revisão final; não será refeito sem motivo.
 
 1. **Completar a continuidade dos formulários diários.** Conferir na CI a
    sincronização de agenda, foco e Andamentos. Investigar a seleção da aba no
-   recebimento se a falha se repetir. Completar os
-   cadastros complementares do catálogo que afetam materiais e estoque, como
-   unidades, apresentações e sucessores. Conferir as mensagens de recuperação
-   e conflito. As contagens, preparações da agenda, revisões de fluxo e o
-   editor de itens do catálogo serão incluídos na revisão conjunta.
+   recebimento se a falha se repetir. Completar os formulários administrativos
+   de uso diário, como acessos, cadastros e configurações de avisos. Incluir
+   o atalho de recuperação de confirmações do catálogo e conferir as
+   mensagens de conflito. As contagens, a agenda, as revisões de fluxo e o
+   catálogo serão incluídos na revisão conjunta.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.

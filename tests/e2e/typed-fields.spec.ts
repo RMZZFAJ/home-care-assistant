@@ -45,6 +45,12 @@ test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo
   await page.getByRole("button", { name: "Nova unidade", exact: true }).click();
   const unit = page.getByRole("dialog", { name: "Nova unidade", exact: true });
   await unit.getByLabel("Código", { exact: true }).fill("001234");
+  await unit.getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click();
+  await expect(unit.getByText(/Preenchimento privado salvo/)).toBeVisible();
+  await unit.getByRole("button", { name: "Fechar edição", exact: true }).click();
+  await page.reload();
+  await page.getByRole("button", { name: "Nova unidade", exact: true }).click();
+  await expect(unit.getByLabel("Código", { exact: true })).toHaveValue("001234");
   await unit.getByLabel("Nome", { exact: true }).fill("Volume livre / código preservado");
   await unit.getByRole("combobox", { name: "Dimensão", exact: true }).selectOption("volume");
   await expect(unit.getByRole("combobox", { name: "Âmbito", exact: true })).toHaveValue("patient");

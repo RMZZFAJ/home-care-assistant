@@ -338,7 +338,8 @@ export async function POST(request: Request) {
     const auth = await authenticate();
     if ("cataloguePreparation" in input) {
       const attempt = input.cataloguePreparation;
-      if (attempt.action !== "commit" || (input.action === "adoptProduct") !== (attempt.purpose === "adopt"))
+      if (attempt.action !== "commit" || !["create", "edit", "adopt"].includes(attempt.purpose)
+        || (input.action === "adoptProduct") !== (attempt.purpose === "adopt"))
         throw new ApiError("VALIDATION_ERROR", "Confira a confirmação do catálogo.", 400);
       return NextResponse.json(await runCatalogueAttempt(auth, attempt));
     }

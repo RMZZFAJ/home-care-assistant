@@ -59,6 +59,10 @@ async function chooseProduct(page: Page, name: string) {
     name: "Material da apresentação",
     exact: true,
   });
+  const next = page.getByRole("button", { name: "Iniciar outro preenchimento", exact: true });
+  await expect(combo.or(next).first()).toBeVisible();
+  if (await next.isVisible()) await next.click();
+  await expect(combo).toBeVisible();
   const before = await combo.boundingBox();
   await combo.click();
   await expect(combo).toBeInViewport({ ratio: 1 });
@@ -153,6 +157,14 @@ test("apresentações recuperam criação própria, preservam versões e estoque
     .getByLabel("Código da apresentação", { exact: false })
     .fill("0123456789012");
   await drawer.getByLabel("Fator na unidade base", { exact: false }).fill("10");
+  await drawer.getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click();
+  await expect(drawer.getByText(/Preenchimento privado salvo/)).toBeVisible();
+  await drawer.getByRole("button", { name: "Fechar edição", exact: true }).click();
+  await page.reload();
+  await page.getByRole("button", { name: "Nova apresentação", exact: true }).click();
+  await expect(drawer.getByLabel("Fator na unidade base", { exact: false })).toHaveValue("10");
+  await expect(drawer.getByLabel("Código da apresentação", { exact: false })).toHaveValue("0123456789012");
+  await expect(drawer.getByRole("combobox", { name: "Material da apresentação", exact: true })).toHaveValue("Material fictício V4 0");
   const attempts: unknown[] = [];
   await page.route("**/api/catalog/presentations", async (route) => {
     if (route.request().method() !== "POST") return route.continue();

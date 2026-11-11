@@ -111,3 +111,12 @@ substitui dois formulários pela mesma estrutura reutilizável. O inventário
 mantém 50 fontes e passa a registrar 51 tags de formulário. Continuam na
 revisão unidades, apresentações, situações, sucessores, os demais cadastros
 administrativos e o perfil. [Incremento](CATALOGUE_PREPARATIONS.md).
+
+## Atualização D3.59
+
+Unidades, precisão, apresentações e situações/sucessores usam as mesmas
+revisões privadas, comparação e recuperação do catálogo. O inventário tem
+51 fontes e 50 tags de formulário. A identidade entra como controlador
+sem tag própria. Seguem na revisão as demais áreas administrativas, o
+perfil e a recuperação do comprovante após perda de escrita quando o
+editor já estiver fechado. [Incremento](CATALOGUE_COMPLEMENTARY_PREPARATIONS.md).

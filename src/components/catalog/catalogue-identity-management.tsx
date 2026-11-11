@@ -1,9 +1,9 @@
 "use client";
-import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
+import { ActionButton, FormField, LoadingIndicator, SelectField, TextAreaField } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 
-import { api, ApiError, inputClass, Notice } from "@/components/workspace";
+import { api, Notice } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { formatQuantity } from "@/lib/quantity";
@@ -12,8 +12,15 @@ import { catalogueIdentityCommandSchema } from "@/lib/validation/catalogue";
 import type {
   CatalogueIdentity,
   CatalogueIdentityContext,
-  CatalogueIdentityResult,
 } from "@/types/catalogue";
+
+import type { CatalogueOutcome, IdentityFields } from "@/lib/validation/catalogue-preparation";
+import { CatalogueDraftButtons, CataloguePreparationFeedback } from "./catalogue-preparation-controls";
+import { sendPreparedCatalogueCommit, useCataloguePreparation } from "./use-catalogue-preparation";
+
+function identityOutcome(outcome: CatalogueOutcome) {
+  return "eventId" in outcome ? `${labels[outcome.identityAction]} registrado por ${outcome.actorName}. Saldos, documentos e identidades anteriores preservados.` : "Alteração confirmada.";
+}
 
 const labels = {
   retire: "Inativar",
@@ -72,6 +79,7 @@ function IdentityCard({
   );
 }
 export function CatalogueIdentityManagement({
+  userId,
   writable,
   patientId,
   productId,
@@ -81,6 +89,7 @@ export function CatalogueIdentityManagement({
   onSaved,
   restoreFocusFallbackRef,
 }: {
+  userId: string;
   writable: boolean;
   patientId: string;
   productId: string;
@@ -90,9 +99,6 @@ export function CatalogueIdentityManagement({
   onSaved: (message: string) => Promise<void>;
   restoreFocusFallbackRef: RefObject<HTMLElement | null>;
 }) {
-  const [action, setAction] = useState<Packet["action"] | "">("");
-  const [successorId, setSuccessorId] = useState("");
-  const [reason, setReason] = useState("");
   const [adopted, setAdopted] = useState<CatalogueIdentityContext | null>(null);
   const [comparison, setComparison] = useState<CatalogueIdentityContext | null>(
     null,
@@ -102,14 +108,36 @@ export function CatalogueIdentityManagement({
     packet: Packet;
     context: CatalogueIdentityContext;
   } | null>(null);
-  const [busy, setBusy] = useState(false),
-    [uncertain, setUncertain] = useState(false),
-    [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const reasonId = useId();
   const reasonRef = useRef<HTMLTextAreaElement>(null),
     reviewRef = useRef<HTMLHeadingElement>(null),
     focusAfterRefusalRef = useRef(false);
+  const editor = useCataloguePreparation<IdentityFields, { hash: string | null }>({
+    scope: { patientId, mode: "patient", purpose: "identity", targetId: productId }, userId,
+    separateReference: true,
+    defaultFields: () => ({ identityAction: "", successorId: "", reason: "" }),
+    hashFor: reference => reference.hash,
+    validOutcome: (outcome, attempt) => "eventId" in outcome && outcome.productId === productId
+      && (attempt.action !== "commit" || (!!attempt.fields && "identityAction" in attempt.fields && outcome.identityAction === attempt.fields.identityAction)),
+    sendCommit: attempt => sendPreparedCatalogueCommit("/api/catalog/identities", attempt),
+    onCommit: (outcome, recovered) => {
+      onClose();
+      void onSaved(identityOutcome(outcome) + (recovered ? " A mesma intenção foi recuperada." : "")).catch(() => undefined);
+    },
+    onRejected: reason => {
+      setPrepared(null);
+      focusAfterRefusalRef.current = true;
+      if (reason.code === "VERSION_CONFLICT") {
+        setConflict(true);
+        void consultConflict();
+      }
+    },
+  });
+  const fields = editor.fields;
+  const { identityAction: action, successorId, reason } = fields ?? { identityAction: "", successorId: "", reason: "" };
+  const { busy } = editor;
+  const uncertain = !!editor.pending;
   const url =
     "/api/catalog/identities?" +
     new URLSearchParams({
@@ -117,11 +145,13 @@ export function CatalogueIdentityManagement({
       productId,
       ...(action === "retire" && successorId ? { successorId } : {}),
     });
-  const source = useScopedRead<{ data: CatalogueIdentityContext }>(url);
+  const source = useScopedRead<{ data: CatalogueIdentityContext }>(writable && fields ? url : null);
   const older = useScopedRead<{ data: CatalogueIdentityContext }>(
-    page > 1 ? url + "&page=" + page : null,
+    writable && page > 1 ? url + "&page=" + page : null,
   );
   const reference = adopted ?? source.data?.data;
+  const hash = editor.reviewedHash ?? reference?.referenceHash ?? editor.snapshot?.reference.hash ?? null;
+  const referenceChanged = !!(reference && hash && reference.referenceHash !== hash);
   const history = page > 1 ? older.data?.data : reference;
   useEffect(() => {
     if (prepared) reviewRef.current?.focus();
@@ -136,27 +166,28 @@ export function CatalogueIdentityManagement({
     setAdopted(null);
     setComparison(null);
     setConflict(false);
-    setError("");
+    editor.setError("");
     setPage(1);
+    editor.setReviewedHash(null);
   }
   function prepare() {
-    if (!writable || !reference || source.loading || source.error || conflict)
+    if (!writable || !fields || !reference || !hash || source.loading || source.error || conflict || referenceChanged || editor.locked)
       return;
     const result = catalogueIdentityCommandSchema.safeParse({
       careRecipientId: patientId,
       productId,
       successorId: action === "retire" && successorId ? successorId : null,
-      referenceHash: reference.referenceHash,
+      referenceHash: hash,
       action,
       reason,
       idempotencyKey: crypto.randomUUID(),
     });
     if (!result.success) {
-      setError(result.error.issues[0]?.message ?? "Confira o ato e o motivo.");
+      editor.setError(result.error.issues[0]?.message ?? "Confira o ato e o motivo.");
       reasonRef.current?.focus();
       return;
     }
-    setError("");
+    editor.setError("");
     setPrepared({ packet: result.data, context: reference });
   }
   async function consultConflict() {
@@ -164,45 +195,9 @@ export function CatalogueIdentityManagement({
       const current = await api<{ data: CatalogueIdentityContext }>(url);
       setComparison(current.data);
     } catch {
-      setError(
+      editor.setError(
         "A referência atual está indisponível. Seu motivo e sua escolha foram preservados; consulte novamente.",
       );
-    }
-  }
-  async function save() {
-    if (!prepared || (!writable && !uncertain)) return;
-    setBusy(true);
-    setError("");
-    try {
-      const response = await api<{ data: CatalogueIdentityResult }>(
-        "/api/catalog/identities",
-        prepared.packet,
-      );
-      setUncertain(false);
-      await onSaved(
-        `${labels[response.data.result.event.action]} registrado por ${response.data.result.event.actor_name}. Saldos, documentos e identidades anteriores preservados.${response.data.replayed ? " A mesma intenção foi recuperada." : ""}`,
-      );
-      onClose();
-    } catch (failure) {
-      const rejected =
-        failure instanceof ApiError &&
-        [400, 403, 404, 409, 422].includes(failure.status);
-      setError(
-        failure instanceof Error
-          ? failure.message
-          : "Resultado não confirmado.",
-      );
-      setUncertain(!rejected);
-      if (rejected) {
-        setPrepared(null);
-        focusAfterRefusalRef.current = true;
-      }
-      if (failure instanceof ApiError && failure.status === 409) {
-        setConflict(true);
-        await consultConflict();
-      }
-    } finally {
-      setBusy(false);
     }
   }
   return (
@@ -211,17 +206,19 @@ export function CatalogueIdentityManagement({
       onClose={onClose}
       busy={busy}
       preventClose={uncertain}
+      hasUnsavedChanges={editor.dirty}
       restoreFocusTo={opener}
       restoreFocusFallbackRef={restoreFocusFallbackRef}
     >
       <div className="space-y-4">
-        {error ? <Notice error>{error}</Notice> : null}
-        {uncertain ? (
-          <Notice>
-            O resultado ainda não foi confirmado. A escolha, o motivo e a chave
-            estão congelados; recupere a mesma intenção antes de continuar.
-          </Notice>
-        ) : null}
+        <CataloguePreparationFeedback editor={editor} onClose={onClose} outcomeText={identityOutcome}
+          retryLabel="Recuperar mesma intenção" writable={writable}
+          uncertaintyText="O resultado ainda não foi confirmado. A escolha, o motivo e a chave estão congelados. Consulte o comprovante ou recupere a mesma intenção."
+          compareFields={value => <dl className="hca-summary-grid wrap-anywhere">
+            <dt>Ato</dt><dd>{value.identityAction ? labels[value.identityAction] : "Em branco"}</dd>
+            <dt>Sucessor</dt><dd>{products.find(row => row.id === value.successorId)?.name ?? (value.successorId || "Sem sucessor")}</dd>
+            <dt>Motivo</dt><dd>{value.reason || "Em branco"}</dd>
+          </dl>} />
         {prepared ? (
           <section
             className="space-y-4"
@@ -267,15 +264,14 @@ export function CatalogueIdentityManagement({
               >
                 Voltar à escolha
               </ActionButton>
-              <ActionButton
-                variant="primary"
-                disabled={busy || (!writable && !uncertain)}
-                onClick={() => void save()}
+              {!uncertain ? <ActionButton
+                variant="primary" disabled={busy || !writable}
+                onClick={() => editor.start("commit", prepared.packet.referenceHash, {
+                  identityAction: prepared.packet.action, successorId: prepared.packet.successorId ?? "", reason: prepared.packet.reason,
+                })}
               >
-                {uncertain
-                  ? "Recuperar mesma intenção"
-                  : "Confirmar mudança no catálogo"}
-              </ActionButton>
+                Confirmar mudança no catálogo
+              </ActionButton> : null}
             </div>
           </section>
         ) : !writable ? (
@@ -283,7 +279,7 @@ export function CatalogueIdentityManagement({
             A permissão de alterar o catálogo não está mais disponível. Feche
             esta consulta para continuar.
           </Notice>
-        ) : (
+        ) : fields && !uncertain ? (
           <>
             {source.loading ? (
               <LoadingIndicator label="Consultando material, situação e saldos autorizados" />
@@ -327,7 +323,7 @@ export function CatalogueIdentityManagement({
                   novas escolhas; unidades e saldos não são somados ou
                   convertidos.
                 </Notice>
-                {conflict ? (
+                {(conflict || referenceChanged) ? (
                   <section
                     aria-label="Comparação da referência atual"
                     className="ui-card space-y-3"
@@ -350,7 +346,8 @@ export function CatalogueIdentityManagement({
                             setAdopted(comparison);
                             setComparison(null);
                             setConflict(false);
-                            setError("");
+                            editor.setReviewedHash(comparison.referenceHash);
+                            editor.setError("");
                             reasonRef.current?.focus();
                           }}
                         >
@@ -363,79 +360,41 @@ export function CatalogueIdentityManagement({
                     </ActionButton>
                   </section>
                 ) : null}
-                <label className="block text-sm font-semibold">
-                  Ato no catálogo
-                  <select
-                    className={inputClass}
-                    value={action}
-                    onChange={(event) => {
-                      setAction(event.target.value as typeof action);
-                      setSuccessorId("");
-                      changed();
-                    }}
-                  >
-                    <option value="">Escolha o ato</option>
-                    <option value="retire">Inativar, mantendo os saldos</option>
-                    <option value="reactivate">
-                      Reativar a mesma identidade
-                    </option>
-                    <option value="clear_successor">
-                      Remover indicação de sucessor
-                    </option>
-                  </select>
-                </label>
-                {action === "retire" ? (
-                  <label className="block text-sm font-semibold">
-                    Sucessor para novas escolhas, opcional
-                    <select
-                      className={inputClass}
-                      value={successorId}
-                      onChange={(event) => {
-                        setSuccessorId(event.target.value);
+                {editor.draft?.state !== "consumed" ? <>
+                  <fieldset className="hca-form" disabled={editor.locked}>
+                    <FormField label="Ato no catálogo">
+                      <SelectField value={action} onChange={event => {
+                        editor.setFields({ ...fields, identityAction: event.target.value as IdentityFields["identityAction"], successorId: "" });
                         changed();
-                      }}
-                    >
-                      <option value="">Sem indicar sucessor</option>
-                      {products
-                        .filter((row) => row.id !== productId)
-                        .map((row) => (
-                          <option key={row.id} value={row.id}>
-                            {row.name} · {row.unit}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
-                ) : null}
-                <div>
-                  <label
-                    htmlFor={reasonId}
-                    className="block text-sm font-semibold"
-                  >
-                    Motivo próprio da escolha
-                  </label>
-                  <textarea
-                    id={reasonId}
-                    ref={reasonRef}
-                    className={inputClass}
-                    value={reason}
-                    minLength={3}
-                    maxLength={1000}
-                    onChange={(event) => setReason(event.target.value)}
-                  />
-                </div>
-                <ActionButton
-                  variant="primary"
-                  disabled={
-                    !writable ||
-                    !action ||
-                    source.loading ||
-                    Boolean(source.error) ||
-                    conflict
-                  }
-                  onClick={prepare}
-                >
-                  Revisar mudança no catálogo
-                </ActionButton>
+                      }}>
+                        <option value="">Escolha o ato</option>
+                        <option value="retire">Inativar, mantendo os saldos</option>
+                        <option value="reactivate">Reativar a mesma identidade</option>
+                        <option value="clear_successor">Remover indicação de sucessor</option>
+                      </SelectField>
+                    </FormField>
+                    {action === "retire" ? <FormField label="Sucessor para novas escolhas, opcional">
+                      <SelectField value={successorId} onChange={event => {
+                        editor.setFields({ ...fields, successorId: event.target.value });
+                        changed();
+                      }}>
+                        <option value="">Sem indicar sucessor</option>
+                        {successorId && !products.some(row => row.id === successorId) ? <option disabled value={successorId}>Sucessor indisponível</option> : null}
+                        {products.filter(row => row.id !== productId).map(row =>
+                          <option key={row.id} value={row.id}>{row.name} · {row.unit}</option>)}
+                      </SelectField>
+                    </FormField> : null}
+                    <FormField label="Motivo próprio da escolha" htmlFor={reasonId}>
+                      <TextAreaField id={reasonId} ref={reasonRef} value={reason} minLength={3} maxLength={1000}
+                        onChange={event => editor.setFields({ ...fields, reason: event.target.value })} />
+                    </FormField>
+                  </fieldset>
+                  <div className="hca-toolbar">
+                    <ActionButton type="button" variant="primary" disabled={editor.locked || !action || source.loading || !!source.error || conflict || referenceChanged}
+                      onClick={prepare}>Revisar mudança no catálogo</ActionButton>
+                    <CatalogueDraftButtons editor={editor} hash={hash} />
+                  </div>
+                </> : null}
                 <Link
                   className="ui-button ui-button-secondary"
                   href={
@@ -513,7 +472,7 @@ export function CatalogueIdentityManagement({
               </>
             ) : null}
           </>
-        )}
+        ) : null}
       </div>
     </RecordDrawer>
   );

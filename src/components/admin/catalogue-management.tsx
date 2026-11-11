@@ -95,6 +95,7 @@ export function CatalogueManagement({
       </div>
       {identity ? (
         <CatalogueIdentityManagement
+          userId={userId}
           writable={writable}
           patientId={patientId}
           productId={identity.id}

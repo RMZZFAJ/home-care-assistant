@@ -1,5 +1,13 @@
 # Checkpoint D-B
 
+D3.59 integrou rascunho privado e comprovante a unidades, precisão,
+apresentações e situações/sucessores. Nove cenários com Auth real e 30
+cenários distintos de navegador foram qualificados. A migration incremental
+foi aplicada no remoto. A versão 201, as permissões e o dry-run final
+vazio foram conferidos. O próximo trabalho inclui os demais formulários
+administrativos e a retomada de uma tentativa quando o editor não pode
+mais ser aberto. [Incremento](CATALOGUE_COMPLEMENTARY_PREPARATIONS.md).
+
 D3.58 implementou a continuidade privada para criar, editar e adotar itens
 do catálogo. Cinco cenários com Auth real e nove testes de navegador
 passaram. Duas migrations incrementais foram aplicadas no remoto, com

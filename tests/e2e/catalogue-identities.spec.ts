@@ -1,6 +1,7 @@
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
+import type { CatalogueAttempt } from "../../src/lib/validation/catalogue-preparation";
 import { mkdirSync } from "node:fs";
 import {
   catalogueIdentityFixture,
@@ -63,9 +64,11 @@ async function choose(
   reason: string,
   successor = "",
 ) {
-  await modal(page)
-    .getByRole("combobox", { name: "Ato no catálogo", exact: true })
-    .selectOption(action);
+  const actionField = modal(page).getByRole("combobox", { name: "Ato no catálogo", exact: true });
+  const next = modal(page).getByRole("button", { name: "Iniciar outro preenchimento", exact: true });
+  await expect(actionField.or(next).first()).toBeVisible();
+  if (await next.isVisible()) await next.click();
+  await actionField.selectOption(action);
   if (successor) {
     await modal(page)
       .getByRole("combobox", {
@@ -161,6 +164,11 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   await expect(
     modal(page).getByText(/A escolha, o motivo e a chave estão congelados/),
   ).toBeVisible();
+  await page.reload();
+  await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
+  await page.getByRole("button", { name: "Situação e sucessor: Material fictício V4 0", exact: true }).click();
+  await expect(modal(page).getByRole("button", { name: "Recuperar mesma intenção", exact: true })).toBeVisible();
+  expect(packets).toHaveLength(1);
   sql(
     `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'catalog.manage',false);`,
   );
@@ -467,7 +475,7 @@ test("gestor delegado conserva somente recuperação própria ao perder a últim
     "Motivo próprio do gestor delegado para preservar a identidade e seu estoque",
   );
   const before = identityPhysicalState(f);
-  const packets: Record<string, unknown>[] = [];
+  const packets: { cataloguePreparation: CatalogueAttempt }[] = [];
   let lost = true;
   await page.route("**/api/catalog/identities**", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
@@ -518,7 +526,7 @@ test("gestor delegado conserva somente recuperação própria ao perder a últim
   expect(identityPhysicalState(f)).toBe(before);
   await page.unroute("**/api/catalog/identities**");
   const denied = await page.request.post("/api/catalog/identities", {
-    data: { ...packets[0], idempotencyKey: randomUUID() },
+    data: { cataloguePreparation: { ...packets[0].cataloguePreparation, key: randomUUID() } },
   });
   expect(denied.status()).toBe(403);
   expect(identityPhysicalState(f)).toBe(before);

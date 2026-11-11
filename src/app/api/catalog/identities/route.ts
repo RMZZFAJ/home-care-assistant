@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import {
   api,
   ApiError,
@@ -8,6 +9,8 @@ import {
   rpc,
 } from "@/lib/server/api";
 import { catalogueIdentityCommandSchema } from "@/lib/validation/catalogue";
+import { catalogueCommitFor } from "@/lib/validation/catalogue-preparation";
+import { runCatalogueAttempt } from "@/lib/server/catalogue-preparation";
 
 export async function GET(request: Request) {
   return api("catalog.identity.read", async () => {
@@ -48,8 +51,11 @@ export async function GET(request: Request) {
 }
 export async function POST(request: Request) {
   return api("catalog.identity.write", async () => {
-    const input = await readJson(request, catalogueIdentityCommandSchema),
+    const input = await readJson(request, z.union([catalogueCommitFor("identity"), catalogueIdentityCommandSchema])),
       auth = await authenticate();
+    if ("cataloguePreparation" in input) {
+      return NextResponse.json({ receipt: await runCatalogueAttempt(auth, input.cataloguePreparation) });
+    }
     // The database distinguishes a new change from recovery of this actor's
     // already committed key. Recovery requires live read, not renewed write.
     const patient = await patientContext(auth, input.careRecipientId);

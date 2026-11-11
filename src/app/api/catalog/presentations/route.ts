@@ -13,6 +13,8 @@ import {
 import { exactQuantity } from "@/lib/validation/documents";
 import { quantity } from "@/lib/quantity";
 import { presentationCommandSchema } from "@/lib/validation/catalogue";
+import { catalogueCommitFor } from "@/lib/validation/catalogue-preparation";
+import { runCatalogueAttempt } from "@/lib/server/catalogue-preparation";
 
 export async function GET(request: Request) {
   return api("presentations.read", async () => {
@@ -73,6 +75,7 @@ export async function POST(request: Request) {
     const input = await readJson(
       request,
       z.union([
+        catalogueCommitFor("unit_configure", "presentation_create", "presentation_edit"),
         presentationCommandSchema,
         z
           .object({
@@ -103,6 +106,9 @@ export async function POST(request: Request) {
       ]),
     );
     const auth = await authenticate();
+    if ("cataloguePreparation" in input) {
+      return NextResponse.json({ receipt: await runCatalogueAttempt(auth, input.cataloguePreparation) });
+    }
     if ("action" in input) {
       // The RPC distinguishes a new write from recovery of this actor's own
       // immutable intent, under a live read authority check.

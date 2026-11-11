@@ -5,13 +5,13 @@ export function catalogueScopeArgs(scope: CatalogueScope) {
   return { p_patient: scope.patientId, p_mode: scope.mode, p_purpose: scope.purpose, p_target: scope.targetId };
 }
 
-export async function authorizeCatalogue(auth: Awaited<ReturnType<typeof authenticate>>, scope: CatalogueScope) {
+export async function authorizeCatalogue(auth: Awaited<ReturnType<typeof authenticate>>, scope: CatalogueScope, recover = false) {
   if (scope.mode === "global") requireGlobal(auth);
-  else await patientContext(auth, scope.patientId, "catalog.manage", true);
+  else await patientContext(auth, scope.patientId, recover ? "read" : "catalog.manage", !recover);
 }
 
 export async function runCatalogueAttempt(auth: Awaited<ReturnType<typeof authenticate>>, attempt: CatalogueAttempt) {
-  await authorizeCatalogue(auth, attempt);
+  await authorizeCatalogue(auth, attempt, attempt.action === "commit");
   return rpc(auth.client, "catalogue_preparation_command", {
     ...catalogueScopeArgs(attempt),
     p_action: attempt.action,
