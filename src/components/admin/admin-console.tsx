@@ -297,6 +297,13 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           Unidades e apresentações / scanner
         </Link>
       ) : null}
+      {section === "catalog" && patientId ? (
+        <Link className={buttonClass} href={"/comprovantes-catalogo?" + new URLSearchParams({
+          [globalMode ? "paciente" : "careRecipientId"]: patientId,
+        })}>
+          Comprovantes do catálogo
+        </Link>
+      ) : null}
       {section === "memberships" ? (
         <Link className={buttonClass} href="/configuracoes?area=people">
           Permissões e alterações com dupla aprovação

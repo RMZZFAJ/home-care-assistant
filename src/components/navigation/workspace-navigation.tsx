@@ -41,6 +41,7 @@ const groups: { label: string; items: Item[] }[] = [
     { label: "Permissões e regras", href: "/configuracoes", icon: "settings", capability: "access.manage" },
     { label: "Catálogo", href: "/admin?section=catalog", icon: "stock", capability: "catalog.manage" },
     { label: "Unidades e apresentações", href: "/unidades", icon: "stock", capability: "catalog.manage" },
+    { label: "Comprovantes do catálogo", href: "/comprovantes-catalogo", icon: "history" },
     { label: "Auditoria", href: "/admin?section=audit", icon: "history", capability: "audit.read" },
   ] },
 ];

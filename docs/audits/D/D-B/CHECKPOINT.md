@@ -1,5 +1,12 @@
 # Checkpoint D-B
 
+D3.60 disponibilizou comprovantes do catálogo em outra sessão e após
+perda de escrita com leitura autorizada. Onze cenários Auth, 13 cenários
+distintos de navegador e paginação com 106 confirmações passaram.
+Remoto 202 reconciliado e dry-run vazio. A matriz mantém 56 critérios
+com prova local e 49 parciais. O próximo trabalho inclui regras de
+alerta, destinatários e vínculos. [Incremento](CATALOGUE_RECEIPT_DISCOVERY.md).
+
 D3.59 integrou rascunho privado e comprovante a unidades, precisão,
 apresentações e situações/sucessores. Nove cenários com Auth real e 30
 cenários distintos de navegador foram qualificados. A migration incremental

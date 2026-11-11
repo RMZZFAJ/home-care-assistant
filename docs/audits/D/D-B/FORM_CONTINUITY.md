@@ -120,3 +120,11 @@ revisões privadas, comparação e recuperação do catálogo. O inventário tem
 sem tag própria. Seguem na revisão as demais áreas administrativas, o
 perfil e a recuperação do comprovante após perda de escrita quando o
 editor já estiver fechado. [Incremento](CATALOGUE_COMPLEMENTARY_PREPARATIONS.md).
+
+## Atualização D3.60
+
+A página de comprovantes abre pelo catálogo, por Unidades e apresentações
+e por Mais opções. Recupera confirmações de outra sessão e mantém a consulta
+quando a leitura está autorizada após a perda de escrita. O inventário
+registra o novo consumidor de leitura. Formulários administrativos e de
+perfil seguem na revisão. [Incremento](CATALOGUE_RECEIPT_DISCOVERY.md).

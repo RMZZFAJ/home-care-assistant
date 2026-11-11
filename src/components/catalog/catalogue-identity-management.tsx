@@ -118,8 +118,6 @@ export function CatalogueIdentityManagement({
     separateReference: true,
     defaultFields: () => ({ identityAction: "", successorId: "", reason: "" }),
     hashFor: reference => reference.hash,
-    validOutcome: (outcome, attempt) => "eventId" in outcome && outcome.productId === productId
-      && (attempt.action !== "commit" || (!!attempt.fields && "identityAction" in attempt.fields && outcome.identityAction === attempt.fields.identityAction)),
     sendCommit: attempt => sendPreparedCatalogueCommit("/api/catalog/identities", attempt),
     onCommit: (outcome, recovered) => {
       onClose();

@@ -31,9 +31,6 @@ export function UnitPreparationEditor({ scope, userId, products, opener, onClose
     scope, userId, separateReference: true,
     defaultFields: () => create ? { code: "", name: "", dimension: "count", decimals: "0" } : { productId: "", unit: "", decimals: "" },
     hashFor: reference => reference.hash,
-    validOutcome: (outcome, attempt) => create ? "unitId" in outcome
-      : "productId" in outcome && !("presentationId" in outcome) && !("eventId" in outcome)
-        && (attempt.action !== "commit" || (!!attempt.fields && "productId" in attempt.fields && outcome.productId === attempt.fields.productId)),
     sendCommit: attempt => sendPreparedCatalogueCommit(create ? "/api/units" : "/api/catalog/presentations", attempt),
     onCommit: outcome => { onClose(); onSaved(outcomeText(outcome)); },
   });

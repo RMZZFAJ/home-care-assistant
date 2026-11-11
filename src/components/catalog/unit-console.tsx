@@ -1,8 +1,10 @@
 "use client";
+import Link from "next/link";
 import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, TextInput } from "@/components/ui/controls";
 import { useEffect, useState } from "react";
 import {
   api,
+  buttonClass,
   can,
   Notice,
   Workspace,
@@ -78,6 +80,7 @@ function Units({ context }: { context: WorkspaceContext }) {
             </p>
           </div>
           <div className="hca-toolbar">
+            <Link className={buttonClass} href="/comprovantes-catalogo">Comprovantes do catálogo</Link>
             {globalMode || can(context, "catalog.manage") ? (
               <ActionButton
                 variant="primary"

@@ -84,12 +84,17 @@ da aprovação de outro administrador no paciente.
 dos editores.** Os campos incompletos podem ser retomados. O cadastro
 preserva zeros à esquerda, o fator das embalagens e o motivo de uma mudança
 de situação. O comprovante pode ser recuperado no editor se a permissão de
-gravar for retirada e a leitura continuar autorizada. Falta um atalho para
-encontrá-lo depois de fechar o editor nesse caso. Responsável: Codex.
+gravar for retirada e a leitura continuar autorizada.
+
+**Localizar comprovantes do catálogo · 100% deste recurso.** O atalho em
+Mais opções abre o histórico da própria conta no paciente selecionado.
+Funciona depois de fechar o editor, em outra sessão e após perder a permissão
+de gravar, enquanto a leitura estiver autorizada. Tentativas ainda guardadas
+no navegador podem ser consultadas sem enviar a operação outra vez.
 
 A recuperação entre aparelhos continua estimada em 90% no sistema inteiro.
-Ainda faltam o atalho de recuperação do catálogo, outros formulários de
-administração, perfil e combinações de edição. Essas pendências são do Codex.
+Ainda faltam outros formulários de administração, perfil e combinações de
+edição. Essas pendências são do Codex.
 Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
@@ -555,10 +560,9 @@ preservado e incluído na revisão final; não será refeito sem motivo.
 1. **Completar a continuidade dos formulários diários.** Conferir na CI a
    sincronização de agenda, foco e Andamentos. Investigar a seleção da aba no
    recebimento se a falha se repetir. Completar os formulários administrativos
-   de uso diário, como acessos, cadastros e configurações de avisos. Incluir
-   o atalho de recuperação de confirmações do catálogo e conferir as
-   mensagens de conflito. As contagens, a agenda, as revisões de fluxo e o
-   catálogo serão incluídos na revisão conjunta.
+   de uso diário, com prioridade para regras de alerta, destinatários e
+   vínculos. As contagens, a agenda, as revisões de fluxo e o catálogo
+   serão incluídos na revisão conjunta.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.

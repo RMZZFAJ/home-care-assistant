@@ -65,14 +65,6 @@ export function CataloguePreparationEditor({ patientId, mode, purpose, targetId,
   const editor = useCataloguePreparation({
     scope: { patientId, mode, purpose, targetId }, userId, defaultFields, hashFor: fieldHash,
     sendCommit: attempt => api("/api/admin", { action: purpose === "adopt" ? "adoptProduct" : "product", cataloguePreparation: attempt }),
-    validOutcome: (outcome, attempt) => {
-      if (mode === "global") return "proposalId" in outcome;
-      if (!("productId" in outcome) || "eventId" in outcome || "presentationId" in outcome) return false;
-      if (purpose === "edit") return outcome.productId === targetId;
-      if (purpose === "adopt" && attempt.action === "commit")
-        return !!attempt.fields && "modelId" in attempt.fields && outcome.productId === attempt.fields.modelId;
-      return true;
-    },
     onCommit: outcome => {
       onClose();
       void onSaved(messageFor(outcome, purpose)).catch(() => undefined);

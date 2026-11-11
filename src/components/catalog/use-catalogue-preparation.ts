@@ -2,13 +2,13 @@
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/client/api";
+import { catalogueAttemptStorageKey, forgetRetainedCatalogueAttempt } from "@/lib/client/catalogue-attempt-storage";
 import {
-  catalogueAttempt, catalogueReceipt, type CatalogueAttempt, type CatalogueDraft,
+  catalogueAttempt, verifyCatalogueReceipt, type CatalogueAttempt, type CatalogueDraft,
   type CatalogueInput, type CatalogueOutcome, type CatalogueScope,
 } from "@/lib/validation/catalogue-preparation";
 
 const endpoint = "/api/admin/catalogue-preparations";
-const stages = { save: "active", commit: "consumed", discard: "discarded", acknowledge: "acknowledged" } as const;
 const revisionRejections = new Set(["DRAFT_VERSION_CONFLICT", "VERSION_CONFLICT"]);
 const checkedRejections = new Set([...revisionRejections, "INVALID_OPERATION", "AMBIGUOUS_PRODUCT", "DUPLICATE"]);
 
@@ -35,14 +35,13 @@ function sameFields(left: CatalogueInput, right: CatalogueInput) {
 }
 
 export function useCataloguePreparation<Fields extends CatalogueInput, Reference>({
-  scope: { patientId, mode, purpose, targetId }, userId, defaultFields, hashFor, validOutcome, sendCommit, onCommit,
+  scope: { patientId, mode, purpose, targetId }, userId, defaultFields, hashFor, sendCommit, onCommit,
   separateReference = false, onRejected,
 }: {
   scope: CatalogueScope;
   userId: string;
   defaultFields: (reference: Reference) => Fields;
   hashFor: (reference: Reference, fields: Fields) => string | null;
-  validOutcome: (outcome: CatalogueOutcome, attempt: CatalogueAttempt) => boolean;
   sendCommit: (attempt: CatalogueAttempt) => Promise<unknown>;
   onCommit: (outcome: CatalogueOutcome, recovered: boolean) => void;
   separateReference?: boolean;
@@ -50,7 +49,7 @@ export function useCataloguePreparation<Fields extends CatalogueInput, Reference
 }) {
   const scope = { patientId, mode, purpose, targetId };
   const url = cataloguePreparationUrl(scope);
-  const storageKey = "hca:catalogue-preparation:" + JSON.stringify([userId, patientId, mode, purpose, targetId]);
+  const storageKey = catalogueAttemptStorageKey(userId, scope);
   const mountedRef = useRef(false);
   const inFlightRef = useRef(false);
   const [snapshot, setSnapshot] = useState<PreparationSnapshot<Fields, Reference> | null>(null);
@@ -92,25 +91,14 @@ export function useCataloguePreparation<Fields extends CatalogueInput, Reference
     return () => { mountedRef.current = false; controller.abort(); };
   }, [mode, patientId, purpose, url, reload, storageKey, targetId]);
 
-  function forget() {
+  function forget(attempt: CatalogueAttempt) {
     setPending(null);
-    try { sessionStorage.removeItem(storageKey); } catch { /* The receipt remains on the server. */ }
+    forgetRetainedCatalogueAttempt(userId, attempt);
   }
 
   function acceptReceipt(attempt: CatalogueAttempt, value: unknown, recovered: boolean) {
-    const parsed = catalogueReceipt.safeParse(value);
-    if (!parsed.success) throw new Error("Não foi possível conferir o comprovante desta tentativa.");
-    const receipt = parsed.data;
-    if (receipt.ownerId !== userId || receipt.patientId !== patientId || receipt.mode !== mode
-      || receipt.purpose !== purpose || receipt.targetId !== targetId || receipt.key !== attempt.key
-      || receipt.action !== attempt.action || receipt.state !== stages[attempt.action]
-      || (attempt.id !== null && attempt.id !== receipt.id) || receipt.revision !== attempt.revision + 1
-      || ((attempt.action === "commit" || attempt.action === "acknowledge") !== (receipt.outcome !== null))
-      || (receipt.outcome && !validOutcome(receipt.outcome, attempt))) {
-      throw new Error("O comprovante recebido não corresponde a esta tentativa.");
-    }
-
-    forget();
+    const receipt = verifyCatalogueReceipt(userId, attempt, value);
+    forget(attempt);
     if (attempt.action === "commit" && receipt.outcome) {
       onCommit(receipt.outcome, recovered);
     } else if (attempt.action === "save" && attempt.fields && attempt.referenceHash) {
@@ -157,7 +145,7 @@ export function useCataloguePreparation<Fields extends CatalogueInput, Reference
       if (!mountedRef.current) return;
       if (operation !== "read" && reason instanceof ApiError && reason.status >= 400 && reason.status < 500
         && (operation === "send" || checkedRejections.has(reason.code ?? ""))) {
-        forget();
+        forget(attempt);
         if (reason.code === "VERSION_CONFLICT" && separateReference) {
           setReferenceAttempt(value => value + 1);
         } else if (revisionRejections.has(reason.code ?? "")) {

@@ -1,8 +1,11 @@
 import { z } from "zod";
 
-export const catalogueScope = z.strictObject({
+export const catalogueReceiptScope = z.strictObject({
   patientId: z.uuid().nullable(),
   mode: z.enum(["patient", "global"]),
+});
+
+export const catalogueScope = catalogueReceiptScope.extend({
   purpose: z.enum(["create", "edit", "adopt", "unit_create", "unit_configure", "presentation_create", "presentation_edit", "identity"]),
   targetId: z.string().min(1).max(120).nullable(),
 });
@@ -103,6 +106,55 @@ export const catalogueReceipt = catalogueScope.extend({
 });
 
 export type CatalogueReceipt = z.infer<typeof catalogueReceipt>;
+
+export const catalogueReceiptHistory = catalogueReceiptScope.extend({
+  ownerId: z.uuid(),
+  next: z.uuid().nullable(),
+  entries: z.array(z.strictObject({
+    id: z.uuid(),
+    purpose: catalogueScope.shape.purpose,
+    outcome,
+    confirmedAt: z.iso.datetime({ offset: true }).nullable(),
+    currentName: z.string().nullable(),
+  })).max(15),
+});
+
+export type CatalogueReceiptScope = z.infer<typeof catalogueReceiptScope>;
+export type CatalogueReceiptHistory = z.infer<typeof catalogueReceiptHistory>;
+
+export function verifyCatalogueReceipt(userId: string, attempt: CatalogueAttempt, value: unknown) {
+  const parsed = catalogueReceipt.safeParse(value);
+  if (!parsed.success) throw new Error("Não foi possível conferir o comprovante desta tentativa.");
+  const result = parsed.data;
+  const stages = { save: "active", commit: "consumed", discard: "discarded", acknowledge: "acknowledged" } as const;
+  if (result.ownerId !== userId || result.patientId !== attempt.patientId || result.mode !== attempt.mode
+    || result.purpose !== attempt.purpose || result.targetId !== attempt.targetId || result.key !== attempt.key
+    || result.action !== attempt.action || result.state !== stages[attempt.action]
+    || (attempt.id !== null && attempt.id !== result.id) || result.revision !== attempt.revision + 1
+    || ((attempt.action === "commit" || attempt.action === "acknowledge") !== (result.outcome !== null))
+    || (result.outcome && !matchesCatalogueOutcome(attempt, result.outcome))) {
+    throw new Error("O comprovante recebido não corresponde a esta tentativa.");
+  }
+  return result;
+}
+
+function matchesCatalogueOutcome(attempt: CatalogueAttempt, result: CatalogueOutcome) {
+  const { fields, purpose, targetId, mode } = attempt;
+  if (purpose === "unit_create") return "unitId" in result;
+  if (mode === "global") return "proposalId" in result;
+  if (!("productId" in result)) return false;
+  if (purpose === "identity") return "eventId" in result && result.productId === targetId
+    && (!fields || ("identityAction" in fields && result.identityAction === fields.identityAction));
+  if (purpose === "presentation_create" || purpose === "presentation_edit")
+    return "presentationId" in result && (purpose !== "presentation_edit" || result.presentationId === targetId)
+      && (!fields || ("productId" in fields && result.productId === fields.productId));
+  if ("eventId" in result || "presentationId" in result) return false;
+  if (purpose === "edit") return result.productId === targetId;
+  if (!fields) return true;
+  if (purpose === "adopt") return "modelId" in fields && result.productId === fields.modelId;
+  if (purpose === "unit_configure") return "productId" in fields && result.productId === fields.productId;
+  return purpose === "create";
+}
 
 export function catalogueCommitFor(...purposes: CatalogueScope["purpose"][]) {
   return z.strictObject({

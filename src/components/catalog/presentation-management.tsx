@@ -261,8 +261,6 @@ function PresentationEditor({
       barcode: reference.presentation?.barcode ?? "", factor: reference.presentation ? String(reference.presentation.base_quantity) : "",
       active: reference.presentation?.active ?? true }),
     hashFor: reference => reference.hash,
-    validOutcome: (outcome, attempt) => "presentationId" in outcome && (!initial || initial.id === outcome.presentationId)
-      && (attempt.action !== "commit" || (!!attempt.fields && "factor" in attempt.fields && outcome.productId === attempt.fields.productId)),
     sendCommit: attempt => sendPreparedCatalogueCommit("/api/catalog/presentations", attempt),
     onCommit: (outcome, recovered) => {
       onSaved(presentationOutcome(outcome) + (recovered ? " A intenção original foi recuperada." : ""));
