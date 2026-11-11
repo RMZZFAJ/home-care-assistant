@@ -171,10 +171,9 @@ test("transferência separa três autores, recupera declaração incerta com per
     const ana = await anaContext.newPage();
     await login(ana, f.counterparty.email, f.patient);
     await ana.goto("/entregas");
-    await ana
-      .getByRole("link")
-      .filter({ hasText: "Decidir concordância da transferência" })
-      .click();
+    const task = ana.locator(`[data-delivery-id="${id}"]`);
+    await expect(task).toContainText("Decidir concordância da transferência");
+    await task.getByRole("link", { name: "Abrir tarefa", exact: true }).click();
     await selectDocumentSection(ana, "workflow");
     await ana
       .getByRole("button", {
@@ -231,10 +230,9 @@ test("transferência separa três autores, recupera declaração incerta com per
     const bruno = await brunoContext.newPage();
     await login(bruno, f.recipient.email, f.patient);
     await bruno.goto("/entregas");
-    await bruno
-      .getByRole("link")
-      .filter({ hasText: "Conferir meu recebimento" })
-      .click();
+    const receiptTask = bruno.locator(`[data-delivery-id="${id}"]`);
+    await expect(receiptTask).toContainText("Conferir meu recebimento");
+    await receiptTask.getByRole("link", { name: "Conferir", exact: true }).click();
     await selectDocumentSection(bruno, "workflow");
     await bruno
       .getByRole("button", { name: "Informar divergência", exact: true })

@@ -1,4 +1,4 @@
-import { test, expect, type Locator } from "@playwright/test";
+import { test, expect, type Locator, type Route } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { setup, fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
@@ -29,6 +29,39 @@ for (const width of [390, 1440]) test(`RecordDrawer ${width}: continuar, descart
   const name = drawer.getByLabel("Nome", { exact: true });
   const count = () => sql(`select count(*) from public.care_recipient_products where care_recipient_id=${sqlLiteral(f.patient)};`);
   const before = count(), value = "Material teclado " + randomUUID().slice(0, 8);
+  await expect(opener).toBeEnabled();
+  await opener.focus();
+  await expect(opener).toBeFocused();
+  let releaseRead!: () => void, readStarted!: () => void;
+  const heldRead = new Promise<void>(resolve => { releaseRead = resolve; });
+  const receivedRead = new Promise<void>(resolve => { readStarted = resolve; });
+  const holdCatalogue = async (route: Route) => {
+    const url = new URL(route.request().url());
+    if (route.request().method() === "GET" && url.searchParams.get("section") === "catalog" && url.searchParams.get("careRecipientId") === f.patient) {
+      readStarted();
+      await heldRead;
+    }
+    await route.continue();
+  };
+  await page.route("**/api/admin?**", holdCatalogue);
+  try {
+    // This is the same invalidation sent by the live synchronization channel.
+    // A retained read must block commands without dropping keyboard focus.
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    await receivedRead;
+    await expect(opener).toBeDisabled();
+    await expect(opener).toBeFocused();
+    expect(await opener.evaluate(element => (element as HTMLButtonElement).disabled)).toBe(false);
+    await page.keyboard.press("Enter");
+    await opener.evaluate(element => (element as HTMLButtonElement).click());
+    await expect(drawer).toHaveCount(0);
+    expect(count()).toBe(before);
+  } finally {
+    releaseRead();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+  await expect(opener).toBeEnabled();
+  await expect(opener).toBeFocused();
   await keyboard(opener);
   await name.fill(value);
   await page.keyboard.press("Escape");

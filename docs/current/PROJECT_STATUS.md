@@ -4,7 +4,30 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.84
+## Incremento atual D3.85
+
+D3.85 conclui o ponto06.6 e a etapa06 local, no escopo original das 46 composições
+cotidianas. Foram qualificados 47 cenários distintos nos três perfis, com
+comparação canônica, cinco larguras, textos extensos, teclado, foco, cores
+forçadas e movimento reduzido. As provas recentes de 06.1–06.5 permanecem
+válidas nos consumidores inalterados. A reconsulta do catálogo preserva foco
+e bloqueia ações até terminar; leitura ausente ou recusada mantém bloqueio
+nativo. O seletor ENT usa rolagem real e conserva a exigência de 100% visível.
+Consumidores antigos agora conferem as tabelas e tarefas reais, mantendo
+quantidades, autoria, ciência, permissões e efeitos independentes.
+Tipos e lint dos afetados passaram. Remoto 207 atualizado, dry-run vazio,
+sem SQL novo. A CI do baseline e8a6adb confirmou banco e Linux/Windows;
+navegadores estavam em execução na observação. CI do novo SHA continua gate.
+Os 105 estados originais(57PASS/48PARTIAL) e 18 estados UI foram preservados.
+Visual global estimado 85%; etapa 06 original local 100%. As outras 20
+composições, conferência final, zoom nativo 400%, AT e aparelho físico mantêm
+seus gates. DOC-A/B/C/D permanecem separados e pendentes, inclusive a nova
+aparência dos PDFs e a separação do parecer BAL de qualquer efeito de estoque.
+O próximo bloco é o complemento documental de 07/09/10, com dependências
+operacionais estritamente necessárias. Produção NO-GO.
+[Resultados e limites](../audits/D/D-B/DAILY_OPERATION_JOINT.md).
+
+## Incremento anterior D3.84
 
 D3.84 conclui06.5 localmente: nove composições DOC/ARQ/RAS. FileRecord
 compartilha arquivos gerados, anexos e legados, com conteúdo integral e ações

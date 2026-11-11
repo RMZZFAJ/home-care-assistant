@@ -78,7 +78,7 @@ test("D3 consumo distingue demora vazio dados falha e repetição sem inventar m
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do consumo");
     await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toHaveCount(0); await expect(panel.getByText("Carregando relatos…", { exact: true })).toHaveCount(0);
     mode = "invalid"; await page.getByRole("button", { name: "Atualizar lista", exact: true }).click();
-    await expect(panel.getByRole("alert")).toContainText("A resposta da consulta dos relatos não pôde ser lida");
+    await expect(panel.getByRole("alert")).toContainText("A resposta recebida não corresponde à consulta dos relatos. Atualize a lista.");
     const admin = await actor("adminA", f.patient), text = "Relato fictício para estados de consulta " + randomUUID().slice(0, 8);
     await rpc(admin, "report_extraordinary_consumption", { p_patient: f.patient, p_kind: "shortage", p_location: "FAMILY", p_text: text, p_lines: [], p_key: randomUUID() });
     mode = "live"; await page.getByRole("button", { name: "Atualizar lista", exact: true }).click();

@@ -1190,11 +1190,6 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(5);
-  await expect(
-    page.getByText("Consumo · Equipe · Aguardando conferência", {
-      exact: true,
-    }),
-  ).toBeVisible();
   const reports = (
     await (
       await get(page, "/api/consumption?careRecipientId=" + patient)
@@ -1202,6 +1197,9 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   ).data;
   expect(reports).toHaveLength(1);
   const report = reports[0];
+  const reportRow = page.locator(`[data-consumption-id="${report.id}"]`);
+  await expect(reportRow.locator(".hca-consumption-main strong")).toHaveText("Consumo · Equipe");
+  await expect(reportRow.locator(".hca-consumption-end")).toContainText("Aguardando conferência");
   expect(report).toMatchObject({
     kind: "consumption",
     location: "CARE_TEAM",
@@ -1223,9 +1221,8 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   await decision
     .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })
     .click();
-  await expect(
-    page.getByText("Consumo · Equipe · Confirmado", { exact: true }),
-  ).toBeVisible();
+  await expect(reportRow.locator(".hca-consumption-main strong")).toHaveText("Consumo · Equipe");
+  await expect(reportRow.locator(".hca-consumption-end")).toContainText("Confirmado");
   stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)

@@ -29,24 +29,23 @@ responsabilidade. “Você” indica decisão, configuração, participação em
 ou liberação que depende de você. “Participantes/equipe” são pessoas que
 usarão ou avaliarão o sistema; “serviço externo” depende também do fornecedor.
 
-A última CI completa do commit anterior apontou ajustes de compatibilidade,
-foco e conferência visual nos navegadores. Eles entram na conferência
-conjunta06.6. O lote atual ainda precisa da validação completa de sua própria
-versão publicada; isso não altera os resultados locais registrados acima.
+A conferência conjunta da operação diária foi concluída localmente, com
+47 cenários distintos qualificados. Os ajustes de foco, links e rolagem
+identificados foram corrigidos. A nova versão ainda precisa da validação
+completa de sua própria publicação; isso não é aprovação geral da fase.
 
 O banco remoto já recebeu as atualizações desta etapa, sem pendências.
 A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03, 04, 05 e 07 estão concluídas
-localmente. Os dez pontos de listas da etapa05 foram conferidos.
-A etapa 06 continua em execução. Os pontos 06.1 a 06.5 estão concluídos
-localmente: requisição e compra; entregas e transferências; balanços e agenda;
-estoque, catálogo e consumo; arquivos, resumos e seções documentais. Arquivos,
-versões, anexos e verificação agora têm composições comuns e fatos separados.
-A comparação privada mantém os dois textos completos. O próximo ponto é
-06.6, a conferência visual conjunta. A simplificação completa dos rascunhos
-continua no complemento DOC-C.
+localmente, junto com a etapa06 no escopo original da operação diária.
+Os dez pontos de listas da etapa05 foram conferidos. Os pontos06.1 a06.6
+estão concluídos localmente: as 46 composições diárias e sua conferência
+conjunta. Isso inclui fichas, transferências, balanços, agenda, estoque,
+catálogo, consumo, arquivos, anexos e resumos privados. O próximo bloco é
+o complemento documental. As novas regras de fichas e PDFs e a retomada
+simplificada continuam nos blocos DOC-A a DOC-D.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -305,6 +304,21 @@ aproveitados. Os resultados anteriores continuam registrados.
   tem identidade própria. Conferir dados, permissões, links, QR e verificação
   conforme o que mudou. Disponibilizar PDFs reais para avaliação visual.
   Responsável: Codex; você poderá avaliar as amostras entregues.
+
+Sequência do complemento, sem criar outra etapa geral:
+
+1. **Fatos e atos próprios (DOC-B).** Primeiro separar parecer e estoque no
+   BAL; depois saldo histórico autorizado da COM, devolução autônoma e
+   preservação das fichas com cancelamento/complemento próprios.
+2. **Modelo dos arquivos (DOC-A).** Composição compartilhada, seguida de
+   requisição, compra/doação, entrega/devolução e BAL, com conteúdo longo.
+3. **Uso das fichas (DOC-C).** Retomada simples; Andamentos com referências
+   e destaques; acessos agrupados; modalidades completa e ampliada e auditoria.
+4. **Integração e amostras (DOC-D).** Ligar os conteúdos novos à emissão e
+   assinatura atuais, conferir os caminhos alterados e entregar PDFs reais.
+
+Todos esses pontos são responsabilidade de Codex. Sua participação será a
+avaliação das amostras e os testes humanos indicados no grupo final.
 
 Entram nos blocos 07, 09 e 10. Devolução, revisão BAL, Andamentos, acessos e
 retomada simples são dependências diretas nos blocos correspondentes.
@@ -698,7 +712,7 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    recuperação e resposta atrasada foram conferidos.
    Responsável — Codex.
 
-6. **06 — Aparência da operação diária.** Em execução · 97%.
+6. **06 — Aparência da operação diária.** Concluída localmente · 100%.
 
    Concluído — 06.1, as nove composições de requisição e compra: seleção,
    revisão, consulta, ciência, lista frequente, aquisição, parcelas e
@@ -726,8 +740,10 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    recuperação e comparações. O novo diálogo de abandono tem retorno seguro;
    as novas regras de retomada simples continuam no complemento DOC-C.
 
-   Depois — 06.6 conferência conjunta de larguras, teclado, foco, textos
-   extensos e ampliação. O grupo mantém suas 46 composições originais.
+   Concluído — 06.6 conferência conjunta local, com larguras, textos longos,
+   teclado, foco e formas de leitura. O grupo mantém suas 46 composições
+   originais. Ampliação nativa, leitor de tela e aparelho real continuam nos
+   testes finais com participantes; a fase ainda não está liberada.
    Responsável — Codex.
 
 7. **07 — Dados e histórico dos PDFs.** Concluída localmente · 100%.
@@ -963,8 +979,8 @@ de acesso e as confirmações incertas conservam sua recuperação própria.
   rascunho para todo campo; conferência pendente.
   Responsável — Codex.
 
-O próximo ponto de implementação é 06.6. O quadro será atualizado pelos
-pontos encerrados dessa lista. O fechamento técnico da D-B exige as etapas
+O próximo bloco é o complemento documental de 07/09/10. O quadro será atualizado
+pelos pontos encerrados dessa lista. O fechamento técnico da D-B exige as etapas
 executáveis 01 a 19 e o registro correto das pendências da etapa 20. A decisão
 de liberação real continua com os responsáveis e os gates de D-C/D6. O novo
 complemento DOC-A a DOC-D também deve ser entregue no bloco documental.

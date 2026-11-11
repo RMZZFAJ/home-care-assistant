@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 export type DocumentSection =
   | "overview"
@@ -26,7 +26,26 @@ export async function selectDocumentSection(
 ) {
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
   await tab.click();
-  await expect(tab).toHaveAttribute("aria-selected", "true");
+  try {
+    await expect(tab).toHaveAttribute("aria-selected", "true");
+  } catch (error) {
+    try {
+      await test.info().attach("document-tab-failure", {
+        contentType: "application/json",
+        body: JSON.stringify(await page.evaluate(() => ({
+          url: location.pathname + location.search,
+          tabs: Array.from(document.querySelectorAll('[role="tab"]')).map(node => ({
+            text: node.textContent,
+            selected: node.getAttribute("aria-selected"),
+            focused: node === document.activeElement,
+          })),
+        }))),
+      });
+    } catch {
+      /* Preserve the original failure if the page already closed. */
+    }
+    throw error;
+  }
   await expect(page.getByRole("tabpanel")).toHaveCount(1);
 }
 

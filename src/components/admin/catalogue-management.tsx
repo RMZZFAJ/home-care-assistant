@@ -31,6 +31,12 @@ export function CatalogueManagement({
   const read = useScopedRead("/api/admin?" + new URLSearchParams({ section: "catalog", careRecipientId: patientId }), String(revision), decode);
   const rows = read.data?.data ?? [], loading = read.loading;
   const unavailable = loading || Boolean(read.error) || !read.data;
+  // Retained, authorized data may be revalidated while an action has focus.
+  // Keep that focus, but never accept the action before the read finishes.
+  const editAvailability = {
+    disabled: !read.data || Boolean(read.error),
+    "aria-disabled": unavailable || undefined,
+  };
   async function saved(message: string) { await onIdentitySaved(message); read.refresh(); }
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("active");
@@ -76,28 +82,30 @@ export function CatalogueManagement({
         {writable ? (
           <div className="hca-toolbar">
             <ActionButton
-              disabled={unavailable}
+              {...editAvailability}
 
               variant="primary"
-              onClick={(event) =>
+              onClick={(event) => {
+                if (unavailable) return;
                 setEditor({
                   row: null,
                   mode: "product",
                   opener: event.currentTarget,
-                })
-              }
+                });
+              }}
             >{<Icon name="plus" />}
               Novo item
             </ActionButton>
             <ActionButton
-              disabled={unavailable}
-              onClick={(event) =>
+              {...editAvailability}
+              onClick={(event) => {
+                if (unavailable) return;
                 setEditor({
                   row: null,
                   mode: "model",
                   opener: event.currentTarget,
-                })
-              }
+                });
+              }}
             >
               Adotar modelo
             </ActionButton>
@@ -186,29 +194,31 @@ export function CatalogueManagement({
                     </DataTableCell>
                     <DataTableCell data-label="Ações">
                       <ActionButton
-                        disabled={unavailable}
+                        {...editAvailability}
                         variant="quiet"
                         aria-label={"Editar " + text(row, "name")}
-                        onClick={(event) =>
+                        onClick={(event) => {
+                          if (unavailable) return;
                           setEditor({
                             row,
                             mode: "product",
                             opener: event.currentTarget,
-                          })
-                        }
+                          });
+                        }}
                       >
                         Editar
                       </ActionButton>
                       <ActionButton
-                        disabled={unavailable}
+                        {...editAvailability}
                         variant="quiet"
                         aria-label={"Situação e sucessor: " + text(row, "name")}
-                        onClick={(event) =>
+                        onClick={(event) => {
+                          if (unavailable) return;
                           setIdentity({
                             id: text(row, "id"),
                             opener: event.currentTarget,
-                          })
-                        }
+                          });
+                        }}
                       >
                         Situação e sucessor
                       </ActionButton>

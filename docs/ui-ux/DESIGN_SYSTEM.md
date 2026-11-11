@@ -45,6 +45,10 @@ Estados conservam texto e cor semântica. Quantidades e estoque usam contratos
 exatos. Dados indisponíveis não viram zero, vazio ou aprovação. Leitura e
 escrita incerta têm recuperação própria, foco visível e autorização real.
 Revisões são leitura; validação aponta campos editáveis legítimos.
+Na reconsulta do catálogo com dados autorizados retidos, os botões de edição
+conservam foco com aria-disabled e guard explícito no handler. Nenhuma ação
+fica aguardando execução automática. Sem dados ou com erro, o bloqueio é
+nativo. A API e o banco continuam responsáveis pela autorização.
 
 DocumentHeader compartilha identificação, grade de dados e progresso separado
 da cronologia. O cabeçalho completo é h1; a consulta embutida mantém h2.

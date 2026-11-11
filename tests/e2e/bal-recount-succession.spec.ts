@@ -20,7 +20,7 @@ import { formatZonedDate } from "../../src/lib/schedules/time";
 import type { ScheduledShift } from "../../src/types/schedules";
 import type { SupplyDocument } from "../../src/types/documents";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 async function login(page: Page, email: string, patient: string) {
@@ -372,7 +372,7 @@ test("BAL reconto sem contador mostra recuperação, preserva motivo no conflito
     await recoveryCode.scrollIntoViewIfNeeded();
     await expect(recoveryCode).toBeVisible();
     await expect(recoveryCode).toBeInViewport({ ratio: 1 });
-    await audit(page, `recount-recovery-row-${width}`);
+    await auditFromTop(page, `recount-recovery-row-${width}`);
     if (width <= 390)
       await page.screenshot({
         path: `output/playwright/phase-d/recount-recovery-row-${info.project.name}-${width}.png`,

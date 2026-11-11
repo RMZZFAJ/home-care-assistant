@@ -194,7 +194,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     ).toBeVisible();
     await selectDocumentSection(pro, "materials");
     await expect(
-      pro.getByRole("listitem").filter({ hasText: "Material V4 visual" }),
+      pro.getByRole("table", { name: "Materiais requisitados", exact: true }).getByRole("row").filter({ hasText: "Material V4 visual" }),
     ).toHaveCount(1);
     await selectDocumentSection(family, "files");
     await family.getByRole("button", { name: "Gerar PDF", exact: true }).click();

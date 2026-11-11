@@ -91,8 +91,28 @@ for (const count of [1, 5, 20, 100]) {
               name: "Destinatário designado",
               exact: true,
             });
+            // A native click can leave a subpixel beyond the viewport edge.
+            // Scroll the real control fully into view; keep the original ratio.
+            await receiver.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
             await receiver.click();
-            await expect(receiver).toBeInViewport({ ratio: 1 });
+            await expect(receiver).toHaveAttribute("aria-expanded", "true");
+            await receiver.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
+            const geometry = () => receiver.evaluate(node => {
+              const r = node.getBoundingClientRect(), control = node.closest(".hca-search-select") ?? node;
+              const x = r.left + r.width / 2, y = r.top + r.height / 2;
+              return {
+                bounds: { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: innerWidth, height: innerHeight },
+                inside: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight,
+                edges: [[x, r.top + 1], [x, r.bottom - 1], [r.left + 1, y], [r.right - 1, y]].map(([px, py]) => control.contains(document.elementFromPoint(px, py))),
+              };
+            });
+            try {
+              await expect.poll(geometry).toMatchObject({ inside: true, edges: [true, true, true, true] });
+              await expect(receiver).toBeInViewport({ ratio: 1 });
+            } catch (failure) {
+              await info.attach("recipient-geometry", { contentType: "application/json", body: JSON.stringify(await geometry()) });
+              throw failure;
+            }
             await receiver.fill(person.name);
             await receiver.press("ArrowDown");
             await page

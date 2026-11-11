@@ -66,7 +66,7 @@ test("REQ follow-up reaches pending ENT and partial fulfillment; stale reads and
   await nextStep.focus();
   await nextStep.press("Enter");
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
-  const material = overview(page).getByRole("listitem").filter({ hasText: "Material fictício V4 0" });
+  const material = overview(page).getByRole("table", { name: "Materiais requisitados", exact: true }).getByRole("row").filter({ hasText: "Material fictício V4 0" });
   await expect(material).toContainText("Pendente");
   await expect(material).toContainText("Aguardando recebimento");
   await expect(material).toContainText("Quantidade aceita para este item: 0 unidade");
