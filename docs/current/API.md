@@ -519,6 +519,29 @@ filters(scope,status). Servidor e consumidor conferem estrutura, identidade
 única, total e âmbito antes de adotar a resposta. A tarefa própria continua
 calculada no banco, sem derivar autorização de recipient_id no navegador.
 
+## Coleções completas de catálogo e contas globais
+
+GET /api/catalog conserva data e os campos de seleção anteriores, incluindo
+aliases, active, successor e selectionPredecessors. Acrescenta careRecipientId,
+total e includeInactive. A leitura catalogue_workspace agrega itens e orientação
+em um único snapshot estável sob o usuário/RLS/contexto originais; não há corte
+em1000 linhas. Servidor confere total, unicidade e referências do paciente antes
+de mapear as mesmas identidades. Nenhum saldo ou quantidade é convertido.
+
+GET /api/admin?section=catalog usa a mesma leitura no contexto local e preserva
+o agregado nativo da administração global. Ambos retornam data,total,
+careRecipientId e includeInactive=true. O consumidor confere o envelope antes
+de apresentar a coleção completa, com busca e páginas locais. Falha conserva
+só leitura válida da mesma seleção e recusa retira os dados, sem vazio falso.
+
+GET /api/admin?section=profiles&profilePage=N&query=texto mantém guarda global,
+RPC e ordem full_name/id. Retorna data,total,profilePage,pageSize30 e query
+normalizada. A tela global e o seletor de vínculos conferem página, tamanho,
+consulta, quantidade e IDs. Count/data ausentes não viram zero. A tela usa
+profilePage/profileQuery na URL, com Voltar/recarga e revisão global anterior.
+A busca é submetida por Buscar contas/Enter. A resposta legada sem profilePage
+permanece para compatibilidade, sem ser a fonte paginada da tela global.
+
 ## Relatos e consumo
 
 GET /api/consumption usa páginas de 20 por created_at/id, cursor beforeAt/

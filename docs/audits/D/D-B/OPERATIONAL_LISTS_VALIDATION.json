@@ -504,5 +504,117 @@
       "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
       "No merge,production or external activation"
     ]
+  },
+  "D3.75": {
+    "baseSha": "0d4b7b108cb26827bff775d97fca25d20925c42e",
+    "scope": "05.7 complete patient catalogue and global identity directories",
+    "implementation": [
+      "New stable SECURITY INVOKER catalogue_workspace aggregates full catalogue and successor guidance in one snapshot under original grants/RLS and selected real Auth membership;no table-result1000 cap",
+      "GET catalog/admin catalogue preserve existing row fields,identities,aliases,inactive guidance and successor semantics;server and UI validate patient,total,selection and uniqueness",
+      "Catalogue queries use useScopedRead with same-scope timestamp and suspended list actions on failure;denial clears;query fields do not acquire drafts;last page clamps after changed collection",
+      "GlobalAccounts uses existing30-row native paginated RPC endpoint with exact count/search/query scope;URL,Back and reload preserve query;incomplete or wrong page/query/count refused;four approved global classifications retained and unknown stored value cannot adopt first option implicitly",
+      "Global membership picker shares response validation;parent no longer downloads unpaged global profiles/catalogue for these directory screens",
+      "Explicit acknowledge/discard clears transient fields/hash until fresh private snapshot;prevents a user choice being overwritten by the asynchronous fresh read"
+    ],
+    "unit": {
+      "passed": 31,
+      "files": [
+        "tests/catalogue-list.test.ts",
+        "tests/catalog-match.test.ts",
+        "tests/administrative-preparations.test.ts"
+      ]
+    },
+    "database": {
+      "localPrepare": "PASS without reset;home-care-assistant,54321/54322",
+      "nativeAuthTests": 1,
+      "file": "tests/integration/catalogue-completeness.test.mjs",
+      "proofs": [
+        "More than1000 native items exactly match independent SQL order/count;old tabular result is1000 with larger exact count",
+        "Late inactive/source/successor guidance intact;real reader positive;foreign patient,other context,global mode,revoked membership and anonymous denied",
+        "Invoker,STABLE,authenticated-only execute;items,guidance and ledger unchanged"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuthViewers": true,
+      "syntheticDirectoryAuthRows": "Bulk local target identities;not logged-in users or remote fixtures",
+      "initial": {
+        "startTime": "2026-11-11T10:21:59.575Z",
+        "duration": 542098.745,
+        "expected": 24,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "ackFinal": {
+        "startTime": "2026-11-11T10:32:58.132Z",
+        "duration": 167403.68600000002,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 30,
+      "executions": 33,
+      "initialRealFailures": 3,
+      "qualifiedBy": "Twenty-four initial passes retained;three legacy catalogue cases and three additional recipient cases pass final.Both shared hook consumers cover explicit acknowledgement;unaffected branch proofs retained.",
+      "reports": [
+        "catalogue-directory-first.json",
+        "catalogue-directory-ack-final.json"
+      ],
+      "failureDirectory": "catalogue-directory-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "regression": "Legacy reactivation accepted fields after acknowledging previous result while fresh private GET was pending;later read reset choice/reason.Three failures retained.Product clears stale local fields/hash after explicit acknowledgement/discard.Held real GET now proves no editable choice before fresh result;original reactivation/recovery assertions retained.",
+    "counterproofs": [
+      "Catalogue API returns all1005+items in independent SQL order;all101 late search matches traverse7 UI pages;old inactive alias and active successor predecessor labels remain available",
+      "Global directory has1005 filler Auth rows before101 late targets;all101 search identities traverse4 UI pages in SQL order;Back/reload and wrong/incomplete reads,503 and403 handled without identity edits",
+      "Real catalogue manage revocation403 clears rows;real local administrator cannot read global profile pages",
+      "Raw catalogue,successors,stock,documents and target profiles remain unchanged by directory reads",
+      "Original100-item REQ/COM/ENT selection preserves aliases,keyboard,categories,manual entry;old successor preserves stock/PDF bytes,lost-result recovery and personal selection;global proposal rejects changed/rebased attempts;global identity review preserves own and local isolation"
+    ],
+    "validation": {
+      "types": "PASS after race correction",
+      "directedLint": "PASS",
+      "axe": "New catalogue/profile320 and old directed consumers across3profiles",
+      "visual": "Fresh profile page320 inspected and legible.Catalogue late-item capture inspected;existing narrow table wraps status/clips initially offscreen actions,retained for06.4 full appearance review.No broad visual approval."
+    },
+    "remote": {
+      "versions": 206,
+      "migration": "20261111095717_phase_d3_complete_catalogue_read.sql",
+      "receipt": "CATALOGUE_LIST_REMOTE.json",
+      "pending": 0,
+      "localRemoteFunctionAndHistoryMatch": true,
+      "advisorsSameClassesAndCounts": true,
+      "localAdvisorLimitation": "CLI TCP connection timeout;remote MCP before/after completed;existing findings not approved"
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6",
+        "05.7"
+      ],
+      "next": "05.8"
+    },
+    "limits": [
+      "Own SHA CI,clean install/legacy evolution/full integration required",
+      "05.8–05.10 and other phase gates remain;legacy unpaged compatibility response is not the global screen data source",
+      "Catalogue320 table composition remains06.4;global editor ordinary fields/lifetime remain14",
+      "DOC-B10percent;DOC-A/C/D pending;new PDF appearance not approved",
+      "No merge,production,remote fixtures/Auth/Vault/reset or external activation"
+    ]
   }
 }

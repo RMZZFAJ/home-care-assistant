@@ -107,7 +107,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [page, setPage] = useState(1);
   const [notificationTotal, setNotificationTotal] = useState(0);
   const [loading, setLoading] = useState(
-    !["patient", "import", "overview", "audit", "operations"].includes(section),
+    !["patient", "import", "overview", "audit", "operations", "catalog", "profiles"].includes(section),
   );
   const command = useCommandIntent<Row, AdministrativeResult>(governanceCommandConfirmed);
   const intentRef = useRef<AdministrativeIntent | null>(null);
@@ -140,7 +140,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   }, [globalMode, patientId, versionAttempt]);
   const load = useCallback(
     (signal?: AbortSignal) => {
-      if (!allowed || ["patient", "import", "overview", "audit", "operations"].includes(section))
+      if (!allowed || ["patient", "import", "overview", "audit", "operations", "catalog", "profiles"].includes(section))
         return Promise.resolve();
       const sequence = ++loadSequenceRef.current;
       const query = new URLSearchParams({ section });
@@ -369,8 +369,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             userId={context.userId}
             globalMode={globalMode}
             writable={allowed}
-            rows={rows}
-            loading={loading}
             patientId={patientId}
             onIdentitySaved={async (message) => {
               setMessage(message);
@@ -611,7 +609,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         )}
         {section === "profiles" && globalMode ? (
           <GlobalAccounts
-            rows={rows}
             save={execute}
             busy={busy}
             error={error}

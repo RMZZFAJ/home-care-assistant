@@ -1,6 +1,11 @@
 "use client";
 import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, Pill, SelectField, TextInput } from "@/components/ui/controls";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { parseCatalogueCollectionRead } from "@/lib/validation/catalogue-list";
+import { formatBrazilDate } from "@/lib/receipt";
+import { Notice } from "@/components/workspace";
 
 import { EmptyState, Icon } from "@/components/ui/primitives";
 import { CataloguePreparationEditor } from "./catalogue-preparation-editor";
@@ -9,21 +14,23 @@ import { CatalogueIdentityManagement } from "@/components/catalog/catalogue-iden
 
 export function CatalogueManagement({
   writable,
-  rows,
   userId,
   globalMode,
-  loading,
   patientId,
   onIdentitySaved,
 }: {
   writable: boolean;
-  rows: Row[];
   userId: string;
   globalMode: boolean;
-  loading: boolean;
   patientId: string;
   onIdentitySaved: (message: string) => Promise<void>;
 }) {
+  const revision = useLiveRevision();
+  const decode = useCallback((value: unknown) => parseCatalogueCollectionRead(value, patientId), [patientId]);
+  const read = useScopedRead("/api/admin?" + new URLSearchParams({ section: "catalog", careRecipientId: patientId }), String(revision), decode);
+  const rows = read.data?.data ?? [], loading = read.loading;
+  const unavailable = loading || Boolean(read.error) || !read.data;
+  async function saved(message: string) { await onIdentitySaved(message); read.refresh(); }
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("active");
   const [page, setPage] = useState(1);
@@ -53,6 +60,7 @@ export function CatalogueManagement({
         .toLocaleLowerCase("pt-BR")
         .includes(search.toLocaleLowerCase("pt-BR")),
   );
+  const selectedPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / 15)));
   return (
     <section>
       <div className="hca-section-heading">
@@ -61,12 +69,13 @@ export function CatalogueManagement({
             Catálogo do paciente
           </h2>
           <p>
-            {rows.length} produtos cadastrados · aquisição e controle da família
+            {read.data ? `${rows.length} produtos cadastrados` : "Total de produtos ainda não confirmado"} · aquisição e controle da família
           </p>
         </div>
         {writable ? (
           <div className="hca-toolbar">
             <ActionButton
+              disabled={unavailable}
 
               variant="primary"
               onClick={(event) =>
@@ -80,6 +89,7 @@ export function CatalogueManagement({
               Novo item
             </ActionButton>
             <ActionButton
+              disabled={unavailable}
               onClick={(event) =>
                 setEditor({
                   row: null,
@@ -106,10 +116,13 @@ export function CatalogueManagement({
           }))}
           opener={identity.opener}
           onClose={() => setIdentity(null)}
-          onSaved={onIdentitySaved}
+          onSaved={saved}
           restoreFocusFallbackRef={headingRef}
         />
       ) : null}
+      {read.error ? <Notice error>{read.error} <ActionButton onClick={read.refresh}>Consultar catálogo novamente</ActionButton></Notice> : null}
+      {loading ? <Notice>Consultando catálogo…</Notice> : null}
+      {read.queriedAt ? <p className="hca-muted">{loading || read.error ? "Última consulta preservada; alterações aguardam atualização." : "Catálogo consultado:"} {formatBrazilDate(read.queriedAt)}.</p> : null}
       {writable ? (
         <>
           <div className="hca-toolbar">
@@ -137,7 +150,7 @@ export function CatalogueManagement({
               <option value="">Todos</option>
             </SelectField>
             <span className="hca-result-count" role="status">
-              {filtered.length} resultados
+              {read.data ? `${filtered.length} resultados` : "Resultados ainda não confirmados"}
             </span>
           </div>
           <div className="hca-records hca-table-container">
@@ -153,8 +166,8 @@ export function CatalogueManagement({
                 </DataTableRow>
               </DataTableHead>
               <DataTableBody>
-                {filtered.slice((page - 1) * 15, page * 15).map((row) => (
-                  <DataTableRow key={text(row, "id")}>
+                {filtered.slice((selectedPage - 1) * 15, selectedPage * 15).map((row) => (
+                  <DataTableRow key={text(row, "id")} data-product-id={text(row, "id")}>
                     <DataTableCell>
                       <strong>{text(row, "name")}</strong>
                     </DataTableCell>
@@ -174,6 +187,7 @@ export function CatalogueManagement({
                     </DataTableCell>
                     <DataTableCell>
                       <ActionButton
+                        disabled={unavailable}
                         variant="quiet"
                         aria-label={"Editar " + text(row, "name")}
                         onClick={(event) =>
@@ -187,6 +201,7 @@ export function CatalogueManagement({
                         Editar
                       </ActionButton>
                       <ActionButton
+                        disabled={unavailable}
                         variant="quiet"
                         aria-label={"Situação e sucessor: " + text(row, "name")}
                         onClick={(event) =>
@@ -203,7 +218,7 @@ export function CatalogueManagement({
                 ))}
               </DataTableBody>
             </DataTable>
-            {!loading && !filtered.length ? (
+            {read.data && !loading && !read.error && !filtered.length ? (
               <EmptyState title="Nenhum produto nesta seleção">
                 Ajuste os filtros ou adicione um item ao catálogo.
               </EmptyState>
@@ -212,17 +227,17 @@ export function CatalogueManagement({
           {filtered.length > 15 ? (
             <nav className="hca-pagination" aria-label="Páginas do catálogo">
               <ActionButton
-                disabled={page <= 1}
-                onClick={() => setPage((value) => value - 1)}
+                disabled={selectedPage <= 1 || unavailable}
+                onClick={() => setPage(selectedPage - 1)}
               >
                 Anterior
               </ActionButton>
               <span>
-                Página {page} de {Math.ceil(filtered.length / 15)}
+                Página {selectedPage} de {Math.ceil(filtered.length / 15)}
               </span>
               <ActionButton
-                disabled={page * 15 >= filtered.length}
-                onClick={() => setPage((value) => value + 1)}
+                disabled={selectedPage * 15 >= filtered.length || unavailable}
+                onClick={() => setPage(selectedPage + 1)}
               >
                 Próxima
               </ActionButton>
@@ -239,7 +254,7 @@ export function CatalogueManagement({
               opener={editor.opener}
               headingRef={headingRef}
               onClose={() => setEditor(null)}
-              onSaved={onIdentitySaved}
+              onSaved={saved}
             />
           ) : null}
         </>

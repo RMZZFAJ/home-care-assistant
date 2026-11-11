@@ -273,3 +273,76 @@ histórico completo continua no ponto05.10 e não é aprovado por este fechament
 Os105 critérios mantêm56 PASS locais e49 PARTIAL. Restam05.7–05.10 e gates
 conjuntos/visuais. DOC-B permanece10% e DOC-A/C/D pendentes, incluindo os novos
 PDFs aprovados. CI do SHA publicado continua necessária.
+
+## D3.75 — catálogo e contas, ponto 05.7
+
+Base0d4b7b1. O limite tabular1000 foi reproduzido com Auth real: a consulta
+antiga retornou1000, com total exato maior. A nova catalogue_workspace retorna
+um JSON completo de itens e sucessores, em um snapshot estável. É SECURITY
+INVOKER, com search_path vazio, execução somente authenticated e a mesma RLS.
+Exige vínculo e contexto Auth atuais; não concede acesso pelo UUID informado.
+Não altera tabela, saldo, histórico, permissões anteriores ou identidade.
+
+GET catalog/admin preservam campos, IDs, aliases e semântica dos sucessores.
+Servidor e consumidor conferem paciente, total, seleção e unicidade. A tela do
+catálogo usa useScopedRead e paginação local, sem rascunho para filtros. A
+página efetiva acompanha a coleção sem apagar a consulta. Falha conserva só
+leitura válida da mesma seleção, identificada; novas ações da lista aguardam
+atualização e recusa remove o conteúdo. Os editores de negócio continuam próprios.
+
+A tela global usa o endpoint paginado existente, com30 linhas, busca e total
+exatos. O pai não baixa mais a lista tabular inteira para essa tela. Página,
+consulta, tamanho e identidades são conferidos também no seletor global de
+vínculos. URL, Voltar e recarga conservam a busca; ela é aplicada por Buscar
+contas/Enter. O teste anterior passou a submeter a busca explicitamente,
+preservando todas as revisões e negativas. As quatro classificações globais
+aprovadas foram mantidas; um valor histórico não reconhecido permanece
+selecionado e não assume a primeira opção implicitamente.
+
+Passaram31 unitários, tipos e lint dirigido, mais uma prova nativa com Auth
+real. O catálogo com1005+ itens corresponde ao SQL independente, incluindo
+origem inativa e sucessor tardios. Leitor autorizado passa; anônimo, paciente
+estranho, outro contexto, modo global e vínculo revogado são recusados. Grants,
+invoker e STABLE foram conferidos, com catálogo, orientação e ledger intactos.
+
+São30 cenários distintos de navegador qualificados nos três perfis, por24
+aprovações iniciais e seis finais. Das33 execuções, três falharam realmente no
+reinício do editor antigo: depois de reconhecer o resultado, o formulário
+aceitava escolha/motivo antes da nova leitura e os campos eram sobrescritos.
+A correção limpa somente os campos/hash transitórios depois de reconhecimento
+ou descarte explícitos, aguardando o snapshot novo. Uma resposta real retida
+agora comprova ausência de campos editáveis nessa janela. O teste preservou
+reativação, recuperação, autoria, saldos e PDF; outro consumidor de destinatários
+conferiu o mesmo reconhecimento. As três falhas e seus contextos estão preservados.
+Os24 casos iniciais usam ramos não alterados por essa correção e foram conservados.
+
+As provas percorrem101 resultados tardios de catálogo em sete páginas e101
+contas em quatro páginas, com ordem/IDs independentes por SQL. Há mais de1000
+materiais e identidades sintéticas na origem. As contas-alvo são fixtures de
+Auth locais; os operadores de leitura usam sessões Auth reais. Aliases,
+inativos, predecessores, filtros, respostas incompletas, página/consulta/total
+incorretos,503,403, perda real de gestão do catálogo e recusa do diretório para
+administrador local foram conferidos. Ler não modifica catálogo, sucessores,
+estoque, fichas ou perfis-alvo. REQ/COM/ENT com100 materiais conservaram seleção,
+alias, teclado, categorias e entrada manual. A proposta global conservou
+idempotência/recusas de rebase; a edição global conservou revisão e isolamento.
+
+Axe dirigido passou a320px e nos consumidores anteriores. A captura de contas
+foi inspecionada, com identificação e controles legíveis. A captura da tabela
+do catálogo confirma o item tardio, mas sua composição estreita ainda quebra
+o estado e exige deslocamento para ações; a comparação integral permanece
+em06.4. Não há aprovação visual ampla nem fechamento do editor global da etapa14.
+
+A migration20261111095717 foi aplicada uma vez no remoto, antes do commit,
+após preparo local sem reset, Auth e regressões. O dry-run isolou só essa
+versão e terminou vazio. Local/remoto206: corpo, SQL registrado, propriedades
+e grants iguais. Somente função de leitura; nenhum seed, Auth, Vault, reset,
+backup redundante, merge ou produção. O CLI local de advisors teve timeout de
+conexão; o MCP remoto concluiu antes/depois, com as mesmas cinco classes e
+contagens anteriores, sem aprová-las. [Recibo](CATALOGUE_LIST_REMOTE.json).
+
+05.7 fechado localmente; próximo05.8, notificações. Sete dos dez pontos de
+listas conferidos; estimativa da etapa05 mantida90%. Os105 critérios conservam
+56 PASS locais/49 PARTIAL. DOC-B permanece10% e DOC-A/C/D pendentes, incluindo
+os novos PDFs. CI do próprio SHA, instalação limpa, evolução legada, integração
+e demais gates continuam necessários.

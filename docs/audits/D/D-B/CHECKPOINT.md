@@ -1,5 +1,25 @@
 # Checkpoint D-B
 
+D3.75 fechou 05.7. Catálogo e sucessores chegam por uma leitura completa,
+estável e invoker, sob RLS e contexto Auth originais; o limite tabular de1000
+não corta mais a coleção. Contas globais usam páginas de30 e busca no servidor,
+com escopo conferido e URL/Voltar/recarga. Falhas preservam só leitura válida
+da mesma seleção; recusa retira dados. Consulta não ganha rascunho de negócio.
+Passaram31 unitários, uma prova nativa Auth e30 cenários distintos nos três
+perfis:24 aprovações iniciais e seis finais. Três falhas reais de reinício
+foram preservadas: após reconhecer/descartar, campos antigos agora aguardam
+a nova leitura. GET retido comprova a janela fechada nos consumidores afetados.
+Mais de1000 itens e contas,101 resultados tardios por todas as páginas,
+SQL independente, REQ/COM/ENT e PDF/saldos anteriores preservados. Tipos,
+lint e axe dirigidos passaram; cartões de contas320 legíveis. Tabela de
+catálogo estreita continua na revisão06.4, sem aprovação visual integral.
+Migration20261111095717 aplicada antes do commit; local/remoto206, história,
+corpo e grants iguais; dry-run vazio. Advisors conservam classes/contagens
+anteriores. CLI local de advisors teve timeout; MCP remoto concluiu a verificação.
+Próximo05.8; sete de dez pontos conferidos, etapa05 parcial90%. Matriz56/49,
+DOC-A/B/C/D e gates conjuntos preservados; CI própria necessária.
+[Resultados](OPERATIONAL_LISTS_VALIDATION.json) e [remoto](CATALOGUE_LIST_REMOTE.json).
+
 D3.74 fechou 05.6. Um plantão que começa antes do período e continua nele
 agora aparece uma vez no primeiro dia, com aviso e horários originais. A
 contraprova mostrou 122 plantões na API e ausência do noturno na tela.

@@ -114,6 +114,8 @@ export function useScopedPreparation<Fields extends object, Reference, Attempt e
     } else {
       setConfirmDiscard(false);
       setSnapshot(null);
+      setFields(null);
+      setReviewedHash(null);
       setMessage(attempt.action === "discard" ? "Preenchimento privado descartado." : "");
       setReload(value => value + 1);
     }

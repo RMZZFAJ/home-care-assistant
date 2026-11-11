@@ -870,7 +870,12 @@ Responsável por todos os pontos — Codex.
    alcança, sem duplicação. Falha identifica a consulta anterior e suspende
    alterações; perda de acesso retira os dados. O histórico completo de
    mudanças permanece no ponto 05.10.
-7. **05.7 — Catálogo e contas.** Conferir também o diretório global de contas.
+7. **05.7 — Catálogo e contas.** Concluído localmente · 100% deste ponto.
+   O catálogo completo e as contas globais alcançam registros além do limite
+   antigo de 1.000 linhas. Foram conferidos busca, todas as páginas dos
+   resultados tardios e preservação dos registros. Uma falha não inventa vazio
+   e a perda de acesso retira o conteúdo. A revisão da tabela estreita continua
+   na aparência da etapa 06; outros ajustes do editor global ficam na etapa 14.
 8. **05.8 — Notificações.** Alcançar avisos antigos e suas pendências.
 9. **05.9 — Propostas antigas.** Localizar propostas ainda sem decisão.
 10. **05.10 — Auditoria e históricos.** Conferir filtros, ordem e paginação.

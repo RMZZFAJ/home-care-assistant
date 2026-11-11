@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { governanceIntentFields } from "@/lib/validation/governance";
 import { auditQuerySchema } from "@/lib/validation/audit";
+import { parseCatalogueCollectionRead, parseProfilesPage } from "@/lib/validation/catalogue-list";
+import { readCompleteCatalogue } from "@/lib/server/catalogue-read";
 import { catalogueAttempt } from "@/lib/validation/catalogue-preparation";
 import { runCatalogueAttempt } from "@/lib/server/catalogue-preparation";
 import { administrativeAttempt, administrativeScope } from "@/lib/validation/administrative-preparation";
@@ -228,7 +230,9 @@ export async function GET(request: Request) {
         if (query.query) profiles = profiles.ilike("full_name", "%" + query.query.replace(/[\\%_]/g, "\\$&") + "%");
         const { data, error, count } = await profiles.range((query.profilePage - 1) * pageSize, query.profilePage * pageSize - 1);
         if (error) databaseError(error);
-        return NextResponse.json({ data: data ?? [], total: count ?? 0, profilePage: query.profilePage, pageSize });
+        const body = { data, total: count, profilePage: query.profilePage, pageSize, query: query.query };
+        parseProfilesPage(body, query.profilePage, query.query);
+        return NextResponse.json(body);
       }
       return NextResponse.json({
         data: (await rpc(auth.client, "admin_list_profiles")) ?? [],
@@ -248,6 +252,13 @@ export async function GET(request: Request) {
       if (error) databaseError(error);
       return NextResponse.json({ data: data ?? [] });
     }
+    if (auth.isGlobalAdmin && section === "catalog") {
+      const patientId = parseUuid(params.get("careRecipientId"));
+      const data = await rpc(auth.client, "global_patient_administration", { p_patient: patientId, p_section: section });
+      const body = { data, total: Array.isArray(data) ? data.length : null, careRecipientId: patientId, includeInactive: true };
+      parseCatalogueCollectionRead(body, patientId);
+      return NextResponse.json(body);
+    }
     if (auth.isGlobalAdmin)
       return NextResponse.json({
         data: await rpc(auth.client, "global_patient_administration", {
@@ -260,6 +271,12 @@ export async function GET(request: Request) {
       params.get("careRecipientId"),
       ["catalog", "products"].includes(section) ? "catalog.manage" : section === "audit" ? "audit.read" : "manage",
     );
+    if (section === "catalog") {
+      const complete = await readCompleteCatalogue(auth.client, patient.id);
+      const body = { data: complete.items.map(row => ({ ...row, id: row.product_id })), total: complete.total, careRecipientId: patient.id, includeInactive: true };
+      parseCatalogueCollectionRead(body, patient.id);
+      return NextResponse.json(body);
+    }
     if (section === "audit") {
       const query = parseQuery(auditQuerySchema, Object.fromEntries(["query", "reference", "action", "entityType", "from", "to", "page", "pageSize"].filter(key => params.has(key) && params.get(key) !== "").map(key => [key, params.get(key)])));
       return NextResponse.json(await rpc(auth.client, "patient_audit_page", {
@@ -318,14 +335,7 @@ export async function GET(request: Request) {
             )
             .eq("care_recipient_id", patient.id)
             .order("created_at", { ascending: false })
-        : section === "catalog"
-          ? auth.client
-              .from("care_recipient_products")
-              .select("*")
-              .eq("care_recipient_id", patient.id)
-              .order("sort_order")
-              .order("name")
-          : section === "notificationRecipients"
+        : section === "notificationRecipients"
               ? auth.client
                   .from("recipient_notification_settings")
                   .select("*")
@@ -336,10 +346,7 @@ export async function GET(request: Request) {
     const { data, error } = await query;
     if (error) databaseError(error);
     return NextResponse.json({
-      data:
-        section === "catalog"
-          ? (data ?? []).map((item) => ({ ...item, id: item.product_id }))
-          : (data ?? []),
+      data: data ?? [],
     });
   });
 }

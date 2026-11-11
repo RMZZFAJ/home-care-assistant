@@ -262,6 +262,25 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
     `update public.capability_overrides set enabled=true where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.adminA.id)} and capability='catalog.manage';`,
   );
   await open(page, f.patient, true);
+  // Acknowledging the previous result starts a separate private fill. The
+  // fresh read must finish before its fields accept a new choice or reason.
+  const another = modal(page).getByRole("button", { name: "Iniciar outro preenchimento", exact: true });
+  await expect(another).toBeVisible();
+  let releaseFresh!: () => void, enteredFresh!: () => void;
+  const freshGate = new Promise<void>(resolve => { releaseFresh = resolve; });
+  const freshEntered = new Promise<void>(resolve => { enteredFresh = resolve; });
+  await page.route("**/api/admin/catalogue-preparations?*", async route => {
+    const response = await route.fetch(); enteredFresh(); await freshGate;
+    return route.fulfill({ response });
+  });
+  try {
+    await another.click(); await freshEntered;
+    await expect(modal(page).getByRole("combobox", { name: "Ato no catálogo", exact: true })).toHaveCount(0);
+    const freshRead = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-preparations" && response.request().method() === "GET");
+    releaseFresh(); await (await freshRead).finished();
+  } finally {
+    releaseFresh?.(); await page.unroute("**/api/admin/catalogue-preparations?*");
+  }
   await choose(
     page,
     "reactivate",

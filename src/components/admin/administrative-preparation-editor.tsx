@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { parseProfilesPage } from "@/lib/validation/catalogue-list";
 import { ActionButton, CheckboxField, FormField, SelectField, TextInput } from "@/components/ui/controls";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Dialog } from "@/components/ui/primitives";
@@ -71,8 +72,9 @@ export function AdministrativePreparationEditor({ scope, userId, products = [], 
   const [accountSearch, setAccountSearch] = useState("");
   const [accountQuery, setAccountQuery] = useState({ query: "", page: 1 });
   const globalAccountPicker = scope.mode === "global" && scope.purpose === "membership" && !scope.targetId;
-  const accounts = useScopedRead<{ data: Row[]; total: number; pageSize: number }>(globalAccountPicker
-    ? "/api/admin?" + new URLSearchParams({ section: "profiles", profilePage: String(accountQuery.page), query: accountQuery.query }) : null);
+  const decodeAccounts = useCallback((value: unknown) => parseProfilesPage(value, accountQuery.page, accountQuery.query), [accountQuery.page, accountQuery.query]);
+  const accounts = useScopedRead(globalAccountPicker
+    ? "/api/admin?" + new URLSearchParams({ section: "profiles", profilePage: String(accountQuery.page), query: accountQuery.query }) : null, "", decodeAccounts);
   const accountOptions = globalAccountPicker ? accounts.data?.data ?? [] : people;
   const selection = fields && ("productId" in fields ? fields.productId : "recipientUserId" in fields ? fields.recipientUserId : "userId" in fields ? fields.userId : scope.targetId ?? "");
   const option = fields && ("location" in fields ? fields.location : "channel" in fields ? fields.channel : "");

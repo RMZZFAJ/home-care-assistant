@@ -17,6 +17,7 @@ test("CFinal021 conta alheia tem revisão global própria e não atravessa Meu p
     await login(page, "global", null); await page.goto("/admin?section=profiles");
     const search = page.getByRole("searchbox", { name: "Pesquisar contas globais", exact: true });
     await search.fill(before.fullName);
+    await page.getByRole("button", { name: "Buscar contas", exact: true }).click();
     await page.getByRole("button", { name: "Editar conta " + before.fullName, exact: true }).click();
     const editor = page.getByRole("dialog", { name: "Editar conta global", exact: true });
     await expect(editor.getByRole("heading", { name: "Meu perfil e segurança", exact: true })).toHaveCount(0);
@@ -36,6 +37,7 @@ test("CFinal021 conta alheia tem revisão global própria e não atravessa Meu p
     await expect(editor).toHaveCount(0); await expect(review).toHaveCount(0);
     expect(profile(own)).toEqual(ownBefore);
     await search.fill(changedName);
+    await page.getByRole("button", { name: "Buscar contas", exact: true }).click();
     await page.getByRole("button", { name: "Editar conta " + changedName, exact: true }).click();
     await editor.getByLabel("Nome da conta", { exact: true }).fill(before.fullName);
     await editor.getByRole("button", { name: "Revisar alteração", exact: true }).click();

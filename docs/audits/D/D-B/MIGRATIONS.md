@@ -3,7 +3,37 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D3.61
+## Estado atual — D3.75
+
+Local e remoto com206 versões, sem pendências. A migration20261111095717
+acrescenta somente catalogue_workspace, leitura STABLE/SECURITY INVOKER com
+search_path vazio, execução authenticated e a RLS/vínculo/contexto anteriores.
+Itens e sucessores chegam completos em um snapshot, sem o limite tabular1000.
+Não altera tabela, dados, autoria, saldo ou funções de escrita.
+
+Preparo local sem reset, uma prova nativa Auth e30 cenários distintos de
+navegador qualificados precederam a aplicação. Dry-run isolou uma migration;
+a aplicação usou linked/skip-vault e terminou com dry-run vazio. Corpo, SQL
+registrado, propriedades e ACL coincidem com o local. Os84 arquivos protegidos
+não foram alterados. Sem seed, Auth, Vault, reset, produção, transportes ou
+backup/reconstrução redundantes do banco descartável autorizado.
+
+O CLI local de advisors teve timeout de conexão TCP. O MCP remoto concluiu
+antes/depois, mantendo as mesmas cinco classes e contagens; os achados antigos
+não recebem aprovação. Orientações para consulta:
+
+- RLS fechada sem políticas:62 INFO — [orientação](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy).
+- Extensão no schema público:1 WARN — [orientação](https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public).
+- Funções definer executáveis por anon:3 WARN — [orientação](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable).
+- Funções definer executáveis por authenticated:208 WARN — [orientação](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable).
+- Proteção de senhas vazadas:1 WARN — [orientação](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
+A função nova é invoker, não integra essas classes de definer e não acrescentou
+apontamentos. [Recibo](CATALOGUE_LIST_REMOTE.json) e
+[resultados](OPERATIONAL_LISTS_VALIDATION.json). Instalação limpa, evolução
+legada, integração completa e CI continuam necessárias no SHA publicado.
+
+## D3.61 — registro histórico
 
 Local e remoto com 205 versões. As migrations 20261111010628,
 20261111012930 e 20261111013009 foram aplicadas uma vez, após seis
