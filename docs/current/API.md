@@ -300,7 +300,9 @@ retorna409 CONTEXT_REQUIRED. Sem contexto de paciente, responde
 availability=patient_context_required, sem consultar notificações de outros
 pacientes. A seleção é conferida novamente depois das leituras autorizadas.
 Resposta consultada inclui availability=ready, careRecipientId, data, total,
-unreadCount, page e pageSize. O sino exclui silenciosas antes da paginação;
+unreadCount, page, pageSize, unread e surface. A central confere a seleção,
+o tamanho esperado da página e identidades únicas; resposta inconsistente
+não substitui a leitura válida. O sino exclui silenciosas antes da paginação;
 na central, o filtro de não vistas se aplica antes da página. Falha de leitura
 ou resultado inválido não vira caixa vazia. POST marca vista no aplicativo;
 não registra ciência, aceite documental ou leitura confirmada por provedor.

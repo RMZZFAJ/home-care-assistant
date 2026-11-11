@@ -616,5 +616,102 @@
       "DOC-B10percent;DOC-A/C/D pending;new PDF appearance not approved",
       "No merge,production,remote fixtures/Auth/Vault/reset or external activation"
     ]
+  },
+  "D3.76": {
+    "baseSha": "aacc89dfcf0d29c091dbe5ea5123a33360da9d69",
+    "scope": "05.8 complete personal notification history and filters",
+    "baseline": {
+      "unitPassed": 12,
+      "unitFailed": 1,
+      "counterproof": "One row accepted with total21,page1,pageSize20 before parser correction",
+      "report": "notification-list-baseline.json"
+    },
+    "unit": {
+      "passed": 19,
+      "file": "tests/notification-inbox.test.ts"
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T10:57:34.968Z",
+        "duration": 348325.853,
+        "expected": 15,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "final": {
+        "startTime": "2026-11-11T11:04:36.001Z",
+        "duration": 180585.629,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 21,
+      "executions": 27,
+      "initialRealFailures": 6,
+      "qualifiedBy": "15 unchanged old cases initially pass;6 new cases pass after immediate controlled checkbox correction;no test weakened",
+      "reports": [
+        "notification-list-first.json",
+        "notification-list-final.json"
+      ],
+      "failureDirectory": "notification-list-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "implementation": [
+      "Bind successful response to requested patient/page/pageSize/unread/surface;expected row count,unique identities and compatible row filters",
+      "Immediate controlled query synchronized with URL,Back and reload without remount or business draft",
+      "Keep only valid same-selection retained read with timestamp;403 clears;page and mark-seen actions await fresh read;original auth/session/RLS unchanged"
+    ],
+    "counterproofs": [
+      "102 native notices across6 UI pages exactly match independent SQL identities/order;oldest retained",
+      "Unread selection,Back,reload and bell excluding silent notices preserve distinct counts",
+      "Wrong page,size,filter,surface,patient,short page,duplicate and503 rejected without false empty or stale actions",
+      "Retained real old response cannot replace new filter;new-filter503 clears prior selection;403 clears content",
+      "Read/navigation leave full notifications,documents,events and ledger unchanged with no POST;explicit mark seen changes only selected notice and no official facts",
+      "Original bell focus/guide/isolation,close-without-science,silent filtering,context and controlled provider distinctions remain"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS",
+      "axe": "All rules retained;new oldest-page320 plus old directed consumer widths",
+      "visual": "Fresh oldest notification page320 inspected;not global appearance approval"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 206,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6",
+        "05.7",
+        "05.8"
+      ],
+      "next": "05.9"
+    },
+    "limits": [
+      "Own published SHA CI required;remaining05.9/05.10 and full phase gates",
+      "No new SQL,authorization,notification provider,SCI,stock,PDF/signing,cache or offline replay",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred;physical/human/provider gates separate",
+      "No merge,production,external activation or remote fixtures/Auth/Vault/reset"
+    ]
   }
 }

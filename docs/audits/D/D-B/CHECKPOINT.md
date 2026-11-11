@@ -1,5 +1,23 @@
 # Checkpoint D-B
 
+D3.76 fechou 05.8. O histórico alcança todos os102 avisos, inclusive o mais
+antigo, em ordem nativa por SQL independente. Página e filtro de não vistas
+permanecem na URL, com recarga e Voltar. O checkbox responde imediatamente.
+Paciente, página, tamanho, superfície, filtro, quantidade e identidades são
+conferidos antes de aceitar uma resposta. Erro conserva apenas a leitura válida
+da mesma seleção, identificada; recusa retira os dados e suspende a marcação.
+Passaram19 unitários e21 cenários distintos nos três perfis:15 aprovações
+iniciais e seis finais. As seis falhas reais do checkbox estão preservadas.
+A correção sincroniza estado imediato e URL sem remontar o controle ou criar
+rascunho. Respostas atrasadas não substituem outro filtro; consultas não enviam
+POST, não registram ciência e não alteram documentos ou estoque. Somente a
+marcação explícita altera o aviso escolhido. Sino, silêncio, foco e contexto
+global conservam os contratos anteriores. Tipos, lint e axe dirigidos passaram;
+a captura320 foi inspecionada. Sem SQL novo; remoto206 com dry-run vazio.
+Próximo05.9; oito de dez pontos conferidos, etapa05 parcial90%. Matriz56/49,
+DOC-A/B/C/D e gates conjuntos preservados; CI própria necessária.
+[Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
 D3.75 fechou 05.7. Catálogo e sucessores chegam por uma leitura completa,
 estável e invoker, sob RLS e contexto Auth originais; o limite tabular de1000
 não corta mais a coleção. Contas globais usam páginas de30 e busca no servidor,

@@ -346,3 +346,52 @@ listas conferidos; estimativa da etapa05 mantida90%. Os105 critérios conservam
 56 PASS locais/49 PARTIAL. DOC-B permanece10% e DOC-A/C/D pendentes, incluindo
 os novos PDFs. CI do próprio SHA, instalação limpa, evolução legada, integração
 e demais gates continuam necessários.
+
+## D3.76 — notificações, ponto05.8
+
+Baseaacc89d. A central já paginava, mas o parser aceitava páginas curtas,
+identidades repetidas e metadados de outra seleção. A contraprova unitária
+aceitou uma linha quando total21 e página1 de20 exigiam20. Agora o envelope
+conserva os campos anteriores e identifica também unread e surface. O parser
+confere paciente, página, tamanho, filtro, sino/central, comprimento esperado,
+identidades únicas e linhas compatíveis com os filtros. A contagem do sino,
+que exclui silenciosas, permanece independente do total filtrado da central.
+A autorização continua na sessão revogável e RLS; metadados não a substituem.
+
+A URL conserva página e filtro, com recarga e Voltar. A primeira coorte aprovou
+15 dos21 cenários; os seis novos encontraram uma falha real: o checkbox era
+controlado pela URL e demorava a responder ao clique. O estado local agora
+responde no evento e se reconcilia com a URL sem remontar o campo. O controle
+e a consulta compartilham a seleção imediata. Ao navegar pelo histórico do
+navegador, a seleção da URL volta a prevalecer. Não há rascunho de negócio,
+persistência local, replay ou alteração do cache privado.
+
+As seis repetições exclusivas passaram:21 cenários distintos qualificados por
+15 aprovações iniciais e seis finais, em27 execuções totais. Falhas, relatórios
+e capturas iniciais estão preservados. Os15 cenários antigos conservam suas
+aprovações e asserções; a correção posterior afeta somente a seleção da central,
+coberta pelos seis casos finais. As19
+verificações unitárias, tipos e lint dirigido passaram. Não foram reduzidas
+regras, timeouts, asserções de autorização ou testes anteriores.
+
+Auth real, API e banco local guardado comprovaram102 avisos em todas as seis
+páginas por ordem/IDs de SQL independente, inclusive o mais antigo. Filtro,
+recarga, Voltar e sino sem silenciosas mantêm os resultados corretos. Respostas
+de outra página, tamanho, filtro, superfície ou paciente, página curta e ID
+repetido são recusados.503 conserva só a leitura válida da mesma seleção;
+mudar filtro não mostra dados anteriores como atuais, nem inventa vazio.
+Uma resposta real retida não substitui o filtro atual.403 retira os avisos.
+
+Consultar e navegar preservam o conteúdo integral de avisos, documentos,
+eventos e estoque, sem POST. A marcação explícita altera somente seen_at do
+aviso escolhido; os fatos documentais e o ledger continuam iguais. Os testes
+anteriores preservam foco/fechamento do sino, contexto global sem leitura
+ampla, ausência de ciência e separação de evidência controlada do provedor.
+Axe mantém todas as regras; captura da página antiga a320px inspecionada.
+Isso não é homologação física de Android/iOS nem aprovação visual global.
+
+Sem SQL novo, dry-run remoto vazio em206 antes do commit. Oito dos dez pontos
+fixos de listas estão conferidos. Restam05.9 propostas antigas e05.10 auditoria
+e históricos; os105 critérios continuam56 PASS locais/49 PARTIAL. DOC-B10%,
+DOC-A/C/D pendentes, Sonar adiado e demais gates preservados. PR7 Draft, sem
+merge, produção ou ativação externa. [Resultados](OPERATIONAL_LISTS_VALIDATION.json).

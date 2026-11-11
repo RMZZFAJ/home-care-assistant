@@ -37,9 +37,9 @@ A fase continua em execução.
 conclusão definidos. As etapas 01, 02, 03, 04 e 07 estão concluídas localmente.
 Os seis pontos da etapa 04 estão fechados no escopo anterior. A próxima etapa
 é a 05, busca, filtros e históricos. O ponto 05.1, estoques e movimentos,
-também está concluído localmente. O ponto 05.2, fichas e requisições, foi
-concluído, assim como 05.3, compras e parcelas. O próximo é 05.4, entregas e
-transferências.
+também está concluído localmente, assim como os pontos 05.2 a 05.8.
+São oito dos dez pontos de listas conferidos. O próximo é 05.9, propostas
+antigas, seguido de 05.10, auditoria e históricos.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -835,9 +835,9 @@ documentais continuam identificadas em DOC-A a DOC-D.
 ### Próxima etapa — 05, busca, filtros e históricos
 
 Estes são os dez pontos já previstos no plano fixo. O bloco está em execução,
-com estimativa de85%; seu fechamento ainda está pendente. Os pontos05.1 a05.3
-estão concluídos; o próximo é05.4. Vou reaproveitar verificações anteriores válidas
-e corrigir as lacunas de cada lista.
+com estimativa de90%; seu fechamento ainda está pendente. Os pontos05.1 a05.8
+estão concluídos: oito dos dez pontos. O próximo é05.9. Vou reaproveitar
+verificações anteriores válidas e corrigir as lacunas de cada lista.
 Responsável por todos os pontos — Codex.
 
 1. **05.1 — Estoques e movimentos.** Concluído localmente · 100% deste ponto.
@@ -876,7 +876,12 @@ Responsável por todos os pontos — Codex.
    resultados tardios e preservação dos registros. Uma falha não inventa vazio
    e a perda de acesso retira o conteúdo. A revisão da tabela estreita continua
    na aparência da etapa 06; outros ajustes do editor global ficam na etapa 14.
-8. **05.8 — Notificações.** Alcançar avisos antigos e suas pendências.
+8. **05.8 — Notificações.** Concluído localmente · 100% deste ponto.
+   Foram conferidos102 avisos, todas as páginas e o mais antigo. Página e
+   filtro são mantidos ao recarregar e usar Voltar. Consulta com falha não
+   inventa vazio; uma resposta atrasada não troca o filtro atual. Consultar
+   não marca avisos nem registra ciência. Só a marcação escolhida altera
+   o aviso correspondente.
 9. **05.9 — Propostas antigas.** Localizar propostas ainda sem decisão.
 10. **05.10 — Auditoria e históricos.** Conferir filtros, ordem e paginação.
 

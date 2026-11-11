@@ -17,12 +17,14 @@ export async function GET(request: Request) {
     const auth = await authenticate();
     const params = new URL(request.url).searchParams;
     const { page, pageSize, start, end } = pageParameters(params);
+    const surface = params.get("surface") === "bell" ? "bell" : "center";
+    const unreadOnly = params.get("unread") === "true";
     const requested = params.get("careRecipientId")
       ? parseUuid(params.get("careRecipientId"))
       : null;
     const context = await rpc(auth.client, "my_active_context") as { mode?: string; care_recipient_id?: string } | null;
     if (context?.mode !== "patient" || !uuid.safeParse(context.care_recipient_id).success)
-      return NextResponse.json({ data: [], total: 0, unreadCount: 0, page, pageSize, availability: "patient_context_required" });
+      return NextResponse.json({ data: [], total: 0, unreadCount: 0, page, pageSize, unread: unreadOnly, surface, availability: "patient_context_required" });
     const patient = context.care_recipient_id!;
     if (requested && requested !== patient) throw new ApiError("CONTEXT_REQUIRED", "Selecione seu vínculo com o paciente destas notificações em Mudar perfil.", 409);
     let query = auth.client
@@ -34,7 +36,7 @@ export async function GET(request: Request) {
       .eq("recipient_user_id", auth.userId)
       .order("created_at", { ascending: false })
       .order("id");
-    if (params.get("surface") === "bell") query = query.eq("silent", false);
+    if (surface === "bell") query = query.eq("silent", false);
     let unseen = auth.client
       .from("requisition_notifications")
       .select("id", { count: "exact", head: true })
@@ -46,7 +48,7 @@ export async function GET(request: Request) {
     // RLS and each document's read capability continue to apply to both reads.
     query = query.eq("care_recipient_id", patient);
     unseen = unseen.eq("care_recipient_id", patient);
-    if (params.get("unread") === "true") query = query.is("seen_at", null);
+    if (unreadOnly) query = query.is("seen_at", null);
     const [result, unread] = await Promise.all([
       query.range(start, end),
       unseen,
@@ -64,6 +66,8 @@ export async function GET(request: Request) {
       unreadCount: unread.count,
       page,
       pageSize,
+      unread: unreadOnly,
+      surface,
       availability: "ready",
       careRecipientId: patient,
     });

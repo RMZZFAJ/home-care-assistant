@@ -17,13 +17,13 @@ export function useInbox({ patientId, page = 1, pageSize = 20, unread = false, s
   useEffect(() => {
     if (!patientId || paused) return;
     const controller = new AbortController();
-    void api<unknown>(url, undefined, controller.signal).then(value => parseInboxPage(value, patientId)).then(data => {
+    void api<unknown>(url, undefined, controller.signal).then(value => parseInboxPage(value, patientId, { page, pageSize, unread, surface })).then(data => {
       if (!controller.signal.aborted) { setResult({ key, selection, data, receivedAt: new Date().toISOString() }); setFailure(null); }
     }).catch(reason => {
       if (!controller.signal.aborted) setFailure({ key, selection, message: reason instanceof Error ? reason.message : "Não foi possível consultar as notificações.", unavailable: reason instanceof ApiError && [401, 403, 404, 409].includes(reason.status) });
     });
     return () => controller.abort();
-  }, [key, selection, url, patientId, paused]);
+  }, [key, selection, url, patientId, paused, page, pageSize, unread, surface]);
   useEffect(() => {
     if (!poll || !patientId || paused) return;
     const update = () => { if (!document.hidden) setAttempt(value => value + 1); };

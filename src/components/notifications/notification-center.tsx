@@ -1,6 +1,7 @@
 "use client";
 import { CheckboxField, Pill } from "@/components/ui/controls";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { api, buttonClass, Notice, Workspace } from "../workspace";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -24,10 +25,24 @@ export function NotificationCenter() {
   );
 }
 function Center({ patientId }: { patientId?: string }) {
-  const [page, setPage] = useState(1);
+  const params = useSearchParams(), router = useRouter();
+  const urlPage = Math.max(1, Math.min(100_000, Number.parseInt(params.get("page") ?? "1", 10) || 1));
+  const urlUnread = params.get("unread") === "true", queryKey = JSON.stringify([urlPage, urlUnread]);
+  const [selection, setSelection] = useState({ queryKey, page: urlPage, unread: urlUnread });
+  if (selection.queryKey !== queryKey) {
+    // Restore Back/Forward without remounting the focused control.
+    setSelection({ queryKey, page: urlPage, unread: urlUnread });
+  }
+  const { page, unread } = selection.queryKey === queryKey ? selection : { page: urlPage, unread: urlUnread };
   const [writeError, setWriteError] = useState("");
-  const [unread, setUnread] = useState(false);
   const inbox = useInbox({ patientId, page, unread });
+  const navigate = (nextPage: number, nextUnread = unread) => {
+    // Controlled fields and the read scope change in the same event.
+    setSelection({ queryKey, page: nextPage, unread: nextUnread });
+    const next = new URLSearchParams(params.toString());
+    next.set("page", String(nextPage)); next.set("unread", String(nextUnread));
+    router.push("/notificacoes?" + next, { scroll: false });
+  };
   const rows = inbox.data?.data ?? [], total = inbox.data?.total ?? 0;
   return (
     <section className="ui-card" aria-label="Acompanhamento pessoal">
@@ -46,8 +61,7 @@ function Center({ patientId }: { patientId?: string }) {
           checked={unread}
           label="Somente não vistas"
           onChange={controlEvent => { const controlValue = controlEvent.currentTarget.checked;
-            setUnread(controlValue === true);
-            setPage(1);
+            navigate(1, controlValue === true);
            }}
         /></div>
       {inbox.scopeRequired ? <Notice>Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.</Notice> : null}
@@ -58,11 +72,12 @@ function Center({ patientId }: { patientId?: string }) {
           Consultando notificações…
         </p>
       ) : null}
-      {rows.length > 0 && !inbox.fresh ? <p className="my-3 text-sm text-(--muted)">Última consulta confirmada; aguardando atualização.</p> : null}
+      {rows.length > 0 && !inbox.fresh ? <p className="my-3 text-sm text-(--muted)">Última consulta confirmada{inbox.receivedAt ? " em " + formatBrazilDate(inbox.receivedAt) : ""}; aguardando atualização.</p> : null}
       <ul className="hca-notification-list">
         {rows.map((row) => (
           <li
             key={row.id}
+            data-notification-id={row.id}
             className={
               "hca-notification-row " +
               (row.seen_at
@@ -99,6 +114,7 @@ function Center({ patientId }: { patientId?: string }) {
                 <button
                   className={buttonClass}
                   type="button"
+                  disabled={!inbox.fresh}
                   onClick={async () => {
                     setWriteError("");
                     try {
@@ -137,9 +153,9 @@ function Center({ patientId }: { patientId?: string }) {
           <button
             className={buttonClass}
             type="button"
-            disabled={page === 1 || inbox.loading}
+            disabled={page === 1 || !inbox.fresh}
             onClick={() => {
-              setPage((value) => value - 1);
+              navigate(page - 1);
             }}
           >
             Anterior
@@ -150,9 +166,9 @@ function Center({ patientId }: { patientId?: string }) {
           <button
             className={buttonClass}
             type="button"
-            disabled={page * 20 >= total || inbox.loading}
+            disabled={page * 20 >= total || !inbox.fresh}
             onClick={() => {
-              setPage((value) => value + 1);
+              navigate(page + 1);
             }}
           >
             Próxima
