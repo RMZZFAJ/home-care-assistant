@@ -110,5 +110,90 @@
       "DOC-B10percent and DOC-A/C/D pending;new PDF/signature/cancellation/draft rules not approved here",
       "No SQL,merge,production,external activation or security relaxation;Sonar owner-deferred"
     ]
+  },
+  "D3.71": {
+    "baseSha": "f4b0045fbabc90c4a8a35e07ad9a80c3a796d83f",
+    "scope": "05.3 purchases and receipt collection;query controls only,no new business draft",
+    "implementation": [
+      "Receipt view sorts by instant and ID without mutating the native collection;ordinals precede filters and remain tied to full-view chronology",
+      "Local query by ordinal/material/recorded author/decision and state;20rows per page,all rows reachable;genuine empty versus empty selection",
+      "Read refresh preserves query;new document key resets it;clamps effective page after collection change without effects",
+      "Shared canonical controls;no new dependency,API,RPC,permission,storage,replay or signed-document change"
+    ],
+    "unit": {
+      "qualifiedDistinct": 15,
+      "initialPassed": 14,
+      "initialFailed": 1,
+      "finalRepeated": 6,
+      "retainedUnchanged": 9,
+      "qualification": "The new helper test initially expected Aprovada;existing receipt label is Validada.Corrected only that expectation;all6helper tests pass,retained9purchase-follow-up cases unchanged.",
+      "files": [
+        "tests/purchase-receipt-list.test.ts",
+        "tests/purchase-follow-up.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "cohort": {
+        "startTime": "2026-11-11T08:26:19.508Z",
+        "duration": 217719.513,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctPassed": 18,
+      "executions": 18,
+      "failures": 0,
+      "report": "output/phase-d-work/ui-canonical/purchase-list-qualified.json",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "frozenSources": true
+    },
+    "counterproofs": [
+      "101native COM records,including donation/purchase,all pages exactly match raw SQL created_atDESC,idASC;oldest COM found by code with type retained and page reset",
+      "101native receipts;99pending/1approved/1rejected;exactly1.000000 stock credit before UI read;all receipt pages match raw SQL created_atASC,idASC",
+      "Search101 reaches last receipt;state+text empty is not absence of arrivals;approved receipt retains ordinal3 instead of1;clear restores first20",
+      "Readonly GET503 preserves local query101 and previous receipt;recovery works without extra official POST",
+      "Independent checksum of complete raw documents,lines,events,receipts and ledger unchanged during read/search/pagination;positive counts/states/stock checked separately",
+      "All4existing arrival,decision recovery,rejection,conflict/explicit adoption,expectation closure and distinct-PDF cases pass with their original assertions"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS after setter naming repair,no rule suppression",
+      "reactReview": "Shared canonical controls;derived filter/page;immutable array;per-document key;no new effect/network;serializable client props",
+      "axeOverflow": "320px receipt101 and existing consumer width checks retained",
+      "visual": "Fresh Chromium320 receipt101 inspected;complete heading,author,quantity,unit and controls;not whole-system appearance approval"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3"
+      ],
+      "next": "05.4"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "05.4–05.10 and joint/visual/human/physical/provider gates remain",
+      "Receipt ordinal is a locator in the current view,not an official protocol",
+      "DOC-B10percent and DOC-A/C/D remain;old PDF regression is not new PDF approval",
+      "No SQL,merge,production,external activation or security relaxation;Sonar owner-deferred"
+    ]
   }
 }

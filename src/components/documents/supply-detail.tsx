@@ -1097,7 +1097,7 @@ export function SupplyDocumentContent({
                   }}
                 />
               ) : null}
-              {data.type === "COM" ? <PurchaseDetails data={data} /> : null}
+              {data.type === "COM" ? <PurchaseDetails key={data.id} data={data} /> : null}
               {data.type === "BAL" && data.status !== "draft" ? (
                 <BalanceReview
                   data={data}

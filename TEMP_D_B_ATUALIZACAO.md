@@ -38,7 +38,8 @@ conclusão definidos. As etapas 01, 02, 03, 04 e 07 estão concluídas localment
 Os seis pontos da etapa 04 estão fechados no escopo anterior. A próxima etapa
 é a 05, busca, filtros e históricos. O ponto 05.1, estoques e movimentos,
 também está concluído localmente. O ponto 05.2, fichas e requisições, foi
-concluído; o próximo é 05.3, compras e parcelas.
+concluído, assim como 05.3, compras e parcelas. O próximo é 05.4, entregas e
+transferências.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -675,7 +676,7 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    complemento continuam nos blocos DOC-A a DOC-D; a revisão geral permanece.
    Responsável — Codex.
 
-5. **05 — Busca, filtros e históricos.** Em execução · 80%.
+5. **05 — Busca, filtros e históricos.** Em execução · 85%.
 
    Para concluir — Todas as listas previstas alcançam os registros permitidos,
    inclusive listas grandes e pendências antigas, com ordenação e resposta
@@ -834,8 +835,8 @@ documentais continuam identificadas em DOC-A a DOC-D.
 ### Próxima etapa — 05, busca, filtros e históricos
 
 Estes são os dez pontos já previstos no plano fixo. O bloco está em execução,
-com estimativa de80%; seu fechamento ainda está pendente. Os pontos05.1 e05.2
-estão concluídos; o próximo é05.3. Vou reaproveitar verificações anteriores válidas
+com estimativa de85%; seu fechamento ainda está pendente. Os pontos05.1 a05.3
+estão concluídos; o próximo é05.4. Vou reaproveitar verificações anteriores válidas
 e corrigir as lacunas de cada lista.
 Responsável por todos os pontos — Codex.
 
@@ -848,7 +849,11 @@ Responsável por todos os pontos — Codex.
    antiga. Resposta incompleta não aparece como lista vazia; falhas conservam
    a leitura anterior identificada. Filtros, foco, recarga e Voltar foram
    conferidos, sem registrar ciência ou movimentar estoque.
-3. **05.3 — Compras e parcelas.** Conferir a busca e todas as parcelas.
+3. **05.3 — Compras e parcelas.** Concluído localmente · 100% deste ponto.
+   Conferidas101 compras e101 parcelas, com todas as páginas e busca da mais
+   antiga. As parcelas têm busca e filtro por situação, sem mudar sua
+   identificação ao filtrar. Falha de consulta conserva os campos e não
+   repete crédito de estoque. São filtros simples, sem novo rascunho.
 4. **05.4 — Entregas e transferências.** Percorrer as duas direções e estados.
 5. **05.5 — Consumo.** Conferir relatos antigos, busca e resultados completos.
 6. **05.6 — Agenda.** Conferir períodos e listagens permitidas.

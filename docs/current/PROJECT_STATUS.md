@@ -4,7 +4,21 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.70
+## Incremento atual D3.71
+
+Parcelas de aquisição têm busca, filtro por situação e páginas completas,
+mantendo identidade e número de localização na ficha ao filtrar. Passaram15
+unitários qualificados e18 cenários de produção nos três perfis, sem falhas
+de navegador ou repetições. Tipos, lint e axe/inspeção dirigidos passaram.
+Foram conferidas101 COM e101 parcelas nativas por SQL independente, com
+declarações, decisões e crédito único preservados. Recuperação, conflitos,
+rejeição, encerramento e PDFs existentes mantêm suas asserções.
+Sem SQL novo; remoto205 com dry-run vazio. Ponto05.3 fechado localmente;
+próximo05.4. Etapa05 parcial85%; matriz56/49 preservada. CI própria e novos
+DOC-A/B/C/D continuam pendentes, sem aprovação dos novos PDFs neste lote.
+[Implementação e limites](../audits/D/D-B/OPERATIONAL_LISTS.md).
+
+## Incremento anterior D3.70
 
 A lista unificada confere paciente, filtros, página e total antes de adotar
 respostas; uma falha não fabrica vazio ou zero. A leitura anterior do mesmo

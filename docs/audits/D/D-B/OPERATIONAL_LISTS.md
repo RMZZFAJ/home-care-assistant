@@ -65,3 +65,51 @@ escopo declarado; próximo05.3, compras e parcelas. Os105 critérios conservam
 conjuntos continuam necessários. DOC-B permanece10% e DOC-A/C/D pendentes;
 este incremento não aprova os novos PDFs, cancelamentos ou rascunhos simples.
 [Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
+## D3.71 — compras e parcelas, ponto05.3
+
+Basef4b0045. A lista de compras reutiliza a consulta unificada. As parcelas
+agora têm busca local por número de localização, material e autoria preservada,
+filtro por situação e páginas de20. Todas continuam alcançáveis. A ordem da
+consulta usa instante e ID; a coleção recebida não é alterada. Os números de
+localização são calculados antes de filtrar, sem virar protocolos oficiais.
+Selecionar uma parcela continua usando sua identidade nativa.
+
+Uma seleção vazia não significa ausência de chegadas. Limpar a consulta
+restaura a primeira página. Atualizar a ficha preserva os filtros; mudar de
+ficha reinicia a consulta. Controles do modelo canônico e campos completos
+foram mantidos, incluindo quantidade/unidade, autor, instante e decisão.
+Os controles foram classificados no inventário como consulta, sem rascunho
+de negócio ou nova persistência. Não há novo endpoint, RPC, autorização,
+dependência, armazenamento ou replay.
+
+São15 unitários distintos qualificados: nove de acompanhamento preservados
+e seis do helper aprovados após corrigir uma expectativa de rótulo. O contrato
+existente diz Validada, não Aprovada; o produto não foi alterado para acomodar
+o teste. Tipos e lint dirigido passaram, com o nome do setter corrigido sem
+suprimir a regra. A revisão React conferiu derivação de filtros/página,
+imutabilidade, chave por ficha e ausência de novos efeitos/requisições.
+
+Os18 cenários de produção passaram numa única coorte, nos três perfis, sem
+falhas ou repetições. Com Auth real,101 COM percorrem todas as páginas em
+ordem exata por SQL independente; a mais antiga é alcançada pelo código.
+Outra COM tem101 parcelas nativas:99 pendentes, uma validada e uma rejeitada.
+Antes da consulta, o crédito oficial é exatamente1 unidade; informar chegada
+ou rejeitar não cria esse crédito. Todas as101 parcelas foram percorridas,
+sem perdas ou duplicações. A parcela101 permanece alcançável por busca e a
+terceira validada conserva seu número ao filtrar.
+
+Uma falha503 conserva a consulta101 e a parcela anterior; a recuperação não
+envia comando oficial. Comparações independentes dos documentos, linhas,
+eventos, parcelas e ledger completos comprovam sua preservação durante a
+leitura e navegação; as contagens, estados e o crédito também têm asserções
+positivas separadas. Os quatro consumidores antigos conservaram chegada
+vazia, quantidades declaradas, decisão recuperável, rejeição sem entrada,
+conflito com adoção explícita, encerramento da expectativa e PDFs distintos.
+Axe/overflow e a captura da parcela101 a320px passaram. A captura Chromium
+foi inspecionada, sem substituir o aceite integral da aparência.
+
+Sem SQL novo; dry-run remoto vazio em205. Ponto05.3 fechado localmente;
+próximo05.4, entregas e transferências. Os105 critérios mantêm56 PASS locais
+e49 PARTIAL. CI própria e demais pontos/gates continuam necessários.
+DOC-B permanece10% e DOC-A/C/D pendentes, incluindo os novos PDFs aprovados.

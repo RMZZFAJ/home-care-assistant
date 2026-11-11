@@ -1,5 +1,16 @@
 # Checkpoint D-B
 
+D3.71 fechou05.3. Parcelas têm busca, situação, páginas de20 e ordem estável,
+sem perder identidade, autoria, quantidades ou localização ao filtrar.
+Passaram15 unitários qualificados e18 cenários de produção nos três perfis,
+em uma coorte sem falhas. Tipos, lint e axe/inspeção a320px passaram.
+Auth real,101 COM e101 parcelas por SQL independente;99 pendentes/1 validada/
+1 rejeitada e crédito único de1 unidade. Consulta/falha/retomada preservam
+fatos completos sem comando oficial. Os quatro consumidores antigos passaram.
+Sem SQL novo; dry-run remoto vazio em205. Próximo05.4; etapa05 parcial85%.
+Matriz56/49 e DOC-A/B/C/D preservados; CI própria necessária.
+[Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
 D3.70 fechou05.2. A falha real200 sem total mostrava vazio; agora a lista
 confere paciente/filtro/página/registros e preserva a leitura válida do mesmo
 âmbito. URL/Voltar mantêm campos e foco, sem novo rascunho. Passaram30 unitários
