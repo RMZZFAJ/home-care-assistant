@@ -1,5 +1,16 @@
 # Checkpoint D-B
 
+D3.70 fechou05.2. A falha real200 sem total mostrava vazio; agora a lista
+confere paciente/filtro/página/registros e preserva a leitura válida do mesmo
+âmbito. URL/Voltar mantêm campos e foco, sem novo rascunho. Passaram30 unitários
+e15 cenários distintos nos três perfis, por nove aprovações iniciais e seis
+finais. Seis falhas de expectativa e a contraprova do baseline preservadas.
+Auth real,101 REQ/103 fichas, SQL independente, resposta tardia, permissões,
+SCI/aberturas/estoque preservados. Tipos, lint e axe/inspeção dirigida passaram.
+Sem SQL novo; dry-run remoto vazio em205. Próximo05.3; etapa05 parcial80%.
+Matriz56/49 e complementos documentais preservados; CI própria necessária.
+[Dossiê](OPERATIONAL_LISTS.md) e [resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
 D3.69 fechou05.1 sem alteração de produto. Conferidos os fontes e dependências
 do estoque desde90f832d;18 cenários anteriores reaproveitados, sem nova execução.
 Três casos novos passaram nos três perfis com mais de100 movimentos nativos,

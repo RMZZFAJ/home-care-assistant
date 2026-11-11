@@ -1,0 +1,114 @@
+{
+  "D3.70": {
+    "baseSha": "81fa08a5e3297de19c7495e5a5a4a1313cce737a",
+    "scope": "05.2 canonical unified document/REQ history;old RequisitionHistory has no consumer and was not refactored",
+    "implementation": [
+      "HTTP list retains native fields and adds exact patient/filter envelope;server and client validate native shape,identity,page,size,total,uniqueness and explicit type",
+      "Shared useScopedRead retains only same-scope valid data and timestamp,clears401/403/404,no false initial zero or empty",
+      "Patient-keyed form preserves focus during query navigation;conditional query reset restores draft filters on Back/Forward;no private business draft or new storage",
+      "Native ordering/date/authorization/protocol/stock/signature contracts retained;inverted document date range rejected400"
+    ],
+    "unitApi": {
+      "passed": 30,
+      "files": [
+        "tests/document-list.test.ts",
+        "tests/language-navigation.test.ts",
+        "tests/api/purchase-origin-contract.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "baselineDefect": {
+        "startTime": "2026-11-11T07:41:29.586Z",
+        "duration": 78410.105,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "initialCohort": {
+        "startTime": "2026-11-11T07:52:36.943Z",
+        "duration": 353599.043,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "affectedFinal": {
+        "startTime": "2026-11-11T08:00:12.182Z",
+        "duration": 134015.098,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 15,
+      "qualification": "Nine initial passes retained;repeat only six failures after test-only readiness/bounds corrections.Runtime sources unchanged after initial cohort.First six failures preserved,not hidden.",
+      "incrementExecutions": 21,
+      "incrementPasses": 15,
+      "initialExpectationFailures": 6,
+      "baselineProductFailureSeparate": 1,
+      "reports": [
+        "document-list-baseline.json",
+        "document-list-first.json",
+        "document-list-affected-final.json"
+      ],
+      "failureDirectories": [
+        "document-list-baseline-81fa08a",
+        "document-list-first-failed"
+      ],
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "counterproofs": [
+      "Baseline HTTP200 without total renders false empty despite real COM;archived screenshot inspected",
+      "Six malformed200 modes cannot replace prior valid read:missing envelope/total,other patient,page,filter,impossible total,duplicate ID",
+      "101REQ plus real COMdraft and ENT;all103 rows and101REQ traversed by pages in independent SQL created_atDESC,idASC order;no losses or duplicate identities;oldest REQ reached by page and code",
+      "Real older no-result response delivered after latest query cannot replace current result;focus preserved,URL/reload and Back/Forward verified",
+      "Initial held503 never claims zero/empty;retry recovers;controlled403 clears prior data;real com.read revocation returns authorized empty;real foreign patient404",
+      "HTTP pageSize101 clamps100 as established contract;invalid date range400",
+      "Complete raw documents,events,movements,science and openings unchanged by list reads/navigation;no UI operational POST",
+      "Existing translated chips/unknown status fallback and dashboard archive-task exact list consumers retain original assertions"
+    ],
+    "testCorrections": [
+      "Date-filter navigation initially was not awaited before Back;added exact URL assertions without relaxing field/result assertions",
+      "Existing pageParameters clamps101 to100;replaced incorrect400 expectation with200 and exact effective100 assertion;no runtime bounds change"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS",
+      "visual": "Fresh initial-error desktop and oldest-REQ320 screenshots inspected;full app parity remains step06",
+      "axe": "New oldestREQ320 and existing translated-chip/status four widths across3profiles",
+      "postInitialProductionChanges": 0
+    },
+    "remote": {
+      "project": "qwfrqychokvhdzakibid",
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2"
+      ],
+      "next": "05.3"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "Other eight list checkpoints and joint validation remain",
+      "Full visual composition/171relations and physical/human/provider gates remain separate",
+      "DOC-B10percent and DOC-A/C/D pending;new PDF/signature/cancellation/draft rules not approved here",
+      "No SQL,merge,production,external activation or security relaxation;Sonar owner-deferred"
+    ]
+  }
+}

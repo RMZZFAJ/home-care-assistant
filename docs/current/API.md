@@ -188,6 +188,15 @@ documentais também exigem expectedVersion para detectar concorrência.
 
   **Contrato:** Lista unificada e criação COM, ENT ou BAL
 
+  GET conserva data,total,page,pageSize e acrescenta careRecipientId e
+  filters(search,type,status,from,to), com filtros vazios como NULL.
+  O servidor confere a estrutura nativa, os totais e a página antes de responder;
+  resultado interno inconsistente é erro de consulta, não vazio ou rejeição de
+  preenchimento. A tela confere esse âmbito, preserva somente a leitura válida
+  do mesmo filtro e a identifica quando a atualização falha. 401/403/404 retiram
+  os dados anteriores. Busca e paginação não registram abertura, ciência ou
+  operação de estoque. A ordenação nativa é created_at decrescente e id crescente.
+
 - **Rota:** /api/documents/:id
 
   **Contrato:** Documento e comando transacional

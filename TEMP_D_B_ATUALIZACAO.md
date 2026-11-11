@@ -37,7 +37,8 @@ A fase continua em execução.
 conclusão definidos. As etapas 01, 02, 03, 04 e 07 estão concluídas localmente.
 Os seis pontos da etapa 04 estão fechados no escopo anterior. A próxima etapa
 é a 05, busca, filtros e históricos. O ponto 05.1, estoques e movimentos,
-também está concluído localmente; o próximo é 05.2, fichas e requisições.
+também está concluído localmente. O ponto 05.2, fichas e requisições, foi
+concluído; o próximo é 05.3, compras e parcelas.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -674,7 +675,7 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    complemento continuam nos blocos DOC-A a DOC-D; a revisão geral permanece.
    Responsável — Codex.
 
-5. **05 — Busca, filtros e históricos.** Em execução · 75%.
+5. **05 — Busca, filtros e históricos.** Em execução · 80%.
 
    Para concluir — Todas as listas previstas alcançam os registros permitidos,
    inclusive listas grandes e pendências antigas, com ordenação e resposta
@@ -833,8 +834,8 @@ documentais continuam identificadas em DOC-A a DOC-D.
 ### Próxima etapa — 05, busca, filtros e históricos
 
 Estes são os dez pontos já previstos no plano fixo. O bloco está em execução,
-com estimativa de75%; seu fechamento ainda está pendente. O ponto05.1 está
-concluído; o próximo é05.2. Vou reaproveitar verificações anteriores válidas
+com estimativa de80%; seu fechamento ainda está pendente. Os pontos05.1 e05.2
+estão concluídos; o próximo é05.3. Vou reaproveitar verificações anteriores válidas
 e corrigir as lacunas de cada lista.
 Responsável por todos os pontos — Codex.
 
@@ -842,7 +843,11 @@ Responsável por todos os pontos — Codex.
    Foram conferidos os materiais e o histórico com mais de100 movimentos,
    páginas completas, ordem, filtros, falha, vazio e resposta antiga, sem
    alteração do estoque. Reaproveitadas as verificações anteriores válidas.
-2. **05.2 — Fichas e requisições.** Alcançar também fichas e pendências antigas.
+2. **05.2 — Fichas e requisições.** Concluído localmente · 100% deste ponto.
+   Conferidas mais de100 requisições, todas as páginas e a pendência mais
+   antiga. Resposta incompleta não aparece como lista vazia; falhas conservam
+   a leitura anterior identificada. Filtros, foco, recarga e Voltar foram
+   conferidos, sem registrar ciência ou movimentar estoque.
 3. **05.3 — Compras e parcelas.** Conferir a busca e todas as parcelas.
 4. **05.4 — Entregas e transferências.** Percorrer as duas direções e estados.
 5. **05.5 — Consumo.** Conferir relatos antigos, busca e resultados completos.

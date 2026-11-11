@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 import {
-  api,
   buttonClass,
   inputClass,
   Notice,
@@ -18,6 +17,8 @@ import { documentLabels } from "@/types/documents";
 import {historyFilterPresentation,historyStatusLabels} from "@/lib/documents/presentation";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import { parseDocumentListRead } from "@/lib/validation/document-list";
 
 export type { DocumentSummary } from "@/types/documents";
 import type { DocumentSummary } from "@/types/documents";
@@ -71,7 +72,7 @@ export function DocumentHistory() {
       {(context) =>
         context.patient ? (
           <HistoryContent
-            key={context.patient.id + params.toString()}
+            key={context.patient.id}
             context={context}
             initial={{
               ...empty,
@@ -105,16 +106,29 @@ function HistoryContent({
   const [showFilters, setShowFilters] = useState(
     Object.values(initial).some(Boolean),
   );
-  const [rows, setRows] = useState<DocumentSummary[]>([]);
+  const queryKey = JSON.stringify([initial, initialPage]);
+  const [previousQuery, setPreviousQuery] = useState(queryKey);
+  if (previousQuery !== queryKey) {
+    // Back/forward restores the query without replacing the focused form.
+    setPreviousQuery(queryKey);
+    setDraft(initial);
+    if (Object.values(initial).some(Boolean)) setShowFilters(true);
+  }
   const page = initialPage;
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [attempt, setAttempt] = useState(0);
   const liveRevision = useLiveRevision();
+  const patientId = context.patient!.id;
+  const decode = useCallback((value: unknown) => parseDocumentListRead(value, {
+    careRecipientId: patientId, page, pageSize: 20,
+    search: filters.search, type: filters.type, status: filters.status, from: filters.from, to: filters.to,
+  }), [patientId, page, filters.search, filters.type, filters.status, filters.from, filters.to]);
+  const read = useScopedRead("/api/documents?" + new URLSearchParams({
+    careRecipientId: patientId, page: String(page), pageSize: "20", ...filters,
+  }), String(liveRevision), decode);
+  const { loading, error } = read;
+  const rows = read.data?.data ?? [], total = read.data?.total ?? 0;
   const navigate = (next: Filters, nextPage = 1) => {
     if (JSON.stringify(next) === JSON.stringify(filters) && nextPage === page) {
-      setAttempt((value) => value + 1);
+      read.refresh();
       return;
     }
     const query = new URLSearchParams({ careRecipientId: context.patient!.id });
@@ -124,44 +138,9 @@ function HistoryContent({
   };
   const setPage = (value: number) => navigate(filters, value);
   const setFilters = (value: Filters) => navigate(value);
-  useEffect(() => {
-    const controller = new AbortController();
-    const query = new URLSearchParams({
-      careRecipientId: context.patient!.id,
-      page: String(page),
-      pageSize: "20",
-      ...filters,
-    });
-    api<{ data: DocumentSummary[]; total: number }>(
-      "/api/documents?" + query,
-      undefined,
-      controller.signal,
-    )
-      .then(
-        (result) => {
-          if(controller.signal.aborted)return;
-          setRows(result.data);
-          setTotal(result.total);
-          setError("");
-        },
-        (reason) => {
-          if (!controller.signal.aborted)
-            setError(
-              reason instanceof Error
-                ? reason.message
-                : "Não foi possível consultar o histórico.",
-            );
-        },
-      )
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [context.patient, filters, page, attempt, liveRevision]);
   const active = Object.entries(filters).filter(([, value]) => value).map(([key,value])=>({key,...historyFilterPresentation(key,value)}));
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setLoading(true);
     setFilters({ ...draft });
   }
   return (
@@ -171,7 +150,7 @@ function HistoryContent({
           <div>
             <h2 className="font-semibold">Documentos e acompanhamento</h2>
             <p className="mt-1 text-xs text-(--muted)">
-              {total} registro(s) no contexto autorizado
+              {read.data ? `${total} registro(s) no contexto autorizado` : "Total ainda não confirmado."}
             </p>
           </div>
           <button
@@ -281,7 +260,6 @@ function HistoryContent({
                 onClick={() => {
                   setFilters(empty);
                   setDraft(empty);
-                  setLoading(true);
                 }}
               >
                 Limpar
@@ -303,7 +281,6 @@ function HistoryContent({
                 onClick={() => {
                   setFilters({ ...filters, [key]: "" });
                   setDraft({ ...draft, [key]: "" });
-                  setLoading(true);
                 }}
                 aria-label={removeLabel}
               >
@@ -320,8 +297,7 @@ function HistoryContent({
             className={buttonClass}
             type="button"
             onClick={() => {
-              setAttempt((value) => value + 1);
-              setLoading(true);
+              read.refresh();
             }}
           >
             Tentar novamente
@@ -329,28 +305,31 @@ function HistoryContent({
         </Notice>
       ) : null}
       {loading ? <Notice>Consultando documentos…</Notice> : null}
-      {!loading && !error ? (
+      {read.queriedAt ? <p className="text-xs text-(--muted)">
+        {loading || error ? "Última consulta válida" : "Lista consultada"}: {formatBrazilDate(read.queriedAt)}.
+        {loading || error ? " Os registros preservados podem estar desatualizados." : ""}
+      </p> : null}
+      {read.data ? (
         <section className={panelClass}>
           {rows.length ? (
             rows.map((row) => <DocumentRow key={row.id} row={row} />)
-          ) : (
+          ) : !loading && !error ? (
             <EmptyState title="Nenhuma ficha encontrada">
               Ajuste os filtros ou registre uma nova ficha autorizada.
             </EmptyState>
-          )}
+          ) : null}
         </section>
       ) : null}
-      {total > 20 ? (
+      {read.data && total > 20 ? (
         <nav
           className="flex items-center justify-between gap-3"
           aria-label="Páginas do histórico"
         >
           <button
             className={buttonClass}
-            disabled={page <= 1 || loading}
+            disabled={page <= 1 || loading || Boolean(error)}
             onClick={() => {
               setPage(page - 1);
-              setLoading(true);
             }}
           >
             Anterior
@@ -360,10 +339,9 @@ function HistoryContent({
           </span>
           <button
             className={buttonClass}
-            disabled={page * 20 >= total || loading}
+            disabled={page * 20 >= total || loading || Boolean(error)}
             onClick={() => {
               setPage(page + 1);
-              setLoading(true);
             }}
           >
             Próxima

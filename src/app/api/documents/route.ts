@@ -11,6 +11,7 @@ import {
 } from "@/lib/server/api";
 import { createSupplySchema } from "@/lib/validation/documents";
 import { supplyWriteConfirmation } from "@/lib/supply/write-confirmation";
+import { parseDocumentListRead } from "@/lib/validation/document-list";
 
 export async function GET(request: Request) {
   return api("documents.list", async () => {
@@ -21,27 +22,36 @@ export async function GET(request: Request) {
     const type = params.get("type") || null,
       status = params.get("status") || null,
       search = params.get("search")?.trim() || null;
+    const from = params.get("from") || null,
+      to = params.get("to") || null;
     if (
       (type && !["REQ", "COM", "ENT", "BAL"].includes(type)) ||
       (status && !/^[a-z_]{1,40}$/.test(status)) ||
       (search && !/^[A-Za-z0-9-]{1,100}$/.test(search))
     )
       throw new ApiError("VALIDATION_ERROR", "Revise os filtros de documento.");
+    if (from && to && from > to)
+      throw new ApiError("INVALID_DATE", "O início deve ser anterior ao fim do período.");
     const result = await rpc(auth.client, "operational_document_list", {
       p_patient: patient.id,
       p_type: type,
       p_status: status,
       p_search: search,
-      p_from: params.get("from")
-        ? saoPauloDateBoundary(params.get("from")!)
-        : null,
-      p_to: params.get("to")
-        ? saoPauloDateBoundary(params.get("to")!, true)
-        : null,
+      p_from: from ? saoPauloDateBoundary(from) : null,
+      p_to: to ? saoPauloDateBoundary(to, true) : null,
       p_page: page,
       p_size: pageSize,
     });
-    return NextResponse.json(result);
+    const body = {
+      ...(result as Record<string, unknown>),
+      careRecipientId: patient.id,
+      filters: { search, type, status, from, to },
+    };
+    parseDocumentListRead(body, {
+      careRecipientId: patient.id, page, pageSize,
+      search: search ?? "", type: type ?? "", status: status ?? "", from: from ?? "", to: to ?? "",
+    });
+    return NextResponse.json(body);
   });
 }
 export async function POST(request: Request) {
