@@ -86,9 +86,9 @@ test("BAL review keeps physical fields after an invalid read and uses its own au
   mode = "live";
   await button(page, "Revisar").click();
   await expect(page.getByRole("heading", { name: "Revisão da contagem", exact: true })).toBeVisible();
-  const material = page.getByRole("article").filter({ has: page.getByText("Material fictício V4 0", { exact: true }) });
-  await expect(material).toContainText("Referência: 3 unidade");
-  await expect(material).toContainText("Diferença: -1 unidade");
+  const material = page.getByRole("table", { name: "Materiais da contagem", exact: true }).locator("tbody tr").filter({ has: page.getByText("Material fictício V4 0", { exact: true }) });
+  await expect(material.locator('td[data-label="Referência"]')).toHaveText("3 unidade");
+  await expect(material.locator('td[data-label="Diferença"]')).toHaveText("-1 unidade");
   expect(generalStockReads).toBe(0);
   expect(writes).toBe(0);
   expect(facts(f.patient)).toBe(before);

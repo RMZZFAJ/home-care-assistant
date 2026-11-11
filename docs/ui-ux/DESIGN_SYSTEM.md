@@ -84,6 +84,19 @@ separados, com unidade. Antes da expedição bilateral apresenta só declarado.
 Recebimento, cancelamento e apuração usam DefinitionGrid para seus fatos em
 leitura; consumo confirmado não ganha input nem novo débito na apresentação.
 
+BalanceMaterials compartilha a tabela/cartão e a busca reversível de materiais.
+Contagem física, referência e diferença têm colunas próprias, com unidade e
+precisão exatas. Referência ausente não vira zero nem diferença calculada.
+Programação do BAL, responsabilidade, contagem consultada e adiamentos usam
+DefinitionGrid; destino congelado e situação atual permanecem distintos.
+Campos físicos começam vazios; a observação inicial não expõe o saldo teórico.
+
+ScheduleShift mantém pessoa, tipo, intervalo completo, fuso, situação, notas e
+ação nativa. O celular usa o registro do modelo; o calendário conserva os sete
+dias e o período completo, com rolagem horizontal local acessível por teclado.
+As superfícies e os ícones compartilham a paleta canônica. Antes/depois e
+revisões de programação usam DefinitionGrid sem transformar fatos em inputs.
+
 DeliveryTaskRow reproduz o registro e ícone das entregas do modelo, com nomes
 históricos, percurso, situação e ação nativa. Fatos ausentes recebem texto
 explícito; declaração, concordância e conferência pessoal continuam distintas.

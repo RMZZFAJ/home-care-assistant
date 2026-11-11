@@ -47,13 +47,24 @@ async function choose(page: Page, target: ScheduledShift) {
   const field = editor(page).getByRole("combobox", {
     name: /^Plantão para o reconto/,
   });
+  await field.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
   await field.click();
-  await expect(field).toBeInViewport({ ratio: 1 });
+  const fieldGeometry = () => field.evaluate(node => {
+    const r = node.getBoundingClientRect(), control = node.closest(".hca-search-select") ?? node, x = r.left + r.width / 2, y = r.top + r.height / 2;
+    return { bounds: { left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:innerWidth,height:innerHeight }, inside: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight, edges: [[x,r.top + 1],[x,r.bottom - 1],[r.left + 1,y],[r.right - 1,y]].map(([px,py]) => control.contains(document.elementFromPoint(px,py))) };
+  });
+  try { await expect.poll(fieldGeometry).toMatchObject({ inside: true, edges: [true,true,true,true] }); }
+  catch(error) { await test.info().attach("recount-field-geometry", { body: JSON.stringify(await fieldGeometry()), contentType: "application/json" }); throw error; }
   await field.fill(target.professional_name);
   await field.press("ArrowDown");
   const label = `${target.professional_name} · ${target.type_name} · ${formatZonedDate(target.starts_at, target.timezone)} → ${formatZonedDate(target.ends_at, target.timezone)}`;
   const option = page.getByRole("option", { name: label, exact: true });
-  await expect(option).toBeInViewport({ ratio: 1 });
+  await expect.poll(() => option.evaluate(node => {
+    const r = node.getBoundingClientRect();
+    if (r.left < 0 || r.top < 0 || r.right > innerWidth || r.bottom > innerHeight) return false;
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    return [[x,r.top + 1],[x,r.bottom - 1],[r.left + 1,y],[r.right - 1,y]].every(([px,py]) => node.contains(document.elementFromPoint(px,py)));
+  }), { message: "The complete option must fit and remain unobstructed;avoid IntersectionObserver floating-point ratio" }).toBe(true);
   await option.click();
 }
 test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e concilia somente a nova contagem", async ({
@@ -183,7 +194,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
       );
     await counter.getByRole("button", { name: "Revisar", exact: true }).click();
     await expect(
-      counter.getByText("Referência: 5 unidade", { exact: true }),
+      counter.getByRole("table", { name: "Materiais da contagem", exact: true }).locator('td[data-label="Referência"]').filter({ hasText: /^5 unidade$/ }),
     ).toBeVisible();
     await counter
       .getByRole("button", { name: "Confirmar reconto", exact: true })

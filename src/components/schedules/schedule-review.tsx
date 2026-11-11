@@ -1,4 +1,5 @@
 "use client";
+import { DefinitionGrid } from "@/components/ui/controls";
 import { Notice } from "@/components/workspace";
 import { civilInstant } from "@/lib/schedules/time";
 import type { ScheduleCommand } from "@/lib/validation/schedules";
@@ -34,28 +35,12 @@ export function ShiftFacts({
     <section className="ui-card" aria-label={title}>
       <h3>{title}</h3>
       {value ? (
-        <dl>
-          <dt>Profissional</dt>
-          <dd>
-            {value.professional_name ||
-              (currentName
-                ? `${currentName} (nome do cadastro atual)`
-                : "Nome não preservado no registro")}
-          </dd>
-          <dt>Período</dt>
-          <dd>
-            {scheduleStamp(value.starts_at, value.timezone)} →{" "}
-            {scheduleStamp(value.ends_at, value.timezone)}
-          </dd>
-          <dt>Fuso</dt>
-          <dd>{value.timezone}</dd>
-          <dt>Notas</dt>
-          <dd className="whitespace-pre-wrap">
-            {value.notes == null
-              ? "Notas não preservadas no registro"
-              : value.notes || "Sem notas"}
-          </dd>
-        </dl>
+        <DefinitionGrid items={[
+          { label: "Profissional", value: value.professional_name || (currentName ? currentName + " (nome do cadastro atual)" : "Nome não preservado no registro") },
+          { label: "Período", value: scheduleStamp(value.starts_at, value.timezone) + " → " + scheduleStamp(value.ends_at, value.timezone) },
+          { label: "Fuso", value: value.timezone },
+          { label: "Notas", value: value.notes == null ? "Notas não preservadas no registro" : value.notes || "Sem notas", wide: true },
+        ]} />
       ) : (
         <Notice error>
           O registro anterior não está disponível. A aprovação exige conferir a
@@ -179,111 +164,28 @@ export function ScheduleReviewDetails({ review }: { review: ScheduleReview }) {
     return <ScheduleChangeFacts proposal={proposal} />;
   }
   if (command.action === "type")
-    return (
-      <dl>
-        <dt>Tipo de plantão</dt>
-        <dd>{command.body.name}</dd>
-        <dt>Início local</dt>
-        <dd>{command.body.startsLocal}</dd>
-        <dt>Duração</dt>
-        <dd>{command.body.durationMinutes} minutos</dd>
-        <dt>Uso futuro</dt>
-        <dd>
-          {command.body.active === false ? "Indisponível" : "Disponível"}.
-          Ocorrências anteriores conservam seus horários.
-        </dd>
-      </dl>
-    );
+    return <DefinitionGrid items={[
+      { label: "Tipo de plantão", value: command.body.name },
+      { label: "Início local", value: command.body.startsLocal },
+      { label: "Duração", value: command.body.durationMinutes + " minutos" },
+      { label: "Uso futuro", value: (command.body.active === false ? "Indisponível" : "Disponível") + ". Ocorrências anteriores conservam seus horários." },
+    ]} />;
   if (command.action === "series")
-    return (
-      <dl>
-        <dt>Profissional</dt>
-        <dd>
-          {data.professionals.find(
-            (person) => person.id === command.body.professionalId,
-          )?.name ?? "Profissional indisponível"}
-        </dd>
-        <dt>Tipo de plantão</dt>
-        <dd>
-          {
-            data.types.find((type) => type.id === command.body.shiftTypeId)
-              ?.name
-          }
-        </dd>
-        <dt>Período</dt>
-        <dd>
-          {command.body.anchorDate.split("-").reverse().join("/")} a{" "}
-          {command.body.validUntil.split("-").reverse().join("/")}
-        </dd>
-        <dt>Fuso</dt>
-        <dd>{command.body.timezone}</dd>
-        <dt>Repetição</dt>
-        <dd>
-          {command.body.recurrence === "dates"
-            ? "Datas escolhidas"
-            : command.body.recurrence === "once"
-              ? "Data específica"
-              : command.body.recurrence === "cycle"
-                ? `${command.body.workHours} horas de trabalho / ${command.body.restHours} horas de descanso`
-                : command.body.weekdays
-                    .map(
-                      (day) =>
-                        [
-                          "Domingo",
-                          "Segunda",
-                          "Terça",
-                          "Quarta",
-                          "Quinta",
-                          "Sexta",
-                          "Sábado",
-                        ][day],
-                    )
-                    .join(", ")}
-        </dd>
-        {command.body.recurrence === "dates" ? (
-          <>
-            <dt>Plantões selecionados</dt>
-            <dd>
-              <ol className="hca-form-stack">
-                {(command.body.dates ?? []).map((day) => {
-                  const type = data.types.find(
-                    (row) => row.id === command.body.shiftTypeId,
-                  );
-                  if (!type)
-                    return (
-                      <li key={day}>
-                        Tipo indisponível; retorne à preparação.
-                      </li>
-                    );
-                  const start = civilInstant(
-                      day + "T" + type.starts_local.slice(0, 5),
-                      command.body.timezone,
-                    ),
-                    end = new Date(
-                      Date.parse(start) + type.duration_minutes * 60000,
-                    ).toISOString();
-                  return (
-                    <li key={day}>
-                      {scheduleStamp(start, command.body.timezone)} →{" "}
-                      {scheduleStamp(end, command.body.timezone)}
-                    </li>
-                  );
-                })}
-              </ol>
-            </dd>
-          </>
-        ) : null}
-        <dt>Notas</dt>
-        <dd className="whitespace-pre-wrap">
-          {command.body.notes || "Sem notas"}
-        </dd>
-        <dt>Consequência</dt>
-        <dd>
-          A capacidade vigente determina publicação ou proposta para aprovação.
-          Nenhuma programação comprova presença.
-        </dd>
-      </dl>
-    );
+    return <DefinitionGrid items={[
+      { label: "Profissional", value: data.professionals.find(person => person.id === command.body.professionalId)?.name ?? "Profissional indisponível" },
+      { label: "Tipo de plantão", value: data.types.find(type => type.id === command.body.shiftTypeId)?.name ?? "Tipo de plantão indisponível" },
+      { label: "Período", value: command.body.anchorDate.split("-").reverse().join("/") + " a " + command.body.validUntil.split("-").reverse().join("/") },
+      { label: "Fuso", value: command.body.timezone },
+      { label: "Repetição", value: command.body.recurrence === "dates" ? "Datas escolhidas" : command.body.recurrence === "once" ? "Data específica" : command.body.recurrence === "cycle" ? command.body.workHours + " horas de trabalho / " + command.body.restHours + " horas de descanso" : command.body.weekdays.map(day => ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][day]).join(", ") },
+      ...(command.body.recurrence === "dates" ? [{ label: "Plantões selecionados", wide: true, value: <ol className="hca-form-stack">{(command.body.dates ?? []).map(day => {
+        const type = data.types.find(row => row.id === command.body.shiftTypeId);
+        if (!type) return <li key={day}>Tipo indisponível; retorne à preparação.</li>;
+        const start = civilInstant(day + "T" + type.starts_local.slice(0,5), command.body.timezone), end = new Date(Date.parse(start) + type.duration_minutes * 60000).toISOString();
+        return <li key={day}>{scheduleStamp(start, command.body.timezone)} → {scheduleStamp(end, command.body.timezone)}</li>;
+      })}</ol> }] : []),
+      { label: "Notas", value: command.body.notes || "Sem notas", wide: true },
+      { label: "Consequência", value: "A capacidade vigente determina publicação ou proposta para aprovação. Nenhuma programação comprova presença.", wide: true },
+    ]} />;
   if (
     command.action === "approve" ||
     command.action === "reject" ||

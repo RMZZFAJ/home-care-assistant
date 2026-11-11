@@ -18,6 +18,7 @@ import {
 } from "@/components/workspace";
 import {
   ActionButton,
+  DefinitionGrid,
   FormField,
   TextAreaField,
 } from "@/components/ui/controls";
@@ -47,7 +48,7 @@ import type {
   ReceiptDraftContent,
 } from "@/lib/validation/supply-drafts";
 import { formatZonedDate } from "@/lib/schedules/time";
-import { formatQuantity } from "@/lib/quantity";
+import { BalanceMaterials } from "./balance-materials";
 
 export function BalancePreparationFacts({
   source,
@@ -57,19 +58,13 @@ export function BalancePreparationFacts({
   const facts = source.review ?? source.recount!;
   return (
     <section className="hca-form-stack" aria-label="Contagem física consultada">
-      <p>
-        <strong>{source.code ?? "BAL"}</strong> · versão documental{" "}
-        {source.documentVersion} · contagem{" "}
-        {facts.countVersion ?? "não identificada"}.
-      </p>
-      <p>
-        Contador efetivo:{" "}
-        <strong>{facts.counter.name ?? "Autoria não disponível"}</strong>
-        {facts.counter.recordedAt
-          ? ` · ${formatZonedDate(facts.counter.recordedAt)}`
-          : ""}
-        .
-      </p>
+      <DefinitionGrid items={[
+        { label: "Ficha", value: source.code ?? "BAL" },
+        { label: "Versão documental", value: source.documentVersion },
+        { label: "Contagem", value: facts.countVersion ?? "não identificada" },
+        { label: "Contador efetivo", value: facts.counter.name ?? "Autoria não disponível" },
+        { label: "Registro da contagem", value: facts.counter.recordedAt ? formatZonedDate(facts.counter.recordedAt) : "Instante não preservado" },
+      ]} />
       {facts.counter.source === "current_profile" ? (
         <p>Nome atual do cadastro; o nome histórico não foi preservado.</p>
       ) : null}
@@ -95,15 +90,7 @@ export function BalancePreparationFacts({
                       ? "Contagem já conciliada. A revisão facultativa não repete a movimentação."
                       : "A conciliação depende da política configurada e desta referência de estoque ainda válida."}
           </p>
-          <ul>
-            {source.lines.map((row) => (
-              <li key={row.id}>
-                {row.name}: contado {formatQuantity(row.quantity, row.unit)}
-                {"; "}
-                referência {formatQuantity(row.expectedQuantity, row.unit)}.
-              </li>
-            ))}
-          </ul>
+          <BalanceMaterials rows={source.lines.map(row => ({ id: row.id, name: row.name, unit: row.unit, counted: row.quantity, reference: row.expectedQuantity }))} />
         </>
       ) : null}
       {source.recount?.countWindow ? (

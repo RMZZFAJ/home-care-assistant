@@ -8,7 +8,6 @@ import {
   ActionButton,
   FormField,
   LoadingIndicator,
-  Pill,
   SelectField,
   TextInput,
 } from "@/components/ui/controls";
@@ -29,7 +28,6 @@ import { parseScheduleListRead } from "@/lib/validation/schedule-list";
 import { formatBrazilDate } from "@/lib/receipt";
 import { adjacentPeriod, calendarPeriod, scheduleDisplayDay } from "@/lib/schedules/calendar";
 import type { ScheduleEditor } from "./schedule-forms";
-import { scheduleStamp as stamp } from "./schedule-review";
 import type { ScheduledShift } from "@/types/schedules";
 import {
   useScheduleConfirmation,
@@ -48,6 +46,7 @@ const stateLabels: Record<string, string> = {
   rejected: "Recusado",
   obsolete: "Obsoleto",
 };
+import { ScheduleShift } from "./schedule-shift";
 import { ScheduleHistory } from "./schedule-history";
 export function ScheduleConsole() {
   return (
@@ -320,44 +319,10 @@ function Agenda({
     for (const shift of visible) result.get(scheduleDisplayDay(shift.starts_at, shift.timezone, period.from))?.push(shift);
     return result;
   }, [visible, period]);
-  const renderShift = (shift: ScheduledShift) => (
-    <article
-      key={shift.id}
-      data-shift-id={shift.id}
-      className="hca-shift-card"
-      aria-label={`${shift.type_name} · ${shift.professional_name}`}
-    >
-      <div className="hca-toolbar">
-        <strong>{shift.type_name}</strong>
-        <Pill tone={shift.status === "published" ? "accent" : "neutral"}>
-          {stateLabels[shift.status]}
-        </Pill>
-      </div>
-      <p>{shift.professional_name}</p>
-      {new Intl.DateTimeFormat("sv-SE", { timeZone: shift.timezone }).format(new Date(shift.starts_at)) < period.from ? <p className="text-sm text-(--muted)">Iniciado no período anterior.</p> : null}
-      <p>
-        {stamp(shift.starts_at, shift.timezone)} →{" "}
-        {stamp(shift.ends_at, shift.timezone)}
-      </p>
-      {shift.is_exception ? <small>Exceção autorizada</small> : null}
-      {shift.notes ? (
-        <p className="whitespace-pre-wrap">{shift.notes}</p>
-      ) : null}
-      {shift.status === "published" &&
-      (team ||
-        (shift.professional_id === context.userId &&
-          (can(context, "schedule.propose") || publishOwn))) ? (
-        <ActionButton
-          disabled={busy || uncertain}
-          onClick={(event) =>
-            open({ kind: "shift", shift }, event.currentTarget)
-          }
-        >
-          {team || publishOwn ? "Alterar plantão" : "Propor alteração"}
-        </ActionButton>
-      ) : null}
-    </article>
-  );
+  const renderShift = (shift: ScheduledShift) => <ScheduleShift key={shift.id} shift={shift}
+    stateLabel={stateLabels[shift.status]} earlier={new Intl.DateTimeFormat("sv-SE", { timeZone: shift.timezone }).format(new Date(shift.starts_at)) < period.from}
+    action={shift.status === "published" && (team || (shift.professional_id === context.userId && (can(context, "schedule.propose") || publishOwn))) ? team || publishOwn ? "Alterar plantão" : "Propor alteração" : undefined}
+    disabled={busy || uncertain} onEdit={target => open({ kind: "shift", shift }, target)} />;
   const renderDay = (date: string) => {
     const shifts = byDay.get(date) ?? [];
     return (
@@ -500,7 +465,7 @@ function Agenda({
             Programação prevista, sem registro de presença. O mesmo período
             aparece em computador e celular.
           </p>
-          <div className="hca-agenda-desktop">
+          <div className="hca-agenda-desktop" tabIndex={0} role="region" aria-label="Calendário de plantões; rolagem horizontal quando necessária">
             {period.dates.map(renderDay)}
           </div>
           <div className="hca-agenda-mobile">{period.dates.map(renderDay)}</div>

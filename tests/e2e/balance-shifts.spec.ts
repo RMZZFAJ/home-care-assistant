@@ -275,7 +275,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
     page.getByRole("heading", { name: "Revisão da contagem", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Referência: 0 unidade", { exact: true }),
+    page.getByRole("table", { name: "Materiais da contagem", exact: true }).locator('td[data-label="Referência"]').filter({ hasText: /^0 unidade$/ }),
   ).toHaveCount(2);
   await audit(page, "scheduled BAL review");
   await page.getByRole("button", { name: "Voltar", exact: true }).click();

@@ -97,8 +97,8 @@ test("BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria p
   await expect(
     review(page)
       .getByRole("region", { name: "Conferência da decisão", exact: true })
-      .getByText("Versão proposta: 1.", { exact: true }),
-  ).toBeVisible();
+      .locator(".hca-definition-grid > div").filter({ has: page.getByText("Versão proposta", { exact: true }) }).locator("dd"),
+  ).toHaveText("1");
   const attempts: unknown[] = [];
   await page.route("**/api/balances/preparations/commit", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
@@ -216,8 +216,8 @@ test("mudança do alvo durante a aprovação conserva a justificativa e o destin
   ).toBeDisabled();
   await expect(reason).toHaveValue(ownReason);
   await expect(
-    form(page).getByText("Versão proposta: 1.", { exact: true }),
-  ).toBeVisible();
+    form(page).locator(".hca-definition-grid > div").filter({ has: page.getByText("Versão proposta", { exact: true }) }).locator("dd"),
+  ).toHaveText("1");
   const after = deferralState(f.patient);
   expect(after.requests[0].status).toBe("pending");
   expect(after.requests[0].target_shift_version).toBe(1);

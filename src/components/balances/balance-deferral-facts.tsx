@@ -1,3 +1,4 @@
+import { DefinitionGrid } from "@/components/ui/controls";
 import { Notice } from "@/components/workspace";
 import { formatZonedDate } from "@/lib/schedules/time";
 import type { BalanceDeferral } from "@/types/balances";
@@ -14,23 +15,16 @@ export function DeferralFacts({
   const format = (value: string | null) =>
     value ? formatZonedDate(value, timezone) : "Não preservado";
   return (
-    <div className="space-y-3 text-sm">
+    <div className="hca-form-stack hca-balance-facts">
       <p>Solicitação original: {deferral.reason}</p>
       <div aria-label="Destino congelado da solicitação">
         <h3 className="font-semibold">Plantão proposto na solicitação</h3>
-        <p>
-          {deferral.target_snapshot.professional_name} ·{" "}
-          {deferral.target_snapshot.type_name}
-        </p>
-        <p>
-          {format(deferral.target_snapshot.starts_at)} →{" "}
-          {format(deferral.target_snapshot.ends_at)}
-        </p>
-        <p>Versão proposta: {deferral.target_shift_version}.</p>
-        <p>
-          Prazo da atribuição original:{" "}
-          {format(context?.sourceDeadline ?? null)}.
-        </p>
+        <DefinitionGrid items={[
+          { label: "Profissional e tipo propostos", value: deferral.target_snapshot.professional_name + " · " + deferral.target_snapshot.type_name },
+          { label: "Período proposto", value: format(deferral.target_snapshot.starts_at) + " → " + format(deferral.target_snapshot.ends_at) },
+          { label: "Versão proposta", value: deferral.target_shift_version },
+          { label: "Prazo da atribuição original", value: format(context?.sourceDeadline ?? null) },
+        ]} />
       </div>
       {deferral.status === "pending" &&
       context?.canReject &&
@@ -45,18 +39,12 @@ export function DeferralFacts({
       {context?.targetState !== "unchanged" && target ? (
         <div aria-label="Plantão atual para comparação">
           <h3 className="font-semibold">Situação atual do plantão proposto</h3>
-          <p>
-            {target.professional_name} · {target.type_name} · versão{" "}
-            {target.version} ·{" "}
-            {target.status === "cancelled"
-              ? "Cancelado"
-              : target.status === "published"
-                ? "Publicado"
-                : "Em preparação"}
-          </p>
-          <p>
-            {format(target.starts_at)} → {format(target.ends_at)}
-          </p>
+          <DefinitionGrid items={[
+            { label: "Profissional e tipo atuais", value: target.professional_name + " · " + target.type_name },
+            { label: "Versão atual", value: target.version },
+            { label: "Situação atual", value: target.status === "cancelled" ? "Cancelado" : target.status === "published" ? "Publicado" : "Em preparação" },
+            { label: "Período atual", value: format(target.starts_at) + " → " + format(target.ends_at) },
+          ]} />
           <p>
             A situação atual não substitui o destino congelado deste pedido.
           </p>
@@ -65,11 +53,11 @@ export function DeferralFacts({
       {deferral.decision_snapshot ? (
         <div>
           <h3 className="font-semibold">Decisão registrada</h3>
-          <p>
-            {deferral.decision_snapshot.actor.name} ·{" "}
-            {format(deferral.decision_snapshot.recordedAt)}
-          </p>
-          <p>{deferral.decision_snapshot.reason}</p>
+          <DefinitionGrid items={[
+            { label: "Decisão registrada por", value: deferral.decision_snapshot.actor.name },
+            { label: "Instante da decisão", value: format(deferral.decision_snapshot.recordedAt) },
+            { label: "Motivo próprio da decisão", value: deferral.decision_snapshot.reason, wide: true },
+          ]} />
           <p>
             {deferral.decision_snapshot.deadlineChanged
               ? "Adiamento autorizado para o destino proposto e validado."

@@ -1,0 +1,263 @@
+{
+  "at": "2026-11-11T15:37:15.975516+00:00",
+  "increment": "D3.82",
+  "checkpoint": "06.3",
+  "status": "COMPLETE_LOCAL_SCOPED_9_COMPOSITIONS",
+  "baseSha": "0165c1810603db8401d5e378dd314bbc815cc86e",
+  "compositions": [
+    "BAL-01",
+    "BAL-02",
+    "BAL-03",
+    "BAL-04",
+    "BAL-05",
+    "ESC-01",
+    "ESC-02",
+    "ESC-03",
+    "ESC-04"
+  ],
+  "distinctQualifiedCases": 46,
+  "qualification": {
+    "unchangedPassingCases": 30,
+    "secondPassingAndAddedConsumers": 7,
+    "penultimatePassingCases": 8,
+    "finalAffectedCases": 1
+  },
+  "rounds": {
+    "first": {
+      "startTime": "2026-11-11T15:01:09.176Z",
+      "duration": 760635.3570000001,
+      "expected": 31,
+      "skipped": 0,
+      "unexpected": 11,
+      "flaky": 0
+    },
+    "second": {
+      "startTime": "2026-11-11T15:15:24.882Z",
+      "duration": 468663.042,
+      "expected": 7,
+      "skipped": 0,
+      "unexpected": 9,
+      "flaky": 0
+    },
+    "third": {
+      "startTime": "2026-11-11T15:24:11.621Z",
+      "duration": 401028.034,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "final": {
+      "startTime": "2026-11-11T15:33:46.518Z",
+      "duration": 175221.914,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "cases": [
+    {
+      "file": "bal-agenda-canonical.spec.ts",
+      "title": "06.3 BAL canonical readonly materials preserve physical zero,original reference and reversible search",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "bal-agenda-canonical.spec.ts",
+      "title": "06.3 agenda canonical records retain overnight dates,timezone and native editing without operational writes",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "bal-deferral-decisions.spec.ts",
+      "title": "BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria própria e recuperação sem mudar prazo",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "bal-deferral-decisions.spec.ts",
+      "title": "mudança do alvo durante a aprovação conserva a justificativa e o destino congelado, sem aprovar outra versão",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "bal-recount-succession.spec.ts",
+      "title": "BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e concilia somente a nova contagem",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "bal-recount-succession.spec.ts",
+      "title": "BAL reconto sem contador mostra recuperação, preserva motivo no conflito e exige adoção explícita do plantão atual",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "bal-review.spec.ts",
+      "title": "BAL facultativo preserva autoria e observações, recupera parecer próprio após revogação e não reaplica estoque",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "bal-review.spec.ts",
+      "title": "BAL com referência alterada conserva o parecer e exige reconto, consulta e adoção explícita antes de revisar",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "balance-shifts.spec.ts",
+      "title": "BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "balance-shifts.spec.ts",
+      "title": "supervisão solicita adiamento, família decide e o prazo só muda após a aprovação",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "schedule-decisions.spec.ts",
+      "title": "C-FINAL023 escala recupera leitura e preserva foco sem validar fuso proposto como input",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "schedule-decisions.spec.ts",
+      "title": "decisão de escala mostra antes/depois completos e aplica a versão apresentada",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "schedule-decisions.spec.ts",
+      "title": "a vista mensal móvel conserva o período e os plantões de dias diferentes",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "schedules.spec.ts",
+      "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "bal-optional-recount.spec.ts",
+      "title": "BAL legado facultativo permite designar Sheila, preservar o efeito anterior e recuperar a nova contagem sem criar semanas",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "balance-count-recovery.spec.ts",
+      "title": "BAL review keeps physical fields after an invalid read and uses its own authorized stock reference",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "schedule-resource-preparations.spec.ts",
+      "title": "resource preparation schedule_shift_edit resumes another session and applies exactly the reviewed intent",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "selected-dates-new-window.spec.ts",
+      "title": "BAL em janela nova mostra a contagem de Sheila17 e conserva Juliana18 e seus pareceres anteriores",
+      "projects": [
+        "chromium"
+      ]
+    }
+  ],
+  "unitCases": 3,
+  "native": [
+    "Scheduled count starts empty,hides theoretical reference initially,retains own stock capability,zero,assignment,notes and lost-reply recovery.",
+    "Independent opinions,recount succession,old reference,deferral target snapshots and deadlines retain original authorization/version/ledger assertions.",
+    "Schedule type/series creation,overnight timing,monthly period,complete before/after and native edit intent remain real and authorized."
+  ],
+  "visual": {
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "reference": "Offline canonical HTML;shared material table/card and record/icon geometry. Calendar extends canonical surfaces with accessible local horizontal scrolling,retaining seven columns and complete period.",
+    "allAxeRules": "Enabled",
+    "media": "Forced colors and reduced motion in three browser profiles",
+    "inspection": "BAL320 material and agenda record captures inspected;actual centered scrolling and hit-tests,without screenshot CSS changes.",
+    "notProved": "Physical device,assistive technology or native400% zoom."
+  },
+  "counterproof": {
+    "preserved": "bal-agenda-first/second/third.json and all three corresponding artifact folders",
+    "causes": [
+      "Old literal summaries now have separate semantic label/value or table cells.",
+      "Viewport IntersectionObserver ratio rounded below1;actual centered scrolling,full bounds and edge hit-tests preserve visibility without changing screenshot CSS.",
+      "Calendar comparison initially used an intermediate reference row for a last-row product record;match last-row state.",
+      "New agenda test corrected the field label to Profissional de destino.",
+      "Hit-tests at square bounding-box corners were outside the painted rounded option;edge midpoints verify the actual interactive surface."
+    ],
+    "regressionStrategy": "Retain passing cases;repeat only affected cases and add identified old consumers. Native mutable suites were sequential under guarded runner."
+  },
+  "checks": {
+    "types": "PASS",
+    "affectedLint": "PASS",
+    "markdown": "PASS"
+  },
+  "remote": {
+    "newSql": false,
+    "expectedMigrations": 207,
+    "reconciliation": "PASS:remote database up to date;empty dry-run with --skip-vault;207 versions from reconciled baseline;no new SQL,reset,remote Auth or fixtures."
+  },
+  "limits": [
+    "Original105 criterion states remain57PASS/48PARTIAL and18 UI states unchanged.",
+    "06.3 local scope only;06.4–06.6 andjoint stage19 remain.",
+    "DOC-A/B/C/D unchanged;BAL opinion/stock policy,PDF appearance,mentions,20-minute views,cancellation science andsimplified drafts remain in their blocks.",
+    "Own published SHA CI,clean/legacy database andhuman/provider gates required;no merge orproduction.",
+    "Sonar:OWNER_DEFERRED_SONAR_CONFIGURATION;no Quality Gate approval."
+  ]
+}

@@ -128,7 +128,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
       ),
     ).toBeVisible();
     await expect(
-      counter.getByText("Referência: 2 unidade", { exact: true }),
+      counter.getByRole("table", { name: "Materiais da contagem", exact: true }).locator('td[data-label="Referência"]').filter({ hasText: /^2 unidade$/ }),
     ).toHaveCount(2);
     const attempts: unknown[] = [];
     await counter.route(

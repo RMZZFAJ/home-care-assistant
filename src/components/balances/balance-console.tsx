@@ -1,5 +1,5 @@
 "use client";
-import { ActionButton, LoadingIndicator, Pill } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, LoadingIndicator, Pill } from "@/components/ui/controls";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -139,7 +139,7 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
     can(context, "bal.defer.request") &&
     (a?.professional_id === context.userId || patient.role === "supervisor");
   return (
-    <div className="hca-form-stack">
+    <div className="hca-form-stack hca-balance-console">
       {loadError ? <Notice error>{loadError}</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
@@ -153,12 +153,11 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
           </Pill>
         </div>
         {data.regime ? (
-          <p>
-            {weekDays[data.regime.weekday]} ·{" "}
-            {data.types.find((t) => t.id === data.regime?.shift_type_id)
-              ?.name ?? "Plantão configurado"}{" "}
-            · {data.regime.timezone}
-          </p>
+          <DefinitionGrid items={[
+            { label: "Dia do balanço", value: weekDays[data.regime.weekday] },
+            { label: "Plantão configurado", value: data.types.find(t => t.id === data.regime?.shift_type_id)?.name ?? "Plantão configurado" },
+            { label: "Fuso", value: data.regime.timezone },
+          ]} />
         ) : (
           <p>O novo regime ainda não foi ativado neste paciente.</p>
         )}
@@ -208,13 +207,11 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
         <h2>Responsabilidade atual</h2>
         {a ? (
           <>
-            <strong>
-              {current?.professional_name ?? "Profissional designado"}
-            </strong>
-            <p>
-              {current?.type_name} · {formatBrazilDate(a.starts_at)} →{" "}
-              {formatBrazilDate(a.ends_at)}
-            </p>
+            <DefinitionGrid items={[
+              { label: "Profissional designado", value: current?.professional_name ?? "Profissional designado" },
+              { label: "Tipo de plantão", value: current?.type_name ?? "Tipo não disponível" },
+              { label: "Período da atribuição", value: formatBrazilDate(a.starts_at) + " → " + formatBrazilDate(a.ends_at), wide: true },
+            ]} />
             <p>
               {data.eligibility.available
                 ? "Contagem disponível para você durante este plantão."

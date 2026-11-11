@@ -473,3 +473,47 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 .hca-definition-grid dd { margin: 0; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; white-space: pre-wrap; }
 @media (max-width: 500px) { .hca-form-grid { grid-template-columns: minmax(0,1fr); } }
 @media (max-width: 500px) { .hca-definition-grid { gap: 13px; } }
+
+/* BAL and agenda extend the same canonical surfaces;calendar keeps its native period. */
+.hca-bal-context { padding: 13px 16px; background: var(--hca-tint); border-left: 3px solid var(--hca-teal); border-radius: 10px; color: var(--hca-ink); }
+.hca-count-row { padding: 16px 0; background: transparent; border-bottom: 1px solid #e6ede6; }
+.hca-count-row:last-of-type { border-bottom: 0; }
+.hca-balance-facts { min-width: 0; overflow-wrap: anywhere; }
+.hca-balance-facts :is(h3,h4) { font-size: 13px; font-weight: 670; }
+.hca-schedule-agenda { --hca-agenda-border: var(--hca-line); }
+.hca-schedule-agenda .hca-agenda-desktop { max-width: 100%; grid-template-columns: repeat(7,minmax(260px,1fr)); overflow: auto; border: 1px solid var(--hca-line); border-radius: 15px; background: var(--hca-paper); }
+.hca-schedule-agenda .hca-agenda-day { padding: 0; background: var(--hca-paper); }
+.hca-schedule-agenda .hca-agenda-day h2 { padding: 13px 19px; margin: 0; font-size: 13px; font-weight: 670; color: var(--hca-teal); background: var(--hca-tint); overflow-wrap: anywhere; }
+.hca-schedule-agenda .hca-agenda-day > .hca-muted { padding: 14px 19px; }
+.hca-schedule-agenda .hca-shift-card { display: grid; grid-template-columns: 38px minmax(0,1fr); align-items: start; gap: 13px; padding: 16px 19px; margin: 0; background: var(--hca-paper); border: 0; border-bottom: 1px solid #eaf0ec; border-radius: 0; color: var(--hca-ink); min-width: 0; }
+.hca-schedule-agenda .hca-shift-card:last-child { border-bottom: 0; }
+.hca-shift-icon { display: grid; place-items: center; width: 38px; height: 40px; border-radius: 10px; background: var(--hca-tint); color: var(--hca-teal); flex: none; }
+.hca-shift-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.hca-shift-main strong { display: block; font-size: 13px; font-weight: 670; }
+.hca-shift-main small { display: block; font-size: 11px; margin-top: 3px; color: var(--hca-muted); }
+.hca-shift-end { display: grid; grid-column: 2; justify-items: start; gap: 4px; min-width: 0; }
+.hca-shift-end .hca-control { white-space: normal; }
+@media (min-width: 851px) { .hca-schedule-agenda .hca-agenda-desktop { display: grid; } .hca-schedule-agenda .hca-agenda-mobile { display: none; } }
+@media (max-width: 850px) {
+  .hca-schedule-agenda .hca-agenda-desktop { display: none; }
+  .hca-schedule-agenda .hca-agenda-mobile { display: grid; gap: 18px; }
+  .hca-schedule-agenda .hca-agenda-day { border: 1px solid var(--hca-line); border-radius: 15px; overflow: hidden; }
+  .hca-schedule-agenda .hca-shift-card { display: flex; align-items: center; }
+  .hca-shift-end { justify-items: end; text-align: right; }
+}
+@media (max-width: 500px) { .hca-schedule-agenda .hca-shift-card { padding: 14px; } .hca-shift-main small { font-size: 10px; } .hca-shift-end { max-width: 105px; } }
+@media (forced-colors: active) {
+  .hca-bal-context { background: Canvas; color: CanvasText; border-color: CanvasText; }
+  .hca-count-row, .hca-schedule-agenda .hca-agenda-desktop, .hca-schedule-agenda .hca-agenda-day, .hca-schedule-agenda .hca-shift-card { background: Canvas; color: CanvasText; border-color: CanvasText; }
+  .hca-schedule-agenda .hca-agenda-day h2, .hca-shift-main small, .hca-shift-icon { background: Canvas; color: CanvasText; }
+  .hca-shift-icon { border: 1px solid CanvasText; }
+}
+
+.hca-balance-console .hca-record { gap: 13px; padding: 16px 19px; color: var(--hca-ink); background: var(--hca-paper); border-bottom: 1px solid #eaf0ec; overflow-wrap: anywhere; }
+.hca-balance-console .hca-record:last-child { border-bottom: 0; }
+.hca-balance-console .hca-record-main strong { font-size: 13px; font-weight: 670; }
+.hca-balance-console .hca-record-main small { margin-top: 3px; font-size: 11px; }
+@media (max-width: 500px) { .hca-balance-console .hca-record { padding: 14px; } .hca-balance-console .hca-record-main small { font-size: 10px; } }
+@media (forced-colors: active) { .hca-balance-console .hca-record { background: Canvas; color: CanvasText; border-color: CanvasText; } }
+
+.hca-shift-main p { margin-block: 6px; font-size: 13px; }

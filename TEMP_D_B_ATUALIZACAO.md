@@ -36,10 +36,11 @@ A fase continua em execução.
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03, 04, 05 e 07 estão concluídas
 localmente. Os dez pontos de listas da etapa05 foram conferidos.
-A etapa06 continua em execução. Os pontos06.1, requisição e compra, e06.2,
-entregas e transferências, estão concluídos localmente. A caixa de tarefas
-agora mostra pessoas, caminho dos materiais e próxima ação, mantendo os
-filtros e a página ao voltar. O próximo ponto é06.3, balanços e agenda.
+A etapa 06 continua em execução. Os pontos 06.1 (requisição e compra),
+06.2 (entregas e transferências) e 06.3 (balanços e agenda) estão concluídos
+localmente. Balanços agora separam contagem, referência e diferença em
+cartões/tabela; a agenda preserva pessoa, horários completos, fuso e ações
+reais. O próximo ponto é 06.4: estoque, catálogo e consumo.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -487,7 +488,7 @@ concluído; os quatro resultados novos ainda não estão implementados.
 ### Nova aparência do sistema
 
 - **Aplicar integralmente o Modelo Integral em todos os recursos** — Em
-  execução · ≈70%. Falta: Concluir telas, variações, diálogos e conferência
+  execução · ≈75%. Falta: Concluir telas, variações, diálogos e conferência
   visual global. Responsável: Codex.
 - **Fechar, voltar, confirmar e descartar mantendo o foco correto** — Em
   execução · ≈75%. Falta: Concluir diálogos e variações restantes; depois
@@ -496,14 +497,14 @@ concluído; os quatro resultados novos ainda não estão implementados.
   ≈65%. Falta: Conferir textos extremos, ampliação de 400% e todas as telas.
   Responsável: Codex; depois participantes.
 - **Concluir cada composição de tela preservando suas funções** — Em execução
-  · ≈70%. Falta: Concluir e conferir individualmente as 66 composições e suas
+  · ≈75%. Falta: Concluir e conferir individualmente as 66 composições e suas
   variações. Responsável: Codex.
 
 ## Refatoração visual de todo o sistema
 
-**Estimativa global: aproximadamente 70% executados.** É uma estimativa
+**Estimativa global: aproximadamente 75% executados.** É uma estimativa
 conservadora da aplicação completa do modelo, incluindo telas, estados e
-funções; não significa que 70% das telas estejam individualmente aprovadas.
+funções; não significa que 75% das telas estejam individualmente aprovadas.
 Ainda falta conferir cada uma das 66 composições e suas 171 relações. A
 aparência Fluent foi descartada e sua dependência técnica já foi removida. A
 nova base compartilhada e as fichas em abas estão implementadas; isso não
@@ -535,17 +536,18 @@ adicionais DOC-A a DOC-D, acompanhados no bloco documental.
   unidades, precisão, apresentações, situações e sucessores do catálogo.
   Falta: Conferir demais variações, lacunas de continuidade e apresentação
   conjunta. Responsável: Codex.
-- **Listas, tabelas, cartões, busca e filtros** — 60%. Já aplicado: Base,
-  vários consumidores e a consulta de saldos com mínimo, situação, unidades e
-  filtro. Falta: Completar as outras listas e verificar todas as variações.
-  Responsável: Codex.
-- **Fichas de requisição, compra, entrega e balanço em abas** — 85%. Já
+- **Listas, tabelas, cartões, busca e filtros** — 65%. Já aplicado: Base,
+  consulta de saldos e materiais de requisição, compra, entrega e balanço,
+  com unidades e valores próprios. Falta: Completar as outras listas e
+  verificar todas as variações. Responsável: Codex.
+- **Fichas de requisição, compra, entrega e balanço em abas** — 90%. Já
   aplicado: Abas, cabeçalho, ações e painéis reais; seleção, revisão e materiais
   de requisição e compra conferidos. Entregas agora separam declaração,
   expedição, aceite, conciliação e pendência; recebimento, cancelamento e
   apuração mantêm seus fatos. A caixa mostra autoria, percurso e tarefa
-  com filtros recuperáveis. Falta: Balanços e as demais composições e
-  variantes. Responsável: Codex.
+  com filtros recuperáveis. Balanços agora apresentam contagem, referência,
+  diferenças e pareceres em composições próprias. Falta: Demais seções
+  documentais, composições e variantes. Responsável: Codex.
 - **Andamentos nas quatro fichas** — 80%. Já aplicado: Registro salvo,
   autoria, data, categoria, etapa, preenchimento privado entre aparelhos,
   comparação e recuperação, com resumos próprios para cada situação.
@@ -687,7 +689,7 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    recuperação e resposta atrasada foram conferidos.
    Responsável — Codex.
 
-6. **06 — Aparência da operação diária.** Em execução · 85%.
+6. **06 — Aparência da operação diária.** Em execução · 90%.
 
    Concluído — 06.1, as nove composições de requisição e compra: seleção,
    revisão, consulta, ciência, lista frequente, aquisição, parcelas e
@@ -698,8 +700,13 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    tarefas, materiais, recebimento pessoal, cancelamento, apuração e fatos
    da transferência, sem confundir declaração com entrega realizada.
 
-   Depois — 06.3 balanços e agenda;
-   06.4 estoque, catálogo e consumo; 06.5 arquivos, rascunhos e seções
+   Concluído — 06.3 balanços e agenda, 100% deste ponto local.
+   As nove composições foram conferidas, com contagem e referência separadas,
+   pareceres com autoria própria, reconto, adiamento, horários e comparação
+   das alterações. A regra nova para o parecer nunca alterar o estoque
+   ainda está pendente no grupo de fichas e documentos.
+
+   Depois — 06.4 estoque, catálogo e consumo; 06.5 arquivos, rascunhos e seções
    documentais; 06.6 conferência conjunta de larguras, teclado, foco, textos
    extensos e ampliação. O grupo mantém suas 46 composições originais.
    Responsável — Codex.

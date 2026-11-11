@@ -1,5 +1,30 @@
 # Checkpoint D-B
 
+D3.82 fechou06.3 localmente,no escopo das nove composições BAL/ESC. Contagem,
+referência e diferença usam a tabela/cartão canônica,com busca reversível e
+valores exatos; referência ausente não vira zero. Programação,responsabilidade,
+contagem consultada,destinos de adiamento e antes/depois de plantões usam a
+grade compartilhada. A agenda tem pessoa,tipo,intervalo completo,fuso,notas,
+situação e ação nativa; calendário preserva sete colunas/período,com rolagem
+horizontal local acessível. Regras antigas de cor/cartão foram removidas.
+Foram qualificados46 cenários distintos:30 aprovações iniciais inalteradas,
+sete da segunda rodada,oito da terceira e um final. A seleção inclui
+consumidores antigos
+de contagem/reconto e edição de plantão. Passaram três unitários,tipos e lint.
+Cinco larguras,axe completo,teclado,nomes extensos,cores forçadas e movimento
+reduzido; capturas320 inspecionadas. Seletores antigos agora conferem células
+ou pares rótulo/valor. A opção de reconto usa rolagem real,limites completos e
+hit-tests nas bordas úteis; evita arredondamento de razão e cantos arredondados.
+Falhas e artefatos das três rodadas anteriores permanecem preservados.
+Mantidas as contraprovas de autorização,referência própria sem saldo geral,
+conflito,confirmação perdida,autorias e efeitos de estoque. Sem SQL novo;
+remoto207 e dry-run vazio. CI própria e gates conjuntos/humanos permanecem.
+06.1–06.3 concluídos localmente; próximo06.4,estoque,catálogo e consumo.
+Etapa06 parcial90%; estimativa visual global75%,sem promover os105 critérios
+originais(57/48) ou18 estados UI. DOC-A/B/C/D seguem nos seus blocos,incluindo
+a nova separação integral de parecer BAL e efeito de estoque. Produção NO-GO.
+[Resultados e limites](BAL_AGENDA_CANONICAL.md).
+
 D3.81 concluiu ENT-02 e fechou06.2 localmente: as sete composições previstas
 estão conferidas no escopo deste ponto. A caixa de entregas usa cartões e
 navegação canônicos,com nomes preservados da emissão/designação,percurso e

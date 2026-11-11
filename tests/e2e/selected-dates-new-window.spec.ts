@@ -562,7 +562,7 @@ test("BAL em janela nova mostra a contagem de Sheila17 e conserva Juliana18 e se
   await page.getByRole("button", { name: "Revisar", exact: true }).click();
   await expect(page.getByRole("textbox")).toHaveCount(0);
   await expect(
-    page.getByText("Referência: 20 unidade", { exact: true }),
+    page.getByRole("table", { name: "Materiais da contagem", exact: true }).locator('td[data-label="Referência"]').filter({ hasText: /^20 unidade$/ }),
   ).toBeVisible();
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 950 });

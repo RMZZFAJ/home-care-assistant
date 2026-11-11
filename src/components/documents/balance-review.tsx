@@ -1,5 +1,5 @@
 "use client";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { recountHref } from "@/components/balances/balance-recount-assignment";
@@ -15,6 +15,8 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { BalanceReviewContext, SupplyDocument } from "@/types/documents";
 
+import { BalanceMaterials } from "@/components/balances/balance-materials";
+
 const groupLabel = { family: "Família", supervisor: "Supervisão" };
 function referenceLabel(context: BalanceReviewContext) {
   if (context.referenceState === "unavailable")
@@ -28,21 +30,14 @@ function referenceLabel(context: BalanceReviewContext) {
 function CountFacts({ data }: { data: SupplyDocument }) {
   const context = data.balanceReview!;
   return (
-    <div className="space-y-3 text-sm">
-      <p>
-        Contador efetivo:{" "}
-        <strong>{context.counter.name ?? "Autoria não disponível"}</strong> ·
-        contagem {context.countVersion ?? "não identificada"}
-      </p>
-      {context.counter.source === "current_profile" ? (
-        <p>Nome atual do cadastro; o nome histórico não foi preservado.</p>
-      ) : null}
-      {context.counter.recordedAt ? (
-        <p>
-          Registro da contagem: {formatBrazilDate(context.counter.recordedAt)}
-        </p>
-      ) : null}
-      <p>Versão documental: {data.version}</p>
+    <div className="hca-form-stack hca-balance-facts">
+      <DefinitionGrid items={[
+        { label: "Contador efetivo", value: context.counter.name ?? "Autoria não disponível" },
+        { label: "Contagem", value: context.countVersion ?? "não identificada" },
+        { label: "Registro da contagem", value: context.counter.recordedAt ? formatBrazilDate(context.counter.recordedAt) : "Instante não preservado" },
+        { label: "Versão documental", value: data.version },
+      ]} />
+      {context.counter.source === "current_profile" ? <p>Nome atual do cadastro; o nome histórico não foi preservado.</p> : null}
       <div>
         <h4 className="font-semibold">Observações originais de quem contou</h4>
         <p className="whitespace-pre-wrap wrap-break-word">
@@ -56,23 +51,7 @@ function CountFacts({ data }: { data: SupplyDocument }) {
             ? "A referência desta contagem não permite concluir a conciliação. É necessário um reconto autorizado; a referência original permanece preservada."
             : referenceLabel(context)}
       </p>
-      <ul className="space-y-2">
-        {data.lines.map((line) => (
-          <li key={line.id}>
-            {line.name_snapshot}: contado{" "}
-            {formatQuantity(line.quantity, line.unit_snapshot)}; referência{" "}
-            {formatQuantity(
-              line.metadata.expectedQuantity as
-                | string
-                | number
-                | null
-                | undefined,
-              line.unit_snapshot,
-            )}
-            .
-          </li>
-        ))}
-      </ul>
+      <BalanceMaterials rows={data.lines.map(line => ({ id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, counted: line.quantity, reference: line.metadata.expectedQuantity as string | number | null | undefined }))} />
     </div>
   );
 }
@@ -169,7 +148,7 @@ export function BalanceReview({
               : "Nome não preservado neste histórico";
           return (
             <article
-              className="rounded-lg border border-(--line) p-3 text-sm space-y-2"
+              className="ui-card hca-form-stack"
               key={event.id}
             >
               <p>
@@ -251,7 +230,7 @@ export function BalanceReview({
         <h3 className="font-semibold">Pareceres com autoria própria</h3>
         {context.reviews.map((row) => (
           <article
-            className="rounded-lg border border-(--line) p-3 text-sm"
+            className="ui-card hca-form-stack"
             key={row.id}
           >
             <p>
