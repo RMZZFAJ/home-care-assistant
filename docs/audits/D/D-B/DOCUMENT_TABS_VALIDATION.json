@@ -1524,5 +1524,78 @@
       "human/device/provider/operational gates",
       "owner-deferred Sonar"
     ]
+  },
+  "D3.64": {
+    "baseSha": "4e1768d84af68dfde357b11a6f2443a3fc899f51",
+    "scope": "04.2 COM acquisition/donation/parcels/arrival/closure;original scoped local closure",
+    "unit": {
+      "command": "npx vitest run tests/purchase-follow-up.test.ts tests/document-milestones.test.ts tests/requisition-follow-up.test.ts",
+      "files": 3,
+      "passed": 25
+    },
+    "browser": {
+      "cohort": {
+        "startTime": "2026-11-11T04:41:25.454Z",
+        "duration": 397478.868,
+        "expected": 24,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "command": "node scripts/run-e2e.mjs purchase-follow-up,purchase-receipts,com-action-private-drafts,purchase-origin,com-decision-private-drafts;grep selected8cases",
+      "report": "output/phase-d-work/ui-canonical/purchase-follow-up-qualified.json",
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "distinctQualified": 24,
+      "repeated": 0
+    },
+    "proofs": [
+      "draft and pending-approval zero approved quantities cannot complete COM milestones",
+      "COM read does not request the unused patient-settings directory",
+      "next-step selects and focuses real workflow/history tab without mutation",
+      "closed expectation does not waive receipt validation or unarrived acquired material",
+      "rejected parcel retains its exact declaration and creates no stock movement",
+      "replacement parcel validation creates exactly one quantity4 receipt stock credit",
+      "donation origin and acquisition-state labels remain explicit",
+      "503 retains identified last valid data without current next-step;valid read recovers",
+      "native revoked read capability produces403 and removes the document",
+      "independent SQL snapshots of documents,lines,events,receipts and stock unchanged by browser-only reading/navigation",
+      "old cross-session fields,uncertain confirmation recovery,cancellation,P14 PDFs and rejected-parcel recovery pass unchanged"
+    ],
+    "validation": {
+      "typecheck": "PASS",
+      "directedEslint": "PASS",
+      "visual": "320px donation closed header inspected;no clipping/overlap;existing P14 width/axe checks retained",
+      "newDonationAxeAndOverflow": "320px all3profiles"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date.",
+      "project": "qwfrqychokvhdzakibid"
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "completedCheckpoints": [
+        "04.1",
+        "04.2"
+      ],
+      "nextCheckpoint": "04.3"
+    },
+    "limits": [
+      "own published SHA CI required",
+      "04.3–04.6 and full UI parity remain",
+      "DOC-A/B/C/D still pending;no new PDF appearance claimed",
+      "physical-device/human/provider/operational gates distinct",
+      "owner-deferred Sonar"
+    ]
   }
 }

@@ -119,6 +119,7 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
   );
   if (data.type === "COM") {
     const progress = data.purchaseProgress;
+    const operational = Boolean(data.protocol) && !["draft", "pending_approval"].includes(data.status);
     const acquired =
       progress?.lines.filter(
         (line) =>
@@ -132,12 +133,15 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
       progress?.lines.some((line) => quantity(line.purchasedQuantity).gt(0)) ??
       false;
     const received =
+      operational &&
       progress &&
       hasAcquisition &&
       !progress.physicalPending &&
       !progress.validationPending;
     const settled =
+      operational &&
       progress &&
+      (hasAcquisition || progress.expectationClosed) &&
       !progress.expectationPending &&
       !progress.physicalPending &&
       !progress.validationPending;
@@ -149,28 +153,34 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
           ? linePercent(acquired, progress.lines.length)
           : undefined,
         state: progress
-          ? acquired === progress.lines.length && acquired > 0
+          ? operational && acquired === progress.lines.length && acquired > 0
             ? "done"
-            : waived && !progress.expectationPending
+            : closed ? "closed" : operational && waived && !progress.expectationPending
               ? "waived"
               : "pending"
           : "unknown",
-        detail: progress
-          ? `${acquired}/${progress.lines.length} linhas integralmente adquiridas${waived ? "; há parcela dispensada" : ""}`
+        detail: data.status === "draft"
+          ? "Preparação não comprova aquisição"
+          : data.status === "pending_approval"
+            ? "Aguardando decisão de aprovação"
+            : progress
+          ? `${acquired}/${progress.lines.length} linhas integralmente adquiridas${waived ? "; aquisição restante encerrada" : ""}`
           : "Referência de aquisição indisponível",
       },
       {
         label: "Recebimento",
         state: received
           ? "done"
-          : progress && !hasAcquisition && progress.expectationClosed
+          : closed ? "closed" : operational && progress && !hasAcquisition && progress.expectationClosed
             ? "waived"
             : progress
               ? "pending"
               : "unknown",
         detail: received
           ? "Chegadas conferidas"
-          : progress?.validationPending
+          : closed
+            ? "Encerramento preservado; sem recebimento presumido"
+            : progress?.validationPending
             ? "Conferência de chegada pendente"
             : !hasAcquisition && progress?.expectationClosed
               ? "Expectativa encerrada sem nova chegada"

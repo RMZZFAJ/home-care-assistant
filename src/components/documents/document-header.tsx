@@ -14,6 +14,7 @@ export function DocumentHeader({
   typeLabel,
   code,
   status,
+  statusLabel,
   protocol,
   version,
   createdAt,
@@ -42,6 +43,7 @@ export function DocumentHeader({
   type: DocumentType;
   code: string;
   status: string;
+  statusLabel?: string;
   protocol: string | null;
   version: number;
   createdAt: string | null;
@@ -95,7 +97,7 @@ export function DocumentHeader({
             </div>
           </div>
           <div className="hca-document-tags">
-            <StatusBadge status={status} />
+            <StatusBadge status={status} label={statusLabel} />
             {badges}
             <Pill>Versão {version}</Pill>
             {contextLabel ? <Pill>Perfil: {contextLabel}</Pill> : null}

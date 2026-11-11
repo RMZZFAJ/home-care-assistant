@@ -35,8 +35,8 @@ A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03 e 07 estão concluídas localmente.
-A 03 foi fechada no lote anterior. A etapa 04 tem seis pontos. O ponto 04.1
-foi concluído localmente no escopo anterior; o próximo é 04.2, compra e doação.
+A etapa 04 tem seis pontos. Os pontos 04.1 e 04.2 estão concluídos localmente
+no escopo declarado; o próximo é 04.3, entregas.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -780,8 +780,8 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
 
 ### Próxima etapa — 04, estados e vínculos das fichas
 
-O ponto 04.1 está concluído no escopo anterior. Restam os pontos 04.2 a
-04.6. Cada um terá seu próprio fechamento, mantendo esta lista. As novas
+Os pontos 04.1 e 04.2 estão concluídos no escopo declarado. Restam os pontos
+04.3 a 04.6. Cada um terá seu próprio fechamento, mantendo esta lista. As novas
 regras documentais estão identificadas em DOC-A a DOC-D.
 
 - **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.**
@@ -791,7 +791,12 @@ regras documentais estão identificadas em DOC-A a DOC-D.
   ao complemento DOC-B/DOC-C e ainda precisam de execução.
   Responsável — Codex.
 - **04.2 — Compra e doação — aquisição, parcelas, chegada e encerramento.**
-  Implementado; conferência conjunta pendente. Responsável — Codex.
+  Concluído localmente · 100% deste ponto. Preparação e aprovação pendente
+  não aparecem como conclusão. A orientação distingue aquisição, chegada,
+  conferência e encerramento; parcelas rejeitadas continuam no histórico.
+  Recuperação, doação, permissões e ausência de entrada duplicada foram
+  conferidas. Os novos PDFs e regras do complemento continuam nos blocos
+  DOC-A a DOC-D. Responsável — Codex.
 - **04.3 — Entrega — conferência, divergência, devolução e regularização.**
   Implementado; conferência conjunta pendente. Responsável — Codex.
 - **04.4 — Transferências — origem, destino, aceite e encerramento.**

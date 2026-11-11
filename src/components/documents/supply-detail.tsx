@@ -55,6 +55,7 @@ import { DocumentActions } from "@/components/documents/document-actions";
 import { DocumentMilestones } from "@/components/documents/document-milestones";
 import { DocumentNextStep } from "@/components/documents/document-next-step";
 import { supplyMilestones } from "@/lib/documents/milestones";
+import { purchaseFollowUp } from "@/lib/documents/purchase-follow-up";
 import { DocumentProgress } from "./document-progress";
 import {
   PurchaseDetails,
@@ -96,6 +97,7 @@ export function SupplyDocumentContent({
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
   const [readDenied, setReadDenied] = useState(false);
+  const [readFailed, setReadFailed] = useState(false);
   const [message, setMessage] = useState("");
   const [readNotice, setReadNotice] = useState("");
   const [action, setAction] = useState<DocumentAction | null>(null);
@@ -193,6 +195,7 @@ export function SupplyDocumentContent({
       .then(async (result) => {
         if (controller.signal.aborted) return;
         setReadDenied(false);
+        setReadFailed(false);
         setData((current) =>
           !editingRef.current || current === null ? result.data : current,
         );
@@ -201,7 +204,7 @@ export function SupplyDocumentContent({
             "O acompanhamento foi atualizado. Sua operação permanece preservada e será validada contra a versão original ao confirmar.",
           );
         setError("");
-        if (result.data.care_recipient_id === patientId) {
+        if (result.data.type !== "COM" && result.data.care_recipient_id === patientId) {
           const directory = await api<{ directory: PatientPerson[] }>(
             "/api/patient-settings?careRecipientId=" +
               result.data.care_recipient_id,
@@ -213,6 +216,7 @@ export function SupplyDocumentContent({
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {
+          setReadFailed(true);
           if (
             reason instanceof ApiError &&
             [401, 403, 404].includes(reason.status)
@@ -260,6 +264,7 @@ export function SupplyDocumentContent({
       resultFocusRef.current = true;
       setFocusRevision((value) => value + 1);
       setData(result.data);
+      setReadFailed(false);
       pendingRef.current = null;
       setUncertain(false);
       setReview(null);
@@ -378,6 +383,10 @@ export function SupplyDocumentContent({
     }
   }
   const activeContext = data?.care_recipient_id === context.patient?.id;
+  const purchaseStep = data?.type === "COM" ? purchaseFollowUp({
+    status: data.status, origin: data.payload.origin, progress: data.purchaseProgress,
+  }) : null;
+  const operationOpen = Boolean(action || review || uncertain || regularizationEditing || balanceReviewEditing || transferEditing);
   const allowed = (cap: string) => Boolean(activeContext && can(context, cap));
   const actions: DocumentAction[] = [];
   if (
@@ -859,6 +868,7 @@ export function SupplyDocumentContent({
                 ? (data.purchaseProgress?.state ?? data.status)
                 : data.status
             }
+            statusLabel={purchaseStep?.statusLabel}
             protocol={data.protocol}
             version={data.version}
             createdAt={data.created_at}
@@ -916,21 +926,33 @@ export function SupplyDocumentContent({
             ) : null}
           </DocumentHeader>
           <DocumentTabs
+            rootRef={tabs.rootRef}
             type={data.type}
             value={tabs.value}
             onSelect={tabs.select}
             auditAllowed={can(context, "audit.read")}
           >
             <DocumentPanel value="overview">
-              <DocumentNextStep
+              {purchaseStep && (loading || readFailed || operationOpen) ? (
+                <Notice>
+                  {operationOpen
+                    ? "Sua operação está preservada na versão de trabalho. Conclua ou feche a operação para consultar a próxima providência atual."
+                    : loading
+                      ? "Atualizando o acompanhamento da aquisição…"
+                      : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
+                  {" "}Os dados preservados não representam uma nova confirmação.
+                </Notice>
+              ) : <DocumentNextStep
                 label={
-                  data.type === "COM"
-                    ? "Aquisição e chegadas"
+                  purchaseStep
+                    ? purchaseStep.label
                     : data.type === "BAL"
                       ? "Contagem e revisão"
                       : "Atendimento e decisões"
                 }
-                pending={
+                heading={purchaseStep?.heading}
+                description={purchaseStep?.description}
+                pending={purchaseStep?.pending ?? (
                   data.status === "draft" ||
                   data.status === "pending_receipt" ||
                   data.status === "disputed" ||
@@ -948,9 +970,9 @@ export function SupplyDocumentContent({
                     data.balanceRecount?.activeAssignment ||
                       data.balanceRecount?.requiresDesignation,
                   )
-                }
-                onOpen={() => tabs.select("workflow")}
-              />
+                )}
+                onOpen={() => tabs.select(purchaseStep?.section ?? "workflow", Boolean(purchaseStep))}
+              />}
               <DocumentProgress
                 actionTarget={progressActionTarget}
                 onAction={() => tabs.select("overview")}

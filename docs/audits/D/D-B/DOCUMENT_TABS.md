@@ -121,3 +121,50 @@ rodada tem quatro resultados próprios DOC-A/DOC-B/DOC-C/DOC-D ainda pendentes,
 incluindo os novos avisos e confirmação de cancelamento. Não reclassifica
 este fechamento local como aprovação das novas regras. A implementação
 documental e a simplificação de rascunhos permanecem no acréscimo aprovado.
+
+## D3.64 — estados e próximas providências da compra e doação
+
+Base 4e1768d. O ponto fixo 04.2 trata da aquisição, parcelas, chegada e
+encerramento da COM. A orientação agora diferencia preparação, aprovação,
+aquisição efetiva, chegada ainda não válida, conferência de parcela,
+expectativa encerrada e registro terminal. Seu atalho abre Aquisição ou
+Versões e integridade e transfere o foco à aba selecionada. Não confirma
+uma operação. Doação conserva sua origem e recebe rótulo próprio nos estados
+de aquisição em andamento ou registrada, sem criar outro tipo documental.
+
+Havia uma falsa conclusão nos marcos: antes da aprovação, quantidades
+aprovadas zeradas deixavam os indicadores de pendência falsos e eram
+tratadas como etapas satisfeitas. Aquisição e conclusão agora exigem fase
+operacional e fatos positivos de aquisição ou encerramento registrado.
+Preparação e aprovação pendente não satisfazem esses marcos. Encerramento
+da expectativa não dispensa chegada ou conferência, nem faz uma COM atender
+uma REQ sem ENT aceita. Rejeição conserva a declaração e não gera crédito.
+
+Falha de consulta mantém a última leitura identificada e retira a orientação
+atual até uma consulta válida. Uma operação aberta permanece na versão de
+trabalho; a orientação não a apresenta como leitura atual. Recusa de leitura
+retira a ficha. A COM deixou de consultar o diretório de pessoas, pois não o
+usa; o fluxo ENT mantém sua consulta. Comandos, permissões, recuperação,
+parcelas, PDFs anteriores e ledger mantêm seus contratos.
+
+Passaram 25 unitários nos três arquivos dirigidos e 24 cenários de navegador
+em uma única coorte com build de produção, Auth real e stack local guardada,
+sem falhas ou repetições. Oito cenários em cada perfil: Chromium desktop,
+Android emulado e WebKit. A coorte conserva os testes existentes de retomada
+de aprovação/aquisição/chegada entre sessões, confirmação perdida sem outro
+fato, cancelamento, doação explícita, rejeição de parcela, encerramento P14 e
+seus PDFs distintos. Os novos cenários comparam fatos oficiais e ledger por
+SQL independente; navegar, reler e seguir a próxima providência não enviam
+comando nem alteram esses fatos. Incluem preparação/aprovação, parcela
+rejeitada e substituta, crédito único, negativa de leitura, falha 503,
+recuperação da consulta, teclado/foco e ausência de consulta ao diretório COM.
+
+Tipos e lint dirigido passaram. A auditoria de acessibilidade/overflow a
+320 px e a inspeção visual do cabeçalho da doação foram realizadas; os casos
+existentes conservam suas larguras e verificações. Sem SQL novo; dry-run remoto
+vazio. CI do novo SHA ainda necessária. Ponto 04.2 qualificado localmente no
+escopo declarado; próximo 04.3. A matriz conserva 56 PASS locais/49 PARTIAL.
+O complemento DOC-A/B/C/D conserva seus resultados próprios pendentes; este
+ponto não implementa a nova aparência dos PDFs, os novos atos de cancelamento
+ou a simplificação dos rascunhos. Os ensaios móveis são emulação; gates humanos,
+de aparelho real, provedores e operação permanecem nas etapas correspondentes.

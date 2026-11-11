@@ -8,7 +8,7 @@ export { Dialog } from "./overlays";
 import { Icon } from "./icon";
 export { Icon, type IconName } from "./icon";
 
-export function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({ status, label }: { status: string; label?: string }) {
   const tone = !Object.hasOwn(documentStatuses,status)?"neutral":[
     "approved",
     "confirmed",
@@ -26,7 +26,7 @@ export function StatusBadge({ status }: { status: string }) {
         : "pending";
   return (
     <span className={`hca-status hca-status--${tone}`}>
-      {documentStatusLabel(status)}
+      {label ?? documentStatusLabel(status)}
     </span>
   );
 }

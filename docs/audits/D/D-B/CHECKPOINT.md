@@ -1,5 +1,19 @@
 # Checkpoint D-B
 
+D3.64 fechou localmente o ponto fixo 04.2 no escopo de estados da COM.
+Preparação/aprovação não aparecem concluídas por totais zerados; a orientação
+distingue aquisição, chegada, parcela pendente/rejeitada, expectativa
+encerrada e histórico terminal. Doação conserva origem e rótulo próprios.
+Falha de consulta identifica a leitura anterior; recusa retira a ficha.
+Passaram 25 unitários e 24 cenários de navegador em uma única coorte de
+produção, nos três perfis, sem falhas ou repetições. Tipos e lint dirigido
+aprovados; cabeçalho de doação conferido visualmente a 320 px. Sem SQL novo;
+dry-run remoto vazio. As 205 versões previamente reconciliadas permanecem
+sem pendências. CI do novo SHA ainda necessária; Sonar adiado pelo responsável.
+Pontos 04.1 e 04.2 qualificados; próximo 04.3, entregas. Os 105 critérios
+conservam 56 PASS locais/49 PARTIAL. DOC-A/B/C/D ainda pendentes, sem aprovação
+por este fechamento. [Resultados](DOCUMENT_TABS_VALIDATION.json).
+
 D3.63 fechou localmente o ponto 04.1 no escopo declarado. A orientação REQ
 abre a seção correspondente ao fato pendente ou encerrado; vínculos ENT
 mostram situação e quantidade aceita, sem ampliar autorização. Falha de

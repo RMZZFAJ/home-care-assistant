@@ -4,7 +4,19 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.63
+## Incremento atual D3.64
+
+Compra e doação têm orientação específica para preparação, aprovação,
+aquisição, chegada, conferência de parcelas, expectativa encerrada e histórico.
+Totais zerados antes da aprovação deixaram de indicar conclusão indevida.
+Uma falha de consulta identifica os dados preservados; a recusa retira a ficha.
+Passaram 25 unitários e 24 cenários de navegador, sem falhas ou repetições,
+em Chromium desktop, Android emulado e WebKit. Tipos e lint dirigido passaram.
+Sem SQL novo; dry-run remoto vazio. CI do novo SHA ainda necessária.
+O ponto 04.2 está qualificado localmente; próximo 04.3, entregas.
+[Implementação e limites](../audits/D/D-B/DOCUMENT_TABS.md).
+
+## Incremento anterior D3.63
 
 A próxima providência da REQ e seus vínculos agora distinguem atendimento,
 ciência, conclusão, cancelamento, arquivo e histórico. A consulta recusada
