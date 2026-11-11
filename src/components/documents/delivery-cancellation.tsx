@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import { DefinitionGrid } from "@/components/ui/controls";
 import type {
   DeliveryCancellationContext,
   DeliveryCancellationLine,
@@ -141,43 +142,17 @@ export function DeliveryCancellationDetails({
         </>
       ) : null}
       {context.lines.map((line) => (
-        <section className="border-t border-(--line) pt-3" key={line.lineId}>
+        <section className="hca-factual-material border-t border-(--line) pt-3" key={line.lineId}>
           <h3 className="font-semibold">{line.name}</h3>
-          <dl className="my-2 space-y-1 text-sm">
-            <div>
-              <dt className="inline">Recebido no aceite: </dt>
-              <dd className="inline">
-                {formatQuantity(line.acceptedQuantity, line.unit)}
-              </dd>
-            </div>
-            {context.request.status === "pending" ? (
-              <div>
-                <dt className="inline">
-                  Consumo confirmado disponível para conciliação:{" "}
-                </dt>
-                <dd className="inline">
-                  {formatQuantity(line.availableConsumedQuantity, line.unit)}
-                </dd>
-              </div>
-            ) : line.consumedQuantity !== undefined ? (
-              <>
-                <div>
-                  <dt className="inline">
-                    Consumo já confirmado referenciado:{" "}
-                  </dt>
-                  <dd className="inline">
-                    {formatQuantity(line.consumedQuantity, line.unit)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="inline">Devolução real registrada: </dt>
-                  <dd className="inline">
-                    {formatQuantity(line.returnQuantity, line.unit)}
-                  </dd>
-                </div>
-              </>
-            ) : null}
-          </dl>
+          <DefinitionGrid items={[
+            { label: "Recebido no aceite", value: formatQuantity(line.acceptedQuantity, line.unit) },
+            ...(context.request.status === "pending" ? [
+              { label: "Consumo confirmado disponível para conciliação", value: formatQuantity(line.availableConsumedQuantity, line.unit) },
+            ] : line.consumedQuantity !== undefined ? [
+              { label: "Consumo já confirmado referenciado", value: formatQuantity(line.consumedQuantity, line.unit) },
+              { label: "Devolução real registrada", value: formatQuantity(line.returnQuantity, line.unit) },
+            ] : []),
+          ]} />
           <DeliveryConsumptionReferences line={line} />
         </section>
       ))}

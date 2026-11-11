@@ -13,6 +13,7 @@ import {
 import { documentVariant } from "@/lib/documents/variant";
 import { SupplyLineSummary } from "./supply-line-summary";
 import { PurchaseMaterials } from "./purchase-materials";
+import { DeliveryMaterials } from "./delivery-materials";
 import {
   DeliveryDispatchFacts,
   DeliveryReceiptReview,
@@ -998,8 +999,8 @@ export function SupplyDocumentContent({
               />
             </DocumentPanel>
             <DocumentPanel value="materials">
-              <section className={data.type === "COM" ? "hca-materials-section" : "ui-card"}>
-                {data.type === "COM" ? <PurchaseMaterials data={data} /> : <>
+              <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>
+                {data.type === "COM" ? <PurchaseMaterials data={data} /> : data.type === "ENT" ? <DeliveryMaterials data={data} /> : <>
                 <h2 className="font-semibold">Produtos e quantidades</h2>
                 <div className="mt-4 space-y-3">
                   {data.lines.map((line) => (

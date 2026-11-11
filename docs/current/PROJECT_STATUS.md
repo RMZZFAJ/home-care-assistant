@@ -4,7 +4,30 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.79
+## Incremento atual D3.80
+
+D3.80 avançou06.2: seis das sete composições previstas foram implementadas e
+conferidas no escopo visual. Preparação e revisão ENT usam os componentes
+canônicos; materiais separam expedido,aceito,conciliado e pendente. Uma
+transferência ainda sem expedição mostra somente declarado. Recebimento,
+cancelamento e apuração preservam suas quantidades,autorias e fatos distintos.
+Foram qualificados30 cenários distintos nos três perfis:27 resultados iniciais
+e três finais da consulta relacionada. Cinco larguras,axe,teclado,nomes longos,
+escolha de recebedor,resposta perdida,consumo em leitura,retorno autônomo,
+apuração independente e PDFs técnicos anteriores preservados. Um seletor
+antigo esperava outro nome do atalho; a correção confere código e quantidade
+aceita separados,sem reduzir negativas,recuperação ou ausência de escrita.
+Tipos e lint passaram. Capturas320px usam rolagem real e conferência de
+sobreposição; não são prova de aparelho físico. A caixa de tarefas ENT-02
+continua pendente: aparência do cartão e resumo autorizado de pessoas e
+percurso,ausentes da consulta mínima atual. Portanto06.2 permanece85%,sem novo
+ponto de escopo. Próxima atividade é concluir ENT-02 antes de06.3. Etapa06
+parcial80%; estimativa visual global70%. Matriz57/48 e18 estados UI mantidos.
+Sem SQL novo; reconciliação remota e CI própria continuam gates independentes.
+DOC-A/B/C/D e as verificações conjuntas,humanas e físicas permanecem pendentes.
+[Resultados e limites](../audits/D/D-B/ENT_TRANSFER_CANONICAL.md).
+
+## Incremento anterior D3.79
 
 D3.79 fechou06.1 no escopo visual de REQ/COM: seleção e revisão compartilham
 componentes canônicos; materiais usam tabela/cartões com busca reversível.

@@ -37,7 +37,9 @@ A fase continua em execução.
 conclusão definidos. As etapas 01, 02, 03, 04, 05 e 07 estão concluídas
 localmente. Os dez pontos de listas da etapa05 foram conferidos.
 A etapa06 continua em execução. O ponto06.1, aparência de REQ e COM,
-está concluído localmente. O próximo é06.2, entregas e transferências.
+está concluído localmente. O ponto06.2, entregas e transferências, está em
+85%: seis das sete composições previstas foram conferidas. Falta terminar
+a caixa de tarefas, com pessoas, caminho dos materiais e próxima ação.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -485,7 +487,7 @@ concluído; os quatro resultados novos ainda não estão implementados.
 ### Nova aparência do sistema
 
 - **Aplicar integralmente o Modelo Integral em todos os recursos** — Em
-  execução · ≈65%. Falta: Concluir telas, variações, diálogos e conferência
+  execução · ≈70%. Falta: Concluir telas, variações, diálogos e conferência
   visual global. Responsável: Codex.
 - **Fechar, voltar, confirmar e descartar mantendo o foco correto** — Em
   execução · ≈75%. Falta: Concluir diálogos e variações restantes; depois
@@ -494,14 +496,14 @@ concluído; os quatro resultados novos ainda não estão implementados.
   ≈65%. Falta: Conferir textos extremos, ampliação de 400% e todas as telas.
   Responsável: Codex; depois participantes.
 - **Concluir cada composição de tela preservando suas funções** — Em execução
-  · ≈65%. Falta: Concluir e conferir individualmente as 66 composições e suas
+  · ≈70%. Falta: Concluir e conferir individualmente as 66 composições e suas
   variações. Responsável: Codex.
 
 ## Refatoração visual de todo o sistema
 
-**Estimativa global: aproximadamente 65% executados.** É uma estimativa
+**Estimativa global: aproximadamente 70% executados.** É uma estimativa
 conservadora da aplicação completa do modelo, incluindo telas, estados e
-funções; não significa que 65% das telas estejam individualmente aprovadas.
+funções; não significa que 70% das telas estejam individualmente aprovadas.
 Ainda falta conferir cada uma das 66 composições e suas 171 relações. A
 aparência Fluent foi descartada e sua dependência técnica já foi removida. A
 nova base compartilhada e as fichas em abas estão implementadas; isso não
@@ -537,9 +539,11 @@ adicionais DOC-A a DOC-D, acompanhados no bloco documental.
   vários consumidores e a consulta de saldos com mínimo, situação, unidades e
   filtro. Falta: Completar as outras listas e verificar todas as variações.
   Responsável: Codex.
-- **Fichas de requisição, compra, entrega e balanço em abas** — 80%. Já
+- **Fichas de requisição, compra, entrega e balanço em abas** — 85%. Já
   aplicado: Abas, cabeçalho, ações e painéis reais; seleção, revisão e materiais
-  de requisição e compra conferidos. Falta: Entregas, balanços e as demais
+  de requisição e compra conferidos. Entregas agora separam declaração,
+  expedição, aceite, conciliação e pendência; recebimento, cancelamento e
+  apuração mantêm seus fatos. Falta: Caixa de tarefas, balanços e as demais
   composições e variantes. Responsável: Codex.
 - **Andamentos nas quatro fichas** — 80%. Já aplicado: Registro salvo,
   autoria, data, categoria, etapa, preenchimento privado entre aparelhos,
@@ -682,13 +686,18 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    recuperação e resposta atrasada foram conferidos.
    Responsável — Codex.
 
-6. **06 — Aparência da operação diária.** Em execução · 75%.
+6. **06 — Aparência da operação diária.** Em execução · 80%.
 
    Concluído — 06.1, as nove composições de requisição e compra: seleção,
    revisão, consulta, ciência, lista frequente, aquisição, parcelas e
    encerramento da expectativa, com funções e dados preservados.
 
-   Para concluir — 06.2 entregas e transferências; 06.3 balanços e agenda;
+   Em execução — 06.2 entregas e transferências, 85%. Preparação, revisão,
+   materiais, recebimento pessoal, cancelamento, apuração e fatos da
+   transferência foram conferidos. Falta uma das sete composições: a caixa
+   de tarefas, com pessoas, caminho dos materiais e ação de cada registro.
+
+   Depois — 06.3 balanços e agenda;
    06.4 estoque, catálogo e consumo; 06.5 arquivos, rascunhos e seções
    documentais; 06.6 conferência conjunta de larguras, teclado, foco, textos
    extensos e ampliação. O grupo mantém suas 46 composições originais.

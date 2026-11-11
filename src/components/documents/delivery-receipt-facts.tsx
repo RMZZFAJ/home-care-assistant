@@ -1,30 +1,17 @@
 import Link from "next/link";
 import type { SupplyDocument } from "@/types/documents";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import { DefinitionGrid } from "@/components/ui/controls";
 
 export function DeliveryDispatchFacts({ data }: { data: SupplyDocument }) {
   return (
     <section aria-label="Expedição preservada" className="space-y-3 text-sm">
       <h3 className="font-semibold">Expedição preservada</h3>
-      <dl className="grid grid-cols-2 gap-3">
-        <div>
-          <dt>Origem</dt>
-          <dd>{data.payload.source === "FAMILY" ? "Família" : "Equipe"}</dd>
-        </div>
-        <div>
-          <dt>Destino</dt>
-          <dd>
-            {data.payload.destination === "FAMILY" ? "Família" : "Equipe"}
-          </dd>
-        </div>
-        <div className="col-span-2">
-          <dt>Recebedor designado</dt>
-          <dd>
-            {data.workflow_data.recipientSelection?.recipientName ??
-              "Pessoa designada no documento"}
-          </dd>
-        </div>
-      </dl>
+      <DefinitionGrid items={[
+        { label: "Origem", value: data.payload.source === "FAMILY" ? "Família" : "Equipe" },
+        { label: "Destino", value: data.payload.destination === "FAMILY" ? "Família" : "Equipe" },
+        { label: "Recebedor designado", value: data.workflow_data.recipientSelection?.recipientName ?? "Pessoa designada no documento", wide: true },
+      ]} />
       <div className="space-y-2">
         <p className="font-semibold">REQs vinculadas</p>
         {data.linkedRequisitions?.map((req) => (
@@ -78,23 +65,14 @@ export function DeliveryReceiptReview({
         return (
           <article
             key={line.id}
-            className="rounded-xl border border-(--line) p-3 text-sm"
+            className="ui-card hca-form-stack hca-factual-material text-sm"
           >
             <h3 className="font-semibold">{line.name_snapshot}</h3>
-            <dl className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
-              <div>
-                <dt>Expedido</dt>
-                <dd>{formatQuantity(line.quantity, line.unit_snapshot)}</dd>
-              </div>
-              <div>
-                <dt>Recebido neste ato</dt>
-                <dd>{formatQuantity(accepted, line.unit_snapshot)}</dd>
-              </div>
-              <div>
-                <dt>Pendente de conciliação</dt>
-                <dd>{formatQuantity(pending, line.unit_snapshot)}</dd>
-              </div>
-            </dl>
+            <DefinitionGrid items={[
+              { label: "Expedido", value: formatQuantity(line.quantity, line.unit_snapshot) },
+              { label: "Recebido neste ato", value: formatQuantity(accepted, line.unit_snapshot) },
+              { label: "Pendente de conciliação", value: formatQuantity(pending, line.unit_snapshot) },
+            ]} />
             <p className="mt-2">
               {divergence
                 ? "Linha divergente: " +

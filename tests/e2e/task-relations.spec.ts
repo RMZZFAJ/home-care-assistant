@@ -28,8 +28,9 @@ test("relação REQ para ENT abre fatos de expedição em leitura, recupera cons
   await selectDocumentSection(page, "materials");
   expect((await sourceOpening).status()).toBe(200);
   await expect(page.locator(".hca-document-milestones > li").filter({has:page.getByText("Atendimento",{exact:true})}).locator(".hca-milestone-track > span")).toHaveAttribute("style", "width: 50%;");
-  const open = page.getByRole("button", { name: new RegExp("^" + f.ent.code + " · aceito") });
+  const open = page.getByRole("button", { name: f.ent.code, exact: true });
   await expect(open).toBeVisible();
+  await expect(page.getByRole("cell").filter({ has: open })).toContainText("Quantidade aceita para este item: 2 unidade");
   const response = await page.request.get(`/api/documents/${f.ent.id}`); expect(response.status()).toBe(200);
   const body = await response.json();
   await info.attach("related-read-shape", { body: JSON.stringify({ type: body.data.type, lineTypes: Object.fromEntries(Object.entries(body.data.lines[0]).map(([name, value]) => [name, Array.isArray(value) ? "array" : value === null ? "null" : typeof value])) }), contentType: "application/json" });

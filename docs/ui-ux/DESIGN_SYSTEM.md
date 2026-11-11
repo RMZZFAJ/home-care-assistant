@@ -79,6 +79,10 @@ Consulta indisponível recebe texto explícito, sem presumir quantidade zero.
 MaterialReview apresenta nome e detalhes completos em leitura, separando
 observação, instante, urgência e motivo. Quantidades continuam com sua unidade;
 o resumo não cria outro editor nem transforma observação em pedido de compra.
+DeliveryMaterials conserva expedição, aceite pessoal, conciliação e pendência
+separados, com unidade. Antes da expedição bilateral apresenta só declarado.
+Recebimento, cancelamento e apuração usam DefinitionGrid para seus fatos em
+leitura; consumo confirmado não ganha input nem novo débito na apresentação.
 
 ## Aceite
 

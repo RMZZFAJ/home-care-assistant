@@ -528,25 +528,16 @@ export function SupplyWizardStep({
             { label: "Pessoa assistida", value: context.patient?.display_name },
             { label: "Responsável", value: context.fullName },
             { label: "Forma de aquisição", value: form.origin === "donation" ? "Doação" : form.origin === "purchase" ? "Compra pela família" : "Não informada" },
-          ]} /> : <div className="rounded-xl bg-(--background) p-4 text-sm">
-            <strong>{context.patient?.display_name}</strong>
+          ]} /> : <div className={type === "ENT" ? "hca-form-stack" : "rounded-xl bg-(--background) p-4 text-sm"}>
+            {type === "ENT" ? <DefinitionGrid items={[
+              { label: "Pessoa assistida", value: context.patient?.display_name },
+              { label: "Responsável", value: context.fullName },
+              { label: "Percurso", value: form.source === "FAMILY" ? "Família → Equipe" : "Equipe → Família" },
+              { label: "Recebedor", value: recipientContext?.people.find(person => person.id === form.recipientId)?.name ?? people.find(person => person.id === form.recipientId)?.name ?? "Pessoa não disponível na referência atual" },
+            ]} /> : <><strong>{context.patient?.display_name}</strong>
             <p className="mt-1 text-xs text-(--muted)">
               Responsável: {context.fullName}
-            </p>
-            {type === "ENT" ? (
-              <p className="mt-2">
-                {form.source === "FAMILY"
-                  ? "Família → Equipe"
-                  : "Equipe → Família"}{" "}
-                · Recebedor:{" "}
-                {recipientContext?.people.find(
-                  (person) => person.id === form.recipientId,
-                )?.name ??
-                  people.find((person) => person.id === form.recipientId)
-                    ?.name ??
-                  "Pessoa não disponível na referência atual"}
-              </p>
-            ) : null}
+            </p></>}
             {type === "ENT" && recipientContext ? (
               <div className="mt-3 space-y-2">
                 <DeliveryRecipientReference data={recipientContext} />
@@ -558,7 +549,7 @@ export function SupplyWizardStep({
               </div>
             ) : null}
           </div>}
-          {type === "COM" ? <MaterialReview rows={selected.map(product => ({
+          {type !== "BAL" ? <MaterialReview rows={selected.map(product => ({
             id: product.id, name: product.name,
             details: <><small>{form.quantities[product.id] ? formatQuantity(form.quantities[product.id], product.unit) : "Quantidade pendente"}</small>{form.presentationSelections?.[product.id]?.map(row => <small key={row.id}>{presentationCaption(row)}</small>)}</>,
           }))} /> : <ul className="divide-y divide-(--line)">

@@ -207,7 +207,11 @@ test("P06 escala sugere, a família pode escolher outra pessoa e o profissional 
     await selectDeliveryRecipient(page, "Teste global", reason);
     await expect(explanation(page)).toHaveValue(reason);
     await materialsAndReview(page);
-    await expect(page.getByText(/Recebedor: Teste global/)).toBeVisible();
+    const recipientSummary = page.locator("dl > div").filter({
+      has: page.locator("dt").filter({ hasText: /^Recebedor$/ }),
+    }).locator("dd");
+    await expect(recipientSummary).toBeVisible();
+    await expect(recipientSummary).toContainText("Teste global");
     await expect(page.getByText("Sugestão: ", { exact: false })).toContainText(
       "Teste professional",
     );

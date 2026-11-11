@@ -2,6 +2,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import type { TransferFacts } from "@/types/transfers";
 import { custodyName } from "./transfer-console";
 import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
+import { DefinitionGrid } from "@/components/ui/controls";
 export function TransferFactsDisplay({ facts }: { facts: TransferFacts }) {
   const declaration = facts.declaration;
   return (
@@ -15,20 +16,14 @@ export function TransferFactsDisplay({ facts }: { facts: TransferFacts }) {
         </strong>
         .
       </p>
-      <p>
-        Declarante: <strong>{declaration.actor.name}</strong> ·{" "}
-        {formatBrazilDate(declaration.recordedAt)}.
-      </p>
+      <DefinitionGrid items={[
+        { label: "Declarante", value: declaration.actor.name },
+        { label: "Registrada em", value: formatBrazilDate(declaration.recordedAt) },
+        { label: "Contraparte designada para concordância", value: declaration.counterparty.name },
+        { label: "Recebedor físico designado", value: declaration.recipient.name },
+      ]} />
       <p className="whitespace-pre-wrap">
         Justificativa original: {declaration.reason}
-      </p>
-      <p>
-        Contraparte designada para concordância:{" "}
-        <strong>{declaration.counterparty.name}</strong>.
-      </p>
-      <p>
-        Recebedor físico designado:{" "}
-        <strong>{declaration.recipient.name}</strong>.
       </p>
       {facts.agreement ? (
         <>

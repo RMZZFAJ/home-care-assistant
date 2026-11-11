@@ -1,7 +1,7 @@
 "use client";
 import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import { SearchSelect } from "@/components/ui/search-select";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { RecordDrawer } from "@/components/forms/record-drawer";
@@ -93,39 +93,17 @@ export function RegularizationLines({
       {lines.map((line) => (
         <article
           key={line.lineId}
-          className="rounded-xl border border-(--line) p-3 text-sm"
+          className="ui-card hca-form-stack hca-factual-material text-sm"
         >
           <h4 className="font-semibold wrap-break-word">{line.name}</h4>
-          <p>
-            Expedido: {formatQuantity(line.expeditedQuantity, line.unit)} ·
-            Aceite pessoal preservado:{" "}
-            {formatQuantity(line.acceptedQuantity, line.unit)}
-          </p>
-          <p>
-            Conciliação anterior:{" "}
-            {formatQuantity(line.priorReconciledQuantity, line.unit)} · Em
-            trânsito antes desta proposta:{" "}
-            {formatQuantity(line.pendingQuantity, line.unit)}
-          </p>
-          <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-            {amounts.map(([field, label]) => (
-              <div key={field}>
-                <dt>
-                  {proposed ? "Proposto · " : "Apurado · "}
-                  {label}
-                </dt>
-                <dd className="font-semibold">
-                  {formatQuantity(line[field], line.unit)}
-                </dd>
-              </div>
-            ))}
-            <div>
-              <dt>Situação física desconhecida</dt>
-              <dd className="font-semibold">
-                {formatQuantity(line.unknownQuantity, line.unit)}
-              </dd>
-            </div>
-          </dl>
+          <DefinitionGrid items={[
+            { label: "Expedido", value: formatQuantity(line.expeditedQuantity, line.unit) },
+            { label: "Aceite pessoal preservado", value: formatQuantity(line.acceptedQuantity, line.unit) },
+            { label: "Conciliação anterior", value: formatQuantity(line.priorReconciledQuantity, line.unit) },
+            { label: "Em trânsito antes desta proposta", value: formatQuantity(line.pendingQuantity, line.unit) },
+            ...amounts.map(([field, label]) => ({ label: (proposed ? "Proposto · " : "Apurado · ") + label, value: formatQuantity(line[field], line.unit) })),
+            { label: "Situação física desconhecida", value: formatQuantity(line.unknownQuantity, line.unit) },
+          ]} />
           {line.movementIds?.length ? (
             <details className="mt-2">
               <summary>Movimentos vinculados</summary>

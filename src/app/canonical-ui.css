@@ -143,6 +143,7 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 .hca-material-review li, .hca-document-summary .hca-material-review li { display: flex; align-items: center; gap: 13px; padding: 12px 0; border-bottom: 1px solid #eaf0ec; min-width: 0; }
 .hca-material-review li:last-child, .hca-document-summary .hca-material-review li:last-child { border-bottom: 0; }
 .hca-material-review-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.hca-factual-material :is(h3,h4) { font-size: 13px; font-weight: 670; overflow-wrap: anywhere; }
 .hca-material-review strong { display: block; font-size: 13px; font-weight: 670; }
 .hca-material-review small { display: block; margin-top: 3px; font-size: 11px; color: var(--hca-muted); }
 @media (max-width: 500px) { .hca-material-review small { font-size: 10px; } }
