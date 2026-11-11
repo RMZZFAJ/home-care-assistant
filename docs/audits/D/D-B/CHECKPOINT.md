@@ -1,5 +1,32 @@
 # Checkpoint D-B
 
+D3.84 conclui06.5 localmente: nove composições DOC/ARQ/RAS. FileRecord
+compartilha arquivos gerados, anexos e legados, com conteúdo integral e ações
+próprias. Cronologia, fatos e diferenças usam os componentes canônicos;
+nomes históricos, fonte e versão exatas permanecem preservados. O verificador
+público separa código, arquivo, bytes, assinatura, confiança e tempo. Resumos
+e comparações privadas mantêm ambas as edições e escolhas manuais.
+O abandono de reserva usa diálogo contextual com recuperação, teclado e
+retorno de foco; arquivo pronto continua fora do descarte elegível. A Central
+de fichas mantém seu marcador comum após a retirada das regras antigas.
+Qualificados45 cenários distintos. Cinco larguras, axe completo, cores
+forçadas e movimento reduzido; capturas inspecionadas. Contraprovas de Auth,
+RLS, versões, bytes, consulta, erro, recuperação e efeitos oficiais mantidas.
+Tipos e lint dos afetados passaram. Sem SQL novo; remoto207 reconciliado,
+dry-run vazio. CI própria e gates conjuntos/humanos permanecem necessários.
+06.1–06.5 concluídos localmente; próximo06.6, conferência conjunta. Etapa06
+parcial97%; estimativa visual global85%. Estados originais105(57/48) e18 UI
+preservados. A política simplificada de rascunhos, nova aparência dos PDFs e
+novas regras documentais continuam em DOC-A/B/C/D; este incremento não as
+aprova. Produção NO-GO.
+[Resultados e limites](DOCUMENT_SECTIONS_CANONICAL.md).
+
+A CI do baseline039ba70 confirmou banco e validações Linux/Windows, mas
+reprovou navegadores por consumidores antigos, foco e geometria; um shard
+WebKit falhou na instalação por DNS/índice APT. Os logs completos estão
+preservados no diretório ignorado. Compatibilidade e contraprovas entram
+em06.6, já previsto; não há aprovação global da CI.
+
 D3.83 conclui06.4 localmente: as12 composições de estoque, catálogo e
 consumo. Movimentos usam tabela/cartões; trânsito separa expedido, aceito,
 conciliado e pendente. Cadastro atual e fatos preservados na origem estão

@@ -124,6 +124,19 @@ ficam em duas colunas; situação e ação vêm abaixo do texto, como as ações
 registros de arquivos do modelo. Conserva espaçamentos, paleta e componentes,
 sem comprimir o relato numa coluna estreita ou ocultar trechos.
 
+FileRecord compartilha a composição de arquivos do modelo entre anexos,
+exemplares assinados e arquivos legados. Nome, fatos e ações permanecem
+integrais; no celular as ações vêm abaixo do conteúdo. O abandono de uma
+reserva usa Dialog compacto com retorno ao acionador ou à atualização da seção.
+Não transforma arquivo pronto em reserva descartável.
+
+O histórico documental usa eventos cronológicos e DefinitionGrid para fatos
+e diferenças, com chaves estáveis da fonte quando rótulos se repetem. A
+consulta pública separa código, exemplar, integridade, assinatura, confiança
+e tempo, sem receber aparência de detalhe privado. A comparação privada
+empilha as duas edições em telas estreitas e conserva cada texto completo.
+As regras de retomada simples do complemento documental têm escopo próprio.
+
 ## Aceite
 
 Comparar produto e modelo em cinco viewports; testar teclado, retorno de foco,

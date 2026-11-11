@@ -64,15 +64,15 @@ type FieldMetadata = {
 };
 /** Canonical key/value composition;values remain complete at every viewport. */
 export function DefinitionGrid({
-  items,
+  items, className, ...props
 }: {
-  items: readonly { label: string; value: ReactNode; wide?: boolean }[];
-}) {
+  items: readonly { key?: string; label: string; value: ReactNode; wide?: boolean }[];
+} & ComponentProps<"dl">) {
   return (
-    <dl className="hca-definition-grid">
+    <dl {...props} className={["hca-definition-grid", className].filter(Boolean).join(" ")}>
       {items.map((item) => (
         <div
-          key={item.label}
+          key={item.key ?? item.label}
           className={item.wide ? "hca-definition-wide" : undefined}
         >
           <dt>{item.label}</dt>

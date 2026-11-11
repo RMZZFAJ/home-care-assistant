@@ -1,4 +1,5 @@
 "use client";
+import { FileRecord } from "@/components/ui/file-record";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { buttonClass, Notice } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
@@ -334,7 +335,7 @@ function GeneratedFiles({
           emissão explícita.
         </p>
       ) : null}
-      <ul className="space-y-3">
+      <ul className="hca-file-records" aria-label="Exemplares registrados">
         {rows.map((entry) => {
           if (entry.kind !== "issuance")
             return (
@@ -347,38 +348,9 @@ function GeneratedFiles({
             );
           const row = entry.issuance;
           return (
-            <li
-              key={row.id}
-              className="rounded-lg border border-(--border) p-3"
-            >
-              <p className="font-medium">
-                {code} · Versão {row.version} · {steps[row.step]}
-              </p>
-              <p className="text-sm">
-                Solicitado por {row.requestedName} ·{" "}
-                {formatBrazilDate(row.requestedAt)}
-              </p>
-              {row.readyAt ? (
-                <p className="text-sm">
-                  Emissão concluída em {formatBrazilDate(row.readyAt)} ·
-                  Assinatura técnica e carimbo internos
-                </p>
-              ) : null}
-              {entDocument && row.rendererRevision < 9 ? (
-                <p className="ui-notice text-sm" role="note">
-                  Este arquivo preserva orientações de uma emissão anterior.
-                  Consulte a ficha no aplicativo para saber se há tarefa atual.
-                  Você pode gerar um novo PDF para obter a representação
-                  atualizada; o arquivo original permanece preservado.
-                </p>
-              ) : null}
-              {row.representation === "derived" ? (
-                <p className="text-sm">
-                  Nova representação de uma versão histórica, gerada no momento
-                  indicado.
-                </p>
-              ) : null}
-              {row.state === "ready" ? (
+            <FileRecord key={row.id} identity={row.id}
+              title={<>{code} · Versão {row.version} · {steps[row.step]}</>}
+              actions={<>              {row.state === "ready" ? (
                 <div className="mt-2 flex flex-wrap gap-3">
                   <a
                     className={buttonClass}
@@ -410,6 +382,32 @@ function GeneratedFiles({
                     : "O arquivo ficará disponível após assinatura, validação e confirmação do armazenamento."}
                 </p>
               )}
+</>}
+            >
+              <p className="text-sm">
+                Solicitado por {row.requestedName} ·{" "}
+                {formatBrazilDate(row.requestedAt)}
+              </p>
+              {row.readyAt ? (
+                <p className="text-sm">
+                  Emissão concluída em {formatBrazilDate(row.readyAt)} ·
+                  Assinatura técnica e carimbo internos
+                </p>
+              ) : null}
+              {entDocument && row.rendererRevision < 9 ? (
+                <p className="ui-notice text-sm" role="note">
+                  Este arquivo preserva orientações de uma emissão anterior.
+                  Consulte a ficha no aplicativo para saber se há tarefa atual.
+                  Você pode gerar um novo PDF para obter a representação
+                  atualizada; o arquivo original permanece preservado.
+                </p>
+              ) : null}
+              {row.representation === "derived" ? (
+                <p className="text-sm">
+                  Nova representação de uma versão histórica, gerada no momento
+                  indicado.
+                </p>
+              ) : null}
               <details className="mt-2 text-sm">
                 <summary>Identificação do exemplar</summary>
                 <p className="break-all">{row.id}</p>
@@ -417,7 +415,7 @@ function GeneratedFiles({
                   Código: HCA-{row.verificationCode.match(/.{4}/g)?.join("-")}
                 </p>
               </details>
-            </li>
+            </FileRecord>
           );
         })}
       </ul>
@@ -447,13 +445,10 @@ function LegacyFile({
 }) {
   const url = `/api/documents/${id}/pdf?version=${entry.version}&renderer=${entry.kind === "legacy_original" ? "legacy" : entry.renderer}`;
   return (
-    <li className="rounded-lg border border-(--border) p-3 space-y-2">
-      <p className="font-medium">
-        {code} · Versão {entry.version} ·{" "}
-        {entry.kind === "legacy_original"
-          ? "Arquivo original registrado"
-          : `Representação legada V${entry.renderer}`}
-      </p>
+    <FileRecord identity={entry.reference}
+      title={<>{code} · Versão {entry.version} · {entry.kind === "legacy_original" ? "Arquivo original registrado" : `Representação legada V${entry.renderer}`}</>}
+      actions={<><a className={buttonClass} href={url} target="_blank" rel="noopener">Visualizar arquivo legado</a><a className={buttonClass} href={url} download>Baixar arquivo legado</a></>}
+    >
       <p className="text-sm">
         Registrado no acervo em {formatBrazilDate(entry.at)}. A data de emissão
         e o solicitante do arquivo não foram preservados neste registro.
@@ -462,18 +457,10 @@ function LegacyFile({
         Legado: assinatura incorporada não comprovada neste registro. O download
         confere os bytes e não gera outra representação.
       </p>
-      <div className="flex flex-wrap gap-3">
-        <a className={buttonClass} href={url} target="_blank" rel="noopener">
-          Visualizar arquivo legado
-        </a>
-        <a className={buttonClass} href={url} download>
-          Baixar arquivo legado
-        </a>
-      </div>
       <details className="text-sm">
         <summary>Identificação do arquivo legado</summary>
         <p className="break-all">SHA-256: {entry.sha256}</p>
       </details>
-    </li>
+    </FileRecord>
   );
 }

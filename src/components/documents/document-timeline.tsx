@@ -1,5 +1,7 @@
 "use client";
 import { Suspense, useCallback } from "react";
+import { DefinitionGrid } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/primitives";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
@@ -20,14 +22,14 @@ export type TimelineEvent = {
   version?: number;
 };
 export function VersionFacts({ version }: { version: DocumentVersion }) {
-  return <article className="space-y-3" aria-label={`Conteúdo preservado da versão ${version.version}`}>
+  return <article className="hca-version-facts hca-form-stack" aria-label={`Conteúdo preservado da versão ${version.version}`}>
     <h3>Versão {version.version} · {versionEventLabel(version)}</h3>
     <p>{version.code} · Registro do evento: {formatBrazilDate(version.recordedAt)}</p>
     <p>Autoria do evento: {version.actorSource === "system" ? "Sistema, conforme o evento sem autor pessoal"
       : version.actorName ?? "Nome histórico não preservado"}.
       {version.actorSource === "event_snapshot" ? " Nome preservado no evento; não consultado no cadastro atual." : null}</p>
     {version.actorId ? <details><summary>Identidade vinculada ao evento</summary><p className="break-all">{version.actorId}</p></details> : null}
-    <dl className="space-y-3">{version.facts.map(fact => <div key={fact.key}><dt className="font-semibold">{fact.label}</dt><dd className="whitespace-pre-wrap wrap-break-word">{fact.value}</dd></div>)}</dl>
+    <DefinitionGrid items={version.facts.map(fact => ({ key: fact.key, label: fact.label, value: fact.value }))} />
     <details><summary>Hash canônico desta versão</summary><code className="block break-all text-xs">{version.hash}</code></details>
   </article>;
 }
@@ -59,10 +61,11 @@ function TimelineContent({ id, version, events, title = "Linha do tempo" }: Time
       <p>Compare os fatos congelados em cada evento. Consultar não altera o documento nem emite outro PDF. A ausência de um nome antigo não será preenchida pelo cadastro atual.</p>
       <button type="button" className="ui-button ui-button-secondary" onClick={() => choose(version)}>Comparar versões</button>
       {events.length ? (
-        <ol className="mt-4 space-y-4 border-l-2 border-(--line) pl-4">
+        <ol className="hca-document-feed" aria-label="Eventos documentais">
           {events.map((event) => (
-            <li key={event.id}>
-              <p className="text-sm font-semibold">
+            <li key={event.id} className="hca-document-event">
+              <span className="hca-document-event-mark" aria-hidden="true"><Icon name="history" /></span>
+              <div className="hca-document-event-body"><p className="text-sm font-semibold">
                 {documentEventLabel(event.action)}
               </p>
               <p className="text-xs text-(--muted)">
@@ -71,6 +74,7 @@ function TimelineContent({ id, version, events, title = "Linha do tempo" }: Time
                 {event.version ? " · versão " + event.version : ""}
               </p>
               {event.version ? <button type="button" className="ui-button ui-button-secondary mt-2" onClick={() => choose(event.version!)}>Consultar versão {event.version}</button> : null}
+              </div>
             </li>
           ))}
         </ol>
@@ -93,8 +97,8 @@ function TimelineContent({ id, version, events, title = "Linha do tempo" }: Time
           {comparison.selected.additionalFields || comparison.before?.additionalFields ? <Notice>Há dados adicionais preservados que ainda não têm descrição nesta comparação. Consulte também o arquivo exato da versão; esta leitura não resume todos esses dados.</Notice> : null}
           {comparison.before && comparison.selected.version !== comparison.before.version + 1 ? <Notice>As versões não são consecutivas. A comparação abrange somente as duas versões indicadas.</Notice> : null}
           <p role="status">{comparison.before ? `Comparação da versão ${comparison.before.version} com a versão ${comparison.selected.version}.` : "Primeira versão disponível; não há versão anterior nesta consulta."}</p>
-          {changes.length ? <ol className="space-y-4">{changes.map(change => <li key={change.key} className="rounded-lg border border-(--line) p-3">
-            <h4 className="font-semibold">{change.label}</h4><dl className="grid gap-3 sm:grid-cols-2"><div><dt>Antes{comparison.before ? ` · versão ${comparison.before.version}` : " · sem versão anterior"}</dt><dd className="whitespace-pre-wrap wrap-break-word">{change.before}</dd></div><div><dt>Depois · versão {comparison.selected.version}</dt><dd className="whitespace-pre-wrap wrap-break-word">{change.after}</dd></div></dl>
+          {changes.length ? <ol className="space-y-4">{changes.map(change => <li key={change.key} className="hca-version-change hca-form-stack">
+            <h4 className="font-semibold">{change.label}</h4><DefinitionGrid items={[{ label: "Antes" + (comparison.before ? ` · versão ${comparison.before.version}` : " · sem versão anterior"), value: change.before },{ label: `Depois · versão ${comparison.selected.version}`, value: change.after }]} />
           </li>)}</ol> : <p>Não há mudança nos campos descritos nesta comparação. O evento e sua autoria continuam identificados abaixo.</p>}
           <VersionFacts version={comparison.selected} />
           {comparison.before ? <details><summary>Consultar todos os fatos da versão {comparison.before.version}</summary><VersionFacts version={comparison.before} /></details> : null}

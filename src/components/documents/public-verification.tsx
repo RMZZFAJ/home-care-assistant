@@ -8,6 +8,7 @@ import {
   useState,
   type RefObject,
 } from "react";
+import { ActionButton, DefinitionGrid, TextInput } from "@/components/ui/controls";
 import { api, errorMessage } from "@/lib/client/api";
 import {
   publicPdfLimit,
@@ -203,8 +204,8 @@ export function PublicVerification({
     }
   }
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
-      <h1 className="text-2xl font-bold">Verificação de documentos</h1>
+    <main className="hca-public-page hca-form-stack">
+      <header className="page-heading"><div><p className="eyebrow">Consulta pública</p><h1>Verificação de documentos</h1></div></header>
       <p>
         Consulte uma emissão pelo código impresso ou envie o PDF para comparar
         os bytes e conferir a assinatura. Você não precisa de conta.
@@ -214,19 +215,20 @@ export function PublicVerification({
         do arquivo em suas mãos. Dados do paciente, materiais e responsáveis não
         são exibidos.
       </p>
+      <div className="hca-public-methods">
       <form
         onSubmit={(event) => {
           event.preventDefault();
           void query(code);
         }}
-        className="space-y-3"
+        className="ui-card hca-form-stack"
         aria-label="Consultar código"
       >
-        <label htmlFor={codeId}>Código de verificação</label>
-        <input
+        <h2>Consultar pelo código</h2>
+        <label className="hca-field" htmlFor={codeId}>Código de verificação</label>
+        <TextInput
           ref={codeInputRef}
           id={codeId}
-          className="ui-input w-full"
           value={code}
           disabled={busy}
           onChange={(event) => {
@@ -240,30 +242,30 @@ export function PublicVerification({
           aria-describedby={`${helpId}${error && errorField === "code" ? " " + errorId : ""}`}
           aria-invalid={Boolean(error) && errorField === "code"}
         />
-        <button
-          className="ui-button ui-button-primary"
+        <ActionButton
+          variant="primary"
           disabled={busy}
           type="submit"
         >
           Consultar código
-        </button>
+        </ActionButton>
       </form>
       <form
         onSubmit={(event) => {
           event.preventDefault();
           void upload();
         }}
-        className="space-y-3"
+        className="ui-card hca-form-stack"
         aria-label="Conferir arquivo PDF"
       >
-        <label htmlFor={fileId}>Arquivo PDF para conferir</label>
-        <input
+        <h2>Conferir o exemplar</h2>
+        <label className="hca-field" htmlFor={fileId}>Arquivo PDF para conferir</label>
+        <TextInput
           ref={fileInputRef}
           id={fileId}
           type="file"
           disabled={busy}
           accept="application/pdf,.pdf"
-          className="block w-full min-w-0 text-sm"
           onChange={(event) => {
             setFile(event.target.files?.[0] ?? null);
             setError("");
@@ -272,18 +274,20 @@ export function PublicVerification({
           aria-describedby={`${helpId}${error && errorField === "file" ? " " + errorId : ""}`}
           aria-invalid={Boolean(error) && errorField === "file"}
         />
+        {file ? <p className="hca-selected-file">Arquivo selecionado: {file.name}</p> : null}
         <p className="text-sm">
           Até 4 MB. O arquivo é analisado em memória e não é guardado no acervo.
           Limites temporários protegem o serviço contra abuso.
         </p>
-        <button
-          className="ui-button ui-button-primary"
+        <ActionButton
+          variant="primary"
           disabled={busy}
           type="submit"
         >
           Conferir PDF
-        </button>
+        </ActionButton>
       </form>
+      </div>
       {busy ? (
         <p role="status">
           Consultando e conferindo as informações disponíveis…
@@ -330,7 +334,7 @@ function VerificationResult({
   return (
     <section
       aria-label="Resultado da verificação"
-      className="space-y-3 rounded-lg border border-(--border) p-4"
+      className="ui-card hca-form-stack hca-verification-result"
     >
       <h2 ref={headingRef} tabIndex={-1} className="text-xl font-semibold">
         {ref.found ? "Emissão localizada" : "Emissão não localizada"}
@@ -404,51 +408,15 @@ function VerificationResult({
             </p>
           ) : null}
           {verification ? (
-            <dl className="space-y-2 text-sm">
-              <div>
-                <dt>Cobertura dos bytes</dt>
-                <dd>
-                  {verification.wholeFile
-                    ? "A assinatura cobre o arquivo inteiro."
-                    : "Há bytes acrescentados após a assinatura. O arquivo completo não é aceito como exemplar imutável."}
-                </dd>
-              </div>
-              <div>
-                <dt>Confiança do assinador</dt>
-                <dd>{trustLabels[verification.signerTrust]}</dd>
-              </div>
-              <div>
-                <dt>Carimbo de tempo</dt>
-                <dd>
-                  Token RFC3161 criptograficamente íntegro ·{" "}
-                  {formatBrazilDate(verification.timestampAt)}
-                </dd>
-              </div>
-              <div>
-                <dt>Confiança da TSA</dt>
-                <dd>{trustLabels[verification.timestampTrust]}</dd>
-              </div>
-              <div>
-                <dt>Aceite técnico sob a política atual</dt>
-                <dd>
-                  {verification.accepted
-                    ? "Aceito para integridade e confiança configurada."
-                    : "Não aceito sob a política atual. Consulte os resultados específicos acima."}
-                </dd>
-              </div>
-              <div>
-                <dt>Certificado que assinou · SHA-256</dt>
-                <dd className="break-all">
-                  {verification.certificateFingerprint}
-                </dd>
-              </div>
-              <div>
-                <dt>Certificado da TSA · SHA-256</dt>
-                <dd className="break-all">
-                  {verification.timestampCertificateFingerprint}
-                </dd>
-              </div>
-            </dl>
+            <DefinitionGrid items={[
+              { label: "Cobertura dos bytes", value: verification.wholeFile ? "A assinatura cobre o arquivo inteiro." : "Há bytes acrescentados após a assinatura. O arquivo completo não é aceito como exemplar imutável.", wide: true },
+              { label: "Confiança do assinador", value: trustLabels[verification.signerTrust] },
+              { label: "Carimbo de tempo", value: "Token RFC3161 criptograficamente íntegro · " + formatBrazilDate(verification.timestampAt) },
+              { label: "Confiança da TSA", value: trustLabels[verification.timestampTrust] },
+              { label: "Aceite técnico sob a política atual", value: verification.accepted ? "Aceito para integridade e confiança configurada." : "Não aceito sob a política atual. Consulte os resultados específicos acima." },
+              { label: "Certificado que assinou · SHA-256", value: verification.certificateFingerprint, wide: true },
+              { label: "Certificado da TSA · SHA-256", value: verification.timestampCertificateFingerprint, wide: true },
+            ]} />
           ) : null}
           <p className="break-all text-xs">
             SHA-256 do arquivo enviado: {result.fileSha256}

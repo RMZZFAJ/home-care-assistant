@@ -10,7 +10,7 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { generatedPdf } from "./generated-pdf";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
@@ -93,7 +93,7 @@ test("Histórico COM compara snapshots, não usa nome/catálogo posterior e cons
   const delta = comparison(page).getByRole("listitem").filter({ has: page.getByRole("heading", { name: `Materiais · ${f.oldProduct} · Quantidade aprovada`, exact: true }) });
   await expect(delta).toContainText("Antes · versão " + f.initial.version); await expect(delta).toContainText("Depois · versão " + f.approved.version); await expect(delta).toContainText("2");
   await expect(comparison(page).locator("textarea,input")).toHaveCount(0);
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "D4 version history " + width); }
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await auditFromTop(page, "D4 version history " + width); }
   await page.setViewportSize({ width: 390, height: 900 }); mkdirSync("output/playwright/phase-d", { recursive: true });
   await comparison(page).screenshot({ path: `output/playwright/phase-d/version-history-${info.project.name}.png` });
   await comparison(page).getByRole("link", { name: `Consultar arquivos da versão ${f.approved.version}`, exact: true }).click();

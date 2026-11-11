@@ -9,7 +9,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { pauseLocalAutomationForTests, sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { attachmentMaxBytes } from "../../src/lib/documents/attachment-attempt";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(150000);
 const owned = new Set<string>();
@@ -122,16 +122,30 @@ test("perda antes da reserva conserva arquivo e chave e permite concluir a mesma
   expect(new Set(keys).size).toBe(1); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].state).toBe("ready");
 });
 
-test("reserva preparada permite abandono explícito recuperável sem apagar história ou criar ato operacional", async ({ page }) => {
+test("reserva preparada permite abandono explícito recuperável sem apagar história ou criar ato operacional", async ({ page }, info) => {
   const f = await fixture(page), before = facts(f.doc.id), version = sql(`select version from public.operational_documents where id=${q(f.doc.id)}`);
   await loseConfirmedResponse(page, "prepareAndAbandon");
   await picker(page).setInputFiles(f.file); await submit(page).click(); const abandonButton = page.getByRole("button", { name: "Abandonar tentativa incompleta", exact: true }); await expect(abandonButton).toBeVisible();
-  await abandonButton.click(); await page.getByRole("button", { name: "Voltar sem abandonar", exact: true }).click(); expect(rows(f.doc.id)[0].state).toBe("quarantine"); await expect(picker(page)).toBeDisabled();
+  await abandonButton.click(); const dialog=page.getByRole("dialog",{name:"Abandonar tentativa incompleta",exact:true});
+  for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:1100});await auditFromTop(page,"abandon reservation modal "+width);expect(await dialog.evaluate(n=>{const r=n.getBoundingClientRect();return r.top>=0&&r.left>=0&&r.bottom<=innerHeight&&r.right<=innerWidth;})).toBe(true);if(width===320)await dialog.screenshot({path:info.outputPath("abandon-modal-320.png"),animations:"disabled"});}
+  await page.keyboard.press("Escape");await expect(dialog).toHaveCount(0);await expect(abandonButton).toBeFocused();await abandonButton.press("Enter");
+  await page.getByRole("button", { name: "Voltar sem abandonar", exact: true }).click();await expect(abandonButton).toBeFocused();expect(rows(f.doc.id)[0].state).toBe("quarantine");await expect(picker(page)).toBeDisabled();
   await abandonButton.click(); await page.getByRole("button", { name: "Confirmar abandono desta tentativa", exact: true }).click(); await expect(page.getByText(/O abandono não pôde ser confirmado/)).toBeVisible(); expect(rows(f.doc.id)[0].state).toBe("abandoned"); await expect(picker(page)).toBeDisabled();
   expect(await page.evaluate(() => document.documentElement.dataset.attachmentFaultUpstream)).toBe("200:prepared"); expect(await page.evaluate(() => document.documentElement.dataset.attachmentAbandonUpstream)).toBe("200:abandoned");
   await page.getByRole("button", { name: "Confirmar abandono desta tentativa", exact: true }).click(); await expect(picker(page)).toBeEnabled();
+  await expect(page.getByRole("button",{name:"Atualizar anexos",exact:true})).toBeFocused();
   const [abandoned] = rows(f.doc.id); expect(sql(`select count(*) from public.audit_events where action='attachment.abandoned' and entity_id=${q(abandoned.id)}`)).toBe("1"); expect(sql(`select version from public.operational_documents where id=${q(f.doc.id)}`)).toBe(version); expect(facts(f.doc.id)).toBe(before);
   await picker(page).setInputFiles({ ...f.file, name: "nova-ficha.png" }); await submit(page).click(); await expect(page.getByRole("link", { name: "nova-ficha.png", exact: true })).toBeVisible(); expect(rows(f.doc.id)).toHaveLength(2); expect(rows(f.doc.id).filter((row: { state: string }) => row.state === "ready")).toHaveLength(1);
+});
+
+test("abandon dialog clears server metadata after native membership denial without abandoning the reservation", async ({page})=>{
+  const f=await fixture(page),before=facts(f.doc.id);await loseConfirmedResponse(page,"prepareAndAbandon");
+  await picker(page).setInputFiles(f.file);await submit(page).click();await page.getByRole("button",{name:"Abandonar tentativa incompleta",exact:true}).click();
+  const dialog=page.getByRole("dialog",{name:"Abandonar tentativa incompleta",exact:true});await expect(dialog).toContainText(f.file.name);
+  await page.route("**/api/attachments",async route=>{if(route.request().method()==="PATCH")sql("update public.care_recipient_memberships set status='revoked' where care_recipient_id="+q(f.patient)+" and user_id="+q(fixtures.family.id));await route.continue();});
+  const denied=page.waitForResponse(r=>new URL(r.url()).pathname==="/api/attachments"&&r.request().method()==="PATCH");await dialog.getByRole("button",{name:"Confirmar abandono desta tentativa",exact:true}).click();expect([403,404]).toContain((await denied).status());
+  await expect(dialog).toHaveCount(0);await expect(page.locator(".hca-file-title")).toHaveCount(0);expect(rows(f.doc.id)).toHaveLength(1);expect(rows(f.doc.id)[0].state).toBe("quarantine");expect(facts(f.doc.id)).toBe(before);
+  expect(sql("select count(*) from public.audit_events where action='attachment.abandoned' and entity_id="+q(rows(f.doc.id)[0].id))).toBe("0");
 });
 
 test("PDF com ressalva é recusado com explicação e limite4MB é verificado antes de enviar", async ({ page }) => {

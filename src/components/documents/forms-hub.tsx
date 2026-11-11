@@ -28,7 +28,7 @@ export function FormsHub() {
               .map((type) => (
                 <section key={type} className="ui-card flex flex-col gap-4">
                   <div className="flex items-center justify-between">
-                    <span className="document-type">{type}</span>
+                    <span className="document-type hca-document-kind">{type}</span>
                     <Icon name="forms" />
                   </div>
                   <div>

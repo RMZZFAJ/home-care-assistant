@@ -1,8 +1,11 @@
 "use client";
 import { ApiError, requireRuntimeCommandsAvailable } from "@/lib/client/api";
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { z } from "zod";
 import { api, buttonClass, errorMessage, inputClass, Notice, primaryClass } from "@/components/workspace";
+import { FileRecord } from "@/components/ui/file-record";
+import { DefinitionGrid } from "@/components/ui/controls";
+import { Dialog } from "@/components/ui/overlays";
 import { SettingsSection } from "@/components/forms/settings-section";
 import { attachmentForm, attachmentMaxBytes, attachmentMaxLabel, attachmentPrepared, confirmedAttachment, freezeAttachment, type FrozenAttachment } from "@/lib/documents/attachment-attempt";
 
@@ -25,8 +28,13 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
   const [fileInvalid, setFileInvalid] = useState(false), [fileValidation, setFileValidation] = useState(0);
   const fileErrorId = useId(), focusFileRef = useRef(false);
   const [frozen, setFrozen] = useState<FrozenAttachment | null>(null), [uncertain, setUncertain] = useState(false);
+  const abandonFocusRef = useRef<HTMLElement | null>(null);
   const [abandonTarget, setAbandonTarget] = useState<Attachment | null>(null), [resumeTarget, setResumeTarget] = useState<Attachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null), refreshRef = useRef<HTMLButtonElement>(null), pendingRef = useRef<FrozenAttachment | null>(null), preparedIdRef = useRef<string | undefined>(undefined), mountedRef = useRef(true);
+  const resolveAbandonFocus = useCallback(() => {
+    const target = abandonFocusRef.current;
+    return target?.isConnected && !target.matches(':disabled,[aria-disabled="true"]') ? target : refreshRef.current;
+  }, []);
   useEffect(() => {
     if (readError && (!document.activeElement || document.activeElement === document.body)) refreshRef.current?.focus();
   }, [readError]);
@@ -52,7 +60,7 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
       if (controller.signal.aborted) return;
       setFiles(readList(result).data); setReadError(""); setLoading(false);
     }).catch(reason => {
-      if (!controller.signal.aborted) { setFiles([]); setReadError(reason instanceof Error ? reason.message : "Não foi possível consultar anexos."); setLoading(false); }
+      if (!controller.signal.aborted) { setFiles([]); setAbandonTarget(null); setReadError(reason instanceof Error ? reason.message : "Não foi possível consultar anexos."); setLoading(false); }
     });
     return () => controller.abort();
   }, [query, attempt]);
@@ -72,7 +80,7 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
   }
   function deniedRead(reason: unknown) {
     if (!(reason instanceof ApiError) || ![401, 403, 404].includes(reason.status)) return false;
-    setFiles([]); setReadError(reason.message); return true;
+    setFiles([]); setAbandonTarget(null); setReadError(reason.message); return true;
   }
   async function upload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (busy || newPreparationBlocked) return;
@@ -157,6 +165,7 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
       if (result.id !== file.id) throw new Error("A resposta não corresponde a esta tentativa.");
       if (pendingRef.current?.key === file.uploadKey) clearPending();
       if (resumeTarget?.id === file.id) setResumeTarget(null);
+      abandonFocusRef.current = refreshRef.current;
       setAbandonTarget(null); setAttempt(value => value + 1); setMessage("Tentativa abandonada. O histórico foi preservado; você pode preparar outro arquivo.");
     } catch (reason) { if (!deniedRead(reason)) setError(reason instanceof Error ? reason.message : "Não foi possível confirmar o abandono."); }
     finally { setBusy(false); }
@@ -164,13 +173,13 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
   return <SettingsSection title="Anexos e ficha física" summary={`${files.length} arquivo(s) · foto e PDF vinculados à operação`}>
     <button ref={refreshRef} className={buttonClass} disabled={busy} onClick={() => { setLoading(true); setAttempt(value => value + 1); }}>Atualizar anexos</button>
     <p className="mt-2 text-xs text-(--muted)">Até dez arquivos ou reservas em andamento. Novos envios de até {attachmentMaxLabel}. Fotos e PDFs são convertidos para leitura segura; confira o arquivo disponível. A foto da ficha física continua como alternativa ao formulário.</p>
-    {error ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
+    {error && !abandonTarget ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
     {readError ? <Notice error>Não foi possível consultar a lista de anexos. {readError} Atualize esta seção.</Notice> : null}
     {message ? <Notice>{message}</Notice> : null}
     {loading ? <p className="mt-3 text-sm" role="status">Consultando anexos…</p> : null}
-    <ul className="mt-4 space-y-3">{files.map(file => <li key={file.id} className="rounded border border-(--line) p-3 text-sm">
-      {file.url ? <a href={file.url} target="_blank" rel="noopener" className="break-all font-semibold underline">{file.filename}</a> : <strong className="break-all">{file.filename}</strong>}
-      <p className="mt-1 text-xs text-(--muted)">{Math.ceil(file.bytes / 1024)} KB · {file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : file.pending ? "Resultado do envio pendente" : "Preparado; envio não confirmado"}</p>
+    <ul className="hca-file-records" aria-label="Arquivos anexados">{files.map(file => <FileRecord key={file.id} identity={file.id}
+      title={file.url ? <a href={file.url} target="_blank" rel="noopener">{file.filename}</a> : file.filename}>
+      <DefinitionGrid items={[{ label: "Tamanho disponível", value: Math.ceil(file.bytes / 1024) + " KB" },{ label: "Estado", value: file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : file.pending ? "Resultado do envio pendente" : "Preparado; envio não confirmado" }]} />
       <details className="mt-2"><summary className="cursor-pointer text-xs">Origem e conversão do arquivo</summary>
         {file.sourceSha256 ? <><p>Original selecionado: {file.sourceMime} · {Math.ceil((file.sourceBytes ?? 0) / 1024)} KB. O original não é armazenado.</p><p className="break-all">SHA-256 do original: <code>{file.sourceSha256}</code></p><p>{file.transformation === "image-normalized-v1" ? "Imagem orientada, redimensionada e convertida para JPEG sem metadados." : "PDF com páginas passivas, sem anotações ou campos interativos."}</p></> : <p>A origem e a transformação deste envio histórico não foram registradas. O hash disponível corresponde ao arquivo armazenado.</p>}
         {file.sha256 ? <p className="break-all">SHA-256 do arquivo disponível: <code>{file.sha256}</code></p> : null}
@@ -178,10 +187,20 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
       {writable && file.state === "quarantine" && file.uploadKey && file.tracked ? <div className="mt-2 flex flex-wrap gap-2">
         <button type="button" className={buttonClass} disabled={busy} onClick={() => void recover(file)}>Consultar e recuperar tentativa</button>
         {!frozen && file.sourceSha256 ? <button type="button" className={buttonClass} disabled={busy} onClick={() => { setResumeTarget(file); setMessage("Selecione o mesmo arquivo original. A impressão será conferida antes de retomar."); fileInputRef.current?.focus(); }}>Retomar com arquivo original</button> : null}
-        {file.canAbandon ? <button type="button" className={buttonClass} disabled={busy} onClick={() => setAbandonTarget(file)}>Abandonar tentativa incompleta</button> : <p className="text-xs">O resultado ainda pode estar pendente. O abandono permanece indisponível.</p>}
+        {file.canAbandon ? <button type="button" className={buttonClass} disabled={busy} onClick={event => { abandonFocusRef.current = event.currentTarget; setAbandonTarget(file); }}>Abandonar tentativa incompleta</button> : <p className="text-xs">O resultado ainda pode estar pendente. O abandono permanece indisponível.</p>}
       </div> : null}
-      {abandonTarget?.id === file.id ? <div role="group" aria-label="Confirmar abandono da tentativa" className="mt-3 space-y-2"><p>Abandonar esta reserva incompleta libera a vaga. Arquivos confirmados e histórico serão preservados.</p><button type="button" className={buttonClass} disabled={busy} onClick={() => setAbandonTarget(null)}>Voltar sem abandonar</button><button type="button" className={buttonClass} disabled={busy} onClick={() => void abandon(file)}>Confirmar abandono desta tentativa</button></div> : null}
-    </li>)}</ul>
+    </FileRecord>)}</ul>
+    <Dialog open={Boolean(abandonTarget && files.some(file => file.id === abandonTarget.id))} title="Abandonar tentativa incompleta" closeDisabled={busy} finalFocus={resolveAbandonFocus} onClose={() => setAbandonTarget(null)}>
+      {abandonTarget ? <>
+      <div role="group" aria-label="Confirmar abandono da tentativa" className="hca-form-stack">
+        {error ? <Notice error>{error}</Notice> : null}
+        <p>Abandonar esta reserva incompleta libera a vaga. Arquivos confirmados e histórico serão preservados.</p>
+        <DefinitionGrid items={[{ label: "Arquivo", value: abandonTarget.filename, wide: true },{ label: "Tentativa", value: abandonTarget.id, wide: true }]} />
+        <button type="button" className={buttonClass} disabled={busy} onClick={() => setAbandonTarget(null)}>Voltar sem abandonar</button>
+        <button type="button" className={buttonClass} disabled={busy} onClick={() => void abandon(abandonTarget)}>Confirmar abandono desta tentativa</button>
+      </div>
+      </> : null}
+    </Dialog>
     {!loading && !files.length && !readError ? <p className="mt-4 text-sm text-(--muted)">Nenhum anexo registrado.</p> : null}
     {writable ? <form className="mt-4 space-y-3" onSubmit={upload}>
       {unresolved && !frozen && !resumeTarget ? <p role="status">Consulte ou retome a tentativa em andamento antes de preparar outro anexo.</p> : null}

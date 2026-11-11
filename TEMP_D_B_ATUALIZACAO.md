@@ -29,19 +29,24 @@ responsabilidade. “Você” indica decisão, configuração, participação em
 ou liberação que depende de você. “Participantes/equipe” são pessoas que
 usarão ou avaliarão o sistema; “serviço externo” depende também do fornecedor.
 
-Os testes completos da próxima versão publicada ainda precisam ser concluídos.
+A última CI completa do commit anterior apontou ajustes de compatibilidade,
+foco e conferência visual nos navegadores. Eles entram na conferência
+conjunta06.6. O lote atual ainda precisa da validação completa de sua própria
+versão publicada; isso não altera os resultados locais registrados acima.
+
 O banco remoto já recebeu as atualizações desta etapa, sem pendências.
 A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03, 04, 05 e 07 estão concluídas
 localmente. Os dez pontos de listas da etapa05 foram conferidos.
-A etapa 06 continua em execução. Os pontos 06.1 (requisição e compra),
-06.2 (entregas e transferências), 06.3 (balanços e agenda) e 06.4 (estoque,
-catálogo e consumo) estão concluídos localmente. Agora os movimentos e o
-catálogo usam tabelas/cartões do modelo; o trânsito separa as quatro
-quantidades e os relatos preservam texto e autoria originais. O próximo
-ponto é 06.5: arquivos, rascunhos e seções documentais.
+A etapa 06 continua em execução. Os pontos 06.1 a 06.5 estão concluídos
+localmente: requisição e compra; entregas e transferências; balanços e agenda;
+estoque, catálogo e consumo; arquivos, resumos e seções documentais. Arquivos,
+versões, anexos e verificação agora têm composições comuns e fatos separados.
+A comparação privada mantém os dois textos completos. O próximo ponto é
+06.6, a conferência visual conjunta. A simplificação completa dos rascunhos
+continua no complemento DOC-C.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -489,7 +494,7 @@ concluído; os quatro resultados novos ainda não estão implementados.
 ### Nova aparência do sistema
 
 - **Aplicar integralmente o Modelo Integral em todos os recursos** — Em
-  execução · ≈80%. Falta: Concluir telas, variações, diálogos e conferência
+  execução · ≈85%. Falta: Concluir telas, variações, diálogos e conferência
   visual global. Responsável: Codex.
 - **Fechar, voltar, confirmar e descartar mantendo o foco correto** — Em
   execução · ≈75%. Falta: Concluir diálogos e variações restantes; depois
@@ -498,14 +503,14 @@ concluído; os quatro resultados novos ainda não estão implementados.
   ≈65%. Falta: Conferir textos extremos, ampliação de 400% e todas as telas.
   Responsável: Codex; depois participantes.
 - **Concluir cada composição de tela preservando suas funções** — Em execução
-  · ≈80%. Falta: Concluir e conferir individualmente as 66 composições e suas
+  · ≈85%. Falta: Concluir e conferir individualmente as 66 composições e suas
   variações. Responsável: Codex.
 
 ## Refatoração visual de todo o sistema
 
-**Estimativa global: aproximadamente 80% executados.** É uma estimativa
+**Estimativa global: aproximadamente 85% executados.** É uma estimativa
 conservadora da aplicação completa do modelo, incluindo telas, estados e
-funções; não significa que 80% das telas estejam individualmente aprovadas.
+funções; não significa que 85% das telas estejam individualmente aprovadas.
 Ainda falta conferir cada uma das 66 composições e suas 171 relações. A
 aparência Fluent foi descartada e sua dependência técnica já foi removida. A
 nova base compartilhada e as fichas em abas estão implementadas; isso não
@@ -537,27 +542,29 @@ adicionais DOC-A a DOC-D, acompanhados no bloco documental.
   unidades, precisão, apresentações, situações e sucessores do catálogo.
   Falta: Conferir demais variações, lacunas de continuidade e apresentação
   conjunta. Responsável: Codex.
-- **Listas, tabelas, cartões, busca e filtros** — 75%. Já aplicado: Saldos,
-  movimentos, catálogo, unidades, embalagens, relatos e materiais das quatro
-  fichas usam as composições comuns. Nomes alternativos, precisão e valores
+- **Listas, tabelas, cartões, busca e filtros** — 80%. Já aplicado: Saldos,
+  movimentos, catálogo, unidades, embalagens, relatos, arquivos e materiais das
+  quatro fichas usam as composições comuns. Nomes, precisão e valores
   continuam visíveis. Falta: Demais listas e conferência conjunta de todas
   as variações. Responsável: Codex.
-- **Fichas de requisição, compra, entrega e balanço em abas** — 90%. Já
+- **Fichas de requisição, compra, entrega e balanço em abas** — 95%. Já
   aplicado: Abas, cabeçalho, ações e painéis reais; seleção, revisão e materiais
   de requisição e compra conferidos. Entregas agora separam declaração,
   expedição, aceite, conciliação e pendência; recebimento, cancelamento e
   apuração mantêm seus fatos. A caixa mostra autoria, percurso e tarefa
   com filtros recuperáveis. Balanços agora apresentam contagem, referência,
-  diferenças e pareceres em composições próprias. Falta: Demais seções
-  documentais, composições e variantes. Responsável: Codex.
+  diferenças e pareceres em composições próprias. Versões, anexos e novos
+  arquivos têm composição comum. Falta: Conferência conjunta,
+  variações restantes e novas regras do complemento. Responsável: Codex.
 - **Andamentos nas quatro fichas** — 80%. Já aplicado: Registro salvo,
   autoria, data, categoria, etapa, preenchimento privado entre aparelhos,
   comparação e recuperação, com resumos próprios para cada situação.
   Falta: Fechar aparência de todos
   os estados e vínculos. Responsável: Codex.
-- **Cronologia, fatos automáticos e referências** — 70%. Já aplicado:
-  Histórico integrado e vínculos autorizados. Falta: Completar combinações e
-  comparação com o modelo. Responsável: Codex.
+- **Cronologia, fatos automáticos e referências** — 80%. Já aplicado:
+  Eventos, fatos por versão, comparações e vínculos autorizados seguem a
+  composição comum. Falta: Conferência conjunta, combinações restantes e
+  referências novas do complemento. Responsável: Codex.
 - **Faixa de atenção, próxima providência e status** — 65%. Já aplicado:
   Estrutura integrada a fatos operacionais. Falta: Concluir critérios de cada
   tarefa sem avisos simulados. Responsável: Codex.
@@ -691,7 +698,7 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    recuperação e resposta atrasada foram conferidos.
    Responsável — Codex.
 
-6. **06 — Aparência da operação diária.** Em execução · 95%.
+6. **06 — Aparência da operação diária.** Em execução · 97%.
 
    Concluído — 06.1, as nove composições de requisição e compra: seleção,
    revisão, consulta, ciência, lista frequente, aquisição, parcelas e
@@ -714,8 +721,12 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    embalagens, sucessores, relatos, complementos e decisões. Os registros
    preservam os fatos antigos e identificam o cadastro atual.
 
-   Depois — 06.5 arquivos, rascunhos e seções documentais; 06.6 conferência
-   conjunta de larguras, teclado, foco, textos
+   Concluído — 06.5 arquivos, resumos e seções documentais, 100% deste ponto
+   local. As nove composições preservam versões, exemplares, anexos, consultas,
+   recuperação e comparações. O novo diálogo de abandono tem retorno seguro;
+   as novas regras de retomada simples continuam no complemento DOC-C.
+
+   Depois — 06.6 conferência conjunta de larguras, teclado, foco, textos
    extensos e ampliação. O grupo mantém suas 46 composições originais.
    Responsável — Codex.
 
@@ -952,7 +963,7 @@ de acesso e as confirmações incertas conservam sua recuperação própria.
   rascunho para todo campo; conferência pendente.
   Responsável — Codex.
 
-O próximo ponto de implementação é 06.5. O quadro será atualizado pelos
+O próximo ponto de implementação é 06.6. O quadro será atualizado pelos
 pontos encerrados dessa lista. O fechamento técnico da D-B exige as etapas
 executáveis 01 a 19 e o registro correto das pendências da etapa 20. A decisão
 de liberação real continua com os responsáveis e os gates de D-C/D6. O novo

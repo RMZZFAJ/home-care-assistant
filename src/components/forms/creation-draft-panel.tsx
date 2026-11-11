@@ -158,23 +158,12 @@ export function DraftContentSummary({
     "counts" in content ? content.context.referenceRevision : null;
   return (
     <div className="hca-form-stack">
-      <dl aria-label="Referências do preenchimento preservado">
-        <dt>Etapa do preenchimento</dt>
-        <dd>{navigationLabel(navigation)}</dd>
-        <dt>Versão base da ficha</dt>
-        <dd>{version ?? "Sem ficha oficial como base"}</dd>
-        {kind === "BAL" ? (
-          <>
-            <dt>Referência de estoque preservada</dt>
-            <dd>{reference ?? "Não preservada neste rascunho"}</dd>
-          </>
-        ) : null}
-        <dt>Política base preservada</dt>
-        <dd>
-          Não preservada neste rascunho; as regras vigentes serão conferidas na
-          confirmação.
-        </dd>
-      </dl>
+      <DefinitionGrid aria-label="Referências do preenchimento preservado" items={[
+        { label: "Etapa do preenchimento", value: navigationLabel(navigation) },
+        { label: "Versão base da ficha", value: version ?? "Sem ficha oficial como base" },
+        ...(kind === "BAL" ? [{ label: "Referência de estoque preservada", value: reference ?? "Não preservada neste rascunho" }] : []),
+        { label: "Política base preservada", value: "Não preservada neste rascunho; as regras vigentes serão conferidas na confirmação.", wide: true },
+      ]} />
       <DraftFieldsSummary content={content} kind={kind} purpose={purpose} />
     </div>
   );
@@ -273,7 +262,7 @@ function DraftFieldsSummary({
       targetShiftQuery: "Busca preservada",
     };
     return (
-      <dl>
+      <dl className="hca-definition-grid">
         {Object.entries(content.values)
           .filter(([key]) => key in labels)
           .map(([key, value]) => (
@@ -372,30 +361,12 @@ function DraftFieldsSummary({
             ? ` · versão ${content.context.documentVersion}`
             : ""}
         </p>
-        <dl>
-          {kind === "COM" ? (
-            <>
-              <dt>Origem da aquisição</dt>
-              <dd>
-                {content.form.origin === "donation"
-                  ? "Doação"
-                  : content.form.origin === "purchase"
-                    ? "Compra"
-                    : "Não escolhida"}
-              </dd>
-            </>
-          ) : (
-            <>
-              <dt>Custódia de origem da entrega</dt>
-              <dd>{content.form.source === "FAMILY" ? "Família" : "Equipe"}</dd>
-              <dt>Pessoa recebedora</dt>
-              <dd>
-                {content.context.recipientName ||
-                  "Não escolhida ou indisponível no diretório atual"}
-              </dd>
-            </>
-          )}
-        </dl>
+        <DefinitionGrid items={kind === "COM" ? [
+          { label: "Origem da aquisição", value: content.form.origin === "donation" ? "Doação" : content.form.origin === "purchase" ? "Compra" : "Não escolhida" },
+        ] : [
+          { label: "Custódia de origem da entrega", value: content.form.source === "FAMILY" ? "Família" : "Equipe" },
+          { label: "Pessoa recebedora", value: content.context.recipientName || "Não escolhida ou indisponível no diretório atual" },
+        ]} />
         {content.materials
           .filter((m) => Object.hasOwn(content.form.quantities, m.id))
           .map((m) => (
@@ -441,25 +412,12 @@ function DraftFieldsSummary({
           Declaração privada em preparação, sem ficha oficial como base. Salvar
           não registra declaração, concordância, expedição ou recebimento.
         </p>
-        <dl>
-          <dt>Sentido da transferência</dt>
-          <dd>
-            {content.fields.source === "FAMILY"
-              ? "Família → Equipe"
-              : "Equipe → Família"}
-          </dd>
-          <dt>Contraparte preservada</dt>
-          <dd>
-            {content.fields.counterpartyLabel ||
-              "Não escolhida ou indisponível"}
-          </dd>
-          <dt>Recebedor físico preservado</dt>
-          <dd>
-            {content.fields.recipientLabel || "Não escolhido ou indisponível"}
-          </dd>
-          <dt>Origem documental preservada</dt>
-          <dd>{content.fields.originLabel || "Sem vínculo informado"}</dd>
-        </dl>
+        <DefinitionGrid items={[
+          { label: "Sentido da transferência", value: content.fields.source === "FAMILY" ? "Família → Equipe" : "Equipe → Família" },
+          { label: "Contraparte preservada", value: content.fields.counterpartyLabel || "Não escolhida ou indisponível" },
+          { label: "Recebedor físico preservado", value: content.fields.recipientLabel || "Não escolhido ou indisponível" },
+          { label: "Origem documental preservada", value: content.fields.originLabel || "Sem vínculo informado" },
+        ]} />
         {content.materials.map((material) => (
           <p className="whitespace-pre-wrap wrap-anywhere" key={material.id}>
             {material.name} · quantidade no preenchimento:{" "}
@@ -482,7 +440,7 @@ function DraftFieldsSummary({
     );
   if ("fields" in content && kind === "REQ")
     return (
-      <dl className="hca-form-stack">
+      <dl className="hca-definition-grid">
         <div>
           <dt>Justificativa própria</dt>
           <dd className="whitespace-pre-wrap wrap-anywhere">
@@ -620,7 +578,7 @@ function DraftFieldsSummary({
         ) : !operation ? (
           <p>Nenhuma linha divergente selecionada.</p>
         ) : null}
-        <dl>
+        <dl className="hca-definition-grid">
           {Object.entries(content.fields)
             .filter(
               ([key]) =>
@@ -1096,7 +1054,7 @@ export function CreationDraftPanel({
             Sua edição foi preservada. Compare os valores salvos antes de
             escolher como continuar.
           </Notice>
-          <div className="grid min-w-0 gap-4 md:grid-cols-2">
+          <div className="hca-draft-comparison">
             <section className="min-w-0" aria-label="Minha edição">
               <h3>Minha edição</h3>
               <DraftContentSummary

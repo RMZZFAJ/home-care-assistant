@@ -34,19 +34,19 @@ const historyFilters = historyStatusLabels;
 export function DocumentRow({ row }: { row: DocumentSummary }) {
   return (
     <Link
-      className="document-row"
+      className="document-row hca-document-record"
       href={"/documentos/" + row.id}
       prefetch={false}
     >
-      <span className="document-type">{row.type}</span>
-      <span className="min-w-0">
+      <span className="document-type hca-document-kind">{row.type}</span>
+      <span className="hca-document-record-main">
         <strong>{row.code ?? (row.status === "draft" ? "Rascunho" : "Registro sem expedição")}</strong>
         <span className="block text-xs text-(--muted)">
           {documentLabels[row.type]} · {formatBrazilDate(row.created_at)}
         </span>
         {row.task?<span className="mt-1 block text-sm font-semibold">{row.task.label}</span>:null}
       </span>
-      <span className="grid justify-items-end gap-1">
+      <span className="hca-document-record-end">
         <StatusBadge status={row.status} />
         {row.fulfillment ? (
           <span className="text-xs text-(--muted)">
@@ -59,7 +59,7 @@ export function DocumentRow({ row }: { row: DocumentSummary }) {
           </span>
         ) : null}
       </span>
-      <span className="document-row-arrow">
+      <span className="document-row-arrow hca-document-record-arrow">
         <Icon name="arrow" width="18" />
       </span>
     </Link>
