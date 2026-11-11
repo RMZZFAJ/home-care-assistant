@@ -121,3 +121,62 @@ operacionais. Sem produção, merge ou ativação externa; PR7 sempre Draft.
 Contrato e precedência:[Modelo Integral](../../../ui-ux/CANONICAL_MODEL.md).
 [Registro adicional de execução](UI_MODEL_ACCEPTANCE.csv) acompanha o novo
 escopo junto aos105 critérios D-B, sem converter planejamento em implementação.
+
+## Complemento de fichas e PDFs — 11/11/2026
+
+O responsável autorizou a aparência antes adiada dos PDFs e acrescentou regras
+documentais. Permanecem a missão, branch, PR7 Draft, operação segura em curso,
+plano de 20 etapas e os resultados anteriores. A aplicação mantém o Modelo
+Integral. [Ordem integral](../../../documents/01_COMANDO_COMPLEMENTAR_PDFS.md),
+[especificação](../../../documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md) e
+[HTML aprovado](../../../documents/02_REFERENCIA_VISUAL_FICHAS.html) são o
+conjunto canônico deste acréscimo. A ordem fornecida no texto anexo foi
+preservada nesse diretório. Não há novo gate de aprovação de design.
+
+Cinco decisões fechadas: bandeira lateral como único selo; Devolução de
+materiais como processo autônomo equipe→família, sem exigir entrega de origem;
+parecer BAL sem efeito de estoque; saldo COM por material imediatamente após
+sua última entrada validada naquela COM, com instante e parcelas separados;
+e Acesso restrito sem transportar o valor não autorizado ao PDF. BAL usa o
+saldo imediatamente após a aplicação correspondente. Ausência de prova
+histórica permanece indisponibilidade explícita, sem aproximação.
+
+A redação direta do responsável acrescenta menções a pessoas e referências
+do sistema nos Andamentos, separação de origem/natureza/relevância e marcos
+sem reordenar a cronologia. Menção não atribui autoria, ciência ou recebimento,
+nem ativa envio externo. As fichas emitidas conservam o conteúdo original.
+Atos posteriores permanecem fatos próprios; correção material exige
+cancelamento ou complemento vinculado conforme o processo. Cancelamento
+preserva a ciência anterior e produz aviso e pedido de confirmação próprios
+do novo ato; não converter essa confirmação em ciência retroativa nem em
+substituição dos consentimentos já exigidos pelo fluxo correspondente.
+
+Acessos repetidos terão janela inicial de 20 minutos por pessoa, paciente,
+ficha e conteúdo material, preservando o registro da primeira observação e
+distinguindo conteúdo novo. Acesso não comprova leitura nem ciência. A regra
+será aplicada prospectivamente; registros anteriores não serão apagados.
+
+Rascunhos comuns ficam simples: um ativo por usuário, paciente e tipo de
+ficha/fluxo, com diálogo Continuar ou Descartar e começar novo ao abrir o
+local correspondente. Descarte próprio é direto. Não criar um rascunho para
+todo campo administrativo. Os recibos e as intenções oficiais incertas
+continuam recuperáveis em seu processo próprio, sem serem tratados como um
+novo rascunho comum. As estruturas já implementadas serão aproveitadas;
+simplificar a apresentação não significa apagar resultados confirmados.
+
+Integração finita: DOC-A, aparência; DOC-B, fatos e atos específicos; DOC-C,
+modalidades e consulta; DOC-D, integração ao pipeline e exemplares reais.
+Os resultados adicionais são acompanhados separadamente dos 105 critérios
+no quadro temporário. Entram nos blocos 07/09/10; dependências diretas de
+Andamentos, acessos, devolução, revisão BAL e retomada simples são vinculadas
+aos blocos correspondentes. O escopo anterior da etapa 07 continua concluído
+localmente; o novo acabamento não recebe aprovação por esse estado anterior.
+
+Abordagem: aproveitar o compositor pdf-lib/fontkit, a estrutura de paginação,
+PdfSourceFacts e os provedores atuais de assinatura, TSA, armazenamento e
+verificação. A seleção autorizada e os fatos serão congelados para cada
+emissão. Incorporar Source Sans 3 e adaptar a composição, sem transplantar
+as simulações e o paginador do laboratório. Novas modalidades não alteram
+emissões antigas. Conferência dirigida aos dados e à aparência efetivamente
+alterados, com amostras reais. Nenhum manifesto das referências, auditoria
+geral, suíte repetitiva ou gate de design adicional será criado pelo pacote.

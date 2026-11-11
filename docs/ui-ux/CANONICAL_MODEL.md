@@ -77,9 +77,11 @@ recebimento e efeito de estoque permanecem atos distintos.
 Preservar formulários/rascunhos, recuperação entre sessões, listas/paginação,
 histórico/versões, filtros, permissões, contraprovas, estoque, PDFs técnicos,
 assinatura/TSA/verificação, anexos, PWA/cache privado/ausência de replay, Push,
-notificações, guias, suporte, backup e monitoramento. Aparência dos PDFs continua
-adiada pela instrução anterior; o export demonstrativo do HTML não substitui
-os arquivos oficiais. Sem produção ou ativação de transportes externos.
+notificações, guias, suporte, backup e monitoramento. A aparência dos PDFs foi
+autorizada no [complemento documental de 11/11/2026](../documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md).
+Sua referência própria não altera este modelo da aplicação. O export
+demonstrativo deste HTML não substitui os arquivos oficiais. Sem produção
+ou ativação de transportes externos.
 
 O [registro adicional](../audits/D/D-B/UI_MODEL_ACCEPTANCE.csv) não substitui
 os 105 critérios D-B. Exigir comparação com o HTML em cinco viewports, teclado,

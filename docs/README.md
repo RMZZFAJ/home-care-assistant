@@ -4,6 +4,10 @@
 em 09/11/2026, substitui Fluent e a direção visual anterior. Aplicar a todos
 os recursos existentes/futuros sem reduzir funções; migração em execução.
 
+**PDFs e fichas:** o [complemento documental aprovado](documents/01_COMANDO_COMPLEMENTAR_PDFS.md)
+autoriza a [nova composição e conteúdo](documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md).
+A aplicação conserva o Modelo Integral. Implementação do acréscimo pendente.
+
 **Estado atual:** [fonte por SHA](current/PROJECT_STATUS.md). Produção NO-GO;
 A e B1–B8 concluídas como diagnóstico; C é planejamento e organização;
 **D-B em execução** na [ordem vigente](audits/D/D-B/README.md);

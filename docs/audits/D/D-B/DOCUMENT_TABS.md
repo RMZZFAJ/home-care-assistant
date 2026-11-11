@@ -74,3 +74,50 @@ paridade de todas as telas,66 composições/171 relações e gates humanos,
 assistivos, físicos, operacionais e externos continuam separados. Sonar adiado
 pelo proprietário, PR7 Draft e produção NO-GO. Backup e monitoramento não
 recebem nova aprovação por esta mudança de navegação.
+
+## D3.63 — estados e vínculos da requisição
+
+Base 90f832d. O ponto 04.1 do plano finito foi qualificado localmente no
+escopo de estados, atendimento, cancelamento e vínculos já definido. A faixa
+de próxima providência distingue atendimento pendente/parcial, ciência e
+designação familiar, conclusão, arquivamento, cancelamento e origem histórica.
+Abre Materiais para acompanhar atendimento, Ciência e responsáveis para os
+atos correspondentes e Versões e integridade para os registros encerrados.
+Falha de atualização conserva a consulta anterior, identificada, e retira a
+orientação atual até uma leitura válida. Nenhum atalho realiza um comando.
+O atalho transfere o foco para a aba selecionada após a atualização React,
+inclusive pelo teclado. Falha de escrita da ciência mantém a leitura válida;
+não é apresentada como falha de consulta do acompanhamento.
+
+As entregas são as referências já fornecidas por requisition_fulfillment.
+Agora mostram situação e quantidade aceita com a unidade original. Várias
+linhas de uma ENT no mesmo item são reunidas com soma decimal exata e chave
+única. Quantidade ausente ou ilegível permanece desconhecida. Expedição,
+compra, pendência de conferência, aceite e atendimento continuam distintos.
+O leitor da REQ não recebe autoridade de ler outra ficha pelo vínculo.
+
+Passaram 16 testes unitários e 27 cenários distintos de navegador em Chromium
+desktop, Mobile Chromium e WebKit, com Auth real. Incluem as quatro famílias
+documentais, cinco larguras e teclado; REQ pendente/parcial; ciência pessoal;
+arquivo, cancelamento e importação histórica real; negativa de leitura ENT;
+falha de atualização; recuperação de cancelamento e arquivamento; necessidade
+remanescente com PDF anterior preservado; e Andamentos sem efeito operacional.
+Os casos novos comparam fatos oficiais e ledger por leitura independente.
+
+O diagnóstico inicial encontrou seletor que incluía o anunciador do Next,
+uma preparação que já gerava ciência causal por expedição e uma identidade
+sem leitura do histórico reutilizado. Os testes foram corrigidos para mirar
+o aviso correto, usar expedição legítima sem representação familiar e consultar
+o histórico com sua identidade autorizada. Não houve mudança dessas regras
+do produto. A coorte de produção teve 26 aprovações e um timeout WebKit no
+caso antigo de abas. A repetição dirigida passou com os mesmos fontes,
+oráculos e timeout. A observação intermitente permanece identificada para a
+validação conjunta; não é uma correção de causa demonstrada.
+
+Tipos e lint dirigido passaram. Não há SQL novo; remoto205 com dry-run vazio
+no fechamento do lote. A CI do novo SHA permanece necessária. O próximo ponto
+do plano é 04.2, compra/doação. O complemento documental recebido durante a
+rodada tem quatro resultados próprios DOC-A/DOC-B/DOC-C/DOC-D ainda pendentes,
+incluindo os novos avisos e confirmação de cancelamento. Não reclassifica
+este fechamento local como aprovação das novas regras. A implementação
+documental e a simplificação de rascunhos permanecem no acréscimo aprovado.

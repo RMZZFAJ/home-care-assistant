@@ -4,7 +4,24 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.62
+## Incremento atual D3.63
+
+A próxima providência da REQ e seus vínculos agora distinguem atendimento,
+ciência, conclusão, cancelamento, arquivo e histórico. A consulta recusada
+preserva a leitura anterior identificada, sem apresentá-la como orientação
+atual. Dezesseis unitários e 27 cenários distintos de navegador passaram,
+com repetição dirigida de um timeout WebKit antigo. Tipos e lint aprovados.
+O ponto 04.1 está qualificado localmente; próximo 04.2. CI própria necessária.
+[Implementação e limites](../audits/D/D-B/DOCUMENT_TABS.md).
+
+O complemento aprovado em 11/11/2026 acrescenta DOC-A/B/C/D aos blocos
+documentais, preservando as 20 etapas e os 105 critérios anteriores.
+Autoriza a aparência dos PDFs; mantém o Modelo Integral da aplicação.
+As novas regras e a simplificação de rascunhos estão registradas e ainda
+precisam ser implementadas. O compositor e o pipeline atuais serão
+reutilizados. [Contrato aprovado](../documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md).
+
+## Incremento anterior D3.62
 
 As consultas de estoque validam a estrutura e o âmbito da resposta e
 preservam a última leitura válida após falha. A revisão BAL usa sua

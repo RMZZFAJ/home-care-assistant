@@ -2,7 +2,7 @@
 
 import { Tabs } from "@base-ui/react/tabs";
 import { useSearchParams } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode, type Ref } from "react";
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import type { DocumentType } from "@/types/documents";
@@ -27,6 +27,8 @@ const baseTabs: { id: DocumentTab; label: string; icon: IconName }[] = [
 ];
 
 export function useDocumentTabs(auditAllowed: boolean) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const focusSelectionRef = useRef(false);
   const params = useSearchParams();
   const requested = params.get("documentTab");
   const valid = [
@@ -38,13 +40,26 @@ export function useDocumentTabs(auditAllowed: boolean) {
     : params.has("historyVersion")
       ? "history"
       : "overview";
-  function select(next: DocumentTab) {
+  useEffect(() => {
+    if (!focusSelectionRef.current) return;
+    const target = rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+    if (target) {
+      focusSelectionRef.current = false;
+      target.focus();
+    }
+  }, [value]);
+  function select(next: DocumentTab, focus = false) {
     if (!valid.includes(next)) return;
+    focusSelectionRef.current = focus;
     const url = new URL(window.location.href);
     url.searchParams.set("documentTab", next);
     window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+    if (focus && next === value) {
+      focusSelectionRef.current = false;
+      rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus();
+    }
   }
-  return { value, select };
+  return { value, select, rootRef };
 }
 
 export function DocumentTabs({
@@ -53,12 +68,14 @@ export function DocumentTabs({
   onSelect,
   auditAllowed,
   children,
+  rootRef,
 }: {
   type: DocumentType;
   value: DocumentTab;
   onSelect: (value: DocumentTab) => void;
   auditAllowed: boolean;
   children: ReactNode;
+  rootRef?: Ref<HTMLDivElement>;
 }) {
   const tabs = [
     ...baseTabs,
@@ -68,6 +85,7 @@ export function DocumentTabs({
   ];
   return (
     <Tabs.Root
+      ref={rootRef}
       value={value}
       onValueChange={(next) => {
         if (typeof next === "string") onSelect(next as DocumentTab);

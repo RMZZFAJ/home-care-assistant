@@ -1,5 +1,25 @@
 # Checkpoint D-B
 
+D3.63 fechou localmente o ponto 04.1 no escopo declarado. A orientação REQ
+abre a seção correspondente ao fato pendente ou encerrado; vínculos ENT
+mostram situação e quantidade aceita, sem ampliar autorização. Falha de
+consulta preserva e identifica a leitura anterior. Passaram 16 unitários e
+27 cenários distintos de navegador, por coorte e repetição dirigida de um
+timeout WebKit, mantido como observação intermitente. Tipos e lint dirigido
+aprovados. Sem SQL novo; remoto205 com dry-run final vazio.
+Próximo ponto fixo: 04.2. Os 105 critérios conservam 56 PASS locais/49 PARTIAL.
+[Incremento](DOCUMENT_TABS.md) e [plano](EXECUTION_STAGES.csv).
+
+Complemento de fichas/PDFs de 11/11/2026 incorporado à missão em curso. Ordem,
+HTML e contrato estão em docs/documents; DOC-A/B/C/D são resultados adicionais
+separados no quadro temporário, ligados aos blocos 07/09/10. Mantidos os
+resultados anteriores. Aparência PDF autorizada; Modelo Integral da aplicação
+preservado. Rascunhos simples, acessos com janela inicial de 20 minutos,
+menções/relevância nos Andamentos, devolução autônoma, imutabilidade material,
+cancelamento com ciência anterior preservada e aviso/confirmação próprios
+registrados como novo escopo, ainda não implementado. Nenhum manifesto das
+referências ou gate adicional. [Decisão](OWNER_AMENDMENTS.md).
+
 D3.62 fechou a etapa 03 do plano fixo. Saldo, trânsito e histórico validam
 estrutura e âmbito da resposta. BAL usa a referência própria com bal.read
 e preserva campos após falha de consulta. Chaves semânticas corrigem o aviso

@@ -13,6 +13,10 @@ concluídas e 49 parcialmente executados. Nenhum critério inteiro está sem
 início, mas há subtarefas ainda não iniciadas, indicadas abaixo. Critérios
 semelhantes aparecem separados porque cobrem exigências distintas da fase.
 
+O complemento aprovado de fichas e PDFs acrescenta quatro resultados,
+DOC-A a DOC-D, acompanhados separadamente abaixo. Ele conserva os critérios
+e os avanços anteriores. A nova aparência dos documentos está autorizada.
+
 “Concluído · 100%” significa concluído no escopo interno daquele critério.
 Ainda há a revisão final conjunta e os testes necessários antes da liberação.
 Os percentuais parciais são estimativas de quanto foi executado, arredondadas;
@@ -31,9 +35,10 @@ A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03 e 07 estão concluídas localmente.
-A 03 foi fechada neste lote. A próxima é a 04, dividida em seis verificações
-das fichas. Os nove formulários que ainda precisam de retomada estão
-enumerados na etapa 14. A sequência e os pontos individuais estão ao final.
+A 03 foi fechada no lote anterior. A etapa 04 tem seis pontos. O ponto 04.1
+foi concluído localmente no escopo anterior; o próximo é 04.2, compra e doação.
+Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
+os pontos individuais estão ao final.
 
 **Consultar estoque e revisar contagens · 100% deste bloco.** Consultas
 incompletas ou de outro paciente, custódia, página ou filtro recebem erro
@@ -230,7 +235,8 @@ acompanhamento: Codex.
   Concluído · 100%.
 - **Documentos completos, legíveis e acessíveis em todos os estados** — Em
   execução · ≈75%. Falta: Completar cenários restantes e leitura assistida;
-  aparência do PDF adiada. Responsável: Codex; depois participantes.
+  nova aparência no complemento documental. Responsável: Codex; depois
+  participantes.
 - **PDF de regularização com autores, motivos, efeitos e assinatura** — Em
   execução · ≈80%. Falta: Completar todas as variações e conferir conteúdo e
   acessibilidade. Responsável: Codex.
@@ -249,6 +255,47 @@ acompanhamento: Codex.
 - **Verificar dados completos e recusar PDF vazio ou incompleto** — Em
   execução · ≈80%. Falta: Completar conferência independente de documentos
   longos e casos restantes. Responsável: Codex.
+
+### Complemento aprovado de fichas e PDFs
+
+Acrescentado em 11/11/2026. Os percentuais abaixo medem somente o novo
+complemento. O gerador, a assinatura e os documentos já implementados serão
+aproveitados. Os resultados anteriores continuam registrados.
+
+- **DOC-A — Aparência dos documentos.** A iniciar · 0% do acréscimo.
+  REQ, entrega, devolução, compra/doação e BAL terão a composição aprovada,
+  fonte Source Sans 3, cores, bandeira lateral quando aplicável, autores,
+  macroetapas, tabelas, observações e avisos completos. Conteúdo longo
+  continuará em novas páginas com cabeçalhos e rodapés legíveis.
+  Responsável: Codex.
+- **DOC-B — Fatos, saldos e atos específicos.** A iniciar · 0% do acréscimo.
+  Mostrar saldo histórico de cada material da COM após sua última entrada
+  validada, parcelas separadas e saldo do BAL após a aplicação correspondente.
+  Revisão não altera estoque. Mostrar Acesso restrito quando necessário.
+  Devolução é autônoma e não exige entrega de origem. Conteúdo emitido,
+  ciências anteriores e atos de cancelamento/complemento serão preservados;
+  o cancelamento terá seu aviso e pedido de confirmação próprios.
+  Responsável: Codex.
+- **DOC-C — Modalidades, Andamentos e consulta.** A iniciar · 0% do acréscimo.
+  Ficha completa; Ficha Ampliada com complementos e período; auditoria
+  restrita com marca nominativa. Andamentos terão menções a pessoas,
+  referências e destaques comuns à tela e ao PDF, mantendo a cronologia.
+  Acessos repetidos serão agrupados em janelas iniciais de 20 minutos.
+  Rascunhos comuns terão um ativo por usuário, paciente e tipo, com diálogo
+  Continuar ou Descartar e começar novo. Não haverá rascunho para todo campo.
+  Confirmações incertas continuarão recuperáveis no próprio processo.
+  Responsável: Codex.
+- **DOC-D — Geração integrada e exemplos reais.** A iniciar · 0% do acréscimo.
+  Integrar a nova composição ao gerador e à assinatura atuais. Preservar
+  cópias antigas, recuperação e re-download dos mesmos bytes; nova emissão
+  tem identidade própria. Conferir dados, permissões, links, QR e verificação
+  conforme o que mudou. Disponibilizar PDFs reais para avaliação visual.
+  Responsável: Codex; você poderá avaliar as amostras entregues.
+
+Entram nos blocos 07, 09 e 10. Devolução, revisão BAL, Andamentos, acessos e
+retomada simples são dependências diretas nos blocos correspondentes.
+A sequência de 20 etapas continua. O escopo anterior da etapa 07 está
+concluído; os quatro resultados novos ainda não estão implementados.
 
 ### Assinatura e verificação documental
 
@@ -456,9 +503,9 @@ nova base compartilhada e as fichas em abas estão implementadas; isso não
 conclui a migração inteira.
 
 O alvo é uma aparência única do Modelo Integral, com todos os recursos atuais,
-inclusive os que não aparecem no HTML. A nova estética dos PDFs está fora
-deste trabalho por sua decisão; fidelidade dos dados e funcionamento continuam
-incluídos.
+inclusive os que não aparecem no HTML. Esse percentual se refere à aplicação.
+Os PDFs agora têm aparência própria aprovada e os quatro resultados
+adicionais DOC-A a DOC-D, acompanhados no bloco documental.
 
 - **Regra visual única e retirada do Fluent** — 100%. Já aplicado: Nova regra
   adotada; biblioteca antiga retirada. Falta: Manter a regra nos próximos
@@ -577,7 +624,7 @@ A sequência anterior agrupava trabalho demais no primeiro item e recebia
 novos subfluxos a cada lote. Esse item foi desdobrado. A retomada das
 operações está na etapa 01, os cadastros diários na 02 e os nove formulários
 restantes na 14. Os dois primeiros blocos já estão concluídos localmente.
-A etapa 03 foi fechada neste lote. A etapa 07 também já tem sua parte técnica
+A etapa 03 foi fechada no lote anterior. A etapa 07 já tem sua parte técnica
 qualificada. São quatro blocos fechados localmente nesta organização.
 
 O plano cobre os 75 critérios originais e os 30 complementos da Ordem Mestre.
@@ -685,9 +732,9 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
 
 14. **14 — Formulários restantes.** A iniciar neste escopo · 0%.
 
-    Para concluir — Os nove formulários detalhados abaixo têm a retomada dos
-    campos
-    comuns e a recuperação da confirmação concluídas.
+    Para concluir — Conferir os nove grupos abaixo e simplificar a retomada
+    somente onde necessária, sem criar rascunho para cada campo. Resultados
+    incertos continuam recuperáveis no próprio processo.
     Responsável — Codex.
 
 15. **15 — Aparência das demais áreas.** Em execução · 50%.
@@ -733,12 +780,16 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
 
 ### Próxima etapa — 04, estados e vínculos das fichas
 
-As funções já estão implementadas. O fechamento conjunto desta etapa ainda
-precisa ser concluído para os seis pontos abaixo. Cada ponto receberá seu
-próprio estado de conclusão, mantendo esta lista.
+O ponto 04.1 está concluído no escopo anterior. Restam os pontos 04.2 a
+04.6. Cada um terá seu próprio fechamento, mantendo esta lista. As novas
+regras documentais estão identificadas em DOC-A a DOC-D.
 
 - **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.**
-  Implementado; conferência conjunta pendente. Responsável — Codex.
+  Concluído localmente · 100% do escopo anterior. A orientação abre a seção
+  correta; vínculos, falhas de consulta e registros encerrados foram
+  conferidos. O novo aviso e pedido de confirmação do cancelamento pertencem
+  ao complemento DOC-B/DOC-C e ainda precisam de execução.
+  Responsável — Codex.
 - **04.2 — Compra e doação — aquisição, parcelas, chegada e encerramento.**
   Implementado; conferência conjunta pendente. Responsável — Codex.
 - **04.3 — Entrega — conferência, divergência, devolução e regularização.**
@@ -753,29 +804,36 @@ próprio estado de conclusão, mantendo esta lista.
 ### Escopo restante dos formulários — etapa 14
 
 Esta etapa inclui os nove grupos abaixo. Ela está depois dos blocos
-operacionais e dos PDFs por sua prioridade. Os campos e fluxos de acesso
-continuam seguindo sua recuperação própria.
+operacionais e dos PDFs por sua prioridade. Pela orientação de 11/11/2026,
+será conferida a necessidade de retomada e adotado um diálogo simples onde
+couber. Não será criada persistência de rascunho para todo campo. Os fluxos
+de acesso e as confirmações incertas conservam sua recuperação própria.
 
-- **14.1 — Convites.** Retomada dos campos comuns ainda a concluir. Responsável
+- **14.1 — Convites.** Retomada simples onde necessária, sem rascunho para todo
+  campo; conferência pendente. Responsável
   — Codex.
-- **14.2 — Conferência profissional.** Retomada dos campos comuns ainda a
-  concluir. Responsável — Codex.
-- **14.3 — Contas globais.** Retomada dos campos comuns ainda a concluir.
+- **14.2 — Conferência profissional.** Retomada simples onde necessária, sem
+  rascunho para todo campo; conferência pendente. Responsável — Codex.
+- **14.3 — Contas globais.** Retomada simples onde necessária, sem rascunho para
+  todo campo; conferência pendente.
   Responsável — Codex.
-- **14.4 — Cadastro do paciente.** Retomada dos campos comuns ainda a concluir.
+- **14.4 — Cadastro do paciente.** Retomada simples onde necessária, sem
+  rascunho para todo campo; conferência pendente.
   Responsável — Codex.
-- **14.5 — Configurações do paciente.** Retomada dos campos comuns ainda a
-  concluir. Responsável — Codex.
+- **14.5 — Configurações do paciente.** Retomada simples onde necessária, sem
+  rascunho para todo campo; conferência pendente. Responsável — Codex.
 - **14.6 — Regras de comunicação e permissões.** Retomada dos campos comuns
   ainda a concluir. Responsável — Codex.
-- **14.7 — Campos comuns do perfil.** Retomada dos campos comuns ainda a
-  concluir. Responsável — Codex.
-- **14.8 — Preferência de ciência.** Retomada dos campos comuns ainda a
-  concluir. Responsável — Codex.
-- **14.9 — Políticas de suporte.** Retomada dos campos comuns ainda a concluir.
+- **14.7 — Campos comuns do perfil.** Retomada simples onde necessária, sem
+  rascunho para todo campo; conferência pendente. Responsável — Codex.
+- **14.8 — Preferência de ciência.** Retomada simples onde necessária, sem
+  rascunho para todo campo; conferência pendente. Responsável — Codex.
+- **14.9 — Políticas de suporte.** Retomada simples onde necessária, sem
+  rascunho para todo campo; conferência pendente.
   Responsável — Codex.
 
 A próxima etapa de implementação é a 04. O quadro será atualizado pelos
 pontos encerrados dessa lista. O fechamento técnico da D-B exige as etapas
 executáveis 01 a 19 e o registro correto das pendências da etapa 20. A decisão
-de liberação real continua com os responsáveis e os gates de D-C/D6.
+de liberação real continua com os responsáveis e os gates de D-C/D6. O novo
+complemento DOC-A a DOC-D também deve ser entregue no bloco documental.

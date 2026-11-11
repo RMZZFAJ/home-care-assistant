@@ -1408,5 +1408,121 @@
     "Audit tab links to patient audit with explicit scope; documentary versions remain reader accessible",
     "No signature, backup, monitoring or provider approval added by this navigation change",
     "Own published SHA CI remains required"
-  ]
+  ],
+  "D3.63": {
+    "base": "90f832df3b61b77bd0fbfcdb56f9bfed930ddee7",
+    "checkpoint": "04.1",
+    "unit": 16,
+    "types": "pass",
+    "targetedLint": "pass",
+    "diagnostic": {
+      "stats": {
+        "startTime": "2026-11-11T03:28:15.781Z",
+        "duration": 159952.634,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "scope": "diagnostic only;three test preparation/selector corrections;not production acceptance"
+    },
+    "browser": {
+      "cohort": {
+        "startTime": "2026-11-11T03:34:15.965Z",
+        "duration": 817805.43,
+        "expected": 26,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "webkitUnchangedRecheck": {
+        "startTime": "2026-11-11T03:49:35.420Z",
+        "duration": 154138.188,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 27,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "engines": [
+        "Chromium",
+        "WebKit"
+      ],
+      "originalTimeoutPreserved": true,
+      "focusAndWriteErrorRound": {
+        "startTime": "2026-11-11T04:02:42.242Z",
+        "duration": 258679.85700000002,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "scienceFinal": {
+        "startTime": "2026-11-11T04:07:41.074Z",
+        "duration": 204721.892,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "scopeReuse": "Final focus selection is opt-in for REQ next-step actions; existing default navigation stays unchanged. Repeated only affected REQ scenarios after the focused changes.",
+      "scienceTestCorrection": "After the failed write assertion in Overview,the test returns to the real workflow tab before checking the personal science result;no hidden-panel access.",
+      "terminalFinal": {
+        "startTime": "2026-11-11T04:13:28.900Z",
+        "duration": 178823.421,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    "proofs": [
+      "pending ENT is not fulfillment;positive acceptance changes exactly one item",
+      "current read503 preserves last valid data and removes current next step",
+      "ENT read denial does not expose its content or grant new authority",
+      "native nonrepresentative dispatch creates no science;later personal science preserves fulfillment and ledger",
+      "archived,cancelled and true historical records direct to preserved history",
+      "original cancel/archive recovery,remaining need,old PDF,all four tab consumers and Andamentos retained",
+      "next-step keyboard navigation focuses its selected tab",
+      "science write refusal leaves the confirmed read available;successful personal science still records exactly one event",
+      "historical fulfillment is unknown rather than0/1 pending;closed documents preserve fulfillment without soliciting a new receipt"
+    ],
+    "intermittent": "Old four-document WebKit tab case timed out entering ENT after REQ/COM;same test and timeout passed on directed repeat. Cause not claimed fixed.",
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "finalDryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "nextCheckpoint": "04.2",
+      "stageLocalClosure": "04.1 scoped;new cancellation notice/confirmation remains DOC-B/C pending"
+    },
+    "approvedDocumentComplement": {
+      "results": [
+        "DOC-A",
+        "DOC-B",
+        "DOC-C",
+        "DOC-D"
+      ],
+      "state": "approved;implementation pending;separate from original105",
+      "references": "docs/documents",
+      "newReferenceManifest": false
+    },
+    "remaining": [
+      "own SHA CI",
+      "04.2–04.6",
+      "DOC-A/B/C/D",
+      "full UI parity",
+      "human/device/provider/operational gates",
+      "owner-deferred Sonar"
+    ]
+  }
 }

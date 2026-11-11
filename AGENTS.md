@@ -19,9 +19,11 @@ the tree clean.
 
 ## Projeto e fontes de verdade
 
-Home Care Assistant usa App Router, React, TypeScript e Supabase Auth/PostgreSQL.
+Home Care Assistant usa App Router, React, TypeScript e Supabase
+Auth/PostgreSQL.
 O paciente é a unidade operacional. Leia README e os documentos de arquitetura,
-banco, segurança, APIs e testes antes de ampliar fluxos. Consulte docs/README.md,
+banco, segurança, APIs e testes antes de ampliar fluxos. Consulte
+docs/README.md,
 docs/current/PROJECT_STATUS.md, a auditoria datada
 e seu checkpoint para retomar sem recriar funções existentes. Decisões em
 docs/decisions e planos C descrevem futuro, não comportamento implementado.
@@ -43,6 +45,18 @@ de etapa separados do progresso operacional. Preservar contratos, autorização,
 histórico, rascunhos, recuperação, acessibilidade e todas as contraprovas.
 As auditorias e capturas anteriores são históricas, não aprovação da nova UI.
 
+### Documentos e complemento vigente
+
+Os PDFs seguem docs/documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md e a
+referência HTML no mesmo diretório. A aparência documental antes adiada foi
+autorizada em 11/11/2026; o Modelo Integral da aplicação permanece vigente.
+Reutilizar o pipeline de emissão/assinatura. Não alterar exemplares prontos.
+Devolução equipe→família é processo autônomo, sem exigir entrega de origem.
+Preservar o conteúdo emitido, seus atos e a ciência no cancelamento. Menções,
+referências e acessos não substituem ciência, recebimento ou autoria.
+Rascunhos comuns têm retomada simples, sem estender persistência a todo campo;
+preservar separadamente a recuperação de uma confirmação ainda incerta.
+
 ### Contratos operacionais
 
 - Identidade global e papel por paciente são conceitos distintos.
@@ -53,9 +67,12 @@ As auditorias e capturas anteriores são históricas, não aprovação da nova U
 - Estoque oficial vem de movimentações, não de edição direta de saldo.
 - Quantidade solicitada não pertence ao contrato de requisição.
 - Funções críticas usam RPC transacional com autorização no banco e na API.
-- RLS, grants explícitos/defaults e SECURITY DEFINER precisam ser revisados juntos.
-- Erros externos usam código seguro e correlação; logs não recebem payload privado.
-- Componentes devem ter carregamento, erro, vazio, feedback e controles acessíveis.
+- RLS, grants explícitos/defaults e SECURITY DEFINER precisam ser revisados
+juntos.
+- Erros externos usam código seguro e correlação; logs não recebem payload
+privado.
+- Componentes devem ter carregamento, erro, vazio, feedback e controles
+acessíveis.
 - Evitar abstrações sem consumidor e dependências sem uso demonstrável.
 
 ## Preservação e ambientes
@@ -105,7 +122,8 @@ desabilita envio externo. Manter fontes estáveis durante a execução; não rod
 suítes mutáveis de banco em paralelo com E2E.
 
 Corrigir falhas e repetir verificações afetadas. Não excluir testes ou reduzir
-regras para obter verde. RLS precisa de identidades Auth reais; mocks não bastam.
+regras para obter verde. RLS precisa de identidades Auth reais; mocks não
+bastam.
 Registrar evidências, limitações e estado final na matriz. Interface, API, banco
 e permissões precisam funcionar conjuntamente antes de concluir uma feature.
 Manter instruções permanentes separadas de incidentes e estados transitórios.

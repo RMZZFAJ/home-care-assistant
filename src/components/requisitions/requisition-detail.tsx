@@ -25,7 +25,9 @@ import type {
   StockObservationTimeSource,
 } from "@/types/requisition";
 import { textRows } from "@/lib/text-rows";
-import { requisitionDocumentState } from "@/lib/documents/presentation";
+import { requisitionDocumentState, documentStatusLabel } from "@/lib/documents/presentation";
+import { requisitionDeliveries, requisitionFollowUp, type RequisitionDelivery } from "@/lib/requisitions/follow-up";
+import { formatQuantity } from "@/lib/quantity";
 import { Attachments } from "@/components/documents/attachments";
 import { DocumentHeader } from "@/components/documents/document-header";
 import {
@@ -120,7 +122,7 @@ type Detail = {
     lines: {
       id: string;
       attended: boolean;
-      deliveries: { id: string; code: string; acceptedQuantity: string }[];
+      deliveries: RequisitionDelivery[];
     }[];
   };
   progress: Progress;
@@ -152,6 +154,7 @@ export function RequisitionDocumentContent({
   const [data, setData] = useState<Detail | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
+  const [readFailed, setReadFailed] = useState(false);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [reading, setReading] = useState(true);
@@ -201,11 +204,13 @@ export function RequisitionDocumentContent({
       .then((result) => {
         if (!controller.signal.aborted) {
           setData(result.data);
+          setReadFailed(false);
           setError("");
         }
       })
       .catch((cause) => {
         if (!controller.signal.aborted) {
+          setReadFailed(true);
           if (
             cause instanceof ApiError &&
             [401, 403, 404].includes(cause.status)
@@ -267,6 +272,13 @@ export function RequisitionDocumentContent({
     completedAt: p.completedAt,
     scienceSatisfied: p.scienceSatisfied,
     fulfilled: f.fulfilled,
+  });
+  const followUp = requisitionFollowUp({
+    historical: Boolean(data.is_historical), status: data.status,
+    archivedAt: p.archivedAt, completedAt: p.completedAt,
+    scienceSatisfied: p.scienceSatisfied, designationPending: p.designationPending,
+    eligible: p.eligible, personalScience: p.personalScience,
+    fulfilled: f.fulfilled, total: f.total,
   });
   return (
     <div className="hca-record-detail space-y-5">
@@ -446,22 +458,27 @@ export function RequisitionDocumentContent({
         </div>
       </details>
       <DocumentTabs
+        rootRef={tabs.rootRef}
         type="REQ"
         value={tabs.value}
         onSelect={tabs.select}
         auditAllowed={can(context, "audit.read")}
       >
         <DocumentPanel value="overview">
-          <DocumentNextStep
-            label="Ciência e atendimento"
-            pending={
-              !data.is_historical &&
-              !p.archivedAt &&
-              data.status !== "cancelled" &&
-              (f.fulfilled < f.total || !p.scienceSatisfied)
-            }
-            onOpen={() => tabs.select("workflow")}
-          />
+          {reading || readFailed ? (
+            <Notice>
+              {reading ? "Atualizando o acompanhamento da requisição…" : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
+              {" "}Os dados preservados são da última consulta válida.
+            </Notice>
+          ) : (
+            <DocumentNextStep
+              label={followUp.label}
+              pending={followUp.pending}
+              heading={followUp.heading}
+              description={followUp.description}
+              onOpen={() => tabs.select(followUp.section, true)}
+            />
+          )}
           <section
             className="ui-card"
             aria-label="Dimensões independentes da requisição"
@@ -470,14 +487,20 @@ export function RequisitionDocumentContent({
               <div className="rounded-lg bg-(--background) p-3">
                 <p className="text-xs text-(--muted)">Atendimento</p>
                 <strong>
-                  {f.fulfilled}/{f.total} itens atendidos
+                  {data.is_historical
+                    ? "Atendimento original não apurado"
+                    : `${f.fulfilled}/${f.total} itens atendidos`}
                 </strong>
                 <p className="text-xs">
-                  {f.total > 0 && f.fulfilled === f.total
-                    ? "Completo"
-                    : f.fulfilled
-                      ? "Parcial"
-                      : "Aguardando ENT aceita"}
+                  {data.is_historical
+                    ? "Os registros preservados não comprovam o atendimento físico do original."
+                    : f.total > 0 && f.fulfilled === f.total
+                      ? "Completo"
+                      : ["cancelled", "archived"].includes(documentState)
+                        ? "Atendimento preservado no encerramento"
+                        : f.fulfilled
+                          ? "Parcial"
+                          : "Aguardando ENT aceita"}
                 </p>
               </div>
               <div className="rounded-lg bg-(--background) p-3">
@@ -601,10 +624,16 @@ export function RequisitionDocumentContent({
                       <span
                         className={
                           "ui-badge ui-badge-" +
-                          (line?.attended ? "success" : "pending")
+                          (data.is_historical ? "neutral" : line?.attended ? "success" : "pending")
                         }
                       >
-                        {line?.attended ? "Atendido" : "Pendente"}
+                        {data.is_historical
+                          ? "Não apurado no original"
+                          : line?.attended
+                            ? "Atendido"
+                            : ["cancelled", "archived"].includes(documentState)
+                              ? "Sem atendimento confirmado"
+                              : "Pendente"}
                       </span>
                       {item.urgent ? (
                         <span className="ui-badge ui-badge-danger">
@@ -627,13 +656,20 @@ export function RequisitionDocumentContent({
                       </span>
                     </p>
                     <div className="mt-2 flex flex-wrap gap-3">
-                      {line?.deliveries.map((delivery) => (
-                        <RelatedDocument
-                          key={delivery.id}
-                          id={delivery.id}
-                          type="ENT"
-                          label={`${delivery.code} · aceito ${delivery.acceptedQuantity}`}
-                        />
+                      {requisitionDeliveries(line?.deliveries ?? []).map((delivery) => (
+                        <div key={delivery.id}>
+                          <RelatedDocument
+                            id={delivery.id}
+                            type="ENT"
+                            label={delivery.code ?? "ENT em preparação"}
+                          />
+                          <p className="text-xs text-(--muted)">
+                            {documentStatusLabel(delivery.status)} ·{" "}
+                            {delivery.acceptedQuantity === null
+                              ? "Quantidade aceita não informada"
+                              : `Quantidade aceita para este item: ${formatQuantity(delivery.acceptedQuantity, item.unit_snapshot)}`}
+                          </p>
+                        </div>
                       ))}
                     </div>
                   </li>

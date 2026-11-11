@@ -5,6 +5,10 @@ Fluent UI foi descartado como aparência. O
 [HTML original](../../Home_Care_Assistant_Modelo_Integral.html) governa todo o
 sistema, sem misturar estilos ou reduzir funcionalidades.
 
+Os PDFs têm [referência documental própria](../documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md),
+autorizada em 11/11/2026. A composição impressa não substitui este sistema visual
+da aplicação; autoria, estados e ícones conservam o significado compartilhado.
+
 Tokens e componentes devem reproduzir o modelo. canonical-ui.css concentra a
 paleta, os componentes compartilhados e o shell. Ícones próprios do HTML,
 badges e etapas nativos acompanham overlays Base UI sem tema. Fluent, seu
