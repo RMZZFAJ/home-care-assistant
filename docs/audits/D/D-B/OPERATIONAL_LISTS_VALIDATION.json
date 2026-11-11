@@ -289,5 +289,109 @@
       "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
       "No SQL,merge,production or external activation"
     ]
+  },
+  "D3.73": {
+    "baseSha": "e422bb2003ab543ef18c67a2503d4c3f62f2c640",
+    "scope": "05.5 consumption original-text search,filters and complete cursor pages",
+    "implementation": [
+      "Native rows/next preserved;server/client check patient,effective filters,size and requested cursor",
+      "Strict native timestampDESC,UUIDDESC order with PostgreSQL microseconds;unique IDs,last-row cursor,strict advancement and no silent Map deduplication",
+      "Continuation rejects stale generation and repeated request;403/401/404/409 clear accumulated rows;transient read retains only same selection with timestamp and stops further paging until refresh",
+      "URL is the applied query;Back/Forward/reload restore controlled filter fields without replacing focused form;query controls have no business draft"
+    ],
+    "baseline": {
+      "tests": 2,
+      "failed": 2,
+      "report": "consumption-list-baseline.json",
+      "causes": [
+        "Duplicate IDs accepted",
+        "Cursor incorrectly pointing to first row accepted"
+      ]
+    },
+    "unit": {
+      "passed": 21,
+      "files": [
+        "tests/consumption-list.test.ts",
+        "tests/read-state-models.test.ts",
+        "tests/api/consumption-contract.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T09:15:17.676Z",
+        "duration": 245588.64500000002,
+        "expected": 8,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      },
+      "errorsFinal": {
+        "startTime": "2026-11-11T09:20:11.437Z",
+        "duration": 127722.398,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 12,
+      "executions": 18,
+      "initialTestExpectationFailures": 4,
+      "qualifiedBy": "Six old-consumer initial passes retained;all six new list cases pass after test-only alert scoping and keyboard activation.Four initial failures preserved;two already-passing navigation cases repeated to verify the revised keyboard method.Runtime unchanged.",
+      "reports": [
+        "consumption-list-first.json",
+        "consumption-list-errors-final.json"
+      ],
+      "failureDirectory": "consumption-list-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "counterproofs": [
+      "102reports traversed completely by UI and API in independent SQL created_atDESC,idDESC order;oldest reference and original-body search,date and kind/status filters,reload,real empty and400 inverted period",
+      "Seven corrupt successful initial reads refused:incomplete,foreign patient,filters,size,duplicate IDs,order,next;invalid continuation cursor and503 retain same-selection20rows;403 continuation removes all rows without false empty",
+      "An actual delayed continuation delivered after a new kind/search selection cannot append;focus,Back/Forward and reload preserve applied filters",
+      "Actual RLS revocation of FAMILY read leaves exactly the one CARE_TEAM report;revoking TEAM then produces an authorized empty list,without exposing either custody",
+      "Raw complete original reports,revisions,decisions and ledger preserved by reading/navigation;no operational POST from the query",
+      "Existing lost-confirmation recovery,write denial,read denial,unique debit and oldest-report detail assertions preserved"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS without suppression",
+      "visual": "Fresh Chromium320 consumption list inspected",
+      "axe": "New scoped list320 across3profiles",
+      "existingConsumerChange": "Expanded prior102record case from20to40 UI rows to all102;independent SQL order,old original-body search and dates added;old detail/error/API assertions retained"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5"
+      ],
+      "next": "05.6"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "05.6–05.10 and full visual/joint/human/physical/provider gates remain",
+      "No PDF appearance/signing,stock/decision,permissions or migration contract changed",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
+      "No SQL,merge,production or external activation"
+    ]
   }
 }

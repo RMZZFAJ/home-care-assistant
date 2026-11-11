@@ -814,6 +814,7 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   sql(
     `insert into public.consumption_reports(care_recipient_id,reported_by,kind,location,body,lines,idempotency_key) select ${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'shortage','FAMILY','Registro histórico fictício para paginação '||n,'[]'::jsonb,gen_random_uuid() from generate_series(1,101)n;`,
   );
+  const order: string[] = JSON.parse(sql(`select jsonb_agg(id::text order by created_at desc,id desc) from public.consumption_reports where care_recipient_id=${sqlLiteral(f.patient)};`));
   await login(page, f.patient, "adminA");
   let fail = true;
   await page.route("**/api/consumption?*", async (route) => {
@@ -849,12 +850,13 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   await expect(
     page.getByRole("button", { name: /^Abrir relato / }),
   ).toHaveCount(20);
-  await page
-    .getByRole("button", { name: "Carregar mais relatos", exact: true })
-    .click();
-  await expect(
-    page.getByRole("button", { name: /^Abrir relato / }),
-  ).toHaveCount(40);
+  const visibleIds = () => page.getByRole("button", { name: /^Abrir relato / }).evaluateAll(nodes => nodes.map(node => node.querySelector(".sr-only")!.textContent));
+  for (let size = 20; size < order.length; size += 20) {
+    await expect.poll(visibleIds).toEqual(order.slice(0, size));
+    await page.getByRole("button", { name: "Carregar mais relatos", exact: true }).click();
+  }
+  await expect.poll(visibleIds).toEqual(order);
+  await expect(page.getByRole("button", { name: "Carregar mais relatos", exact: true })).toHaveCount(0);
   let next: null | { at: string; id: string } = null;
   const found = new Set<string>();
   let pages = 0;
@@ -883,6 +885,7 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   } while (next);
   expect(found.size).toBe(102);
   expect(found.has(old)).toBe(true);
+  expect([...found]).toEqual(order);
   await page.unroute("**/api/consumption?*");
   await page
     .getByRole("combobox", { name: "Tipo", exact: true })
@@ -898,4 +901,18 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   await expect(
     page.getByRole("combobox", { name: "Tipo", exact: true }),
   ).toHaveValue("shortage");
+  const day = sql(`select to_char(created_at at time zone 'America/Sao_Paulo','YYYY-MM-DD') from public.consumption_reports where id=${sqlLiteral(old)};`);
+  await page.getByRole("textbox", { name: "Buscar no relato original", exact: true }).fill("Relato fictício preservado para decisão");
+  await page.getByLabel("Desde", { exact: true }).fill(day);
+  await page.getByLabel("Até", { exact: true }).fill(day);
+  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await expect(page).toHaveURL(/q=Relato/);
+  await expect.poll(visibleIds).toEqual([old]);
+  await page.reload(); await expect.poll(visibleIds).toEqual([old]);
+  await expect(page.getByLabel("Desde", { exact: true })).toHaveValue(day);
+  await expect(page.getByLabel("Até", { exact: true })).toHaveValue(day);
+  await page.getByRole("combobox", { name: "Estado", exact: true }).selectOption("confirmed");
+  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await expect(page.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible();
+  expect((await page.request.get(`/api/consumption?careRecipientId=${f.patient}&from=2026-11-12&to=2026-11-11`)).status()).toBe(400);
 });

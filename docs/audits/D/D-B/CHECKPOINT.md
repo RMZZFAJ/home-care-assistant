@@ -1,5 +1,19 @@
 # Checkpoint D-B
 
+D3.73 fechou05.5. A lista de consumo confere âmbito, ordem e cursor, sem
+mesclar IDs repetidos ou aceitar página que não avança. Falha preserva apenas
+a seleção válida anterior, com instante; recusa na continuação retira também
+as páginas acumuladas. URL/Voltar/Avançar restauram filtros sem novo rascunho.
+Passaram21 unitários e12 cenários distintos nos três perfis: seis consumidores
+anteriores na coorte inicial e seis novos na rodada final. Quatro falhas de
+expectativa do teste e duas contraprovas do baseline estão preservadas.
+Auth real,102 relatos por todas as páginas em ordem SQL, busca original,
+período, recarga, resposta tardia e RLS por custódia; fatos oficiais intactos.
+Tipos, lint e axe/inspeção a320px passaram. Sem SQL novo; remoto205 com dry-run
+vazio.05.1–05.5 fechados localmente; próximo05.6,agenda. Etapa05 parcial90%,
+com cinco dos dez pontos conferidos. Matriz56/49 e DOC-A/B/C/D preservados;
+CI própria necessária. [Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
 D3.72 fechou05.4. Entregas conferem paciente, página, seleção e registros antes
 de aceitar a resposta. Falha conserva somente a consulta válida da mesma
 seleção, com instante; trocar filtros não apresenta dados anteriores como

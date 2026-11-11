@@ -13,6 +13,7 @@ import {
   consumptionCommand,
   consumptionCursor,
   consumptionFilters,
+  parseConsumptionListRead,
 } from "@/lib/validation/consumption";
 import {reminderReportReceipt} from "@/lib/validation/notification-reference";
 
@@ -73,14 +74,20 @@ export async function GET(request: Request) {
       );
     const result = await query;
     if (result.error) databaseError(result.error);
-    const rows = result.data ?? [],
+    if (!Array.isArray(result.data)) throw new ApiError("INTERNAL_ERROR", "A consulta dos relatos não pôde ser conferida.", 500);
+    const rows = result.data,
       data = rows.slice(0, 20),
       last = data.at(-1);
-    return NextResponse.json({
+    const body = {
       data,
       next:
         rows.length > 20 && last ? { at: last.created_at, id: last.id } : null,
-    });
+      careRecipientId: patient.id, pageSize: 20,
+      before: before?.success ? before.data : null,
+      filters: { kind: filters.data.kind ?? "", status: filters.data.status ?? "", search: filters.data.search, from: filters.data.from ?? "", to: filters.data.to ?? "", sourceReminder: filters.data.sourceReminder ?? "" },
+    };
+    parseConsumptionListRead(body, patient.id, params, body.before);
+    return NextResponse.json(body);
   });
 }
 

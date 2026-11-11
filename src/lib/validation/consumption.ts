@@ -110,5 +110,41 @@ export function parseConsumptionPage(value: unknown, patient: string) {
   const result = consumptionPage.safeParse(value);
   if (!result.success || result.data.data.some(row => row.care_recipient_id !== patient))
     throw new Error("A resposta da consulta dos relatos não pôde ser lida. Atualize a lista.");
+  const { data, next } = result.data;
+  const last = data.at(-1);
+  if (new Set(data.map(row => row.id)).size !== data.length
+    || data.some((row, index) => index > 0 && comparePosition(
+      { at: data[index - 1].created_at, id: data[index - 1].id }, { at: row.created_at, id: row.id },
+    ) <= 0)
+    || (next && (data.length !== 20 || !last || comparePosition(next, { at: last.created_at, id: last.id }) !== 0)))
+    throw new Error("A resposta da consulta dos relatos não pôde ser lida. Atualize a lista.");
   return result.data;
+}
+
+type Cursor = z.infer<typeof consumptionCursor>;
+// Date alone loses PostgreSQL microseconds. Keep the fractional tie-breaker.
+function comparePosition(left: Cursor, right: Cursor) {
+  const instant = Date.parse(left.at) - Date.parse(right.at);
+  if (instant) return Math.sign(instant);
+  const fraction = (value: string) => (value.match(/\.(\d+)/)?.[1] ?? "").replace(/0+$/, "").padEnd(9, "0");
+  const a = fraction(left.at), b = fraction(right.at);
+  if (a !== b) return a > b ? 1 : -1;
+  const leftId = left.id.toLowerCase(), rightId = right.id.toLowerCase();
+  return leftId === rightId ? 0 : leftId > rightId ? 1 : -1;
+}
+const consumptionRead = z.object({
+  careRecipientId: z.uuid(), pageSize: z.literal(20), before: consumptionCursor.nullable(),
+  filters: z.object({ kind: z.string(), status: z.string(), search: z.string(), from: z.string(), to: z.string(), sourceReminder: z.string() }),
+});
+export function parseConsumptionListRead(value: unknown, patient: string, query: URLSearchParams, before: Cursor | null = null) {
+  const parsed = consumptionRead.safeParse(value);
+  const expected = { kind: query.get("kind") ?? "", status: query.get("status") ?? "", search: (query.get("q") ?? "").trim(), from: query.get("from") ?? "", to: query.get("to") ?? "", sourceReminder: query.get("sourceReminder") ?? "" };
+  if (!parsed.success || parsed.data.careRecipientId !== patient
+    || Object.entries(expected).some(([key, value]) => parsed.data.filters[key as keyof typeof expected] !== value)
+    || (before === null ? parsed.data.before !== null : !parsed.data.before || comparePosition(before, parsed.data.before) !== 0))
+    throw new Error("A resposta recebida não corresponde à consulta dos relatos. Atualize a lista.");
+  const result = parseConsumptionPage(value, patient);
+  if (before && result.data.some(row => comparePosition({ at: row.created_at, id: row.id }, before) >= 0))
+    throw new Error("A página recebida não avança na consulta dos relatos. Atualize a lista.");
+  return result;
 }

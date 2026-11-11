@@ -859,7 +859,11 @@ Responsável por todos os pontos — Codex.
    autorizado, incluindo devoluções. Uma consulta incompleta recebe erro
    recuperável; trocar filtros não mostra a seleção anterior como atual.
    Consultar não confirma recebimento nem altera estoque.
-5. **05.5 — Consumo.** Conferir relatos antigos, busca e resultados completos.
+5. **05.5 — Consumo.** Concluído localmente · 100% deste ponto.
+   Todas as páginas permitem alcançar relatos antigos, com busca no texto
+   original, filtros e retorno pelo navegador. Consulta com falha não inventa
+   vazio. Uma página atrasada não entra em outra seleção; perda de acesso
+   retira o conteúdo daquela custódia. Consultar não confirma nem desconta.
 6. **05.6 — Agenda.** Conferir períodos e listagens permitidas.
 7. **05.7 — Catálogo e contas.** Conferir também o diretório global de contas.
 8. **05.8 — Notificações.** Alcançar avisos antigos e suas pendências.

@@ -522,9 +522,20 @@ calculada no banco, sem derivar autorização de recipient_id no navegador.
 ## Relatos e consumo
 
 GET /api/consumption usa páginas de 20 por created_at/id, cursor beforeAt/
-beforeId e filtros q (texto original), kind, status, from e to. Datas seguem
-America/Sao_Paulo. A referência abre GET `/api/consumption/[id]` mesmo fora da
-página recente; filtros não comandam movimentos.
+beforeId e filtros q (texto original), kind, status, from, to e sourceReminder.
+Datas seguem America/Sao_Paulo. O envelope conserva data/next e acrescenta
+careRecipientId,pageSize20,before e filters normalizados. Servidor e consumidor
+conferem âmbito, identidade única, ordem decrescente por instante/ID e cursor
+ligado à última linha da página completa, preservando microssegundos. Uma
+continuação precisa avançar além da referência solicitada, sem repetir IDs.
+Falhas preservam somente a seleção válida anterior, com instante; recusas
+401/403/404/409 retiram também páginas acumuladas. Erro bloqueia continuação
+até atualizar a consulta. A lista usa a RLS de cada custódia: perder leitura
+familiar conserva somente relatos da equipe ainda autorizados, sem exigir
+uma recusa global para uma lista parcialmente permitida.
+A referência abre GET `/api/consumption/[id]` mesmo fora da página recente;
+filtros não comandam movimentos. URL, recarga e Voltar/Avançar restauram os
+filtros, sem rascunho de negócio ou nova persistência.
 
 POST action=report conserva texto e linhas originais, autor e nome capturado
 no novo fato. Texto livre sem linhas é um relato válido, sem desconto.

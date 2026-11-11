@@ -19,7 +19,7 @@ import type { ConsumptionSummary } from "@/types/consumption";
 import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDetail } from "./consumption-detail";
 import { FlowReviews } from "./flow-reviews";
-import { parseConsumptionPage } from "@/lib/validation/consumption";
+import { parseConsumptionListRead } from "@/lib/validation/consumption";
 import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
 import {
   NotificationReference,
@@ -45,14 +45,18 @@ function Reports({ context }: { context: WorkspaceContext }) {
     router = useRouter(),
     live = useLiveRevision(),
     patient = context.patient!.id;
-  const selected = params.get("ref"),
-    [query, setQuery] = useState(() =>
-      new URLSearchParams(
-        [...params].filter(([key]) =>
-          ["q", "kind", "status", "from", "to", "sourceReminder"].includes(key),
-        ),
-      ).toString(),
-    );
+  const selected = params.get("ref");
+  const query = new URLSearchParams(
+    ["q", "kind", "status", "from", "to", "sourceReminder"]
+      .filter(key => Boolean(params.get(key)))
+      .map(key => [key, params.get(key)!]),
+  ).toString();
+  const fields = { q: params.get("q") ?? "", kind: params.get("kind") ?? "", status: params.get("status") ?? "", from: params.get("from") ?? "", to: params.get("to") ?? "" };
+  const [draft, setDraft] = useState(fields), [previousQuery, setPreviousQuery] = useState(query);
+  if (previousQuery !== query) {
+    setPreviousQuery(query);
+    setDraft(fields);
+  }
   const explicitReport = params.get("refKind") === "report",
     notice = useNotificationReference(
       patient,
@@ -65,16 +69,18 @@ function Reports({ context }: { context: WorkspaceContext }) {
     key: string;
     rows: ConsumptionSummary[] | null;
     next: Cursor | null;
+    queriedAt: string | null;
     error: string;
   } | null>(null);
   const [attempt, setAttempt] = useState(0),
-    [moreBusy, setMoreBusy] = useState(false);
+    [moreRequestKey, setMoreRequestKey] = useState<string | null>(null);
   const readKey = JSON.stringify([patient, query, live, attempt]),
     current = read?.query === query ? read : null;
   const rows = current?.rows ?? null,
     next = current?.next ?? null,
     error = current?.error ?? "",
-    reading = current?.key !== readKey;
+    reading = current?.key !== readKey,
+    moreBusy = moreRequestKey === readKey;
   const [products, setProducts] = useState<CatalogProduct[]>([]),
     [catalogError, setCatalogError] = useState(""),
     [catalogLoading, setCatalogLoading] = useState(true),
@@ -85,7 +91,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [editorOrigin, setEditorOrigin] = useState<ReminderOrigin | null>(null);
   const listHeadingRef = useRef<HTMLHeadingElement>(null),
     triggerRef = useRef<HTMLElement | null>(null),
-    generationRef = useRef(0);
+    generationRef = useRef(0),
+    moreRequestRef = useRef<{ key: string } | null>(null);
   useEffect(() => {
     const controller = new AbortController();
     generationRef.current++;
@@ -94,7 +101,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
       undefined,
       controller.signal,
     )
-      .then((value) => parseConsumptionPage(value, patient))
+      .then((value) => parseConsumptionListRead(value, patient, new URLSearchParams(query)))
       .then((result) => {
         if (!controller.signal.aborted) {
           setRead({
@@ -102,6 +109,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
             key: readKey,
             rows: result.data,
             next: result.next,
+            queriedAt: new Date().toISOString(),
             error: "",
           });
         }
@@ -118,6 +126,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
               !unavailable && previous?.query === query ? previous.rows : null,
             next:
               !unavailable && previous?.query === query ? previous.next : null,
+            queriedAt:
+              !unavailable && previous?.query === query ? previous.queriedAt : null,
             error:
               reason instanceof Error
                 ? reason.message
@@ -171,50 +181,54 @@ function Reports({ context }: { context: WorkspaceContext }) {
         values.set(key, value.trim());
     const applied = new URLSearchParams(values);
     applied.delete("careRecipientId");
-    setQuery(applied.toString());
+    if (["q", "kind", "status", "from", "to", "sourceReminder"].every(key =>
+      (applied.get(key) ?? "") === (new URLSearchParams(query).get(key) ?? ""),
+    )) setAttempt(value => value + 1);
     if (selected) {
       values.set("ref", selected);
       if (params.get("refKind")) values.set("refKind", params.get("refKind")!);
     }
-    router.replace("/consumo" + (values.size ? "?" + values : ""), {
+    router.push("/consumo" + (values.size ? "?" + values : ""), {
       scroll: false,
     });
   }
   async function loadMore() {
-    if (!next) return;
-    setMoreBusy(true);
+    if (!next || reading || error || moreRequestRef.current?.key === readKey) return;
+    const request = { key: readKey };
+    moreRequestRef.current = request;
+    setMoreRequestKey(readKey);
     const snapshot = generationRef.current;
     try {
       const response = await api<unknown>(
         `/api/consumption?careRecipientId=${patient}&${query}&` +
           new URLSearchParams({ beforeAt: next.at, beforeId: next.id }),
       );
-      const result = parseConsumptionPage(response, patient);
-      if (snapshot === generationRef.current) {
+      const result = parseConsumptionListRead(response, patient, new URLSearchParams(query), next);
+      if (result.data.some(row => rows?.some(existing => existing.id === row.id)))
+        throw new Error("A página recebida repete relatos já consultados. Atualize a lista.");
+      if (snapshot === generationRef.current && moreRequestRef.current === request) {
         setRead((previous) =>
-          previous?.query === query
+          previous?.key === readKey
             ? {
                 ...previous,
-                rows: [
-                  ...new Map(
-                    [...(previous.rows ?? []), ...result.data].map((row) => [
-                      row.id,
-                      row,
-                    ]),
-                  ).values(),
-                ],
+                rows: [...(previous.rows ?? []), ...result.data],
                 next: result.next,
+                queriedAt: new Date().toISOString(),
                 error: "",
               }
             : previous,
         );
       }
     } catch (reason) {
-      if (snapshot === generationRef.current)
+      if (snapshot === generationRef.current && moreRequestRef.current === request) {
+        const unavailable = reason instanceof ApiError && [401, 403, 404, 409].includes(reason.status);
         setRead((previous) =>
-          previous?.query === query
+          previous?.key === readKey
             ? {
                 ...previous,
+                rows: unavailable ? null : previous.rows,
+                next: unavailable ? null : previous.next,
+                queriedAt: unavailable ? null : previous.queriedAt,
                 error:
                   reason instanceof Error
                     ? reason.message
@@ -222,8 +236,10 @@ function Reports({ context }: { context: WorkspaceContext }) {
               }
             : previous,
         );
+      }
     } finally {
-      setMoreBusy(false);
+      if (moreRequestRef.current === request) moreRequestRef.current = null;
+      setMoreRequestKey(previous => previous === readKey ? null : previous);
     }
   }
   const catalogRetry = () => {
@@ -280,7 +296,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
               className={inputClass}
               name="q"
               maxLength={120}
-              defaultValue={params.get("q") ?? ""}
+              value={draft.q}
+              onChange={event => setDraft({ ...draft, q: event.target.value })}
             />
           </label>
           <label className="block text-sm">
@@ -288,7 +305,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
             <select
               className={inputClass}
               name="kind"
-              defaultValue={params.get("kind") ?? ""}
+              value={draft.kind}
+              onChange={event => setDraft({ ...draft, kind: event.target.value })}
             >
               <option value="">Todos</option>
               <option value="consumption">Consumo</option>
@@ -300,7 +318,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
             <select
               className={inputClass}
               name="status"
-              defaultValue={params.get("status") ?? ""}
+              value={draft.status}
+              onChange={event => setDraft({ ...draft, status: event.target.value })}
             >
               <option value="">Todos</option>
               <option value="reported">Aguardando conferência</option>
@@ -314,7 +333,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
               className={inputClass}
               name="from"
               type="date"
-              defaultValue={params.get("from") ?? ""}
+              value={draft.from}
+              onChange={event => setDraft({ ...draft, from: event.target.value })}
             />
           </label>
           <label className="block text-sm">
@@ -323,7 +343,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
               className={inputClass}
               name="to"
               type="date"
-              defaultValue={params.get("to") ?? ""}
+              value={draft.to}
+              onChange={event => setDraft({ ...draft, to: event.target.value })}
             />
           </label>
           <ActionButton type="submit">Aplicar filtros</ActionButton>
@@ -369,12 +390,10 @@ function Reports({ context }: { context: WorkspaceContext }) {
           </Notice>
         ) : null}
         {reading ? <Notice>Carregando relatos…</Notice> : null}
-        {rows && rows.length > 0 && (reading || error) ? (
-          <p className="my-3 text-sm text-(--muted)">
-            Última consulta confirmada; aguardando atualização.
-          </p>
-        ) : null}
-        <ul className="space-y-3">
+        {current?.queriedAt ? <p className="my-3 text-sm text-(--muted)">
+          {reading || error ? "Última consulta confirmada; aguardando atualização." : "Relatos consultados:"} {formatBrazilDate(current.queriedAt)}.
+        </p> : null}
+        <ul className="space-y-3" aria-label="Relatos da consulta" aria-busy={reading || moreBusy}>
           {rows?.map((row) => (
             <li
               className="rounded border border-(--line) p-4 wrap-break-word"
@@ -412,7 +431,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
         {next ? (
           <ActionButton
             className="mt-4"
-            disabled={moreBusy || reading}
+            disabled={moreBusy || reading || Boolean(error)}
             onClick={() => void loadMore()}
           >
             Carregar mais relatos

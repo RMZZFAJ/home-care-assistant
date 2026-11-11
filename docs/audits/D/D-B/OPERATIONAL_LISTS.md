@@ -159,3 +159,57 @@ próximo05.5, consumo. Etapa05 parcial90%;105 critérios mantêm56 PASS locais
 e49 PARTIAL. Restam05.5–05.10, comparação visual conjunta e demais gates.
 DOC-B permanece10% e DOC-A/C/D pendentes; não há nova aprovação de PDFs,
 rascunhos simples ou cancelamentos. CI do SHA publicado continua necessária.
+
+## D3.73 — consumo, ponto05.5
+
+Basee422bb2. Duas contraprovas unitárias do baseline reproduziram a aceitação
+de IDs repetidos e de cursor apontando para a primeira linha. Os resultados
+originais estão preservados. O envelope mantém data/next e acrescenta paciente,
+tamanho20, filtros normalizados e referência recebida. Servidor e consumidor
+conferem o âmbito e a ordem nativa decrescente por instante/ID, preservando
+microssegundos. O cursor identifica a última linha da página completa; a
+continuação precisa avançar. IDs repetidos geram erro, sem fusão silenciosa.
+
+Uma continuação antiga não entra em outra geração da consulta. Tentativas
+simultâneas da mesma página são bloqueadas. Falha preserva somente a seleção
+válida anterior, identificada com instante; erro interrompe paginação até
+atualizar a lista. Recusas401/403/404/409 retiram também as páginas acumuladas.
+A URL representa a consulta aplicada; Voltar/Avançar e recarga restauram campos
+controlados sem substituir o formulário focado. Consultas não recebem novo
+rascunho de negócio, persistência, RPC ou autoridade própria.
+
+Passaram21 unitários/de contrato, tipos e lint dirigido. São12 cenários
+distintos qualificados nos três perfis: os seis consumidores anteriores
+passaram na coorte inicial; os seis novos passaram na rodada final. Houve18
+execuções, com14 aprovações e quatro falhas iniciais de expectativa do teste.
+Três asserções incluíam o alerta global do Next.js, fora da região consultada;
+foram delimitadas à região dos relatos. No iOS, clicar não conservava foco no
+botão como a ativação pelo teclado; o teste agora comprova foco antes de Enter.
+A espera da resposta retida começa imediatamente antes de liberá-la, sem
+alongar timeout. Os dois casos de navegação já aprovados foram repetidos para
+conferir o método ajustado. Produto inalterado depois da coorte inicial.
+Relatório, capturas e contextos das quatro falhas estão preservados.
+
+Com Auth real,102 relatos percorrem todas as páginas na interface e na API,
+em ordem exata comparada com SQL independente. A referência mais antiga,
+busca no texto original, tipo, estado, período, recarga, vazio verdadeiro e
+recusa400 de período invertido foram conferidos. Sete respostas200 corrompidas
+não substituem a leitura válida; cursor inconsistente e503 na continuação
+não avançam nem fabricam vazio.403 retira as linhas acumuladas.
+
+Uma página real retida foi entregue após mudar tipo/busca e não entrou na
+seleção atual. Foco, Voltar/Avançar e recarga mantiveram os filtros. A retirada
+real de stock.family.read deixou somente o relato da equipe permitido pela
+RLS; retirar também stock.team.read produziu a lista autorizada vazia. Não se
+converteu esse contrato de leitura parcial numa recusa global presumida.
+Relatos, complementos, decisões e ledger completos permaneceram iguais após
+consultar/navegar, sem POST operacional. O consumidor anterior de confirmação
+perdida conservou recuperação, recusa de nova escrita/leitura e débito único.
+Axe a320px passou; a captura Chromium foi inspecionada.
+
+Sem SQL novo; dry-run remoto vazio em205.05.5 fechado localmente; próximo05.6,
+agenda. Cinco dos dez pontos de listas conferidos; estimativa da etapa05
+mantida90%, sem inferir avanço geral pela contagem dos pontos. Os105 critérios
+mantêm56 PASS locais e49 PARTIAL. Restam05.6–05.10 e gates conjuntos/visuais.
+DOC-B permanece10% e DOC-A/C/D pendentes, incluindo os novos PDFs aprovados.
+CI do SHA publicado continua necessária.
