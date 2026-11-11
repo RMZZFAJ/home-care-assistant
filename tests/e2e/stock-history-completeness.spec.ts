@@ -7,7 +7,7 @@ import { selectContext } from "./auth-context";
 
 test.setTimeout(120_000);
 const history = (page: Page) => page.getByRole("region", { name: "Histórico auditável", exact: true });
-const rows = (page: Page) => history(page).getByRole("listitem");
+const rows = (page: Page) => history(page).locator("tbody tr[data-movement-id]");
 const ids = (page: Page) => rows(page).locator("details p.break-all").allTextContents();
 const expected = (patient: string, product?: string): string[] => JSON.parse(sql(`select jsonb_agg(id::text order by created_at desc,id desc) from public.stock_movements where care_recipient_id=${q(patient)} and (source_location='FAMILY' or destination_location='FAMILY')${product ? ` and product_id=${q(product)}` : ""};`));
 const facts = (patient: string) => sql(`select jsonb_build_object('stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)}),'documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${q(patient)}));`);

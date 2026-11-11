@@ -116,7 +116,7 @@ test.describe("administração integrada no ambiente local", () => {
     const productId = created.outcome.productId as string;
     expect(productId).toBeTruthy();
     await expect(
-      page.getByRole("cell", { name: originalName, exact: true }),
+      page.getByRole("cell").filter({ has: page.getByText(originalName, { exact: true }) }),
     ).toBeVisible();
     await page
       .getByRole("button", { name: `Editar ${originalName}`, exact: true })
@@ -135,7 +135,7 @@ test.describe("administração integrada no ambiente local", () => {
       .uncheck();
     await submit(page, "Salvar item", "product");
     await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
-    const article = page.getByRole("row").filter({ has: page.getByRole("cell", { name: finalName, exact: true }) });
+    const article = page.getByRole("row").filter({ has: page.getByRole("cell").filter({ has: page.getByText(finalName, { exact: true }) }) });
     await expect(article.getByText("Inativo", { exact: true })).toBeVisible();
     await expect(article).toContainText("higiene");
     await expect(article.getByText("pacote", { exact: true })).toBeVisible();

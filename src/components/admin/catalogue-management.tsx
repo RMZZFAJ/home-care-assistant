@@ -1,5 +1,6 @@
 "use client";
 import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, Pill, SelectField, TextInput } from "@/components/ui/controls";
+import { TableFrame } from "@/components/ui/table-frame";
 import { useCallback, useRef, useState } from "react";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -153,12 +154,13 @@ export function CatalogueManagement({
               {read.data ? `${filtered.length} resultados` : "Resultados ainda não confirmados"}
             </span>
           </div>
-          <div className="hca-records hca-table-container">
-            <DataTable className="hca-table" aria-label="Produtos do catálogo">
+          <TableFrame label="Produtos do catálogo">
+            <DataTable className="hca-table hca-mobile-records" aria-label="Produtos do catálogo">
               <DataTableHead>
                 <DataTableRow>
                   <DataTableHeading>Produto</DataTableHeading>
-                  <DataTableHeading>Categoria / unidade</DataTableHeading>
+                  <DataTableHeading scope="col">Categoria</DataTableHeading>
+                  <DataTableHeading scope="col">Unidade</DataTableHeading>
                   <DataTableHeading>Situação</DataTableHeading>
                   <DataTableHeading>
                     <span className="sr-only">Ações</span>
@@ -170,14 +172,11 @@ export function CatalogueManagement({
                   <DataTableRow key={text(row, "id")} data-product-id={text(row, "id")}>
                     <DataTableCell>
                       <strong>{text(row, "name")}</strong>
+                      <small>{Array.isArray(row.aliases) && row.aliases.length ? row.aliases.join(", ") : "Sem nomes alternativos"}</small>
                     </DataTableCell>
-                    <DataTableCell>
-                      {text(row, "category")}
-                      <small className="hca-cell-secondary">
-                        {text(row, "unit")}
-                      </small>
-                    </DataTableCell>
-                    <DataTableCell>
+                    <DataTableCell data-label="Categoria">{text(row,"category")}</DataTableCell>
+                    <DataTableCell data-label="Unidade"><span>{text(row,"unit")}</span><small>Precisão {String(row.quantity_decimals)} casa(s)</small></DataTableCell>
+                    <DataTableCell data-label="Situação">
                       <Pill
 
                         tone={active(row) ? "success" : "neutral"}
@@ -185,7 +184,7 @@ export function CatalogueManagement({
                         {active(row) ? "Ativo" : "Inativo"}
                       </Pill>
                     </DataTableCell>
-                    <DataTableCell>
+                    <DataTableCell data-label="Ações">
                       <ActionButton
                         disabled={unavailable}
                         variant="quiet"
@@ -223,7 +222,7 @@ export function CatalogueManagement({
                 Ajuste os filtros ou adicione um item ao catálogo.
               </EmptyState>
             ) : null}
-          </div>
+          </TableFrame>
           {filtered.length > 15 ? (
             <nav className="hca-pagination" aria-label="Páginas do catálogo">
               <ActionButton

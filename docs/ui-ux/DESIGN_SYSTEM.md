@@ -105,6 +105,25 @@ suspensa, preservando foco; consulta da ficha permanece disponível sob sua
 autorização própria. Abas inativas usam o token muted acessível da paleta:
 o tom literal do HTML falhou AA. As novas superfícies respeitam cores forçadas.
 
+TableFrame compartilha a superfície de tabela/cartões, com rolagem local e
+foco visível por teclado. Catálogo preserva aliases e precisão; apresentações
+preservam código textual, fator, situação e versão. Cadastros e comparações
+usam DefinitionGrid; nenhuma conversão é inferida apenas pela aparência.
+
+O histórico de movimentos identifica nomes/unidades do cadastro atual e abre
+a origem preservada sob sua autorização própria. Consulta, compensação,
+referências e atalhos permanecem separados. Trânsito conserva expedido,
+aceito, conciliado e pendente em leitura; esses valores não viram saldo.
+
+ConsumptionRecord reproduz o registro e ícone do modelo. Texto completo,
+autoria histórica, instante, custódia e situação permanecem visíveis. Materiais
+de relato e complemento usam MaterialReview; metadados e decisões usam a grade
+compartilhada. Relatar, complementar, confirmar e debitar continuam atos próprios.
+O texto integral exige a variante móvel de conteúdo longo: ícone e conteúdo
+ficam em duas colunas; situação e ação vêm abaixo do texto, como as ações dos
+registros de arquivos do modelo. Conserva espaçamentos, paleta e componentes,
+sem comprimir o relato numa coluna estreita ou ocultar trechos.
+
 ## Aceite
 
 Comparar produto e modelo em cinco viewports; testar teclado, retorno de foco,

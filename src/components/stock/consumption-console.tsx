@@ -17,6 +17,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import type { CatalogProduct } from "@/types/documents";
 import type { ConsumptionSummary } from "@/types/consumption";
 import { ConsumptionEditor } from "./consumption-editor";
+import { ConsumptionRecord } from "./consumption-record";
 import { ConsumptionDetail } from "./consumption-detail";
 import { FlowReviews } from "./flow-reviews";
 import { parseConsumptionListRead } from "@/lib/validation/consumption";
@@ -393,37 +394,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
         {current?.queriedAt ? <p className="my-3 text-sm text-(--muted)">
           {reading || error ? "Última consulta confirmada; aguardando atualização." : "Relatos consultados:"} {formatBrazilDate(current.queriedAt)}.
         </p> : null}
-        <ul className="space-y-3" aria-label="Relatos da consulta" aria-busy={reading || moreBusy}>
-          {rows?.map((row) => (
-            <li
-              className="rounded border border-(--line) p-4 wrap-break-word"
-              key={row.id}
-            >
-              <p className="font-semibold">
-                {row.kind === "shortage" ? "Falta" : "Consumo"} ·{" "}
-                {row.location === "FAMILY" ? "Família" : "Equipe"} ·{" "}
-                {row.status === "reported"
-                  ? "Aguardando conferência"
-                  : row.status === "confirmed"
-                    ? "Confirmado"
-                    : "Rejeitado"}
-              </p>
-              <p className="my-2 whitespace-pre-wrap text-sm">{row.body}</p>
-              <p className="text-xs text-(--muted)">
-                {row.reported_name ?? "Nome original não preservado"} ·{" "}
-                {formatBrazilDate(row.created_at)} · versão {row.version}
-              </p>
-              <ActionButton
-                className="mt-3"
-                onClick={(event) => {
-                  triggerRef.current = event.currentTarget;
-                  open(row.id);
-                }}
-              >
-                Abrir relato <span className="sr-only">{row.id}</span>
-              </ActionButton>
-            </li>
-          ))}
+        <ul className="hca-consumption-records" aria-label="Relatos da consulta" aria-busy={reading || moreBusy}>
+          {rows?.map(row => <ConsumptionRecord key={row.id} row={row} onOpen={target => { triggerRef.current = target; open(row.id); }} />)}
         </ul>
         {!reading && rows?.length === 0 && !error ? (
           <p>Nenhum relato encontrado para estes filtros.</p>

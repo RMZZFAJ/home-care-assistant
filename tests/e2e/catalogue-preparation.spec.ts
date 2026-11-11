@@ -78,7 +78,7 @@ test("catalogue restores partial input and recovers a lost confirmation without 
   await expect(consult).toBeVisible();
   await consult.click();
   await expect(editor).toHaveCount(0);
-  await expect(page.getByRole("cell", { name: item, exact: true })).toBeVisible();
+  await expect(page.getByRole("cell").filter({ has: page.getByText(item, { exact: true }) })).toBeVisible();
   expect(sent).toBe(1);
   expect(count()).toBe(before + 1);
 });

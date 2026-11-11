@@ -103,29 +103,29 @@ test("stock history refuses incomplete totals and foreign page or filter respons
   await expect(balances.getByRole("row", { name: "Material fictício V4 0 · Família", exact: true })).toContainText("51");
   mode = "live";
   await history.getByRole("button", { name: "Atualizar histórico", exact: true }).click();
-  await expect(history.getByRole("listitem")).toHaveCount(20);
+  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(20);
   for (const invalid of ["count", "number"] as const) {
     mode = invalid;
     await history.getByRole("button", { name: "Atualizar histórico", exact: true }).click();
     await expect(history.getByRole("alert")).toContainText("resposta");
-    await expect(history.getByRole("listitem")).toHaveCount(20);
+    await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(20);
   }
   mode = "page";
   await history.getByRole("navigation", { name: "Páginas das movimentações", exact: true }).getByRole("button", { name: "Próxima", exact: true }).click();
   await expect(history.getByRole("alert")).toContainText("resposta");
-  await expect(history.getByRole("listitem")).toHaveCount(0);
+  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(0);
   mode = "live";
   await history.getByRole("button", { name: "Atualizar histórico", exact: true }).click();
-  await expect(history.getByRole("listitem")).toHaveCount(3);
+  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(3);
   await history.getByRole("button", { name: "Filtrar", exact: true }).click();
   await history.getByRole("combobox", { name: "Produto", exact: true }).selectOption(f.products[1]);
   mode = "filter";
   await history.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(history.getByRole("alert")).toContainText("resposta");
-  await expect(history.getByRole("listitem")).toHaveCount(0);
+  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(0);
   mode = "live";
   await history.getByRole("button", { name: "Atualizar histórico", exact: true }).click();
-  await expect(history.getByRole("listitem")).toHaveCount(1);
+  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(1);
   await expect(history.getByText("Sem movimentações neste filtro", { exact: true })).toHaveCount(0);
   expect(state(f.patient)).toBe(before);
 });

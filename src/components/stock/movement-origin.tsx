@@ -1,6 +1,6 @@
 "use client";
 import { holdDialogFocus } from "@/lib/forms/dialog-focus";
-import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, LoadingIndicator } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useRef, type RefObject } from "react";
 
@@ -24,13 +24,12 @@ const custody: Record<string, string> = {
 function MovementFacts({ movement }: { movement: OriginMovement }) {
   return (
     <div className="space-y-2 text-sm">
-      <p>
-        {formatQuantity(movement.quantity)} ·{" "}
-        {custody[movement.source_location ?? ""] ?? "Entrada"} para{" "}
-        {custody[movement.destination_location ?? ""] ?? "Retirada"}
-      </p>
-      <p className="whitespace-pre-wrap">{movement.justification}</p>
-      <p>{formatBrazilDate(movement.created_at)}</p>
+      <DefinitionGrid items={[
+        { label: "Quantidade na unidade-base do movimento", value: formatQuantity(movement.quantity) },
+        { label: "Percurso", value: (custody[movement.source_location ?? ""] ?? "Entrada") + " para " + (custody[movement.destination_location ?? ""] ?? "Retirada") },
+        { label: "Instante", value: formatBrazilDate(movement.created_at) },
+        { label: "Justificativa", value: movement.justification, wide: true },
+      ]} />
       <details>
         <summary>Identificação do registro</summary>
         <p className="break-all">Movimento: {movement.id}</p>

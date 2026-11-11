@@ -517,3 +517,38 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 @media (forced-colors: active) { .hca-balance-console .hca-record { background: Canvas; color: CanvasText; border-color: CanvasText; } }
 
 .hca-shift-main p { margin-block: 6px; font-size: 13px; }
+
+/* Complete operational tables and report records share the canonical surfaces. */
+.hca-table-frame { min-width: 0; max-width: 100%; overflow: auto; background: var(--hca-paper); border: 1px solid var(--hca-line); border-radius: 15px; box-shadow: var(--hca-shadow); }
+.hca-table-frame .hca-table { width: 100%; }
+.hca-table-frame td { overflow-wrap: anywhere; }
+.hca-table-frame td > a { display: inline-flex; align-items: center; min-height: 24px; }
+.hca-table-frame td summary { min-height: 24px; line-height: 24px; }
+.hca-table-frame td small { display: block; margin-top: 4px; color: var(--hca-muted); font-size: 11px; }
+.hca-table-frame td .hca-toolbar { align-items: flex-start; }
+.hca-transit-material { padding: 16px 0; border-bottom: 1px solid #e6ede6; }
+.hca-transit-material:last-child { border-bottom: 0; }
+.hca-transit-material h3 { font-size: 13px; font-weight: 670; margin-bottom: 14px; overflow-wrap: anywhere; }
+.hca-consumption-records { padding: 0; margin: 0; list-style: none; background: var(--hca-paper); border: 1px solid var(--hca-line); border-radius: 15px; overflow: hidden; }
+.hca-consumption-record { display: flex; align-items: center; gap: 13px; padding: 16px 19px; border-bottom: 1px solid #eaf0ec; color: var(--hca-ink); min-width: 0; }
+.hca-consumption-record:last-child { border-bottom: 0; }
+.hca-consumption-icon { display: grid; place-items: center; width: 38px; height: 40px; border-radius: 10px; background: var(--hca-tint); color: var(--hca-teal); flex: none; }
+.hca-consumption-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.hca-consumption-main strong { display: block; font-size: 13px; font-weight: 670; }
+.hca-consumption-main :is(small,p) { display: block; font-size: 11px; margin-top: 3px; color: var(--hca-muted); }
+.hca-consumption-main p { font-size: 13px; line-height: 1.6; }
+.hca-consumption-end { display: grid; justify-items: end; text-align: right; gap: 4px; min-width: 0; }
+.hca-consumption-end .hca-control { white-space: normal; }
+@media (max-width: 500px) {
+  .hca-consumption-record { display: grid; grid-template-columns: 38px minmax(0,1fr); align-items: start; padding: 14px; }
+  .hca-consumption-main small { font-size: 10px; }
+  .hca-consumption-end { grid-column: 2; justify-items: start; text-align: left; }
+}
+@media (forced-colors: active) {
+  .hca-table-frame,.hca-consumption-records,.hca-consumption-record { background: Canvas; color: CanvasText; border-color: CanvasText; }
+  .hca-table-frame td small,.hca-consumption-main :is(small,p),.hca-consumption-icon { color: CanvasText; }
+  .hca-consumption-icon { background: Canvas; border: 1px solid CanvasText; }
+}
+
+.hca-table-frame:focus-visible { outline: 3px solid #5aa99a; outline-offset: 2px; }
+@media (forced-colors: active) { .hca-table-frame:focus-visible { outline-color: Highlight; } }

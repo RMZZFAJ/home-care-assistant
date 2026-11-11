@@ -4,6 +4,7 @@ import { EmptyState, StatusBadge } from "@/components/ui/primitives";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import type { TransitDocument } from "@/types/stock";
+import { DefinitionGrid } from "@/components/ui/controls";
 
 export type { TransitDocument } from "@/types/stock";
 export function TransitStock({
@@ -25,14 +26,14 @@ export function TransitStock({
     ),
   );
   return (
-    <div className="mt-5 space-y-4">
+    <div className="hca-form-stack hca-transit-stock">
       <p className="text-sm leading-6 text-(--muted)">
         Materiais expedidos aguardando conferência ou resolução de divergência.
         Essas quantidades ainda não fazem parte do saldo confirmado do
         destinatário.
       </p>
       {visible.map((doc) => (
-        <article className="rounded-xl border border-(--line) p-4" key={doc.id}>
+        <article className="ui-card hca-form-stack" key={doc.id}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link
               className="font-semibold underline"
@@ -49,12 +50,11 @@ export function TransitStock({
           <ul className="mt-4 space-y-3">
             {doc.lines.map((line) => (
               <li
-                className="rounded-lg bg-(--background) p-3"
+                className="hca-transit-material"
                 key={line.productId}
               >
                 <h3 className="text-sm font-semibold">{line.name}</h3>
-                <dl className="mt-3 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
-                  {[
+                <DefinitionGrid items={[
                     ["Expedido", line.dispatched],
                     ["Aceito no destino", line.accepted],
                     ["Conciliado", line.reconciled],
@@ -64,15 +64,7 @@ export function TransitStock({
                         : "Aguardando conferência",
                       line.pending,
                     ],
-                  ].map(([label, value]) => (
-                    <div key={label}>
-                      <dt className="text-(--muted)">{label}</dt>
-                      <dd className="mt-1 font-semibold">
-                        {formatQuantity(value, line.unit)}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+                  ].map(([label, value]) => ({ label, value: formatQuantity(value, line.unit) }))} />
               </li>
             ))}
           </ul>

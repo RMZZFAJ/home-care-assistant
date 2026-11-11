@@ -8,6 +8,7 @@ import { selectContext } from "./auth-context";
 test.setTimeout(120_000);
 
 async function keyboard(button: Locator) {
+  await expect(button).toBeEnabled();
   await button.focus();
   await expect(button).toBeFocused();
   await button.press("Enter");
@@ -95,5 +96,5 @@ for (const width of [390, 1440]) test(`RecordDrawer ${width}: continuar, descart
   const heading = page.getByRole("heading", { name: "Catálogo do paciente", exact: true });
   await expect.poll(async () => (await opener.evaluate(element => element === document.activeElement)) || (await heading.evaluate(element => element === document.activeElement)), { message: "Saved catalogue returns to its enabled opener or its explicit contextual heading" }).toBe(true);
   expect(Number(count())).toBe(Number(before) + 1);
-  await expect(page.getByRole("cell", { name: value, exact: true })).toBeVisible();
+  await expect(page.getByRole("cell").filter({ has: page.getByText(value, { exact: true }) })).toBeVisible();
 });

@@ -1,5 +1,5 @@
 "use client";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -164,24 +164,18 @@ export function ConsumptionDetail({
       {message ? <Notice>{message}</Notice> : null}
       {data ? (
         <>
-          <p className="text-sm">
-            {data.kind === "shortage"
-              ? "Falta de material"
-              : "Consumo extraordinário"}{" "}
-            · {consumptionLocationLabel(data.location)} ·{" "}
-            {data.status === "reported"
-              ? "Aguardando conferência"
-              : data.status === "confirmed"
-                ? "Confirmado"
-                : "Rejeitado"}{" "}
-            · versão {data.version}
-          </p>
+          <DefinitionGrid items={[
+            { label: "Tipo", value: data.kind === "shortage" ? "Falta de material" : "Consumo extraordinário" },
+            { label: "Custódia", value: consumptionLocationLabel(data.location) },
+            { label: "Situação", value: data.status === "reported" ? "Aguardando conferência" : data.status === "confirmed" ? "Confirmado" : "Rejeitado" },
+            { label: "Versão", value: data.version },
+            { label: "Referência", value: data.id, wide: true },
+          ]} />
           {reading || error ? (
             <p className="text-sm text-(--muted)">
               Última consulta confirmada; os dados preservados não representam uma nova atualização.
             </p>
           ) : null}
-          <p className="text-xs break-all">Referência: {data.id}</p>
           {data.source_reminder_id ? (
             <Link
               href={
@@ -198,10 +192,7 @@ export function ConsumptionDetail({
           ) : null}
           <section>
             <h3 className="font-semibold">Relato original · versão 1</h3>
-            <p className="text-sm">
-              {data.reported_name ?? "Nome não preservado no registro original"}{" "}
-              · {formatBrazilDate(data.created_at)}
-            </p>
+            <DefinitionGrid items={[{ label: "Relatado por", value: data.reported_name ?? "Nome não preservado no registro original" },{ label: "Registrado em", value: formatBrazilDate(data.created_at) }]} />
             <p className="my-2 whitespace-pre-wrap wrap-break-word">
               {data.body}
             </p>
@@ -215,10 +206,7 @@ export function ConsumptionDetail({
               <h3 className="font-semibold">
                 Complemento · versão {revision.version}
               </h3>
-              <p className="text-sm">
-                {revision.actor_name ?? "Nome não preservado"} ·{" "}
-                {formatBrazilDate(revision.created_at)}
-              </p>
+              <DefinitionGrid items={[{ label: "Complementado por", value: revision.actor_name ?? "Nome não preservado" },{ label: "Registrado em", value: formatBrazilDate(revision.created_at) }]} />
               <p className="my-2 whitespace-pre-wrap wrap-break-word">
                 {revision.body}
               </p>
@@ -278,15 +266,11 @@ export function ConsumptionDetail({
                 Decisão preservada · versão{" "}
                 {data.decision?.version ?? data.version}
               </h3>
-              <p>
-                {data.decision?.actor_name ?? "Nome do decisor não preservado"}{" "}
-                · {formatBrazilDate(data.confirmed_at)}
-              </p>
-              {data.decision?.reason ? (
-                <p className="whitespace-pre-wrap">
-                  Motivo: {data.decision.reason}
-                </p>
-              ) : null}
+              <DefinitionGrid items={[
+                { label: "Decisão registrada por", value: data.decision?.actor_name ?? "Nome do decisor não preservado" },
+                { label: "Registrada em", value: formatBrazilDate(data.confirmed_at) },
+                ...(data.decision?.reason ? [{ label: "Motivo próprio", value: data.decision.reason, wide: true }] : []),
+              ]} />
               <p className="my-2">
                 {data.status === "rejected"
                   ? "Rejeição sem movimento de estoque."

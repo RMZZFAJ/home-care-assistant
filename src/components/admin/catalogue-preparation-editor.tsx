@@ -1,8 +1,8 @@
 "use client";
 
-import { Fragment, type RefObject } from "react";
+import { type RefObject } from "react";
 import { RecordDrawer } from "@/components/forms/record-drawer";
-import { ActionButton, CheckboxField, FormField, SelectField, TextInput } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, CheckboxField, FormField, SelectField, TextInput } from "@/components/ui/controls";
 import { api } from "@/lib/client/api";
 import { CatalogueDraftButtons, CataloguePreparationFeedback } from "@/components/catalog/catalogue-preparation-controls";
 import { useCataloguePreparation } from "@/components/catalog/use-catalogue-preparation";
@@ -43,16 +43,13 @@ function messageFor(outcome: CatalogueOutcome, purpose: CatalogueScope["purpose"
 
 function FieldValues({ fields, reference }: { fields: ItemFields; reference?: CatalogueReference }) {
   const model = "modelId" in fields && reference && "models" in reference ? reference.models.find(option => option.id === fields.modelId) : null;
-  return <dl className="hca-summary-grid wrap-anywhere">
-    {"modelId" in fields ? <>
-      <dt>Modelo</dt><dd>{model?.name ?? (fields.modelId || "Em branco")}</dd>
-      {model ? <><dt>Unidade</dt><dd>{model.unit}</dd><dt>Categoria</dt><dd>{categories[model.category]}</dd>
-        <dt>Nomes alternativos</dt><dd>{model.aliases.join(", ") || "Em branco"}</dd></> : null}
-    </> : (Object.keys(productLabels) as (keyof CatalogueFields)[]).map(key => <Fragment key={key}>
-        <dt>{productLabels[key]}</dt>
-        <dd>{key === "isActive" ? fields.isActive ? "Sim" : "Não" : key === "category" ? categories[fields.category] : fields[key] || "Em branco"}</dd>
-      </Fragment>)}
-  </dl>;
+  const items = "modelId" in fields ? [
+    { label: "Modelo", value: model?.name ?? (fields.modelId || "Em branco") },
+    ...(model ? [{ label: "Unidade", value: model.unit }, { label: "Categoria", value: categories[model.category] }, { label: "Nomes alternativos", value: model.aliases.join(", ") || "Em branco", wide: true }] : []),
+  ] : (Object.keys(productLabels) as (keyof CatalogueFields)[]).map(key => ({
+    label: productLabels[key], value: key === "isActive" ? fields.isActive ? "Sim" : "Não" : key === "category" ? categories[fields.category] : fields[key] || "Em branco", wide: key === "description" || key === "aliases",
+  }));
+  return <DefinitionGrid items={items} />;
 }
 
 export function CataloguePreparationEditor({ patientId, mode, purpose, targetId, userId, opener, headingRef, onClose, onSaved }: CatalogueScope & {

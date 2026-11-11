@@ -255,7 +255,7 @@ test("compensação privada preserva referência fora da página,retoma sem repl
   await login(page, f.patient);
   const original = page
     .getByRole("region", { name: "Histórico auditável", exact: true })
-    .locator("li")
+    .locator("tbody tr[data-movement-id]")
     .filter({ has: page.getByText(f.referenceId!, { exact: true }) });
   await original
     .getByRole("button", { name: "Corrigir este movimento", exact: true })

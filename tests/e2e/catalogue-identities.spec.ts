@@ -410,7 +410,7 @@ test("compensação de inativo mantém a referência visível e usa uma única s
       exact: true,
     }),
     row = history
-      .locator("li")
+      .locator("tbody tr[data-movement-id]")
       .filter({ has: page.getByText(original.id, { exact: true }) });
   await row
     .getByRole("button", { name: "Corrigir este movimento", exact: true })

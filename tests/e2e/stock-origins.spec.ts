@@ -79,7 +79,7 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
   });
   // Select by the immutable movement identity without guessing a receipt as a document.
   const row = history
-    .locator("li")
+    .locator("tbody tr[data-movement-id]")
     .filter({ has: page.getByText(receiptMovement.id, { exact: true }) });
   const opener = row.getByRole("button", {
     name: "Consultar origem",
@@ -167,7 +167,7 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
       expect(origin.document.type).toBe(kind === "bal" ? "BAL" : "ENT");
     }
     const item = history
-      .locator("li")
+      .locator("tbody tr[data-movement-id]")
       .filter({ has: page.getByText(movement.id, { exact: true }) });
     await item
       .getByRole("button", { name: "Consultar origem", exact: true })
@@ -192,7 +192,7 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
   const compensation = history
-    .locator("li")
+    .locator("tbody tr[data-movement-id]")
     .filter({ has: page.getByText(f.compensationId, { exact: true }) });
   await compensation
     .getByRole("button", { name: "Consultar origem", exact: true })

@@ -23,22 +23,17 @@ import {
 import { Attachments } from "@/components/documents/attachments";
 import { EmptyState, Icon } from "@/components/ui/primitives";
 import { TransitStock } from "./transit-stock";
-import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 
 import { parseStockBalances, parseStockHistory } from "@/lib/validation/stock-reads";
 import { StockOverview } from "./stock-overview";
 
 import { useScopedRead } from "@/lib/use-scoped-read";
+import { StockMovementHistory } from "./stock-movement-history";
 import { MovementOrigin } from "./movement-origin";
 import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
 import { NotificationReference } from "@/components/notifications/notification-reference";
 
-const locationLabels: Record<string, string> = {
-  FAMILY: "Família",
-  CARE_TEAM: "Equipe",
-  TRANSIT: "Em trânsito",
-};
 export function StockConsole() {
   const params = useSearchParams();
   return (
@@ -124,8 +119,6 @@ function PatientStock({
   const products = stock.data?.overview ?? [];
   const movements = history.data?.data ?? [];
   const total = history.data?.total ?? 0;
-  const name = (id: string) =>
-    products.find((product) => product.productId === id)?.name ?? "Produto";
   const hasFamily = can(context, "stock.family.read");
   const hasTeam = can(context, "stock.team.read");
   const visible = products.filter((product) =>
@@ -440,84 +433,12 @@ function PatientStock({
             <button className={primaryClass}>Aplicar filtros</button>
           </form>
         ) : null}
-        <ul className="mt-4 space-y-3">
-          {movements.map((movement) => (
-            <li
-              key={movement.id}
-              className="rounded-lg border border-(--line) p-3 text-sm"
-            >
-              <p className="font-semibold">
-                {name(movement.product_id)} ·{" "}
-                {formatQuantity(movement.quantity)}
-              </p>
-              <p className="mt-1">
-                {movement.source_location
-                  ? locationLabels[movement.source_location]
-                  : "Entrada"}{" "}
-                →{" "}
-                {movement.destination_location
-                  ? locationLabels[movement.destination_location]
-                  : "Retirada / consumo"}
-              </p>
-              <p className="mt-1">{movement.justification}</p>
-              <p className="mt-2 text-xs text-(--muted)">
-                {formatBrazilDate(movement.created_at)}
-              </p>
-              <ActionButton
-                className="mt-2"
-                onClick={(event) =>
-                  setOrigin({ id: movement.id, opener: event.currentTarget })
-                }
-              >
-                Consultar origem
-              </ActionButton>
-              {movement.reference_type === "document" &&
-              movement.reference_id ? (
-                <Link
-                  className="mt-2 inline-block underline"
-                  href={"/fichas/" + movement.reference_id}
-                >
-                  Abrir ficha
-                </Link>
-              ) : null}
-              {movement.reference_type === "delivery_regularization" &&
-              movement.reference_document_id ? (
-                <Link
-                  className="mt-2 inline-block underline"
-                  href={"/fichas/" + movement.reference_document_id}
-                >
-                  Abrir dossiê administrativo
-                </Link>
-              ) : null}
-              <details className="mt-2">
-                <summary className="cursor-pointer text-xs">
-                  Referência da movimentação
-                </summary>
-                <p className="break-all text-xs">{movement.id}</p>
-              </details>
-              {can(context, "stock.family.manage") &&
-              movement.reference_type === "family_manual" &&
-              (movement.source_location === "FAMILY" ||
-                movement.destination_location === "FAMILY") ? (
-                <ActionButton
-                  className="mt-3"
-                  onClick={(event) => {
-                    setOperation(
-                      movement.source_location === "FAMILY"
-                        ? "correction_in"
-                        : "correction_out",
-                    );
-                    setMovementProductId(movement.product_id);
-                    setReferenceId(movement.id);
-                    setMovementEditor(event.currentTarget);
-                  }}
-                >
-                  Corrigir este movimento
-                </ActionButton>
-              ) : null}
-            </li>
-          ))}
-        </ul>
+        <StockMovementHistory movements={movements} products={products} canCorrect={can(context,"stock.family.manage")}
+          onOrigin={(movement,target) => setOrigin({ id: movement.id, opener: target })}
+          onCorrect={(movement,target) => {
+            setOperation(movement.source_location === "FAMILY" ? "correction_in" : "correction_out");
+            setMovementProductId(movement.product_id); setReferenceId(movement.id); setMovementEditor(target);
+          }} />
         {history.data &&
         !history.loading &&
         !history.error &&

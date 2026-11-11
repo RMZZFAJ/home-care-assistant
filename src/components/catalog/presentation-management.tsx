@@ -1,6 +1,7 @@
 "use client";
 import { SearchSelect } from "@/components/ui/search-select";
-import { ActionButton, CheckboxField, TextInput } from "@/components/ui/controls";
+import { ActionButton, CheckboxField, DefinitionGrid, FormField, SelectField, TextInput, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, Pill } from "@/components/ui/controls";
+import { TableFrame } from "@/components/ui/table-frame";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { Notice } from "@/components/workspace";
@@ -126,64 +127,25 @@ export function PresentationManagement({
         </p>
       ) : null}
       <div className="hca-toolbar">
-        <label>
-          Pesquisar apresentações
-          <input
-                        type="search"
-            value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              setPage(1);
-            }}
-          />
-        </label>
-        <label>
-          Situação das apresentações
-          <select
-                        value={status}
-            onChange={(event) => {
-              setStatus(event.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="active">Ativas</option>
-            <option value="inactive">Inativas</option>
-            <option value="">Todas</option>
-          </select>
-        </label>
+        <FormField label="Pesquisar apresentações"><TextInput type="search" value={search} onChange={event => { setSearch(event.currentTarget.value); setPage(1); }} /></FormField>
+        <FormField label="Situação das apresentações"><SelectField value={status} onChange={event => { setStatus(event.currentTarget.value); setPage(1); }}>
+          <option value="active">Ativas</option><option value="inactive">Inativas</option><option value="">Todas</option>
+        </SelectField></FormField>
       </div>
-      <ul className="space-y-3">
-        {filtered.slice((currentPage - 1) * 15, currentPage * 15).map((row) => {
-          const product = products.find((p) => p.id === row.product_id);
-          return (
-            <li
-              className="rounded-lg border border-(--line) p-4 text-sm"
-              key={row.id}
-            >
-              <h3 className="font-semibold">{row.name}</h3>
-              <p>
-                {product?.name ?? "Material autorizado"} ·{" "}
-                {row.active ? "Ativa" : "Inativa"} · v{row.version}
-              </p>
-              <p className="break-all">Código: {row.barcode}</p>
-              <p>
-                {quantity(row.base_quantity).isFinite()
-                  ? `1 embalagem = ${formatQuantity(row.base_quantity, product?.unit)}`
-                  : "Fator legado inválido: requer revisão explícita, sem conversão."}
-              </p>
-              <ActionButton
-                className="mt-2"
-                onClick={(event) =>
-                  setEditor({ row, opener: event.currentTarget })
-                }
-                aria-label={`Consultar ${row.name}`}
-              >
-                Consultar{writable ? " / editar" : ""}
-              </ActionButton>
-            </li>
-          );
-        })}
-      </ul>
+      <TableFrame label="Apresentações por material"><DataTable className="hca-table hca-mobile-records" aria-label="Apresentações por material">
+        <DataTableHead><DataTableRow>{["Apresentação","Material","Código","Equivalência","Situação","Ações"].map(label => <DataTableHeading key={label} scope="col">{label}</DataTableHeading>)}</DataTableRow></DataTableHead>
+        <DataTableBody>{filtered.slice((currentPage-1)*15,currentPage*15).map(row => {
+          const product = products.find(p => p.id === row.product_id);
+          return <DataTableRow key={row.id} data-presentation-id={row.id}>
+            <DataTableCell><strong>{row.name}</strong><small>Versão {row.version}</small></DataTableCell>
+            <DataTableCell data-label="Material">{product?.name ?? "Material autorizado"}<small>{product?.unit ?? "Unidade não disponível nesta consulta"}</small></DataTableCell>
+            <DataTableCell data-label="Código"><span className="wrap-anywhere">{row.barcode}</span></DataTableCell>
+            <DataTableCell data-label="Equivalência">{quantity(row.base_quantity).isFinite() ? "1 embalagem = " + formatQuantity(row.base_quantity,product?.unit) : "Fator legado inválido: requer revisão explícita, sem conversão."}</DataTableCell>
+            <DataTableCell data-label="Situação"><Pill tone={row.active ? "success" : "neutral"}>{row.active ? "Ativa" : "Inativa"}</Pill></DataTableCell>
+            <DataTableCell data-label="Ações"><ActionButton onClick={event => setEditor({ row,opener:event.currentTarget })} aria-label={"Consultar " + row.name}>Consultar{writable ? " / editar" : ""}</ActionButton></DataTableCell>
+          </DataTableRow>;
+        })}</DataTableBody>
+      </DataTable></TableFrame>
       {source.data && !source.loading && !source.error && !filtered.length ? (
         <EmptyState title="Nenhuma apresentação nesta seleção">
           Ajuste a busca ou cadastre uma embalagem. A entrada manual na unidade
@@ -340,13 +302,13 @@ function PresentationEditor({
     >
       <div className="space-y-4">
         <CataloguePreparationFeedback editor={editor} onClose={onClose} outcomeText={presentationOutcome}
-          compareFields={values => <dl className="hca-summary-grid wrap-anywhere">
-            <dt>Material</dt><dd>{products.find(row => row.id === values.productId)?.name ?? (values.productId || "Em branco")}</dd>
-            <dt>Nome</dt><dd>{values.name || "Em branco"}</dd>
-            <dt>Código</dt><dd>{values.barcode || "Em branco"}</dd>
-            <dt>Fator</dt><dd>{values.factor || "Em branco"}</dd>
-            <dt>Situação</dt><dd>{values.active ? "Ativa" : "Inativa"}</dd>
-          </dl>} retryLabel="Recuperar apresentação" writable={writable} />
+          compareFields={values => <DefinitionGrid items={[
+            { label: "Material", value: products.find(row => row.id === values.productId)?.name ?? (values.productId || "Em branco") },
+            { label: "Nome", value: values.name || "Em branco" },
+            { label: "Código", value: values.barcode || "Em branco" },
+            { label: "Fator", value: values.factor || "Em branco" },
+            { label: "Situação", value: values.active ? "Ativa" : "Inativa" },
+          ]} />}retryLabel="Recuperar apresentação" writable={writable} />
         {selected.error ? <Notice error>{selected.error} <ActionButton type="button" onClick={selected.refresh}>Consultar referência novamente</ActionButton></Notice> : null}
         {referenceChanged && sourceReference && writable && !editor.pending ? (
           <div className="hca-attention">
@@ -428,34 +390,23 @@ function PresentationEditor({
               Consulta em leitura. Seu vínculo não permite editar esta
               apresentação.
             </Notice>
-            <dl>
-              <dt>Nome</dt>
-              <dd>{reference?.name}</dd>
-              <dt>Código</dt>
-              <dd className="break-all">{reference?.barcode}</dd>
-              <dt>Fator</dt>
-              <dd>
-                {reference
-                  ? formatQuantity(reference.base_quantity, product?.unit)
-                  : "Não disponível"}
-              </dd>
-              <dt>Situação</dt>
-              <dd>{reference?.active ? "Ativa" : "Inativa"}</dd>
-            </dl>
+            <DefinitionGrid items={[
+              { label: "Nome", value: reference?.name ?? "Não disponível" },
+              { label: "Código", value: reference?.barcode ?? "Não disponível" },
+              { label: "Fator", value: reference ? formatQuantity(reference.base_quantity,product?.unit) : "Não disponível" },
+              { label: "Situação", value: reference ? reference.active ? "Ativa" : "Inativa" : "Não disponível" },
+            ]} />
           </div>
         ) : review && !editor.conflict ? (
           <div className="space-y-3 text-sm">
             <h3 className="font-semibold">Revisar apresentação</h3>
-            <p>Material: {product?.name}</p>
-            <p>Nome: {name}</p>
-            <p className="break-all">Código: {barcode}</p>
-            <p>1 embalagem = {formatQuantity(factor, product?.unit)}</p>
-            <p>
-              Situação:{" "}
-              {active
-                ? "Ativa para novas escolhas"
-                : "Inativa; documentos anteriores preservados"}
-            </p>
+            <DefinitionGrid items={[
+              { label: "Material", value: product?.name ?? "Material não disponível nesta consulta" },
+              { label: "Nome", value: name },
+              { label: "Código", value: barcode },
+              { label: "Equivalência", value: "1 embalagem = " + formatQuantity(factor,product?.unit) },
+              { label: "Situação", value: active ? "Ativa para novas escolhas" : "Inativa; documentos anteriores preservados" },
+            ]} />
             <p>
               O estoque permanece intacto. Documentos emitidos conservam o fator
               original.

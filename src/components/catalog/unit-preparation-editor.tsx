@@ -1,8 +1,7 @@
 "use client";
 
-import { Fragment } from "react";
 import { RecordDrawer } from "@/components/forms/record-drawer";
-import { ActionButton, FormField, SelectField, TextInput } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, FormField, SelectField, TextInput } from "@/components/ui/controls";
 import type { CatalogueOutcome, CatalogueScope, PrecisionFields, UnitFields } from "@/lib/validation/catalogue-preparation";
 import type { CatalogProduct } from "@/types/documents";
 import { CatalogueDraftButtons, CataloguePreparationFeedback } from "./catalogue-preparation-controls";
@@ -42,13 +41,10 @@ export function UnitPreparationEditor({ scope, userId, products, opener, onClose
   const changed = !!(reference && hash && hash !== reference.hash);
   const units = reference?.units ?? snapshot?.reference.units ?? [];
   function compareFields(values: Fields) {
-    return <dl className="hca-summary-grid wrap-anywhere">
-      {Object.entries(values).map(([key, value]) => <Fragment key={key}>
-        <dt>{key === "productId" ? "Produto" : unitLabels[key as keyof typeof unitLabels]}</dt>
-        <dd>{key === "productId" ? products.find(row => row.id === value)?.name ?? value
-          : key === "dimension" ? dimensions[value as keyof typeof dimensions] : value || "Em branco"}</dd>
-      </Fragment>)}
-    </dl>;
+    return <DefinitionGrid items={Object.entries(values).map(([key,value]) => ({
+      label: key === "productId" ? "Produto" : unitLabels[key as keyof typeof unitLabels],
+      value: key === "productId" ? products.find(row => row.id === value)?.name ?? value : key === "dimension" ? dimensions[value as keyof typeof dimensions] : value || "Em branco",
+    }))} />;
   }
   return <RecordDrawer title={create ? "Nova unidade" : "Unidade base e precisão"}
     onClose={onClose} busy={editor.busy} preventClose={!!editor.pending}

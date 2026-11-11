@@ -1,5 +1,5 @@
 "use client";
-import { ActionButton, FormField, LoadingIndicator, SelectField, TextAreaField } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, FormField, LoadingIndicator, SelectField, TextAreaField } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 
@@ -56,21 +56,7 @@ function IdentityCard({
       <p>
         Nomes alternativos: {product.aliases.join(", ") || "Nenhum cadastrado"}.
       </p>
-      <dl>
-        {Object.entries(locations).map(([key, name]) => (
-          <div key={key}>
-            <dt>{name}</dt>
-            <dd>
-              {product.stock[key as keyof typeof locations] == null
-                ? "Consulta restrita ao seu acesso"
-                : formatQuantity(
-                    product.stock[key as keyof typeof locations]!,
-                    product.unit,
-                  )}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      <DefinitionGrid items={Object.entries(locations).map(([key,name]) => ({ label: name, value: product.stock[key as keyof typeof locations] == null ? "Consulta restrita ao seu acesso" : formatQuantity(product.stock[key as keyof typeof locations]!,product.unit) }))} />
       <details>
         <summary>Identidade preservada</summary>
         <p className="break-all">{product.product_id}</p>
@@ -212,11 +198,11 @@ export function CatalogueIdentityManagement({
         <CataloguePreparationFeedback editor={editor} onClose={onClose} outcomeText={identityOutcome}
           retryLabel="Recuperar mesma intenção" writable={writable}
           uncertaintyText="O resultado ainda não foi confirmado. A escolha, o motivo e a chave estão congelados. Consulte o comprovante ou recupere a mesma intenção."
-          compareFields={value => <dl className="hca-summary-grid wrap-anywhere">
-            <dt>Ato</dt><dd>{value.identityAction ? labels[value.identityAction] : "Em branco"}</dd>
-            <dt>Sucessor</dt><dd>{products.find(row => row.id === value.successorId)?.name ?? (value.successorId || "Sem sucessor")}</dd>
-            <dt>Motivo</dt><dd>{value.reason || "Em branco"}</dd>
-          </dl>} />
+          compareFields={value => <DefinitionGrid items={[
+            { label: "Ato", value: value.identityAction ? labels[value.identityAction] : "Em branco" },
+            { label: "Sucessor", value: products.find(row => row.id === value.successorId)?.name ?? (value.successorId || "Sem sucessor") },
+            { label: "Motivo", value: value.reason || "Em branco", wide: true },
+          ]} />} />
         {prepared ? (
           <section
             className="space-y-4"

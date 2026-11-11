@@ -4,7 +4,32 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.82
+## Incremento atual D3.83
+
+D3.83 conclui06.4 localmente: as12 composições de estoque, catálogo e
+consumo. Movimentos usam tabela/cartões; trânsito separa expedido, aceito,
+conciliado e pendente. Cadastro atual e fatos preservados na origem estão
+identificados. Catálogo mantém nomes alternativos e precisão; apresentações
+mantêm código e conversão exata. Relatos conservam texto integral, autoria
+original e decisões distintas de baixa. Revisões usam a grade compartilhada.
+Foram qualificados54 cenários distintos:42 aprovações iniciais inalteradas,
+oito da segunda rodada e quatro finais. Cinco larguras, axe completo, cores
+forçadas e movimento reduzido; capturas320 inspecionadas. Contraprovas de
+Auth, RLS, consulta incompleta, paginação, concorrência, recuperação e efeitos
+nativos continuam presentes. Corrigido alvo pequeno do link da origem e
+seletores antigos de células. Texto longo ganhou disposição móvel própria;
+o teste de teclado aguarda o botão habilitado antes de focar. Regras e
+timeouts preservados.
+Tipos e lint dos afetados passaram. Sem SQL novo; remoto207 reconciliado,
+dry-run vazio, sem alterações remotas. A própria CI ainda deve validar o
+SHA publicado.06.1–06.4 concluídos localmente; próximo06.5, arquivos,
+rascunhos e seções documentais; depois06.6, conferência conjunta.
+Etapa06 parcial95%; estimativa visual global80%, sem promover os105 critérios
+originais(57/48) ou18 estados UI. DOC-A/B/C/D continuam separados e pendentes,
+incluindo a nova regra do parecer BAL sem efeito de estoque. Produção NO-GO.
+[Resultados e limites](../audits/D/D-B/STOCK_CATALOGUE_CONSUMPTION_CANONICAL.md).
+
+## Incremento anterior D3.82
 
 D3.82 fechou06.3 localmente,no escopo das nove composições BAL/ESC. Contagem,
 referência e diferença usam a tabela/cartão canônica,com busca reversível e

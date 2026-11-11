@@ -1,4 +1,5 @@
 "use client";
+import { TableFrame } from "@/components/ui/table-frame";
 import Link from "next/link";
 import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, TextInput } from "@/components/ui/controls";
 import { useEffect, useState } from "react";
@@ -117,8 +118,8 @@ function Units({ context }: { context: WorkspaceContext }) {
           />
         </div>
         {!loaded && !error ? <Notice>Carregando unidades…</Notice> : null}
-        <div className="hca-records hca-table-container">
-          <DataTable className="hca-table" aria-label="Unidades base">
+        <TableFrame label="Unidades base">
+          <DataTable className="hca-table hca-mobile-records" aria-label="Unidades base">
             <DataTableHead>
               <DataTableRow>
                 <DataTableHeading>Unidade</DataTableHeading>
@@ -134,8 +135,8 @@ function Units({ context }: { context: WorkspaceContext }) {
                       <strong>{unit.name}</strong>
                       <small className="hca-cell-secondary">{unit.code}</small>
                     </DataTableCell>
-                    <DataTableCell>{unit.decimals} casa(s)</DataTableCell>
-                    <DataTableCell>
+                    <DataTableCell data-label="Precisão">{unit.decimals} casa(s)</DataTableCell>
+                    <DataTableCell data-label="Âmbito">
                       {unit.care_recipient_id ? "Paciente" : "Global"}
                     </DataTableCell>
                   </DataTableRow>
@@ -145,7 +146,7 @@ function Units({ context }: { context: WorkspaceContext }) {
           {loaded && !matches.length ? (
             <EmptyState title={units.length ? "Nenhuma unidade encontrada" : "Nenhuma unidade disponível"} />
           ) : null}
-        </div>
+        </TableFrame>
       </section>
       {editor ? <UnitPreparationEditor
         key={editor.mode}
