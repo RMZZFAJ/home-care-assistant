@@ -34,9 +34,9 @@ O banco remoto já recebeu as atualizações desta etapa, sem pendências.
 A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
-conclusão definidos. As etapas 01, 02, 03 e 07 estão concluídas localmente.
-A etapa 04 tem seis pontos. Os pontos 04.1 a 04.5 estão concluídos localmente
-no escopo declarado; o próximo é 04.6, balanço de estoque.
+conclusão definidos. As etapas 01, 02, 03, 04 e 07 estão concluídas localmente.
+Os seis pontos da etapa 04 estão fechados no escopo anterior. A próxima etapa
+é a 05, busca, filtros e históricos, começando por estoques e movimentos.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -666,11 +666,11 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    falhas preservam a leitura anterior e o preenchimento físico.
    Responsável — Codex.
 
-4. **04 — Estados e vínculos das fichas.** Em execução · 85%.
+4. **04 — Estados e vínculos das fichas.** Concluído localmente · 100%.
 
-   Para concluir — As seis verificações detalhadas abaixo estão fechadas,
-   incluindo
-   próxima providência, Andamentos e navegação entre os registros.
+   As seis verificações estão fechadas no escopo anterior, incluindo próxima
+   providência e navegação. Os novos PDFs, pareceres e demais mudanças do
+   complemento continuam nos blocos DOC-A a DOC-D; a revisão geral permanece.
    Responsável — Codex.
 
 5. **05 — Busca, filtros e históricos.** Em execução · 70%.
@@ -782,11 +782,10 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
     dependem de uso real, aparelhos, serviços ou autorização operacional.
     Responsável — Você, equipe e fornecedores.
 
-### Próxima etapa — 04, estados e vínculos das fichas
+### Etapa 04 concluída localmente — estados e vínculos das fichas
 
-Os pontos 04.1 a 04.5 estão concluídos no escopo declarado. Resta o ponto
-04.6, com seu próprio fechamento. As novas
-regras documentais estão identificadas em DOC-A a DOC-D.
+Os pontos 04.1 a 04.6 estão concluídos no escopo anterior. As novas regras
+documentais continuam identificadas em DOC-A a DOC-D.
 
 - **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.**
   Concluído localmente · 100% do escopo anterior. A orientação abre a seção
@@ -823,7 +822,30 @@ regras documentais estão identificadas em DOC-A a DOC-D.
   e recuperação após perda de resposta ou permissão foram conferidos.
   Responsável — Codex.
 - **04.6 — BAL — agendado, sem regime, revisão, reconto e contagens.**
-  Implementado; conferência conjunta pendente. Responsável — Codex.
+  Concluído localmente · 100% deste ponto. A orientação distingue revisão,
+  mudança de referência, efeito registrado, reconto e falta de contador.
+  Outra atribuição ativa não cria uma pendência nesta ficha. Recuperação,
+  autoria, contagem anterior e ausência de desconto repetido foram conferidas.
+  A nova regra que separa parecer e alteração de estoque continua em DOC-B.
+  Responsável — Codex.
+
+### Próxima etapa — 05, busca, filtros e históricos
+
+Estes são os dez pontos já previstos no plano fixo. O bloco está em execução,
+com estimativa de70%; seu fechamento ainda está pendente. Vou reaproveitar
+verificações anteriores válidas e corrigir as lacunas de cada lista.
+Responsável por todos os pontos — Codex.
+
+1. **05.1 — Estoques e movimentos.** Conferir páginas, filtros e histórico.
+2. **05.2 — Fichas e requisições.** Alcançar também fichas e pendências antigas.
+3. **05.3 — Compras e parcelas.** Conferir a busca e todas as parcelas.
+4. **05.4 — Entregas e transferências.** Percorrer as duas direções e estados.
+5. **05.5 — Consumo.** Conferir relatos antigos, busca e resultados completos.
+6. **05.6 — Agenda.** Conferir períodos e listagens permitidas.
+7. **05.7 — Catálogo e contas.** Conferir também o diretório global de contas.
+8. **05.8 — Notificações.** Alcançar avisos antigos e suas pendências.
+9. **05.9 — Propostas antigas.** Localizar propostas ainda sem decisão.
+10. **05.10 — Auditoria e históricos.** Conferir filtros, ordem e paginação.
 
 ### Escopo restante dos formulários — etapa 14
 

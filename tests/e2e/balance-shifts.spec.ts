@@ -340,6 +340,8 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   expect(pdf.ok()).toBe(true);
   expect((await pdf.body()).length).toBeGreaterThan(1000);
   await capture(page, "bal-conclusao-" + info.project.name, true);
+  await page.goto("/documentos/" + id);
+  await expect(page.getByRole("tabpanel")).toContainText("Acompanhar as revisões do balanço");
 });
 
 test("supervisão solicita adiamento, família decide e o prazo só muda após a aprovação", async ({

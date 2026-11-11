@@ -1,5 +1,17 @@
 # Checkpoint D-B
 
+D3.68 fechou localmente04.6 e os seis pontos fixos da etapa04 no escopo anterior.
+O BAL distingue revisão, referência, conciliação e reconto; atribuição ordinária
+ou de outro ciclo não gera pendência nesta ficha. Aprovação sem emissão/efeito
+comprovados não conclui contagem. Atualização/falha suspendem a orientação.
+Passaram12 unitários e24 cenários de produção nos três perfis, em uma coorte
+sem falhas ou repetições. Tipos, lint e inspeção/axe a320px passaram. Auth real,
+SQL independente, referência posterior, perda de leitura, recuperação e
+consumidores anteriores preservados. Sem SQL novo; dry-run remoto vazio em205.
+Próximo05.1; etapas01/02/03/04/07 fechadas localmente. Matriz56/49 preservada.
+Nova separação de parecer BAL/estoque e demais DOC-A/B/C/D continuam pendentes;
+CI própria e gates conjuntos permanecem. [Resultados](DOCUMENT_TABS_VALIDATION.json).
+
 D3.67 fechou localmente o ponto fixo04.5. O consumo distingue relato textual,
 complemento, decisão, falta/rejeição sem baixa e origem dos movimentos.
 Atualização/falha identifica a leitura anterior e suspende novas operações.

@@ -290,3 +290,56 @@ ainda exige os novos PDFs, o ajuste da criação cotidiana ENT e a apresentaçã
 das variantes em outras superfícies. Rascunhos simplificados, novos atos de
 cancelamento e demais DOC-A/B/C/D continuam separados; essas partes não são
 aprovadas pela existência do fluxo bilateral.
+
+## D3.68 — orientação factual do BAL e fechamento do ponto04.6
+
+Base697e103. O BAL passa a indicar preparação, revisão exigida, referência
+alterada ou indisponível, conciliação registrada, reconto designado, falta de
+designação e encerramento. A próxima providência abre e foca a seção real de
+Contagem e revisão ou Versões e integridade. Atualização, falha de consulta e
+operação aberta suspendem a orientação atual, usando os estados já existentes
+da ficha. Os dados preservados não são apresentados como nova confirmação.
+
+Uma conciliação comprovada permanece histórica após movimentos posteriores;
+uma contagem pendente com referência antiga não aparece conciliada. Aprovação
+sem protocolo ou aplicação comprovada não produz marco de contagem concluída.
+Designar reconto não equivale a contar novamente. O contexto nativo também
+pode trazer outra atribuição ativa do paciente: os marcos e a orientação agora
+exigem uma atribuição de reconto vinculada ao ciclo desta ficha, conferida
+contra a última atribuição desse ciclo. Uma tarefa ordinária ou de outro ciclo
+não cria pendência de reconto neste BAL.
+
+Passaram12 unitários distintos e24 cenários de navegador nos três perfis,
+em uma única coorte com build de produção e fontes congelados, sem falhas,
+repetições ou casos ignorados. O primeiro conjunto tinha11 unitários; o caso
+de outra atribuição foi acrescentado antes da coorte e o conjunto final12
+passou. Tipos e lint dirigido passaram. O tipo opcional do rótulo compartilhado
+foi ajustado antes da coorte; não houve alteração de comportamento posterior.
+
+Os casos novos usam Auth real e saldo real do banco local guardado. Uma entrada
+posterior invalida a referência pendente e preserva o efeito já conciliado.
+SQL independente compara documento, eventos, pareceres e todos os movimentos
+do paciente; GETs, troca de aba e ativação do atalho por teclado não os alteram
+nem enviam operação oficial. Delay/falha503 suspendem a orientação; recuperação
+restabelece a consulta. A revogação real de bal.read produz403 e remove a ficha.
+Axe e overflow a320px passaram para revisão exigida e facultativa, nos três
+perfis; os dois avisos Chromium foram inspecionados sem cortes.
+
+Os consumidores anteriores conservam seus oráculos: parecer facultativo com
+resposta perdida/revogação sem nova baixa, referência alterada com adoção
+explícita, substituição Juliana→Sheila, reconto sem contador, reconto facultativo
+legado sem semanas inventadas e contagem agendada em duas etapas com resposta
+perdida e PDF. Foram acrescentadas verificações das orientações reais, sem
+retirar asserções de autoria, referência, recuperação, conciliação ou estoque.
+As relações BAL de contagem, revisão, designação, retorno à ficha e PDF da
+versão original foram conferidas; isso não aprova todas as171 relações globais.
+Adiamento/configuração conservam seus contratos e pacotes anteriores, sem
+mudança desses formulários, APIs ou banco neste incremento.
+
+Sem SQL novo; dry-run remoto vazio em205. Os seis pontos04.1–04.6 da etapa04
+ficam qualificados localmente no escopo anterior. Próximo05.1, estoques e
+movimentos na conferência das listas. Os105 critérios mantêm56 PASS locais e
+49 PARTIAL; a CI do novo SHA e a revisão conjunta continuam necessárias.
+DOC-B conserva10%: a nova separação de parecer BAL e efeito de estoque ainda
+exige implementação própria. DOC-A/C/D, PDFs novos, cancelamento, rascunhos
+simplificados, aparência integral e demais gates permanecem nas etapas próprias.

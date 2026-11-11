@@ -56,6 +56,7 @@ import { DocumentMilestones } from "@/components/documents/document-milestones";
 import { DocumentNextStep } from "@/components/documents/document-next-step";
 import { supplyMilestones } from "@/lib/documents/milestones";
 import { purchaseFollowUp } from "@/lib/documents/purchase-follow-up";
+import { balanceFollowUp } from "@/lib/documents/balance-follow-up";
 import { deliveryFollowUp } from "@/lib/documents/delivery-follow-up";
 import { materialTransferDirection, materialTransferLabel, transferFollowUp } from "@/lib/documents/transfer-follow-up";
 import { DocumentProgress } from "./document-progress";
@@ -391,7 +392,8 @@ export function SupplyDocumentContent({
   const deliveryStep = data?.type === "ENT"
     ? data.transfer ? transferFollowUp(data) : deliveryFollowUp(data,
       materialTransferDirection(data.payload.source, data.payload.destination) === "return" ? "return" : "delivery") : null;
-  const followUpStep = purchaseStep ?? deliveryStep;
+  const balanceStep = data?.type === "BAL" ? balanceFollowUp(data) : null;
+  const followUpStep = purchaseStep ?? deliveryStep ?? balanceStep;
   const operationOpen = Boolean(action || review || uncertain || regularizationEditing || balanceReviewEditing || transferEditing);
   const allowed = (cap: string) => Boolean(activeContext && can(context, cap));
   const actions: DocumentAction[] = [];

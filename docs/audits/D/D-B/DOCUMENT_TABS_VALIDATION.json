@@ -1786,5 +1786,97 @@
       "human/physical/provider/operational gates distinct",
       "owner-deferred Sonar"
     ]
+  },
+  "D3.68": {
+    "baseSha": "697e103a004954e98eae81f02a74aa583df78534",
+    "scope": "Fixed04.6 BAL:scheduled/no-regime,review,reference,recount and physical-count facts;fixed original stage04 closure",
+    "unit": {
+      "distinctPassed": 12,
+      "files": [
+        "tests/balance-follow-up.test.ts",
+        "tests/document-milestones.test.ts"
+      ],
+      "qualification": "11initial passed;new cross-cycle and ordinary-assignment contraproof added;final12passed,not23distinct"
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "cohort": {
+        "startTime": "2026-11-11T07:14:46.667Z",
+        "duration": 361998.59599999996,
+        "expected": 24,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 24,
+      "executions": 24,
+      "failures": 0,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "report": "output/phase-d-work/ui-canonical/balance-follow-up-qualified.json",
+      "frozenSources": true
+    },
+    "proofs": [
+      "Native required BAL waits for review;optional applied BAL is reconciled;reader/count author does not gain reviewer eligibility",
+      "Real subsequent ENT credit invalidates pending reference without changing original BAL/reviews;already applied optional BAL remains historically reconciled",
+      "Required and optional read delay503 suspend current next-step;recovery restores it;actual bal.read revocation403 removes ficha",
+      "GET,tab navigation and next-step keyboard activation preserve independent raw document,events,reviews and all patient stock movements;no operational POST",
+      "Active recount must have kind=recount and cycle matching this documents lastAssignment;another cycle or ordinary count cannot mark it pending",
+      "Protocol-less approval/application does not produce a completed-count milestone;draft/terminal/missing reference handled without invented facts",
+      "Existing optional review response-loss/revocation,stale-reference explicit adoption,succession Juliana→Sheila,unassigned recovery,legacy optional recount and scheduled two-step/lost-response/PDF consumers pass with original business assertions"
+    ],
+    "relations": {
+      "scope": "BAL task relations and links;not all171 global relations",
+      "checked": [
+        "count→review→document",
+        "document overview→review tab and focus",
+        "review→recount designation→follow-up",
+        "scheduled and legacy recount→new physical count→document",
+        "count history→original version PDF"
+      ],
+      "unchangedDependencies": "BAL deferral/configuration/private authority contracts remain covered by their earlier scoped packages;no changes to those forms,API or DB"
+    },
+    "validation": {
+      "typecheck": "PASS after optional shared statusLabel typing",
+      "directedEslint": "PASS",
+      "axeOverflow": "320px required/optional across3profiles;original consumer width/focus checks retained",
+      "visual": "required Chromium320 next-step inspected;no clipping;full visual comparison remains step06",
+      "reactReview": "derived helper and shared existing banner/tabs;no new requests,effects,dependencies or authorization decisions"
+    },
+    "remote": {
+      "project": "qwfrqychokvhdzakibid",
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "stage04": "CONCLUIDO_LOCAL",
+      "completedCheckpoints": [
+        "04.1",
+        "04.2",
+        "04.3",
+        "04.4",
+        "04.5",
+        "04.6"
+      ],
+      "nextCheckpoint": "05.1"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "Stage04 closes prior fixed scope;new BAL opinion/stock separation still DOC-B,not implemented here",
+      "DOC-B10percent;DOC-A/C/D pending;new PDFs not approved by old generator regression",
+      "Original105 statuses and canonical columns preserved;full171 links and46operational compositions remain other stages",
+      "No new SQL,merge,production release,external activation or relaxed rules",
+      "Human/AT/physical/provider/operational gates remain distinct;Sonar owner-deferred"
+    ]
   }
 }

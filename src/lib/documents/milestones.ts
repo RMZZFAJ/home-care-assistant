@@ -1,5 +1,6 @@
 import { quantity } from "@/lib/quantity";
 import type { SupplyDocument } from "@/types/documents";
+import { currentBalanceRecount } from "./balance-follow-up";
 export type DocumentMilestone = {
   label: string;
   state: "done" | "pending" | "unknown" | "waived" | "closed";
@@ -28,7 +29,7 @@ type MilestoneFacts = Pick<
   balanceRecount?: Pick<
     NonNullable<SupplyDocument["balanceRecount"]>,
     "activeAssignment" | "requiresDesignation"
-  >;
+  > & Partial<Pick<NonNullable<SupplyDocument["balanceRecount"]>, "lastAssignment">>;
   transfer?: Pick<NonNullable<SupplyDocument["transfer"]>, "state" | "agreement">;
 };
 
@@ -263,12 +264,13 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
   const counted =
     Boolean(data.protocol) && ["submitted", "approved"].includes(data.status);
   const recountPending = Boolean(
-    data.balanceRecount?.activeAssignment ||
+    currentBalanceRecount(data.balanceRecount) ||
       data.balanceRecount?.requiresDesignation,
   );
   // Approval and reconciliation are separate facts. A later movement does not
   // undo a recorded reconciliation, but a new recount prevents finality.
   const complete =
+    counted &&
     data.status === "approved" &&
     review?.reconciliationApplied === true &&
     !recountPending;

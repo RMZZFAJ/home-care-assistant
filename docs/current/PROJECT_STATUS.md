@@ -4,7 +4,21 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.67
+## Incremento atual D3.68
+
+O BAL tem orientação própria para revisão, referência alterada, conciliação e
+reconto. Uma atribuição de outro ciclo não aparece como pendência desta ficha;
+aprovação sem emissão/efeito comprovados não conclui a contagem. Passaram12
+unitários e24 cenários de produção nos três perfis, sem falhas ou repetições.
+Tipos, lint, inspeção visual e axe a320px passaram. As recuperações, autorias,
+contagens agendadas/legadas e PDFs existentes conservam seus oráculos.
+Sem SQL novo; dry-run remoto vazio em205. Etapa04 fechada localmente em seus
+seis pontos anteriores; próximo05.1. A matriz mantém56 PASS locais/49 PARTIAL.
+Nova separação parecer BAL/estoque e demais DOC-A/B/C/D continuam pendentes.
+CI do novo SHA e demais gates continuam necessários.
+[Implementação e limites](../audits/D/D-B/DOCUMENT_TABS.md).
+
+## Incremento anterior D3.67
 
 O consumo identifica relato, complemento, decisão e origem dos descontos,
 sem tratar falta ou rejeição como baixa. Atualização/falha marca a consulta
