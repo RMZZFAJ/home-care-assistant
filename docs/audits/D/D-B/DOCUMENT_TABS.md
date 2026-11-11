@@ -168,3 +168,65 @@ O complemento DOC-A/B/C/D conserva seus resultados próprios pendentes; este
 ponto não implementa a nova aparência dos PDFs, os novos atos de cancelamento
 ou a simplificação dos rascunhos. Os ensaios móveis são emulação; gates humanos,
 de aparelho real, provedores e operação permanecem nas etapas correspondentes.
+
+## D3.65 — conferência e conciliação das entregas
+
+Base c57c613. O ponto fixo 04.3 distingue preparação, conferência pessoal,
+divergência, pedido de cancelamento, referências de conciliação, proposta de
+regularização e encerramento administrativo. Material físico ainda desconhecido
+mantém orientação própria mesmo depois do encerramento administrativo. Uma
+proposta não vira decisão e outra pessoa não substitui o aceite pessoal do
+recebedor indisponível. O atalho seleciona e foca Atendimento ou Versões e
+integridade conforme o registro preservado, sem executar comando.
+
+O estado nativo confirmed também pode resultar da conciliação de uma parcela
+como devolvida ou faltante. O marco Recebimento deixava de considerar essa
+distinção e aparecia satisfeito só pelo estado. Agora recebimento integral
+exige todas as linhas integralmente conferidas e emissão comprovada. Uma
+conferência encerrada com diferenças tem identificação própria. A parte
+devolvida ou faltante não é quantidade recebida. O vínculo REQ conserva o
+atendimento já sustentado pela parcela aceita, sem exigir quantidade que a
+REQ não define. Ausência da
+referência integral permanece desconhecida. Quantidades aceitas e seus autores,
+expedição, vínculos e movimentos preservam os contratos existentes.
+
+A orientação ENT identifica leitura antiga após falha, fica suspensa enquanto
+uma operação está aberta e transfere foco ao seguir sua aba. Transferências
+ainda sem expedição conservam o fluxo próprio do ponto 04.4. A conciliação de
+uma parcela não recebida desta ENT continua sendo fato desta expedição; não
+implementa nem substitui a devolução autônoma equipe→família do complemento.
+
+Passaram 24 unitários em três arquivos, tipos e lint dirigido. A primeira
+coorte de produção teve 21 aprovações e seis falhas, correspondentes aos mesmos
+dois cenários nos três perfis. Um consumidor antigo ainda buscava literalmente
+o texto anterior do cabeçalho de cancelamento. O caso novo esperava apenas um
+item REQ atendido, embora ambos tivessem quantidade aceita positiva. A REQ não
+define quantidade solicitada; receber parte da expedição pode atender seu item.
+A expectativa foi corrigida para 0→2→2: antes do aceite, depois do aceite parcial
+e depois da devolução da parte não recebida. O teste do consumidor passou a
+buscar o texto atual, conservando as verificações de autoria, conciliação,
+consumo, recuperação e estoque. Nenhum contrato de atendimento foi alterado.
+Relatório, screenshots e contextos das seis falhas foram preservados.
+
+A repetição restrita aos seis casos passou nos três perfis. Dez unitários do
+helper afetado passaram novamente, sem somá-los como novos testes. No conjunto,
+27 cenários distintos de navegador qualificados: 33 execuções, 27 aprovações
+e seis falhas iniciais de expectativa. A orientação confirmada com diferenças
+foi a única ramificação do helper ajustada após a coorte, para explicitar a
+independência do atendimento REQ; foi exercitada na repetição dirigida.
+
+As comparações SQL independentes confirmam que leitura, navegação e atualização
+não alteram ficha, linhas, eventos, regularizações ou ledger. A coorte abrange
+vínculo REQ, aceites, devolução da parte não recebida, cancelamento com trânsito,
+falha503 e recuperação, proposta independente, parcela desconhecida, apuração
+posterior, retomada de conciliação decimal e compatibilidade COM. Conserva os
+consumidores existentes de cancelamento com consumo, confirmação perdida e
+PDFs, além do dossiê administrativo. A caixa de entregas conserva seu contrato;
+o caso de apuração futura percorre a tarefa real até a ficha.
+
+Tipos e lint passaram. Axe/overflow e o cabeçalho com diferenças a320px foram
+conferidos, incluindo inspeção visual do exemplar Chromium. Sem alteração de
+banco, contratos de comando ou permissões; dry-run remoto vazio em205. Ponto
+04.3 qualificado no escopo declarado; próximo04.4. CI do novo SHA necessária.
+DOC-A/B/C/D, incluindo devolução autônoma, novos atos de cancelamento,
+aparência documental e retomada simplificada, conservam implementação pendente.

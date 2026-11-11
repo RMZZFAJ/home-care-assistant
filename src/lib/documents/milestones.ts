@@ -205,7 +205,9 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
       },
     ];
   }
-  if (data.type === "ENT")
+  if (data.type === "ENT") {
+    const fullReceipt = Boolean(data.protocol) && data.totalLines > 0 && data.fullyCheckedLines === data.totalLines;
+    const differences = data.totalLines > 0 && data.fullyCheckedLines >= 0 && data.fullyCheckedLines < data.totalLines;
     return [
       issued,
       {
@@ -218,8 +220,10 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
       {
         label: "Recebimento",
         state:
-          data.status === "confirmed" ? "done" : closed ? "unknown" : "pending",
-        detail: `${data.fullyCheckedLines}/${data.totalLines} linhas integralmente conferidas${closed ? "; histórico físico preservado" : ""}`,
+          data.status === "confirmed"
+            ? fullReceipt ? "done" : differences ? "closed" : "unknown"
+            : closed ? "unknown" : "pending",
+        detail: `${data.fullyCheckedLines}/${data.totalLines} linhas integralmente conferidas${closed ? "; histórico físico preservado" : data.status === "confirmed" && !fullReceipt ? differences ? "; diferenças conciliadas não são recebimento" : "; referência integral indisponível" : ""}`,
         percent: closed
           ? undefined
           : linePercent(data.fullyCheckedLines, data.totalLines),
@@ -237,10 +241,11 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
             : data.status === "cancelled"
               ? "Cancelamento formal registrado"
               : data.status === "confirmed"
-                ? "Recebimento confirmado"
+                ? fullReceipt ? "Recebimento confirmado" : differences ? "Conferência e conciliação concluídas" : "Conclusão registrada; recebimento integral não comprovado"
                 : "Consulte o aceite e eventuais divergências",
       },
     ];
+  }
   if (data.type !== "BAL") return [issued];
   const review = data.balanceReview;
   const counted =

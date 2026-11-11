@@ -1597,5 +1597,100 @@
       "physical-device/human/provider/operational gates distinct",
       "owner-deferred Sonar"
     ]
+  },
+  "D3.65": {
+    "baseSha": "c57c61360a4567571e5e76bdc0bf18087146929a",
+    "scope": "04.3 ENT states,next-step,links,receipt,reconciliation,cancellation and regularization;original scoped local closure",
+    "unit": {
+      "files": [
+        "tests/delivery-follow-up.test.ts",
+        "tests/document-milestones.test.ts",
+        "tests/purchase-follow-up.test.ts"
+      ],
+      "distinctPassed": 24,
+      "affectedHelperFinalPassed": 10,
+      "repeatedNotAdded": true
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "cohort": {
+        "startTime": "2026-11-11T05:02:17.181Z",
+        "duration": 471712.81,
+        "expected": 21,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "directedFinal": {
+        "startTime": "2026-11-11T05:11:29.004Z",
+        "duration": 155309.647,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 27,
+      "executions": 33,
+      "passes": 27,
+      "initialFailures": 6,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "reports": [
+        "output/phase-d-work/ui-canonical/delivery-follow-up-qualified.json",
+        "output/phase-d-work/ui-canonical/delivery-follow-up-final.json"
+      ],
+      "originalFailures": "output/phase-d-work/ui-canonical/delivery-follow-up-initial-failures"
+    },
+    "expectationCorrections": [
+      "Old cancellation consumer expected the replaced unconditional receipt-preservation header text;assertion updated to actual factual text without weakening its authorship,consumption,recovery or stock checks",
+      "New test assumed full expedition receipt was required for REQ item fulfillment;native contract requires positive accepted linked quantity and no requested quantity.Oracle corrected0→2→2(before receipt,after partial receipt,after returning unreceived remainder);no business-rule change"
+    ],
+    "scopeReuse": "Only two scenarios repeated after the header expectation/native fulfillment oracle corrections and the confirmed-with-differences description clarification;other21passing scenarios exercise unchanged branches",
+    "proofs": [
+      "Confirmed delivery after returned/missing reconciliation does not show full receipt milestone;complete receipt still distinct",
+      "REQ linked positive receipt fulfillment remains independent from receipt-integral progress and returned remainder",
+      "Next-step keyboard navigation selects and focuses the real workflow/history tab;no browser API writes",
+      "Pending cancellation preserves accepted quantities and requires transit reconciliation before personal consent",
+      "503 retains identified last read and suppresses current next-step;valid GET restores guidance",
+      "Unavailable recipient leads to administrative process,not substitute personal receipt",
+      "Pending independent proposal does not mutate stock;approved unknown remainder stays in transit and guidance remains pending",
+      "Independent SQL snapshots of documents,lines,events,regularizations and stock unchanged by browser-only reading/navigation",
+      "Original cancellation with consumption/lost-response recovery/PDF,independent P05 dossier/future findings,decimal draft recovery,C-FINAL023 and COM consumers retained"
+    ],
+    "validation": {
+      "typecheck": "PASS",
+      "directedEslint": "PASS",
+      "newAxeOverflow": "320px all3profiles on confirmed differences",
+      "visual": "fresh Chromium320 header inspected;status,counts and independent milestones fit without clipping"
+    },
+    "remote": {
+      "project": "qwfrqychokvhdzakibid",
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "completedCheckpoints": [
+        "04.1",
+        "04.2",
+        "04.3"
+      ],
+      "nextCheckpoint": "04.4"
+    },
+    "limits": [
+      "own published SHA CI required",
+      "04.4–04.6 and full UI parity remain",
+      "autonomous CARE_TEAM→FAMILY return,new cancellation acts and DOC-A/B/C/D still pending",
+      "physical/human/provider/operational gates distinct",
+      "owner-deferred Sonar"
+    ]
   }
 }

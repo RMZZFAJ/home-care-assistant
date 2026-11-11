@@ -56,6 +56,7 @@ import { DocumentMilestones } from "@/components/documents/document-milestones";
 import { DocumentNextStep } from "@/components/documents/document-next-step";
 import { supplyMilestones } from "@/lib/documents/milestones";
 import { purchaseFollowUp } from "@/lib/documents/purchase-follow-up";
+import { deliveryFollowUp } from "@/lib/documents/delivery-follow-up";
 import { DocumentProgress } from "./document-progress";
 import {
   PurchaseDetails,
@@ -386,6 +387,9 @@ export function SupplyDocumentContent({
   const purchaseStep = data?.type === "COM" ? purchaseFollowUp({
     status: data.status, origin: data.payload.origin, progress: data.purchaseProgress,
   }) : null;
+  const deliveryStep = data?.type === "ENT" && (!data.transfer || data.transfer.state === "dispatched")
+    ? deliveryFollowUp(data) : null;
+  const followUpStep = purchaseStep ?? deliveryStep;
   const operationOpen = Boolean(action || review || uncertain || regularizationEditing || balanceReviewEditing || transferEditing);
   const allowed = (cap: string) => Boolean(activeContext && can(context, cap));
   const actions: DocumentAction[] = [];
@@ -868,7 +872,7 @@ export function SupplyDocumentContent({
                 ? (data.purchaseProgress?.state ?? data.status)
                 : data.status
             }
-            statusLabel={purchaseStep?.statusLabel}
+            statusLabel={followUpStep?.statusLabel}
             protocol={data.protocol}
             version={data.version}
             createdAt={data.created_at}
@@ -906,9 +910,11 @@ export function SupplyDocumentContent({
                 </p>
                 <p className="text-xs text-(--muted)">
                   {data.status === "cancelled"
-                    ? "O histórico preserva o recebimento. Consulte abaixo as devoluções e o consumo conciliados no cancelamento."
+                    ? "Os fatos anteriores permanecem preservados. Consulte as devoluções e o consumo efetivamente conciliados, quando existentes."
                     : data.status === "administratively_closed"
-                      ? "Recebimento pessoal preservado. O dossiê distingue os efeitos administrativos comprovados da parcela física ainda desconhecida."
+                      ? "O aceite pessoal, quando existente, permanece preservado. O dossiê distingue os efeitos administrativos comprovados da parcela física ainda desconhecida."
+                      : data.status === "confirmed"
+                        ? "Conferência encerrada. Consulte as quantidades aceitas e os atos próprios de conciliação; devolução e falta não são recebimento."
                       : "Quantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal."}
                 </p>
               </div>
@@ -933,26 +939,26 @@ export function SupplyDocumentContent({
             auditAllowed={can(context, "audit.read")}
           >
             <DocumentPanel value="overview">
-              {purchaseStep && (loading || readFailed || operationOpen) ? (
+              {followUpStep && (loading || readFailed || operationOpen) ? (
                 <Notice>
                   {operationOpen
                     ? "Sua operação está preservada na versão de trabalho. Conclua ou feche a operação para consultar a próxima providência atual."
                     : loading
-                      ? "Atualizando o acompanhamento da aquisição…"
+                      ? "Atualizando o acompanhamento da ficha…"
                       : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
                   {" "}Os dados preservados não representam uma nova confirmação.
                 </Notice>
               ) : <DocumentNextStep
                 label={
-                  purchaseStep
-                    ? purchaseStep.label
+                  followUpStep
+                    ? followUpStep.label
                     : data.type === "BAL"
                       ? "Contagem e revisão"
                       : "Atendimento e decisões"
                 }
-                heading={purchaseStep?.heading}
-                description={purchaseStep?.description}
-                pending={purchaseStep?.pending ?? (
+                heading={followUpStep?.heading}
+                description={followUpStep?.description}
+                pending={followUpStep?.pending ?? (
                   data.status === "draft" ||
                   data.status === "pending_receipt" ||
                   data.status === "disputed" ||
@@ -971,7 +977,7 @@ export function SupplyDocumentContent({
                       data.balanceRecount?.requiresDesignation,
                   )
                 )}
-                onOpen={() => tabs.select(purchaseStep?.section ?? "workflow", Boolean(purchaseStep))}
+                onOpen={() => tabs.select(followUpStep?.section ?? "workflow", Boolean(followUpStep))}
               />}
               <DocumentProgress
                 actionTarget={progressActionTarget}

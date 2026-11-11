@@ -35,8 +35,8 @@ A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03 e 07 estão concluídas localmente.
-A etapa 04 tem seis pontos. Os pontos 04.1 e 04.2 estão concluídos localmente
-no escopo declarado; o próximo é 04.3, entregas.
+A etapa 04 tem seis pontos. Os pontos 04.1, 04.2 e 04.3 estão concluídos
+localmente no escopo declarado; o próximo é 04.4, transferências.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -780,8 +780,8 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
 
 ### Próxima etapa — 04, estados e vínculos das fichas
 
-Os pontos 04.1 e 04.2 estão concluídos no escopo declarado. Restam os pontos
-04.3 a 04.6. Cada um terá seu próprio fechamento, mantendo esta lista. As novas
+Os pontos 04.1, 04.2 e 04.3 estão concluídos no escopo declarado. Restam os
+pontos 04.4 a 04.6. Cada um terá seu próprio fechamento. As novas
 regras documentais estão identificadas em DOC-A a DOC-D.
 
 - **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.**
@@ -798,7 +798,12 @@ regras documentais estão identificadas em DOC-A a DOC-D.
   conferidas. Os novos PDFs e regras do complemento continuam nos blocos
   DOC-A a DOC-D. Responsável — Codex.
 - **04.3 — Entrega — conferência, divergência, devolução e regularização.**
-  Implementado; conferência conjunta pendente. Responsável — Codex.
+  Concluído localmente · 100% deste ponto. Encerrar a conferência com uma
+  diferença não aparece como recebimento integral. Cancelamento, divergência,
+  regularização e material ainda desconhecido têm orientações distintas.
+  Quantidades aceitas, autoria, vínculos e recuperação foram conferidos.
+  A nova devolução autônoma e os novos atos do complemento continuam no
+  bloco DOC-B. Responsável — Codex.
 - **04.4 — Transferências — origem, destino, aceite e encerramento.**
   Implementado; conferência conjunta pendente. Responsável — Codex.
 - **04.5 — Consumo — relato, complemento, decisão e origem do desconto.**

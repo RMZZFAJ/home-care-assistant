@@ -1,5 +1,19 @@
 # Checkpoint D-B
 
+D3.65 fechou localmente o ponto fixo 04.3 no escopo declarado da ENT.
+Conferência encerrada com diferenças não equivale a recebimento integral.
+O atendimento REQ conserva a parcela aceita, sem quantidade solicitada
+presumida. A orientação distingue divergência, cancelamento, proposta de
+regularização e material ainda em trânsito após encerramento administrativo.
+Passaram 24 unitários distintos e 27 cenários distintos de navegador nos
+três perfis: 21 na coorte inicial e seis em repetição dirigida, após corrigir
+texto esperado e uma premissa indevida do teste sobre atendimento REQ. As seis
+falhas originais estão preservadas. Tipos, lint e conferência visual a320px
+aprovados. Sem SQL novo; dry-run remoto vazio em205. CI do novo SHA necessária.
+Pontos 04.1/04.2/04.3 qualificados; próximo04.4, transferências. Permanecem
+56 PASS locais/49 PARTIAL e DOC-A/B/C/D pendentes, inclusive a devolução autônoma
+e os novos atos de cancelamento. [Resultados](DOCUMENT_TABS_VALIDATION.json).
+
 D3.64 fechou localmente o ponto fixo 04.2 no escopo de estados da COM.
 Preparação/aprovação não aparecem concluídas por totais zerados; a orientação
 distingue aquisição, chegada, parcela pendente/rejeitada, expectativa

@@ -4,7 +4,21 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.64
+## Incremento atual D3.65
+
+A ENT distingue recebimento integral de conferência encerrada com diferenças.
+O atendimento REQ já sustentado pela quantidade aceita não é desfeito pela
+devolução da parte não recebida. Cancelamento, regularização independente e
+parcela física desconhecida têm orientação própria, com foco na aba correta.
+Passaram 24 unitários distintos e 27 cenários distintos de navegador, por
+coorte e repetição dirigida de seis casos após correções nas expectativas.
+As falhas originais estão preservadas. Tipos, lint e inspeção a320px passaram.
+Sem SQL novo; dry-run remoto vazio. CI do novo SHA ainda necessária.
+Ponto 04.3 qualificado localmente no escopo declarado; próximo04.4.
+DOC-A/B/C/D, incluindo a devolução autônoma e os novos PDFs, continuam pendentes.
+[Implementação e limites](../audits/D/D-B/DOCUMENT_TABS.md).
+
+## Incremento anterior D3.64
 
 Compra e doação têm orientação específica para preparação, aprovação,
 aquisição, chegada, conferência de parcelas, expectativa encerrada e histórico.

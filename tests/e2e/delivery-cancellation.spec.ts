@@ -289,7 +289,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
     expect(final.status).toBe("cancelled");
     await expect(
       recipient.getByText(
-        "O histórico preserva o recebimento. Consulte abaixo as devoluções e o consumo conciliados no cancelamento.",
+        "Os fatos anteriores permanecem preservados. Consulte as devoluções e o consumo efetivamente conciliados, quando existentes.",
         { exact: true },
       ),
     ).toBeVisible();
