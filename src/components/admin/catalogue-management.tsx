@@ -1,34 +1,25 @@
 "use client";
-import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
-import { useRef, useState, type ReactNode } from "react";
+import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, Pill, SelectField, TextInput } from "@/components/ui/controls";
+import { useRef, useState } from "react";
 
-import { Notice } from "@/components/workspace";
 import { EmptyState, Icon } from "@/components/ui/primitives";
-import { RecordDrawer } from "@/components/forms/record-drawer";
-import { Field, Check, text, bool, type Row } from "./admin-fields";
+import { CataloguePreparationEditor } from "./catalogue-preparation-editor";
+import { text, bool, type Row } from "./admin-fields";
 import { CatalogueIdentityManagement } from "@/components/catalog/catalogue-identity-management";
 
 export function CatalogueManagement({
   writable,
   rows,
-  templates,
-  save,
-  busy,
-  error,
-  recovery,
-  confirmationRevision = 0,
+  userId,
+  globalMode,
   loading,
   patientId,
   onIdentitySaved,
 }: {
   writable: boolean;
   rows: Row[];
-  templates: Row[];
-  save: (payload: Row, message: string) => Promise<unknown>;
-  busy: boolean;
-  error: string;
-  recovery?: ReactNode;
-  confirmationRevision?: number;
+  userId: string;
+  globalMode: boolean;
   loading: boolean;
   patientId: string;
   onIdentitySaved: (message: string) => Promise<void>;
@@ -46,9 +37,7 @@ export function CatalogueManagement({
     mode: "product" | "model";
     opener: HTMLElement;
   };
-  const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
-  const editor = editorState?.revision === confirmationRevision ? editorState : null;
-  const setEditor = (value: Editor | null) => setEditorState(value ? { ...value, revision: confirmationRevision } : null);
+  const [editor, setEditor] = useState<Editor | null>(null);
   const active = (row: Row) =>
     bool(row, "is_active", bool(row, "active", true));
   const filtered = rows.filter(
@@ -64,7 +53,6 @@ export function CatalogueManagement({
         .toLocaleLowerCase("pt-BR")
         .includes(search.toLocaleLowerCase("pt-BR")),
   );
-  const editing = editor?.row;
   return (
     <section>
       <div className="hca-section-heading">
@@ -240,142 +228,18 @@ export function CatalogueManagement({
             </nav>
           ) : null}
           {editor ? (
-            <RecordDrawer
-              title={
-                editor.mode === "model"
-                  ? "Adotar modelo existente"
-                  : editing
-                    ? "Editar item"
-                    : "Adicionar item exclusivo deste paciente"
-              }
-              busy={busy}
-              recovery={recovery}
+            <CataloguePreparationEditor
+              key={JSON.stringify([userId, patientId, globalMode, editor.mode, editor.row?.id])}
+              patientId={patientId}
+              userId={userId}
+              mode={globalMode ? "global" : "patient"}
+              purpose={editor.mode === "model" ? "adopt" : editor.row ? "edit" : "create"}
+              targetId={editor.row ? text(editor.row, "id") : null}
+              opener={editor.opener}
+              headingRef={headingRef}
               onClose={() => setEditor(null)}
-              restoreFocusTo={editor.opener}
-              restoreFocusFallbackRef={headingRef}
-            >
-              {error ? <Notice error>{error}</Notice> : null}
-              {editor.mode === "model" ? (
-                <form
-                  className="hca-form"
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    const result = await save(
-                      {
-                        action: "adoptProduct",
-                        productId: new FormData(event.currentTarget).get(
-                          "productId",
-                        ),
-                      },
-                      "Modelo adicionado ao catálogo deste paciente.",
-                    );
-                    if (result) setEditorState(current => current === editor ? null : current);
-                  }}
-                >
-                  <p>A cópia será editável apenas neste paciente.</p>
-                  <FormField label="Produto modelo">
-                    <SelectField name="productId" required>
-                      <option value="">Selecione</option>
-                      {templates.map((row) => (
-                        <option key={text(row, "id")} value={text(row, "id")}>
-                          {text(row, "name")} · {text(row, "unit")}
-                        </option>
-                      ))}
-                    </SelectField>
-                  </FormField>
-                  <ActionButton variant="primary" disabled={busy} type="submit">
-                    Adotar modelo
-                  </ActionButton>
-                </form>
-              ) : (
-                <form
-                  className="hca-form"
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    const data = new FormData(event.currentTarget);
-                    const result = await save(
-                      {
-                        action: "product",
-                        id: editing ? text(editing, "id") : null,
-                        name: data.get("name"),
-                        category: data.get("category"),
-                        unit: data.get("unit"),
-                        description: data.get("description"),
-                        aliases: String(data.get("aliases") ?? "")
-                          .split(",")
-                          .map((alias) => alias.trim())
-                          .filter(Boolean),
-                        sortOrder: Number(data.get("sortOrder")),
-                        isActive: data.has("isActive"),
-                      },
-                      "Item salvo e auditado.",
-                    );
-                    if (result) setEditorState(current => current === editor ? null : current);
-                  }}
-                >
-                  <Field
-                    name="name"
-                    label="Nome"
-                    value={editing ? text(editing, "name") : ""}
-                    required
-                  />
-                  <FormField label="Categoria">
-                    <SelectField
-                      name="category"
-                      defaultValue={
-                        editing ? text(editing, "category") : "medicamentos"
-                      }
-                    >
-                      <option value="medicamentos">Medicamentos</option>
-                      <option value="higiene">Higiene</option>
-                      <option value="dieta">Dieta</option>
-                    </SelectField>
-                  </FormField>
-                  <Field
-                    name="unit"
-                    label="Unidade"
-                    value={editing ? text(editing, "unit") : "unidade"}
-                    required
-                  />
-                  <Field
-                    name="aliases"
-                    label="Nomes alternativos, separados por vírgula"
-                    value={
-                      editing && Array.isArray(editing.aliases)
-                        ? editing.aliases.join(", ")
-                        : ""
-                    }
-                  />
-                  <Field
-                    name="description"
-                    label="Descrição operacional"
-                    value={editing ? text(editing, "description") : ""}
-                  />
-                  <Field
-                    name="sortOrder"
-                    label="Ordem"
-                    type="number"
-                    min={0}
-                    max={1_000_000}
-                    step={1}
-                    required
-                    value={editing ? Number(editing.sort_order ?? 0) : 0}
-                  />
-                  <Check
-                    name="isActive"
-                    label="Item ativo"
-                    checked={editing ? active(editing) : true}
-                  />
-                  <p className="hca-field-hint">
-                    A unidade de itens com histórico é preservada. Para outra
-                    unidade, cadastre um novo item.
-                  </p>
-                  <ActionButton type="submit" disabled={busy} variant="primary">
-                    Salvar item
-                  </ActionButton>
-                </form>
-              )}
-            </RecordDrawer>
+              onSaved={onIdentitySaved}
+            />
           ) : null}
         </>
       ) : null}

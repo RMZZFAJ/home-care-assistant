@@ -1,0 +1,87 @@
+{
+  "increment": "D3.58",
+  "base": "4550eff5c1a936a865684c1ae8e3484a58371581",
+  "scope": [
+    "create item",
+    "edit patient item",
+    "adopt available template",
+    "global proposal in the same flows"
+  ],
+  "validation": {
+    "historicalMigrationGuard": 84,
+    "targetedLint": "pass",
+    "typecheck": "pass",
+    "localPrepareWithoutReset": true,
+    "realAuthDistinct": 5,
+    "browserDistinct": 9,
+    "browserEngines": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "negativeEvidence": [
+      "Initial local grant signature failure rolled back migration",
+      "Initial 40001 conflicts stalled in the local gateway and failed 3 Auth cases",
+      "Same losing version, stale reference, and unauthorized discard return PT409 after correction",
+      "Observed patient stock lock did not retain the catalogue lock in either adoption entrypoint",
+      "Revocation during the wait left no item or receipt",
+      "Simulated lost native response recovered by GET after reload with one original POST"
+    ]
+  },
+  "remote": {
+    "before": 198,
+    "after": 200,
+    "appliedVersions": [
+      "20261110235121",
+      "20261111000604"
+    ],
+    "finalDryRunEmpty": true,
+    "orderedHistoryMatchesLocal": true,
+    "definitionsAclAndRlsMatchLocal": true,
+    "invalidIndexesInPublicOrPrivate": 0,
+    "previousAdoptionDefinitionRetained": true,
+    "functionDigests": {
+      "private.adopt_catalogue_model(uuid,text)": "99ed9daf32e03ec413fda31ee3419e14f7ae5b29d6854196c932410e7502fcc5",
+      "private.catalogue_preparation_arguments(uuid,text,text,jsonb,boolean)": "f8b676a642e71ff6cd33e44003d37f706b4e26b292f7f8a76e31b85f0c41ca5a",
+      "private.catalogue_preparation_reference(uuid,text,text,text,text)": "f5261240b91426ba7c59c63d11b2a0dd10be17b3422fdd835106324c61698f5e",
+      "private.catalogue_preparation_version(uuid,text)": "fe404101a35a00ac9ac188714a0b25bf928beb8eec80386b4d797bc9733655d1",
+      "private.require_catalogue_preparation_scope(uuid,text,text,text)": "6a5a42d42fd92a7eb1d38a76d49105db3a22c58ff57b9d0f39d3c6e7734401bc",
+      "public.catalogue_preparation_command(uuid,text,text,text,text,uuid,uuid,integer,jsonb,text)": "6b6335c9acea3c2a5545909f49bfa1c386de8879934ce084bd874256f0366d2f",
+      "public.catalogue_preparation_read(uuid,text,text,text,uuid)": "27d641f71b2b69d30853028c62cefedb1622533dc9ee7fed88bce34e303b51c5"
+    },
+    "relatedAdvisors": {
+      "rls_enabled_no_policy": 2,
+      "authenticated_security_definer_function_executable": 2,
+      "unused_index": 3
+    }
+  },
+  "criteria": {
+    "total": 105,
+    "localPass": 56,
+    "partial": 49,
+    "visualEstimate": 60,
+    "formsEstimate": 90,
+    "recoveryEstimate": 90
+  },
+  "remaining": [
+    "catalogue unit, presentation and identity workflows",
+    "other administration and profile",
+    "66/171 parity",
+    "own SHA CI and D-C gates"
+  ],
+  "sourceLfSha256": {
+    "src/app/api/admin/catalogue-preparations/route.ts": "18307e2b6935edf007c9317b213fb53eca10b478424a68e01ed754620b7a91e3",
+    "src/app/api/admin/route.ts": "f6ca3174126976103fb6a164db1adec40b48aead47bfae120dada42bb6f46e47",
+    "src/components/admin/admin-console.tsx": "f7630a12a0bdf202b9a359643ac6f765381e243865fb8ed0850383a72a7dce4c",
+    "src/components/admin/catalogue-management.tsx": "875cce1fdab5cdb96bf3a0826adb80e3355086f4d8d440cbe9dbee2424a1e362",
+    "src/components/admin/catalogue-preparation-editor.tsx": "2f64fcda2e4ef1b25a4a6b84079e51d0cb49a789f55718aadba1245e00131b82",
+    "src/lib/server/api.ts": "af83dc6963c18f9f6e9655b9ba2aa74e03b8d5b0809d01f3080e0f07241b7ec5",
+    "src/lib/server/catalogue-preparation.ts": "4e46882faddc8de362b00d484a7caef2c899801f14998790798499734d264397",
+    "src/lib/validation/catalogue-preparation.ts": "b09cdcd2deaadccf0a8b23e1df8a8117b64df180959e165d077c33acfd77229a",
+    "tests/e2e/catalogue-preparation.spec.ts": "a9075fd3f3ec8080f5d57b9743eab75c1eec60e269bb136af677d66c6e240f2d",
+    "tests/e2e/record-drawer-focus.spec.ts": "7b134b9c5f6ac82e3c3a97ffc3c010b5a20cae7c6e18ec33dc451497ecdcc620",
+    "tests/integration/catalogue-preparations.test.mjs": "0032885a92d0e830722d8b61909a4aa56eea5a2f517e28016eb107f55ed0e05e",
+    "supabase/migrations/20261110235121_phase_d3_catalogue_private_preparations.sql": "1df2f12b4d86288f1657d2c8978e848451fb45bea7809c7cde997584f81bb9cf",
+    "supabase/migrations/20261111000604_phase_d3_catalogue_conflict_http_status.sql": "bbb7c178ab222428cf0e5dd462981dab8940bb4f958ddd9e1ff5330c4d3a0464"
+  }
+}

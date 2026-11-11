@@ -1,5 +1,13 @@
 # Checkpoint D-B
 
+D3.58 implementou a continuidade privada para criar, editar e adotar itens
+do catálogo. Cinco cenários com Auth real e nove testes de navegador
+passaram. Duas migrations incrementais foram aplicadas no remoto, com
+histórico e permissões verificados em 200 versões e dry-run final vazio.
+A matriz mantém 56 critérios com prova local e 49 parciais. CI do próprio
+SHA, cadastros complementares e paridade integral seguem pendentes.
+[Incremento](CATALOGUE_PREPARATIONS.md).
+
 D3.57 corrigiu as esperas de três testes da CI. A agenda foi reproduzida
 localmente. A nova rodada aprovou 15 cenários nos três navegadores. A falha
 intermitente de seleção de aba no recebimento segue aberta. O remoto ficou

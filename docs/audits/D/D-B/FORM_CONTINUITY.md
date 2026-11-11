@@ -102,3 +102,12 @@ no rascunho privado e podem ser retomadas em outra sessão. A abertura antiga
 mantém a recuperação pela chave original. Cadastro, administração, perfil e
 as composições restantes continuam sob responsabilidade do Codex.
 [Incremento](BAL_OBSERVATION_CONTINUITY.md).
+
+## Atualização D3.58
+
+Criação, edição e adoção no catálogo têm preenchimento privado, revisão
+concorrente, comparação e recuperação de confirmação. O editor canônico
+substitui dois formulários pela mesma estrutura reutilizável. O inventário
+mantém 50 fontes e passa a registrar 51 tags de formulário. Continuam na
+revisão unidades, apresentações, situações, sucessores, os demais cadastros
+administrativos e o perfil. [Incremento](CATALOGUE_PREPARATIONS.md).

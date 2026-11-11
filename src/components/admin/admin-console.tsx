@@ -99,7 +99,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     section === "overview" ||
     administrationAreas(context).some((area) => area.section === section);
   const [rows, setRows] = useState<Row[]>([]);
-  const [templates, setTemplates] = useState<Row[]>([]);
   const [directory, setDirectory] = useState<Row[]>([]);
   const [catalog, setCatalog] = useState<Row[]>([]);
   const [editing, setEditing] = useState<Row | null>(null);
@@ -152,13 +151,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           undefined,
           signal,
         ),
-        section === "catalog"
-          ? api<{ data: Row[] }>(
-              `/api/admin?section=products&careRecipientId=${patientId}`,
-              undefined,
-              signal,
-            )
-          : Promise.resolve({ data: [] as Row[] }),
         ["memberships", "notificationRecipients"].includes(section)
           ? api<{ data: Row[] }>(
               section === "memberships" && globalMode
@@ -176,13 +168,12 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             )
           : Promise.resolve({ data: [] as Row[] }),
       ]).then(
-        ([result, models, people, products]) => {
+        ([result, people, products]) => {
           if (signal?.aborted || sequence !== loadSequenceRef.current) return;
           setRows(result.data ?? []);
           setNotificationTotal(result.total ?? 0);
           setDirectory(people.data);
           setCatalog(products.data);
-          if (section === "catalog") setTemplates(models.data);
           setLoading(false);
           setReadError("");
           setReadDenied(false);
@@ -356,14 +347,11 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         )}
         {section === "catalog" && patientId ? (
           <CatalogueManagement
-            recovery={recovery}
-            confirmationRevision={confirmationRevision}
+            key={JSON.stringify([context.userId, patientId, globalMode])}
+            userId={context.userId}
+            globalMode={globalMode}
             writable={allowed}
             rows={rows}
-            templates={templates}
-            save={execute}
-            busy={busy}
-            error={error}
             loading={loading}
             patientId={patientId}
             onIdentitySaved={async (message) => {

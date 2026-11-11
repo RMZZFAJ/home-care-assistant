@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { governanceIntentFields } from "@/lib/validation/governance";
 import { auditQuerySchema } from "@/lib/validation/audit";
+import { catalogueAttempt } from "@/lib/validation/catalogue-preparation";
+import { runCatalogueAttempt } from "@/lib/server/catalogue-preparation";
 import { appOrigin } from "@/lib/server/app-origin";
 import { exactQuantity } from "@/lib/validation/documents";
 import { quantity } from "@/lib/quantity";
@@ -329,8 +331,17 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   return api("admin.write", async () => {
-    const input = await readJson(request, schema, 2_000_000);
+    const input = await readJson(request, z.union([z.strictObject({
+      action: z.enum(["product", "adoptProduct"]),
+      cataloguePreparation: catalogueAttempt,
+    }), schema]), 2_000_000);
     const auth = await authenticate();
+    if ("cataloguePreparation" in input) {
+      const attempt = input.cataloguePreparation;
+      if (attempt.action !== "commit" || (input.action === "adoptProduct") !== (attempt.purpose === "adopt"))
+        throw new ApiError("VALIDATION_ERROR", "Confira a confirmação do catálogo.", 400);
+      return NextResponse.json(await runCatalogueAttempt(auth, attempt));
+    }
     if (
       auth.isGlobalAdmin &&
       [

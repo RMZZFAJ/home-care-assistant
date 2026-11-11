@@ -74,9 +74,16 @@ para registrar o que existe no momento. As notas ficam disponíveis, inclusive
 em outro aparelho após salvar o rascunho privado. A recuperação da abertura
 de fichas antigas também foi conferida. Responsável pelo ajuste: Codex.
 
+**Preenchimento privado do catálogo · 100% de criar, editar e adotar itens.**
+É possível salvar campos incompletos, retomar em outra sessão, comparar
+edições, descartar o preenchimento privado e consultar uma confirmação
+perdida. Uma proposta enviada pela administração global continua a depender
+da aprovação de outro administrador no paciente. Unidades, apresentações,
+situações e sucessores seguem na revisão. Responsável pelo restante: Codex.
+
 A recuperação entre aparelhos continua estimada em 90% no sistema inteiro.
-Ainda faltam formulários de cadastro e administração e combinações de edição
-em algumas telas. Essas pendências são do Codex.
+Ainda faltam cadastros complementares do catálogo, outras áreas de
+administração, perfil e combinações de edição. Essas pendências são do Codex.
 Relatos e decisões de consumo, revisões de fluxo, movimentação familiar,
 fichas e atos de balanço dos lotes anteriores permanecem implementados.
 A troca das classes de quebra de texto já foi concluída.
@@ -129,8 +136,9 @@ acompanhamento: Codex.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em
-  execução · ≈90%. Falta: Concluir cadastros, administração e as combinações
-  restantes de edição. As contagens preservam observações após mudanças de
+  execução · ≈90%. Falta: Concluir cadastros complementares do catálogo,
+  administração, perfil e as combinações restantes de edição. As contagens
+  preservam observações após mudanças de
   estoque, plantão ou ficha. As preparações
   privadas da agenda estão concluídas no escopo interno deste recurso.
   Revisões de fluxo, relatos e decisões de consumo, movimentação familiar,
@@ -439,8 +447,8 @@ incluídos.
   reconto, programação, atribuição e adiamentos do balanço, movimentação
   familiar, relatos, complementos e decisões de consumo, revisões de fluxo e
   preparação privada de Andamentos e agenda, incluindo alterações,
-  cancelamentos e decisões sobre recursos existentes, com comparação e
-  recuperação.
+  cancelamentos e decisões sobre recursos existentes, e criação, edição e
+  adoção de itens do catálogo, com comparação e recuperação.
   Falta: Conferir demais variações, lacunas de continuidade e apresentação
   conjunta. Responsável: Codex.
 - **Listas, tabelas, cartões, busca e filtros** — 55%. Já aplicado: Base,
@@ -541,9 +549,10 @@ preservado e incluído na revisão final; não será refeito sem motivo.
 1. **Completar a continuidade dos formulários diários.** Conferir na CI a
    sincronização de agenda, foco e Andamentos. Investigar a seleção da aba no
    recebimento se a falha se repetir. Completar os
-   cadastros necessários à operação e conferir as mensagens de recuperação
-   e conflito. As contagens, preparações da agenda e revisões de fluxo já
-   implementadas serão incluídas na revisão conjunta.
+   cadastros complementares do catálogo que afetam materiais e estoque, como
+   unidades, apresentações e sucessores. Conferir as mensagens de recuperação
+   e conflito. As contagens, preparações da agenda, revisões de fluxo e o
+   editor de itens do catálogo serão incluídos na revisão conjunta.
 2. **Completar fichas e estoque.** Fechar requisição, compra, entrega,
    transferência, consumo e variantes de balanço; concluir avisos, próximas
    providências, Andamentos, vínculos, listas e filtros dessas tarefas.
