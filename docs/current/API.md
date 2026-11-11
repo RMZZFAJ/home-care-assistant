@@ -307,6 +307,13 @@ na central, o filtro de não vistas se aplica antes da página. Falha de leitura
 ou resultado inválido não vira caixa vazia. POST marca vista no aplicativo;
 não registra ciência, aceite documental ou leitura confirmada por provedor.
 
+Em GET /api/patient-settings, a leitura de propostas mantém a RPC nativa e
+inclui careRecipientId, status, kind e query, além de changes, total, page e
+pageSize. Em changesOnly=true, esse é o envelope direto; nas leituras compostas,
+os metadados ficam em changePage. Servidor e lista conferem paciente, seleção,
+comprimento esperado e identidades, preservando campos e tipos futuros seguros.
+Isso não altera permissões, proposta original ou autorização para decidir.
+
 ## Documentos e quantidades
 
 REQ recebe currentStock como valor exato ou NULL e stockObservation como

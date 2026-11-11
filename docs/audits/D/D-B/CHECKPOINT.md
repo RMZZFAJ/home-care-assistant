@@ -1,5 +1,22 @@
 # Checkpoint D-B
 
+D3.77 fechou05.9. Todas as101 pendências antigas e202 propostas do histórico
+permanecem alcançáveis em páginas completas, na ordem SQL nativa. Servidor
+e cliente conferem paciente, seleção, página, tamanho e identidades. Uma
+falha preserva só a consulta válida da mesma seleção, com instante e decisões
+suspensas; recusa retira dados. O formulário mantém foco e campos, com URL,
+recarga e Voltar, sem novo rascunho ou mudança das regras de aprovação.
+Passaram50 unitários e nove cenários distintos nos três perfis, por seis
+aprovações iniciais reaproveitadas e três finais. As12 execuções passaram.
+Comparações dos cinco tipos, valores futuros sem aprovação, autorização,
+aprovação local explícita e ledger original conservam asserções anteriores.
+As consultas novas preservam propostas, configurações, vínculos, permissões
+e estoque integralmente. Tipos, lint e axe passaram; captura320 inspecionada.
+Sem SQL novo; remoto206 com dry-run vazio. Nove de dez pontos conferidos;
+resta05.10, auditoria e históricos. Etapa05 parcial90%, matriz56/49 e
+DOC-A/B/C/D preservados. CI própria e demais gates continuam necessários.
+[Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
 D3.76 fechou 05.8. O histórico alcança todos os102 avisos, inclusive o mais
 antigo, em ordem nativa por SQL independente. Página e filtro de não vistas
 permanecem na URL, com recarga e Voltar. O checkbox responde imediatamente.

@@ -37,9 +37,9 @@ A fase continua em execução.
 conclusão definidos. As etapas 01, 02, 03, 04 e 07 estão concluídas localmente.
 Os seis pontos da etapa 04 estão fechados no escopo anterior. A próxima etapa
 é a 05, busca, filtros e históricos. O ponto 05.1, estoques e movimentos,
-também está concluído localmente, assim como os pontos 05.2 a 05.8.
-São oito dos dez pontos de listas conferidos. O próximo é 05.9, propostas
-antigas, seguido de 05.10, auditoria e históricos.
+também está concluído localmente, assim como os pontos 05.2 a 05.9.
+São nove dos dez pontos de listas conferidos. Resta o ponto 05.10, auditoria
+e históricos.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -835,8 +835,8 @@ documentais continuam identificadas em DOC-A a DOC-D.
 ### Próxima etapa — 05, busca, filtros e históricos
 
 Estes são os dez pontos já previstos no plano fixo. O bloco está em execução,
-com estimativa de90%; seu fechamento ainda está pendente. Os pontos05.1 a05.8
-estão concluídos: oito dos dez pontos. O próximo é05.9. Vou reaproveitar
+com estimativa de90%; seu fechamento ainda está pendente. Os pontos05.1 a05.9
+estão concluídos: nove dos dez pontos. O próximo é05.10. Vou reaproveitar
 verificações anteriores válidas e corrigir as lacunas de cada lista.
 Responsável por todos os pontos — Codex.
 
@@ -882,7 +882,11 @@ Responsável por todos os pontos — Codex.
    inventa vazio; uma resposta atrasada não troca o filtro atual. Consultar
    não marca avisos nem registra ciência. Só a marcação escolhida altera
    o aviso correspondente.
-9. **05.9 — Propostas antigas.** Localizar propostas ainda sem decisão.
+9. **05.9 — Propostas antigas.** Concluído localmente · 100% deste ponto.
+   Todas as101 pendências e202 propostas do histórico ficaram alcançáveis,
+   incluindo a mais antiga. Busca, foco, recarga e Voltar foram conferidos.
+   Falha mantém apenas a consulta válida da mesma seleção, identificada e
+   com decisões suspensas. Consultar não aprova nem altera configurações.
 10. **05.10 — Auditoria e históricos.** Conferir filtros, ordem e paginação.
 
 ### Escopo restante dos formulários — etapa 14

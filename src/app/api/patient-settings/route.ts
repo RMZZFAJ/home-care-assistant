@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { appOrigin } from "@/lib/server/app-origin";
 import { z } from "zod";
 import { governanceKinds, governanceQuerySchema } from "@/lib/validation/governance";
+import { parseGovernanceListRead } from "@/lib/validation/governance-list";
 import {
   api,
   authenticate,
@@ -31,7 +32,11 @@ export async function GET(request: Request) {
     const params = new URL(request.url).searchParams;
     const requested = params.get("careRecipientId");
     const query = parseQuery(governanceQuerySchema, Object.fromEntries(["status", "kind", "query", "page", "pageSize"].filter(key => params.has(key)).map(key => [key, params.get(key)])));
-    const readChanges = async (patientId: string) => rpc(auth.client, "patient_governance_changes", { p_patient: patientId, p_status: query.status, p_kind: query.kind ?? null, p_query: query.query, p_page: query.page, p_size: query.pageSize }) as Promise<{ changes: unknown[]; total: number; page: number; pageSize: number }>;
+    const readChanges = async (patientId: string) => {
+      const result = await rpc(auth.client, "patient_governance_changes", { p_patient: patientId, p_status: query.status, p_kind: query.kind ?? null, p_query: query.query, p_page: query.page, p_size: query.pageSize });
+      const selection = { careRecipientId: patientId, page: query.page, pageSize: query.pageSize, status: query.status, kind: query.kind ?? "", query: query.query };
+      return parseGovernanceListRead({ ...result as object, careRecipientId: patientId, status: query.status, kind: query.kind ?? "", query: query.query }, selection);
+    };
     if (auth.isGlobalAdmin && uuid.safeParse(requested).success) {
       const page = await readChanges(requested!);
       if (params.get("changesOnly") === "true") return NextResponse.json(page);

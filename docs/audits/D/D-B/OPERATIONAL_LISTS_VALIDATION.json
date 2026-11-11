@@ -713,5 +713,102 @@
       "DOC-B10percent;DOC-A/C/D pending;Sonar deferred;physical/human/provider gates separate",
       "No merge,production,external activation or remote fixtures/Auth/Vault/reset"
     ]
+  },
+  "D3.77": {
+    "baseSha": "caee35c61d793cbd583d3ce684cfdcafce287b04",
+    "scope": "05.9 complete old governance proposals and scoped recovery",
+    "unit": {
+      "passed": 50,
+      "files": [
+        "tests/governance-list.test.ts",
+        "tests/governance-presentation.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T11:15:25.115Z",
+        "duration": 275470.75299999997,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "volumeFinal": {
+        "startTime": "2026-11-11T11:21:28.769Z",
+        "duration": 99226.987,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 9,
+      "executions": 12,
+      "qualifiedBy": "Six unaffected initial cases retained;three volume cases final include same-filter refresh when normalizing URL;all12 executions pass",
+      "reports": [
+        "governance-list-first.json",
+        "governance-list-volume-final.json"
+      ],
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "implementation": [
+      "Native RPC and approval semantics preserved;server/client validate complete scoped page and native patient IDs",
+      "Reuse useScopedRead;retain only valid same-selection result with timestamp,disable stale decisions;denial clears;no false empty",
+      "Controlled query form remains mounted;URL/Back/reload and focused Enter;no business draft or persistence"
+    ],
+    "counterproofs": [
+      "101pending and202all proposals traverse6/11pages exactly matching independent SQL order,including oldest pending",
+      "Incomplete,patient,native patient,page,status,query,short andduplicate200 rejected;503 same-scope retained;other-search503 not empty;held old response ignored;403 clears",
+      "New reads send no POST and preserve full proposals,settings,memberships,overrides,ledger",
+      "Original five-type comparison,unknown future kind/status/fields,global readonly,foreign patient denial,explicit local approval and unchanged ledger retain assertions"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS",
+      "axe": "All rules;new320 plus original four widths",
+      "visual": "Fresh oldest proposal page320 inspected;full visual gate remains",
+      "lastServerGuardReview": {
+        "change": "Preserve native RPC page/pageSize before shared validation;only trusted scope/filter metadata added",
+        "unchanged": "RPC,query and valid successful response unchanged",
+        "checks": "Shared parser16 unit cases repeated;final types and directed API lint",
+        "browserReuse": "Qualified successful-path cohorts retained;no claim of native RPC fault injection"
+      }
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 206,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6",
+        "05.7",
+        "05.8",
+        "05.9"
+      ],
+      "next": "05.10"
+    },
+    "limits": [
+      "Own SHA CI and full phase gates required",
+      "05.10 native audit/history completeness remains;no new DB grants,authorization,approval engine,PDF or offline replay",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred;human/physical/provider gates separate",
+      "No merge,production,remote mutation or external activation"
+    ]
   }
 }

@@ -395,3 +395,53 @@ fixos de listas estão conferidos. Restam05.9 propostas antigas e05.10 auditoria
 e históricos; os105 critérios continuam56 PASS locais/49 PARTIAL. DOC-B10%,
 DOC-A/C/D pendentes, Sonar adiado e demais gates preservados. PR7 Draft, sem
 merge, produção ou ativação externa. [Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
+## D3.77 — propostas antigas, ponto05.9
+
+Basecaee35c. A consulta nativa já filtra antes da página, incluindo propostas
+pendentes e vínculos aguardando aceite. O incremento preserva essa consulta,
+autorização e decisões, acrescentando paciente e filtros ao envelope HTTP.
+Servidor e cliente conferem o comprimento esperado da página, identidades
+únicas, paciente nativo de cada linha, seleção e campos necessários à leitura.
+Tipos e situações futuros mantêm a apresentação segura anterior no histórico;
+não viram aprovação nem são removidos para acomodar o parser.
+
+A lista reutiliza useScopedRead: falha conserva só a consulta válida da mesma
+seleção, identificada por instante, com decisões e paginação suspensas.
+Outra seleção não recebe dados antigos;401/403/404 retiram o conteúdo. Vazio
+somente após consulta válida. O formulário agora é controlado e permanece
+montado; Enter preserva foco e a URL permite recarga e Voltar. Consultas não
+ganham rascunho de negócio. Não há novo SQL, armazenamento ou replay offline.
+A revisão final conservou page/pageSize nativos antes de validá-los, sem
+recobri-los com a seleção solicitada. A saída válida e a RPC não mudaram;
+os16 contratos do parser, tipos e lint foram repetidos. As coortes do ramo
+válido foram reutilizadas; não se afirma injeção de falha na RPC nativa.
+
+São50 unitários/de apresentação e nove cenários distintos de navegador
+qualificados. A coorte inicial aprovou os nove; após revisão da normalização
+de URL, a repetição exclusiva dos três percursos de volume também passou.
+São12 execuções sem falhas, flakes ou skips, por seis aprovações iniciais
+reaproveitadas e três finais. Consultar com os mesmos filtros provoca nova
+leitura, inclusive quando apenas normaliza a URL. Auth real e banco local guardado
+comprovam101 pendências em seis páginas e202 propostas em11 páginas, na
+ordem/IDs de SQL independente, inclusive a pendência mais antiga. Busca por
+referência, foco, recarga e Voltar preservam os campos e o resultado.
+Respostas incompletas, de outro paciente/página/filtro/busca, página curta e
+ID repetido são recusados.503 preserva apenas a leitura válida da mesma
+seleção; outra busca com falha não inventa vazio. Uma resposta real retida
+não substitui a busca atual.403 retira as propostas e impede decisão anterior.
+
+Snapshots completos de propostas, configurações, vínculos, permissões e
+ledger continuam iguais após consultar, filtrar e navegar; nenhum POST é
+enviado nesses casos. A regressão anterior mantém cinco tipos comparados,
+campos/tipos/situações futuros seguros, global somente consulta, outro paciente
+negado e aprovação local explícita, sem rebase ou alteração indireta do ledger.
+Axe preserva todas as regras, e a captura320 foi inspecionada. Não é aprovação
+visual global, evidência de aparelho físico ou prova de provedor externo.
+
+Sem migration nova; dry-run remoto vazio em206 antes do commit. Nove dos dez
+pontos fixos de listas estão conferidos; resta05.10 auditoria e históricos,
+incluindo o limite nativo100 de eventos da agenda. Os105 critérios continuam
+56 PASS locais/49 PARTIAL. DOC-B10%,DOC-A/C/D pendentes e demais gates
+preservados. PR7 Draft, sem merge, produção ou ativação externa.
+[Resultados](OPERATIONAL_LISTS_VALIDATION.json).
