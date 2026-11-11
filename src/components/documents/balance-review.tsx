@@ -16,6 +16,8 @@ import { formatQuantity } from "@/lib/quantity";
 import type { BalanceReviewContext, SupplyDocument } from "@/types/documents";
 
 import { BalanceMaterials } from "@/components/balances/balance-materials";
+import { BalanceReviewItemFacts } from "@/components/balances/balance-review-items";
+import { BalanceApplication } from "@/components/balances/balance-application";
 
 const groupLabel = { family: "Família", supervisor: "Supervisão" };
 function referenceLabel(context: BalanceReviewContext) {
@@ -24,8 +26,8 @@ function referenceLabel(context: BalanceReviewContext) {
   if (context.referenceState === "historical")
     return "O estoque recebeu movimentos posteriores. O parecer sobre esta contagem não valida o saldo atual nem reaplica ajustes.";
   return context.reconciliationApplied
-    ? "Contagem já conciliada. A revisão facultativa não repete a movimentação."
-    : "A conciliação depende da política configurada e desta referência de estoque ainda válida.";
+    ? "Contagem já conciliada. Nenhum parecer repete a movimentação."
+    : "O parecer confirma ou aponta diferenças na contagem. Aplicar a contagem ao estoque exige um ato separado, com referência válida e as revisões previstas.";
 }
 function CountFacts({ data }: { data: SupplyDocument }) {
   const context = data.balanceReview!;
@@ -47,9 +49,7 @@ function CountFacts({ data }: { data: SupplyDocument }) {
       <p>
         {["cancelled", "rejected"].includes(data.status)
           ? "Consulta histórica de balanço encerrado. A revisão não inicia uma nova conciliação."
-          : data.status === "submitted" && context.referenceState !== "current"
-            ? "A referência desta contagem não permite concluir a conciliação. É necessário um reconto autorizado; a referência original permanece preservada."
-            : referenceLabel(context)}
+          : referenceLabel(context)}
       </p>
       <BalanceMaterials rows={data.lines.map(line => ({ id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, counted: line.quantity, reference: line.metadata.expectedQuantity as string | number | null | undefined }))} />
     </div>
@@ -110,6 +110,7 @@ export function BalanceReview({
       </h2>
       {message ? <Notice>{message}</Notice> : null}
       <CountFacts data={data} />
+      <BalanceApplication key={workspace.userId + ":" + data.id} data={data} userId={workspace.userId} patientActive={workspace.patient?.id === data.care_recipient_id} onRefresh={onRefresh} onEditingChange={onEditingChange} />
       {data.balanceRecount?.canAssign ? (
         <Link
           href={recountHref(data.balanceRecount.patientId, data.id)}
@@ -173,8 +174,10 @@ export function BalanceReview({
         {["cancelled", "rejected"].includes(data.status)
           ? "Balanço encerrado: pareceres e observações permanecem em leitura."
           : context.reviewRequired
-            ? "Este balanço usa a revisão configurada para concluir a conciliação. Cada pessoa revisa uma vez, em grupo autorizado e distinto de quem contou."
-            : "Revisão facultativa. A contagem válida não entra em uma fila universal de aprovação."}
+            ? "As revisões previstas ainda precisam ser registradas. Cada pessoa revisa uma vez, em grupo autorizado e distinto de quem contou. O parecer não altera estoque."
+            : context.policyReviewRequired
+              ? "As revisões previstas foram registradas. O parecer não substitui a confirmação da aplicação ao estoque."
+              : "Revisão facultativa. A contagem válida não entra em uma fila universal de aprovação."}
       </Notice>
       <details className="ui-card">
         <summary>Minhas decisões em preparação</summary>
@@ -249,10 +252,13 @@ export function BalanceReview({
             <p className="whitespace-pre-wrap wrap-break-word">
               {row.comment || "Parecer sem comentário adicional."}
             </p>
+            <BalanceReviewItemFacts review={row} />
             <p>
-              {row.reviewed_snapshot.appliedBeforeReview
+              {row.reviewed_snapshot.opinionOnly
+                ? "Parecer registrado sem aplicar a contagem ao estoque."
+                : row.reviewed_snapshot.appliedBeforeReview
                 ? "Revisão posterior sem reaplicar o estoque."
-                : "Revisão da contagem para conciliação, conforme política e referência."}
+                : "Registro histórico de revisão; consulte a aplicação preservada da contagem."}
             </p>
             <details>
               <summary>Contagem e observações revisadas</summary>

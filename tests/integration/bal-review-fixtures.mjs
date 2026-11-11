@@ -33,6 +33,14 @@ export const balCommand = (client, document, body, key = randomUUID()) =>
     p_key: key,
     p_version: document.version,
   });
+export const balApply = (client, document, group = "family", key = randomUUID()) =>
+  client.rpc("supply_document_command", {
+    p_id: document.id,
+    p_action: "apply_balance",
+    p_body: { group, reviewReference: document.balanceReview.referenceHash },
+    p_key: key,
+    p_version: document.version,
+  });
 export const balState = (id) =>
   sql(
     `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(id)}),'approvals',(select jsonb_agg(to_jsonb(a)) from public.bal_approvals a where document_id=${sqlLiteral(id)}),'reviews',(select jsonb_agg(to_jsonb(r) order by recorded_at,id) from public.balance_reviews r where document_id=${sqlLiteral(id)}),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where reference_type='bal' and reference_id=${sqlLiteral(id)}));`,

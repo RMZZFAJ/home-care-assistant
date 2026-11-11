@@ -19,6 +19,7 @@ import { pdfFidelitySchema } from "../documents/pdf-fidelity";
 import { validatePdfStructure } from "./pdf-structure-validation";
 import { formatStockObservation, formatStockObservationTime } from "../stock-observation";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
+import { balanceApplicationFacts } from "@/lib/validation/balance-application";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
@@ -58,6 +59,15 @@ export async function composeIssuance(
   const sourceFacts = parsed?.success ? parsed.data : undefined;
   const fidelity = revision >= 7 ? pdfFidelitySchema.safeParse(snapshot.documentFacts) : null;
   if (fidelity && !fidelity.success) throw invalid("fidelity-facts-schema");
+  const application = revision >= 11 && snapshot.type === "BAL" ? balanceApplicationFacts.safeParse(snapshot.balanceApplication) : null;
+  if (application && !application.success) throw invalid("balance-application-schema");
+  if (application?.success && application.data.state === "applied") {
+    const expected = snapshot.lines.map(line => String(line.id));
+    const actual = application.data.lines.map(line => line.lineId);
+    if (application.data.documentVersion > snapshot.version || application.data.countVersion !== snapshot.workflow?.countVersion
+      || expected.length !== actual.length || new Set(actual).size !== actual.length || expected.some(id => !actual.includes(id)))
+      throw invalid("balance-application-source");
+  }
   let bytes: Buffer;
   try {
     bytes = await renderDocumentPdf(snapshot, sourceHash, {
@@ -117,6 +127,17 @@ export async function composeIssuance(
     ]),
   ];
   const semanticFacts: Record<string, string> = {};
+  if (application?.success) {
+    const a = application.data;
+    semanticFacts["fidelity/balance/application-state"] = a.state === "not_applied" ? "Não aplicado" : a.state === "unavailable" ? "Não disponível no registro" : "Aplicação registrada";
+    if (a.state === "applied") {
+      semanticFacts["fidelity/balance/application-act"] = a.id + " · " + a.actorName + " · " + formatBrazilDate(a.appliedAt) + " · versão " + a.documentVersion;
+      for (const line of a.lines) {
+        const source = snapshot.lines.find(item => item.id === line.lineId)!;
+        semanticFacts["fidelity/balance/after/" + line.lineId] = line.state === "restricted" ? "Acesso restrito" : formatQuantity(line.quantity, String(source.unit_snapshot ?? ""));
+      }
+    }
+  }
   if (sourceFacts) {
     const f = sourceFacts;
     Object.assign(semanticFacts, {
@@ -180,6 +201,11 @@ export async function composeIssuance(
           : "Parecer preservado; elegibilidade vigente não comprovada por este contexto.";
     for (const review of snapshot.balanceReviews?.legacyApprovals ?? [])
       semanticFacts[`fidelity/legacy-review/${review.actor_id}/${review.count_version}`] = `${review.actor_id} · ${review.actorName ?? "Nome não preservado"}`;
+    for (const review of snapshot.balanceReviews?.reviews ?? []) if (review.reviewed_snapshot.opinionOnly)
+      for (const item of review.item_results ?? []) {
+        const source = review.reviewed_snapshot.lines.find(line => line.id === item.lineId);
+        semanticFacts[`fidelity/review/${review.id}/item/${item.lineId}`] = `${source?.name_snapshot ?? "Material não identificado"} · ${item.result === "confirmed" ? "Confirmado" : "Diferença apontada"} · ${item.forwarding === "none" ? "Sem encaminhamento" : item.forwarding === "recount" ? "Reconto indicado" : "Ajuste autorizado indicado"} · ${item.comment || "Sem comentário adicional"}`;
+      }
   }
   if (revision >= 9 && snapshot.type === "ENT") semanticFacts["fidelity/ent/receipt-state"] = entReceiptState(snapshot.status,Boolean(sourceFacts?.historical),typeof snapshot.workflow?.acceptedAt === "string" ? snapshot.workflow.acceptedAt : null,emission.representation).declaration;
   if (revision >= 8 && snapshot.type === "ENT") for (const item of snapshot.deliveryRegularization?.cases ?? []) {

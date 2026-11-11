@@ -11,6 +11,7 @@ import type {
   ReceiptDraftContent,
 } from "@/lib/validation/supply-drafts";
 import { formatZonedDate } from "@/lib/schedules/time";
+import { balanceReviewItems, balanceReviewItemsFromFields } from "@/lib/validation/balance-review-items";
 
 export const balanceDocumentLabels: Record<BalanceDocumentPurpose, string> = {
   review_family: "Revisão da família",
@@ -63,9 +64,7 @@ export function balanceDocumentAvailable(
     : ["submitted", "approved"].includes(reference.status) &&
         reference.review?.eligibleGroups.includes(
           purpose === "review_family" ? "family" : "supervisor",
-        ) === true &&
-        (reference.status !== "submitted" ||
-          reference.review.referenceState === "current");
+        ) === true;
 }
 export function emptyBalanceDocumentDraft(
   reference: BalancePreparation,
@@ -141,6 +140,7 @@ export function balanceDocumentPacket(
           group: scope.purpose === "review_family" ? "family" : "supervisor",
           comment: content.fields.comment ?? "",
           reviewReference: content.fields.referenceHash,
+          items: balanceReviewItemsFromFields(content.fields),
         };
   return balanceDocumentDecisionSchema.parse({
     careRecipientId: scope.patientId,
@@ -173,6 +173,7 @@ const reviewResult = z.object({
         reviewer_id: z.uuid(),
         review_group: z.enum(["family", "supervisor"]),
         comment: z.string(),
+        item_results: balanceReviewItems.optional(),
         reviewed_document_version: z.number().int().positive(),
       }),
     ),
@@ -241,6 +242,7 @@ export function parseBalanceDocumentConfirmation(
         review.reviewer_id === userId &&
         review.review_group === packet.body.group &&
         review.comment === packet.body.comment &&
+        JSON.stringify(review.item_results ?? []) === JSON.stringify(packet.body.items ?? []) &&
         review.reviewed_document_version === packet.expectedVersion,
     )
   )

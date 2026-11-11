@@ -49,6 +49,8 @@ import type {
 } from "@/lib/validation/supply-drafts";
 import { formatZonedDate } from "@/lib/schedules/time";
 import { BalanceMaterials } from "./balance-materials";
+import { BalanceReviewItemFields, BalanceReviewPreparedFacts } from "./balance-review-items";
+import { balanceReviewItemFields, balanceReviewItemsFromFields } from "@/lib/validation/balance-review-items";
 
 export function BalancePreparationFacts({
   source,
@@ -79,16 +81,13 @@ export function BalancePreparationFacts({
           <p>
             {["cancelled", "rejected"].includes(source.status)
               ? "Consulta histórica de balanço encerrado. A revisão não inicia uma nova conciliação."
-              : source.status === "submitted" &&
-                  source.review.referenceState !== "current"
-                ? "A referência desta contagem não permite concluir a conciliação. É necessário um reconto autorizado; a referência original permanece preservada."
-                : source.review.referenceState === "unavailable"
+              : source.review.referenceState === "unavailable"
                   ? "Referência do efeito anterior não preservada. O parecer histórico não reaplica estoque."
                   : source.review.referenceState === "historical"
                     ? "O estoque recebeu movimentos posteriores. O parecer sobre esta contagem não valida o saldo atual nem reaplica ajustes."
                     : source.review.reconciliationApplied
                       ? "Contagem já conciliada. A revisão facultativa não repete a movimentação."
-                      : "A conciliação depende da política configurada e desta referência de estoque ainda válida."}
+                      : "O parecer não aplica a contagem ao estoque. A aplicação é um ato separado, após as revisões previstas e com referência válida."}
           </p>
           <BalanceMaterials rows={source.lines.map(row => ({ id: row.id, name: row.name, unit: row.unit, counted: row.quantity, reference: row.expectedQuantity }))} />
         </>
@@ -178,6 +177,7 @@ export function BalanceDocumentPreparation({
     initialFocusRef = useRef(false),
     focusQueryRef = useRef(false);
   const textRef = useRef<HTMLTextAreaElement>(null),
+    itemsRef = useRef<HTMLFieldSetElement>(null),
     resultRef = useRef<HTMLHeadingElement>(null),
     reviewRef = useRef<HTMLHeadingElement>(null),
     readRecoveryRef = useRef<HTMLButtonElement>(null),
@@ -387,6 +387,13 @@ export function BalanceDocumentPreparation({
   async function prepare() {
     if (!content || !allowed || busy || uncertain) return;
     try {
+      if (purpose !== "assign_recount" && source && balanceReviewItemsFromFields(fields).some(item => !source.lines.some(line => line.id === item.lineId)))
+        throw new Error("Há um material de outra referência neste parecer. Remova a referência anterior explicitamente.");
+      if (purpose !== "assign_recount" && source) for (const [key, raw] of Object.entries(fields).filter(([key]) => key.startsWith("item:"))) {
+        const item = balanceReviewItemFields.parse(JSON.parse(raw)), line = source.lines.find(row => row.id === key.slice(5));
+        if (!line || (item.materialName !== undefined && item.materialName !== line.name) || (item.unit !== undefined && item.unit !== line.unit))
+          throw new Error("O material da referência mudou. Confira e escolha novamente seu resultado antes de confirmar.");
+      }
       balanceDocumentPacket(
         {
           patientId,
@@ -401,9 +408,10 @@ export function BalanceDocumentPreparation({
       setFieldError(
         cause instanceof z.ZodError
           ? (cause.issues[0]?.message ?? "Confira seu preenchimento.")
-          : "Confira seu preenchimento.",
+          : cause instanceof Error ? cause.message : "Confira seu preenchimento.",
       );
-      textRef.current?.focus();
+      const invalidItem = itemsRef.current?.querySelector<HTMLElement>('[aria-invalid="true"],button');
+      if (invalidItem) invalidItem.focus(); else textRef.current?.focus();
       return;
     }
     setBusy(true);
@@ -828,6 +836,12 @@ export function BalanceDocumentPreparation({
                 . Seu parecer não substitui as observações da contagem.
               </p>
             )}
+            {purpose !== "assign_recount" && source ? <BalanceReviewItemFields
+              ref={itemsRef}
+              lines={source.lines} fields={fields}
+              disabled={busy || privateDraft.busy || privateDraft.loading || !!privateDraft.offered || !!privateDraft.pending || uncertain || needsReference || unavailable}
+              onChange={next => { setFields(next);setDirty(true);setFieldError(""); }}
+            /> : null}
             <FormField
               label={
                 purpose === "assign_recount"
@@ -905,6 +919,7 @@ export function BalanceDocumentPreparation({
                 vigente da contagem.
               </p>
             )}
+            {purpose !== "assign_recount" && source ? <BalanceReviewPreparedFacts lines={source.lines} fields={fields} /> : null}
             <div>
               <h3>
                 {purpose === "assign_recount"

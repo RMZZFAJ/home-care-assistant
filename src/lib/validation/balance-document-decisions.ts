@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { draftCommitSchema } from "./creation-drafts";
 import { balanceDocumentPurpose } from "./supply-drafts";
+import { balanceReviewItems } from "./balance-review-items";
+import { balanceApplicationFacts } from "./balance-application";
 
 const id = z.uuid(),
   version = z.number().int().positive().max(2147483647),
@@ -22,6 +24,7 @@ const reviewBody = z
         "Seu parecer permite até 2.000 caracteres.",
       ),
     reviewReference: hash,
+    items: balanceReviewItems.optional(),
   })
   .strict();
 const recountBody = z
@@ -126,6 +129,11 @@ const review = z.object({
   eligibleGroups: z.array(z.enum(["family", "supervisor"])).max(2),
   reconciliationApplied: z.boolean(),
   reviewRequired: z.boolean(),
+  policyReviewRequired: z.boolean().optional(),
+  reviewSatisfied: z.boolean().optional(),
+  hasItemDifferences: z.boolean().optional(),
+  applicationGroups: z.array(z.enum(["family", "supervisor"])).max(2).optional(),
+  application: balanceApplicationFacts.optional(),
 });
 const target = z
   .object({

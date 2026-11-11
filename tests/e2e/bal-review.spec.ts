@@ -168,7 +168,7 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
   }
 });
 
-test("BAL com referência alterada conserva o parecer e exige reconto, consulta e adoção explícita antes de revisar", async ({
+test("BAL com referência alterada conserva o parecer e adota explicitamente o novo reconto antes de revisar", async ({
   page,
 }) => {
   const f = await legacyBalance(),
@@ -229,7 +229,7 @@ test("BAL com referência alterada conserva o parecer e exige reconto, consulta 
   await expect(comparison).toBeVisible();
   await expect(
     button(page, "Adotar referência atual e manter meu parecer"),
-  ).toBeDisabled();
+  ).toBeEnabled(); // A historical opinion is allowed; application remains separate.
   await expect(button(page, "Revisar parecer")).toBeDisabled();
   const old = await rpc(f.admin, "operational_document", {
     p_id: f.document.id,
@@ -273,7 +273,8 @@ test("BAL com referência alterada conserva o parecer e exige reconto, consulta 
   const document = (
     await (await page.request.get("/api/documents/" + old.id)).json()
   ).data as SupplyDocument;
-  expect(document.status).toBe("approved");
+  expect(document.status).toBe("submitted");
+  expect(document.balanceReview?.reviewSatisfied).toBe(true);
   expect(document.balanceReview?.countVersion).toBe(2);
   expect(document.balanceReview?.reviews[0].comment).toBe(ownComment);
   expect(document.balanceReview?.reviews[0].reviewed_snapshot.notes).toBe(

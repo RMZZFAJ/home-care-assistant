@@ -45,6 +45,7 @@ import type {
 import { documentVariant } from "@/lib/documents/variant";
 import type { PdfFidelityFacts } from "@/lib/documents/pdf-fidelity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
+import { balanceApplicationFacts } from "@/lib/validation/balance-application";
 
 type Person = {
   id?: string;
@@ -63,6 +64,7 @@ export type DocumentSnapshot = {
   createdAt?: string;
   sourceFacts?: unknown;
   documentFacts?: unknown;
+  balanceApplication?: unknown;
   materialIdentity?: string;
   materialIdentitySource?: string;
   purchaseProgress?: PurchaseProgress;
@@ -165,7 +167,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -1486,6 +1488,27 @@ export async function renderDocumentPdf(
     }
   } else {
     section("Referência e reconciliação");
+    if (revision >= 11) {
+      const application = balanceApplicationFacts.parse(snapshot.balanceApplication);
+      const after = (id: unknown) => {
+        if (application.state !== "applied") return application.state === "not_applied" ? "Não aplicado" : "Não disponível no registro";
+        const line = application.lines.find(item => item.lineId === id);
+        if (!line) throw new Error("BAL application line missing");
+        const source = snapshot.lines.find(item => item.id === id)!;
+        return line.state === "restricted" ? "Acesso restrito" : formatQuantity(line.quantity, String(source.unit_snapshot ?? ""));
+      };
+      table(["MATERIAL E UNIDADE", "REFERÊNCIA", "CONTADO", "SALDO APÓS BALANÇO"], [.34, .20, .20, .26], snapshot.lines.map(item => [
+        name(item) + " · " + String(item.unit_snapshot ?? "Unidade não preservada"),
+        formatQuantity((item.metadata as Record<string, unknown> | undefined)?.expectedQuantity as string | number | null | undefined),
+        item.quantity == null ? "Não informado" : formatQuantity(String(item.quantity)), after(item.id),
+      ]));
+      fidelityFact("balance/application-state", "Situação da aplicação", application.state === "not_applied" ? "Não aplicado" : application.state === "unavailable" ? "Não disponível no registro" : "Aplicação registrada");
+      if (application.state === "applied") {
+        fidelityFact("balance/application-act", "Ato e momento do saldo", application.id + " · " + application.actorName + " · " + formatBrazilDate(application.appliedAt) + " · versão " + application.documentVersion);
+        for (const line of application.lines) fidelityFact("balance/after/" + line.lineId, "Saldo preservado após aplicação — " + name(snapshot.lines.find(item => item.id === line.lineId)!), after(line.lineId));
+        text("O saldo corresponde ao momento desta aplicação. Movimentos posteriores não substituem esse registro.", 8);
+      }
+    } else {
     table(
       ["MATERIAL", "REFERÊNCIA", "CONTADO"],
       [0.5, 0.25, 0.25],
@@ -1498,6 +1521,7 @@ export async function renderDocumentPdf(
         formatQuantity(String(item.quantity ?? 0)),
       ]),
     );
+    }
   }
   if (snapshot.type === "BAL" && snapshot.balanceReviews) {
     const facts = snapshot.balanceReviews;
@@ -1551,8 +1575,28 @@ export async function renderDocumentPdf(
           );
       text("Parecer próprio do revisor:", 9, true);
       text(review.comment || "Parecer sem comentário adicional.");
+      if (review.reviewed_snapshot.opinionOnly) {
+        text("Parecer sem efeito de estoque; aplicação, reconto ou ajuste exigem ato próprio.", 9, true);
+        const items = review.item_results ?? [];
+        if (items.length) {
+          table(["Material", "Resultado", "Encaminhamento", "Comentário"], [.28, .18, .24, .30], items.map(item => {
+            const source = review.reviewed_snapshot.lines.find(line => line.id === item.lineId);
+            return [source ? `${source.name_snapshot} · ${source.unit_snapshot}` : "Material não identificado no registro",
+              item.result === "confirmed" ? "Confirmado" : "Diferença apontada",
+              item.forwarding === "none" ? "Sem encaminhamento adicional" : item.forwarding === "recount" ? "Reconto indicado; execução não comprovada por este parecer" : "Ajuste autorizado indicado; execução não comprovada por este parecer",
+              item.comment || "Sem comentário adicional"];
+          }));
+          text("Os demais materiais não têm resultado individual declarado neste parecer.", 8);
+          if (fidelity) for (const item of items) {
+            const source = review.reviewed_snapshot.lines.find(line => line.id === item.lineId);
+            fidelityFact(`review/${review.id}/item/${item.lineId}`, "Parecer individual preservado", `${source?.name_snapshot ?? "Material não identificado"} · ${item.result === "confirmed" ? "Confirmado" : "Diferença apontada"} · ${item.forwarding === "none" ? "Sem encaminhamento" : item.forwarding === "recount" ? "Reconto indicado" : "Ajuste autorizado indicado"} · ${item.comment || "Sem comentário adicional"}`);
+          }
+        } else text("Parecer geral; nenhum resultado individual por material foi declarado.", 8);
+      }
       text(
-        review.reviewed_snapshot.appliedBeforeReview
+        review.reviewed_snapshot.opinionOnly
+          ? "Este parecer não aplicou a contagem ao estoque."
+          : review.reviewed_snapshot.appliedBeforeReview
           ? "Revisão posterior: nenhuma reaplicação de estoque."
           : "Revisão da contagem para conciliação conforme política e referência.",
         8,

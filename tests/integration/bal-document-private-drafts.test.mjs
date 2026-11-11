@@ -75,18 +75,8 @@ for (const purpose of balDocumentPurposes) {
       p_id: f.document.id,
     });
     assert.equal(latest.payload.notes, f.document.payload.notes);
-    const materialFacts = (lines) =>
-      lines.map((line) =>
-        Object.fromEntries(
-          Object.entries(line).filter(([key]) => key !== "fully_checked"),
-        ),
-      );
-    assert.deepEqual(
-      materialFacts(latest.lines),
-      materialFacts(f.document.lines),
-    );
-    if (purpose !== "assign_recount")
-      assert.ok(latest.lines.every((line) => line.fully_checked));
+    assert.deepEqual(latest.lines, f.document.lines, "A private opinion or recount assignment never applies the count");
+    assert.deepEqual(JSON.parse(after).ledger, JSON.parse(before).ledger);
     if (purpose !== "assign_recount") {
       const review = latest.balanceReview.reviews.find(
         (r) => r.review_group === f.body.group,

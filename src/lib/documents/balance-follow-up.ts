@@ -35,6 +35,10 @@ export function balanceFollowUp(data: Facts): Step {
     ...workflow, heading: "Consultar os fatos da contagem", pending: false,
     description: "Os dados disponíveis não comprovam todas as etapas da contagem e da conciliação. Atualize a ficha antes de concluir seu efeito ou uma nova providência; não foi presumida aprovação.",
   };
+  if (review.hasItemDifferences) return {
+    ...workflow, heading: "Acompanhar as diferenças apontadas no balanço", pending: true,
+    description: "Há materiais com diferença declarada em parecer. O parecer não corrige o estoque; consulte o encaminhamento e o ato autorizado de reconto ou ajuste, preservando a contagem original.",
+  };
   if (data.status === "submitted" && !review.reconciliationApplied && review.referenceState !== "current") return {
     ...workflow, heading: "Conferir a referência do balanço", pending: true,
     description: review.referenceState === "historical"
@@ -44,6 +48,10 @@ export function balanceFollowUp(data: Facts): Step {
   if (data.status === "approved" && review.reconciliationApplied) return {
     ...workflow, heading: "Consultar a contagem conciliada", pending: false,
     description: "A contagem aprovada tem conciliação registrada. Consulte as diferenças e as revisões com autoria própria. Movimentos posteriores não apagam esse efeito histórico nem autorizam reaplicá-lo; o saldo atual é uma consulta distinta.",
+  };
+  if (data.status === "submitted" && review.reviewSatisfied) return {
+    ...workflow, heading: "Confirmar a aplicação da contagem ao estoque", pending: true,
+    description: "As revisões previstas foram registradas. A aplicação ainda depende de uma confirmação própria por pessoa habilitada e da referência válida. Os pareceres, sozinhos, não alteraram o estoque.",
   };
   if (data.status === "submitted" && review.reviewRequired) return {
     ...workflow, heading: "Acompanhar as revisões do balanço", pending: true,

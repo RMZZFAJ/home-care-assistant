@@ -1,3 +1,6 @@
+import type { BalanceReviewItem } from "@/lib/validation/balance-review-items";
+import type { BalanceApplicationFacts } from "@/lib/validation/balance-application";
+
 export type DocumentType = "REQ" | "COM" | "ENT" | "BAL";
 export type SupplyType = Exclude<DocumentType, "REQ">;
 export type Custody = "FAMILY" | "CARE_TEAM";
@@ -114,6 +117,7 @@ export type BalanceReviewRecord = {
   reviewer_name: string;
   review_group: "family" | "supervisor";
   comment: string;
+  item_results?: BalanceReviewItem[];
   reference_state: "current" | "historical" | "unavailable";
   recorded_at: string;
   reviewed_document_version: number;
@@ -128,6 +132,7 @@ export type BalanceReviewRecord = {
     referenceRevision: string | null;
     currentRevision: string;
     appliedBeforeReview: boolean;
+    opinionOnly?: boolean;
   };
 };
 export type BalanceReviewFacts = {
@@ -152,6 +157,11 @@ export type BalanceReviewContext = BalanceReviewFacts & {
   referenceHash: string;
   reconciliationApplied: boolean;
   reviewRequired: boolean;
+  policyReviewRequired?: boolean;
+  reviewSatisfied?: boolean;
+  hasItemDifferences?: boolean;
+  applicationGroups?: ("family" | "supervisor")[];
+  application?: BalanceApplicationFacts;
 };
 export type PurchaseReceipt = {
   id: string;

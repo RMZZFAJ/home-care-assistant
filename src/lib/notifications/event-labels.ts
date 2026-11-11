@@ -72,6 +72,7 @@ const labels: Record<string, string> = {
   "bal.issued": "Balanço registrado",
   "bal.recount": "Nova contagem registrada",
   "bal.approve": "Revisão do balanço registrada",
+  "bal.apply": "Aplicação da contagem ao estoque registrada",
   "bal.cancel": "Balanço cancelado",
   "attachment.bound": "Anexo vinculado",
 };

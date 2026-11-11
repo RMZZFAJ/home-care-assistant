@@ -4,7 +4,33 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.85
+## Incremento atual DOC-B_BAL
+
+DOC-B_BAL implementa o núcleo da separação entre parecer e aplicação do BAL,
+com resultados individuais explícitos, confirmação de estoque própria,
+recuperação GET após reload e saldo histórico congelado na nova emissão V11.
+Política facultativa mantém seu efeito nativo; parecer posterior não repete
+estoque. Revisores, contador, notas, versões e dados legados são preservados.
+Valores privados ficam fora dos snapshots públicos. Emissão sem permissão não
+transporta o saldo; perder a leitura impede obter exemplar antigo com valor.
+
+Qualificados36 cenários Auth distintos,35 testes unitários/contratos/PDF e15
+cenários de navegador nos três perfis. Primeiras falhas e contraprovas foram
+preservadas; somente os afetados foram repetidos. Tipos/lint passaram. As cinco
+migrations208–212 foram reconciliadas no remoto autorizado, com histórico igual
+ao local, dry-run vazio, RLS/grants conferidos e alertas novos delimitados.
+Sem reset, dados de teste remotos, produção ou ativação externa. CI do SHA
+publicado, instalação limpa, evolução legada e integração completa seguem gates.
+
+DOC-B permanece parcial, estimado20%. No BAL, resta vincular as correções
+posteriores de cada diferença e mostrar momento/resultado do ato próprio.
+Depois seguem COM, devolução cotidiana e cancelamento/complemento, mantendo a
+sequência consolidada. DOC-A/C/D continuam pendentes; os105 estados originais
+(57PASS/48PARTIAL),18 estados UI e estimativa visual85% não mudam. Sonar adiado;
+gates humanos, AT e aparelho físico preservados. Produção NO-GO.
+[Resultados e limites](../audits/D/D-B/BAL_REVIEW_APPLICATION.md).
+
+## Incremento anterior D3.85
 
 D3.85 conclui o ponto06.6 e a etapa06 local, no escopo original das 46 composições
 cotidianas. Foram qualificados 47 cenários distintos nos três perfis, com

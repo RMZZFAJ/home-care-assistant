@@ -25,7 +25,7 @@ type MilestoneFacts = Pick<
   balanceReview?: Pick<
     NonNullable<SupplyDocument["balanceReview"]>,
     "reviewRequired" | "referenceState" | "reconciliationApplied"
-  >;
+  > & Partial<Pick<NonNullable<SupplyDocument["balanceReview"]>, "policyReviewRequired" | "reviewSatisfied" | "hasItemDifferences" | "reviews" | "countVersion">>;
   balanceRecount?: Pick<
     NonNullable<SupplyDocument["balanceRecount"]>,
     "activeAssignment" | "requiresDesignation"
@@ -273,6 +273,7 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
     counted &&
     data.status === "approved" &&
     review?.reconciliationApplied === true &&
+    !review.hasItemDifferences &&
     !recountPending;
   return [
     issued,
@@ -288,7 +289,11 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
     {
       label: "Revisão",
       state:
-        review?.reviewRequired === false
+        review?.policyReviewRequired === false && review.reviews?.some(row => row.count_version === review.countVersion)
+          ? "done"
+          : review?.reviewSatisfied && review.policyReviewRequired
+            ? "done"
+            : review?.reviewRequired === false && !review.policyReviewRequired
           ? "waived"
           : data.status === "approved"
             ? "done"
@@ -296,7 +301,11 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
               ? "pending"
               : "unknown",
       detail:
-        review?.reviewRequired === false
+        review?.policyReviewRequired === false && review.reviews?.some(row => row.count_version === review.countVersion)
+          ? "Parecer facultativo registrado"
+          : review?.reviewSatisfied && review.policyReviewRequired
+            ? "Revisões exigidas registradas; aplicação é ato separado"
+            : review?.reviewRequired === false && !review.policyReviewRequired
           ? "Revisão facultativa nesta contagem"
           : data.status === "approved"
             ? "Revisões exigidas registradas"
@@ -306,14 +315,16 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
       label: "Conclusão",
       state: closed
         ? "closed"
-        : recountPending
+        : recountPending || review?.hasItemDifferences
           ? "pending"
           : complete
             ? "done"
             : "unknown",
       detail: closed
         ? "Documento encerrado; histórico preservado"
-        : recountPending
+        : review?.hasItemDifferences
+          ? "Diferença apontada; correção depende de ato próprio"
+          : recountPending
           ? "Reconto ou nova designação pendente"
           : complete
             ? "Contagem aprovada e conciliação registrada"

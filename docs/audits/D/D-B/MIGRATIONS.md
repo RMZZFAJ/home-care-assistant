@@ -3,7 +3,37 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — D3.75
+## Estado atual — DOC-B_BAL
+
+Local e remoto com212 versões, sem pendências. As migrations20261111183942,
+20261111192340,20261111193015 e20261111194511 separam parecer/aplicação BAL,
+preservam sua proveniência e os rótulos privados e acrescentam a nova emissão
+BAL V11 com saldo autorizado congelado. Não reescrevem aplicações históricas,
+snapshots, protocolos, hashes canônicos ou arquivos emitidos. A entrada atual
+mantém revisão10 para os outros tipos; entradas antigas continuam recuperáveis.
+
+Preflight confirmou207 versões e as funções-alvo compatíveis. Testes locais
+Auth, contratos, PDF e navegador precederam o push linked/skip-vault. Dry-run
+isolou quatro pendências e terminou vazio após a aplicação. As212 versões
+coincidem exatamente com os arquivos locais. RLS e negação de acesso direto
+à tabela privada, grants das duas RPCs e três auxiliares conferidos no alvo.
+Não houve reset, seed, alteração Auth, ativação externa ou backup/reconstrução
+redundantes do banco descartável, conforme autorização vigente.
+
+Advisors de segurança mantêm as cinco classes: RLS sem política63 INFO, extensão
+pública1 WARN, definer anon3 WARN, definer authenticated210 WARN e proteção de
+senhas1 WARN. O acréscimo é a tabela privada fechada(+1 INFO) e as duas RPCs
+pessoais(+2 ocorrências de definer authenticated), com grants e negativas Auth
+conferidos. Os alertas antigos continuam sem aprovação genérica. As orientações
+permanecem na seção histórica D3.75 abaixo. CI própria, instalação limpa,
+evolução legada e integração completa permanecem gates do SHA publicado.
+A checagem de performance identificou a FK composta nova sem índice completo.
+A migration20261111201053 acrescentou apenas o índice document_id/paciente,
+após preparo local e dry-run isolado. Índices novos ainda não utilizados não
+recebem alegação de uso produtivo. Sem repetição de testes funcionais inalterados.
+[Resultados e limites](BAL_REVIEW_APPLICATION.md).
+
+## D3.75 — registro histórico
 
 Local e remoto com206 versões, sem pendências. A migration20261111095717
 acrescenta somente catalogue_workspace, leitura STABLE/SECURITY INVOKER com

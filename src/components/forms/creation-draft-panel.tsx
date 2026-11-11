@@ -1,6 +1,7 @@
 "use client";
 import { BalancePreviousObservations } from "@/components/balances/observation-continuity";
 import { ScheduleResourceSummary } from "@/components/schedules/schedule-resource-summary";
+import { balanceReviewItemFields } from "@/lib/validation/balance-review-items";
 import {
   scheduleResourceOutcomeLabel,
   isScheduleResourcePurpose,
@@ -508,6 +509,13 @@ function DraftFieldsSummary({
       followUpOwnerId: "Responsável pela apuração futura",
     };
     const display = (key: string, value: string) => {
+      if (kind === "BAL" && key.startsWith("item:")) {
+        let opinion: ReturnType<typeof balanceReviewItemFields.safeParse> | null = null;
+        try { opinion = balanceReviewItemFields.safeParse(JSON.parse(value)); } catch { /* The private value remains available for explicit correction. */ }
+        if (!opinion?.success) return "Parecer individual preservado; confira o preenchimento ao continuar.";
+        const item = opinion.data;
+        return `${item.materialName ?? "Material com nome não preservado na preparação"}${item.unit ? " · " + item.unit : ""} · ${item.result === "confirmed" ? "Confirmado" : "Diferença apontada"} · ${item.forwarding === "none" ? item.result === "difference" ? "Encaminhamento ainda não escolhido" : "Sem encaminhamento adicional" : item.forwarding === "recount" ? "Reconto indicado" : "Ajuste autorizado indicado"}${item.comment ? " · " + item.comment : ""}`;
+      }
       if (key === "receiptId")
         return (
           content.fields.receiptLabel ||
@@ -599,7 +607,7 @@ function DraftFieldsSummary({
               <div key={key}>
                 <dt>
                   {labels[key] ??
-                    (key.endsWith(":receivedQuantity")
+                    (kind === "BAL" && key.startsWith("item:") ? "Parecer individual do material" : key.endsWith(":receivedQuantity")
                       ? name(key.slice(0, -17)) +
                         " · recebimento físico apurado"
                       : key.endsWith(":returnedQuantity")

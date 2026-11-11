@@ -167,7 +167,7 @@ test("a count approved while its formal recount is pending remains executable an
     source = await rpc(supervisor.client, "operational_document", {
       p_id: f.document.id,
     });
-  const approved = await rpc(supervisor.client, "supply_document_command", {
+  const reviewed = await rpc(supervisor.client, "supply_document_command", {
     p_id: f.document.id,
     p_action: "approve",
     p_body: {
@@ -177,6 +177,11 @@ test("a count approved while its formal recount is pending remains executable an
     },
     p_key: randomUUID(),
     p_version: source.version,
+  });
+  assert.equal(reviewed.status, "submitted");
+  const approved = await rpc(supervisor.client, "supply_document_command", {
+    p_id: reviewed.id, p_action: "apply_balance", p_body: { group: "supervisor", reviewReference: reviewed.balanceReview.referenceHash },
+    p_key: randomUUID(), p_version: reviewed.version,
   });
   assert.equal(approved.status, "approved");
   const before = JSON.parse(recountState(f)),

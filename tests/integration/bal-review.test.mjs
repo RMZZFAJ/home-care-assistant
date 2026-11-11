@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import {
   legacyBalance,
   balCommand,
+  balApply,
   balState,
   rpc,
   actor,
@@ -85,7 +86,7 @@ test("BAL review rows enforce live patient read authority, immutable history and
   );
 });
 
-test("a later stock movement blocks pending reconciliation but permits an explicit historical optional opinion without another adjustment", async () => {
+test("a later stock movement permits a historical opinion under either policy but blocks its application", async () => {
   for (const policy of ["required", "optional"]) {
     const f = await legacyBalance({ policy, quantity: "1" });
     await receiveBalanceMaterials(f);
@@ -100,17 +101,13 @@ test("a later stock movement blocks pending reconciliation but permits an explic
         "Parecer sobre a contagem preservada, sem validar estoque posterior.",
       reviewReference: data.balanceReview.referenceHash,
     });
-    if (policy === "required") {
-      assert.equal(result.error?.code, "PT409");
-      assert.equal(balState(data.id), before);
-    } else {
       assert.ifError(result.error);
       assert.equal(
         result.data.balanceReview.reviews[0].reference_state,
         "historical",
       );
       assert.deepEqual(JSON.parse(balState(data.id)).ledger, ledger);
-    }
+    if (policy === "required") assert.equal((await balApply(family, result.data)).error?.code, "PT409");
   }
 });
 
@@ -128,7 +125,8 @@ test("a distinct family reviewer records an independent comment without replacin
     reviewReference: context.referenceHash,
   });
   assert.ifError(response.error);
-  assert.equal(response.data.status, "approved");
+  assert.equal(response.data.status, "submitted");
+  assert.equal(response.data.balanceReview.reviewSatisfied, true);
   assert.equal(response.data.payload.notes, f.payload.notes);
   assert.equal(response.data.balanceReview.reviews.length, 1);
   assert.equal(
@@ -285,7 +283,7 @@ for (const wait of ["stock", "profile"]) {
   );
 }
 
-test("concurrent reviews cannot reconcile the same count twice", async () => {
+test("concurrent reviews never reconcile and separate concurrent applications cannot apply the same count twice", async () => {
   const f = await legacyBalance({ quantity: "1" }),
     family = await actor("family", f.patient),
     peer = await actor("global", f.patient);
@@ -315,8 +313,15 @@ test("concurrent reviews cannot reconcile the same count twice", async () => {
     sql(
       `select count(*) from public.stock_movements where reference_type='bal' and reference_id=${sqlLiteral(a.id)};`,
     ),
-    "2",
+    "0",
   );
+  const own = await rpc(family, "operational_document", { p_id: a.id });
+  const other = await rpc(peer, "operational_document", { p_id: a.id });
+  const applications = await Promise.all([balApply(family, own), balApply(peer, other)]);
+  assert.equal(applications.filter(r => !r.error).length, 1);
+  assert.equal(applications.find(r => r.error).error.code, "PT409");
+  assert.equal(sql(`select count(*) from public.stock_movements where reference_type='bal' and reference_id=${sqlLiteral(a.id)}`), "2");
+  assert.equal(sql(`select count(*) from private.balance_applications where document_id=${sqlLiteral(a.id)}`), "1");
 });
 
 test("recount preserves first authors and invalidates old review eligibility instead of confusing creator with counter", async () => {
@@ -368,7 +373,10 @@ test("recount preserves first authors and invalidates old review eligibility ins
     comment: "Parecer independente da segunda contagem.",
   });
   assert.ifError(approved.error);
-  assert.equal(approved.data.status, "approved");
+  assert.equal(approved.data.status, "submitted");
+  const applied = await balApply(supervisor.client, approved.data, "supervisor");
+  assert.ifError(applied.error);
+  assert.equal(applied.data.status, "approved");
   assert.equal(approved.data.payload.notes, payload.notes);
   assert.equal(approved.data.balanceReview.reviews.length, 3);
 });

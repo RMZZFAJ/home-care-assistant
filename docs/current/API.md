@@ -25,6 +25,15 @@ recupera a mesma intenção; mudança de seletor documental conflita. Cada nova
 chave explícita cria outra emissão, sem alterar documento, SCI ou estoque.
 Resposta200 exige ready;202 representa processamento ainda não concluído.
 
+A reserva atual usa reserve_pdf_issuance_v11: BAL novo recebe revisão11; outros
+tipos recebem10. Além da fonte canônica preservada, balanceApplication congela
+o ato correspondente à contagem e ao corte de versão escolhidos. not_applied,
+unavailable e applied com linhas known/restricted são distintos; quantidade
+restrita é null e não transporta o valor. Perda de stock.team.read impede
+retornar snapshot ou baixar emissão anterior com saldo known, inclusive por
+entradas antigas que recuperam a mesma intenção. Pode ser emitido outro exemplar
+mascarado. Ganho de acesso não altera o mascaramento já congelado.
+
 A orquestração obtém claim de serviço com lease de cinco minutos e token
 aleatório que nunca vai ao navegador. Composição/oráculo precedem assinatura
 PAdES-B-T e verificação. Upload usa caminho exclusivo e upsert=false. Read-back
@@ -374,15 +383,34 @@ obrigatórios e não existe ficha de abastecimento externo.
 Comandos incluem approve, purchase, receive, validate_receipt, reject_receipt,
 close_expectation, reassign, resolve, cancel e consent_cancel, conforme tipo
 e estado.
-BAL approve aceita group family/supervisor, comment opcional com até 2.000
+BAL approve aceita group family/supervisor, comment opcional com até2.000
 unidades UTF-16 e reviewReference SHA-256 da referência retornada pelo banco.
+items opcional declara somente materiais examinados:lineId,result
+confirmed/difference,forwarding none/recount/adjustment e comment até500 UTF-16.
+Não examinado é omissão; diferença exige encaminhamento próprio. Não aceita
+quantidade, autoria escolhida ou alteração de notas da contagem. A opinião
+nova é marcada opinionOnly e nunca aplica estoque. Registros antigos mantêm
+sua proveniência. Parecer sobre referência histórica não valida saldo atual.
+Hash/versão obsoletos exigem consulta e adoção explícita da referência.
 O contrato antigo com somente group continua aceito; a UI envia a referência
-e expectedVersion. balanceReview retorna contador efetivo, contagem, pareceres,
-observações originais e grupos elegíveis para o ator. Referência obsoleta
-produz VERSION_CONFLICT; contagem sem autoria comprovável exige reconto.
-Recuperação da própria intenção confirmada exige bal.read vigente; uma nova
-revisão exige também papel/capacidade efetivos, pessoa distinta e paciente ativo.
-Não recebe contador ou autoria escolhidos pelo cliente e não sobrescreve notas.
+e expectedVersion. balanceReview distingue reviewSatisfied,hasItemDifferences,
+applicationGroups e application, além de contador, contagem e pareceres.
+
+BAL apply_balance exige idempotencyKey,expectedVersion e body com group e
+reviewReference. Requer revisões previstas, grupo/pessoa autorizados distintos
+do contador, paciente ativo, referência atual e ausência de diferença apontada.
+Tem evento bal.apply e efeito próprios. A contagem facultativa mantém a aplicação
+nativa; seu parecer posterior não repete esse efeito. Valores após aplicação
+ficam em tabela privada e retornam mascarados conforme stock.team.read.
+
+GET /api/balances/application recebe careRecipientId,documentId,idempotencyKey,
+expectedVersion,group e reviewReference. Exige bal.read e escopo exato antes da
+consulta bloqueada balance_application_result. found identifica evento, versão
+e aplicação da própria tentativa. not_found não confirma efeito; obsolete só
+é retornado quando a versão observada antes da consulta já impede um futuro
+commit daquela intenção. Consulta não cria ou repete movimento. Reenvio exige
+ato explícito, mesma chave e corpo. A recuperação por leitura permite perda de
+escrita, nunca perda de bal.read; saldos respeitam a permissão atual.
 
 ENT receive exige divergences, mesmo vazio. Linhas não selecionadas são
 integralmente aceitas; acceptedQuantity positiva parcial credita o destino.

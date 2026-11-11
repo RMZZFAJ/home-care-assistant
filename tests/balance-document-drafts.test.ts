@@ -203,7 +203,7 @@ describe("BAL document preparations preserve physical authorship and own incompl
     ])
       expect(() => parseBalancePreparation({ data: changed }, scope)).toThrow();
   });
-  it("allows optional historical review without revalidating current stock and blocks stale submitted reconciliation", () => {
+  it("allows historical opinions without granting a reconciliation or bypassing group eligibility", () => {
     const ref = source();
     expect(balanceDocumentAvailable(ref, "review_family")).toBe(true);
     expect(
@@ -211,7 +211,7 @@ describe("BAL document preparations preserve physical authorship and own incompl
         { ...ref, status: "submitted" },
         "review_family",
       ),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       balanceDocumentAvailable(
         { ...ref, review: { ...ref.review!, eligibleGroups: [] } },
@@ -277,6 +277,7 @@ describe("BAL document preparations preserve physical authorship and own incompl
       group: "family",
       comment: content.fields.comment,
       reviewReference: content.fields.referenceHash,
+      items: [],
     });
     expect(
       balanceDocumentDecisionSchema.safeParse({

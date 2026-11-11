@@ -44,17 +44,16 @@ As etapas 01 a 07 estão concluídas localmente em seus escopos anteriores. A et
 visual do sistema inteiro permanece estimada em 85%; restam outras 20
 composições e a conferência completa das 171 relações.
 
-**Trabalho atual:** DOC-B, começando pela separação entre parecer BAL e
-aplicação ao estoque. A mudança está em implementação e testes locais; ainda
-não foi concluída nem publicada no banco remoto. Não foi atribuído novo
-percentual por esse início. A ordem completa do trabalho restante está somente
-na seção 5, ao final.
+**Trabalho atual:** DOC-B, no BAL. Parecer por material, aplicação separada ao
+estoque, recuperação após resposta perdida e saldo no PDF foram implementados
+e conferidos. Falta vincular e mostrar o resultado das correções posteriores de
+cada diferença. O complemento DOC-B passa de 10% para aproximadamente 20%; ele
+continua parcial. A ordem restante está somente na seção 5, ao final.
 
-O banco remoto recebeu todas as atualizações publicadas até este ponto.
-Atualizações novas continuam sob responsabilidade de Codex. A validação
-automática da última versão publicada ainda estava em andamento na última
-consulta; o resultado local não aprova o conjunto inteiro. Sonar permanece
-adiado por sua decisão.
+O banco remoto recebeu as cinco atualizações deste lote e está sincronizado.
+As verificações locais do lote passaram. A validação automática do commit
+publicado continua sendo um gate separado. Sonar permanece adiado por sua
+decisão.
 
 Os grupos abaixo reúnem o estado dos recursos. A seção final reúne o histórico
 das etapas, seus pontos de verificação e uma única sequência de execução.
@@ -312,17 +311,21 @@ não transforma os quatro resultados novos em concluídos.
   Source Sans 3, cores, bandeira lateral quando aplicável, autores, macroetapas,
   tabelas, observações e avisos completos. Conteúdo longo continuará em novas
   páginas com cabeçalhos e rodapés legíveis. Responsável: Codex.
-- **DOC-B — Fatos, saldos e atos específicos.** Em execução · 10% do acréscimo.
-  Na preparação bilateral, entrega e devolução têm nomes próprios. A devolução
-  pode ser registrada sem vincular entrega de origem; concordância, expedição e
-  recebimento foram conferidos separadamente. Restam as outras telas, o ajuste
-  da criação cotidiana ENT e as novas regras dos arquivos abaixo. Mostrar saldo
-  histórico de cada material da COM após sua última entrada validada, parcelas
-  separadas e saldo do BAL após a aplicação correspondente. Revisão não altera
-  estoque. Mostrar Acesso restrito quando necessário. Devolução é autônoma e não
-  exige entrega de origem. Conteúdo emitido, ciências anteriores e atos de
-  cancelamento/complemento serão preservados; o cancelamento terá seu aviso e
-  pedido de confirmação próprios. Responsável: Codex.
+- **DOC-B — Fatos, saldos e atos específicos.** Em execução · ≈20% do acréscimo.
+  No BAL, o parecer por material e a aplicação ao estoque agora são atos
+  separados. A aplicação tem confirmação, autoria e momento próprios; uma
+  resposta perdida pode ser recuperada sem repetir movimentos. O PDF mostra o
+  saldo daquela aplicação, com seu momento, ou Acesso restrito. Movimentos
+  posteriores não substituem esse saldo. **Falta no BAL:** vincular as correções
+  posteriores das diferenças e mostrar momento e resultado de cada ato.
+  Na preparação bilateral, entrega e devolução já têm nomes próprios; a
+  devolução não exige entrega de origem, e concordância, expedição e recebimento
+  foram conferidos separadamente. **Restante:** concluir as outras telas e a
+  criação cotidiana de devolução autônoma; mostrar saldo histórico de cada
+  material da COM após sua última entrada validada, com data e parcelas
+  separadas; preservar conteúdo emitido e ciências anteriores em cancelamentos
+  e complementos vinculados, com aviso e pedido de confirmação próprios do
+  cancelamento. Responsável: Codex.
 - **DOC-C — Modalidades, Andamentos e consulta.** A iniciar · 0% do acréscimo.
   Ficha completa; Ficha Ampliada com complementos e período; auditoria restrita
   com marca nominativa. Andamentos terão menções a pessoas, referências e
@@ -876,11 +879,12 @@ outra missão nem substituir as 20 etapas. Depois seguem os blocos ainda abertos
 abaixo. As atividades externas continuam separadas e podem ser preparadas em
 paralelo quando independentes.
 
-**Agora — DOC-B · 10%, começando pelo BAL.** Separar parecer e estoque; depois
-saldo histórico autorizado da COM, devolução autônoma cotidiana e preservação de
-fichas com cancelamento/complemento e confirmações próprias. A mudança do BAL
-está em implementação e testes locais, ainda sem conclusão nem publicação no
-banco remoto.
+**Agora — DOC-B · ≈20%, terminando as regras do BAL.** Vincular correções
+posteriores de cada diferença e mostrar momento/resultado sem alterar a
+contagem anterior. Parecer, aplicação própria, recuperação e saldo do BAL no
+exemplar já foram implementados e conferidos. Depois seguem saldo histórico
+autorizado da COM, devolução autônoma cotidiana e preservação de fichas com
+cancelamento/complemento e confirmações próprias.
 
 **Depois — DOC-A · 0%.** Composição documental compartilhada; requisição;
 compra/doação; entrega/devolução; BAL; conteúdo longo.

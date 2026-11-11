@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { balanceApplicationBody } from "./balance-application";
+import { balanceReviewItems } from "./balance-review-items";
 import { quantity } from "@/lib/quantity";
 import { exactQuantity } from "./exact-quantity";
 export { exactQuantity } from "./exact-quantity";
@@ -171,6 +173,7 @@ export const supplyCommandSchema = z
     action: z.enum([
       "submit",
       "approve",
+      "apply_balance",
       "purchase",
       "receive",
       "validate_receipt",
@@ -229,6 +232,7 @@ export const supplyCommandSchema = z
         })
         .strict(),
       submit: z.object({}).strict(),
+      apply_balance: balanceApplicationBody,
       approve: z.union([
         z.object({ lines: commandLines, reason: reason.optional() }).strict(),
         z
@@ -246,6 +250,7 @@ export const supplyCommandSchema = z
               .string()
               .regex(/^[0-9a-f]{64}$/)
               .optional(),
+            items: balanceReviewItems.optional(),
           })
           .strict(),
       ]),

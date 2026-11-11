@@ -8,6 +8,8 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Etapas fixas vinculadas aos critérios originais](EXECUTION_STAGES.csv).
 - [Complemento aprovado de fichas e PDFs](../../../documents/01_COMANDO_COMPLEMENTAR_PDFS.md):
   quatro resultados adicionais, sem reinício da missão ou dos 105 critérios.
+- [Parecer BAL, aplicação própria e saldo no exemplar](BAL_REVIEW_APPLICATION.md):
+  núcleo implementado; correções posteriores e restante DOC-B ainda pendentes.
 - [Consultas de estoque e revisão BAL conferidas](STOCK_READ_VALIDATION.md).
 - [Continuidade de alertas, destinatários e vínculos](ADMINISTRATIVE_PREPARATIONS.md).
 
