@@ -49,7 +49,7 @@ test("consumo recupera a própria confirmação após perder escrita, mas nova d
   const f = await setup(),
     id = await seedReport(f);
   await login(page, f.patient, "adminA");
-  await page.goto("/consumo?ref=" + id);
+  await page.goto(`/consumo?careRecipientId=${f.patient}&ref=${id}&refKind=report`);
   await detail(page)
     .getByRole("button", { name: "Conferir consumo", exact: true })
     .click();
@@ -133,6 +133,33 @@ test("consumo recupera a própria confirmação após perder escrita, mas nova d
       await page.request.post("/api/consumption", { data: attempts[0].command })
     ).status(),
   ).toBe(403);
+  const denied = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === `/api/consumption/${id}` &&
+      response.request().method() === "GET" &&
+      response.status() === 403,
+  );
+  await detail(page)
+    .getByRole("button", { name: "Atualizar relato", exact: true })
+    .click();
+  await denied;
+  await expect(
+    detail(page).getByRole("heading", {
+      name: "Relato original · versão 1",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await expect(
+    detail(page).getByText(
+      "Consumo confirmado: 1 unidade descontado da família.",
+      { exact: true },
+    ),
+  ).toHaveCount(0);
+  expect(
+    sql(
+      `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`,
+    ),
+  ).toBe(before);
 });
 test("consumo recupera complemento próprio já conferido por outra pessoa sem reabrir o relato ou repetir movimentos", async ({
   page,

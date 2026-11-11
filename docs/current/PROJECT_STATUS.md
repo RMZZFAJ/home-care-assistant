@@ -4,7 +4,22 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.66
+## Incremento atual D3.67
+
+O consumo identifica relato, complemento, decisão e origem dos descontos,
+sem tratar falta ou rejeição como baixa. Atualização/falha marca a consulta
+anterior e suspende novas operações. Uma leitura antiga não apaga complemento
+nem reabre uma confirmação da mesma versão; resposta de outro relato é recusada.
+Passaram13 unitários/API e27 cenários distintos de navegador nos três perfis,
+mais três repetições após retirar a mensagem anterior na recusa de leitura.
+As30 execuções passaram. Os consumidores de resposta perdida, concorrência,
+duas sessões e recuperação privada após inativação foram preservados.
+Tipos, lint e inspeção a320px passaram. Sem SQL novo; dry-run remoto vazio.
+Ponto04.5 qualificado localmente no escopo declarado; próximo04.6, BAL.
+CI própria e demais gates permanecem necessários.
+[Implementação e limites](../audits/D/D-B/CONSUMPTION_DRAFTS.md).
+
+## Incremento anterior D3.66
 
 Entrega e devolução têm identificação própria na preparação bilateral e na
 ficha correspondente. O vínculo documental de origem é opcional, sem exigir

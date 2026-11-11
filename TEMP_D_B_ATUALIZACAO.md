@@ -35,8 +35,8 @@ A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03 e 07 estão concluídas localmente.
-A etapa 04 tem seis pontos. Os pontos 04.1 a 04.4 estão concluídos localmente
-no escopo declarado; o próximo é 04.5, consumo.
+A etapa 04 tem seis pontos. Os pontos 04.1 a 04.5 estão concluídos localmente
+no escopo declarado; o próximo é 04.6, balanço de estoque.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -666,7 +666,7 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    falhas preservam a leitura anterior e o preenchimento físico.
    Responsável — Codex.
 
-4. **04 — Estados e vínculos das fichas.** Em execução · 80%.
+4. **04 — Estados e vínculos das fichas.** Em execução · 85%.
 
    Para concluir — As seis verificações detalhadas abaixo estão fechadas,
    incluindo
@@ -784,8 +784,8 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
 
 ### Próxima etapa — 04, estados e vínculos das fichas
 
-Os pontos 04.1 a 04.4 estão concluídos no escopo declarado. Restam os pontos
-04.5 e 04.6. Cada um terá seu próprio fechamento. As novas
+Os pontos 04.1 a 04.5 estão concluídos no escopo declarado. Resta o ponto
+04.6, com seu próprio fechamento. As novas
 regras documentais estão identificadas em DOC-A a DOC-D.
 
 - **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.**
@@ -816,7 +816,12 @@ regras documentais estão identificadas em DOC-A a DOC-D.
   telas e os novos arquivos de devolução continuam em DOC-B/DOC-D.
   Responsável — Codex.
 - **04.5 — Consumo — relato, complemento, decisão e origem do desconto.**
-  Implementado; conferência conjunta pendente. Responsável — Codex.
+  Concluído localmente · 100% deste ponto. Uma leitura antiga não apaga
+  complemento nem reabre uma confirmação. Durante atualização ou falha, a
+  leitura anterior fica identificada e novas operações aguardam consulta
+  válida. Origem do desconto, falta/rejeição sem baixa, original preservado
+  e recuperação após perda de resposta ou permissão foram conferidos.
+  Responsável — Codex.
 - **04.6 — BAL — agendado, sem regime, revisão, reconto e contagens.**
   Implementado; conferência conjunta pendente. Responsável — Codex.
 

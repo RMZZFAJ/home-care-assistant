@@ -704,5 +704,95 @@
     "noRuntimeSourceChange": true,
     "databaseDefinitionsAndAppliedStatementsUnchanged": true,
     "functionalRetestRequired": false
+  },
+  "D3.67": {
+    "baseSha": "5350fd5d9d702493104623046e8e8be48607736b",
+    "scope": "Fixed04.5:consumption report,supplement,custody decision,shortage/rejection and movement origin;read ordering and readiness",
+    "unitApi": {
+      "distinctPassed": 13,
+      "files": [
+        "tests/consumption-follow-up.test.ts",
+        "tests/api/consumption-contract.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "cohort": {
+        "startTime": "2026-11-11T06:29:18.124Z",
+        "duration": 277484.11100000003,
+        "expected": 27,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "readDenialFinal": {
+        "startTime": "2026-11-11T07:01:24.542Z",
+        "duration": 55005.443,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 27,
+      "executions": 30,
+      "failures": 0,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "reports": [
+        "output/phase-d-work/ui-canonical/consumption-follow-up-qualified.json",
+        "output/phase-d-work/ui-canonical/consumption-follow-up-read-denial-final.json"
+      ]
+    },
+    "qualification": "Initial27cases pass with frozen sources.Final source change only clears the prior success message with denied operational read;repeated own-response-recovery case with new real403 assertions and canonical explicit reference in all3profiles.Then formatting only of that existing test.No behavioral assertions removed;old automatic-reference consumers remain in the cohort.",
+    "proofs": [
+      "Real Auth in both FAMILY and CARE_TEAM;native textual report→supplementv2→confirmedv2;decision closes the same version",
+      "Independent SQL:original body,lines,author and time unchanged;one exact2.000000 movement from correct custody to NULL;no effect from supplement or GETs",
+      "Native older GET snapshots:v1 cannot erase v2 complement;pendingv2 cannot reopen confirmedv2 or discard its decision",
+      "Delayed read and503 identify last confirmed data,suspend next-operation controls and recover without official POST",
+      "HTTP200 for another report refused before presentation;actual stock.family.read revocation produces403 and hides operational data",
+      "After lost-response recovery,real read denial also removes prior success text;no new decision or stock effect",
+      "Original response-loss,concurrent complement,explicit newer review,second-session,shortage/rejection and inactive private-recovery consumers pass",
+      "Unknown custody not inferred as CARE_TEAM;confirmed report without movement data not described as zero debit"
+    ],
+    "validation": {
+      "typecheck": "PASS",
+      "directedEslint": "PASS",
+      "axeOverflow": "320px both custodians across3profiles",
+      "visual": "FAMILY Chromium320 follow-up screenshot inspected;not whole-system or physical-device approval",
+      "reactReview": "shared FeedbackBanner;derived guidance;scoped functional read merge;no new dependency,request or authority",
+      "postBrowserChange": "formatting only of added assertions in existing consumption.spec.ts"
+    },
+    "remote": {
+      "project": "qwfrqychokvhdzakibid",
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "completedCheckpoints": [
+        "04.1",
+        "04.2",
+        "04.3",
+        "04.4",
+        "04.5"
+      ],
+      "nextCheckpoint": "04.6"
+    },
+    "limits": [
+      "Own published SHA CI required;earlier SHA not approval",
+      "04.6 BAL and joint validation remain",
+      "DOC-B stays10percent;DOC-A/C/D unimplemented;new PDF appearance and document rules not qualified here",
+      "No new migration,external delivery,merge,production release or security relaxation",
+      "Human,physical-device,provider and operational gates distinct",
+      "Sonar deferred by owner"
+    ]
   }
 }

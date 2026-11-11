@@ -1,5 +1,63 @@
 # D3.47 — preenchimentos privados de consumo
 
+## D3.67 — acompanhamento operacional e leitura preservada
+
+Base5350fd5. O ponto fixo04.5 distingue relato textual, complemento com
+materiais, conferência de consumo por custódia, falta conferida, rejeição e
+movimentos efetivos da confirmação. A faixa usa FeedbackBanner do modelo
+canônico. Relato e complemento não debitam estoque; falta e rejeição não
+recebem descrição de consumo descontado. Os movimentos conservam quantidade,
+unidade e origem próprias, sem presumir Equipe quando a custódia é desconhecida.
+
+O detalhe mantinha botões oficiais durante a atualização e não identificava
+a leitura anterior. Uma resposta antiga podia sobrescrever uma confirmação
+recebida, pois a decisão fecha a versão existente sem incrementar o número.
+Agora atualização/falha suspendem a orientação e as novas operações, com dados
+anteriores explicitamente identificados. A referência consultada deve
+corresponder ao relato, paciente, versão nativa válida e estado conhecido.
+Uma consulta de
+versão inferior não apaga complemento, e um relato já encerrado não reabre
+pela chegada de um snapshot anterior. Uma decisão preservada conserva sua
+autoria e não vira outra decisão por essa ordenação de leitura.
+
+A consulta recusada retira os dados operacionais e a mensagem de confirmação
+anterior. Os controles privados e a
+recuperação própria, inclusive após inativação, mantêm o processo existente.
+Durante uma operação aberta, a orientação não apresenta sua versão de trabalho
+como nova providência atual. Não há novo endpoint, comando, armazenamento local,
+replay automático, migration ou alteração de autorização.
+
+Passaram13 unitários/de contrato, tipos e lint dirigido. A coorte de produção
+passou27 cenários nos três perfis, sem falhas ou fontes alteradas durante a
+execução. Após corrigir a mensagem anterior na recusa de leitura, o caso de
+recuperação própria passou novamente nos três perfis:30 execuções,27 cenários
+distintos, sem falhas. O caso usa a referência explícita da lista, conserva
+as contraprovas anteriores e verifica a remoção da mensagem junto do relato.
+Depois, somente sua formatação foi ajustada. Os casos novos usam Auth real,
+API e banco local guardado.
+As duas custódias percorrem relato textual, complemento e decisão, com versões
+e origem dos movimentos verificadas por SQL independente. Complementar não
+altera o ledger; confirmar gera exatamente um desconto de2 unidades da custódia
+correta. O texto, os materiais e a autoria do original permanecem intactos.
+
+Snapshots nativos anteriores foram reapresentados por GET controlado: v1 não
+substitui complemento v2, e v2 pendente não reabre v2 já confirmada. A consulta
+é repetida sem POST, nova decisão ou débito. Delay/falha503 suspendem operações
+e identificam a leitura preservada; uma resposta200 de outro relato é recusada
+antes de exibir seus dados. A perda real de stock.family.read produz403 e retira
+o conteúdo operacional, sem alterar fatos de consumo ou movimentos.
+
+Os consumidores anteriores passaram com seus oráculos preservados: duas
+sessões, confirmação/complemento após resposta perdida, conflito que exige
+nova revisão, falta/rejeição sem baixa e recuperação privada depois de perder
+escrita e inativar o paciente. A inspeção visual e axe/overflow a320px nas duas
+custódias passaram. Não é aceite de aparelho real ou de toda a aparência.
+Sem SQL novo; dry-run remoto vazio em205. Ponto04.5 qualificado localmente no
+escopo declarado; próximo04.6, BAL. CI própria necessária. Os complementos
+documentais, a simplificação de rascunhos e os demais gates permanecem pendentes.
+
+## D3.47 — escopo anterior preservado
+
 Base14fdd28. Incremento de relatos familiares/equipe,complementos,aceite e
 recusa. O recurso é o paciente no relato novo ou o relato real nos outros
 três atos. Tipo CONSUMPTION,sem documento,protocolo ou movimento fictício.

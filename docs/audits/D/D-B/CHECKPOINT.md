@@ -1,5 +1,20 @@
 # Checkpoint D-B
 
+D3.67 fechou localmente o ponto fixo04.5. O consumo distingue relato textual,
+complemento, decisão, falta/rejeição sem baixa e origem dos movimentos.
+Atualização/falha identifica a leitura anterior e suspende novas operações.
+Uma resposta antiga não apaga complemento nem reabre decisão da mesma versão;
+alvo/paciente incorretos são recusados e perda de leitura retira os dados.
+Passaram13 unitários/API e27 cenários distintos de produção nos três perfis.
+Três repetições dirigidas confirmaram a remoção da mensagem anterior após
+recusa real de leitura:30 execuções sem falhas. Tipos, lint e inspeção
+visual/axe a320px passaram. Original
+preservado, desconto único e recuperações anteriores conferidos com Auth real
+e SQL independente. Sem SQL novo; dry-run remoto vazio em205.
+04.1–04.5 qualificados; próximo04.6, BAL. Matriz56 PASS locais/49 PARTIAL,
+complementos documentais e gates gerais preservados. CI própria necessária.
+[Dossiê](CONSUMPTION_DRAFTS.md) e [resultados](CONSUMPTION_DRAFTS_VALIDATION.json).
+
 D3.66 fechou localmente o ponto fixo04.4 no escopo declarado. A preparação
 bilateral distingue entrega e devolução, com vínculo documental opcional.
 Declaração/concordância não aparecem como expedição ou recebimento. Depois

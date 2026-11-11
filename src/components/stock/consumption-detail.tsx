@@ -1,5 +1,6 @@
 "use client";
 import { ActionButton } from "@/components/ui/controls";
+import { FeedbackBanner } from "@/components/ui/feedback";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -19,6 +20,7 @@ import { ConsumptionPrivateResults } from "./consumption-private-results";
 import { ConsumptionLines } from "./consumption-lines";
 import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDecision } from "./consumption-decision";
+import { consumptionFollowUp, consumptionLocationLabel, consumptionReadStampMatches, mergeConsumptionRead } from "@/lib/consumption/follow-up";
 
 export function ConsumptionDetail({
   id,
@@ -42,7 +44,8 @@ export function ConsumptionDetail({
   const [data, setData] = useState<ConsumptionReport | null>(null),
     [error, setError] = useState(""),
     [attempt, setAttempt] = useState(0),
-    [message, setMessage] = useState("");
+    [message, setMessage] = useState(""),
+    [reading, setReading] = useState(true);
   const [editor, setEditor] = useState<HTMLElement | null>(null),
     [decision, setDecision] = useState<{
       report: ConsumptionReport;
@@ -53,6 +56,9 @@ export function ConsumptionDetail({
     firstFocusRef = useRef(false);
   useEffect(() => {
     const controller = new AbortController();
+    queueMicrotask(() => {
+      if (!controller.signal.aborted) setReading(true);
+    });
     api<{ data: ConsumptionReport }>(
       "/api/consumption/" + id,
       undefined,
@@ -60,11 +66,11 @@ export function ConsumptionDetail({
     )
       .then((result) => {
         if (controller.signal.aborted) return;
-        if (result.data.care_recipient_id !== context.patient!.id)
+        if (!consumptionReadStampMatches(result.data, id, context.patient!.id))
           throw new Error(
-            "A referência pertence a outro contexto. Selecione o paciente autorizado.",
+            "A consulta não corresponde ao relato, paciente ou versão esperados. Atualize o relato.",
           );
-        setData(result.data);
+        setData(current => mergeConsumptionRead(current, result.data));
         setError("");
         if (!firstFocusRef.current) {
           firstFocusRef.current = true;
@@ -73,21 +79,26 @@ export function ConsumptionDetail({
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {
-          setError(reason.message);
+          setError(reason instanceof Error ? reason.message : "Não foi possível consultar o relato.");
           if (
             reason instanceof ApiError &&
             [401, 403, 404].includes(reason.status)
           ) {
             setData(null);
+            setMessage("");
             setEditor(null);
             setDecision(null);
           }
         }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setReading(false);
       });
     return () => controller.abort();
   }, [id, context.patient, attempt, live]);
   function saved(result: ConsumptionReport, action: "supplement" | "decision") {
     setData(result);
+    setReading(false);
     setEditor(null);
     setDecision(null);
     setError("");
@@ -107,6 +118,7 @@ export function ConsumptionDetail({
   }
   const decide =
     data &&
+    !reading &&
     !error &&
     can(
       context,
@@ -116,10 +128,12 @@ export function ConsumptionDetail({
     );
   const supplement =
     data &&
+    !reading &&
     !error &&
     can(context, "consumption.report") &&
     (data.location !== "FAMILY" ||
       ["admin", "family"].includes(context.patient!.role));
+  const followUp = data ? consumptionFollowUp(data) : null;
   return (
     <section className="ui-card space-y-4" aria-label="Detalhe do relato">
       <div className="hca-toolbar">
@@ -127,7 +141,7 @@ export function ConsumptionDetail({
           Relato e conferência
         </h2>
         <ActionButton onClick={onClose}>Voltar à lista</ActionButton>
-        <ActionButton onClick={() => setAttempt((value) => value + 1)}>
+        <ActionButton onClick={() => { setReading(true); setAttempt((value) => value + 1); }}>
           Atualizar relato
         </ActionButton>
       </div>
@@ -154,7 +168,7 @@ export function ConsumptionDetail({
             {data.kind === "shortage"
               ? "Falta de material"
               : "Consumo extraordinário"}{" "}
-            · {data.location === "FAMILY" ? "Família" : "Equipe"} ·{" "}
+            · {consumptionLocationLabel(data.location)} ·{" "}
             {data.status === "reported"
               ? "Aguardando conferência"
               : data.status === "confirmed"
@@ -162,6 +176,11 @@ export function ConsumptionDetail({
                 : "Rejeitado"}{" "}
             · versão {data.version}
           </p>
+          {reading || error ? (
+            <p className="text-sm text-(--muted)">
+              Última consulta confirmada; os dados preservados não representam uma nova atualização.
+            </p>
+          ) : null}
           <p className="text-xs break-all">Referência: {data.id}</p>
           {data.source_reminder_id ? (
             <Link
@@ -206,14 +225,18 @@ export function ConsumptionDetail({
               <ConsumptionLines lines={revision.lines} />
             </section>
           ))}
+          <section aria-label="Acompanhamento do relato">
+            {reading || error ? <Notice>
+              {reading ? "Atualizando o acompanhamento do relato…" : "O acompanhamento atual não foi confirmado. Atualize o relato antes de iniciar uma operação."}
+            </Notice> : editor || decision ? <Notice>
+              Sua operação está preservada na versão de trabalho. Conclua ou feche a operação para consultar a próxima providência atual.
+            </Notice> : <FeedbackBanner tone={followUp?.pending ? "warning" : "info"}>
+              <h3 className="font-semibold">{followUp?.heading}</h3>
+              <p className="my-2 text-sm">{followUp?.description}</p>
+            </FeedbackBanner>}
+          </section>
           {data.status === "reported" ? (
             <section>
-              <h3 className="font-semibold">Próximo passo</h3>
-              <p className="my-2 text-sm">
-                {data.kind === "consumption" && !data.current_lines.length
-                  ? "Inclua materiais e quantidades num complemento. Depois, um responsável pela custódia poderá confirmar o consumo."
-                  : "A estrutura desta versão aguarda decisão de um responsável autorizado pela custódia. Relato e complemento não descontam estoque."}
-              </p>
               <div className="hca-toolbar">
                 {supplement ? (
                   <ActionButton
@@ -290,7 +313,7 @@ export function ConsumptionDetail({
                       )?.unit,
                     )}{" "}
                     · saída de{" "}
-                    {movement.source === "FAMILY" ? "Família" : "Equipe"} ·{" "}
+                    {consumptionLocationLabel(movement.source)} ·{" "}
                     {formatBrazilDate(movement.createdAt)}
                     <details className="mt-2">
                       <summary>Referência do movimento</summary>
